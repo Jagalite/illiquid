@@ -13,7 +13,27 @@ ILLIQUID_VERIFY_SDK_ONLY=1 python3 Scripts/install-ci-native-sdk.py
 Scripts/build-local-dmg.sh --adhoc
 revision=$(git rev-parse HEAD)
 git archive --format=tar.gz --prefix="Illiquid-$version/" HEAD > "dist/Illiquid-$version-source.tar.gz"
-COPYFILE_DISABLE=1 tar -czf "dist/Illiquid-$version-dependency-sources.tar.gz" DependencySources
+# Normalize archive ownership/timestamps and include only committed source inputs.
+python3 - "dist/Illiquid-$version-dependency-sources.tar.gz" <<'PY_ARCHIVE'
+import gzip
+import subprocess
+import sys
+import tarfile
+
+def normalize(info):
+    info.uid = info.gid = 0
+    info.uname = info.gname = ''
+    info.mtime = 0
+    info.pax_headers = {}
+    return info
+
+files = subprocess.check_output(['git', 'ls-files', '-z', '--', 'DependencySources']).decode().split('\0')
+with open(sys.argv[1], 'wb') as output:
+    with gzip.GzipFile(filename='', mode='wb', fileobj=output, mtime=0) as compressed:
+        with tarfile.open(fileobj=compressed, mode='w') as archive:
+            for name in sorted(filter(None, files)):
+                archive.add(name, recursive=False, filter=normalize)
+PY_ARCHIVE
 cp dist/Illiquid.app/Contents/Resources/NativeDependencyProvenance.json dist/build-provenance.json
 python3 - "$revision" <<'PY'
 import json,sys
