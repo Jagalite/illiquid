@@ -90,12 +90,17 @@ swift_arguments=(
     --package-path "$repository_root"
     --scratch-path "$build_root/swiftpm"
     --configuration release
+    --force-resolved-versions
 )
 for architecture in $architectures; do
     swift_arguments+=(--arch "$architecture")
 done
 swift build "${swift_arguments[@]}" --product Superplayr \
-    -Xlinker -headerpad_max_install_names
+    -Xlinker -headerpad_max_install_names \
+    -Xswiftc -file-prefix-map -Xswiftc "$repository_root=." \
+    -Xswiftc -debug-prefix-map -Xswiftc "$repository_root=." \
+    -Xswiftc -debug-prefix-map -Xswiftc "$build_root=build" \
+    -Xcc "-ffile-prefix-map=$repository_root=."
 binary_directory=$(swift build "${swift_arguments[@]}" --show-bin-path)
 source_executable="$binary_directory/Superplayr"
 [[ -x "$source_executable" ]] || platinum_fail "executable is missing: $source_executable"

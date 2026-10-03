@@ -5,9 +5,18 @@ VideoToolbox, Apple sample-buffer renderers, and libass. It supports local files
 and folder playlists, tracks and subtitles, crash-safe resume, HDR/EDR display
 policy, Now Playing/media keys, and system Picture in Picture.
 
+## Download
+
+Get the Apple Silicon DMG from [GitHub Releases](https://github.com/Jagalite/illiquid/releases).
+Requires macOS 26 or later. Current releases are **ad hoc signed, unnotarized
+prereleases**; macOS may block downloaded copies. Notarization is planned later.
+
 ## Build and run
 
 Requirements: macOS 26, full Xcode, Homebrew, FFmpeg, libass, and pkg-config.
+Packaging enforces the exact native versions/hashes in the dependency lock;
+current Homebrew versions may differ. See the pinned CI inputs in
+[DISTRIBUTING.md](DISTRIBUTING.md).
 
 ```sh
 brew install ffmpeg libass pkg-config

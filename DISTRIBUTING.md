@@ -1,8 +1,8 @@
 # Distributing Illiquid
 
-This guide covers the local Illiquid application and DMG workflow. It does not
-implement notarization, Apple credential handling, release publishing, or
-GitHub Actions.
+This guide covers local packaging and GitHub Actions prerelease publication.
+The current release uses ad hoc signing. Developer ID signing, Apple credential
+handling and notarization are deferred.
 
 ## Prerequisites
 
@@ -99,9 +99,9 @@ current Git revision for local About-window diagnostics.
 - **Notarized** means Apple has accepted the signed artifact and its ticket has
   normally been stapled. Notarization is not implemented in this pass.
 
-Public signing, notarization, stapling, and publishing will be added later in
-GitHub CI. A local ad hoc DMG is for development/testing, not normal public
-internet distribution.
+GitHub CI publishes explicitly unnotarized test prereleases. Downloaded copies
+may be blocked by macOS. Developer ID signing, notarization and stapling will be
+added later; this workflow requires no Apple credentials.
 
 ## Dependency and architecture audit
 
@@ -171,8 +171,7 @@ the transition because old Platinum copies can remain installed.
 
 Internal Swift package, target, module, type, logging, and persistence names
 retain `Superplayr` where no user sees them. The temporary reproducible Illiquid
-icon is correctly embedded, but final production artwork remains a public
-release prerequisite.
+icon is correctly embedded and is original project artwork.
 
 ## License and corresponding source
 
@@ -184,7 +183,7 @@ The dependency notice collection and matching source inputs, patches and build
 recipes are assembled. Follow [Documentation/CORRESPONDING_SOURCE.md](Documentation/CORRESPONDING_SOURCE.md)
 to verify and distribute the companion package beside matching binaries. Recheck
 the final bundle whenever dependencies change. Source availability, signing and
-physical-device playback qualification must still be established for a public release.
+physical-device playback qualification remains separate from CI packaging checks.
 
 ## Illiquid rename and existing user data
 
@@ -197,3 +196,43 @@ The permanent identifier is `io.github.jagalite.illiquid`. Preferences are impor
 once from the original domain before app settings are read; history retains its
 existing path. Migration tests cover existing destination values, repeat imports,
 binary preference payloads and the untouched source domain.
+
+## GitHub prerelease workflow
+
+[release.yml](.github/workflows/release.yml) builds on a GitHub-hosted Apple
+Silicon macOS 26 runner with Xcode 26.6. Update the version/build in
+`Resources/Info.plist`, commit the clean release candidate, then push a matching
+`v<version>` tag. The workflow can also be rerun with its existing tag through
+Actions → Build and release DMG → Run workflow.
+
+```sh
+git tag -a v0.1.0 -m 'Illiquid 0.1.0 unnotarized prerelease'
+git push origin main v0.1.0
+```
+
+CI verifies matching source inputs, installs the pinned native SDK, checks the
+architecture, runs focused packaging/product tests, builds and audits the app,
+and mounts and launch-tests the DMG. Publication happens only after these
+checks pass. The GitHub token needs `contents: write`; no signing secrets are
+needed for this prerelease.
+
+Each release attaches the DMG, its checksum, the exact Git project-source
+archive, the dependency-source archive, native build provenance and SHA256SUMS.
+The dependency source archive is required alongside the project source archive.
+Git archive excludes the SDK and the separately distributed dependency sources.
+
+`BuildInputs/native-sdk.tar.gz` contains reviewed native dylibs, development
+headers, pkg-config metadata and the FFmpeg CLI. It preserves the exact native
+lock hashes rather than taking moving Homebrew versions. Its manifest validates
+every member and binds the SDK to `DependencySources/source-manifest.json`.
+The installer only runs on disposable GitHub-hosted runners; it must not replace
+a developer's local Homebrew installation. `DependencySources/` contains the
+matching upstream source, notices, recipes and patches. A full dependency rebuild
+from source has not yet been qualified; these inputs pin the release build,
+without claiming bit-for-bit source reproducibility.
+
+For a local release from an already configured Mac with matching dependencies:
+
+```sh
+./Scripts/build-release-artifacts.sh
+```

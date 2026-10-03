@@ -28,7 +28,7 @@ done
 
 cd "$repository_root"
 "$script_directory/tests/platinum-packaging-tests.sh"
-swift test -c release --filter \
+swift test --force-resolved-versions -c release --filter \
     'ProductMetadataTests|LaunchOpenQueueTests|platinumRetainsLegacy'
 
 created_build_root=false
@@ -48,8 +48,8 @@ trap cleanup EXIT
 "$script_directory/package-platinum-dmg.sh"
 
 if [[ "$mode" = adhoc ]]; then
-    printf '\nWARNING: This ad hoc signed DMG is for local development/testing.\n'
-    printf 'It is not ready for normal public internet distribution.\n'
+    printf '\nNOTICE: This ad hoc signed DMG is an unnotarized test prerelease.\n'
+    printf 'Developer ID signing and notarization are deferred. macOS may block downloaded copies.\n'
 elif [[ "$mode" = unsigned ]]; then
     printf '\nWARNING: This unsigned DMG is for controlled local testing only.\n'
 fi
