@@ -66,7 +66,7 @@ for name, keg in kegs.items():
     elif opt.exists():
         raise SystemExit('Refusing to replace non-symlink opt directory: ' + str(opt))
     opt.symlink_to(prefix / keg)
-pcdirs = []
+pcdirs = [str(root / 'BuildInputs/system-pkgconfig')]
 for keg in kegs.values():
     for sub in ('lib/pkgconfig', 'share/pkgconfig'):
         directory = prefix / keg / sub
