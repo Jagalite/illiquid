@@ -279,16 +279,20 @@ public enum ArchitectureValidation {
     }
 
     private static func runStaticAuthorityChecks(_ failures: inout [String]) {
-        let repository = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
+        let repository = URL(
+            fileURLWithPath: FileManager.default.currentDirectoryPath,
+            isDirectory: true
+        )
         func contents(_ relativePath: String) -> String {
-            (try? String(
-                contentsOf: repository.appendingPathComponent(relativePath),
-                encoding: .utf8
-            )) ?? ""
+            do {
+                return try String(
+                    contentsOf: repository.appendingPathComponent(relativePath),
+                    encoding: .utf8
+                )
+            } catch {
+                failures.append("architecture source unavailable: \(relativePath)")
+                return ""
+            }
         }
 
         let controller = contents("Sources/SuperplayrPlayer/Player/PlaybackController.swift")

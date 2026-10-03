@@ -134,6 +134,13 @@ done
 ditto "$repository_root/Licenses" "$resources/Licenses"
 ditto "$source_executable" "$executable"
 chmod 0755 "$executable"
+# Compiler path maps do not rewrite Swift #filePath string literals.
+python3 - "$executable" "$repository_root" <<'PY_CHECK'
+from pathlib import Path
+import sys
+if sys.argv[2].encode() in Path(sys.argv[1]).read_bytes():
+    raise SystemExit('Release executable embeds the local checkout path')
+PY_CHECK
 ditto "$metadata" "$app_bundle/Contents/Info.plist"
 
 while IFS= read -r -d '' resource_bundle; do
