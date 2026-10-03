@@ -203,7 +203,8 @@ binary preference payloads and the untouched source domain.
 Silicon macOS 26 runner with Xcode 26.6. Update the version/build in
 `Resources/Info.plist`, commit the clean release candidate, then push a matching
 `v<version>` tag. The workflow can also be rerun with its existing tag through
-Actions → Build and release DMG → Run workflow.
+Actions → Build and release DMG → Run workflow. Pushes to `main` run the same
+build and packaging checks without creating a release.
 
 ```sh
 git tag -a v0.1.0 -m 'Illiquid 0.1.0 unnotarized prerelease'

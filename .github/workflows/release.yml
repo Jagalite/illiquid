@@ -1,6 +1,7 @@
 name: Build and release DMG
 on:
   push:
+    branches: [main]
     tags: ['v*']
   workflow_dispatch:
     inputs:
@@ -19,12 +20,12 @@ jobs:
     timeout-minutes: 60
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      ILLIQUID_RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      ILLIQUID_RELEASE_TAG: ${{ github.event.inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || '' }}
     steps:
       - name: Check out release tag
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.event.inputs.tag || github.ref_name }}
+          ref: ${{ github.event.inputs.tag || github.sha }}
           fetch-depth: 1
           persist-credentials: false
       - name: Verify release identity
@@ -32,9 +33,9 @@ jobs:
           python3 - <<'PY'
           import os, re, subprocess
           tag = os.environ['ILLIQUID_RELEASE_TAG']
-          if not re.fullmatch(r'v\d+\.\d+\.\d+', tag):
+          if tag and not re.fullmatch(r'v\d+\.\d+\.\d+', tag):
               raise SystemExit('Invalid release tag')
-          if subprocess.check_output(['git', 'rev-parse', tag + '^{commit}']).strip() != subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip():
+          if tag and subprocess.check_output(['git', 'rev-parse', tag + '^{commit}']).strip() != subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip():
               raise SystemExit('Tag and checkout differ')
           PY
           test "$(uname -m)" = arm64
@@ -52,6 +53,7 @@ jobs:
       - name: Build, audit and smoke-test release artifacts
         run: Scripts/build-release-artifacts.sh
       - name: Publish unnotarized prerelease
+        if: env.ILLIQUID_RELEASE_TAG != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
