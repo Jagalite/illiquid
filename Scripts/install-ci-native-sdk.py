@@ -76,5 +76,5 @@ with open(os.environ['GITHUB_PATH'], 'a') as f:
     f.write(str(prefix / kegs['ffmpeg'] / 'bin') + '\n')
 with open(os.environ['GITHUB_ENV'], 'a') as f:
     f.write('PKG_CONFIG_LIBDIR=' + ':'.join(pcdirs) + '\n')
-    f.write('PKG_CONFIG_PATH=\n')
+    f.write('PKG_CONFIG_PATH=' + ':'.join(pcdirs) + '\n')
 print('Installed checksum-verified SDK on ephemeral runner')

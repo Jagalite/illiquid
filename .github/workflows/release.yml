@@ -49,7 +49,9 @@ jobs:
           python3 Scripts/verify-corresponding-source.py DependencySources
           python3 Scripts/install-ci-native-sdk.py
       - name: Check architecture
-        run: swift run --force-resolved-versions SuperplayrArchitectureCheck
+        run: |
+          pkg-config --cflags --libs libass libavformat
+          swift run --force-resolved-versions SuperplayrArchitectureCheck
       - name: Build, audit and smoke-test release artifacts
         run: Scripts/build-release-artifacts.sh
       - name: Publish unnotarized prerelease
