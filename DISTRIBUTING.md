@@ -1,8 +1,8 @@
 # Distributing Illiquid
 
 This guide covers local packaging and GitHub Actions prerelease publication.
-The current release uses ad hoc signing. Developer ID signing, Apple credential
-handling and notarization are deferred.
+Tagged releases require Developer ID Application signing and Apple notarization.
+Main-branch builds use ad hoc signing for packaging validation without publishing.
 
 ## Prerequisites
 
@@ -99,9 +99,11 @@ current Git revision for local About-window diagnostics.
 - **Notarized** means Apple has accepted the signed artifact and its ticket has
   normally been stapled. Notarization is not implemented in this pass.
 
-GitHub CI publishes explicitly unnotarized test prereleases. Downloaded copies
-may be blocked by macOS. Developer ID signing, notarization and stapling will be
-added later; this workflow requires no Apple credentials.
+GitHub tagged releases import Illiquid’s dedicated Application certificate into a
+temporary runner keychain, notarize and staple the app before DMG assembly, then
+sign, notarize and staple the DMG. Apple acceptance, ticket validation and
+Gatekeeper assessment are required before publishing. Final checksums are
+generated after stapling. The temporary keychain is removed even on failure.
 
 ## Dependency and architecture audit
 
@@ -207,18 +209,30 @@ Actions → Build and release DMG → Run workflow. Pushes to `main` run the sam
 build and packaging checks without creating a release.
 
 ```sh
-git tag -a v0.1.0 -m 'Illiquid 0.1.0 unnotarized prerelease'
-git push origin main v0.1.0
+git tag -a v0.1.2 -m 'Illiquid 0.1.2 notarized prerelease'
+git push origin main v0.1.2
 ```
 
 CI verifies matching source inputs, installs the pinned native SDK, checks the
 architecture, runs focused packaging/product tests, builds and audits the app,
 and mounts and launch-tests the DMG. Publication happens only after these
-checks pass. The GitHub token needs `contents: write`; no signing secrets are
-needed for this prerelease.
+checks pass. The GitHub token needs `contents: write`. Configure the following
+repository Actions secrets before pushing a release tag:
+
+| Secret | Value |
+| --- | --- |
+| `APPLE_APPLICATION_CERT_P12_BASE64` | Base64 of Illiquid’s dedicated Developer ID Application certificate and private key, exported as P12 |
+| `APPLE_APPLICATION_CERT_PASSWORD` | Password protecting that P12 |
+| `APPLE_NOTARY_USERNAME` | Apple Account email |
+| `APPLE_NOTARY_PASSWORD` | Dedicated app-specific password for Illiquid notarization |
+| `APPLE_TEAM_ID` | Ten-character team identifier matching the certificate |
+
+These are separate from Superseedr’s credentials; its Installer certificate is
+not an Application signing identity. Missing or invalid secrets fail the tagged
+release before the build. Main-branch checks do not require these credentials.
 
 Each release attaches the DMG, its checksum, the exact Git project-source
-archive, the dependency-source archive, native build provenance and SHA256SUMS.
+archive, the dependency-source archive, native build provenance, SHA256SUMS and Apple app/DMG notarization receipts.
 The dependency source archive is required alongside the project source archive.
 Git archive excludes the SDK and the separately distributed dependency sources.
 

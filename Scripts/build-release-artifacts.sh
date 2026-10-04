@@ -10,7 +10,15 @@ if [[ -n "${ILLIQUID_RELEASE_TAG:-}" && "$ILLIQUID_RELEASE_TAG" != "v$version" ]
 fi
 python3 Scripts/verify-corresponding-source.py DependencySources
 ILLIQUID_VERIFY_SDK_ONLY=1 python3 Scripts/install-ci-native-sdk.py
-Scripts/build-local-dmg.sh --adhoc
+if [[ -n "${ILLIQUID_RELEASE_TAG:-}" ]]; then
+    : "${DEVELOPER_ID_APPLICATION:?Tagged releases require Developer ID signing}"
+    : "${ILLIQUID_NOTARY_PROFILE:?Tagged releases require notarization}"
+    Scripts/build-local-dmg.sh --developer-id
+    distribution_status='This is a **Developer ID signed and Apple-notarized prerelease**. The app and DMG have stapled notarization tickets. The DMG contains Illiquid.app and an Applications shortcut.'
+else
+    Scripts/build-local-dmg.sh --adhoc
+    distribution_status='This is an **ad hoc signed, unnotarized CI build**, intended for packaging validation. It is not a published release.'
+fi
 revision=$(git rev-parse HEAD)
 git archive --format=tar.gz --prefix="Illiquid-$version/" HEAD > "dist/Illiquid-$version-source.tar.gz"
 # Normalize archive ownership/timestamps and include only committed source inputs.
@@ -46,14 +54,18 @@ PY
     cd dist
     shasum -a 256 "Illiquid-$version-macOS.dmg" "Illiquid-$version-source.tar.gz" \
         "Illiquid-$version-dependency-sources.tar.gz" build-provenance.json > SHA256SUMS
+    if [[ -n "${ILLIQUID_RELEASE_TAG:-}" ]]; then
+        for receipt in notarization/*.json; do
+            # GitHub release downloads flatten asset paths.
+            digest=$(shasum -a 256 "$receipt")
+            printf '%s  %s\n' "${digest%% *}" "$(basename "$receipt")" >> SHA256SUMS
+        done
+    fi
 )
 cat > dist/release-notes.md <<EOF
 Illiquid $version — Apple Silicon, macOS 26 or later.
 
-This is an **ad hoc signed, unnotarized prerelease**. Developer ID signing and
-Apple notarization are planned for a later release. macOS may block the download;
-follow Apple's documented Privacy & Security approval procedure only if you trust
-this release. The DMG contains Illiquid.app and an Applications shortcut.
+$distribution_status
 
 Source revision: \`$revision\`. Matching project source, dependency source,
 build provenance and SHA-256 checksums are attached. Original project code is

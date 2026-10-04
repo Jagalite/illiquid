@@ -60,6 +60,9 @@ if [[ "$mode" = adhoc ]]; then
 else
     signing_arguments=(--force --sign "$identity" --timestamp --options runtime)
 fi
+if [[ -n "${ILLIQUID_SIGNING_KEYCHAIN:-}" ]]; then
+    signing_arguments+=(--keychain "$ILLIQUID_SIGNING_KEYCHAIN")
+fi
 
 while IFS= read -r nested_code; do
     codesign "${signing_arguments[@]}" "$nested_code"

@@ -45,11 +45,24 @@ cleanup() {
 trap cleanup EXIT
 
 "$script_directory/build-platinum-app.sh" "--$mode"
+if [[ "$mode" = developer-id && -n "${ILLIQUID_NOTARY_PROFILE:-}" ]]; then
+    "$script_directory/notarize-artifact.sh" "$repository_root/dist/Illiquid.app"
+fi
 "$script_directory/package-platinum-dmg.sh"
+if [[ "$mode" = developer-id && -n "${ILLIQUID_NOTARY_PROFILE:-}" ]]; then
+    version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$repository_root/dist/Illiquid.app/Contents/Info.plist")
+    dmg="$repository_root/dist/Illiquid-$version-macOS.dmg"
+    signing_arguments=(--force --sign "$DEVELOPER_ID_APPLICATION" --timestamp)
+    [[ -z "${ILLIQUID_SIGNING_KEYCHAIN:-}" ]] || signing_arguments+=(--keychain "$ILLIQUID_SIGNING_KEYCHAIN")
+    codesign "${signing_arguments[@]}" "$dmg"
+    "$script_directory/notarize-artifact.sh" "$dmg"
+    # Stapling changes the DMG bytes; checksums must describe the final artifact.
+    (cd "$repository_root/dist" && shasum -a 256 "Illiquid-$version-macOS.dmg" > "Illiquid-$version-macOS.dmg.sha256")
+fi
 
 if [[ "$mode" = adhoc ]]; then
     printf '\nNOTICE: This ad hoc signed DMG is an unnotarized test prerelease.\n'
-    printf 'Developer ID signing and notarization are deferred. macOS may block downloaded copies.\n'
+    printf 'Tagged GitHub releases require Developer ID signing and notarization. macOS may block this ad hoc build.\n'
 elif [[ "$mode" = unsigned ]]; then
     printf '\nWARNING: This unsigned DMG is for controlled local testing only.\n'
 fi
