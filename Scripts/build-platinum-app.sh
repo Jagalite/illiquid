@@ -163,29 +163,36 @@ if [[ -n "$git_revision" ]]; then
     "$plist" -c "Add :PlatinumGitCommit string $git_revision" "$app_bundle/Contents/Info.plist"
 fi
 
-icon_work="$build_root/Illiquid.iconset"
-mkdir -p "$icon_work"
-master_icon="$build_root/Illiquid-1024.png"
-sips -s format png "$repository_root/Resources/IlliquidIcon.svg" \
-    --out "$master_icon" >/dev/null
-for specification in \
-    '16 icon_16x16.png' \
-    '32 icon_16x16@2x.png' \
-    '32 icon_32x32.png' \
-    '64 icon_32x32@2x.png' \
-    '128 icon_128x128.png' \
-    '256 icon_128x128@2x.png' \
-    '256 icon_256x256.png' \
-    '512 icon_256x256@2x.png' \
-    '512 icon_512x512.png' \
-    '1024 icon_512x512@2x.png'
-do
-    size=${specification%% *}
-    filename=${specification#* }
-    sips -z "$size" "$size" "$master_icon" --out "$icon_work/$filename" >/dev/null
-done
-iconutil -c icns "$icon_work" -o "$resources/AppIcon.icns"
-[[ -s "$resources/AppIcon.icns" ]] || platinum_fail 'failed to create AppIcon.icns'
+generate_brand_icon() {
+    local icon_source="$1"
+    local icon_name="$2"
+    local specification size filename
+    local icon_work="$build_root/$icon_name.iconset"
+    mkdir -p "$icon_work"
+    local master_icon="$build_root/$icon_name-1024.png"
+    sips -s format png -z 1024 1024 "$icon_source" \
+        --out "$master_icon" >/dev/null
+    for specification in \
+        '16 icon_16x16.png' \
+        '32 icon_16x16@2x.png' \
+        '32 icon_32x32.png' \
+        '64 icon_32x32@2x.png' \
+        '128 icon_128x128.png' \
+        '256 icon_128x128@2x.png' \
+        '256 icon_256x256.png' \
+        '512 icon_256x256@2x.png' \
+        '512 icon_512x512.png' \
+        '1024 icon_512x512@2x.png'
+    do
+        size=${specification%% *}
+        filename=${specification#* }
+        sips -z "$size" "$size" "$master_icon" --out "$icon_work/$filename" >/dev/null
+    done
+    iconutil -c icns "$icon_work" -o "$resources/$icon_name.icns"
+    [[ -s "$resources/$icon_name.icns" ]] || platinum_fail "failed to create $icon_name.icns"
+}
+generate_brand_icon "$repository_root/Resources/IlliquidIcon.png" AppIcon
+generate_brand_icon "$repository_root/Resources/Branding/SmoothPrism/video-document.svg" VideoDocument
 
 search_directories=()
 for package in libavformat libavfilter libass; do
