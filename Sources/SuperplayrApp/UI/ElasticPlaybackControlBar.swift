@@ -1068,6 +1068,7 @@ private struct ElasticPlaybackTimelineLabels: View {
 private struct ElasticTimelineThumbnailPreview: View {
     let image: CGImage?
     let position: TimeInterval
+    let isLoading: Bool
     @Environment(\.playerTheme) private var theme
 
     var body: some View {
@@ -1078,10 +1079,15 @@ private struct ElasticTimelineThumbnailPreview: View {
                 Image(decorative: image, scale: 1)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-            } else {
+            } else if isLoading {
                 ProgressView()
                     .controlSize(.small)
                     .tint(.white.opacity(0.86))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                Text("Preview unavailable")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.8))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
 
@@ -1111,10 +1117,32 @@ private struct ElasticTimelineHoverPreviewState {
     var fraction: CGFloat
     var position: TimeInterval
     var image: CGImage?
+    var isLoading = true
 }
 
 enum TimelineThumbnailHoverPolicy {
     static let cacheMissDelay: Duration = .milliseconds(40)
+
+    /// A timed-out native call can release its worker just after the caller
+    /// expires. Retry once while this hover still owns the request; never loop
+    /// indefinitely on unsupported media or seek the active playback session.
+    @MainActor
+    static func image(
+        retryDelay: Duration = .milliseconds(150),
+        decode: () async -> CGImage?
+    ) async -> CGImage? {
+        for attempt in 0..<2 {
+            guard !Task.isCancelled else { return nil }
+            let image = await decode()
+            guard !Task.isCancelled else { return nil }
+            if let image { return image }
+            if attempt == 0 {
+                do { try await Task.sleep(for: retryDelay) }
+                catch { return nil }
+            }
+        }
+        return nil
+    }
 }
 
 enum ElasticPlaybackUtility: Hashable {
@@ -1255,7 +1283,8 @@ struct ElasticPlaybackControlBar: View {
                     )
                     ElasticTimelineThumbnailPreview(
                         image: preview.image,
-                        position: preview.position
+                        position: preview.position,
+                        isLoading: preview.isLoading
                     )
                     .frame(
                         width: TimelineThumbnailPlacement.cardSize.width,
@@ -1368,16 +1397,19 @@ struct ElasticPlaybackControlBar: View {
         )
         timelineThumbnailTask = Task { @MainActor in
             let maximumPixelSize = CGSize(width: 368, height: 208)
-            let image = await model.player.timelineThumbnail(
-                at: position,
-                maximumPixelSize: maximumPixelSize,
-                delayBeforeDecoding: TimelineThumbnailHoverPolicy.cacheMissDelay
-            )
+            let image = await TimelineThumbnailHoverPolicy.image {
+                await model.player.timelineThumbnail(
+                    at: position,
+                    maximumPixelSize: maximumPixelSize,
+                    delayBeforeDecoding: TimelineThumbnailHoverPolicy.cacheMissDelay
+                )
+            }
             guard !Task.isCancelled,
                   var preview = timelineHoverPreview,
                   preview.requestID == requestID
             else { return }
             preview.image = image
+            preview.isLoading = false
             timelineHoverPreview = preview
         }
     }

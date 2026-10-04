@@ -83,6 +83,7 @@ private enum SettingsClearAction: String, Identifiable {
 }
 
 struct SettingsView: View {
+    @Bindable private var interfaceScale = PlayerInterfaceScaleStore.shared
     @Bindable var model: AppModel
     @Bindable var themeStore: PlayerThemeStore
 
@@ -412,6 +413,24 @@ struct SettingsView: View {
 
     private var appearancePage: some View {
         VStack(alignment: .leading, spacing: 18) {
+            SettingsSectionLabel("Interface Size")
+            SettingsCard {
+                SettingsRow(
+                    title: "UI Scale",
+                    detail: "Resize text, controls, and spacing. Use ⌘+ or ⌘− to adjust, and ⌘0 to reset."
+                ) {
+                    Picker("UI Scale", selection: Binding(
+                        get: { interfaceScale.percentage },
+                        set: { interfaceScale.select($0) }
+                    )) {
+                        ForEach(PlayerInterfaceScaleStore.percentages, id: \.self) { percentage in
+                            Text("\(percentage)%").tag(percentage)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 100)
+                }
+            }
             SettingsSectionLabel("Theme")
             SettingsCard {
                 SettingsRow(

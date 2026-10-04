@@ -33,6 +33,10 @@ public actor NativeTimelineThumbnailGenerator {
     }
 
     private static let maximumCachedImages = 48
+    // Software decoding a long GOP while playback is active can exceed 1.5s.
+    // Keep the independent worker bounded, with time left for image conversion.
+    private static let maximumDecodeSeconds: TimeInterval = 2.5
+    private static let maximumRequestSeconds: TimeInterval = 3
     private static let imageRenderer = ImageRenderer()
 
     private var cache: [CacheKey: CGImage] = [:]
@@ -127,7 +131,7 @@ public actor NativeTimelineThumbnailGenerator {
 
     public init() {
         let storage = DecoderStorage(observe: nil)
-        worker = TimelineThumbnailWorker { input, cancellation in
+        worker = TimelineThumbnailWorker(requestTimeout: Self.maximumRequestSeconds) { input, cancellation in
             storage.decode(input, cancellation: cancellation)
         }
     }
@@ -135,7 +139,7 @@ public actor NativeTimelineThumbnailGenerator {
     init(optimized: Bool = true, maximumPackets: Int = 1_500,
          observe: @escaping @Sendable (ThumbnailDecodeObservation) -> Void) {
         let storage = DecoderStorage(optimized: optimized, maximumPackets: maximumPackets, observe: observe)
-        worker = TimelineThumbnailWorker { input, cancellation in
+        worker = TimelineThumbnailWorker(requestTimeout: Self.maximumRequestSeconds) { input, cancellation in
             storage.decode(input, cancellation: cancellation)
         }
     }
@@ -308,7 +312,7 @@ public actor NativeTimelineThumbnailGenerator {
             reachedTarget = frame.presentationTime.seconds + 0.001 >= target
         }
         while packetCount < maximumPackets,
-              ProcessInfo.processInfo.systemUptime - startedAt < 1.5,
+              ProcessInfo.processInfo.systemUptime - startedAt < maximumDecodeSeconds,
               !cancellation.cancellationRequested
         {
             guard let packet = try demuxer.readPacket(generation: 1) else {
@@ -318,7 +322,7 @@ public actor NativeTimelineThumbnailGenerator {
                 // the same deadline and hold only the nearest output frame.
                 try decoder.drain(generation: 1, while: {
                     !cancellation.cancellationRequested &&
-                        ProcessInfo.processInfo.systemUptime - startedAt < 1.5
+                        ProcessInfo.processInfo.systemUptime - startedAt < maximumDecodeSeconds
                 }, emit: receive)
                 break
             }

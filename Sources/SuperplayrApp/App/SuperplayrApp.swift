@@ -7,6 +7,7 @@ struct SuperplayrApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var model: AppModel?
     @State private var themeStore: PlayerThemeStore
+    @State private var interfaceScale = PlayerInterfaceScaleStore.shared
 
     init() {
         if Bundle.main.bundleIdentifier == LegacyPreferencesMigration.bundleIdentifier {
@@ -38,8 +39,17 @@ struct SuperplayrApp: App {
 
         Settings {
             if let model {
-                SettingsView(model: model, themeStore: themeStore)
-                    .frame(minWidth: 820, minHeight: 600)
+                GeometryReader { geometry in
+                    ScrollView([.horizontal, .vertical]) {
+                        SettingsView(model: model, themeStore: themeStore)
+                            .frame(
+                                width: max(820, geometry.size.width / interfaceScale.factor),
+                                height: max(600, geometry.size.height / interfaceScale.factor)
+                            )
+                            .scaledPlayerInterface()
+                    }
+                }
+                .frame(minWidth: 820, minHeight: 600)
             } else {
                 StartupHistoryView()
                     .frame(minWidth: 820, minHeight: 600)

@@ -30,6 +30,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
     private let lock = NSLock()
     private let queue = DispatchQueue(label: "com.platinum.thumbnail-decode", qos: .utility)
     private let decode: @Sendable (Input, FFmpegInputCancellationSignal) -> CGImage?
+    private let requestTimeout: TimeInterval
     private var active: Request?
     private var pending: Request?
 
@@ -37,7 +38,9 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
         lock.withLock { pending?.input.seconds }
     }
 
-    init(decode: @escaping @Sendable (Input, FFmpegInputCancellationSignal) -> CGImage?) {
+    init(requestTimeout: TimeInterval = 1.5,
+         decode: @escaping @Sendable (Input, FFmpegInputCancellationSignal) -> CGImage?) {
+        self.requestTimeout = requestTimeout
         self.decode = decode
     }
 
@@ -58,7 +61,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
     private func enqueue(_ request: Request) {
         let deadline = DispatchWorkItem { [weak self, weak request] in
             guard let request, self?.cancel(request.id) == true else { return }
-            Self.logger.notice("Thumbnail request reached its 1.5-second deadline, including queue wait")
+            Self.logger.notice("Thumbnail request reached its deadline, including queue wait")
         }
         request.deadline = deadline
         lock.lock()
@@ -82,7 +85,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
         oldActive?.deadline?.cancel()
         oldActive?.cancellation.requestCancellation()
         oldContinuation?.resume(returning: nil)
-        DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 1.5, execute: deadline)
+        DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + requestTimeout, execute: deadline)
         if startsWorker { queue.async { self.drain() } }
     }
 

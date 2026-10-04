@@ -29,7 +29,7 @@ done
 cd "$repository_root"
 "$script_directory/tests/platinum-packaging-tests.sh"
 swift test --force-resolved-versions -c release --filter \
-    'ProductMetadataTests|LaunchOpenQueueTests|platinumRetainsLegacy'
+    'ProductMetadataTests|LaunchOpenQueueTests|platinumRetainsLegacy|PlayerInterfaceScaleTests|TimelineThumbnailHoverPolicyTests'
 
 created_build_root=false
 if [[ -z "${PLATINUM_BUILD_ROOT:-}" ]]; then

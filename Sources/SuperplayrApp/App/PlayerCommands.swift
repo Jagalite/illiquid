@@ -3,6 +3,7 @@ import SuperplayrCore
 
 struct PlayerCommands: Commands {
     let model: AppModel
+    @Bindable private var interfaceScale = PlayerInterfaceScaleStore.shared
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
 
     var body: some Commands {
@@ -97,6 +98,16 @@ struct PlayerCommands: Commands {
         }
 
         CommandGroup(after: .toolbar) {
+            Button("Increase UI Size", action: interfaceScale.increase)
+                .keyboardShortcut("+", modifiers: .command)
+                .disabled(!interfaceScale.canIncrease)
+            Button("Decrease UI Size", action: interfaceScale.decrease)
+                .keyboardShortcut("-", modifiers: .command)
+                .disabled(!interfaceScale.canDecrease)
+            Button("Reset UI Size", action: interfaceScale.reset)
+                .keyboardShortcut("0", modifiers: .command)
+                .disabled(interfaceScale.percentage == 100)
+            Divider()
             Button(model.isSidebarPresented ? "Hide Sources" : "Show Sources") {
                 model.toggleSidebar()
             }

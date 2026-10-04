@@ -11,6 +11,18 @@ struct PlayerRootView: View {
     @State private var sidebarLayout = SourcesSidebarLayoutState()
 
     var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            VideoSurface(model: model)
+                .ignoresSafeArea()
+                .onHover { isHovering in
+                    model.setPointerRegion(isHovering ? .video : .outside)
+                }
+            chrome.scaledPlayerInterface()
+        }
+    }
+
+    private var chrome: some View {
         GeometryReader { geometry in
             let maximumSidebarWidth = SourcesSidebarSizing.maximumWidth(
                 for: geometry.size.width
@@ -60,17 +72,17 @@ struct PlayerRootView: View {
             model.setChromePin(.accessibilityInteraction, active: false)
         }
         .onChange(of: model.state.currentSource) { _, _ in model.clearLoop() }
-        .sheet(isPresented: $model.isGoToTimePresented) { GoToTimeView(model: model) }
+        .sheet(isPresented: $model.isGoToTimePresented) { GoToTimeView(model: model).scaledPlayerInterface() }
         .onChange(of: model.isGoToTimePresented) { _, shown in
             model.setTransientPresentation(shown, owner: "go-to-time")
         }
         .sheet(isPresented: $model.isInspectorPresented) {
-            PlaybackInspectorView(model: model)
+            PlaybackInspectorView(model: model).scaledPlayerInterface()
         }
         .onChange(of: model.isInspectorPresented) { _, isPresented in
             model.setTransientPresentation(isPresented, owner: "inspector")
         }
-        .sheet(isPresented: $model.isShortcutSettingsPresented) { ShortcutSettingsView(model: model) }
+        .sheet(isPresented: $model.isShortcutSettingsPresented) { ShortcutSettingsView(model: model).scaledPlayerInterface() }
         .onChange(of: model.isShortcutSettingsPresented) { _, shown in
             model.setTransientPresentation(shown, owner: "shortcut-settings")
         }
@@ -78,12 +90,13 @@ struct PlayerRootView: View {
             ShortcutHelpView(supportsFrameStep: model.player.supports(.stepFrame),
                              supportsPictureInPicture: model.player.supports(.pictureInPicture),
                              bindings: model.shortcutBindings)
+                .scaledPlayerInterface()
         }
         .onChange(of: model.isShortcutHelpPresented) { _, isPresented in
             model.setTransientPresentation(isPresented, owner: "shortcuts")
         }
         .sheet(isPresented: $model.isMessageHistoryPresented) {
-            PlaybackMessageHistoryView(presenter: model.osdPresenter)
+            PlaybackMessageHistoryView(presenter: model.osdPresenter).scaledPlayerInterface()
         }
         .onChange(of: model.isMessageHistoryPresented) { _, isPresented in
             model.setTransientPresentation(isPresented, owner: "messages")
@@ -102,15 +115,6 @@ private struct PlayerPane: View {
 
     var body: some View {
         ZStack {
-            Color.black
-                .ignoresSafeArea()
-
-            VideoSurface(model: model)
-                .ignoresSafeArea()
-                .onHover { isHovering in
-                    model.setPointerRegion(isHovering ? .video : .outside)
-                }
-
             PlaybackChromeHorizontalPlacement(layout: sidebarLayout, fillsAvailableHeight: true) {
                 EmptyPlayerPresentation(model: model)
             }
@@ -235,7 +239,6 @@ private struct PlayerPane: View {
             }
         }
         .contentShape(Rectangle())
-        .background(.black)
         .onHover { isHovering in
             if !isHovering {
                 model.pointerExitedWindow()

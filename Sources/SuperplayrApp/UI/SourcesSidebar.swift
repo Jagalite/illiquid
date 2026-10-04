@@ -1085,6 +1085,7 @@ private struct SourcesSidebarLiveViewport<Content: View>: View {
 }
 
 private struct SourcesSidebarResizeHandle: View {
+    @Environment(\.playerInterfaceScale) private var interfaceScale
     @Bindable var model: AppModel
     @Binding var storedSidebarWidth: Double
     let maximumWidth: CGFloat
@@ -1121,10 +1122,10 @@ private struct SourcesSidebarResizeHandle: View {
                     if resizeState.beginGesture() {
                         model.setChromePin(.sidebarResize, active: true)
                     }
-                    updateLiveWidth(for: value.translation.width)
+                    updateLiveWidth(for: value.translation.width, interfaceScale: interfaceScale)
                 }
                 .onEnded { value in
-                    let width = resolvedWidth(for: value.translation.width)
+                    let width = resolvedWidth(for: value.translation.width, interfaceScale: interfaceScale)
                     resizeState.setLiveWidth(width)
                     layout.setSidebarWidth(width)
                     storedSidebarWidth = Double(width)
@@ -1163,16 +1164,19 @@ private struct SourcesSidebarResizeHandle: View {
         }
     }
 
-    private func resolvedWidth(for translation: CGFloat) -> CGFloat {
+    private func resolvedWidth(for translation: CGFloat, interfaceScale: CGFloat = 1) -> CGFloat {
         SourcesSidebarSizing.resolvedWidth(
-            storedWidth: CGFloat(storedSidebarWidth),
+            storedWidth: SourcesSidebarSizing.settledWidth(
+                storedWidth: CGFloat(storedSidebarWidth), maximumWidth: maximumWidth
+            ),
             dragTranslation: translation,
-            maximumWidth: maximumWidth
+            maximumWidth: maximumWidth,
+            interfaceScale: interfaceScale
         )
     }
 
-    private func updateLiveWidth(for translation: CGFloat) {
-        let width = resolvedWidth(for: translation)
+    private func updateLiveWidth(for translation: CGFloat, interfaceScale: CGFloat) {
+        let width = resolvedWidth(for: translation, interfaceScale: interfaceScale)
         resizeState.setLiveWidth(width)
         layout.setSidebarWidth(width)
     }
@@ -2696,10 +2700,11 @@ enum SourcesSidebarSizing {
     static func resolvedWidth(
         storedWidth: CGFloat,
         dragTranslation: CGFloat,
-        maximumWidth: CGFloat
+        maximumWidth: CGFloat,
+        interfaceScale: CGFloat = 1
     ) -> CGFloat {
         min(
-            max(storedWidth + dragTranslation, minimumWidth),
+            max(storedWidth + dragTranslation / interfaceScale, minimumWidth),
             max(maximumWidth, minimumWidth)
         )
     }
