@@ -4,7 +4,7 @@ import Testing
 
 @Suite("Timeline hover recovery")
 @MainActor
-struct TimelineThumbnailHoverPolicyTests {
+struct TimelineThumbnailHoverRecoveryTests {
     private func image() throws -> CGImage {
         try #require(CGContext(data: nil, width: 2, height: 2,
             bitsPerComponent: 8, bytesPerRow: 8,
