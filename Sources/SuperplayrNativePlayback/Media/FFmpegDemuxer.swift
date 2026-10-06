@@ -45,6 +45,8 @@ final class FFmpegDemuxer {
     private var terminalPacketWasCorrupt = false
     private var context: UnsafeMutablePointer<AVFormatContext>?
     private let interruptState: AnyObject?
+    /// AVIO bytes fetched, including filesystem-cache hits; not physical disk bytes.
+    var bytesRead: Int64 { context?.pointee.pb?.pointee.bytes_read ?? 0 }
     let mediaInfo: FFmpegMediaInfo
 
     init(url: URL, interruptState: AnyObject? = nil) throws {

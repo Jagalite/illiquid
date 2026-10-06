@@ -8,6 +8,7 @@ public enum PlaybackBenchmarkControlAction: Equatable, Sendable {
     case pause
     case seekExact(TimeInterval)
     case snapshot
+    case rendererMetrics
 
     var diagnosticName: String {
         switch self {
@@ -15,6 +16,7 @@ public enum PlaybackBenchmarkControlAction: Equatable, Sendable {
         case .pause: "pause"
         case .seekExact: "seek-exact"
         case .snapshot: "snapshot"
+        case .rendererMetrics: "renderer-metrics"
         }
     }
 }

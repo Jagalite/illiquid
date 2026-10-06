@@ -39,6 +39,10 @@ struct SourcesSidebar: View {
     @State private var browserFilter = SourceBrowserFilter()
     @State private var filterTask: Task<Void, Never>?
     @State private var thumbnailFocusedFolder: URL?
+    @State private var scrollRowID: String?
+    @State private var pendingScrollRestoration: String?
+    private let restoresScrollPosition = !LifecyclePerformance.isEnabled
+        || ProcessInfo.processInfo.environment["SUPERPLAYR_BENCHMARK_SCROLL_RESTORATION"] != "0"
     @State private var visibleRows: [SourceTreeDisplayRow] = []
     @State private var hiddenItemCount = 0
     @State private var regexMatchCounts: [String: Int] = [:]
@@ -110,12 +114,14 @@ struct SourcesSidebar: View {
                                         }
                                 }
                             }
+                            .scrollTargetLayout(isEnabled: restoresScrollPosition)
                             .padding(.bottom, 10)
                             .background {
                                 SourcesSidebarScrollerConfigurator()
                                     .frame(width: 0, height: 0)
                             }
                         }
+                        .modifier(SourceScrollRestoration(rowID: $scrollRowID, isEnabled: restoresScrollPosition))
                     }
                 }
             }
@@ -145,6 +151,7 @@ struct SourcesSidebar: View {
     private var sidebarWithSourceUpdates: some View {
         sidebarSurface
         .onAppear {
+            restoreNavigation()
             resizeState.setLiveWidth(settledSidebarWidth)
             layout.setSidebarWidth(settledSidebarWidth)
             restartFilesystemMonitor(watching: model.allSourceWatchRoots)
@@ -158,6 +165,9 @@ struct SourcesSidebar: View {
             resizeState.setLiveWidth(width)
             layout.setSidebarWidth(width)
         }
+        .onChange(of: model.areSourceRootsReady) { _, ready in
+            if ready { activateSelectedSourceTab() }
+        }
         .onChange(of: model.allSourceWatchRoots) { _, current in
             restartFilesystemMonitor(watching: current)
         }
@@ -167,13 +177,14 @@ struct SourcesSidebar: View {
         .onChange(of: model.activeSourceItems) {
             activateSelectedSourceTab()
         }
-        .onChange(of: model.activeSourceTabID) {
+        .onChange(of: model.activeSourceTabID) { previous, _ in
+            saveNavigation(for: previous)
             // Don't leave another tab's files actionable while its replacement
             // projection is being computed in the background.
             visibleRows = []
             thumbnailFocusedFolder = nil
             model.thumbnailScheduler.navigate(folder: nil, discovered: [])
-            searchText = ""
+            restoreNavigation()
             previewRegexRuleID = nil
             activateSelectedSourceTab()
         }
@@ -192,6 +203,10 @@ struct SourcesSidebar: View {
         }
         .onChange(of: searchText) {
             refreshVisibleRows()
+        }
+        .onChange(of: model.benchmarkSourceQuery) { _, query in
+            guard LifecyclePerformance.isEnabled, let query else { return }
+            searchText = query
         }
         .onChange(of: storedNameSortDirection) {
             refreshVisibleRows(rebuildProjection: true)
@@ -212,6 +227,7 @@ struct SourcesSidebar: View {
     }
 
     private func tearDownSidebar() {
+        saveNavigation(for: model.activeSourceTabID)
         model.thumbnailScheduler.navigate(folder: nil, discovered: [])
         model.setChromePin(.sourceVisibilityPopover, active: false)
         model.setTransientPresentation(false, owner: "source-visibility")
@@ -320,10 +336,7 @@ struct SourcesSidebar: View {
                 Button("Reveal in Finder") {
                     model.revealSourceInFinder(row.url)
                 }
-                if let sourceItem = model.activeSourceItems.first(where: {
-                    $0.kind == .file
-                        && NormalizedFileURL.representsSameFile($0.url, row.url)
-                }) {
+                if let sourceItem = model.activeSourceFileItem(for: row.url) {
                     Divider()
                     Button("Remove from Tab", role: .destructive) {
                         model.removeSourceItem(sourceItem)
@@ -695,7 +708,7 @@ struct SourcesSidebar: View {
     }
 
     private var isActiveTabLoading: Bool {
-        isRecursiveMediaLoading || model.activeSourceFolders.contains { folder in
+        !model.areSourceRootsReady || isRecursiveMediaLoading || model.activeSourceFolders.contains { folder in
             loadingFolderIDs.contains(SourceTreeIdentity.folderID(for: folder))
         }
     }
@@ -712,7 +725,9 @@ struct SourcesSidebar: View {
     }
 
     private func refreshVisibleRows(rebuildProjection _: Bool = false) {
+        let started = LifecyclePerformance.begin("source-projection")
         filterTask?.cancel()
+        guard model.areSourceRootsReady else { return }
         let input = SourceTreeProjectionInput(
             items: model.activeSourceItems, visibility: model.activeSourceVisibility,
             roots: model.activeSourceFolders, directoryContents: directoryContents,
@@ -726,14 +741,28 @@ struct SourcesSidebar: View {
                 input: input, revealsRulePreview: revealsRulePreview, query: query
             ), !Task.isCancelled else { return }
             if visibleRows != projection.rows { visibleRows = projection.rows }
-            let mediaURLs = projection.rows.compactMap { row -> URL? in
-                if case .media = row.kind { return row.url }
-                return nil
+            if let restored = pendingScrollRestoration {
+                scrollRowID = projection.rows.contains { $0.id == restored } ? restored : nil
+                pendingScrollRestoration = nil
             }
-            model.thumbnailScheduler.navigate(folder: thumbnailFocusedFolder ?? model.activeSourceFolders.first, discovered: mediaURLs)
+            model.thumbnailScheduler.navigate(folder: thumbnailFocusedFolder ?? model.activeSourceFolders.first,
+                discovered: projection.thumbnailCandidates, validPaths: projection.mediaPaths)
             if hiddenItemCount != projection.hiddenCount { hiddenItemCount = projection.hiddenCount }
             if regexMatchCounts != projection.regexCounts { regexMatchCounts = projection.regexCounts }
+            LifecyclePerformance.end("source-projection", since: started)
         }
+    }
+
+    private func saveNavigation(for tab: String?) {
+        model.sourceNavigation.save(.init(query: searchText, rowID: pendingScrollRestoration ?? scrollRowID),
+            for: tab, validTabs: Set(model.sourceTabs.map(\.id)))
+    }
+
+    private func restoreNavigation() {
+        let location = model.sourceNavigation.location(for: model.activeSourceTabID)
+        searchText = location.query
+        pendingScrollRestoration = location.rowID
+        scrollRowID = nil
     }
 
     private func synchronizeSourceFolders(previous: [URL], current: [URL]) {
@@ -864,7 +893,9 @@ struct SourcesSidebar: View {
         let monitor = SourceFilesystemMonitor { events in
             enqueueFilesystemEvents(events)
         }
-        guard monitor.start(watching: roots) else { return }
+        // Keep volume notifications alive even when an offline root cannot
+        // currently start an FSEvents stream. A later mount retries it.
+        _ = monitor.start(watching: roots)
         filesystemMonitor = monitor
     }
 
@@ -957,6 +988,7 @@ struct SourcesSidebar: View {
             directoryLoadTasks[folderID] = nil
             directoryContents[folderID] = listing.entries
             directoryErrors[folderID] = listing.errorMessage
+            LifecyclePerformance.mark(listing.errorMessage == nil ? "source-directory-ready" : "source-directory-unavailable")
             loadExpandedChildren(of: folderID)
             refreshVisibleRows(rebuildProjection: true)
         }
@@ -1207,6 +1239,15 @@ enum SourcesSidebarScrollerStyle {
     }
 }
 
+private struct SourceScrollRestoration: ViewModifier {
+    @Binding var rowID: String?
+    let isEnabled: Bool
+    @ViewBuilder func body(content: Content) -> some View {
+        if isEnabled { content.scrollPosition(id: $rowID, anchor: .top) }
+        else { content }
+    }
+}
+
 private struct SourcesSidebarScrollerConfigurator: NSViewRepresentable {
     func makeNSView(context: Context) -> ConfigurationView {
         ConfigurationView()
@@ -1268,6 +1309,8 @@ private struct SourcesSearchField: NSViewRepresentable {
     func makeNSView(context: Context) -> NSSearchField {
         let searchField = NSSearchField()
         searchField.placeholderString = "Filter sources"
+        searchField.setAccessibilityLabel("Filter sources in this tab")
+        searchField.setAccessibilityIdentifier("source-search")
         searchField.controlSize = .small
         searchField.sendsSearchStringImmediately = true
         searchField.delegate = context.coordinator

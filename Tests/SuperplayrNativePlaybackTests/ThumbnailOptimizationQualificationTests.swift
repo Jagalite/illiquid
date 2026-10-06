@@ -52,6 +52,50 @@ struct ThumbnailOptimizationQualificationTests {
         await old.releaseIdleResources(); await new.releaseIdleResources()
     }
 
+    @Test func packetExperimentFallsBackUnderTinyBudgetAndReleasesOnPressureOrInvalidation() async throws {
+        guard let path = ProcessInfo.processInfo.environment["ILLIQUID_PACKET_REGRESSION_FIXTURE"] else { return }
+        let url = URL(fileURLWithPath: path), size = CGSize(width: 368, height: 208)
+        for budget in [1, 32 * 1024 * 1024] {
+            let records = Observations()
+            let generator = NativeTimelineThumbnailGenerator(packetWindowBytes: budget, packetReadAheadSeconds: 0.5) { records.append($0) }
+            for target in [1.5, 0.5] {
+                let candidate = try #require(await generator.thumbnail(for: url, at: target, maximumPixelSize: size))
+                let fresh = NativeTimelineThumbnailGenerator()
+                let reference = try #require(await fresh.thumbnail(for: url, at: target, maximumPixelSize: size))
+                #expect(candidate.dataProvider?.data == reference.dataProvider?.data)
+                await fresh.releaseIdleResources()
+            }
+            if budget == 1 { #expect(records.snapshot().allSatisfy { $0.retainedPacketBytes == 0 }) }
+            else { #expect(records.snapshot().contains { $0.replayedPacketWindow }) }
+            await generator.handleMemoryPressure(critical: true)
+            #expect(await generator.thumbnail(for: url, at: 1, maximumPixelSize: size) != nil)
+            #expect(records.snapshot().last?.reusedContext == false)
+            await generator.invalidate(for: 2)
+            #expect(await generator.thumbnail(for: url, at: 3, maximumPixelSize: size) != nil)
+            #expect(records.snapshot().last?.reusedContext == false)
+            await generator.releaseIdleResources()
+        }
+    }
+
+    @Test func shortInterlacedEndHoverReturnsFinalFrame() async throws {
+        guard let path = ProcessInfo.processInfo.environment["ILLIQUID_PREVIEW_END_FIXTURE"] else { return }
+        let url = URL(fileURLWithPath: path)
+        let duration = try FFmpegDemuxer(url: url).mediaInfo.duration
+        #expect(duration > 0 && duration < 3)
+        for target in [duration - 0.01, duration, duration + 0.5, duration + 20] {
+            let observations = Observations()
+            let generator = NativeTimelineThumbnailGenerator { observations.append($0) }
+            let image = await generator.thumbnail(for: url, at: target,
+                maximumPixelSize: CGSize(width: 368, height: 208))
+            #expect(image != nil)
+            let record = try #require(observations.snapshot().last)
+            let selected = try #require(record.selectedFrameSeconds)
+            #expect(selected >= duration - 0.15 && selected <= duration + 0.01)
+            #expect(record.totalMilliseconds < 3_000)
+            await generator.releaseIdleResources()
+        }
+    }
+
     @Test func measure() async throws {
         let env = ProcessInfo.processInfo.environment
         guard let path = env["ILLIQUID_PREVIEW_FIXTURE"], let output = env["ILLIQUID_PREVIEW_RECEIPT"] else { return }
@@ -61,8 +105,18 @@ struct ThumbnailOptimizationQualificationTests {
         let planar = env["ILLIQUID_PREVIEW_PLANAR"] == "1"
         let foreground = env["ILLIQUID_PREVIEW_FOREGROUND_PRIORITY"] == "1"
         let indexed = env["ILLIQUID_PREVIEW_KEYFRAME_INDEX"] == "1"
-        let generator = NativeTimelineThumbnailGenerator(softwareThreads: threads, planarOutput: planar, prioritizesForeground: foreground, usesKeyframeIndex: indexed) { observations.append($0) }
+        let packetBytes = Int(env["ILLIQUID_PREVIEW_PACKET_BYTES"] ?? "0") ?? 0
+        let readAhead = Double(env["ILLIQUID_PREVIEW_READAHEAD_SECONDS"] ?? "0") ?? 0
+        let refillDelay = Double(env["ILLIQUID_PREVIEW_REFILL_DELAY_MS"] ?? "0") ?? 0
+        let generator = NativeTimelineThumbnailGenerator(softwareThreads: threads, planarOutput: planar,
+            prioritizesForeground: foreground, usesKeyframeIndex: indexed, packetWindowBytes: packetBytes,
+            packetReadAheadSeconds: readAhead, simulatedRefillDelay: refillDelay / 1000) { observations.append($0) }
         var requests: [(URL, Double)] = [1.5, 2, 2.5, 1.5, 3.5, 4, 3.5].map { (url, $0) }
+        if env["ILLIQUID_PREVIEW_PACKET_WORKLOAD"] == "1" {
+            // Unique thumbnail buckets force decoding: image-cache hits must not
+            // masquerade as packet-cache wins. Mix backward GOP visits and forward continuation.
+            requests = [1.5, 1, 0.5, 0, 3.5, 3, 2.5, 2, 5.5, 5, 4.5, 4, 6, 6.5, 7, 18.5, 8].map { (url, $0) }
+        }
         if let second = env["ILLIQUID_PREVIEW_SECOND_FIXTURE"] {
             let urls = [url, URL(fileURLWithPath: second)]
             let plans = try urls.map { file in
@@ -103,7 +157,7 @@ struct ThumbnailOptimizationQualificationTests {
         let cpu = (cpuSeconds() - batchCPU) * 1_000
         await generator.releaseIdleResources()
         let stages = try JSONSerialization.jsonObject(with: JSONEncoder().encode(observations.snapshot()))
-        let receipt: [String: Any] = ["threads": threads, "planar": planar, "foreground_priority": foreground, "keyframe_index": indexed, "requests": callers,
+        let receipt: [String: Any] = ["packet_bytes": packetBytes, "read_ahead_seconds": readAhead, "simulated_refill_delay_ms": refillDelay, "threads": threads, "planar": planar, "foreground_priority": foreground, "keyframe_index": indexed, "requests": callers,
             "stages": stages, "batch_wall_ms": wall, "batch_cpu_ms": cpu]
         try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
             .write(to: URL(fileURLWithPath: output))

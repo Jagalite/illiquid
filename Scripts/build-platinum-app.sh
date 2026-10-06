@@ -4,6 +4,8 @@ set -euo pipefail
 
 script_directory=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repository_root=$(cd -P "$script_directory/.." && pwd)
+source "$script_directory/lib/native-sdk-environment.sh"
+illiquid_select_native_sdk "$repository_root"
 # shellcheck source=scripts/lib/platinum-packaging.sh
 source "$script_directory/lib/platinum-packaging.sh"
 
@@ -45,7 +47,7 @@ for command_name in swift xcrun otool lipo install_name_tool pkg-config sips ico
     command -v "$command_name" >/dev/null 2>&1 || platinum_fail "$command_name is required"
 done
 pkg-config --exists libavformat || platinum_fail 'FFmpeg development libraries are required'
-pkg-config --exists libavfilter || platinum_fail 'FFmpeg deinterlacing filter libraries are required'
+illiquid_verify_ffmpeg_linkage || platinum_fail 'FFmpeg dependency preflight failed'
 pkg-config --exists libass || platinum_fail 'libass development libraries are required'
 
 metadata="$repository_root/Resources/Info.plist"

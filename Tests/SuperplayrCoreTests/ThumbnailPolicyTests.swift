@@ -4,6 +4,30 @@ import Testing
 
 @Suite("Thumbnail scheduling policy")
 struct ThumbnailPolicyTests {
+    @Test func oldPreferencesKeepTheirBudgetsWhenExclusionsAreAdded() throws {
+        let data = Data(#"{"memoryMiB":64,"diskMiB":0,"generatesInBackground":true,"priority":"recent"}"#.utf8)
+        let settings = try JSONDecoder().decode(ThumbnailPreferences.self, from: data)
+        #expect(settings.memoryMiB == 64 && settings.diskMiB == 0)
+        #expect(settings.generatesInBackground && settings.priority == .recent)
+        #expect(settings.excludedFolderPaths.isEmpty)
+        #expect(try JSONDecoder().decode(ThumbnailPreferences.self, from: JSONEncoder().encode(settings)) == settings)
+    }
+
+    @Test func presetsPreserveConsentAndExclusionsAndMatchPathBoundaries() {
+        var settings = ThumbnailPreferences()
+        settings.excludedFolderPaths = ["/media/slow", "/media/slow/../slow", "relative"]
+        settings = settings.bounded
+        #expect(settings.excludedFolderPaths == ["/media/slow"])
+        for preset in ThumbnailPreferences.Preset.allCases {
+            settings.apply(preset)
+            #expect(!settings.generatesInBackground && !settings.generatesWithWindowClosed)
+            #expect(settings.excludesBackgroundGeneration(for: URL(fileURLWithPath: "/media/slow/show/video.mkv")))
+            #expect(!settings.excludesBackgroundGeneration(for: URL(fileURLWithPath: "/media/slowish/video.mkv")))
+        }
+        let blocked = URL(fileURLWithPath: "/media/slow/video.mkv")
+        #expect(ThumbnailPolicy.ranked([.init(url: blocked, isVisible: true)], current: blocked,
+            folder: nil, now: Date(), preferences: settings).isEmpty)
+    }
     let now = Date(timeIntervalSince1970: 2_000_000)
     func url(_ path: String) -> URL { URL(fileURLWithPath: "/media/\(path)") }
 

@@ -5,6 +5,11 @@ import Testing
 @Suite("Timeline hover recovery")
 @MainActor
 struct TimelineThumbnailHoverRecoveryTests {
+    @Test func delayedRevisionObservationKeepsANewHoverButRetiresTheOldSource() {
+        #expect(TimelineThumbnailHoverPolicy.shouldRetirePreview(sourceRevision: 1, currentRevision: 2))
+        #expect(!TimelineThumbnailHoverPolicy.shouldRetirePreview(sourceRevision: 2, currentRevision: 2))
+        #expect(!TimelineThumbnailHoverPolicy.shouldRetirePreview(sourceRevision: nil, currentRevision: 2))
+    }
     @Test func fallbackCannotFollowThePointerBeyondTheNearbyWindow() {
         #expect(TimelineThumbnailHoverPolicy.canRetainPreview(at: 10, for: 20, maximumDistance: 30))
         #expect(!TimelineThumbnailHoverPolicy.canRetainPreview(at: 10, for: 120, maximumDistance: 30))

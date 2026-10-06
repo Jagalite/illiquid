@@ -38,7 +38,8 @@ def usage(pid):
         raise RuntimeError("Cannot read process resource counters")
     return {"cpu_s": (value.user + value.system) * CPU_SECONDS_PER_TICK,
             "cpu_seconds_per_tick": CPU_SECONDS_PER_TICK, "cpu_ticks": value.user + value.system,
-            "footprint_mib": value.footprint / 2**20, "rss_mib": value.resident / 2**20}
+            "footprint_mib": value.footprint / 2**20, "rss_mib": value.resident / 2**20,
+            "idle_wakeups": value.idle_wakeups, "interrupt_wakeups": value.interrupt_wakeups}
 
 
 def windows(pid):

@@ -226,7 +226,15 @@ final class AppModel {
         // Concurrent scene/delegate waiters share one model and native graph.
         if let sharedInstance { return sharedInstance }
         let timing = LifecyclePerformance.begin("model-init")
-        let model = AppModel(player: PlaybackController(persistence: persistence))
+        let player: PlaybackController
+        if LifecyclePerformance.isEnabled {
+            let directory = ProcessInfo.processInfo.environment["SUPERPLAYR_BENCHMARK_THUMBNAIL_CACHE"]
+                .flatMap { $0.hasPrefix("/") ? URL(fileURLWithPath: $0, isDirectory: true) : nil }
+            player = PlaybackController(persistence: persistence, thumbnailCacheDirectory: directory)
+        } else {
+            player = PlaybackController(persistence: persistence)
+        }
+        let model = AppModel(player: player)
         LifecyclePerformance.end("model-init", since: timing)
         sharedInstance = model
         let requests = pendingStartupOpenRequests
@@ -265,8 +273,14 @@ final class AppModel {
     private(set) var isAlwaysOnTop: Bool
     private(set) var chromePhase: PlaybackChromePhase = .visible
     private(set) var isUIObservationActive = true
-    private(set) var sourceTabs: [SourceTab]
+    private(set) var sourceTabs: [SourceTab] {
+        didSet { sourceRootIndex.replace(tabs: sourceTabs) }
+    }
+    private let sourceRootIndex = SourceRootIndexStore()
     private(set) var activeSourceTabID: String?
+    @ObservationIgnored var sourceNavigation = SourceNavigationState()
+    var benchmarkTimelineHover: BenchmarkTimelineHover?
+    var benchmarkSourceQuery: String?
     var isInspectorPresented = false
     let shortcutBindings = PlayerShortcutBindings()
     var isShortcutSettingsPresented = false
@@ -395,6 +409,22 @@ final class AppModel {
             guard let self else { return false }
             switch command.action {
             case "ping": break
+            case "hover-preview":
+                guard let target = command.targetSeconds, target.isFinite else { return false }
+                self.benchmarkTimelineHover = BenchmarkTimelineHover(id: command.id, seconds: target)
+            case "source-query":
+                self.benchmarkSourceQuery = command.sourcePath ?? ""
+            case "clear-previews":
+                Task {
+                    _ = await self.player.clearThumbnailCache()
+                    LifecyclePerformance.mark("preview-cache-cleared")
+                }
+            case "memory-pressure":
+                Task {
+                    await self.thumbnailScheduler.handleMemoryPressure(constrained: command.targetSeconds != 0,
+                        critical: command.targetSeconds == 2)
+                    LifecyclePerformance.mark("preview-memory-pressure-handled")
+                }
             case "open":
                 guard let path = command.sourcePath, path.hasPrefix("/") else { return false }
                 LifecyclePerformance.mark("open-request")
@@ -425,6 +455,7 @@ final class AppModel {
         player.thumbnailInteractionHandler = { [weak self] url, position in
             self?.thumbnailScheduler.interaction(url, position: position)
         }
+        sourceRootIndex.replace(tabs: sourceTabs)
         installPlaybackLifecycleObservation(deliverCurrent: true)
         player.setPictureInPictureRestoreRequestHandler { [weak self] completion in
             guard let self else {
@@ -483,33 +514,36 @@ final class AppModel {
         activeSourceTab?.items ?? []
     }
 
+    func activeSourceFileItem(for url: URL) -> SourceTabItem? {
+        guard sourceRootIndex.isReady, let id = activeSourceTabID,
+              let path = NormalizedFileURL.persistenceKey(for: url) else { return nil }
+        return sourceRoots.byTab[id]?.filesByPath[path]
+    }
+
     var activeSourceVisibility: SourceVisibilityConfiguration {
         activeSourceTab?.visibility ?? .default
     }
 
     var activeSourceFolders: [URL] {
-        activeSourceItems.compactMap { item in
-            item.kind == .folder ? item.url : nil
-        }
+        activeSourceTabID.flatMap { sourceRoots.byTab[$0]?.folders } ?? []
     }
 
     var activeSourceWatchRoots: [URL] {
-        SourceTabItems.watchRoots(for: activeSourceItems)
+        activeSourceTabID.flatMap { sourceRoots.byTab[$0]?.watchRoots } ?? []
     }
 
     var allSourceWatchRoots: [URL] {
-        SourceTabItems.watchRoots(for: sourceTabs.flatMap(\.items))
+        sourceRoots.watchRoots
     }
 
     var allSourceFolders: [URL] {
-        SourceFolderLibrary.merging(
-            [],
-            with: sourceTabs.flatMap { tab in
-                tab.items.compactMap { item in
-                    item.kind == .folder ? item.url : nil
-                }
-            }
-        )
+        sourceRoots.folders
+    }
+
+    var areSourceRootsReady: Bool { sourceRootIndex.isReady }
+
+    private var sourceRoots: SourceRootIndex {
+        sourceRootIndex.snapshot
     }
 
     func openFilePanel() {
@@ -2440,14 +2474,11 @@ enum SourceFolderLibrary {
 
     static func merging(_ existing: [URL], with additions: [URL]) -> [URL] {
         var result: [URL] = []
+        var seen = Set<String>()
         for candidate in existing + additions {
             guard candidate.isFileURL else { continue }
             let normalized = NormalizedFileURL.normalize(candidate) ?? candidate.absoluteURL.standardized
-            guard !result.contains(where: {
-                NormalizedFileURL.representsSameFile($0, normalized)
-            }) else {
-                continue
-            }
+            guard seen.insert(normalized.path).inserted else { continue }
             result.append(normalized)
         }
         return result

@@ -57,6 +57,8 @@ done
 
 script_directory=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repository_root=$(cd -P "$script_directory/.." && pwd)
+source "$script_directory/lib/native-sdk-environment.sh"
+illiquid_select_native_sdk "$repository_root"
 app_name=${app_name:-$product}
 output_directory=${output_directory:-$repository_root/dist}
 
@@ -69,6 +71,7 @@ command -v otool >/dev/null || fail 'otool is required'
 command -v install_name_tool >/dev/null || fail 'install_name_tool is required'
 command -v pkg-config >/dev/null || fail 'pkg-config is required (brew install pkg-config)'
 pkg-config --exists libavformat || fail 'FFmpeg development libraries are required (brew install ffmpeg)'
+illiquid_verify_ffmpeg_linkage || fail 'FFmpeg dependency preflight failed'
 pkg-config --exists libass || fail 'libass development libraries are required (brew install libass)'
 
 export MACOSX_DEPLOYMENT_TARGET=$minimum_macos

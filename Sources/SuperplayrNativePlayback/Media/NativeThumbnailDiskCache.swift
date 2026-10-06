@@ -161,5 +161,5 @@ actor NativeThumbnailDiskCache {
         for key in Array(files.keys) { removeDisk(key) }
         return files.isEmpty
     }
-    func bytes() -> Int { diskBytes }
+    func bytes() -> Int { loadDisk(); return diskBytes }
 }

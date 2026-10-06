@@ -50,8 +50,8 @@ struct RendererPresentationMetricsSnapshot: Equatable, Sendable {
     let flushCompleted: Bool
     let rendererDrainEvidence: Bool
 
-    // AVSampleBufferVideoRenderer does not expose equivalent per-frame
-    // presented/late/dropped completion evidence. Nil means unmeasured, not 0.
+    // This snapshot does not poll the renderer's asynchronous aggregate metrics
+    // or pixel-buffer readback. Nil means unmeasured here, not zero.
     let firstVisibleFrameSeconds: Double? = nil
     let lateVideoFrames: Int? = nil
     let droppedVideoFrames: Int? = nil

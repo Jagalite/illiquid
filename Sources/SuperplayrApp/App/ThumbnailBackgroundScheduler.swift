@@ -15,6 +15,9 @@ final class ThumbnailBackgroundScheduler {
         }
     }
     private(set) var status = "Background generation is off."
+    private(set) var cacheUsage: ThumbnailCacheUsage?
+    @ObservationIgnored private var memoryPressureSource: DispatchSourceMemoryPressure?
+    @ObservationIgnored private var isUnderMemoryPressure = false
     @ObservationIgnored private let player: PlaybackController
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let readDuration: @MainActor (URL) async -> Double?
@@ -48,6 +51,16 @@ final class ThumbnailBackgroundScheduler {
             ?? ThumbnailPreferences()
         let settings = preferences
         Task { await player.configureThumbnailCache(settings) }
+        let pressure = DispatchSource.makeMemoryPressureSource(eventMask: [.normal, .warning, .critical], queue: .main)
+        pressure.setEventHandler { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self, let event = self.memoryPressureSource?.data else { return }
+                await self.handleMemoryPressure(constrained: event.contains(.warning) || event.contains(.critical),
+                                                critical: event.contains(.critical))
+            }
+        }
+        memoryPressureSource = pressure
+        pressure.resume()
         for name in [Notification.Name.NSProcessInfoPowerStateDidChange, ProcessInfo.thermalStateDidChangeNotification] {
             powerObservers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 Task { @MainActor [weak self] in self?.reschedule() }
@@ -64,10 +77,13 @@ final class ThumbnailBackgroundScheduler {
         if changed { reschedule() }
     }
 
-    func navigate(folder: URL?, discovered: [URL]) {
+    func navigate(folder: URL?, discovered: [URL], validPaths: Set<String>? = nil) {
         // Policy never initiates a filesystem walk. Bound UI-to-scheduler metadata too.
         let entries = Array(discovered.prefix(2048))
-        let retainedVisible = visible.intersection(discovered.lazy.map(\.standardizedFileURL))
+        let retainedVisible: Set<URL>
+        if visible.isEmpty { retainedVisible = [] }
+        else if let validPaths { retainedVisible = visible.filter { validPaths.contains($0.path) } }
+        else { retainedVisible = visible.intersection(discovered.lazy.map(\.standardizedFileURL)) }
         guard self.discovered != entries || self.folder != folder?.standardizedFileURL
                 || visible != retainedVisible else { return }
         visible = retainedVisible
@@ -107,6 +123,8 @@ final class ThumbnailBackgroundScheduler {
 
     func shutdown() {
         stopped = true
+        memoryPressureSource?.cancel()
+        memoryPressureSource = nil
         for observer in powerObservers { NotificationCenter.default.removeObserver(observer) }
         powerObservers.removeAll()
         cancel()
@@ -116,6 +134,21 @@ final class ThumbnailBackgroundScheduler {
         cancel()
         let cleared = await player.clearThumbnailCache()
         status = cleared ? "Thumbnail cache cleared." : "Some disk thumbnails could not be removed."
+        await refreshCacheUsage()
+    }
+
+    func refreshCacheUsage() async {
+        let usage = await player.thumbnailCacheUsage()
+        guard !Task.isCancelled, !stopped else { return }
+        cacheUsage = usage
+    }
+
+    func handleMemoryPressure(constrained: Bool, critical: Bool) async {
+        guard !stopped else { return }
+        isUnderMemoryPressure = constrained
+        reschedule()
+        if constrained { await player.handleThumbnailMemoryPressure(critical: critical) }
+        await refreshCacheUsage()
     }
 
     private func reschedule() {
@@ -127,6 +160,10 @@ final class ThumbnailBackgroundScheduler {
         }
         guard idle, windowVisible || settings.generatesWithWindowClosed else {
             status = "Waiting for paused or stopped playback."
+            return
+        }
+        guard !isUnderMemoryPressure else {
+            status = "Background generation is paused while memory is limited."
             return
         }
         guard !ProcessInfo.processInfo.isLowPowerModeEnabled,
@@ -207,7 +244,7 @@ final class ThumbnailBackgroundScheduler {
     }
 
     private func canContinue(_ id: UUID) -> Bool {
-        !Task.isCancelled && !stopped && generation == id && idle
+        !Task.isCancelled && !stopped && !isUnderMemoryPressure && generation == id && idle
             && !ProcessInfo.processInfo.isLowPowerModeEnabled
             && ProcessInfo.processInfo.thermalState != .serious
             && ProcessInfo.processInfo.thermalState != .critical

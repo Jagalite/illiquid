@@ -7,6 +7,15 @@ struct ThumbnailDecodeObservation: Codable, Sendable {
     var reusedContext = false
     var continuedForward = false
     var indexedKeyframeSeconds: Double?
+    var replayedPacketWindow = false
+    var replayedPackets = 0
+    var demuxReadCalls = 0
+    var demuxBytesRead: Int64 = 0
+    var packetReadMilliseconds: Double = 0
+    var retainedPacketBytes = 0
+    var retainedPacketCount = 0
+    var prefetchedPackets = 0
+    var prefetchMilliseconds: Double = 0
     var packets = 0
     var frames = 0
     var discardedBeforeOutput = 0

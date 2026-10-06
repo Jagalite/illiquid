@@ -35,6 +35,7 @@ actor NativeThumbnailCache {
     private let disk: NativeThumbnailDiskCache
     private let hasDisk: Bool
     private var epoch: UInt64 = 0
+    private var memoryRevision: UInt64 = 0
     private struct Write: Sendable {
         let image: CGImage
         let key: Key
@@ -115,9 +116,10 @@ actor NativeThumbnailCache {
             return resident.image
         }
         let revision = epoch
+        let residentRevision = memoryRevision
         guard hasDisk, preferences.diskMiB > 0,
               let image = await disk.image(for: key, background: background),
-              epoch == revision, !Task.isCancelled else { return nil }
+              epoch == revision, memoryRevision == residentRevision, !Task.isCancelled else { return nil }
         rememberMemory(image, key: key, background: background)
         return image
     }
@@ -203,5 +205,22 @@ actor NativeThumbnailCache {
 
     func usage() async -> (memoryBytes: Int, diskBytes: Int, images: Int) {
         (memoryBytes, await disk.bytes(), images.count)
+    }
+
+    /// Preserve disk entries and user limits. Reclaim speculative images first;
+    /// critical pressure discards all resident images, including dictionary capacity.
+    func trimForMemoryPressure(critical: Bool) {
+        memoryRevision &+= 1
+        pending = nil
+        let target = critical ? 0 : memoryBytes / 2
+        let victims = images.sorted {
+            if $0.value.background != $1.value.background { return $0.value.background }
+            return $0.value.used < $1.value.used
+        }
+        for victim in victims where memoryBytes > target {
+            memoryBytes -= victim.value.bytes
+            images.removeValue(forKey: victim.key)
+        }
+        if images.isEmpty { images = [:] }
     }
 }

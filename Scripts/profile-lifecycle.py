@@ -34,7 +34,7 @@ def digest(path):
 
 class Run:
     def __init__(self, app, directory, entries, keep, source_count=0, *, environment_overrides=None,
-                 controls_always_visible=True):
+                 controls_always_visible=True, source_folders=()):
         self.directory = directory
         directory.mkdir(parents=True, exist_ok=False)
         self.runtime_directory = tempfile.TemporaryDirectory(prefix='illiquid-lifecycle-')
@@ -54,6 +54,9 @@ class Run:
         if source_count:
             settings['Superplayr.source-tabs.v1'] = json.dumps([{'id': 'benchmark', 'items': [
                 {'kind': 'file', 'path': f'/benchmark/sources/episode-{i}.mkv'} for i in range(source_count)]}]).encode()
+        if source_folders:
+            settings['Superplayr.source-tabs.v1'] = json.dumps([{'id': 'benchmark', 'items': [
+                {'kind': 'folder', 'path': str(folder)} for folder in source_folders]}]).encode()
         seed = directory / 'preferences.plist'
         seed.write_bytes(plistlib.dumps(settings))
         # `defaults import` merges unspecified keys. Reset this benchmark-only
@@ -67,6 +70,7 @@ class Run:
             SUPERPLAYR_BENCHMARK_LIFECYCLE='1', SUPERPLAYR_BENCHMARK_CONTROL_SESSION=self.session,
             SUPERPLAYR_BENCHMARK_CONTROL_FILE=str(self.commandpath),
             SUPERPLAYR_BENCHMARK_SESSION_FILE=str(self.sessionpath),
+            SUPERPLAYR_BENCHMARK_THUMBNAIL_CACHE=str(runtime / 'thumbnails'),
             SUPERPLAYR_BENCHMARK_WINDOW_SIZE='960x600', SUPERPLAYR_BENCHMARK_HIDE_SIDEBAR='0',
             SUPERPLAYR_BENCHMARK_SOFTWARE_OUTPUT='planar', SUPERPLAYR_BENCHMARK_VP9_HARDWARE='0')
         environment.update(environment_overrides or {})

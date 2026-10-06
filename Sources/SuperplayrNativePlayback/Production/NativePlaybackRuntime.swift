@@ -1700,6 +1700,17 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         }
     }
 
+    /// Opt-in renderer qualification. Counters describe renderer output rather
+    /// than display scanout; missing metrics remain unavailable, never zero.
+    public func benchmarkRendererMetrics() async -> String? {
+        guard Bundle.main.bundleIdentifier == "com.example.SuperplayrBenchmark",
+              ProcessInfo.processInfo.environment["SUPERPLAYR_ENABLE_BENCHMARK_OVERRIDES"] == "1"
+        else { return nil }
+        guard let metrics = await presentation.video.renderer.videoPerformanceMetrics else { return nil }
+        return "total=\(metrics.totalNumberOfFrames) dropped=\(metrics.numberOfDroppedFrames) "
+            + "corrupted=\(metrics.numberOfCorruptedFrames) delay-seconds=\(metrics.totalAccumulatedFrameDelay)"
+    }
+
     public func pausedReadbackDiagnostic() -> NativePausedReadbackDiagnostic {
         let buffer = presentation.video.renderer.displayedPixelBuffer()
         let frame = buffer.flatMap { presentation.video.identity(for: $0) }

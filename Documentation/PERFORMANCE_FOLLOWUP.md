@@ -853,3 +853,506 @@ runs probes sequentially, preserves failures, reports process CPU as well as wal
 time, and exits unsuccessfully if any preview is missing. It does not launch the
 installed app. The optional direct runner uses the active Xcode toolchain's Swift
 Testing helper to avoid repeated SwiftPM manifest compilation between samples.
+
+## 2026-10-06: UI responsiveness, cache controls and storage scheduling
+
+This pass follows commit `0500268ce09e78f17a758e9e96a56fd19fef3fd9` and covers
+all six proposed followups. Receipts are in the ignored
+`QualificationArtifacts/ResponsivenessAudit/` directory. Tests and probes used an
+M1 on macOS 26.5.2, synthetic local files, warm OS file pages and isolated app
+identities/preferences/caches. The installed app was not replaced. Unrelated
+edits to `PlaybackOSD.swift` and `PlayerRootView.swift` were preserved; their
+hashes are in `baseline.json` and checked in `manifest.json`.
+
+| Area | Disposition | Result and remaining boundary |
+| --- | --- | --- |
+| Preview/open/seek UI latency | Implemented and measured | Instrumented real hover handler, cache/image readiness and an AppKit draw witness. Fixed a source-revision race that cancelled a fresh hover in the same SwiftUI update. Physical input and compositor presentation remain unmeasured. |
+| Cold previews / backward seeks | Measured; further decoder changes deferred | Four codecs, paused/playing hover sequences and alternating exact seeks pass. Keep established decoder route, pixel size and thread limit; pool/hardware/output changes need fidelity and concurrent-playback evidence. |
+| Cache usability | Implemented | Economical/Balanced/Extensive presets, live RAM/disk/resident-image usage, background folder exclusions, memory-pressure suspension and resident trimming. |
+| Large libraries / navigation | Implemented and measured | Reuse tab root indexes and direct file-item lookups, linear folder deduplication, session-local per-tab search/scroll restoration, accessible search label. Full VoiceOver walkthrough and a native-list/background-index redesign are deferred. |
+| Slow/unavailable storage | Implemented and tested | Reserve an interactive slot, replace polling with completion notifications, retain bounded waits/deadlines and physical ownership after cancellation. Actual NAS disconnect/reconnect qualification is deferred. |
+| Idle/closed resource use | Measured; retention investigation deferred | Completed 24 mixed-codec cycles plus an eight-cycle memory-map followup. Closed CPU is low; retained process memory is unresolved. Hours-long, energy and broad-device qualification remain deferred. |
+
+Presets only change budgets, never background-generation consent. Exclusions
+include lexical subfolders and apply before background metadata probing; they
+leave foreground hover available. Existing preferences migrate with defaults for
+missing fields. Usage refresh runs every two seconds only while settings is
+mounted. Warning pressure reclaims half the current resident bytes, speculative
+images first; critical pressure releases resident thumbnails and the independent
+preview decoder. Disk entries and configured limits survive, and stale work is
+fenced from repopulating the trimmed resident cache. The settings render was
+visually checked (`settings.png`).
+
+### Preview observations
+
+The three-run cohort (`previews/summary.json`) completed 168 hover requests with
+playback-clock checks. The final release executable repeated all four fixtures
+once (`final-previews/summary.json`, 56 more requests). Values below measure
+command injection to the first draw witness observed by the probe, including
+command/polling overhead and the existing 40 ms cache-miss debounce.
+
+| Fixture | Earlier cohort cold paused median | Final cold paused | Final cold playing |
+| --- | ---: | ---: | ---: |
+| H.264 1080p30 | 185 ms | 172 ms | 124 ms |
+| H.264 4K30 | 315 ms | 272 ms | 266 ms |
+| HEVC 10-bit 1080p60 | 425 ms | 403 ms | 412 ms |
+| VP9 1080p60 | 219 ms | 215 ms | 200 ms |
+
+These are observations across successive candidates, **not a decoder speedup
+comparison**. Each paused first request starts with cleared thumbnails/decoder;
+the subsequent playing first request clears those again but retains the warmed
+image renderer. Final repeated cached positions reached the first witness in
+16–42 ms. A witness can represent a nearby cached image before exact refinement;
+separate image-ready stages are preserved. The AppKit witness and screenshots do
+not prove compositor scan-out timing. Early failed cohorts retain evidence of the
+source-revision cancellation, which occurred within 9–17 ms of the request.
+
+Final 4K exact-seek pipeline completion was 199–216 ms forward to 18.5 seconds
+and approximately 165 ms backward to 2 seconds (three each, paused). These
+endpoints confirm pipeline completion, not displayed pixels. Broader seek tails,
+real high-bitrate/HDR files and frame-drop accounting remain deferred. No new
+playback decoder tuning is justified by this pass.
+
+### Library and storage results
+
+With 100,000 synthetic file entries, the initial candidate's worst sampled
+main-queue gap was 2,232 ms. Caching roots alone left 1,375–1,454 ms gaps; replacing
+the row context-menu linear file search with an indexed lookup reduced the
+maximum to 310–329 ms across three runs. Query projections were 138–226 ms and
+post-query process CPU 0.32–0.45% of one core. A separate two-run experiment
+without scroll restoration showed no meaningful improvement, so restoration is
+retained. This does not make 100,000 rows hitch-free: initial indexing still
+runs on the main actor, and a larger list/index redesign is deferred.
+
+Final 10,000-item runs configured in 540–613 ms, projected queries in 14–26 ms
+and had maximum sampled queue gaps of 63–68 ms (initial candidate: 644 ms in
+one run). The 10 ms diagnostic heartbeat is enabled for navigation and previews,
+so these are instrumented observations. Query commands bypass physical typing.
+Per-tab state and index/deduplication semantics have regression coverage. The
+keyboard audit retained existing bindings, including Cmd-F fullscreen, rather
+than introducing a conflicting search binding.
+
+A controlled executor probe submitted 32 concurrent synthetic 1 ms reads with a
+two-second deadline. Committed polling completed 22 and timed out 10 in 2.004 s;
+completion-driven admission completed all 32 in 51 ms. A stalled background
+worker still allowed a healthy interactive request in approximately 0.03 ms.
+These test queue admission, **not NAS throughput or kernel I/O cancellation**.
+Logical cancellation continues to hold the physical slot until the worker exits.
+Polling is dropped; the default two-slot executor allows one background owner
+and reserves capacity for interactive work.
+
+### mpv/IINA and lifecycle controls
+
+Three rotated-order H.264 4K runs used mpv 0.41.0, IINA 1.4.4 and an intermediate
+Illiquid candidate (`reference-4k/summary.json`). Hardware decode was requested,
+audio muted per player, target windows 960×540 points, diagnostic heartbeat off,
+and IINA automatic thumbnail generation explicitly disabled. This isolates a
+playback control; it is not a default-settings comparison. IINA 1.4.4 otherwise
+[defaults to thumbnail previews, a 240-pixel width and a 500 MB cache limit](https://raw.githubusercontent.com/iina/iina/v1.4.4/iina/Preference.swift).
+
+| Player | Playing CPU | Paused CPU | Closed CPU | Playing footprint |
+| --- | ---: | ---: | ---: | ---: |
+| Illiquid | 4.23% | 0.37% | 0.05% | 153 MiB |
+| mpv | 8.03% | 0.47% | unavailable | 424 MiB |
+| IINA | 3.77% | 0.48% | 0.04% | 606 MiB |
+
+Values are medians, process CPU as a percentage of one core. They exclude GPU,
+WindowServer and other processes. mpv native window close was unavailable through
+the control helper; no close ranking is claimed. Reference and native readiness
+and seek endpoints differ. Native playback clocks advanced correctly, but a
+native dropped-frame counter was not available: missing is not zero.
+
+Three subsequent baseline Illiquid runs measured 4.36% median playing CPU.
+The 4.23% candidate result is not evidence of a new playback CPU gain; the
+cohorts were sequential and host background activity varied. Baseline closed
+footprints ranged 81–232 MiB, candidate approximately 220–242 MiB. A memory
+nonregression claim is therefore **not established**.
+
+The 24-cycle mixed-codec soak completed every open/play/hover/close/reopen cycle.
+Median observed open-to-first-submit was 56 ms (maximum 249 ms), median closed
+CPU 0.22%, and process exit after quit 257 ms. Final reopened idle footprint was
+266 MiB and 264 MiB after critical thumbnail trimming. An independent eight-cycle
+followup ended at 186 MiB before trimming and 137 MiB afterward. Its pre-trim
+`vmmap` reported 24.9 MiB allocated in malloc zones and 88.0 MiB dirty/swapped
+fragmentation, plus 21.9 MiB resident IOSurfaces. This suggests allocator
+retention contributes, but does not attribute allocations to components or prove
+a leak/plateau. A longer matched baseline/candidate run with allocation ownership
+tracing is deferred; speculative global allocator purges are not adopted.
+
+### Validation and reproduction
+
+Final source passed **396 tests in 69 suites**, architecture checks, Python
+compilation and a release build. The initial broad regression run had two missing
+fixture failures; repeating with separate complete synthetic fixtures passed all
+396. Both logs are preserved. The existing native dependency packaging blocker
+is unchanged; a successful release build and ad-hoc benchmark bundle do not
+qualify a distributable application.
+
+Each cohort records its own executable hash. The early three-run preview,
+100,000-item variants, reference comparison and 24-cycle soak used successive
+intermediate candidates. Final previews, 10,000-item navigation and eight-cycle
+memory map share signed executable SHA-256
+`412f7f20a1a65a695578fa6c83103275fbe1e525fafdedb26119ffd62f2c096b`.
+`manifest.json` captures final source/script/fixture hashes, validation receipts
+and each cohort identity; this is not a uniform exact-revision qualification of
+all historical measurements.
+
+Use a separate benchmark bundle with identifier `com.example.SuperplayrBenchmark`
+(as required by `profile-lifecycle.py`), never the installed production bundle.
+The output directory must not already exist. For example:
+
+```sh
+Scripts/profile-responsiveness.py --app /path/to/benchmark/Illiquid.app \
+  --fixture /path/to/video.mp4 --runs 3 --output /tmp/preview-ui
+Scripts/profile-responsiveness.py --app /path/to/benchmark/Illiquid.app \
+  --mode navigation --source-count 100000 --runs 3 --output /tmp/sidebar-ui
+Scripts/profile-responsiveness.py --app /path/to/benchmark/Illiquid.app \
+  --mode soak --cycles 24 --runs 1 --memory-map \
+  --fixture /path/to/video.mp4 --output /tmp/lifecycle-soak
+```
+
+The probe isolates session/preferences/thumbnail cache, retains failure receipts,
+and exits unsuccessfully on missing previews or failed playback-clock checks.
+Use multiple `--fixture` arguments to rotate media in the soak. Full physical
+input/display timing, real storage faults, HDR/device/energy matrices and native
+retention ownership are explicit followup qualifications, not completed claims.
+
+## 2026-10-06: compressed-packet preview experiment
+
+**Decision: keep packet retention experimental; do not enable speculative
+read-ahead for local previews.** Reusing compressed packets substantially reduces
+FFmpeg's input reads, but the local-file cohort does not show a consistent latency
+or CPU improvement. The artificial slow-read cohort supports investigating
+retention for I/O-bound storage. It does not qualify NAS performance or justify
+sharing packet ownership with the live playback session yet.
+
+The internal qualification initializer now offers a packet window. The public
+initializer leaves it disabled. The window retains at most 32 MiB of video packet
+payload and 512 packets, for the independent decoder's current file. Replay must
+start at the same indexed keyframe the existing preview path would select; absent
+coverage/index, corrupt packets, or exceeded bounds fall back to demux seeking.
+Packet exhaustion resumes reading at the demuxer's real frontier. Source changes,
+worker cancellation/resource release and memory-pressure handling release the
+window with its decoder context. Decoder state is not shared with playback.
+
+Three modes used identical two-thread software BGRA decoding and 368×208 output:
+
+- `indexed`: current production preview policy, without packet retention.
+- `packet-retain`: retain video packets already fetched, without extra reads.
+- `packet-prefetch`: retain packets and attempt up to another 0.5 seconds of
+  reading, capped at 32 demux calls or 50 ms per request. A blocking call can
+  overrun the 50 ms admission limit; the existing request/decode deadlines remain.
+  This prototype charges prefetch work to caller latency, rather than hiding its
+  cost. Prefetched packets are delivered before any subsequent physical read.
+
+The read-ahead variant runs on the request worker: speculative stalls or read
+errors can affect foreground completion. It is a cost probe, not a qualified
+background-prefetch service; its results do not rule out a better idle scheduler.
+
+Each run requests 17 distinct half-second thumbnail buckets, mixing backward
+visits within GOPs, forward continuation and distant seeks. No finished-image
+cache hit can masquerade as a packet-cache win in this workload. Three alternating
+mode-order runs cover H.264 1080p30/4K30, HEVC 10-bit 1080p60 and VP9 1080p60.
+These are debug native-generator probes, not UI or simultaneous-playback probes.
+OS file pages are warm; host background activity was substantial and variable.
+
+| Fixture | AVIO bytes: baseline → retention | Retained packet payload peak | Median whole workload: baseline / retention / read-ahead |
+| --- | ---: | ---: | ---: |
+| H.264 1080p | 45.8 → 21.2 MB (54% less) | 6.6 MiB | 927 / 888 / 881 ms |
+| H.264 4K | 177.2 → 81.8 MB (54% less) | 26.0 MiB | 3,675 / 3,961 / 3,821 ms |
+| HEVC 10-bit | 16.6 → 10.7 MB (35% less) | 3.6 MiB | 8,443 / 8,030 / 8,568 ms |
+| VP9 | 10.9 → 8.3 MB (24% less) | 1.1 MiB | 1,882 / 1,760 / 2,143 ms |
+
+AVIO bytes count data fetched by FFmpeg **including filesystem-cache hits**, after
+initial media opening/probing. They are not physical disk bytes. Packet payload
+is additional retained compressed data, not total process footprint or a complete
+native-allocation budget. Extra read-ahead fetched more data than retention alone
+and raised peak payload to approximately 29 MiB for 4K. In the local baseline,
+packet reads took only about 0.4–1.6% of total workload time (ratio of medians).
+Decoded output/preroll frame counts were identical between modes: retaining
+packets does not eliminate reference-frame decoding. All **612 local images**
+matched the baseline pixel hashes, with no missing previews.
+
+A second cohort requested a 2 ms sleep after each demux call that increased the
+AVIO byte counter. This is a synthetic input-stall test; it does not model disk
+throughput, network round trips, buffering or NAS cancellation. Actual sleep and
+scheduling delays can exceed 2 ms substantially. In the complete 1080p cohort,
+median backward preview latency was **532 ms baseline, 34 ms retention, 36 ms
+read-ahead**; whole-workload medians were 13.50, 7.06 and 7.73 seconds. Thus
+retention avoids repeated input stalls, whereas extra speculative work adds cost.
+
+The delayed 4K cohort exceeded existing decode/caller deadlines on five requests:
+three baseline, two read-ahead, zero retention-only. All **301 delivered images**
+across the delayed cohort match the complete local baseline. Missing outputs are
+preserved and make the delayed benchmark exit unsuccessfully. Some raw
+`hashes_match_first_run` fields are false because the first delayed 4K baseline
+itself lacked an image; `analysis.json` separately compares every delivered image
+to the complete local baseline. Failed 4K runs are not a clean latency comparison
+or a production qualification. No deadlines were relaxed to make the probe pass.
+
+The production path gains no packet cache, extra reader, thread or prefetch setting
+from this experiment. Packet measurement timers and simulated stalls are confined
+to the internal observation-enabled qualification path. Further steps are deferred:
+real slow-storage trials, matched process-memory/energy and playback-contention
+measurements, and a playback seek cache with coherent audio/subtitle/generation
+handling. Sharing immutable packet ranges may be useful eventually; sharing the
+mutable demux/decoder cursor is not part of this prototype.
+
+Receipts, failures, fixture hashes and test-binary identities are under
+`QualificationArtifacts/PacketPreviewExperiment/`. The main `local` and `delayed`
+cohorts precede final defensive argument guards (rejecting pre-keyframe targets
+and negative prefetch indexes). Their supplied arguments already satisfy those
+guards. Final validation and edge-case receipts identify the rebuilt binary.
+
+To reproduce after building the qualification tests:
+
+```sh
+swift test --filter 'ThumbnailPacketWindowTests|ThumbnailOptimizationQualificationTests'
+Scripts/profile-thumbnails.py --direct-runner --packet-workload --runs 3 \
+  --mode indexed --mode packet-retain --mode packet-prefetch \
+  --fixture /path/to/video.mp4 --output /tmp/packet-preview-local
+```
+
+Add multiple `--fixture` arguments for a matrix; add `--refill-delay-ms 2` with a
+new output directory for the synthetic stall test. Failures and mismatches cause
+a nonzero exit. This experiment does not launch or replace the installed app.
+
+Final validation passed **123 tests in 22 suites**, including the packet-window
+bounds/keyframe tests, actual tiny-budget decoding, pressure/invalidation release,
+and exact-seek frame comparisons on five fixtures. The missing long-VFR fixture
+was generated separately using the repository's 120-second recipe. An initial
+overly broad native-fixture run was interrupted before qualification and is not
+counted. Architecture and Python checks passed.
+
+The rebuilt test binary produced another **204 matching main-matrix images**.
+Nonzero-origin and single-frame fixtures added 102 matching images. The initial
+interlaced fixture was only two seconds long: 13 targets per mode were at/past its
+end and unavailable in every mode (39 unavailable requests total). Those receipts
+are retained; they are not packet-cache regressions or a passing edge cohort.
+A 24-second top-field-first MPEG-2 fixture then produced **51/51 matching images**,
+with no packet replay or speculative reads: the filtered-frame guard correctly
+keeps the established seek/decode path. End-of-duration behavior of the short
+interlaced fixture is a separate deferred investigation.
+
+Final confirmation ran during heavier host activity and is used for correctness,
+not a new timing claim. All executable/fixture identities and preserved-edit
+checks are in `manifest.json`. No release-package or concurrent-playback
+qualification is claimed; the experimental code remains disabled by default.
+
+## 2026-10-06: remaining-fixes qualification
+
+This pass addresses the six followups after the packet experiment. Receipts are
+in `QualificationArtifacts/FixAllAudit/`. It supersedes the earlier short-clip
+EOF, main-thread root-index and native-package deferrals. The compressed packet
+experiment remains disabled. Measurements use the same M1/macOS host, synthetic
+fixtures and isolated benchmark identities; the installed app is unchanged.
+
+### Retained changes and measurements
+
+Root/file indexes now build on a cancellable background task and publish only
+the latest complete revision. The previous watch roots remain active while a
+replacement builds; file actions wait for the new revision. Thumbnail candidates
+and full-path membership sets are prepared with the background row projection,
+removing another full-library walk from the main actor. Three packaged-app runs
+with 100,000 files recorded worst sampled main-queue gaps of **107.6, 102.8 and
+111.3 ms**, compared with the earlier 310–329 ms cohort. Query projections took
+approximately 138–256 ms off the main actor. These are successive cohorts, not
+controlled cold-start measurements. Restoring all rows after clearing the query
+still produces a roughly 100 ms SwiftUI reconciliation hitch. A native table or
+windowed row model is deferred: it needs separate selection, accessibility and
+scroll-restoration validation, not just a faster timing result.
+
+Preview target buckets now clamp below a known finite EOF and seek with up to a
+second of preroll near the end. The two-second interlaced MPEG-2 fixture returns
+a final image at duration minus 0.01 seconds, duration, duration plus 0.5 seconds
+and duration plus 20 seconds. Each selected frame is within 0.15 seconds of the
+end. This fixes the previously recorded missing images without relaxing decode
+or cancellation deadlines. Additional per-decode/per-enqueue autorelease scopes
+were also tested, but showed no established memory benefit and were removed
+while investigating a possible small playback CPU regression.
+
+Volume mount/unmount notifications now invalidate affected descendant roots and
+reattach their filesystem streams. An offline root retains its volume observer
+even when stream creation fails. The packaged integration test creates its own
+APFS disk image, plays a copied file, force-detaches only that owned device,
+closes/reopens the window, plays a healthy local file, then reattaches and verifies
+listing, playback readback and preview drawing. `storage-final` passed:
+**393 ms** from detach invocation to unavailable-state observation and **332 ms**
+from attach invocation to directory-ready observation. These include OS command
+and polling overhead. They do not qualify SMB/NAS timeouts or physical disk loss;
+those remain deferred pending an appropriate storage target. Physical-worker
+ownership and cancellation are separately covered by executor tests.
+
+Renderer qualification now reads current-generation displayed pixel buffers and
+public renderer performance counters. Readback is opt-in for benchmark snapshots
+and does not add polling to production. Six paused 4K seeks reached a matching
+current-generation displayed buffer in **187–253 ms** after command dispatch.
+This is stronger evidence than enqueue completion, but it is not compositor
+scanout or physical-input-to-photon latency.
+
+The packaged four-codec interaction cohort uses six-second steady, repeated-hover
+and repeated-resize phases. Controls remain visible, unlike the playback-only
+reference comparison. Counters are checked for availability and progress;
+missing metrics are never treated as zero.
+
+| Fixture | Steady CPU / drops | Hover CPU / drops | Resize CPU / drops |
+| --- | ---: | ---: | ---: |
+| H.264 1080p30 | 5.30% / 0 | 11.95% / 0 | 8.01% / 0 |
+| H.264 4K30 | 6.35% / 0 | 24.08% / 0 | 9.47% / 0 |
+| HEVC 10-bit 1080p60 | 7.02% / 0 | 102.90% / 0 | 9.03% / 2 |
+| VP9 1080p60 | 17.90% / 0 | 36.62% / 0 | 21.27% / 1 |
+
+CPU is a percentage of one core; drops are renderer counter deltas. All corrupted
+frame deltas were zero. The three resize drops remain a measured limitation,
+not a zero-drop claim. HEVC cold-hover CPU warrants further scheduling/decoder
+work, but no alternate decode route is promoted without image and playback
+qualification. GPU/WindowServer cost is excluded. Hardware energy measurement
+was unavailable because `powermetrics` required a password; CPU is not energy.
+
+### Memory experiment disposition
+
+The mixed-codec soaks still show variable closed footprints. Memory maps report
+substantial dirty/swapped empty malloc regions alongside roughly 25 MiB of live
+malloc allocations and 22 MiB resident IOSurfaces. This suggests allocator
+retention contributes; it does not prove that every retained object is expected.
+
+An idle-only `malloc_zone_pressure_relief` experiment was tested after physical
+session cancellation, off the main actor, with cancellation on reopen. The first
+A/B cohort missed the typed stop path and had **no cleanup events**, so it cannot
+support an effect claim. Corrected wiring produced four observed cleanup events
+(0.065–0.106 ms each), but the closed footprints were still approximately
+104, 189, 214 and 226 MiB. Final idle was 224 MiB and critical preview trimming
+left 223 MiB. The cleanup and its benchmark switches were **removed** because
+there was no demonstrated benefit. The experimental source and receipts are
+preserved under `dropped-idle-reclaim` and `allocator-v2-pilot`. Longer allocation
+ownership tracing remains deferred; neither a leak fix nor a stable long-session
+plateau is claimed.
+
+### Native packaging repair
+
+FFmpeg 8.1.2 was rebuilt from the existing pinned source with only the unused
+CoreImage filters disabled, removing libavfilter's OpenGL dependency. Its separate
+`8.1.2-illiquid1` prefix does not replace Homebrew's global opt link. The SDK,
+lockfile, source manifests, recipe and build receipt now describe the new bytes.
+Build scripts prefer that reviewed SDK when no explicit toolchain is supplied
+and reject the incompatible OpenGL-linked variant before compiling. Both bundle
+audits reject OpenGL and libmpv dependencies.
+
+The 26-library non-system closure, seven public-header digests, decoder, encoder
+and demuxer lists were preserved. Only `coreimage` and `coreimagesrc` filters were
+removed; `bwdif` remains. **156 decoded frame hashes matched** the prior FFmpeg
+across H.264 1080p/4K, HEVC 10-bit, VP9 and deinterlaced MPEG-2 fixtures. Source
+verification passed for **28 inputs and 114 notices**, and SDK verification passed.
+Packaged benchmark builds pass signature, architecture and loader-path audits
+for all **27 Mach-O images**. Ad-hoc local qualification is not Developer ID
+signing, notarization or a published release.
+
+The final ad-hoc DMG also passed create/mount/copy/signature verification,
+media-open and relaunch smoke tests. Its SHA-256 is
+`529d1268bba86d8fa402ec488c51287fa7dc7b3431576c3642094f74813cf35a`.
+It lives under `/tmp/illiquid-fixall-dmg-final/`; no installed application or
+Homebrew opt link was replaced. Final-source packaging and generic audit logs
+are `package-final-source.log`, `dmg-final.log` and `verify-final-app.log`.
+
+Final source passed **434 tests in 76 suites** in the selected regression run,
+with the new FFmpeg SDK and short-EOF/4K-index/packet-regression fixture overrides.
+Architecture, packaging-helper and Python syntax checks also passed. The earlier
+435-test run included the subsequently dropped allocator helper test; it is not
+the final-source count. The fixture-gated full native integration matrix is not
+claimed by this selected-suite result. Logs preserve an earlier stalled SwiftPM
+planning attempt and the successful retry rather than counting interruption as
+validation.
+
+### Packaged player comparison before removing autorelease scopes
+
+A fresh three-repeat rotated-order 4K cohort used the packaged candidate,
+mpv and isolated IINA, with the same hidden-controls playback protocol described
+above. IINA automatic thumbnails were disabled, hardware decode requested and
+sound muted per player. This candidate has no idle allocator relief but still
+has the subsequently removed autorelease scopes.
+
+| Player | Playing CPU | Paused CPU | Closed CPU | Playing footprint |
+| --- | ---: | ---: | ---: | ---: |
+| Illiquid | 5.15% | 0.43% | 0.04% | 135 MiB |
+| mpv | 9.50% | 0.38% | unavailable | 339 MiB |
+| IINA | 8.05% | 0.48% | 0.03% | 397 MiB |
+
+These are medians of process CPU as a percentage of one core and end-of-playing
+footprint. The endpoints and exclusions remain unchanged: no GPU/WindowServer
+accounting, no cross-player scanout ranking, and no mpv close measurement.
+They describe this workload and host session, not a universal player ranking.
+The different IINA result from the earlier cohort reinforces why measurements
+from separate host conditions must not be treated as a controlled speedup.
+
+Three subsequent previous-build Illiquid controls measured **4.86% playing,
+0.35% paused and 0.04% closed CPU**. The candidate's extra 0.29 percentage points
+of playing CPU do not establish a gain or nonregression. The scopes were removed
+for a followup measurement; this is an investigation, not proof of causality.
+
+The later 16-cycle packaged soak (`soak-final`, still with the autorelease scopes)
+completed all cycles. Closed footprint ranged **94–256 MiB**, falling from about
+250 MiB to 94 MiB late in the run; final reopened idle was **113 MiB**, or **110
+MiB** after preview trimming. This variability is why one ending footprint is
+not used as a memory-fix claim. Quit took 279 ms. A `leaks` snapshot reported
+**14,400 bytes in 288 allocations**, rooted in three AppIntents/NSXPC cycles;
+it also reported restricted process inspection. That limited result neither
+explains the hundreds of MiB nor provides full leak clearance. No unsupported
+framework teardown was added.
+
+### Final source after dropping unproven memory changes
+
+The four decoder/presenter/thumbnail autorelease edits were restored to their
+pre-pass implementations; those files had no preexisting working-tree edits.
+The idle allocator helper, its wiring and benchmark switches are also absent.
+The retained fixes are background library indexing/projection preparation,
+end-of-duration previews, volume reconnect handling, renderer qualification and
+the reviewed native SDK/package repair.
+
+This final source again passed **434 tests in 76 suites** (`no-pools-regressions.log`).
+The final bundle is `/tmp/illiquid-fixall-no-pools/Illiquid.app`; all 27 native
+images pass the packaging audit. Its DMG passed mount/copy/media-open/relaunch
+verification (`no-pools-dmg.log`) and has SHA-256
+`34f56729d192528677519b9a2154685c5cdb1b5ed0828e9e195a8b8e18401b73`.
+It is an isolated ad-hoc benchmark package, not an installed or notarized release.
+
+Three final playback-only controls measured **4.70% playing, 0.47% paused and
+0.04% closed CPU**. Individual playing observations were 4.70%, 4.81% and 4.61%,
+versus 4.86%, 4.84% and 4.95% for the earlier build. This removes the observed
+CPU increase in the scoped-autorelease candidate; sequential host measurements
+do not prove a universal speedup or identify causality conclusively. The mpv/IINA
+values above belong to the preceding rotated cohort, not a newly interleaved
+comparison with this final binary.
+
+Final 4K displayed-frame seeks took **218–308 ms** in the six-request confirmation.
+Steady/hover/resize phases again reported **zero dropped or corrupted frames**;
+CPU with controls visible was 7.26%, 24.61% and 11.02%, respectively. Those CPU
+figures cannot be compared directly to the hidden-controls playback-only median.
+The earlier four-codec results, 16-cycle soak and reconnect tests retain their
+own binary hashes and are not relabeled as final-source runs. The final-source
+regression and 4K output checks cover the removal of the extra scopes.
+
+Remaining deferrals are explicit: the roughly 100 ms full-library reconciliation
+hitch, allocation ownership/long-duration memory qualification, real NAS failures,
+physical scanout/energy measurements, and broader high-rate resize/drop tuning.
+The allocator purge, extra autorelease scopes and compressed-packet prefetch are
+not enabled. No new decoder policy was promoted on CPU evidence alone. At the end of qualification, changes
+were uncommitted, and the two protected user-edited UI files retained their
+initial hashes. `manifest.json` records the final source, test and app identities.
+
+
+### Review before committing
+
+Review found and fixed two tooling failures: FFmpeg preflight now rejects missing
+filter libraries and failed/empty dependency inspection, and output/recovery
+probes refuse an existing result directory before touching its evidence. Both
+build entrypoints use the shared preflight. Packaging helper tests exercise a
+valid path containing spaces plus five failure cases; six native-lock tests,
+script syntax checks, real pinned-SDK inspection and output/storage receipt
+preservation checks passed.
+
+No Swift implementation changed during this review. All 299 app/test source files
+still match the 434-test qualification snapshot. Those tests and app measurements
+used the working tree with the two separately edited UI files; the performance
+commit excludes those cosmetic edits. Qualification is local and ad hoc, not a
+claim of a release built from a clean committed tree. The unresolved/deferred
+items above remain unchanged.

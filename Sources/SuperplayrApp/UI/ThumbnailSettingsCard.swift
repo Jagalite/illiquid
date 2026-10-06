@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import SuperplayrCore
 
@@ -9,12 +10,26 @@ struct ThumbnailSettingsCard: View {
             Text("Thumbnail Previews").font(.headline)
             GroupBox {
                 VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Resource preset")
+                        Spacer()
+                        Menu("Apply Preset") {
+                            Button("Economical") { scheduler.preferences.apply(.economical) }
+                            Button("Balanced") { scheduler.preferences.apply(.balanced) }
+                            Button("Extensive") { scheduler.preferences.apply(.extensive) }
+                        }
+                    }
                     Stepper("Memory cache: \(scheduler.preferences.memoryMiB) MiB",
                             value: $scheduler.preferences.memoryMiB, in: 8...128, step: 8)
                     Stepper("Disk cache: \(scheduler.preferences.diskMiB) MiB",
                             value: $scheduler.preferences.diskMiB, in: 0...2048, step: 64)
                     Text("Cached previews are shared across videos. Set disk storage to zero to disable it. Decoder memory is separate from these limits.")
                         .font(.caption).foregroundStyle(.secondary)
+                    if let usage = scheduler.cacheUsage {
+                        Text("In use: \(size(usage.memoryBytes)) memory · \(size(usage.diskBytes)) disk · \(usage.images) resident previews")
+                            .font(.caption).foregroundStyle(.secondary)
+                            .accessibilityIdentifier("thumbnail-cache-usage")
+                    }
                     Button("Clear Thumbnail Cache") { Task { await scheduler.clearCache() } }
                     Divider()
                     Toggle("Generate thumbnails while idle", isOn: $scheduler.preferences.generatesInBackground)
@@ -44,10 +59,50 @@ struct ThumbnailSettingsCard: View {
                             .font(.caption).foregroundStyle(.secondary)
                     }
                     .disabled(!scheduler.preferences.generatesInBackground)
+                    Divider()
+                    Text("Skip background generation in these folders").font(.subheadline)
+                    Text("Includes subfolders. Hover previews remain available when you play these files.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    ForEach(scheduler.preferences.excludedFolderPaths, id: \.self) { path in
+                        HStack {
+                            Text(path).lineLimit(1).truncationMode(.middle).help(path)
+                            Spacer()
+                            Button("Remove", systemImage: "minus.circle") {
+                                scheduler.preferences.excludedFolderPaths.removeAll { $0 == path }
+                            }
+                            .labelStyle(.iconOnly)
+                            .accessibilityLabel("Remove exclusion for \(path)")
+                        }
+                    }
+                    Button("Exclude Folder…", action: excludeFolder)
+                        .disabled(scheduler.preferences.excludedFolderPaths.count >= 128)
                     Text(scheduler.status).font(.caption).foregroundStyle(.secondary)
                 }
                 .padding(8)
             }
+        }
+        .task {
+            while !Task.isCancelled {
+                await scheduler.refreshCacheUsage()
+                do { try await Task.sleep(for: .seconds(2)) } catch { return }
+            }
+        }
+    }
+
+    private func size(_ bytes: Int) -> String {
+        ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .memory)
+    }
+
+    private func excludeFolder() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = true
+        panel.prompt = "Exclude"
+        panel.begin { response in
+            guard response == .OK else { return }
+            scheduler.preferences.excludedFolderPaths += panel.urls.map { $0.standardizedFileURL.path }
+            scheduler.preferences = scheduler.preferences.bounded
         }
     }
 }

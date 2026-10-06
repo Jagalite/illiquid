@@ -5,6 +5,7 @@ set -euo pipefail
 script_directory=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=scripts/lib/platinum-packaging.sh
 source "$script_directory/../lib/platinum-packaging.sh"
+source "$script_directory/../lib/native-sdk-environment.sh"
 
 fail() {
     printf 'FAIL: %s\n' "$*" >&2
@@ -19,6 +20,11 @@ platinum_dependency_reference_is_allowed '/System/Library/Frameworks/AppKit.fram
     || fail 'Homebrew dependency should escape the bundle audit'
 ! platinum_dependency_reference_is_allowed '/private/tmp/user/project/liblocal.dylib' \
     || fail 'source-checkout dependency should escape the bundle audit'
+
+! platinum_dependency_reference_is_allowed '/System/Library/Frameworks/OpenGL.framework/Versions/A/OpenGL' \
+    || fail 'OpenGL must fail even though it is a system framework'
+! platinum_dependency_reference_is_allowed '@rpath/libmpv.2.dylib' \
+    || fail 'bundling a legacy backend must not bypass the audit'
 
 platinum_architectures_cover 'arm64' 'arm64 x86_64' \
     || fail 'a universal dependency should satisfy arm64'
@@ -48,5 +54,32 @@ platinum_stage_dmg \
     || fail 'DMG staging should add the Applications symlink'
 [[ "$(readlink "$temporary_directory/staging/Applications")" = /Applications ]] \
     || fail 'Applications symlink should target /Applications'
+
+# Exercise dependency failures without depending on the host's installed SDK.
+(
+    probe_case=valid
+    pkg-config() {
+        [[ "$probe_case" != missing ]] || return 1
+        if [[ "$1" == --variable=libdir ]]; then
+            [[ "$probe_case" != empty-directory ]] || return 0
+            printf '/sdk with spaces/lib\n'
+        fi
+    }
+    otool() {
+        [[ "$1" == -L && "$2" == '/sdk with spaces/lib/libavfilter.dylib' ]] || return 1
+        [[ "$probe_case" != unreadable ]] || return 1
+        [[ "$probe_case" != empty-inspection ]] || return 0
+        printf 'libavfilter.dylib:\n\t/usr/lib/libSystem.B.dylib\n'
+        if [[ "$probe_case" == legacy ]]; then
+            printf '\t/System/Library/Frameworks/OpenGL.framework/OpenGL\n'
+        fi
+    }
+    illiquid_verify_ffmpeg_linkage || fail 'valid filter dependencies should pass'
+    for probe_case in missing empty-directory unreadable empty-inspection legacy; do
+        if illiquid_verify_ffmpeg_linkage 2>/dev/null; then
+            fail "FFmpeg preflight accepted $probe_case"
+        fi
+    done
+)
 
 printf 'Illiquid packaging helper tests passed\n'

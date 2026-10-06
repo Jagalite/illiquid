@@ -1,5 +1,7 @@
+import AppKit
 import CoreServices
 import Foundation
+import SuperplayrCore
 
 struct SourceFilesystemEvent: Equatable, Sendable {
     struct Flags: OptionSet, Equatable, Sendable {
@@ -79,6 +81,7 @@ enum SourceFilesystemInvalidationPlanner {
             let eventPath = normalizedPath(event.path)
             let matchingRoots = rootPaths.filter {
                 contains(eventPath, within: $0)
+                    || (event.flags.requiresFullRescan && contains($0, within: eventPath))
             }
             guard !matchingRoots.isEmpty else { continue }
 
@@ -152,6 +155,8 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
 
     private let handler: Handler
     private var stream: FSEventStreamRef?
+    private var volumeObservers: [NSObjectProtocol] = []
+    private var watchedRoots: [URL] = []
 
     init(handler: @escaping Handler) {
         self.handler = handler
@@ -167,6 +172,18 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
 
         let paths = Array(Set(roots.map { $0.absoluteURL.standardized.path })).sorted()
         guard !paths.isEmpty else { return false }
+        watchedRoots = roots
+        // An FSEvents stream tied to the old device is not sufficient after a
+        // drive reconnects. Reattach on volume changes and invalidate descendants.
+        for name in [NSWorkspace.didMountNotification, NSWorkspace.didUnmountNotification] {
+            volumeObservers.append(NSWorkspace.shared.notificationCenter.addObserver(
+                forName: name, object: nil, queue: .main
+            ) { [weak self] notification in
+                guard let volume = notification.userInfo?[NSWorkspace.volumeURLUserInfoKey] as? URL else { return }
+                let path = volume.standardizedFileURL.path
+                MainActor.assumeIsolated { self?.volumeChanged(path: path) }
+            })
+        }
 
         var context = FSEventStreamContext(
             version: 0,
@@ -204,7 +221,22 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
         return true
     }
 
+    @MainActor private func volumeChanged(path: String) {
+        let affected = watchedRoots.filter {
+            let root = $0.standardizedFileURL.path
+            return root == path || root.hasPrefix(path + "/")
+        }
+        guard !affected.isEmpty else { return }
+        LifecyclePerformance.mark("source-volume-change")
+        let roots = watchedRoots
+        _ = start(watching: roots)
+        handler(affected.map { .init(path: $0.path, flags: [.rootChanged]) })
+    }
+
     func stop() {
+        for observer in volumeObservers { NSWorkspace.shared.notificationCenter.removeObserver(observer) }
+        volumeObservers.removeAll()
+        watchedRoots.removeAll()
         guard let stream else { return }
         FSEventStreamStop(stream)
         FSEventStreamInvalidate(stream)

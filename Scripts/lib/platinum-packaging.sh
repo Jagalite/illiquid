@@ -14,6 +14,7 @@ platinum_is_system_dependency() {
 
 platinum_dependency_reference_is_allowed() {
     case "$1" in
+        *libmpv*|*OpenGL*) return 1 ;;
         /usr/lib/*|/System/Library/*|/Library/Apple/System/*) return 0 ;;
         @rpath/*|@loader_path/*|@executable_path/*) return 0 ;;
         *) return 1 ;;

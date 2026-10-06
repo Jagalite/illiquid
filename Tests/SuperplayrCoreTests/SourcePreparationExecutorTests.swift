@@ -4,6 +4,53 @@ import Testing
 
 @Suite("Bounded source preparation", .serialized)
 struct SourcePreparationExecutorTests {
+    @Test func healthyBackgroundBurstsWakeOnCompletionRatherThanPollingIntoTheirDeadline() async throws {
+        let executor = SourcePreparationExecutor(capacity: 2, timeout: 2)
+        let start = ContinuousClock.now
+        let count = try await withThrowingTaskGroup(of: Int.self) { group in
+            for _ in 0..<32 {
+                group.addTask {
+                    try await executor.performWhenAvailable { check in
+                        Thread.sleep(forTimeInterval: 0.001)
+                        try check()
+                        return 1
+                    }
+                }
+            }
+            var total = 0
+            for try await value in group { total += value }
+            return total
+        }
+        #expect(count == 32)
+        #expect(executor.activeCount == 0)
+        print("STORAGE_HEALTHY_BURST count=\(count) wall=\(start.duration(to: .now))")
+    }
+    @Test func stalledBackgroundScanLeavesAnInteractiveSlotAndCancellationDoesNotFreeIt() async throws {
+        let executor = SourcePreparationExecutor(capacity: 2, timeout: 2)
+        let entered = DispatchSemaphore(value: 0), release = DispatchSemaphore(value: 0)
+        defer { release.signal() }
+        let scan = Task {
+            try await executor.performWhenAvailable { _ in
+                entered.signal(); release.wait(); return 1
+            }
+        }
+        let started = await withCheckedContinuation { continuation in
+            DispatchQueue.global().async { continuation.resume(returning: entered.wait(timeout: .now() + 1)) }
+        }
+        #expect(started == .success)
+        let queued = Task { try await executor.performWhenAvailable { _ in 2 } }
+        try await Task.sleep(for: .milliseconds(40))
+        #expect(executor.activeCount == 1)
+        let clock = ContinuousClock.now
+        #expect(try await executor.perform { _ in 3 } == 3)
+        print("STORAGE_INTERACTIVE_WHILE_SCAN_STALLED \(clock.duration(to: .now))")
+        scan.cancel()
+        await #expect(throws: CancellationError.self) { try await scan.value }
+        #expect(executor.activeCount == 1)
+        queued.cancel()
+        await #expect(throws: CancellationError.self) { try await queued.value }
+        release.signal()
+    }
     @Test func cancellationReturnsBeforeBlockedWorkAndRetainsPhysicalAdmission() async throws {
         let executor = SourcePreparationExecutor(capacity: 1, timeout: 5)
         let entered = DispatchSemaphore(value: 0)

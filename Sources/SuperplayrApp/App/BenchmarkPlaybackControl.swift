@@ -11,7 +11,8 @@ struct BenchmarkPlaybackControlCommand: Decodable, Equatable {
     let sourcePath: String?
 
     var isApplicationAction: Bool {
-        ["ping", "open", "close-window", "reopen-window", "toggle-sidebar", "resize-window", "window-animation"].contains(action)
+        ["ping", "open", "close-window", "reopen-window", "toggle-sidebar", "resize-window", "window-animation",
+         "hover-preview", "clear-previews", "source-query", "memory-pressure"].contains(action)
     }
 
     var playbackAction: PlaybackBenchmarkControlAction? {
@@ -21,9 +22,15 @@ struct BenchmarkPlaybackControlCommand: Decodable, Equatable {
         case "seek-exact":
             targetSeconds.map(PlaybackBenchmarkControlAction.seekExact)
         case "snapshot": .snapshot
+        case "renderer-metrics": .rendererMetrics
         default: nil
         }
     }
+}
+
+struct BenchmarkTimelineHover: Equatable {
+    let id: String
+    let seconds: Double
 }
 
 struct BenchmarkPlaybackControlDeduplicator {

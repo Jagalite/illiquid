@@ -110,3 +110,15 @@ exclusions restrict upstream asset/test coverage, rather than project playback t
 
 The generated HarfBuzz recipe explicitly disables optional rendered documentation
 so that omitted artwork is not required by an installed gtk-doc tool.
+
+## FFmpeg variant without OpenGL
+
+The current SDK uses a source rebuild of FFmpeg 8.1.2 with `--disable-coreimage`.
+The unused `coreimage` and `coreimagesrc` filters were the OpenGL link; BWDIF and
+all prior decoders, encoders and demuxers remain available. `recipes/ffmpeg.rb`
+is the original Homebrew recipe; `recipes/ffmpeg-illiquid.rb` adds the configure
+switch and is selected by the manifest and tap generator. The actual build
+configuration and output hashes are in `receipts/ffmpeg-illiquid-build.json`.
+The repository's `Scripts/build-native-ffmpeg.sh` builds into a separate prefix
+without relinking Homebrew. The remaining native component binaries are unchanged.
+This does not establish a byte-identical rebuild of all components.

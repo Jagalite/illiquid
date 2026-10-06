@@ -1,5 +1,5 @@
 {
-  "status": "assembled source inputs and installed build recipes; source rebuild not yet qualified",
+  "status": "FFmpeg rebuilt from pinned source with CoreImage disabled; other component binaries remain the reviewed Homebrew inputs",
   "records": [
     {
       "component": "dav1d",
@@ -42,32 +42,32 @@
       "source_url": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
       "expected_sha256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
       "git_revision": null,
-      "recipe": "recipes/ffmpeg.rb",
-      "recipe_sha256": "814b170aba269903e79993f528ef4dfe96b6480b056be023f578b8d1a2771bc8",
+      "recipe": "recipes/ffmpeg-illiquid.rb",
+      "recipe_sha256": "d718b877dff8cef7f8cdb92eb22eda784f17d983607322e694e5aa8a14aa3d2b",
       "libraries": [
         {
           "name": "libavcodec.62.28.102.dylib",
-          "sha256": "ae84a5ff6b97bb6343b1551833e7fb07803090eeb4802ff48facb6d51b17ecae"
+          "sha256": "3963c76dc2430341edef6f75b27efa4e60f60af0bf3aa080751c061084c60b48"
         },
         {
           "name": "libavfilter.11.14.102.dylib",
-          "sha256": "96bb31eeff73c1f8443f1346e2d095b111a32834f896bf579d60085c02615d4a"
+          "sha256": "d37212f12cbf5875bed26cf1908537110c47720f73adcdb38c7b6f9e3e026110"
         },
         {
           "name": "libavformat.62.12.102.dylib",
-          "sha256": "34fcec1e8a9caef1db6100fb8d30329b69f1ede1464e36c62d395e770f28d14c"
+          "sha256": "c671566dd5fd8cd2dc4df58093bb1fb440f2bedb464396ffc1583f1aa5d1aaa1"
         },
         {
           "name": "libavutil.60.26.102.dylib",
-          "sha256": "a51680558ed77e2ed5a8772f1b4fe2dbb5ee7f0521d8063b1af46d6b4c95c7f3"
+          "sha256": "475c71ddcf2a5141e12c8abfedb1c97681cded54f7f92a38eeaf17ba02703462"
         },
         {
           "name": "libswresample.6.3.102.dylib",
-          "sha256": "6314045ea3982a1cfe98553187fdd8cf031811fb4cfff26665afc38a522aefcd"
+          "sha256": "0d92adcb41c113934de473bd95ebb7afd96c1d6177606b08331bdc9dcb6643c2"
         },
         {
           "name": "libswscale.9.5.102.dylib",
-          "sha256": "657716e9a35fd809067c128b53accdb7365c81f9fd8a6b784d0adeab50d0c94f"
+          "sha256": "9dc4a476e6e8f9a5c7f80565005242842f08c012922447943d6655d922e56dfc"
         }
       ],
       "download_url": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
@@ -676,7 +676,7 @@
       "status": "downloaded"
     }
   ],
-  "bundle_configuration": "configuration:\n    --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.2\n    --enable-shared\n    --enable-pthreads\n    --enable-version3\n    --cc=clang\n    --host-cflags=\n    --host-ldflags=\n    --enable-ffplay\n    --enable-gpl\n    --enable-libsvtav1\n    --enable-libopus\n    --enable-libx264\n    --enable-libmp3lame\n    --enable-libdav1d\n    --enable-libvmaf\n    --enable-libvpx\n    --enable-libx265\n    --enable-openssl\n    --enable-videotoolbox\n    --enable-audiotoolbox\n    --enable-neon\n\nExiting with exit code 0",
+  "bundle_configuration": "configuration:\n    --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1\n    --enable-shared\n    --enable-pthreads\n    --enable-version3\n    --cc=clang\n    --host-cflags=\n    --host-ldflags=\n    --enable-ffplay\n    --enable-gpl\n    --enable-libsvtav1\n    --enable-libopus\n    --enable-libx264\n    --enable-libmp3lame\n    --enable-libdav1d\n    --enable-libvmaf\n    --enable-libvpx\n    --enable-libx265\n    --enable-openssl\n    --enable-videotoolbox\n    --enable-audiotoolbox\n    --enable-neon\n    --disable-coreimage\n    --extra-cflags=-I/opt/homebrew/opt/lame/include\n    --extra-ldflags=-L/opt/homebrew/opt/lame/lib\n\nExiting with exit code 0",
   "upstream_patches_and_inplace_edits": "See preserved recipes; source archives are unmodified upstream inputs.",
   "glib_patch_verification": "Historical recipe matches installed recipe after removal of bottle/livecheck metadata and blank lines.",
   "excluded_test_fonts": [

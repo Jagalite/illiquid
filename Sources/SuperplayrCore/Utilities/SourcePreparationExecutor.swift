@@ -11,7 +11,9 @@ public final class SourcePreparationExecutor: @unchecked Sendable {
     private let capacity: Int
     private let timeout: TimeInterval
     private var running = 0
+    private var backgroundRunning = 0
     private var waiting = 0
+    private var availabilityWaiters: [UUID: Request<Void>] = [:]
     private let maximumWaiters = 64
 
     public enum Failure: Error, LocalizedError {
@@ -57,22 +59,44 @@ public final class SourcePreparationExecutor: @unchecked Sendable {
         }) else { throw Failure.busy }
         defer { lock.withLock { waiting -= 1 } }
         let deadline = ProcessInfo.processInfo.systemUptime + timeout
-        var backoff: TimeInterval = 0.025
         while true {
             try Task.checkCancellation()
             let remaining = deadline - ProcessInfo.processInfo.systemUptime
             guard remaining > 0 else { throw Failure.timedOut }
-            do { return try await perform(work, timeout: remaining) }
+            do { return try await perform(work, timeout: remaining, background: true) }
             catch Failure.busy {
-                try await Task.sleep(for: .seconds(min(backoff, remaining)))
-                backoff = min(backoff * 2, 0.25)
+                try await waitForAvailability(timeout: max(0.001, deadline - ProcessInfo.processInfo.systemUptime))
             }
+        }
+    }
+
+    /// Wake on physical completion rather than making healthy directory loads
+    /// wait for a 25–250 ms polling interval. Registration checks capacity under
+    /// the same lock as release, so a completion cannot be missed.
+    private func waitForAvailability(timeout: TimeInterval) async throws {
+        let id = UUID(), request = Request<Void>()
+        defer { lock.withLock { _ = availabilityWaiters.removeValue(forKey: id) } }
+        try await withTaskCancellationHandler {
+            try Task.checkCancellation()
+            try await withCheckedThrowingContinuation { continuation in
+                request.install(continuation)
+                let shouldWait = lock.withLock {
+                    if running < capacity && backgroundRunning < max(1, capacity - 1) { return false }
+                    availabilityWaiters[id] = request
+                    return true
+                }
+                if shouldWait { request.startDeadline(after: timeout) }
+                else { request.finish(.success(())) }
+            }
+        } onCancel: {
+            request.finish(.failure(CancellationError()))
         }
     }
 
     private func perform<Value: Sendable>(
         _ work: @escaping @Sendable (@Sendable () throws -> Void) throws -> Value,
-        timeout: TimeInterval
+        timeout: TimeInterval,
+        background: Bool = false
     ) async throws -> Value {
         let request = Request<Value>()
         return try await withTaskCancellationHandler {
@@ -81,7 +105,11 @@ public final class SourcePreparationExecutor: @unchecked Sendable {
                 request.install(continuation)
                 guard lock.withLock({
                     guard running < capacity else { return false }
+                    // Keep one physical slot available for an interactive open
+                    // when directory scans are stalled on a different volume.
+                    guard !background || backgroundRunning < max(1, capacity - 1) else { return false }
                     running += 1
+                    if background { backgroundRunning += 1 }
                     return true
                 }) else {
                     request.finish(.failure(Failure.busy))
@@ -93,8 +121,15 @@ public final class SourcePreparationExecutor: @unchecked Sendable {
                         try request.checkCancellation()
                         return try work { try request.checkCancellation() }
                     }
-                    lock.withLock { running -= 1 }
+                    let waiters = lock.withLock {
+                        running -= 1
+                        if background { backgroundRunning -= 1 }
+                        let waiters = Array(availabilityWaiters.values)
+                        availabilityWaiters.removeAll(keepingCapacity: true)
+                        return waiters
+                    }
                     request.finish(result)
+                    for waiter in waiters { waiter.finish(.success(())) }
                 }
             }
         } onCancel: {

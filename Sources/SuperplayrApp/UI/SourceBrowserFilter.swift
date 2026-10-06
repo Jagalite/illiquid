@@ -4,6 +4,22 @@ struct SourceBrowserProjection: Sendable {
     let rows: [SourceTreeDisplayRow]
     let hiddenCount: Int
     let regexCounts: [String: Int]
+    let thumbnailCandidates: [URL]
+    let mediaPaths: Set<String>
+
+    init(rows: [SourceTreeDisplayRow], hiddenCount: Int, regexCounts: [String: Int]) {
+        self.rows = rows
+        self.hiddenCount = hiddenCount
+        self.regexCounts = regexCounts
+        var candidates: [URL] = [], paths: Set<String> = []
+        for row in rows {
+            guard case .media = row.kind else { continue }
+            if candidates.count < 2048 { candidates.append(row.url) }
+            paths.insert(row.url.standardizedFileURL.path)
+        }
+        thumbnailCandidates = candidates
+        mediaPaths = paths
+    }
 }
 
 /// Serial background projection. Search changes reuse the visibility result,

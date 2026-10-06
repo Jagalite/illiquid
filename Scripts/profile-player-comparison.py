@@ -41,7 +41,7 @@ def phase(pid, name, seconds, clock=None):
     return result
 
 class Reference:
-    def __init__(self,player,iina,fixture,directory):
+    def __init__(self,player,iina,fixture,directory,disable_thumbnails=False):
         self.temp=tempfile.TemporaryDirectory(prefix='illiquid-reference-');temp=Path(self.temp.name)
         self.logpath=temp/'app.log';self.log=self.logpath.open('w');self.directory=directory
         self.ipc=None;ipcpath=temp/'ipc'
@@ -56,6 +56,7 @@ class Reference:
                       'SUEnableAutomaticChecks':False,'SUAutomaticallyUpdate':False,'SUHasLaunchedBefore':True,
                       'enableRecentDocumentsWorkaround':False,'pauseWhenOpen':True,'actionAfterLaunch':0,
                       'enableLogging':False,'enablePluginSystem':False}
+            if disable_thumbnails: settings['enableThumbnailPreview']=False
             seed=temp/'seed.plist';seed.write_bytes(plistlib.dumps(settings))
             subprocess.run(['defaults','delete',IINA_DOMAIN],capture_output=True)
             subprocess.run(['defaults','import',IINA_DOMAIN,str(seed)],check=True,capture_output=True)
@@ -105,7 +106,7 @@ def run(player,case,index,args,output):
             pause=lambda value:app.command('pause' if value else 'play')
             seek=lambda target:app.command('seek-exact',target)
         else:
-            app=Reference(player,args.iina,fixture,directory);pid=app.pid;result=app.result
+            app=Reference(player,args.iina,fixture,directory,disable_thumbnails=args.no_iina_thumbnails);pid=app.pid;result=app.result
             clock=lambda:float(app.ipc.get('time-pos') or 0)
             pause=lambda value:app.ipc.command(['set_property','pause',value])
             seek=lambda target:app.ipc.seek(target)
@@ -188,6 +189,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ['illiquid','iina','fixtures','control','output']:p.add_argument('--'+name,required=True,type=Path)
     p.add_argument('--repeats',type=int,default=3);p.add_argument('--close',action='store_true')
+    p.add_argument('--no-iina-thumbnails',action='store_true',help='Disable IINA automatic thumbnails for the playback-only control')
     p.add_argument('--drain',action='store_true',help='Also seek near EOF and verify reference EOF/native clock stopped near end; this does not prove audible/visible output')
     p.add_argument('--experimental-vp9-hardware',action='store_true',help='Opt into supplemental VP9 registration in supported benchmark builds; not the production default')
     p.add_argument('--players',nargs='+',choices=['illiquid','mpv','iina'],default=['illiquid','mpv','iina'])
@@ -213,7 +215,7 @@ def main():
     if plistlib.loads((a.illiquid/'Contents/Info.plist').read_bytes())['CFBundleIdentifier']!=lifecycle.DOMAIN:p.error('requires benchmark Illiquid identity')
     a.output.mkdir(parents=True,exist_ok=False)
     digest=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
-    summary={'runs':[],'protocol':{'script_sha256':digest(Path(__file__)),'repeats':a.repeats,'heartbeat':False,'target_window_points':'960x540','muting':'per-player only','quit':'NSRunningApplication helper for apps; IPC for mpv CLI','lifecycle_script_sha256':digest(Path(__file__).with_name('profile-lifecycle.py')),'resource_script_sha256':digest(Path(__file__).with_name('profile-reference-player.py'))},
+    summary={'runs':[],'protocol':{'script_sha256':digest(Path(__file__)),'repeats':a.repeats,'heartbeat':False,'iina_thumbnail_generation':'disabled' if a.no_iina_thumbnails else 'default','target_window_points':'960x540','muting':'per-player only','quit':'NSRunningApplication helper for apps; IPC for mpv CLI','lifecycle_script_sha256':digest(Path(__file__).with_name('profile-lifecycle.py')),'resource_script_sha256':digest(Path(__file__).with_name('profile-reference-player.py'))},
       'versions':{'mpv':subprocess.check_output(['mpv','--version'],text=True),'iina':plistlib.loads((a.iina/'Contents/Info.plist').read_bytes())['CFBundleShortVersionString']},
       'sha256':{'illiquid':digest(a.illiquid/'Contents/MacOS/Illiquid'),'iina':digest(a.iina/'Contents/MacOS/IINA'),'mpv':digest(Path(shutil.which('mpv'))),'control':digest(a.control),**{name:digest(f) for name,f in selected_media.items()}},
       'fixtures':probes,

@@ -1,0 +1,36 @@
+{
+  "sourceSHA256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
+  "configuration": "configuration:\n    --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1\n    --enable-shared\n    --enable-pthreads\n    --enable-version3\n    --cc=clang\n    --host-cflags=\n    --host-ldflags=\n    --enable-ffplay\n    --enable-gpl\n    --enable-libsvtav1\n    --enable-libopus\n    --enable-libx264\n    --enable-libmp3lame\n    --enable-libdav1d\n    --enable-libvmaf\n    --enable-libvpx\n    --enable-libx265\n    --enable-openssl\n    --enable-videotoolbox\n    --enable-audiotoolbox\n    --enable-neon\n    --disable-coreimage\n    --extra-cflags=-I/opt/homebrew/opt/lame/include\n    --extra-ldflags=-L/opt/homebrew/opt/lame/lib\n\nExiting with exit code 0",
+  "compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "sdk": "26.5",
+  "macOS": "26.5.2",
+  "libraries": [
+    {
+      "name": "libavcodec.62.28.102.dylib",
+      "sha256": "3963c76dc2430341edef6f75b27efa4e60f60af0bf3aa080751c061084c60b48"
+    },
+    {
+      "name": "libavfilter.11.14.102.dylib",
+      "sha256": "d37212f12cbf5875bed26cf1908537110c47720f73adcdb38c7b6f9e3e026110"
+    },
+    {
+      "name": "libavformat.62.12.102.dylib",
+      "sha256": "c671566dd5fd8cd2dc4df58093bb1fb440f2bedb464396ffc1583f1aa5d1aaa1"
+    },
+    {
+      "name": "libavutil.60.26.102.dylib",
+      "sha256": "475c71ddcf2a5141e12c8abfedb1c97681cded54f7f92a38eeaf17ba02703462"
+    },
+    {
+      "name": "libswresample.6.3.102.dylib",
+      "sha256": "0d92adcb41c113934de473bd95ebb7afd96c1d6177606b08331bdc9dcb6643c2"
+    },
+    {
+      "name": "libswscale.9.5.102.dylib",
+      "sha256": "9dc4a476e6e8f9a5c7f80565005242842f08c012922447943d6655d922e56dfc"
+    }
+  ],
+  "script": "Scripts/build-native-ffmpeg.sh",
+  "scriptSHA256": "1632afe882efa5aed03736c8f7247e04cbf1ee9167f09dea636dce1255a64084",
+  "scope": "FFmpeg only; unchanged codec and demuxer lists, coreimage/coreimagesrc filters removed"
+}

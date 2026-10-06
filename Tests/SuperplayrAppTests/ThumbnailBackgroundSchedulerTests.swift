@@ -9,6 +9,39 @@ import SwiftUI
 @Suite("Background thumbnail scheduling", .serialized)
 @MainActor
 struct ThumbnailBackgroundSchedulerTests {
+    @Test func memoryPressureCancelsBackgroundWorkUntilNormalAndExclusionsPreventProbes() async throws {
+        let suite = "ThumbnailPressure-\(UUID())"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(suite)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let player = PlaybackController(persistence: PlaybackPersistenceStore(userDefaults: defaults),
+            sessionStore: AtomicPlaybackSessionStore(fileURL: root.appendingPathComponent("session.json")),
+            thumbnailCacheDirectory: nil)
+        var probes: [URL] = [], generated: [URL] = []
+        let scheduler = ThumbnailBackgroundScheduler(player: player, defaults: defaults,
+            readDuration: { probes.append($0); return 30 },
+            generate: { url, _ in generated.append(url); return true })
+        defer { scheduler.shutdown() }
+        let allowed = URL(fileURLWithPath: "/media/local/video.mkv")
+        let excluded = URL(fileURLWithPath: "/media/offline/video.mkv")
+        var preferences = ThumbnailPreferences()
+        preferences.generatesInBackground = true; preferences.idleSeconds = 1; preferences.samplesPerVideo = 1
+        preferences.excludedFolderPaths = ["/media/offline"]
+        scheduler.preferences = preferences
+        scheduler.updatePlayback(current: allowed, idle: true, windowVisible: true)
+        scheduler.navigate(folder: nil, discovered: [allowed, excluded])
+        scheduler.setVisible(excluded, visible: true)
+        await scheduler.handleMemoryPressure(constrained: true, critical: true)
+        try await Task.sleep(for: .milliseconds(1100))
+        #expect(probes.isEmpty && generated.isEmpty)
+        #expect(scheduler.status.contains("memory is limited"))
+        await scheduler.handleMemoryPressure(constrained: false, critical: false)
+        for _ in 0..<150 where generated.isEmpty { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(probes == [allowed] && generated == [allowed])
+        scheduler.shutdown()
+        await player.shutdown()
+    }
     @Test func nativeIdlePassPreparesDiscoveredVideosWithoutStartingPlayback() async throws {
         guard let raw = ProcessInfo.processInfo.environment["ILLIQUID_THUMBNAIL_IDLE_FIXTURES"] else { return }
         let folder = URL(fileURLWithPath: raw, isDirectory: true)
@@ -49,6 +82,8 @@ struct ThumbnailBackgroundSchedulerTests {
         let scheduler = ThumbnailBackgroundScheduler(player: player, defaults: defaults)
         defer { scheduler.shutdown() }
         scheduler.preferences.generatesInBackground = true
+        scheduler.preferences.excludedFolderPaths = ["/Volumes/Archive/Slow Media"]
+        await scheduler.refreshCacheUsage()
         let view = NSHostingView(rootView: ThumbnailSettingsCard(scheduler: scheduler).padding(24)
             .frame(width: 680).background(Color(nsColor: .windowBackgroundColor)))
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 680, height: 1000),
@@ -134,7 +169,7 @@ struct ThumbnailBackgroundSchedulerTests {
         await player.shutdown()
     }
 
-    @Test func removingVisibleRowsBeyondDiscoveryLimitCancelsTheirWork() async throws {
+    @Test(arguments: [false, true]) func removingVisibleRowsBeyondDiscoveryLimitCancelsTheirWork(projected: Bool) async throws {
         let suite = "ThumbnailScheduler-\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
@@ -155,12 +190,14 @@ struct ThumbnailBackgroundSchedulerTests {
         scheduler.preferences = settings
         scheduler.updatePlayback(current: nil, idle: true, windowVisible: true)
         let rows = (0...2048).map { root.appendingPathComponent("\($0).mkv") }
-        scheduler.navigate(folder: nil, discovered: rows)
+        scheduler.navigate(folder: nil, discovered: projected ? Array(rows.prefix(2048)) : rows,
+            validPaths: projected ? Set(rows.map(\.path)) : nil)
         scheduler.setVisible(rows[2048], visible: true)
         for _ in 0..<150 where !started { try await Task.sleep(for: .milliseconds(20)) }
         #expect(started)
         // The bounded discovery prefix is unchanged; only viewport membership changed.
-        scheduler.navigate(folder: nil, discovered: Array(rows.prefix(2048)))
+        scheduler.navigate(folder: nil, discovered: Array(rows.prefix(2048)),
+            validPaths: projected ? Set(rows.prefix(2048).map(\.path)) : nil)
         for _ in 0..<50 where !cancelled { try await Task.sleep(for: .milliseconds(10)) }
         #expect(cancelled)
         await player.shutdown()

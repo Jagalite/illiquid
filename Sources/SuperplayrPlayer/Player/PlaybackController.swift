@@ -873,6 +873,14 @@ public final class PlaybackCoordinator {
         await timelineThumbnailGenerator.releaseIdleResources()
     }
 
+    public func thumbnailCacheUsage() async -> ThumbnailCacheUsage {
+        await timelineThumbnailGenerator.cacheUsage()
+    }
+
+    public func handleThumbnailMemoryPressure(critical: Bool) async {
+        await timelineThumbnailGenerator.handleMemoryPressure(critical: critical)
+    }
+
     private func invalidateTimelineThumbnails() {
         timelineThumbnailRevision &+= 1
         let revision = timelineThumbnailRevision
@@ -914,6 +922,15 @@ public final class PlaybackCoordinator {
             return false
         }
 
+        if case .rendererMetrics = action {
+            Task { [weak self] in
+                guard let self else { return }
+                let metrics = await (backend as? NativePlaybackRuntime)?.benchmarkRendererMetrics()
+                writeBenchmarkControlDiagnostic(session: session, id: id, action: action,
+                    fields: "phase=completed accepted=yes metrics-available=\(metrics != nil ? "yes" : "no") " + (metrics ?? ""))
+            }
+            return true
+        }
         if case .snapshot = action {
             guard let snapshot = (backend as? NativePlaybackRuntime)?.diagnosticSnapshot else {
                 writeBenchmarkControlDiagnostic(
@@ -924,6 +941,11 @@ public final class PlaybackCoordinator {
                 )
                 return false
             }
+            let displayed = environment["SUPERPLAYR_BENCHMARK_DISPLAY_READBACK"] == "1"
+                ? (backend as? NativePlaybackRuntime)?.pausedReadbackDiagnostic() : nil
+            let displayedFields = " displayed-pts=\(displayed?.displayedPTS.map { String($0) } ?? "unavailable")"
+                + " displayed-generation=\(displayed?.displayedGeneration.map { String($0) } ?? "unavailable")"
+                + " displayed-current=\(displayed?.isCurrent == true ? "yes" : "no")"
             writeBenchmarkControlDiagnostic(
                 session: session,
                 id: id,
@@ -936,7 +958,7 @@ public final class PlaybackCoordinator {
                     + "renderer-clock-advanced="
                     + "\(snapshot.rendererClockAdvanced ? "yes" : "no") "
                     + "video-submit=\(snapshot.videoSubmissionAttempts) "
-                    + "frames-submitted=\(snapshot.framesSubmitted)"
+                    + "frames-submitted=\(snapshot.framesSubmitted)" + displayedFields
             )
             return true
         }
@@ -977,7 +999,7 @@ public final class PlaybackCoordinator {
             } else if pendingBenchmarkSeek?.id == pending.id {
                 pendingBenchmarkSeek = previous
             }
-        case .snapshot:
+        case .snapshot, .rendererMetrics:
             accepted = false
         }
         defersBenchmarkCompletionDiagnostics = false
@@ -2504,7 +2526,7 @@ public final class PlaybackCoordinator {
         let matches = switch pending.action {
         case .play: !isPaused
         case .pause: isPaused
-        case .seekExact, .snapshot: false
+        case .seekExact, .snapshot, .rendererMetrics: false
         }
         guard matches else { return }
         pendingBenchmarkTransport = nil

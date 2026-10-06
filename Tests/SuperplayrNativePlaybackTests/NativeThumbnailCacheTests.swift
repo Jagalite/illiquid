@@ -7,6 +7,28 @@ import SuperplayrCore
 
 @Suite("Global thumbnail cache")
 struct NativeThumbnailCacheTests {
+    @Test func memoryPressureReclaimsSpeculativeImagesFirstAndPreservesDisk() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = NativeThumbnailCache(directory: directory)
+        let value = try image(width: 512, height: 512)
+        await cache.insert(value, for: key(1), background: false)
+        await cache.flushPendingWrites()
+        await cache.insert(value, for: key(2), background: true)
+        await cache.flushPendingWrites()
+        let diskBytes = await cache.usage().diskBytes
+        #expect(diskBytes > 0)
+        await cache.trimForMemoryPressure(critical: false)
+        #expect(await cache.usage().memoryBytes == value.bytesPerRow * value.height)
+        #expect(await cache.image(for: key(1), background: false) === value)
+        await cache.trimForMemoryPressure(critical: true)
+        #expect(await cache.usage().memoryBytes == 0)
+        #expect(await cache.usage().images == 0)
+        #expect(await cache.usage().diskBytes == diskBytes)
+        #expect(await cache.image(for: key(2), background: false) != nil)
+        let restarted = NativeThumbnailCache(directory: directory)
+        #expect(await restarted.usage().diskBytes == diskBytes)
+    }
     private actor EncodingGate {
         var isBlocked = false
         private var continuation: CheckedContinuation<Void, Never>?

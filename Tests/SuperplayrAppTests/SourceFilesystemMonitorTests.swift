@@ -7,6 +7,14 @@ import Testing
 struct SourceFilesystemMonitorTests {
     private let root = URL(fileURLWithPath: "/media/library", isDirectory: true)
 
+    @Test func volumeChangeInvalidatesNestedRootsButNotSiblingVolumes() {
+        let plan = SourceFilesystemInvalidationPlanner.plan(events: [
+            .init(path: "/Volumes/Media", flags: [.rootChanged])
+        ], roots: [URL(fileURLWithPath: "/Volumes/Media/Movies"),
+                   URL(fileURLWithPath: "/Volumes/Media2/Movies")])
+        #expect(plan.rootsToRescan == ["/Volumes/Media/Movies"])
+    }
+
     @Test func createdFileReloadsItsContainingDirectory() {
         let plan = SourceFilesystemInvalidationPlanner.plan(
             events: [

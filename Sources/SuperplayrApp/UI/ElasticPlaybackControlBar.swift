@@ -1115,16 +1115,22 @@ private struct ElasticTimelineThumbnailPreview: View {
 
 private struct ElasticTimelineHoverPreviewState {
     let requestID: Int
+    let sourceRevision: UInt64
     let bucket: Int
     var fraction: CGFloat
     var position: TimeInterval
     var image: CGImage?
     var representedPosition: Double?
     var isLoading = true
+    var started: UInt64 = 0
 }
 
 enum TimelineThumbnailHoverPolicy {
     static let cacheMissDelay: Duration = .milliseconds(40)
+
+    static func shouldRetirePreview(sourceRevision: UInt64?, currentRevision: UInt64) -> Bool {
+        sourceRevision.map { $0 != currentRevision } ?? false
+    }
 
     static func canRetainPreview(at representedPosition: Double?, for position: Double,
                                  maximumDistance: Double) -> Bool {
@@ -1303,6 +1309,13 @@ struct ElasticPlaybackControlBar: View {
                     )
                     .position(x: previewFrame.midX, y: previewFrame.midY)
                     .allowsHitTesting(false)
+                    .background {
+                        if LifecyclePerformance.isEnabled, preview.image != nil,
+                           let represented = preview.representedPosition {
+                            PreviewDrawingProbe(requestID: preview.requestID, started: preview.started,
+                                                representedPosition: represented)
+                        }
+                    }
                     .transition(.opacity)
                     .zIndex(20)
                 }
@@ -1310,16 +1323,27 @@ struct ElasticPlaybackControlBar: View {
             .frame(width: size.width, height: size.height)
             .contentShape(shape)
             .onContinuousHover(coordinateSpace: .local) { phase in
+                // An explicitly injected benchmark hover owns its lifetime;
+                // the physical pointer elsewhere must not cancel that probe.
+                guard !LifecyclePerformance.isEnabled || model.benchmarkTimelineHover == nil else { return }
                 switch phase {
                 case let .active(location):
                     updateTimelineHover(at: location, geometry: geometry)
                     updatePointerHover(geometry.containsSurface(location))
                 case .ended:
-                    clearTimelineHover()
+                    clearTimelineHover(reason: "pointer-ended")
                     updatePointerHover(false)
                 }
             }
             .accessibilityIdentifier("elastic-playback-control-bar")
+            .onChange(of: model.benchmarkTimelineHover) { _, request in
+                guard LifecyclePerformance.isEnabled, let request else { return }
+                if request.seconds < 0 { clearTimelineHover(reason: "benchmark-clear"); return }
+                guard model.state.duration > 0 else { return }
+                let fraction = min(1, max(0, request.seconds / model.state.duration))
+                LifecyclePerformance.mark("preview-command-\(request.id)")
+                updateTimelineHover(at: geometry.pointOnTrack(fraction: fraction), geometry: geometry)
+            }
         }
         .environment(\.colorScheme, theme.preferredColorScheme)
         .onChange(of: isVolumePopoverPresented) { _, isPresented in
@@ -1328,7 +1352,13 @@ struct ElasticPlaybackControlBar: View {
         }
         .onChange(of: model.player.interactionSourceRevision) {
             cancelGesture(restorePosition: false)
-            clearTimelineHover()
+            // SwiftUI can observe a revision change in the same update as a
+            // new hover. Retire the old source's preview, not that fresh request.
+            if TimelineThumbnailHoverPolicy.shouldRetirePreview(
+                sourceRevision: timelineHoverPreview?.sourceRevision,
+                currentRevision: model.player.interactionSourceRevision) {
+                clearTimelineHover(reason: "source-revision")
+            }
         }
         .onChange(of: model.interactionCancellationRevision) { cancelGesture() }
         .onChange(of: model.controlsPositionRevision) {
@@ -1342,7 +1372,7 @@ struct ElasticPlaybackControlBar: View {
         }
         .onDisappear {
             cancelGesture()
-            clearTimelineHover()
+            clearTimelineHover(reason: "disappear")
             persistPlacement()
             model.setChromePin(.chromeDrag, active: false)
             model.setChromePin(.scrubbing, active: false)
@@ -1388,7 +1418,9 @@ struct ElasticPlaybackControlBar: View {
 
         let position = model.state.duration * Double(fraction)
         let bucket = Int((position * 2).rounded())
-        if var preview = timelineHoverPreview, preview.bucket == bucket {
+        if var preview = timelineHoverPreview,
+           preview.sourceRevision == model.player.interactionSourceRevision,
+           preview.bucket == bucket {
             preview.fraction = fraction
             preview.position = position
             timelineHoverPreview = preview
@@ -1398,22 +1430,27 @@ struct ElasticPlaybackControlBar: View {
         timelineThumbnailTask?.cancel()
         timelineThumbnailRequestID += 1
         let requestID = timelineThumbnailRequestID
+        let started = LifecyclePerformance.begin("preview-hover-\(requestID)")
         let maximumDistance = min(30, model.state.duration /
             Double(model.thumbnailScheduler.preferences.bounded.samplesPerVideo * 2))
-        let canRetain = TimelineThumbnailHoverPolicy.canRetainPreview(
+        let canRetain = timelineHoverPreview?.sourceRevision == model.player.interactionSourceRevision
+            && TimelineThumbnailHoverPolicy.canRetainPreview(
             at: timelineHoverPreview?.representedPosition, for: Double(bucket) / 2,
             maximumDistance: maximumDistance)
         let retainedImage = canRetain ? timelineHoverPreview?.image : nil
         let retainedPosition = canRetain ? timelineHoverPreview?.representedPosition : nil
         timelineHoverPreview = ElasticTimelineHoverPreviewState(
             requestID: requestID,
+            sourceRevision: model.player.interactionSourceRevision,
             bucket: bucket,
             fraction: fraction,
             position: position,
             image: retainedImage,
-            representedPosition: retainedPosition
+            representedPosition: retainedPosition,
+            started: started
         )
         timelineThumbnailTask = Task { @MainActor in
+            LifecyclePerformance.mark("preview-task-start-\(requestID)")
             let maximumPixelSize = CGSize(width: 368, height: 208)
             if let cached = await model.player.cachedTimelineThumbnail(at: position,
                 maximumPixelSize: maximumPixelSize,
@@ -1423,9 +1460,11 @@ struct ElasticPlaybackControlBar: View {
                 preview.representedPosition = cached.position
                 preview.isLoading = cached.position != Double(bucket) / 2
                 timelineHoverPreview = preview
+                LifecyclePerformance.end("preview-cache-ready-\(requestID)", since: started)
                 if !preview.isLoading { return }
             }
             guard !Task.isCancelled else { return }
+            LifecyclePerformance.mark("preview-cache-miss-\(requestID)")
             let image = await TimelineThumbnailHoverPolicy.image {
                 await model.player.timelineThumbnail(
                     at: position,
@@ -1443,10 +1482,15 @@ struct ElasticPlaybackControlBar: View {
             }
             preview.isLoading = false
             timelineHoverPreview = preview
+            LifecyclePerformance.end(image == nil ? "preview-unavailable-\(requestID)" : "preview-image-ready-\(requestID)", since: started)
         }
     }
 
-    private func clearTimelineHover() {
+    private func clearTimelineHover(reason: String = "gesture-or-location") {
+        if let preview = timelineHoverPreview {
+            LifecyclePerformance.mark("preview-retirement-reason-\(reason)")
+            LifecyclePerformance.end("preview-retired-\(preview.requestID)", since: preview.started)
+        }
         timelineThumbnailTask?.cancel()
         timelineThumbnailTask = nil
         timelineHoverPreview = nil

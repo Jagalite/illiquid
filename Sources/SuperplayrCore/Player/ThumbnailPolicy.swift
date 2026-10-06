@@ -14,7 +14,57 @@ public struct ThumbnailPreferences: Codable, Equatable, Sendable {
     public var workSeconds = 15
     public var recencyDays = 7
     public var priority: Priority = .balanced
+    public var excludedFolderPaths: [String] = []
     public init() {}
+
+    public enum Preset: String, CaseIterable, Sendable {
+        case economical, balanced, extensive
+    }
+
+    /// Presets change budgets, never opt the user into background work.
+    public mutating func apply(_ preset: Preset) {
+        switch preset {
+        case .economical:
+            memoryMiB = 8; diskMiB = 64; videosPerPass = 4; samplesPerVideo = 6
+            idleSeconds = 5; workSeconds = 5
+        case .balanced:
+            memoryMiB = 32; diskMiB = 256; videosPerPass = 8; samplesPerVideo = 12
+            idleSeconds = 3; workSeconds = 15
+        case .extensive:
+            memoryMiB = 64; diskMiB = 1024; videosPerPass = 16; samplesPerVideo = 24
+            idleSeconds = 3; workSeconds = 30
+        }
+    }
+
+    public func excludesBackgroundGeneration(for url: URL) -> Bool {
+        let path = url.standardizedFileURL.path
+        return excludedFolderPaths.contains { folder in
+            let root = URL(fileURLWithPath: folder).standardizedFileURL.path
+            return root == "/" || path == root || path.hasPrefix(root + "/")
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case generatesInBackground, generatesWithWindowClosed, memoryMiB, diskMiB
+        case videosPerPass, samplesPerVideo, idleSeconds, workSeconds, recencyDays, priority
+        case excludedFolderPaths
+    }
+
+    public init(from decoder: Decoder) throws {
+        self.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        generatesInBackground = try values.decodeIfPresent(Bool.self, forKey: .generatesInBackground) ?? generatesInBackground
+        generatesWithWindowClosed = try values.decodeIfPresent(Bool.self, forKey: .generatesWithWindowClosed) ?? generatesWithWindowClosed
+        memoryMiB = try values.decodeIfPresent(Int.self, forKey: .memoryMiB) ?? memoryMiB
+        diskMiB = try values.decodeIfPresent(Int.self, forKey: .diskMiB) ?? diskMiB
+        videosPerPass = try values.decodeIfPresent(Int.self, forKey: .videosPerPass) ?? videosPerPass
+        samplesPerVideo = try values.decodeIfPresent(Int.self, forKey: .samplesPerVideo) ?? samplesPerVideo
+        idleSeconds = try values.decodeIfPresent(Int.self, forKey: .idleSeconds) ?? idleSeconds
+        workSeconds = try values.decodeIfPresent(Int.self, forKey: .workSeconds) ?? workSeconds
+        recencyDays = try values.decodeIfPresent(Int.self, forKey: .recencyDays) ?? recencyDays
+        priority = try values.decodeIfPresent(Priority.self, forKey: .priority) ?? priority
+        excludedFolderPaths = try values.decodeIfPresent([String].self, forKey: .excludedFolderPaths) ?? []
+    }
 
     public var bounded: Self {
         var value = self
@@ -25,6 +75,13 @@ public struct ThumbnailPreferences: Codable, Equatable, Sendable {
         value.idleSeconds = min(max(idleSeconds, 1), 30)
         value.workSeconds = min(max(workSeconds, 1), 120)
         value.recencyDays = min(max(recencyDays, 1), 30)
+        var seen = Set<String>()
+        value.excludedFolderPaths = []
+        for path in excludedFolderPaths where path.hasPrefix("/") {
+            let normalized = URL(fileURLWithPath: path).standardizedFileURL.path
+            if seen.insert(normalized).inserted { value.excludedFolderPaths.append(normalized) }
+            if value.excludedFolderPaths.count == 128 { break }
+        }
         return value
     }
 }
@@ -53,7 +110,8 @@ public enum ThumbnailPolicy {
         let horizon = Double(settings.recencyDays) * 86400
         var seen = Set<URL>()
         let eligible = candidates.filter { item in
-            guard item.url.isFileURL, seen.insert(item.url).inserted else { return false }
+            guard item.url.isFileURL, !settings.excludesBackgroundGeneration(for: item.url),
+                  seen.insert(item.url).inserted else { return false }
             return item.url == current || item.isVisible || item.neighborDistance != nil
                 || item.url.deletingLastPathComponent().path == folderPath
                 || item.lastUsed.map { now.timeIntervalSince($0) <= horizon } == true
@@ -117,5 +175,14 @@ public enum ThumbnailPolicy {
             divisions *= 2
         }
         return Array(result.prefix(min(max(count, 1), 64)))
+    }
+}
+
+public struct ThumbnailCacheUsage: Equatable, Sendable {
+    public let memoryBytes: Int
+    public let diskBytes: Int
+    public let images: Int
+    public init(memoryBytes: Int = 0, diskBytes: Int = 0, images: Int = 0) {
+        self.memoryBytes = memoryBytes; self.diskBytes = diskBytes; self.images = images
     }
 }
