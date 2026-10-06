@@ -38,6 +38,7 @@ struct SourcesSidebar: View {
     @State private var filesystemDebounceTask: Task<Void, Never>?
     @State private var browserFilter = SourceBrowserFilter()
     @State private var filterTask: Task<Void, Never>?
+    @State private var thumbnailFocusedFolder: URL?
     @State private var visibleRows: [SourceTreeDisplayRow] = []
     @State private var hiddenItemCount = 0
     @State private var regexMatchCounts: [String: Int] = [:]
@@ -102,6 +103,11 @@ struct SourcesSidebar: View {
                                     sourceRow(row)
                                         .dynamicPlayerTextStyle()
                                         .padding(.horizontal, 7)
+                                        .onScrollVisibilityChange(threshold: 0.1) { visible in
+                                            if case .media = row.kind {
+                                                model.thumbnailScheduler.setVisible(row.url, visible: visible)
+                                            }
+                                        }
                                 }
                             }
                             .padding(.bottom, 10)
@@ -165,6 +171,8 @@ struct SourcesSidebar: View {
             // Don't leave another tab's files actionable while its replacement
             // projection is being computed in the background.
             visibleRows = []
+            thumbnailFocusedFolder = nil
+            model.thumbnailScheduler.navigate(folder: nil, discovered: [])
             searchText = ""
             previewRegexRuleID = nil
             activateSelectedSourceTab()
@@ -204,6 +212,7 @@ struct SourcesSidebar: View {
     }
 
     private func tearDownSidebar() {
+        model.thumbnailScheduler.navigate(folder: nil, discovered: [])
         model.setChromePin(.sourceVisibilityPopover, active: false)
         model.setTransientPresentation(false, owner: "source-visibility")
         filterTask?.cancel()
@@ -717,6 +726,11 @@ struct SourcesSidebar: View {
                 input: input, revealsRulePreview: revealsRulePreview, query: query
             ), !Task.isCancelled else { return }
             if visibleRows != projection.rows { visibleRows = projection.rows }
+            let mediaURLs = projection.rows.compactMap { row -> URL? in
+                if case .media = row.kind { return row.url }
+                return nil
+            }
+            model.thumbnailScheduler.navigate(folder: thumbnailFocusedFolder ?? model.activeSourceFolders.first, discovered: mediaURLs)
             if hiddenItemCount != projection.hiddenCount { hiddenItemCount = projection.hiddenCount }
             if regexMatchCounts != projection.regexCounts { regexMatchCounts = projection.regexCounts }
         }
@@ -805,6 +819,7 @@ struct SourcesSidebar: View {
     }
 
     private func toggleFolder(_ folderURL: URL) {
+        thumbnailFocusedFolder = folderURL
         let folderID = SourceTreeIdentity.folderID(for: folderURL)
         if expandedFolderIDs.contains(folderID) {
             expandedFolderIDs.remove(folderID)

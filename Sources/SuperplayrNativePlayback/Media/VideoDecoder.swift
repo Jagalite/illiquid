@@ -598,7 +598,8 @@ final class VideoDecoder {
         hardwareCapabilityWasAdvertised =
             superplayr_decoder_supports_videotoolbox(parameters) != 0
         hardwarePlatformWasSupported = Self.platformSupportsHardwareDecode(
-            codecName: stream.codecName
+            codecName: stream.codecName,
+            registerSupplementalVP9: Self.isVP9HardwareExperimentEnabled
         )
         let shouldRequestHardware = preferHardware
             && hardwareCapabilityWasAdvertised
@@ -669,8 +670,25 @@ final class VideoDecoder {
         return "Software decoder"
     }
 
-    private static func platformSupportsHardwareDecode(codecName: String) -> Bool {
-        let codecType: CMVideoCodecType? = switch codecName.lowercased() {
+    private static let isVP9HardwareExperimentEnabled = supplementalVP9ExperimentEnabled()
+
+    static func supplementalVP9ExperimentEnabled(
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        bundleIdentifier: String? = Bundle.main.bundleIdentifier
+    ) -> Bool {
+        bundleIdentifier == "com.example.SuperplayrBenchmark"
+            && environment["SUPERPLAYR_ENABLE_BENCHMARK_OVERRIDES"] == "1"
+            && environment["SUPERPLAYR_BENCHMARK_VP9_HARDWARE"] == "1"
+    }
+
+    static func platformSupportsHardwareDecode(
+        codecName: String,
+        registerSupplementalVP9: Bool = false,
+        registerSupplemental: (CMVideoCodecType) -> Void = VTRegisterSupplementalVideoDecoderIfAvailable,
+        isSupported: (CMVideoCodecType) -> Bool = VTIsHardwareDecodeSupported
+    ) -> Bool {
+        let normalizedName = codecName.lowercased()
+        let codecType: CMVideoCodecType? = switch normalizedName {
         case "h264": kCMVideoCodecType_H264
         case "hevc": kCMVideoCodecType_HEVC
         case "vp9": CMVideoCodecType(0x7670_3039) // vp09
@@ -678,7 +696,13 @@ final class VideoDecoder {
         default: nil
         }
         guard let codecType else { return true }
-        return VTIsHardwareDecodeSupported(codecType)
+        // Supplemental VP9 reduces steady CPU, but measured first-open/seek
+        // latency needs further work. Keep opt-in discovery benchmark-only until
+        // both paths qualify together. Registration alone never implies support.
+        if normalizedName == "vp9", registerSupplementalVP9 {
+            registerSupplemental(codecType)
+        }
+        return isSupported(codecType)
     }
 
     deinit {
@@ -1296,7 +1320,7 @@ final class VideoDecoder {
                 kCVImageBufferContentLightLevelInfoKey,
                 nil
             ) != nil,
-            sourceComponentDepth: Int(superplayr_frame_component_depth(frame)),
+            sourceComponentDepth: Int(superplayr_frame_source_component_depth(frame)),
             ffmpegPixelFormat: pixelFormatName,
             isHardwareDecoded: isHardware || filteredOutput.copiedHardware,
             isCopiedHardwarePath: filteredOutput.copiedHardware,
@@ -1338,7 +1362,7 @@ final class VideoDecoder {
 
     static func preferredPlanarPixelFormat(for frame: UnsafePointer<AVFrame>) -> OSType? {
         let pixelFormat = superplayr_frame_pixel_format(frame)
-        let depth = superplayr_frame_component_depth(frame)
+        let depth = superplayr_frame_source_component_depth(frame)
         let fullRange = superplayr_frame_is_full_range(frame) != 0
         if depth <= 8 {
             guard pixelFormat == AV_PIX_FMT_YUV420P

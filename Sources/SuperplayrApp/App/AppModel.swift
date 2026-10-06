@@ -212,7 +212,11 @@ final class AppModel {
     private static var sharedShutdownRequested = false
     private static var pendingStartupOpenRequests: [[URL]] = []
     private static let historyStartup = ReadOnlyStartupLoader {
-        await Task.detached(priority: .userInitiated) { PlaybackPersistenceStore() }.value
+        await Task.detached(priority: .userInitiated) {
+            let timing = LifecyclePerformance.begin("history-load")
+            defer { LifecyclePerformance.end("history-load", since: timing) }
+            return PlaybackPersistenceStore()
+        }.value
     }
 
     static func loadShared() async -> AppModel? {
@@ -221,7 +225,9 @@ final class AppModel {
         guard let persistence = await historyStartup.load(), !sharedShutdownRequested else { return nil }
         // Concurrent scene/delegate waiters share one model and native graph.
         if let sharedInstance { return sharedInstance }
+        let timing = LifecyclePerformance.begin("model-init")
         let model = AppModel(player: PlaybackController(persistence: persistence))
+        LifecyclePerformance.end("model-init", since: timing)
         sharedInstance = model
         let requests = pendingStartupOpenRequests
         pendingStartupOpenRequests.removeAll()
@@ -250,6 +256,7 @@ final class AppModel {
     }
 
     let player: PlaybackController
+    let thumbnailScheduler: ThumbnailBackgroundScheduler
     private let systemCoordinator: PlaybackSystemCoordinator
     private let nowPlayingCoordinator: NowPlayingCoordinator
     let osdPresenter = PlaybackOSDPresenter()
@@ -351,6 +358,7 @@ final class AppModel {
 
     private init(player: PlaybackController) {
         self.player = player
+        thumbnailScheduler = ThumbnailBackgroundScheduler(player: player)
         remembersPlaybackHistory = player.remembersPlaybackHistory
         restoresSessionPaused = player.restoresSessionPaused
         systemCoordinator = PlaybackSystemCoordinator(player: player)
@@ -383,8 +391,39 @@ final class AppModel {
         )
         chromePhase = chromeMachine.phase
         benchmarkPlaybackControl = BenchmarkPlaybackControl.install(player: player)
+        benchmarkPlaybackControl?.applicationCommand = { [weak self] command in
+            guard let self else { return false }
+            switch command.action {
+            case "ping": break
+            case "open":
+                guard let path = command.sourcePath, path.hasPrefix("/") else { return false }
+                LifecyclePerformance.mark("open-request")
+                self.handleOpenURLs([URL(fileURLWithPath: path)])
+            case "close-window":
+                RunLoop.main.perform(inModes: [.common]) { [weak self] in
+                    MainActor.assumeIsolated { self?.playerWindow?.performClose(nil) }
+                }
+            case "reopen-window": self.reopenPlayerWindow()
+            case "toggle-sidebar": self.setSidebarVisible(!self.state.isSidebarVisible)
+            case "window-animation":
+                guard let window = self.playerWindow else { return false }
+                window.animationBehavior = command.targetSeconds == 0 ? .none : .default
+            case "resize-window":
+                guard let window = self.playerWindow else { return false }
+                var frame = window.frame
+                frame.size = CGSize(width: command.targetSeconds ?? 960, height: 600)
+                window.setFrame(frame, display: true, animate: false)
+                window.contentView?.layoutSubtreeIfNeeded()
+                window.displayIfNeeded()
+            default: return false
+            }
+            return true
+        }
         player.setPlaybackCompletionHandler { [weak self] url in
             self?.osdPresenter.present(.mediaCompleted(Self.mediaDisplayName(for: url)))
+        }
+        player.thumbnailInteractionHandler = { [weak self] url, position in
+            self?.thumbnailScheduler.interaction(url, position: position)
         }
         installPlaybackLifecycleObservation(deliverCurrent: true)
         player.setPictureInPictureRestoreRequestHandler { [weak self] completion in
@@ -1219,6 +1258,7 @@ final class AppModel {
     }
 
     func playbackStateDidChange() {
+        updateThumbnailScheduling()
         let pipEnded = wasPictureInPictureActive && !state.pictureInPicture.isActive
         wasPictureInPictureActive = state.pictureInPicture.isActive
         if pipEnded, playerWindow == nil, pictureInPictureRestoreCompletion == nil, !isShuttingDown {
@@ -1321,6 +1361,8 @@ final class AppModel {
     }
 
     func configure(window: NSWindow) {
+        let timing = LifecyclePerformance.begin("window-configure")
+        defer { LifecyclePerformance.end("window-configure", since: timing) }
         guard !isShuttingDown else { window.close(); return }
         if let playerWindow {
             guard playerWindow !== window else { return }
@@ -1329,6 +1371,7 @@ final class AppModel {
             return
         }
         playerWindow = window
+        updateThumbnailScheduling()
         PlayerWindowControls.configure(window)
         window.minSize = NSSize(width: 720, height: 440)
         window.titleVisibility = .hidden
@@ -1629,6 +1672,8 @@ final class AppModel {
     func shutdown() async {
         guard !isShuttingDown else { return }
         isShuttingDown = true
+        thumbnailScheduler.shutdown()
+        player.thumbnailInteractionHandler = nil
         cancelActiveInteraction()
         if NSApp.modalWindow != nil { NSApp.abortModal() }
         if let window = playerWindow, let sheet = window.attachedSheet {
@@ -1823,6 +1868,13 @@ final class AppModel {
         }
     }
 
+    private func updateThumbnailScheduling() {
+        thumbnailScheduler.updatePlayback(current: state.currentURL,
+            idle: !isShuttingDown && (state.phase == .idle || state.phase == .paused)
+                && state.isPauseDesired,
+            windowVisible: playerWindow != nil)
+    }
+
     private func updateUIObservationActivity(for window: NSWindow) {
         let active = WindowUIObservationPolicy.shouldObserve(
             isApplicationActive: NSApp.isActive,
@@ -1841,6 +1893,8 @@ final class AppModel {
     }
 
     private func playerWindowWillClose(_ window: NSWindow) {
+        let timing = LifecyclePerformance.begin("window-close")
+        defer { LifecyclePerformance.end("window-close", since: timing) }
         guard window === playerWindow else { return }
         setChromePin(.windowResize, active: false)
         saveFrame(of: window)
@@ -1872,6 +1926,7 @@ final class AppModel {
         titlebarTitleView?.removeFromSuperview()
         titlebarTitleView = nil
         playerWindow = nil
+        updateThumbnailScheduling()
         isUIObservationActive = false
     }
 
@@ -2600,16 +2655,15 @@ enum SourceTabItems {
         with additions: [SourceTabItem]
     ) -> [SourceTabItem] {
         var result: [SourceTabItem] = []
+        var seen: Set<SourceTabItem> = []
+        result.reserveCapacity(existing.count + additions.count)
         for item in existing + additions {
-            guard !item.path.isEmpty,
-                  !result.contains(where: {
-                      $0.kind == item.kind
-                          && NormalizedFileURL.representsSameFile($0.url, item.url)
-                  })
-            else {
-                continue
-            }
-            result.append(SourceTabItem(kind: item.kind, url: item.url))
+            guard !item.path.isEmpty else { continue }
+            // Decoded items may contain noncanonical paths. Normalize once and
+            // retain the first occurrence of each (kind, canonical path) pair.
+            let canonical = SourceTabItem(kind: item.kind, url: item.url)
+            guard seen.insert(canonical).inserted else { continue }
+            result.append(canonical)
         }
         return result
     }

@@ -5,6 +5,7 @@ import SwiftUI
 
 enum SettingsDestination: String, CaseIterable, Identifiable {
     case playback
+    case behavior
     case audio
     case video
     case appearance
@@ -16,6 +17,7 @@ enum SettingsDestination: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .playback: "Playback"
+        case .behavior: "Behavior"
         case .audio: "Audio & Subtitles"
         case .video: "Video"
         case .appearance: "Appearance"
@@ -27,6 +29,7 @@ enum SettingsDestination: String, CaseIterable, Identifiable {
     var subtitle: String {
         switch self {
         case .playback: "Defaults and playlist behavior"
+        case .behavior: "Window closing, session restoration and previews"
         case .audio: "Output and remembered media choices"
         case .video: "Decoding and current output status"
         case .appearance: "Themes, overlay text, and windows"
@@ -38,6 +41,7 @@ enum SettingsDestination: String, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .playback: "play.circle.fill"
+        case .behavior: "app.badge"
         case .audio: "speaker.wave.2.fill"
         case .video: "display"
         case .appearance: "paintpalette.fill"
@@ -86,6 +90,9 @@ struct SettingsView: View {
     @Bindable private var interfaceScale = PlayerInterfaceScaleStore.shared
     @Bindable var model: AppModel
     @Bindable var themeStore: PlayerThemeStore
+
+    @AppStorage(WindowCloseBehavior.keepsRunningKey)
+    private var keepsRunningAfterLastWindowClosed = false
 
     @State private var selection: SettingsDestination? = .playback
     @State private var pendingClearAction: SettingsClearAction?
@@ -148,6 +155,8 @@ struct SettingsView: View {
         switch destination {
         case .playback:
             playbackPage
+        case .behavior:
+            behaviorPage
         case .audio:
             audioPage
         case .video:
@@ -161,6 +170,25 @@ struct SettingsView: View {
         }
     }
 
+    private var behaviorPage: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            SettingsSectionLabel("Window Closing")
+            SettingsCard {
+                Toggle("Keep Illiquid running after closing the last window",
+                       isOn: $keepsRunningAfterLastWindowClosed)
+                Text("Closing the player stops playback unless Picture in Picture is active. Click Illiquid in the Dock to reopen it. Quit Illiquid (⌘Q) always exits the app.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            ThumbnailSettingsCard(scheduler: model.thumbnailScheduler)
+            SettingsSectionLabel("Session Restoration")
+            SettingsCard {
+                Toggle("Restore the previous session paused", isOn: $model.restoresSessionPaused)
+                Text("Files you explicitly open play automatically.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+        }
+    }
+
     private var playbackPage: some View {
         VStack(alignment: .leading, spacing: 18) {
             SettingsSectionLabel("Controls")
@@ -171,8 +199,6 @@ struct SettingsView: View {
                 Toggle("Lock controls position", isOn: $model.isControlsPositionLocked)
                 Button("Reset Controls Position", action: model.resetControlsPosition)
             }
-            Toggle("Restore the previous session paused", isOn: $model.restoresSessionPaused)
-            Text("Files you explicitly open play automatically.").font(.caption).foregroundStyle(.secondary)
             SettingsSectionLabel("Playback Preferences")
             SettingsCard {
                 SettingsRow(

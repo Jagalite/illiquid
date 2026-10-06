@@ -1,4 +1,5 @@
 import AppKit
+import SuperplayrCore
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -8,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var terminationIsInProgress = false
     private var activatesStandaloneLaunch = false
     private let shutdown: @MainActor () async -> String?
+    private let keepsRunningAfterLastWindowClosed: @MainActor () -> Bool
     private let presentSaveFailure: @MainActor (String) -> Void
 
     // SwiftUI creates the delegate through NSObject's zero-argument initializer.
@@ -18,8 +20,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     init(
         shutdown: @escaping @MainActor () async -> String?,
-        presentSaveFailure: @escaping @MainActor (String) -> Void = AppDelegate.showSaveFailure
+        presentSaveFailure: @escaping @MainActor (String) -> Void = AppDelegate.showSaveFailure,
+        keepsRunningAfterLastWindowClosed: @escaping @MainActor () -> Bool = {
+            UserDefaults.standard.bool(forKey: WindowCloseBehavior.keepsRunningKey)
+        }
     ) {
+        self.keepsRunningAfterLastWindowClosed = keepsRunningAfterLastWindowClosed
         self.shutdown = shutdown
         self.presentSaveFailure = presentSaveFailure
         super.init()
@@ -51,7 +57,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        !AppModel.keepsPlayingInPictureInPicture
+        WindowCloseBehavior.shouldTerminate(
+            keepsRunning: keepsRunningAfterLastWindowClosed(),
+            pictureInPictureActive: AppModel.keepsPlayingInPictureInPicture
+        )
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
@@ -97,6 +106,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func finishTermination(reply: () -> Void) async {
+        let timing = LifecyclePerformance.begin("app-shutdown")
+        defer { LifecyclePerformance.end("app-shutdown", since: timing) }
         let failure = await shutdown()
         delayedQuitTask?.cancel()
         delayedQuitTask = nil

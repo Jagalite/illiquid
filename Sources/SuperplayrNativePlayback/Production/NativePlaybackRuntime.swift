@@ -527,7 +527,10 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
             1,
             softwarePlanarOutputMaximumBufferCount
         )
+        let presentationTiming = LifecyclePerformance.begin("presentation-init")
         let presentation = try NativePresentationCoordinator()
+        LifecyclePerformance.end("presentation-init", since: presentationTiming)
+        let subtitleTiming = LifecyclePerformance.begin("subtitles-init")
         let subtitleMemoryBudget = SubtitleMemoryBudget()
         self.subtitleMemoryBudget = subtitleMemoryBudget
         let subtitles = try SubtitlePipeline(
@@ -536,6 +539,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
             memoryBudget: self.subtitleMemoryBudget,
             memoryOwner: .mainLibass
         )
+        LifecyclePerformance.end("subtitles-init", since: subtitleTiming)
         self.presentation = presentation
         self.subtitles = subtitles
         pictureInPictureSubtitles = nil
@@ -1806,6 +1810,8 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     private func performPhysicalShutdown() async -> Bool {
+        let timing = LifecyclePerformance.begin("native-shutdown")
+        defer { LifecyclePerformance.end("native-shutdown", since: timing) }
         pendingLoad = nil
         desiredPlaying = false
         pictureInPictureRestoreRequestHandler = nil
@@ -2986,6 +2992,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
 
         if !didEmitFirstFrameSubmitted, snapshot.framesSubmitted > 0 {
             didEmitFirstFrameSubmitted = true
+            LifecyclePerformance.mark("first-frame-submitted")
             emit(.firstFrameSubmitted)
         }
         if !didEmitPreroll, snapshot.isPrerolled {

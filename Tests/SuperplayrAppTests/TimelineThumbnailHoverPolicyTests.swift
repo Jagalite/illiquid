@@ -5,6 +5,14 @@ import Testing
 @Suite("Timeline hover recovery")
 @MainActor
 struct TimelineThumbnailHoverRecoveryTests {
+    @Test func fallbackCannotFollowThePointerBeyondTheNearbyWindow() {
+        #expect(TimelineThumbnailHoverPolicy.canRetainPreview(at: 10, for: 20, maximumDistance: 30))
+        #expect(!TimelineThumbnailHoverPolicy.canRetainPreview(at: 10, for: 120, maximumDistance: 30))
+        // Short videos can have a smaller adaptive distance than the global cap.
+        #expect(!TimelineThumbnailHoverPolicy.canRetainPreview(at: 10, for: 20, maximumDistance: 5))
+        #expect(!TimelineThumbnailHoverPolicy.canRetainPreview(at: nil, for: 20, maximumDistance: 30))
+    }
+
     private func image() throws -> CGImage {
         try #require(CGContext(data: nil, width: 2, height: 2,
             bitsPerComponent: 8, bytesPerRow: 8,

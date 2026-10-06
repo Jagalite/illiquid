@@ -1,0 +1,68 @@
+import Foundation
+import Testing
+@testable import SuperplayrCore
+
+@Suite("Thumbnail scheduling policy")
+struct ThumbnailPolicyTests {
+    let now = Date(timeIntervalSince1970: 2_000_000)
+    func url(_ path: String) -> URL { URL(fileURLWithPath: "/media/\(path)") }
+
+    @Test func foregroundAndViewportCannotBeOvertakenByHistory() {
+        let current = url("a/current.mkv"), visible = url("b/visible.mkv"), recent = url("a/recent.mkv")
+        var settings = ThumbnailPreferences(); settings.priority = .recent
+        let result = ThumbnailPolicy.ranked([
+            .init(url: recent, lastUsed: now), .init(url: visible, isVisible: true), .init(url: current)
+        ], current: current, folder: url("a"), now: now, preferences: settings)
+        #expect(result == [current, visible, recent])
+    }
+
+    @Test func userPriorityChangesTheNextSpeculativeVideo() {
+        let nearby = url("a/old.mkv"), recent = url("b/new.mkv")
+        let candidates: [ThumbnailPolicy.Candidate] = [.init(url: nearby), .init(url: recent, lastUsed: now)]
+        var settings = ThumbnailPreferences(); settings.priority = .nearby
+        #expect(ThumbnailPolicy.ranked(candidates, current: nil, folder: url("a"), now: now, preferences: settings).first == nearby)
+        settings.priority = .recent
+        #expect(ThumbnailPolicy.ranked(candidates, current: nil, folder: url("a"), now: now, preferences: settings).first == recent)
+    }
+
+    @Test func navigationRetiresDistantUnseenFilesAndExpiresHistory() {
+        let old = url("old/a.mkv"), new = url("new/b.mkv")
+        let candidates: [ThumbnailPolicy.Candidate] = [
+            .init(url: old, lastUsed: now.addingTimeInterval(-8 * 86400)), .init(url: new), .init(url: new)]
+        #expect(ThumbnailPolicy.ranked(candidates, current: nil, folder: url("new"), now: now,
+                                      preferences: .init()) == [new])
+    }
+
+    @Test func samplesAreUniqueBoundedAndStartAtInterest() {
+        #expect(ThumbnailPolicy.samples(duration: .infinity, focus: 0, count: 12).isEmpty)
+        #expect(ThumbnailPolicy.samples(duration: 0.1, focus: 99, count: 64) == [0])
+        let samples = ThumbnailPolicy.samples(duration: 120, focus: 42.3, count: 12)
+        #expect(samples.first == 42.5)
+        #expect(samples.count == 12 && Set(samples).count == 12)
+        #expect(samples.allSatisfy { $0 >= 0 && $0 < 120 })
+        #expect(samples.prefix(4).contains(60))
+    }
+
+    @Test func malformedBudgetsAreClampedAndGenerationDefaultsOff() throws {
+        var settings = ThumbnailPreferences()
+        #expect(!settings.generatesInBackground && !settings.generatesWithWindowClosed)
+        settings.memoryMiB = Int.max; settings.diskMiB = -1; settings.videosPerPass = Int.max
+        settings.samplesPerVideo = -20; settings.workSeconds = Int.max
+        let bounded = settings.bounded
+        #expect(bounded.memoryMiB == 128 && bounded.diskMiB == 0)
+        #expect(bounded.videosPerPass == 64 && bounded.samplesPerVideo == 1 && bounded.workSeconds == 120)
+        #expect(try JSONDecoder().decode(ThumbnailPreferences.self, from: JSONEncoder().encode(bounded)) == bounded)
+    }
+
+    @Test func refinementKeepsBoundedLocalVisitsWithoutChangingPerVideoSamplePriority() {
+        let plans: [[Double]] = [[60, 30, 90, 15, 45, 75], [12, 6, 18], []]
+        let order = ThumbnailPolicy.refinementOrder(plans)
+        #expect(order.map(\.video) == [0, 0, 0, 0, 1, 1, 1, 0, 0])
+        for video in plans.indices {
+            #expect(order.filter { $0.video == video }.map(\.position) == plans[video])
+        }
+        let fair = ThumbnailPolicy.refinementOrder([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+        #expect(fair.prefix(8).map(\.video) == [0, 0, 0, 0, 1, 1, 1, 1])
+        #expect(ThumbnailPolicy.refinementOrder([]).isEmpty)
+    }
+}

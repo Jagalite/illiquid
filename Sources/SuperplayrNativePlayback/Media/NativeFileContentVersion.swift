@@ -3,7 +3,7 @@ import Foundation
 import SuperplayrCore
 
 enum NativeFileContentVersion {
-    /// Called only within native session construction's bounded worker lifetime.
+    /// Filesystem metadata only; call off the UI actor within a bounded worker.
     /// stat follows symlinks, so retargeting cannot reuse the link's own metadata.
     static func read(_ url: URL) -> MediaContentVersion? {
         guard url.isFileURL else { return nil }

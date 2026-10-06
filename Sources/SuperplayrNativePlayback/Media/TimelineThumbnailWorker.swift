@@ -11,6 +11,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
         let seconds: TimeInterval
         let size: CGSize
         var cacheRevision: UInt64 = 0
+        var background = false
     }
     private final class Request {
         let id: UUID
@@ -30,7 +31,9 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
     private let lock = NSLock()
     private let queue = DispatchQueue(label: "com.platinum.thumbnail-decode", qos: .utility)
     private let decode: @Sendable (Input, FFmpegInputCancellationSignal) -> CGImage?
+    private let release: @Sendable () -> Void
     private let requestTimeout: TimeInterval
+    private let prioritizesForeground: Bool
     private var active: Request?
     private var pending: Request?
 
@@ -39,7 +42,11 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
     }
 
     init(requestTimeout: TimeInterval = 1.5,
+         prioritizesForeground: Bool = false,
+         release: @escaping @Sendable () -> Void = {},
          decode: @escaping @Sendable (Input, FFmpegInputCancellationSignal) -> CGImage?) {
+        self.release = release
+        self.prioritizesForeground = prioritizesForeground
         self.requestTimeout = requestTimeout
         self.decode = decode
     }
@@ -86,7 +93,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
         oldActive?.cancellation.requestCancellation()
         oldContinuation?.resume(returning: nil)
         DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + requestTimeout, execute: deadline)
-        if startsWorker { queue.async { self.drain() } }
+        if startsWorker { schedule(request) }
     }
 
     @discardableResult
@@ -110,7 +117,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
         return continuation != nil
     }
 
-    func cancelAll() {
+    func cancelAll(releasingResources: Bool = false) {
         lock.lock()
         let requests = [active, pending].compactMap { $0 }
         let continuations = requests.compactMap { $0.continuation }
@@ -123,6 +130,22 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
             request.cancellation.requestCancellation()
         }
         for continuation in continuations { continuation.resume(returning: nil) }
+        if releasingResources { queue.async { self.release() } }
+    }
+
+    func releaseResourcesWhenIdle() {
+        queue.async {
+            guard self.lock.withLock({ self.active == nil && self.pending == nil }) else { return }
+            // Native access is confined to this serial queue. A request admitted
+            // after the check will begin decoding after release has completed.
+            self.release()
+        }
+    }
+
+    private func schedule(_ request: Request) {
+        guard prioritizesForeground else { queue.async { self.drain() }; return }
+        let qos: DispatchQoS = !request.input.background ? .userInitiated : .utility
+        queue.async(qos: qos, flags: .enforceQoS) { self.drain() }
     }
 
     private func drain() {
@@ -138,8 +161,15 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
             request.continuation = nil
             active = pending
             pending = nil
+            let next = active
             lock.unlock()
             continuation?.resume(returning: request.cancellation.cancellationRequested ? nil : image)
+            // A pending hover must get its own foreground work item even when
+            // it arrived while a background native call was still returning.
+            if prioritizesForeground {
+                if let next { schedule(next) }
+                return
+            }
         }
     }
 }

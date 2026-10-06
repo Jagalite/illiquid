@@ -161,6 +161,20 @@ final class FFmpegDemuxer {
         }
     }
 
+    /// Consult only the demuxer's existing index. Never scan packets or seek to
+    /// discover a keyframe; callers fall back when the container has no entry.
+    func indexedKeyframeTime(at seconds: Double, streamIndex: Int32) -> Double? {
+        guard seconds.isFinite, let context, streamIndex >= 0,
+              streamIndex < Int32(context.pointee.nb_streams),
+              let stream = context.pointee.streams[Int(streamIndex)] else { return nil }
+        let base = stream.pointee.time_base
+        guard base.num > 0, base.den > 0,
+              let timestamp = Int64(exactly: floor(seconds * Double(base.den) / Double(base.num))),
+              let entry = avformat_index_get_entry_from_timestamp(stream, timestamp, AVSEEK_FLAG_BACKWARD),
+              entry.pointee.timestamp != superplayr_nopts_value() else { return nil }
+        return Double(entry.pointee.timestamp) * Double(base.num) / Double(base.den)
+    }
+
     func seek(to seconds: Double, exact: Bool) throws {
         guard let context else { return }
         guard let target = Int64(exactly: (seconds * Double(AV_TIME_BASE)).rounded()) else {

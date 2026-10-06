@@ -1069,6 +1069,7 @@ private struct ElasticTimelineThumbnailPreview: View {
     let image: CGImage?
     let position: TimeInterval
     let isLoading: Bool
+    var representedPosition: Double? = nil
     @Environment(\.playerTheme) private var theme
 
     var body: some View {
@@ -1091,7 +1092,8 @@ private struct ElasticTimelineThumbnailPreview: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
 
-            Text(TimecodeFormatter.string(from: position))
+            Text((representedPosition.map { abs($0 - position) > 0.5 } == true ? "≈ " : "")
+                 + TimecodeFormatter.string(from: representedPosition ?? position))
                 .font(.system(size: 11, weight: .semibold, design: .monospaced))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 7)
@@ -1117,11 +1119,19 @@ private struct ElasticTimelineHoverPreviewState {
     var fraction: CGFloat
     var position: TimeInterval
     var image: CGImage?
+    var representedPosition: Double?
     var isLoading = true
 }
 
 enum TimelineThumbnailHoverPolicy {
     static let cacheMissDelay: Duration = .milliseconds(40)
+
+    static func canRetainPreview(at representedPosition: Double?, for position: Double,
+                                 maximumDistance: Double) -> Bool {
+        guard let representedPosition, representedPosition.isFinite, position.isFinite,
+              maximumDistance.isFinite, maximumDistance >= 0 else { return false }
+        return abs(representedPosition - position) <= maximumDistance
+    }
 
     /// A timed-out native call can release its worker just after the caller
     /// expires. Retry once while this hover still owns the request; never loop
@@ -1284,7 +1294,8 @@ struct ElasticPlaybackControlBar: View {
                     ElasticTimelineThumbnailPreview(
                         image: preview.image,
                         position: preview.position,
-                        isLoading: preview.isLoading
+                        isLoading: preview.isLoading,
+                        representedPosition: preview.representedPosition
                     )
                     .frame(
                         width: TimelineThumbnailPlacement.cardSize.width,
@@ -1387,16 +1398,34 @@ struct ElasticPlaybackControlBar: View {
         timelineThumbnailTask?.cancel()
         timelineThumbnailRequestID += 1
         let requestID = timelineThumbnailRequestID
-        let retainedImage = timelineHoverPreview?.image
+        let maximumDistance = min(30, model.state.duration /
+            Double(model.thumbnailScheduler.preferences.bounded.samplesPerVideo * 2))
+        let canRetain = TimelineThumbnailHoverPolicy.canRetainPreview(
+            at: timelineHoverPreview?.representedPosition, for: Double(bucket) / 2,
+            maximumDistance: maximumDistance)
+        let retainedImage = canRetain ? timelineHoverPreview?.image : nil
+        let retainedPosition = canRetain ? timelineHoverPreview?.representedPosition : nil
         timelineHoverPreview = ElasticTimelineHoverPreviewState(
             requestID: requestID,
             bucket: bucket,
             fraction: fraction,
             position: position,
-            image: retainedImage
+            image: retainedImage,
+            representedPosition: retainedPosition
         )
         timelineThumbnailTask = Task { @MainActor in
             let maximumPixelSize = CGSize(width: 368, height: 208)
+            if let cached = await model.player.cachedTimelineThumbnail(at: position,
+                maximumPixelSize: maximumPixelSize,
+                maximumDistance: maximumDistance),
+               !Task.isCancelled, var preview = timelineHoverPreview, preview.requestID == requestID {
+                preview.image = cached.image
+                preview.representedPosition = cached.position
+                preview.isLoading = cached.position != Double(bucket) / 2
+                timelineHoverPreview = preview
+                if !preview.isLoading { return }
+            }
+            guard !Task.isCancelled else { return }
             let image = await TimelineThumbnailHoverPolicy.image {
                 await model.player.timelineThumbnail(
                     at: position,
@@ -1408,7 +1437,10 @@ struct ElasticPlaybackControlBar: View {
                   var preview = timelineHoverPreview,
                   preview.requestID == requestID
             else { return }
-            preview.image = image
+            if let image {
+                preview.image = image
+                preview.representedPosition = Double(bucket) / 2
+            }
             preview.isLoading = false
             timelineHoverPreview = preview
         }

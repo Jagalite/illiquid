@@ -594,12 +594,21 @@ static inline double superplayr_frame_rotation_degrees(const AVFrame *frame) {
     return av_display_rotation_get((const int32_t *)side_data->data);
 }
 
-static inline int superplayr_frame_component_depth(const AVFrame *frame) {
+static inline int superplayr_frame_source_component_depth(const AVFrame *frame) {
     if (!frame)
         return 0;
     const AVPixFmtDescriptor *descriptor = av_pix_fmt_desc_get(
         (enum AVPixelFormat)frame->format
     );
+    // Hardware wrapper formats have no components of their own. Preserve the
+    // decoded component depth (also used by PiP eligibility) from FFmpeg's
+    // backing software format rather than reporting every VT frame as depth 0.
+    if (descriptor && (descriptor->flags & AV_PIX_FMT_FLAG_HWACCEL)
+        && frame->hw_frames_ctx && frame->hw_frames_ctx->data) {
+        const AVHWFramesContext *frames =
+            (const AVHWFramesContext *)frame->hw_frames_ctx->data;
+        descriptor = av_pix_fmt_desc_get(frames->sw_format);
+    }
     return descriptor && descriptor->nb_components > 0
         ? descriptor->comp[0].depth
         : 0;

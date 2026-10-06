@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import SuperplayrCore
 import SuperplayrPlayer
 
 struct BenchmarkPlaybackControlCommand: Decodable, Equatable {
@@ -7,6 +8,11 @@ struct BenchmarkPlaybackControlCommand: Decodable, Equatable {
     let id: String
     let action: String
     let targetSeconds: TimeInterval?
+    let sourcePath: String?
+
+    var isApplicationAction: Bool {
+        ["ping", "open", "close-window", "reopen-window", "toggle-sidebar", "resize-window", "window-animation"].contains(action)
+    }
 
     var playbackAction: PlaybackBenchmarkControlAction? {
         switch action {
@@ -54,6 +60,9 @@ final class BenchmarkPlaybackControl {
     private let source: DispatchSourceSignal
     private var isInvalidated = false
     private var deduplicator = BenchmarkPlaybackControlDeduplicator()
+    var applicationCommand: ((BenchmarkPlaybackControlCommand) -> Bool)?
+    private var heartbeat: DispatchSourceTimer?
+    private var lastHeartbeat: UInt64 = 0
 
     static func configuration(
         environment: [String: String] = ProcessInfo.processInfo.environment,
@@ -103,6 +112,23 @@ final class BenchmarkPlaybackControl {
             Task { @MainActor in self?.consumeCommand() }
         }
         source.resume()
+        if LifecyclePerformance.isEnabled,
+           ProcessInfo.processInfo.environment["SUPERPLAYR_BENCHMARK_HEARTBEAT"] != "0" {
+            let timer = DispatchSource.makeTimerSource(queue: .main)
+            timer.schedule(deadline: .now(), repeating: .milliseconds(10), leeway: .milliseconds(1))
+            timer.setEventHandler { [weak self] in
+                MainActor.assumeIsolated {
+                    guard let self else { return }
+                    let now = DispatchTime.now().uptimeNanoseconds
+                    if self.lastHeartbeat != 0, now - self.lastHeartbeat > 20_000_000 {
+                        LifecyclePerformance.end("main-queue-gap", since: self.lastHeartbeat)
+                    }
+                    self.lastHeartbeat = now
+                }
+            }
+            heartbeat = timer
+            timer.resume()
+        }
         writeDiagnostic("session=\(configuration.session) phase=ready")
     }
 
@@ -110,6 +136,9 @@ final class BenchmarkPlaybackControl {
         guard !isInvalidated else { return }
         isInvalidated = true
         source.cancel()
+        heartbeat?.cancel()
+        heartbeat = nil
+        applicationCommand = nil
     }
 
     private func consumeCommand() {
@@ -129,7 +158,7 @@ final class BenchmarkPlaybackControl {
             let command = try JSONDecoder().decode(BenchmarkPlaybackControlCommand.self, from: data)
             guard command.session == configuration.session,
                   Self.isValidToken(command.id),
-                  let action = command.playbackAction
+                  command.playbackAction != nil || (LifecyclePerformance.isEnabled && command.isApplicationAction)
             else {
                 writeDiagnostic(
                     "session=\(configuration.session) phase=rejected reason=invalid-command"
@@ -143,11 +172,12 @@ final class BenchmarkPlaybackControl {
                 )
                 return
             }
-            _ = player.executeBenchmarkControl(
-                session: command.session,
-                id: command.id,
-                action: action
-            )
+            if let action = command.playbackAction {
+                _ = player.executeBenchmarkControl(session: command.session, id: command.id, action: action)
+            } else {
+                let accepted = applicationCommand?(command) == true
+                writeDiagnostic("session=\(command.session) id=\(command.id) phase=completed accepted=\(accepted ? "yes" : "no")")
+            }
         } catch {
             writeDiagnostic(
                 "session=\(configuration.session) phase=rejected reason=read-or-decode"
@@ -163,5 +193,6 @@ final class BenchmarkPlaybackControl {
 
     deinit {
         source.cancel()
+        heartbeat?.cancel()
     }
 }

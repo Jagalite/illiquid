@@ -73,8 +73,37 @@ struct PresentationTimeObservationTests {
         }
         #expect(coalescer.snapshot().scheduledDeliveries == 1)
         #expect(coalescer.snapshot().coalescedRequests == 999)
-        for _ in 0..<100 where deliveries < 2 { await Task.yield() }
+        // Drain the batch before asserting the retained delivery policy.
+        for _ in 0..<100 { await Task.yield() }
         #expect(deliveries == 2)
+        #expect(coalescer.snapshot().followUpDeliveries == 1)
+    }
+
+    @Test @MainActor func requestDuringDeliveryStillGetsAFollowUp() async {
+        let coalescer = RuntimeObservationCoalescer()
+        var revision = 0
+        var observed: [Int] = []
+        coalescer.request(.init(source: .videoEnqueue, urgency: .routine)) {
+            observed.append(revision)
+            if revision == 0 {
+                revision = 1
+                coalescer.request(.init(source: .preroll, urgency: .urgent)) {
+                    // The scheduled operation owns the batch, as before.
+                    Issue.record("Unexpected replacement of the pending operation")
+                }
+            }
+        }
+        for _ in 0..<100 where observed.count < 2 { await Task.yield() }
+        #expect(observed == [0, 1])
+        #expect(coalescer.snapshot().followUpDeliveries == 1)
+
+        // Once the batch drains, a fresh request must schedule a new operation.
+        coalescer.request(.init(source: .decoderDrain, urgency: .urgent)) {
+            observed.append(2)
+        }
+        for _ in 0..<100 where observed.count < 3 { await Task.yield() }
+        #expect(observed == [0, 1, 2])
+        #expect(coalescer.snapshot().scheduledDeliveries == 2)
     }
 
     @Test func invalidFrameRatesStayBounded() {

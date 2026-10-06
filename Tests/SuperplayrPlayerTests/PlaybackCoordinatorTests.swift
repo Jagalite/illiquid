@@ -391,6 +391,65 @@ struct PlaybackCoordinatorTests {
         func clear() throws {}
     }
 
+    private final class BlockedSaveStore: PlaybackSessionStoring, @unchecked Sendable {
+        let entered = DispatchSemaphore(value: 0)
+        let release = DispatchSemaphore(value: 0)
+        private let lock = NSLock()
+        private var hasBlocked = false
+        private var records: [PlaybackSessionRecord] = []
+        var positions: [TimeInterval] { lock.withLock { records.map(\.position) } }
+        func waitUntilEntered() -> Bool { entered.wait(timeout: .now() + 3) == .success }
+        func load() throws -> PlaybackSessionRecord? { nil }
+        func save(_ session: PlaybackSessionRecord) throws {
+            #expect(!Thread.isMainThread)
+            let mustBlock = lock.withLock {
+                let first = !hasBlocked
+                hasBlocked = true
+                return first
+            }
+            if mustBlock {
+                entered.signal()
+                guard release.wait(timeout: .now() + 5) == .success else {
+                    throw CocoaError(.fileWriteUnknown)
+                }
+            }
+            lock.withLock { records.append(session) }
+        }
+        func clear() throws {}
+    }
+
+    @Test func shutdownJoinsBlockedSaveWithoutBlockingMainActorOrLosingLatestProgress() async throws {
+        let store = BlockedSaveStore()
+        defer { store.release.signal() }
+        let fixture = try CoordinatorFixture(sessionStore: store)
+        let file = try fixture.createFile("slow-final-save.mkv")
+        fixture.coordinator.open(url: file)
+        try await waitForPreparation(fixture.coordinator)
+        let load = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: load.identity)
+        fixture.runtime.emit(.durationChanged(300), identity: load.identity)
+        fixture.runtime.emit(.positionChanged(42), identity: load.identity)
+        let entered = await Task.detached {
+            store.waitUntilEntered()
+        }.value
+        try #require(entered)
+        fixture.runtime.emit(.positionChanged(43), identity: load.identity)
+        var finished = false
+        let shutdown = Task { await fixture.coordinator.shutdown(); finished = true }
+        let deadline = ContinuousClock.now.advanced(by: .seconds(2))
+        while fixture.runtime.shutdownCount == 0, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        #expect(fixture.runtime.shutdownCount == 1)
+        #expect(!finished)
+        #expect(store.positions.isEmpty)
+        store.release.signal()
+        await shutdown.value
+        #expect(finished)
+        #expect(store.positions.last == 43)
+        #expect(fixture.coordinator.shutdownPersistenceError == nil)
+    }
+
     @Test func failedCheckpointDoesNotAdvanceThePlaylist() async throws {
         let fixture = try CoordinatorFixture(sessionStore: FailedSessionStore())
         let first = try fixture.createFile("failure-01.mkv")
@@ -1540,6 +1599,57 @@ struct PlaybackCoordinatorTests {
 
         #expect(runtime.seeks.isEmpty)
         #expect(coordinator.state.isPauseDesired)
+    }
+
+    @Test func batchOpenOfStoppedCurrentFileCreatesANewPlaybackSession() async throws {
+        let fixture = try CoordinatorFixture()
+        let file = try fixture.createFile("reopen-after-close.mkv")
+        fixture.coordinator.open(urls: [file])
+        try await waitForPreparation(fixture.coordinator)
+        let first = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: first.identity)
+        fixture.runtime.emit(.durationChanged(300), identity: first.identity)
+        fixture.runtime.emit(.positionChanged(43), identity: first.identity)
+        fixture.coordinator.stop()
+        fixture.coordinator.open(urls: [file])
+        try await waitForPreparation(fixture.coordinator)
+        #expect(fixture.runtime.loads.count == 2)
+        #expect(fixture.runtime.loads.last?.identity != first.identity)
+        #expect(fixture.persistence.playbackPosition(for: file) == 43)
+        await fixture.coordinator.shutdown()
+        #expect(try fixture.sessionStore.load()?.position == 43)
+    }
+
+    @Test func quittingAfterStopKeepsTheLastPlaybackCheckpoint() async throws {
+        let fixture = try CoordinatorFixture()
+        let file = try fixture.createFile("quit-after-close.mkv")
+        fixture.coordinator.open(urls: [file])
+        try await waitForPreparation(fixture.coordinator)
+        let load = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: load.identity)
+        fixture.runtime.emit(.durationChanged(300), identity: load.identity)
+        fixture.runtime.emit(.positionChanged(43), identity: load.identity)
+        fixture.coordinator.stop()
+        await fixture.coordinator.shutdown()
+        #expect(fixture.persistence.playbackPosition(for: file) == 43)
+        #expect(try fixture.sessionStore.load()?.position == 43)
+    }
+
+    @Test func shutdownFlushesLatestProgressWithoutDependingOnDebouncedTask() async throws {
+        let fixture = try CoordinatorFixture()
+        let file = try fixture.createFile("final-progress.mkv")
+        fixture.coordinator.open(url: file)
+        try await waitForPreparation(fixture.coordinator)
+        let load = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: load.identity)
+        fixture.runtime.emit(.durationChanged(300), identity: load.identity)
+        fixture.runtime.emit(.positionChanged(42), identity: load.identity)
+        fixture.runtime.emit(.positionChanged(43), identity: load.identity)
+        await fixture.coordinator.shutdown()
+        #expect(fixture.persistence.playbackPosition(for: file) == 43)
+        #expect(try fixture.sessionStore.load()?.position == 43)
+        #expect(fixture.coordinator.shutdownPersistenceError == nil)
+        #expect(fixture.runtime.shutdownCount == 1)
     }
 
     @Test func shutdownIsForwardedExactlyOnce() async throws {

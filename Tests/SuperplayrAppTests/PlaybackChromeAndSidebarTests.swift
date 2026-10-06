@@ -10,17 +10,18 @@ import Testing
 @Suite("Player themes")
 @MainActor
 struct PlayerThemeTests {
-    @Test func settingsExposeSixStableDestinations() {
+    @Test func settingsExposeSevenStableDestinations() {
         #expect(SettingsDestination.allCases == [
             .playback,
+            .behavior,
             .audio,
             .video,
             .appearance,
             .sources,
             .data,
         ])
-        #expect(Set(SettingsDestination.allCases.map(\.title)).count == 6)
-        #expect(Set(SettingsDestination.allCases.map(\.systemImage)).count == 6)
+        #expect(Set(SettingsDestination.allCases.map(\.title)).count == 7)
+        #expect(Set(SettingsDestination.allCases.map(\.systemImage)).count == 7)
     }
 
     @Test func exposesFiveStableThemeChoices() {

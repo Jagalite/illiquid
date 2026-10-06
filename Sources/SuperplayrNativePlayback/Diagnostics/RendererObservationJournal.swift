@@ -20,7 +20,12 @@ public struct DifferentialRendererObservationJournal: Sendable {
   public private(set) var staleObservationCount = 0
   public private(set) var rendererEOFMonotonicSeconds: Double?
 
-  private var intervals: [DifferentialStreamKind: [DifferentialMediaInterval]] = [:]
+  // Readiness asks whether the clock crossed any submitted start; drain asks
+  // whether it crossed every submitted end. These extrema preserve both
+  // predicates, including out-of-order submissions, without retaining a
+  // playback-length array or scanning it on every EOF observation.
+  private var earliestStarts: [DifferentialStreamKind: Double] = [:]
+  private var latestEnd: Double?
   private var readiness: [DifferentialStreamKind: DifferentialReadiness] = [:]
   private var demuxEOF = false
 
@@ -37,7 +42,8 @@ public struct DifferentialRendererObservationJournal: Sendable {
       staleObservationCount += 1
       return
     }
-    intervals[kind, default: []].append(interval)
+    earliestStarts[kind] = min(earliestStarts[kind] ?? interval.start, interval.start)
+    latestEnd = max(latestEnd ?? interval.end, interval.end)
   }
 
   public mutating func markDemuxEOF(epoch: Int) {
@@ -58,8 +64,8 @@ public struct DifferentialRendererObservationJournal: Sendable {
       return
     }
     guard mediaTime.isFinite, monotonicSeconds.isFinite else { return }
-    for (kind, samples) in intervals where readiness[kind] == nil {
-      if samples.contains(where: { mediaTime >= $0.start }) {
+    for (kind, start) in earliestStarts where readiness[kind] == nil {
+      if mediaTime >= start {
         readiness[kind] = .measured(
           monotonicSeconds: monotonicSeconds,
           evidence: "renderer-clock-crossed-sample"
@@ -67,7 +73,7 @@ public struct DifferentialRendererObservationJournal: Sendable {
       }
     }
     guard demuxEOF,
-      let requiredEnd = intervals.values.flatMap({ $0 }).map(\.end).max(),
+      let requiredEnd = latestEnd,
       mediaTime >= requiredEnd,
       rendererEOFMonotonicSeconds == nil
     else { return }

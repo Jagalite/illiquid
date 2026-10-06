@@ -135,10 +135,17 @@ public final class AtomicPlaybackSessionStore: PlaybackSessionStoring, @unchecke
     }
 
     private static func defaultFileURL(fileManager: FileManager) -> URL {
+        if LifecyclePerformance.isEnabled,
+           let path = ProcessInfo.processInfo.environment["SUPERPLAYR_BENCHMARK_SESSION_FILE"],
+           path.hasPrefix("/") {
+            return URL(fileURLWithPath: path)
+        }
         let base = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? fileManager.temporaryDirectory
+        let directory = Bundle.main.bundleIdentifier == "com.example.SuperplayrBenchmark"
+            ? "SuperplayrBenchmark" : "Superplayr"
         return base
-            .appendingPathComponent("Superplayr", isDirectory: true)
+            .appendingPathComponent(directory, isDirectory: true)
             .appendingPathComponent("PlaybackSession.json", isDirectory: false)
     }
 }

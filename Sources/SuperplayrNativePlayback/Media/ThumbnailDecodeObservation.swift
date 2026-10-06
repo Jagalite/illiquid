@@ -6,6 +6,7 @@ struct ThumbnailDecodeObservation: Codable, Sendable {
     var target: Double
     var reusedContext = false
     var continuedForward = false
+    var indexedKeyframeSeconds: Double?
     var packets = 0
     var frames = 0
     var discardedBeforeOutput = 0

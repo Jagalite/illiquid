@@ -3,6 +3,12 @@ import CoreImage
 import CoreMedia
 import Foundation
 import OSLog
+import SuperplayrCore
+
+public struct CachedTimelineThumbnail: Sendable {
+    public let image: CGImage
+    public let position: Double
+}
 
 /// Produces timeline previews from an independent FFmpeg decode path so hover
 /// never seeks, pauses, or otherwise mutates the active playback session.
@@ -25,31 +31,30 @@ public actor NativeTimelineThumbnailGenerator {
         }
     }
 
-    private struct CacheKey: Hashable {
-        let url: URL
-        let halfSecond: Int
-        let maximumWidth: Int
-        let maximumHeight: Int
-    }
-
-    private static let maximumCachedImages = 48
     // Software decoding a long GOP while playback is active can exceed 1.5s.
     // Keep the independent worker bounded, with time left for image conversion.
     private static let maximumDecodeSeconds: TimeInterval = 2.5
     private static let maximumRequestSeconds: TimeInterval = 3
     private static let imageRenderer = ImageRenderer()
 
-    private var cache: [CacheKey: CGImage] = [:]
-    private var cacheOrder: [CacheKey] = []
+    private let cache: NativeThumbnailCache
+    private var foregroundRequests = 0
 
     // The decode context is confined to the worker's serial queue.
     private final class DecoderStorage: @unchecked Sendable {
         let observe: (@Sendable (ThumbnailDecodeObservation) -> Void)?
         let optimized: Bool
         let maximumPackets: Int
+        let softwareThreads: Int
+        let planarOutput: Bool
+        let usesKeyframeIndex: Bool
         init(optimized: Bool = true, maximumPackets: Int = 1_500,
+             softwareThreads: Int = 2, planarOutput: Bool = false, usesKeyframeIndex: Bool = true,
              observe: (@Sendable (ThumbnailDecodeObservation) -> Void)?) {
             self.optimized = optimized
+            self.softwareThreads = softwareThreads
+            self.planarOutput = planarOutput
+            self.usesKeyframeIndex = usesKeyframeIndex
             self.maximumPackets = max(1, min(maximumPackets, 1_500))
             self.observe = observe
         }
@@ -76,7 +81,8 @@ public actor NativeTimelineThumbnailGenerator {
                     from: input.url, at: input.seconds, maximumPixelSize: input.size,
                     cancellation: cancellation, context: &context,
                     token: FFmpegInputEffectToken(rawValue: nextToken), optimized: optimized,
-                    maximumPackets: maximumPackets,
+                    maximumPackets: maximumPackets, softwareThreads: softwareThreads, planarOutput: planarOutput,
+                    usesKeyframeIndex: usesKeyframeIndex,
                     observation: &observation
                 )
                 observation.imageCreated = image != nil
@@ -106,7 +112,7 @@ public actor NativeTimelineThumbnailGenerator {
         var lastDecodedSeconds: Double?
         var reachedEOF = false
         var forwardContinuationIsSafe = true
-        init(url: URL, interrupt: FFmpegInterruptState) throws {
+        init(url: URL, interrupt: FFmpegInterruptState, softwareThreads: Int, planarOutput: Bool) throws {
             self.url = url
             self.interrupt = interrupt
             let opened = try FFmpegDemuxer(url: url, interruptState: interrupt)
@@ -119,7 +125,8 @@ public actor NativeTimelineThumbnailGenerator {
             decoder = try VideoDecoder(
                 parameters: parameters, stream: stream, preferHardware: false,
                 timelineOriginSeconds: demuxer.mediaInfo.startTime,
-                softwareOutputMode: .bgra, softwareDecoderThreadCount: 2,
+                softwareOutputMode: planarOutput ? .planarPreferred(rendererAttributes: [:]) : .bgra,
+                softwareDecoderThreadCount: softwareThreads,
                 softwarePlanarOutputMaximumBufferCount: 2
             )
         }
@@ -127,21 +134,31 @@ public actor NativeTimelineThumbnailGenerator {
 
     private let worker: TimelineThumbnailWorker
     private var cacheRevision: UInt64 = 0
+    private var decoderRevision: UInt64 = 0
+    private var decoderIdentity: String?
     private var latestSourceRevision: UInt64?
 
-    public init() {
+    public init(cacheDirectory: URL? = nil) {
+        cache = NativeThumbnailCache(directory: cacheDirectory)
         let storage = DecoderStorage(observe: nil)
-        worker = TimelineThumbnailWorker(requestTimeout: Self.maximumRequestSeconds) { input, cancellation in
-            storage.decode(input, cancellation: cancellation)
-        }
+        worker = TimelineThumbnailWorker(requestTimeout: Self.maximumRequestSeconds,
+            release: { storage.context = nil }) { input, cancellation in
+                storage.decode(input, cancellation: cancellation)
+            }
     }
 
+    // Internal qualification controls; the public initializer keeps the
+    // two-thread BGRA route and the established worker scheduling priority.
     init(optimized: Bool = true, maximumPackets: Int = 1_500,
+         softwareThreads: Int = 2, planarOutput: Bool = false, prioritizesForeground: Bool = false, usesKeyframeIndex: Bool = true,
          observe: @escaping @Sendable (ThumbnailDecodeObservation) -> Void) {
-        let storage = DecoderStorage(optimized: optimized, maximumPackets: maximumPackets, observe: observe)
-        worker = TimelineThumbnailWorker(requestTimeout: Self.maximumRequestSeconds) { input, cancellation in
-            storage.decode(input, cancellation: cancellation)
-        }
+        cache = NativeThumbnailCache()
+        let storage = DecoderStorage(optimized: optimized, maximumPackets: maximumPackets,
+            softwareThreads: softwareThreads, planarOutput: planarOutput, usesKeyframeIndex: usesKeyframeIndex, observe: observe)
+        worker = TimelineThumbnailWorker(requestTimeout: Self.maximumRequestSeconds, prioritizesForeground: prioritizesForeground,
+            release: { storage.context = nil }) { input, cancellation in
+                storage.decode(input, cancellation: cancellation)
+            }
     }
 
     public func thumbnail(
@@ -149,20 +166,25 @@ public actor NativeTimelineThumbnailGenerator {
         at seconds: TimeInterval,
         maximumPixelSize: CGSize,
         delayBeforeDecoding: Duration = .zero,
-        sourceRevision: UInt64? = nil
+        sourceRevision: UInt64? = nil,
+        background: Bool = false,
+        allowDecoding: Bool = true
     ) async -> CGImage? {
-        guard !Task.isCancelled else { return nil }
+        guard !Task.isCancelled, !background || foregroundRequests == 0 else { return nil }
+        if !background { foregroundRequests += 1 }
+        defer { if !background { foregroundRequests -= 1 } }
         if let sourceRevision {
             invalidate(for: sourceRevision)
             guard latestSourceRevision == sourceRevision else { return nil }
         }
         let revision = cacheRevision
-        guard let key = Self.cacheKey(
-            for: url,
-            at: seconds,
-            maximumPixelSize: maximumPixelSize
-        ) else { return nil }
-        if let cached = cachedImage(for: key) { return cached }
+        guard let key = await cache.makeKey(url: url, time: seconds, size: maximumPixelSize),
+              !Task.isCancelled, revision == cacheRevision else { return nil }
+        if let cached = await cache.image(for: key, background: background) {
+            return !Task.isCancelled && revision == cacheRevision ? cached : nil
+        }
+        guard allowDecoding else { return nil }
+        if background, !(await cache.admitsBackground(size: maximumPixelSize)) { return nil }
 
         if delayBeforeDecoding > .zero {
             do {
@@ -171,70 +193,71 @@ public actor NativeTimelineThumbnailGenerator {
                 return nil
             }
             guard !Task.isCancelled, revision == cacheRevision else { return nil }
-            if let cached = cachedImage(for: key) { return cached }
+            if let cached = await cache.image(for: key, background: background) {
+                return !Task.isCancelled && revision == cacheRevision ? cached : nil
+            }
         }
 
+        guard !Task.isCancelled, revision == cacheRevision,
+              !background || foregroundRequests == 0 else { return nil }
+        let identity = key.path + "\n" + key.version
+        if decoderIdentity != identity { decoderRevision &+= 1; decoderIdentity = identity }
         let image = await worker.image(for: .init(
-            url: key.url, seconds: Double(key.halfSecond) / 2,
-            size: maximumPixelSize, cacheRevision: revision
+            url: URL(fileURLWithPath: key.path), seconds: Double(key.halfSecond) / 2,
+            size: maximumPixelSize, cacheRevision: decoderRevision, background: background
         ))
         guard !Task.isCancelled, revision == cacheRevision, let image else { return nil }
 
-        cache[key] = image
-        touch(key)
-        while cacheOrder.count > Self.maximumCachedImages {
-            cache.removeValue(forKey: cacheOrder.removeFirst())
-        }
-        return image
+        guard await cache.makeKey(url: url, time: seconds, size: maximumPixelSize) == key,
+              !Task.isCancelled, revision == cacheRevision else { return nil }
+        await cache.insert(image, for: key, background: background)
+        return !Task.isCancelled && revision == cacheRevision ? image : nil
     }
 
-    /// A source owner can invalidate synchronously in its own state and send
-    /// this message asynchronously. Late messages cannot retire a newer source.
+    /// Source changes cancel delivery and release native resources, but valid small
+    /// images remain available when returning to another file.
     public func invalidate(for sourceRevision: UInt64) {
         guard latestSourceRevision.map({ sourceRevision > $0 }) ?? true else { return }
         latestSourceRevision = sourceRevision
-        removeAllCachedThumbnails()
+        cancelWork()
     }
 
-    public func removeAllCachedThumbnails() {
+    public func cancelWork() {
         cacheRevision &+= 1
-        worker.cancelAll()
-        cache.removeAll(keepingCapacity: true)
-        cacheOrder.removeAll(keepingCapacity: true)
+        decoderIdentity = nil
+        worker.cancelAll(releasingResources: true)
     }
 
-    private func touch(_ key: CacheKey) {
-        cacheOrder.removeAll { $0 == key }
-        cacheOrder.append(key)
+    func flushPendingCacheWrites() async { await cache.flushPendingWrites() }
+
+    public func releaseIdleResources() {
+        guard foregroundRequests == 0 else { return }
+        worker.releaseResourcesWhenIdle()
     }
 
-    private func cachedImage(for key: CacheKey) -> CGImage? {
-        guard let cached = cache[key] else { return nil }
-        touch(key)
-        return cached
+    public func cachedThumbnail(for url: URL, at seconds: Double, size: CGSize,
+                                maximumDistance: Double, sourceRevision: UInt64) async -> CachedTimelineThumbnail? {
+        invalidate(for: sourceRevision)
+        let revision = cacheRevision
+        guard latestSourceRevision == sourceRevision, !Task.isCancelled,
+              let key = await cache.makeKey(url: url, time: seconds, size: size) else { return nil }
+        if let image = await cache.image(for: key, background: false) {
+            guard !Task.isCancelled, cacheRevision == revision else { return nil }
+            return CachedTimelineThumbnail(image: image, position: Double(key.halfSecond) / 2)
+        }
+        guard let (image, position) = await cache.nearest(to: key, maximumDistance: maximumDistance),
+              !Task.isCancelled, cacheRevision == revision else { return nil }
+        return CachedTimelineThumbnail(image: image, position: position)
     }
 
-    private nonisolated static func cacheKey(
-        for url: URL,
-        at seconds: TimeInterval,
-        maximumPixelSize: CGSize
-    ) -> CacheKey? {
-        guard url.isFileURL,
-              seconds.isFinite,
-              seconds >= 0,
-              maximumPixelSize.width > 0,
-              maximumPixelSize.height > 0,
-              let halfSecond = Int(exactly: (seconds * 2).rounded()),
-              let maximumWidth = Int(exactly: maximumPixelSize.width.rounded()),
-              let maximumHeight = Int(exactly: maximumPixelSize.height.rounded()),
-              maximumWidth > 0, maximumHeight > 0
-        else { return nil }
-        return CacheKey(
-            url: url.standardizedFileURL,
-            halfSecond: halfSecond,
-            maximumWidth: maximumWidth,
-            maximumHeight: maximumHeight
-        )
+    public func configure(_ preferences: ThumbnailPreferences) async {
+        await cache.configure(preferences)
+    }
+
+    @discardableResult
+    public func removeAllCachedThumbnails() async -> Bool {
+        cancelWork()
+        return await cache.clear()
     }
 
     private nonisolated static func decodeThumbnail(
@@ -246,6 +269,7 @@ public actor NativeTimelineThumbnailGenerator {
         token: FFmpegInputEffectToken,
         optimized: Bool,
         maximumPackets: Int,
+        softwareThreads: Int, planarOutput: Bool, usesKeyframeIndex: Bool,
         observation: inout ThumbnailDecodeObservation
     ) throws -> CGImage? {
         let interrupt = context?.url == url ? context!.interrupt : FFmpegInterruptState()
@@ -262,7 +286,7 @@ public actor NativeTimelineThumbnailGenerator {
         do {
             defer { observation.openMilliseconds = (ProcessInfo.processInfo.systemUptime - openStarted) * 1_000 }
             if context?.url != url {
-                context = try DecodeContext(url: url, interrupt: interrupt)
+                context = try DecodeContext(url: url, interrupt: interrupt, softwareThreads: softwareThreads, planarOutput: planarOutput)
             }
         }
         try cancellation.checkCancellation()
@@ -274,8 +298,18 @@ public actor NativeTimelineThumbnailGenerator {
         // Keep codec references and demux position for nearby forward hovers.
         // No frame history or compressed-packet cache is added. Backward jumps,
         // EOF, cancellation and source invalidation always take the seek path.
+        let indexedKeyframe = usesKeyframeIndex
+            ? demuxer.indexedKeyframeTime(at: target + demuxer.mediaInfo.startTime, streamIndex: stream.index)
+                .map { $0 - demuxer.mediaInfo.startTime } : nil
+        observation.indexedKeyframeSeconds = indexedKeyframe
+        // Do not flush for a tiny indexed shortcut: codec reorder/pool setup
+        // can cost more than decoding a few additional frames.
+        let minimumShortcut = max(0.25, 4 / max(1, stream.averageFrameRate ?? 30))
         let continuesForward = optimized && current.forwardContinuationIsSafe && !current.reachedEOF &&
-            current.lastDecodedSeconds.map { target > $0 && target - $0 <= 2 } == true
+            current.lastDecodedSeconds.map { last in
+                target > last && target - last <= 2
+                    && !(indexedKeyframe.map { $0 > last + minimumShortcut && $0 <= target } ?? false)
+            } == true
         observation.continuedForward = continuesForward
         do {
             defer { observation.seekMilliseconds = (ProcessInfo.processInfo.systemUptime - seekStarted) * 1_000 }

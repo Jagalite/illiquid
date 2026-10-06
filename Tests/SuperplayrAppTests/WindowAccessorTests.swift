@@ -32,4 +32,32 @@ struct WindowAccessorTests {
         second.contentView = nil
         first.close(); second.close()
     }
+
+    @Test func resolvesReusedWindowAfterCloseButNotWhileItRemainsHidden() async {
+        var resolutions = 0
+        let view = WindowResolverView { _ in resolutions += 1 }
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 320, height: 200),
+                              styleMask: [.titled, .closable], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        defer { window.contentView = nil; window.close() }
+        window.contentView = view
+        window.makeKeyAndOrderFront(nil)
+        await drainMainQueue()
+        #expect(resolutions == 1)
+
+        window.close()
+        view.scheduleResolution()
+        await drainMainQueue()
+        #expect(resolutions == 1)
+        #expect(view.window === window)
+
+        window.makeKeyAndOrderFront(nil)
+        // Occlusion notifications can arrive on a later run-loop turn.
+        NotificationCenter.default.post(name: NSWindow.didChangeOcclusionStateNotification, object: window)
+        await drainMainQueue()
+        #expect(resolutions == 2)
+        view.scheduleResolution()
+        await drainMainQueue()
+        #expect(resolutions == 2)
+    }
 }

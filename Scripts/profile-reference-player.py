@@ -149,8 +149,7 @@ def main():
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     args.output.write_text(json.dumps({"status": "running", "started_at": started_at}) + "\n")
     existing_iina = set(subprocess.run(["pgrep", "-x", "IINA"], capture_output=True, text=True).stdout.split())
-    # User requested system mute; additionally silence every test player.
-    subprocess.run(["osascript", "-e", "set volume output muted true"], check=True)
+    # Silence only the owned test player; leave the system output setting intact.
     with tempfile.TemporaryDirectory(prefix="platinum-reference-") as temporary:
         ipc_path = Path(temporary) / "ipc"
         options = [f"--input-ipc-server={ipc_path}", "--pause=yes", "--keep-open=yes",

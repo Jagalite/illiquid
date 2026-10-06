@@ -10,6 +10,8 @@ struct SuperplayrApp: App {
     @State private var interfaceScale = PlayerInterfaceScaleStore.shared
 
     init() {
+        let timing = LifecyclePerformance.begin("app-init")
+        defer { LifecyclePerformance.end("app-init", since: timing) }
         if Bundle.main.bundleIdentifier == LegacyPreferencesMigration.bundleIdentifier {
             LegacyPreferencesMigration.migrateIfNeeded(
                 destinationDomain: LegacyPreferencesMigration.bundleIdentifier
@@ -26,6 +28,11 @@ struct SuperplayrApp: App {
                 } else {
                     StartupHistoryView()
                         .frame(minWidth: 720, minHeight: 440)
+                        .background {
+                            if LifecyclePerformance.isEnabled {
+                                WindowAccessor { _ in LifecyclePerformance.mark("startup-shell-attached") }
+                            }
+                        }
                         .task { model = await AppModel.loadShared() }
                 }
             }

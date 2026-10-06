@@ -116,7 +116,9 @@ public final class PlaybackCoordinator {
     private var deferredBenchmarkCompletionDiagnostics: [(PendingBenchmarkControl, String)] = []
     var benchmarkDiagnosticHandler: ((String) -> Void)?
     private var playbackCompletionHandler: ((URL) -> Void)?
-    private let timelineThumbnailGenerator = NativeTimelineThumbnailGenerator()
+    private let timelineThumbnailGenerator: NativeTimelineThumbnailGenerator
+    private let thumbnailMetadataReader = NativeThumbnailMetadataReader()
+    public var thumbnailInteractionHandler: ((URL, Double) -> Void)?
     private var timelineThumbnailRevision: UInt64 = 0
     public var interactionSourceRevision: UInt64 { timelineThumbnailRevision }
     public var pendingOperationLabel: String {
@@ -220,8 +222,13 @@ public final class PlaybackCoordinator {
     public init(
         persistence: PlaybackPersistenceStore = PlaybackPersistenceStore(),
         sessionStore: any PlaybackSessionStoring = AtomicPlaybackSessionStore(),
-        runtime: (any PlaybackRuntime)? = nil
+        runtime: (any PlaybackRuntime)? = nil,
+        thumbnailCacheDirectory: URL? = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("Illiquid/Thumbnails-v1", isDirectory: true)
     ) {
+        let timing = LifecyclePerformance.begin("controller-init")
+        defer { LifecyclePerformance.end("controller-init", since: timing) }
+        timelineThumbnailGenerator = NativeTimelineThumbnailGenerator(cacheDirectory: thumbnailCacheDirectory)
         self.persistence = persistence
         self.sessionStore = sessionStore
         checkpointWriter = CoalescingPersistenceWriter(label: "com.platinum.session-writer") {
@@ -815,16 +822,55 @@ public final class PlaybackCoordinator {
               source.url.isFileURL,
               state.videoAspectRatio != nil
         else { return nil }
+        thumbnailInteractionHandler?(source.url, seconds)
         let revision = timelineThumbnailRevision
         let image = await timelineThumbnailGenerator.thumbnail(
             for: source.url,
             at: seconds,
             maximumPixelSize: maximumPixelSize,
             delayBeforeDecoding: delayBeforeDecoding,
-            sourceRevision: revision
+            sourceRevision: revision,
+            allowDecoding: !state.phase.isLoading && runtimeDriver?.currentSnapshot.phase != .seeking
         )
         guard !isShuttingDown, revision == timelineThumbnailRevision else { return nil }
         return image
+    }
+
+    public func cachedTimelineThumbnail(at seconds: Double, maximumPixelSize: CGSize,
+                                         maximumDistance: Double) async -> CachedTimelineThumbnail? {
+        guard !isShuttingDown, let url = state.currentURL, url.isFileURL else { return nil }
+        thumbnailInteractionHandler?(url, seconds)
+        let revision = timelineThumbnailRevision
+        let result = await timelineThumbnailGenerator.cachedThumbnail(for: url, at: seconds,
+            size: maximumPixelSize, maximumDistance: maximumDistance, sourceRevision: revision)
+        return !isShuttingDown && revision == timelineThumbnailRevision ? result : nil
+    }
+
+    public func configureThumbnailCache(_ preferences: ThumbnailPreferences) async {
+        await timelineThumbnailGenerator.configure(preferences)
+    }
+
+    public func clearThumbnailCache() async -> Bool {
+        invalidateTimelineThumbnails()
+        return await timelineThumbnailGenerator.removeAllCachedThumbnails()
+    }
+
+    public func thumbnailDuration(for url: URL) async -> Double? {
+        guard !isShuttingDown, !Task.isCancelled else { return nil }
+        return await thumbnailMetadataReader.duration(of: url)
+    }
+
+    public func prewarmThumbnail(for url: URL, at seconds: Double) async -> Bool {
+        guard !isShuttingDown, !Task.isCancelled,
+              state.phase == .idle || state.phase == .paused,
+              state.isPauseDesired,
+              runtimeDriver?.currentSnapshot.phase != .seeking else { return false }
+        return await timelineThumbnailGenerator.thumbnail(for: url, at: seconds,
+            maximumPixelSize: CGSize(width: 368, height: 208), background: true) != nil
+    }
+
+    public func releaseIdleThumbnailResources() async {
+        await timelineThumbnailGenerator.releaseIdleResources()
     }
 
     private func invalidateTimelineThumbnails() {
@@ -1724,8 +1770,14 @@ public final class PlaybackCoordinator {
     }
 
     public func shutdown() async {
+        let timing = LifecyclePerformance.begin("controller-shutdown")
+        defer { LifecyclePerformance.end("controller-shutdown", since: timing) }
         guard !isShuttingDown else { return }
         isShuttingDown = true
+        // A final checkpoint must not wait for the interactive save debounce.
+        // If a flush already started, join it before the final authoritative flush.
+        let terminatingCheckpointFlush = checkpointFlushTask
+        terminatingCheckpointFlush?.cancel()
         invalidateTimelineThumbnails()
         folderScanGeneration = UUID()
         queuedSourceOpens.removeAll()
@@ -1752,7 +1804,10 @@ public final class PlaybackCoordinator {
         } else {
             await terminatingBackend?.shutdown()
         }
-        await checkpointFlushTask?.value
+        let checkpointTiming = LifecyclePerformance.begin("shutdown-checkpoint-wait")
+        await terminatingCheckpointFlush?.value
+        checkpointFlushTask = nil
+        LifecyclePerformance.end("shutdown-checkpoint-wait", since: checkpointTiming)
         if !(await flushPlaybackPersistence()) {
             shutdownPersistenceError = state.shellError ?? "Could not save playback progress."
         }
@@ -1762,6 +1817,7 @@ public final class PlaybackCoordinator {
     private func saveCurrentProgress() -> Bool {
         guard remembersPlaybackHistory, !persistence.hasUnreadableHistory else { return true }
         guard let source = state.currentSource else { return false }
+        guard hasCurrentPlaybackAuthority else { return true }
         guard progressClearedAtPosition == nil else { return true }
         guard canPersistCurrentMediaHistory else { return true }
         if case let .localFile(currentURL) = source {
@@ -1789,6 +1845,7 @@ public final class PlaybackCoordinator {
     private func checkpointSession() -> Bool {
         guard remembersPlaybackHistory, !persistence.hasUnreadableHistory else { return true }
         guard let source = state.currentSource else { return false }
+        guard hasCurrentPlaybackAuthority else { return true }
         guard progressClearedAtPosition == nil else { return true }
         guard canPersistCurrentMediaHistory else { return true }
         if state.isShuffleEnabled {
@@ -1809,11 +1866,22 @@ public final class PlaybackCoordinator {
         return true
     }
 
+    private var hasCurrentPlaybackAuthority: Bool {
+        guard let source = state.currentSource,
+              let snapshot = runtimeDriver?.currentSnapshot else { return false }
+        // The playlist and last source survive Stop, while the idle projection
+        // resets position to zero. Never save that placeholder over the final
+        // checkpoint captured before stopping the actual session.
+        return snapshot.sessionID != nil && snapshot.source == Self.coreSourceIdentity(source)
+    }
+
     private func scheduleCheckpointFlush() {
+        guard !isShuttingDown else { return }
         if checkpointFlushTask == nil {
             checkpointFlushTask = Task { [weak self] in
-                try? await Task.sleep(for: .milliseconds(250))
-                guard let self else { return }
+                do { try await Task.sleep(for: .milliseconds(250)) }
+                catch { return }
+                guard let self, !isShuttingDown else { return }
                 _ = await flushPlaybackPersistence()
                 checkpointFlushTask = nil
             }
@@ -1821,6 +1889,8 @@ public final class PlaybackCoordinator {
     }
 
     private func flushPlaybackPersistence() async -> Bool {
+        let timing = LifecyclePerformance.begin("persistence-flush")
+        defer { LifecyclePerformance.end("persistence-flush", since: timing) }
         let revision = checkpointRevision
         let historyResult = await persistence.flush()
         let sessionResult = await checkpointWriter.flush()
@@ -2322,7 +2392,11 @@ public final class PlaybackCoordinator {
                 NormalizedFileURL.representsSameFile($0.url, current)
             }
         }
-        if preservedCurrent == nil, let selectedIndex {
+        // Stop/window-close retains playlist metadata, but retires playback
+        // authority. An explicit replacement open must create a fresh session
+        // even when its URL matches that retained selection.
+        let reopensStoppedSelection = mode == .replace && eventGate.activeIdentity == nil
+        if preservedCurrent == nil || reopensStoppedSelection, let selectedIndex {
             let folder = mode == .replace ? plan.folderURL : nil
             beginSourceTransaction(
                 item: items[selectedIndex],
