@@ -7,19 +7,52 @@ on:
     inputs:
       tag:
         description: 'Existing release tag (must match Info.plist, e.g. v0.1.0)'
-        required: true
+        required: false
         type: string
+      initialize_update_feed:
+        description: 'Initialize signed update hosting only (no application release)'
+        required: true
+        type: boolean
+        default: false
+      prerelease:
+        description: 'Publish to the opt-in prerelease update channel'
+        required: true
+        type: boolean
+        default: true
 permissions:
   contents: write
 concurrency:
-  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  group: illiquid-release-and-appcast
   cancel-in-progress: false
 jobs:
+  initialize-update-feed:
+    if: github.event_name == 'workflow_dispatch' && inputs.initialize_update_feed
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Download pinned Sparkle signing tools
+        run: |
+          curl --fail --location --retry 3 \
+            https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip \
+            -o "$RUNNER_TEMP/Sparkle.zip"
+          echo "17e28312b8e18ab7cdbbe09a6fb28cc55a5479ec6c371dbc07cdecd2a14fd959  $RUNNER_TEMP/Sparkle.zip" | shasum -a 256 --check
+          ditto -x -k "$RUNNER_TEMP/Sparkle.zip" "$RUNNER_TEMP/Sparkle"
+      - name: Initialize signed update hosting
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PUBLIC_KEY: ${{ vars.SPARKLE_PUBLIC_KEY }}
+        run: python3 Scripts/initialize-update-feed.py --tools "$RUNNER_TEMP/Sparkle/bin"
   release:
+    if: github.event_name != 'workflow_dispatch' || !inputs.initialize_update_feed
     runs-on: macos-26
     timeout-minutes: 60
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      ILLIQUID_RELEASE_CHANNEL: ${{ github.event_name == 'workflow_dispatch' && inputs.prerelease == false && 'stable' || 'beta' }}
       ILLIQUID_RELEASE_TAG: ${{ github.event.inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || '' }}
     steps:
       - name: Check out release tag
@@ -33,6 +66,8 @@ jobs:
           python3 - <<'PY'
           import os, re, subprocess
           tag = os.environ['ILLIQUID_RELEASE_TAG']
+          if os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch' and not tag:
+              raise SystemExit('A release tag is required unless initializing the feed')
           if tag and not re.fullmatch(r'v\d+\.\d+\.\d+', tag):
               raise SystemExit('Invalid release tag')
           if tag and subprocess.check_output(['git', 'rev-parse', tag + '^{commit}']).strip() != subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip():
@@ -60,7 +95,7 @@ jobs:
       - name: Check architecture
         run: |
           pkg-config --cflags --libs libass libavformat
-          swift run --force-resolved-versions SuperplayrArchitectureCheck
+          swift run --force-resolved-versions IlliquidArchitectureCheck
       - name: Validate timeline thumbnail decoding
         run: |
           fixture_dir="$RUNNER_TEMP/illiquid-thumbnail-fixtures"
@@ -78,23 +113,49 @@ jobs:
             'ThumbnailReleaseRegressionTests|expiredThumbnailCanRecover|thumbnailInvalidationRetains|pendingThumbnailDeadline|thumbnailRejectsNonrepresentable'
       - name: Build, audit and smoke-test release artifacts
         run: Scripts/build-release-artifacts.sh
-      - name: Publish notarized prerelease
+      - name: Generate signed update feed
+        if: env.ILLIQUID_RELEASE_TAG != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          test -n "$SPARKLE_PRIVATE_KEY"
+          mkdir -p "$RUNNER_TEMP/illiquid-previous-feed"
+          gh release download appcast --pattern appcast.xml --dir "$RUNNER_TEMP/illiquid-previous-feed"
+          python3 Scripts/generate-update-feed.py \
+            --app dist/Illiquid.app \
+            --archive "dist/Illiquid-${ILLIQUID_RELEASE_TAG#v}-macOS.dmg" \
+            --previous-feed "$RUNNER_TEMP/illiquid-previous-feed/appcast.xml" \
+            --output dist/appcast.xml --tools .build/artifacts/sparkle/Sparkle/bin \
+            --tag "$ILLIQUID_RELEASE_TAG" --channel "$ILLIQUID_RELEASE_CHANNEL"
+      - name: Publish notarized release
         if: env.ILLIQUID_RELEASE_TAG != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          if [[ "$ILLIQUID_RELEASE_CHANNEL" = beta ]]; then
+            channel_flag=--prerelease
+          else
+            channel_flag=--prerelease=false
+          fi
           if gh release view "$ILLIQUID_RELEASE_TAG" >/dev/null 2>&1; then
-            gh release edit "$ILLIQUID_RELEASE_TAG" --prerelease --notes-file dist/release-notes.md
+            gh release edit "$ILLIQUID_RELEASE_TAG" "$channel_flag" --notes-file dist/release-notes.md
             gh release upload "$ILLIQUID_RELEASE_TAG" \
               dist/*.dmg dist/*.dmg.sha256 dist/*-source.tar.gz dist/*-sources.tar.gz \
               dist/SHA256SUMS dist/build-provenance.json dist/notarization/*.json --clobber
           else
-            gh release create "$ILLIQUID_RELEASE_TAG" --verify-tag --prerelease \
-              --title "Illiquid $ILLIQUID_RELEASE_TAG (notarized prerelease)" \
+            gh release create "$ILLIQUID_RELEASE_TAG" --verify-tag "$channel_flag" \
+              --title "Illiquid $ILLIQUID_RELEASE_TAG (notarized)" \
               --notes-file dist/release-notes.md \
               dist/*.dmg dist/*.dmg.sha256 dist/*-source.tar.gz dist/*-sources.tar.gz \
               dist/SHA256SUMS dist/build-provenance.json dist/notarization/*.json
           fi
+      # Upload the feed last so clients never see an update before its archive exists.
+      - name: Publish signed update feed
+        if: env.ILLIQUID_RELEASE_TAG != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload appcast dist/appcast.xml --clobber
       - name: Remove temporary signing credentials
         if: always() && env.ILLIQUID_RELEASE_TAG != ''
         run: python3 Scripts/configure-ci-signing.py cleanup
