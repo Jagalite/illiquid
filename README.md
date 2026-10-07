@@ -33,6 +33,11 @@ for physical-device playback QA.
 The [living findings register](Documentation/ROBUSTNESS_REVIEW_MPV_IINA.md)
 tracks structural, robustness, and user-experience research against mpv and IINA.
 
+Double-click or double-tap the video’s left third to seek backward 5 seconds,
+or the right third to seek forward 5 seconds. Double-click the center third to
+toggle fullscreen. Trackpad taps require macOS **Tap to click** to be enabled.
+After a side double-tap, each additional rapid tap seeks another 5 seconds.
+
 ## Architecture
 
 - `SuperplayrPlaybackCore` is the deterministic imperative playback authority.

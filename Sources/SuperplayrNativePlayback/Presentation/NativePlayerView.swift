@@ -69,7 +69,7 @@ final class NativePlayerNSView: NSView {
         setAccessibilityElement(true)
         setAccessibilityRole(.group)
         setAccessibilityLabel("Video")
-        setAccessibilityHelp("Show the menu for playback actions.")
+        setAccessibilityHelp("Double-click the left or right third to seek backward or forward 5 seconds. Double-click the center to toggle fullscreen. Show the menu for more playback actions.")
     }
 
     @available(*, unavailable)
@@ -236,6 +236,9 @@ final class NativePlayerNSView: NSView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
+        pendingSurfaceClick?.cancel()
+        pendingSurfaceClick = nil
+        surfacePressOrigin = nil
         updateDisplayConfiguration()
         DispatchQueue.main.async { [weak self] in
             self?.onWindowChanged?()
@@ -279,7 +282,10 @@ final class NativePlayerNSView: NSView {
     }
 
     private var surfacePressOrigin: NSPoint?
+    private var pendingSurfaceClick: Task<Void, Never>?
     override func mouseDown(with event: NSEvent) {
+        pendingSurfaceClick?.cancel()
+        pendingSurfaceClick = nil
         window?.makeFirstResponder(self)
         surfacePressOrigin = event.locationInWindow
     }
@@ -296,10 +302,38 @@ final class NativePlayerNSView: NSView {
         guard let origin = surfacePressOrigin,
               hypot(event.locationInWindow.x - origin.x, event.locationInWindow.y - origin.y) <= 4,
               bounds.contains(convert(event.locationInWindow, from: nil)), window?.isKeyWindow == true else { return }
-        onInteraction?(event.clickCount == 2 ? .doubleClick : .primaryClick)
+        let location = convert(event.locationInWindow, from: nil)
+        if event.clickCount >= 2 {
+            let fraction = (location.x - bounds.minX) / bounds.width
+            if fraction < 1.0 / 3.0 {
+                onInteraction?(.doubleClickSeek(-5))
+            } else if fraction > 2.0 / 3.0 {
+                onInteraction?(.doubleClickSeek(5))
+            } else if event.clickCount == 2 {
+                onInteraction?(.doubleClick)
+            }
+        } else if event.clickCount == 1 {
+            // Wait for a possible second tap so seeking does not first toggle
+            // the controls. Match the user's macOS double-click speed setting.
+            pendingSurfaceClick = Task { @MainActor [weak self, weak clickWindow = window] in
+                do {
+                    try await Task.sleep(for: .seconds(NSEvent.doubleClickInterval))
+                } catch {
+                    return
+                }
+                guard let self, let clickWindow,
+                      self.window === clickWindow, clickWindow.isKeyWindow,
+                      clickWindow.firstResponder === self,
+                      clickWindow.attachedSheet == nil else { return }
+                self.pendingSurfaceClick = nil
+                self.onInteraction?(.primaryClick)
+            }
+        }
     }
 
     override func keyDown(with event: NSEvent) {
+        pendingSurfaceClick?.cancel()
+        pendingSurfaceClick = nil
         guard !isVoiceOverEnabled() else {
             super.keyDown(with: event)
             return
@@ -330,6 +364,8 @@ final class NativePlayerNSView: NSView {
     }
 
     override func rightMouseDown(with event: NSEvent) {
+        pendingSurfaceClick?.cancel()
+        pendingSurfaceClick = nil
         onUserActivity?()
         super.rightMouseDown(with: event)
     }
@@ -339,11 +375,15 @@ final class NativePlayerNSView: NSView {
     }
 
     override func otherMouseDown(with event: NSEvent) {
+        pendingSurfaceClick?.cancel()
+        pendingSurfaceClick = nil
         onUserActivity?()
         onInteraction?(.auxiliaryButton(event.buttonNumber))
     }
 
     override func scrollWheel(with event: NSEvent) {
+        pendingSurfaceClick?.cancel()
+        pendingSurfaceClick = nil
         onUserActivity?()
         onInteraction?(.scroll(PlaybackSurfaceScroll(
             deltaX: event.scrollingDeltaX,

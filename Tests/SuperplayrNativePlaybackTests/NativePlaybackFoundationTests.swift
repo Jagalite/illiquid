@@ -207,12 +207,14 @@ struct NativeDamagedStreamHardeningPolicyTests {
 }
 
 @Suite("Native player click routing")
+@MainActor
 struct NativePlayerClickRoutingTests {
-    @MainActor private final class KeyWindow: NSWindow {
-        override var isKeyWindow: Bool { true }
+    private final class KeyWindow: NSWindow {
+        var keyForTesting = true
+        override var isKeyWindow: Bool { keyForTesting }
     }
 
-    @Test @MainActor func completedPressesDistinguishDoubleClickAndCancelDrags() throws {
+    private func makeSurface() -> (NativePlayerNSView, KeyWindow) {
         let presenter = SampleBufferVideoPresenter()
         let view = NativePlayerNSView(videoLayer: presenter.displayLayer,
             subtitleOverlay: SubtitleOverlayView(), rotationDegrees: 0)
@@ -220,24 +222,94 @@ struct NativePlayerClickRoutingTests {
             styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = view
+        return (view, window)
+    }
+
+    private func event(_ type: NSEvent.EventType, window: NSWindow,
+                       count: Int = 1, x: CGFloat = 20) throws -> NSEvent {
+        try #require(NSEvent.mouseEvent(with: type, location: CGPoint(x: x, y: 20),
+            modifierFlags: [], timestamp: 0, windowNumber: window.windowNumber,
+            context: nil, eventNumber: 0, clickCount: count, pressure: 0))
+    }
+
+    private func click(_ view: NativePlayerNSView, window: NSWindow,
+                       count: Int = 1, x: CGFloat = 20) throws {
+        view.mouseDown(with: try event(.leftMouseDown, window: window, count: count, x: x))
+        view.mouseUp(with: try event(.leftMouseUp, window: window, count: count, x: x))
+    }
+
+    private func waitForSingleClick() async throws {
+        try await Task.sleep(for: .seconds(NSEvent.doubleClickInterval + 0.1))
+    }
+
+    @Test func singleClickWaitsForDoubleClickInterval() async throws {
+        let (view, window) = makeSurface()
         defer { window.close() }
         var interactions: [PlaybackSurfaceInteraction] = []
         view.onInteraction = { interactions.append($0) }
-        func event(_ type: NSEvent.EventType, count: Int = 1, x: CGFloat = 20) throws -> NSEvent {
-            try #require(NSEvent.mouseEvent(with: type, location: CGPoint(x: x, y: 20),
-                modifierFlags: [], timestamp: 0, windowNumber: window.windowNumber,
-                context: nil, eventNumber: 0, clickCount: count, pressure: 0))
-        }
-        view.mouseDown(with: try event(.leftMouseDown))
+        try click(view, window: window)
         #expect(interactions.isEmpty)
-        view.mouseUp(with: try event(.leftMouseUp))
-        view.mouseDown(with: try event(.leftMouseDown, count: 2))
-        view.mouseUp(with: try event(.leftMouseUp, count: 2))
-        #expect(interactions == [.primaryClick, .doubleClick])
-        view.mouseDown(with: try event(.leftMouseDown))
-        view.mouseDragged(with: try event(.leftMouseDragged, x: 40))
-        view.mouseUp(with: try event(.leftMouseUp))
-        #expect(interactions == [.primaryClick, .doubleClick])
+        try await waitForSingleClick()
+        #expect(interactions == [.primaryClick])
+    }
+
+    @Test(arguments: [CGFloat(20), 200, 380])
+    func doubleClickCancelsSingleClick(x: CGFloat) async throws {
+        let (view, window) = makeSurface()
+        defer { window.close() }
+        var interactions: [PlaybackSurfaceInteraction] = []
+        view.onInteraction = { interactions.append($0) }
+        try click(view, window: window, x: x)
+        try click(view, window: window, count: 2, x: x)
+        let expected: PlaybackSurfaceInteraction = x == 20 ? .doubleClickSeek(-5)
+            : x == 380 ? .doubleClickSeek(5) : .doubleClick
+        #expect(interactions == [expected])
+        try await waitForSingleClick()
+        #expect(interactions == [expected])
+    }
+
+    @Test(arguments: [CGFloat(20), 200, 380])
+    func continuedTapsSeekWithoutRepeatedFullscreenToggles(x: CGFloat) throws {
+        let (view, window) = makeSurface()
+        defer { window.close() }
+        var interactions: [PlaybackSurfaceInteraction] = []
+        view.onInteraction = { interactions.append($0) }
+        for count in 1...4 {
+            try click(view, window: window, count: count, x: x)
+        }
+        if x == 200 {
+            #expect(interactions == [.doubleClick])
+        } else {
+            let seek: PlaybackSurfaceInteraction = .doubleClickSeek(x == 20 ? -5 : 5)
+            #expect(interactions == [seek, seek, seek])
+        }
+    }
+
+    @Test func rejectedPressesDoNotSeek() throws {
+        let (view, window) = makeSurface()
+        defer { window.close() }
+        var interactions: [PlaybackSurfaceInteraction] = []
+        view.onInteraction = { interactions.append($0) }
+        view.mouseUp(with: try event(.leftMouseUp, window: window, count: 2))
+        view.mouseDown(with: try event(.leftMouseDown, window: window, count: 2))
+        view.mouseDragged(with: try event(.leftMouseDragged, window: window, count: 2, x: 40))
+        view.mouseUp(with: try event(.leftMouseUp, window: window, count: 2))
+        try click(view, window: window, count: 2, x: -1)
+        window.keyForTesting = false
+        try click(view, window: window, count: 2)
+        #expect(interactions.isEmpty)
+    }
+
+    @Test func detachingSurfaceCancelsPendingSingleClick() async throws {
+        let (view, window) = makeSurface()
+        defer { window.close() }
+        var interactions: [PlaybackSurfaceInteraction] = []
+        view.onInteraction = { interactions.append($0) }
+        try click(view, window: window)
+        window.contentView = nil
+        window.contentView = view
+        try await waitForSingleClick()
+        #expect(interactions.isEmpty)
     }
 }
 

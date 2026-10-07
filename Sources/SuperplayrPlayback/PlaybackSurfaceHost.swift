@@ -37,6 +37,7 @@ public enum PlaybackSurfaceInteraction: Equatable, Sendable {
     case pointerExited(CGPoint)
     case primaryClick
     case doubleClick
+    case doubleClickSeek(TimeInterval)
     case togglePause
     case seekRelative(TimeInterval)
     case auxiliaryButton(Int)

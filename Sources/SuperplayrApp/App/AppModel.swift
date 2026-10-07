@@ -1157,6 +1157,9 @@ final class AppModel {
         case .doubleClick:
             guard !hasTransientPresentation, playerWindow?.attachedSheet == nil else { return }
             toggleFullscreen()
+        case let .doubleClickSeek(seconds):
+            guard !hasTransientPresentation, playerWindow?.attachedSheet == nil else { return }
+            performRelativeSeek(seconds)
         case .primaryClick:
             guard !hasTransientPresentation, playerWindow?.attachedSheet == nil else { return }
             chromeMachine.handleSurfaceClick(
