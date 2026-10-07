@@ -41,12 +41,6 @@ struct OpenVideoTabBar: View {
                         }
                     }
                 }
-                Button(action: model.openFilePanel) {
-                    Image(systemName: "plus").frame(width: 28, height: 24)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Open videos in tabs")
-                .help("Open videos in tabs")
             }
             .frame(height: 28)
             .onChange(of: model.openVideoTabs.selectedID, initial: true) { _, id in

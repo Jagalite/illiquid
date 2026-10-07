@@ -186,6 +186,7 @@ final class PlaybackOSDPresenter {
 struct PlaybackOSDView: View {
     @Bindable var presenter: PlaybackOSDPresenter
     let showHistory: () -> Void
+    var isTitlebar = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -201,12 +202,12 @@ struct PlaybackOSDView: View {
                             .accessibilityHidden(true)
                         Text(item.text)
                             .font(.subheadline.monospacedDigit().weight(.medium))
-                            .lineLimit(2)
+                            .lineLimit(isTitlebar ? 1 : 2)
                             .multilineTextAlignment(.leading)
                             .contentTransition(.opacity)
                     }
                     .padding(.horizontal, 12)
-                    .padding(.vertical, 9)
+                    .padding(.vertical, isTitlebar ? 5 : 9)
                     .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
                 .buttonStyle(.plain)
@@ -214,8 +215,8 @@ struct PlaybackOSDView: View {
                 .playerOverlaySurface(cornerRadius: 10, role: .status)
                 .accessibilityLabel(item.text)
                 .accessibilityHint("Shows playback message history")
-                .help("Show Message History")
-                .frame(maxWidth: 420, alignment: .trailing)
+                .help("\(item.text)\nShow Message History")
+                .frame(maxWidth: isTitlebar ? 280 : 420, alignment: .trailing)
                 .transition(.opacity)
                 .animation(
                     IlliquidMotion.stateMorph(reduceMotion: reduceMotion),

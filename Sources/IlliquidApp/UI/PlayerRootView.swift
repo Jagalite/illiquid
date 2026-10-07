@@ -128,14 +128,17 @@ private struct PlayerPane: View {
                 reduceMotion: reduceMotion
             )
 
-            PlaybackOSDView(
-                presenter: model.osdPresenter,
-                showHistory: { model.isMessageHistoryPresented = true }
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-            .padding(.top, 20)
-            .padding(.trailing, 24)
-            .environment(\.playerTheme, PlayerTheme.liquidGlass)
+            // Fullscreen hides the native title bar, so keep feedback over the video.
+            if model.state.isFullscreen {
+                PlaybackOSDView(
+                    presenter: model.osdPresenter,
+                    showHistory: { model.isMessageHistoryPresented = true }
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                .padding(.top, 20)
+                .padding(.trailing, 24)
+                .environment(\.playerTheme, PlayerTheme.liquidGlass)
+            }
 
             if PlaybackChromeMountPolicy.shouldMount(
                 hasSource: model.state.currentSource != nil,
@@ -680,10 +683,43 @@ struct PlaybackTitlebarAccessoryView: View {
 
     var body: some View {
         HStack(spacing: 10) {
+            sourceContent
+            if !model.state.isFullscreen {
+                PlaybackOSDView(
+                    presenter: model.osdPresenter,
+                    showHistory: { model.isMessageHistoryPresented = true },
+                    isTitlebar: true
+                )
+                .fixedSize(horizontal: true, vertical: false)
+                .layoutPriority(1)
+                .background {
+                    if model.osdPresenter.item != nil {
+                        TitlebarInteractiveRegion().accessibilityHidden(true)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: 28)
+        // The native title bar is an opaque dark surface, not part of the video.
+        .foregroundStyle(themeStore.selection.primaryColor,
+            themeStore.selection.secondaryColor, themeStore.selection.secondaryColor)
+        .environment(\.playerTheme, themeStore.selection)
+        .environment(\.playerTextColorMode, themeStore.textColorMode)
+        .environment(\.playerRainbowPalette, themeStore.rainbowPalette)
+        .environment(\.colorScheme, themeStore.selection.preferredColorScheme)
+        .tint(themeStore.selection.accentColor)
+        .accessibilityElement(children: .contain)
+    }
+
+    private var sourceContent: some View {
+        HStack(spacing: 10) {
             if !model.openVideoTabs.items.isEmpty {
                 OpenVideoTabBar(model: model)
                     .background {
-                        TitlebarInteractiveRegion().accessibilityHidden(true)
+                        if isVisible {
+                            TitlebarInteractiveRegion().accessibilityHidden(true)
+                        }
                     }
             } else if model.state.currentSource != nil {
                 HStack(spacing: 6) {
@@ -709,14 +745,6 @@ struct PlaybackTitlebarAccessoryView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(height: 28)
-        // The native title bar is an opaque dark surface, not part of the video.
-        .foregroundStyle(themeStore.selection.primaryColor,
-            themeStore.selection.secondaryColor, themeStore.selection.secondaryColor)
-        .environment(\.playerTheme, themeStore.selection)
-        .environment(\.playerTextColorMode, themeStore.textColorMode)
-        .environment(\.playerRainbowPalette, themeStore.rainbowPalette)
-        .environment(\.colorScheme, themeStore.selection.preferredColorScheme)
-        .tint(themeStore.selection.accentColor)
         .opacity(
             isVisible ? 1 : 0
         )

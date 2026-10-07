@@ -1521,7 +1521,8 @@ final class AppModel {
                         PlayerWindowControls.handleTitlebarDoubleClick(
                             event,
                             in: window,
-                            accessory: self?.isPlaybackChromeVisible == true
+                            accessory: (self?.isPlaybackChromeVisible == true
+                                || self?.osdPresenter.item != nil)
                                 ? self?.titlebarTitleView : nil
                         )
                     }
