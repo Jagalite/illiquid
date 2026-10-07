@@ -2014,3 +2014,22 @@ tests cover ownership lost during settling, source change during decoding, and
 renewed pointer movement between attempts. 172 tests in 32 suites passed. Desktop
 latency/playback qualification remains deferred; no performance gain is claimed
 from these correctness tests.
+
+
+### Ready exact previews bypass hover settling (2026-10-07)
+
+Fixed the nearby-reuse path skipping an already cached precise preview. Each
+refinement attempt now performs an exact-only cache lookup before its settling
+wait. A hit returns immediately without waiting or decoding, so the UI replaces
+the approximate image and updates its represented timestamp. Cache misses retain
+the 180 ms movement-based settling policy. Retries also check the cache before
+issuing more native work. Foreground decode completion still publishes immediately
+when its request and source remain current.
+
+Ownership and cancellation are checked on both sides of the asynchronous cache
+read, as well as around preparation and decoding. Four added regression tests
+cover ready-image bypass, cache-miss ordering, source replacement during lookup,
+and a cache hit before retry. 176 focused tests in 32 suites passed. This fixes
+cache availability at request/retry admission; it does not add a background-cache
+notification subscription or claim zero-latency discovery of unrelated cache writes.
+Visible-window timing and concurrent-playback qualification remain deferred.

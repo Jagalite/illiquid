@@ -1168,12 +1168,16 @@ enum TimelineThumbnailHoverPolicy {
     static func image(
         retryDelay: Duration = .milliseconds(150),
         isCurrent: () -> Bool = { true },
+        cached: () async -> CGImage? = { nil },
         prepare: () async -> Bool = { true },
         decode: () async -> CGImage?
     ) async -> CGImage? {
         for attempt in 0..<2 {
-            guard !Task.isCancelled, isCurrent(), await prepare(),
-                  !Task.isCancelled, isCurrent() else { return nil }
+            guard !Task.isCancelled, isCurrent() else { return nil }
+            let ready = await cached()
+            guard !Task.isCancelled, isCurrent() else { return nil }
+            if let ready { return ready }
+            guard await prepare(), !Task.isCancelled, isCurrent() else { return nil }
             let image = await decode()
             guard !Task.isCancelled, isCurrent() else { return nil }
             if let image { return image }
@@ -1515,6 +1519,12 @@ struct ElasticPlaybackControlBar: View {
                 isCurrent: {
                     timelineHoverPreview?.requestID == requestID &&
                     timelineHoverPreview?.sourceRevision == model.player.interactionSourceRevision
+                },
+                cached: {
+                    // Only native decoding waits for settling. A ready exact
+                    // image takes precedence over the retained approximation.
+                    await model.player.cachedTimelineThumbnail(at: position,
+                        maximumPixelSize: maximumPixelSize, maximumDistance: 0)?.image
                 },
                 prepare: {
                     await TimelineThumbnailHoverPolicy.waitUntilSettled(

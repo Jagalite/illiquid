@@ -119,6 +119,56 @@ struct TimelineThumbnailHoverRecoveryTests {
         #expect(sleeps == 3)
     }
 
+
+    @Test func readyPrecisePreviewBypassesSettlingAndNativeDecode() async throws {
+        let precise = try image()
+        var preparations = 0
+        var decodes = 0
+        let result = await TimelineThumbnailHoverPolicy.image(
+            cached: { precise }, prepare: { preparations += 1; return true }
+        ) { decodes += 1; return nil }
+        #expect(result === precise)
+        #expect(preparations == 0)
+        #expect(decodes == 0)
+    }
+
+    @Test func exactCacheMissStillWaitsBeforeDecoding() async throws {
+        let precise = try image()
+        var events: [String] = []
+        let result = await TimelineThumbnailHoverPolicy.image(
+            cached: { events.append("cache"); return nil },
+            prepare: { events.append("settle"); return true }
+        ) { events.append("decode"); return precise }
+        #expect(result === precise)
+        #expect(events == ["cache", "settle", "decode"])
+    }
+
+    @Test func sourceChangeDuringExactCacheReadRejectsTheReadyImage() async throws {
+        let precise = try image()
+        var current = true
+        var preparations = 0
+        let result = await TimelineThumbnailHoverPolicy.image(
+            isCurrent: { current }, cached: { current = false; return precise },
+            prepare: { preparations += 1; return true }
+        ) { Issue.record("Stale cache read must not trigger decoding"); return nil }
+        #expect(result == nil)
+        #expect(preparations == 0)
+    }
+
+    @Test func preciseImageReadyBeforeRetryAvoidsAnotherNativeAttempt() async throws {
+        let precise = try image()
+        var decodes = 0
+        var preparations = 0
+        let result = await TimelineThumbnailHoverPolicy.image(
+            retryDelay: .zero,
+            cached: { decodes == 0 ? nil : precise },
+            prepare: { preparations += 1; return true }
+        ) { decodes += 1; return nil }
+        #expect(result === precise)
+        #expect(decodes == 1)
+        #expect(preparations == 1)
+    }
+
     private func image() throws -> CGImage {
         try #require(CGContext(data: nil, width: 2, height: 2,
             bitsPerComponent: 8, bytesPerRow: 8,
