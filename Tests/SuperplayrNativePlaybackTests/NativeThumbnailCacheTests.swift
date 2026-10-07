@@ -7,6 +7,67 @@ import SuperplayrCore
 
 @Suite("Global thumbnail cache")
 struct NativeThumbnailCacheTests {
+    @Test func residentEntryLimitEvictsEvenBelowByteBudget() async throws {
+        let cache = NativeThumbnailCache()
+        var settings = ThumbnailPreferences(); settings.diskMiB = 0
+        await cache.configure(settings)
+        let value = try image(width: 16, height: 16)
+        for position in 0..<97 {
+            await cache.insert(value, for: key(position), background: false)
+        }
+        #expect(await cache.usage().images == 96)
+        #expect(await cache.image(for: key(0), background: false) == nil)
+        #expect(await cache.image(for: key(96), background: false) != nil)
+    }
+
+    @Test func protectedEntryLimitRejectsSpeculativeDecode() async throws {
+        let cache = NativeThumbnailCache()
+        var settings = ThumbnailPreferences(); settings.diskMiB = 0
+        await cache.configure(settings)
+        let value = try image(width: 16, height: 16)
+        for position in 0..<96 {
+            await cache.insert(value, for: key(position), background: true, storyboard: true)
+        }
+        #expect(await cache.usage().images == 96)
+        #expect(!(await cache.admitsBackground(size: CGSize(width: 16, height: 16))))
+        await cache.selectStoryboardSource(.init(path: "/other.mkv", version: "new", halfSecond: 0, width: 16, height: 16))
+        #expect(await cache.admitsBackground(size: CGSize(width: 16, height: 16)))
+    }
+
+    @Test func storyboardApproximationLoadsFromDiskAfterRestart() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = NativeThumbnailCache(directory: directory)
+        let value = try image()
+        await cache.insert(value, for: key(200), background: true, storyboard: true)
+        await cache.flushPendingWrites()
+        let restarted = NativeThumbnailCache(directory: directory)
+        let match = try #require(await restarted.nearest(to: key(500), maximumDistance: 7_200, fallbackTimes: [100]))
+        #expect(match.1 == 100 && match.0.width == value.width)
+        #expect(await restarted.nearest(to: key(500), maximumDistance: 30, fallbackTimes: [100]) == nil)
+        let replaced = NativeThumbnailCache.Key(path: key(500).path, version: "replacement", halfSecond: 500, width: 2048, height: 2048)
+        #expect(await restarted.nearest(to: replaced, maximumDistance: 7_200, fallbackTimes: [100]) == nil)
+    }
+
+    @Test func localPreparationCannotEvictStoryboardButPressureCan() async throws {
+        let cache = NativeThumbnailCache()
+        var settings = ThumbnailPreferences(); settings.memoryMiB = 8; settings.diskMiB = 0
+        await cache.configure(settings)
+        let large = try image(width: 1024, height: 1024)
+        await cache.insert(large, for: key(1), background: true, storyboard: true)
+        await cache.insert(large, for: key(2), background: true, storyboard: true)
+        #expect(!(await cache.admitsBackground(size: CGSize(width: 1024, height: 1024))))
+        await cache.insert(large, for: key(3), background: true)
+        #expect(await cache.image(for: key(1), background: true) != nil)
+        #expect(await cache.image(for: key(2), background: true) != nil)
+        #expect(await cache.image(for: key(3), background: true) == nil)
+        let nextSource = NativeThumbnailCache.Key(path: "/test/next.mkv", version: "2", halfSecond: 0, width: 2048, height: 2048)
+        await cache.selectStoryboardSource(nextSource)
+        #expect(await cache.admitsBackground(size: CGSize(width: 1024, height: 1024)))
+        await cache.trimForMemoryPressure(critical: true)
+        #expect(await cache.usage().images == 0)
+    }
+
     @Test func memoryPressureReclaimsSpeculativeImagesFirstAndPreservesDisk() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }

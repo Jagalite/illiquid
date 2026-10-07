@@ -1909,7 +1909,8 @@ final class AppModel {
         thumbnailScheduler.updatePlayback(current: state.currentURL,
             idle: !isShuttingDown && (state.phase == .idle || state.phase == .paused)
                 && state.isPauseDesired,
-            windowVisible: playerWindow != nil)
+            windowVisible: playerWindow != nil, playing: !isShuttingDown && state.phase == .playing,
+            sourceRevision: player.interactionSourceRevision)
     }
 
     private func updateUIObservationActivity(for window: NSWindow) {

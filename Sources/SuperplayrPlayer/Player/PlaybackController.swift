@@ -842,7 +842,8 @@ public final class PlaybackCoordinator {
         thumbnailInteractionHandler?(url, seconds)
         let revision = timelineThumbnailRevision
         let result = await timelineThumbnailGenerator.cachedThumbnail(for: url, at: seconds,
-            size: maximumPixelSize, maximumDistance: maximumDistance, sourceRevision: revision)
+            size: maximumPixelSize, maximumDistance: maximumDistance, sourceRevision: revision,
+            storyboardDuration: state.duration)
         return !isShuttingDown && revision == timelineThumbnailRevision ? result : nil
     }
 
@@ -860,13 +861,15 @@ public final class PlaybackCoordinator {
         return await thumbnailMetadataReader.duration(of: url)
     }
 
-    public func prewarmThumbnail(for url: URL, at seconds: Double) async -> Bool {
+    public func prewarmThumbnail(for url: URL, at seconds: Double, currentVideo: Bool = false) async -> Bool {
         guard !isShuttingDown, !Task.isCancelled,
-              state.phase == .idle || state.phase == .paused,
-              state.isPauseDesired,
+              ((state.phase == .idle || state.phase == .paused) && state.isPauseDesired)
+                || (currentVideo && url == state.currentURL && state.phase == .playing
+                    && runtimeDriver?.currentSnapshot.phase == .playing),
               runtimeDriver?.currentSnapshot.phase != .seeking else { return false }
         return await timelineThumbnailGenerator.thumbnail(for: url, at: seconds,
-            maximumPixelSize: CGSize(width: 368, height: 208), background: true) != nil
+            maximumPixelSize: CGSize(width: 368, height: 208), background: true,
+            storyboard: currentVideo && url == state.currentURL && ThumbnailPolicy.storyboard(duration: state.duration).contains(seconds)) != nil
     }
 
     public func releaseIdleThumbnailResources() async {

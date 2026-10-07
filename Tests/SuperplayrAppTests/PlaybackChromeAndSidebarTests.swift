@@ -1685,7 +1685,7 @@ struct PlaybackControlBarFeatureGateTests {
 @Suite("Timeline thumbnail hover policy")
 struct TimelineThumbnailHoverPolicyTests {
     @Test func cacheMissDebounceRemainsBrief() {
-        #expect(TimelineThumbnailHoverPolicy.cacheMissDelay == .milliseconds(40))
+        #expect(TimelineThumbnailHoverPolicy.cacheMissDelay == .milliseconds(180))
     }
 }
 

@@ -187,6 +187,7 @@ public actor NativeTimelineThumbnailGenerator {
         delayBeforeDecoding: Duration = .zero,
         sourceRevision: UInt64? = nil,
         background: Bool = false,
+        storyboard: Bool = false,
         allowDecoding: Bool = true
     ) async -> CGImage? {
         guard !Task.isCancelled, !background || foregroundRequests == 0 else { return nil }
@@ -200,7 +201,10 @@ public actor NativeTimelineThumbnailGenerator {
         let admissionRevision = worker.currentAdmissionRevision
         guard let key = await cache.makeKey(url: url, time: seconds, size: maximumPixelSize),
               !Task.isCancelled, revision == cacheRevision else { return nil }
+        if storyboard { await cache.selectStoryboardSource(key) }
         if let cached = await cache.image(for: key, background: background) {
+            guard !Task.isCancelled, revision == cacheRevision else { return nil }
+            if storyboard { await cache.protectStoryboard(key) }
             return !Task.isCancelled && revision == cacheRevision ? cached : nil
         }
         guard allowDecoding else { return nil }
@@ -231,7 +235,7 @@ public actor NativeTimelineThumbnailGenerator {
 
         guard await cache.makeKey(url: url, time: seconds, size: maximumPixelSize) == key,
               !Task.isCancelled, revision == cacheRevision else { return nil }
-        await cache.insert(image, for: key, background: background)
+        await cache.insert(image, for: key, background: background, storyboard: storyboard)
         return !Task.isCancelled && revision == cacheRevision ? image : nil
     }
 
@@ -273,7 +277,7 @@ public actor NativeTimelineThumbnailGenerator {
     }
 
     public func cachedThumbnail(for url: URL, at seconds: Double, size: CGSize,
-                                maximumDistance: Double, sourceRevision: UInt64) async -> CachedTimelineThumbnail? {
+                                maximumDistance: Double, sourceRevision: UInt64, storyboardDuration: Double? = nil) async -> CachedTimelineThumbnail? {
         invalidate(for: sourceRevision)
         let revision = cacheRevision
         guard latestSourceRevision == sourceRevision, !Task.isCancelled,
@@ -282,7 +286,8 @@ public actor NativeTimelineThumbnailGenerator {
             guard !Task.isCancelled, cacheRevision == revision else { return nil }
             return CachedTimelineThumbnail(image: image, position: Double(key.halfSecond) / 2)
         }
-        guard let (image, position) = await cache.nearest(to: key, maximumDistance: maximumDistance),
+        guard let (image, position) = await cache.nearest(to: key, maximumDistance: maximumDistance,
+            fallbackTimes: storyboardDuration.map { ThumbnailPolicy.storyboard(duration: $0) } ?? []),
               !Task.isCancelled, cacheRevision == revision else { return nil }
         return CachedTimelineThumbnail(image: image, position: position)
     }

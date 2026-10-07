@@ -30,6 +30,10 @@ final class ThumbnailBackgroundScheduler {
     @ObservationIgnored private var powerObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var windowVisible = false
     @ObservationIgnored private var idle = false
+    @ObservationIgnored private var playing = false
+    @ObservationIgnored private var sourceRevision: UInt64 = 0
+    @ObservationIgnored private var prepared = Set<Double>()
+    @ObservationIgnored private var lastAttempt: [Double: Double] = [:]
     @ObservationIgnored private var current: URL?
     @ObservationIgnored private var folder: URL?
     @ObservationIgnored private var visible = Set<URL>()
@@ -42,7 +46,7 @@ final class ThumbnailBackgroundScheduler {
          generate: (@MainActor (URL, Double) async -> Bool)? = nil,
          releaseResources: (@MainActor () async -> Void)? = nil) {
         self.readDuration = readDuration ?? { await player.thumbnailDuration(for: $0) }
-        self.generate = generate ?? { await player.prewarmThumbnail(for: $0, at: $1) }
+        self.generate = generate ?? { await player.prewarmThumbnail(for: $0, at: $1, currentVideo: true) }
         self.releaseResources = releaseResources ?? { await player.releaseIdleThumbnailResources() }
         self.player = player
         self.defaults = defaults
@@ -68,9 +72,12 @@ final class ThumbnailBackgroundScheduler {
         }
     }
 
-    func updatePlayback(current: URL?, idle: Bool, windowVisible: Bool) {
-        let changed = self.current != current || self.idle != idle || self.windowVisible != windowVisible
+    func updatePlayback(current: URL?, idle: Bool, windowVisible: Bool, playing: Bool = false, sourceRevision: UInt64 = 0) {
+        let changed = self.current != current || self.idle != idle || self.windowVisible != windowVisible || self.playing != playing || self.sourceRevision != sourceRevision
         if let current, self.current != current { recordUse(current, position: nil) }
+        if self.current != current || self.sourceRevision != sourceRevision { prepared.removeAll(); lastAttempt.removeAll() }
+        self.sourceRevision = sourceRevision
+        self.playing = playing
         self.current = current
         self.idle = idle
         self.windowVisible = windowVisible
@@ -100,7 +107,7 @@ final class ThumbnailBackgroundScheduler {
 
     func interaction(_ url: URL, position: Double) {
         recordUse(url, position: position)
-        reschedule()
+        if task == nil { reschedule() }
     }
 
     private func recordUse(_ url: URL, position: Double?) {
@@ -132,6 +139,7 @@ final class ThumbnailBackgroundScheduler {
 
     func clearCache() async {
         cancel()
+        prepared.removeAll(); lastAttempt.removeAll()
         let cleared = await player.clearThumbnailCache()
         status = cleared ? "Thumbnail cache cleared." : "Some disk thumbnails could not be removed."
         await refreshCacheUsage()
@@ -146,6 +154,7 @@ final class ThumbnailBackgroundScheduler {
     func handleMemoryPressure(constrained: Bool, critical: Bool) async {
         guard !stopped else { return }
         isUnderMemoryPressure = constrained
+        if constrained { prepared.removeAll(); lastAttempt.removeAll() }
         reschedule()
         if constrained { await player.handleThumbnailMemoryPressure(critical: critical) }
         await refreshCacheUsage()
@@ -154,12 +163,13 @@ final class ThumbnailBackgroundScheduler {
     private func reschedule() {
         cancel()
         let settings = preferences.bounded
-        guard !stopped, settings.generatesInBackground else {
+        let automatic = settings.preparesCurrentVideo && current?.isFileURL == true
+        guard !stopped, automatic || settings.generatesInBackground else {
             status = "Background generation is off."
             return
         }
-        guard idle, windowVisible || settings.generatesWithWindowClosed else {
-            status = "Waiting for paused or stopped playback."
+        guard (idle || (automatic && playing)), windowVisible || (idle && settings.generatesWithWindowClosed) else {
+            status = "Waiting for playback to settle or pause."
             return
         }
         guard !isUnderMemoryPressure else {
@@ -183,13 +193,45 @@ final class ThumbnailBackgroundScheduler {
                 task?.cancel()
                 status = "Background work budget reached."
             }
-            await runPass(settings: settings, id: id)
+            if automatic {
+                await runCurrent(settings: settings, id: id)
+                if idle, settings.generatesInBackground, canContinue(id) { await runPass(settings: settings, id: id) }
+            }
+            else { await runPass(settings: settings, id: id) }
             if generation == id {
                 deadline?.cancel(); deadline = nil; task = nil
             }
             // A cancelled pass still owns cleanup. Release only idle resources,
             // so late cleanup cannot cancel a newer foreground/background request.
             await releaseResources()
+            if automatic, generation == id, !stopped { reschedule() }
+        }
+    }
+
+    private func runCurrent(settings: ThumbnailPreferences, id: UUID) async {
+        guard let url = current, url.isFileURL, !settings.excludesBackgroundGeneration(for: url) else { return }
+        let duration: Double?
+        if let known = player.playbackProgress(for: url)?.duration, known > 0 { duration = known }
+        else { duration = await readDuration(url) }
+        guard canContinue(id), let duration, duration.isFinite, duration > 0 else { return }
+        let broad = ThumbnailPolicy.storyboard(duration: duration)
+        while canContinue(id) {
+            let now = ProcessInfo.processInfo.systemUptime
+            lastAttempt = lastAttempt.filter { now - $0.value < 20 }
+            let hoverIsRecent = recent[url].map { Date().timeIntervalSince($0) < 1.5 } ?? false
+            let interest = (idle || hoverIsRecent ? focus[url] : nil)
+                ?? player.playbackProgress(for: url)?.position ?? 0
+            let nearby = ThumbnailPolicy.nearby(duration: duration, focus: interest)
+            let candidates = broad.filter { !prepared.contains($0) } + nearby
+            guard let time = candidates.first(where: { now - (lastAttempt[$0] ?? -.infinity) >= 20 }) else { return }
+            lastAttempt[time] = now
+            let succeeded = await generate(url, time)
+            guard canContinue(id) else { return }
+            if succeeded, broad.contains(time) { prepared.insert(time) }
+            status = "Prepared \(prepared.intersection(broad).count) of \(broad.count) timeline previews."
+            // One independent decode at a time; pause between requests, including
+            // cache hits, so preparation never becomes an unbounded tight loop.
+            do { try await Task.sleep(for: .seconds(2)) } catch { return }
         }
     }
 
@@ -244,7 +286,7 @@ final class ThumbnailBackgroundScheduler {
     }
 
     private func canContinue(_ id: UUID) -> Bool {
-        !Task.isCancelled && !stopped && !isUnderMemoryPressure && generation == id && idle
+        !Task.isCancelled && !stopped && !isUnderMemoryPressure && generation == id && (idle || (preferences.preparesCurrentVideo && playing))
             && !ProcessInfo.processInfo.isLowPowerModeEnabled
             && ProcessInfo.processInfo.thermalState != .serious
             && ProcessInfo.processInfo.thermalState != .critical

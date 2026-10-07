@@ -4,9 +4,10 @@ public struct ThumbnailPreferences: Codable, Equatable, Sendable {
     public enum Priority: String, Codable, CaseIterable, Sendable {
         case balanced, nearby, recent
     }
+    public var preparesCurrentVideo = true
     public var generatesInBackground = false
     public var generatesWithWindowClosed = false
-    public var memoryMiB = 32
+    public var memoryMiB = 16
     public var diskMiB = 256
     public var videosPerPass = 8
     public var samplesPerVideo = 12
@@ -28,7 +29,7 @@ public struct ThumbnailPreferences: Codable, Equatable, Sendable {
             memoryMiB = 8; diskMiB = 64; videosPerPass = 4; samplesPerVideo = 6
             idleSeconds = 5; workSeconds = 5
         case .balanced:
-            memoryMiB = 32; diskMiB = 256; videosPerPass = 8; samplesPerVideo = 12
+            memoryMiB = 16; diskMiB = 256; videosPerPass = 8; samplesPerVideo = 12
             idleSeconds = 3; workSeconds = 15
         case .extensive:
             memoryMiB = 64; diskMiB = 1024; videosPerPass = 16; samplesPerVideo = 24
@@ -45,7 +46,7 @@ public struct ThumbnailPreferences: Codable, Equatable, Sendable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case generatesInBackground, generatesWithWindowClosed, memoryMiB, diskMiB
+        case preparesCurrentVideo, generatesInBackground, generatesWithWindowClosed, memoryMiB, diskMiB
         case videosPerPass, samplesPerVideo, idleSeconds, workSeconds, recencyDays, priority
         case excludedFolderPaths
     }
@@ -53,6 +54,7 @@ public struct ThumbnailPreferences: Codable, Equatable, Sendable {
     public init(from decoder: Decoder) throws {
         self.init()
         let values = try decoder.container(keyedBy: CodingKeys.self)
+        preparesCurrentVideo = try values.decodeIfPresent(Bool.self, forKey: .preparesCurrentVideo) ?? preparesCurrentVideo
         generatesInBackground = try values.decodeIfPresent(Bool.self, forKey: .generatesInBackground) ?? generatesInBackground
         generatesWithWindowClosed = try values.decodeIfPresent(Bool.self, forKey: .generatesWithWindowClosed) ?? generatesWithWindowClosed
         memoryMiB = try values.decodeIfPresent(Int.self, forKey: .memoryMiB) ?? memoryMiB
@@ -88,6 +90,21 @@ public struct ThumbnailPreferences: Codable, Equatable, Sendable {
 
 /// Pure policy: no directory walks, decoding, or wall-clock reads.
 public enum ThumbnailPolicy {
+    public static func storyboard(duration: Double) -> [Double] {
+        samples(duration: duration, focus: 0, count: 24)
+    }
+
+    public static func nearby(duration: Double, focus: Double) -> [Double] {
+        guard duration.isFinite, duration > 0, focus.isFinite else { return [] }
+        let interest = min(duration, max(0, focus))
+        let center = floor(interest / 5) * 5
+        return (0...12).compactMap { index in
+            let offset = index == 0 ? 0 : ((index + 1) / 2) * (index % 2 == 1 ? 1 : -1)
+            let time = center + Double(offset) * 5
+            return time >= 0 && time < duration && abs(time - interest) <= 30 ? (time * 2).rounded() / 2 : nil
+        }
+    }
+
     public struct Candidate: Equatable, Sendable {
         public let url: URL
         public let lastUsed: Date?

@@ -31,6 +31,9 @@ struct ThumbnailSettingsCard: View {
                             .accessibilityIdentifier("thumbnail-cache-usage")
                     }
                     Button("Clear Thumbnail Cache") { Task { await scheduler.clearCache() } }
+                    Toggle("Prepare previews for the current video", isOn: $scheduler.preferences.preparesCurrentVideo)
+                    Text("Builds broad timeline coverage, then fills in near your hover position. Yields while loading, seeking, buffering, or under memory and power constraints.")
+                        .font(.caption).foregroundStyle(.secondary)
                     Divider()
                     Toggle("Generate thumbnails while idle", isOn: $scheduler.preferences.generatesInBackground)
                     Text("Prepares previews for nearby files and recently viewed videos while playback is paused or stopped. Suspends in Low Power Mode or when the Mac is too warm.")

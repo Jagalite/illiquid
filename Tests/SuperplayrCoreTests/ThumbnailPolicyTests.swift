@@ -4,6 +4,26 @@ import Testing
 
 @Suite("Thumbnail scheduling policy")
 struct ThumbnailPolicyTests {
+    @Test func storyboardAndLocalCoverageStayBoundedAndValid() throws {
+        for duration in [0.2, 30, 7_200] {
+            let broad = ThumbnailPolicy.storyboard(duration: duration)
+            #expect(!broad.isEmpty && broad.count <= 24 && Set(broad).count == broad.count)
+            #expect(broad.allSatisfy { $0 >= 0 && $0 < duration })
+            for focus in [0.0, min(32.4, duration), duration / 2, duration] {
+                let local = ThumbnailPolicy.nearby(duration: duration, focus: focus)
+                #expect(local.count <= 13 && Set(local).count == local.count)
+                #expect(local.allSatisfy { $0 >= 0 && $0 < duration && abs($0 - focus) <= 30 })
+            }
+        }
+        #expect(ThumbnailPolicy.storyboard(duration: .nan).isEmpty)
+        #expect(ThumbnailPolicy.nearby(duration: 20, focus: .infinity).isEmpty)
+        let settings = try JSONDecoder().decode(ThumbnailPreferences.self, from: Data("{}".utf8))
+        #expect(settings.preparesCurrentVideo && !settings.generatesInBackground)
+        #expect(settings.memoryMiB == 16)
+        var disabled = settings; disabled.preparesCurrentVideo = false
+        #expect(try JSONDecoder().decode(ThumbnailPreferences.self, from: JSONEncoder().encode(disabled)) == disabled)
+    }
+
     @Test func oldPreferencesKeepTheirBudgetsWhenExclusionsAreAdded() throws {
         let data = Data(#"{"memoryMiB":64,"diskMiB":0,"generatesInBackground":true,"priority":"recent"}"#.utf8)
         let settings = try JSONDecoder().decode(ThumbnailPreferences.self, from: data)

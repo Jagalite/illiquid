@@ -1126,7 +1126,7 @@ private struct ElasticTimelineHoverPreviewState {
 }
 
 enum TimelineThumbnailHoverPolicy {
-    static let cacheMissDelay: Duration = .milliseconds(40)
+    static let cacheMissDelay: Duration = .milliseconds(180)
 
     static func shouldRetirePreview(sourceRevision: UInt64?, currentRevision: UInt64) -> Bool {
         sourceRevision.map { $0 != currentRevision } ?? false
@@ -1447,8 +1447,7 @@ struct ElasticPlaybackControlBar: View {
         timelineThumbnailRequestID += 1
         let requestID = timelineThumbnailRequestID
         let started = LifecyclePerformance.begin("preview-hover-\(requestID)")
-        let maximumDistance = min(30, model.state.duration /
-            Double(model.thumbnailScheduler.preferences.bounded.samplesPerVideo * 2))
+        let maximumDistance = max(0, model.state.duration)
         let canRetain = timelineHoverPreview?.sourceRevision == model.player.interactionSourceRevision
             && TimelineThumbnailHoverPolicy.canRetainPreview(
             at: timelineHoverPreview?.representedPosition, for: Double(bucket) / 2,
