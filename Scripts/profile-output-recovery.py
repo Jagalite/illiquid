@@ -11,6 +11,7 @@ lifecycle=responsive.lifecycle
 def displayed(run, target=None, timeout=10):
     end=time.monotonic()+timeout
     while time.monotonic()<end:
+        run.require_visible_window('displayed-frame-readback')
         sample=run.command('snapshot')['response']
         pts=sample.get('displayed-pts','unavailable')
         if sample.get('displayed-current')=='yes' and pts!='unavailable':
@@ -35,6 +36,7 @@ def output(run, fixture):
         start_usage=lifecycle.resources.usage(run.process.pid);started=time.monotonic()
         run.command('play')
         for i in range(12):
+            run.require_visible_window(f'{workload}-{i}')
             if workload=='hover': run.command('hover-preview',[1.5,4,8,14][i%4])
             elif workload=='resize': run.command('resize-window',[700,960,1200][i%3])
             time.sleep(.5)

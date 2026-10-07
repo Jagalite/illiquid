@@ -2161,6 +2161,9 @@ public final class PlaybackCoordinator {
             case .failed: .failed
             }
         }
+        timelineThumbnailGenerator.setDecodingSuspended(
+            phase.isLoading || phase == .stopping || phase == .shuttingDown
+        )
         state.applyAuthorityProjection(PlaybackAuthorityProjection(
             phase: phase,
             position: seconds(snapshot.position) ?? 0,

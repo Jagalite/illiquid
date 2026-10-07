@@ -5,6 +5,17 @@ import Testing
 @Suite("Timeline hover recovery")
 @MainActor
 struct TimelineThumbnailHoverRecoveryTests {
+    @Test func playbackRecoveryRestartsOnlyIncompletePreviewsForTheCurrentSource() {
+        #expect(TimelineThumbnailHoverPolicy.shouldResumePreview(
+            sourceRevision: 2, currentRevision: 2, representedPosition: nil, bucket: 10))
+        #expect(TimelineThumbnailHoverPolicy.shouldResumePreview(
+            sourceRevision: 2, currentRevision: 2, representedPosition: 4.5, bucket: 10))
+        #expect(!TimelineThumbnailHoverPolicy.shouldResumePreview(
+            sourceRevision: 2, currentRevision: 2, representedPosition: 5, bucket: 10))
+        #expect(!TimelineThumbnailHoverPolicy.shouldResumePreview(
+            sourceRevision: 1, currentRevision: 2, representedPosition: nil, bucket: 10))
+    }
+
     @Test func delayedRevisionObservationKeepsANewHoverButRetiresTheOldSource() {
         #expect(TimelineThumbnailHoverPolicy.shouldRetirePreview(sourceRevision: 1, currentRevision: 2))
         #expect(!TimelineThumbnailHoverPolicy.shouldRetirePreview(sourceRevision: 2, currentRevision: 2))

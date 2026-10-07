@@ -1132,6 +1132,11 @@ enum TimelineThumbnailHoverPolicy {
         sourceRevision.map { $0 != currentRevision } ?? false
     }
 
+    static func shouldResumePreview(sourceRevision: UInt64, currentRevision: UInt64,
+                                    representedPosition: Double?, bucket: Int) -> Bool {
+        sourceRevision == currentRevision && representedPosition != Double(bucket) / 2
+    }
+
     static func canRetainPreview(at representedPosition: Double?, for position: Double,
                                  maximumDistance: Double) -> Bool {
         guard let representedPosition, representedPosition.isFinite, position.isFinite,
@@ -1344,6 +1349,16 @@ struct ElasticPlaybackControlBar: View {
                 LifecyclePerformance.mark("preview-command-\(request.id)")
                 updateTimelineHover(at: geometry.pointOnTrack(fraction: fraction), geometry: geometry)
             }
+            .onChange(of: model.state.phase.isLoading) { wasLoading, isLoading in
+                guard wasLoading, !isLoading, let preview = timelineHoverPreview,
+                      TimelineThumbnailHoverPolicy.shouldResumePreview(
+                        sourceRevision: preview.sourceRevision,
+                        currentRevision: model.player.interactionSourceRevision,
+                        representedPosition: preview.representedPosition,
+                        bucket: preview.bucket) else { return }
+                updateTimelineHover(at: geometry.pointOnTrack(fraction: preview.fraction),
+                                    geometry: geometry, forceRefresh: true)
+            }
         }
         .environment(\.colorScheme, theme.preferredColorScheme)
         .onChange(of: isVolumePopoverPresented) { _, isPresented in
@@ -1402,7 +1417,8 @@ struct ElasticPlaybackControlBar: View {
 
     private func updateTimelineHover(
         at location: CGPoint,
-        geometry: ElasticPlaybackControlBarGeometry
+        geometry: ElasticPlaybackControlBarGeometry,
+        forceRefresh: Bool = false
     ) {
         guard gestureMode == nil,
               model.state.duration > 0,
@@ -1418,7 +1434,7 @@ struct ElasticPlaybackControlBar: View {
 
         let position = model.state.duration * Double(fraction)
         let bucket = Int((position * 2).rounded())
-        if var preview = timelineHoverPreview,
+        if !forceRefresh, var preview = timelineHoverPreview,
            preview.sourceRevision == model.player.interactionSourceRevision,
            preview.bucket == bucket {
             preview.fraction = fraction

@@ -90,11 +90,14 @@ def navigation(run, count):
     run.wait_line(lambda line: 'phase=source-projection.end ' in line,timeout=60)
     run.result['queries']=[]
     for query in ['episode-9','episode-99',f'episode-{count-1}','']:
+        run.require_visible_window('source-query-start')
         offset=len(run.text()); run.command('source-query',source=query)
         line=run.wait_line(lambda s:'phase=source-projection.end ' in s,offset=offset,timeout=60)
+        run.require_visible_window('source-query-end')
         run.result['queries'].append(dict(query=query,projection=lifecycle.fields(line)))
     run.result['sidebar_screenshot']=screenshot(run,'sidebar.png')
     run.phase('large-sidebar-idle',seconds=3)
+    run.require_visible_window('source-query-idle-end')
 
 def soak(run, fixtures, cycles, memory_map=False):
     run.result['cycles']=[]

@@ -214,6 +214,8 @@ struct SettingsView: View {
                             in: 0...100
                         )
                         .frame(width: 220)
+                        .accessibilityLabel("Remembered volume")
+                        .accessibilityValue("\(Int(model.state.volume.rounded())) percent")
 
                         Text("\(Int(model.state.volume.rounded()))%")
                             .font(.body.monospacedDigit())
@@ -589,6 +591,8 @@ struct SettingsView: View {
                     HStack(spacing: 12) {
                         Slider(value: $storedSidebarWidth, in: 300...720, step: 1)
                             .frame(width: 190)
+                            .accessibilityLabel("Sidebar width")
+                            .accessibilityValue("\(Int(storedSidebarWidth.rounded())) points")
                         Text("\(Int(storedSidebarWidth.rounded())) pt")
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(.secondary)

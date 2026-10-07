@@ -70,6 +70,12 @@ actor SourceBrowserFilter {
             cachedKey = key
         }
         guard let projection = cachedProjection else { return nil }
+        // Clearing search restores the existing projection. Rebuilding its path
+        // set needlessly normalizes every URL again in a large library.
+        if configuration.viewMode != .media,
+           query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return projection
+        }
         let searched = Self.search(projection.rows, query: query)
         let result = configuration.viewMode == .media
             ? Self.organizeMedia(searched) : searched

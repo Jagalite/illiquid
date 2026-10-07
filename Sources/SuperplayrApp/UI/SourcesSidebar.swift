@@ -387,11 +387,13 @@ struct SourcesSidebar: View {
                 Text(model.activeSourceTab?.displayName ?? "Sources")
                     .font(.headline.weight(.semibold))
                     .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
+                    .truncationMode(.middle)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
                 Spacer(minLength: 4)
 
                 headerActions
+                    .fixedSize()
             }
         }
         .padding(.leading, 14)
@@ -1322,6 +1324,12 @@ private struct SourcesSearchField: NSViewRepresentable {
         if searchField.stringValue != text {
             searchField.stringValue = text
         }
+    }
+
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSSearchField, context: Context) -> CGSize? {
+        // NSSearchField's intrinsic width must not expand the entire sidebar
+        // beyond its clipped viewport and hide the adjacent visibility control.
+        CGSize(width: max(0, proposal.width ?? 200), height: 28)
     }
 
     final class Coordinator: NSObject, NSSearchFieldDelegate {

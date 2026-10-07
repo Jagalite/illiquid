@@ -12,6 +12,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
         let size: CGSize
         var cacheRevision: UInt64 = 0
         var background = false
+        var admissionRevision: UInt64?
     }
     private final class Request {
         let id: UUID
@@ -36,6 +37,25 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
     private let prioritizesForeground: Bool
     private var active: Request?
     private var pending: Request?
+    private var decodingSuspended = false
+    private var admissionRevision: UInt64 = 0
+
+    var currentAdmissionRevision: UInt64 {
+        lock.withLock { admissionRevision }
+    }
+
+    /// Synchronous with playback transitions: no actor hop can admit a decode
+    /// between seeking/buffering and cancellation. Old metadata/debounce work
+    /// remains fenced even if playback resumes before it reaches this worker.
+    func setDecodingSuspended(_ suspended: Bool) {
+        lock.lock()
+        guard suspended != decodingSuspended else { lock.unlock(); return }
+        decodingSuspended = suspended
+        admissionRevision &+= 1
+        let cancellation = suspended ? cancelRequestsLocked() : nil
+        lock.unlock()
+        cancellation?()
+    }
 
     var pendingPosition: TimeInterval? {
         lock.withLock { pending?.input.seconds }
@@ -72,7 +92,8 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
         }
         request.deadline = deadline
         lock.lock()
-        guard !request.cancellation.cancellationRequested else {
+        guard !request.cancellation.cancellationRequested, !decodingSuspended,
+              request.input.admissionRevision.map({ $0 == admissionRevision }) ?? true else {
             lock.unlock()
             request.continuation?.resume(returning: nil)
             return
@@ -119,18 +140,26 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
 
     func cancelAll(releasingResources: Bool = false) {
         lock.lock()
+        let cancellation = cancelRequestsLocked()
+        lock.unlock()
+        cancellation()
+        if releasingResources { queue.async { self.release() } }
+    }
+
+    /// Caller holds lock; cancellation callbacks and continuations run unlocked.
+    private func cancelRequestsLocked() -> () -> Void {
         let requests = [active, pending].compactMap { $0 }
         let continuations = requests.compactMap { $0.continuation }
         for request in requests { request.continuation = nil }
         pending = nil
         // Keep active ownership until its native call has actually returned.
-        lock.unlock()
-        for request in requests {
-            request.deadline?.cancel()
-            request.cancellation.requestCancellation()
+        return {
+            for request in requests {
+                request.deadline?.cancel()
+                request.cancellation.requestCancellation()
+            }
+            for continuation in continuations { continuation.resume(returning: nil) }
         }
-        for continuation in continuations { continuation.resume(returning: nil) }
-        if releasingResources { queue.async { self.release() } }
     }
 
     func releaseResourcesWhenIdle() {

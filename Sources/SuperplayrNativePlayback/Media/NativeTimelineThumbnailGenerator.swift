@@ -158,6 +158,11 @@ public actor NativeTimelineThumbnailGenerator {
             }
     }
 
+    init(cacheDirectory: URL, worker: TimelineThumbnailWorker) {
+        cache = NativeThumbnailCache(directory: cacheDirectory)
+        self.worker = worker
+    }
+
     // Internal qualification controls; the public initializer keeps the
     // two-thread BGRA route and the established worker scheduling priority.
     init(optimized: Bool = true, maximumPackets: Int = 1_500,
@@ -192,6 +197,7 @@ public actor NativeTimelineThumbnailGenerator {
             guard latestSourceRevision == sourceRevision else { return nil }
         }
         let revision = cacheRevision
+        let admissionRevision = worker.currentAdmissionRevision
         guard let key = await cache.makeKey(url: url, time: seconds, size: maximumPixelSize),
               !Task.isCancelled, revision == cacheRevision else { return nil }
         if let cached = await cache.image(for: key, background: background) {
@@ -218,7 +224,8 @@ public actor NativeTimelineThumbnailGenerator {
         if decoderIdentity != identity { decoderRevision &+= 1; decoderIdentity = identity }
         let image = await worker.image(for: .init(
             url: URL(fileURLWithPath: key.path), seconds: Double(key.halfSecond) / 2,
-            size: maximumPixelSize, cacheRevision: decoderRevision, background: background
+            size: maximumPixelSize, cacheRevision: decoderRevision, background: background,
+            admissionRevision: admissionRevision
         ))
         guard !Task.isCancelled, revision == cacheRevision, let image else { return nil }
 
@@ -234,6 +241,11 @@ public actor NativeTimelineThumbnailGenerator {
         guard latestSourceRevision.map({ sourceRevision > $0 }) ?? true else { return }
         latestSourceRevision = sourceRevision
         cancelWork()
+    }
+
+    /// Cached images remain readable while playback needs the decode budget.
+    public nonisolated func setDecodingSuspended(_ suspended: Bool) {
+        worker.setDecodingSuspended(suspended)
     }
 
     public func cancelWork() {

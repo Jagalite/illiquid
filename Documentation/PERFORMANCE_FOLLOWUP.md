@@ -1356,3 +1356,180 @@ used the working tree with the two separately edited UI files; the performance
 commit excludes those cosmetic edits. Qualification is local and ad hoc, not a
 claim of a release built from a clean committed tree. The unresolved/deferred
 items above remain unchanged.
+
+## Full audit following 47007a2 (2026-10-06)
+
+This pass reviewed preview/playback contention, 100k-source UI work, regression
+qualification, memory ownership, high-rate transitions, and usability. It keeps
+four application fixes and adds repeatable benchmark gating. **The performance
+qualification is not green:** a completed cohort failed memory and dropped-frame
+gates, and subsequent visible-window measurements were interrupted. The user
+explicitly deferred the remaining visible-window benchmarks. No commit, install,
+push, release, or change to another player was performed in this pass.
+
+Evidence is under `QualificationArtifacts/FullAudit/` (ignored local artifacts).
+`manifest.json` binds source, test, harness, fixture, application and receipt
+identities. The starting revision was
+`47007a2ae107f5d0fb592afbd8cbaeb8e32df095`. Existing edits to `PlaybackOSD.swift`
+and `PlayerRootView.swift` were preserved byte-for-byte. Test/build snapshots
+include those user edits; this is working-tree qualification, not a clean-commit
+release claim.
+
+### Retained fixes and disposition
+
+| Area | Disposition and evidence |
+| --- | --- |
+| Playback versus preview decoding | Implemented synchronous admission fencing during prepare, buffering, stop and shutdown. Active/pending requests are interrupted without releasing the physical native-worker slot early; stale metadata/debounce work cannot revive after recovery. Cached images remain available. Four deterministic admission tests cover these boundaries. |
+| Stationary hover after buffering | Implemented a retry when recovery ends for an incomplete preview of the current source. Exact cached previews and previous-source requests are not restarted. Policy regression coverage accompanies the change. |
+| Clearing a large-library search | Implemented reuse of the existing visibility projection for empty/whitespace searches outside media grouping. Three-pair medians: 246.13 → 2.52 ms for 100k rows. This is projection timing, not complete visual response. |
+| Full-library UI reconciliation | Deferred. Main-thread sampling points to SwiftUI `ForEachState.update(view:)`, identity lookup and large row-value copies. A computed lightweight collection did not materially improve the roughly 100 ms hitch. A precomputed reference-array experiment passed correctness tests but could not be performance-qualified; both experiments were removed. The latter is archived in `deferred-row-references.patch`. |
+| Sidebar layout and settings accessibility | Fixed long-title/search-field sizing that clipped Add Files, Add Folder and visibility controls. Added labels and units to remembered-volume and sidebar-width sliders. Live AX and screenshot verification passed at 359/360-point sidebar widths. |
+| Repeated regression qualification | Implemented `Scripts/profile-performance-suite.py`: serial alternating order, at least three repeats, exact input hashes, complete readback/renderer evidence, finite metrics and explicit gates. Missing evidence fails. Added scoped display-awake assertions and periodic visibility evidence after diagnosing Space-related failures. |
+| Retained-memory ownership | Deferred: longer 48-cycle soak and entitled allocation trace were prepared but not run after the visibility failures and user deferral. Existing variable-footprint findings remain unresolved. No allocator-purge or autorelease change was reintroduced. |
+| 60fps playback/resize | Audited with HEVC 10-bit and VP9; dropped-frame gates failed. No decoder-thread, queue, hardware or presentation-policy change was promoted. Stable visible-window confirmation remains deferred. |
+| Fullscreen, keyboard and recovery usability | Search/Escape, AX Play, settings, close, aspect-preserving resize and fullscreen return were exercised. External-display switching, spoken VoiceOver, physical scanout and real NAS disconnect qualification remain deferred. |
+| mpv/IINA comparison | Refreshed cohort deferred with the other visible-window work. Earlier comparison receipts in this document retain their original binary/workload scope; they do not establish a ranking for the final source here. Neither reference player was changed. |
+| Compressed prefetch / speculative decode changes | Remain dropped/default-off as previously directed. Cold HEVC previews still warrant investigation, but coarse-keyframe-first previews need separate accuracy, latency and playback qualification before adoption. |
+
+The admission change coordinates ownership and scheduling; it does not make a
+cold codec decode intrinsically cheaper. In three alternating contention pairs,
+12 HEVC seeks per app measured median **168.48 → 164.54 ms**, maximum
+**187.60 → 189.33 ms**, from command to current-generation displayed-frame
+readback. This does not establish a material latency improvement. The benefit
+proved by the tests is cancellation/admission correctness.
+
+### Completed comparison, including failed gates
+
+`alternating-suite/summary.json` contains 24 completed runs: three repeats of
+navigation plus H.264 4K30, HEVC 10-bit 1080p60 and VP9 1080p60 for each app,
+rotating baseline/candidate order. Baseline binary SHA-256:
+`9b4d26e26d9eda5b2945f04ba0a104fba55e4d1b4cbfbaa702e302c10cbc336d`.
+Candidate binary SHA-256:
+`55b1dcfa31cd08c1972f92e7f7009762841052fd46d998b8b1382f1854f9ff78`.
+That candidate contains admission, cached projection and layout/accessibility
+fixes, before the later stationary-hover retry. It has neither row-reference
+experiment. Its results are not relabeled as final-binary measurements.
+
+| Median observation | Baseline | Candidate |
+| --- | ---: | ---: |
+| 100k-source launch through window configuration | 1,472 ms | 1,012 ms |
+| 100k-source clear-search projection | 246.13 ms | 2.52 ms |
+| Maximum recorded main-queue gap per navigation run | 120.48 ms | 113.72 ms |
+| Navigation quit through process exit | 188.93 ms | 173.31 ms |
+| H.264 4K displayed seek | 260.73 ms | 232.18 ms |
+| HEVC 60fps displayed seek | 157.44 ms | 156.35 ms |
+| VP9 60fps displayed seek | 256.12 ms | 247.43 ms |
+| H.264 steady / hover / resize CPU | 6.33 / 24.82 / 9.56% | 6.01 / 24.17 / 9.05% |
+| HEVC steady / hover / resize CPU | 7.32 / 106.18 / 9.50% | 6.78 / 103.85 / 9.20% |
+| VP9 steady / hover / resize CPU | 19.69 / 35.36 / 21.07% | 19.14 / 34.84 / 21.22% |
+
+CPU is percent of one core and excludes GPU/WindowServer. Controls are visible;
+this differs from the earlier hidden-controls mpv/IINA comparison. Launches use
+fresh processes with warm OS caches. Seek readback is not physical scanout.
+These observations are workload-bound, not a universal speedup or nonregression
+claim. The final visibility-aware harness was added afterward; this older cohort
+cannot retroactively prove uninterrupted on-screen presentation.
+
+Failed gates must remain visible:
+
+- H.264 hover footprint median **226.61 → 300.16 MiB** and resize footprint
+  **222.27 → 298.47 MiB** exceeded the configured 15%/16 MiB allowance. Individual
+  observations varied on both builds, but allocator retention is not established
+  as the complete explanation.
+- HEVC maximum steady dropped-frame delta **34 → 120** and resize **0 → 39**;
+  VP9 steady **0 → 120**. These are failed renderer-counter gates, not dismissed
+  as harmless telemetry. Every corrupted-frame delta was zero.
+- A paused repeated-seek diagnostic (`drop-accounting/`) did not reproduce the
+  hypothesized delayed dropped-frame accounting. That explanation remains
+  unproven.
+
+The subsequent `final-suite/` is an **incomplete 15-record experiment**, stopped
+when the unchanged baseline lost displayed-frame readback. It also observed
+baseline HEVC hover drops, so drops are not isolated to the new admission logic.
+It is not a passing confirmation. `confirmed-suite/` then failed baseline window
+visibility before obtaining any paired result. Its filename does not imply
+confirmation.
+
+### Visibility failure and remaining qualification
+
+Cua/WindowServer evidence identified the diagnostic benchmark window as 960×600
+on Space 3, while fullscreen Space 217 was active; it was explicitly offscreen
+and not on the current Space (`window-space-evidence.json`). Thus the later
+startup visibility failures were not caused by an undersized window. A scoped
+`caffeinate` assertion alone did not fix them. This observation explains that
+startup failure; it does not establish the cause of every earlier frame drop or
+memory result. No user Space, fullscreen app or display preference was changed.
+
+The harness now records own-window geometry and visibility during navigation,
+readback and each half-second playback-workload step, and rejects a run that
+leaves the visible desktop. These are sampled checks, not continuous occlusion
+or compositor proof. Startup timeout errors include own-window details. The
+suite also refuses old receipts lacking the new visibility evidence. Existing
+failed receipts and pre-change harness sources remain archived unchanged.
+
+On user instruction, the remaining controlled comparison, 48-cycle mixed-codec
+soak, entitled allocation trace, and three-repeat mpv/IINA refresh are deferred.
+Resume these on a quiet normal desktop with Illiquid continuously visible. The
+allocation trace should use only the separately signed diagnostic bundle from
+`prepare-memory-copy.py`; its stack-logging memory/CPU results are diagnostic,
+not normal-performance measurements. The memory-copy preparation now points to the retained bundle; the older
+batch scheduler is preserved as historical evidence and should not be rerun.
+Use fresh output directories when resuming. No prepared-but-unexecuted probe
+counts as validation.
+
+Reproduce the retained-source comparison with a new, nonexistent output path:
+
+```sh
+python3 Scripts/profile-performance-suite.py \
+  --baseline-app /tmp/illiquid-fixall-no-pools/Illiquid.app \
+  --candidate-app /tmp/illiquid-full-audit-retained/Illiquid.app \
+  --fixture /tmp/illiquid-performance-fixtures/h264-4k.mp4 \
+  --fixture /tmp/illiquid-performance-joint-fixtures/hevc-10bit-1080p60.mkv \
+  --fixture /tmp/illiquid-performance-joint-fixtures/vp9-1080p60.mkv \
+  --output /tmp/illiquid-visible-confirmation --runs 3 --source-count 100000
+```
+
+### Usability evidence and validation scope
+
+`gui-audit.json` and `gui-final/` preserve live verification. Search filtered the
+real list and Escape cleared it; AX Play started the selected local file.
+Fullscreen reached 1440×900 and returned to 960×540 with video visible. A
+700×500 request settled at 699×393 under aspect locking, correctly hiding the
+sidebar. Closing Settings left an offscreen backing window, so retained
+WindowServer membership was not mistaken for failed close behavior.
+
+The 300-point sidebar limit was not visually qualified: AX `set_value` failed.
+Background Cmd-W with two eligible windows was refused by the automation driver;
+the native Close menu was used instead. This does not prove a keyboard shortcut
+bug. Slider AX labels/units passed; spoken VoiceOver and full contrast/focus
+certification did not run. Fullscreen used the VFR fixture; 60fps resize has the
+separate failed-gate scope above. The final hover-recovery edit has deterministic
+coverage but no subsequent live-window timing claim.
+
+The retained source is packaged at
+`/tmp/illiquid-full-audit-retained/Illiquid.app`, binary SHA-256
+`44b4927f82be799bb23cc32c43b7e335930f663f85bc6b1b902e71cfbda6e7c7`.
+The ad-hoc build passed signature, architecture and dependency checks for all
+27 Mach-O images (`build-retained.log`). Architecture validation passed
+(`architecture-final.log`); all ten Python regression-gate tests and script
+syntax checks passed (`harness-tests.log`). The focused final-source Swift run
+passed 14 tests in three suites (`retained-tests.log`). Native dependency policy
+and reviewed FFmpeg 8.1.2-illiquid1 remain unchanged.
+
+The first final-source expanded regression run executed 504 tests and exposed
+one existing PiP subtitle test race (`final-regressions.log`): after seeking to
+75 seconds it slept exactly 600 ms and sampled an empty replacement subtitle
+track. The test now waits up to its existing three-second bound for a newer seek
+generation and nonempty subtitle output, while retaining the main/PiP counters,
+packet-count equality, renderer-failure and backward-seek checks. No production
+subtitle implementation or playback timeout was changed. The failed receipt is
+preserved; its run is not counted as passing.
+
+After repairing that synchronization, the retained-source regression selection
+passed **504 tests in 81 suites in 55.623 seconds**
+(`final-regressions-repaired.log`). It uses the reviewed FFmpeg SDK and the
+explicit local thumbnail/index/packet/subtitle fixtures recorded in the manifest.
+Some opt-in tests return early without their own qualification flags, so this
+count does not claim the complete media-format matrix. The final report keeps
+unit/fixture/build success separate from the failed or deferred performance
+cohorts. All changes remain uncommitted.

@@ -120,7 +120,23 @@ class Run:
                         and row['kCGWindowBounds']['Width'] >= 600 and row['kCGWindowBounds']['Height'] >= 400 for row in resources.windows(self.process.pid))
             if found == visible: return
             time.sleep(.01)
-        raise TimeoutError(f'window visibility never became {visible}')
+        raise TimeoutError(f'window visibility never became {visible}; '
+                           f'own windows: {resources.windows(self.process.pid)}')
+
+    def require_visible_window(self, context):
+        # Small aspect-locked resize windows can be shorter than the startup
+        # threshold. Record every own window so another Space is distinguishable
+        # from a missing or undersized window. Onscreen is not scanout proof.
+        rows = resources.windows(self.process.pid)
+        visible = any(row.get('kCGWindowIsOnscreen') and row.get('kCGWindowLayer') == 0
+                      and row['kCGWindowBounds']['Width'] >= 600
+                      and row['kCGWindowBounds']['Height'] >= 200 for row in rows)
+        self.result.setdefault('visibility_samples', []).append(
+            dict(context=context, elapsed_s=time.monotonic() - self.start,
+                 visible=visible, windows=rows))
+        if not visible:
+            raise RuntimeError(f'Benchmark window left the visible desktop during {context}; '
+                               'this run is invalid, not a playback performance result')
 
     def command(self, action, target=None, source=None):
         identifier = uuid.uuid4().hex

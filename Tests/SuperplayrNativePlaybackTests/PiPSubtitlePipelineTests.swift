@@ -1179,8 +1179,18 @@ struct PiPSubtitlePipelineTests {
         let initialMainFrames = main.counters().libassFrames
         let initialPiPFrames = pip.counters().libassFrames
 
+        let initialGeneration = session.snapshot().generation
         session.seek(to: 75, exact: true, resumeRate: 0)
-        try await Task.sleep(for: .milliseconds(600))
+        // Seeking and subtitle packet delivery are asynchronous. A fixed sleep
+        // can sample the cleared track before the replacement packets arrive.
+        // Require the new generation's actual subtitle output instead.
+        #expect(await waitUntil {
+            let snapshot = pip.pictureInPictureSubtitleSnapshot(
+                at: CMTime(seconds: 75, preferredTimescale: 1_000),
+                viewport: viewport, videoSize: size)
+            return session.snapshot().generation > initialGeneration
+                && !snapshot.regions.isEmpty
+        })
         main.render(
             at: CMTime(seconds: 75, preferredTimescale: 1_000),
             viewport: viewport,
