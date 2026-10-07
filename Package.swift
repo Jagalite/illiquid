@@ -3,27 +3,28 @@
 import PackageDescription
 
 let package = Package(
-    name: "Superplayr",
+    name: "Illiquid",
     platforms: [
         .macOS("26.0"),
     ],
     products: [
-        .executable(name: "Superplayr", targets: ["SuperplayrApp"]),
-        .executable(name: "SuperplayrPlaybackStress", targets: ["SuperplayrPlaybackStress"]),
-        .executable(name: "SuperplayrRenderProfile", targets: ["SuperplayrRenderProfile"]),
-        .executable(name: "SuperplayrStateSpaceExplorer", targets: ["SuperplayrStateSpaceExplorer"]),
+        .executable(name: "Illiquid", targets: ["IlliquidApp"]),
+        .executable(name: "IlliquidPlaybackStress", targets: ["IlliquidPlaybackStress"]),
+        .executable(name: "IlliquidRenderProfile", targets: ["IlliquidRenderProfile"]),
+        .executable(name: "IlliquidStateSpaceExplorer", targets: ["IlliquidStateSpaceExplorer"]),
         .executable(
-            name: "SuperplayrDifferentialHarness",
-            targets: ["SuperplayrDifferentialHarness"]
+            name: "IlliquidDifferentialHarness",
+            targets: ["IlliquidDifferentialHarness"]
         ),
-        .library(name: "SuperplayrCore", targets: ["SuperplayrCore"]),
-        .library(name: "SuperplayrPlaybackCore", targets: ["SuperplayrPlaybackCore"]),
-        .library(name: "SuperplayrPlaybackStateSpace", targets: ["SuperplayrPlaybackStateSpace"]),
-        .library(name: "SuperplayrPlayback", targets: ["SuperplayrPlayback"]),
-        .library(name: "SuperplayrNativePlayback", targets: ["SuperplayrNativePlayback"]),
-        .library(name: "SuperplayrPlayer", targets: ["SuperplayrPlayer"]),
+        .library(name: "IlliquidCore", targets: ["IlliquidCore"]),
+        .library(name: "IlliquidPlaybackCore", targets: ["IlliquidPlaybackCore"]),
+        .library(name: "IlliquidPlaybackStateSpace", targets: ["IlliquidPlaybackStateSpace"]),
+        .library(name: "IlliquidPlayback", targets: ["IlliquidPlayback"]),
+        .library(name: "IlliquidNativePlayback", targets: ["IlliquidNativePlayback"]),
+        .library(name: "IlliquidPlayer", targets: ["IlliquidPlayer"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/sparkle-project/Sparkle.git", exact: "2.10.0"),
         .package(
             url: "https://github.com/swiftlang/swift-testing.git",
             revision: "swift-6.3.2-RELEASE"
@@ -53,38 +54,38 @@ let package = Package(
             linkerSettings: [.linkedFramework("AVFoundation")]
         ),
         .target(
-            name: "SuperplayrCore",
-            path: "Sources/SuperplayrCore"
+            name: "IlliquidCore",
+            path: "Sources/IlliquidCore"
         ),
         .target(
-            name: "SuperplayrPlaybackCore",
-            dependencies: ["SuperplayrCore"],
-            path: "Sources/SuperplayrPlaybackCore"
+            name: "IlliquidPlaybackCore",
+            dependencies: ["IlliquidCore"],
+            path: "Sources/IlliquidPlaybackCore"
         ),
         .target(
-            name: "SuperplayrPlaybackStateSpace",
-            dependencies: ["SuperplayrPlaybackCore"],
-            path: "Sources/SuperplayrPlaybackStateSpace"
+            name: "IlliquidPlaybackStateSpace",
+            dependencies: ["IlliquidPlaybackCore"],
+            path: "Sources/IlliquidPlaybackStateSpace"
         ),
         .target(
-            name: "SuperplayrPlayback",
-            dependencies: ["SuperplayrCore", "SuperplayrPlaybackCore"],
-            path: "Sources/SuperplayrPlayback",
+            name: "IlliquidPlayback",
+            dependencies: ["IlliquidCore", "IlliquidPlaybackCore"],
+            path: "Sources/IlliquidPlayback",
             linkerSettings: [
                 .linkedFramework("AppKit"),
             ]
         ),
         .target(
-            name: "SuperplayrNativePlayback",
+            name: "IlliquidNativePlayback",
             dependencies: [
                 "CFFmpeg",
                 "CLibass",
                 "CNativeAudio",
-                "SuperplayrCore",
-                "SuperplayrPlaybackCore",
-                "SuperplayrPlayback",
+                "IlliquidCore",
+                "IlliquidPlaybackCore",
+                "IlliquidPlayback",
             ],
-            path: "Sources/SuperplayrNativePlayback",
+            path: "Sources/IlliquidNativePlayback",
             resources: [
                 .process("Resources"),
             ],
@@ -101,20 +102,20 @@ let package = Package(
             ]
         ),
         .target(
-            name: "SuperplayrPlayer",
+            name: "IlliquidPlayer",
             dependencies: [
-                "SuperplayrCore",
-                "SuperplayrPlaybackCore",
-                "SuperplayrPlayback",
-                "SuperplayrNativePlayback",
+                "IlliquidCore",
+                "IlliquidPlaybackCore",
+                "IlliquidPlayback",
+                "IlliquidNativePlayback",
             ],
-            path: "Sources/SuperplayrPlayer",
+            path: "Sources/IlliquidPlayer",
             linkerSettings: [.linkedFramework("AppKit")]
         ),
         .executableTarget(
-            name: "SuperplayrApp",
-            dependencies: ["SuperplayrCore", "SuperplayrPlayer"],
-            path: "Sources/SuperplayrApp",
+            name: "IlliquidApp",
+            dependencies: ["IlliquidCore", "IlliquidPlayer", .product(name: "Sparkle", package: "Sparkle")],
+            path: "Sources/IlliquidApp",
             resources: [
                 .process("Resources"),
             ],
@@ -125,96 +126,96 @@ let package = Package(
             ]
         ),
         .executableTarget(
-            name: "SuperplayrArchitectureCheck",
-            dependencies: ["SuperplayrPlayer", "SuperplayrPlaybackCore"],
-            path: "Validation/SuperplayrArchitectureCheck"
+            name: "IlliquidArchitectureCheck",
+            dependencies: ["IlliquidPlayer", "IlliquidPlaybackCore"],
+            path: "Validation/IlliquidArchitectureCheck"
         ),
         .executableTarget(
-            name: "SuperplayrRenderProfile",
-            dependencies: ["SuperplayrCore", "SuperplayrPlayback", "SuperplayrNativePlayback"],
-            path: "Validation/SuperplayrRenderProfile",
+            name: "IlliquidRenderProfile",
+            dependencies: ["IlliquidCore", "IlliquidPlayback", "IlliquidNativePlayback"],
+            path: "Validation/IlliquidRenderProfile",
             linkerSettings: [.linkedFramework("AppKit")]
         ),
         .executableTarget(
-            name: "SuperplayrPlaybackStress",
+            name: "IlliquidPlaybackStress",
             dependencies: [
-                "SuperplayrCore",
-                "SuperplayrPlayback",
-                "SuperplayrNativePlayback",
-                "SuperplayrPlayer",
+                "IlliquidCore",
+                "IlliquidPlayback",
+                "IlliquidNativePlayback",
+                "IlliquidPlayer",
             ],
-            path: "Validation/SuperplayrPlaybackStress",
+            path: "Validation/IlliquidPlaybackStress",
             linkerSettings: [.linkedFramework("AppKit")]
         ),
         .executableTarget(
-            name: "SuperplayrDifferentialHarness",
-            dependencies: ["SuperplayrNativePlayback"],
-            path: "Validation/SuperplayrDifferentialHarness"
+            name: "IlliquidDifferentialHarness",
+            dependencies: ["IlliquidNativePlayback"],
+            path: "Validation/IlliquidDifferentialHarness"
         ),
         .executableTarget(
-            name: "SuperplayrStateSpaceExplorer",
-            dependencies: ["SuperplayrPlaybackStateSpace"],
-            path: "Validation/SuperplayrStateSpaceExplorer"
+            name: "IlliquidStateSpaceExplorer",
+            dependencies: ["IlliquidPlaybackStateSpace"],
+            path: "Validation/IlliquidStateSpaceExplorer"
         ),
         .testTarget(
-            name: "SuperplayrPlaybackCoreTests",
+            name: "IlliquidPlaybackCoreTests",
             dependencies: [
-                "SuperplayrPlaybackCore",
+                "IlliquidPlaybackCore",
                 .product(name: "Testing", package: "swift-testing"),
             ],
-            path: "Tests/SuperplayrPlaybackCoreTests"
+            path: "Tests/IlliquidPlaybackCoreTests"
         ),
         .testTarget(
-            name: "SuperplayrPlaybackStateSpaceTests",
+            name: "IlliquidPlaybackStateSpaceTests",
             dependencies: [
-                "SuperplayrPlaybackStateSpace",
+                "IlliquidPlaybackStateSpace",
                 .product(name: "Testing", package: "swift-testing"),
             ],
-            path: "Tests/SuperplayrPlaybackStateSpaceTests"
+            path: "Tests/IlliquidPlaybackStateSpaceTests"
         ),
         .testTarget(
-            name: "SuperplayrCoreTests",
+            name: "IlliquidCoreTests",
             dependencies: [
-                "SuperplayrCore",
+                "IlliquidCore",
                 .product(name: "Testing", package: "swift-testing"),
             ],
-            path: "Tests/SuperplayrCoreTests"
+            path: "Tests/IlliquidCoreTests"
         ),
         .testTarget(
-            name: "SuperplayrNativePlaybackTests",
+            name: "IlliquidNativePlaybackTests",
             dependencies: [
                 "CFFmpeg",
-                "SuperplayrNativePlayback",
+                "IlliquidNativePlayback",
                 .product(name: "Testing", package: "swift-testing"),
             ],
-            path: "Tests/SuperplayrNativePlaybackTests"
+            path: "Tests/IlliquidNativePlaybackTests"
         ),
         .testTarget(
-            name: "SuperplayrPlaybackTests",
+            name: "IlliquidPlaybackTests",
             dependencies: [
-                "SuperplayrPlayback",
+                "IlliquidPlayback",
                 .product(name: "Testing", package: "swift-testing"),
             ],
-            path: "Tests/SuperplayrPlaybackTests"
+            path: "Tests/IlliquidPlaybackTests"
         ),
         .testTarget(
-            name: "SuperplayrPlayerTests",
+            name: "IlliquidPlayerTests",
             dependencies: [
-                "SuperplayrPlayer",
-                "SuperplayrPlaybackCore",
+                "IlliquidPlayer",
+                "IlliquidPlaybackCore",
                 .product(name: "Testing", package: "swift-testing"),
             ],
-            path: "Tests/SuperplayrPlayerTests"
+            path: "Tests/IlliquidPlayerTests"
         ),
         .testTarget(
-            name: "SuperplayrAppTests",
+            name: "IlliquidAppTests",
             dependencies: [
-                "SuperplayrApp",
-                "SuperplayrPlayback",
-                "SuperplayrPlayer",
+                "IlliquidApp",
+                "IlliquidPlayback",
+                "IlliquidPlayer",
                 .product(name: "Testing", package: "swift-testing"),
             ],
-            path: "Tests/SuperplayrAppTests",
+            path: "Tests/IlliquidAppTests",
             linkerSettings: [
                 .unsafeFlags([
                     "-L/Library/Developer/CommandLineTools/Library/Developer/usr/lib",

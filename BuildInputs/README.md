@@ -35,7 +35,7 @@ To reproduce the FFmpeg variant locally without replacing Homebrew's active keg:
 Scripts/build-native-ffmpeg.sh /opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1
 export PKG_CONFIG_PATH=/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig
 export PATH=/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/bin:$PATH
-Scripts/build-platinum-app.sh --adhoc
+Scripts/build-illiquid-app.sh --adhoc
 ```
 
 The prefix must not already exist. A rebuild can produce different binary hashes;
@@ -44,6 +44,10 @@ SDK is the exact locked input for CI. Build configuration and source binding are
 recorded in `DependencySources/receipts/ffmpeg-illiquid-build.json`; the original
 Homebrew recipe and the modified recipe are both retained.
 
-Both app build scripts prefer the reviewed FFmpeg prefix when it is installed
-and `PKG_CONFIG_PATH` is unset. Explicit toolchain selections remain respected.
-An OpenGL-linked host FFmpeg now fails preflight before compiling the app.
+The app build script prefers the reviewed FFmpeg prefix when it is installed
+and `PKG_CONFIG_PATH` is unset. In that mode it also resolves transitive dylibs
+from the SDK's pinned keg directories before following Homebrew's moving `opt`
+links. The native-input hash lock still verifies the complete packaged closure;
+this does not refresh the lock or modify installed Homebrew links. Explicit
+toolchain selections remain respected. An OpenGL-linked host FFmpeg fails
+preflight before compiling the app.

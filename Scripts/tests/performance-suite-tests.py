@@ -31,6 +31,21 @@ class RegressionGateTests(unittest.TestCase):
         rows=self.records();rows[0]['metrics']['hover_corrupted']=1
         self.assertFalse(suite.compare(rows)['passed'])
 
+    def test_matching_drops_pass_regression_but_fail_playback_quality(self):
+        rows = self.records()
+        for row in rows: row['metrics']['hover_dropped'] = 12
+        result = suite.compare(rows)
+        self.assertTrue(result['regression_passed'])
+        self.assertFalse(result['quality_passed'])
+        self.assertFalse(result['passed'])
+
+    def test_improved_candidate_does_not_qualify_a_dropping_baseline(self):
+        rows = self.records()
+        rows[0]['metrics']['hover_dropped'] = 12
+        result = suite.compare(rows)
+        self.assertTrue(result['regression_passed'])
+        self.assertFalse(result['quality_passed'])
+
     def test_incomplete_or_mismatched_cohort_rejected(self):
         for rows in ([],self.records()[:-1]):
             with self.assertRaises(ValueError):suite.compare(rows)

@@ -24,7 +24,7 @@ import uuid
 spec = importlib.util.spec_from_file_location('resources', Path(__file__).with_name('profile-reference-player.py'))
 resources = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(resources)
-DOMAIN = 'com.example.SuperplayrBenchmark'
+DOMAIN = 'com.example.IlliquidBenchmark'
 
 def fields(line):
     return dict(re.findall(r'([\w-]+)=([^ ]+)', line))
@@ -47,15 +47,15 @@ class Run:
                    'playbackDurations': {f'/benchmark/media/{i}.mkv': 3600 for i in range(entries)}}
         preferences = {'isMuted': True, 'volume': 0, 'playbackSpeed': 1,
                        'remembersPlaybackHistory': True, 'restoresSessionPaused': True}
-        settings = {'Superplayr.playback-state.v1': json.dumps(history).encode(),
-                    'Superplayr.playback-preferences.v1': json.dumps(preferences).encode(),
+        settings = {'Illiquid.playback-state.v1': json.dumps(history).encode(),
+                    'Illiquid.playback-preferences.v1': json.dumps(preferences).encode(),
                     'Illiquid.keeps-running-after-last-window-closed': keep,
-                    'Platinum.controls-always-visible': controls_always_visible}
+                    'Illiquid.controls-always-visible': controls_always_visible}
         if source_count:
-            settings['Superplayr.source-tabs.v1'] = json.dumps([{'id': 'benchmark', 'items': [
+            settings['Illiquid.source-tabs.v1'] = json.dumps([{'id': 'benchmark', 'items': [
                 {'kind': 'file', 'path': f'/benchmark/sources/episode-{i}.mkv'} for i in range(source_count)]}]).encode()
         if source_folders:
-            settings['Superplayr.source-tabs.v1'] = json.dumps([{'id': 'benchmark', 'items': [
+            settings['Illiquid.source-tabs.v1'] = json.dumps([{'id': 'benchmark', 'items': [
                 {'kind': 'folder', 'path': str(folder)} for folder in source_folders]}]).encode()
         seed = directory / 'preferences.plist'
         seed.write_bytes(plistlib.dumps(settings))
@@ -66,20 +66,20 @@ class Run:
         self.log = self.logpath.open('w')
         # Benchmark bundles otherwise default to legacy BGRA, unlike production.
         # Do not inherit unrelated tuning flags from an earlier shell experiment.
-        environment = dict({k:v for k,v in os.environ.items() if not k.startswith('SUPERPLAYR_BENCHMARK_')}, SUPERPLAYR_ENABLE_BENCHMARK_OVERRIDES='1',
-            SUPERPLAYR_BENCHMARK_LIFECYCLE='1', SUPERPLAYR_BENCHMARK_CONTROL_SESSION=self.session,
-            SUPERPLAYR_BENCHMARK_CONTROL_FILE=str(self.commandpath),
-            SUPERPLAYR_BENCHMARK_SESSION_FILE=str(self.sessionpath),
-            SUPERPLAYR_BENCHMARK_THUMBNAIL_CACHE=str(runtime / 'thumbnails'),
-            SUPERPLAYR_BENCHMARK_WINDOW_SIZE='960x600', SUPERPLAYR_BENCHMARK_HIDE_SIDEBAR='0',
-            SUPERPLAYR_BENCHMARK_SOFTWARE_OUTPUT='planar', SUPERPLAYR_BENCHMARK_VP9_HARDWARE='0')
+        environment = dict({k:v for k,v in os.environ.items() if not k.startswith('ILLIQUID_BENCHMARK_')}, ILLIQUID_ENABLE_BENCHMARK_OVERRIDES='1',
+            ILLIQUID_BENCHMARK_LIFECYCLE='1', ILLIQUID_BENCHMARK_CONTROL_SESSION=self.session,
+            ILLIQUID_BENCHMARK_CONTROL_FILE=str(self.commandpath),
+            ILLIQUID_BENCHMARK_SESSION_FILE=str(self.sessionpath),
+            ILLIQUID_BENCHMARK_THUMBNAIL_CACHE=str(runtime / 'thumbnails'),
+            ILLIQUID_BENCHMARK_WINDOW_SIZE='960x600', ILLIQUID_BENCHMARK_HIDE_SIDEBAR='0',
+            ILLIQUID_BENCHMARK_SOFTWARE_OUTPUT='planar', ILLIQUID_BENCHMARK_VP9_HARDWARE='0')
         environment.update(environment_overrides or {})
         self.start = time.monotonic()
         self.process = subprocess.Popen([str(app / 'Contents/MacOS/Illiquid')], env=environment,
                                         stdout=self.log, stderr=subprocess.STDOUT)
         self.result = {'history_entries': entries, 'keep_running': keep, 'source_items': source_count, 'pid': self.process.pid,
-                       'commands': [], 'phases': [], 'software_output': environment['SUPERPLAYR_BENCHMARK_SOFTWARE_OUTPUT'],
-                       'supplemental_vp9_experiment': environment['SUPERPLAYR_BENCHMARK_VP9_HARDWARE']=='1'}
+                       'commands': [], 'phases': [], 'software_output': environment['ILLIQUID_BENCHMARK_SOFTWARE_OUTPUT'],
+                       'supplemental_vp9_experiment': environment['ILLIQUID_BENCHMARK_VP9_HARDWARE']=='1'}
         try:
             self.wait_window(True)
             self.result['launch_first_onscreen_ms'] = (time.monotonic() - self.start) * 1000

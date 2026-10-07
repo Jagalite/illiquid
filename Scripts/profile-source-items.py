@@ -18,10 +18,10 @@ counts = [int(x) for x in a.counts.split(',')]
 if any(x < 1 or x > 100000 for x in counts): p.error('counts must be 1...100000')
 root = Path(__file__).resolve().parents[1]
 a.output.mkdir(parents=True, exist_ok=True)
-model = (root/'Sources/SuperplayrApp/App/AppModel.swift').read_text()
+model = (root/'Sources/IlliquidApp/App/AppModel.swift').read_text()
 item = model[model.index('struct SourceTabItem:'):model.index('\nstruct SourceTab:', model.index('struct SourceTabItem:'))]
 merging = model[model.index('enum SourceTabItems {'):model.index('\nenum SourceTabStore {')]
-normalization = (root/'Sources/SuperplayrCore/Utilities/NormalizedFileURL.swift').read_text()
+normalization = (root/'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift').read_text()
 source = normalization+'\n'+item+'\n'+merging+'\n'+'''
 for count in COUNTS {
     let input = (0..<count).map { SourceTabItem(kind: .file, url: URL(fileURLWithPath: "/benchmark/episode-\\($0).mkv")) }

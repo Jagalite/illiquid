@@ -154,9 +154,9 @@ def main():
             for index,fixture in enumerate(fixtures):
                 run=lifecycle.Run(args.app,args.output/f'{repeat}-{index}',0,True,
                     source_count=args.source_count if args.mode=='navigation' else 0,
-                    environment_overrides={'SUPERPLAYR_BENCHMARK_HIDE_SIDEBAR':'0' if args.mode=='navigation' else '1',
-                        'SUPERPLAYR_BENCHMARK_HEARTBEAT':'0' if args.mode=='soak' else '1',
-                        'SUPERPLAYR_BENCHMARK_SCROLL_RESTORATION':'0' if args.disable_scroll_restoration else '1'})
+                    environment_overrides={'ILLIQUID_BENCHMARK_HIDE_SIDEBAR':'0' if args.mode=='navigation' else '1',
+                        'ILLIQUID_BENCHMARK_HEARTBEAT':'0' if args.mode=='soak' else '1',
+                        'ILLIQUID_BENCHMARK_SCROLL_RESTORATION':'0' if args.disable_scroll_restoration else '1'})
                 try:
                     if args.mode=='previews':previews(run,fixture)
                     elif args.mode=='navigation':navigation(run,args.source_count)

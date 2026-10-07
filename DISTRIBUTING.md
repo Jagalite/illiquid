@@ -26,8 +26,8 @@ universal build could be produced.
 Ad hoc signing is the default and is the normal local-development workflow:
 
 ```sh
-PLATINUM_VERSION=0.1.0 \
-PLATINUM_BUILD_NUMBER=1 \
+ILLIQUID_VERSION=0.1.0 \
+ILLIQUID_BUILD_NUMBER=1 \
 ./Scripts/build-local-dmg.sh
 ```
 
@@ -63,8 +63,8 @@ Illiquid.app  ->  Applications
 ## Build only the application
 
 ```sh
-./Scripts/build-platinum-app.sh --adhoc
-./Scripts/audit-platinum-app.sh --require-signature \
+./Scripts/build-illiquid-app.sh --adhoc
+./Scripts/audit-illiquid-app.sh --require-signature \
   --archs arm64 dist/Illiquid.app
 ```
 
@@ -72,16 +72,16 @@ Supported metadata and build inputs are:
 
 | Variable | Default source | Purpose |
 | --- | --- | --- |
-| `PLATINUM_VERSION` | `Resources/Info.plist` | Marketing version |
-| `PLATINUM_BUILD_NUMBER` | `Resources/Info.plist` | Bundle build number |
-| `PLATINUM_BUNDLE_ID` | `Resources/Info.plist` | Bundle identifier override |
-| `PLATINUM_ARCHS` | `Resources/Info.plist` | Space-separated required architectures |
-| `PLATINUM_MINIMUM_MACOS` | `Resources/Info.plist` | Deployment target |
-| `PLATINUM_COPYRIGHT` | `Resources/Info.plist` | About/Finder copyright |
-| `PLATINUM_BUILD_ROOT` | temporary directory | Explicit isolated build root |
-| `PLATINUM_SIGNING_MODE` | `adhoc` | `unsigned`, `adhoc`, or `developer-id` |
+| `ILLIQUID_VERSION` | `Resources/Info.plist` | Marketing version |
+| `ILLIQUID_BUILD_NUMBER` | `Resources/Info.plist` | Bundle build number |
+| `ILLIQUID_BUNDLE_ID` | `Resources/Info.plist` | Bundle identifier override |
+| `ILLIQUID_ARCHS` | `Resources/Info.plist` | Space-separated required architectures |
+| `ILLIQUID_MINIMUM_MACOS` | `Resources/Info.plist` | Deployment target |
+| `ILLIQUID_COPYRIGHT` | `Resources/Info.plist` | About/Finder copyright |
+| `ILLIQUID_BUILD_ROOT` | temporary directory | Explicit isolated build root |
+| `ILLIQUID_SIGNING_MODE` | `adhoc` | `unsigned`, `adhoc`, or `developer-id` |
 | `DEVELOPER_ID_APPLICATION` | none | Locally installed signing identity |
-| `PLATINUM_SMOKE_VIDEO` | generated fixture | Representative install-smoke video |
+| `ILLIQUID_SMOKE_VIDEO` | generated fixture | Representative install-smoke video |
 
 `Resources/Info.plist` is the checked-in metadata source of truth. The assembly
 script applies environment overrides to the copied bundle only and records the
@@ -120,7 +120,7 @@ codesign --verify --deep --strict dist/Illiquid.app
 ```
 
 Allowed non-system references use `@rpath`, `@loader_path`, or
-`@executable_path`. `./Scripts/audit-platinum-app.sh` fails for missing
+`@executable_path`. `./Scripts/audit-illiquid-app.sh` fails for missing
 resources, inconsistent Illiquid metadata, escaping dependencies, unresolved
 embedded libraries, incompatible architectures, or a required invalid
 signature.
@@ -132,7 +132,7 @@ then register that exact copy without resetting the global Launch Services
 database:
 
 ```sh
-./Scripts/register-platinum-launch-services.sh \
+./Scripts/register-illiquid-launch-services.sh \
   /Applications/Illiquid.app \
   /absolute/path/to/video.mkv
 ```
@@ -158,21 +158,29 @@ subtitle, HDR/Main10, and close-window PiP cases in
 ## Bundle identity and release prerequisites
 
 The production identifier is `io.github.jagalite.illiquid`, using the owner's
-GitHub namespace: <https://github.com/Jagalite/illiquid>. On first launch under
-this identity, the app copies its `Superplayr.*` and `Platinum.*` preference keys
-from `com.example.Superplayr` before creating theme/player stores. Existing
-Illiquid values win, and a marker prevents repeat imports. The old defaults
-domain is retained. History/session files continue in the existing Superplayr
-Application Support location.
+GitHub namespace: <https://github.com/Jagalite/illiquid>. Before creating settings
+stores, migration copies `Superplayr.*` and `Platinum.*` preferences into
+`Illiquid.*` keys. Existing Illiquid values win, followed by old keys in the
+current domain, then `com.example.Superplayr`. The original keys remain intact.
+The playback session is copied once from Application Support/Superplayr to
+Application Support/Illiquid; the old file remains intact. A marker prevents a
+cleared session from being imported again.
 
 macOS permissions and system-managed saved application state are not copied;
 users may need to grant permissions again. The new app registers its media
 associations through Launch Services; existing user-selected default handlers
-are not forcibly replaced. Use the exact Illiquid.app path when launching during
-the transition because old Platinum copies can remain installed.
+are not forcibly replaced. On each launch from `/Applications` or
+`~/Applications`, Illiquid offers to become the default video player if any
+supported format still opens with another app. “Not Now” dismisses the offer
+for that launch only; reopening the player window does not repeat it.
+Settings → Behavior includes an enabled-by-default launch reminder toggle and
+a Make Default button that remains available when reminders are disabled. The action uses macOS consent handling and verifies the resulting
+associations, reporting formats that could not be changed. Copies running from
+the DMG must first be moved to Applications. Use the exact Illiquid.app path when launching during
+the transition because old Illiquid copies can remain installed.
 
 Internal Swift package, target, module, type, logging, and persistence names
-retain `Superplayr` where no user sees them. The temporary reproducible Illiquid
+retain `Illiquid` where no user sees them. The temporary reproducible Illiquid
 icon is correctly embedded and is original project artwork.
 
 ## License and corresponding source
@@ -189,35 +197,34 @@ physical-device playback qualification remains separate from CI packaging checks
 
 ## Illiquid rename and existing user data
 
-The visible product and packaged executable are now Illiquid. Build scripts keep
-their existing `platinum` filenames and `PLATINUM_*` environment variables for
-compatibility. Swift package/module names, persistence keys, the Application
-Support location and custom metadata keys retain their previous names.
-
-The permanent identifier is `io.github.jagalite.illiquid`. Preferences are imported
-once from the original domain before app settings are read; history retains its
-existing path. Migration tests cover existing destination values, repeat imports,
-binary preference payloads and the untouched source domain.
+The Swift package, executable, modules, scripts and active settings keys now use
+Illiquid. Local development uses `swift run Illiquid`; packaging uses
+`Scripts/build-illiquid-app.sh` and `ILLIQUID_*` environment variables. The bundle
+identifier remains `io.github.jagalite.illiquid`. Migration tests cover existing
+destination values, repeat imports, binary preference payloads, preservation of
+the old domain, and cleared sessions remaining cleared.
 
 ## GitHub prerelease workflow
 
 [release.yml](.github/workflows/release.yml) builds on a GitHub-hosted Apple
 Silicon macOS 26 runner with Xcode 26.6. Update the version/build in
 `Resources/Info.plist`, commit the clean release candidate, then push a matching
-`v<version>` tag. The workflow can also be rerun with its existing tag through
-Actions → Build and release DMG → Run workflow. Pushes to `main` run the same
+`v<version>` tag. Publish by choosing that tag and the prerelease option through
+Actions → Build and release DMG → Run workflow. Tag pushes alone do not publish.
+Pushes to `main` run the same
 build and packaging checks without creating a release.
 
 ```sh
 git tag -a v0.1.2 -m 'Illiquid 0.1.2 notarized prerelease'
 git push origin main v0.1.2
+gh workflow run release.yml -f tag=v0.1.2 -f prerelease=true
 ```
 
 CI verifies matching source inputs, installs the pinned native SDK, checks the
 architecture, runs focused packaging/product tests, builds and audits the app,
 and mounts and launch-tests the DMG. Publication happens only after these
 checks pass. The GitHub token needs `contents: write`. Configure the following
-repository Actions secrets before pushing a release tag:
+repository Actions secrets before dispatching a release:
 
 | Secret | Value |
 | --- | --- |
@@ -251,3 +258,63 @@ For a local release from an already configured Mac with matching dependencies:
 ```sh
 ./Scripts/build-release-artifacts.sh
 ```
+
+## In-app updates
+
+Illiquid embeds Sparkle 2.10.0. The app menu and Settings → Updates provide
+manual checks, a daily automatic-check toggle, and an opt-in prerelease channel.
+Updates always require installation confirmation. System profiling is disabled.
+The updater is disabled for bare SwiftPM executables and benchmark launches.
+
+Production signing happens in GitHub Actions. `SPARKLE_PRIVATE_KEY` is an Actions
+secret containing Sparkle's base64 Ed25519 seed; `SPARKLE_PUBLIC_KEY` is the
+matching repository variable. Only the public key is included in
+`Resources/Info.plist`. Local app testing uses ad hoc code signatures and the
+installation smoke test generates an independent disposable update key.
+Do not replace a production update key after shipping without a key-rotation plan.
+
+The permanent feed URL is
+`https://github.com/Jagalite/illiquid/releases/download/appcast/appcast.xml`.
+The `appcast` prerelease is infrastructure and must not be marked as the latest
+application release. Initialize it once by dispatching the release workflow with
+`initialize_update_feed=true`; no tag is required for that mode. It creates a
+signed empty feed, or verifies and preserves existing signed update history.
+
+For each application release:
+
+1. Increment `CFBundleVersion` to an integer greater than all builds in the feed,
+   update the marketing version and corresponding metadata tests, and tag that
+   version. The release script requires a clean source checkout.
+2. Dispatch the workflow with the existing tag and choose `prerelease=true` for
+   beta or `prerelease=false` for stable. Tag pushes do not publish automatically;
+   this prevents a beta publication racing a stable dispatch for the same build.
+   Stable updates are
+   visible to everyone; beta updates require the Settings opt-in. Disabling beta
+   updates never downgrades the installed app.
+3. CI signs and notarizes the app and DMG using its Apple credentials, verifies
+   the existing signed feed, generates the new signed appcast, and validates the
+   archive signature against the public key embedded in the app.
+4. CI uploads the release archive before replacing the feed. Release jobs are
+   serialized to prevent concurrent feed edits. Existing or decreasing build
+   numbers fail instead of replacing a published update's bytes.
+   To move from beta to stable, publish a new version with a higher build number.
+
+The feed and update archives both require Ed25519 signatures. Signing secrets
+are sent to Sparkle tools through stdin, never command arguments or repository
+files. If feed publication fails after the release assets were uploaded, rerun
+the workflow before attempting another release; if the feed was already updated,
+use a new version/build instead of overwriting it.
+
+Validation:
+
+- `python3 Scripts/tests/update-feed-tests.py` checks build sequencing and malformed history.
+- `AppUpdateControllerTests` checks configuration and channel preferences.
+- `Scripts/tests/sparkle-install-smoke.py --app APP --tools SPARKLE_BIN --cli SPARKLE_CLI`
+  tests signed feed selection, tampered download rejection, and a real installation
+  into disposable app copies. Build `sparkle-cli` from the matching upstream
+  Sparkle source; it is not included in the SwiftPM binary archive. This test does
+  not qualify Apple notarization or the public production feed.
+
+Existing installations without Sparkle need one manual upgrade to an
+updater-enabled build. The current updater build is 5; its future update must
+have a higher build number.

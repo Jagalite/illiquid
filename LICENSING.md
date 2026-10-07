@@ -22,9 +22,9 @@ This grant applies to original project code, scripts, tests, documentation and
 original assets throughout this repository, including the independent libraries.
 There is no separate permissive license for the core libraries.
 
-The project owner confirmed that `Resources/PlatinumIcon.svg`,
-`Documentation/Design/SuperplayrLiquidGlass/droplet-controls-concept.png` and
-`Documentation/Design/SuperplayrLiquidGlass/quiet-waterline-concept.png` are original
+The project owner confirmed that `Resources/IlliquidIcon.svg`,
+`Documentation/Design/IlliquidLiquidGlass/droplet-controls-concept.png` and
+`Documentation/Design/IlliquidLiquidGlass/quiet-waterline-concept.png` are original
 project assets. They are included in this GPL-3.0-or-later grant. The renamed
 `Resources/IlliquidIcon.svg` is an original adaptation of that icon, also GPL-3.0-or-later. Their provenance
 and hashes are recorded in [Licenses/original-assets.json](Licenses/original-assets.json).

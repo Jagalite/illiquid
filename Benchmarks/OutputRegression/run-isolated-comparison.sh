@@ -4,10 +4,10 @@ set -euo pipefail
 repository_root="$(cd "$(dirname "$0")/../.." && pwd)"
 baseline_revision="${1:-8cf2db78d52c679444dd1b668bda32877b842c6b}"
 candidate_revision="${2:-98c7179347963ba395d9f990d0410d6d00d657ff}"
-output_root="${3:-/private/tmp/superplayr-output-comparison}"
+output_root="${3:-/private/tmp/illiquid-output-comparison}"
 harness_revision="${4:-$(git -C "${repository_root}" rev-parse HEAD)}"
-fixture_source="${SUPERPLAYR_NATIVE_FIXTURE_DIR:-${repository_root}/TestFixtures/Generated}"
-test_path="Tests/SuperplayrNativePlaybackTests/OutputRegressionArtifactTests.swift"
+fixture_source="${ILLIQUID_NATIVE_FIXTURE_DIR:-${repository_root}/TestFixtures/Generated}"
+test_path="Tests/IlliquidNativePlaybackTests/OutputRegressionArtifactTests.swift"
 fixture_names=(
     h264-aac.mp4
     hdr10-pq-p010.mkv
@@ -53,11 +53,11 @@ run_revision() {
 
     (
         cd "${worktree}"
-        SUPERPLAYR_NATIVE_FIXTURE_DIR="${fixtures}" \
-        SUPERPLAYR_OUTPUT_ARTIFACT_DIR="${artifacts}" \
-        SUPERPLAYR_OUTPUT_REQUIRE=1 \
-        SUPERPLAYR_OUTPUT_SOURCE_REVISION="${revision}" \
-        SUPERPLAYR_OUTPUT_HARNESS_REVISION="${harness_revision}" \
+        ILLIQUID_NATIVE_FIXTURE_DIR="${fixtures}" \
+        ILLIQUID_OUTPUT_ARTIFACT_DIR="${artifacts}" \
+        ILLIQUID_OUTPUT_REQUIRE=1 \
+        ILLIQUID_OUTPUT_SOURCE_REVISION="${revision}" \
+        ILLIQUID_OUTPUT_HARNESS_REVISION="${harness_revision}" \
         swift test --scratch-path "${scratch}" --no-parallel \
             --filter OutputRegressionArtifactTests
     ) > "${artifacts}/test-output.log" 2>&1

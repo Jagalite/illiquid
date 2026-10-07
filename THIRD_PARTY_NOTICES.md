@@ -70,3 +70,11 @@ changed dependencies require refreshed sources/notices and qualification.
 Archive integrity and patch checks passed for this package; a fresh rebuild of
 all dependencies and byte-for-byte reproduction of Homebrew bottles has not been
 performed. Source preparation does not establish runtime or notarization readiness.
+
+## Sparkle 2.10.0
+
+Sparkle provides update checking and installation. The official SwiftPM binary
+artifact is pinned by version, source revision and SHA-256 in its package
+manifest; `Package.resolved` records the revision. Its complete license notices,
+including bundled third-party components, are in `Licenses/ThirdParty/Sparkle/LICENSE`.
+Source: https://github.com/sparkle-project/Sparkle/tree/2.10.0

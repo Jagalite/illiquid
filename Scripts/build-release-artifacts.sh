@@ -14,7 +14,7 @@ if [[ -n "${ILLIQUID_RELEASE_TAG:-}" ]]; then
     : "${DEVELOPER_ID_APPLICATION:?Tagged releases require Developer ID signing}"
     : "${ILLIQUID_NOTARY_PROFILE:?Tagged releases require notarization}"
     Scripts/build-local-dmg.sh --developer-id
-    distribution_status='This is a **Developer ID signed and Apple-notarized prerelease**. The app and DMG have stapled notarization tickets. The DMG contains Illiquid.app and an Applications shortcut.'
+    distribution_status='This is a **Developer ID signed and Apple-notarized release**. The app and DMG have stapled notarization tickets. The DMG contains Illiquid.app and an Applications shortcut.'
 else
     Scripts/build-local-dmg.sh --adhoc
     distribution_status='This is an **ad hoc signed, unnotarized CI build**, intended for packaging validation. It is not a published release.'

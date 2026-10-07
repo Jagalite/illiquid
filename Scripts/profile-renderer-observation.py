@@ -8,7 +8,7 @@ import argparse, hashlib, json, subprocess, tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / 'Sources/SuperplayrNativePlayback/Diagnostics/RendererObservationJournal.swift'
+SOURCE = ROOT / 'Sources/IlliquidNativePlayback/Diagnostics/RendererObservationJournal.swift'
 CONTRACT = SOURCE.with_name('DifferentialHarnessContract.swift')
 
 def enum(text, name):

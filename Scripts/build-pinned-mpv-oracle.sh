@@ -2,7 +2,7 @@
 set -euo pipefail
 
 expected_revision="94335ab87ab225ca3e36e0faeac831639d3e1d4e"
-source_dir="${MPV_ORACLE_SOURCE_DIR:-/tmp/superplayr-reference-src/mpv}"
+source_dir="${MPV_ORACLE_SOURCE_DIR:-/tmp/illiquid-reference-src/mpv}"
 build_dir="${MPV_ORACLE_BUILD_DIR:-${source_dir}/build-oracle}"
 
 if [[ ! -d "${source_dir}/.git" ]]; then

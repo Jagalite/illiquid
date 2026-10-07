@@ -6,12 +6,12 @@ usage() {
     cat <<'USAGE'
 Usage: build-app.sh [options]
 
-Build Superplayr, assemble a native .app, bundle the FFmpeg/libass dependency
+Build Illiquid, assemble a native .app, bundle the FFmpeg/libass dependency
 closure, rewrite loader paths, verify the bundle, and ad-hoc sign it by default.
 
 Options:
   --configuration NAME   debug or release (default: release)
-  --product NAME         executable product (default: Superplayr)
+  --product NAME         executable product (default: Illiquid)
   --app-name NAME        bundle display name (default: Illiquid)
   --bundle-id ID         bundle identifier (default: io.github.jagalite.illiquid)
   --version VERSION      marketing version (default: 0.1.0)
@@ -28,7 +28,7 @@ fail() { printf 'error: %s\n' "$*" >&2; exit 1; }
 require_value() { (($# >= 2)) || fail "$1 requires a value"; }
 
 configuration=release
-product=Superplayr
+product=Illiquid
 app_name=Illiquid
 bundle_identifier=io.github.jagalite.illiquid
 marketing_version=0.1.0
@@ -58,6 +58,7 @@ done
 script_directory=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repository_root=$(cd -P "$script_directory/.." && pwd)
 source "$script_directory/lib/native-sdk-environment.sh"
+source "$script_directory/lib/sparkle-packaging.sh"
 illiquid_select_native_sdk "$repository_root"
 app_name=${app_name:-$product}
 output_directory=${output_directory:-$repository_root/dist}
@@ -76,7 +77,7 @@ pkg-config --exists libass || fail 'libass development libraries are required (b
 
 export MACOSX_DEPLOYMENT_TARGET=$minimum_macos
 swift_build_args=(--package-path "$repository_root")
-if [[ "${SUPERPLAYR_SWIFTPM_DISABLE_SANDBOX:-0}" = 1 ]]; then
+if [[ "${ILLIQUID_SWIFTPM_DISABLE_SANDBOX:-0}" = 1 ]]; then
     swift_build_args+=(--disable-sandbox)
 fi
 if [[ "$skip_build" = false ]]; then
@@ -88,9 +89,9 @@ binary_directory=$(swift build "${swift_build_args[@]}" \
 source_executable="$binary_directory/$product"
 [[ -f "$source_executable" ]] || fail "executable not found: $source_executable"
 
-native_shader_source="$repository_root/Sources/SuperplayrNativePlayback/Resources/NativePlaybackShaders.metal"
+native_shader_source="$repository_root/Sources/IlliquidNativePlayback/Resources/NativePlaybackShaders.metal"
 native_resource_bundle=$(find "$binary_directory" -maxdepth 1 -type d \
-    -name '*SuperplayrNativePlayback.bundle' -print -quit)
+    -name '*IlliquidNativePlayback.bundle' -print -quit)
 [[ -n "$native_resource_bundle" ]] || fail 'native playback resource bundle is missing'
 native_shader_air="$binary_directory/NativePlaybackShaders.air"
 xcrun -sdk macosx metal -c "$native_shader_source" -o "$native_shader_air"
@@ -111,6 +112,7 @@ executable="$app_bundle/Contents/MacOS/$product"
 mkdir -p "$app_bundle/Contents/MacOS" "$frameworks" "$app_bundle/Contents/Resources"
 ditto "$source_executable" "$executable"
 chmod 0755 "$executable"
+illiquid_embed_sparkle "$binary_directory" "$app_bundle"
 ditto "$repository_root/Resources/Info.plist" "$app_bundle/Contents/Info.plist"
 while IFS= read -r -d '' bundle; do
     ditto "$bundle" "$app_bundle/Contents/Resources/$(basename "$bundle")"
@@ -131,7 +133,7 @@ if [[ -f "$repository_root/Resources/AppIcon.icns" ]]; then
 fi
 
 dependencies_for() {
-    otool -L "$1" | sed -n '2,$p' | sed -E \
+    otool -L "$1" | sed -n '/^[[:space:]]/p' | sed -E \
         's/^[[:space:]]*//; s/[[:space:]]+\(compatibility version.*$//'
 }
 is_system() { case "$1" in /usr/lib/*|/System/Library/*|/Library/Apple/System/*) return 0 ;; *) return 1 ;; esac; }
@@ -170,6 +172,7 @@ while ((${#queue[@]})); do
     while IFS= read -r dependency; do
         [[ -n "$dependency" ]] || continue
         is_system "$dependency" && continue
+        [[ "$dependency" != @rpath/Sparkle.framework/* ]] || continue
         source_library=$(resolve_dependency "$dependency" "$owner") || \
             fail "could not resolve $dependency referenced by $owner"
         destination="$frameworks/$(basename "$source_library")"

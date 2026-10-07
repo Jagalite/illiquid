@@ -3,7 +3,7 @@ set -euo pipefail
 
 fixture_dir="${1:-${PWD}/TestFixtures/Generated}"
 mkdir -p "${fixture_dir}"
-work_dir="$(mktemp -d "${TMPDIR:-/tmp}/superplayr-fixtures.XXXXXX")"
+work_dir="$(mktemp -d "${TMPDIR:-/tmp}/illiquid-fixtures.XXXXXX")"
 trap 'rm -rf "${work_dir}"' EXIT
 
 ffmpeg_bin="${FFMPEG_BIN:-$(command -v ffmpeg)}"
@@ -124,7 +124,7 @@ printf '%s\n' \
     '[Script Info]' 'ScriptType: v4.00+' 'PlayResX: 640' 'PlayResY: 360' '' \
     '[V4+ Styles]' \
     'Format: Name,Fontname,Fontsize,PrimaryColour,SecondaryColour,OutlineColour,BackColour,Bold,Italic,Underline,StrikeOut,ScaleX,ScaleY,Spacing,Angle,BorderStyle,Outline,Shadow,Alignment,MarginL,MarginR,MarginV,Encoding' \
-    'Style: Default,Superplayr Fixture Missing Font,30,&H00FFFFFF,&H0000FFFF,&H00101010,&H80000000,0,0,0,0,100,100,0,0,1,2,1,2,20,20,24,1' '' \
+    'Style: Default,Illiquid Fixture Missing Font,30,&H00FFFFFF,&H0000FFFF,&H00101010,&H80000000,0,0,0,0,100,100,0,0,1,2,1,2,20,20,24,1' '' \
     '[Events]' \
     'Format: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text' \
     'Dialogue: 0,0:00:00.20,0:00:02.80,Default,,0,0,0,,Missing font and glyph fallback: A \U00010FFFD' \
@@ -365,7 +365,7 @@ for event_index in {0..119}; do
         >> "${heavy_ass}"
 done
 
-qualification_duration="${SUPERPLAYR_NATIVE_QUALIFICATION_DURATION:-120}"
+qualification_duration="${ILLIQUID_NATIVE_QUALIFICATION_DURATION:-120}"
 "${ffmpeg_bin}" -hide_banner -loglevel error -y \
     -f lavfi -i "testsrc2=size=320x180:rate=24" \
     -f lavfi -i "sine=frequency=440:sample_rate=48000" \
@@ -409,18 +409,18 @@ repository_root="$(cd "$(dirname "$0")/.." && pwd)"
 generator_head="$(git -C "${repository_root}" rev-parse HEAD)"
 generator_hash="$(shasum -a 256 "${repository_root}/Scripts/generate-native-fixtures.sh" \
     | awk '{print $1}')"
-module_cache="${TMPDIR:-/tmp}/superplayr-fixture-module-cache"
+module_cache="${TMPDIR:-/tmp}/illiquid-fixture-module-cache"
 mkdir -p "${module_cache}/clang" "${module_cache}/swiftpm"
 env CLANG_MODULE_CACHE_PATH="${module_cache}/clang" \
     SWIFTPM_MODULECACHE_OVERRIDE="${module_cache}/swiftpm" \
     swift run --disable-sandbox --package-path "${repository_root}" \
-    SuperplayrDifferentialHarness fixture-manifest \
+    IlliquidDifferentialHarness fixture-manifest \
     --directory "${fixture_dir}" \
     --generator-revision "git:${generator_head};script-sha256:${generator_hash}"
 env CLANG_MODULE_CACHE_PATH="${module_cache}/clang" \
     SWIFTPM_MODULECACHE_OVERRIDE="${module_cache}/swiftpm" \
     swift run --disable-sandbox --package-path "${repository_root}" \
-    SuperplayrDifferentialHarness fixture-matrix \
+    IlliquidDifferentialHarness fixture-matrix \
     --directory "${fixture_dir}"
 
 print "Generated native playback fixtures in ${fixture_dir}"

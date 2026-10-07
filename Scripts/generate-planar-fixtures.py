@@ -31,7 +31,7 @@ def generate(output):
         "-pix_fmt", "yuv420p", "-color_range", "pc", "-chroma_sample_location", "center"])
     encode(output / "unsupported-444.mkv", "640x360", [
         "-c:v", "ffv1", "-pix_fmt", "yuv444p", "-color_range", "tv"])
-    with tempfile.TemporaryDirectory(prefix="platinum-planar-") as work:
+    with tempfile.TemporaryDirectory(prefix="illiquid-planar-") as work:
         parts = []
         for index, size in enumerate(["640x360", "960x540"]):
             part = Path(work) / f"part-{index}.ts"

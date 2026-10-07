@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare two isolated Superplayr native output artifact manifests."""
+"""Compare two isolated Illiquid native output artifact manifests."""
 
 from __future__ import annotations
 

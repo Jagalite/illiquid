@@ -92,9 +92,9 @@ def run(player,case,index,args,output):
             # Run creates its own output directory.
             directory.rmdir()
             app=lifecycle.Run(args.illiquid,directory,0,True,environment_overrides={
-                'SUPERPLAYR_BENCHMARK_HEARTBEAT':'0','SUPERPLAYR_BENCHMARK_HIDE_SIDEBAR':'1',
-                'SUPERPLAYR_BENCHMARK_VP9_HARDWARE':'1' if getattr(args,'experimental_vp9_hardware',False) else '0',
-                'SUPERPLAYR_BENCHMARK_WINDOW_SIZE':'960x540'},controls_always_visible=False)
+                'ILLIQUID_BENCHMARK_HEARTBEAT':'0','ILLIQUID_BENCHMARK_HIDE_SIDEBAR':'1',
+                'ILLIQUID_BENCHMARK_VP9_HARDWARE':'1' if getattr(args,'experimental_vp9_hardware',False) else '0',
+                'ILLIQUID_BENCHMARK_WINDOW_SIZE':'960x540'},controls_always_visible=False)
             pid=app.process.pid;result=app.result;result['launch_player_ready_ms']=result['launch_onscreen_ms']
             result['windows']=visible(pid)
             clock=lambda:float(app.command('snapshot')['response']['renderer-time'])

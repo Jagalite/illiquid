@@ -1533,3 +1533,484 @@ Some opt-in tests return early without their own qualification flags, so this
 count does not claim the complete media-format matrix. The final report keeps
 unit/fixture/build success separate from the failed or deferred performance
 cohorts. All changes remain uncommitted.
+
+### Active-window click-to-hide follow-up
+
+A reported failure while Illiquid was already active exposed a focus-ordering
+gap: native video mouse-down transfers first responder to the video, but
+SwiftUI's control-focus loss can arrive after mouse-up. The click handler cleared
+hover/legacy focus pins while retaining `playbackFocus`, which could reject the
+explicit hide. Video clicks now retire the stale focus owners and that pin;
+control activation, keyboard navigation and pointer exit preserve their existing
+focus rules. Active scrubbing, popovers, accessibility interaction, loading and
+always-visible settings remain protected. Two regression tests cover delayed
+focus loss and preservation of those other owners. The targeted run passed
+180 tests in 34 suites, including native click routing. This verifies the
+identified state transition; the user's original intermittent live sequence has
+not yet been reproduced on the replacement build.
+
+The startup placeholder now says “Starting Illiquid…” because it covers history
+loading and player/model initialization. A read-only probe found about 32 KB of
+saved history and sub-millisecond raw plist/JSON parsing, but that is not Cocoa
+preferences or end-to-end startup timing. Sampling began after startup completed,
+so the original long-startup cause remains unconfirmed. The label change is not
+a claimed startup speedup. Local evidence: `QualificationArtifacts/HistoryStartup/`
+and `QualificationArtifacts/ClickHideFix/`. These follow-up changes are uncommitted.
+
+### Sources scrolling report and subtitle reader spin
+
+The user identified Sources-list scrolling as laggy. A read-only sample of the
+running `2e6d3ad` build found a continuously executing subtitle demux worker,
+repeatedly reading and throwing through the input executor. Its main thread and
+audio/video workers were waiting during the sample. A separate 3.004-second
+process CPU measurement recorded **97.05% of one core**. This identifies wasted
+background work; it does not establish that this is the sole cause of scroll lag
+or identify the exact native error code in that existing process.
+
+`subtitleDemuxLoop` previously retried both invalid-data and interrupted errors
+without a bound, including errors thrown after `readPacket` had exhausted its
+own bounded retry policy. Malformed *decoded cues* remain skippable. Exhausted
+*input reads* now report the existing subtitle failure once and exit. An
+interrupted read continues only when a pending seek owns the next operation.
+Intentional stop and subtitle-disable cancellation do not emit another failure.
+The existing recovery path disables the failed subtitle track while preserving
+audio/video playback; this is not a new input-repair or subtitle-reopen policy.
+
+A fault-injected MediaSession regression reproduced **145,353 invalid-data
+retries** and **146,920 interrupted-read retries** during respective 250 ms
+observation windows with the old loop. Both cases make **one read and report one
+failure** with the fix. This is a controlled retry-count result, not a measured
+before/after CPU reduction in the user's running instance. Additional tests
+verify that a cancelled read with a pending seek reaches the new generation,
+20 cancel/seek cycles remain readable, and subtitle reconstruction and cancelled
+reads remain usable on the media open in the user's app. The PiP/main subtitle
+pipeline seek test ran against a generated 95-second H.264/AAC/SRT fixture.
+The final reviewed regression run passed **273 tests in 41 suites**, including
+seek/disable/stop cancellation and subtitle-only recovery. Architecture checks,
+packaging, signing and dependency checks passed (27 Mach-O images). Opt-in cases without their own
+fixture flags are not a claim of complete format-matrix coverage.
+
+A temporary isolated-bundle scroll probe traversed 180 native clip-position
+steps with 10,000 synthetic source rows. It did not record whole-sidebar body
+reevaluation, so no change to scroll-state ownership was justified. Its sampler
+did not capture useful active-scroll stacks; a second trial failed the visible
+window gate after a Space change. These trials are insufficient to qualify
+wheel/trackpad scrolling, adaptive text over playing video, compositor frame
+pacing, or a scroll-latency improvement. The temporary probe is archived rather
+than shipped. No Sources rendering, cache, or navigation behavior was changed.
+Visible-window scroll verification remains outstanding; the earlier deferred
+playback benchmark cohorts remain deferred too.
+
+Evidence is retained under `QualificationArtifacts/SidebarScroll/`: live process
+sample and CPU receipt, exploratory scroll trial, failing old-loop regression,
+passing fixed-loop tests, packaging log, and source/binary manifest. The build
+at `/tmp/illiquid-scroll-fix-reviewed/Illiquid.app` includes this fix and the click/startup
+label follow-up above. It does not replace or restart the user's running app.
+These follow-up changes remain uncommitted.
+
+### Subtitle read failure during a pending seek
+
+Review found that a superseded subtitle read returning `INVALIDDATA` could exit
+the worker and report a track failure even after a new seek was pending. The
+fault-injected review test reproduced one unexpected failure and no read in the
+new generation. The error handler now checks for a pending seek for all read
+errors, after synchronizing with seek publication. It lets that seek reposition
+the input; errors without a pending seek still report once and terminate the
+worker, preserving the bounded retry behavior.
+
+The permanent seek/disable/stop regression now covers both `EXIT` and
+`INVALIDDATA`. Review evidence and follow-up test logs are under
+`QualificationArtifacts/SubtitleReadReview/`. This source fix is newer than the
+previously packaged `/tmp/illiquid-scroll-fix-reviewed/Illiquid.app`.
+
+Validation: the focused run passed 24 tests in three suites (two optional media
+tests skipped), including all six seek/disable/stop error cases and the one-read,
+one-failure assertions for persistent errors. Architecture checks passed. The
+broader test selection did not complete: `externalSubtitleSeedHasNoStuckProgressStates`
+terminated with signal 10, also reproduced when run alone. That state-space
+test does not exercise `MediaSession`; its crash remains unresolved, and this
+follow-up does not claim a fully passing broader suite. Logs retain both failed
+runs and the passing focused run. No new app bundle was packaged or installed.
+
+Subsequent requested rebuild: `/tmp/illiquid-seek-race-fix/Illiquid.app` includes
+the pending-seek fix. Release compilation, dependency audit and ad-hoc signature
+verification passed (arm64, 27 Mach-O images). All 334 recorded build inputs
+remained unchanged through packaging. The binary hash and source manifest are
+recorded in `QualificationArtifacts/SubtitleReadReview/build-fix-receipt.json`
+and `build-fix-inputs.json`. The app was not launched or installed over the
+running copy; this packaging result does not resolve the state-space test crash.
+
+
+### Donor checkout reconciliation
+
+The missing video tabs, sidebar folder tabs, progressive folder scanning,
+contrast fixes and Illiquid naming/migration work from the development checkout
+are now reconciled with the performance and subtitle/click fixes above.
+[Checkout reconciliation](CHECKOUT_RECONCILIATION.md) records exact inputs,
+imported/retained/deferred decisions, the combined test result (901 tests in
+135 suites; state-space excluded), and `/tmp/illiquid-reconciled/Illiquid.app`.
+No new whole-player performance gain is claimed by this integration; the
+existing visible-window qualification limits still apply.
+
+
+## Optimization follow-up after checkout reconciliation (2026-10-07)
+
+The user's request to fix and test remaining issues retains their earlier
+visible-window benchmark deferral. Evidence for this pass is under
+`QualificationArtifacts/OptimizationFollowup/`; the reconciliation build remains
+an unchanged baseline at `/tmp/illiquid-reconciled/Illiquid.app`.
+
+Implemented changes:
+
+- Split the playback core's effect-result switch into scoped handlers without
+  changing the 14 extracted transition bodies. The excluded external-subtitle
+  state-space test reproduced a SIGBUS stack overflow on the merged baseline.
+  Its debug `apply` frame reserved 277,728 bytes; the new dispatcher reserves
+  17,520 bytes (arm64 object-code measurements, excluding callees/prologue).
+  The CLI explorer now completes 7,180 states and 57,236 edges for that seed.
+- Keep open-video resume data outside the observed title-bar membership and
+  selection. Position/pause/playlist checkpoints stay current without requiring
+  a visible tab-list update. Added observation and close/restore coverage.
+- Move saved source-tab decoding, normalization and legacy-source restoration
+  into the existing read-only background startup operation. The UI receives one
+  complete snapshot, and shutdown still prevents late model publication. Valid
+  modern tabs avoid decoding unused legacy folder data. This removes a known
+  main-thread startup workload; it does not establish the cause of the user's
+  original intermittent startup delay.
+
+The large-library SwiftUI reconciliation hitch, actual trackpad/wheel scrolling,
+60fps resize/drop counters, whole-app retained memory, and refreshed mpv/IINA
+comparison still require the deferred visible-window cohort. Existing failed
+memory/drop gates are not reclassified as passing by unit or headless fixture
+tests. The extra observation cadence and compressed-packet prefetch remain off;
+no decoder/thread/cache-size policy is changed without playback nonregression
+measurements. Final test results and the replacement bundle are recorded below.
+
+The first complete run reached 930 tests in 138 suites: the formerly crashing
+state-space tests completed, and one real-media subtitle cancellation regression
+failed with `AVERROR_EXIT`. The generated 95-second Matroska fixture exposes a
+stored AVIO interruption that `avformat_flush` and buffered seeks do not clear.
+New seeks now clear only the previous `AVERROR_EXIT` and its EOF flag before
+repositioning; ordinary reads, other I/O failures, and cancellation of the new
+operation retain their existing behavior. A focused test verifies that genuine
+I/O, invalid-data and EOF errors are not cleared.
+
+Packaging also found that Homebrew's active HarfBuzz, GLib and PCRE2 links had
+moved to newer kegs. The reviewed originals remain installed. Automatic SDK
+selection now resolves transitive libraries from the SDK's pinned keg paths,
+with the unchanged native-input hash lock as the final check. No Homebrew links
+or dependency versions were changed. The final headless test/probe run explicitly
+loads the same pinned libraries and records loaded paths; the initial full run
+used the host's newer transitive libraries and is retained separately.
+
+A first test-only attempt to pin every library directory via `DYLD_LIBRARY_PATH`
+shadowed Apple's private ImageIO PNG library and crashed screenshot encoding.
+The corrected runner overrides only HarfBuzz, GLib and PCRE2; the screenshot
+suite passes and the loader receipt verifies all 26 locked native inputs plus
+Apple's own PNG implementation. Packaging never exports that loader override.
+The failed harness run is retained as `all-tests-broad-override-failed.log`.
+
+Other Rust compilation and Firefox workloads were active during qualification
+(load average approximately 16, 3.7 GiB swap in use at one sample). Timing data
+from this pass is diagnostic under that host load; it cannot establish an
+idle-host performance improvement or replace deferred playback nonregression
+measurements. No unrelated processes were stopped.
+
+The first complete run with the corrected pinned-library environment completed
+931 tests in 138 suites with five issues in four preview integration tests.
+The short interlaced receipt explicitly recorded `decode-budget-exhausted`
+(2,790.5 ms decode against a 2.5-second limit); source restoration and core
+exploration also took substantially longer during the competing host workloads.
+The four affected tests subsequently passed unchanged on both the reconciled
+baseline (4.497 seconds) and the current binary (2.725 seconds), sequentially on
+the same host and pinned dependencies. These small, changing-load timings are
+not a speedup claim. No deadline was extended and no failing test was disabled.
+The contended run is preserved as `all-tests-pinned-contended.log`; focused
+baseline/current logs retain the recovery evidence.
+
+Final complete test run: **931 tests in 138 suites passed in 210.128 seconds**,
+with state-space tests included, required native fixture inventory enabled,
+bitmap fixtures, long-caption cancellation/seeking, idle generation, indexed
+preview and interlaced-end regressions active. The conversion-only opt-in timing
+test remained explicitly skipped; other environment-gated experiments without
+flags remain unqualified. This is debug-test evidence, separate from Release
+packaging and the deferred visible playback cohort. Architecture validation,
+10 performance-harness tests, six dependency-lock tests and packaging helper
+checks passed. No test timeout or production decode deadline was relaxed.
+
+Observation instrumentation measured **1,000 -> 0 tab-strip invalidations** for
+1,000 playback checkpoints while preserving resume data. The final 100,000-file
+source restoration sample took 753 ms on its background worker; an earlier
+less-contended sample took 600 ms. These demonstrate work placement, not an
+end-to-end startup speedup.
+
+Three current-policy preview runs per fixture measured the following caller
+medians, with warm OS pages and no concurrent playback. The initial aborted
+probe's samples are retained in these totals rather than discarded.
+
+| Fixture | First request | Warm decode request | RAM hit | Missing images / requests |
+| --- | ---: | ---: | ---: | ---: |
+| H.264 1080p | 290 ms | 17.4 ms | 0.040 ms | 0 / 21 |
+| H.264 4K | 336 ms | 87.6 ms | 0.047 ms | 1 / 21 |
+| HEVC 10-bit 1080p60 | 473 ms | 66.6 ms | 0.051 ms | 0 / 21 |
+| VP9 1080p60 | 307 ms | 38.7 ms | 0.043 ms | 0 / 21 |
+
+All available images matched their corresponding available repeated-request
+hashes. One first 4K call returned nil at 3,085.6 ms; its worker completed around
+3,091 ms, after the existing request deadline. A later request for that same
+timestamp succeeded. The corresponding opt-in measurement exits with a failure
+and remains preserved; **83/84 available images is not an all-green preview
+qualification**. Deadline tuning and any settled-hover retry remain deferred
+until playback contention can be measured. Packet prefetch remains disabled.
+
+All four separate cache-tier probes passed, including background generation and
+foreground promotion. Across those fixtures, each 20-hit RAM sample had a median
+of 0.030-0.033 ms. New-generator exact disk reads, with decoding prohibited, took
+2.21-4.34 ms (one sample per fixture; same process and warm filesystem cache).
+These results support retaining the existing cache tiers; they do not justify
+larger caches or additional decoder threads.
+
+Final runnable build: `/tmp/illiquid-optimization-fixes/Illiquid.app`. Release
+compilation, arm64 dependency audit and ad-hoc signing passed for 27 Mach-O
+images. All 26 signed native libraries are byte-identical to the reconciled
+baseline, and all 365 recorded code/build inputs remained unchanged through
+packaging. The original reconciled executable remains unchanged. The final
+executable SHA-256 is `1fdeb1306fcf5739ba065daf81b3c0244cdac326420c974c43239060e7410d74`.
+`final-receipt.json` binds the app, source manifest, tests and qualification limits.
+The changes remain uncommitted; the app was not launched or installed.
+
+Run a separate instance with:
+
+```sh
+open -n /tmp/illiquid-optimization-fixes/Illiquid.app
+```
+
+
+## Cold 4K preview deadline investigation (2026-10-07)
+
+This investigation uses the exact prior debug test binary
+`416f8beff68198dfa1d5b5b37d3ff279acb4fe477bb044c498774af4a71fc0fc`, copied to
+`/tmp/illiquid-preview-timing-runner/IlliquidPackageTests` to preserve its identity.
+The working checkout has newer edits in 16 previously recorded files; this pass
+neither changes them nor claims to qualify them. Evidence and the reproducible
+probe driver are under `QualificationArtifacts/PreviewTimingInvestigation/`.
+The same pinned native-library environment and hashed H.264 4K fixture were used.
+
+The original failed caller returned nil after 3,085.6 ms. Its native worker
+finished at 3,091.2 ms with `imageCreated=true`, `cancelled=true`, and the correct
+selected timestamp of 1.5 seconds. The stages were:
+
+| Original worker stage | Elapsed time |
+| --- | ---: |
+| Opening/probing and decoder setup | 448.9 ms |
+| Seek | 0.4 ms |
+| Reading/decoding | 1,146.7 ms |
+| Image creation/scaling, including lazy renderer initialization | 1,490.4 ms |
+
+Packet reads account for 62.5 ms within reading/decoding, not an additional stage.
+The byte counter starts after opening, so it does not measure probing I/O.
+The caller recorded 733.2 ms total process CPU during its 3,085.6 ms wait. This
+is consistent with substantial waiting/descheduling/GPU work, but does not
+identify a specific OS stall. No native stack was captured for that original
+failure. The result was discarded because cancellation won while the final image
+operation was still returning; the decoder had already reached the target.
+
+Twelve fresh-process runs alternated the existing utility policy and the opt-in
+foreground-priority experiment (six each, two decoder threads, no packet cache).
+All runs processed the same measured 11,902,883 bytes and 119 packets for the
+first request. Every available image matched its corresponding repeated-request
+hash. Utility produced 41/42 images, foreground 42/42. Another utility miss
+returned at 3,222 ms: opening took 1,831 ms, decoding 1,139 ms, and image work
+433 ms. The slow stage is therefore not consistently image conversion alone.
+
+| Six-run cohort | First-request median | First-request process CPU median | Missing images |
+| --- | ---: | ---: | ---: |
+| Current utility priority | 477 ms | 600 ms | 1 / 42 |
+| Experimental foreground priority | 407 ms | 594 ms | 0 / 42 |
+
+These results include the outlier. Host load varied, and the cohort excludes
+concurrent playback. A 70 ms median difference in this small experiment does
+not overturn the previous decision to retain production priority. First-image
+stage medians were 62.5/49.9 ms; warm image medians were 4.5/4.3 ms.
+
+A separate optimized Swift component probe uses a decoded 3840x2160 BGRA frame
+from the same fixture, with the existing Core Image options and 368x207 output.
+Across five fresh processes, context initialization took a median 30.1 ms
+(range 29.4-39.1), first rendering 6.9 ms (6.8-7.2), and warm rendering 2.4 ms
+(2.4-2.6). This isolates the component rather than claiming native-pipeline or
+color qualification. It supports cold setup as an ordinary tens-of-milliseconds
+cost, with additional resource delays needed to explain the original 1.49-second
+image stage. An attempted stack sample timed out; its separate trial is excluded
+from the latency cohort.
+
+Disposition: retain the current deadline, two-thread limit, and utility priority.
+An idle context prewarm could hide about 37 ms of normal isolated setup/render
+cost, but has not been shown to remove multi-second stalls and could increase
+startup/idle work. It remains an experiment pending concurrent-playback and
+resource measurements. A targeted trace of a failing cold request is needed to
+distinguish initialization, GPU waiting, paging, and scheduling precisely.
+Visible-window qualification stays deferred. No production code or policy was
+changed, and no rebuild or commit was made by this investigation.
+
+A post-measurement verbose loader audit reached its 45-second limit before
+test execution; seven observed native inputs matched the prior run. All 26
+original pinned input files still hash identically. The incomplete loader audit
+is retained separately and is not counted as a passing test or full live-loader
+verification.
+
+
+## Native stack capture of a cold preview stall (2026-10-07)
+
+Follow-up evidence is in `QualificationArtifacts/PreviewStallTrace/`.
+The exact earlier debug binary and H.264 4K fixture were SHA-256 verified against
+`PreviewTimingInvestigation/protocol.json`. Logs and sampling output were written
+to the internal drive before archiving. No application source or policy changed;
+these runs do not qualify the newer checkout edits.
+
+One of three sampled fresh-process runs missed the deadline. Its caller returned
+nil at 3,189 ms with 480 ms process CPU. Worker stages were opening 60 ms,
+decoding 269 ms, and image creation 3,774 ms; the worker finished at 4,105 ms.
+It selected the correct 1.5-second frame, read the usual 119 packets / 11,902,883
+measured bytes, and discarded the late image after cancellation.
+
+`sample-0.txt` captured 883 samples on the preview worker with this stack:
+
+```text
+NativeTimelineThumbnailGenerator.ImageRenderer.init
+CIContext.initWithOptions
+CI::MetalContext::init
+CI::new_precompiled_kernels
+MTLLibraryBuilder::newLibraryWithFile
+fopen -> open$NOCANCEL -> __open_nocancel
+```
+
+This localizes the sampled stall to a file-open operation during lazy Core Image
+Metal kernel-library initialization. The decoder threads were waiting during
+that interval. It does not identify the precise file, explain the kernel-level
+reason for the blocked open, or prove that every earlier outlier had this cause.
+In particular, the earlier decoder-opening stall remains unexplained. Sampling
+can perturb timing. The other two sample reports had no useful call graph and
+are not counted as additional stack evidence.
+
+Eight separate unsampled control processes returned 56/56 previews. Their first
+request median was 513 ms, with a range of 295-1,820 ms. The sampled cohort
+returned 20/21 previews. Every available image in both cohorts matched its prior
+reference hash. After the sampled timeout, the next request returned in 1,182 ms;
+a later request for the original target returned in 190 ms. The existing worker
+therefore recovered without a process restart; active native work remained
+serialized until it returned.
+
+Four runs of the existing proposed stable-hover retry qualification returned
+16/16 previews, all on the first attempt. They validate the exercised first-attempt
+path only: no actual retry occurred, so this does not qualify timeout recovery
+or justify enabling the retry policy.
+
+Disposition: lazy renderer initialization is now a directly observed stall
+location. The next targeted experiment is preparing the existing shared renderer
+after startup, when preview work is expected and playback load permits it.
+Prewarming moves work earlier; it does not remove its I/O or resource cost and
+must not block app startup or delay a foreground request behind speculative work.
+Measure readiness, first-hover latency, CPU/memory, and playback interference
+before adoption. A bounded retry for an unchanged hover remains a separate
+resilience candidate. Preserve the three-second deadline, utility priority, and
+two decoder threads. No downscaling, media prefetch, or decoder-thread change is
+supported by this captured stall. Concurrent-playback and visible-window
+qualification remain deferred.
+
+
+## Shared preview renderer prewarming experiment (2026-10-07)
+
+Disposition: retain the opt-in qualification hook; defer automatic app adoption.
+`NativeTimelineThumbnailGenerator.prepareImageRendererForQualification()` prepares
+its existing shared CIContext on a utility queue. Only the measurement test calls
+it, with `ILLIQUID_PREVIEW_PREWARM=1`. No app startup, playback, background scheduler,
+or user setting enables it. The hook does not decode media or render a dummy image.
+
+The current checkout built successfully in debug mode. Baseline and candidate
+used the same copied test binary, with fresh processes and alternating order.
+Preparation completed before the first request: this measures the opportunity
+when idle lead time exists, not actual app startup or a hover racing preparation.
+Both modes retained the existing deadline, two decode threads, utility priority,
+BGRA output, and disabled packet-prefetch experiment. The fixture pages were warm.
+
+| Fixture | Runs per mode | First request baseline median | Prepared median | Median paired saving |
+| --- | ---: | ---: | ---: | ---: |
+| H.264 4K | 10 | 256 ms | 218 ms | 38 ms |
+| H.264 1080p | 3 | 102 ms | 64 ms | 38 ms |
+| HEVC 10-bit 1080p60 | 3 | 248 ms | 212 ms | 37 ms |
+| VP9 1080p60 | 3 | 214 ms | 151 ms | 37 ms |
+
+VP9's difference between cohort medians is larger than its median paired saving;
+retain the paired result and small-sample limitation rather than claiming 63 ms
+of consistent improvement. All 38 runs returned all seven images (266/266), with
+matching image hashes between baseline and prepared modes. No multi-second miss
+occurred in either mode, so prevention of the previously traced stall is unproven.
+
+For 4K, the first image-stage median fell from 33.7 to 7.5 ms. Preparation took
+34.6 ms wall time and 11.5 ms process CPU, adding a median 2.0 MiB physical footprint
+and 6.3 MiB resident memory before any preview. This is work moved earlier rather
+than removed: seven-request batch CPU including preparation was 941.8 ms baseline
+versus 939.4 ms prepared, effectively unchanged in this cohort. After requests and
+idle decoder release, incremental physical footprint was approximately 124.4 MiB
+in both modes. These are process snapshots, not a long-soak or memory-budget pass.
+
+Five existing worker admission/priority tests passed, covering cancellation,
+retained native ownership, stale admission, cached images during recovery, and
+pending foreground priority. The full application suite was not rerun for this
+unused experimental hook. New metrics in the opt-in measurement test account for
+preparation separately and capture memory before/after preparation and requests.
+
+Evidence: `QualificationArtifacts/PreviewPrewarmExperiment/` contains the analysis,
+protocol, final receipt, and `receipts.tar.gz` with the exact source changes, driver,
+per-run receipts, build log, and regression log. The recorded binary SHA-256 binds
+these measurements to the copied candidate, not earlier benchmark binaries.
+
+Before adoption, measure concurrent playback and actual startup/first-hover
+behavior. If hover arrives while lazy initialization is still running, Swift's
+shared initialization can still make it wait; prewarming is not a cancellation
+mechanism. Preparation also consumes resources even if the user never hovers.
+Visible-window qualification stays deferred. Keep the experimental hook off all
+production call paths until these tradeoffs are qualified.
+
+
+## Hover cache reuse and pointer settling (2026-10-07)
+
+Implemented: when an already displayed thumbnail is within 3.5 seconds of the
+hover position, reuse it during movement without another nearest-cache lookup.
+A broader existing storyboard fallback remains visible when available; precise
+refinement still targets the existing half-second bucket. Actual click-to-seek
+coordinates and playback decoding are unchanged.
+
+Settling now follows pointer-position changes, including motion within the same
+half-second bucket. Native refinement waits until 180 ms after the last movement.
+The old additional decoder debounce is removed from this call path, so settling
+does not stack two delays. An already exact cached image returns immediately.
+Pointer exit and replacement requests keep task cancellation, and both cache and
+decode publication explicitly check the current source revision. Cached images
+keep their represented timestamp and existing approximate marker.
+
+169 tests in 32 suites passed, including deterministic within-bucket movement,
+cancellation before refinement, already-settled admission, nearby-distance bounds,
+retry/recovery, playback admission, and control-bar interaction/geometry coverage.
+This validates scheduling and correctness, not measured desktop frame pacing or
+an end-to-end hover latency improvement. A completely uncached position can still
+show a spinner. Renderer prewarming remains benchmark-only. Visible-window
+performance qualification stays deferred.
+
+
+### Hover refinement review fixes (2026-10-07)
+
+Review found that pointer settling and current-request/source admission were
+checked only before entering the retry helper. Movement within a bucket after
+the first failed attempt could therefore allow an unsettled retry; a delayed
+source-change observer could also leave a stale task issuing another request.
+Publication already had an outer source guard, so this finding concerns stale
+work admission rather than proof of an incorrectly displayed cross-source frame.
+
+Every decode attempt now checks ownership, waits for settling, checks ownership
+again after that suspension, and rejects stale results after decoding. Existing
+task cancellation and the two-attempt bound remain. Three deterministic regression
+tests cover ownership lost during settling, source change during decoding, and
+renewed pointer movement between attempts. 172 tests in 32 suites passed. Desktop
+latency/playback qualification remains deferred; no performance gain is claimed
+from these correctness tests.

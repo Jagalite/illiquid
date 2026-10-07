@@ -70,7 +70,7 @@ def storage(app, directory, fixture):
         try:
             device=attach();media=mount/'Library';media.mkdir();copied=media/fixture.name;shutil.copy2(fixture,copied)
             run=lifecycle.Run(app,directory,0,True,source_folders=[media],
-                environment_overrides={"SUPERPLAYR_BENCHMARK_DISPLAY_READBACK":"1"})
+                environment_overrides={"ILLIQUID_BENCHMARK_DISPLAY_READBACK":"1"})
             run.wait_line(lambda s:'phase=source-directory-ready ' in s)
             responsive.open_media(run,copied);displayed(run)
             run.command('play');time.sleep(.3)
@@ -112,7 +112,7 @@ def main():
     try:
         if args.mode=='storage': receipt['run']=storage(args.app,args.output/'run',args.fixture)
         else:
-            run=lifecycle.Run(args.app,args.output/'run',0,True,environment_overrides={'SUPERPLAYR_BENCHMARK_HEARTBEAT':'0','SUPERPLAYR_BENCHMARK_HIDE_SIDEBAR':'1','SUPERPLAYR_BENCHMARK_DISPLAY_READBACK':'1'})
+            run=lifecycle.Run(args.app,args.output/'run',0,True,environment_overrides={'ILLIQUID_BENCHMARK_HEARTBEAT':'0','ILLIQUID_BENCHMARK_HIDE_SIDEBAR':'1','ILLIQUID_BENCHMARK_DISPLAY_READBACK':'1'})
             try: output(run,args.fixture);receipt['run']=run.finish()
             finally:
                 receipt['run']=run.result

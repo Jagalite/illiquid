@@ -54,7 +54,7 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     env = {key: value for key, value in os.environ.items()
-           if not key.startswith("SUPERPLAYR_SEEK_PROFILE_")}
+           if not key.startswith("ILLIQUID_SEEK_PROFILE_")}
     selection = "profileThumbnailStages" if args.thumbnail_only else "profileNativeSeekStages" if args.native_only else "SeekPerformanceQualification"
     configuration = ["-c", "release"] if args.release else []
     if not args.skip_build:
@@ -67,14 +67,14 @@ def main():
         callers, stages, seeks = [], [], []
         for repeat in range(args.repeats):
             prefix = output / f"fixture-{index}-run-{repeat}"
-            run_env = dict(env, SUPERPLAYR_SEEK_PROFILE_FIXTURE=str(fixture),
-                           SUPERPLAYR_SEEK_PROFILE_RESULT=str(prefix),
-                           SUPERPLAYR_SEEK_PROFILE_TARGETS=args.targets,
-                           SUPERPLAYR_SEEK_PROFILE_BASELINE="1" if args.baseline else "0",
-                           SUPERPLAYR_SEEK_PROFILE_DISABLE_NONREF="1" if args.disable_nonref else "0",
-                           SUPERPLAYR_SEEK_PROFILE_DISABLE_SOFTWARE_BURST="1" if args.disable_software_burst else "0",
-                           SUPERPLAYR_SEEK_PROFILE_OBSERVE_RENDERER="1" if args.observe_renderer else "0",
-                           SUPERPLAYR_SEEK_PROFILE_SHOW_WINDOW="1" if args.show_window else "0")
+            run_env = dict(env, ILLIQUID_SEEK_PROFILE_FIXTURE=str(fixture),
+                           ILLIQUID_SEEK_PROFILE_RESULT=str(prefix),
+                           ILLIQUID_SEEK_PROFILE_TARGETS=args.targets,
+                           ILLIQUID_SEEK_PROFILE_BASELINE="1" if args.baseline else "0",
+                           ILLIQUID_SEEK_PROFILE_DISABLE_NONREF="1" if args.disable_nonref else "0",
+                           ILLIQUID_SEEK_PROFILE_DISABLE_SOFTWARE_BURST="1" if args.disable_software_burst else "0",
+                           ILLIQUID_SEEK_PROFILE_OBSERVE_RENDERER="1" if args.observe_renderer else "0",
+                           ILLIQUID_SEEK_PROFILE_SHOW_WINDOW="1" if args.show_window else "0")
             with Path(str(prefix) + ".log").open("w") as log:
                 result = subprocess.run(["swift", "test", *configuration, "--skip-build", "--no-parallel",
                                          "--filter", selection], cwd=repository, env=run_env,

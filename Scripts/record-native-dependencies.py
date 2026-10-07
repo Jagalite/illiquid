@@ -11,8 +11,8 @@ import shutil
 import tempfile
 
 
-def run(*args):
-    return subprocess.check_output(args, text=True, timeout=30).strip()
+def run(*args, timeout=30):
+    return subprocess.check_output(args, text=True, timeout=timeout).strip()
 
 
 def digest(path):
@@ -156,15 +156,18 @@ def collect(bundle=None, input_libraries=None):
         "schemaVersion": 1,
         "purpose": "Native build provenance; versions and hashes must be compared across release hosts.",
         "sourceRevision": run("git", "-C", str(root), "rev-parse", "HEAD"),
-        "sourceDirty": bool(run("git", "-C", str(root), "status", "--porcelain")),
+        # A broad module rename on an external volume can exceed the native
+        # probe deadline. Keep repository inspection bounded, with more time
+        # than the individual pkg-config/otool probes.
+        "sourceDirty": bool(run("git", "-C", str(root), "status", "--porcelain", timeout=120)),
         "trackedDiffSHA256": hashlib.sha256(subprocess.check_output(
-            ["git", "-C", str(root), "diff", "HEAD", "--binary"], timeout=30
+            ["git", "-C", str(root), "diff", "HEAD", "--binary"], timeout=120
         )).hexdigest(),
         "untrackedSourceHashes": {
             name: digest(root / name)
             for name in subprocess.check_output(
                 ["git", "-C", str(root), "ls-files", "--others", "--exclude-standard", "-z",
-                 "--", "Sources", "Tests", "Scripts", "Resources", "Package.swift"], timeout=30
+                 "--", "Sources", "Tests", "Validation", "Scripts", "Resources", "Package.swift"], timeout=120
             ).decode().split("\0") if name and (root / name).is_file()
         },
         "architecture": run("uname", "-m"), "macOS": run("sw_vers", "-productVersion"),

@@ -15,7 +15,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-DOMAIN = 'com.example.SuperplayrBenchmark'
+DOMAIN = 'com.example.IlliquidBenchmark'
 SCRIPTS = ('profile-performance-suite.py', 'profile-output-recovery.py',
            'profile-responsiveness.py', 'profile-lifecycle.py', 'profile-reference-player.py')
 
@@ -86,6 +86,7 @@ def compare(records, minimum_runs=3):
     if not cases:
         raise ValueError('No measurements')
     checks = []
+    quality_checks = []
     for case in cases:
         cohorts = {label: [r['metrics'] for r in records if r['case'] == case and r['app'] == label]
                    for label in ('baseline', 'candidate')}
@@ -105,6 +106,11 @@ def compare(records, minimum_runs=3):
                 base, candidate = max(av), max(bv)
                 limit = base
                 passed = candidate <= limit
+                # An equally choppy baseline and candidate can pass a relative
+                # regression check. Keep the independent smooth-playback gate
+                # visible rather than treating that as qualification.
+                quality_checks.append(dict(case=case, metric=key, baseline=base,
+                    candidate=candidate, limit=0, passed=max(base, candidate) == 0))
             else:
                 base, candidate = statistics.median(av), statistics.median(bv)
                 absolute = 2 if key.endswith('_cpu') else 16 if key.endswith('_mib') else 25
@@ -112,9 +118,14 @@ def compare(records, minimum_runs=3):
                 passed = candidate <= limit
             checks.append(dict(case=case, metric=key, baseline=base, candidate=candidate,
                                limit=limit, passed=passed, n=len(a)))
-    return dict(passed=all(c['passed'] for c in checks), checks=checks,
+    regression_passed = all(c['passed'] for c in checks)
+    quality_passed = all(c['passed'] for c in quality_checks)
+    return dict(passed=regression_passed and quality_passed,
+                regression_passed=regression_passed, quality_passed=quality_passed,
+                quality_checks=quality_checks, checks=checks,
                 policy='median <= max(baseline * 1.15, baseline + 2 CPU points / 16 MiB / 25 ms); '
-                       'maximum dropped frames cannot increase; no corrupted frames in either cohort')
+                       'maximum dropped frames cannot increase; no corrupted frames in either cohort; '
+                       'absolute playback qualification requires zero dropped frames in both cohorts')
 
 
 def main():

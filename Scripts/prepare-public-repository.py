@@ -13,7 +13,7 @@ import subprocess
 
 ROOT_FILES = {'.gitignore', 'README.md', 'DISTRIBUTING.md', 'LICENSE', 'LICENSING.md', 'THIRD_PARTY_NOTICES.md', 'Package.swift', 'Package.resolved'}
 CODE_ROOTS = {'Sources', 'Tests', 'Validation', 'Scripts', 'Resources', 'Licenses'}
-ARTWORK = {'Documentation/Design/SuperplayrLiquidGlass/droplet-controls-concept.png', 'Documentation/Design/SuperplayrLiquidGlass/quiet-waterline-concept.png'}
+ARTWORK = {'Documentation/Design/IlliquidLiquidGlass/droplet-controls-concept.png', 'Documentation/Design/IlliquidLiquidGlass/quiet-waterline-concept.png'}
 
 
 def include(name):

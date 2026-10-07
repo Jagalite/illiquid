@@ -46,12 +46,12 @@ def main():
     if args.direct_runner:
         swift = Path(subprocess.check_output(["xcrun", "--find", "swift"], text=True).strip())
         helper = swift.parent.parent / "libexec/swift/pm/swiftpm-testing-helper"
-        bundle = Path(f".build/{args.configuration}/SuperplayrPackageTests.xctest/Contents/MacOS/SuperplayrPackageTests").resolve()
+        bundle = Path(f".build/{args.configuration}/IlliquidPackageTests.xctest/Contents/MacOS/IlliquidPackageTests").resolve()
         command = [str(helper), "--test-bundle-path", str(bundle), "--testing-library", "swift-testing",
                    "--no-parallel", "--filter", "ThumbnailOptimizationQualificationTests"]
     (output / "protocol.json").write_text(json.dumps({
         "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-        "test_binary_sha256": hashlib.sha256(Path(f".build/{args.configuration}/SuperplayrPackageTests.xctest/Contents/MacOS/SuperplayrPackageTests").read_bytes()).hexdigest(),
+        "test_binary_sha256": hashlib.sha256(Path(f".build/{args.configuration}/IlliquidPackageTests.xctest/Contents/MacOS/IlliquidPackageTests").read_bytes()).hexdigest(),
         "fixtures": {str(p.resolve()): hashlib.sha256(p.read_bytes()).hexdigest() for p in args.fixture},
         "configuration": args.configuration, "packet_workload": args.packet_workload,
         "simulated_refill_delay_ms": args.refill_delay_ms, "runs": args.runs,

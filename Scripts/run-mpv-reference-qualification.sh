@@ -6,9 +6,9 @@ repository_root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${repository_root}"
 
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
-artifact_root="${SUPERPLAYR_REFERENCE_QUALIFICATION_ARTIFACT_DIR:-${repository_root}/QualificationArtifacts/${stamp}}"
-fixture_dir="${SUPERPLAYR_NATIVE_FIXTURE_DIR:-${repository_root}/TestFixtures/Generated}"
-module_cache="${TMPDIR:-/tmp}/superplayr-reference-qualification-module-cache"
+artifact_root="${ILLIQUID_REFERENCE_QUALIFICATION_ARTIFACT_DIR:-${repository_root}/QualificationArtifacts/${stamp}}"
+fixture_dir="${ILLIQUID_NATIVE_FIXTURE_DIR:-${repository_root}/TestFixtures/Generated}"
+module_cache="${TMPDIR:-/tmp}/illiquid-reference-qualification-module-cache"
 if [[ -e "${artifact_root}" ]]; then
     print -u2 "Qualification artifact destination already exists: ${artifact_root}"
     print -u2 "Use a new empty path so stale semantic results cannot enter the acceptance report."
@@ -36,29 +36,29 @@ uname -a > "${artifact_root}/uname.txt"
 run_logged build-harness env \
     CLANG_MODULE_CACHE_PATH="${module_cache}/clang" \
     SWIFTPM_MODULECACHE_OVERRIDE="${module_cache}/swiftpm" \
-    swift build --disable-sandbox --product SuperplayrDifferentialHarness
+    swift build --disable-sandbox --product IlliquidDifferentialHarness
 
-run_logged verify-fixtures .build/debug/SuperplayrDifferentialHarness \
+run_logged verify-fixtures .build/debug/IlliquidDifferentialHarness \
     verify-fixture-manifest --directory "${fixture_dir}"
 
-run_logged deterministic-races .build/debug/SuperplayrDifferentialHarness \
+run_logged deterministic-races .build/debug/IlliquidDifferentialHarness \
     deterministic-races --output "${artifact_root}/deterministic-races.json"
 
-run_logged deterministic-semantic-policies .build/debug/SuperplayrDifferentialHarness \
+run_logged deterministic-semantic-policies .build/debug/IlliquidDifferentialHarness \
     deterministic-semantic-policies \
     --output "${artifact_root}/deterministic-semantic-policies.json"
 
-run_logged deterministic-acceptance .build/debug/SuperplayrDifferentialHarness \
+run_logged deterministic-acceptance .build/debug/IlliquidDifferentialHarness \
     deterministic-acceptance \
     --output "${artifact_root}/deterministic-acceptance.json"
 
-run_logged homebrew-semantic-matrix .build/debug/SuperplayrDifferentialHarness \
+run_logged homebrew-semantic-matrix .build/debug/IlliquidDifferentialHarness \
     semantic-matrix --directory "${fixture_dir}" \
     --output "${artifact_root}/homebrew-semantic-matrix" \
-    --mpv "${SUPERPLAYR_MPV_BIN:-/opt/homebrew/bin/mpv}"
+    --mpv "${ILLIQUID_MPV_BIN:-/opt/homebrew/bin/mpv}"
 
 if [[ "${exit_codes["homebrew-semantic-matrix"]:-not-run}" == "0" ]]; then
-    run_logged acceptance-report .build/debug/SuperplayrDifferentialHarness \
+    run_logged acceptance-report .build/debug/IlliquidDifferentialHarness \
         acceptance-report \
         --matrix-directory "${artifact_root}/homebrew-semantic-matrix" \
         --output "${artifact_root}/acceptance-report.json"
@@ -67,9 +67,9 @@ else
 fi
 
 run_logged pinned-mpv-build Scripts/build-pinned-mpv-oracle.sh
-pinned_binary="${MPV_ORACLE_BUILD_DIR:-/tmp/superplayr-reference-src/mpv/build-oracle}/mpv"
+pinned_binary="${MPV_ORACLE_BUILD_DIR:-/tmp/illiquid-reference-src/mpv/build-oracle}/mpv"
 if [[ "${exit_codes["pinned-mpv-build"]:-not-run}" == "0" && -x "${pinned_binary}" ]]; then
-    run_logged pinned-semantic-matrix .build/debug/SuperplayrDifferentialHarness \
+    run_logged pinned-semantic-matrix .build/debug/IlliquidDifferentialHarness \
         semantic-matrix --directory "${fixture_dir}" \
         --output "${artifact_root}/pinned-semantic-matrix" \
         --mpv "${pinned_binary}" \
@@ -80,17 +80,17 @@ else
     pinned_status="blocked: exact source checkout present but Meson unavailable or build failed; see pinned-mpv-build.log"
 fi
 
-run_logged native-renderer-smoke .build/debug/SuperplayrDifferentialHarness \
+run_logged native-renderer-smoke .build/debug/IlliquidDifferentialHarness \
     native-renderer-smoke --fixture "${fixture_dir}/h264-aac.mp4" \
     --output "${artifact_root}/native-renderer-smoke"
 
 run_logged build-replacement-stress env \
     CLANG_MODULE_CACHE_PATH="${module_cache}/clang" \
     SWIFTPM_MODULECACHE_OVERRIDE="${module_cache}/swiftpm" \
-    swift build --disable-sandbox --product SuperplayrPlaybackStress
+    swift build --disable-sandbox --product IlliquidPlaybackStress
 if [[ "${exit_codes["build-replacement-stress"]:-not-run}" == "0" ]]; then
     run_logged replacement-stress /usr/bin/time -l \
-        .build/debug/SuperplayrPlaybackStress \
+        .build/debug/IlliquidPlaybackStress \
         --media "${fixture_dir}/h264-aac.mp4" --reopen-count 50 --duration 10
 else
     exit_codes["replacement-stress"]="not-run"
@@ -101,10 +101,10 @@ for sanitizer in address thread; do
         CLANG_MODULE_CACHE_PATH="${module_cache}/clang" \
         SWIFTPM_MODULECACHE_OVERRIDE="${module_cache}/swiftpm" \
         swift build --disable-sandbox --sanitize "${sanitizer}" \
-        --product SuperplayrPlaybackStress
+        --product IlliquidPlaybackStress
     if [[ "${exit_codes["${sanitizer}-build"]:-not-run}" == "0" ]]; then
         run_logged "${sanitizer}-stress" /usr/bin/time -l \
-            .build/debug/SuperplayrPlaybackStress \
+            .build/debug/IlliquidPlaybackStress \
             --media "${fixture_dir}/h264-aac.mp4" --reopen-count 50 --duration 10
     else
         exit_codes["${sanitizer}-stress"]="not-run"
@@ -118,23 +118,23 @@ run_logged swift-tests env \
 run_logged fixture-semantic-tests env \
     CLANG_MODULE_CACHE_PATH="${module_cache}/clang" \
     SWIFTPM_MODULECACHE_OVERRIDE="${module_cache}/swiftpm" \
-    SUPERPLAYR_NATIVE_FIXTURE_DIR="${fixture_dir}" \
-    SUPERPLAYR_NATIVE_REQUIRE_FIXTURES=1 \
+    ILLIQUID_NATIVE_FIXTURE_DIR="${fixture_dir}" \
+    ILLIQUID_NATIVE_REQUIRE_FIXTURES=1 \
     swift test --disable-sandbox --skip-build --no-parallel --filter \
     'requiredFixtureManifest|prioritizedFixtureTruth|fixtureMatrixAccounts|unknownDuration|timelineOrigins|bitmapSubtitleCapabilities|mirroredAndInterlaced|nativeTrackIDs|cleanAndTruncated|inputExecutor|safelyDownmixes|heavyAnimatedASS|detectsSubtitle|seekInvalidates|convertsMultipleAudio|catalogSelection|audioFormatChange|codecCapabilityFixtures|rotationMatrix|anamorphicFixture|decodesAudioFixtureMatrix|resampled44100|embeddedSRT|subtitlePacketInvalidates|libassRendersExternal'
 run_logged architecture-check env \
     CLANG_MODULE_CACHE_PATH="${module_cache}/clang" \
     SWIFTPM_MODULECACHE_OVERRIDE="${module_cache}/swiftpm" \
-    swift run --disable-sandbox SuperplayrArchitectureCheck
+    swift run --disable-sandbox IlliquidArchitectureCheck
 run_logged build-app env \
     CLANG_MODULE_CACHE_PATH="${module_cache}/clang" \
     SWIFTPM_MODULECACHE_OVERRIDE="${module_cache}/swiftpm" \
-    SUPERPLAYR_SWIFTPM_DISABLE_SANDBOX=1 \
+    ILLIQUID_SWIFTPM_DISABLE_SANDBOX=1 \
     Scripts/build-app.sh
-run_logged verify-app Scripts/verify-app.sh --require-signature dist/Superplayr.app
+run_logged verify-app Scripts/verify-app.sh --require-signature dist/Illiquid.app
 
 set +e
-dist/Superplayr.app/Contents/MacOS/Superplayr "${fixture_dir}/h264-aac.mp4" \
+dist/Illiquid.app/Contents/MacOS/Illiquid "${fixture_dir}/h264-aac.mp4" \
     > "${artifact_root}/packaged-app-smoke.log" 2>&1 &
 app_pid=$!
 sleep 5

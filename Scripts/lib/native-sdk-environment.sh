@@ -18,7 +18,37 @@ PY
     if [[ -d "$keg/lib/pkgconfig" ]]; then
         export PKG_CONFIG_PATH="$keg/lib/pkgconfig"
         export PATH="$keg/bin:$PATH"
+        # Transitive install names use Homebrew opt links, which may move to a
+        # newer keg independently of FFmpeg. Package from the reviewed SDK
+        # directories and let the native-input hash lock verify every byte.
+        export ILLIQUID_NATIVE_LIBRARY_PATH
+        ILLIQUID_NATIVE_LIBRARY_PATH=$(python3 - "$repository_root/BuildInputs/native-sdk.json" <<'PY'
+import json,sys
+from pathlib import PurePosixPath
+directories=[]
+for name,value in json.load(open(sys.argv[1]))['kegs'].items():
+    path=PurePosixPath(value)
+    if len(path.parts)!=3 or path.parts[:2]!=('Cellar',name) or '..' in path.parts:
+        raise SystemExit('Invalid pinned native prefix')
+    directories.append('/opt/homebrew/'+str(path)+'/lib')
+print(':'.join(directories))
+PY
+) || return 1
     fi
+}
+
+# Only the automatically selected SDK (or an explicit directory override) uses
+# this lookup. An explicitly selected PKG_CONFIG_PATH keeps its existing behavior.
+illiquid_pinned_native_library() {
+    local dependency=$1 directory
+    local directories=()
+    IFS=: read -r -a directories <<< "${ILLIQUID_NATIVE_LIBRARY_PATH:-}"
+    for directory in "${directories[@]:-}"; do
+        [[ -n "$directory" && -f "$directory/${dependency##*/}" ]] || continue
+        printf '%s\n' "$directory/${dependency##*/}"
+        return 0
+    done
+    return 1
 }
 
 # Fail closed: a missing filter library or failed inspection cannot establish

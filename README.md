@@ -20,7 +20,9 @@ current Homebrew versions may differ. See the pinned CI inputs in
 
 ```sh
 brew install ffmpeg libass pkg-config
-swift run SuperplayrArchitectureCheck
+swift run Illiquid
+# Validate the architecture separately:
+swift run IlliquidArchitectureCheck
 swift test --no-parallel
 ./Scripts/build-local-dmg.sh
 open dist/Illiquid.app
@@ -33,6 +35,10 @@ for physical-device playback QA.
 The [living findings register](Documentation/ROBUSTNESS_REVIEW_MPV_IINA.md)
 tracks structural, robustness, and user-experience research against mpv and IINA.
 
+Use **⌘+** and **⌘−** to resize the interface, and **⌘0** to reset it to 100%.
+The scale is remembered across launches and can also be selected in
+**Settings → Appearance → UI Scale** (80–150%, in 10% steps).
+
 Double-click or double-tap the video’s left third to seek backward 5 seconds,
 or the right third to seek forward 5 seconds. Double-click the center third to
 toggle fullscreen. Trackpad taps require macOS **Tap to click** to be enabled.
@@ -40,20 +46,18 @@ After a side double-tap, each additional rapid tap seeks another 5 seconds.
 
 ## Architecture
 
-- `SuperplayrPlaybackCore` is the deterministic imperative playback authority.
+- `IlliquidPlaybackCore` is the deterministic imperative playback authority.
   It owns transitions, effect identity, seeks, drains, recovery, lifecycle,
   synchronization, track intent, and subtitle/control state.
-- `SuperplayrNativePlayback` executes those decisions through FFmpeg,
+- `IlliquidNativePlayback` executes those decisions through FFmpeg,
   VideoToolbox, AVSampleBuffer renderers, and libass. Generation fences and
   leases reject stale work and separate logical invalidation from cleanup.
-- `SuperplayrPlayer` coordinates product commands, persistence, and immutable
+- `IlliquidPlayer` coordinates product commands, persistence, and immutable
   runtime snapshots. It constructs the native runtime directly.
-- `SuperplayrApp` is the reactive SwiftUI/AppKit shell. It observes
+- `IlliquidApp` is the reactive SwiftUI/AppKit shell. It observes
   `PlaybackViewStore` and does not own playback truth.
 
-The internal Swift package and module names intentionally retain the historical
-`Superplayr` prefix. The installed product and all user-facing surfaces are
-named Illiquid. The macOS bundle identifier is `io.github.jagalite.illiquid`;
+The Swift package, executable, modules, and installed app are named Illiquid. The macOS bundle identifier is `io.github.jagalite.illiquid`;
 existing user data is preserved through the documented preference migration.
 
 There is one playback implementation. The package has no engine selector,
@@ -66,7 +70,7 @@ Synthetic fixture generation and native qualification are repeatable:
 ```sh
 ./Scripts/run-playback-state-space.sh
 ./Scripts/generate-native-fixtures.sh
-SUPERPLAYR_NATIVE_FIXTURE_DIR="$PWD/TestFixtures/Generated" swift test --no-parallel
+ILLIQUID_NATIVE_FIXTURE_DIR="$PWD/TestFixtures/Generated" swift test --no-parallel
 ./Scripts/run-native-qualification.sh
 ```
 

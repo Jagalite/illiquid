@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Serial, opt-in release render profiles; generated media stays outside evidence.
 
-Build first: swift build -c release --product SuperplayrRenderProfile
+Build first: swift build -c release --product IlliquidRenderProfile
 Then: python3 Scripts/profile-rendering.py --output QualificationArtifacts/render
 """
 import argparse
@@ -70,9 +70,9 @@ def main():
         ("captions", "TestFixtures/Generated/long-caption.mkv", {}),
         ("caption-control", "TestFixtures/Generated/long-h264-av-sync.mkv", {}),
         ("software-planar", "TestFixtures/SeekPerformance/h264-1080p-gop10.mp4",
-            {"SUPERPLAYR_RENDER_PROFILE_SOFTWARE": "1"}),
+            {"ILLIQUID_RENDER_PROFILE_SOFTWARE": "1"}),
         ("software-bgra", "TestFixtures/SeekPerformance/h264-1080p-gop10.mp4",
-            {"SUPERPLAYR_RENDER_PROFILE_SOFTWARE": "1", "SUPERPLAYR_RENDER_PROFILE_BGRA": "1"}),
+            {"ILLIQUID_RENDER_PROFILE_SOFTWARE": "1", "ILLIQUID_RENDER_PROFILE_BGRA": "1"}),
     ]
     if args.selected_cases:
         cases = [case for case in cases if case[0] in args.selected_cases]
@@ -91,11 +91,11 @@ def main():
         for name, relative, overrides in (cases if repeat % 2 == 0 else list(reversed(cases))):
             label = f"{name}-{repeat + 1}"
             destination = output / f"{label}.json"
-            env = {k: v for k, v in os.environ.items() if not k.startswith("SUPERPLAYR_RENDER_PROFILE_")}
+            env = {k: v for k, v in os.environ.items() if not k.startswith("ILLIQUID_RENDER_PROFILE_")}
             env.update(overrides)
-            env.update(SUPERPLAYR_RENDER_PROFILE_FIXTURE=str(root / relative),
-                       SUPERPLAYR_RENDER_PROFILE_RESULT=str(destination))
-            command = [str(root / ".build/release/SuperplayrRenderProfile")]
+            env.update(ILLIQUID_RENDER_PROFILE_FIXTURE=str(root / relative),
+                       ILLIQUID_RENDER_PROFILE_RESULT=str(destination))
+            command = [str(root / ".build/release/IlliquidRenderProfile")]
             print(f"Profiling {label}", flush=True)
             with (output / f"{label}.log").open("w") as log:
                 subprocess.run(command, cwd=root, env=env, stdout=log, stderr=subprocess.STDOUT,

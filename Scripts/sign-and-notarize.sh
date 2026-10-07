@@ -11,7 +11,7 @@ identity and notarytool keychain profile, also submit, wait, staple, and validat
 
 Options:
   --identity NAME       codesign identity. Required; use '-' for local ad-hoc.
-  --entitlements PATH   App entitlements plist (default: Resources/Superplayr.entitlements).
+  --entitlements PATH   App entitlements plist (default: Resources/Illiquid.entitlements).
   --keychain PATH       Optional keychain passed to codesign.
   --notary-profile NAME notarytool keychain profile created with store-credentials.
   --archive PATH        Notarization zip output (default: sibling of the app).
@@ -19,9 +19,9 @@ Options:
   -h, --help            Show this help.
 
 Examples:
-  sign-and-notarize.sh --identity - --skip-notarize dist/Superplayr.app
+  sign-and-notarize.sh --identity - --skip-notarize dist/Illiquid.app
   sign-and-notarize.sh --identity 'Developer ID Application: Example (TEAMID)' \
-    --notary-profile superplayr-notary dist/Superplayr.app
+    --notary-profile illiquid-notary dist/Illiquid.app
 USAGE
 }
 
@@ -90,7 +90,7 @@ done
 
 script_directory=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repository_root=$(cd -P "$script_directory/.." && pwd)
-entitlements=${entitlements:-$repository_root/Resources/Superplayr.entitlements}
+entitlements=${entitlements:-$repository_root/Resources/Illiquid.entitlements}
 archive=${archive:-${app_bundle%.app}-notarization.zip}
 
 [[ -f "$entitlements" ]] || fail "entitlements file does not exist: $entitlements"
@@ -111,12 +111,8 @@ fi
 
 frameworks="$app_bundle/Contents/Frameworks"
 if [[ -d "$frameworks" ]]; then
-    while IFS= read -r -d '' nested_code; do
-        codesign \
-            "${codesign_arguments[@]}" \
-            "$nested_code"
-    done < <(find "$frameworks" -depth -type f ! -name '*.cstemp' \
-        \( -name '*.dylib' -o -perm -111 \) -print0)
+    source "$(dirname "$0")/lib/sparkle-packaging.sh"
+    illiquid_sign_nested_code "$frameworks" "${codesign_arguments[@]}"
 fi
 
 codesign \

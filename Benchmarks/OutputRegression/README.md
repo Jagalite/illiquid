@@ -17,11 +17,11 @@ The artifact test covers:
 Run one source tree with a dedicated scratch and artifact directory:
 
 ```sh
-SUPERPLAYR_NATIVE_FIXTURE_DIR="$PWD/TestFixtures/Generated" \
-SUPERPLAYR_OUTPUT_ARTIFACT_DIR=/absolute/path/to/artifacts \
-SUPERPLAYR_OUTPUT_REQUIRE=1 \
-SUPERPLAYR_OUTPUT_SOURCE_REVISION="$(git rev-parse HEAD)" \
-SUPERPLAYR_OUTPUT_HARNESS_REVISION=<test-commit> \
+ILLIQUID_NATIVE_FIXTURE_DIR="$PWD/TestFixtures/Generated" \
+ILLIQUID_OUTPUT_ARTIFACT_DIR=/absolute/path/to/artifacts \
+ILLIQUID_OUTPUT_REQUIRE=1 \
+ILLIQUID_OUTPUT_SOURCE_REVISION="$(git rev-parse HEAD)" \
+ILLIQUID_OUTPUT_HARNESS_REVISION=<test-commit> \
 swift test --scratch-path /absolute/path/to/build --no-parallel \
   --filter OutputRegressionArtifactTests
 ```
@@ -42,7 +42,7 @@ both product revisions, and compare in one command:
 ```sh
 Benchmarks/OutputRegression/run-isolated-comparison.sh \
   <baseline-product-commit> <candidate-product-commit> \
-  /private/tmp/superplayr-output-comparison <harness-commit>
+  /private/tmp/illiquid-output-comparison <harness-commit>
 ```
 
 Exact hashes are the primary same-machine gate. Video luma additionally carries

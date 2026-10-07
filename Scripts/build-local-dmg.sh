@@ -27,28 +27,29 @@ while (($# > 0)); do
 done
 
 cd "$repository_root"
-"$script_directory/tests/platinum-packaging-tests.sh"
+"$script_directory/tests/illiquid-packaging-tests.sh"
+python3 "$script_directory/tests/update-feed-tests.py"
 swift test --force-resolved-versions -c release --filter \
-    'ProductMetadataTests|LaunchOpenQueueTests|platinumRetainsLegacy|PlayerInterfaceScaleTests|TimelineThumbnailHoverPolicyTests|TimelineThumbnailHoverRecoveryTests'
+    'AppUpdateControllerTests|DefaultVideoPlayerTests|ProductMetadataTests|LaunchOpenQueueTests|illiquidRetainsLegacy|PlayerInterfaceScaleTests|TimelineThumbnailHoverPolicyTests|TimelineThumbnailHoverRecoveryTests'
 
 created_build_root=false
-if [[ -z "${PLATINUM_BUILD_ROOT:-}" ]]; then
-    PLATINUM_BUILD_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/platinum-local-dmg-build.XXXXXX")
-    export PLATINUM_BUILD_ROOT
+if [[ -z "${ILLIQUID_BUILD_ROOT:-}" ]]; then
+    ILLIQUID_BUILD_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/illiquid-local-dmg-build.XXXXXX")
+    export ILLIQUID_BUILD_ROOT
     created_build_root=true
 fi
 cleanup() {
-    if [[ "$created_build_root" = true && -d "$PLATINUM_BUILD_ROOT" ]]; then
-        rm -rf -- "$PLATINUM_BUILD_ROOT"
+    if [[ "$created_build_root" = true && -d "$ILLIQUID_BUILD_ROOT" ]]; then
+        rm -rf -- "$ILLIQUID_BUILD_ROOT"
     fi
 }
 trap cleanup EXIT
 
-"$script_directory/build-platinum-app.sh" "--$mode"
+"$script_directory/build-illiquid-app.sh" "--$mode"
 if [[ "$mode" = developer-id && -n "${ILLIQUID_NOTARY_PROFILE:-}" ]]; then
     "$script_directory/notarize-artifact.sh" "$repository_root/dist/Illiquid.app"
 fi
-"$script_directory/package-platinum-dmg.sh"
+"$script_directory/package-illiquid-dmg.sh"
 if [[ "$mode" = developer-id && -n "${ILLIQUID_NOTARY_PROFILE:-}" ]]; then
     version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$repository_root/dist/Illiquid.app/Contents/Info.plist")
     dmg="$repository_root/dist/Illiquid-$version-macOS.dmg"

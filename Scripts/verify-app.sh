@@ -19,7 +19,7 @@ fail() {
 }
 
 dependencies_for() {
-    otool -L "$1" | sed -n '2,$p' | sed -E \
+    otool -L "$1" | sed -n '/^[[:space:]]/p' | sed -E \
         's/^[[:space:]]*//; s/[[:space:]]+\(compatibility version.*$//'
 }
 
@@ -142,7 +142,7 @@ for image in "${images[@]}"; do
                 ;;
             @rpath/*)
                 dependency_base=$(basename "$dependency")
-                if [[ ! -f "$frameworks/$dependency_base" ]] && \
+                if [[ ! -f "$frameworks/${dependency#@rpath/}" ]] && \
                     ! is_os_swift_runtime "$dependency_base"; then
                     printf 'error: unresolved bundled @rpath dependency in %s: %s\n' \
                         "$image" "$dependency" >&2
