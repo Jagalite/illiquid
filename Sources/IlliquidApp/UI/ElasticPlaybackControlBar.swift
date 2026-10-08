@@ -134,6 +134,9 @@ struct ElasticPlaybackControlBarGeometry {
     static let topInset: CGFloat = 18
     static let bottomInset: CGFloat = 16
     static let utilitySpacing: CGFloat = 34
+    static let minimumTimelineLength: CGFloat = 160
+    // Grip, two time labels, and the gaps between the track and utilities.
+    static let timelineChromeLength: CGFloat = 218
     static let edgeAttachmentReleaseProgress: CGFloat = 0.10
     static let edgeAttachmentFullProgress: CGFloat = 0.20
     static let standardTrackingCorrection: CGFloat = 4
@@ -152,6 +155,7 @@ struct ElasticPlaybackControlBarGeometry {
     let trackEndS: CGFloat
     let elapsedLabelS: CGFloat
     let durationLabelS: CGFloat
+    let showsDurationLabel: Bool
     private(set) var containmentOffset = CGSize.zero
     private(set) var utilityPositions: [CGPoint] = []
     private(set) var surfacePoints: [CGPoint] = []
@@ -192,12 +196,14 @@ struct ElasticPlaybackControlBarGeometry {
         let lastUtilityS = halfLength - 19
         let firstUtilityS = lastUtilityS
             - CGFloat(max(0, utilityCount - 1)) * Self.utilitySpacing
-        timelineStartS = -halfLength + 18
+        timelineStartS = -halfLength + 42
         timelineEndS = firstUtilityS - 29
         elapsedLabelS = timelineStartS + 26
         durationLabelS = timelineEndS - 26
         trackStartS = timelineStartS + 64
-        trackEndS = max(trackStartS + 40, timelineEndS - 64)
+        showsDurationLabel = utilityCount > 1
+            || totalLength >= Self.timelineChromeLength + Self.minimumTimelineLength
+        trackEndS = max(trackStartS + 40, timelineEndS - (showsDurationLabel ? 64 : 0))
 
         let rawSurfacePoints = Self.samples(
             from: -halfLength,
@@ -632,20 +638,45 @@ struct ElasticPlaybackControlBarGeometry {
         point(at: trackStartS + (trackEndS - trackStartS) * Self.clampedUnit(fraction))
     }
 
+    var dragHandleS: CGFloat { -totalLength / 2 + 18 }
+
+    func containsDragHandle(_ location: CGPoint) -> Bool {
+        let center = point(at: dragHandleS)
+        let angle = tangentAngle(at: dragHandleS)
+        let dx = location.x - center.x
+        let dy = location.y - center.y
+        let along = dx * cos(angle) + dy * sin(angle)
+        let across = -dx * sin(angle) + dy * cos(angle)
+        return abs(along) <= 12 && abs(across) <= 20
+    }
+
     func timelineFraction(at location: CGPoint, maximumDistance: CGFloat) -> CGFloat? {
+        guard location.x.isFinite, location.y.isFinite,
+              maximumDistance.isFinite, maximumDistance >= 0 else { return nil }
+        // Project onto segments, not sampled vertices, so seeking and previews
+        // remain continuous even for long media and a curved control bar.
         let count = 120
-        var nearestDistance = CGFloat.greatestFiniteMagnitude
+        var nearestDistanceSquared = CGFloat.greatestFiniteMagnitude
         var nearestFraction: CGFloat = 0
-        for index in 0...count {
-            let fraction = CGFloat(index) / CGFloat(count)
-            let candidate = pointOnTrack(fraction: fraction)
-            let distance = hypot(candidate.x - location.x, candidate.y - location.y)
-            if distance < nearestDistance {
-                nearestDistance = distance
-                nearestFraction = fraction
+        var start = pointOnTrack(fraction: 0)
+        for index in 0..<count {
+            let end = pointOnTrack(fraction: CGFloat(index + 1) / CGFloat(count))
+            let dx = end.x - start.x
+            let dy = end.y - start.y
+            let lengthSquared = dx * dx + dy * dy
+            let projection = lengthSquared > 0
+                ? Self.clampedUnit(((location.x - start.x) * dx + (location.y - start.y) * dy) / lengthSquared)
+                : 0
+            let offsetX = location.x - (start.x + projection * dx)
+            let offsetY = location.y - (start.y + projection * dy)
+            let distanceSquared = offsetX * offsetX + offsetY * offsetY
+            if distanceSquared < nearestDistanceSquared {
+                nearestDistanceSquared = distanceSquared
+                nearestFraction = (CGFloat(index) + projection) / CGFloat(count)
             }
+            start = end
         }
-        return nearestDistance <= maximumDistance ? nearestFraction : nil
+        return nearestDistanceSquared <= maximumDistance * maximumDistance ? nearestFraction : nil
     }
 
     /// Resolves an ambiguous drag that begins on the timeline. Movement along
@@ -1044,23 +1075,25 @@ private struct ElasticPlaybackTimelineLabels: View {
                 .dynamicPlayerTextStyle(role: .secondary)
                 .position(geometry.point(at: geometry.elapsedLabelS))
 
-            Button {
-                showsRemainingDuration.toggle()
-            } label: {
-                Text(PlaybackTimelineInteraction.durationLabel(
-                    position: model.state.position,
-                    duration: model.state.duration,
-                    showsRemaining: showsRemainingDuration
-                ))
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .frame(width: 52, height: 30)
-                .dynamicPlayerTextStyle(role: .secondary)
-                .contentShape(Rectangle())
+            if geometry.showsDurationLabel {
+                Button {
+                    showsRemainingDuration.toggle()
+                } label: {
+                    Text(PlaybackTimelineInteraction.durationLabel(
+                        position: model.state.position,
+                        duration: model.state.duration,
+                        showsRemaining: showsRemainingDuration
+                    ))
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .frame(width: 52, height: 30)
+                    .dynamicPlayerTextStyle(role: .secondary)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.borderless)
+                .help("Toggle total and remaining time")
+                .accessibilityLabel("Playback duration")
+                .position(geometry.point(at: geometry.durationLabelS))
             }
-            .buttonStyle(.borderless)
-            .help("Toggle total and remaining time")
-            .accessibilityLabel("Playback duration")
-            .position(geometry.point(at: geometry.durationLabelS))
         }
     }
 }
@@ -1200,12 +1233,20 @@ enum ElasticPlaybackUtility: Hashable {
     case more
 
     static func fitting(_ utilities: [Self], length: CGFloat) -> [Self] {
-        // Reserve two time labels, a useful seek track, and their padding.
-        let requiredLength = 234 + CGFloat(max(0, utilities.count - 1))
-            * ElasticPlaybackControlBarGeometry.utilitySpacing
-        return length >= requiredLength
-            ? utilities
-            : utilities.filter { $0 == .volume || $0 == .sidebar || $0 == .more }
+        let tiers = [
+            utilities,
+            utilities.filter { $0 == .volume || $0 == .sidebar || $0 == .more },
+            utilities.filter { $0 == .volume || $0 == .more },
+        ]
+        for tier in tiers {
+            let requiredLength = ElasticPlaybackControlBarGeometry.timelineChromeLength
+                + ElasticPlaybackControlBarGeometry.minimumTimelineLength
+                + CGFloat(max(0, tier.count - 1)) * ElasticPlaybackControlBarGeometry.utilitySpacing
+            if length >= requiredLength { return tier }
+        }
+        // The smallest layout also omits the trailing time label. All actions
+        // remain available in More, leaving the track at least 160 points.
+        return utilities.filter { $0 == .more }
     }
 }
 
@@ -1286,8 +1327,8 @@ struct ElasticPlaybackControlBar: View {
                 ElasticPlaybackControlBarSurface(shape: shape)
                     .allowsHitTesting(false)
 
-                // Only the background owns movement and scrubbing. Buttons
-                // above it retain their native press/release tracking.
+                // The surface handles seeking; only the grip starts repositioning.
+                // Utility buttons retain their native press/release tracking.
                 shape.fill(Color.clear)
                     .contentShape(shape)
                     .gesture(barDragGesture(
@@ -1295,6 +1336,17 @@ struct ElasticPlaybackControlBar: View {
                         size: size,
                         utilityCount: utilities.count
                     ))
+                    .accessibilityHidden(true)
+
+                Image(systemName: model.isControlsPositionLocked ? "lock.fill" : "line.3.horizontal")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(theme.secondaryColor)
+                    .frame(width: 24, height: 40)
+                    .contentShape(Rectangle())
+                    .rotationEffect(.radians(geometry.tangentAngle(at: geometry.dragHandleS)))
+                    .position(geometry.point(at: geometry.dragHandleS))
+                    .gesture(barDragGesture(geometry: geometry, size: size, utilityCount: utilities.count))
+                    .help(model.isControlsPositionLocked ? "Controls position locked" : "Drag to move playback controls")
                     .accessibilityHidden(true)
 
                 ElasticPlaybackTimelineArtwork(model: model, geometry: geometry)
@@ -1750,6 +1802,14 @@ struct ElasticPlaybackControlBar: View {
         case .more:
             Menu {
                 // Keep compacted controls reachable without shrinking hit targets.
+                Menu("Volume") {
+                    Button(model.state.isMuted ? "Unmute" : "Mute", action: model.toggleMuteFromUser)
+                    Button("Increase Volume") { model.setVolumeFromUser(model.state.volume + 5) }
+                    Button("Decrease Volume") { model.setVolumeFromUser(model.state.volume - 5) }
+                }
+                Button(SidebarToggleControlPolicy.title(isSidebarVisible: model.isSidebarPresented),
+                       action: model.toggleSidebar)
+                    .disabled(!model.isSidebarAvailable)
                 AnyView(utilityControl(.audio, popoverEdge: popoverEdge, inMenu: true))
                 AnyView(utilityControl(.subtitles, popoverEdge: popoverEdge, inMenu: true))
                 if model.canTogglePictureInPicture {
@@ -1944,7 +2004,11 @@ struct ElasticPlaybackControlBar: View {
                         dragTimelineFraction = timelineFraction
                         model.setChromePin(.scrubbing, active: true)
                     } else {
-                        guard !model.isControlsPositionLocked else { rejectsCurrentDrag = true; return }
+                        guard !model.isControlsPositionLocked,
+                              geometry.containsDragHandle(value.startLocation) else {
+                            rejectsCurrentDrag = true
+                            return
+                        }
                         beginMovingBar(
                             geometry: geometry,
                             startLocation: value.startLocation,

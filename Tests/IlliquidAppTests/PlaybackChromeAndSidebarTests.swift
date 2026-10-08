@@ -1785,8 +1785,10 @@ struct ElasticPlaybackControlBarGeometryTests {
                 #expect(geometry.surfaceBounds.maxX <= size.width + 0.25)
                 #expect(geometry.surfaceBounds.minY >= -0.25)
                 #expect(geometry.surfaceBounds.maxY <= size.height + 0.25)
-                #expect(geometry.trackEndS <= geometry.durationLabelS - 38 + 0.25)
-                #expect(geometry.trackEndS - geometry.trackStartS >= 40)
+                if geometry.showsDurationLabel {
+                    #expect(geometry.trackEndS <= geometry.durationLabelS - 38 + 0.25)
+                }
+                #expect(geometry.trackEndS - geometry.trackStartS >= 160)
             }
         }
     }

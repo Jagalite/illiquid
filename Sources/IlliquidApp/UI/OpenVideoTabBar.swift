@@ -4,6 +4,7 @@ import IlliquidCore
 struct OpenVideoTabBar: View {
     @Bindable var model: AppModel
     @Environment(\.playerTheme) private var theme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -41,10 +42,35 @@ struct OpenVideoTabBar: View {
                         }
                     }
                 }
+                if model.openVideoTabs.items.count > 1 {
+                    Menu {
+                        ForEach(model.openVideoTabs.items) { tab in
+                            Button { model.selectOpenVideoTab(tab.id) } label: {
+                                if tab.id == model.openVideoTabs.selectedID {
+                                    Label(tab.title, systemImage: "checkmark")
+                                } else {
+                                    Text(tab.title)
+                                }
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .frame(width: 24, height: 24)
+                            .contentShape(Rectangle())
+                    }
+                    .menuStyle(.borderlessButton)
+                    .menuIndicator(.hidden)
+                    .fixedSize()
+                    .help("All Open Videos (\(model.openVideoTabs.items.count))")
+                    .accessibilityLabel("All Open Videos")
+                }
             }
             .frame(height: 28)
             .onChange(of: model.openVideoTabs.selectedID, initial: true) { _, id in
-                if let id { withAnimation { proxy.scrollTo(id, anchor: .center) } }
+                guard let id else { return }
+                withAnimation(reduceMotion ? nil : .easeOut(duration: 0.16)) {
+                    proxy.scrollTo(id, anchor: .center)
+                }
             }
         }
         .environment(\.colorScheme, theme.preferredColorScheme)

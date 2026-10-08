@@ -3,6 +3,7 @@ import IlliquidCore
 
 struct SourceSidebarTabs: View {
     @Bindable var model: AppModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 4) {
@@ -17,7 +18,7 @@ struct SourceSidebarTabs: View {
                 .frame(minWidth: 0, maxWidth: .infinity)
                 .onChange(of: model.activeSourceTabID, initial: true) { _, id in
                     guard let id else { return }
-                    withAnimation(.easeOut(duration: 0.16)) {
+                    withAnimation(reduceMotion ? nil : .easeOut(duration: 0.16)) {
                         proxy.scrollTo(id, anchor: .center)
                     }
                 }
