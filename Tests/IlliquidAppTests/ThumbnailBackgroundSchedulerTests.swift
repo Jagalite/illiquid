@@ -131,6 +131,39 @@ struct ThumbnailBackgroundSchedulerTests {
         scheduler.shutdown(); await player.shutdown()
     }
 
+    @Test func currentVideoPreparationSharesIdleBudgetWithLibraryWork() async throws {
+        let suite = "ThumbnailIdleFairness-\(UUID())"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(suite)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let player = PlaybackController(persistence: PlaybackPersistenceStore(userDefaults: defaults),
+            sessionStore: AtomicPlaybackSessionStore(fileURL: root.appendingPathComponent("session.json")),
+            thumbnailCacheDirectory: nil)
+        let current = URL(fileURLWithPath: "/media/current.mkv")
+        let other = URL(fileURLWithPath: "/media/other.mkv")
+        var generated: [URL] = []
+        let scheduler = ThumbnailBackgroundScheduler(player: player, defaults: defaults,
+            readDuration: { _ in 7_200 },
+            generate: { url, _ in generated.append(url); return true })
+        defer { scheduler.shutdown() }
+        var settings = ThumbnailPreferences()
+        settings.generatesInBackground = true
+        settings.idleSeconds = 1
+        settings.workSeconds = 3
+        settings.samplesPerVideo = 1
+        scheduler.preferences = settings
+        scheduler.navigate(folder: other.deletingLastPathComponent(), discovered: [other])
+        scheduler.updatePlayback(current: current, idle: true, windowVisible: true)
+        for _ in 0..<200 where !generated.contains(other) {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        #expect(generated.first == current)
+        #expect(generated.contains(other))
+        scheduler.shutdown()
+        await player.shutdown()
+    }
+
     @Test func memoryPressureCancelsBackgroundWorkUntilNormalAndExclusionsPreventProbes() async throws {
         let suite = "ThumbnailPressure-\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: suite))

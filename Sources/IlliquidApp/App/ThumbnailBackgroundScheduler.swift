@@ -194,7 +194,11 @@ final class ThumbnailBackgroundScheduler {
                 status = "Background work budget reached."
             }
             if automatic {
-                await runCurrent(settings: settings, id: id)
+                // Share an idle pass with opted-in library work. Otherwise the
+                // current video's replenishing nearby queue can spend every
+                // work budget before runPass ever gets a turn.
+                await runCurrent(settings: settings, id: id,
+                    maximumRequests: idle && settings.generatesInBackground ? 1 : nil)
                 if idle, settings.generatesInBackground, canContinue(id) { await runPass(settings: settings, id: id) }
             }
             else { await runPass(settings: settings, id: id) }
@@ -208,13 +212,14 @@ final class ThumbnailBackgroundScheduler {
         }
     }
 
-    private func runCurrent(settings: ThumbnailPreferences, id: UUID) async {
+    private func runCurrent(settings: ThumbnailPreferences, id: UUID, maximumRequests: Int? = nil) async {
         guard let url = current, url.isFileURL, !settings.excludesBackgroundGeneration(for: url) else { return }
         let duration: Double?
         if let known = player.playbackProgress(for: url)?.duration, known > 0 { duration = known }
         else { duration = await readDuration(url) }
         guard canContinue(id), let duration, duration.isFinite, duration > 0 else { return }
         let broad = ThumbnailPolicy.storyboard(duration: duration)
+        var requests = 0
         while canContinue(id) {
             let now = ProcessInfo.processInfo.systemUptime
             lastAttempt = lastAttempt.filter { now - $0.value < 20 }
@@ -229,6 +234,8 @@ final class ThumbnailBackgroundScheduler {
             guard canContinue(id) else { return }
             if succeeded, broad.contains(time) { prepared.insert(time) }
             status = "Prepared \(prepared.intersection(broad).count) of \(broad.count) timeline previews."
+            requests += 1
+            if let maximumRequests, requests >= maximumRequests { return }
             // One independent decode at a time; pause between requests, including
             // cache hits, so preparation never becomes an unbounded tight loop.
             do { try await Task.sleep(for: .seconds(2)) } catch { return }
