@@ -9,6 +9,7 @@ import IlliquidPlayer
 /// than hiding the test runner or depending on a window server's occlusion timing.
 @MainActor
 private final class ThumbnailVisibilityTestWindow: NSWindow {
+    var testApplicationHidden = false
     var testVisible = true
     var testMiniaturized = false
     var testOccluded = false
@@ -55,9 +56,8 @@ struct ThumbnailLifecycleRegressionTests {
     @Test func visibilityNotificationsCoverMinimizeHideOcclusionAndClose() {
         let window = window()
         defer { window.close() }
-        var hidden = false
         var changes = 0
-        let observation = ThumbnailWindowObservation(window: window, applicationHidden: { hidden }) { changes += 1 }
+        let observation = ThumbnailWindowObservation(window: window, applicationHidden: { window.testApplicationHidden }) { changes += 1 }
         defer { observation.stop() }
         let center = NotificationCenter.default
         #expect(observation.isVisible)
@@ -71,10 +71,10 @@ struct ThumbnailLifecycleRegressionTests {
         center.post(name: NSWindow.didDeminiaturizeNotification, object: window)
         #expect(observation.isVisible && changes == 2)
 
-        hidden = true
+        window.testApplicationHidden = true
         center.post(name: NSApplication.didHideNotification, object: NSApplication.shared)
         #expect(!observation.isVisible && changes == 3)
-        hidden = false
+        window.testApplicationHidden = false
         center.post(name: NSApplication.didUnhideNotification, object: NSApplication.shared)
         #expect(observation.isVisible && changes == 4)
 

@@ -14,7 +14,10 @@ import hashlib
 import json
 from pathlib import Path
 import plistlib
+import shutil
+import subprocess
 import sys
+import tempfile
 from typing import Any
 
 
@@ -24,6 +27,28 @@ def digest(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             hasher.update(block)
     return hasher.hexdigest()
+
+
+def executable_payload(path: Path) -> tuple[str, str]:
+    """Ignore signing-only differences without modifying the installed binary."""
+    with path.open("rb") as stream:
+        magic = stream.read(4)
+    macho = {bytes.fromhex(value) for value in (
+        "feedface", "cefaedfe", "feedfacf", "cffaedfe",
+        "cafebabe", "bebafeca", "cafebabf", "bfbafeca")}
+    if magic not in macho:
+        # Supports opaque synthetic fixtures; genuine Illiquid executables are Mach-O.
+        return digest(path), "opaque-bytes-v1"
+    if sys.platform != "darwin":
+        raise ValueError("Mach-O snapshots require macOS codesign for signature-independent identity")
+    with tempfile.TemporaryDirectory(prefix="illiquid-code-identity-") as directory:
+        unsigned = Path(directory) / "executable"
+        shutil.copyfile(path, unsigned)
+        result = subprocess.run(["/usr/bin/codesign", "--remove-signature", str(unsigned)],
+                                capture_output=True, timeout=30, check=False)
+        if result.returncode != 0:
+            raise ValueError("Cannot derive unsigned executable identity; check the test artifact's signature")
+        return digest(unsigned), "mach-o-codesign-stripped-v1"
 
 
 def canonical(value: Any) -> Any:
@@ -58,6 +83,8 @@ def snapshot(app: Path, package: Path, preferences: dict[str, Path], sessions: d
     executable = info["CFBundleExecutable"]
     if not isinstance(executable, str) or Path(executable).name != executable:
         raise ValueError("Invalid CFBundleExecutable")
+    binary = app / "Contents/MacOS" / executable
+    payload_hash, payload_identity = executable_payload(binary)
     state = {
         "preferences": {name: canonical(plistlib.loads(path.read_bytes())) for name, path in preferences.items()},
         "sessions": {name: json.loads(path.read_bytes()) for name, path in sessions.items()},
@@ -65,14 +92,16 @@ def snapshot(app: Path, package: Path, preferences: dict[str, Path], sessions: d
     if not any(state["preferences"].values()) or not any(state["sessions"].values()):
         raise ValueError("Empty exports cannot demonstrate populated-state preservation")
     return {
-        "schema": 1,
+        "schema": 2,
         "scope": "exported-state-only; operator must verify install and UI behavior",
         "application": {
             "path": str(app.resolve()),
             "bundle_identifier": info["CFBundleIdentifier"],
             "version": str(info["CFBundleShortVersionString"]),
             "build": str(info["CFBundleVersion"]),
-            "executable_sha256": digest(app / "Contents/MacOS" / executable),
+            "executable_sha256": digest(binary),
+            "payload_sha256": payload_hash,
+            "payload_identity": payload_identity,
         },
         "package": {"path": str(package.resolve()), "sha256": digest(package)},
         "state": state,
@@ -101,10 +130,12 @@ def differences(expected: Any, actual: Any, path: str = "state") -> list[str]:
 
 
 def compare(before: dict[str, Any], after: dict[str, Any], expected_state: Any = None) -> list[str]:
-    if before.get("schema") != 1 or after.get("schema") != 1:
+    if before.get("schema") != 2 or after.get("schema") != 2:
         raise ValueError("Unsupported receipt schema")
-    if before["application"]["executable_sha256"] == after["application"]["executable_sha256"]:
-        raise ValueError("Same executable: changing build numbers is not a historical-package upgrade")
+    if before["application"]["payload_identity"] != after["application"]["payload_identity"]:
+        raise ValueError("Incompatible executable identity methods")
+    if before["application"]["payload_sha256"] == after["application"]["payload_sha256"]:
+        raise ValueError("Same executable payload: version bumps/re-signing are not a historical-package upgrade")
     if before["package"]["sha256"] == after["package"]["sha256"]:
         raise ValueError("Same package: supply two distinct historical/candidate artifacts")
     if not before["state"].get("preferences") or not before["state"].get("sessions"):
@@ -146,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print("PASS: compared exported state preserved across distinct artifacts; not a full installed-app qualification.")
         return 0
-    except (OSError, ValueError, KeyError, TypeError, plistlib.InvalidFileException) as error:
+    except (OSError, ValueError, KeyError, TypeError, plistlib.InvalidFileException, subprocess.TimeoutExpired) as error:
         print(f"Cannot qualify: {error}", file=sys.stderr)
         return 2
 

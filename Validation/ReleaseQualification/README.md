@@ -79,8 +79,13 @@ expected projection of the receipt's `state` object. Missing expected keys fail;
 additive dictionary fields are allowed. JSON stored inside plist Data is exposed
 under `$json_data`; opaque bytes are represented under `$base64_data`.
 
-The comparison deliberately rejects the same executable or the same package,
-even when build numbers differ. A pass establishes only the recorded state
+The comparison deliberately rejects the same executable payload or the same
+package, even when build numbers differ. For Mach-O, it records the original hash
+and hashes a disposable copy after `codesign --remove-signature`; the installed
+executable is never modified. This prevents re-signing a version-bumped copy from
+masquerading as different application code. Mach-O snapshots require macOS; old
+signature-sensitive receipts are rejected. A macOS test compiles a tiny executable,
+signs two differently versioned app copies, and verifies rejection. A pass establishes only the recorded state
 comparison, not UI behavior, correct migration semantics outside the expectations,
 signing provenance, or installed-package qualification. Review intentional
 changes rather than removing inconvenient assertions. A mismatch requires
