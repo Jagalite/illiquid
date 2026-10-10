@@ -120,7 +120,7 @@ public enum ThumbnailPolicy {
     }
 
     public static func ranked(_ candidates: [Candidate], current: URL?, folder: URL?,
-                              now: Date, preferences: ThumbnailPreferences) -> [URL] {
+                              now: Date, preferences: ThumbnailPreferences, maximumCount: Int? = nil) -> [URL] {
         let settings = preferences.bounded
         let current = current?.standardizedFileURL
         let folderPath = folder?.standardizedFileURL.path
@@ -151,7 +151,10 @@ public enum ThumbnailPolicy {
             if left.score == right.score { return left.offset < right.offset }
             return left.score > right.score
         }
-        return ordered.prefix(settings.videosPerPass).map { $0.url }
+        // A scheduler may rank its entire bounded candidate pool before applying
+        // a persistent pass cursor. Truncating first would starve everything below
+        // the same high-priority prefix on every pass.
+        return ordered.prefix(max(0, maximumCount ?? settings.videosPerPass)).map { $0.url }
     }
 
     /// After every video has its first image, keep a bounded visit on each file

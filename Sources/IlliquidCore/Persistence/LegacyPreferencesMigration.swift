@@ -41,7 +41,14 @@ public enum LegacyPreferencesMigration {
                 withIntermediateDirectories: true)
             if !fileManager.fileExists(atPath: destination.path),
                fileManager.fileExists(atPath: legacy.path) {
-                try fileManager.copyItem(at: legacy, to: destination)
+                // Never expose a partially copied session as the destination:
+                // a later launch would otherwise mistake it for a completed import.
+                // Stage beside the destination, then publish with a same-volume move.
+                let staged = destination.deletingLastPathComponent()
+                    .appendingPathComponent(".legacy-session-\(UUID().uuidString).tmp")
+                defer { try? fileManager.removeItem(at: staged) }
+                try fileManager.copyItem(at: legacy, to: staged)
+                try fileManager.moveItem(at: staged, to: destination)
             }
             try Data().write(to: marker, options: .atomic)
         } catch {

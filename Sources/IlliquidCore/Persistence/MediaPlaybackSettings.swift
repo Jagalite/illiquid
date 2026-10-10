@@ -2,6 +2,9 @@ import Foundation
 
 public struct MediaTrackPreference: Codable, Equatable, Sendable {
     public let kind: MediaTrackKind
+    /// A same-file tie-breaker, not a stable identity after remuxing/renumbering.
+    /// Optional so preferences saved by older releases still decode.
+    public let trackID: Int64?
     public let title: String?
     public let languageCode: String?
     public let codec: String?
@@ -10,6 +13,7 @@ public struct MediaTrackPreference: Codable, Equatable, Sendable {
 
     public init(track: MediaTrack) {
         kind = track.kind
+        trackID = track.id
         title = track.title
         languageCode = track.languageCode
         codec = track.codec
@@ -36,6 +40,12 @@ public struct MediaTrackPreference: Codable, Equatable, Sendable {
             .filter { $0.1 > 0 }
             .max { lhs, rhs in
                 if lhs.1 != rhs.1 { return lhs.1 < rhs.1 }
+                // Distinctive metadata still wins when stream IDs change.
+                // For otherwise indistinguishable tracks, preserve the saved ID
+                // instead of always selecting the lowest ID.
+                if let trackID, (lhs.0.id == trackID) != (rhs.0.id == trackID) {
+                    return rhs.0.id == trackID
+                }
                 return lhs.0.id > rhs.0.id
             }?
             .0
