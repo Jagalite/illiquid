@@ -85,6 +85,7 @@ struct IlliquidApp: App {
             .tint(themeStore.selection.accentColor)
             .background {
                 WindowAccessor { window in
+                    model.thumbnailScheduler.observeVisibility(of: window)
                     model.configure(window: window)
                 }
                 PlayerWindowSceneBridge(model: model)
