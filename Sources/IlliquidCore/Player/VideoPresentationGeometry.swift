@@ -1,5 +1,4 @@
 import Foundation
-import CoreGraphics
 
 public enum VideoScaleMode: String, Codable, CaseIterable, Sendable {
     case fit, fill
