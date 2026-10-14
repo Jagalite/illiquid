@@ -2,7 +2,7 @@ name: Validate reviewed product series
 on:
   push:
     branches: [work/illiquid-product-review]
-    paths: ['ReviewWork/changes.json']
+    paths: ['ReviewWork/plan.json']
 permissions:
   contents: write
 concurrency:
@@ -29,26 +29,38 @@ jobs:
         run: |
           python3 - <<'PY'
           import base64, gzip, hashlib, json, pathlib, subprocess
+          root = pathlib.Path('../transport/ReviewWork').resolve()
+          def read(name):
+              path = (root / name).resolve()
+              if not path.is_relative_to(root):
+                  raise SystemExit('Patch must be in ReviewWork')
+              return path.read_bytes()
           def run(*args, **kwargs):
               return subprocess.run(args, check=True, **kwargs)
-          series = json.loads(pathlib.Path('../transport/ReviewWork/changes.json').read_text())
+          plan = json.loads(read('plan.json'))
           actual = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
-          if actual != series['base_sha']:
-              raise SystemExit('Feature branch changed; refusing to apply against another base')
+          if actual != plan['base_sha']:
+              raise SystemExit('Feature branch changed; refusing another base')
           run('git', 'config', 'user.name', 'Jaga Tranvo')
           run('git', 'config', 'user.email', '8354941+Jagalite@users.noreply.github.com')
-          assert 1 <= len(series['patches']) <= 20
-          for patch in series['patches']:
+          assert 1 <= len(plan['patches']) <= 30
+          for entry in plan['patches']:
+              source = json.loads(read(entry['source']))
+              patch = source['patches'][entry['index']] if 'index' in entry else source
               decoded = gzip.decompress(base64.b64decode(patch['gzip_base64'], validate=True))
               assert len(decoded) < 2000000
               assert hashlib.sha256(decoded).hexdigest() == patch['sha256']
               run('git', 'apply', '--check', input=decoded)
               run('git', 'apply', '--index', input=decoded)
+              for fixup in entry.get('fixups', []):
+                  data = read(fixup)
+                  run('git', 'apply', '--check', input=data)
+                  run('git', 'apply', '--index', input=data)
               run('git', 'diff', '--cached', '--check')
               run('bash', 'Scripts/test-product-regressions.sh')
               run('git', 'commit', '--no-gpg-sign', '-m', patch['subject'])
               run('git', 'show', '--check', '--stat', 'HEAD')
-          run('git', 'diff', '--check', series['base_sha'], 'HEAD')
+          run('git', 'diff', '--check', plan['base_sha'], 'HEAD')
           pathlib.Path('REVIEW_REVISION.txt').write_text(subprocess.check_output(['git','rev-parse','HEAD'], text=True))
           PY
       - name: Prepare pinned native dependencies
@@ -59,6 +71,7 @@ jobs:
           fi
           python3 Scripts/verify-corresponding-source.py DependencySources
           python3 Scripts/install-ci-native-sdk.py
+          xcrun appintentsmetadataprocessor --help > appintents-tool-help.txt 2>&1 || true
       - name: Native application build and product regression tests
         working-directory: product
         run: |
@@ -84,5 +97,6 @@ jobs:
           path: |
             product/candidate-source.tar.gz
             product/product-tests.log
+            product/appintents-tool-help.txt
             product/REVIEW_REVISION.txt
           retention-days: 14
