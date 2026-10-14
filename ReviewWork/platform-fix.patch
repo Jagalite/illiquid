@@ -1,0 +1,13 @@
+diff --git a/Scripts/test-product-regressions.sh b/Scripts/test-product-regressions.sh
+index 17b5dc1..b7e49eb 100755
+--- a/Scripts/test-product-regressions.sh
++++ b/Scripts/test-product-regressions.sh
+@@ -34,7 +34,7 @@ done
+ cat > "$work/Package.swift" <<'SWIFT'
+ // swift-tools-version: 6.1
+ import PackageDescription
+-let package = Package(name: "IlliquidProductRegressions", targets: [
++let package = Package(name: "IlliquidProductRegressions", platforms: [.macOS("26.0")], targets: [
+     .target(name: "IlliquidCore"),
+     .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])
+ ])
