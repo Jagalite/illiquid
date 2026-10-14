@@ -2,7 +2,7 @@ import Foundation
 
 /// A cheap, path-independent filesystem version, not a hash of the entire video.
 /// Device numbers are excluded because a remount may assign a different one.
-public struct MediaContentVersion: Codable, Equatable, Sendable {
+public struct MediaContentVersion: Codable, Equatable, Hashable, Sendable {
     public let fileIdentifier: UInt64
     public let byteCount: Int64
     public let modificationSeconds: Int64

@@ -8,6 +8,8 @@ trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/Sources/IlliquidCore" "$work/Tests/IlliquidCoreTests"
 for file in \
     Player/MediaTrack.swift \
+    Player/TrackSelectionPreferences.swift \
+    Utilities/NormalizedFileURL.swift \
     Player/ThumbnailPolicy.swift \
     Player/ThumbnailPassCursor.swift \
     Player/ThumbnailVisibilityPolicy.swift \
