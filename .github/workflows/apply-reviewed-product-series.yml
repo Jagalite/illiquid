@@ -1,0 +1,88 @@
+name: Validate reviewed product series
+on:
+  push:
+    branches: [work/illiquid-product-review]
+    paths: ['ReviewWork/changes.json']
+permissions:
+  contents: write
+concurrency:
+  group: reviewed-illiquid-product-series
+  cancel-in-progress: false
+jobs:
+  validate-and-publish:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          path: transport
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: feat/recovery-captions-automation
+          path: product
+          fetch-depth: 0
+      - name: Apply and review exact patch series
+        working-directory: product
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, pathlib, subprocess
+          def run(*args, **kwargs):
+              return subprocess.run(args, check=True, **kwargs)
+          series = json.loads(pathlib.Path('../transport/ReviewWork/changes.json').read_text())
+          actual = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          if actual != series['base_sha']:
+              raise SystemExit('Feature branch changed; refusing to apply against another base')
+          run('git', 'config', 'user.name', 'Jaga Tranvo')
+          run('git', 'config', 'user.email', '8354941+Jagalite@users.noreply.github.com')
+          assert 1 <= len(series['patches']) <= 20
+          for patch in series['patches']:
+              decoded = gzip.decompress(base64.b64decode(patch['gzip_base64'], validate=True))
+              assert len(decoded) < 2000000
+              assert hashlib.sha256(decoded).hexdigest() == patch['sha256']
+              run('git', 'apply', '--check', input=decoded)
+              run('git', 'apply', '--index', input=decoded)
+              run('git', 'diff', '--cached', '--check')
+              run('bash', 'Scripts/test-product-regressions.sh')
+              run('git', 'commit', '--no-gpg-sign', '-m', patch['subject'])
+              run('git', 'show', '--check', '--stat', 'HEAD')
+          run('git', 'diff', '--check', series['base_sha'], 'HEAD')
+          pathlib.Path('REVIEW_REVISION.txt').write_text(subprocess.check_output(['git','rev-parse','HEAD'], text=True))
+          PY
+      - name: Prepare pinned native dependencies
+        working-directory: product
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Native application build and product regression tests
+        working-directory: product
+        run: |
+          set -o pipefail
+          swift test --force-resolved-versions --no-parallel --filter 'IlliquidCoreTests|IlliquidPlayerTests|IlliquidPlaybackCoreTests|IlliquidAppTests|CaptionTranscript' 2>&1 | tee product-tests.log
+          bash Scripts/test-restoration-regressions.sh
+          python3 -m unittest discover -s Validation/ReleaseQualification -p 'test_*.py' -v
+      - name: Publish tested commits to feature branch only
+        working-directory: product
+        run: |
+          git push origin HEAD:refs/heads/feat/recovery-captions-automation
+          git rev-parse HEAD
+      - name: Collect candidate source and test evidence
+        if: always()
+        working-directory: product
+        run: |
+          git rev-parse HEAD > REVIEW_REVISION.txt
+          tar -czf candidate-source.tar.gz Sources Tests Scripts Documentation Validation Package.swift Package.resolved .github Resources README.md REVIEW_REVISION.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: reviewed-product-candidate
+          path: |
+            product/candidate-source.tar.gz
+            product/product-tests.log
+            product/REVIEW_REVISION.txt
+          retention-days: 14
