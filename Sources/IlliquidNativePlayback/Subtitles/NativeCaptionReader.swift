@@ -3,7 +3,7 @@ import Foundation
 import IlliquidCore
 
 public enum CaptionReadError: Error, LocalizedError, Equatable {
-    case localFileRequired, textTrackRequired, externalFileUnavailable, sourceChanged, trackUnavailable
+    case localFileRequired, textTrackRequired, externalFileUnavailable, sourceChanged, trackUnavailable, decoderUnavailable
 
     public var errorDescription: String? {
         switch self {
@@ -12,6 +12,7 @@ public enum CaptionReadError: Error, LocalizedError, Equatable {
         case .externalFileUnavailable: "The external subtitle file is unavailable. Load it again, then retry."
         case .sourceChanged: "The media or subtitle file changed while its captions were being read. Retry to rebuild the index."
         case .trackUnavailable: "The selected subtitle track is no longer available."
+        case .decoderUnavailable: "This text subtitle format cannot be decoded for caption navigation."
         }
     }
 }
@@ -95,7 +96,9 @@ public enum NativeCaptionReader {
         guard let parameters = try input.copyCodecParameters(streamIndex: streamIndex) else {
             throw CaptionReadError.trackUnavailable
         }
-        let decoder = try parameters.withUnsafePointer { try SubtitleDecoder(parameters: $0, stream: stream) }
+        guard let decoder = try parameters.withUnsafePointer({ try SubtitleDecoder(parameters: $0, stream: stream) }) else {
+            throw CaptionReadError.decoderUnavailable
+        }
         let origin = input.mediaInfo.startTime
         guard origin.isFinite else { throw CaptionReadError.sourceChanged }
         let deadline = ProcessInfo.processInfo.systemUptime + 8
