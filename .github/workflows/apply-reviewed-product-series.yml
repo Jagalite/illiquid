@@ -47,7 +47,11 @@ jobs:
           for entry in plan['patches']:
               source = json.loads(read(entry['source']))
               patch = source['patches'][entry['index']] if 'index' in entry else source
-              decoded = gzip.decompress(base64.b64decode(patch['gzip_base64'], validate=True))
+              encoded = patch['gzip_base64']
+              for old, new in entry.get('base64_replacements', []):
+                  assert encoded.count(old) == 1
+                  encoded = encoded.replace(old, new)
+              decoded = gzip.decompress(base64.b64decode(encoded, validate=True))
               assert len(decoded) < 2000000
               assert hashlib.sha256(decoded).hexdigest() == patch['sha256']
               run('git', 'apply', '--check', input=decoded)
@@ -72,6 +76,21 @@ jobs:
           python3 Scripts/verify-corresponding-source.py DependencySources
           python3 Scripts/install-ci-native-sdk.py
           xcrun appintentsmetadataprocessor --help > appintents-tool-help.txt 2>&1 || true
+          xcrun swiftc -help-hidden > swiftc-help.txt
+          python3 - <<'PY'
+          import pathlib, re, subprocess
+          sdk = pathlib.Path(subprocess.check_output(['xcrun','--show-sdk-path'],text=True).strip())
+          files = list((sdk/'System/Library/Frameworks/AppIntents.framework/Modules/AppIntents.swiftmodule').glob('arm64e-apple-macos.swiftinterface'))
+          if not files:
+              files = list((sdk/'System/Library/Frameworks/AppIntents.framework/Modules/AppIntents.swiftmodule').glob('*.swiftinterface'))
+          if files:
+              lines = files[0].read_text().splitlines()
+              out=[]
+              for i,line in enumerate(lines):
+                  if re.search(r'(struct IntentFile|protocol AppIntent[ :]|protocol AppEntity[ :]|protocol EntityQuery[ :]|protocol ReturnsValue[ :]|func result.*value:)',line):
+                      out.extend(lines[max(0,i-2):i+90])
+              pathlib.Path('appintents-api.txt').write_text('\n'.join(out))
+          PY
       - name: Native application build and product regression tests
         working-directory: product
         run: |
@@ -98,5 +117,7 @@ jobs:
             product/candidate-source.tar.gz
             product/product-tests.log
             product/appintents-tool-help.txt
+            product/appintents-api.txt
+            product/swiftc-help.txt
             product/REVIEW_REVISION.txt
           retention-days: 14
