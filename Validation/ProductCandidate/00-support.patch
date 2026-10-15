@@ -1,0 +1,542 @@
+diff --git a/Package.swift b/Package.swift
+index 6f36094..3534710 100644
+--- a/Package.swift
++++ b/Package.swift
+@@ -1,6 +1,14 @@
+ // swift-tools-version: 6.1
+ 
+ import PackageDescription
++import Foundation
++
++let intentExtractionSettings: [SwiftSetting] = ProcessInfo.processInfo.environment["ILLIQUID_INTENTS_BUILD_DIRECTORY"].map { directory in
++    [.unsafeFlags([
++        "-Xfrontend", "-const-gather-protocols-file", "-Xfrontend", directory + "/protocols.json",
++        "-Xfrontend", "-emit-const-values-path", "-Xfrontend", directory + "/IlliquidApp.swiftconstvalues"
++    ], .when(configuration: .release))]
++} ?? []
+ 
+ let package = Package(
+     name: "Illiquid",
+@@ -119,6 +127,7 @@ let package = Package(
+             resources: [
+                 .process("Resources"),
+             ],
++            swiftSettings: intentExtractionSettings,
+             linkerSettings: [
+                 .linkedFramework("AppKit"),
+                 .linkedFramework("AVKit"),
+diff --git a/Scripts/app-intents-metadata.py b/Scripts/app-intents-metadata.py
+new file mode 100644
+index 0000000..45f2c47
+--- /dev/null
++++ b/Scripts/app-intents-metadata.py
+@@ -0,0 +1,131 @@
++#!/usr/bin/env python3
++"""Produce and verify real compiler/Apple-generated Shortcuts metadata.
++
++No fallback metadata is manufactured and extractor failures are fatal. The
++normal packaging script invokes this before codesigning, never after signing.
++"""
++from __future__ import annotations
++import argparse
++import json
++import re
++import subprocess
++from pathlib import Path
++
++INTENTS = frozenset({"OpenMediaAtTimeIntent", "EnqueueOrderedMediaIntent",
++                     "GetPlaybackReferenceIntent", "OpenPlaybackReferenceIntent"})
++PROTOCOLS = ["AppIntent", "AppEntity", "AppEnum", "AppShortcutsProvider", "EntityQuery",
++             "AppIntentsPackage", "DynamicOptionsProvider", "IntentValueQuery"]
++
++
++def prepare(directory: Path) -> None:
++    directory.mkdir(parents=True, exist_ok=True)
++    (directory / "protocols.json").write_text(json.dumps(PROTOCOLS) + "\n", encoding="utf-8")
++    # A reused scratch directory must not validate yesterday's declarations.
++    (directory / "IlliquidApp.swiftconstvalues").unlink(missing_ok=True)
++
++
++def strings(value: object):
++    if isinstance(value, str):
++        yield value
++    elif isinstance(value, list):
++        for item in value:
++            yield from strings(item)
++    elif isinstance(value, dict):
++        for key, item in value.items():
++            yield key
++            yield from strings(item)
++
++
++def require_intents(value: object, label: str) -> None:
++    # The schema includes both qualified Swift names and identifier keys.
++    names = {part for text in strings(value) for part in re.findall(r"[A-Za-z_][A-Za-z0-9_]*", text)}
++    missing = INTENTS - names
++    if missing:
++        raise ValueError(f"{label} is missing actions: {', '.join(sorted(missing))}")
++
++
++def validate_constants(path: Path) -> None:
++    value = json.loads(path.read_text(encoding="utf-8"))
++    if not isinstance(value, list) or not value:
++        raise ValueError("Compiler constant metadata is empty or malformed")
++    require_intents(value, "Compiler metadata")
++
++
++def validate_resources(resources: Path) -> dict:
++    metadata = resources / "Metadata.appintents"
++    actions = sorted(metadata.rglob("*.actionsdata")) if metadata.is_dir() else []
++    if not actions:
++        raise ValueError("Apple's Metadata.appintents action catalog is missing")
++    records = []
++    for path in actions:
++        if path.is_symlink() or path.stat().st_size > 16 * 1024 * 1024:
++            raise ValueError("Invalid action catalog")
++        records.append(json.loads(path.read_text(encoding="utf-8")))
++    require_intents(records, "Packaged action catalog")
++    return {"actions": sorted(INTENTS), "files": [str(p.relative_to(resources)) for p in actions]}
++
++
++def capture(*command: str) -> str:
++    return subprocess.check_output(command, text=True).strip()
++
++
++def extract(directory: Path, repository: Path, resources: Path, deployment: str, architecture: str) -> None:
++    if not re.fullmatch(r"[0-9]+(?:\.[0-9]+){0,2}", deployment):
++        raise ValueError("Invalid deployment target")
++    if architecture not in {"arm64", "x86_64"}:
++        raise ValueError("Unsupported architecture")
++    constants = directory / "IlliquidApp.swiftconstvalues"
++    validate_constants(constants)
++    sources = sorted((repository / "Sources/IlliquidApp").rglob("*.swift"))
++    if not sources:
++        raise ValueError("App sources are missing")
++    source_list, constants_list = directory / "sources.txt", directory / "constants.txt"
++    source_list.write_text("".join(str(p.resolve()) + "\n" for p in sources), encoding="utf-8")
++    constants_list.write_text(str(constants.resolve()) + "\n", encoding="utf-8")
++    developer = Path(capture("xcode-select", "-p"))
++    # xcrun honors DEVELOPER_DIR even when the global xcode-select differs.
++    compiler = Path(capture("xcrun", "--find", "swiftc")).resolve()
++    toolchain = next((p for p in compiler.parents if p.name.endswith(".xctoolchain")),
++                     developer / "Toolchains/XcodeDefault.xctoolchain")
++    version = capture("xcodebuild", "-version")
++    match = re.search(r"^Build version (\S+)$", version, re.M)
++    if not match:
++        raise ValueError("Xcode build version is unavailable")
++    resources.mkdir(parents=True, exist_ok=True)
++    if (resources / "Metadata.appintents").exists():
++        raise ValueError("Refusing to validate or overwrite stale packaged intent metadata")
++    subprocess.run(["xcrun", "appintentsmetadataprocessor",
++                    "--toolchain-dir", str(toolchain), "--module-name", "IlliquidApp",
++                    "--output", str(resources), "--sdk-root", capture("xcrun", "--sdk", "macosx", "--show-sdk-path"),
++                    "--xcode-version", match[1], "--platform-family", "macOS",
++                    "--deployment-target", deployment, "--target-triple", f"{architecture}-apple-macosx{deployment}",
++                    "--source-file-list", str(source_list), "--swift-const-vals-list", str(constants_list),
++                    "--no-app-shortcuts-localization"], check=True)
++    report = validate_resources(resources)
++    (directory / "validation.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
++    print(json.dumps(report))
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(description=__doc__)
++    sub = parser.add_subparsers(dest="command", required=True)
++    sub.add_parser("prepare").add_argument("directory", type=Path)
++    validator = sub.add_parser("validate")
++    validator.add_argument("resources", type=Path)
++    extractor = sub.add_parser("extract")
++    extractor.add_argument("--build-directory", required=True, type=Path)
++    extractor.add_argument("--repository", required=True, type=Path)
++    extractor.add_argument("--resources", required=True, type=Path)
++    extractor.add_argument("--deployment-target", required=True)
++    extractor.add_argument("--architecture", required=True)
++    args = parser.parse_args()
++    if args.command == "prepare":
++        prepare(args.directory)
++    elif args.command == "validate":
++        print(json.dumps(validate_resources(args.resources)))
++    else:
++        extract(args.build_directory, args.repository, args.resources, args.deployment_target, args.architecture)
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/Scripts/build-illiquid-app.sh b/Scripts/build-illiquid-app.sh
+index 31e06d8..dca1678 100755
+--- a/Scripts/build-illiquid-app.sh
++++ b/Scripts/build-illiquid-app.sh
+@@ -89,6 +89,11 @@ cleanup() {
+ trap cleanup EXIT
+ 
+ export MACOSX_DEPLOYMENT_TARGET=$minimum_macos
++# Only the executable target emits constants, avoiding concurrent writes from
++# dependency targets. Extraction must succeed before the bundle is signed.
++export ILLIQUID_INTENTS_BUILD_DIRECTORY="$build_root/app-intents"
++python3 "$script_directory/app-intents-metadata.py" prepare "$ILLIQUID_INTENTS_BUILD_DIRECTORY"
++
+ swift_arguments=(
+     --package-path "$repository_root"
+     --scratch-path "$build_root/swiftpm"
+@@ -198,6 +203,12 @@ generate_brand_icon() {
+ generate_brand_icon "$repository_root/Resources/IlliquidIcon.png" AppIcon
+ generate_brand_icon "$repository_root/Resources/Branding/SmoothPrism/video-document.svg" VideoDocument
+ 
++python3 "$script_directory/app-intents-metadata.py" extract \
++    --build-directory "$ILLIQUID_INTENTS_BUILD_DIRECTORY" \
++    --repository "$repository_root" --resources "$resources" \
++    --deployment-target "$minimum_macos" --architecture "${architectures%% *}"
++
++
+ search_directories=()
+ for package in libavformat libavfilter libass; do
+     library_directory=$(pkg-config --variable=libdir "$package")
+diff --git a/Scripts/tests/app-intents-metadata-tests.py b/Scripts/tests/app-intents-metadata-tests.py
+new file mode 100644
+index 0000000..319e0f3
+--- /dev/null
++++ b/Scripts/tests/app-intents-metadata-tests.py
+@@ -0,0 +1,60 @@
++import importlib.util
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++spec = importlib.util.spec_from_file_location('intent_metadata', Path(__file__).resolve().parents[1] / 'app-intents-metadata.py')
++metadata = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(metadata)
++
++class AppIntentsMetadataTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++
++    def test_prepare_removes_stale_constants(self):
++        constants = self.root / 'IlliquidApp.swiftconstvalues'
++        constants.write_text('old')
++        metadata.prepare(self.root)
++        self.assertFalse(constants.exists())
++        self.assertIn('AppIntent', json.loads((self.root / 'protocols.json').read_text()))
++
++    def test_compiler_metadata_requires_all_action_types(self):
++        constants = self.root / 'IlliquidApp.swiftconstvalues'
++        constants.write_text(json.dumps([{'typeName': 'IlliquidApp.' + name} for name in metadata.INTENTS]))
++        metadata.validate_constants(constants)
++        constants.write_text(json.dumps([{'typeName': 'Unrelated'}]))
++        with self.assertRaisesRegex(ValueError, 'missing actions'):
++            metadata.validate_constants(constants)
++
++    def test_missing_or_empty_metadata_is_not_success(self):
++        with self.assertRaisesRegex(ValueError, 'missing'):
++            metadata.validate_resources(self.root)
++        directory = self.root / 'Metadata.appintents'
++        directory.mkdir()
++        (directory / 'extract.actionsdata').write_text('{}')
++        with self.assertRaisesRegex(ValueError, 'missing actions'):
++            metadata.validate_resources(self.root)
++
++    def test_generated_catalog_requires_each_action(self):
++        directory = self.root / 'Metadata.appintents'
++        directory.mkdir()
++        path = directory / 'extract.actionsdata'
++        path.write_text(json.dumps({'actions': [{'identifier': 'IlliquidApp.' + name} for name in metadata.INTENTS]}))
++        result = metadata.validate_resources(self.root)
++        self.assertEqual(result['actions'], sorted(metadata.INTENTS))
++        self.assertEqual(result['files'], ['Metadata.appintents/extract.actionsdata'])
++
++    def test_symlink_catalog_is_rejected(self):
++        directory = self.root / 'Metadata.appintents'
++        directory.mkdir()
++        external = self.root / 'external'
++        external.write_text(json.dumps(sorted(metadata.INTENTS)))
++        (directory / 'extract.actionsdata').symlink_to(external)
++        with self.assertRaisesRegex(ValueError, 'Invalid'):
++            metadata.validate_resources(self.root)
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/Sources/IlliquidApp/App/IlliquidApp.swift b/Sources/IlliquidApp/App/IlliquidApp.swift
+index a6ab934..ff80645 100644
+--- a/Sources/IlliquidApp/App/IlliquidApp.swift
++++ b/Sources/IlliquidApp/App/IlliquidApp.swift
+@@ -1,4 +1,5 @@
+ import SwiftUI
++import AppIntents
+ import IlliquidCore
+ 
+ @main
+@@ -8,10 +9,13 @@ struct IlliquidApp: App {
+     @State private var model: AppModel?
+     @State private var offersDefaultPlayer = false
+     @State private var showsDefaultPlayerResult = false
++    @State private var showsCaptions = false
++    @State private var showsMediaPreferences = false
+     @State private var themeStore: PlayerThemeStore
+     @State private var interfaceScale: PlayerInterfaceScaleStore
+ 
+     init() {
++        IlliquidAppShortcuts.updateAppShortcutParameters()
+         let timing = LifecyclePerformance.begin("app-init")
+         defer { LifecyclePerformance.end("app-init", since: timing) }
+         if Bundle.main.bundleIdentifier == LegacyPreferencesMigration.bundleIdentifier {
+@@ -45,7 +49,16 @@ struct IlliquidApp: App {
+         .defaultSize(width: 1_200, height: 760)
+         .commands {
+             UpdateCommands()
+-            if let model { PlayerCommands(model: model) }
++            if let model {
++                PlayerCommands(model: model)
++                CommandMenu("Media Tools") {
++                    Button("Caption Navigation…") { showsCaptions = true }
++                        .keyboardShortcut("f", modifiers: [.command, .shift])
++                        .disabled(model.player.viewStore.currentSource == nil)
++                    Button("Preferences for This File…") { showsMediaPreferences = true }
++                        .disabled(!model.player.canEditCurrentMediaSettings)
++                }
++            }
+         }
+ 
+         Settings {
+@@ -71,6 +84,22 @@ struct IlliquidApp: App {
+ 
+     private func playerView(_ model: AppModel) -> some View {
+         PlayerRootView(model: model)
++            .sheet(isPresented: $showsCaptions) {
++                CaptionNavigationView(player: model.player).scaledPlayerInterface()
++            }
++            .onChange(of: showsCaptions) { _, shown in
++                model.setTransientPresentation(shown, owner: "caption-navigation")
++            }
++            .sheet(isPresented: $showsMediaPreferences) {
++                MediaPlaybackPreferencesView(player: model.player).scaledPlayerInterface()
++            }
++            .onChange(of: showsMediaPreferences) { _, shown in
++                model.setTransientPresentation(shown, owner: "media-preferences")
++            }
++            .onDisappear {
++                model.setTransientPresentation(false, owner: "caption-navigation")
++                model.setTransientPresentation(false, owner: "media-preferences")
++            }
+             .environment(\.playerTheme, themeStore.selection)
+             .environment(\.playerTextColorMode, themeStore.textColorMode)
+             .environment(\.playerRainbowPalette, themeStore.rainbowPalette)
+diff --git a/Sources/IlliquidApp/UI/PlaybackRecoveryView.swift b/Sources/IlliquidApp/UI/PlaybackRecoveryView.swift
+index 09b2d23..e15ae9f 100644
+--- a/Sources/IlliquidApp/UI/PlaybackRecoveryView.swift
++++ b/Sources/IlliquidApp/UI/PlaybackRecoveryView.swift
+@@ -37,13 +37,20 @@ struct PlaybackRecoveryView: View {
+         case .message: EmptyView()
+         case .unavailableRestore(let isFolder):
+             Button("Retry") { player.retryRecovery() }
+-            Button("Locate…") { locate(isFolder: isFolder) }
++            Button("Locate…") { locate(isFolder: isFolder, issueID: issue.id) }
+             Button("Forget Session") { player.forgetUnavailableSession() }
+                 .help("Forget the unavailable launch session. Playback history is kept.")
+         case .failedSource(let canSkip):
+             Button("Retry") { player.retryRecovery() }
++            if issue.source?.isFileURL == true {
++                Button("Locate…") { locate(isFolder: false, issueID: issue.id) }
++            }
+             if canSkip { Button("Skip") { player.skipFailedSource() } }
+             Button("Stop") { player.stop() }
++        case .interruptedSource:
++            Button("Retry") { player.retryRecovery() }
++            Button("Locate…") { locate(isFolder: false, issueID: issue.id) }
++            Button("Stop") { player.stop() }
+         }
+         Button("Copy Details") {
+             NSPasteboard.general.clearContents()
+@@ -52,7 +59,7 @@ struct PlaybackRecoveryView: View {
+         Button("Dismiss") { player.dismissRecovery() }
+     }
+ 
+-    private func locate(isFolder: Bool) {
++    private func locate(isFolder: Bool, issueID: UUID) {
+         let panel = NSOpenPanel()
+         panel.title = isFolder ? "Locate Previous Folder" : "Locate Previous File"
+         panel.canChooseDirectories = isFolder
+@@ -61,7 +68,7 @@ struct PlaybackRecoveryView: View {
+         panel.prompt = "Locate"
+         panel.begin { response in
+             guard response == .OK, let url = panel.url else { return }
+-            player.locateUnavailableSession(at: url)
++            player.locateUnavailableSession(at: url, expectedIssueID: issueID)
+         }
+     }
+ }
+diff --git a/Sources/IlliquidApp/UI/SettingsView.swift b/Sources/IlliquidApp/UI/SettingsView.swift
+index 688b66c..0ceea2b 100644
+--- a/Sources/IlliquidApp/UI/SettingsView.swift
++++ b/Sources/IlliquidApp/UI/SettingsView.swift
+@@ -266,14 +266,14 @@ struct SettingsView: View {
+                 SettingsRow(
+                     title: "Default playback speed",
+                     detail: model.player.supports(.changePlaybackSpeed)
+-                        ? "Also updates the current media."
++                        ? "Applies to files without a playback-speed override."
+                         : "The current playback engine uses normal speed."
+                 ) {
+                     Picker(
+                         "Default playback speed",
+                         selection: Binding(
+-                            get: { model.state.playbackSpeed },
+-                            set: { model.player.setPlaybackSpeed($0) }
++                            get: { model.player.defaultPlaybackSpeed },
++                            set: { model.player.setDefaultPlaybackSpeed($0) }
+                         )
+                     ) {
+                         ForEach([0.5, 0.75, 1, 1.25, 1.5, 2], id: \.self) { speed in
+diff --git a/Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift b/Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift
+index 9e9fc15..dd193c1 100644
+--- a/Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift
++++ b/Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift
+@@ -334,7 +334,7 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
+         }
+         mutate { state in
+             if let settings {
+-                state.mediaSettings[key] = settings
++                state.mediaSettings[key] = settings.sanitized()
+             } else {
+                 state.mediaSettings.removeValue(forKey: key)
+             }
+diff --git a/Sources/IlliquidCore/Player/PlaybackRecoveryIssue.swift b/Sources/IlliquidCore/Player/PlaybackRecoveryIssue.swift
+index fb102c4..9f3c3c2 100644
+--- a/Sources/IlliquidCore/Player/PlaybackRecoveryIssue.swift
++++ b/Sources/IlliquidCore/Player/PlaybackRecoveryIssue.swift
+@@ -6,21 +6,25 @@ public struct PlaybackRecoveryIssue: Equatable, Sendable {
+         case message
+         case unavailableRestore(isFolder: Bool)
+         case failedSource(canSkip: Bool)
++        case interruptedSource
+     }
+ 
++    public let id: UUID
+     public let kind: Kind
+     public let message: String
+     public let source: URL?
+     public let diagnosticCode: String?
+ 
+-    public init(kind: Kind, message: String, source: URL? = nil) {
++    public init(kind: Kind, message: String, source: URL? = nil, diagnosticCode: String? = nil) {
++        id = UUID()
+         self.kind = kind
+         self.message = message
+         self.source = source
+-        diagnosticCode = nil
++        self.diagnosticCode = diagnosticCode
+     }
+ 
+     public init(coreFailureCode code: String) {
++        id = UUID()
+         kind = .message
+         source = nil
+         diagnosticCode = code
+diff --git a/Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift b/Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift
+index 648b522..aa52077 100644
+--- a/Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift
++++ b/Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift
+@@ -1423,6 +1423,23 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
+         lastPublishedAudioDevices = devices
+         emit(.audioDevicesChanged(devices), identity: nil)
+     }
++    /// Physical replacement completion, used only to avoid returning a product
++    /// result while a native candidate can still replace its clock/resources.
++    public var hasPendingMediaReplacement: Bool {
++        !replacementTasks.isEmpty || deferredReplacementRequest != nil || pendingCommittedReplacement != nil
++    }
++
++    /// Immutable bytes used by the active text subtitle pipeline. A separate
++    /// caption index cannot accidentally read a newer on-disk sidecar while
++    /// playback is still displaying the previously loaded version.
++    public var externalCaptionDocument: NativeCaptionDocument? {
++        guard !hasPendingMediaReplacement,
++              case let .external(url) = subtitleSource,
++              let prepared = preparedExternalSubtitle, prepared.url == url,
++              let data = prepared.data else { return nil }
++        return NativeCaptionDocument(url: url, assData: data)
++    }
++
+     public func loadExternalSubtitle(_ url: URL, select: Bool) {
+         guard select else {
+             emit(.diagnostic(
+diff --git a/Sources/IlliquidPlayer/Player/PlaybackAutomationQueue.swift b/Sources/IlliquidPlayer/Player/PlaybackAutomationQueue.swift
+new file mode 100644
+index 0000000..0846d85
+--- /dev/null
++++ b/Sources/IlliquidPlayer/Player/PlaybackAutomationQueue.swift
+@@ -0,0 +1,32 @@
++import Foundation
++import IlliquidCore
++
++/// Main-actor admission orders automation requests independently of filesystem
++/// completion order. Waiting requests allocate no worker and never bypass the
++/// playback core. Cancelling a waiter cannot release its successor early.
++@MainActor
++final class PlaybackAutomationQueue {
++    private var tail: Task<Void, Never>?
++    private var pending = 0
++
++    func perform<Value: Sendable>(_ operation: @escaping @MainActor @Sendable () async throws -> Value) async throws -> Value {
++        guard pending < PlaybackAutomationPolicy.maximumPendingRequests else { throw PlaybackAutomationError.busy }
++        try Task.checkCancellation()
++        pending += 1
++        let predecessor = tail
++        let job = Task { @MainActor in
++            await predecessor?.value
++            try Task.checkCancellation()
++            return try await operation()
++        }
++        let completion = Task { @MainActor in _ = try? await job.value }
++        tail = completion
++        defer {
++            pending -= 1
++            if pending == 0 { tail = nil }
++        }
++        return try await withTaskCancellationHandler {
++            try await job.value
++        } onCancel: { job.cancel() }
++    }
++}
+diff --git a/Sources/IlliquidPlayer/Player/PlaybackRuntimeDriver.swift b/Sources/IlliquidPlayer/Player/PlaybackRuntimeDriver.swift
+index 94968fa..aebcacb 100644
+--- a/Sources/IlliquidPlayer/Player/PlaybackRuntimeDriver.swift
++++ b/Sources/IlliquidPlayer/Player/PlaybackRuntimeDriver.swift
+@@ -34,6 +34,21 @@ final class PlaybackRuntimeDriver {
+ 
+     var currentSnapshot: PlaybackUISnapshot { PlaybackUISnapshot(state: model.core.state) }
+ 
++    var hasPendingTrackSelection: Bool {
++        guard let tracks = model.core.state.activeSession?.tracks else { return false }
++        return tracks.phase != .idle
++    }
++
++    var acknowledgedExternalSubtitleURL: URL? {
++        guard !hasPendingTrackSelection,
++              case let .external(source) = model.core.state.activeSession?.tracks.effectiveSubtitle,
++              source.rawValue.hasPrefix("subtitle:/") else { return nil }
++        return URL(fileURLWithPath: String(source.rawValue.dropFirst("subtitle:".count)))
++    }
++
++    @discardableResult
++    func selectAutomaticSubtitle() -> Bool { send(.selectSubtitle(.automatic)) }
++
+     init(
+         runtime: any PlaybackRuntime,
+         model: PlaybackModelRuntime = PlaybackModelRuntime(recordsReplaySteps: false)
+@@ -44,12 +59,12 @@ final class PlaybackRuntimeDriver {
+     }
+ 
+     @discardableResult
+-    func load(_ request: PlaybackRuntimeLoadRequest) -> Bool {
++    func load(_ request: PlaybackRuntimeLoadRequest, autoplay: Bool = true) -> Bool {
+         pendingLoad = request
+         sessionBeforePendingLoad = model.core.state.activeSession?.id
+         return send(.load(
+             source: sourceIdentity(request.media.source),
+-            autoplay: true
++            autoplay: autoplay
+         ))
+     }
+ 
