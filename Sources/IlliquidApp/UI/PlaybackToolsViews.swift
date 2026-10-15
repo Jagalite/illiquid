@@ -151,7 +151,7 @@ struct MediaPlaybackPreferencesView: View {
                 : "Playback history is off. Changes apply only to this open session and are not saved.")
                 .font(.callout).foregroundStyle(.secondary)
             Form {
-                Picker("Audio", selection: Binding(get: { audioChoice }, set: setAudioChoice)) {
+                Picker("Audio", selection: Binding(get: { audioChoice }, set: { setAudioChoice($0) })) {
                     Text("Inherit global preference").tag("inherit")
                     if let language = settings.audioLanguage { Text("Language: \(language)").tag("language") }
                     if audioChoice == "saved" { Text("Saved choice unavailable").tag("saved") }
@@ -164,7 +164,7 @@ struct MediaPlaybackPreferencesView: View {
                     Button("Use Language") { player.setMediaLanguage(audioLanguage, kind: .audio); refresh() }
                         .disabled(TrackSelectionPreferences.normalizedLanguage(audioLanguage) == nil)
                 }
-                Picker("Subtitles", selection: Binding(get: { subtitleChoice }, set: setSubtitleChoice)) {
+                Picker("Subtitles", selection: Binding(get: { subtitleChoice }, set: { setSubtitleChoice($0) })) {
                     Text("Inherit global preference").tag("inherit")
                     Text("Off for this file").tag("off")
                     if let language = settings.subtitleLanguage { Text("Language: \(language)").tag("language") }
@@ -183,13 +183,13 @@ struct MediaPlaybackPreferencesView: View {
                 }
                 scalarRow("Playback speed", field: .playbackSpeed,
                     value: settings.playbackSpeed ?? player.viewStore.playbackSpeed,
-                    range: 0.25...4, step: 0.05, unit: "×", update: player.setPlaybackSpeed)
+                    range: 0.25...4, step: 0.05, unit: "×", update: { player.setPlaybackSpeed($0) })
                 scalarRow("Audio delay", field: .audioDelay,
                     value: settings.audioDelay ?? player.viewStore.audioDelay,
-                    range: -10...10, step: 0.05, unit: "s", update: player.setAudioDelay)
+                    range: -10...10, step: 0.05, unit: "s", update: { player.setAudioDelay($0) })
                 scalarRow("Subtitle delay", field: .subtitleDelay,
                     value: settings.overrides(.subtitleDelay) ? settings.subtitleDelay : player.viewStore.subtitleDelay,
-                    range: -10...10, step: 0.05, unit: "s", update: player.setSubtitleDelay)
+                    range: -10...10, step: 0.05, unit: "s", update: { player.setSubtitleDelay($0) })
             }
             .formStyle(.grouped)
             .disabled(!player.canEditCurrentMediaSettings)
@@ -203,16 +203,19 @@ struct MediaPlaybackPreferencesView: View {
         }
         .padding(22)
         .frame(minWidth: 630, idealWidth: 700, minHeight: 550)
-        .onAppear(perform: refresh)
+        .onAppear { refresh() }
         .onChange(of: player.viewStore.currentSource) { _, _ in refresh() }
         .onChange(of: player.viewStore.phase) { _, _ in refresh() }
         .onChange(of: player.viewStore.selectedAudioTrack) { _, _ in refresh() }
         .onChange(of: player.viewStore.selectedSubtitleTrack) { _, _ in refresh() }
+        .onChange(of: player.viewStore.playbackSpeed) { _, _ in refresh() }
+        .onChange(of: player.viewStore.audioDelay) { _, _ in refresh() }
+        .onChange(of: player.viewStore.subtitleDelay) { _, _ in refresh() }
     }
 
     private func scalarRow(_ title: String, field: MediaPlaybackSetting, value: Double,
                            range: ClosedRange<Double>, step: Double, unit: String,
-                           update: @escaping (Double) -> Void) -> some View {
+                           update: @escaping @MainActor (Double) -> Void) -> some View {
         HStack {
             Text(title)
             Spacer()

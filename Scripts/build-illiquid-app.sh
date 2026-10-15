@@ -89,10 +89,21 @@ cleanup() {
 trap cleanup EXIT
 
 export MACOSX_DEPLOYMENT_TARGET=$minimum_macos
+# Only the executable target emits constants, avoiding concurrent writes from
+# dependency targets. Extraction must succeed before the bundle is signed.
+# SwiftPM does not track arbitrary environment reads in a cached package
+# manifest. Reevaluate this manifest, and give the app-only side output a new
+# path so a cached compile cannot skip reemission after a packaging retry.
+mkdir -p "$build_root/app-intents"
+export ILLIQUID_INTENTS_BUILD_DIRECTORY
+ILLIQUID_INTENTS_BUILD_DIRECTORY=$(mktemp -d "$build_root/app-intents/compile.XXXXXX")
+python3 "$script_directory/app-intents-metadata.py" prepare "$ILLIQUID_INTENTS_BUILD_DIRECTORY"
+
 swift_arguments=(
     --package-path "$repository_root"
     --scratch-path "$build_root/swiftpm"
     --configuration release
+    --manifest-cache none
     --force-resolved-versions
 )
 for architecture in $architectures; do
@@ -197,6 +208,13 @@ generate_brand_icon() {
 }
 generate_brand_icon "$repository_root/Resources/IlliquidIcon.png" AppIcon
 generate_brand_icon "$repository_root/Resources/Branding/SmoothPrism/video-document.svg" VideoDocument
+
+python3 "$script_directory/app-intents-metadata.py" extract \
+    --build-directory "$ILLIQUID_INTENTS_BUILD_DIRECTORY" \
+    --repository "$repository_root" --resources "$resources" \
+    --deployment-target "$minimum_macos" --architecture "${architectures%% *}"
+cp "$ILLIQUID_INTENTS_BUILD_DIRECTORY/validation.json" "$build_root/app-intents/validation.json"
+
 
 search_directories=()
 for package in libavformat libavfilter libass; do

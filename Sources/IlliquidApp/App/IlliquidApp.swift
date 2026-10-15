@@ -84,8 +84,22 @@ struct IlliquidApp: App {
 
     private func playerView(_ model: AppModel) -> some View {
         PlayerRootView(model: model)
-            .sheet(isPresented: $showsCaptions) { CaptionNavigationView(player: model.player) }
-            .sheet(isPresented: $showsMediaPreferences) { MediaPlaybackPreferencesView(player: model.player) }
+            .sheet(isPresented: $showsCaptions) {
+                CaptionNavigationView(player: model.player).scaledPlayerInterface()
+            }
+            .onChange(of: showsCaptions) { _, shown in
+                model.setTransientPresentation(shown, owner: "caption-navigation")
+            }
+            .sheet(isPresented: $showsMediaPreferences) {
+                MediaPlaybackPreferencesView(player: model.player).scaledPlayerInterface()
+            }
+            .onChange(of: showsMediaPreferences) { _, shown in
+                model.setTransientPresentation(shown, owner: "media-preferences")
+            }
+            .onDisappear {
+                model.setTransientPresentation(false, owner: "caption-navigation")
+                model.setTransientPresentation(false, owner: "media-preferences")
+            }
             .environment(\.playerTheme, themeStore.selection)
             .environment(\.playerTextColorMode, themeStore.textColorMode)
             .environment(\.playerRainbowPalette, themeStore.rainbowPalette)

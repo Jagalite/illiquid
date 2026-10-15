@@ -34,6 +34,10 @@ final class PlaybackRuntimeDriver {
 
     var currentSnapshot: PlaybackUISnapshot { PlaybackUISnapshot(state: model.core.state) }
 
+    /// Transport may acknowledge Pause while the decoder is still seeking.
+    /// The UI phase alone must not be treated as seek completion.
+    var hasPendingSeek: Bool { model.core.state.activeSession?.seek != nil }
+
     var hasPendingTrackSelection: Bool {
         guard let tracks = model.core.state.activeSession?.tracks else { return false }
         return tracks.phase != .idle

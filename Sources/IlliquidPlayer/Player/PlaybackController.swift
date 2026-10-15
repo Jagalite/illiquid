@@ -2262,6 +2262,7 @@ public final class PlaybackCoordinator {
             state.updateChapters(chapters, currentID: currentID)
         case let .audioDelayChanged(value):
             state.setAudioDelay(value)
+            scheduleMediaRestoreDrain()
         case .subtitleDelayChanged:
             break
         case let .videoAdjustmentsChanged(adjustments):
@@ -2546,10 +2547,12 @@ public final class PlaybackCoordinator {
         _ update: (inout MediaPlaybackSettings) -> Void
     ) {
         guard hasLoadedCurrentSource, hasCurrentPlaybackAuthority,
-              let currentURL = state.currentURL, currentURL.isFileURL else { return }
+              let currentURL = state.currentURL else { return }
+        // Remote playback also has session-local track/delay intent. Only
+        // verified local files may persist that intent across sessions.
         update(&currentMediaSettings)
         currentMediaSettings = currentMediaSettings.sanitized()
-        if canPersistCurrentMediaHistory {
+        if currentURL.isFileURL, canPersistCurrentMediaHistory {
             persistence.setMediaSettings(currentMediaSettings.isEmpty ? nil : currentMediaSettings, for: currentURL)
         }
     }
@@ -2874,6 +2877,7 @@ public typealias PlaybackController = PlaybackCoordinator
 extension PlaybackCoordinator {
     private var hasSettledPlaybackPosition: Bool {
         guard hasLoadedCurrentSource, hasCurrentPlaybackAuthority,
+              runtimeDriver?.hasPendingSeek != true,
               let snapshot = runtimeDriver?.currentSnapshot else { return false }
         switch snapshot.phase {
         case .playing, .paused, .ready, .buffering, .draining, .ended:
@@ -2883,8 +2887,14 @@ extension PlaybackCoordinator {
     }
 
     private var canCheckpointCurrentPosition: Bool {
-        hasSettledPlaybackPosition && automationCheckpointOwner == nil
-            && pendingPositionRestore == nil
+        // Metadata and resume completion gate the position, not transport-rate
+        // acknowledgement. A new file at zero or a valid accepted clock remains
+        // saveable while the presentation executor is acknowledging Play.
+        (hasSettledPlaybackPosition || (hasLoadedCurrentSource && hasCurrentPlaybackAuthority
+            && runtimeDriver?.hasPendingSeek != true
+            && runtimeDriver?.currentSnapshot.phase == .prerolling
+            && state.position.isFinite && state.position >= 0))
+            && automationCheckpointOwner == nil && pendingPositionRestore == nil
             && pendingMediaSettingFields.isEmpty && pendingExternalInstallURL == nil
             && runtimeDriver?.hasPendingTrackSelection != true
     }
@@ -2944,7 +2954,7 @@ extension PlaybackCoordinator {
     private func drainMediaRestore() {
         guard !isDrainingMediaRestore, !isShuttingDown, hasLoadedCurrentSource,
               hasCurrentPlaybackAuthority, pendingSourceTransaction == nil,
-              runtimeDriver?.currentSnapshot.phase != .seeking,
+              runtimeDriver?.hasPendingSeek != true,
               runtimeDriver?.currentSnapshot.phase != .failed else { return }
         isDrainingMediaRestore = true
         defer { isDrainingMediaRestore = false }
@@ -2986,7 +2996,8 @@ extension PlaybackCoordinator {
     public var defaultPlaybackSpeed: Double { persistence.loadPreferences().playbackSpeed }
     public var mediaSettingsForCurrentFile: MediaPlaybackSettings { currentMediaSettings }
     public var canEditCurrentMediaSettings: Bool {
-        hasLoadedCurrentSource && state.currentURL?.isFileURL == true && hasCurrentPlaybackAuthority
+        hasLoadedCurrentSource && pendingSourceTransaction == nil && !isShuttingDown
+            && state.currentURL?.isFileURL == true && hasCurrentPlaybackAuthority
     }
 
     public func setDefaultPlaybackSpeed(_ speed: Double) {
@@ -3093,7 +3104,8 @@ extension PlaybackCoordinator {
     /// An immutable source/track token. UI tasks compare it again before using an
     /// index or issuing a jump; identical names in another session are not enough.
     public var captionSourceRequest: CaptionSourceRequest? {
-        guard hasLoadedCurrentSource, state.currentURL?.isFileURL == true,
+        guard hasLoadedCurrentSource, hasCurrentPlaybackAuthority,
+              pendingSourceTransaction == nil, state.currentURL?.isFileURL == true,
               runtimeDriver?.hasPendingTrackSelection != true, pendingExternalInstallURL == nil,
               let url = state.currentURL, let track = state.selectedSubtitleTrack else { return nil }
         let externalURL = track.isExternal ? installedExternalSubtitleURL : nil
@@ -3227,7 +3239,7 @@ extension PlaybackCoordinator {
     }
 
     private func makeSettledPlaybackReference() throws -> PlaybackReference {
-        guard hasSettledPlaybackPosition, !hasUnsettledNativeReplacement, pendingPositionRestore == nil,
+        guard pendingSourceTransaction == nil, !isPreparingSource, hasSettledPlaybackPosition, !hasUnsettledNativeReplacement, pendingPositionRestore == nil,
               pendingMediaSettingFields.isEmpty, pendingExternalInstallURL == nil,
               pendingRestoredAudioDelay == nil,
               runtimeDriver?.hasPendingTrackSelection != true,
@@ -3310,7 +3322,7 @@ extension PlaybackCoordinator {
                 let transportMatches = paused ? snapshot?.actualTransport == .paused : snapshot?.actualTransport == .playing
                 let phaseMatches = paused ? snapshot?.phase == .paused : snapshot?.phase == .playing
                 if transportMatches, phaseMatches, state.isPauseDesired == paused, !hasUnsettledNativeReplacement,
-                   pendingPositionRestore == nil, pendingMediaSettingFields.isEmpty,
+                   runtimeDriver?.hasPendingSeek != true, pendingPositionRestore == nil, pendingMediaSettingFields.isEmpty,
                    pendingExternalInstallURL == nil, pendingRestoredAudioDelay == nil,
                    runtimeDriver?.hasPendingTrackSelection != true {
                     if !state.audioTracks.isEmpty,
