@@ -3106,12 +3106,13 @@ extension PlaybackCoordinator {
     public var captionSourceRequest: CaptionSourceRequest? {
         guard hasLoadedCurrentSource, hasCurrentPlaybackAuthority,
               pendingSourceTransaction == nil, state.currentURL?.isFileURL == true,
-              runtimeDriver?.hasPendingTrackSelection != true, pendingExternalInstallURL == nil,
+              !hasUnsettledNativeReplacement, pendingExternalInstallURL == nil,
+              let trackRevision = runtimeDriver?.settledTrackRevision,
               let url = state.currentURL, let track = state.selectedSubtitleTrack else { return nil }
         let externalURL = track.isExternal ? installedExternalSubtitleURL : nil
         return CaptionSourceRequest(mediaURL: url, subtitleTrack: track,
             externalURL: externalURL, fallbackEncoding: state.subtitleFallbackEncoding,
-            sourceRevision: playbackGeneration, mediaVersion: currentContentVersion)
+            sourceRevision: playbackGeneration, mediaVersion: currentContentVersion, trackRevision: trackRevision)
     }
 
     public func readCaptions(for request: CaptionSourceRequest) async throws -> CaptionIndex {

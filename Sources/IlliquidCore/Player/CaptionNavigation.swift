@@ -230,15 +230,18 @@ public struct CaptionSourceRequest: Equatable, Hashable, Sendable {
     public let externalURL: URL?
     public let fallbackEncoding: SubtitleFallbackEncoding
     public let sourceRevision: UInt64
+    /// Track transactions distinguish reloaded sidecar bytes at the same URL.
+    public let trackRevision: UInt64
     public let mediaVersion: MediaContentVersion?
 
     public init(mediaURL: URL, subtitleTrack: MediaTrack, externalURL: URL? = nil,
-                fallbackEncoding: SubtitleFallbackEncoding = .unicodeOnly, sourceRevision: UInt64, mediaVersion: MediaContentVersion? = nil) {
+                fallbackEncoding: SubtitleFallbackEncoding = .unicodeOnly, sourceRevision: UInt64, mediaVersion: MediaContentVersion? = nil, trackRevision: UInt64 = 0) {
         self.mediaURL = mediaURL
         self.subtitleTrack = subtitleTrack
         self.externalURL = externalURL
         self.fallbackEncoding = fallbackEncoding
         self.sourceRevision = sourceRevision
+        self.trackRevision = trackRevision
         self.mediaVersion = mediaVersion
     }
 }

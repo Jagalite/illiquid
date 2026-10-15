@@ -43,6 +43,13 @@ final class PlaybackRuntimeDriver {
         return tracks.phase != .idle
     }
 
+    /// Reuse the core's monotonic track transaction identity, including Off →
+    /// external transitions. Seeks do not change it or invalidate a caption index.
+    var settledTrackRevision: UInt64? {
+        guard let tracks = model.core.state.activeSession?.tracks, tracks.phase == .idle else { return nil }
+        return tracks.revision.rawValue
+    }
+
     var acknowledgedExternalSubtitleURL: URL? {
         guard !hasPendingTrackSelection,
               case let .external(source) = model.core.state.activeSession?.tracks.effectiveSubtitle,

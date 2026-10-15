@@ -21,7 +21,7 @@ rm "$work/Sources/IlliquidCore/Player/PlaybackState.swift" \
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1
 import PackageDescription
-let package = Package(name: "IlliquidPortablePlayback", targets: [
+let package = Package(name: "IlliquidPortablePlayback", platforms: [.macOS("26.0")], targets: [
     .target(name: "IlliquidCore"),
     .target(name: "IlliquidPlaybackCore", dependencies: ["IlliquidCore"]),
     .target(name: "IlliquidPlaybackStateSpace", dependencies: ["IlliquidPlaybackCore"]),

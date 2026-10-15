@@ -51,6 +51,29 @@ class AppIntentsMetadataTests(unittest.TestCase):
         self.assertEqual(result['files'], ['Metadata.appintents/extract.actionsdata'])
 
     @unittest.skipUnless(shutil.which('swift'), 'Swift compiler unavailable')
+    def test_app_manifest_registers_constants_as_a_driver_output(self):
+        """Frontend-only flags passed the miniature build but broke the real app."""
+        repository = Path(__file__).resolve().parents[2]
+        output = self.root / 'constants'
+        metadata.prepare(output)
+        environment = dict(os.environ, ILLIQUID_INTENTS_BUILD_DIRECTORY=str(output))
+        manifest = subprocess.run(
+            ['swift', 'package', '--package-path', str(repository),
+             '--scratch-path', str(self.root / 'manifest'), '--manifest-cache', 'none', 'dump-package'],
+            env=environment, capture_output=True, text=True, timeout=120, check=True)
+        target = next(t for t in json.loads(manifest.stdout)['targets'] if t['name'] == 'IlliquidApp')
+        flags = [flag for setting in target['settings'] if setting['tool'] == 'swift'
+                 for flag in setting['kind'].get('unsafeFlags', {}).get('_0', [])]
+        source = self.root / 'main.swift'
+        source.write_text('print("driver output probe")\n')
+        process = subprocess.run(
+            ['swiftc', '-driver-print-bindings', '-whole-module-optimization', '-c',
+             str(source), '-o', str(self.root / 'probe.o'), *flags],
+            capture_output=True, text=True, timeout=120, check=True)
+        self.assertIn('const-values: "' + str(output / 'IlliquidApp.swiftconstvalues') + '"',
+                      process.stdout + process.stderr)
+
+    @unittest.skipUnless(shutil.which('swift'), 'Swift compiler unavailable')
     def test_manifest_reloads_environment_when_rebuilding_constants(self):
         """Regression for packaging's absent .swiftconstvalues after SwiftPM caching.
 
@@ -71,8 +94,8 @@ import Foundation
 import PackageDescription
 let settings: [SwiftSetting] = ProcessInfo.processInfo.environment["INTENTS_COMPILE_DIR"].map { path in
     [.unsafeFlags(["-Xfrontend", "-const-gather-protocols-file", "-Xfrontend",
-                   path + "/protocols.json", "-Xfrontend", "-emit-const-values-path",
-                   "-Xfrontend", path + "/Demo.swiftconstvalues"],
+                   path + "/protocols.json", "-emit-const-values-path",
+                   path + "/Demo.swiftconstvalues"],
                   .when(configuration: .release))]
 } ?? []
 let package = Package(name: "Demo", targets: [

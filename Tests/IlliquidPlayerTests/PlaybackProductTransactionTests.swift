@@ -533,7 +533,10 @@ struct PlaybackProductNativeTests {
             player.seek(to: 4.5)
             try await nativeEventually {
                 let shown = runtime.pausedReadbackDiagnostic()
+                // Renderer publication can precede the core's seek acknowledgement.
+                // Require both observations before asking for a settled reference.
                 return shown.isCurrent && shown.displayedPTS.map { abs($0 - 4.5) < 0.04 } == true
+                    && (try? player.currentPlaybackReference()).map { abs($0.position - 4.5) < 0.04 } == true
             }
             let shown = runtime.pausedReadbackDiagnostic()
             #expect(player.viewStore.isPauseDesired)
@@ -543,7 +546,11 @@ struct PlaybackProductNativeTests {
             // Drive the real lifecycle commands without sleeping the CI machine.
             player.systemWillSleep()
             player.systemDidWake()
-            try await nativeEventually { runtime.pausedReadbackDiagnostic().isCurrent }
+            try await nativeEventually {
+                let shown = runtime.pausedReadbackDiagnostic()
+                return shown.isCurrent && shown.displayedPTS.map { abs($0 - 4.5) < 0.04 } == true
+                    && (try? player.currentPlaybackReference()).map { abs($0.position - 4.5) < 0.04 } == true
+            }
             #expect(player.viewStore.isPauseDesired)
             #expect(abs(try player.currentPlaybackReference().position - 4.5) < 0.04)
         }
@@ -610,6 +617,23 @@ struct PlaybackProductNativeTests {
             try "1\n00:00:01,000 --> 00:00:03,000\nChanged on disk.\n".write(to: subtitle, atomically: true, encoding: .utf8)
             let after = try await player.readCaptions(for: externalSource)
             #expect(before == after) // Search indexes the bytes being played.
+            player.selectSubtitleTrack(nil)
+            try await nativeEventually { player.viewStore.selectedSubtitleTrack == nil && !runtime.hasPendingMediaReplacement }
+            player.loadExternalSubtitle(subtitle)
+            try await nativeEventually {
+                player.captionSourceRequest?.subtitleTrack.isExternal == true && !runtime.hasPendingMediaReplacement
+            }
+            let reloadedSource = try #require(player.captionSourceRequest)
+            let reloadedIndex = try await player.readCaptions(for: reloadedSource)
+            #expect(reloadedIndex.search("Changed on disk").count == 1)
+            #expect(reloadedSource != externalSource)
+            #expect(!player.jumpToCaption(0, in: before, source: externalSource))
+            #expect(!player.replayPreviousCaption(in: before, source: externalSource, sentence: false))
+            await #expect(throws: PlaybackAutomationError.superseded) { try await player.readCaptions(for: externalSource) }
+            #expect(player.jumpToCaption(0, in: reloadedIndex, source: reloadedSource))
+            try await nativeEventually { (try? player.currentPlaybackReference()) != nil }
+            // An ordinary seek keeps the index usable.
+            #expect(player.captionSourceRequest == reloadedSource)
             player.selectSubtitleTrack(nil)
             try await nativeEventually { player.viewStore.selectedSubtitleTrack == nil && !runtime.hasPendingMediaReplacement }
             #expect(!player.jumpToCaption(0, in: before, source: externalSource))
