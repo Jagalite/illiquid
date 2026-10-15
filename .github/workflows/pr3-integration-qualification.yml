@@ -1,0 +1,42 @@
+name: PR3 integration qualification
+on:
+  push:
+    branches: [work/pr3-integration-qualification]
+permissions:
+  contents: read
+jobs:
+  source-audit:
+    runs-on: macos-26
+    timeout-minutes: 5
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Capture previously authored integration source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p evidence
+          gh api repos/Jagalite/illiquid/git/blobs/40adf47492e2cab34bebd27952db0a765938def1 > evidence/blob.json
+          python3 - <<'PY'
+          import base64, json, pathlib, hashlib
+          value = json.loads(pathlib.Path('evidence/blob.json').read_text())
+          data = base64.b64decode(value['content'])
+          assert hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest() == '40adf47492e2cab34bebd27952db0a765938def1'
+          pathlib.Path('evidence/PlaybackController.swift').write_bytes(data)
+          pathlib.Path('evidence/blob.json').unlink()
+          PY
+      - name: Capture App Intents tooling contracts
+        run: |
+          xcrun appintentsmetadataprocessor --help > evidence/metadata-tool.txt 2>&1 || true
+          xcrun swiftc -frontend -help-hidden > evidence/compiler-tool.txt
+          sdk=$(xcrun --sdk macosx --show-sdk-path)
+          find "$sdk/System/Library/Frameworks/AppIntents.framework" -name '*.swiftinterface' -print -quit | while IFS= read -r file; do cp "$file" evidence/AppIntents.swiftinterface; done
+          find "$DEVELOPER_DIR" -name '*const*protocol*' -o -name '*Const*Protocol*' > evidence/protocol-paths.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: integration-source-audit
+          path: evidence/
+          retention-days: 7
