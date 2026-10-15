@@ -23,7 +23,7 @@ done
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1
 import PackageDescription
-let package = Package(name: "IlliquidRestorationRegressions", targets: [
+let package = Package(name: "IlliquidRestorationRegressions", platforms: [.macOS(.v13)], targets: [
     .target(name: "IlliquidCore"),
     .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])
 ])

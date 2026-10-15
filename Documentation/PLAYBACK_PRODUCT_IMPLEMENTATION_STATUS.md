@@ -1,103 +1,46 @@
-# Playback product work: partial implementation and qualification
+# Playback reliability and product features — PR #3 integration status
 
-Status: **partial; draft, not the completed product request**. Updated October 14, 2026.
+Updated October 15, 2026. **Integrated source pushed; PR remains draft pending full macOS package and physical qualification.**
 
-Branch: `feat/playback-reliability-tools`, based on the still-unmerged
-`fix/track-restoration-thumbnail-lifecycle` branch at `a753599e` (PR #1).
-Neither PR #1 nor this branch was merged. No release or installed-user-state
-mutation was performed.
+Pull request: https://github.com/Jagalite/illiquid/pull/3
 
-## Committed scope
+This branch is stacked on [PR #1](https://github.com/Jagalite/illiquid/pull/1), which is **still unmerged** and provides the upstream track-ID restoration, thumbnail window lifecycle, slow-probe fairness, and migration fixes. Do not accidentally rebase against `main` while PR #1 remains open. Neither branch is a released application.
 
-| Area | Delivered in this branch | Not yet delivered here |
+## Included implementation
+
+| Area | Committed functionality | Boundaries |
 | --- | --- | --- |
-| Preference isolation | Volume/speed setters preserve history and restore-paused flags. Real-store tests exercise all ten setters and four flag combinations through flush/reload. | Full application privacy task qualification. |
-| Per-file preferences | Sparse override model for tracks/languages, subtitle delay, speed and audio delay; explicit inheritance; legacy Off/zero decoding. | Coordinator application of the new speed/audio-delay/language fields and the new reset/inherit UI. |
-| Caption navigation | Bounded text cues, search, delay-aware targets, cue replay and deterministic sentence grouping; external text parser and independent embedded-text decoder. | Player-facing transcript UI, jump/replay command wiring and source-scoped UI cancellation. |
-| Native automation | Bounded local-file input validation, order-preserving deduplication, and versioned media/time reference serialization. | Acknowledged coordinator open/enqueue actions, App Intents adapters, metadata packaging and real Shortcuts qualification. |
-| Recovery | Existing PR #1 migration fixes are inherited; selected existing coordinator regressions are exercised. | New checkpoint gating, serialized track restoration, failed-item Locate and interrupted-source recovery integration. |
-| Seek and lifecycle | Existing seek/coordinator, PiP policy, renderer observation, authority fences and thumbnail lifecycle regressions are included in macOS CI. | New end-to-end rapid-scrub/display, physical sleep/wake, disconnected-volume and energy qualification. |
+| Privacy and session preferences | Individual preference setters preserve disabled history and restore-paused choice; real-store round-trip regression across all ten setters. | A manual installed-app privacy audit is still required. |
+| Crash resume and recovery | Avoid optimistic checkpoint writes during unsettled load/seek; source-scoped recovery and Locate for failed queued media, with stale-panel rejection. | Process-kill windows, detached volumes, slow NAS I/O and retry after sleep require physical testing. |
+| Audio/subtitle restoration | Sequenced track selection and session acknowledgement; explicit saved Off/Automatic behavior and manual override supersession. | Ambiguous remuxed/renumbered stream identity remains best effort. |
+| Per-file playback preferences | Sparse override model and application for audio/subtitle, playback speed, subtitle delay and audio delay; inherit/reset UI controls. | Verify exact UI behavior and persistence on a real installed app. |
+| Caption navigation | Bounded SRT/ASS/embedded text indexing, search, jump-to-cue, previous-cue/sentence replay and source-scoped cancellation. | No bitmap OCR; sentence grouping is heuristic, not ASR. Blocking file I/O has no hard deadline. |
+| Native automation | Four App Intents for timestamped open, ordered enqueue, current playback reference and reopen reference; acknowledgement-based coordinator/queue; explicit invalid/replaced-file failures. | Shortcuts discovery, file authorization across launches, and installed-app registration remain unqualified. |
+| Seek, window and PiP lifecycle | Existing tests and additional transaction/seek guards exercise deterministic policy and selected native boundaries. | Final presented frame, minimized/occluded-window energy, actual PiP and sleep/wake require hardware. |
+| Packaging | Real compiler constant emission and Apple App Intents metadata extraction with fail-closed catalog verification before signing. | App bundle metadata generation has **not yet passed final CI qualification** for this pushed revision. |
 
-The core models and native caption reader are **not** equivalent to shipping
-all requested features. Bitmap subtitles do not gain OCR. Sentence grouping is
-a bounded subtitle-text heuristic, not speech recognition. Native cancellation
-and scan budgets are not a hard guarantee that a blocked operating-system I/O
-call has stopped.
+## Test evidence
 
-## Recorded tests
+- Exact locally applied source patch verified against the `9dde96b` repository snapshot, with all 16 resulting blob hashes independently confirmed on GitHub after push.
+- Current Linux actual-source portable playback: **179 passing tests in 33 suites**, including the bounded state-space explorer. The harness excludes the macOS app UI, renderer and certain Darwin facilities.
+- Current local packaging metadata unit tests: **6/6 passed**, including recompilation into a new compiler-constants output path without SwiftPM manifest caching.
+- Prior native macOS integration candidate: **148 tests in 13 suites passed**, including transaction restore, seeks, caption navigation and automation; see the saved development handoff log. The previous release assembly compiled the product but failed before extracting App Intents metadata because SwiftPM omitted the expected `.swiftconstvalues`; this branch includes the output-directory and manifest-cache corrections. **That prior native run is not a pass claim for the new release packaging revision.**
+- PR #3 CI triggered after integration was pushed on October 15; inspect the results for the exact HEAD SHA before promoting out of draft.
+- A separate restoration-harness CI failure originated from missing explicit macOS platform deployment in the temporary Swift package; setting `.macOS(.v13)` passed all **14 regression tests in 3 suites** locally. The corrected harness is included in the next qualification commit.
 
-**Tested source commit:** `9dde96b68a2e4d74a93ed87a8f4b42c0919d7560`.
+These runs overlap and are not additive. A filtered test run is not equivalent to an end-to-end release qualification or an actual Shortcuts-registration test.
 
-[macOS CI run 38576537233](https://github.com/Jagalite/illiquid/actions/runs/38576537233)
-completed successfully. The pinned dependency setup, small fixture generation,
-full app/test dependency build and link, and selected test invocation succeeded.
-The runner reported Apple Swift 6.3.3, arm64 macOS 26, and **167 tests in 17 suites
-passed**. `realMediaTextSubtitleSeeksRemainUsable` and
-`realMediaCancelledSubtitleReadsRecover` were explicitly skipped because their
-separate real-media inputs were unavailable. The generated embedded-caption,
-external-text, signed-audio-delay and selected lifecycle tests did execute.
+## Integration commit review
 
-The local Linux core-only run reported **110 tests in 27 suites passed**. It
-uses actual source in the portable harness and excludes Darwin catalog scanning
-and UI observation. These counts contain existing regressions and overlap the
-macOS invocation: they are neither all-new tests nor additive totals. A full
-all-target/state-space test run was not completed in this work.
+- `1864da35` through `9dde96b6`: foundational CI, persistence, sparse preferences, caption source, native reader and regression work. Intermediate failures were corrected in follow-up commits; history preserved.
+- `1b83d2d4`: integrate coordinator recovery and transaction fences, caption UI, per-file override application, App Intents types, and native automation/transaction tests. The resulting 12 blobs were checked byte-for-byte against the saved candidate at this development stage.
+- `3491e34d`: add the final native transaction changes, app packaging compiler constants, Apple metadata extraction and strict validation; all 16 final blobs matched the tested local patch hashes.
+- Subsequent qualification-only commits should record their own failure reproduction, repair and rerun results before changing PR draft status.
 
-The original volume/speed setters failed the new real-store preference regression;
-the corrected setters passed. Invalid scalar, malformed reference, ambiguous
-file-URL, caption bound, malformed ASS and legacy-settings cases are covered.
+This is a self-review ledger, not an independent review or physical-qualification claim.
 
-Reproduce the scoped portable run with:
+## Remaining gates and local agent handoff
 
-```sh
-bash Scripts/test-portable-playback.sh --filter IlliquidCoreTests
-```
+Follow [`PLAYBACK_PRODUCT_LOCAL_QUALIFICATION.md`](PLAYBACK_PRODUCT_LOCAL_QUALIFICATION.md) for exact commands, test matrix, and evidence collection. At minimum: clean native app build, unsigned bundle with `.actionsdata`, all native tests, manual crash/reopen/moved-volume/track/seek/PiP/sleep cases, installed-app Shortcuts actions, accessibility and energy measurements. Record every failure and its fix in commits and rerun tests. Do **not** merge PR #3 until its dependency PR #1 and qualification gates are addressed.
 
-The macOS workflow records its exact filter, revision and toolchain, and uploads
-the test log as `playback-product-macos`. Inspect skipped and environment-gated
-tests rather than treating a green filtered run as complete native qualification.
-Inspecting App Intents tool help in CI does not build or register App Intents.
-
-## Commit review ledger
-
-| Commit | Review and outcome |
-| --- | --- |
-| `1864da35` | Checked pinned actions, read-only permissions, branch scope and native SDK setup. Initial macOS baseline passed. |
-| `3d0aadc7` | Checked scalar-only mutation, sanitization, all-field equality and actual store reload tests. Native CI exposed a portability regression: Foundation alone did not supply macOS CoreGraphics overlays. |
-| `2d074068` | Restored the conditional CoreGraphics import while retaining Linux compatibility. Included in the final successful native build. |
-| `22b1820b` | Checked legacy settings semantics, finite/bounded values, caller order, future reference schemas, file-URL boundaries, ASS parsing complexity and inverse subtitle-delay mapping. A null-byte URL test exposed Foundation representation differences; validation was corrected before this commit. |
-| `7b2d29ff` | Checked independent caption input ownership, bounded output, partial-index reporting, cancellation and generated fixtures. Native CI exposed use of a failable subtitle decoder without unwrapping. |
-| `9dde96b6` | Explicitly unwrap the throwing/failable decoder and report decoder unavailability. The complete filtered macOS run passed after this correction. |
-
-This is a self-review record, not an independent reviewer approval. Intermediate
-failing revisions remain visible with explicit correction commits.
-
-## Uncommitted integration work
-
-A separate 12-file development patch was retained with the conversation work
-bundle. Its base is exactly `9dde96b68a2e4d74a93ed87a8f4b42c0919d7560`.
-It contains candidate checkpoint/restore/recovery coordination, per-file
-application, caption UI, ordered automation, App Intents types and transaction
-tests. It is **not part of this PR** and must not be inferred from the feature
-models in the branch.
-
-The patch passed `git diff --check`, an apply check against the exact source
-base, and Swift syntax parsing. It was **not** typechecked, linked or run as a
-complete macOS application. App Intents metadata extraction/packaging remains
-unimplemented even in that candidate. Its transaction tests have not run.
-
-## Remaining acceptance gates
-
-1. Build and test the integrated coordinator/native/AppKit/SwiftUI changes; review
-   each remaining source commit and resolve failures before publishing it.
-2. Inject termination after source commit and before resume seek acknowledgement;
-   retain the last valid checkpoint through failed retry/Locate and drive loss.
-3. Qualify A-to-B-to-A track choices, external subtitles, Off versus Automatic,
-   per-file speed/audio delay, reset/inherit and disabled history.
-4. Add metadata generation to the packaged app and test actual Shortcuts
-   open-at-zero, ordered enqueue, cancellation and reference resolution.
-5. Measure final displayed timestamps and responsiveness during rapid scrubbing;
-   run real PiP/hidden-window/sleep/wake, accessibility and energy checks.
-
-No process-kill, physical mount/NAS, installed historical upgrade, display/PiP,
-Shortcuts registration, accessibility or battery qualification is claimed.
+No new app release, production signing, notarization, update feed, or mutation of an existing installed user's playback state is part of this work.
