@@ -1,0 +1,43 @@
+name: Restoration and thumbnail regressions
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: restoration-regressions-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  focused-core:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: bash Scripts/test-restoration-regressions.sh
+      - run: python3 -m unittest discover -s Validation/ReleaseQualification -p 'test_*.py' -v
+  native-lifecycle:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      # Use the existing release build's pinned compiler/native SDK setup.
+      # This workflow has no release, signing, feed, or installed-user-state writes.
+      - name: Prepare native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build app graph and run targeted regressions
+        run: |
+          swift test --force-resolved-versions --filter \
+            'TrackRestorationRegressionTests|InterruptedMigrationRegressionTests|ThumbnailSchedulingPolicyRegressionTests|ThumbnailLifecycleRegressionTests|ThumbnailBackgroundSchedulerTests|LegacyPreferencesMigrationTests'

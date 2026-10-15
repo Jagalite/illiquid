@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Observation
 import IlliquidCore
@@ -29,6 +30,24 @@ final class ThumbnailBackgroundScheduler {
     @ObservationIgnored private var stopped = false
     @ObservationIgnored private var powerObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var windowVisible = false
+    @ObservationIgnored private var windowObservation: ThumbnailWindowObservation?
+    @ObservationIgnored private var passCursor = ThumbnailPassCursor()
+    @ObservationIgnored private var hasPendingLibraryWork = false
+
+    private var isWindowVisible: Bool {
+        windowVisible && (windowObservation?.isVisible ?? true)
+    }
+
+    /// Bind at the scene's existing window-resolution point. Visibility updates
+    /// must reschedule even when no playback state or UI observation value changes.
+    func observeVisibility(of window: NSWindow) {
+        guard !stopped else { return }
+        windowObservation?.stop()
+        windowObservation = ThumbnailWindowObservation(window: window) { [weak self] in
+            self?.reschedule()
+        }
+        reschedule()
+    }
     @ObservationIgnored private var idle = false
     @ObservationIgnored private var playing = false
     @ObservationIgnored private var sourceRevision: UInt64 = 0
@@ -130,6 +149,8 @@ final class ThumbnailBackgroundScheduler {
 
     func shutdown() {
         stopped = true
+        windowObservation?.stop()
+        windowObservation = nil
         memoryPressureSource?.cancel()
         memoryPressureSource = nil
         for observer in powerObservers { NotificationCenter.default.removeObserver(observer) }
@@ -168,7 +189,7 @@ final class ThumbnailBackgroundScheduler {
             status = "Background generation is off."
             return
         }
-        guard (idle || (automatic && playing)), windowVisible || (idle && settings.generatesWithWindowClosed) else {
+        guard (idle || (automatic && playing)), isWindowVisible || (idle && settings.generatesWithWindowClosed) else {
             status = "Waiting for playback to settle or pause."
             return
         }
@@ -193,22 +214,29 @@ final class ThumbnailBackgroundScheduler {
                 task?.cancel()
                 status = "Background work budget reached."
             }
-            if automatic {
-                // Share an idle pass with opted-in library work. Otherwise the
-                // current video's replenishing nearby queue can spend every
-                // work budget before runPass ever gets a turn.
-                await runCurrent(settings: settings, id: id,
-                    maximumRequests: idle && settings.generatesInBackground ? 1 : nil)
-                if idle, settings.generatesInBackground, canContinue(id) { await runPass(settings: settings, id: id) }
+            if idle && settings.generatesInBackground {
+                // The current video participates in the same resumable queue.
+                // Even ONE current-video probe/decode can consume a whole budget;
+                // doing it unconditionally before this queue can starve the library.
+                await runPass(settings: settings, id: id)
+                if automatic, canContinue(id) {
+                    await runCurrent(settings: settings, id: id, maximumRequests: 1)
+                }
+            } else if automatic {
+                await runCurrent(settings: settings, id: id)
+            } else {
+                await runPass(settings: settings, id: id)
             }
-            else { await runPass(settings: settings, id: id) }
             if generation == id {
                 deadline?.cancel(); deadline = nil; task = nil
             }
             // A cancelled pass still owns cleanup. Release only idle resources,
             // so late cleanup cannot cancel a newer foreground/background request.
             await releaseResources()
-            if automatic, generation == id, !stopped { reschedule() }
+            if generation == id, !stopped,
+               automatic || (settings.generatesInBackground && hasPendingLibraryWork) {
+                reschedule()
+            }
         }
     }
 
@@ -262,14 +290,21 @@ final class ThumbnailBackgroundScheduler {
         }
         let source = current, location = folder, now = Date()
         let ranked = await Task.detached(priority: .utility) {
-            ThumbnailPolicy.ranked(candidates, current: source, folder: location, now: now, preferences: settings)
+            ThumbnailPolicy.ranked(candidates, current: source, folder: location, now: now,
+                preferences: settings, maximumCount: candidates.count)
         }.value
         guard canContinue(id) else { return }
+        let batch = passCursor.batch(from: ranked, limit: settings.videosPerPass)
+        hasPendingLibraryWork = !batch.isEmpty
         var plans: [(URL, [Double])] = []
         var completed = 0
         // First image for each likely video precedes deeper coverage of any video.
-        for url in ranked {
+        for url in batch {
             guard canContinue(id) else { return }
+            // Advance before either await, including failed or cancelled probes.
+            // Cancellation remains cooperative: this does not bound blocked OS I/O.
+            passCursor.advance(past: url)
+            hasPendingLibraryWork = passCursor.hasRemaining(in: ranked)
             let progress = player.playbackProgress(for: url)
             let duration: Double?
             if let known = progress?.duration, known > 0 { duration = known }
@@ -294,6 +329,7 @@ final class ThumbnailBackgroundScheduler {
 
     private func canContinue(_ id: UUID) -> Bool {
         !Task.isCancelled && !stopped && !isUnderMemoryPressure && generation == id && (idle || (preferences.preparesCurrentVideo && playing))
+            && (isWindowVisible || (idle && preferences.generatesWithWindowClosed))
             && !ProcessInfo.processInfo.isLowPowerModeEnabled
             && ProcessInfo.processInfo.thermalState != .serious
             && ProcessInfo.processInfo.thermalState != .critical
