@@ -1,0 +1,50 @@
+name: Playback Shortcuts package qualification
+on:
+  push:
+    branches: [feat/playback-reliability-tools]
+permissions:
+  contents: read
+concurrency:
+  group: illiquid-playback-package-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  macos-unsigned-package:
+    runs-on: macos-26
+    timeout-minutes: 50
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Run App Intents metadata regression tests
+        run: python3 Scripts/tests/app-intents-metadata-tests.py -v
+      - name: Assemble isolated unsigned app and verify Shortcuts catalog
+        run: |
+          set -o pipefail
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/revision.txt
+          swift --version > evidence/toolchain.txt
+          mkdir -p "$RUNNER_TEMP/illiquid-product-qualification"
+          bash Scripts/build-illiquid-app.sh --unsigned \
+            --output "$RUNNER_TEMP/illiquid-product-qualification" \
+            2>&1 | tee evidence/package.log
+          app="$RUNNER_TEMP/illiquid-product-qualification/Illiquid.app"
+          test -x "$app/Contents/MacOS/Illiquid"
+          python3 Scripts/app-intents-metadata.py validate \
+            "$app/Contents/Resources" | tee evidence/app-intents-validation.json
+          find "$app/Contents/Resources/Metadata.appintents" -type f \
+            > evidence/app-intents-files.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playback-packaging-qualification
+          path: evidence/
+          retention-days: 14

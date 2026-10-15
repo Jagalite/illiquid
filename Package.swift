@@ -1,6 +1,16 @@
 // swift-tools-version: 6.1
 
 import PackageDescription
+import Foundation
+
+let intentExtractionSettings: [SwiftSetting] = ProcessInfo.processInfo.environment["ILLIQUID_INTENTS_BUILD_DIRECTORY"].map { directory in
+    // The driver must register this supplementary output. Forwarding only the
+    // path to the frontend can compile the app without emitting the constants.
+    [.unsafeFlags([
+        "-Xfrontend", "-const-gather-protocols-file", "-Xfrontend", directory + "/protocols.json",
+        "-emit-const-values-path", directory + "/IlliquidApp.swiftconstvalues"
+    ], .when(configuration: .release))]
+} ?? []
 
 let package = Package(
     name: "Illiquid",
@@ -119,6 +129,7 @@ let package = Package(
             resources: [
                 .process("Resources"),
             ],
+            swiftSettings: intentExtractionSettings,
             linkerSettings: [
                 .linkedFramework("AppKit"),
                 .linkedFramework("AVKit"),

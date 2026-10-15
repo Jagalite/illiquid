@@ -160,13 +160,22 @@ struct PlaybackCoordinatorTests {
         for delta in [10.0, 10.0, -5.0] { fixture.coordinator.seek(relative: delta) }
         fixture.coordinator.pause()
         #expect(fixture.coordinator.state.position == 295)
-        try await Task.sleep(for: .milliseconds(80))
+        // A coalesced relative seek uses a 40 ms dispatch timer. Its actor
+        // can be scheduled later on a loaded CI runner; wait for the real
+        // final effect rather than assuming 80 ms is a hard upper bound.
+        let highDeadline = ContinuousClock.now + .seconds(1)
+        while fixture.runtime.seeks.last?.value != 295, ContinuousClock.now < highDeadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
         #expect(fixture.runtime.seeks.last?.value == 295)
         #expect(fixture.coordinator.state.isPauseDesired)
         fixture.coordinator.seek(to: 5)
         for delta in [-10.0, -10.0, 5.0] { fixture.coordinator.seek(relative: delta) }
         #expect(fixture.coordinator.state.position == 5)
-        try await Task.sleep(for: .milliseconds(80))
+        let lowDeadline = ContinuousClock.now + .seconds(1)
+        while fixture.runtime.seeks.last?.value != 5, ContinuousClock.now < lowDeadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
         #expect(fixture.runtime.seeks.last?.value == 5)
         await fixture.coordinator.shutdown()
     }

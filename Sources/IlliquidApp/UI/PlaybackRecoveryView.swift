@@ -37,12 +37,19 @@ struct PlaybackRecoveryView: View {
         case .message: EmptyView()
         case .unavailableRestore(let isFolder):
             Button("Retry") { player.retryRecovery() }
-            Button("Locate…") { locate(isFolder: isFolder) }
+            Button("Locate…") { locate(isFolder: isFolder, issueID: issue.id) }
             Button("Forget Session") { player.forgetUnavailableSession() }
                 .help("Forget the unavailable launch session. Playback history is kept.")
         case .failedSource(let canSkip):
             Button("Retry") { player.retryRecovery() }
+            if issue.source?.isFileURL == true {
+                Button("Locate…") { locate(isFolder: false, issueID: issue.id) }
+            }
             if canSkip { Button("Skip") { player.skipFailedSource() } }
+            Button("Stop") { player.stop() }
+        case .interruptedSource:
+            Button("Retry") { player.retryRecovery() }
+            Button("Locate…") { locate(isFolder: false, issueID: issue.id) }
             Button("Stop") { player.stop() }
         }
         Button("Copy Details") {
@@ -52,7 +59,7 @@ struct PlaybackRecoveryView: View {
         Button("Dismiss") { player.dismissRecovery() }
     }
 
-    private func locate(isFolder: Bool) {
+    private func locate(isFolder: Bool, issueID: UUID) {
         let panel = NSOpenPanel()
         panel.title = isFolder ? "Locate Previous Folder" : "Locate Previous File"
         panel.canChooseDirectories = isFolder
@@ -61,7 +68,7 @@ struct PlaybackRecoveryView: View {
         panel.prompt = "Locate"
         panel.begin { response in
             guard response == .OK, let url = panel.url else { return }
-            player.locateUnavailableSession(at: url)
+            player.locateUnavailableSession(at: url, expectedIssueID: issueID)
         }
     }
 }

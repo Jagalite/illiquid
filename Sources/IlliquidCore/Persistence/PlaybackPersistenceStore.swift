@@ -334,7 +334,7 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         }
         mutate { state in
             if let settings {
-                state.mediaSettings[key] = settings
+                state.mediaSettings[key] = settings.sanitized()
             } else {
                 state.mediaSettings.removeValue(forKey: key)
             }
@@ -406,19 +406,8 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
 
     public func setVolume(_ volume: Double) {
         mutatePreferences {
-            $0.preferences = PlaybackPreferences(
-                volume: volume,
-                isMuted: $0.preferences.isMuted,
-                playbackSpeed: $0.preferences.playbackSpeed,
-                isSidebarVisible: $0.preferences.isSidebarVisible,
-                repeatMode: $0.preferences.repeatMode,
-                isShuffleEnabled: $0.preferences.isShuffleEnabled,
-                hardwareDecodingPolicy: $0.preferences.hardwareDecodingPolicy,
-                preferredAudioOutputDeviceID:
-                    $0.preferences.preferredAudioOutputDeviceID,
-                subtitleFallbackEncoding: $0.preferences.subtitleFallbackEncoding,
-                trackSelection: $0.preferences.trackSelection
-            )
+            $0.preferences.volume = volume
+            $0.preferences = $0.preferences.sanitized()
         }
     }
 
@@ -436,19 +425,8 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
 
     public func setPlaybackSpeed(_ playbackSpeed: Double) {
         mutatePreferences {
-            $0.preferences = PlaybackPreferences(
-                volume: $0.preferences.volume,
-                isMuted: $0.preferences.isMuted,
-                playbackSpeed: playbackSpeed,
-                isSidebarVisible: $0.preferences.isSidebarVisible,
-                repeatMode: $0.preferences.repeatMode,
-                isShuffleEnabled: $0.preferences.isShuffleEnabled,
-                hardwareDecodingPolicy: $0.preferences.hardwareDecodingPolicy,
-                preferredAudioOutputDeviceID:
-                    $0.preferences.preferredAudioOutputDeviceID,
-                subtitleFallbackEncoding: $0.preferences.subtitleFallbackEncoding,
-                trackSelection: $0.preferences.trackSelection
-            )
+            $0.preferences.playbackSpeed = playbackSpeed
+            $0.preferences = $0.preferences.sanitized()
         }
     }
 

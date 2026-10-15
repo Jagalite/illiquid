@@ -1,4 +1,5 @@
 import SwiftUI
+import AppIntents
 import IlliquidCore
 
 @main
@@ -8,10 +9,13 @@ struct IlliquidApp: App {
     @State private var model: AppModel?
     @State private var offersDefaultPlayer = false
     @State private var showsDefaultPlayerResult = false
+    @State private var showsCaptions = false
+    @State private var showsMediaPreferences = false
     @State private var themeStore: PlayerThemeStore
     @State private var interfaceScale: PlayerInterfaceScaleStore
 
     init() {
+        IlliquidAppShortcuts.updateAppShortcutParameters()
         let timing = LifecyclePerformance.begin("app-init")
         defer { LifecyclePerformance.end("app-init", since: timing) }
         if Bundle.main.bundleIdentifier == LegacyPreferencesMigration.bundleIdentifier {
@@ -45,7 +49,16 @@ struct IlliquidApp: App {
         .defaultSize(width: 1_200, height: 760)
         .commands {
             UpdateCommands()
-            if let model { PlayerCommands(model: model) }
+            if let model {
+                PlayerCommands(model: model)
+                CommandMenu("Media Tools") {
+                    Button("Caption Navigation…") { showsCaptions = true }
+                        .keyboardShortcut("f", modifiers: [.command, .shift])
+                        .disabled(model.player.viewStore.currentSource == nil)
+                    Button("Preferences for This File…") { showsMediaPreferences = true }
+                        .disabled(!model.player.canEditCurrentMediaSettings)
+                }
+            }
         }
 
         Settings {
@@ -71,6 +84,22 @@ struct IlliquidApp: App {
 
     private func playerView(_ model: AppModel) -> some View {
         PlayerRootView(model: model)
+            .sheet(isPresented: $showsCaptions) {
+                CaptionNavigationView(player: model.player).scaledPlayerInterface()
+            }
+            .onChange(of: showsCaptions) { _, shown in
+                model.setTransientPresentation(shown, owner: "caption-navigation")
+            }
+            .sheet(isPresented: $showsMediaPreferences) {
+                MediaPlaybackPreferencesView(player: model.player).scaledPlayerInterface()
+            }
+            .onChange(of: showsMediaPreferences) { _, shown in
+                model.setTransientPresentation(shown, owner: "media-preferences")
+            }
+            .onDisappear {
+                model.setTransientPresentation(false, owner: "caption-navigation")
+                model.setTransientPresentation(false, owner: "media-preferences")
+            }
             .environment(\.playerTheme, themeStore.selection)
             .environment(\.playerTextColorMode, themeStore.textColorMode)
             .environment(\.playerRainbowPalette, themeStore.rainbowPalette)

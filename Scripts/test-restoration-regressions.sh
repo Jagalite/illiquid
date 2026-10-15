@@ -8,6 +8,8 @@ trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/Sources/IlliquidCore" "$work/Tests/IlliquidCoreTests"
 for file in \
     Player/MediaTrack.swift \
+    Player/TrackSelectionPreferences.swift \
+    Utilities/NormalizedFileURL.swift \
     Player/ThumbnailPolicy.swift \
     Player/ThumbnailPassCursor.swift \
     Player/ThumbnailVisibilityPolicy.swift \
@@ -21,7 +23,7 @@ done
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1
 import PackageDescription
-let package = Package(name: "IlliquidRestorationRegressions", targets: [
+let package = Package(name: "IlliquidRestorationRegressions", platforms: [.macOS(.v13)], targets: [
     .target(name: "IlliquidCore"),
     .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])
 ])

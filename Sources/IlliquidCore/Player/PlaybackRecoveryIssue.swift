@@ -6,21 +6,25 @@ public struct PlaybackRecoveryIssue: Equatable, Sendable {
         case message
         case unavailableRestore(isFolder: Bool)
         case failedSource(canSkip: Bool)
+        case interruptedSource
     }
 
+    public let id: UUID
     public let kind: Kind
     public let message: String
     public let source: URL?
     public let diagnosticCode: String?
 
-    public init(kind: Kind, message: String, source: URL? = nil) {
+    public init(kind: Kind, message: String, source: URL? = nil, diagnosticCode: String? = nil) {
+        id = UUID()
         self.kind = kind
         self.message = message
         self.source = source
-        diagnosticCode = nil
+        self.diagnosticCode = diagnosticCode
     }
 
     public init(coreFailureCode code: String) {
+        id = UUID()
         kind = .message
         source = nil
         diagnosticCode = code

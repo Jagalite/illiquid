@@ -1423,6 +1423,23 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         lastPublishedAudioDevices = devices
         emit(.audioDevicesChanged(devices), identity: nil)
     }
+    /// Physical replacement completion, used only to avoid returning a product
+    /// result while a native candidate can still replace its clock/resources.
+    public var hasPendingMediaReplacement: Bool {
+        !replacementTasks.isEmpty || deferredReplacementRequest != nil || pendingCommittedReplacement != nil
+    }
+
+    /// Immutable bytes used by the active text subtitle pipeline. A separate
+    /// caption index cannot accidentally read a newer on-disk sidecar while
+    /// playback is still displaying the previously loaded version.
+    public var externalCaptionDocument: NativeCaptionDocument? {
+        guard !hasPendingMediaReplacement,
+              case let .external(url) = subtitleSource,
+              let prepared = preparedExternalSubtitle, prepared.url == url,
+              let data = prepared.data else { return nil }
+        return NativeCaptionDocument(url: url, assData: data)
+    }
+
     public func loadExternalSubtitle(_ url: URL, select: Bool) {
         guard select else {
             emit(.diagnostic(
