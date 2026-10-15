@@ -1,0 +1,1220 @@
+diff --git a/Sources/IlliquidPlayer/Player/PlaybackController.swift b/Sources/IlliquidPlayer/Player/PlaybackController.swift
+index fc4d550..a18a761 100644
+--- a/Sources/IlliquidPlayer/Player/PlaybackController.swift
++++ b/Sources/IlliquidPlayer/Player/PlaybackController.swift
+@@ -12,6 +12,16 @@ public final class PlaybackCoordinator {
+         let position: TimeInterval
+         let wasPaused: Bool
+         let playlistIndex: Int?
++        let positionIsExplicit: Bool
++
++        init(source: MediaSource, position: TimeInterval, wasPaused: Bool,
++             playlistIndex: Int?, positionIsExplicit: Bool = false) {
++            self.source = source
++            self.position = position
++            self.wasPaused = wasPaused
++            self.playlistIndex = playlistIndex
++            self.positionIsExplicit = positionIsExplicit
++        }
+     }
+ 
+     private struct PendingSourceTransaction {
+@@ -25,6 +35,7 @@ public final class PlaybackCoordinator {
+         let mediaSettings: MediaPlaybackSettings?
+         let restoreTarget: PlaybackRestoreTarget?
+         let traversalStep: Int?
++        let recoverySession: PlaybackSessionRecord?
+     }
+ 
+     private struct PreparedOpenPlan: Sendable {
+@@ -104,10 +115,32 @@ public final class PlaybackCoordinator {
+     private var unshuffledPlaylistIDs: [FolderPlaylistItem.ID]?
+     private var pendingSourceTransaction: PendingSourceTransaction?
+     private var failedSourceTransaction: PendingSourceTransaction?
+-    private var pendingMediaSettings: MediaPlaybackSettings?
++    private var pendingMediaSettingFields: Set<MediaPlaybackSetting> = []
++    private var hasReceivedCurrentCatalog = false
++    private var pendingPositionRestore: PendingPlaybackRestore?
++    private var pendingExternalInstallURL: URL?
++    private var isDrainingMediaRestore = false
++    private var restoreDrainTask: Task<Void, Never>?
+     private var pendingExternalSubtitleRestore: (preference: MediaTrackPreference?, visible: Bool)?
+     private var ignoresSavedPositionForCurrentSource = false
+     private var canPersistCurrentMediaHistory = true
++    // A source commit precedes metadata/restore. Never persist its zero-valued
++    // loading projection or an optimistic seek target over a valid checkpoint.
++    private var hasLoadedCurrentSource = false
++    private var checkpointWhenSettled = false
++    private var historyCheckpointWhenSettled = false
++    private var lastSettledSession: PlaybackSessionRecord?
++    private var interruptedRecoverySession: PlaybackSessionRecord?
++    private var pendingLocatedSession: PlaybackSessionRecord?
++    private var currentContentVersion: MediaContentVersion?
++    private var currentMediaSettings = MediaPlaybackSettings()
++    private var installedExternalSubtitleURL: URL?
++    private var pendingExternalPreferenceURL: URL?
++    private var pendingRestoredAudioDelay: Double?
++    private let automationQueue = PlaybackAutomationQueue()
++    private let automationTimeout: TimeInterval
++    private var activeAutomationID: UUID?
++    private var automationCheckpointOwner: UUID?
+     private var pendingLocatedHistorySource: URL?
+     private var lastCheckpointedPosition: TimeInterval = 0
+     private var filterMutationTokens: [VideoFilterPreset: UUID] = [:]
+@@ -225,12 +258,14 @@ public final class PlaybackCoordinator {
+         sessionStore: any PlaybackSessionStoring = AtomicPlaybackSessionStore(),
+         runtime: (any PlaybackRuntime)? = nil,
+         thumbnailCacheDirectory: URL? = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
+-            .appendingPathComponent("Illiquid/Thumbnails-v1", isDirectory: true)
++            .appendingPathComponent("Illiquid/Thumbnails-v1", isDirectory: true),
++        automationTimeout: TimeInterval = 30
+     ) {
+         let timing = LifecyclePerformance.begin("controller-init")
+         defer { LifecyclePerformance.end("controller-init", since: timing) }
+         timelineThumbnailGenerator = NativeTimelineThumbnailGenerator(cacheDirectory: thumbnailCacheDirectory)
+         self.persistence = persistence
++        self.automationTimeout = min(max(automationTimeout.isFinite ? automationTimeout : 30, 0.05), 120)
+         self.sessionStore = sessionStore
+         checkpointWriter = CoalescingPersistenceWriter(label: "com.illiquid.session-writer") {
+             try $0.apply(to: sessionStore)
+@@ -377,12 +412,20 @@ public final class PlaybackCoordinator {
+ 
+     public func retryRecovery() {
+         if let failed = failedSourceTransaction {
++            if let saved = failed.recoverySession {
++                pendingPlaybackRestore = PendingPlaybackRestore(source: failed.request.source,
++                    position: saved.position, wasPaused: saved.wasPaused, playlistIndex: failed.playlistIndex)
++                pendingLocatedHistorySource = saved.source.url
++            }
+             beginSourceTransaction(
+                 item: failed.playlist[failed.playlistIndex], playlist: failed.playlist,
+                 folder: failed.folder, playlistIndex: failed.playlistIndex,
+                 origin: failed.request.origin, restoreTarget: failed.restoreTarget,
+-                traversalStep: failed.traversalStep
++                traversalStep: failed.traversalStep, recoverySession: failed.recoverySession
+             )
++        } else if case .interruptedSource = state.recoveryIssue?.kind,
++                  let saved = interruptedRecoverySession {
++            applyLocatedSession(at: saved.source.url, isFolder: false, saved: saved)
+         } else if case .unavailableRestore = state.recoveryIssue?.kind {
+             _ = restoreLastSession()
+         }
+@@ -417,10 +460,30 @@ public final class PlaybackCoordinator {
+         dismissRecovery()
+     }
+ 
+-    public func locateUnavailableSession(at url: URL) {
+-        guard case let .unavailableRestore(isFolder) = state.recoveryIssue?.kind,
+-              url.isFileURL else { return }
+-        let saved = preparedRestoreSession
++    public func locateUnavailableSession(at url: URL, expectedIssueID: UUID? = nil) {
++        guard let issue = state.recoveryIssue, url.isFileURL,
++              expectedIssueID == nil || issue.id == expectedIssueID else { return }
++        let saved: PlaybackSessionRecord?
++        let isFolder: Bool
++        switch issue.kind {
++        case .unavailableRestore(let folder):
++            if let session = preparedRestoreSession {
++                saved = session
++            } else if let source = issue.source, !folder {
++                saved = PlaybackSessionRecord(source: .localFile(source),
++                    position: persistence.playbackPosition(for: source) ?? 0, wasPaused: restoresSessionPaused)
++            } else { saved = nil }
++            isFolder = folder
++        case .failedSource:
++            guard let failed = failedSourceTransaction, !failed.request.source.isRemote else { return }
++            saved = failed.recoverySession ?? recoveryRecord(for: failed)
++            isFolder = false
++        case .interruptedSource:
++            saved = interruptedRecoverySession
++            isFolder = false
++        case .message: return
++        }
++        guard saved != nil || isFolder else { return }
+         cancelFolderScans()
+         let generation = folderScanGeneration
+         let preparation = sourcePreparation
+@@ -433,39 +496,54 @@ public final class PlaybackCoordinator {
+             }
+             guard let self else { return }
+             defer { folderScanTasks[generation] = nil }
+-            guard !Task.isCancelled, !isShuttingDown, generation == folderScanGeneration else { return }
++            guard !Task.isCancelled, !isShuttingDown, generation == folderScanGeneration,
++                  state.recoveryIssue?.id == issue.id else { return }
+             do { applyLocatedSession(at: try result.get(), isFolder: isFolder, saved: saved) }
+             catch { state.setShellError(error.localizedDescription) }
+         }
+     }
+ 
+     private func applyLocatedSession(at url: URL, isFolder: Bool, saved: PlaybackSessionRecord?) {
++        guard let saved else {
++            // Legacy history may have a restore target but no session document.
++            if isFolder { openFolder(url: url, origin: .restoredSession) }
++            else { open(url: url, origin: .restoredSession) }
++            return
++        }
+         let sourceURL = isFolder
+-            ? url.appendingPathComponent(saved?.source.url.lastPathComponent ?? "", isDirectory: false) : url
+-        pendingLocatedHistorySource = saved?.source.url
++            ? url.appendingPathComponent(saved.source.url.lastPathComponent, isDirectory: false) : url
++        pendingLocatedHistorySource = saved.source.url
++        pendingLocatedSession = saved
+         pendingPlaybackRestore = PendingPlaybackRestore(
+-            source: .localFile(sourceURL), position: saved?.position ?? 0,
+-            wasPaused: saved?.wasPaused ?? true, playlistIndex: nil
++            source: .localFile(sourceURL), position: saved.position,
++            wasPaused: saved.wasPaused, playlistIndex: nil
+         )
+-        // Commit a replacement restore target only after it opens successfully.
++        // Do not publish the replacement session until loading and its restored
++        // seek have completed. Rejected Locate and retry attempts retain saved.
+         dismissRecovery()
+         if isFolder {
+             openFolder(url: url, origin: .restoredSession)
+-        } else if let saved, !saved.playlistItems.isEmpty {
+-            let items = saved.playlistItems.map { item in
++        } else {
++            var items = saved.playlistItems.map { item in
+                 item.url == saved.source.url
+-                    ? FolderPlaylistItem(url: url, dateAdded: item.dateAdded) : item
++                    ? FolderPlaylistItem(url: url, externalSubtitleURLs: item.externalSubtitleURLs,
++                                         dateAdded: item.dateAdded) : item
+             }
+-            if let index = items.firstIndex(where: { $0.url == url }) {
+-                beginSourceTransaction(item: items[index], playlist: items, folder: nil,
+-                                       playlistIndex: index, origin: .restoredSession,
+-                                       restoreTarget: .file(url))
+-            } else {
+-                open(url: url, origin: .restoredSession)
+-            }
+-        } else {
+-            open(url: url, origin: .restoredSession)
++            if !items.contains(where: { $0.url == url }) { items.append(FolderPlaylistItem(url: url)) }
++            guard let index = items.firstIndex(where: { $0.url == url }) else { return }
++            beginSourceTransaction(item: items[index], playlist: items, folder: nil,
++                playlistIndex: index, origin: .restoredSession, restoreTarget: .file(url), recoverySession: saved)
++        }
++    }
++
++    private func recoveryRecord(for failed: PendingSourceTransaction) -> PlaybackSessionRecord {
++        let restore = pendingPlaybackRestore.flatMap {
++            $0.source.representsSameResource(as: failed.request.source) ? $0 : nil
+         }
++        return PlaybackSessionRecord(source: failed.request.source, collectionFolder: failed.folder,
++            playlistItems: failed.playlist, playlistIndex: failed.playlistIndex,
++            position: restore?.position ?? persistence.playbackPosition(for: failed.request.source.url) ?? 0,
++            wasPaused: restore?.wasPaused ?? true)
+     }
+ 
+     private func reportUnavailableRestore(_ url: URL, isFolder: Bool) {
+@@ -797,6 +875,8 @@ public final class PlaybackCoordinator {
+     }
+ 
+     public func play() {
++        activeAutomationID = nil
++        updatePendingRestoreTransport(paused: false)
+         if retainsCompletedFrame {
+             retainsCompletedFrame = false
+             seek(to: 0)
+@@ -812,6 +892,8 @@ public final class PlaybackCoordinator {
+     }
+ 
+     public func pause() {
++        activeAutomationID = nil
++        updatePendingRestoreTransport(paused: true)
+         _ = runtimeDriver?.pause()
+     }
+ 
+@@ -820,12 +902,19 @@ public final class PlaybackCoordinator {
+     }
+ 
+     public func stop() {
++        activeAutomationID = nil
+         retainsCompletedFrame = false
+         invalidateTimelineThumbnails()
+         cancelFolderScans()
+         pendingLocatedHistorySource = nil
+         pendingPlaybackRestore = nil
+         saveCurrentProgress()
++        pendingMediaSettingFields.removeAll()
++        pendingPositionRestore = nil
++        pendingExternalInstallURL = nil
++        pendingRestoredAudioDelay = nil
++        restoreDrainTask?.cancel()
++        restoreDrainTask = nil
+         pendingSourceTransaction = nil
+         dismissRecovery()
+         eventGate.activate(nil)
+@@ -840,22 +929,45 @@ public final class PlaybackCoordinator {
+         clearSavedPlaybackSession()
+         discardFailedTraversalForPlaylistChange()
+         pendingExternalSubtitles = []
+-        pendingMediaSettings = nil
++        pendingMediaSettingFields.removeAll()
+         pendingExternalSubtitleRestore = nil
++        pendingExternalPreferenceURL = nil
++        installedExternalSubtitleURL = nil
++        pendingRestoredAudioDelay = nil
++        currentMediaSettings = MediaPlaybackSettings()
++        hasLoadedCurrentSource = false
++        currentContentVersion = nil
++        lastSettledSession = nil
++        interruptedRecoverySession = nil
+         videoColorStore.reset()
+         state.clearMediaMetadata()
+     }
+ 
+     public func seek(relative seconds: TimeInterval) {
++        activeAutomationID = nil
++        pendingPositionRestore = nil
++        pendingPlaybackRestore = nil
++        checkpointWhenSettled = true
++        historyCheckpointWhenSettled = true
+         _ = runtimeDriver?.seek(to: seconds, mode: .relative)
+     }
+ 
+     public func seek(to seconds: TimeInterval) {
++        activeAutomationID = nil
++        pendingPositionRestore = nil
++        pendingPlaybackRestore = nil
++        checkpointWhenSettled = true
++        historyCheckpointWhenSettled = true
+         retainsCompletedFrame = false
+         _ = runtimeDriver?.seek(to: seconds, mode: .exact)
+     }
+ 
+     public func previewSeek(to seconds: TimeInterval) {
++        activeAutomationID = nil
++        pendingPositionRestore = nil
++        pendingPlaybackRestore = nil
++        checkpointWhenSettled = true
++        historyCheckpointWhenSettled = true
+         retainsCompletedFrame = false
+         _ = runtimeDriver?.seek(to: seconds, mode: .preview)
+     }
+@@ -1120,9 +1232,16 @@ public final class PlaybackCoordinator {
+         guard speed.isFinite else { return }
+         let sanitized = (min(max(speed, 0.25), 4) * 1_000).rounded() / 1_000
+         state.setPlaybackSpeed(sanitized)
+-        persistence.setPlaybackSpeed(sanitized)
+         _ = runtimeDriver?.setPlaybackSpeed(sanitized)
+         backend?.setPlaybackSpeed(sanitized)
++        if state.currentSource == nil {
++            persistence.setPlaybackSpeed(sanitized)
++        } else {
++            updateCurrentMediaSettings { settings in
++                settings.overriddenFields.insert(.playbackSpeed)
++                settings.playbackSpeed = sanitized
++            }
++        }
+     }
+ 
+     public func setHardwareDecodingPolicy(_ policy: HardwareDecodingPolicy) {
+@@ -1133,20 +1252,29 @@ public final class PlaybackCoordinator {
+ 
+     public func selectAudioTrack(_ track: MediaTrack?) {
+         guard supports(.selectAudioTrack, operation: "audio tracks") else { return }
+-        _ = runtimeDriver?.selectAudioTrack(track?.id)
+         updateCurrentMediaSettings { settings in
++            settings.overriddenFields.insert(.audio)
+             settings.audioTrack = track.map(MediaTrackPreference.init)
++            settings.audioLanguage = nil
+         }
++        pendingMediaSettingFields.insert(.audio)
++        drainMediaRestore()
+     }
+ 
+     public func selectSubtitleTrack(_ track: MediaTrack?) {
+         pendingExternalSubtitleRestore = nil
++        pendingExternalPreferenceURL = nil
+         guard supports(.selectSubtitleTrack, operation: "subtitle tracks") else { return }
+-        _ = runtimeDriver?.selectSubtitleTrack(track?.id)
++        pendingExternalInstallURL = nil
+         updateCurrentMediaSettings { settings in
++            settings.overriddenFields.insert(.subtitles)
+             settings.subtitleTrack = track.map(MediaTrackPreference.init)
++            settings.subtitleLanguage = nil
++            settings.externalSubtitleURL = track?.isExternal == true ? installedExternalSubtitleURL : nil
+             settings.areSubtitlesVisible = track != nil
+         }
++        pendingMediaSettingFields.insert(.subtitles)
++        drainMediaRestore()
+     }
+ 
+     public func selectAudioOutputDevice(_ device: AudioOutputDevice?) {
+@@ -1163,16 +1291,26 @@ public final class PlaybackCoordinator {
+ 
+     public func setAudioDelay(_ delay: TimeInterval) {
+         guard supports(.changeAudioDelay, operation: "audio delay") else { return }
+-        backend?.setAudioDelay(min(max(delay, -10), 10))
++        guard delay.isFinite else { return }
++        let sanitized = min(max(delay, -10), 10)
++        pendingRestoredAudioDelay = sanitized
++        updateCurrentMediaSettings { settings in
++            settings.overriddenFields.insert(.audioDelay)
++            settings.audioDelay = sanitized
++        }
++        applyDeferredMediaAudioDelay()
+     }
+ 
+     public func setSubtitleDelay(_ delay: TimeInterval) {
+         guard supports(.changeSubtitleDelay, operation: "subtitle delay") else { return }
++        guard delay.isFinite else { return }
+         let sanitized = min(max(delay, -10), 10)
+-        _ = runtimeDriver?.setSubtitleDelay(sanitized)
+         updateCurrentMediaSettings { settings in
++            settings.overriddenFields.insert(.subtitleDelay)
+             settings.subtitleDelay = sanitized
+         }
++        pendingMediaSettingFields.insert(.subtitleDelay)
++        drainMediaRestore()
+     }
+ 
+     public func setVideoScaleMode(_ mode: VideoScaleMode) {
+@@ -1286,7 +1424,12 @@ public final class PlaybackCoordinator {
+             return
+         }
+         guard supports(.loadExternalSubtitle, operation: "external subtitles") else { return }
+-        _ = runtimeDriver?.selectExternalSubtitle(url)
++        guard url.isFileURL else { return }
++        pendingExternalPreferenceURL = url
++        pendingExternalInstallURL = url
++        pendingMediaSettingFields.remove(.subtitles)
++        pendingExternalSubtitleRestore = nil
++        drainMediaRestore()
+     }
+ 
+     public func captureScreenshot(to url: URL, includeSubtitles: Bool = true) async throws {
+@@ -1339,6 +1482,7 @@ public final class PlaybackCoordinator {
+     }
+ 
+     public func sortPlaylist(by order: PlaylistSortOrder, ascending: Bool) {
++        activeAutomationID = nil
+         guard !state.playlist.isEmpty else { return }
+         finishShuffleForExplicitOrder()
+         let items = PlaylistMutation.sorted(
+@@ -1371,6 +1515,7 @@ public final class PlaybackCoordinator {
+     }
+ 
+     public func removePlaylistItem(id: FolderPlaylistItem.ID) {
++        activeAutomationID = nil
+         guard let index = state.playlist.firstIndex(where: { $0.id == id }) else {
+             return
+         }
+@@ -1402,6 +1547,7 @@ public final class PlaybackCoordinator {
+     }
+ 
+     public func removeCompletedPlaylistItems() {
++        activeAutomationID = nil
+         let currentURL = state.currentURL
+         let items = state.playlist.filter { item in
+             if let currentURL,
+@@ -1426,12 +1572,14 @@ public final class PlaybackCoordinator {
+     }
+ 
+     public func clearPlaylist() {
++        activeAutomationID = nil
+         discardFailedTraversalForPlaylistChange()
+         state.configurePlaylist(folder: nil, items: [], selectedIndex: nil)
+         checkpointSession()
+     }
+ 
+     public func movePlaylistItem(id: FolderPlaylistItem.ID, before targetID: FolderPlaylistItem.ID) {
++        activeAutomationID = nil
+         guard id != targetID,
+               let sourceIndex = state.playlist.firstIndex(where: { $0.id == id }),
+               let originalTargetIndex = state.playlist.firstIndex(where: { $0.id == targetID })
+@@ -1518,12 +1666,16 @@ public final class PlaybackCoordinator {
+         playlistIndex: Int,
+         origin: MediaSourceOrigin,
+         restoreTarget: PlaybackRestoreTarget?,
+-        traversalStep: Int? = nil
++        traversalStep: Int? = nil,
++        recoverySession: PlaybackSessionRecord? = nil,
++        automationID: UUID? = nil
+     ) -> Bool {
+         guard backend != nil, playlist.indices.contains(playlistIndex) else { return false }
++        activeAutomationID = automationID
+         invalidateTimelineThumbnails()
+         dismissRecovery()
+         saveCurrentProgress()
++        automationCheckpointOwner = automationID
+         guard let source = MediaSource(url: item.url) else {
+             state.setShellError("This media source is not supported.")
+             return false
+@@ -1545,10 +1697,15 @@ public final class PlaybackCoordinator {
+             externalSubtitleURLs: item.externalSubtitleURLs,
+             mediaSettings: remembersPlaybackHistory ? persistence.mediaSettings(for: item.url) : nil,
+             restoreTarget: restoreTarget,
+-            traversalStep: traversalStep
++            traversalStep: traversalStep,
++            recoverySession: recoverySession ?? pendingLocatedSession
+         )
++        pendingLocatedSession = nil
+         let accepted = runtimeDriver?.load(
+-            PlaybackRuntimeLoadRequest(media: request, identity: identity)
++            PlaybackRuntimeLoadRequest(media: request, identity: identity),
++            autoplay: !(pendingPlaybackRestore.map {
++                $0.source.representsSameResource(as: source) && $0.wasPaused
++            } ?? (origin == .restoredSession && restoresSessionPaused))
+         ) == true
+         if !accepted {
+             pendingSourceTransaction = nil
+@@ -1593,6 +1750,7 @@ public final class PlaybackCoordinator {
+     }
+ 
+     public func setShuffleEnabled(_ isEnabled: Bool) {
++        activeAutomationID = nil
+         guard state.isShuffleEnabled != isEnabled else { return }
+         if isEnabled { unshuffledPlaylistIDs = state.playlist.map(\.id) }
+         state.setShuffleEnabled(isEnabled)
+@@ -1834,6 +1992,7 @@ public final class PlaybackCoordinator {
+     }
+ 
+     public func systemWillSleep() {
++        activeAutomationID = nil
+         saveCurrentProgress()
+         _ = runtimeDriver?.systemWillSleep()
+     }
+@@ -1848,6 +2007,7 @@ public final class PlaybackCoordinator {
+         defer { LifecyclePerformance.end("controller-shutdown", since: timing) }
+         guard !isShuttingDown else { return }
+         isShuttingDown = true
++        activeAutomationID = nil
+         // A final checkpoint must not wait for the interactive save debounce.
+         // If a flush already started, join it before the final authoritative flush.
+         let terminatingCheckpointFlush = checkpointFlushTask
+@@ -1894,6 +2054,12 @@ public final class PlaybackCoordinator {
+         guard hasCurrentPlaybackAuthority else { return true }
+         guard progressClearedAtPosition == nil else { return true }
+         guard canPersistCurrentMediaHistory else { return true }
++        guard canCheckpointCurrentPosition else {
++            checkpointWhenSettled = true
++            historyCheckpointWhenSettled = true
++            return true
++        }
++        historyCheckpointWhenSettled = false
+         if case let .localFile(currentURL) = source {
+             if state.duration > 0 {
+                 persistence.setPlaybackProgress(
+@@ -1922,11 +2088,13 @@ public final class PlaybackCoordinator {
+         guard hasCurrentPlaybackAuthority else { return true }
+         guard progressClearedAtPosition == nil else { return true }
+         guard canPersistCurrentMediaHistory else { return true }
++        guard canCheckpointCurrentPosition else { checkpointWhenSettled = true; return true }
+         if state.isShuffleEnabled {
+             unshuffledPlaylistIDs = PlaylistMutation.restoringOrder(
+                 state.playlist, ids: unshuffledPlaylistIDs ?? []
+             ).map(\.id)
+         }
++        checkpointWhenSettled = false
+         checkpointWriter.submit(.save(PlaybackCheckpoint(
+             source: source, folder: state.currentFolder, playlist: state.playlist,
+             index: state.currentPlaylistIndex, position: state.position,
+@@ -2002,7 +2170,15 @@ public final class PlaybackCoordinator {
+         case .loaded:
+             invalidateTimelineThumbnails()
+             videoColorStore.reset()
++            // Apply speed before the explicit transport/seek restore so a
++            // preference change cannot overwrite that newer command intent.
++            applyCurrentMediaSpeed()
+             restorePositionAndExternalSubtitles()
++            hasLoadedCurrentSource = true
++            pendingRestoredAudioDelay = currentMediaSettings.effectiveAudioDelay
++            drainMediaRestore()
++            checkpointSession()
++            if let snapshot = runtimeDriver?.currentSnapshot { observeSettledProductState(snapshot) }
+         case .firstFrameSubmitted:
+             recordDiagnostic(
+                 "[native] First frame submitted to the renderer.",
+@@ -2030,12 +2206,14 @@ public final class PlaybackCoordinator {
+         case .synchronization:
+             break
+         case let .tracksChanged(snapshot):
++            hasReceivedCurrentCatalog = true
+             state.updateTrackCatalog(snapshot.tracks)
+             if let currentSnapshot = runtimeDriver?.currentSnapshot {
+                 applyCoreSnapshot(currentSnapshot)
+             }
+-            applyPendingMediaSettings()
+-            applyPendingExternalSubtitleRestore()
++            drainMediaRestore()
++            observeAcknowledgedExternalSubtitle()
++            applyDeferredMediaAudioDelay()
+         case let .decoderChanged(status):
+             state.updateActiveDecoder(
+                 status.name,
+@@ -2084,6 +2262,7 @@ public final class PlaybackCoordinator {
+             state.updateChapters(chapters, currentID: currentID)
+         case let .audioDelayChanged(value):
+             state.setAudioDelay(value)
++            scheduleMediaRestoreDrain()
+         case .subtitleDelayChanged:
+             break
+         case let .videoAdjustmentsChanged(adjustments):
+@@ -2122,6 +2301,7 @@ public final class PlaybackCoordinator {
+         let committedSource = settlePendingSourceTransaction(using: transition.snapshot)
+         applyCoreSnapshot(transition.snapshot)
+         if committedSource { checkpointSession() }
++        observeSettledProductState(transition.snapshot)
+     }
+ 
+     private func settlePendingSourceTransaction(
+@@ -2148,8 +2328,23 @@ public final class PlaybackCoordinator {
+                 playlistIndex: pending.playlistIndex
+             )
+             pendingExternalSubtitles = pending.externalSubtitleURLs
+-            pendingMediaSettings = pending.mediaSettings
++            currentMediaSettings = pending.mediaSettings?.sanitized() ?? MediaPlaybackSettings()
++            pendingMediaSettingFields = currentMediaSettings.overriddenFields.intersection([.audio, .subtitles, .subtitleDelay])
++            hasReceivedCurrentCatalog = false
++            pendingPositionRestore = nil
++            pendingExternalInstallURL = nil
++            restoreDrainTask?.cancel()
++            restoreDrainTask = nil
+             pendingExternalSubtitleRestore = nil
++            pendingExternalPreferenceURL = nil
++            installedExternalSubtitleURL = nil
++            pendingRestoredAudioDelay = nil
++            hasLoadedCurrentSource = false
++            checkpointWhenSettled = false
++            historyCheckpointWhenSettled = false
++            lastSettledSession = nil
++            interruptedRecoverySession = nil
++            currentContentVersion = nil
+             ignoresSavedPositionForCurrentSource = false
+             canPersistCurrentMediaHistory = true
+             progressClearedAtPosition = nil
+@@ -2175,9 +2370,11 @@ public final class PlaybackCoordinator {
+             } ?? false
+             state.setRecoveryIssue(PlaybackRecoveryIssue(
+                 kind: .failedSource(canSkip: canSkip),
+-                message: "Could not open \(pending.request.source.url.lastPathComponent)."
+-                    + (snapshot.failureCode.map { " \($0)" } ?? ""),
+-                source: pending.request.source.url
++                message: "Could not open \(pending.request.source.url.lastPathComponent). "
++                    + (pending.request.source.isRemote
++                        ? "Check the address and connection, then retry."
++                        : "Check that the file and its drive are accessible, retry, or locate the file."),
++                source: pending.request.source.url, diagnosticCode: snapshot.failureCode
+             ))
+         }
+         return false
+@@ -2239,12 +2436,14 @@ public final class PlaybackCoordinator {
+         guard let url = state.currentURL, url.isFileURL else { return }
+         let locatedSource = pendingLocatedHistorySource
+         pendingLocatedHistorySource = nil
++        currentContentVersion = version
+         canPersistCurrentMediaHistory = version != nil
+         var changed = false
+         if let version {
+             if let locatedSource,
+                persistence.copyHistoryForLocatedMedia(from: locatedSource, to: url, version: version) {
+-                pendingMediaSettings = persistence.mediaSettings(for: url)
++                currentMediaSettings = persistence.mediaSettings(for: url) ?? MediaPlaybackSettings()
++                pendingMediaSettingFields = currentMediaSettings.overriddenFields.intersection([.audio, .subtitles, .subtitleDelay])
+             } else if let locatedSource, let previousVersion = persistence.mediaVersion(for: locatedSource) {
+                 changed = previousVersion != version
+             }
+@@ -2254,10 +2453,13 @@ public final class PlaybackCoordinator {
+         // Preserve the requested paused state, but discard inapplicable seek
+         // positions and per-file track/delay choices before loaded/catalog.
+         ignoresSavedPositionForCurrentSource = true
+-        pendingMediaSettings = nil
++        pendingMediaSettingFields.removeAll()
++        currentMediaSettings = MediaPlaybackSettings()
+         if let restore = pendingPlaybackRestore {
+-            pendingPlaybackRestore = PendingPlaybackRestore(source: restore.source, position: 0,
+-                                                            wasPaused: restore.wasPaused, playlistIndex: restore.playlistIndex)
++            pendingPlaybackRestore = PendingPlaybackRestore(source: restore.source,
++                position: restore.positionIsExplicit ? restore.position : 0,
++                wasPaused: restore.wasPaused, playlistIndex: restore.playlistIndex,
++                positionIsExplicit: restore.positionIsExplicit)
+         }
+         state.setRecoveryIssue(PlaybackRecoveryIssue(
+             kind: .message,
+@@ -2287,19 +2489,26 @@ public final class PlaybackCoordinator {
+             state.currentURL.flatMap { persistence.playbackPosition(for: $0) }
+         }
+         pendingPlaybackRestore = nil
+-        if matchingRestore?.wasPaused == true || (restoresSessionPaused && state.currentSourceOrigin == .restoredSession) {
+-            pause()
+-        }
+-        if let savedPosition, savedPosition > 1 {
+-            seek(to: savedPosition)
+-        }
+-        for (index, subtitle) in pendingExternalSubtitles.enumerated() {
+-            if index == 0 { _ = runtimeDriver?.selectExternalSubtitle(subtitle) }
++        guard let source = state.currentSource else { return }
++        let paused = matchingRestore?.wasPaused == true
++            || (restoresSessionPaused && state.currentSourceOrigin == .restoredSession)
++        pendingPositionRestore = PendingPlaybackRestore(source: source,
++            position: savedPosition ?? 0, wasPaused: paused || state.isPauseDesired, playlistIndex: state.currentPlaylistIndex,
++            positionIsExplicit: matchingRestore?.positionIsExplicit == true)
++        if paused { _ = runtimeDriver?.pause() }
++        if currentMediaSettings.overrides(.subtitles),
++           let subtitle = currentMediaSettings.externalSubtitleURL,
++           currentMediaSettings.areSubtitlesVisible {
++            pendingExternalInstallURL = subtitle
++        } else if let subtitle = pendingExternalSubtitles.first,
++                  !currentMediaSettings.overrides(.subtitles) || currentMediaSettings.areSubtitlesVisible {
++            pendingExternalInstallURL = subtitle
+         }
+         pendingExternalSubtitles = []
+     }
+ 
+     private func cancelFolderScans() {
++        activeAutomationID = nil
+         queuedSourceOpens.removeAll()
+         sourceOpenGeneration = nil
+         folderScanGeneration = UUID()
+@@ -2337,40 +2546,51 @@ public final class PlaybackCoordinator {
+     private func updateCurrentMediaSettings(
+         _ update: (inout MediaPlaybackSettings) -> Void
+     ) {
+-        guard canPersistCurrentMediaHistory, let currentURL = state.currentURL, currentURL.isFileURL else { return }
+-        var settings = persistence.mediaSettings(for: currentURL)
+-            ?? MediaPlaybackSettings(
+-                audioTrack: state.selectedAudioTrack.map(MediaTrackPreference.init),
+-                subtitleTrack: state.selectedSubtitleTrack.map(MediaTrackPreference.init),
+-                areSubtitlesVisible: state.selectedSubtitleTrack != nil,
+-                subtitleDelay: state.subtitleDelay
+-            )
+-        update(&settings)
+-        persistence.setMediaSettings(settings, for: currentURL)
++        guard hasLoadedCurrentSource, hasCurrentPlaybackAuthority,
++              let currentURL = state.currentURL, currentURL.isFileURL else { return }
++        update(&currentMediaSettings)
++        currentMediaSettings = currentMediaSettings.sanitized()
++        if canPersistCurrentMediaHistory {
++            persistence.setMediaSettings(currentMediaSettings.isEmpty ? nil : currentMediaSettings, for: currentURL)
++        }
+     }
+ 
+     private func applyPendingMediaSettings() {
+-        guard let settings = pendingMediaSettings else { return }
+-        pendingMediaSettings = nil
+-        if settings.subtitleTrack?.isExternal == true || !pendingExternalSubtitles.isEmpty {
+-            pendingExternalSubtitleRestore = (settings.subtitleTrack, settings.areSubtitlesVisible)
+-        }
+-        if let audioTrack = settings.audioTrack?.bestMatch(in: state.audioTracks) {
+-            _ = runtimeDriver?.selectAudioTrack(audioTrack.id)
++        guard hasReceivedCurrentCatalog, runtimeDriver?.hasPendingTrackSelection != true else { return }
++        let settings = currentMediaSettings
++        if pendingMediaSettingFields.remove(.audio) != nil {
++            if !settings.overrides(.audio) || (settings.audioTrack == nil && settings.audioLanguage == nil) {
++                _ = runtimeDriver?.selectAudioTrack(nil)
++            } else if let track = settings.audioTrack?.bestMatch(in: state.audioTracks)
++                ?? preferredMediaTrack(language: settings.audioLanguage, kind: .audio) {
++                _ = runtimeDriver?.selectAudioTrack(track.id)
++            }
+         }
+-        if !settings.areSubtitlesVisible {
+-            _ = runtimeDriver?.selectSubtitleTrack(nil)
+-        } else if settings.subtitleTrack?.isExternal != true,
+-                  let subtitleTrack = settings.subtitleTrack?.bestMatch(in: state.subtitleTracks) {
+-            _ = runtimeDriver?.selectSubtitleTrack(subtitleTrack.id)
++        guard runtimeDriver?.hasPendingTrackSelection != true else { return }
++        if pendingMediaSettingFields.remove(.subtitles) != nil {
++            if settings.subtitleTrack?.isExternal == true || settings.externalSubtitleURL != nil {
++                pendingExternalSubtitleRestore = (settings.subtitleTrack, settings.areSubtitlesVisible)
++            }
++            if !settings.overrides(.subtitles) {
++                _ = runtimeDriver?.selectAutomaticSubtitle()
++            } else if !settings.areSubtitlesVisible {
++                pendingExternalInstallURL = nil
++                _ = runtimeDriver?.selectSubtitleTrack(nil)
++            } else if settings.subtitleTrack?.isExternal != true, settings.externalSubtitleURL == nil,
++                      let track = settings.subtitleTrack?.bestMatch(in: state.subtitleTracks)
++                        ?? preferredMediaTrack(language: settings.subtitleLanguage, kind: .subtitle) {
++                _ = runtimeDriver?.selectSubtitleTrack(track.id)
++            }
+         }
+-        if abs(settings.subtitleDelay) > 0.000_1 {
+-            _ = runtimeDriver?.setSubtitleDelay(settings.subtitleDelay)
++        guard runtimeDriver?.hasPendingTrackSelection != true else { return }
++        if pendingMediaSettingFields.remove(.subtitleDelay) != nil {
++            _ = runtimeDriver?.setSubtitleDelay(settings.overrides(.subtitleDelay) ? settings.subtitleDelay : 0)
+         }
+     }
+ 
+     private func applyPendingExternalSubtitleRestore() {
+-        guard let restore = pendingExternalSubtitleRestore else { return }
++        guard runtimeDriver?.hasPendingTrackSelection != true,
++              let restore = pendingExternalSubtitleRestore else { return }
+         let tracks = state.subtitleTracks.filter { track in
+             track.isExternal && (restore.preference?.externalFilename == nil
+                 || track.externalFilename == restore.preference?.externalFilename)
+@@ -2649,3 +2869,472 @@ public final class PlaybackCoordinator {
+ /// Source-compatible name retained while application call sites migrate to
+ /// the production coordinator terminology.
+ public typealias PlaybackController = PlaybackCoordinator
++
++// MARK: - Settled recovery, sparse overrides and caption navigation
++
++extension PlaybackCoordinator {
++    private var hasSettledPlaybackPosition: Bool {
++        guard hasLoadedCurrentSource, hasCurrentPlaybackAuthority,
++              let snapshot = runtimeDriver?.currentSnapshot else { return false }
++        switch snapshot.phase {
++        case .playing, .paused, .ready, .buffering, .draining, .ended:
++            return state.position.isFinite && state.position >= 0
++        default: return false
++        }
++    }
++
++    private var canCheckpointCurrentPosition: Bool {
++        hasSettledPlaybackPosition && automationCheckpointOwner == nil
++            && pendingPositionRestore == nil
++            && pendingMediaSettingFields.isEmpty && pendingExternalInstallURL == nil
++            && runtimeDriver?.hasPendingTrackSelection != true
++    }
++
++    private func flushSettledCheckpoint() {
++        if historyCheckpointWhenSettled { saveCurrentProgress() }
++        else { checkpointSession() }
++    }
++
++    private func observeSettledProductState(_ snapshot: PlaybackUISnapshot) {
++        observeAcknowledgedExternalSubtitle()
++        if hasSettledPlaybackPosition, pendingPositionRestore == nil {
++            if lastSettledSession?.source == state.currentSource {
++                lastSettledSession?.position = state.position
++                lastSettledSession?.wasPaused = state.isPauseDesired
++            } else if let source = state.currentSource, !source.isRemote {
++                lastSettledSession = PlaybackSessionRecord(source: source,
++                    collectionFolder: state.currentFolder, playlistItems: state.playlist,
++                    playlistIndex: state.currentPlaylistIndex, position: state.position,
++                    wasPaused: state.isPauseDesired)
++            }
++        }
++        if snapshot.phase == .failed, failedSourceTransaction == nil,
++           interruptedRecoverySession == nil, var saved = lastSettledSession {
++            // The failed runtime may reset its projection. Recover from the last
++            // accepted clock, not its failure/seek placeholder. Queue edits are
++            // copied once here, not deduplicated on every high-frequency tick.
++            saved.playlistItems = state.playlist
++            saved.playlistIndex = state.currentPlaylistIndex
++            saved.collectionFolder = state.currentFolder
++            interruptedRecoverySession = saved
++            state.setRecoveryIssue(PlaybackRecoveryIssue(kind: .interruptedSource,
++                message: "Playback was interrupted. Check the file and its drive, then retry or locate the file. Your last settled position is retained.",
++                source: saved.source.url, diagnosticCode: snapshot.failureCode))
++        }
++        if checkpointWhenSettled, canCheckpointCurrentPosition { flushSettledCheckpoint() }
++        scheduleMediaRestoreDrain()
++    }
++
++    private func scheduleMediaRestoreDrain() {
++        guard restoreDrainTask == nil, !isDrainingMediaRestore, !isShuttingDown,
++              !pendingMediaSettingFields.isEmpty || pendingPositionRestore != nil
++                || pendingExternalInstallURL != nil || pendingRestoredAudioDelay != nil
++                || pendingExternalSubtitleRestore != nil else { return }
++        let generation = playbackGeneration
++        restoreDrainTask = Task { @MainActor [weak self] in
++            guard let self else { return }
++            restoreDrainTask = nil
++            guard !Task.isCancelled, generation == playbackGeneration, !isShuttingDown else { return }
++            drainMediaRestore()
++        }
++    }
++
++    /// The core accepts a single track transaction at a time. Keep the product's
++    /// remaining explicit fields until acknowledgement, and restore position
++    /// last so a track replacement cannot retire an in-flight resume seek.
++    private func drainMediaRestore() {
++        guard !isDrainingMediaRestore, !isShuttingDown, hasLoadedCurrentSource,
++              hasCurrentPlaybackAuthority, pendingSourceTransaction == nil,
++              runtimeDriver?.currentSnapshot.phase != .seeking,
++              runtimeDriver?.currentSnapshot.phase != .failed else { return }
++        isDrainingMediaRestore = true
++        defer { isDrainingMediaRestore = false }
++        applyPendingMediaSettings()
++        guard runtimeDriver?.hasPendingTrackSelection != true,
++              pendingMediaSettingFields.isEmpty else { return }
++        if let url = pendingExternalInstallURL {
++            pendingExternalInstallURL = nil
++            if runtimeDriver?.selectExternalSubtitle(url) != true {
++                pendingExternalPreferenceURL = nil
++            }
++        }
++        guard runtimeDriver?.hasPendingTrackSelection != true else { return }
++        applyPendingExternalSubtitleRestore()
++        guard runtimeDriver?.hasPendingTrackSelection != true else { return }
++        if let restore = pendingPositionRestore {
++            pendingPositionRestore = nil
++            guard state.currentSource?.representsSameResource(as: restore.source) == true else { return }
++            if restore.wasPaused { _ = runtimeDriver?.pause() }
++            if restore.position > 1 || restore.positionIsExplicit {
++                checkpointWhenSettled = true
++                historyCheckpointWhenSettled = true
++                _ = runtimeDriver?.seek(to: restore.position, mode: .exact)
++            }
++        }
++        applyDeferredMediaAudioDelay()
++        if checkpointWhenSettled, canCheckpointCurrentPosition { flushSettledCheckpoint() }
++    }
++
++    private func updatePendingRestoreTransport(paused: Bool) {
++        func updated(_ value: PendingPlaybackRestore?) -> PendingPlaybackRestore? {
++            value.map { PendingPlaybackRestore(source: $0.source, position: $0.position,
++                wasPaused: paused, playlistIndex: $0.playlistIndex, positionIsExplicit: $0.positionIsExplicit) }
++        }
++        pendingPositionRestore = updated(pendingPositionRestore)
++        pendingPlaybackRestore = updated(pendingPlaybackRestore)
++    }
++
++    public var defaultPlaybackSpeed: Double { persistence.loadPreferences().playbackSpeed }
++    public var mediaSettingsForCurrentFile: MediaPlaybackSettings { currentMediaSettings }
++    public var canEditCurrentMediaSettings: Bool {
++        hasLoadedCurrentSource && pendingSourceTransaction == nil && !isShuttingDown
++            && state.currentURL?.isFileURL == true && hasCurrentPlaybackAuthority
++    }
++
++    public func setDefaultPlaybackSpeed(_ speed: Double) {
++        guard speed.isFinite, supports(.changePlaybackSpeed) else { return }
++        persistence.setPlaybackSpeed(speed)
++        if !currentMediaSettings.overrides(.playbackSpeed) { applyCurrentMediaSpeed() }
++    }
++
++    private func applyCurrentMediaSpeed() {
++        guard supports(.changePlaybackSpeed) else { return }
++        let speed = currentMediaSettings.effectivePlaybackSpeed(default: defaultPlaybackSpeed)
++        state.setPlaybackSpeed(speed)
++        _ = runtimeDriver?.setPlaybackSpeed(speed)
++        backend?.setPlaybackSpeed(speed)
++    }
++
++    private func applyDeferredMediaAudioDelay() {
++        guard hasSettledPlaybackPosition, !hasUnsettledNativeReplacement, pendingPositionRestore == nil,
++              pendingMediaSettingFields.isEmpty, pendingExternalInstallURL == nil,
++              runtimeDriver?.hasPendingTrackSelection != true,
++              let delay = pendingRestoredAudioDelay else { return }
++        pendingRestoredAudioDelay = nil
++        guard supports(.changeAudioDelay), !state.audioTracks.isEmpty else { return }
++        backend?.setAudioDelay(delay)
++    }
++
++    private func preferredMediaTrack(language: String?, kind: MediaTrackKind) -> MediaTrack? {
++        guard let language = TrackSelectionPreferences.normalizedLanguage(language) else { return nil }
++        let tracks = (kind == .audio ? state.audioTracks : state.subtitleTracks).filter {
++            TrackSelectionPreferences.normalizedLanguage($0.languageCode) == language
++        }
++        return tracks.first(where: \.isDefault) ?? tracks.min { $0.id < $1.id }
++    }
++
++    public func setMediaLanguage(_ language: String?, kind: MediaTrackKind) {
++        guard canEditCurrentMediaSettings else { return }
++        guard let normalized = TrackSelectionPreferences.normalizedLanguage(language) else {
++            resetCurrentMediaSetting(kind == .audio ? .audio : .subtitles)
++            return
++        }
++        let field: MediaPlaybackSetting = kind == .audio ? .audio : .subtitles
++        updateCurrentMediaSettings { settings in
++            settings.overriddenFields.insert(field)
++            if kind == .audio { settings.audioLanguage = normalized; settings.audioTrack = nil }
++            else {
++                settings.subtitleLanguage = normalized; settings.subtitleTrack = nil
++                settings.externalSubtitleURL = nil; settings.areSubtitlesVisible = true
++            }
++        }
++        if kind == .subtitle {
++            pendingExternalSubtitleRestore = nil
++            pendingExternalInstallURL = nil
++            pendingExternalPreferenceURL = nil
++        }
++        pendingMediaSettingFields.insert(field)
++        drainMediaRestore()
++    }
++
++    public func resetCurrentMediaSetting(_ field: MediaPlaybackSetting) {
++        guard canEditCurrentMediaSettings else { return }
++        updateCurrentMediaSettings { $0.inherit(field) }
++        switch field {
++        case .playbackSpeed: applyCurrentMediaSpeed()
++        case .audioDelay:
++            pendingRestoredAudioDelay = 0
++            applyDeferredMediaAudioDelay()
++        case .audio, .subtitles, .subtitleDelay:
++            if field == .subtitles {
++                pendingExternalSubtitleRestore = nil
++                pendingExternalInstallURL = nil
++                pendingExternalPreferenceURL = nil
++            }
++            pendingMediaSettingFields.insert(field)
++            drainMediaRestore()
++        }
++    }
++
++    public func resetCurrentMediaSettings() {
++        guard canEditCurrentMediaSettings else { return }
++        updateCurrentMediaSettings { $0 = MediaPlaybackSettings() }
++        pendingExternalSubtitleRestore = nil
++        pendingExternalInstallURL = nil
++        pendingExternalPreferenceURL = nil
++        pendingMediaSettingFields = [.audio, .subtitles, .subtitleDelay]
++        pendingRestoredAudioDelay = 0
++        applyCurrentMediaSpeed()
++        drainMediaRestore()
++    }
++
++    private func observeAcknowledgedExternalSubtitle() {
++        guard let url = runtimeDriver?.acknowledgedExternalSubtitleURL else { return }
++        installedExternalSubtitleURL = url
++        guard pendingExternalPreferenceURL == url else { return }
++        pendingExternalPreferenceURL = nil
++        updateCurrentMediaSettings { settings in
++            settings.overriddenFields.insert(.subtitles)
++            settings.areSubtitlesVisible = true
++            settings.externalSubtitleURL = url
++            settings.subtitleLanguage = nil
++            settings.subtitleTrack = nil
++        }
++    }
++
++    /// An immutable source/track token. UI tasks compare it again before using an
++    /// index or issuing a jump; identical names in another session are not enough.
++    public var captionSourceRequest: CaptionSourceRequest? {
++        guard hasLoadedCurrentSource, hasCurrentPlaybackAuthority,
++              pendingSourceTransaction == nil, state.currentURL?.isFileURL == true,
++              runtimeDriver?.hasPendingTrackSelection != true, pendingExternalInstallURL == nil,
++              let url = state.currentURL, let track = state.selectedSubtitleTrack else { return nil }
++        let externalURL = track.isExternal ? installedExternalSubtitleURL : nil
++        return CaptionSourceRequest(mediaURL: url, subtitleTrack: track,
++            externalURL: externalURL, fallbackEncoding: state.subtitleFallbackEncoding,
++            sourceRevision: playbackGeneration, mediaVersion: currentContentVersion)
++    }
++
++    public func readCaptions(for request: CaptionSourceRequest) async throws -> CaptionIndex {
++        guard captionSourceRequest == request else { throw PlaybackAutomationError.superseded }
++        let index: CaptionIndex
++        if request.subtitleTrack.isExternal, let native = backend as? NativePlaybackRuntime {
++            guard let document = native.externalCaptionDocument, document.url == request.externalURL else {
++                if ["idx", "dvd_subtitle", "hdmv_pgs_subtitle", "dvb_subtitle"].contains(request.subtitleTrack.codec ?? "") {
++                    throw CaptionReadError.textTrackRequired
++                }
++                throw CaptionReadError.trackUnavailable
++            }
++            index = try await NativeCaptionReader.read(document)
++        } else {
++            index = try await NativeCaptionReader.read(request)
++        }
++        try Task.checkCancellation()
++        guard captionSourceRequest == request else { throw PlaybackAutomationError.superseded }
++        return index
++    }
++
++    @discardableResult
++    public func jumpToCaption(_ cueID: Int, in index: CaptionIndex, source: CaptionSourceRequest) -> Bool {
++        guard captionSourceRequest == source,
++              let target = index.target(for: cueID, subtitleDelay: state.subtitleDelay, duration: state.duration) else { return false }
++        seek(to: target)
++        return true
++    }
++
++    @discardableResult
++    public func replayPreviousCaption(in index: CaptionIndex, source: CaptionSourceRequest, sentence: Bool) -> Bool {
++        guard captionSourceRequest == source,
++              let cue = sentence ? index.previousSentence(at: state.position, subtitleDelay: state.subtitleDelay)
++                : index.previousCue(at: state.position, subtitleDelay: state.subtitleDelay) else { return false }
++        guard jumpToCaption(cue.id, in: index, source: source) else { return false }
++        play()
++        return true
++    }
++}
++
++// MARK: - Acknowledged, ordered native automation
++
++extension PlaybackCoordinator {
++    private struct PreparedAutomationFile: Sendable {
++        let item: FolderPlaylistItem
++        let version: MediaContentVersion
++    }
++
++    /// Completes after the requested source and exact seek are acknowledged by
++    /// the playback core. This is not a claim that a physical display was read.
++    public func openMedia(at url: URL, position: Double, paused: Bool = false) async throws -> PlaybackReference {
++        try PlaybackAutomationPolicy.validateTimestamp(position)
++        let urls = try PlaybackAutomationPolicy.orderedLocalURLs([url])
++        return try await automationQueue.perform { [weak self] in
++            guard let self else { throw PlaybackAutomationError.noPlayback }
++            return try await performAutomationOpen(urls: urls, position: position, paused: paused, expectedVersion: nil)
++        }
++    }
++
++    public func openPlaybackReference(_ reference: PlaybackReference, paused: Bool = false) async throws -> PlaybackReference {
++        let urls = try PlaybackAutomationPolicy.orderedLocalURLs([reference.url])
++        return try await automationQueue.perform { [weak self] in
++            guard let self else { throw PlaybackAutomationError.noPlayback }
++            return try await performAutomationOpen(urls: urls, position: reference.position,
++                paused: paused, expectedVersion: reference.contentVersion)
++        }
++    }
++
++    /// Retains caller order, deduplicates by canonical local identity and does
++    /// not sort by date added. If no source is loaded, the first item is opened
++    /// paused so the queue has a valid, recoverable session; otherwise playback
++    /// is untouched. All paths are checked before any queue mutation.
++    @discardableResult
++    public func enqueueOrderedMedia(_ urls: [URL]) async throws -> [URL] {
++        let urls = try PlaybackAutomationPolicy.orderedLocalURLs(urls)
++        return try await automationQueue.perform { [weak self] in
++            guard let self, !isShuttingDown, pendingSourceTransaction == nil, !isPreparingSource else {
++                throw PlaybackAutomationError.busy
++            }
++            let operation = UUID()
++            activeAutomationID = operation
++            defer { finishAutomationOwnership(operation) }
++            let prepared = try await prepareAutomationFiles(urls)
++            try requireAutomationOwnership(operation)
++            let existing = Set(state.playlist.map(\.id))
++            let additions = prepared.filter { !existing.contains($0.item.id) }
++            guard !additions.isEmpty else { return [] }
++            let items = PlaylistMutation.deduplicated(state.playlist + additions.map(\.item))
++            finishShuffleForExplicitOrder()
++            if state.currentSource == nil {
++                // There may already be an idle queue; opening its first newly
++                // requested file is explicit and does not reorder that queue.
++                let first = additions[0]
++                let index = items.firstIndex(where: { $0.id == first.item.id }) ?? 0
++                pendingPlaybackRestore = PendingPlaybackRestore(source: .localFile(first.item.url),
++                    position: 0, wasPaused: true, playlistIndex: index, positionIsExplicit: true)
++                guard beginSourceTransaction(item: first.item, playlist: items, folder: nil,
++                    playlistIndex: index, origin: .userSelected, restoreTarget: .file(first.item.url),
++                    automationID: operation) else { throw PlaybackAutomationError.failed("The player rejected the queued source.") }
++                do {
++                    _ = try await awaitAutomationOpen(first, operation: operation, position: 0, paused: true)
++                } catch {
++                    if activeAutomationID == operation { stop() }
++                    throw error
++                }
++            } else {
++                finishShuffleForExplicitOrder()
++                discardFailedTraversalForPlaylistChange()
++                state.configurePlaylist(folder: nil, items: items,
++                    selectedIndex: PlaylistMutation.indexPreservingCurrentIdentity(currentURL: state.currentURL,
++                        fallbackIndex: state.currentPlaylistIndex, in: items))
++                checkpointSession()
++            }
++            return additions.map { $0.item.url }
++        }
++    }
++
++    private var hasUnsettledNativeReplacement: Bool {
++        (backend as? NativePlaybackRuntime)?.hasPendingMediaReplacement == true
++    }
++
++    public func currentPlaybackReference() throws -> PlaybackReference {
++        guard automationCheckpointOwner == nil else { throw PlaybackAutomationError.noPlayback }
++        return try makeSettledPlaybackReference()
++    }
++
++    private func makeSettledPlaybackReference() throws -> PlaybackReference {
++        guard pendingSourceTransaction == nil, !isPreparingSource, hasSettledPlaybackPosition, !hasUnsettledNativeReplacement, pendingPositionRestore == nil,
++              pendingMediaSettingFields.isEmpty, pendingExternalInstallURL == nil,
++              pendingRestoredAudioDelay == nil,
++              runtimeDriver?.hasPendingTrackSelection != true,
++              let url = state.currentURL, url.isFileURL, let version = currentContentVersion else {
++            throw PlaybackAutomationError.noPlayback
++        }
++        return try PlaybackReference(url: url, position: state.position, contentVersion: version)
++    }
++
++    private func performAutomationOpen(urls: [URL], position: Double, paused: Bool,
++                                       expectedVersion: MediaContentVersion?) async throws -> PlaybackReference {
++        guard !isShuttingDown else { throw PlaybackAutomationError.noPlayback }
++        cancelFolderScans()
++        let operation = UUID()
++        activeAutomationID = operation
++        var started = false
++        defer { finishAutomationOwnership(operation) }
++        do {
++            let prepared = try await prepareAutomationFiles(urls)
++            try requireAutomationOwnership(operation)
++            guard let first = prepared.first else { throw PlaybackAutomationError.invalidFile }
++            if let expectedVersion, first.version != expectedVersion { throw PlaybackAutomationError.changedFile }
++            pendingPlaybackRestore = PendingPlaybackRestore(source: .localFile(first.item.url),
++                position: position, wasPaused: paused, playlistIndex: 0, positionIsExplicit: true)
++            pendingLocatedHistorySource = nil
++            started = beginSourceTransaction(item: first.item, playlist: prepared.map(\.item), folder: nil,
++                playlistIndex: 0, origin: .userSelected, restoreTarget: .file(first.item.url), automationID: operation)
++            guard started else { throw PlaybackAutomationError.failed("The player rejected the open request.") }
++            return try await awaitAutomationOpen(first, operation: operation, position: position, paused: paused)
++        } catch {
++            // Never stop a newer UI/automation session. While this action still
++            // owns the load its candidate checkpoint is suppressed, including
++            // the save performed by Stop on timeout/cancellation/failure.
++            if started, activeAutomationID == operation { stop() }
++            throw error
++        }
++    }
++
++    private func prepareAutomationFiles(_ urls: [URL]) async throws -> [PreparedAutomationFile] {
++        try await sourcePreparation.perform { check in
++            var result: [PreparedAutomationFile] = []
++            var seen = Set<String>()
++            for url in urls {
++                try check()
++                guard let resolved = NormalizedFileURL.resolveFilesystemIdentity(url),
++                      MediaFileSupport.isSupportedMediaFile(resolved),
++                      let version = NativeMediaInspection.contentVersion(of: resolved),
++                      let key = NormalizedFileURL.persistenceKey(for: resolved) else {
++                    throw PlaybackAutomationError.invalidFile
++                }
++                try check()
++                if seen.insert(key).inserted {
++                    result.append(PreparedAutomationFile(item: FolderPlaylistItem(url: resolved), version: version))
++                }
++            }
++            return result
++        }
++    }
++
++    private func requireAutomationOwnership(_ operation: UUID) throws {
++        try Task.checkCancellation()
++        guard !isShuttingDown, activeAutomationID == operation else { throw PlaybackAutomationError.superseded }
++    }
++
++    private func awaitAutomationOpen(_ file: PreparedAutomationFile, operation: UUID,
++                                     position: Double, paused: Bool) async throws -> PlaybackReference {
++        let deadline = ProcessInfo.processInfo.systemUptime + automationTimeout
++        while ProcessInfo.processInfo.systemUptime < deadline {
++            try requireAutomationOwnership(operation)
++            if let failed = failedSourceTransaction, failed.identity.generation == playbackGeneration {
++                throw PlaybackAutomationError.failed(state.recoveryIssue?.message ?? "The source could not be opened.")
++            }
++            let snapshot = runtimeDriver?.currentSnapshot
++            if snapshot?.phase == .failed {
++                throw PlaybackAutomationError.failed(state.recoveryIssue?.message ?? "Playback could not be prepared.")
++            }
++            if hasLoadedCurrentSource, state.currentURL == file.item.url {
++                guard currentContentVersion == file.version else { throw PlaybackAutomationError.changedFile }
++                if state.duration > 0, position > state.duration { throw PlaybackAutomationError.invalidTimestamp }
++                let transportMatches = paused ? snapshot?.actualTransport == .paused : snapshot?.actualTransport == .playing
++                let phaseMatches = paused ? snapshot?.phase == .paused : snapshot?.phase == .playing
++                if transportMatches, phaseMatches, state.isPauseDesired == paused, !hasUnsettledNativeReplacement,
++                   pendingPositionRestore == nil, pendingMediaSettingFields.isEmpty,
++                   pendingExternalInstallURL == nil, pendingRestoredAudioDelay == nil,
++                   runtimeDriver?.hasPendingTrackSelection != true {
++                    if !state.audioTracks.isEmpty,
++                       abs(state.audioDelay - currentMediaSettings.effectiveAudioDelay) > 0.000_1 {
++                        throw PlaybackAutomationError.failed("The saved audio delay could not be applied. Open the file directly to review its preferences.")
++                    }
++                    let reference = try makeSettledPlaybackReference()
++                    // Only an acknowledged, validated action may replace the
++                    // previous crash checkpoint, including explicit timestamp 0.
++                    automationCheckpointOwner = nil
++                    saveCurrentProgress()
++                    return reference
++                }
++            }
++            try await Task.sleep(for: .milliseconds(20))
++        }
++        throw PlaybackAutomationError.timedOut
++    }
++
++    private func finishAutomationOwnership(_ operation: UUID) {
++        if activeAutomationID == operation { activeAutomationID = nil }
++        if automationCheckpointOwner == operation { automationCheckpointOwner = nil }
++    }
++}
