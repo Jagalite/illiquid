@@ -4,39 +4,60 @@ on:
     branches: [work/pr3-integration-qualification]
 permissions:
   contents: read
+concurrency:
+  group: pr3-candidate-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  source-audit:
+  candidate:
     runs-on: macos-26
-    timeout-minutes: 5
+    timeout-minutes: 30
+    # Needed only to store verified immutable source blobs after tests succeed.
+    # No commit, ref, main branch, release, or installed-user-state writes.
+    permissions:
+      contents: write
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - name: Capture previously authored integration source
+      - name: Materialize and verify reviewed source edits
+        run: |
+          python3 Validation/IntegrationCandidate/apply.py
+          git diff --check
+          git rev-parse HEAD > evidence/qualification-revision.txt
+          git diff > evidence/materialized-source.diff
+          tar -cf evidence/source.tar Sources Tests Scripts Package.swift Package.resolved
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate product fixtures
+        run: |
+          bash Scripts/generate-product-fixtures.sh "$RUNNER_TEMP/illiquid-product-fixtures"
+          echo "ILLIQUID_PRODUCT_FIXTURES=$RUNNER_TEMP/illiquid-product-fixtures" >> "$GITHUB_ENV"
+          echo "ILLIQUID_NATIVE_FIXTURE_DIR=$RUNNER_TEMP/illiquid-product-fixtures" >> "$GITHUB_ENV"
+      - name: Build and test integrated application graph
+        run: |
+          set -o pipefail
+          swift --version > evidence/toolchain.txt
+          swift test --force-resolved-versions --no-parallel --filter \
+            'PlaybackProduct|PlaybackCoordinatorTests|CaptionNavigation|PlaybackAutomation|TrackRestorationRegressionTests|ThumbnailLifecycleRegressionTests|RuntimeAuthorityFenceTests|NativePictureInPictureTransitionTests|RendererObservationBoundsTests|AudioDelayTests' \
+            2>&1 | tee evidence/swift-test.log
+      - name: Test standalone restoration harness
+        run: |
+          set -o pipefail
+          bash Scripts/test-restoration-regressions.sh 2>&1 | tee evidence/restoration-test.log
+      - name: Publish verified immutable source objects
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p evidence
-          gh api repos/Jagalite/illiquid/git/blobs/40adf47492e2cab34bebd27952db0a765938def1 > evidence/blob.json
-          python3 - <<'PY'
-          import base64, json, pathlib, hashlib
-          value = json.loads(pathlib.Path('evidence/blob.json').read_text())
-          data = base64.b64decode(value['content'])
-          assert hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest() == '40adf47492e2cab34bebd27952db0a765938def1'
-          pathlib.Path('evidence/PlaybackController.swift').write_bytes(data)
-          pathlib.Path('evidence/blob.json').unlink()
-          PY
-      - name: Capture App Intents tooling contracts
-        run: |
-          xcrun appintentsmetadataprocessor --help > evidence/metadata-tool.txt 2>&1 || true
-          xcrun swiftc -frontend -help-hidden > evidence/compiler-tool.txt
-          sdk=$(xcrun --sdk macosx --show-sdk-path)
-          find "$sdk/System/Library/Frameworks/AppIntents.framework" -name '*.swiftinterface' -print -quit | while IFS= read -r file; do cp "$file" evidence/AppIntents.swiftinterface; done
-          find "$DEVELOPER_DIR" -name '*const*protocol*' -o -name '*Const*Protocol*' > evidence/protocol-paths.txt
+        run: python3 Validation/IntegrationCandidate/publish_objects.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
         with:
-          name: integration-source-audit
+          name: integration-qualification
           path: evidence/
           retention-days: 7
