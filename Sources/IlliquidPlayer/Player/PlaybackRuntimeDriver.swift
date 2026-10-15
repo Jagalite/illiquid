@@ -34,6 +34,21 @@ final class PlaybackRuntimeDriver {
 
     var currentSnapshot: PlaybackUISnapshot { PlaybackUISnapshot(state: model.core.state) }
 
+    var hasPendingTrackSelection: Bool {
+        guard let tracks = model.core.state.activeSession?.tracks else { return false }
+        return tracks.phase != .idle
+    }
+
+    var acknowledgedExternalSubtitleURL: URL? {
+        guard !hasPendingTrackSelection,
+              case let .external(source) = model.core.state.activeSession?.tracks.effectiveSubtitle,
+              source.rawValue.hasPrefix("subtitle:/") else { return nil }
+        return URL(fileURLWithPath: String(source.rawValue.dropFirst("subtitle:".count)))
+    }
+
+    @discardableResult
+    func selectAutomaticSubtitle() -> Bool { send(.selectSubtitle(.automatic)) }
+
     init(
         runtime: any PlaybackRuntime,
         model: PlaybackModelRuntime = PlaybackModelRuntime(recordsReplaySteps: false)
@@ -44,12 +59,12 @@ final class PlaybackRuntimeDriver {
     }
 
     @discardableResult
-    func load(_ request: PlaybackRuntimeLoadRequest) -> Bool {
+    func load(_ request: PlaybackRuntimeLoadRequest, autoplay: Bool = true) -> Bool {
         pendingLoad = request
         sessionBeforePendingLoad = model.core.state.activeSession?.id
         return send(.load(
             source: sourceIdentity(request.media.source),
-            autoplay: true
+            autoplay: autoplay
         ))
     }
 

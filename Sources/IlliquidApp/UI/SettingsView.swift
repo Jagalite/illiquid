@@ -266,14 +266,14 @@ struct SettingsView: View {
                 SettingsRow(
                     title: "Default playback speed",
                     detail: model.player.supports(.changePlaybackSpeed)
-                        ? "Also updates the current media."
+                        ? "Applies to files without a playback-speed override."
                         : "The current playback engine uses normal speed."
                 ) {
                     Picker(
                         "Default playback speed",
                         selection: Binding(
-                            get: { model.state.playbackSpeed },
-                            set: { model.player.setPlaybackSpeed($0) }
+                            get: { model.player.defaultPlaybackSpeed },
+                            set: { model.player.setDefaultPlaybackSpeed($0) }
                         )
                     ) {
                         ForEach([0.5, 0.75, 1, 1.25, 1.5, 2], id: \.self) { speed in

@@ -334,7 +334,7 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         }
         mutate { state in
             if let settings {
-                state.mediaSettings[key] = settings
+                state.mediaSettings[key] = settings.sanitized()
             } else {
                 state.mediaSettings.removeValue(forKey: key)
             }
