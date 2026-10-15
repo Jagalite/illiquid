@@ -1,8 +1,7 @@
-"""Publish only verified source blobs to this same repository, not commits/refs.
+"""Store verified source blobs in this same repository, never commits or refs.
 
-Runs only after the candidate build/tests succeed. The assistant reviews these
-source identities and commits the source-only tree through the GitHub connector.
-No main branch, release, workflow or user-installed state is modified here.
+Runs after all qualification steps succeed. A subsequent connector operation
+constructs the source-only product commits with strict branch-head leases.
 """
 import base64
 import hashlib
@@ -16,7 +15,7 @@ assert os.environ['GITHUB_REF'] == 'refs/heads/work/pr3-integration-qualificatio
 manifest = json.loads(Path('evidence/candidate-source-manifest.json').read_text())
 for item in manifest:
     path = Path(item['path'])
-    assert path.parts[0] in ('Sources', 'Tests', 'Scripts') and '..' not in path.parts
+    assert str(path) == 'Package.swift' or (path.parts[0] in ('Sources', 'Tests', 'Scripts') and '..' not in path.parts)
     data = path.read_bytes()
     expected = hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest()
     assert expected == item['sha']
@@ -25,4 +24,4 @@ for item in manifest:
         input=json.dumps({'content': base64.b64encode(data).decode(), 'encoding': 'base64'}),
         text=True, capture_output=True, check=True)
     assert json.loads(response.stdout)['sha'] == expected
-print('Verified source blobs published; no refs or commits changed')
+print('Verified source blobs stored; no refs or commits changed')

@@ -1,8 +1,7 @@
-"""Materialize the reviewed candidate on its exact source snapshot.
+"""Materialize reviewed candidate files on exact before/after blob hashes.
 
-This temporary branch transports line edits for large files; it is not a
-production patch runner. Both inputs and outputs are git-blob hash checked.
-Only the resulting source files enter PR #3, using normal leased ref updates.
+Temporary qualification inputs never enter the product PR. No repository refs
+or commits are changed here; only source files on an ephemeral runner change.
 """
 import hashlib
 import json
@@ -16,7 +15,7 @@ def blob(data):
 
 def apply(record):
     path = ROOT / record['path']
-    assert record['path'].startswith(('Sources/', 'Tests/', 'Scripts/'))
+    assert record['path'] == 'Package.swift' or record['path'].startswith(('Sources/', 'Tests/', 'Scripts/'))
     assert '..' not in Path(record['path']).parts
     original = path.read_bytes() if path.exists() else b''
     assert (blob(original) if path.exists() else None) == record['base'], record['path']
@@ -33,6 +32,7 @@ def apply(record):
     return {'path': record['path'], 'sha': blob(data)}
 
 records = json.loads((HERE / 'shell-edits.json').read_text())
+records += json.loads((HERE / 'metadata-edits.json').read_text())
 edits = []
 for part in range(1, 4):
     edits += json.loads((HERE / f'coordinator-edits-{part}.json').read_text())
@@ -45,6 +45,8 @@ for path, sha in {
     'Sources/IlliquidApp/App/PlaybackAppIntents.swift': 'bcd53c624cd90830a77e0f428b7e063bf20a6f7b',
     'Sources/IlliquidApp/UI/PlaybackToolsViews.swift': '6d1d8684fea83f76fb71f3f821d4328564da5fed',
     'Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift': '671b2dc6aa5fb0fe71fe664dcf870853d1ead6fa',
+    'Scripts/build-app-intents-metadata.py': 'bc5229c1d8472a6df2b773e56eef37987e20a047',
+    'Scripts/app-intents-const-protocols.json': '6d2e5b0b528a012dedd5a7e896e66a49baccbf8a',
 }.items():
     actual = blob((ROOT / path).read_bytes())
     assert actual == sha, (path, actual, sha)
