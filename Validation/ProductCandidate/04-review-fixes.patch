@@ -1,0 +1,115 @@
+diff --git a/Sources/IlliquidApp/UI/PlaybackToolsViews.swift b/Sources/IlliquidApp/UI/PlaybackToolsViews.swift
+index f116fc5..747ff6c 100644
+--- a/Sources/IlliquidApp/UI/PlaybackToolsViews.swift
++++ b/Sources/IlliquidApp/UI/PlaybackToolsViews.swift
+@@ -151,7 +151,7 @@ struct MediaPlaybackPreferencesView: View {
+                 : "Playback history is off. Changes apply only to this open session and are not saved.")
+                 .font(.callout).foregroundStyle(.secondary)
+             Form {
+-                Picker("Audio", selection: Binding(get: { audioChoice }, set: setAudioChoice)) {
++                Picker("Audio", selection: Binding(get: { audioChoice }, set: { setAudioChoice($0) })) {
+                     Text("Inherit global preference").tag("inherit")
+                     if let language = settings.audioLanguage { Text("Language: \(language)").tag("language") }
+                     if audioChoice == "saved" { Text("Saved choice unavailable").tag("saved") }
+@@ -164,7 +164,7 @@ struct MediaPlaybackPreferencesView: View {
+                     Button("Use Language") { player.setMediaLanguage(audioLanguage, kind: .audio); refresh() }
+                         .disabled(TrackSelectionPreferences.normalizedLanguage(audioLanguage) == nil)
+                 }
+-                Picker("Subtitles", selection: Binding(get: { subtitleChoice }, set: setSubtitleChoice)) {
++                Picker("Subtitles", selection: Binding(get: { subtitleChoice }, set: { setSubtitleChoice($0) })) {
+                     Text("Inherit global preference").tag("inherit")
+                     Text("Off for this file").tag("off")
+                     if let language = settings.subtitleLanguage { Text("Language: \(language)").tag("language") }
+@@ -183,13 +183,13 @@ struct MediaPlaybackPreferencesView: View {
+                 }
+                 scalarRow("Playback speed", field: .playbackSpeed,
+                     value: settings.playbackSpeed ?? player.viewStore.playbackSpeed,
+-                    range: 0.25...4, step: 0.05, unit: "×", update: player.setPlaybackSpeed)
++                    range: 0.25...4, step: 0.05, unit: "×", update: { player.setPlaybackSpeed($0) })
+                 scalarRow("Audio delay", field: .audioDelay,
+                     value: settings.audioDelay ?? player.viewStore.audioDelay,
+-                    range: -10...10, step: 0.05, unit: "s", update: player.setAudioDelay)
++                    range: -10...10, step: 0.05, unit: "s", update: { player.setAudioDelay($0) })
+                 scalarRow("Subtitle delay", field: .subtitleDelay,
+                     value: settings.overrides(.subtitleDelay) ? settings.subtitleDelay : player.viewStore.subtitleDelay,
+-                    range: -10...10, step: 0.05, unit: "s", update: player.setSubtitleDelay)
++                    range: -10...10, step: 0.05, unit: "s", update: { player.setSubtitleDelay($0) })
+             }
+             .formStyle(.grouped)
+             .disabled(!player.canEditCurrentMediaSettings)
+@@ -203,7 +203,7 @@ struct MediaPlaybackPreferencesView: View {
+         }
+         .padding(22)
+         .frame(minWidth: 630, idealWidth: 700, minHeight: 550)
+-        .onAppear(perform: refresh)
++        .onAppear { refresh() }
+         .onChange(of: player.viewStore.currentSource) { _, _ in refresh() }
+         .onChange(of: player.viewStore.phase) { _, _ in refresh() }
+         .onChange(of: player.viewStore.selectedAudioTrack) { _, _ in refresh() }
+@@ -215,7 +215,7 @@ struct MediaPlaybackPreferencesView: View {
+ 
+     private func scalarRow(_ title: String, field: MediaPlaybackSetting, value: Double,
+                            range: ClosedRange<Double>, step: Double, unit: String,
+-                           update: @escaping (Double) -> Void) -> some View {
++                           update: @escaping @MainActor (Double) -> Void) -> some View {
+         HStack {
+             Text(title)
+             Spacer()
+diff --git a/Sources/IlliquidPlayer/Player/PlaybackController.swift b/Sources/IlliquidPlayer/Player/PlaybackController.swift
+index a18a761..0c19bb3 100644
+--- a/Sources/IlliquidPlayer/Player/PlaybackController.swift
++++ b/Sources/IlliquidPlayer/Player/PlaybackController.swift
+@@ -2547,10 +2547,12 @@ public final class PlaybackCoordinator {
+         _ update: (inout MediaPlaybackSettings) -> Void
+     ) {
+         guard hasLoadedCurrentSource, hasCurrentPlaybackAuthority,
+-              let currentURL = state.currentURL, currentURL.isFileURL else { return }
++              let currentURL = state.currentURL else { return }
++        // Remote playback also has session-local track/delay intent. Only
++        // verified local files may persist that intent across sessions.
+         update(&currentMediaSettings)
+         currentMediaSettings = currentMediaSettings.sanitized()
+-        if canPersistCurrentMediaHistory {
++        if currentURL.isFileURL, canPersistCurrentMediaHistory {
+             persistence.setMediaSettings(currentMediaSettings.isEmpty ? nil : currentMediaSettings, for: currentURL)
+         }
+     }
+diff --git a/Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift b/Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift
+index 671b2dc..33a45cf 100644
+--- a/Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift
++++ b/Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift
+@@ -118,6 +118,25 @@ struct PlaybackProductTransactionTests {
+         await f.player.shutdown()
+     }
+ 
++    @Test func remoteTrackAndDelayCommandsRemainSessionLocal() async throws {
++        let f = try ProductFixture()
++        let remote = try #require(URL(string: "https://example.invalid/video.mkv"))
++        f.player.openRemoteStream(url: remote)
++        try await eventually { f.runtime.loads.count == 1 }
++        f.runtime.loadMetadata(version: nil, tracks: ProductRuntime.catalog)
++        f.player.selectAudioTrack(ProductRuntime.audio[1])
++        f.player.selectSubtitleTrack(nil)
++        f.player.setSubtitleDelay(0.5)
++        f.player.setPlaybackSpeed(1.75)
++        #expect(f.player.viewStore.selectedAudioTrack?.id == 2)
++        #expect(f.player.viewStore.selectedSubtitleTrack == nil)
++        #expect(f.player.viewStore.subtitleDelay == 0.5)
++        #expect(f.player.viewStore.playbackSpeed == 1.75)
++        #expect(f.player.defaultPlaybackSpeed == 1)
++        #expect(f.persistence.mediaSettings(for: remote) == nil)
++        await f.player.shutdown()
++    }
++
+     @Test func changedFileArchivesOldHistoryBeforeAnyNewCheckpoint() async throws {
+         let f = try ProductFixture()
+         let file = try f.file("changed.mkv")
+@@ -395,7 +414,7 @@ private final class ProductRuntime: PlaybackRuntime {
+     static let subtitles = [MediaTrack(id: 3, kind: .subtitle, languageCode: "en", isDefault: true),
+                             MediaTrack(id: 4, kind: .subtitle, languageCode: "ja")]
+     static var catalog: [MediaTrack] { audio + subtitles }
+-    let capabilities: PlaybackCapabilities = [.localFiles, .relativeSeeking, .exactSeeking, .previewSeeking,
++    let capabilities: PlaybackCapabilities = [.localFiles, .remoteStreams, .relativeSeeking, .exactSeeking, .previewSeeking,
+         .playbackSpeed, .audioTracks, .subtitleTracks, .externalSubtitles, .audioDelay, .subtitleDelay, .pictureInPicture]
+     var eventHandler: (@MainActor @Sendable (PlaybackRuntimeEvent) -> Void)?
+     var loads: [PlaybackRuntimeLoadRequest] = []
