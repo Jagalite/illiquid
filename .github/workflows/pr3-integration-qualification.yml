@@ -11,8 +11,8 @@ jobs:
   candidate:
     runs-on: macos-26
     timeout-minutes: 30
-    # Needed only to store verified immutable source blobs after tests succeed.
-    # No commit, ref, main branch, release, or installed-user-state writes.
+    # Store verified immutable source blobs only after qualification succeeds.
+    # No refs, commits, release, main branch or installed-user-state writes.
     permissions:
       contents: write
     env:
@@ -25,6 +25,7 @@ jobs:
         run: |
           python3 Validation/IntegrationCandidate/apply.py
           python3 Validation/IntegrationCandidate/review-fixes.py
+          python3 Validation/IntegrationCandidate/review-fixes2.py
           git diff --check
           git rev-parse HEAD > evidence/qualification-revision.txt
           git diff > evidence/materialized-source.diff
@@ -46,8 +47,12 @@ jobs:
           set -o pipefail
           swift --version > evidence/toolchain.txt
           swift test --force-resolved-versions --no-parallel --filter \
-            'PlaybackProduct|PlaybackCoordinatorTests|CaptionNavigation|PlaybackAutomation|TrackRestorationRegressionTests|ThumbnailLifecycleRegressionTests|RuntimeAuthorityFenceTests|NativePictureInPictureTransitionTests|RendererObservationBoundsTests|AudioDelayTests' \
+            'PlaybackProduct|PlaybackCoordinatorTests|CaptionNavigation|PlaybackAutomation|TrackRestorationRegressionTests|ThumbnailLifecycleRegressionTests|RuntimeAuthorityFenceTests|NativePictureInPictureTransitionTests|RendererObservationBoundsTests|AudioDelayTests|nativeRuntimeCoalescesPreviewSeeksBeforeFinalExactSeek' \
             2>&1 | tee evidence/swift-test.log
+      - name: Check architecture
+        run: |
+          set -o pipefail
+          swift run --force-resolved-versions IlliquidArchitectureCheck 2>&1 | tee evidence/architecture.log
       - name: Extract and verify real App Intents metadata
         if: always()
         run: |
@@ -61,7 +66,6 @@ jobs:
         run: |
           mkdir -p evidence/constant-values
           find .build -path '*IlliquidApp.build/*.swiftconstvalues' -exec cp {} evidence/constant-values/ \; || true
-          cp .build/arm64-apple-macosx/debug/description.json evidence/build-description.json || true
       - name: Test standalone restoration harness
         run: |
           set -o pipefail
