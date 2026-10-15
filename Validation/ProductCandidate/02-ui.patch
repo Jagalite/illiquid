@@ -1,0 +1,429 @@
+diff --git a/Sources/IlliquidApp/App/PlaybackAppIntents.swift b/Sources/IlliquidApp/App/PlaybackAppIntents.swift
+new file mode 100644
+index 0000000..c7a43a4
+--- /dev/null
++++ b/Sources/IlliquidApp/App/PlaybackAppIntents.swift
+@@ -0,0 +1,149 @@
++import AppIntents
++import Foundation
++import IlliquidCore
++
++/// A media/time bookmark carried between Shortcuts actions. The identifier is
++/// versioned, bounded and validated by IlliquidCore; it is not a live-session
++/// command token, a network address, or a grant of filesystem access.
++struct PlaybackReferenceEntity: AppEntity {
++    static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Playback Reference")
++    static let defaultQuery = PlaybackReferenceEntityQuery()
++
++    let id: String
++    let reference: PlaybackReference
++
++    var displayRepresentation: DisplayRepresentation {
++        DisplayRepresentation(title: "\(reference.url.lastPathComponent)",
++            subtitle: "\(reference.position.formatted(.number.precision(.fractionLength(2)))) seconds")
++    }
++
++    init(reference: PlaybackReference) throws {
++        self.reference = reference
++        id = try reference.encodedIdentifier()
++    }
++}
++
++struct PlaybackReferenceEntityQuery: EntityQuery {
++    func entities(for identifiers: [String]) async throws -> [PlaybackReferenceEntity] {
++        guard identifiers.count <= PlaybackAutomationPolicy.maximumFiles else {
++            throw PlaybackAutomationError.invalidReference
++        }
++        return try identifiers.map {
++            try PlaybackReferenceEntity(reference: PlaybackReference.decodeIdentifier($0))
++        }
++    }
++
++    // Do not enumerate playback history or access files as a side effect of
++    // showing a Shortcuts parameter picker. References come from explicit actions.
++    func suggestedEntities() async throws -> [PlaybackReferenceEntity] { [] }
++}
++
++struct OpenMediaAtTimeIntent: AppIntent {
++    static let title: LocalizedStringResource = "Open Media at Timestamp"
++    static let description = IntentDescription("Open a local media file at an explicit time, overriding its saved resume position. Returns after the source and seek are acknowledged, not just queued.")
++    static let openAppWhenRun = true
++
++    @Parameter(title: "File") var file: IntentFile
++    @Parameter(title: "Timestamp (seconds)", default: 0) var seconds: Double
++    @Parameter(title: "Start Paused", default: false) var paused: Bool
++
++    static var parameterSummary: some ParameterSummary {
++        Summary("Open \(\.$file) at \(\.$seconds) seconds") { \.$paused }
++    }
++
++    @MainActor
++    func perform() async throws -> some IntentResult & ReturnsValue<PlaybackReferenceEntity> {
++        let urls = try PlaybackIntentFiles.localURLs([file])
++        let access = PlaybackIntentFiles.beginAccess(urls)
++        defer { PlaybackIntentFiles.endAccess(access) }
++        guard let model = await AppModel.loadShared() else { throw PlaybackAutomationError.noPlayback }
++        model.reopenPlayerWindow()
++        let reference = try await model.player.openMedia(at: urls[0], position: seconds, paused: paused)
++        return .result(value: try PlaybackReferenceEntity(reference: reference))
++    }
++}
++
++struct EnqueueOrderedMediaIntent: AppIntent {
++    static let title: LocalizedStringResource = "Enqueue Media in Order"
++    static let description = IntentDescription("Append accessible local media files in the supplied order, ignoring duplicates. Validates every file before changing the queue. An empty player opens the first new file paused. Returns the number added.")
++    static let openAppWhenRun = true
++
++    @Parameter(title: "Files") var files: [IntentFile]
++
++    static var parameterSummary: some ParameterSummary { Summary("Enqueue \(\.$files) in order") }
++
++    @MainActor
++    func perform() async throws -> some IntentResult & ReturnsValue<Int> {
++        let urls = try PlaybackIntentFiles.localURLs(files)
++        let access = PlaybackIntentFiles.beginAccess(urls)
++        defer { PlaybackIntentFiles.endAccess(access) }
++        guard let model = await AppModel.loadShared() else { throw PlaybackAutomationError.noPlayback }
++        model.reopenPlayerWindow()
++        return .result(value: try await model.player.enqueueOrderedMedia(urls).count)
++    }
++}
++
++struct GetPlaybackReferenceIntent: AppIntent {
++    static let title: LocalizedStringResource = "Get Playback Reference"
++    static let description = IntentDescription("Return the settled local media file and playback time as a reusable reference. Unfinished opens and seeks do not return a guessed position. References contain the local path and do not grant access to the file.")
++    static let openAppWhenRun = true
++
++    @MainActor
++    func perform() async throws -> some IntentResult & ReturnsValue<PlaybackReferenceEntity> {
++        guard let model = await AppModel.loadShared() else { throw PlaybackAutomationError.noPlayback }
++        return .result(value: try PlaybackReferenceEntity(reference: model.player.currentPlaybackReference()))
++    }
++}
++
++struct OpenPlaybackReferenceIntent: AppIntent {
++    static let title: LocalizedStringResource = "Open Playback Reference"
++    static let description = IntentDescription("Reopen a returned playback reference after verifying that the local file still matches. A moved or replaced file requires an explicit new open or Locate; the reference does not grant filesystem access.")
++    static let openAppWhenRun = true
++
++    @Parameter(title: "Playback Reference") var playbackReference: PlaybackReferenceEntity
++    @Parameter(title: "Start Paused", default: false) var paused: Bool
++
++    static var parameterSummary: some ParameterSummary {
++        Summary("Open \(\.$playbackReference)") { \.$paused }
++    }
++
++    @MainActor
++    func perform() async throws -> some IntentResult & ReturnsValue<PlaybackReferenceEntity> {
++        guard let model = await AppModel.loadShared() else { throw PlaybackAutomationError.noPlayback }
++        model.reopenPlayerWindow()
++        let reference = try await model.player.openPlaybackReference(playbackReference.reference, paused: paused)
++        return .result(value: try PlaybackReferenceEntity(reference: reference))
++    }
++}
++
++struct IlliquidAppShortcuts: AppShortcutsProvider {
++    static var appShortcuts: [AppShortcut] {
++        AppShortcut(intent: GetPlaybackReferenceIntent(),
++            phrases: ["Get my playback reference in \(.applicationName)"],
++            shortTitle: "Playback Reference", systemImageName: "bookmark")
++    }
++}
++
++/// The current app is not sandboxed. These actions accept existing on-disk
++/// files; they do not materialize provider data or copy large videos into a
++/// temporary import directory. A returned reference is never an access bookmark.
++/// Scoped URLs, when supplied, are balanced around the acknowledged action.
++enum PlaybackIntentFiles {
++    static func localURLs(_ files: [IntentFile]) throws -> [URL] {
++        guard !files.isEmpty, files.count <= PlaybackAutomationPolicy.maximumFiles else {
++            throw PlaybackAutomationError.invalidFile
++        }
++        return try PlaybackAutomationPolicy.orderedLocalURLs(files.map { file in
++            guard let url = file.fileURL else { throw PlaybackAutomationError.invalidFile }
++            return url
++        })
++    }
++
++    static func beginAccess(_ urls: [URL]) -> [URL] {
++        urls.filter { $0.startAccessingSecurityScopedResource() }
++    }
++
++    static func endAccess(_ urls: [URL]) {
++        for url in urls { url.stopAccessingSecurityScopedResource() }
++    }
++}
+diff --git a/Sources/IlliquidApp/UI/PlaybackToolsViews.swift b/Sources/IlliquidApp/UI/PlaybackToolsViews.swift
+new file mode 100644
+index 0000000..f116fc5
+--- /dev/null
++++ b/Sources/IlliquidApp/UI/PlaybackToolsViews.swift
+@@ -0,0 +1,268 @@
++import IlliquidCore
++import IlliquidPlayer
++import SwiftUI
++
++struct CaptionNavigationView: View {
++    let player: PlaybackCoordinator
++    @Environment(\.dismiss) private var dismiss
++    @State private var query = ""
++    @State private var index: CaptionIndex?
++    @State private var indexedSource: CaptionSourceRequest?
++    @State private var results: [CaptionCue] = []
++    @State private var message: String?
++    @State private var loading = false
++    @State private var revision = 0
++
++    private var source: CaptionSourceRequest? { player.captionSourceRequest }
++    private var isCurrent: Bool { indexedSource != nil && indexedSource == source }
++
++    var body: some View {
++        VStack(alignment: .leading, spacing: 14) {
++            HStack {
++                Text("Caption Navigation").font(.title2.bold())
++                Spacer()
++                Button("Done") { dismiss() }.keyboardShortcut(.cancelAction)
++            }
++            Text("Search the selected subtitle track and jump to a line.")
++                .foregroundStyle(.secondary)
++            TextField("Search captions", text: $query)
++                .textFieldStyle(.roundedBorder)
++                .accessibilityLabel("Search captions")
++            HStack {
++                Button("Replay Previous Cue") { replay(sentence: false) }
++                    .disabled(loading || !isCurrent)
++                Button("Replay Previous Sentence") { replay(sentence: true) }
++                    .disabled(loading || !isCurrent)
++                    .help("Groups up to eight neighboring subtitle cues using punctuation and timing. This is a subtitle heuristic, not speech recognition.")
++                Spacer()
++                Button("Reload") { revision += 1 }
++                    .disabled(loading || source == nil)
++            }
++            if loading { ProgressView("Reading captions…") }
++            if let message { Text(message).font(.callout).foregroundStyle(.secondary) }
++            if let index, !index.isComplete {
++                Text("Partial index: the bounded scan reached its time, storage, text, or cue limit. Only indexed captions are searchable.")
++                    .font(.callout).foregroundStyle(.secondary)
++            }
++            List(results) { cue in
++                Button {
++                    guard let index, let indexedSource else { return }
++                    _ = player.jumpToCaption(cue.id, in: index, source: indexedSource)
++                } label: {
++                    HStack(alignment: .top, spacing: 12) {
++                        Text(timestamp(cue.start)).monospacedDigit().foregroundStyle(.secondary)
++                            .frame(width: 86, alignment: .trailing)
++                        Text(cue.text).multilineTextAlignment(.leading).frame(maxWidth: .infinity, alignment: .leading)
++                    }
++                    .padding(.vertical, 4)
++                }
++                .buttonStyle(.plain)
++                .disabled(!isCurrent)
++                .accessibilityLabel("Jump to \(timestamp(cue.start)): \(cue.text)")
++            }
++            .overlay {
++                if results.isEmpty, !loading {
++                    Text(index == nil ? "Select a text subtitle track to begin." : "No matching captions.")
++                        .foregroundStyle(.secondary)
++                }
++            }
++            if let index {
++                Text("\(index.cues.count) indexed cues · showing up to 500 results · timestamps are before subtitle delay")
++                    .font(.caption).foregroundStyle(.secondary)
++            }
++        }
++        .padding(22)
++        .frame(minWidth: 640, idealWidth: 760, minHeight: 460, idealHeight: 600)
++        .task(id: LoadKey(source: source, revision: revision)) { await load() }
++        .task(id: SearchKey(query: query, source: indexedSource, revision: revision)) { await search() }
++    }
++
++    private func load() async {
++        index = nil
++        indexedSource = nil
++        results = []
++        message = nil
++        guard let source else { loading = false; return }
++        loading = true
++        do {
++            let result = try await player.readCaptions(for: source)
++            try Task.checkCancellation()
++            guard player.captionSourceRequest == source else { return }
++            index = result
++            indexedSource = source
++            loading = false
++        } catch is CancellationError {
++        } catch {
++            guard !Task.isCancelled else { return }
++            message = error.localizedDescription
++            loading = false
++        }
++    }
++
++    private func search() async {
++        guard let index, let indexedSource else { return }
++        let query = query
++        do {
++            try await Task.sleep(for: .milliseconds(120))
++            let work = Task.detached(priority: .userInitiated) {
++                index.search(query, isCancelled: { Task.isCancelled })
++            }
++            let found = await withTaskCancellationHandler { await work.value } onCancel: { work.cancel() }
++            try Task.checkCancellation()
++            guard source == indexedSource, self.query == query else { return }
++            results = found
++        } catch {}
++    }
++
++    private func replay(sentence: Bool) {
++        guard let index, let indexedSource else { return }
++        _ = player.replayPreviousCaption(in: index, source: indexedSource, sentence: sentence)
++    }
++
++    private func timestamp(_ seconds: Double) -> String {
++        guard seconds.isFinite, seconds >= 0, seconds < Double(Int.max) else { return "—" }
++        let value = Int(seconds)
++        return [value / 3_600, (value / 60) % 60, value % 60]
++            .map { $0 < 10 ? "0\($0)" : String($0) }.joined(separator: ":")
++    }
++
++    private struct LoadKey: Hashable { let source: CaptionSourceRequest?; let revision: Int }
++    private struct SearchKey: Hashable { let query: String; let source: CaptionSourceRequest?; let revision: Int }
++}
++
++struct MediaPlaybackPreferencesView: View {
++    let player: PlaybackCoordinator
++    @Environment(\.dismiss) private var dismiss
++    @State private var settings = MediaPlaybackSettings()
++    @State private var audioLanguage = ""
++    @State private var subtitleLanguage = ""
++
++    var body: some View {
++        VStack(alignment: .leading, spacing: 16) {
++            HStack {
++                Text("Preferences for This File").font(.title2.bold())
++                Spacer()
++                Button("Done") { dismiss() }.keyboardShortcut(.cancelAction)
++            }
++            Text(player.viewStore.currentURL?.lastPathComponent ?? "No local file is open")
++                .font(.headline).lineLimit(2).textSelection(.enabled)
++            Text(player.remembersPlaybackHistory
++                ? "Explicit file choices override global defaults. Reset a row to inherit its default."
++                : "Playback history is off. Changes apply only to this open session and are not saved.")
++                .font(.callout).foregroundStyle(.secondary)
++            Form {
++                Picker("Audio", selection: Binding(get: { audioChoice }, set: setAudioChoice)) {
++                    Text("Inherit global preference").tag("inherit")
++                    if let language = settings.audioLanguage { Text("Language: \(language)").tag("language") }
++                    if audioChoice == "saved" { Text("Saved choice unavailable").tag("saved") }
++                    ForEach(player.viewStore.audioTracks) { track in
++                        Text(track.displayName).tag(String(track.id))
++                    }
++                }
++                HStack {
++                    TextField("Audio language (for example ja)", text: $audioLanguage)
++                    Button("Use Language") { player.setMediaLanguage(audioLanguage, kind: .audio); refresh() }
++                        .disabled(TrackSelectionPreferences.normalizedLanguage(audioLanguage) == nil)
++                }
++                Picker("Subtitles", selection: Binding(get: { subtitleChoice }, set: setSubtitleChoice)) {
++                    Text("Inherit global preference").tag("inherit")
++                    Text("Off for this file").tag("off")
++                    if let language = settings.subtitleLanguage { Text("Language: \(language)").tag("language") }
++                    if subtitleChoice == "saved" { Text("Saved choice unavailable").tag("saved") }
++                    if settings.externalSubtitleURL != nil, settings.subtitleTrack == nil {
++                        Text("Loaded external subtitle").tag("external")
++                    }
++                    ForEach(player.viewStore.subtitleTracks) { track in
++                        Text(track.displayName).tag(String(track.id))
++                    }
++                }
++                HStack {
++                    TextField("Subtitle language (for example en)", text: $subtitleLanguage)
++                    Button("Use Language") { player.setMediaLanguage(subtitleLanguage, kind: .subtitle); refresh() }
++                        .disabled(TrackSelectionPreferences.normalizedLanguage(subtitleLanguage) == nil)
++                }
++                scalarRow("Playback speed", field: .playbackSpeed,
++                    value: settings.playbackSpeed ?? player.viewStore.playbackSpeed,
++                    range: 0.25...4, step: 0.05, unit: "×", update: player.setPlaybackSpeed)
++                scalarRow("Audio delay", field: .audioDelay,
++                    value: settings.audioDelay ?? player.viewStore.audioDelay,
++                    range: -10...10, step: 0.05, unit: "s", update: player.setAudioDelay)
++                scalarRow("Subtitle delay", field: .subtitleDelay,
++                    value: settings.overrides(.subtitleDelay) ? settings.subtitleDelay : player.viewStore.subtitleDelay,
++                    range: -10...10, step: 0.05, unit: "s", update: player.setSubtitleDelay)
++            }
++            .formStyle(.grouped)
++            .disabled(!player.canEditCurrentMediaSettings)
++            HStack {
++                Text("Missing languages use the available media/default track; they do not change another file's settings.")
++                    .font(.caption).foregroundStyle(.secondary)
++                Spacer()
++                Button("Reset This File to Defaults") { player.resetCurrentMediaSettings(); refresh() }
++                    .disabled(!player.canEditCurrentMediaSettings || settings.isEmpty)
++            }
++        }
++        .padding(22)
++        .frame(minWidth: 630, idealWidth: 700, minHeight: 550)
++        .onAppear(perform: refresh)
++        .onChange(of: player.viewStore.currentSource) { _, _ in refresh() }
++        .onChange(of: player.viewStore.phase) { _, _ in refresh() }
++        .onChange(of: player.viewStore.selectedAudioTrack) { _, _ in refresh() }
++        .onChange(of: player.viewStore.selectedSubtitleTrack) { _, _ in refresh() }
++        .onChange(of: player.viewStore.playbackSpeed) { _, _ in refresh() }
++        .onChange(of: player.viewStore.audioDelay) { _, _ in refresh() }
++        .onChange(of: player.viewStore.subtitleDelay) { _, _ in refresh() }
++    }
++
++    private func scalarRow(_ title: String, field: MediaPlaybackSetting, value: Double,
++                           range: ClosedRange<Double>, step: Double, unit: String,
++                           update: @escaping (Double) -> Void) -> some View {
++        HStack {
++            Text(title)
++            Spacer()
++            Text(settings.overrides(field) ? "This file" : "Inherited").foregroundStyle(.secondary)
++            Stepper(value: Binding(get: { value }, set: { update($0); refresh() }), in: range, step: step) {
++                Text("\(value.formatted(.number.precision(.fractionLength(2)))) \(unit)").monospacedDigit()
++            }
++            .frame(width: 142)
++            Button("Reset") { player.resetCurrentMediaSetting(field); refresh() }
++                .disabled(!settings.overrides(field))
++        }
++    }
++
++    private var audioChoice: String {
++        if !settings.overrides(.audio) { return "inherit" }
++        if settings.audioLanguage != nil { return "language" }
++        return settings.audioTrack?.bestMatch(in: player.viewStore.audioTracks).map { String($0.id) } ?? "saved"
++    }
++
++    private var subtitleChoice: String {
++        if !settings.overrides(.subtitles) { return "inherit" }
++        if !settings.areSubtitlesVisible { return "off" }
++        if settings.subtitleLanguage != nil { return "language" }
++        if settings.externalSubtitleURL != nil, settings.subtitleTrack == nil { return "external" }
++        return settings.subtitleTrack?.bestMatch(in: player.viewStore.subtitleTracks).map { String($0.id) } ?? "saved"
++    }
++
++    private func setAudioChoice(_ choice: String) {
++        if choice == "inherit" { player.resetCurrentMediaSetting(.audio) }
++        else if let id = Int64(choice), let track = player.viewStore.audioTracks.first(where: { $0.id == id }) {
++            player.selectAudioTrack(track)
++        }
++        refresh()
++    }
++
++    private func setSubtitleChoice(_ choice: String) {
++        if choice == "inherit" { player.resetCurrentMediaSetting(.subtitles) }
++        else if choice == "off" { player.selectSubtitleTrack(nil) }
++        else if let id = Int64(choice), let track = player.viewStore.subtitleTracks.first(where: { $0.id == id }) {
++            player.selectSubtitleTrack(track)
++        }
++        refresh()
++    }
++
++    private func refresh() {
++        settings = player.mediaSettingsForCurrentFile
++        audioLanguage = settings.audioLanguage ?? ""
++        subtitleLanguage = settings.subtitleLanguage ?? ""
++    }
++}
