@@ -1,0 +1,33 @@
+diff --git a/Scripts/build-illiquid-app.sh b/Scripts/build-illiquid-app.sh
+index dca1678..6085889 100755
+--- a/Scripts/build-illiquid-app.sh
++++ b/Scripts/build-illiquid-app.sh
+@@ -91,13 +91,19 @@ trap cleanup EXIT
+ export MACOSX_DEPLOYMENT_TARGET=$minimum_macos
+ # Only the executable target emits constants, avoiding concurrent writes from
+ # dependency targets. Extraction must succeed before the bundle is signed.
+-export ILLIQUID_INTENTS_BUILD_DIRECTORY="$build_root/app-intents"
++# SwiftPM does not track arbitrary environment reads in a cached package
++# manifest. Reevaluate this manifest, and give the app-only side output a new
++# path so a cached compile cannot skip reemission after a packaging retry.
++mkdir -p "$build_root/app-intents"
++export ILLIQUID_INTENTS_BUILD_DIRECTORY
++ILLIQUID_INTENTS_BUILD_DIRECTORY=$(mktemp -d "$build_root/app-intents/compile.XXXXXX")
+ python3 "$script_directory/app-intents-metadata.py" prepare "$ILLIQUID_INTENTS_BUILD_DIRECTORY"
+ 
+ swift_arguments=(
+     --package-path "$repository_root"
+     --scratch-path "$build_root/swiftpm"
+     --configuration release
++    --manifest-cache none
+     --force-resolved-versions
+ )
+ for architecture in $architectures; do
+@@ -207,6 +213,7 @@ python3 "$script_directory/app-intents-metadata.py" extract \
+     --build-directory "$ILLIQUID_INTENTS_BUILD_DIRECTORY" \
+     --repository "$repository_root" --resources "$resources" \
+     --deployment-target "$minimum_macos" --architecture "${architectures%% *}"
++cp "$ILLIQUID_INTENTS_BUILD_DIRECTORY/validation.json" "$build_root/app-intents/validation.json"
+ 
+ 
+ search_directories=()
