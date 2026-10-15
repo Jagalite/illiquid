@@ -1,0 +1,168 @@
+diff --git a/Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift b/Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift
+index 33a45cf..eab6118 100644
+--- a/Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift
++++ b/Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift
+@@ -512,3 +512,169 @@ private extension PlaybackEffectKind {
+     var isAudioSelection: Bool { if case .applyAudioSelection = self { true } else { false } }
+     var isSubtitleSelection: Bool { if case .applySubtitleSelection = self { true } else { false } }
+ }
++
++/// Exercises the product coordinator against the actual FFmpeg/Apple runtime.
++/// The hosted window provides renderer-buffer evidence, not physical scanout.
++@MainActor
++@Suite("Playback product native integration", .serialized,
++       .enabled(if: ProcessInfo.processInfo.environment["ILLIQUID_PRODUCT_FIXTURES"] != nil))
++struct PlaybackProductNativeTests {
++    @Test(.timeLimit(.minutes(1)))
++    func nativeOpenReferenceRapidScrubAndWakeRetainTheLatestPausedFrame() async throws {
++        try await withNativePlayer { player, runtime, root in
++            let file = root.appendingPathComponent("first.mp4")
++            let reference = try await player.openMedia(at: file, position: 2, paused: true)
++            #expect(reference.url == file)
++            #expect(abs(reference.position - 2) < 0.04)
++            let started = ContinuousClock.now
++            for position in [6.0, 0.3, 5.0, 1.7, 6.7, 0.8, 3.2] {
++                player.previewSeek(to: position)
++            }
++            player.seek(to: 4.5)
++            try await nativeEventually {
++                let shown = runtime.pausedReadbackDiagnostic()
++                return shown.isCurrent && shown.displayedPTS.map { abs($0 - 4.5) < 0.04 } == true
++            }
++            let shown = runtime.pausedReadbackDiagnostic()
++            #expect(player.viewStore.isPauseDesired)
++            #expect(shown.rendererRate == 0)
++            #expect(abs(try player.currentPlaybackReference().position - 4.5) < 0.04)
++            print("[product-native] rapid-scrub displayed-pts=\(shown.displayedPTS ?? -1) duration=\(started.duration(to: .now))")
++            // Drive the real lifecycle commands without sleeping the CI machine.
++            player.systemWillSleep()
++            player.systemDidWake()
++            try await nativeEventually { runtime.pausedReadbackDiagnostic().isCurrent }
++            #expect(player.viewStore.isPauseDesired)
++            #expect(abs(try player.currentPlaybackReference().position - 4.5) < 0.04)
++        }
++    }
++
++    @Test(.timeLimit(.minutes(1)))
++    func nativeFileOverridesCaptionsAndExternalSnapshotSurviveReopening() async throws {
++        try await withNativePlayer { player, runtime, root in
++            let input = root.appendingPathComponent("first.mp4")
++            let file = root.appendingPathComponent("tracks.mkv")
++            let subtitle = root.appendingPathComponent("captions.srt")
++            // Distinct actual stream slots exercise restoration through the
++            // native decoder adapter; identical source samples are not a claim
++            // of listening-based language qualification.
++            let fixture = Process()
++            fixture.executableURL = URL(fileURLWithPath: "/usr/bin/env")
++            fixture.arguments = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
++                "-i", input.path, "-i", subtitle.path,
++                "-map", "0:v:0", "-map", "0:a:0", "-map", "0:a:0", "-map", "1:s:0", "-map", "1:s:0",
++                "-c", "copy", "-c:s", "srt", "-metadata:s:a:0", "language=eng",
++                "-metadata:s:a:1", "language=jpn", "-metadata:s:s:0", "language=eng",
++                "-metadata:s:s:1", "language=jpn", file.path]
++            try fixture.run()
++            fixture.waitUntilExit()
++            try #require(fixture.terminationStatus == 0)
++            _ = try await player.openMedia(at: file, position: 1, paused: true)
++            let audio = try #require(player.viewStore.audioTracks.last)
++            let captions = try #require(player.viewStore.subtitleTracks.last)
++            player.selectAudioTrack(audio)
++            player.selectSubtitleTrack(captions)
++            player.setSubtitleDelay(0.5)
++            try await nativeEventually {
++                player.viewStore.selectedAudioTrack?.id == audio.id
++                    && player.viewStore.selectedSubtitleTrack?.id == captions.id
++                    && player.viewStore.subtitleDelay == 0.5 && !runtime.hasPendingMediaReplacement
++                    && (try? player.currentPlaybackReference()) != nil
++            }
++            let source = try #require(player.captionSourceRequest)
++            let index = try await player.readCaptions(for: source)
++            #expect(index.search("世界").count == 1)
++            #expect(player.jumpToCaption(0, in: index, source: source))
++            try await nativeEventually { (try? player.currentPlaybackReference()) != nil }
++            #expect(abs(player.viewStore.position - 0.5) < 0.04)
++            player.setPlaybackSpeed(1.5)
++            player.setAudioDelay(0.2)
++            try await nativeEventually {
++                abs(player.viewStore.audioDelay - 0.2) < 0.0001 && !runtime.hasPendingMediaReplacement
++            }
++            _ = try await player.openMedia(at: root.appendingPathComponent("other.mp4"), position: 0, paused: true)
++            #expect(player.viewStore.playbackSpeed == 1)
++            #expect(player.viewStore.audioDelay == 0)
++            _ = try await player.openMedia(at: file, position: 1, paused: true)
++            #expect(player.viewStore.selectedAudioTrack?.id == audio.id)
++            #expect(player.viewStore.selectedSubtitleTrack?.id == captions.id)
++            #expect(player.viewStore.playbackSpeed == 1.5)
++            #expect(abs(player.viewStore.audioDelay - 0.2) < 0.0001)
++            #expect(player.viewStore.subtitleDelay == 0.5)
++            player.loadExternalSubtitle(subtitle)
++            try await nativeEventually {
++                player.captionSourceRequest?.subtitleTrack.isExternal == true && !runtime.hasPendingMediaReplacement
++            }
++            let externalSource = try #require(player.captionSourceRequest)
++            let before = try await player.readCaptions(for: externalSource)
++            try "1\n00:00:01,000 --> 00:00:03,000\nChanged on disk.\n".write(to: subtitle, atomically: true, encoding: .utf8)
++            let after = try await player.readCaptions(for: externalSource)
++            #expect(before == after) // Search indexes the bytes being played.
++            player.selectSubtitleTrack(nil)
++            try await nativeEventually { player.viewStore.selectedSubtitleTrack == nil && !runtime.hasPendingMediaReplacement }
++            #expect(!player.jumpToCaption(0, in: before, source: externalSource))
++            _ = try await player.openMedia(at: root.appendingPathComponent("other.mp4"), position: 0, paused: true)
++            _ = try await player.openMedia(at: file, position: 1, paused: true)
++            #expect(player.viewStore.selectedSubtitleTrack == nil)
++            player.resetCurrentMediaSettings()
++            try await nativeEventually {
++                player.viewStore.audioDelay == 0 && !runtime.hasPendingMediaReplacement
++                    && (try? player.currentPlaybackReference()) != nil
++            }
++            #expect(player.viewStore.playbackSpeed == 1)
++            #expect(player.viewStore.subtitleDelay == 0)
++            #expect(player.mediaSettingsForCurrentFile.isEmpty)
++        }
++    }
++
++    private func withNativePlayer(_ body: @MainActor (PlaybackCoordinator, NativePlaybackRuntime, URL) async throws -> Void) async throws {
++        let fixtures = try #require(ProcessInfo.processInfo.environment["ILLIQUID_PRODUCT_FIXTURES"])
++        let directory = URL(fileURLWithPath: fixtures)
++        let domain = "IlliquidNativeProduct-\(UUID().uuidString)"
++        let root = FileManager.default.temporaryDirectory.resolvingSymlinksInPath().appendingPathComponent(domain)
++        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
++        let defaults = try #require(UserDefaults(suiteName: domain))
++        defer { defaults.removePersistentDomain(forName: domain); try? FileManager.default.removeItem(at: root) }
++        for name in ["first.mp4", "other.mp4"] {
++            try FileManager.default.copyItem(at: directory.appendingPathComponent("h264-aac.mp4"), to: root.appendingPathComponent(name))
++        }
++        try FileManager.default.copyItem(at: directory.appendingPathComponent("captions.srt"), to: root.appendingPathComponent("captions.srt"))
++        let persistence = PlaybackPersistenceStore(userDefaults: defaults, namespace: "NativeProduct")
++        var preferences = PlaybackPreferences.standard
++        preferences.volume = 0
++        preferences.isMuted = true
++        persistence.savePreferences(preferences)
++        let runtime = try NativePlaybackRuntime()
++        let player = PlaybackCoordinator(persistence: persistence,
++            sessionStore: AtomicPlaybackSessionStore(fileURL: root.appendingPathComponent("session.json")),
++            runtime: runtime, thumbnailCacheDirectory: root.appendingPathComponent("thumbnails"), automationTimeout: 15)
++        _ = NSApplication.shared
++        let host = try player.makeVideoSurfaceHost()
++        let window = NSWindow(contentRect: CGRect(x: 80, y: 80, width: 480, height: 300),
++            styleMask: [.titled, .closable], backing: .buffered, defer: false)
++        window.isReleasedWhenClosed = false
++        window.contentView = host.view
++        host.view.frame = CGRect(x: 0, y: 0, width: 480, height: 300)
++        host.view.layoutSubtreeIfNeeded()
++        window.orderFrontRegardless()
++        defer { window.orderOut(nil); window.contentView = nil; window.close() }
++        do { try await body(player, runtime, root) }
++        catch { await player.shutdown(); throw error }
++        await player.shutdown()
++        #expect(player.shutdownPersistenceError == nil)
++    }
++
++    private func nativeEventually(_ condition: @MainActor () -> Bool) async throws {
++        let deadline = ContinuousClock.now + .seconds(15)
++        while !condition() {
++            guard ContinuousClock.now < deadline else { throw ProductTimeout() }
++            try await Task.sleep(for: .milliseconds(10))
++        }
++    }
++}
