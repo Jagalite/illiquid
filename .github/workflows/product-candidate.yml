@@ -1,0 +1,152 @@
+name: Playback integration candidate
+on:
+  push:
+    branches: [work/playback-integration-qualification]
+    paths: [Validation/ProductCandidate/ready.json]
+permissions:
+  contents: read
+concurrency:
+  group: playback-integration-candidate
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: macos-26
+    timeout-minutes: 55
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Apply the reviewed plain-text candidate patches
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,pathlib,subprocess
+          root=pathlib.Path('Validation/ProductCandidate')
+          manifest=json.loads((root/'ready.json').read_text())
+          for name, expected in manifest['patches'].items():
+              if pathlib.Path(name).name != name or not name.endswith('.patch'):
+                  raise SystemExit('Invalid candidate patch path')
+              patch=root/name
+              if hashlib.sha256(patch.read_bytes()).hexdigest()!=expected:
+                  raise SystemExit('Candidate checksum mismatch')
+              subprocess.run(['git','apply','--index','--check',str(patch)],check=True)
+              subprocess.run(['git','apply','--index',str(patch)],check=True)
+          subprocess.run(['git','diff','--cached','--check'],check=True)
+          pathlib.Path('evidence').mkdir()
+          pathlib.Path('evidence/candidate.json').write_text(json.dumps(manifest,indent=2))
+          subprocess.run(['git','diff','--cached','--stat'],check=True)
+          PY
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate local product fixtures
+        run: |
+          bash Scripts/generate-product-fixtures.sh "$RUNNER_TEMP/illiquid-product-fixtures"
+          echo "ILLIQUID_PRODUCT_FIXTURES=$RUNNER_TEMP/illiquid-product-fixtures" >> "$GITHUB_ENV"
+          echo "ILLIQUID_NATIVE_FIXTURE_DIR=$RUNNER_TEMP/illiquid-product-fixtures" >> "$GITHUB_ENV"
+      - name: Compile app and run coordinator and product regressions
+        run: |
+          set -o pipefail
+          swift --version > evidence/toolchain.txt
+          swift test --force-resolved-versions --no-parallel --filter \
+            'PlaybackCoordinatorTests|PlaybackProduct|CaptionNavigation|PlaybackAutomation|TrackRestorationRegressionTests|ThumbnailLifecycleRegressionTests|AudioDelayTests|RuntimeAuthorityFenceTests|NativePictureInPictureTransitionTests|RendererObservationBoundsTests' \
+            2>&1 | tee evidence/swift-test.log
+          python3 Scripts/tests/app-intents-metadata-tests.py -v 2>&1 | tee evidence/metadata-tests.log
+      - name: Build and verify the packaged App Intents catalog
+        run: |
+          set -o pipefail
+          export ILLIQUID_BUILD_ROOT="$RUNNER_TEMP/illiquid-package-build"
+          bash Scripts/build-illiquid-app.sh --output "$RUNNER_TEMP/illiquid-package" --adhoc 2>&1 | tee evidence/package.log
+          cp "$ILLIQUID_BUILD_ROOT/app-intents/validation.json" evidence/metadata-validation.json
+          cp -R "$RUNNER_TEMP/illiquid-package/Illiquid.app/Contents/Resources/Metadata.appintents" evidence/
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playback-integration-evidence
+          path: evidence/
+          retention-days: 14
+  stage-reviewed-objects:
+    needs: qualify
+    # This separate job does not build, import, or execute application code.
+    # It stages immutable Git objects only. No refs/branches/PRs are changed.
+    # The final commit/ref update remains a separate reviewed connector action.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Stage exactly the qualified source tree without publishing a commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,subprocess,urllib.request
+          root=pathlib.Path('Validation/ProductCandidate')
+          manifest=json.loads((root/'ready.json').read_text())
+          for name,expected in manifest['patches'].items():
+              if pathlib.Path(name).name!=name or not name.endswith('.patch'):
+                  raise SystemExit('Invalid candidate patch path')
+              patch=root/name
+              if hashlib.sha256(patch.read_bytes()).hexdigest()!=expected:
+                  raise SystemExit('Candidate checksum mismatch')
+              subprocess.run(['git','apply','--index',str(patch)],check=True)
+          allowed={
+            'Package.swift','Scripts/app-intents-metadata.py','Scripts/build-illiquid-app.sh',
+            'Scripts/tests/app-intents-metadata-tests.py',
+            'Sources/IlliquidApp/App/IlliquidApp.swift',
+            'Sources/IlliquidApp/App/PlaybackAppIntents.swift',
+            'Sources/IlliquidApp/UI/PlaybackRecoveryView.swift',
+            'Sources/IlliquidApp/UI/PlaybackToolsViews.swift',
+            'Sources/IlliquidApp/UI/SettingsView.swift',
+            'Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift',
+            'Sources/IlliquidCore/Player/PlaybackRecoveryIssue.swift',
+            'Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift',
+            'Sources/IlliquidPlayer/Player/PlaybackAutomationQueue.swift',
+            'Sources/IlliquidPlayer/Player/PlaybackController.swift',
+            'Sources/IlliquidPlayer/Player/PlaybackRuntimeDriver.swift',
+            'Tests/IlliquidPlayerTests/PlaybackProductTransactionTests.swift'}
+          changed=set(subprocess.check_output(['git','diff','--cached','--name-only','-z']).decode().strip('\0').split('\0'))
+          if changed!=allowed:
+              raise SystemExit('Candidate must change exactly the reviewed source-file allowlist')
+          def api(path,data=None):
+              request=urllib.request.Request('https://api.github.com/repos/Jagalite/illiquid/'+path,
+                  data=json.dumps(data).encode() if data is not None else None,
+                  headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                           'Accept':'application/vnd.github+json','Content-Type':'application/json',
+                           'X-GitHub-Api-Version':'2022-11-28'})
+              with urllib.request.urlopen(request,timeout=60) as response:
+                  return json.load(response)
+          base='4d6446392c9bc196cf68339cb713d9214474ace4'
+          if api('git/ref/heads/feat/playback-reliability-tools')['object']['sha']!=base:
+              raise SystemExit('PR branch changed; rebase and requalify before staging')
+          entries=[]
+          report={'base_commit':base,'candidate_commit':os.environ['GITHUB_SHA'],'files':[]}
+          for name in sorted(changed):
+              path=pathlib.Path(name)
+              if path.is_symlink() or not path.is_file():
+                  raise SystemExit('Only regular reviewed source files may be staged')
+              data=path.read_bytes()
+              blob=api('git/blobs',{'content':data.decode('utf-8'),'encoding':'utf-8'})['sha']
+              mode=subprocess.check_output(['git','ls-files','--stage','--',name]).decode().split()[0]
+              if mode not in {'100644','100755'}:
+                  raise SystemExit('Invalid source file mode')
+              entries.append({'path':name,'mode':mode,'type':'blob','sha':blob})
+              report['files'].append({'path':name,'blob':blob,'sha256':hashlib.sha256(data).hexdigest()})
+          report['tree_sha']=api('git/trees',{'base_tree':'c03a52c2dda8d69e9ee1ed674400d889c2fd024d','tree':entries})['sha']
+          pathlib.Path('evidence').mkdir()
+          pathlib.Path('evidence/reviewed-tree.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: playback-reviewed-tree
+          path: evidence/reviewed-tree.json
+          retention-days: 14
