@@ -1,0 +1,13 @@
+{
+  "upstream": "854f8365750a0e4f046ab7015e01ca7a138ada40",
+  "final_state_sha256": "36406b6a78cb69e2ef08c3fa024f2de74b03e6a9a956fd82015fcba94e77692d",
+  "primary_timing_observations": 288,
+  "primary_allocation_observations": 81,
+  "primary_order_validation": "Both final cohorts pass recorded-order validation. The earlier two-variant runs always ran baseline first because rotation and reversal canceled; those datasets are exploratory, not the primary comparison.",
+  "variant_names": "In exploratory-guarded, v5 names PlaybackStateGuardedTrial.swift. In exploratory-batched and exploratory-controls, v5 names PlaybackStateBatched.swift. In exploratory-partition and final-* it names the delivered production file. The batched variant explicitly names PlaybackStateBatched.swift.",
+  "legacy_test_source_note": "The first exploratory-guarded manifests reference an earlier assertion-only version of PlaybackStatePublicationTests.swift which was not archived byte-for-byte. Production and timed harness sources were retained. Its changes were to no-op catalogue assertions outside timed loops. The batched assertion version is retained in baseline/PlaybackStatePublicationChecksBatched.swift; final test/harness/production files match final manifests.",
+  "frameworks": "Actual Swift Foundation and Observation, no GUI or image adapters in this pass. Static Swift runtime linkage on Linux resolves the supplied dynamic Observation library hidden-symbol linkage problem without replacing runtime functions.",
+  "not_run": "macOS SDK/application build, full repository test graph, native Instruments or UI layout/rendering, physical footprint/energy. Earlier cache/persistence suites were not rerun in v5; their source and evidence are retained unchanged.",
+  "timing_runs": "Every current-pass driver completed; no outlier removal. Warmup is 200 method calls, timed loops 400-20000 calls. Fresh processes on shared AMD EPYC 9V74 Linux host. Timing is synchronous call service time, not UI tail latency.",
+  "total_current_pass_observations": 1537
+}

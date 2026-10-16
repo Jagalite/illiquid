@@ -1,0 +1,45 @@
+extension PlaybackViewSnapshot {
+    @MainActor public init(baseline: LegacyPlaybackState) {
+        currentSource = baseline.currentSource
+        currentSourceOrigin = baseline.currentSourceOrigin
+        currentFolder = baseline.currentFolder
+        playlist = baseline.playlist
+        currentPlaylistIndex = baseline.currentPlaylistIndex
+        phase = baseline.phase
+        isPauseDesired = baseline.isPauseDesired
+        position = baseline.position
+        duration = baseline.duration
+        videoAspectRatio = baseline.videoAspectRatio
+        volume = baseline.volume
+        isMuted = baseline.isMuted
+        playbackSpeed = baseline.playbackSpeed
+        audioTracks = baseline.audioTracks
+        subtitleTracks = baseline.subtitleTracks
+        selectedAudioTrack = baseline.selectedAudioTrack
+        selectedSubtitleTrack = baseline.selectedSubtitleTrack
+        chapters = baseline.chapters
+        currentChapterID = baseline.currentChapterID
+        audioDelay = baseline.audioDelay
+        subtitleDelay = baseline.subtitleDelay
+        bufferStatus = baseline.bufferStatus
+        videoOutputStatus = baseline.videoOutputStatus
+        displayOutputStatus = baseline.displayOutputStatus
+        hardwareDecodingStatus = baseline.hardwareDecodingStatus
+        audioOutputDevice = baseline.audioOutputDevice
+        audioOutputDevices = baseline.audioOutputDevices
+        videoAdjustments = baseline.videoAdjustments
+        activeVideoFilters = baseline.activeVideoFilters
+        recentDiagnosticMessages = baseline.recentDiagnosticMessages
+        isFullscreen = baseline.isFullscreen
+        pictureInPicture = baseline.pictureInPicture
+        isSidebarVisible = baseline.isSidebarVisible
+        repeatMode = baseline.repeatMode
+        isShuffleEnabled = baseline.isShuffleEnabled
+        coreFailureCode = baseline.coreFailureCode
+        shellError = baseline.shellError
+        recoveryIssue = baseline.recoveryIssue
+        trackSelectionPreferences = baseline.trackSelectionPreferences
+        subtitleFallbackEncoding = baseline.subtitleFallbackEncoding
+        lastError = baseline.lastError
+    }
+}

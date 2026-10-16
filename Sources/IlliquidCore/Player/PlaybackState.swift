@@ -40,6 +40,8 @@ public struct PlaybackAuthorityProjection: Equatable, Sendable {
 @MainActor
 @Observable
 public final class PlaybackState {
+    /// Synchronous projection notification, not a command-acknowledgement stream.
+    /// Compound setters coalesce their changes; unchanged values may be silent.
     @ObservationIgnored public var onMutation: (@MainActor () -> Void)?
     public internal(set) var currentSource: MediaSource? { didSet { notifyMutation() } }
     public internal(set) var currentSourceOrigin: MediaSourceOrigin? { didSet { notifyMutation() } }
@@ -90,6 +92,11 @@ public final class PlaybackState {
             hasPendingMutation = true
             return
         }
+        #if ILLIQUID_STATE_SIGNPOSTS
+        guard onMutation != nil else { return }
+        let interval = NonDecodePerformance.begin("PlaybackStatePublish")
+        defer { NonDecodePerformance.end(interval) }
+        #endif
         onMutation?()
     }
 
@@ -99,6 +106,11 @@ public final class PlaybackState {
         mutationBatchDepth -= 1
         guard mutationBatchDepth == 0, hasPendingMutation else { return }
         hasPendingMutation = false
+        #if ILLIQUID_STATE_SIGNPOSTS
+        guard onMutation != nil else { return }
+        let interval = NonDecodePerformance.begin("PlaybackStatePublish")
+        defer { NonDecodePerformance.end(interval) }
+        #endif
         onMutation?()
     }
 
@@ -241,60 +253,79 @@ public final class PlaybackState {
     }
 
     public func setVolume(_ volume: Double) {
+        guard self.volume != volume else { return }
         self.volume = volume
     }
 
     public func setMuted(_ isMuted: Bool) {
+        guard self.isMuted != isMuted else { return }
         self.isMuted = isMuted
     }
 
     public func setPlaybackSpeed(_ playbackSpeed: Double) {
+        guard self.playbackSpeed != playbackSpeed else { return }
         self.playbackSpeed = playbackSpeed
     }
 
     public func setFullscreen(_ isFullscreen: Bool) {
+        guard self.isFullscreen != isFullscreen else { return }
         self.isFullscreen = isFullscreen
     }
 
     public func updatePictureInPicture(_ state: PictureInPictureState) {
+        guard pictureInPicture != state else { return }
         pictureInPicture = state
     }
 
     public func setSidebarVisible(_ isSidebarVisible: Bool) {
+        guard self.isSidebarVisible != isSidebarVisible else { return }
         self.isSidebarVisible = isSidebarVisible
     }
 
     public func setRepeatMode(_ repeatMode: PlaybackRepeatMode) {
+        guard self.repeatMode != repeatMode else { return }
         self.repeatMode = repeatMode
     }
 
     public func setShuffleEnabled(_ isShuffleEnabled: Bool) {
+        guard self.isShuffleEnabled != isShuffleEnabled else { return }
         self.isShuffleEnabled = isShuffleEnabled
     }
 
     public func setShellError(_ message: String?) {
-        shellError = message
-        if let message {
-            recoveryIssue = PlaybackRecoveryIssue(kind: .message, message: message)
+        performMutationBatch {
+            if shellError != message { shellError = message }
+            // The issue can have been dismissed/replaced while the text stayed
+            // equal. Preserve restoration of that context, even for equal text.
+            if let message {
+                let issue = PlaybackRecoveryIssue(kind: .message, message: message)
+                if recoveryIssue != issue { recoveryIssue = issue }
+            }
         }
     }
 
     public func setRecoveryIssue(_ issue: PlaybackRecoveryIssue?) {
+        guard recoveryIssue != issue else { return }
         recoveryIssue = issue
     }
 
     public func setTrackSelectionPreferences(_ preferences: TrackSelectionPreferences) {
-        trackSelectionPreferences = preferences.sanitized()
+        let normalized = preferences.sanitized()
+        guard trackSelectionPreferences != normalized else { return }
+        trackSelectionPreferences = normalized
     }
 
     public func setSubtitleFallbackEncoding(_ encoding: SubtitleFallbackEncoding) {
+        guard subtitleFallbackEncoding != encoding else { return }
         subtitleFallbackEncoding = encoding
     }
 
     public func updateVideoAspectRatio(_ value: Double?) {
-        videoAspectRatio = value.flatMap { ratio in
+        let normalized = value.flatMap { ratio in
             ratio.isFinite && ratio > 0 ? ratio : nil
         }
+        guard videoAspectRatio != normalized else { return }
+        videoAspectRatio = normalized
     }
 
     public func updateBufferTelemetry(cacheDuration: TimeInterval, cachePercent: Double? = nil) {
@@ -315,45 +346,60 @@ public final class PlaybackState {
     }
 
     public func updateDisplayOutput(_ status: DisplayOutputStatus) {
+        guard displayOutputStatus != status else { return }
         displayOutputStatus = status
     }
 
     public func updateAudioOutputDevices(_ devices: [AudioOutputDevice]) {
-        audioOutputDevices = devices
-        audioOutputDevice = devices.first(where: \.isSelected)
+        let selected = devices.first(where: \.isSelected)
+        performMutationBatch {
+            audioOutputDevices = devices
+            if audioOutputDevice != selected { audioOutputDevice = selected }
+        }
     }
 
     public func updateChapters(_ chapters: [Chapter], currentID: Int64?) {
-        self.chapters = chapters
-        currentChapterID = currentID
+        performMutationBatch {
+            // Do not add another full-array equality scan here. Observation's
+            // setter and the view projection already compare catalogue values.
+            self.chapters = chapters
+            if currentChapterID != currentID { currentChapterID = currentID }
+        }
     }
 
     public func setAudioDelay(_ delay: TimeInterval) {
-        audioDelay = delay.isFinite ? delay : 0
+        let normalized = delay.isFinite ? delay : 0
+        guard audioDelay != normalized else { return }
+        audioDelay = normalized
     }
 
     public func updateVideoAdjustments(_ update: (inout VideoAdjustmentState) -> Void) {
-        update(&videoAdjustments)
+        var adjustments = videoAdjustments
+        update(&adjustments)
+        if videoAdjustments != adjustments { videoAdjustments = adjustments }
     }
 
     public func setVideoFilter(_ filter: VideoFilterPreset, enabled: Bool) {
-        let currentlyEnabled = activeVideoFilters.contains(filter)
-        guard currentlyEnabled != enabled else { return }
+        performMutationBatch {
+            let currentlyEnabled = activeVideoFilters.contains(filter)
+            guard currentlyEnabled != enabled else { return }
 
-        if enabled {
-            activeVideoFilters.append(filter)
-            activeVideoFilters.sort {
-                guard let left = VideoFilterPreset.allCases.firstIndex(of: $0),
-                      let right = VideoFilterPreset.allCases.firstIndex(of: $1)
-                else { return $0.rawValue < $1.rawValue }
-                return left < right
+            if enabled {
+                activeVideoFilters.append(filter)
+                activeVideoFilters.sort {
+                    guard let left = VideoFilterPreset.allCases.firstIndex(of: $0),
+                          let right = VideoFilterPreset.allCases.firstIndex(of: $1)
+                    else { return $0.rawValue < $1.rawValue }
+                    return left < right
+                }
+            } else {
+                activeVideoFilters.removeAll { $0 == filter }
             }
-        } else {
-            activeVideoFilters.removeAll { $0 == filter }
         }
     }
 
     public func setHardwareDecodingPolicy(_ policy: HardwareDecodingPolicy) {
+        guard hardwareDecodingStatus.policy != policy else { return }
         hardwareDecodingStatus.policy = policy
     }
 
@@ -380,15 +426,34 @@ public final class PlaybackState {
     }
 
     public func recordDiagnostic(_ message: String) {
-        guard !message.isEmpty else { return }
-        recentDiagnosticMessages.append(message)
-        if recentDiagnosticMessages.count > 100 {
-            recentDiagnosticMessages.removeFirst(recentDiagnosticMessages.count - 100)
+        performMutationBatch {
+            guard !message.isEmpty else { return }
+            recentDiagnosticMessages.append(message)
+            if recentDiagnosticMessages.count > 100 {
+                recentDiagnosticMessages.removeFirst(recentDiagnosticMessages.count - 100)
+            }
         }
     }
 
     public func updateTrackCatalog(_ tracks: [MediaTrack]) {
-        audioTracks = tracks.filter { $0.kind == .audio }
-        subtitleTracks = tracks.filter { $0.kind == .subtitle }
+        // Count first so both partitions allocate their exact required capacity.
+        // Reserving tracks.count for both would retain unused catalogue memory.
+        let audioCount = tracks.reduce(into: 0) { count, track in
+            if track.kind == .audio { count += 1 }
+        }
+        var audio: [MediaTrack] = []
+        var subtitles: [MediaTrack] = []
+        audio.reserveCapacity(audioCount)
+        subtitles.reserveCapacity(tracks.count - audioCount)
+        for track in tracks {
+            switch track.kind {
+            case .audio: audio.append(track)
+            case .subtitle: subtitles.append(track)
+            }
+        }
+        performMutationBatch {
+            audioTracks = audio
+            subtitleTracks = subtitles
+        }
     }
 }

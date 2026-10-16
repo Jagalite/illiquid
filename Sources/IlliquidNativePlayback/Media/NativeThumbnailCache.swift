@@ -14,10 +14,25 @@ actor NativeThumbnailCache {
         // Bump if default-stream selection, color conversion or image semantics change.
         let renderer = "default-video-bgra-v1"
         var digest: String {
+            let interval = NonDecodePerformance.begin("ThumbnailDigest")
+            defer { NonDecodePerformance.end(interval) }
             let encoder = JSONEncoder()
             encoder.outputFormatting = .sortedKeys
             let data = (try? encoder.encode(self)) ?? Data()
-            return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+            return Self.hexadecimal(SHA256.hash(data: data))
+        }
+
+        /// Byte-identical lowercase encoding without 32 formatted strings for
+        /// every disk-cache SHA-256 key. JSON/hash/schema remain unchanged.
+        static func hexadecimal<Bytes: Sequence>(_ bytes: Bytes) -> String where Bytes.Element == UInt8 {
+            let digits: [UInt8] = Array("0123456789abcdef".utf8)
+            var encoded: [UInt8] = []
+            encoded.reserveCapacity(64)
+            for byte in bytes {
+                encoded.append(digits[Int(byte >> 4)])
+                encoded.append(digits[Int(byte & 0x0f)])
+            }
+            return String(decoding: encoded, as: UTF8.self)
         }
     }
     private struct Resident {
@@ -108,13 +123,27 @@ actor NativeThumbnailCache {
     }
 
     func admitsBackground(size: CGSize) -> Bool {
-        let estimate = (Int(size.width) * 4 + 64) * Int(size.height)
-        let victims = images.filter { $0.value.background && !storyboardKeys.contains($0.key) }
-        let reclaimable = victims.reduce(0) { $0 + $1.value.bytes }
-        // Do not decode speculative images that cannot become resident. Disk
-        // persistence is a secondary benefit, not a reason to keep decoding.
-        return memoryBytes - reclaimable + estimate <= preferences.memoryMiB * 1024 * 1024
-            && (images.count < maximumResidentImages || !victims.isEmpty)
+        let interval = NonDecodePerformance.begin("ThumbnailAdmission")
+        defer { NonDecodePerformance.end(interval) }
+        // Reject invalid sizes without trapping on floating-point conversion.
+        guard let width = Int(exactly: size.width.rounded(.towardZero)),
+              let height = Int(exactly: size.height.rounded(.towardZero)),
+              (1...2048).contains(width), (1...2048).contains(height) else { return false }
+        let estimate = (width * 4 + 64) * height
+        let limit = preferences.memoryMiB * 1024 * 1024
+        if memoryBytes + estimate <= limit, images.count < maximumResidentImages { return true }
+        // Sum directly: filtering a Dictionary copies entries and retains each
+        // selected CGImage merely to answer this admission question.
+        var reclaimable = 0
+        var hasVictim = false
+        for (key, resident) in images where resident.background && !storyboardKeys.contains(key) {
+            reclaimable += resident.bytes
+            hasVictim = true
+        }
+        // Foreground and storyboard protection is unchanged. A disk write is
+        // not a reason to admit a speculative image that cannot stay resident.
+        return memoryBytes - reclaimable + estimate <= limit
+            && (images.count < maximumResidentImages || hasVictim)
     }
 
     func selectStoryboardSource(_ key: Key) {
@@ -132,6 +161,8 @@ actor NativeThumbnailCache {
 
     func image(for key: Key, background: Bool) async -> CGImage? {
         if var resident = images[key] {
+            let interval = NonDecodePerformance.begin("ThumbnailResidentHit")
+            defer { NonDecodePerformance.end(interval) }
             if !background {
                 let now = Date()
                 let shouldTouchDisk = resident.background || now.timeIntervalSince(resident.diskTouch) >= 60
@@ -142,8 +173,11 @@ actor NativeThumbnailCache {
                 images[key] = resident
                 if shouldTouchDisk, hasDisk, preferences.diskMiB > 0 {
                     let revision = epoch
-                    await disk.promote(key, epoch: revision)
-                    guard epoch == revision, !Task.isCancelled else { return nil }
+                    if !disk.enqueuePromotion(key, epoch: revision) {
+                        await disk.promote(key, epoch: revision)
+                        guard epoch == revision else { return nil }
+                    }
+                    guard !Task.isCancelled else { return nil }
                     enqueueWrite(resident.image, key: key, background: false)
                 }
             }
@@ -193,9 +227,11 @@ actor NativeThumbnailCache {
 
     func flushPendingWrites() async {
         while let active = writer { await active.value }
+        await disk.flushPromotions()
     }
 
     private func rememberMemory(_ image: CGImage, key: Key, background: Bool) {
+        defer { NonDecodePerformance.residentMemory(bytes: memoryBytes, images: images.count) }
         if var resident = images[key] {
             // A foreground decode/disk read can finish after a background
             // request has inserted the same key during an actor suspension.
@@ -239,6 +275,7 @@ actor NativeThumbnailCache {
         images.removeAll()
         storyboardKeys.removeAll()
         memoryBytes = 0
+        NonDecodePerformance.residentMemory(bytes: memoryBytes, images: images.count)
         return await disk.clear(epoch: epoch)
     }
 
@@ -249,9 +286,23 @@ actor NativeThumbnailCache {
     /// Preserve disk entries and user limits. Reclaim speculative images first;
     /// critical pressure discards all resident images, including dictionary capacity.
     func trimForMemoryPressure(critical: Bool) {
+        let interval = NonDecodePerformance.begin("ThumbnailMemoryPressure")
+        defer {
+            NonDecodePerformance.residentMemory(bytes: memoryBytes, images: images.count)
+            NonDecodePerformance.end(interval)
+        }
         memoryRevision &+= 1
         pending = nil
-        let target = critical ? 0 : memoryBytes / 2
+        if critical {
+            // No ordering is needed when every entry must go. In particular,
+            // avoid allocating a sorted array that retains the images under
+            // memory pressure and forces Dictionary copy-on-write on removal.
+            images.removeAll(keepingCapacity: false)
+            storyboardKeys.removeAll(keepingCapacity: false)
+            memoryBytes = 0
+            return
+        }
+        let target = memoryBytes / 2
         let victims = images.sorted {
             if $0.value.background != $1.value.background { return $0.value.background }
             return $0.value.used < $1.value.used

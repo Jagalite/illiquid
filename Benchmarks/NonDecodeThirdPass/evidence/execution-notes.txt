@@ -1,0 +1,31 @@
+Execution and interpretation notes — third pass
+
+- All 254 formal observations are completed raw records. Identity tuples are unique.
+- Primary history: 5 process samples/variant/group at 1k and 10k entries, 3 at 100k.
+  Two early parent invocations hit the tool wall-time limit. Completed records were
+  retained; work resumed from unchanged binaries after source/binary hash checks.
+  No interrupted observation was reconstructed or included; no completed outlier
+  was removed. The original last-invocation summary covers only 100k. The complete
+  all-groups summary was independently regenerated with summarize-history.py.
+- Primary inventory: 5 samples/variant/group. Metered store and inventory groups:
+  3 samples each. SQLite prototype: 3 samples/count/mode. Formal phases ran serially.
+- Main validation pipeline and resumed history both completed with exit status 0.
+  No external job or asynchronous post-delivery work is relied upon.
+- The exact inventory timing source is preserved under timed-sources. Its only
+  difference from final production source is a metadata-I/O clarification comment.
+  Non-comment lines were compared exactly. Allocation runs and final tests used
+  the clarified file. Manifests are retained, not rewritten to conceal the difference.
+- Environment metadata was inspected during final review: Intel Xeon Platinum
+  8573C, Linux x86-64, Swift 6.2.1, glibc 2.41. Prior reports describe another host;
+  compare the paired v2/v3 cohort here, not raw values between reports.
+- findmnt reports fsync=volatile for both /tmp and /mnt/data. SQLite FULL was set
+  but this is not SSD-durability timing or a power-loss test. Crash cases kill only
+  owned children while the OS/page cache remains alive.
+- Duplicate-cache diagnostic returns process success while explicitly recording
+  a known remaining defect: clear reports true with one duplicate file left over.
+  It is NOT a passing regression for that defect. The 8256-file capacity assertions
+  in the same program do pass.
+- The expected v2 preference regression fails. Preserve its receipt as defect
+  evidence, not a failed v3 test or a passing old-baseline qualification.
+- Native inventory tests were syntax-parsed only. No macOS SDK/app build or actual
+  GUI, ImageIO, physical footprint, energy, GPU, NAS, or migration test was run.
