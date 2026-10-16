@@ -92,7 +92,8 @@ struct PacketOwnershipTests {
         #expect(addresses.count == retained.count)
         for _ in 0..<512 { _ = try demuxer.readPacket(generation: 1) }
         try demuxer.seek(to: 0, exact: true)
-        let afterSeek = try #require(demuxer.readPacket(generation: 2))
+        let packetAfterSeek = try demuxer.readPacket(generation: 2)
+        let afterSeek = try #require(packetAfterSeek)
         #expect(afterSeek.generation == 2)
         #expect(retained.map(\.data) == data)
         #expect(retained.map(\.presentationTimestamp) == pts)
