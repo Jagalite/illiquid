@@ -8,7 +8,7 @@ Read `Documentation/NONDECODING_PERFORMANCE_FOURTH_PASS.md`. This is a selected-
 * `accounting`: physical-filename accounting and preferred/fallback aliases, still inventory-first. An intermediate ablation fixture, not the final shipping source.
 * `v4`: the current candidate, including exact-name lookup before inventory and failure fallback.
 
-The active production change is in `Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift`. The eleven native counterpart tests are in `Tests/IlliquidNativePlaybackTests/ThumbnailPhysicalEntryTests.swift`. They include queued foreground protection during cold inventory, reconciliation of deferred budgets, and disabling the disk cache with reservations pending.
+The active production change is in `Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift`. The thirteen native counterpart tests are in `Tests/IlliquidNativePlaybackTests/ThumbnailPhysicalEntryTests.swift`. They include queued foreground protection during cold inventory, reconciliation of deferred budgets, disabling the disk cache with reservations pending, foreground-only budget changes, and failed-rename protection during cold inventory.
 
 ## Requirements and running
 

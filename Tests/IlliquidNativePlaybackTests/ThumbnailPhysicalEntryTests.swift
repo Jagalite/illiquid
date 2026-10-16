@@ -77,8 +77,9 @@ final class ThumbnailPhysicalEntryTests: XCTestCase {
         let reservedBytes = await cache.reserveThenInventoryForTest(keys, disable: false)
         XCTAssertEqual(reservedBytes, 1_400_000)
         await cache.flushPromotions()
-        let bytes = await cache.bytes(); XCTAssertEqual(bytes, 700_000)
+        // Check the filesystem before any actor query can serialize with trim.
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: root.path).count, 1)
+        let bytes = await cache.bytes(); XCTAssertEqual(bytes, 700_000)
     }
 
     func testDisablingDiskCacheOverridesPendingReservations() async throws {
@@ -142,7 +143,7 @@ final class ThumbnailPhysicalEntryTests: XCTestCase {
         let cleared = await cache.clear(epoch: 1); XCTAssertTrue(cleared)
         XCTAssertTrue(FileManager.default.fileExists(atPath: target.path))
     }
-    func testForegroundReadDefersUnrelatedPruningButUsageEnforcesBudget() async throws {
+    func testForegroundReadReconcilesChangedBudgetWithoutUsageQuery() async throws {
         let root = try directory(); defer { try? FileManager.default.removeItem(at: root) }
         let k = key(); try jpeg(root, k, true, width: 20)
         let first = path(root, key(2), false), second = path(root, key(3), false)
@@ -151,10 +152,27 @@ final class ThumbnailPhysicalEntryTests: XCTestCase {
         let cache = NativeThumbnailDiskCache(directory: root)
         var settings = ThumbnailPreferences(); settings.diskMiB = 1; await cache.configure(settings)
         let result = await cache.image(for: k, background: false); XCTAssertEqual(result?.width, 20)
-        XCTAssertTrue(FileManager.default.fileExists(atPath: first.path))
-        XCTAssertTrue(FileManager.default.fileExists(atPath: second.path))
+        let remaining = try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: [.fileSizeKey])
+        let physicalBytes = try remaining.reduce(0) { try $0 + $1.resourceValues(forKeys: [.fileSizeKey]).fileSize! }
+        XCTAssertLessThanOrEqual(physicalBytes, 1_048_576)
         let bytes = await cache.bytes(); XCTAssertLessThanOrEqual(bytes, 1_048_576)
     }
+    func testConfiguredDefaultBudgetReconcilesPriorLargerCache() async throws {
+        let root = try directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let selected = key(1), oversized = path(root, key(2), false)
+        try jpeg(root, selected, true, width: 20)
+        XCTAssertTrue(FileManager.default.createFile(atPath: oversized.path, contents: nil))
+        let handle = try FileHandle(forWritingTo: oversized)
+        try handle.truncate(atOffset: UInt64(ThumbnailPreferences().diskMiB + 1) * 1024 * 1024)
+        try handle.close()
+        let cache = NativeThumbnailDiskCache(directory: root)
+        await cache.configure(ThumbnailPreferences())
+        let result = await cache.image(for: selected, background: false)
+        XCTAssertEqual(result?.width, 20)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: oversized.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: path(root, selected, true).path))
+    }
+
     func testClearAfterDirectPromotionFindsAllRecognizedFiles() async throws {
         let root = try directory(); defer { try? FileManager.default.removeItem(at: root) }
         try jpeg(root, key(1), false, width: 10); try jpeg(root, key(2), true, width: 20)
@@ -163,6 +181,22 @@ final class ThumbnailPhysicalEntryTests: XCTestCase {
         let cleared = await cache.clear(epoch: 1); XCTAssertTrue(cleared)
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: root.path).count, 0)
     }
+    func testFailedColdPromotionProtectsSelectedEntryDuringInventory() async throws {
+        let root = try directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let selected = key(1), other = key(2)
+        try paddedJPEG(root, selected, age: 1)
+        try paddedJPEG(root, other, age: 2)
+        try FileManager.default.createDirectory(at: path(root, selected, true), withIntermediateDirectories: true)
+        let cache = NativeThumbnailDiskCache(directory: root)
+        var settings = ThumbnailPreferences(); settings.diskMiB = 1
+        await cache.configure(settings)
+        let result = await cache.image(for: selected, background: false)
+        XCTAssertEqual(result?.width, 10)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: path(root, selected, false).path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: path(root, other, false).path))
+        let bytes = await cache.bytes(); XCTAssertEqual(bytes, 700_000)
+    }
+
     func testFailedPromotionStillProtectsForegroundFromSpeculativeEviction() async throws {
         let root = try directory(); defer { try? FileManager.default.removeItem(at: root) }
         let k = key(); try jpeg(root, k, false, width: 10)

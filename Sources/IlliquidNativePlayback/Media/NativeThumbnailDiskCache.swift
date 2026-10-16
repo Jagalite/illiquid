@@ -24,6 +24,7 @@ actor NativeThumbnailDiskCache {
     // Both consume disk space and must survive in accounting until unlinked.
     private var files: [String: DiskEntry] = [:]
     private var loadedDisk = false
+    private var needsBudgetReconciliation = false
     private var diskBytes = 0
     private var trimDeferredByPromotions = false
     private var generation: UInt64 = 0
@@ -39,6 +40,9 @@ actor NativeThumbnailDiskCache {
 
     func configure(_ value: ThumbnailPreferences) {
         preferences = value.bounded
+        // The previous process may have used a larger limit, even when this
+        // configured value equals our default. Reconcile after the first probe.
+        needsBudgetReconciliation = !loadedDisk
         if preferences.diskMiB == 0 { loadDisk() }
         if loadedDisk { trimDisk(incoming: 0, background: false) }
     }
@@ -160,7 +164,12 @@ actor NativeThumbnailDiskCache {
         }
     }
 
-    func flushPromotions() async { await promotions.waitUntilEmpty() }
+    func flushPromotions() async {
+        await promotions.waitUntilEmpty()
+        // Re-enter this actor before returning to the caller. Mailbox completion
+        // alone does not promise that the disk budget has been reconciled.
+        if trimDeferredByPromotions { trimDisk(incoming: 0, background: false) }
+    }
 
     private nonisolated static func encode(_ image: CGImage) -> Data? {
         let data = NSMutableData()
@@ -190,7 +199,7 @@ actor NativeThumbnailDiskCache {
                 // A failed rename cannot persist the foreground filename. Fall
                 // back to full accounting so the in-memory foreground tier is
                 // retained, rather than discarded with a temporary exact lookup.
-                loadDisk()
+                loadDisk(protecting: name)
                 guard let inventoried = files[name] else { return }
                 entry = inventoried
             }
@@ -223,6 +232,9 @@ actor NativeThumbnailDiskCache {
     }
 
     private func finishExactLookup() {
+        // A changed limit must eventually be enforced even for foreground-only
+        // traffic. Finish the exact hit/promotion first so inventory sees its tier.
+        if needsBudgetReconciliation { loadDisk() }
         guard !loadedDisk else { return }
         // Never let many foreground-only requests accumulate a partial index.
         // These counters are private; bytes() always inventories before reporting.
@@ -240,11 +252,12 @@ actor NativeThumbnailDiskCache {
             used: values.contentModificationDate ?? .distantPast, background: background)
     }
 
-    private func loadDisk() {
+    private func loadDisk(protecting protectedName: String? = nil) {
         guard !loadedDisk else { return }
         let interval = NonDecodePerformance.begin("ThumbnailDiskInventory")
         defer { NonDecodePerformance.end(interval) }
         loadedDisk = true
+        needsBudgetReconciliation = false
         // Stream names rather than retaining a URL/resource cache for every
         // directory entry. Our explicit resource-value lookup runs only for a
         // valid cache filename; FileManager may still do internal metadata I/O.
@@ -254,7 +267,11 @@ actor NativeThumbnailDiskCache {
             options: [.skipsSubdirectoryDescendants]) else { return }
         for case let url as URL in entries {
             guard let parsed = Self.parseFilename(url.lastPathComponent),
-                  let entry = Self.inspectFile(url, background: parsed.background) else { continue }
+                  var entry = Self.inspectFile(url, background: parsed.background) else { continue }
+            if url.lastPathComponent == protectedName {
+                entry.background = false
+                entry.used = Date()
+            }
             files[url.lastPathComponent] = entry
         }
         diskBytes = files.values.reduce(0) { $0 + $1.bytes }
