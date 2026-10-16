@@ -96,16 +96,16 @@ final class FFmpegDemuxer {
 
     func readPacket(generation: Int) throws -> FFmpegPacket? {
         guard let context else { return nil }
-        guard let temporary = av_packet_alloc() else {
+        var ownedPacket = av_packet_alloc()
+        guard let temporary = ownedPacket else {
             throw FFmpegError(
                 operation: "Allocate demux packet",
                 code: illiquid_averror_nomem()
             )
         }
-        defer {
-            var packet: UnsafeMutablePointer<AVPacket>? = temporary
-            av_packet_free(&packet)
-        }
+        // On EOF/error this frees the input packet; successful delivery clears
+        // the slot by transferring its header directly to FFmpegPacket.
+        defer { av_packet_free(&ownedPacket) }
 
         var retryPolicy = FFmpegDemuxReadRetryPolicy()
         let noProgressStart = ProcessInfo.processInfo.systemUptime
@@ -155,7 +155,7 @@ final class FFmpegDemuxer {
             terminalPacketWasCorrupt = temporary.pointee.flags & AV_PKT_FLAG_CORRUPT != 0
                 && (context.pointee.pb?.pointee.eof_reached ?? 0) != 0
             let packet = try FFmpegPacket(
-                moving: temporary,
+                taking: &ownedPacket,
                 timeBase: stream.pointee.time_base,
                 generation: generation
             )

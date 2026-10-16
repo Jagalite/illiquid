@@ -12,7 +12,7 @@ final class FFmpegPacket: @unchecked Sendable {
     let isCorrupt: Bool
     let isKeyframe: Bool
 
-    init(
+    convenience init(
         moving source: UnsafeMutablePointer<AVPacket>,
         timeBase: AVRational,
         generation: Int
@@ -21,6 +21,29 @@ final class FFmpegPacket: @unchecked Sendable {
             throw FFmpegError(operation: "Allocate packet", code: illiquid_averror_nomem())
         }
         av_packet_move_ref(packet, source)
+        self.init(owning: packet, timeBase: timeBase, generation: generation)
+    }
+
+    /// Transfers an allocated header and all its references without allocating a
+    /// second AVPacket. The caller's slot is cleared only on successful transfer.
+    /// Use `moving:` when the caller must retain its empty scratch header.
+    convenience init(
+        taking source: inout UnsafeMutablePointer<AVPacket>?,
+        timeBase: AVRational,
+        generation: Int
+    ) throws {
+        guard let packet = source else {
+            throw FFmpegError(operation: "Take missing demux packet", code: -22)
+        }
+        source = nil
+        self.init(owning: packet, timeBase: timeBase, generation: generation)
+    }
+
+    private init(
+        owning packet: UnsafeMutablePointer<AVPacket>,
+        timeBase: AVRational,
+        generation: Int
+    ) {
         pointer = packet
         streamIndex = packet.pointee.stream_index
         presentationTimestamp = packet.pointee.pts
@@ -90,6 +113,12 @@ final class VideoRecoveryPacketBuffer: @unchecked Sendable {
                 resetLocked(generation: packet.generation)
             }
             if packet.isKeyframe {
+                // A keyframe starts a new GOP but must obey the same byte bound.
+                // Reject the whole GOP; retaining only its tail cannot seed replay.
+                guard packet.byteCount <= Self.maximumByteCount else {
+                    resetLocked(generation: packet.generation)
+                    return
+                }
                 packets = [packet]
                 byteCount = packet.byteCount
                 hasReplayableKeyframe = true
