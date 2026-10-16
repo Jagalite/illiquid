@@ -106,7 +106,8 @@ final class BoundedQueue<Element>: @unchecked Sendable {
         defer { condition.unlock() }
         let arrivalRevision = invalidationRevision
 
-        while wouldExceedBudget(adding: elementCost), !storage.isEmpty, !closed {
+        while arrivalRevision == invalidationRevision,
+              wouldExceedBudget(adding: elementCost), !storage.isEmpty, !closed {
             waitingProducerCount += 1
             peakWaitingProducerCount = max(
                 peakWaitingProducerCount,
@@ -156,7 +157,8 @@ final class BoundedQueue<Element>: @unchecked Sendable {
         defer { condition.unlock() }
         let arrivalRevision = invalidationRevision
 
-        while wouldExceedBudget(adding: elementCost), !storage.isEmpty, !closed {
+        while arrivalRevision == invalidationRevision,
+              wouldExceedBudget(adding: elementCost), !storage.isEmpty, !closed {
             waitingProducerCount += 1
             peakWaitingProducerCount = max(
                 peakWaitingProducerCount,
