@@ -1,0 +1,22 @@
+Execution notes — v4
+
+Primary timing: 141 unique, completed rows; allocation cohorts: 12 completed rows.
+First-access and miss workloads use five fresh processes/variant; control groups use three.
+Order alternates v3/accounting/v4 and reverse order within primary rounds, or v3/v4 and reverse for controls.
+The shared host was not quiesced; fixtures are created before timing and OS caches are warm.
+No completed sample was removed as an outlier. Raw minima/maxima remain authoritative.
+
+Several container execution windows ended during orchestration. Completed observation JSON rows were saved first.
+The driver resumed only missing identities after verifying the same source/binary manifest; interrupted runs are excluded.
+The early three-variant build was interrupted after two compiles and was rebuilt before formal receipts were captured.
+One initial harness compile rejected an unnecessary await with warnings-as-errors; corrected before all formal measurements.
+An attempted pseudo-terminal execution was unsupported and performed no work. No background jobs remained running.
+The old inventory runner invocation was interrupted during compilation; it is not a passing test. The same existing inventory
+harness was subsequently rebuilt against v4 with codec-only adapters and passed 2,319 checks (inventory-regressions).
+The prior preview regression runner completed successfully before that interruption (196 candidate checks).
+
+All raw file paths are investigation-workspace paths, not required installation locations.
+Allocation interposition counts successful malloc/calloc/realloc requested sizes, not live/peak/physical memory.
+The foreground allocation interval stops BEFORE usage() forces inventory; deferred allocation is not eliminated total work.
+Source hashes in timing/allocations match the final production disk source. Timed generated adapters are retained under timed-sources.
+Eight native counterpart tests have syntax-only validation. No macOS SDK/app build or native execution is claimed.

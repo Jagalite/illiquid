@@ -122,6 +122,29 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
     private var state: StoredState
     private let historyWriter: CoalescingPersistenceWriter<StoredState>
     private let preferencesWriter: CoalescingPersistenceWriter<PlaybackPreferences>
+    private let historyWriteStatus = WriteStatus()
+    private let preferencesWriteStatus = WriteStatus()
+
+    /// A failed callback must remain retryable even when a later setter supplies
+    /// an unchanged value. No store lock is acquired from this small status lock.
+    private final class WriteStatus: @unchecked Sendable {
+        private let lock = NSLock()
+        private var failed = false
+        var needsRetry: Bool {
+            lock.lock()
+            defer { lock.unlock() }
+            return failed
+        }
+        func perform(_ body: () throws -> Void) rethrows {
+            do {
+                try body()
+                lock.lock(); failed = false; lock.unlock()
+            } catch {
+                lock.lock(); failed = true; lock.unlock()
+                throw error
+            }
+        }
+    }
 
     private final class DefaultsDestination: @unchecked Sendable {
         let defaults: UserDefaults
@@ -137,11 +160,21 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         let historyKey = storageKey
         let preferencesKey = "\(namespace).playback-preferences.v1"
         let destination = DefaultsDestination(userDefaults)
-        historyWriter = CoalescingPersistenceWriter(label: "com.illiquid.history-writer") {
-            destination.defaults.set(try JSONEncoder().encode($0), forKey: historyKey)
+        let historyStatus = historyWriteStatus
+        let preferencesStatus = preferencesWriteStatus
+        historyWriter = CoalescingPersistenceWriter(label: "com.illiquid.history-writer") { snapshot in
+            try historyStatus.perform {
+                let data = try NonDecodePerformance.measure("HistoryEncode") { try JSONEncoder().encode(snapshot) }
+                NonDecodePerformance.historyPayload(bytes: data.count)
+                NonDecodePerformance.measure("HistoryDefaultsSet") {
+                    destination.defaults.set(data, forKey: historyKey)
+                }
+            }
         }
-        preferencesWriter = CoalescingPersistenceWriter(label: "com.illiquid.preferences-writer") {
-            destination.defaults.set(try JSONEncoder().encode($0), forKey: preferencesKey)
+        preferencesWriter = CoalescingPersistenceWriter(label: "com.illiquid.preferences-writer") { preferences in
+            try preferencesStatus.perform {
+                destination.defaults.set(try JSONEncoder().encode(preferences), forKey: preferencesKey)
+            }
         }
 
         if let data = userDefaults.data(forKey: storageKey),
@@ -159,6 +192,8 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
     }
 
     public func flush() async -> Result<Void, Error> {
+        let interval = NonDecodePerformance.begin("HistoryFlush")
+        defer { NonDecodePerformance.end(interval) }
         let history = await historyWriter.flush()
         let preferences = await preferencesWriter.flush()
         if case .failure = history { return history }
@@ -206,15 +241,21 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
             return false
         }
 
-        mutate { state in
+        mutateIfChanged { state in
             if let duration = state.playbackDurations[key], duration > 0,
-               position / duration > 0.9
-            {
-                state.completedFiles.insert(key)
-                state.playbackPositions.removeValue(forKey: key)
-            } else {
-                state.playbackPositions[key] = position
+               position / duration > 0.9 {
+                var changed = false
+                if !state.completedFiles.contains(key) {
+                    state.completedFiles.insert(key); changed = true
+                }
+                if state.playbackPositions[key] != nil {
+                    state.playbackPositions.removeValue(forKey: key); changed = true
+                }
+                return changed
             }
+            guard state.playbackPositions[key] != position else { return false }
+            state.playbackPositions[key] = position
+            return true
         }
         return true
     }
@@ -234,23 +275,39 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
             return false
         }
 
-        mutate { state in
-            state.playbackDurations[key] = duration
-            if position / duration > 0.9 {
-                state.completedFiles.insert(key)
-                state.playbackPositions.removeValue(forKey: key)
-            } else {
-                state.playbackPositions[key] = position
+        mutateIfChanged { state in
+            var changed = false
+            // An unchanged assignment can still copy a dictionary shared with an
+            // in-flight snapshot. Check individual fields BEFORE mutating them.
+            if state.playbackDurations[key] != duration {
+                state.playbackDurations[key] = duration; changed = true
             }
+            if position / duration > 0.9 {
+                if !state.completedFiles.contains(key) {
+                    state.completedFiles.insert(key); changed = true
+                }
+                if state.playbackPositions[key] != nil {
+                    state.playbackPositions.removeValue(forKey: key); changed = true
+                }
+            } else if state.playbackPositions[key] != position {
+                state.playbackPositions[key] = position; changed = true
+            }
+            return changed
         }
         return true
     }
 
     public func markPlaybackCompleted(for fileURL: URL) {
         guard let key = NormalizedFileURL.persistenceKey(for: fileURL) else { return }
-        mutate { state in
-            state.completedFiles.insert(key)
-            state.playbackPositions.removeValue(forKey: key)
+        mutateIfChanged { state in
+            var changed = false
+            if !state.completedFiles.contains(key) {
+                state.completedFiles.insert(key); changed = true
+            }
+            if state.playbackPositions[key] != nil {
+                state.playbackPositions.removeValue(forKey: key); changed = true
+            }
+            return changed
         }
     }
 
@@ -259,7 +316,11 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
             return
         }
 
-        mutate { $0.playbackPositions.removeValue(forKey: key) }
+        mutateIfChanged { state in
+            guard state.playbackPositions[key] != nil else { return false }
+            state.playbackPositions.removeValue(forKey: key)
+            return true
+        }
     }
 
     public func lastWatchedFile(for folderURL: URL) -> URL? {
@@ -278,7 +339,11 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         }
 
         guard let fileURL else {
-            mutate { $0.lastWatchedFiles.removeValue(forKey: folderKey) }
+            mutateIfChanged { state in
+                guard state.lastWatchedFiles[folderKey] != nil else { return false }
+                state.lastWatchedFiles.removeValue(forKey: folderKey)
+                return true
+            }
             return
         }
 
@@ -286,7 +351,11 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
             return
         }
 
-        mutate { $0.lastWatchedFiles[folderKey] = filePath }
+        mutateIfChanged { state in
+            guard state.lastWatchedFiles[folderKey] != filePath else { return false }
+            state.lastWatchedFiles[folderKey] = filePath
+            return true
+        }
     }
 
     public func lastOpenedMedia() -> PlaybackRestoreTarget? {
@@ -298,7 +367,11 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
     @discardableResult
     public func setLastOpenedMedia(_ target: PlaybackRestoreTarget?) -> Bool {
         guard let target else {
-            mutate { $0.lastOpenedMedia = nil }
+            mutateIfChanged { state in
+                guard state.lastOpenedMedia != nil else { return false }
+                state.lastOpenedMedia = nil
+                return true
+            }
             return true
         }
 
@@ -310,7 +383,11 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         case .file: .file(normalizedURL)
         case .folder: .folder(normalizedURL)
         }
-        mutate { $0.lastOpenedMedia = normalizedTarget }
+        mutateIfChanged { state in
+            guard state.lastOpenedMedia != normalizedTarget else { return false }
+            state.lastOpenedMedia = normalizedTarget
+            return true
+        }
         return true
     }
 
@@ -332,12 +409,10 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         guard let key = NormalizedFileURL.persistenceKey(for: fileURL) else {
             return
         }
-        mutate { state in
-            if let settings {
-                state.mediaSettings[key] = settings
-            } else {
-                state.mediaSettings.removeValue(forKey: key)
-            }
+        mutateIfChanged { state in
+            guard state.mediaSettings[key] != settings else { return false }
+            state.mediaSettings[key] = settings
+            return true
         }
     }
 
@@ -357,9 +432,9 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
     public func acceptMediaVersion(_ version: MediaContentVersion, for fileURL: URL) -> MediaContentVersionDisposition {
         guard let key = NormalizedFileURL.persistenceKey(for: fileURL) else { return .firstObservation }
         var disposition = MediaContentVersionDisposition.firstObservation
-        mutate { state in
+        mutateIfChanged { state in
             if let previous = state.mediaVersions[key] {
-                guard previous != version else { disposition = .unchanged; return }
+                guard previous != version else { disposition = .unchanged; return false }
                 disposition = .changed
                 state.replacedHistory[key, default: []].append(ReplacedMediaHistory(
                     version: previous, position: state.playbackPositions[key],
@@ -372,6 +447,7 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
                 state.mediaSettings.removeValue(forKey: key)
             }
             state.mediaVersions[key] = version
+            return true
         }
         return disposition
     }
@@ -406,19 +482,8 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
 
     public func setVolume(_ volume: Double) {
         mutatePreferences {
-            $0.preferences = PlaybackPreferences(
-                volume: volume,
-                isMuted: $0.preferences.isMuted,
-                playbackSpeed: $0.preferences.playbackSpeed,
-                isSidebarVisible: $0.preferences.isSidebarVisible,
-                repeatMode: $0.preferences.repeatMode,
-                isShuffleEnabled: $0.preferences.isShuffleEnabled,
-                hardwareDecodingPolicy: $0.preferences.hardwareDecodingPolicy,
-                preferredAudioOutputDeviceID:
-                    $0.preferences.preferredAudioOutputDeviceID,
-                subtitleFallbackEncoding: $0.preferences.subtitleFallbackEncoding,
-                trackSelection: $0.preferences.trackSelection
-            )
+            $0.preferences.volume = volume
+            $0.preferences = $0.preferences.sanitized()
         }
     }
 
@@ -436,19 +501,8 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
 
     public func setPlaybackSpeed(_ playbackSpeed: Double) {
         mutatePreferences {
-            $0.preferences = PlaybackPreferences(
-                volume: $0.preferences.volume,
-                isMuted: $0.preferences.isMuted,
-                playbackSpeed: playbackSpeed,
-                isSidebarVisible: $0.preferences.isSidebarVisible,
-                repeatMode: $0.preferences.repeatMode,
-                isShuffleEnabled: $0.preferences.isShuffleEnabled,
-                hardwareDecodingPolicy: $0.preferences.hardwareDecodingPolicy,
-                preferredAudioOutputDeviceID:
-                    $0.preferences.preferredAudioOutputDeviceID,
-                subtitleFallbackEncoding: $0.preferences.subtitleFallbackEncoding,
-                trackSelection: $0.preferences.trackSelection
-            )
+            $0.preferences.playbackSpeed = playbackSpeed
+            $0.preferences = $0.preferences.sanitized()
         }
     }
 
@@ -529,20 +583,37 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
     }
 
     private func mutate(allowWhenHistoryDisabled: Bool = false, allowUnreadableReset: Bool = false, _ body: (inout StoredState) -> Void) {
+        mutateIfChanged(allowWhenHistoryDisabled: allowWhenHistoryDisabled,
+                        allowUnreadableReset: allowUnreadableReset) {
+            body(&$0)
+            return true
+        }
+    }
+
+    /// Callers compare only the affected fields, never the complete history.
+    /// Bulk clears intentionally remain unconditional (including unreadable reset).
+    private func mutateIfChanged(allowWhenHistoryDisabled: Bool = false, allowUnreadableReset: Bool = false,
+                                 _ body: (inout StoredState) -> Bool) {
+        let interval = NonDecodePerformance.begin("HistoryMutation")
         lock.lock()
-        defer { lock.unlock() }
+        defer { lock.unlock(); NonDecodePerformance.end(interval) }
 
         guard !historyReadFailed || allowUnreadableReset else { return }
         guard allowWhenHistoryDisabled || state.preferences.remembersPlaybackHistory else { return }
         if allowUnreadableReset { historyReadFailed = false }
-        body(&state)
-        historyWriter.submit(state)
+        guard body(&state) || historyWriteStatus.needsRetry else { return }
+        // Snapshot capture and serialization retain the v2 lock/lifetime contract.
+        historyWriter.submitSnapshot { [self] in
+            NonDecodePerformance.measure("HistorySnapshot") { withLock { $0 } }
+        }
     }
 
     private func mutatePreferences(_ body: (inout StoredState) -> Void) {
         lock.lock()
         defer { lock.unlock() }
+        let previous = state.preferences
         body(&state)
+        guard previous != state.preferences || preferencesWriteStatus.needsRetry else { return }
         preferencesWriter.submit(state.preferences)
     }
 }

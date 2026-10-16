@@ -122,39 +122,51 @@ public enum ThumbnailPolicy {
     public static func ranked(_ candidates: [Candidate], current: URL?, folder: URL?,
                               now: Date, preferences: ThumbnailPreferences, maximumCount: Int? = nil) -> [URL] {
         let settings = preferences.bounded
+        let limit = max(0, maximumCount ?? settings.videosPerPass)
+        guard limit > 0, !candidates.isEmpty else { return [] }
         let current = current?.standardizedFileURL
         let folderPath = folder?.standardizedFileURL.path
         let horizon = Double(settings.recencyDays) * 86400
+        let locationWeight: Double = settings.priority == .nearby ? 3 : 1
+        let recencyWeight: Double = settings.priority == .recent ? 3 : 1
+        // Both bounded settings and Candidate.init already standardize their
+        // paths. Do not rebuild/standardize every exclusion URL per candidate.
+        // Keep component boundaries: /Movies must not exclude /Movies2.
+        let exclusions = settings.excludedFolderPaths.map { (root: $0, prefix: $0 + "/") }
+        if exclusions.contains(where: { $0.root == "/" }) { return [] }
         var seen = Set<URL>()
-        let eligible = candidates.filter { item in
-            guard item.url.isFileURL, !settings.excludesBackgroundGeneration(for: item.url),
-                  seen.insert(item.url).inserted else { return false }
-            return item.url == current || item.isVisible || item.neighborDistance != nil
-                || item.url.deletingLastPathComponent().path == folderPath
-                || item.lastUsed.map { now.timeIntervalSince($0) <= horizon } == true
+        var scored: [(offset: Int, url: URL, score: Double)] = []
+        for item in candidates {
+            guard item.url.isFileURL else { continue }
+            if !exclusions.isEmpty {
+                let path = item.url.path
+                if exclusions.contains(where: { path == $0.root || path.hasPrefix($0.prefix) }) { continue }
+            }
+            // Preserve first-occurrence semantics even if it is not eligible.
+            guard seen.insert(item.url).inserted else { continue }
+            let isCurrent = item.url == current
+            let isLocal = item.url.deletingLastPathComponent().path == folderPath
+            guard isCurrent || item.isVisible || item.neighborDistance != nil || isLocal
+                    || item.lastUsed.map({ now.timeIntervalSince($0) <= horizon }) == true else { continue }
+            let score: Double
+            if isCurrent {
+                score = 10000
+            } else {
+                let age = max(0, item.lastUsed.map { now.timeIntervalSince($0) } ?? horizon)
+                let recency = max(0, 1 - age / horizon)
+                let locality = isLocal ? 1.0 : 0.0
+                let neighbor = item.neighborDistance.map { 1 / (1 + Double(max(0, $0))) } ?? 0
+                score = (item.isVisible ? 1000 : 0) + 100 * (locationWeight * (locality + neighbor) + recencyWeight * recency)
+            }
+            scored.append((offset: scored.count, url: item.url, score: score))
         }
-        func score(_ item: Candidate) -> Double {
-            // Hard foreground/current/viewport tiers cannot be overwhelmed by history.
-            if item.url == current { return 10000 }
-            let locationWeight: Double = settings.priority == .nearby ? 3 : 1
-            let recencyWeight: Double = settings.priority == .recent ? 3 : 1
-            let age = max(0, item.lastUsed.map { now.timeIntervalSince($0) } ?? horizon)
-            let recency = max(0, 1 - age / horizon)
-            let locality = item.url.deletingLastPathComponent().path == folderPath ? 1.0 : 0.0
-            let neighbor = item.neighborDistance.map { 1 / (1 + Double(max(0, $0))) } ?? 0
-            return (item.isVisible ? 1000 : 0) + 100 * (locationWeight * (locality + neighbor) + recencyWeight * recency)
-        }
-        let scored: [(offset: Int, url: URL, score: Double)] = eligible.enumerated().map {
-            (offset: $0.offset, url: $0.element.url, score: score($0.element))
-        }
-        let ordered = scored.sorted { left, right in
+        scored.sort { left, right in
             if left.score == right.score { return left.offset < right.offset }
             return left.score > right.score
         }
-        // A scheduler may rank its entire bounded candidate pool before applying
-        // a persistent pass cursor. Truncating first would starve everything below
-        // the same high-priority prefix on every pass.
-        return ordered.prefix(max(0, maximumCount ?? settings.videosPerPass)).map { $0.url }
+        // Rank the entire pool before applying the requested limit. The
+        // scheduler needs this ordering for its starvation-free pass cursor.
+        return scored.prefix(limit).map { $0.url }
     }
 
     /// After every video has its first image, keep a bounded visit on each file

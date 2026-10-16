@@ -1,0 +1,172 @@
+{
+  "formal-history": {
+    "observations": 130,
+    "duplicates": 0
+  },
+  "formal-inventory": {
+    "observations": 70,
+    "duplicates": 0
+  },
+  "formal-history-allocations": {
+    "observations": 24,
+    "duplicates": 0
+  },
+  "formal-inventory-allocations": {
+    "observations": 12,
+    "duplicates": 0
+  },
+  "sqlite-experiment": {
+    "observations": 18,
+    "duplicates": 0
+  },
+  "new_timing_allocation_observations": 254,
+  "actual_core_xctest": {
+    "cases": 26,
+    "new_cases": 14,
+    "configurations": [
+      "release",
+      "debug"
+    ],
+    "failures": 0
+  },
+  "mailbox_xctest": {
+    "cases": 5,
+    "failures": 0,
+    "reserve_eviction_races": 5000
+  },
+  "inventory_assertions": [
+    {
+      "checks": 9,
+      "directory_survived_clear": false,
+      "image_codecs_executed": false,
+      "initial_entries": 4,
+      "late_clear_success": true,
+      "late_directory_survived_clear": false,
+      "symlink_survived_clear": false,
+      "variant": "v2"
+    },
+    {
+      "checks": 2319,
+      "directory_survived_clear": true,
+      "image_codecs_executed": false,
+      "initial_entries": 1,
+      "late_clear_success": false,
+      "late_directory_survived_clear": true,
+      "symlink_survived_clear": true,
+      "variant": "v3"
+    }
+  ],
+  "preview_adapter_checks": [
+    {
+      "preview_integration_checks": 5,
+      "image_adapter": "test-only non-JPEG",
+      "filesystem": "real Foundation",
+      "variant": "baseline"
+    },
+    {
+      "preview_integration_checks": 196,
+      "image_adapter": "test-only non-JPEG",
+      "filesystem": "real Foundation",
+      "variant": "candidate"
+    }
+  ],
+  "original_regressions": {
+    "policy": {
+      "test": "ranking_differential",
+      "checks": 4218,
+      "passed": true
+    },
+    "cache": {
+      "checks": {
+        "baseline": 1598,
+        "candidate": 1868
+      },
+      "identical_differential_trace_rows": 1960,
+      "trace_sha256": "d523ca6aa0e04500355c6b442e780e16e1513fd5ae07fd24f5145f46a29486bf",
+      "passed": true,
+      "scope": "Exact cache actor body with platform doubles, NOT macOS integration"
+    }
+  },
+  "store_differential": {
+    "operations_per_variant": 10000,
+    "equal_reload_receipts": 200,
+    "effective_state_sha256": "80b02b7e57412d716afd7bbf8c7b8d0df116d49accc9d30ba48e7e702b075134",
+    "embedded_history_preferences": "replaced by authoritative reloaded preferences for comparison"
+  },
+  "sqlite_logical_tests": {
+    "checks": 123,
+    "mixed_updates": 10000,
+    "matching_receipts": 100,
+    "process_kill_cases": [
+      {
+        "commit": false,
+        "attempt": 0,
+        "recovered_position": 0.0,
+        "integrity": "ok"
+      },
+      {
+        "commit": false,
+        "attempt": 1,
+        "recovered_position": 0.0,
+        "integrity": "ok"
+      },
+      {
+        "commit": false,
+        "attempt": 2,
+        "recovered_position": 0.0,
+        "integrity": "ok"
+      },
+      {
+        "commit": false,
+        "attempt": 3,
+        "recovered_position": 0.0,
+        "integrity": "ok"
+      },
+      {
+        "commit": false,
+        "attempt": 4,
+        "recovered_position": 0.0,
+        "integrity": "ok"
+      },
+      {
+        "commit": true,
+        "attempt": 0,
+        "recovered_position": 777.0,
+        "integrity": "ok"
+      },
+      {
+        "commit": true,
+        "attempt": 1,
+        "recovered_position": 777.0,
+        "integrity": "ok"
+      },
+      {
+        "commit": true,
+        "attempt": 2,
+        "recovered_position": 777.0,
+        "integrity": "ok"
+      },
+      {
+        "commit": true,
+        "attempt": 3,
+        "recovered_position": 777.0,
+        "integrity": "ok"
+      },
+      {
+        "commit": true,
+        "attempt": 4,
+        "recovered_position": 777.0,
+        "integrity": "ok"
+      }
+    ],
+    "power_loss_test": false,
+    "feature_complete": false
+  },
+  "native_tests": {
+    "new_cases": 5,
+    "syntax_parse_only": true,
+    "macos_sdk_typecheck": false,
+    "executed": false
+  },
+  "native_app_qualification": false
+}

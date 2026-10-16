@@ -1,0 +1,59 @@
+{
+  "repository": "Jagalite/illiquid",
+  "baseline_commit": "854f8365750a0e4f046ab7015e01ca7a138ada40",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "swift": "Swift version 6.2.1 (swift-6.2.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "compiler_flags": [
+    "-O",
+    "-swift-version",
+    "6",
+    "-warnings-as-errors"
+  ],
+  "repeats": 7,
+  "cache_test_scope": "Exact cache actor body with platform doubles, NOT macOS integration",
+  "instrumentation": "Production signposts disabled in standalone executables",
+  "source_hashes": {
+    "/mnt/data/illiquid-performance/baseline/Sources/IlliquidCore/Player/ThumbnailPolicy.swift": {
+      "sha256": "429147d492a489eeb6dc5c9baa6e0f2f95db2581f30ea9a4468399bb6bb503ce",
+      "git_blob": "e06088b51837491b6ff5975469453f34205020d8"
+    },
+    "/mnt/data/illiquid-performance/baseline/Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift": {
+      "sha256": "bff532b4b401744790d644f2e088b031575a8a6d53d9cd179eb9d9668ab611ff",
+      "git_blob": "c97deee800b964e44ac02aaceb2ecd590770e41b"
+    },
+    "/mnt/data/illiquid-performance/candidate/Sources/IlliquidCore/Player/ThumbnailPolicy.swift": {
+      "sha256": "1c68b9d4819cc9e9d4a8f3dfe2e6e723e69dd0330e7fa63e389eb76c107986d3",
+      "git_blob": "cf3b96706f34ba5c43041d650f4c9f6217e340cc"
+    },
+    "/mnt/data/illiquid-performance/candidate/Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift": {
+      "sha256": "c759469fe1bfe1b2214599a0aa51fd0236c8dfae502dc0ed84df547f6d54378c",
+      "git_blob": "af1da3bbb0f0db8ae1f5e7e733e9bc887c535e95"
+    },
+    "/mnt/data/illiquid-performance/candidate/Sources/IlliquidCore/Utilities/NonDecodePerformance.swift": {
+      "sha256": "bfd9da2dceb58d79638d678f68475907bb961a91f6b924dd6b8adc42460995ef",
+      "git_blob": "27410229ce45b5400a964c8b7a93dc3e83887686"
+    },
+    "/mnt/data/illiquid-performance/tools/PolicyHarness.swift": {
+      "sha256": "344f0a564aeee105879d399e7a733888d980c43e0435c9fe5976571fbbd8c7d1",
+      "git_blob": "06c289a901210021c089599c8fa3850abb117214"
+    },
+    "/mnt/data/illiquid-performance/tools/CacheStubs.swift": {
+      "sha256": "2c06e9f8364831466af4c6dd6d4f0065d5d4ca9e2a0427fa619449c090f2c4cf",
+      "git_blob": "b2bba1b1471a4f8f09e55dbfdc93bba9fa47e583"
+    },
+    "/mnt/data/illiquid-performance/tools/CacheHarness.swift": {
+      "sha256": "7526065802b6be1ed44e1b5da9e052da86e9b12a19f2a004408f5ac2faf29908",
+      "git_blob": "9d6c897400c1010c8aba0583de5eab4f7496bcf7"
+    },
+    "/mnt/data/illiquid-performance/tools/run.py": {
+      "sha256": "760f78e2a790f6e60febd1fb9cca5459ccd187bdc7667bdeaacccdd9bbb24a5c",
+      "git_blob": "da8f68b4b835cd276d158b8d906fa0099685a871"
+    },
+    "/mnt/data/illiquid-performance/tools/allocmeter.c": {
+      "sha256": "b3ef266d628e2f8c2d474a804de16c090f7503d7f6fc72b4fef42a3998cb4acc",
+      "git_blob": "740bf119f015810c4e63d856d49c3f50e76409b7"
+    }
+  }
+}

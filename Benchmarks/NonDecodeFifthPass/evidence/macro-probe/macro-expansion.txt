@@ -1,0 +1,101 @@
+warning: save unknown driver flag -dump-macro-expansions as additional swift-frontend flag
+@__swiftmacro_5probe5Model10ObservablefMm_.swift
+------------------------------
+@ObservationIgnored private let _$observationRegistrar = Observation.ObservationRegistrar()
+
+internal nonisolated func access<$s5probe5Model10ObservablefMm_6MemberfMu_>(
+  keyPath: KeyPath<Model, $s5probe5Model10ObservablefMm_6MemberfMu_>
+) {
+  _$observationRegistrar.access(self, keyPath: keyPath)
+}
+
+internal nonisolated func withMutation<$s5probe5Model10ObservablefMm_6MemberfMu0_, $s5probe5Model10ObservablefMm_14MutationResultfMu_>(
+  keyPath: KeyPath<Model, $s5probe5Model10ObservablefMm_6MemberfMu0_>,
+  _ mutation: () throws -> $s5probe5Model10ObservablefMm_14MutationResultfMu_
+) rethrows -> $s5probe5Model10ObservablefMm_14MutationResultfMu_ {
+  try _$observationRegistrar.withMutation(of: self, keyPath: keyPath, mutation)
+}
+
+private nonisolated func shouldNotifyObservers<$s5probe5Model10ObservablefMm_6MemberfMu1_>(_ lhs: $s5probe5Model10ObservablefMm_6MemberfMu1_, _ rhs: $s5probe5Model10ObservablefMm_6MemberfMu1_) -> Bool {
+    true
+}
+
+private nonisolated func shouldNotifyObservers<$s5probe5Model10ObservablefMm_6MemberfMu2_: Equatable>(_ lhs: $s5probe5Model10ObservablefMm_6MemberfMu2_, _ rhs: $s5probe5Model10ObservablefMm_6MemberfMu2_) -> Bool {
+    lhs != rhs
+}
+
+private nonisolated func shouldNotifyObservers<$s5probe5Model10ObservablefMm_6MemberfMu3_: AnyObject>(_ lhs: $s5probe5Model10ObservablefMm_6MemberfMu3_, _ rhs: $s5probe5Model10ObservablefMm_6MemberfMu3_) -> Bool {
+    lhs !== rhs
+}
+
+private nonisolated func shouldNotifyObservers<$s5probe5Model10ObservablefMm_6MemberfMu4_: Equatable & AnyObject>(_ lhs: $s5probe5Model10ObservablefMm_6MemberfMu4_, _ rhs: $s5probe5Model10ObservablefMm_6MemberfMu4_) -> Bool {
+    lhs != rhs
+}
+------------------------------
+@__swiftmacro_5probe5ModelC5value10ObservablefMr_.swift
+------------------------------
+@ObservationTracked
+------------------------------
+@__swiftmacro_5probe5ModelC5value18ObservationTrackedfMp_.swift
+------------------------------
+@ObservationIgnored private  var _value: Int = 0 {
+    didSet {
+        callbacks += 1
+    }
+}
+------------------------------
+@__swiftmacro_5probe5ModelC9callbacks10ObservablefMr1_.swift
+------------------------------
+
+------------------------------
+@__swiftmacro_5probe5ModelC5value18ObservationTrackedfMa_.swift
+------------------------------
+@storageRestrictions(initializes: _value)
+init(initialValue) {
+  _value = initialValue
+}
+
+get {
+  access(keyPath: \.value)
+  return _value
+}
+
+set {
+  guard shouldNotifyObservers(_value, newValue) else {
+    _value = newValue
+    return
+  }
+  withMutation(keyPath: \.value) {
+    _value = newValue
+  }
+}
+
+_modify {
+  access(keyPath: \.value)
+  _$observationRegistrar.willSet(self, keyPath: \.value)
+  defer {
+      _$observationRegistrar.didSet(self, keyPath: \.value)
+  }
+  yield &_value
+}
+------------------------------
+@__swiftmacro_5probe5ModelC6_value33_CFDFC9648645A210A03D88ED230D3DEELL18ObservationIgnoredfMa_.swift
+------------------------------
+
+------------------------------
+@__swiftmacro_5probe5Model10ObservablefMe_.swift
+------------------------------
+extension Model: nonisolated Observation.Observable {
+}
+------------------------------
+@__swiftmacro_5probe5ModelC9callbacks18ObservationIgnoredfMa_.swift
+------------------------------
+
+------------------------------
+@__swiftmacro_5probe5ModelC22_$observationRegistrar33_CFDFC9648645A210A03D88ED230D3DEELL18ObservationIgnoredfMa_.swift
+------------------------------
+
+------------------------------
+error: link command failed with exit code 1 (use -v to see invocation)
+/usr/bin/ld: /usr/local/swift/usr/lib/swift/linux/libswiftObservation.so: undefined reference to `swift::threading::fatal(char const*, ...)'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)

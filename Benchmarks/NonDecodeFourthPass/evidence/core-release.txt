@@ -1,0 +1,86 @@
+Test Suite 'All tests' started at 2026-10-16 05:01:39.986
+Test Suite 'release.xctest' started at 2026-10-16 05:01:39.991
+Test Suite 'DeferredHistoryStoreTests' started at 2026-10-16 05:01:39.991
+Test Case 'DeferredHistoryStoreTests.testClearAfterPendingUpdatesDoesNotResurrectHistory' started at 2026-10-16 05:01:39.991
+Test Case 'DeferredHistoryStoreTests.testClearAfterPendingUpdatesDoesNotResurrectHistory' passed (0.005 seconds)
+Test Case 'DeferredHistoryStoreTests.testCompletionAndContentReplacementHistoryArePreserved' started at 2026-10-16 05:01:39.996
+Test Case 'DeferredHistoryStoreTests.testCompletionAndContentReplacementHistoryArePreserved' passed (0.002 seconds)
+Test Case 'DeferredHistoryStoreTests.testHistoryDisabledAndExplicitClearKeepExistingSemantics' started at 2026-10-16 05:01:39.998
+Test Case 'DeferredHistoryStoreTests.testHistoryDisabledAndExplicitClearKeepExistingSemantics' passed (0.001 seconds)
+Test Case 'DeferredHistoryStoreTests.testLatestProgressAndSettingsReloadThroughRealJSON' started at 2026-10-16 05:01:40.000
+Test Case 'DeferredHistoryStoreTests.testLatestProgressAndSettingsReloadThroughRealJSON' passed (0.004 seconds)
+Test Case 'DeferredHistoryStoreTests.testStoreRemainsAliveUntilItsDelayedSnapshotHasBeenWritten' started at 2026-10-16 05:01:40.004
+Test Case 'DeferredHistoryStoreTests.testStoreRemainsAliveUntilItsDelayedSnapshotHasBeenWritten' passed (0.103 seconds)
+Test Case 'DeferredHistoryStoreTests.testUnreadableHistoryCannotBeOverwrittenWithoutExplicitReset' started at 2026-10-16 05:01:40.107
+Test Case 'DeferredHistoryStoreTests.testUnreadableHistoryCannotBeOverwrittenWithoutExplicitReset' passed (0.001 seconds)
+Test Suite 'DeferredHistoryStoreTests' passed at 2026-10-16 05:01:40.108
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.117 (0.117) seconds
+Test Suite 'DeferredPersistenceWriterTests' started at 2026-10-16 05:01:40.108
+Test Case 'DeferredPersistenceWriterTests.testAsyncFlushRunsFactoryAndReturnsErrors' started at 2026-10-16 05:01:40.108
+Test Case 'DeferredPersistenceWriterTests.testAsyncFlushRunsFactoryAndReturnsErrors' passed (0.001 seconds)
+Test Case 'DeferredPersistenceWriterTests.testBlockedWriterRetainsImmutableSnapshotAndFlushWaitsForLatest' started at 2026-10-16 05:01:40.109
+Test Case 'DeferredPersistenceWriterTests.testBlockedWriterRetainsImmutableSnapshotAndFlushWaitsForLatest' passed (0.021 seconds)
+Test Case 'DeferredPersistenceWriterTests.testConcurrentSubmissionsAndFlushesPreserveFinalMarker' started at 2026-10-16 05:01:40.130
+Test Case 'DeferredPersistenceWriterTests.testConcurrentSubmissionsAndFlushesPreserveFinalMarker' passed (0.002 seconds)
+Test Case 'DeferredPersistenceWriterTests.testFactoryDoesNotHoldWriterLockAndNewSubmissionIsNotLost' started at 2026-10-16 05:01:40.132
+Test Case 'DeferredPersistenceWriterTests.testFactoryDoesNotHoldWriterLockAndNewSubmissionIsNotLost' passed (0.0 seconds)
+Test Case 'DeferredPersistenceWriterTests.testFailureIsReportedAndLaterSuccessRecovers' started at 2026-10-16 05:01:40.132
+Test Case 'DeferredPersistenceWriterTests.testFailureIsReportedAndLaterSuccessRecovers' passed (0.0 seconds)
+Test Case 'DeferredPersistenceWriterTests.testOnlyNewestFactoryIsCapturedAndEagerSubmissionStillWorks' started at 2026-10-16 05:01:40.132
+Test Case 'DeferredPersistenceWriterTests.testOnlyNewestFactoryIsCapturedAndEagerSubmissionStillWorks' passed (0.101 seconds)
+Test Suite 'DeferredPersistenceWriterTests' passed at 2026-10-16 05:01:40.233
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.125 (0.125) seconds
+Test Suite 'IdempotentPersistenceTests' started at 2026-10-16 05:01:40.233
+Test Case 'IdempotentPersistenceTests.testChangeDuringInFlightWriteIsSaved' started at 2026-10-16 05:01:40.233
+Test Case 'IdempotentPersistenceTests.testChangeDuringInFlightWriteIsSaved' passed (0.102 seconds)
+Test Case 'IdempotentPersistenceTests.testChangingDurationIsNotSkippedAndRechecksCompletion' started at 2026-10-16 05:01:40.335
+Test Case 'IdempotentPersistenceTests.testChangingDurationIsNotSkippedAndRechecksCompletion' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testCompletionThresholdAndStickyRewatchArePreserved' started at 2026-10-16 05:01:40.336
+Test Case 'IdempotentPersistenceTests.testCompletionThresholdAndStickyRewatchArePreserved' passed (0.101 seconds)
+Test Case 'IdempotentPersistenceTests.testConcurrentDistinctChangesAndDuplicatesSurviveReload' started at 2026-10-16 05:01:40.437
+Test Case 'IdempotentPersistenceTests.testConcurrentDistinctChangesAndDuplicatesSurviveReload' passed (0.009 seconds)
+Test Case 'IdempotentPersistenceTests.testEncodingFailureIsNotHiddenAndValidMutationRecovers' started at 2026-10-16 05:01:40.446
+Test Case 'IdempotentPersistenceTests.testEncodingFailureIsNotHiddenAndValidMutationRecovers' passed (0.002 seconds)
+Test Case 'IdempotentPersistenceTests.testInvalidInputDoesNotWrite' started at 2026-10-16 05:01:40.448
+Test Case 'IdempotentPersistenceTests.testInvalidInputDoesNotWrite' passed (0.0 seconds)
+Test Case 'IdempotentPersistenceTests.testNilSettingsAndTargetsNoOpsButRealDeletionPersists' started at 2026-10-16 05:01:40.448
+Test Case 'IdempotentPersistenceTests.testNilSettingsAndTargetsNoOpsButRealDeletionPersists' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testNoOpDuringInFlightWriteDoesNotCreateSecondWrite' started at 2026-10-16 05:01:40.450
+Test Case 'IdempotentPersistenceTests.testNoOpDuringInFlightWriteDoesNotCreateSecondWrite' passed (0.102 seconds)
+Test Case 'IdempotentPersistenceTests.testPreferenceNoOpsAndSanitization' started at 2026-10-16 05:01:40.551
+Test Case 'IdempotentPersistenceTests.testPreferenceNoOpsAndSanitization' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testRepeatedPositionAndMissingRemovalAreNoOps' started at 2026-10-16 05:01:40.552
+Test Case 'IdempotentPersistenceTests.testRepeatedPositionAndMissingRemovalAreNoOps' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testRepeatedProgressDoesNotWriteButNewProgressDoes' started at 2026-10-16 05:01:40.553
+Test Case 'IdempotentPersistenceTests.testRepeatedProgressDoesNotWriteButNewProgressDoes' passed (0.002 seconds)
+Test Case 'IdempotentPersistenceTests.testSettingsVersionAndRestoreTargetNoOps' started at 2026-10-16 05:01:40.554
+Test Case 'IdempotentPersistenceTests.testSettingsVersionAndRestoreTargetNoOps' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testUnreadableHistoryStillRequiresExplicitClear' started at 2026-10-16 05:01:40.556
+Test Case 'IdempotentPersistenceTests.testUnreadableHistoryStillRequiresExplicitClear' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testVolumeAndSpeedPreserveHistoryOptOutAndRestorePreference' started at 2026-10-16 05:01:40.557
+Test Case 'IdempotentPersistenceTests.testVolumeAndSpeedPreserveHistoryOptOutAndRestorePreference' passed (0.001 seconds)
+Test Suite 'IdempotentPersistenceTests' passed at 2026-10-16 05:01:40.558
+	 Executed 14 tests, with 0 failures (0 unexpected) in 0.325 (0.325) seconds
+Test Suite 'release.xctest' passed at 2026-10-16 05:01:40.558
+	 Executed 26 tests, with 0 failures (0 unexpected) in 0.566 (0.566) seconds
+Test Suite 'All tests' passed at 2026-10-16 05:01:40.558
+	 Executed 26 tests, with 0 failures (0 unexpected) in 0.566 (0.566) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.2.1 (c9d57c83568b06d)
+↳ Target Platform: x86_64-unknown-linux-gnu
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+
+Building for production...
+[0/9] Write sources
+[2/9] Write swift-version--1BA0962812E73E12.txt
+[4/10] Compiling IlliquidCore CoalescingPersistenceWriter.swift
+[5/11] Compiling IlliquidCoreTests DeferredPersistenceTests.swift
+[5/11] /tmp/illiquid-core-tests-7df6nz4j/.build/x86_64-unknown-linux-gnu/release/IlliquidPersistenceTestsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/11] Write sources
+[8/12] Compiling IlliquidPersistenceTestsPackageDiscoveredTests IlliquidCoreTests.swift
+[8/12] /tmp/illiquid-core-tests-7df6nz4j/.build/x86_64-unknown-linux-gnu/release/IlliquidPersistenceTestsPackageTests.derived/runner.swift
+[9/12] Write sources
+[11/13] Compiling IlliquidPersistenceTestsPackageTests runner.swift
+[11/13] Write Objects.LinkFileList
+[12/13] Linking IlliquidPersistenceTestsPackageTests.xctest
+Build complete! (18.52s)
