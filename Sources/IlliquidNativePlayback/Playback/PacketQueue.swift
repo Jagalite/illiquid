@@ -57,6 +57,7 @@ final class BoundedQueue<Element>: @unchecked Sendable {
     private var producerWaitCount = 0
     private var producerWaitSeconds = 0.0
     private var capacityChangeHandler: (@Sendable () -> Void)?
+    private var blockedProducerObservers = 0
 
     init(
         capacity: Int,
@@ -106,8 +107,8 @@ final class BoundedQueue<Element>: @unchecked Sendable {
         defer { condition.unlock() }
         let arrivalRevision = invalidationRevision
 
-        while arrivalRevision == invalidationRevision,
-              wouldExceedBudget(adding: elementCost), !storage.isEmpty, !closed {
+        while wouldExceedBudget(adding: elementCost), !storage.isEmpty, !closed,
+              arrivalRevision == invalidationRevision {
             waitingProducerCount += 1
             peakWaitingProducerCount = max(
                 peakWaitingProducerCount,
@@ -115,14 +116,15 @@ final class BoundedQueue<Element>: @unchecked Sendable {
             )
             producerWaitCount += 1
             let waitStarted = ProcessInfo.processInfo.systemUptime
-            condition.broadcast()
+            // Diagnostic observers need a transition notification; other blocked
+            // producers must not wake each other without a capacity change.
+            if blockedProducerObservers > 0 { condition.broadcast() }
             condition.wait()
             producerWaitSeconds += max(
                 0,
                 ProcessInfo.processInfo.systemUptime - waitStarted
             )
             waitingProducerCount -= 1
-            condition.broadcast()
         }
         guard !closed, arrivalRevision == invalidationRevision else { return false }
         storage.append(Entry(element: element, cost: elementCost))
@@ -157,8 +159,8 @@ final class BoundedQueue<Element>: @unchecked Sendable {
         defer { condition.unlock() }
         let arrivalRevision = invalidationRevision
 
-        while arrivalRevision == invalidationRevision,
-              wouldExceedBudget(adding: elementCost), !storage.isEmpty, !closed {
+        while wouldExceedBudget(adding: elementCost), !storage.isEmpty, !closed,
+              arrivalRevision == invalidationRevision {
             waitingProducerCount += 1
             peakWaitingProducerCount = max(
                 peakWaitingProducerCount,
@@ -166,14 +168,15 @@ final class BoundedQueue<Element>: @unchecked Sendable {
             )
             producerWaitCount += 1
             let waitStarted = ProcessInfo.processInfo.systemUptime
-            condition.broadcast()
+            // Diagnostic observers need a transition notification; other blocked
+            // producers must not wake each other without a capacity change.
+            if blockedProducerObservers > 0 { condition.broadcast() }
             condition.wait()
             producerWaitSeconds += max(
                 0,
                 ProcessInfo.processInfo.systemUptime - waitStarted
             )
             waitingProducerCount -= 1
-            condition.broadcast()
         }
         guard !closed, arrivalRevision == invalidationRevision else { return false }
         storage.prepend(Entry(element: element, cost: elementCost))
@@ -219,7 +222,11 @@ final class BoundedQueue<Element>: @unchecked Sendable {
     /// queue-owned state instead of guessing the interleaving with a sleep.
     func waitForBlockedProducer(timeout: TimeInterval) -> Bool {
         condition.lock()
-        defer { condition.unlock() }
+        blockedProducerObservers += 1
+        defer {
+            blockedProducerObservers -= 1
+            condition.unlock()
+        }
         let deadline = Date().addingTimeInterval(timeout)
         while waitingProducerCount == 0, !closed {
             guard condition.wait(until: deadline) else { break }
