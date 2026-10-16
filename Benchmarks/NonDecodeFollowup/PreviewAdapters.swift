@@ -4,6 +4,8 @@
 import Foundation
 #if canImport(CryptoKit)
 import CryptoKit
+// Generated cache files omit platform imports, which are otherwise file-scoped.
+typealias SHA256 = CryptoKit.SHA256
 #else
 @_silgen_name("SHA256") private func opensslSHA256(_ data: UnsafeRawPointer?, _ count: Int, _ result: UnsafeMutablePointer<UInt8>) -> UnsafeMutablePointer<UInt8>?
 enum SHA256 {

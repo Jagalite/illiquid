@@ -19,9 +19,40 @@ jobs:
         run: |
           mkdir -p evidence
           git rev-parse HEAD > evidence/revision.txt
-          git archive --format=tar HEAD Sources Tests Scripts Documentation Validation Package.swift Package.resolved .github > evidence/source.tar
+          git archive --format=tar HEAD Sources Tests Scripts Documentation Validation Benchmarks Package.swift Package.resolved .github > evidence/source.tar
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: non-decoding-performance-source
           path: evidence/
+          retention-days: 7
+
+  component-regressions:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Run documented component regressions on macOS
+        run: |
+          evidence="$RUNNER_TEMP/non-decoding-regressions"
+          mkdir -p "$evidence"
+          python3 Benchmarks/NonDecodePerformance/run.py --tests-only --output "$evidence/policy-cache"
+          python3 Benchmarks/NonDecodeFollowup/test-core.py --output "$evidence/deferred-persistence.txt"
+          python3 Benchmarks/NonDecodeThirdPass/test-core.py --output "$evidence/persistence.txt"
+          python3 Benchmarks/NonDecodeFollowup/test-mailbox.py --output "$evidence/mailbox.txt"
+          python3 Benchmarks/NonDecodeFollowup/test-differential.py --output "$evidence/history-differential"
+          python3 Benchmarks/NonDecodeFollowup/run-preview.py --tests-only --output "$evidence/preview"
+          python3 Benchmarks/NonDecodeThirdPass/run-inventory.py --tests-only --output "$evidence/inventory"
+          python3 Benchmarks/NonDecodeFourthPass/build.py --output "$evidence/physical-build"
+          python3 Benchmarks/NonDecodeFourthPass/run.py --build-root "$evidence/physical-build" --skip-build --tests-only --output "$evidence/physical-tests"
+          python3 Benchmarks/NonDecodeFifthPass/run.py --tests-only --output "$evidence/state-release"
+          python3 Benchmarks/NonDecodeFifthPass/run.py --tests-only --configuration debug --output "$evidence/state-debug"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: non-decoding-component-regressions
+          path: ${{ runner.temp }}/non-decoding-regressions/
           retention-days: 7

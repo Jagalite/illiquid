@@ -215,7 +215,8 @@ final class DeferredHistoryStoreTests: XCTestCase {
     func testStoreRemainsAliveUntilItsDelayedSnapshotHasBeenWritten() {
         withStore { _, defaults in
             var owner: PlaybackPersistenceStore? = PlaybackPersistenceStore(userDefaults: defaults, namespace: "Lifetime")
-            weak var weakOwner = owner
+            weak var weakOwner: PlaybackPersistenceStore?
+            weakOwner = owner
             owner?.setPlaybackPosition(55, for: url)
             owner = nil
             let deadline = Date().addingTimeInterval(5)

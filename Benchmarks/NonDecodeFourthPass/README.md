@@ -8,7 +8,7 @@ Read `Documentation/NONDECODING_PERFORMANCE_FOURTH_PASS.md`. This is a selected-
 * `accounting`: physical-filename accounting and preferred/fallback aliases, still inventory-first. An intermediate ablation fixture, not the final shipping source.
 * `v4`: the current candidate, including exact-name lookup before inventory and failure fallback.
 
-The active production change is in `Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift`. The eight native counterpart tests are in `Tests/IlliquidNativePlaybackTests/ThumbnailPhysicalEntryTests.swift`.
+The active production change is in `Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift`. The eleven native counterpart tests are in `Tests/IlliquidNativePlaybackTests/ThumbnailPhysicalEntryTests.swift`. They include queued foreground protection during cold inventory, reconciliation of deferred budgets, and disabling the disk cache with reservations pending.
 
 ## Requirements and running
 
@@ -58,7 +58,9 @@ python3 Benchmarks/NonDecodeThirdPass/test-core.py --configuration release --out
 
 The two older adapter runners now detect the extracted image-codec helper, leaving the candidate's actual `image(for:)` control flow intact. Their historical variant directory names remain unchanged; source hashes, not the old `v3` label in the inventory runner, identify the current candidate. Older numerical receipts are immutable historical data, not reruns of v4.
 
-## Native gates (not executed here)
+## Native and CI qualification
+
+The `component-regressions` job in `.github/workflows/non-decoding-performance.yml` runs the documented correctness runners on macOS. The native lifecycle job in `.github/workflows/restoration-regressions.yml` executes the new XCTest and Swift Testing suites with the actual SDK and ImageIO. The source receipt includes `Benchmarks/` so those runners are archived alongside their production inputs. Historical timing/allocation receipts remain unchanged and describe their recorded source hashes, not subsequent review fixes.
 
 ```sh
 swift test -c release --filter ThumbnailPhysicalEntryTests
@@ -66,4 +68,4 @@ swift test -c release --filter 'NativeThumbnailCacheTests|ThumbnailInventoryRegr
 # Then build the full app and run the repository's broader app/native/core tests.
 ```
 
-Use a separate benchmark bundle and production-equivalent decoder/presentation policy for app traces. Existing signposts include `ThumbnailDiskRead` and `ThumbnailDiskInventory`; the new `ThumbnailExactDiskProbe` interval excludes image decode and records no media paths. Both existing explicit benchmark opt-ins and the isolated bundle identity remain required. Actual macOS typechecking, ImageIO decoding, APFS behavior, UI presentation, CPU/energy/physical footprint and cold-OS-cache results are outstanding.
+Use a separate benchmark bundle and production-equivalent decoder/presentation policy for app traces. Existing signposts include `ThumbnailDiskRead` and `ThumbnailDiskInventory`; the new `ThumbnailExactDiskProbe` interval excludes image decode and records no media paths. Both existing explicit benchmark opt-ins and the isolated bundle identity remain required. UI presentation, filesystem fault behavior, CPU/energy/physical footprint and cold-OS-cache performance remain separate qualification gates.

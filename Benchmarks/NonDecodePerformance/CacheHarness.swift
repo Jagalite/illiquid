@@ -94,7 +94,8 @@ func key(_ index: Int, path: String = "/movie.mkv") -> NativeThumbnailCache.Key 
         do {
             let cache = NativeThumbnailCache()
             var image: CGImage? = CGImage(bytesPerRow:1280,height:180)
-            weak var witness = image
+            weak var witness: CGImage?
+            witness = image
             await cache.insert(image!,for:key(0),background:false)
             image = nil
             precondition(witness != nil)

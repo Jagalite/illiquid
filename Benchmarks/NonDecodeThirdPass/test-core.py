@@ -15,7 +15,7 @@ with tempfile.TemporaryDirectory(prefix='illiquid-core-tests-') as d:
  for name in ['DeferredPersistenceTests.swift','IdempotentPersistenceTests.swift']: shutil.copy2(root/'Tests/IlliquidCoreTests'/name,tests/name)
  (work/'Package.swift').write_text('''// swift-tools-version: 6.1
 import PackageDescription
-let package = Package(name: "IlliquidPersistenceTests", targets: [
+let package = Package(name: "IlliquidPersistenceTests", platforms: [.macOS("26.0")], targets: [
  .target(name: "IlliquidCore"),
  .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])
 ])

@@ -25,6 +25,7 @@ actor NativeThumbnailDiskCache {
     private var files: [String: DiskEntry] = [:]
     private var loadedDisk = false
     private var diskBytes = 0
+    private var trimDeferredByPromotions = false
     private var generation: UInt64 = 0
     private nonisolated let promotions = ThumbnailPromotionMailbox()
     private let encode: @Sendable (CGImage) async -> Data?
@@ -150,6 +151,10 @@ actor NativeThumbnailDiskCache {
                 }
             }
             promotions.complete(request)
+            // Inventory may temporarily exceed its budget when every possible
+            // victim has a pending foreground claim. Reconcile as claims finish,
+            // before yielding or allowing a promotion flush to return.
+            if trimDeferredByPromotions { trimDisk(incoming: 0, background: false) }
             processed += 1
             if processed.isMultiple(of: 8) { await Task.yield() }
         }
@@ -275,6 +280,13 @@ actor NativeThumbnailDiskCache {
 
     private func trimDisk(incoming: Int, background: Bool) {
         let limit = preferences.diskMiB * 1024 * 1024
+        var skippedReservation = false
+        defer {
+            // Retry only an existing over-budget inventory, not an insertion
+            // that was rejected or an ordinary promotion at the entry limit.
+            trimDeferredByPromotions = skippedReservation
+                && (diskBytes > limit || files.count >= 8192)
+        }
         guard diskBytes + incoming > limit || files.count >= 8192 else { return }
         let victims = files.filter { !background || $0.value.background }.sorted {
             if $0.value.background != $1.value.background { return $0.value.background }
@@ -283,9 +295,15 @@ actor NativeThumbnailDiskCache {
         }
         for victim in victims {
             guard diskBytes + incoming > limit || files.count >= 8192 else { break }
-            if background {
+            // Initial inventory and reconfiguration also evict entries. Honor
+            // queued foreground claims on those paths, not just insertions.
+            // Explicitly disabling the disk cache must still remove everything.
+            if preferences.diskMiB > 0 {
                 let digest = String(decoding: victim.key.utf8.dropFirst(2).prefix(64), as: UTF8.self)
-                guard promotions.beginEviction(digest, epoch: generation) else { continue }
+                guard promotions.beginEviction(digest, epoch: generation) else {
+                    skippedReservation = true
+                    continue
+                }
                 let removed = removeDisk(victim.key)
                 promotions.endEviction(digest)
                 guard removed else { break }

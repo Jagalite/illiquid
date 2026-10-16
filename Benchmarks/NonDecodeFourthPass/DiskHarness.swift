@@ -198,7 +198,12 @@ struct CheckFailure: Error, CustomStringConvertible { let description: String }
             let root=try directory();defer{try? FileManager.default.removeItem(at:root)}
             let gate=EncodeGate();let cache=NativeThumbnailDiskCache(directory:root,encode:{image in await gate.wait();return image.encoded()})
             let task=Task{await cache.insert(CGImage(),for:key(10),background:true,epoch:0)}
-            _ = await Task.detached {gate.entered.wait(timeout:.now()+10)}.value
+            let entered = await withCheckedContinuation { continuation in
+                DispatchQueue.global().async {
+                    continuation.resume(returning: gate.entered.wait(timeout: .now() + 10) == .success)
+                }
+            }
+            try check(entered, "encoder entered before clear")
             try check(await cache.clear(epoch:1),"clear during encode")
             await gate.open();await task.value
             try check(await cache.bytes()==0 && (try physical(root).0)==0,"old encode cannot resurrect")

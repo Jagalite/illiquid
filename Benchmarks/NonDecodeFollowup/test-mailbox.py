@@ -10,7 +10,7 @@ with tempfile.TemporaryDirectory(prefix='illiquid-mailbox-tests-') as d:
  shutil.copy2(root/'Tests/IlliquidNativePlaybackTests/ThumbnailPromotionMailboxTests.swift',t/'ThumbnailPromotionMailboxTests.swift')
  (w/'Package.swift').write_text('''// swift-tools-version: 6.1
 import PackageDescription
-let package=Package(name:"MailboxTests",targets:[.target(name:"IlliquidNativePlayback"),.testTarget(name:"IlliquidNativePlaybackTests",dependencies:["IlliquidNativePlayback"])])
+let package=Package(name:"MailboxTests",platforms:[.macOS("26.0")],targets:[.target(name:"IlliquidNativePlayback"),.testTarget(name:"IlliquidNativePlaybackTests",dependencies:["IlliquidNativePlayback"])])
 ''')
  r=subprocess.run(['swift','test','--package-path',str(w),'-c','release','--jobs','2'],capture_output=True,text=True)
  text=r.stdout+'\n'+r.stderr
