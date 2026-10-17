@@ -26,7 +26,8 @@ SOURCES = [
     "PlexMatchHints.swift",
     "MediaSidecarReader.swift",
 ]
-TESTS = ["MediaSidecarTests.swift", "NFOMetadataFieldSelectionTests.swift"]
+TESTS = ["MediaSidecarTests.swift", "NFOMetadataFieldSelectionTests.swift",
+         "NFOEpisodeScopeRegressionTests.swift", "MediaNameRecognitionTests.swift"]
 MANIFEST = '''// swift-tools-version: 6.1
 import PackageDescription
 let package = Package(
