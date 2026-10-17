@@ -22,6 +22,13 @@ public enum ExternalSubtitleMatcher {
             result[mediaURL] = []
         }
 
+        // Folder opens can arrive here after their sidecars were already matched.
+        // Keep every original media key without tokenizing names or building a trie.
+        if subtitleURLs.isEmpty {
+            guard !isCancelled() else { return [:] }
+            return result
+        }
+
         let index = TokenIndex()
         var media: [(url: URL, raw: [String], tokens: [String])] = []
         for url in result.keys where MediaFileSupport.isSupportedMediaFile(url) {

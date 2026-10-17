@@ -4,6 +4,62 @@ import Testing
 
 @Suite("External subtitle matching")
 struct ExternalSubtitleMatcherTests {
+    @Test func emptySubtitleInventoryRetainsOriginalMediaKeys() throws {
+        let media = url("Épisode 1.mkv")
+        let unsupported = url("Notes.txt")
+        let remote = try #require(URL(string: "https://example.com/Episode.mkv"))
+        let remoteFile = try #require(URL(string: "file://media.example/Episode.mkv"))
+        let lexicalAlias = try #require(URL(string: "file:///tmp/Shows/Season/../Episode.mkv"))
+        let expected: [URL: [URL]] = [
+            media: [], unsupported: [], remote: [], remoteFile: [], lexicalAlias: [],
+        ]
+
+        #expect(ExternalSubtitleMatcher.associate(
+            subtitleURLs: [],
+            with: [media, unsupported, media, remote, remoteFile, lexicalAlias]
+        ) == expected)
+        #expect(ExternalSubtitleMatcher.matchingSubtitles(for: media, among: []).isEmpty)
+    }
+
+    @Test func emptyMediaAndSubtitleInventoriesReturnNoAssociations() {
+        #expect(ExternalSubtitleMatcher.associate(subtitleURLs: [], with: []).isEmpty)
+    }
+
+    @Test(arguments: [false, true])
+    func cancellationAtEveryEmptySubtitleCheckpointDiscardsMediaKeys(_ singleObservation: Bool) throws {
+        let media = url("Movie.mkv")
+        let unsupported = url("Notes.txt")
+        let remote = try #require(URL(string: "https://example.com/Movie.mkv"))
+        let inventories: [[URL]] = [[], [media, unsupported, media, remote]]
+
+        for inventory in inventories {
+            var checkpointCount = 0
+            let complete = ExternalSubtitleMatcher.associate(
+                subtitleURLs: [], with: inventory, isCancelled: {
+                    checkpointCount += 1
+                    return false
+                }
+            )
+            #expect(Set(complete.keys) == Set(inventory))
+            #expect(complete.values.allSatisfy(\.isEmpty))
+            // Include cancellation before population, during every input item,
+            // and immediately before the completed dictionary is returned.
+            #expect(checkpointCount >= inventory.count + 2)
+
+            for cancelAt in 1...checkpointCount {
+                var checkpoint = 0
+                let cancelled = ExternalSubtitleMatcher.associate(
+                    subtitleURLs: [], with: inventory, isCancelled: {
+                        checkpoint += 1
+                        return singleObservation ? checkpoint == cancelAt : checkpoint >= cancelAt
+                    }
+                )
+                #expect(checkpoint == cancelAt)
+                #expect(cancelled.isEmpty, "Returned media keys at empty-subtitle checkpoint \(cancelAt)")
+            }
+        }
+    }
+
     @Test func indexedMatchingPreservesExhaustiveScoresAndAmbiguity() {
         let stems = ["Show", "Show Episode 1", "Show Episode 10", "Show.en",
                      "Show.1080p", "Show.bluray", "Another Show", "EN", "", "épisode"]
