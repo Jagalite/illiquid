@@ -290,6 +290,9 @@ def run(args: argparse.Namespace, output: Path) -> None:
                 raise RuntimeError(f"Output changed between processes: {case['case']}")
             expected_receipts[case["case"]] = value
     verify_sources(output, manifest, binaries)
+    persisted_rows = [json.loads(line) for line in (output / "observations.jsonl").read_text().splitlines()]
+    if persisted_rows != rows:
+        raise RuntimeError("Persisted observations differ from completed observations")
     summary = {
         "status": "complete", "timed_observations": len(rows), "cases": summarize(rows, cases, args.samples),
         "method": "Fresh process per observation; paired AB/BA order alternates by sample; no discarded completed rows.",

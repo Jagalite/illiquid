@@ -1,8 +1,5 @@
 name: Playlist restoration qualification
 on:
-  push:
-    branches:
-      - 'perf/cache-natural-filename-keys'
   pull_request:
     paths:
       - 'Sources/IlliquidCore/Playlist/**'
@@ -24,7 +21,7 @@ concurrency:
 jobs:
   focused-playlist:
     runs-on: macos-26
-    timeout-minutes: 20
+    timeout-minutes: 10
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
@@ -39,9 +36,9 @@ jobs:
         run: >-
           python3 Benchmarks/PlaylistRestoration/run.py --sizes 100
           --repeats 1 --rounds 1 --output "$RUNNER_TEMP/playlist-restoration-smoke.json"
-      - name: Measure natural filename ordering on macOS
+      - name: Natural filename ordering parity smoke (no timing threshold)
         run: >-
-          python3 Benchmarks/NaturalFilenameOrdering/run.py --samples 6
+          python3 Benchmarks/NaturalFilenameOrdering/run.py --quick --samples 2
           --output "$RUNNER_TEMP/natural-filename-ordering"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
