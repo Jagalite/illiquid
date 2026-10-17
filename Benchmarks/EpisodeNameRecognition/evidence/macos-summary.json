@@ -1,0 +1,396 @@
+{
+  "environment": {
+    "baseline": {
+      "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+      "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+      "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+      "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+    },
+    "baseline_adaptation": "Rename the two top-level types only",
+    "compiled_baseline_sha256": "85bdf0df2513c6bcdec9d43a4b0c76d14841d83dc2bca786d045e18b1937c897",
+    "compiler_flags": [
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-parse-as-library"
+    ],
+    "cpu_count": 3,
+    "hardware": "Apple M1 (Virtual)",
+    "machine": "arm64",
+    "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "reference_name": "main",
+    "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+    "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+    "source_sha256": {
+      "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+      "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+      "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+      "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+    },
+    "swift": "/usr/bin/swift",
+    "swiftc": "/usr/bin/swiftc",
+    "timestamp_utc": "2026-10-17T21:32:42.455121+00:00",
+    "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "differential": {
+    "cases": 16300,
+    "checksum": "9601960839749614061",
+    "locale_identifier": "en_US",
+    "mode": "differential",
+    "ok": true,
+    "preferred_languages": [
+      "en-US"
+    ]
+  },
+  "summary": {
+    "bare-parent-year-episode": {
+      "baseline_median_ns_per_file": 45571.45178222656,
+      "candidate_median_ns_per_file": 38074.907958984375,
+      "paired_median_candidate_over_baseline": 0.8204088946818513,
+      "paired_median_reduction_percent": 17.959110531814872,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.7355519714398709,
+        0.9074612934627586
+      ],
+      "pairs": 12
+    },
+    "bare-season-episode": {
+      "baseline_median_ns_per_file": 54916.127502441406,
+      "candidate_median_ns_per_file": 42536.417724609375,
+      "paired_median_candidate_over_baseline": 0.7733686616032363,
+      "paired_median_reduction_percent": 22.663133839676377,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.7200359419154043,
+        0.9479216275798847
+      ],
+      "pairs": 12
+    },
+    "mixed-library": {
+      "baseline_median_ns_per_file": 42278.09143066406,
+      "candidate_median_ns_per_file": 38404.879333496094,
+      "paired_median_candidate_over_baseline": 0.885297938862512,
+      "paired_median_reduction_percent": 11.470206113748805,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.7786924651232388,
+        0.9906137213405779
+      ],
+      "pairs": 12
+    },
+    "movie-controls": {
+      "baseline_median_ns_per_file": 33356.00793457031,
+      "candidate_median_ns_per_file": 34994.63659667969,
+      "paired_median_candidate_over_baseline": 1.0120347364783542,
+      "paired_median_reduction_percent": -1.203473647835418,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.9483796894385541,
+        1.1210644681726234
+      ],
+      "pairs": 12
+    },
+    "named-episode-no-year": {
+      "baseline_median_ns_per_file": 71604.0064086914,
+      "candidate_median_ns_per_file": 64475.657165527344,
+      "paired_median_candidate_over_baseline": 0.935037018588969,
+      "paired_median_reduction_percent": 6.496298141103097,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.8741731716400404,
+        0.9675727430138995
+      ],
+      "pairs": 12
+    },
+    "named-episode-with-year": {
+      "baseline_median_ns_per_file": 72952.80963134766,
+      "candidate_median_ns_per_file": 54071.856201171875,
+      "paired_median_candidate_over_baseline": 0.7211362737297006,
+      "paired_median_reduction_percent": 27.886372627029942,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.6778327933779593,
+        0.8417732763633988
+      ],
+      "pairs": 12
+    },
+    "unclassified-bare-episode": {
+      "baseline_median_ns_per_file": 76934.98992919922,
+      "candidate_median_ns_per_file": 65661.08197021484,
+      "paired_median_candidate_over_baseline": 0.8053302024601487,
+      "paired_median_reduction_percent": 19.466979753985125,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.6963021899652859,
+        0.9559347792137562
+      ],
+      "pairs": 12
+    }
+  },
+  "folder_reuse_comparison": {
+    "environment": {
+      "baseline": {
+        "branch_at_capture": "perf/media-name-folder-parsing",
+        "commit": "f8386f9be6636432c68a9ced7825544306560a60",
+        "git_blob_sha": "17857027cf8d9a1fc621095149f527d722901675",
+        "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+        "sha256": "f5fb2c51878046d33c341d6b8cde6426011e10730b30dbd564becc4619967b96"
+      },
+      "baseline_adaptation": "Rename the two top-level types only",
+      "compiled_baseline_sha256": "bd4bbb49f84f106394d4b18fce18e6664b66d999b3dfdaa9ca2f40afa6d3c476",
+      "compiler_flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library"
+      ],
+      "cpu_count": 3,
+      "hardware": "Apple M1 (Virtual)",
+      "machine": "arm64",
+      "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "processor": "arm",
+      "reference_name": "folder-reuse",
+      "reference_source": "Benchmarks/EpisodeNameRecognition/folder-reuse/MediaNameRecognition.swift",
+      "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+      "source_sha256": {
+        "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+        "Benchmarks/EpisodeNameRecognition/folder-reuse/MediaNameRecognition.swift": "f5fb2c51878046d33c341d6b8cde6426011e10730b30dbd564becc4619967b96",
+        "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+        "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+      },
+      "swift": "/usr/bin/swift",
+      "swiftc": "/usr/bin/swiftc",
+      "timestamp_utc": "2026-10-17T21:36:53.678378+00:00",
+      "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+    },
+    "differential": {
+      "cases": 16300,
+      "checksum": "9601960839749614061",
+      "locale_identifier": "en_US",
+      "mode": "differential",
+      "ok": true,
+      "preferred_languages": [
+        "en-US"
+      ]
+    },
+    "summary": {
+      "bare-season-episode": {
+        "baseline_median_ns_per_file": 32702.985107421875,
+        "candidate_median_ns_per_file": 31036.679565429688,
+        "paired_median_candidate_over_baseline": 0.9477105475403687,
+        "paired_median_reduction_percent": 5.228945245963135,
+        "paired_ratio_bootstrap_95_percent_interval": [
+          0.9021578910637902,
+          1.034110768778024
+        ],
+        "pairs": 12
+      },
+      "movie-controls": {
+        "baseline_median_ns_per_file": 27692.840576171875,
+        "candidate_median_ns_per_file": 28556.765197753906,
+        "paired_median_candidate_over_baseline": 1.01874243978492,
+        "paired_median_reduction_percent": -1.8742439784920073,
+        "paired_ratio_bootstrap_95_percent_interval": [
+          0.973121857555174,
+          1.0570995801232517
+        ],
+        "pairs": 12
+      },
+      "named-episode-no-year": {
+        "baseline_median_ns_per_file": 42416.913330078125,
+        "candidate_median_ns_per_file": 43860.41259765625,
+        "paired_median_candidate_over_baseline": 0.9875511371100247,
+        "paired_median_reduction_percent": 1.2448862889975265,
+        "paired_ratio_bootstrap_95_percent_interval": [
+          0.926467750481739,
+          1.116645740216635
+        ],
+        "pairs": 12
+      },
+      "named-episode-with-year": {
+        "baseline_median_ns_per_file": 46731.24182128906,
+        "candidate_median_ns_per_file": 42371.98889160156,
+        "paired_median_candidate_over_baseline": 0.9033852400387514,
+        "paired_median_reduction_percent": 9.661475996124857,
+        "paired_ratio_bootstrap_95_percent_interval": [
+          0.8040144112471608,
+          1.0058816031280335
+        ],
+        "pairs": 12
+      }
+    }
+  },
+  "validation": {
+    "baseline-debug": {
+      "compiled_source_sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+      "configuration": "debug",
+      "environment": {
+        "baseline": {
+          "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+          "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+          "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        },
+        "cpu_count": 3,
+        "hardware": "Apple M1 (Virtual)",
+        "machine": "arm64",
+        "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+        "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "processor": "arm",
+        "reference_name": "main",
+        "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+        "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+        "source_sha256": {
+          "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+          "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+        },
+        "swift": "/usr/bin/swift",
+        "swiftc": "/usr/bin/swiftc",
+        "timestamp_utc": "2026-10-17T21:30:54.281833+00:00",
+        "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+      },
+      "exit_code": 0,
+      "implementation": "baseline",
+      "source_adaptations": [],
+      "test_sha256": {
+        "EpisodeNameRecognitionRegressionTests.swift": "331ec30c99a1ceb40cae3c9347689e3d5e9da6feb88d2909bb41fec68a92b6e2",
+        "MediaNameRecognitionTests.swift": "e4d4717dddd679a8214b0b7a5746651e60910aeeebb46aa2c554270bf785ab7c"
+      }
+    },
+    "baseline-release": {
+      "compiled_source_sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+      "configuration": "release",
+      "environment": {
+        "baseline": {
+          "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+          "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+          "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        },
+        "cpu_count": 3,
+        "hardware": "Apple M1 (Virtual)",
+        "machine": "arm64",
+        "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+        "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "processor": "arm",
+        "reference_name": "main",
+        "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+        "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+        "source_sha256": {
+          "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+          "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+        },
+        "swift": "/usr/bin/swift",
+        "swiftc": "/usr/bin/swiftc",
+        "timestamp_utc": "2026-10-17T21:31:31.793307+00:00",
+        "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+      },
+      "exit_code": 0,
+      "implementation": "baseline",
+      "source_adaptations": [],
+      "test_sha256": {
+        "EpisodeNameRecognitionRegressionTests.swift": "331ec30c99a1ceb40cae3c9347689e3d5e9da6feb88d2909bb41fec68a92b6e2",
+        "MediaNameRecognitionTests.swift": "e4d4717dddd679a8214b0b7a5746651e60910aeeebb46aa2c554270bf785ab7c"
+      }
+    },
+    "candidate-debug": {
+      "compiled_source_sha256": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04",
+      "configuration": "debug",
+      "environment": {
+        "baseline": {
+          "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+          "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+          "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        },
+        "cpu_count": 3,
+        "hardware": "Apple M1 (Virtual)",
+        "machine": "arm64",
+        "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+        "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "processor": "arm",
+        "reference_name": "main",
+        "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+        "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+        "source_sha256": {
+          "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+          "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+        },
+        "swift": "/usr/bin/swift",
+        "swiftc": "/usr/bin/swiftc",
+        "timestamp_utc": "2026-10-17T21:31:59.892916+00:00",
+        "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+      },
+      "exit_code": 0,
+      "implementation": "candidate",
+      "source_adaptations": [],
+      "test_sha256": {
+        "EpisodeNameRecognitionRegressionTests.swift": "331ec30c99a1ceb40cae3c9347689e3d5e9da6feb88d2909bb41fec68a92b6e2",
+        "MediaNameRecognitionTests.swift": "e4d4717dddd679a8214b0b7a5746651e60910aeeebb46aa2c554270bf785ab7c"
+      }
+    },
+    "candidate-release": {
+      "compiled_source_sha256": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04",
+      "configuration": "release",
+      "environment": {
+        "baseline": {
+          "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+          "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+          "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        },
+        "cpu_count": 3,
+        "hardware": "Apple M1 (Virtual)",
+        "machine": "arm64",
+        "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+        "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "processor": "arm",
+        "reference_name": "main",
+        "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+        "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+        "source_sha256": {
+          "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+          "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+        },
+        "swift": "/usr/bin/swift",
+        "swiftc": "/usr/bin/swiftc",
+        "timestamp_utc": "2026-10-17T21:32:20.236322+00:00",
+        "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+      },
+      "exit_code": 0,
+      "implementation": "candidate",
+      "source_adaptations": [],
+      "test_sha256": {
+        "EpisodeNameRecognitionRegressionTests.swift": "331ec30c99a1ceb40cae3c9347689e3d5e9da6feb88d2909bb41fec68a92b6e2",
+        "MediaNameRecognitionTests.swift": "e4d4717dddd679a8214b0b7a5746651e60910aeeebb46aa2c554270bf785ab7c"
+      }
+    }
+  },
+  "test_run_summaries": [
+    "2026-10-17T21:31:31.4755200Z ✔ Test run with 19 tests in 2 suites passed after 0.026 seconds.",
+    "2026-10-17T21:31:59.4941760Z ✔ Test run with 19 tests in 2 suites passed after 0.017 seconds.",
+    "2026-10-17T21:32:19.7644520Z ✔ Test run with 19 tests in 2 suites passed after 0.021 seconds.",
+    "2026-10-17T21:32:41.9014350Z ✔ Test run with 19 tests in 2 suites passed after 0.017 seconds."
+  ],
+  "github_run": {
+    "id": "39070382355",
+    "attempt": "1",
+    "sha": "458ca99746f6678c12272757a5df1bf63d469d90",
+    "event": "push",
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39070382355"
+  },
+  "job_id": 117506578613,
+  "job_conclusion": "success",
+  "observation_counts": {
+    "main": 168,
+    "folder_reuse": 96
+  },
+  "method": "Median of per-process medians; paired candidate/baseline ratios; balanced alternating order; all observations retained"
+}
