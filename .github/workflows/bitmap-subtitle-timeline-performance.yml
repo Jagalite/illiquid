@@ -1,16 +1,6 @@
 name: Bitmap subtitle timeline performance
 
 on:
-  push:
-    branches: [perf/bitmap-subtitle-timeline-insertion]
-    paths:
-      - Sources/IlliquidNativePlayback/Subtitles/**
-      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift
-      - Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift
-      - Benchmarks/BitmapSubtitleTimeline/**
-      - .github/workflows/bitmap-subtitle-timeline-performance.yml
-      - '!Benchmarks/BitmapSubtitleTimeline/README.md'
-      - '!Benchmarks/BitmapSubtitleTimeline/evidence/**'
   pull_request:
     paths:
       - Sources/IlliquidNativePlayback/Subtitles/**

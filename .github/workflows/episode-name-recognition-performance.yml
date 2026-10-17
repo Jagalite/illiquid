@@ -1,16 +1,5 @@
 name: Episode name recognition performance
 on:
-  push:
-    branches: ['perf/media-name-episode-recognition-20261017']
-    paths:
-      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
-      - 'Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift'
-      - 'Tests/IlliquidCoreTests/EpisodeNameRecognitionRegressionTests.swift'
-      - 'Benchmarks/EpisodeNameRecognition/Driver.swift'
-      - 'Benchmarks/EpisodeNameRecognition/run.py'
-      - 'Benchmarks/EpisodeNameRecognition/baseline/**'
-      - 'Benchmarks/EpisodeNameRecognition/folder-reuse/**'
-      - '.github/workflows/episode-name-recognition-performance.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
