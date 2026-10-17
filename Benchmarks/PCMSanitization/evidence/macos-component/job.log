@@ -1,0 +1,397 @@
+﻿2026-10-17T17:56:00.0171620Z Current runner version: '2.337.0'
+2026-10-17T17:56:00.0211100Z ##[group]Runner Image Provisioner
+2026-10-17T17:56:00.0212010Z Hosted Compute Agent
+2026-10-17T17:56:00.0212450Z Version: 20261012.601
+2026-10-17T17:56:00.0213040Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-17T17:56:00.0213720Z Build Date: 2026-10-12T17:48:21Z
+2026-10-17T17:56:00.0214260Z Worker ID: {752e7884-4f38-41ff-aa07-3aaa051d0fd5}
+2026-10-17T17:56:00.0214900Z Region: westus
+2026-10-17T17:56:00.0215270Z Cloud: MacCloud
+2026-10-17T17:56:00.0215740Z ##[endgroup]
+2026-10-17T17:56:00.0217010Z ##[group]Operating System
+2026-10-17T17:56:00.0217590Z macOS
+2026-10-17T17:56:00.0217930Z 26.6.2
+2026-10-17T17:56:00.0218270Z 25G83
+2026-10-17T17:56:00.0218640Z ##[endgroup]
+2026-10-17T17:56:00.0219640Z ##[group]Runner Image
+2026-10-17T17:56:00.0220060Z Image: macos-26-arm64
+2026-10-17T17:56:00.0220440Z Version: 20261013.0424.1
+2026-10-17T17:56:00.0221430Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20261013.0424/images/macos/macos-26-arm64-Readme.md
+2026-10-17T17:56:00.0222590Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20261013.0424
+2026-10-17T17:56:00.0223600Z ##[endgroup]
+2026-10-17T17:56:00.0224550Z ##[group]GITHUB_TOKEN Permissions
+2026-10-17T17:56:00.0226450Z Contents: read
+2026-10-17T17:56:00.0226990Z Metadata: read
+2026-10-17T17:56:00.0227400Z ##[endgroup]
+2026-10-17T17:56:00.0229490Z Secret source: Actions
+2026-10-17T17:56:00.0230200Z Cache mode: write
+2026-10-17T17:56:00.0230750Z Prepare workflow directory
+2026-10-17T17:56:00.0684260Z Prepare all required actions
+2026-10-17T17:56:00.0770370Z Getting action download info
+2026-10-17T17:56:00.4740150Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-17T17:56:00.8414470Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-17T17:56:01.1300650Z Complete job name: component
+2026-10-17T17:56:01.1991860Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-17T17:56:01.1992680Z with:
+2026-10-17T17:56:01.1993030Z   persist-credentials: false
+2026-10-17T17:56:01.1993400Z   fetch-depth: 0
+2026-10-17T17:56:01.1993740Z   repository: Jagalite/illiquid
+2026-10-17T17:56:01.1996530Z   token: ***
+2026-10-17T17:56:01.1996850Z   ssh-strict: true
+2026-10-17T17:56:01.1997170Z   ssh-user: git
+2026-10-17T17:56:01.1997540Z   clean: true
+2026-10-17T17:56:01.1997890Z   sparse-checkout-cone-mode: true
+2026-10-17T17:56:01.1998280Z   fetch-tags: false
+2026-10-17T17:56:01.1998610Z   show-progress: true
+2026-10-17T17:56:01.1998940Z   lfs: false
+2026-10-17T17:56:01.1999250Z   submodules: false
+2026-10-17T17:56:01.1999600Z   set-safe-directory: true
+2026-10-17T17:56:01.1999980Z   allow-unsafe-pr-checkout: false
+2026-10-17T17:56:01.2000550Z env:
+2026-10-17T17:56:01.2001060Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T17:56:01.2001670Z ##[endgroup]
+2026-10-17T17:56:01.8535230Z Syncing repository: Jagalite/illiquid
+2026-10-17T17:56:01.8537150Z ##[group]Getting Git version info
+2026-10-17T17:56:01.8537970Z Working directory is '/Users/runner/work/illiquid/illiquid'
+2026-10-17T17:56:01.8539090Z [command]/opt/homebrew/bin/git version
+2026-10-17T17:56:01.8831780Z git version 2.56.0
+2026-10-17T17:56:01.8847930Z ##[endgroup]
+2026-10-17T17:56:01.8857370Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/9e9376de-e256-4cd4-9414-8e76939d67b7/.gitconfig'
+2026-10-17T17:56:01.8866940Z Temporarily overriding HOME='/Users/runner/work/_temp/9e9376de-e256-4cd4-9414-8e76939d67b7' before making global git config changes
+2026-10-17T17:56:01.8869990Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T17:56:01.8871120Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-17T17:56:01.9012520Z Deleting the contents of '/Users/runner/work/illiquid/illiquid'
+2026-10-17T17:56:01.9017740Z ##[group]Initializing the repository
+2026-10-17T17:56:01.9022760Z [command]/opt/homebrew/bin/git init /Users/runner/work/illiquid/illiquid
+2026-10-17T17:56:01.9311480Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-17T17:56:01.9312710Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-17T17:56:01.9313660Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-17T17:56:01.9314520Z hint: call:
+2026-10-17T17:56:01.9315830Z hint:
+2026-10-17T17:56:01.9316490Z hint: 	git config --global init.defaultBranch <name>
+2026-10-17T17:56:01.9317240Z hint:
+2026-10-17T17:56:01.9339690Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-17T17:56:01.9341850Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-17T17:56:01.9342840Z hint:
+2026-10-17T17:56:01.9343460Z hint: 	git branch -m <name>
+2026-10-17T17:56:01.9344000Z hint:
+2026-10-17T17:56:01.9344650Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-17T17:56:01.9346030Z Initialized empty Git repository in /Users/runner/work/illiquid/illiquid/.git/
+2026-10-17T17:56:01.9351000Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Jagalite/illiquid
+2026-10-17T17:56:01.9444800Z ##[endgroup]
+2026-10-17T17:56:01.9446870Z ##[group]Disabling automatic garbage collection
+2026-10-17T17:56:01.9448710Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-17T17:56:01.9531250Z ##[endgroup]
+2026-10-17T17:56:01.9538580Z ##[group]Setting up auth
+2026-10-17T17:56:01.9541010Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T17:56:01.9614280Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T17:56:02.0942520Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T17:56:02.1066820Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T17:56:02.2636270Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T17:56:02.3011430Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T17:56:02.4641980Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-17T17:56:02.4766270Z ##[endgroup]
+2026-10-17T17:56:02.4767100Z ##[group]Fetching the repository
+2026-10-17T17:56:02.4768610Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +a178c2df8506ef464db518019bf2dc7bbadce237:refs/remotes/pull/32/merge
+2026-10-17T17:56:09.9699400Z From https://github.com/Jagalite/illiquid
+2026-10-17T17:56:09.9704540Z  * [new branch]      codex/illiquid-update-hosting            -> origin/codex/illiquid-update-hosting
+2026-10-17T17:56:09.9706880Z  * [new branch]      docs/agent-hierarchy-v2                  -> origin/docs/agent-hierarchy-v2
+2026-10-17T17:56:09.9712300Z  * [new branch]      feat/playback-reliability-tools          -> origin/feat/playback-reliability-tools
+2026-10-17T17:56:09.9714810Z  * [new branch]      feat/recovery-captions-automation        -> origin/feat/recovery-captions-automation
+2026-10-17T17:56:09.9719500Z  * [new branch]      fix/external-text-subtitle-import        -> origin/fix/external-text-subtitle-import
+2026-10-17T17:56:09.9726830Z  * [new branch]      fix/filesystem-event-loss-recovery       -> origin/fix/filesystem-event-loss-recovery
+2026-10-17T17:56:09.9744040Z  * [new branch]      fix/local-media-source-validation        -> origin/fix/local-media-source-validation
+2026-10-17T17:56:09.9747890Z  * [new branch]      fix/nfo-episode-field-scope              -> origin/fix/nfo-episode-field-scope
+2026-10-17T17:56:09.9750600Z  * [new branch]      fix/nfo-unused-field-limits              -> origin/fix/nfo-unused-field-limits
+2026-10-17T17:56:09.9754920Z  * [new branch]      fix/persistence-superseded-request-lifetime -> origin/fix/persistence-superseded-request-lifetime
+2026-10-17T17:56:09.9760080Z  * [new branch]      fix/plexmatch-numeric-validation         -> origin/fix/plexmatch-numeric-validation
+2026-10-17T17:56:09.9765210Z  * [new branch]      fix/renderer-recovery-budget-revision    -> origin/fix/renderer-recovery-budget-revision
+2026-10-17T17:56:09.9770110Z  * [new branch]      fix/sidecar-catalog-id-merge             -> origin/fix/sidecar-catalog-id-merge
+2026-10-17T17:56:09.9774060Z  * [new branch]      fix/source-filesystem-root-invalidation  -> origin/fix/source-filesystem-root-invalidation
+2026-10-17T17:56:09.9784220Z  * [new branch]      fix/source-filesystem-root-volume-routing -> origin/fix/source-filesystem-root-volume-routing
+2026-10-17T17:56:09.9790410Z  * [new branch]      fix/subtitle-exact-stem-priority         -> origin/fix/subtitle-exact-stem-priority
+2026-10-17T17:56:09.9796250Z  * [new branch]      fix/subtitle-filename-association        -> origin/fix/subtitle-filename-association
+2026-10-17T17:56:09.9802130Z  * [new branch]      fix/subtitle-filename-specificity        -> origin/fix/subtitle-filename-specificity
+2026-10-17T17:56:09.9808210Z  * [new branch]      fix/track-restoration-thumbnail-lifecycle -> origin/fix/track-restoration-thumbnail-lifecycle
+2026-10-17T17:56:09.9814230Z  * [new branch]      fix/unicode-date-filename-crash          -> origin/fix/unicode-date-filename-crash
+2026-10-17T17:56:09.9816700Z  * [new branch]      fix/unicode-date-media-recognition       -> origin/fix/unicode-date-media-recognition
+2026-10-17T17:56:09.9823640Z  * [new branch]      main                                     -> origin/main
+2026-10-17T17:56:09.9828300Z  * [new branch]      perf/adaptive-text-opacity               -> origin/perf/adaptive-text-opacity
+2026-10-17T17:56:09.9835160Z  * [new branch]      perf/compiled-player-shortcuts           -> origin/perf/compiled-player-shortcuts
+2026-10-17T17:56:09.9842320Z  * [new branch]      perf/elastic-control-bar-geometry        -> origin/perf/elastic-control-bar-geometry
+2026-10-17T17:56:09.9846490Z  * [new branch]      perf/folder-discovery-selective-io       -> origin/perf/folder-discovery-selective-io
+2026-10-17T17:56:09.9849540Z  * [new branch]      perf/non-decoding-memory-responsiveness  -> origin/perf/non-decoding-memory-responsiveness
+2026-10-17T17:56:09.9851780Z  * [new branch]      perf/pcm-sanitizer                       -> origin/perf/pcm-sanitizer
+2026-10-17T17:56:09.9854130Z  * [new branch]      perf/planar-ownership-transitions        -> origin/perf/planar-ownership-transitions
+2026-10-17T17:56:09.9856770Z  * [new branch]      perf/playback-pipeline-phase1            -> origin/perf/playback-pipeline-phase1
+2026-10-17T17:56:09.9861990Z  * [new branch]      perf/playlist-shuffle-restoration-20261017 -> origin/perf/playlist-shuffle-restoration-20261017
+2026-10-17T17:56:09.9868430Z  * [new branch]      perf/relative-seek-effect-retirement     -> origin/perf/relative-seek-effect-retirement
+2026-10-17T17:56:09.9873960Z  * [new branch]      perf/subtitle-memory-accounting          -> origin/perf/subtitle-memory-accounting
+2026-10-17T17:56:09.9880970Z  * [new branch]      perf/subtitle-memory-budget-accounting-20261017 -> origin/perf/subtitle-memory-budget-accounting-20261017
+2026-10-17T17:56:09.9887220Z  * [new branch]      perf/subtitle-staging-dirty-prefix       -> origin/perf/subtitle-staging-dirty-prefix
+2026-10-17T17:56:09.9892980Z  * [new branch]      perf/video-tab-resource-lookup-b7d0ac7d  -> origin/perf/video-tab-resource-lookup-b7d0ac7d
+2026-10-17T17:56:09.9898520Z  * [new branch]      research/playback-packet-progress        -> origin/research/playback-packet-progress
+2026-10-17T17:56:09.9903680Z  * [new branch]      work/illiquid-product-review             -> origin/work/illiquid-product-review
+2026-10-17T17:56:09.9906180Z  * [new branch]      work/playback-integration-qualification  -> origin/work/playback-integration-qualification
+2026-10-17T17:56:09.9909070Z  * [new branch]      work/pr3-integration-qualification       -> origin/work/pr3-integration-qualification
+2026-10-17T17:56:09.9911090Z  * [new tag]         appcast                                  -> appcast
+2026-10-17T17:56:09.9912530Z  * [new tag]         v0.1.0                                   -> v0.1.0
+2026-10-17T17:56:09.9914030Z  * [new tag]         v0.1.1                                   -> v0.1.1
+2026-10-17T17:56:09.9915590Z  * [new tag]         v0.1.2                                   -> v0.1.2
+2026-10-17T17:56:09.9917230Z  * [new tag]         v0.1.3                                   -> v0.1.3
+2026-10-17T17:56:09.9918900Z  * [new ref]         a178c2df8506ef464db518019bf2dc7bbadce237 -> pull/32/merge
+2026-10-17T17:56:09.9924160Z ##[endgroup]
+2026-10-17T17:56:09.9925420Z ##[group]Determining the checkout info
+2026-10-17T17:56:09.9926850Z ##[endgroup]
+2026-10-17T17:56:09.9927780Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-17T17:56:09.9948000Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-17T17:56:10.0046840Z ##[group]Checking out the ref
+2026-10-17T17:56:10.0050760Z [command]/opt/homebrew/bin/git checkout --progress --force refs/remotes/pull/32/merge
+2026-10-17T17:56:10.9815940Z HEAD is now at a178c2d Merge 6322d2836a77a28fe4d4802706960714304d2832 into 8c3cc3d4008d5d1b8d436bcf2d51d891382b6548
+2026-10-17T17:56:10.9993050Z ##[endgroup]
+2026-10-17T17:56:11.0217430Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-17T17:56:11.0411630Z a178c2df8506ef464db518019bf2dc7bbadce237
+2026-10-17T17:56:11.0430410Z ##[group]Removing auth
+2026-10-17T17:56:11.0432100Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T17:56:11.0571020Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T17:56:11.2354920Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T17:56:11.2479130Z http.https://github.com/.extraheader
+2026-10-17T17:56:11.2484750Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-17T17:56:11.2579260Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T17:56:11.4264060Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T17:56:11.4571120Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T17:56:11.6475890Z ##[endgroup]
+2026-10-17T17:56:11.6944040Z ##[group]Run mkdir -p "$RUNNER_TEMP/pcm-component"
+2026-10-17T17:56:11.6944470Z [36;1mmkdir -p "$RUNNER_TEMP/pcm-component"[0m
+2026-10-17T17:56:11.6944750Z [36;1msw_vers > "$RUNNER_TEMP/pcm-component/host.txt"[0m
+2026-10-17T17:56:11.6945060Z [36;1muname -a >> "$RUNNER_TEMP/pcm-component/host.txt"[0m
+2026-10-17T17:56:11.6945460Z [36;1msysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/pcm-component/host.txt"[0m
+2026-10-17T17:56:11.6946030Z [36;1mswift --version >> "$RUNNER_TEMP/pcm-component/host.txt"[0m
+2026-10-17T17:56:11.7064020Z shell: /bin/bash -e {0}
+2026-10-17T17:56:11.7064560Z env:
+2026-10-17T17:56:11.7065160Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T17:56:11.7065930Z ##[endgroup]
+2026-10-17T17:56:17.8157170Z swift-driver version: 1.148.6 
+2026-10-17T17:56:17.8984630Z ##[group]Run python3 Benchmarks/PCMSanitization/run.py \
+2026-10-17T17:56:17.8985690Z [36;1mpython3 Benchmarks/PCMSanitization/run.py \[0m
+2026-10-17T17:56:17.8986980Z [36;1m  --mode all --test-variant both --test-configuration both \[0m
+2026-10-17T17:56:17.8987880Z [36;1m  --pairs 6 --target-ms 80 \[0m
+2026-10-17T17:56:17.8989190Z [36;1m  --output "$RUNNER_TEMP/pcm-component/results"[0m
+2026-10-17T17:56:17.9038300Z shell: /bin/bash -e {0}
+2026-10-17T17:56:17.9038590Z env:
+2026-10-17T17:56:17.9039040Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T17:56:17.9039440Z ##[endgroup]
+2026-10-17T17:56:19.8112020Z Compiling baseline with Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+2026-10-17T17:56:28.9202090Z Compiling candidate with Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+2026-10-17T17:56:40.8958130Z Exact output equality: 55 cases, 880 input variants, 28904816 output bytes
+2026-10-17T17:56:40.9691730Z Running exact-source tests (baseline, debug)
+2026-10-17T17:57:03.5743870Z ◇ Test run started.
+2026-10-17T17:57:03.5745050Z ↳ Testing Library Version: 1902
+2026-10-17T17:57:03.5745490Z ↳ Target Platform: arm64e-apple-macos14.0
+2026-10-17T17:57:03.5745970Z ◇ Suite "Audio sample sanitization" started.
+2026-10-17T17:57:03.5747240Z ◇ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() started.
+2026-10-17T17:57:03.5748590Z ◇ Test unalignedExternalStorageAndPartialTailMatchReference() started.
+2026-10-17T17:57:03.5749440Z ◇ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() started.
+2026-10-17T17:57:03.5750170Z ◇ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() started.
+2026-10-17T17:57:03.5751820Z ◇ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() started.
+2026-10-17T17:57:03.5752520Z ◇ Test incompleteTrailingBytesRemainUntouched() started.
+2026-10-17T17:57:03.5753260Z ◇ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() started.
+2026-10-17T17:57:03.5755620Z ◇ Test everyDirtyLaneAndShortTailMatchesScalarClassification() started.
+2026-10-17T17:57:03.5756840Z ✔ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() passed after 0.006 seconds.
+2026-10-17T17:57:03.5757910Z ✔ Test unalignedExternalStorageAndPartialTailMatchReference() passed after 0.007 seconds.
+2026-10-17T17:57:03.5758880Z ✔ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() passed after 0.006 seconds.
+2026-10-17T17:57:03.5759830Z ✔ Test incompleteTrailingBytesRemainUntouched() passed after 0.007 seconds.
+2026-10-17T17:57:03.5760650Z ✔ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() passed after 0.007 seconds.
+2026-10-17T17:57:03.5762070Z ✔ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() passed after 0.007 seconds.
+2026-10-17T17:57:03.5763280Z ✔ Test everyDirtyLaneAndShortTailMatchesScalarClassification() passed after 0.114 seconds.
+2026-10-17T17:57:03.5764410Z ✔ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() passed after 0.296 seconds.
+2026-10-17T17:57:03.5765290Z ✔ Suite "Audio sample sanitization" passed after 0.296 seconds.
+2026-10-17T17:57:03.5765800Z ✔ Test run with 8 tests in 1 suite passed after 0.297 seconds.
+2026-10-17T17:57:03.5766190Z 
+2026-10-17T17:57:03.5766460Z Running exact-source tests (baseline, release)
+2026-10-17T17:57:19.7846360Z ◇ Test run started.
+2026-10-17T17:57:19.7941460Z ↳ Testing Library Version: 1902
+2026-10-17T17:57:19.8048220Z ↳ Target Platform: arm64e-apple-macos14.0
+2026-10-17T17:57:19.8145630Z ◇ Suite "Audio sample sanitization" started.
+2026-10-17T17:57:19.8249620Z ◇ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() started.
+2026-10-17T17:57:19.8352740Z ◇ Test everyDirtyLaneAndShortTailMatchesScalarClassification() started.
+2026-10-17T17:57:19.8453730Z ◇ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() started.
+2026-10-17T17:57:19.8555560Z ◇ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() started.
+2026-10-17T17:57:19.8578560Z ◇ Test incompleteTrailingBytesRemainUntouched() started.
+2026-10-17T17:57:19.8662780Z ◇ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() started.
+2026-10-17T17:57:19.8766550Z ◇ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() started.
+2026-10-17T17:57:19.8870930Z ◇ Test unalignedExternalStorageAndPartialTailMatchReference() started.
+2026-10-17T17:57:19.8975020Z ✔ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() passed after 0.001 seconds.
+2026-10-17T17:57:19.9063030Z ✔ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() passed after 0.001 seconds.
+2026-10-17T17:57:19.9080410Z ✔ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() passed after 0.001 seconds.
+2026-10-17T17:57:19.9083350Z ✔ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() passed after 0.001 seconds.
+2026-10-17T17:57:19.9087250Z ✔ Test incompleteTrailingBytesRemainUntouched() passed after 0.001 seconds.
+2026-10-17T17:57:19.9088960Z ✔ Test unalignedExternalStorageAndPartialTailMatchReference() passed after 0.001 seconds.
+2026-10-17T17:57:19.9090060Z ✔ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() passed after 0.002 seconds.
+2026-10-17T17:57:19.9094960Z ✔ Test everyDirtyLaneAndShortTailMatchesScalarClassification() passed after 0.007 seconds.
+2026-10-17T17:57:19.9101090Z ✔ Suite "Audio sample sanitization" passed after 0.007 seconds.
+2026-10-17T17:57:19.9102390Z ✔ Test run with 8 tests in 1 suite passed after 0.007 seconds.
+2026-10-17T17:57:19.9103640Z 
+2026-10-17T17:57:19.9104180Z Running exact-source tests (candidate, debug)
+2026-10-17T17:57:29.4839260Z ◇ Test run started.
+2026-10-17T17:57:29.4839980Z ↳ Testing Library Version: 1902
+2026-10-17T17:57:29.4840530Z ↳ Target Platform: arm64e-apple-macos14.0
+2026-10-17T17:57:29.4840890Z ◇ Suite "Audio sample sanitization" started.
+2026-10-17T17:57:29.4841440Z ◇ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() started.
+2026-10-17T17:57:29.4841970Z ◇ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() started.
+2026-10-17T17:57:29.4842570Z ◇ Test unalignedExternalStorageAndPartialTailMatchReference() started.
+2026-10-17T17:57:29.4843200Z ◇ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() started.
+2026-10-17T17:57:29.4843970Z ◇ Test everyDirtyLaneAndShortTailMatchesScalarClassification() started.
+2026-10-17T17:57:29.4844380Z ◇ Test incompleteTrailingBytesRemainUntouched() started.
+2026-10-17T17:57:29.4844860Z ◇ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() started.
+2026-10-17T17:57:29.4845490Z ◇ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() started.
+2026-10-17T17:57:29.4846130Z ✔ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() passed after 0.014 seconds.
+2026-10-17T17:57:29.4846880Z ✔ Test unalignedExternalStorageAndPartialTailMatchReference() passed after 0.014 seconds.
+2026-10-17T17:57:29.4847560Z ✔ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() passed after 0.014 seconds.
+2026-10-17T17:57:29.4848180Z ✔ Test incompleteTrailingBytesRemainUntouched() passed after 0.014 seconds.
+2026-10-17T17:57:29.4848710Z ✔ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() passed after 0.014 seconds.
+2026-10-17T17:57:29.4849440Z ✔ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() passed after 0.014 seconds.
+2026-10-17T17:57:29.4850170Z ✔ Test everyDirtyLaneAndShortTailMatchesScalarClassification() passed after 0.077 seconds.
+2026-10-17T17:57:29.4850880Z ✔ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() passed after 0.175 seconds.
+2026-10-17T17:57:29.4851580Z ✔ Suite "Audio sample sanitization" passed after 0.176 seconds.
+2026-10-17T17:57:29.4852010Z ✔ Test run with 8 tests in 1 suite passed after 0.176 seconds.
+2026-10-17T17:57:29.4852270Z 
+2026-10-17T17:57:29.4852440Z Running exact-source tests (candidate, release)
+2026-10-17T17:57:45.4215910Z ◇ Test run started.
+2026-10-17T17:57:45.4218990Z ↳ Testing Library Version: 1902
+2026-10-17T17:57:45.4236800Z ↳ Target Platform: arm64e-apple-macos14.0
+2026-10-17T17:57:45.4237830Z ◇ Suite "Audio sample sanitization" started.
+2026-10-17T17:57:45.4240150Z ◇ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() started.
+2026-10-17T17:57:45.4242050Z ◇ Test incompleteTrailingBytesRemainUntouched() started.
+2026-10-17T17:57:45.4243110Z ◇ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() started.
+2026-10-17T17:57:45.4244420Z ◇ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() started.
+2026-10-17T17:57:45.4245100Z ◇ Test everyDirtyLaneAndShortTailMatchesScalarClassification() started.
+2026-10-17T17:57:45.4246270Z ◇ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() started.
+2026-10-17T17:57:45.4247920Z ◇ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() started.
+2026-10-17T17:57:45.4249030Z ◇ Test unalignedExternalStorageAndPartialTailMatchReference() started.
+2026-10-17T17:57:45.4251060Z ✔ Test incompleteTrailingBytesRemainUntouched() passed after 0.001 seconds.
+2026-10-17T17:57:45.4259290Z ✔ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() passed after 0.001 seconds.
+2026-10-17T17:57:45.4260680Z ✔ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() passed after 0.001 seconds.
+2026-10-17T17:57:45.4262380Z ✔ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() passed after 0.001 seconds.
+2026-10-17T17:57:45.4263350Z ✔ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() passed after 0.001 seconds.
+2026-10-17T17:57:45.4264810Z ✔ Test unalignedExternalStorageAndPartialTailMatchReference() passed after 0.001 seconds.
+2026-10-17T17:57:45.4267630Z ✔ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() passed after 0.005 seconds.
+2026-10-17T17:57:45.4268670Z ✔ Test everyDirtyLaneAndShortTailMatchesScalarClassification() passed after 0.007 seconds.
+2026-10-17T17:57:45.4270560Z ✔ Suite "Audio sample sanitization" passed after 0.007 seconds.
+2026-10-17T17:57:45.4271580Z ✔ Test run with 8 tests in 1 suite passed after 0.007 seconds.
+2026-10-17T17:57:45.4272160Z 
+2026-10-17T17:57:46.5197250Z Pair 1/6: baseline then candidate; 55 cases
+2026-10-17T17:57:55.6592550Z Pair 2/6: candidate then baseline; 55 cases
+2026-10-17T17:58:04.7852980Z Pair 3/6: baseline then candidate; 55 cases
+2026-10-17T17:58:14.3242100Z Pair 4/6: candidate then baseline; 55 cases
+2026-10-17T17:58:22.5310310Z Pair 5/6: baseline then candidate; 55 cases
+2026-10-17T17:58:28.8478970Z Pair 6/6: candidate then baseline; 55 cases
+2026-10-17T17:58:34.3469470Z case | baseline us | candidate us | wall reduction | CPU reduction
+2026-10-17T17:58:34.3471470Z healthy_sine/1024x1 | 1.313 | 0.494 | 60.3% | 66.4%
+2026-10-17T17:58:34.3471900Z silence/1024x1 | 1.193 | 0.458 | 59.9% | 61.8%
+2026-10-17T17:58:34.3472700Z sparse_invalid/1024x1 | 1.355 | 0.712 | 53.2% | 51.6%
+2026-10-17T17:58:34.3473300Z dense_invalid/1024x1 | 3.132 | 3.610 | -17.0% | -10.9%
+2026-10-17T17:58:34.3474520Z subnormals/1024x1 | 3.929 | 4.117 | -11.0% | -9.1%
+2026-10-17T17:58:34.3476280Z shared_healthy/1024x1 | 1.358 | 0.933 | 36.3% | 47.3%
+2026-10-17T17:58:34.3477990Z sparse_restore_control/1024x1 | 0.206 | 0.249 | -23.9% | -15.0%
+2026-10-17T17:58:34.3478870Z dense_restore_control/1024x1 | 0.800 | 1.015 | -12.1% | -2.5%
+2026-10-17T17:58:34.3479610Z subnormal_restore_control/1024x1 | 1.063 | 1.191 | -2.2% | -1.5%
+2026-10-17T17:58:34.3480260Z healthy_sine/1024x2 | 2.847 | 0.749 | 70.9% | 68.6%
+2026-10-17T17:58:34.3480640Z silence/1024x2 | 2.513 | 0.558 | 73.3% | 72.9%
+2026-10-17T17:58:34.3481270Z sparse_invalid/1024x2 | 2.476 | 0.942 | 57.7% | 59.9%
+2026-10-17T17:58:34.3481680Z dense_invalid/1024x2 | 7.393 | 6.057 | 8.7% | 1.1%
+2026-10-17T17:58:34.3482280Z subnormals/1024x2 | 8.096 | 8.346 | -8.2% | -5.4%
+2026-10-17T17:58:34.3482880Z shared_healthy/1024x2 | 3.045 | 1.094 | 60.9% | 60.8%
+2026-10-17T17:58:34.3483220Z sparse_restore_control/1024x2 | 0.243 | 0.221 | -7.2% | -3.7%
+2026-10-17T17:58:34.3483950Z dense_restore_control/1024x2 | 1.786 | 1.676 | -8.4% | 2.8%
+2026-10-17T17:58:34.3500740Z subnormal_restore_control/1024x2 | 2.019 | 2.263 | -25.8% | -23.0%
+2026-10-17T17:58:34.3501680Z healthy_sine/1024x6 | 7.107 | 1.784 | 75.9% | 75.8%
+2026-10-17T17:58:34.3502120Z silence/1024x6 | 8.129 | 1.693 | 73.4% | 73.3%
+2026-10-17T17:58:34.3502650Z sparse_invalid/1024x6 | 6.369 | 3.045 | 57.8% | 64.5%
+2026-10-17T17:58:34.3503140Z dense_invalid/1024x6 | 18.803 | 19.770 | -3.9% | -9.5%
+2026-10-17T17:58:34.3503910Z subnormals/1024x6 | 24.585 | 24.391 | -7.7% | -7.7%
+2026-10-17T17:58:34.3504340Z shared_healthy/1024x6 | 7.718 | 2.877 | 53.1% | 51.7%
+2026-10-17T17:58:34.3505000Z sparse_restore_control/1024x6 | 0.267 | 0.270 | -3.4% | -0.7%
+2026-10-17T17:58:34.3505490Z dense_restore_control/1024x6 | 4.102 | 4.033 | 1.3% | 3.5%
+2026-10-17T17:58:34.3506110Z subnormal_restore_control/1024x6 | 5.097 | 6.015 | 4.2% | 0.7%
+2026-10-17T17:58:34.3506580Z healthy_sine/1024x8 | 8.171 | 2.282 | 72.1% | 74.3%
+2026-10-17T17:58:34.3507130Z silence/1024x8 | 9.182 | 1.958 | 75.0% | 75.0%
+2026-10-17T17:58:34.3507580Z sparse_invalid/1024x8 | 8.579 | 3.158 | 69.9% | 70.1%
+2026-10-17T17:58:34.3508120Z dense_invalid/1024x8 | 22.400 | 22.858 | -10.4% | -7.5%
+2026-10-17T17:58:34.3508730Z subnormals/1024x8 | 30.585 | 32.100 | -9.1% | -11.2%
+2026-10-17T17:58:34.3509200Z shared_healthy/1024x8 | 9.421 | 3.707 | 58.8% | 59.4%
+2026-10-17T17:58:34.3509800Z sparse_restore_control/1024x8 | 0.201 | 0.257 | -16.0% | -10.0%
+2026-10-17T17:58:34.3510230Z dense_restore_control/1024x8 | 5.108 | 4.855 | -7.9% | -7.5%
+2026-10-17T17:58:34.3510790Z subnormal_restore_control/1024x8 | 6.532 | 6.941 | -11.6% | -11.1%
+2026-10-17T17:58:34.3511240Z healthy_sine/4096x8 | 32.051 | 7.255 | 75.6% | 74.5%
+2026-10-17T17:58:34.3511740Z silence/4096x8 | 35.938 | 7.862 | 72.2% | 73.7%
+2026-10-17T17:58:34.3512190Z sparse_invalid/4096x8 | 32.715 | 7.721 | 74.9% | 74.2%
+2026-10-17T17:58:34.3512670Z dense_invalid/4096x8 | 95.801 | 93.535 | 5.3% | -2.4%
+2026-10-17T17:58:34.3513290Z subnormals/4096x8 | 138.597 | 123.709 | 2.6% | -9.3%
+2026-10-17T17:58:34.3513670Z shared_healthy/4096x8 | 84.726 | 67.017 | 16.4% | 15.4%
+2026-10-17T17:58:34.3514240Z sparse_restore_control/4096x8 | 0.361 | 0.340 | 1.4% | 1.9%
+2026-10-17T17:58:34.3514820Z dense_restore_control/4096x8 | 21.735 | 21.272 | -10.0% | -15.4%
+2026-10-17T17:58:34.3515430Z subnormal_restore_control/4096x8 | 30.582 | 33.524 | -5.5% | -3.9%
+2026-10-17T17:58:34.3515860Z tiny_tail/0 | 0.103 | 0.102 | 11.3% | 9.3%
+2026-10-17T17:58:34.3516310Z tiny_restore_control/0 | 0.083 | 0.082 | 12.6% | 8.7%
+2026-10-17T17:58:34.3516720Z tiny_tail/1 | 0.214 | 0.211 | -2.0% | -2.2%
+2026-10-17T17:58:34.3517240Z tiny_restore_control/1 | 0.193 | 0.180 | 8.6% | 9.4%
+2026-10-17T17:58:34.3517670Z tiny_tail/7 | 0.304 | 0.284 | -4.5% | -4.7%
+2026-10-17T17:58:34.3518080Z tiny_restore_control/7 | 0.260 | 0.236 | -0.4% | -0.4%
+2026-10-17T17:58:34.3518630Z tiny_tail/8 | 0.345 | 0.326 | -11.9% | -4.1%
+2026-10-17T17:58:34.3518960Z tiny_restore_control/8 | 0.295 | 0.248 | 12.6% | 11.7%
+2026-10-17T17:58:34.3519500Z tiny_tail/9 | 0.362 | 0.346 | -1.5% | -1.2%
+2026-10-17T17:58:34.3519880Z tiny_restore_control/9 | 0.323 | 0.252 | 14.8% | 3.2%
+2026-10-17T17:58:36.1082520Z Report: /Users/runner/work/_temp/pcm-component/results/report.json
+2026-10-17T17:58:36.2271080Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-17T17:58:36.2273460Z with:
+2026-10-17T17:58:36.2274130Z   name: pcm-sanitization-component
+2026-10-17T17:58:36.2276390Z   path: /Users/runner/work/_temp/pcm-component/
+!/Users/runner/work/_temp/pcm-component/results/module-cache/**
+!/Users/runner/work/_temp/pcm-component/results/tests-*/build/**
+!/Users/runner/work/_temp/pcm-component/results/tests-*/cache/**
+
+2026-10-17T17:58:36.2278890Z   retention-days: 14
+2026-10-17T17:58:36.2279500Z   if-no-files-found: warn
+2026-10-17T17:58:36.2280140Z   compression-level: 6
+2026-10-17T17:58:36.2280660Z   overwrite: false
+2026-10-17T17:58:36.2281280Z   include-hidden-files: false
+2026-10-17T17:58:36.2281850Z env:
+2026-10-17T17:58:36.2282640Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T17:58:36.2285040Z ##[endgroup]
+2026-10-17T17:58:36.9052750Z (node:6827) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-17T17:58:36.9054340Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-17T17:58:39.0543780Z With the provided path, there will be 41 files uploaded
+2026-10-17T17:58:39.0544770Z Artifact name is valid!
+2026-10-17T17:58:39.0545440Z Root directory input is valid!
+2026-10-17T17:58:39.3914530Z Beginning upload of artifact content to blob storage
+2026-10-17T17:58:39.7991460Z (node:6827) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-17T17:58:40.3409200Z Uploaded bytes 8388608
+2026-10-17T17:58:40.8371460Z Uploaded bytes 16777216
+2026-10-17T17:58:40.8700150Z Uploaded bytes 25165824
+2026-10-17T17:58:41.1656880Z Uploaded bytes 33554432
+2026-10-17T17:58:41.5118310Z Uploaded bytes 41943040
+2026-10-17T17:58:41.7753110Z Uploaded bytes 50331648
+2026-10-17T17:58:41.9870570Z Uploaded bytes 55127674
+2026-10-17T17:58:42.0305500Z Finished uploading artifact content to blob storage!
+2026-10-17T17:58:42.0307790Z SHA256 digest of uploaded artifact zip is 4e65d9e53e7219f429fbaa9fbe60cc1002d41a4b1a4b6df4449548d29b838b54
+2026-10-17T17:58:42.0309240Z Finalizing artifact upload
+2026-10-17T17:58:42.2688850Z Artifact pcm-sanitization-component.zip successfully finalized. Artifact ID 12109805787
+2026-10-17T17:58:42.2690090Z Artifact pcm-sanitization-component has been successfully uploaded! Final size is 55127674 bytes. Artifact ID is 12109805787
+2026-10-17T17:58:42.2749410Z Artifact download URL: https://github.com/Jagalite/illiquid/actions/runs/39055879742/artifacts/12109805787
+2026-10-17T17:58:42.3495570Z Post job cleanup.
+2026-10-17T17:58:42.5873230Z [command]/opt/homebrew/bin/git version
+2026-10-17T17:58:42.6055220Z git version 2.56.0
+2026-10-17T17:58:42.6116870Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/4b2f35a5-8cb2-443e-b7da-66ffa7036cd5/.gitconfig'
+2026-10-17T17:58:42.6132180Z Temporarily overriding HOME='/Users/runner/work/_temp/4b2f35a5-8cb2-443e-b7da-66ffa7036cd5' before making global git config changes
+2026-10-17T17:58:42.6136330Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T17:58:42.6144430Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-17T17:58:42.6367540Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T17:58:42.6449930Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T17:58:42.9227060Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T17:58:42.9546180Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T17:58:43.0658160Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T17:58:43.0726680Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T17:58:43.2322510Z Cleaning up orphan processes
+2026-10-17T17:58:45.1373940Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

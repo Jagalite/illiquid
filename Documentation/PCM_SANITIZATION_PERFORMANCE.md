@@ -8,6 +8,13 @@ Float samples. It changes only `sanitizeInterleavedFloatPCM` in
 The comparison baseline is main commit
 `8c3cc3d4008d5d1b8d436bcf2d51d891382b6548`.
 
+On the native Apple M1 virtual runner, the four tested healthy stereo/surround
+layouts show a **70.9–75.9% median paired wall-time reduction**, with every
+pair favoring the candidate in both wall and CPU time. Linux independently
+shows **75.1–81.3%** for the same layouts. This is a microsecond-scale
+component gain with explicit dense-invalid repair tradeoffs; the full app
+build and native audio regressions also pass.
+
 The decoder calls the sanitizer after normal resampling and resampler draining
 at end of stream or a format change. Its output rate is 48,000 frames per
 second, so stereo, 5.1, and 7.1 output require 96,000, 288,000, and 384,000 Float
@@ -181,9 +188,69 @@ records source, compiler, harness, and binary identities.
 
 ### Native macOS qualification
 
-Native measurements and app-graph validation will be recorded here after the
-PR workflow completes. The Linux results above do not substitute for that
-platform qualification.
+[The native qualification workflow](https://github.com/Jagalite/illiquid/actions/runs/39055879742)
+passed on an **Apple M1 virtual runner**, ARM64, three logical CPUs,
+macOS 26.6.2 (25G83), and Apple Swift 6.3.3 from Xcode 26.6. It tested merge
+commit `a178c2df8506ef464db518019bf2dc7bbadce237`, containing PR source head
+`6322d2836a77a28fe4d4802706960714304d2832` and the pinned baseline.
+
+The native cohort contains the same 55 cases, six balanced pairs, and 660 raw
+observations. It also passes all four baseline/candidate debug/release suites
+(32 test executions). Its 880 fixture records, counts, and 28,904,816 output
+bytes match exactly. The complete native output receipt is byte-identical to
+the retained Linux receipt, so both refer to the same compressed record file.
+
+| Case | Baseline µs | Candidate µs | Wall reduction | Process CPU reduction |
+| --- | ---: | ---: | ---: | ---: |
+| `healthy_sine/1024x2` | 2.847 | 0.749 | +70.9% | +68.6% |
+| `healthy_sine/1024x6` | 7.107 | 1.784 | +75.9% | +75.8% |
+| `healthy_sine/1024x8` | 8.171 | 2.282 | +72.1% | +74.3% |
+| `healthy_sine/4096x8` | 32.051 | 7.255 | +75.6% | +74.5% |
+| `silence/1024x8` | 9.182 | 1.958 | +75.0% | +75.0% |
+| `sparse_invalid/1024x8` | 8.579 | 3.158 | +69.9% | +70.1% |
+| `shared_healthy/1024x8` | 9.421 | 3.707 | +58.8% | +59.4% |
+| `dense_invalid/1024x8` | 22.400 | 22.858 | -10.4% | -7.5% |
+| `subnormals/1024x8` | 30.585 | 32.100 | -9.1% | -11.2% |
+
+Each of the four healthy player-layout cases improves in all six pairs in
+both wall and CPU time. Signed-zero silence improves 72.2–75.0% in wall time;
+sparse-invalid sanitation plus restoration improves 57.7–74.9%. Shared healthy
+buffers, including COW, improve 16.4–60.9%, with the weakest gain in the largest
+shared allocation. These ranges cover the stereo/surround layouts, excluding
+mono helper coverage.
+
+The hosted VM's unchanged controls are substantially noisier than the Linux
+controls: their paired wall reductions span **−25.8% to +14.8%**, and CPU
+reductions span **−23.0% to +11.7%**. Dense-invalid wall estimates range from
+−17.0% to +8.7% across all five large sizes; all-subnormal estimates range from
+−11.0% to +2.6%. Their CPU estimates range from −10.9% to +1.1% and −11.2% to
+−5.4%, respectively. Those smaller apparent improvements should not be read
+as demonstrated gains. The dense/subnormal tradeoff established by the more
+stable Linux comparison remains relevant.
+
+Mono has one healthy wall outlier with a candidate/baseline ratio of 1.346;
+its six CPU ratios remain between 0.314 and 0.409. This is additional evidence
+of scheduling noise and is retained in the full cohort. It does not affect
+the all-pairs result for the four actual player-output layouts.
+
+The native-audio job built `IlliquidNativePlayback`, `IlliquidApp`, the
+`Illiquid` executable, and the package test executable, then reported **22
+tests in four suites passed**. The resampler rate cases at 32,000, 44,100,
+48,000, and 96,000 Hz and the six/eight-channel decoder cases ran successfully.
+Three fixture-dependent session methods returned without exercising their
+playback assertions, as qualified below. The initial workflow misnamed the
+suite containing the older basic sanitizer test; that method is excluded from
+this first-run 22-test count. The workflow now selects its unique method name
+`audioSanitizationZerosInvalidSamplesOnly` for subsequent runs. The eight new
+sanitizer tests were selected and passed in the initial run.
+
+[All native rows](../Benchmarks/PCMSanitization/evidence/macos-component/results.md),
+[raw timing records](../Benchmarks/PCMSanitization/evidence/macos-component/measurements.jsonl),
+[component provenance](../Benchmarks/PCMSanitization/evidence/macos-component/qualification.json),
+and [the native app/audio build log](../Benchmarks/PCMSanitization/evidence/macos-native-audio/job.log)
+are checked in. The GitHub artifact's downloaded SHA-256 was verified before
+extracting the retained evidence. These measurements exclude audible playback
+and whole-player profiling.
 
 
 ## Validation

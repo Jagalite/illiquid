@@ -75,7 +75,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/pcm-native-audio"
           set -o pipefail
           swift test --force-resolved-versions --filter \
-            'AudioSampleSanitizationTests|AudioResamplerDrainTests|MultichannelAudioTests|AudioDelayTests|NativePlaybackFoundationTests.audioSanitizationZerosInvalidSamplesOnly' \
+            'AudioSampleSanitizationTests|AudioResamplerDrainTests|MultichannelAudioTests|AudioDelayTests|audioSanitizationZerosInvalidSamplesOnly' \
             2>&1 | tee "$RUNNER_TEMP/pcm-native-audio/tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

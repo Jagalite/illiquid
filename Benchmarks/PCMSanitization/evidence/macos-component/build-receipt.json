@@ -1,0 +1,61 @@
+{
+  "binaries": {
+    "baseline": {
+      "build_fingerprint": "cbea9d6109a424687bfd911c5cf80ff4af590dbeebe7821b4fcbabdd73a32e65",
+      "path": "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+      "sha256": "19e6fd818d1eb17b6668d5d3a2c78926823ebd903eae8b6c03277cd713be3119"
+    },
+    "candidate": {
+      "build_fingerprint": "8efaa230c43dc114bcbeb0fde30b12913c08446a3c192f71800c6945068c0811",
+      "path": "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark",
+      "sha256": "4f8abfeef0181ca7d73efe5d145e399dfda843f3ecf29c489280950175a8fce6"
+    }
+  },
+  "compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-parse-as-library",
+    "-enable-testing"
+  ],
+  "harness_sha256": "cca767a35ef09bfb3023bc3a80ea53d0440048c764e8f23e81646ebfd321c880",
+  "runner_sha256": "cb0dd6cd4436cd90fb04f1a593aef7ec8302450bddce586c679c4cd5b76a5f3a",
+  "sources": {
+    "baseline": {
+      "declarations": {
+        "AudioSampleSanitizationResult": "723e8e2a4c4f3cc84b9be853573303eebd7a0380ed1cf85cd04af6c73fd221f2",
+        "sanitizeInterleavedFloatPCM": "7262c800fb645a985cd052db1e0b48dceae169aeb0148eca861d3e74dbbd4796"
+      },
+      "files": {
+        "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+          "bytes": 18503,
+          "sha256": "2554d8452a63992b30142679de1a09f45ba7bc8b1f6020cbad1e975a4503682e"
+        }
+      },
+      "generated": {
+        "Sanitizer.swift": "202ce4f34118c63521c1d1f440562b9825659860d98d6906402f68578a9dd06b"
+      },
+      "revision": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+      "source_kind": "git_revision"
+    },
+    "candidate": {
+      "declarations": {
+        "AudioSampleSanitizationResult": "723e8e2a4c4f3cc84b9be853573303eebd7a0380ed1cf85cd04af6c73fd221f2",
+        "sanitizeInterleavedFloatPCM": "e9b319576c4a8c1c8a5de6c5d5f58f17fb90b4bec3e556334625848fd7648f7c"
+      },
+      "files": {
+        "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+          "bytes": 20477,
+          "sha256": "e8825bfd1dab808470f237f011d74f9d711cf39f8b492760f9f55185d526b918"
+        }
+      },
+      "generated": {
+        "Sanitizer.swift": "8db8a71d81a65fb14f4cfda4d37e45c3e5fcad3c96028c8f8bb93e29c5da6787"
+      },
+      "revision": null,
+      "source_kind": "working_tree"
+    }
+  }
+}
