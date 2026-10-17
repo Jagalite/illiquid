@@ -182,10 +182,10 @@ public enum MediaNameRecognition {
         let text = tags.stringByReplacingMatches(in: original,
             range: NSRange(original.startIndex..., in: original), withTemplate: "")
         if let token = matches(explicitYear, text).last ?? matches(year, text).last, let value = capture(token, 1, in: text).flatMap(Int.init) {
-            let title = clean(prefix(text, before: token))
+            let title = cleanTagless(prefix(text, before: token))
             if !title.isEmpty { return (title, value) }
         }
-        return (clean(text), nil)
+        return (cleanTagless(text), nil)
     }
 
     private static func cleanRelease(_ text: String) -> String {
@@ -193,7 +193,12 @@ public enum MediaNameRecognition {
     }
     private static func clean(_ text: String) -> String {
         let stripped = tags.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: "")
-        return stripped.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "_", with: " ")
+        return cleanTagless(stripped)
+    }
+    // Call only after tag removal; preserve the existing Unicode whitespace
+    // and punctuation rules without another regular-expression replacement.
+    private static func cleanTagless(_ text: String) -> String {
+        text.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "_", with: " ")
             .split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
             .trimmingCharacters(in: CharacterSet(charactersIn: " -()[]"))
     }
