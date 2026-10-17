@@ -4,6 +4,16 @@ import IlliquidCore
 
 @Suite("Local media sidecars")
 struct MediaSidecarTests {
+    @Test func sidecarIdentifiersMergeWithoutErasingOtherProviders() throws {
+        var hints = MediaMetadataHints()
+        hints.content = .movie
+        hints.catalogIDs = ["imdb-tt999"]
+        let movie = MediaNameRecognition.recognize(relativePath: "Movie {tmdb-123}.mkv")
+        let resolved = movie.applying(hints)
+        #expect(resolved.catalogIDs.contains("imdb-tt999"))
+        #expect(resolved.catalogIDs.contains("tmdb-123"))
+    }
+
     @Test func plexMappingsAndPrecedence() throws {
         let plex = try #require(PlexMatchHints.parse("""
             # Explicit identities, including filenames with colons
