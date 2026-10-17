@@ -75,10 +75,7 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
     }
 
     @MainActor private func volumeChanged(path: String) {
-        let affected = watchedRoots.filter {
-            let root = $0.standardizedFileURL.path
-            return root == path || root.hasPrefix(path + "/")
-        }
+        let affected = SourceVolumeChangePolicy.affectedRoots(at: path, roots: watchedRoots)
         guard !affected.isEmpty else { return }
         LifecyclePerformance.mark("source-volume-change")
         let roots = watchedRoots
