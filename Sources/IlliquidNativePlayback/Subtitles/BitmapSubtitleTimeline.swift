@@ -108,13 +108,33 @@ struct BitmapSubtitleTimeline: Sendable {
         guard start.isFinite, composition.canvasSize.width > 0, composition.canvasSize.height > 0,
               composition.canvasSize.width.isFinite, composition.canvasSize.height.isFinite,
               composition.duration.map({ $0.isFinite && $0 > 0 }) ?? true else { return false }
-        let previous = entries.firstIndex { $0.start == start }
+        // Events are already ordered. Append monotonic delivery directly; use
+        // one lower bound for both replacement and insertion otherwise.
+        var insertionIndex = entries.count
+        if let lastStart = entries.last?.start, start <= lastStart {
+            var lower = 0
+            var upper = entries.count
+            while lower < upper {
+                let middle = lower + (upper - lower) / 2
+                if entries[middle].start < start {
+                    lower = middle + 1
+                } else {
+                    upper = middle
+                }
+            }
+            insertionIndex = lower
+        }
+        let previous: Int? = insertionIndex < entries.count && entries[insertionIndex].start == start
+            ? insertionIndex : nil
         let nextBytes = retainedBytes - (previous.map { entries[$0].composition.byteCount } ?? 0) + composition.byteCount
         guard nextBytes <= maximumBytes,
               previous != nil || entries.count < maximumEntries else { return false }
-        if let previous { entries.remove(at: previous) }
-        entries.append(Entry(start: start, composition: composition))
-        entries.sort { $0.start < $1.start }
+        let entry = Entry(start: start, composition: composition)
+        if let previous {
+            entries[previous] = entry
+        } else {
+            entries.insert(entry, at: insertionIndex)
+        }
         retainedBytes = nextBytes
         revision &+= 1
         return true
