@@ -124,7 +124,9 @@ final class SourceMediaPresenceScanner {
                             }
                             // Children settle before ancestors. Unknown descendants
                             // cannot produce a negative result for their parents.
-                            for folder in bufferedSummaries.keys.sorted(by: { $0.count > $1.count }) {
+                            for folder in SourceMediaPresenceRecomputation.orderedPaths(
+                                bufferedSummaries.keys, roots: self.roots
+                            ) {
                                 self.recompute(folder)
                             }
                             bufferedSummaries.removeAll(keepingCapacity: true)
@@ -154,24 +156,18 @@ final class SourceMediaPresenceScanner {
             && !treeRevisions.contains { $0.value > version && Self.contains(path, in: $0.key) }
     }
 
-    private func recompute(_ folder: String) {
-        var path = folder
-        while isWatched(path) {
-            if let summary = summaries[path] {
-                if summary.hasDirectMedia || summary.children.contains(where: { results[$0] == true }) {
-                    results[path] = true
-                } else if summary.isComplete && summary.isReadable
-                            && summary.children.allSatisfy({ results[$0] == false }) {
-                    results[path] = false
-                } else {
-                    results[path] = nil
-                }
+    private func recompute(_ path: String) {
+        if let summary = summaries[path] {
+            if summary.hasDirectMedia || summary.children.contains(where: { results[$0] == true }) {
+                results[path] = true
+            } else if summary.isComplete && summary.isReadable
+                        && summary.children.allSatisfy({ results[$0] == false }) {
+                results[path] = false
             } else {
                 results[path] = nil
             }
-            let parent = URL(fileURLWithPath: path).deletingLastPathComponent().path
-            guard parent != path else { break }
-            path = parent
+        } else {
+            results[path] = nil
         }
     }
 
