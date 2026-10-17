@@ -1,9 +1,11 @@
 import Foundation
 
-/// Associates external SRT and ASS files with the most closely related media
+/// Associates supported external subtitle files with the most closely related media
 /// filename in a folder.
 public enum ExternalSubtitleMatcher {
     /// Returns subtitle associations keyed by the original media URLs.
+    /// Returns an empty dictionary if cancellation is observed; partial
+    /// associations are never published after observing cancellation.
     ///
     /// A subtitle is left unassigned if two media files are equally good matches.
     /// This prevents a generic filename such as `Show.srt` from being loaded for
@@ -13,8 +15,10 @@ public enum ExternalSubtitleMatcher {
         with mediaURLs: [URL],
         isCancelled: () -> Bool = { Task.isCancelled }
     ) -> [URL: [URL]] {
+        guard !isCancelled() else { return [:] }
         var result: [URL: [URL]] = [:]
         for mediaURL in mediaURLs {
+            guard !isCancelled() else { return [:] }
             result[mediaURL] = []
         }
 
@@ -28,13 +32,17 @@ public enum ExternalSubtitleMatcher {
             index.insert(tokens, index: media.count)
             media.append((url, raw, tokens))
         }
-        for subtitleURL in subtitleURLs where MediaFileSupport.isSupportedSubtitleFile(subtitleURL) {
+        for subtitleURL in subtitleURLs {
             guard !isCancelled() else { return [:] }
+            guard MediaFileSupport.isSupportedSubtitleFile(subtitleURL) else { continue }
             let raw = filenameTokens(subtitleURL)
             let tokens = removingTrailingSubtitleQualifiers(from: raw)
             var best: (index: Int, score: Int)?
             var tied = false
-            for candidate in index.candidates(for: tokens, isCancelled: isCancelled) {
+            guard let candidates = index.candidates(for: tokens, isCancelled: isCancelled) else {
+                return [:]
+            }
+            for candidate in candidates {
                 guard !isCancelled() else { return [:] }
                 let item = media[candidate]
                 guard let score = matchScore(
@@ -54,9 +62,11 @@ public enum ExternalSubtitleMatcher {
         }
 
         for mediaURL in Array(result.keys) {
+            guard !isCancelled() else { return [:] }
             result[mediaURL] = NaturalFilenameOrdering.sort(result[mediaURL, default: []])
         }
 
+        guard !isCancelled() else { return [:] }
         return result
     }
 
@@ -75,18 +85,21 @@ public enum ExternalSubtitleMatcher {
             node.terminal.append(index)
         }
 
-        func candidates(for tokens: [String], isCancelled: () -> Bool) -> [Int] {
+        // nil distinguishes an interrupted traversal from a completed lookup
+        // with no candidates, so the caller can discard all earlier matches.
+        func candidates(for tokens: [String], isCancelled: () -> Bool) -> [Int]? {
             guard !tokens.isEmpty else { return [] }
             var result: [Int] = []
             var node = self
             for token in tokens {
+                guard !isCancelled() else { return nil }
                 result.append(contentsOf: node.terminal)
                 guard let child = node.children[token] else { return result }
                 node = child
             }
             var pending = [node]
             while let current = pending.popLast() {
-                guard !isCancelled() else { return [] }
+                guard !isCancelled() else { return nil }
                 result.append(contentsOf: current.terminal)
                 pending.append(contentsOf: current.children.values)
             }
@@ -129,12 +142,14 @@ public enum ExternalSubtitleMatcher {
     ) -> Int? {
         guard !mediaTokens.isEmpty, !subtitleTokens.isEmpty else { return nil }
 
-        if mediaTokens == subtitleTokens {
-            return 10_000 + tokenWeight(mediaTokens)
+        // A language code may also be part of a title, e.g. "The Last of Us".
+        // Rank full media stems before treating suffixes as language qualifiers.
+        if hasOnlySubtitleQualifiers(after: rawMediaTokens, in: rawSubtitleTokens) {
+            return 10_000 + tokenWeight(rawMediaTokens)
         }
 
-        if rawMediaTokens == subtitleTokens || mediaTokens == rawSubtitleTokens {
-            return 9_000 + tokenWeight(mediaTokens)
+        if hasOnlySubtitleQualifiers(after: mediaTokens, in: rawSubtitleTokens) {
+            return 10_000 + tokenWeight(mediaTokens)
         }
 
         let sharedCount: Int
@@ -202,10 +217,16 @@ public enum ExternalSubtitleMatcher {
         }
 
         if token.hasSuffix("p") || token.hasSuffix("i") {
-            return token.dropLast().allSatisfy(\.isNumber)
+            let resolution = token.dropLast()
+            return !resolution.isEmpty && resolution.allSatisfy(\.isNumber)
         }
 
         return false
+    }
+
+    private static func hasOnlySubtitleQualifiers(after stem: [String], in tokens: [String]) -> Bool {
+        isPrefix(stem, of: tokens)
+            && tokens.dropFirst(stem.count).allSatisfy(subtitleQualifiers.contains)
     }
 
     private static func isPrefix(_ prefix: [String], of values: [String]) -> Bool {

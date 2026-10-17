@@ -39,6 +39,23 @@ struct FolderPlaylistDiscoveryTests {
         )
     }
 
+    @Test("Discovery preserves title words when attaching external subtitles")
+    func discoveryPreservesTitleWordsWhenAttachingExternalSubtitles() throws {
+        let directory = try TemporaryDirectory()
+        try directory.createFile("The Last of.mkv")
+        try directory.createFile("The Last of Us.1080p.mkv")
+        try directory.createFile("The Last of.srt")
+        try directory.createFile("The Last of Us.en.srt")
+        let playlist = try FolderPlaylistDiscovery.discover(in: directory.url)
+        let matches = Dictionary(uniqueKeysWithValues: playlist.items.map {
+            ($0.url.lastPathComponent, $0.externalSubtitleURLs.map(\.lastPathComponent))
+        })
+        #expect(matches == [
+            "The Last of.mkv": ["The Last of.srt"],
+            "The Last of Us.1080p.mkv": ["The Last of Us.en.srt"],
+        ])
+    }
+
     @Test("Discovery rejects a file URL as a folder")
     func discoveryRejectsAFileURLAsFolder() throws {
         let directory = try TemporaryDirectory()
