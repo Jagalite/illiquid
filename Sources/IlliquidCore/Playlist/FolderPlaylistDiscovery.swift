@@ -28,22 +28,29 @@ public enum FolderPlaylistDiscovery {
 
         let directChildren = try fileManager.contentsOfDirectory(
             at: folderURL,
-            includingPropertiesForKeys: [
-                .isRegularFileKey,
-                .addedToDirectoryDateKey,
-                .creationDateKey,
-                .contentModificationDateKey,
-            ],
+            // Dates are only needed for accepted media, not every directory entry.
+            includingPropertiesForKeys: [.isSymbolicLinkKey],
             options: [.skipsHiddenFiles]
         )
 
         var metadataDates: [URL: Date] = [:]
         let regularFiles = try directChildren.compactMap { originalURL -> URL? in
             try checkCancellation()
+            // Classify ordinary unsupported entries before resolving their paths.
+            // Extensionless/misnamed symlinks can still lead to supported targets.
+            // Unknown link status must fall through to the existing resolution path.
+            if !MediaFileSupport.isSupportedMediaFile(originalURL),
+               !MediaFileSupport.isSupportedSubtitleFile(originalURL),
+               (try? originalURL.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) == false
+            {
+                return nil
+            }
             let url = NormalizedFileURL.resolveFilesystemIdentity(originalURL) ?? originalURL
             try checkCancellation()
+            let isMedia = MediaFileSupport.isSupportedMediaFile(url)
+            guard isMedia || MediaFileSupport.isSupportedSubtitleFile(url) else { return nil }
             let regular = (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
-            if regular, let date = FolderPlaylistItem.metadataDate(for: url) {
+            if regular, isMedia, let date = FolderPlaylistItem.metadataDate(for: url) {
                 metadataDates[NormalizedFileURL.normalize(url) ?? url] = date
             }
             return regular ? url : nil
