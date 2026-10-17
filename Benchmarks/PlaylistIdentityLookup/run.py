@@ -23,6 +23,7 @@ TESTS = ("PlaylistIdentityLookupTests", "PlaylistMutationTests",
 VARIANTS = ("baseline", "candidate")
 FLAGS = ["-O", "-whole-module-optimization", "-swift-version", "6"]
 BASELINE_COMMIT = "68274d1b09dcc866296321a5a8858efc297c4f19"
+MUTATION_SMALL_INPUT_MIN_ITERATIONS = 500_000
 
 
 def digest(path: Path) -> str:
@@ -118,6 +119,10 @@ def main() -> None:
             "production_module_linkage": "dynamic, separately compiled from driver",
             "source_sha256": receipts, "pairs": args.pairs, "target_ms": args.target_ms,
             "calibration": "All baseline calibration trials retained; one shared iteration count per workload.",
+            "initial_calibration_iterations": {
+                "default": 1,
+                "mutation_count_at_most_one": MUTATION_SMALL_INPUT_MIN_ITERATIONS,
+            },
             "sampling": "Fresh process per variant/pair; baseline-first and candidate-first pairs alternate.",
             "scope": "Function-level lookup elapsed wall time; fixture construction and sorting excluded.",
             "developer_dir": os.environ.get("DEVELOPER_DIR"),
@@ -183,7 +188,10 @@ let package = Package(name: "PlaylistIdentityQualification", platforms: [.macOS(
             (output / "workloads.json").write_text(json.dumps(workloads, indent=2) + "\n")
             for workload in workloads:
                 identifier = workload["id"]
-                iterations = 1
+                # Predefined for the final study: singleton mutation now has a
+                # constant result, so its candidate loop needs more repetitions.
+                iterations = (MUTATION_SMALL_INPUT_MIN_ITERATIONS
+                              if workload["api"] == "mutation" and workload["count"] <= 1 else 1)
                 for trial in range(8):
                     label = f"calibrate-{identifier}-{trial}"
                     row = json.loads(run([str(executables["baseline"]), identifier, str(iterations)], label))

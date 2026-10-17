@@ -1,11 +1,19 @@
 # Playlist identity lookup qualification
 
-This experiment covers `PlaylistMutation.indexPreservingCurrentIdentity` and
-`FolderPlaylist.index(of:)`. Both scan playlist items for a prepared file
-identity. The change computes the target URL's canonical path once per lookup,
-instead of once for every valid item visited. Each visited item's identity is
-still computed normally, and both lookups remain linear scans. No persistent
-identity cache or filesystem lookup is introduced.
+The production change covers `PlaylistMutation.indexPreservingCurrentIdentity`.
+For playlists with at least two items, it computes the target URL's canonical
+path once per lookup, instead of once for every valid item visited. Each visited
+item's identity is still computed normally, and the search remains linear.
+Empty and singleton playlists return their only possible result directly:
+`nil` for empty input and index `0` for one item. Neither identity matching nor
+fallback selection can produce a different answer for those sizes. No
+persistent identity cache or filesystem lookup is introduced.
+
+The final candidate leaves `FolderPlaylist.index(of:)` unchanged. Its 13
+workloads remain in the experiment as unchanged-code controls. The initial
+two-function study is retained separately from the final mutation-only study;
+its source snapshots and runner hashes identify the earlier candidate and
+calibration policy. Do not combine observations from the two studies.
 
 The frozen baseline is `Jagalite/illiquid` commit
 `68274d1b09dcc866296321a5a8858efc297c4f19`. `baseline/manifest.json` records the
@@ -61,7 +69,8 @@ folding repeated invariant lookups into one call.
 
 ## Workloads and timing method
 
-There are 29 workloads. Each API receives the following 13 cases:
+There are 29 workloads: 16 mutation cases and 13 unchanged folder controls.
+Each API receives the following 13 cases:
 
 | Item count | Scenarios |
 |---:|---|
@@ -88,13 +97,22 @@ returned index into a checksum, which is checked after the clock stops.
 Baseline/candidate pairs must also agree on their expected index, checksum,
 workload, and iteration count.
 
-The runner retains every baseline calibration trial. Starting with one call,
-it scales the iteration count toward `--target-ms` (default 40 ms), stopping once
-a trial reaches half that target, eight trials have run, or ten million
-iterations are reached. The resulting **same fixed iteration count** is used
-for both variants and every retained pair for that workload. Calibration records
-are identified separately and are excluded from the reported measurement
-summary by design; no observations are rejected based on their timing.
+The runner retains every baseline calibration trial. The final study defines
+a **500,000-iteration minimum for mutation workloads with at most one item**,
+applied as the initial calibration count. All other workloads start with one
+call. This floor allows the final candidate's fast empty/singleton path to
+produce a measurable loop duration; it intentionally makes some corresponding
+baseline loops take seconds rather than approximately 40 ms. The floor was
+chosen before collecting the final study's measurements and is recorded in its
+manifest. The initial two-function study used one call as every initial count.
+
+From that initial count, calibration only increases iterations toward
+`--target-ms` (default 40 ms), stopping once a trial reaches half that target,
+eight trials have run, or ten million iterations are reached. The resulting
+**same fixed iteration count** is used for both variants and every retained pair
+for that workload. Calibration records are identified separately and excluded
+from the reported measurement summary by design; no observations are rejected
+based on their timing.
 
 Each retained observation runs in a fresh process. Baseline-first and
 candidate-first pairs alternate. At the default eight pairs, every workload has
@@ -106,10 +124,12 @@ those loop durations and their absolute time changes, not percentage alone.
 These are repeated lookups on warm, unchanged in-memory fixtures; cold-cache
 behavior is not measured.
 
-The all-unsupported-item cases deliberately expose a tradeoff: the old helper
-short-circuits before normalizing the target when each item is unsupported,
-whereas eager target preparation performs that work once. The one-item control
-is particularly sensitive to this extra fixed cost. Report these observations
+The all-unsupported-item mutation cases expose an input-dependent tradeoff for
+larger lists: the old helper short-circuits before normalizing the target when
+each item is unsupported, whereas eager target preparation performs that work
+once. The final candidate's singleton fast path avoids both item and target
+normalization. The initial trial lacked that fast path, and its singleton
+unsupported-item result is retained with that trial. Report all controls
 alongside successful valid-file cases rather than hiding them in an average.
 
 ## Evidence and interpretation

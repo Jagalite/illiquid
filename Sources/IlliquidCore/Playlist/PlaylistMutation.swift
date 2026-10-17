@@ -103,7 +103,9 @@ public enum PlaylistMutation {
         fallbackIndex: Int?,
         in items: [FolderPlaylistItem]
     ) -> Int? {
-        guard !items.isEmpty else { return nil }
+        // An empty playlist has no selection; a singleton always selects its
+        // only item regardless of the current URL or fallback.
+        guard items.count > 1 else { return items.indices.first }
         // The target is invariant for this scan; normalize it once, just as
         // each candidate is normalized once when it is visited.
         if let currentURL,
