@@ -94,11 +94,29 @@ public enum MediaNameRecognition {
            let season = capture(token, 1, in: raw).flatMap(Int.init),
            let first = capture(token, 2, in: raw).flatMap(Int.init) {
             let prefixTitle = clean(prefix(raw, before: token))
-            let namedParent = titleAndYear(parent).1 != nil ? parent : ""
-            var show = titleAndYear(prefixTitle.isEmpty ? (showFolder ?? namedParent) : prefixTitle)
-            let folderShow = titleAndYear(showFolder ?? parent)
-            if show.1 == nil, show.0.localizedCaseInsensitiveCompare(folderShow.0) == .orderedSame {
-                show = folderShow
+            var show: (String, Int?)
+            if prefixTitle.isEmpty {
+                // A season folder supplies show context even without a year.
+                // Otherwise a year supplies explicit context in the parent.
+                let folderShow = titleAndYear(showFolder ?? parent)
+                if showFolder != nil || folderShow.1 != nil {
+                    show = folderShow
+                } else {
+                    // Retain the original empty-title comparison: a nonempty
+                    // folder can compare equal to empty under the user's locale.
+                    show = "".localizedCaseInsensitiveCompare(folderShow.0) == .orderedSame
+                        ? folderShow : ("", nil)
+                }
+            } else {
+                show = titleAndYear(prefixTitle)
+                // A filename year already settles identity. Consult the folder
+                // only when it can supply the matching title's year or spelling.
+                if show.1 == nil {
+                    let folderShow = titleAndYear(showFolder ?? parent)
+                    if show.0.localizedCaseInsensitiveCompare(folderShow.0) == .orderedSame {
+                        show = folderShow
+                    }
+                }
             }
             // An isolated S01E01 without a show folder remains unclassified.
             if !show.0.isEmpty {
