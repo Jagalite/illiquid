@@ -1,0 +1,41 @@
+{
+  "build_failure_artifact": "recovery-build-failure/failure.json",
+  "build_recovery_note": "Initial build reported missing stddef.h before any measurements. The same toolchain then typechecked the complete production core source with its default header paths. Preserve failed build under recovery-build-failure and retry the unchanged benchmark command.",
+  "cohort": {
+    "balanced_rounds": 8,
+    "cases": 22,
+    "cpu": 2,
+    "kernels": [
+      "style_miss",
+      "init_score"
+    ],
+    "receipt_samples": 320,
+    "target_ms": 150
+  },
+  "final_measurements_sha256": "180b5840dbb0e32f3cf0be004cee505b702e6f5f340d75436fc742779d16c550",
+  "original_final_observations_lost": 704,
+  "original_final_values_imported": false,
+  "reason": "An external workspace reset removed the original final benchmark artifacts during PR publication. The /tmp exploratory checkpoints survived.",
+  "recovered_at_utc": "2026-10-17T15:12:17.122821+00:00",
+  "recovered_decisions": 3840,
+  "recovered_observations": 704,
+  "recovery_action": "Reconstruct the authored final runner and driver from tool history and surviving source checkpoints; rerun the identical predefined final cohort without selecting or discarding workloads.",
+  "recovery_tests_completed_at_utc": "2026-10-17T15:18:32.753973+00:00",
+  "recovery_timing_completed_at_utc": "2026-10-17T15:17:11.398737+00:00",
+  "source_sha256": {
+    "baseline": "f6c312edecdf8861e3f915689eef4d938447bddd28a751304151a36511e84b90",
+    "candidate": "bbec0383526b1688c46e2e10bc6929774473d8e43e294134dff7fab77a206359",
+    "driver": "dd83754193c49af8027bc9d39df09993b3ac2a4389a4f31db4d43c20efec7bd0",
+    "runner": "76fd413125acf8966e98a2381efa9e733fe468d7d0aa3cd5439ca376ccbf6fc9"
+  },
+  "tests": {
+    "debug": {
+      "output": "tests-debug.txt",
+      "passed": true
+    },
+    "release": {
+      "output": "tests-release.txt",
+      "passed": true
+    }
+  }
+}
