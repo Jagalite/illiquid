@@ -6,6 +6,11 @@ implementation with the frozen source at
 production `MediaTrack.swift` and their complete selection-preferences source.
 There are no platform stubs or copied ranking algorithms.
 
+The [native results and research decision](../../Documentation/TRACK_SELECTION_RANKING_PERFORMANCE.md)
+describe the measured improvement and small-case controls. The successful
+macOS run's complete [retained evidence](evidence/macos-arm64/README.md) remains
+available in the repository, including the original Actions artifact.
+
 ## Reproduce
 
 Use matching Swift 6.1-or-newer `swift` and `swiftc` tools. The native workflow
