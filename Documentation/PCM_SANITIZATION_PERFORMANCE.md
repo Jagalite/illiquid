@@ -8,9 +8,9 @@ Float samples. It changes only `sanitizeInterleavedFloatPCM` in
 The comparison baseline is main commit
 `8c3cc3d4008d5d1b8d436bcf2d51d891382b6548`.
 
-On the native Apple M1 virtual runner, the four tested healthy stereo/surround
-layouts show a **70.9–75.9% median paired wall-time reduction**, with every
-pair favoring the candidate in both wall and CPU time. Linux independently
+Across two cohorts on native Apple M1 virtual runners, the four tested healthy
+stereo/surround layouts show a **69.9–75.9% median paired wall-time reduction**,
+with every pair favoring the candidate in both wall and CPU time. Linux independently
 shows **75.1–81.3%** for the same layouts. This is a microsecond-scale
 component gain with explicit dense-invalid repair tradeoffs; the full app
 build and native audio regressions also pass.
@@ -251,6 +251,58 @@ and [the native app/audio build log](../Benchmarks/PCMSanitization/evidence/maco
 are checked in. The GitHub artifact's downloaded SHA-256 was verified before
 extracting the retained evidence. These measurements exclude audible playback
 and whole-player profiling.
+
+#### Repeat after the CI selector correction
+
+[The repeat workflow](https://github.com/Jagalite/illiquid/actions/runs/39056657414)
+tested merge commit `921e4f243a8c859391ce7efc5923a6553dc2701a`, containing source
+head `0152643c280572ca7b10b07a5991c26e75824e4b`. The sanitizer, harness, runner,
+test file, and compiler hashes match the first native cohort. The intervening
+commit changed evidence, documentation, and the legacy audio-test selector.
+
+The repeat again contains all 55 cases, six balanced pairs, and 660 raw timing
+records. All four component test configurations passed. Fixture bytes,
+replacement counts, restoration, retained aliases, and timed checksums matched.
+Its full preflight receipt has the same SHA-256 as the first native and Linux
+receipts and uses the same checked-in compressed record file.
+
+| Healthy PCM case | First native wall reduction | Repeat wall reduction | Repeat CPU reduction |
+| --- | ---: | ---: | ---: |
+| `1024x2` | +70.9% | +69.9% | +70.3% |
+| `1024x6` | +75.9% | +75.2% | +74.5% |
+| `1024x8` | +72.1% | +75.0% | +74.5% |
+| `4096x8` | +75.6% | +75.8% | +75.3% |
+
+All 24 healthy player-layout pairs in the repeat favored the candidate in both
+wall and CPU time. The repeated ordinary-buffer result supports the same
+component conclusion.
+
+The repeat also exposes a larger repair penalty: **dense-invalid `4096x8`
+sanitation plus restoration took 22.8% more wall time and 19.5% more CPU time**.
+Five of its six CPU pairs were slower. This is a measured tradeoff to retain,
+not dismiss as runner noise. Across all five large sizes, dense-invalid wall
+reductions ranged from −22.8% to +3.8%, and CPU reductions from −19.5% to −0.2%.
+All-subnormal operations ranged from −7.2% to +1.9% in wall time and −15.8% to
++2.2% in CPU time. The first cohort's narrower penalties are not general upper
+bounds.
+
+Restoration-only control reductions remained variable: −13.5% to +15.2% in wall
+time and −13.5% to +12.1% in CPU time. All sizes of sparse-invalid operations
+improved 54.8–73.6% in wall time; shared healthy operations improved 38.4–65.6%.
+These family ranges include mono helper coverage. Each cohort is reported
+separately; the two runs are not pooled into a stronger statistical claim.
+
+The corrected native-audio selector explicitly ran
+`audioSanitizationZerosInvalidSamplesOnly`. The full app graph built and
+**23 tests in five suites passed**, including the eight new sanitizer tests.
+The same three fixture-dependent session methods returned early and retain
+the playback qualification below.
+
+The repeat's [complete results](../Benchmarks/PCMSanitization/evidence/macos-repeat-component/summary.json),
+[raw observations](../Benchmarks/PCMSanitization/evidence/macos-repeat-component/measurements.jsonl),
+[provenance](../Benchmarks/PCMSanitization/evidence/macos-repeat-component/qualification.json),
+and [23-test app/audio log](../Benchmarks/PCMSanitization/evidence/macos-repeat-native-audio/job.log)
+are retained alongside the first cohort.
 
 
 ## Validation
