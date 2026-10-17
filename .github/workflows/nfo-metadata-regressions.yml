@@ -1,0 +1,32 @@
+name: NFO metadata regressions
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Tests/IlliquidCoreTests/NFOEpisodeScopeRegressionTests.swift'
+      - 'Scripts/test-nfo-metadata-regressions.sh'
+      - '.github/workflows/nfo-metadata-regressions.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nfo-metadata-regressions-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  metadata:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record compiler
+        run: swift --version
+      - name: Debug metadata tests
+        run: bash Scripts/test-nfo-metadata-regressions.sh
+      - name: Optimized metadata tests
+        run: bash Scripts/test-nfo-metadata-regressions.sh -c release

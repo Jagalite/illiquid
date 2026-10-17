@@ -10,7 +10,8 @@ public enum NFOMetadataHints {
         parser.shouldResolveExternalEntities = false
         let delegate = MetadataDelegate()
         parser.delegate = delegate
-        guard parser.parse(), delegate.valid, delegate.hasValue else { return nil }
+        // Some Foundation implementations report an error while parse() returns true.
+        guard parser.parse(), parser.parserError == nil, delegate.valid, delegate.hasValue else { return nil }
         var result = delegate.hints
         result.sources = ["NFO"]
         return result
@@ -65,9 +66,10 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
         case "showtitle" where hints.content == .episode: hints.title = value; hasValue = true
         case "year" where hints.content != .episode:
             if let year = MediaMetadataHints.number(value), (1800...2099).contains(year) { hints.year = year; hasValue = true }
-        case "season":
+        // In tvshow NFOs these fields are library totals, not episode identity.
+        case "season" where hints.content == .episode:
             if let season = MediaMetadataHints.number(value, maximum: 999) { hints.season = season; hasValue = true }
-        case "episode":
+        case "episode" where hints.content == .episode:
             if let episode = MediaMetadataHints.number(value) { hints.episode = episode; hasValue = true }
         case "uniqueid":
             if let provider = idProvider, let id = MediaMetadataHints.catalogID(provider: provider, value: value) {
