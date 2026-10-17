@@ -50,7 +50,7 @@ struct NFOMetadataFieldSelectionTests {
 
     @Test(arguments: ["title", "showtitle", "year", "season", "episode", "uniqueid"])
     func consumedFieldsKeepTheirTextLimit(_ field: String) {
-        let root = field == "showtitle" ? "episodedetails" : "movie"
+        let root = ["showtitle", "season", "episode"].contains(field) ? "episodedetails" : "movie"
         let attribute = field == "uniqueid" ? " type='imdb'" : ""
         for count in [4096, 4097] {
             // Split the value across character-data and CDATA callbacks. A limit
