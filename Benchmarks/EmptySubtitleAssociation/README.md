@@ -44,9 +44,19 @@ original input URL keys with empty arrays when there are no subtitles. Matched
 controls independently require each exact subtitle to be assigned. Repository
 tests separately exercise cancellation and real temporary-directory discovery.
 
-Both variants are calibrated in fresh processes; every calibration observation
-is retained separately. A shared iteration count aims for the slower calibration
-to reach the requested duration, capped by `--max-iterations`. The six paired
+Both variants are calibrated in fresh processes. Calibration starts at one
+iteration and increases the loop count fourfold until wall time reaches 5 ms,
+or `--max-iterations` is reached. Every attempt, including a zero-duration
+observation below clock resolution, is retained separately in `calibration.jsonl`.
+At the cap, calibration must obtain positive wall and CPU durations or fail with
+a clear error; a positive sub-5-ms result at the cap is retained and accepted.
+The default 100,000-iteration cap permits at most ten calibration attempts per
+variant and cell. No zero-duration observation enters the paired measurements.
+
+The final calibrations can use different loop counts. The shared measured loop
+count is derived from the larger **per-iteration wall duration**, aiming for that
+slower variant to reach the requested duration, capped by `--max-iterations`.
+The six paired
 observations alternate AB/BA order, use fresh processes and three or fewer warmup
 iterations, and retain every completed observation. Loop counts are the same
 across all processes in each cell. Calibration is excluded from the summary.

@@ -18,6 +18,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PIN = "68274d1b09dcc866296321a5a8858efc297c4f19"
 VARIANTS = ("baseline", "candidate")
+CALIBRATION_MIN_NS = 5_000_000
 TEST_FILES = (
     "ExternalSubtitleMatcherTests.swift", "FolderPlaylistDiscoveryTests.swift",
     "FolderDiscoveryFilesystemRegressionTests.swift", "TestSupport/TemporaryDirectory.swift",
@@ -285,7 +286,8 @@ def workload_id(work: dict) -> str:
     return "-".join(str(work[key]) for key in ("operation", "style", "mode", "media_count"))
 
 
-def measurement(runner: Runner, binary: Path, work: dict, iterations: int, label: str) -> tuple[dict, dict]:
+def measurement(runner: Runner, binary: Path, work: dict, iterations: int, label: str,
+                *, allow_zero_duration: bool = False) -> tuple[dict, dict]:
     raw = runner.execute([binary, "measure", work["operation"], work["style"], work["mode"],
                           str(work["media_count"]), str(iterations)], label, compact_result=True)
     value = json.loads(raw)
@@ -294,13 +296,52 @@ def measurement(runner: Runner, binary: Path, work: dict, iterations: int, label
     for key in ("elapsed_ns", "cpu_ns", "checksum", "warmup_iterations", "subtitle_count"):
         if type(value.get(key)) is not int or value[key] < 0:
             raise RuntimeError(f"Invalid measurement field {key}")
-    if value["elapsed_ns"] <= 0 or value["warmup_iterations"] != min(3, iterations):
-        raise RuntimeError("Invalid wall duration or warmup count")
+    if not allow_zero_duration and (value["elapsed_ns"] == 0 or value["cpu_ns"] == 0):
+        raise RuntimeError("Measured wall and CPU durations must be positive")
+    if value["warmup_iterations"] != min(3, iterations):
+        raise RuntimeError("Invalid warmup count")
     expected_subtitles = 0 if work["mode"] == "empty" else work["media_count"]
     if value["subtitle_count"] != expected_subtitles or value["checksum"] != work["media_count"] * (iterations + min(3, iterations)):
         raise RuntimeError("Invalid subtitle count or consumed-result checksum")
     result = value.pop("result")
     return value, result
+
+
+def calibrate(runner: Runner, binary: Path, work: dict, variant: str, max_iterations: int,
+              expected: dict | None) -> tuple[dict, dict]:
+    identity = workload_id(work)
+    iterations, attempt = 1, 0
+    while True:
+        row, result = measurement(runner, binary, work, iterations,
+                                  f"calibration-{identity}-{variant}-attempt-{attempt}", allow_zero_duration=True)
+        positive = row["elapsed_ns"] > 0 and row["cpu_ns"] > 0
+        at_cap = iterations == max_iterations
+        ready = positive and (row["elapsed_ns"] >= CALIBRATION_MIN_NS or at_cap)
+        row.update(variant=variant, phase="calibration", workload=identity, calibration_attempt=attempt,
+                   calibration_target_ns=CALIBRATION_MIN_NS, at_iteration_cap=at_cap,
+                   selected_for_loop_count=ready, result_sha256=digest(canonical(result)))
+        # Persist even zero-duration and terminal unsuccessful attempts. They
+        # are calibration evidence, never accepted paired timing measurements.
+        append_json(runner.output / "calibration.jsonl", row)
+        if expected is not None and result != expected:
+            raise RuntimeError(f"Calibration output mismatch: {identity}/{variant}/attempt {attempt}")
+        expected = result
+        if ready:
+            return row, expected
+        if at_cap:
+            raise RuntimeError(f"Calibration could not obtain positive wall and CPU durations at "
+                               f"the {max_iterations}-iteration cap: {identity}/{variant}")
+        iterations = min(max_iterations, iterations * 4)
+        attempt += 1
+
+
+def measured_iterations(calibration: list[dict], target_ms: float, max_iterations: int) -> int:
+    # Adaptive calibration may finish with different loop counts for the two
+    # variants. Compare their per-call costs, never their aggregate durations.
+    slowest_per_call = max(row["elapsed_ns"] / row["iterations"] for row in calibration)
+    if slowest_per_call <= 0:
+        raise RuntimeError("Calibration did not establish a positive per-call duration")
+    return max(1, min(max_iterations, math.ceil(target_ms * 1_000_000 / slowest_per_call)))
 
 
 def check_logs(output: Path) -> None:
@@ -329,19 +370,12 @@ def run_benchmark(runner: Runner, args: argparse.Namespace, baseline: dict, swif
         identity = workload_id(work)
         expected = None
         calibration = []
-        # Calibration is not part of the paired result. Keep both observations,
-        # and use one shared loop count for every timed process in this cell.
+        # Grow each variant's calibration above timer resolution before choosing
+        # one shared loop count for every paired process in this cell.
         for variant in VARIANTS:
-            row, result = measurement(runner, binaries[variant], work, 1, f"calibration-{identity}-{variant}")
-            row.update(variant=variant, phase="calibration", workload=identity)
-            if expected is not None and result != expected:
-                raise RuntimeError(f"Calibration output mismatch: {identity}")
-            expected = result
-            row["result_sha256"] = digest(canonical(result))
+            row, expected = calibrate(runner, binaries[variant], work, variant, args.max_iterations, expected)
             calibration.append(row)
-            append_json(runner.output / "calibration.jsonl", row)
-        iterations = max(1, min(args.max_iterations, math.ceil(args.target_ms * 1_000_000 /
-                           max(row["elapsed_ns"] for row in calibration))))
+        iterations = measured_iterations(calibration, args.target_ms, args.max_iterations)
         receipt = runner.output / "receipts" / (identity + ".json")
         write_json(receipt, expected)
         result_digest = digest(canonical(expected))
