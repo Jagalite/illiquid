@@ -1,0 +1,29 @@
+name: Persistence writer regressions
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/Persistence/CoalescingPersistenceWriter.swift
+      - Tests/IlliquidCoreTests/PersistenceWriterLifetimeTests.swift
+      - Scripts/test-persistence-writer-regressions.sh
+      - .github/workflows/persistence-writer-regressions.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: persistence-writer-regressions-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  lifetime-regressions:
+    runs-on: macos-26
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        configuration: [debug, release]
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: swift --version
+      - run: bash Scripts/test-persistence-writer-regressions.sh --configuration "${{ matrix.configuration }}" --jobs 2 -Xswiftc -warnings-as-errors
