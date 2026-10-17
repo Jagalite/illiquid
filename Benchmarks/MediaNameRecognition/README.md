@@ -94,4 +94,24 @@ elapsed-time interference and to assess the two unfavorable controls.
 
 Initial native workflow: [39069913567](https://github.com/Jagalite/illiquid/actions/runs/39069913567),
 implementation commit `2c2e73cead0eb2843ada0a89451ac411b210fdcc`.
-Final measurements will be recorded after the follow-up completes.
+The [CPU confirmation run](https://github.com/Jagalite/illiquid/actions/runs/39070945382)
+at `26ea88858af8ced4750fced9e64606bd58db4147` confirmed the unfavorable
+unclassified-name control: median paired CPU cost increased 8.0%, with only
+two of eight candidate samples faster. Malformed-tag CPU cost increased 1.3%
+at the paired median. Movie and episode categories improved, and the mixed
+workload used 11.7% less CPU at the paired median, but those gains do not
+remove the regression.
+
+The revised implementation scans contiguous byte buffers with
+`String.withUTF8` and reuses any materialized representation in subsequent
+cleanup. The first implementation iterated `String.UTF8View` for each
+delimiter check. The revision targets that traversal cost without changing
+the delimiter predicates, regex fallback, or recognition rules. This is a
+source-based hypothesis; no sampled profiler or allocation measurement was
+taken. A regression also compares Unicode inputs constructed through native
+Swift and UTF-16 Foundation storage.
+
+The revised candidate will use the same eight-pair, 750 ms CPU/elapsed
+protocol and unchanged corpus. All earlier observations remain part of the
+investigation. The confirmation archive has been downloaded for retention
+alongside the final report; final revised measurements are pending.

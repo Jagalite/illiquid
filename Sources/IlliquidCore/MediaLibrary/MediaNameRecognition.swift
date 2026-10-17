@@ -62,16 +62,17 @@ public enum MediaNameRecognition {
     /// may itself be a show/movie. Ancestors are only consulted for explicit naming cues.
     public static func recognize(relativePath: String) -> RecognizedMediaName {
         let path = relativePath as NSString
-        let raw = (path.lastPathComponent as NSString).deletingPathExtension
+        var raw = (path.lastPathComponent as NSString).deletingPathExtension
         let folders = (path.deletingLastPathComponent as NSString).pathComponents.filter { $0 != "/" && $0 != "." }
         let parent = folders.last ?? ""
         let seasonParent = match(seasonFolder, parent) != nil || parent.lowercased() == "specials"
         let showFolder = seasonParent ? folders.dropLast().last : nil
-        let ancestor = showFolder ?? parent
-        let rawHasBrace = raw.utf8.contains(0x7B)
+        var ancestor = showFolder ?? parent
+        // Materialize UTF-8 once for a bridged filename; later scans reuse it.
+        let rawHasBrace = raw.withUTF8 { $0.contains(0x7B) }
         let ids: [String]
         let editionName: String?
-        if rawHasBrace || ancestor.utf8.contains(0x7B) {
+        if rawHasBrace || ancestor.withUTF8({ $0.contains(0x7B) }) {
             // Preserve joined evidence: an edition match can span the separator.
             let evidence = [raw, ancestor].joined(separator: "/")
             ids = Array(Set(matches(id, evidence).compactMap { capture($0, 1, in: evidence)?.lowercased() })).sorted()
@@ -190,10 +191,15 @@ public enum MediaNameRecognition {
             .split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
             .trimmingCharacters(in: CharacterSet(charactersIn: " -()[]"))
     }
-    private static func strippingTags(_ text: String) -> String {
+    private static func strippingTags(_ original: String) -> String {
+        var text = original
         // Every tag match starts with an ASCII brace or bracket. Scan bytes so
         // delimiters joined to combining characters still take the regex path.
-        guard text.utf8.contains(where: { $0 == 0x7B || $0 == 0x5B }) else { return text }
+        // Return the contiguous representation for reuse by subsequent cleanup.
+        let hasOpener = text.withUTF8 { bytes in
+            bytes.contains { $0 == 0x7B || $0 == 0x5B }
+        }
+        guard hasOpener else { return text }
         return tags.stringByReplacingMatches(in: text,
             range: NSRange(text.startIndex..., in: text), withTemplate: "")
     }

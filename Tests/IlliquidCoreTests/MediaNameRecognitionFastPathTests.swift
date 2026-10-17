@@ -109,4 +109,29 @@ struct MediaNameRecognitionFastPathTests {
         #expect(media.edition == nil)
         #expect(media.catalogIDs.isEmpty)
     }
+
+    @Test func foundationAndNativeInputStorageHaveEquivalentResults() {
+        for path in [
+            "Home Videos/旅行 Cafe\u{301} 👩🏽‍🚀 holiday.mp4",
+            "Movies/世界 Cafe\u{301} (2001).mkv",
+            "Show 👩🏽‍🚀 {tvdb-30}/Season 02/S02E03 - 世界.mkv",
+            "世界 Tail}/Film Cafe\u{301} {edition-Open.mkv",
+            "Movies/Film [\u{301}note] (2001).mkv"
+        ] {
+            // Construct Foundation input from UTF-16, independently of Swift's
+            // native buffer. Foundation's exact storage class is not a contract.
+            let units = Array(path.utf16)
+            let bridged = units.withUnsafeBufferPointer {
+                NSString(characters: $0.baseAddress!, length: $0.count) as String
+            }
+            var contiguous = path
+            contiguous.makeContiguousUTF8()
+            let expected = MediaNameRecognition.recognize(relativePath: contiguous)
+            let actual = MediaNameRecognition.recognize(relativePath: bridged)
+            #expect(actual == expected)
+            #expect(actual.displayName == expected.displayName)
+            #expect(actual.seriesTitle == expected.seriesTitle)
+            #expect(actual.section == expected.section)
+        }
+    }
 }
