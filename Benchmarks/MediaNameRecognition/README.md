@@ -113,5 +113,27 @@ Swift and UTF-16 Foundation storage.
 
 The revised candidate will use the same eight-pair, 750 ms CPU/elapsed
 protocol and unchanged corpus. All earlier observations remain part of the
-investigation. The confirmation archive has been downloaded for retention
-alongside the final report; final revised measurements are pending.
+investigation. The confirmation's 192 numeric observations (6,215,680 recognitions) and
+24 calibration records are retained with exact original JSONL hashes in
+[`../MediaNameTagGuards/evidence/confirmation-original/`](../MediaNameTagGuards/evidence/confirmation-original/).
+Their CPU/elapsed summaries, source hashes, calibration and balanced order
+were independently recomputed. Complete differential archives match the
+already audited initial outputs exactly. Final revised measurements are pending.
+
+The first job for the revised candidate
+([39071954176](https://github.com/Jagalite/illiquid/actions/runs/39071954176))
+remained queued without steps for more than 15 minutes. This documentation
+and evidence update resubmits the unchanged production implementation,
+driver, corpus, tests and eight-pair protocol. The superseded queued attempt
+contains no measurements and is not a discarded timing cohort.
+
+## Related work
+
+[PR #46](https://github.com/Jagalite/illiquid/pull/46) opened during this
+investigation and includes an overlapping tag-removal guard plus a separate
+date-validation optimization. This investigation additionally gates
+catalog/edition evidence and uses contiguous UTF-8 scans. These measurements
+compare against the frozen main revision, not against #46; they do not
+establish incremental performance on top of that PR. Production overlap
+requires integration review. This investigation's final benchmark directory
+and workflow will use distinct names to avoid unrelated artifact conflicts.
