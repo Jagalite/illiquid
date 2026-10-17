@@ -57,7 +57,7 @@ The runner includes existing placement, sidebar, geometry and timeline precision
 
 Hit classifications and nearest-sample choices must agree `1e-6` points to either side of their boundaries. Exact distance cutoffs and equidistant samples can resolve differently after rounding; the harness counts those cases separately and checks that the stored local offset preserves the grabbed point. Existing inclusive-boundary tests also run.
 
-## Results
+## Linux component results
 
 **The endpoint optimization merits a PR.** The retained Linux study used Swift 6.3.2 in an x86_64 environment reporting an AMD EPYC 9V74 processor. Six AB/BA rounds covered 13 scenarios, with 4,000 iterations per observation (400 drag corrections): **156 separately timed processes**. The independent verifier matched all observations to process output and verified four executable hashes and 15 generated source hashes. [Raw measurements, ranges, environment and receipts](../Benchmarks/ElasticControlGeometry/evidence/linux/).
 
@@ -83,13 +83,35 @@ An earlier short pilot suggested larger curved regressions and prompted this lon
 
 ### Correctness
 
- The test run passed 37 extracted tests in each baseline/candidate debug/release configuration. The expanded differential covered 1,184 geometries and 520,774 numeric comparisons. Maximum coordinate error was `4.092726157978177e-11` points and maximum fraction error `5.97597736269953e-14`; partial bends constructed from identical inputs had exactly zero error.
+The test run passed 37 extracted tests in each baseline/candidate debug/release configuration. The expanded differential covered 1,184 geometries and 520,774 numeric comparisons. Maximum coordinate error was `4.092726157978177e-11` points and maximum fraction error `5.97597736269953e-14`; partial bends constructed from identical inputs had exactly zero error.
 
 Of 3,552 boundary classifications, 16 differed exactly at the cutoff; all checks `1e-6` points to either side agreed. Of 21,312 nearest-sample checks, 1,464 exact midpoint ties selected the other adjacent sample. Off-tie choices agreed, and reconstructed grabbed points matched within the numerical tolerance. These are disclosed rounding differences, not bit-identical behavior.
 
-### Native qualification
+## Native macOS qualification
 
-macOS component timings and full application compilation/tests are pending the new PR's CI. The dedicated geometry workflow runs the same study with real `SwiftUI.Path`. The existing restoration workflow also builds the real app dependency graph and runs the placement, geometry, timeline and new regression suites. This report will be updated with those results; Linux measurements alone do not qualify native SwiftUI performance.
+**Native qualification passed.** The [geometry workflow](https://github.com/Jagalite/illiquid/actions/runs/39043693976) ran the same six-round, 156-process study with real `SwiftUI.Path`, Apple Swift 6.3.3 and macOS 26.6.2 ARM64. It tested candidate commit `c7631714fba0c579e40f352edc44a35a7056f7eb` merged with the pinned baseline as `1f0e9796c6f56f70b80278dfbd3ace6fa46f4dfa`. Downloaded artifact bytes matched GitHub's SHA-256 digest, and an independent local readback verified all observations, four binaries and 15 generated sources. [Retained native evidence](../Benchmarks/ElasticControlGeometry/evidence/macos/).
+
+| Workload | Original median (µs) | Candidate median (µs) | Time change |
+| --- | ---: | ---: | ---: |
+| Straight: construct geometry | 13.32 | 2.76 | -79.27% |
+| Straight: hover hit testing | 18.11 | 3.55 | -80.41% |
+| Rotated straight: hover | 39.65 | 3.99 | -89.95% |
+| Straight: three paths | 24.14 | 13.09 | -45.77% |
+| Straight: drag correction | 222.53 | 34.65 | -84.43% |
+| Fully turned: construct geometry | 57.75 | 4.30 | -92.56% |
+| Fully turned: hover | 88.03 | 6.04 | -93.14% |
+| Fully turned: three paths | 69.08 | 14.90 | -78.43% |
+| Partial bend: construct geometry | 42.40 | 42.68 | +0.68% |
+| Partial bend: hover | 57.15 | 57.61 | +0.81% |
+| Partial bend: three paths | 42.30 | 42.75 | +1.07% |
+| Partial bend: drag correction | 781.36 | 776.66 | -0.60% |
+| Slight bend: hover | 50.22 | 50.65 | +0.87% |
+
+Native endpoint workloads improve 1.84–14.58×, including the real path-construction cost. Straight hover improves 5.11× and straight drag correction 6.42×, saving 187.88 µs per correction. Native path results improve less than the Linux collector results; real path construction remains part of the timed work. Partial-bend medians range from 0.60% faster to 1.07% slower, with overlapping observed ranges. The largest positive absolute median change among those controls is 0.46 µs. Process CPU medians show the same direction for all scenarios. These small control differences should not be treated as a precisely established causal regression or as proof of zero cost.
+
+All 37 extracted tests passed in each native baseline/candidate debug/release configuration. Both native differential builds passed the same 520,774 comparisons and reported the same maximum coordinate/fraction errors as Linux. Native exact-cutoff differences numbered 17 rather than 16; all checks on either side of the cutoff agreed, and the 1,464 exact sample ties retained their reconstructed initial grab position.
+
+Separately, the [native application job](https://github.com/Jagalite/illiquid/actions/runs/39043694015/job/117428090101) built the real app dependency graph and passed 92 tests in 12 suites, including placement, geometry, timeline and the new fast-path regression suite. The [focused core job](https://github.com/Jagalite/illiquid/actions/runs/39043694015/job/117428090325) passed 14 Swift tests and eight Python qualification tests. The [existing non-decoding workflow](https://github.com/Jagalite/illiquid/actions/runs/39043693924) also passed. Native timing evidence supports the endpoint change, while whole-player user-visible impact remains unmeasured.
 
 ## Limits and alternatives
 
