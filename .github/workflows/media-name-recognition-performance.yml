@@ -1,0 +1,93 @@
+name: Media name recognition performance
+
+on:
+  push:
+    branches: [perf/media-name-recognition]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Tests/IlliquidCoreTests/NFOMetadataFieldSelectionTests.swift'
+      - 'Tests/IlliquidCoreTests/NFOEpisodeScopeRegressionTests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatchHintsRegressionTests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatchReaderRegressionTests.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaOrganizationTests.swift'
+      - 'Benchmarks/MediaNameRecognition/**'
+      - '.github/workflows/media-name-recognition-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-name-recognition-performance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          # Reconstruct the pinned baseline when testing a PR merge commit.
+          fetch-depth: 0
+      - name: Record the native host
+        run: |
+          mkdir -p "$RUNNER_TEMP/media-name-recognition"
+          sw_vers > "$RUNNER_TEMP/media-name-recognition/host.txt"
+          uname -a >> "$RUNNER_TEMP/media-name-recognition/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/media-name-recognition/host.txt"
+          swift --version >> "$RUNNER_TEMP/media-name-recognition/host.txt"
+      - name: Test both implementations and measure balanced native runs
+        run: |
+          python3 Benchmarks/MediaNameRecognition/run.py \
+            --mode all --pairs 6 --iterations 4000 --exhaustive-dates \
+            --output "$RUNNER_TEMP/media-name-recognition/component"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-name-recognition-component
+          path: |
+            ${{ runner.temp }}/media-name-recognition/host.txt
+            ${{ runner.temp }}/media-name-recognition/component/*.json
+            ${{ runner.temp }}/media-name-recognition/component/*.jsonl
+            ${{ runner.temp }}/media-name-recognition/component/logs/
+            ${{ runner.temp }}/media-name-recognition/component/sources/
+            ${{ runner.temp }}/media-name-recognition/component/differential/
+          retention-days: 30
+
+  native-metadata:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and test recognition consumers
+        run: |
+          mkdir -p "$RUNNER_TEMP/media-name-recognition-native"
+          set -o pipefail
+          swift test --force-resolved-versions --filter \
+            'MediaNameRecognitionTests|SourceMediaOrganizationTests|MediaSidecarTests|PlexMatchHintsRegressionTests|PlexMatchReaderRegressionTests|NFOMetadataFieldSelectionTests|NFOEpisodeScopeRegressionTests' \
+            2>&1 | tee "$RUNNER_TEMP/media-name-recognition-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-name-recognition-native-metadata
+          path: ${{ runner.temp }}/media-name-recognition-native/
+          retention-days: 30

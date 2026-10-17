@@ -119,12 +119,7 @@ public enum MediaNameRecognition {
             }
             let y = first > 31 ? first : last
             let d = first > 31 ? last : first
-            var calendar = Calendar(identifier: .gregorian)
-            calendar.timeZone = TimeZone(secondsFromGMT: 0)!
-            let components = DateComponents(year: y, month: m, day: d)
-            let valid = calendar.date(from: components).map {
-                calendar.dateComponents([.year, .month, .day], from: $0) == components
-            } ?? false
+            let valid = isValidAirDate(year: y, month: m, day: d)
             let show = titleAndYear(clean(prefix(raw, before: token)))
             if valid, !show.0.isEmpty {
                 let tail = cleanRelease(suffix(raw, after: token))
@@ -161,8 +156,7 @@ public enum MediaNameRecognition {
     private static func titleAndYear(_ original: String) -> (String, Int?) {
         // Edition dates and IDs are not release years. Parenthesized years win
         // over incidental numbers; the last year handles numeric movie titles.
-        let text = tags.stringByReplacingMatches(in: original,
-            range: NSRange(original.startIndex..., in: original), withTemplate: "")
+        let text = removingTags(from: original)
         if let token = matches(explicitYear, text).last ?? matches(year, text).last, let value = capture(token, 1, in: text).flatMap(Int.init) {
             let title = clean(prefix(text, before: token))
             if !title.isEmpty { return (title, value) }
@@ -174,10 +168,33 @@ public enum MediaNameRecognition {
         clean(match(release, text).map { prefix(text, before: $0) } ?? text)
     }
     private static func clean(_ text: String) -> String {
-        let stripped = tags.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: "")
+        let stripped = removingTags(from: text)
         return stripped.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "_", with: " ")
             .split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
             .trimmingCharacters(in: CharacterSet(charactersIn: " -()[]"))
+    }
+    private static func removingTags(from text: String) -> String {
+        // The tag regex cannot match without an ASCII opener. Inspect bytes so
+        // an opener followed by a combining mark still takes the regex path.
+        guard text.utf8.contains(where: { $0 == 0x5B || $0 == 0x7B }) else { return text }
+        return tags.stringByReplacingMatches(in: text,
+            range: NSRange(text.startIndex..., in: text), withTemplate: "")
+    }
+    private static func isValidAirDate(year: Int, month: Int, day: Int) -> Bool {
+        // Date tokens cover 1900...2099. Validate Gregorian month lengths
+        // without constructing and round-tripping calendar values per file.
+        guard day >= 1 else { return false }
+        let maximumDay: Int
+        switch month {
+        case 2:
+            let leapYear = year.isMultiple(of: 4)
+                && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
+            maximumDay = leapYear ? 29 : 28
+        case 4, 6, 9, 11: maximumDay = 30
+        case 1, 3, 5, 7, 8, 10, 12: maximumDay = 31
+        default: return false
+        }
+        return day <= maximumDay
     }
     private static func regex(_ pattern: String) -> NSRegularExpression { try! NSRegularExpression(pattern: pattern) }
     private static func matches(_ regex: NSRegularExpression, _ text: String) -> [NSTextCheckingResult] {
