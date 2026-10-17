@@ -1,0 +1,38 @@
+name: Episode folder parsing Linux component
+
+on:
+  push:
+    branches: ['perf/media-name-folder-parsing']
+    paths:
+      - '.github/workflows/episode-folder-parsing-linux.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-component:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.3-noble
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Compare exact sources in Linux Swift
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          python3 Benchmarks/MediaNameRecognition/run.py \
+            --output "$RUNNER_TEMP/episode-folder-parsing-linux" \
+            --pairs 6 --target-ms 200
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: episode-folder-parsing-linux
+          path: |
+            ${{ runner.temp }}/episode-folder-parsing-linux/*.json
+            ${{ runner.temp }}/episode-folder-parsing-linux/*.jsonl
+            ${{ runner.temp }}/episode-folder-parsing-linux/*.stdout
+            ${{ runner.temp }}/episode-folder-parsing-linux/*.stderr
+            ${{ runner.temp }}/episode-folder-parsing-linux/inputs/**
+          retention-days: 14
