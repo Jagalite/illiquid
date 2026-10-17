@@ -1,14 +1,55 @@
 # NFO text-limit performance research
 
-## Result and status
+## Result and decision
 
-The first native qualification met the predefined performance target with exact output equality and passing baseline/candidate regressions. Complete parsing of the three intentionally fragmented fields took **95–98% less time**. The ordinary movie control was approximately unchanged. These measurements describe the parser and the fixtures below; they do not measure whole-library loading or playback.
+**The refined candidate meets the predefined research criteria in protocol 3.** Complete parsing of the three intentionally fragmented fields took **93.76–97.91% less time**, with the candidate faster in all twelve measured pairs for each workload. All correctness and exact-output comparisons passed.
 
-The expanded campaign and unchanged-source PR replication both passed correctness checks and retained large fragmented-field gains. They identified a repeated Unicode fallback cost worth removing: the paired median change was +3.05% and then +9.01%. The ignored-plot control was +6.37% in one cohort and -2.80% in the next. Every result remains in the evidence record.
+The longer ordinary-movie observations measured **+1.33% by independent medians and +0.07% by paired medians**, with six of twelve pairs favoring each variant. The earlier material movie slowdown did not repeat in this fixed longer-batch follow-up on unchanged production source. The episode, short-Unicode, repeated-fallback, and ignored-plot controls had lower medians in this cohort. Small differences and their direction should not be treated as reliable general improvements.
 
-The current candidate stops trying the UTF-8 shortcut for a field after its first miss and resets that decision at the same two locations as the accumulated text. Its first native campaign passed all correctness checks and kept 95–98% fragmented-field improvements. With longer fallback and ignored-plot batches, their paired median changes were -0.34% and +1.75%. However, the small-movie control was +12.12% by independent medians and +14.81% by paired medians. That ordinary control still requires investigation before final acceptance.
+The early DOCTYPE rejection control remained slower: +7.14% by independent medians, +3.66% by paired medians, approximately 0.095 microseconds between independent medians. That input returns in the unchanged declaration preflight before the modified callback can execute. Protocol 2 measured +0.33% / +0.11% for this control. We retain both results; this experiment does not establish a uniformly faster parser on every input.
 
-Protocol 3 retains the exact production source and all other protocol-2 counts, but fixes movie, episode, and short-Unicode observations at 100,000, 50,000, and 50,000 parses. Twelve balanced AB/BA pairs remain fixed before measurement. This follow-up lengthens the short ordinary batches rather than treating their variation as proof that the regression is noise. Earlier cohorts and unfavorable results are preserved separately; their samples are not pooled.
+These are complete warmed, in-memory NFO parse measurements on fixed synthetic fixtures. Whole-library loading, file I/O, playback, and energy were outside the experiment.
+
+## Final native cohort
+
+[Run 39075451501](https://github.com/Jagalite/illiquid/actions/runs/39075451501), completed October 17, 2026, used protocol `3-longer-ordinary-controls`.
+
+| Identity | Value |
+|---|---|
+| Pinned baseline commit | `68274d1b09dcc866296321a5a8858efc297c4f19` |
+| PR head for this run | `91dab495865210bbaced94ef39a2eb613209c3c7` |
+| Actual compiled PR merge checkout | `b1ef60bf443ed4018ef2aa20f9b8d99a375ff25a` |
+| Candidate NFO source blob | `051c475fd33bcd16ec33f6b4b93ee98fffdb21d3` |
+| Benchmark runner blob | `f77ca6bf077428a964d4bcefc8f51658d8b6c679` |
+| Benchmark driver blob | `66b8c7f727538beaab6f80558d894482922c9037` |
+| Recorded environment | macOS 26.6.2, arm64, three processors; Apple Swift 6.3.3; Xcode 26.6 selected by workflow |
+| Optimized executable flags | `-swift-version 6 -O -parse-as-library` |
+
+Only `MediaLibrary/NFOMetadataHints.swift` differs among the five compiled production sources. The manifest records exact source and test hashes and a clean working tree.
+
+**Correctness:** 52 tests in five suites passed in each of baseline debug, baseline release, candidate debug, and candidate release. These are the same 52 tests exercised in four configurations. All 136 complete differential outputs matched, including 80 accepted and 56 rejected inputs. Complete receipts also matched across all benchmark observations.
+
+**Audit:** the complete archive, per-file hashes and ZIP checksums, 338 timing records, all receipt hashes, and every reported statistic were independently checked. The runner compares both implementations and saves their shared output; auditing that saved output does not independently reexecute the parser.
+
+Times below are milliseconds per complete parse. “Median change” is candidate median / baseline median minus one. “Paired change” is the median of the twelve within-pair candidate / baseline ratios minus one. They are different statistics. Negative values favor the candidate; all samples, including slow observations, are retained.
+
+| Workload | Baseline median, ms | Candidate median, ms | Median change | Paired change | Faster pairs |
+|---|---:|---:|---:|---:|---:|
+| `movie-small` | 0.017869 | 0.018107 | +1.33% | +0.07% | 6/12 |
+| `episode-small` | 0.017677 | 0.016415 | -7.14% | -5.13% | 9/12 |
+| `unicode-small` | 0.021988 | 0.021065 | -4.20% | -4.27% | 9/12 |
+| `ascii-boundary-4096` | 0.124896 | 0.066493 | -46.76% | -48.92% | 11/12 |
+| `ascii-fragmented-4096` | 18.815955 | 1.174999 | -93.76% | -93.96% | 12/12 |
+| `unicode-fragmented-4095-bytes` | 36.886857 | 1.369906 | -96.29% | -96.17% | 12/12 |
+| `unicode-fallback-2500` | 1.031416 | 0.822989 | -20.21% | -20.52% | 12/12 |
+| `unicode-fallback-fragmented` | 28.017279 | 27.143854 | -3.12% | -7.29% | 7/12 |
+| `combining-cdata` | 35.292989 | 0.737606 | -97.91% | -97.93% | 12/12 |
+| `ignored-long-plot` | 1.303481 | 1.279010 | -1.88% | -4.15% | 9/12 |
+| `ascii-over-limit-4097` | 0.116034 | 0.113054 | -2.57% | -0.07% | 6/12 |
+| `malformed-xml` | 0.012703 | 0.012456 | -1.95% | -6.30% | 8/12 |
+| `doctype-rejected` | 0.001326 | 0.001421 | +7.14% | +3.66% | 3/12 |
+
+The [manifest](evidence/long-ordinary-controls/manifest.json), [raw timings](evidence/long-ordinary-controls/measurements.jsonl), [full summaries including ranges](evidence/long-ordinary-controls/summary.json), [complete evidence ZIP](evidence/long-ordinary-controls/native-evidence.zip), and [provenance](evidence/long-ordinary-controls/provenance.json) preserve this cohort.
 
 ## Production change
 
@@ -38,54 +79,6 @@ Each Swift `Character` occupies at least one UTF-8 byte. A byte sum at or below 
 Keeping the exact expression matters when a combining mark, regional indicator, newline, or joiner merges with preceding text after appending. Summing callback character counts permanently, or counting only the concatenated result, could change the original acceptance boundary. The regression tests cover both permitted grapheme joins and a split grapheme that the old parser rejects at the limit.
 
 The change preserves the document-size and nesting limits, captured-field selection, XML validation, declaration rejection, and metadata interpretation.
-
-## Completed first native campaign
-
-- Baseline: `68274d1b09dcc866296321a5a8858efc297c4f19`.
-- Measured candidate: `971d0b22e19b567dee0adaeca19a86d6be41224d`.
-- [macOS run 39071387820](https://github.com/Jagalite/illiquid/actions/runs/39071387820), completed October 17, 2026.
-- Hosted macOS 26.6.2, arm64; workflow selected Xcode 26.6.
-- **52 tests passed in each of four runs:** baseline debug/release and candidate debug/release.
-- **135 complete differential outputs matched exactly.** All benchmark receipts matched across variants and observations.
-- Twelve measured pairs per workload, with six baseline-first and six candidate-first pairs. An additional warmup pair was retained but excluded from statistics.
-
-Times are milliseconds per complete parse. Change is candidate/baseline minus one, calculated from independent medians. The paired ratio is the median of the twelve within-pair candidate/baseline ratios; these are different statistics. Negative changes and ratios below one favor the candidate.
-
-| Workload | Baseline median, ms | Candidate median, ms | Median change | Paired ratio | Faster pairs |
-|---|---:|---:|---:|---:|---:|
-| `movie-small` | 0.014365 | 0.014228 | -0.95% | 0.9938 | 8/12 |
-| `episode-small` | 0.017458 | 0.016230 | -7.04% | 0.9626 | 11/12 |
-| `unicode-small` | 0.018314 | 0.016648 | -9.10% | 0.9052 | 12/12 |
-| `ascii-boundary-4096` | 0.093331 | 0.051003 | -45.35% | 0.5482 | 12/12 |
-| `ascii-fragmented-4096` | 12.788893 | 0.632953 | -95.05% | 0.0493 | 12/12 |
-| `unicode-fragmented-4095-bytes` | 30.438984 | 1.074328 | -96.47% | 0.0352 | 12/12 |
-| `unicode-fallback-2500` | 0.896670 | 0.687897 | -23.28% | 0.7803 | 12/12 |
-| `combining-cdata` | 30.597912 | 0.624842 | -97.96% | 0.0209 | 12/12 |
-| `ignored-long-plot` | 1.070860 | 1.085250 | 1.34% | 1.0003 | 6/12 |
-| `ascii-over-limit-4097` | 0.088382 | 0.088406 | 0.03% | 1.0020 | 5/12 |
-| `malformed-xml` | 0.008889 | 0.008764 | -1.41% | 0.9919 | 9/12 |
-| `doctype-rejected` | 0.001060 | 0.001067 | 0.59% | 1.0005 | 5/12 |
-
-All three targeted fragmented workloads exceeded the predefined 25% improvement target and favored the candidate in every measured pair. No ordinary or fallback control in this first campaign showed a 5% median regression. Small differences near zero should not be interpreted as reliable improvements.
-
-The [initial artifact](https://github.com/Jagalite/illiquid/actions/runs/39071387820/artifacts/12114899396) contains all timing records, manifests, complete outputs, and test/compiler logs. Its ZIP SHA-256 is `d0dffbd981455d5521aa14c1e82c1450316a92fe914b6fad4db0282a72352214`. Actions artifact retention is 14 days. [The expanded branch summary](evidence/expanded-summary.json) preserves all thirteen workloads from run 39071828452. [The original byte-guard PR cohort](evidence/original-byte-guard/manifest.json), [raw timings](evidence/original-byte-guard/measurements.jsonl), [summary](evidence/original-byte-guard/summary.json), and [complete evidence ZIP](evidence/original-byte-guard/native-evidence.zip) preserve run 39073093655, including the slower controls. These cohorts precede the per-field refinement and longer control batches.
-
-## Refined candidate, first campaign
-
-[Run 39074402470](https://github.com/Jagalite/illiquid/actions/runs/39074402470) tested source blob `051c475fd33bcd16ec33f6b4b93ee98fffdb21d3` using protocol `2-longer-fallback-controls`. All four 52-test runs passed, all 136 differential outputs matched, and every benchmark receipt matched. An independent audit verified all 338 timing records, exact summary recomputation, all archive/hash checks, and the complete saved outputs.
-
-| Workload | Median change | Paired median change | Faster pairs |
-|---|---:|---:|---:|
-| Movie, small | **+12.12%** | **+14.81%** | 4/12 |
-| ASCII fragmented | -95.43% | -95.13% | 12/12 |
-| Unicode fragmented | -96.02% | -96.17% | 12/12 |
-| Combining CDATA | -98.02% | -97.97% | 12/12 |
-| Repeated Unicode fallback | -1.19% | -0.34% | 6/12 |
-| Ignored long plot | +2.05% | +1.75% | 3/12 |
-
-The small-movie paired ratios range from 0.647 to 1.902, with measured process batches of 78–233 ms. This variation alone does not resolve the regression. Protocol 3 investigates it using longer ordinary control batches and unchanged production code.
-
-The [manifest](evidence/refined-short-controls/manifest.json), [all thirteen summaries](evidence/refined-short-controls/summary.json), [raw observations](evidence/refined-short-controls/measurements.jsonl), [complete evidence ZIP](evidence/refined-short-controls/native-evidence.zip), and [provenance](evidence/refined-short-controls/provenance.json) retain this cohort permanently.
 
 ## Reproduce
 
@@ -143,10 +136,40 @@ The fragmented fallback control starts with a 4,500-byte prefix. Subsequent enti
 
 A full expanded campaign has 13 workloads, 312 measured process observations, 26 excluded warmup observations, and 338 retained timing records. The current differential corpus contains 136 fixtures, covering multibyte and split-grapheme boundaries, captured fields, root/field scope, malformed data, file-size and nesting limits, and invalid UTF-8.
 
-## Scope and evidence
+## Historical investigations
 
-The experiment measures complete warmed in-memory NFO parsing, including input validation, XML callbacks, text accumulation, metadata construction, and result consumption. It excludes file I/O, directory scanning, app startup, playback, rendering, GPU work, storage latency, and energy. The sidecar-reader tests check filesystem integration behavior separately.
+The source and protocol changed during the research. Each cohort remains separate; medians and observations from different cohorts are not pooled. The final cohort above is the evidence for the current production implementation.
 
-The fragmented workloads intentionally stress the changed path. This research does not establish their frequency in actual NFO collections. Shared hosted runners also introduce variation; retain slower observations and control results alongside gains.
+The first three campaigns tested the original byte guard, source blob `a5a698d2d19c721ce1252384993307ceaf4fe67c`. Its fragmented-field gains were approximately 95–98%. The expanded campaign added a repeated Unicode fallback control and increased the differential corpus from 135 to 136 cases. Every campaign passed the four 52-test runs and exact output comparisons.
 
-Each campaign produces `manifest.json`, `measurements.jsonl`, `summary.json`, `receipts.json`, `differential.json`, four test logs, and two compiler logs. Permanent evidence should retain the readable manifest/summary and raw measurements, with the repetitive complete receipts and logs in an archive. Executables, temporary test packages, dependency caches, and duplicate source trees are excluded.
+The original candidate kept testing UTF-8 lengths on every fallback callback. Its repeated-fallback paired change was +3.05% and then +9.01%. The refinement disables those probes after the first byte-bound miss for a field. This removes work that can no longer help that field; the internal cause of the earlier timing cost was not profiled.
+
+Protocol 2 tested the refined source with 64 repeated-fallback parses and 1,000 ignored-plot parses per observation, replacing the previous 8/100 counts. Those controls were within the investigation threshold. However, ordinary movie timing regressed +12.12% by independent medians and +14.81% by paired medians. Its short process batches lasted 78–233 ms, with paired ratios of 0.647–1.902. Variation alone did not resolve the regression.
+
+Protocol 3 retained that exact source and all other protocol-2 counts, fixing movie/episode/short-Unicode observations at 100,000/50,000/50,000 parses before the follow-up. The movie batches then lasted approximately 1.67–2.18 seconds. The material movie slowdown did not repeat; this supports acceptance under the declared control criterion without proving that all smaller differences are noise.
+
+The following table shows **paired median changes**, not changes between independent medians:
+
+| Cohort | Ordinary movie | Repeated Unicode fallback | Ignored long plot |
+|---|---:|---:|---:|
+| [Initial byte guard; 12 cases](https://github.com/Jagalite/illiquid/actions/runs/39071387820) | -0.62% | Not measured | +0.03% |
+| [Expanded byte guard; 13 cases](https://github.com/Jagalite/illiquid/actions/runs/39071828452) | -2.65% | +3.05% | +6.37% |
+| [Unchanged byte-guard PR replication](https://github.com/Jagalite/illiquid/actions/runs/39073093655) | -1.89% | +9.01% | -2.80% |
+| [Refined flag; protocol 2](https://github.com/Jagalite/illiquid/actions/runs/39074402470) | +14.81% | -0.34% | +1.75% |
+| [Same refined flag; protocol 3](https://github.com/Jagalite/illiquid/actions/runs/39075451501) | +0.07% | -7.29% | -4.15% |
+
+The first candidate's near-zero movie measurements are historical context. They are not used to qualify the refined implementation. The final DOCTYPE control and all other unfavorable observations are included in the full summaries.
+
+## Evidence availability and scope
+
+| Cohort | Preserved evidence |
+|---|---|
+| Initial, run 39071387820 | [Summary](evidence/initial-summary.json); [Actions artifact with raw evidence](https://github.com/Jagalite/illiquid/actions/runs/39071387820/artifacts/12114899396), subject to 14-day retention. |
+| Expanded, run 39071828452 | [All thirteen summaries](evidence/expanded-summary.json); [Actions artifact with raw evidence](https://github.com/Jagalite/illiquid/actions/runs/39071828452/artifacts/12115383655), subject to 14-day retention. |
+| Original byte-guard PR replication, run 39073093655 | [Committed manifest, observations, summary, provenance, and complete archive](evidence/original-byte-guard/). |
+| Refined source with short ordinary controls, run 39074402470 | [Committed manifest, observations, summary, provenance, and complete archive](evidence/refined-short-controls/). |
+| Refined source with long ordinary controls, run 39075451501 | [Committed manifest, observations, summary, provenance, and complete archive](evidence/long-ordinary-controls/). |
+
+Each complete archive contains `manifest.json`, `measurements.jsonl`, `summary.json`, `receipts.json`, `differential.json`, four test logs, and two compiler logs. ZIP and Git blob hashes are recorded in its provenance. The complete native logs and shared outputs are compressed; manifests, timings, and summaries are directly readable. Executables, build caches, temporary packages, and duplicate source trees are excluded.
+
+The experiment measures input validation, XML callbacks, text accumulation, metadata construction, and result consumption. Existing sidecar-reader tests check filesystem integration behavior separately. The intentionally fragmented fixtures stress the changed path; their frequency in real NFO collections has not been measured. Hosted runners introduce variation, including slow observations on code paths unchanged by this patch. This evidence supports the bounded parser optimization and does not quantify a whole-player speedup.
