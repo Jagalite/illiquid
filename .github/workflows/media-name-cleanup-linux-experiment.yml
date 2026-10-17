@@ -23,6 +23,10 @@ jobs:
           bash Scripts/test-media-name-recognition.sh --jobs 2 -c release -Xswiftc -warnings-as-errors
       - name: Verify related metadata integration
         run: bash Scripts/test-nfo-metadata-regressions.sh --jobs 2 -Xswiftc -warnings-as-errors
+      - name: Install the benchmark runner
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3
       - name: Compare metadata and measure the actual Swift sources
         run: |
           python3 Benchmarks/MediaNameRecognition/run.py \
@@ -31,13 +35,5 @@ jobs:
         if: always()
         with:
           name: media-name-recognition-linux-evidence
-          path: |
-            ${{ runner.temp }}/media-name-recognition/manifest.json
-            ${{ runner.temp }}/media-name-recognition/equivalence.json
-            ${{ runner.temp }}/media-name-recognition/measurements.jsonl
-            ${{ runner.temp }}/media-name-recognition/summary.json
-            ${{ runner.temp }}/media-name-recognition/fixtures.json
-            ${{ runner.temp }}/media-name-recognition/commands.jsonl
-            ${{ runner.temp }}/media-name-recognition/sources/
-            ${{ runner.temp }}/media-name-recognition/logs/
+          path: ${{ runner.temp }}/media-name-recognition/*.json*
           retention-days: 14
