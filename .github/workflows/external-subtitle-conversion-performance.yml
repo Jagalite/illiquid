@@ -1,0 +1,68 @@
+name: External subtitle conversion performance
+
+on:
+  # Bootstrap the research on the target platform before opening a PR.
+  push:
+    branches: [perf/external-subtitle-escaping]
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift
+      - Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift
+      - Scripts/test-external-subtitle-regressions.sh
+      - Benchmarks/ExternalSubtitleConversion/**
+      - .github/workflows/external-subtitle-conversion-performance.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: external-subtitle-conversion-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-conversion:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record native toolchain and run converter regressions
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/subtitle-conversion/tests"
+          {
+            sw_vers
+            uname -m
+            sysctl -n machdep.cpu.brand_string
+            xcodebuild -version
+            swift --version
+          } > "$RUNNER_TEMP/subtitle-conversion/environment.txt"
+          bash Scripts/test-external-subtitle-regressions.sh -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-conversion/tests/debug.txt"
+          bash Scripts/test-external-subtitle-regressions.sh --configuration release -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-conversion/tests/release.txt"
+      - name: Verify exact output and measure paired release conversions
+        run: |
+          python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark \
+            --samples 10 --iterations 5 --warmups 2 --random-cases 5000 \
+            --output "$RUNNER_TEMP/subtitle-conversion/benchmark"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: external-subtitle-conversion-native
+          path: |
+            ${{ runner.temp }}/subtitle-conversion/environment.txt
+            ${{ runner.temp }}/subtitle-conversion/tests/
+            ${{ runner.temp }}/subtitle-conversion/benchmark/*.json
+            ${{ runner.temp }}/subtitle-conversion/benchmark/*.jsonl
+            ${{ runner.temp }}/subtitle-conversion/benchmark/*.swift
+            ${{ runner.temp }}/subtitle-conversion/benchmark/*.py
+            ${{ runner.temp }}/subtitle-conversion/benchmark/baseline/*.swift
+            ${{ runner.temp }}/subtitle-conversion/benchmark/candidate/*.swift
+            ${{ runner.temp }}/subtitle-conversion/benchmark/fixtures/
+            ${{ runner.temp }}/subtitle-conversion/benchmark/logs/
+          retention-days: 14

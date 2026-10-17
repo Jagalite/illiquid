@@ -42,8 +42,10 @@ enum ExternalTextSubtitleConverter {
 
     static func convert(_ source: String, format: Format) throws -> String {
         var normalized = source
-            .replacingOccurrences(of: "\r\n", with: "\n")
-            .replacingOccurrences(of: "\r", with: "\n")
+        if source.utf8.contains(0x0D) {
+            normalized = source.replacingOccurrences(of: "\r\n", with: "\n")
+                .replacingOccurrences(of: "\r", with: "\n")
+        }
         if format == .webVTT {
             // A UTF-8 decoder may retain the optional WebVTT byte-order mark.
             if normalized.first == "\u{FEFF}" { normalized.removeFirst() }
@@ -87,17 +89,25 @@ enum ExternalTextSubtitleConverter {
                   let end = parseTimestamp(timing[1], format: format, allowsSettings: true),
                   end.milliseconds > start.milliseconds
             else { continue }
-            let text = lines.dropFirst(timingIndex + 1).map { line in
-                line.replacingOccurrences(of: "\\", with: "\\\\")
-                    .replacingOccurrences(of: "{", with: "\\{")
-                    .replacingOccurrences(of: "}", with: "\\}")
-            }.joined(separator: "\\N")
+            let text = lines.dropFirst(timingIndex + 1)
+                .map(escapeASSPayloadLine).joined(separator: "\\N")
             events.append(
                 "Dialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
             )
         }
         guard !events.isEmpty else { throw ConversionError.noValidCues(format) }
         return defaultASSHeader + "\n" + events.joined(separator: "\n")
+    }
+
+    private static func escapeASSPayloadLine(_ line: Substring) -> String {
+        // These ASCII bytes cannot occur inside a multibyte UTF-8 scalar.
+        // Most caption lines need none of the three Foundation replacements.
+        guard line.utf8.contains(where: { $0 == 0x5C || $0 == 0x7B || $0 == 0x7D }) else {
+            return String(line)
+        }
+        return line.replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "{", with: "\\{")
+            .replacingOccurrences(of: "}", with: "\\}")
     }
 
     private struct Timestamp {
