@@ -1,9 +1,6 @@
 name: Media name recognition performance
 
 on:
-  push:
-    branches:
-      - perf/media-name-recognition-20261017
   pull_request:
     paths:
       - Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift
@@ -36,11 +33,16 @@ jobs:
           bash Scripts/test-media-name-recognition.sh --jobs 2 -c release -Xswiftc -warnings-as-errors
       - name: Verify related metadata integration
         run: bash Scripts/test-nfo-metadata-regressions.sh --jobs 2 -Xswiftc -warnings-as-errors
-      - name: Compare exact metadata and measure production recognition on macOS
+      - name: Compare exact metadata on pull requests
+        if: github.event_name == 'pull_request'
         run: |
           python3 Benchmarks/MediaNameRecognition/run.py \
-            --output "$RUNNER_TEMP/media-name-recognition" \
-            --workloads mixed-library --rounds 12 --iterations 128
+            --output "$RUNNER_TEMP/media-name-recognition" --verify-only
+      - name: Measure production recognition on manual runs
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/MediaNameRecognition/run.py \
+            --output "$RUNNER_TEMP/media-name-recognition" --rounds 6 --iterations 16
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

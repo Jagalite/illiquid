@@ -107,3 +107,12 @@ hashes are checked again. Failed runs retain their existing logs and are not
 automatically pooled with later runs. Key evidence is also emitted between
 `EVIDENCE_BEGIN` / `EVIDENCE_END` log markers; measurements are represented there
 as one JSON array, which can be restored to JSONL without changing row contents.
+
+## GitHub Actions
+
+The media-name recognition workflow runs debug/release recognition tests,
+related metadata integration tests, and full exact-output verification on
+relevant pull requests. Manual workflow dispatch also runs the complete
+eight-workload timing campaign. Timings are evidence rather than a pass/fail
+threshold. The [research report](../../Documentation/MEDIA_NAME_RECOGNITION_PERFORMANCE.md)
+records the original native cohorts, scope, and committed raw receipts.
