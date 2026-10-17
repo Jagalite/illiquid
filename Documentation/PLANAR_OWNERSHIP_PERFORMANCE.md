@@ -105,6 +105,53 @@ Timing and allocation-instrumented runs are separate. Allocation measurements
 count requested heap allocations and bytes; they do not measure live memory,
 RSS, GPU memory, or the player's physical footprint.
 
+## Native macOS qualification and measurements
+
+The [dedicated macOS workflow](https://github.com/Jagalite/illiquid/actions/runs/39047209497)
+passed on October 17, 2026, using an **Apple M1 virtual runner**, macOS 26.6.2,
+and Apple Swift 6.3.3. Native builds used the real production ledger and Apple
+frameworks, with `-O -whole-module-optimization` for the timed comparison.
+The source and harness hashes match the Linux campaign exactly.
+
+Five native test functions (six cases, including both release orders) passed in **both debug
+and release**, including real `CMSampleBuffer` attachment lifetimes and
+concurrent phase attempts. The macOS differential run also matched **20,010
+snapshots** and passed **30 untimed workload checks** across both configurations.
+
+Eight balanced timing pairs per case used the same 10,000 warmup and 100,000
+measured services as the Linux campaign. The primary native pipeline medians
+were:
+
+| Modeled retained owners | Baseline, µs/service | Candidate, µs/service | Reduction |
+|---|---:|---:|---:|
+| 1: one queued frame | 2.221 | 1.327 | 40.3% |
+| 7: application pipeline allowance | 3.945 | 1.902 | 51.8% |
+| 11: seven queued plus four renderer-only | 5.058 | 2.794 | 44.8% |
+| 16: pool-ceiling pressure model | 6.312 | 3.080 | 51.2% |
+| 32: above-pool stress | 9.326 | 3.791 | 59.3% |
+
+The seven-plus-four model saved **2.263 µs per service**, a **44.8%** reduction
+in native ownership-bookkeeping time. Every native case improved; the mixed
+release-order control showed reductions from **39.2% to 54.2%**. All 160 timing
+observations had matching paired final states. Recomputing the medians and
+checking the raw execution order confirmed four baseline-first and four
+candidate-first pairs for every case.
+
+This confirms a component benefit on the target platform. The virtual runner
+did not execute the full player or measure physical-device CPU, energy, memory
+footprint, frame drops, or responsiveness. The Linux allocation numbers below
+remain Linux-specific measurements.
+
+Retained native evidence:
+
+- [Timing summary](../Benchmarks/PlanarOwnership/evidence/macos-timing/summary.json),
+  [raw measurements](../Benchmarks/PlanarOwnership/evidence/macos-timing/measurements.jsonl),
+  and [platform/source manifest](../Benchmarks/PlanarOwnership/evidence/macos-timing/manifest.json).
+- [Native debug test output](../Benchmarks/PlanarOwnership/evidence/macos-validation/native-tests-debug.txt)
+  and [release test output](../Benchmarks/PlanarOwnership/evidence/macos-validation/native-tests-release.txt).
+- [Qualification receipt](../Benchmarks/PlanarOwnership/evidence/macos-validation/qualification-receipt.json),
+  including the tested commit, workflow URL, verified archive digest, and source hash.
+
 ## Measured results: Linux component run
 
 Measured on October 17, 2026 with Swift 6.3.2,
@@ -176,11 +223,9 @@ measurements had matching paired final states.
   five seeds and 10,005 matching snapshots per configuration, **20,010 total**.
   Another 15 untimed workload checks per configuration passed, **30 total**.
 
-The retained Linux receipt explicitly records native CoreMedia tests as
-unexecuted. The PR's dedicated macOS workflow executes the native component
-tests in debug and release and repeats the timing comparison against the actual
-platform frameworks. Its result must be checked separately from these Linux
-receipts.
+The retained Linux receipt correctly records native CoreMedia tests as
+unexecuted on Linux. The separate successful macOS qualification and its
+retained evidence are documented above.
 
 ## Correctness qualification
 
@@ -212,8 +257,9 @@ broader outcomes.
 
 ## Recommendation
 
-Keep the one-call removal once native component qualification passes. It removes
-work that cannot change a result and introduces no additional cached counters or
-state invariants. Further optimization of checkout/attachment peak calculation
+The one-call removal is ready for review: native component qualification passed,
+and both platforms measured lower bookkeeping cost with matching behavior. It
+removes work that cannot change a result and introduces no additional cached
+counters or state invariants. Further optimization of checkout/attachment peak calculation
 would need its own measurement and correctness case. The present evidence does
 not justify claiming a perceptible player-wide speedup.
