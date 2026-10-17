@@ -1,0 +1,57 @@
+[
+  {
+    "command": [
+      "addr2line",
+      "-C",
+      "-f",
+      "-e",
+      "/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libdispatch.so",
+      "0x232c0",
+      "0x2c048",
+      "0x37696",
+      "0x2eff6",
+      "0x31fe0",
+      "0x31f1d",
+      "0x35125"
+    ],
+    "returncode": 0,
+    "stdout": "_dispatch_workq_monitor_pools.cold.1\nworkqueue.c:?\n_dispatch_continuation_pop\ncrtstuff.c:?\n_dispatch_source_invoke\ncrtstuff.c:?\n_dispatch_lane_serial_drain\ncrtstuff.c:?\n_dispatch_mgr_invoke\nqueue.c:?\n_dispatch_mgr_thread\ncrtstuff.c:?\n_dispatch_worker_thread\nqueue.c:?\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "objdump",
+      "-d",
+      "/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libdispatch.so",
+      "--start-address=0x3d6e4",
+      "--stop-address=0x3d724"
+    ],
+    "returncode": 0,
+    "stdout": "\n/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libdispatch.so:     file format elf64-x86-64\n\n\nDisassembly of section .text:\n\n000000000003d6e4 <_dispatch_workq_monitor_pools+0xf4>:\n   3d6e4:\t49 8b 45 18          \tmov    0x18(%r13),%rax\n   3d6e8:\t42 8b 0c b8          \tmov    (%rax,%r15,4),%ecx\n   3d6ec:\tbe 80 00 00 00       \tmov    $0x80,%esi\n   3d6f1:\t48 8d 9d 20 ff ff ff \tlea    -0xe0(%rbp),%rbx\n   3d6f8:\t48 89 df             \tmov    %rbx,%rdi\n   3d6fb:\t48 8d 15 dd 16 00 00 \tlea    0x16dd(%rip),%rdx        # 3eddf <_fini+0x1333>\n   3d702:\t31 c0                \txor    %eax,%eax\n   3d704:\te8 27 16 fe ff       \tcall   1ed30 <snprintf@plt>\n   3d709:\t48 89 df             \tmov    %rbx,%rdi\n   3d70c:\tbe 00 08 00 00       \tmov    $0x800,%esi\n   3d711:\t31 c0                \txor    %eax,%eax\n   3d713:\te8 38 17 fe ff       \tcall   1ee50 <open@plt>\n   3d718:\t83 f8 ff             \tcmp    $0xffffffff,%eax\n   3d71b:\t0f 84 25 01 00 00    \tje     3d846 <_dispatch_workq_monitor_pools+0x256>\n   3d721:\t41 89 c5             \tmov    %eax,%r13d\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "objdump",
+      "-d",
+      "/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libdispatch.so",
+      "--start-address=0x3d834",
+      "--stop-address=0x3d84b"
+    ],
+    "returncode": 0,
+    "stdout": "\n/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libdispatch.so:     file format elf64-x86-64\n\n\nDisassembly of section .text:\n\n000000000003d834 <_dispatch_workq_monitor_pools+0x244>:\n   3d834:\t48 81 c4 b8 10 00 00 \tadd    $0x10b8,%rsp\n   3d83b:\t5b                   \tpop    %rbx\n   3d83c:\t41 5c                \tpop    %r12\n   3d83e:\t41 5d                \tpop    %r13\n   3d840:\t41 5e                \tpop    %r14\n   3d842:\t41 5f                \tpop    %r15\n   3d844:\t5d                   \tpop    %rbp\n   3d845:\tc3                   \tret\n   3d846:\te8 75 5a fe ff       \tcall   232c0 <_dispatch_workq_monitor_pools.cold.1>\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "objdump",
+      "-d",
+      "/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libdispatch.so",
+      "--start-address=0x232c0",
+      "--stop-address=0x232c4"
+    ],
+    "returncode": 0,
+    "stdout": "\n/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libdispatch.so:     file format elf64-x86-64\n\n\nDisassembly of section .text:\n\n00000000000232c0 <_dispatch_workq_monitor_pools.cold.1>:\n   232c0:\t0f 0b                \tud2\n\t...\n",
+    "stderr": ""
+  }
+]

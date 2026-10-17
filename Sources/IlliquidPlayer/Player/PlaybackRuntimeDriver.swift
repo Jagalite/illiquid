@@ -301,10 +301,29 @@ final class PlaybackRuntimeDriver {
     }
 
     private func cancelPendingRelativeSeek() {
+        let cancelled = pendingRelativeSeek
         relativeSeekDispatchTask?.cancel()
         relativeSeekDispatchTask = nil
         pendingRelativeSeek = nil
         pendingRelativeSeekReceivedAt = nil
+
+        // A superseded deferred seek never reached the native executor, so
+        // nobody else can settle its effect. Only retire an old session or
+        // generation: sleep also detaches a current seek here before dispatch,
+        // and subtitle-only revisions do not invalidate its core authority.
+        guard let cancelled, model.core.state.lifecycle == .running,
+              case let .playback(sessionID, generation, _) = cancelled.context.authority,
+              model.core.state.activeSession?.id != sessionID
+                || model.core.state.activeSession?.generation != generation,
+              model.core.state.pendingSession?.id != sessionID
+                || model.core.state.pendingSession?.generation != generation
+        else { return }
+        if let transition = model.complete(
+            effectID: cancelled.context.effectID,
+            token: EffectResultToken(kind: .cancelled)
+        ) {
+            process(transition)
+        }
     }
 
     private func dispatchRelativeSeek(_ effect: PlaybackEffect) {

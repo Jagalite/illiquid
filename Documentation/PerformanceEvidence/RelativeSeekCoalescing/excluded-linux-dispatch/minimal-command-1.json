@@ -1,0 +1,19 @@
+{
+  "command": [
+    "clang",
+    "-O2",
+    "-I",
+    "/tmp/illiquid-swift-6.3.2/usr/lib/swift",
+    "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-dispatch.c",
+    "-L",
+    "/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux",
+    "-Wl,-rpath,/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux",
+    "-ldispatch",
+    "-lBlocksRuntime",
+    "-o",
+    "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-dispatch"
+  ],
+  "returncode": 0,
+  "stdout": "",
+  "stderr": ""
+}

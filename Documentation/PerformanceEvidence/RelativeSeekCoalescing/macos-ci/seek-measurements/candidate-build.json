@@ -1,0 +1,289 @@
+{
+  "builder": {
+    "git_blob": "b11e9a956bbcdbb930b4c2aad9de5200a8230d2a",
+    "sha256": "adacfb3284d6dbf20a974b0b097cb7f33f8e629e2ab1c62583cc924e29b42e6d"
+  },
+  "checkout_head": "e36bda5c9e6400cd710cf0e54eed978373d1e161",
+  "command": "build",
+  "compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "configuration": "release",
+  "executable": {
+    "path": "/Users/runner/work/_temp/seek-candidate-build/RelativeSeekBenchmark",
+    "sha256": "2f27ea35c8425b194d0e8f7bcc9560b3aa802f649352311d52ff41d02196420b"
+  },
+  "limitations": [
+    "Selected components only; no native app build, decoder, or presentation pipeline",
+    "Fake runtime in tests/harness; production driver, model, core, and event types are unmodified",
+    "Real Foundation, concurrency, Task, and ContinuousClock on the selected host",
+    "Linux AppKit classes are unused surface-type placeholders; CoreGraphics reexports Foundation geometry",
+    "Linux OSLog support discards log messages; macOS uses real OSLog",
+    "Benchmark entry module uses @testable access to the actual internal driver"
+  ],
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "production_source": "working tree",
+  "python": "3.15.0 (main, Oct  9 2026, 11:16:41) [Clang 21.0.0 (clang-2100.3.34.2)]",
+  "resolved_source_revision": null,
+  "source_ref": null,
+  "sources": {
+    "Benchmarks/RelativeSeekCoalescing/Harness.swift": {
+      "git_blob": "976e5ef624ddf49fe6116f0d14485ed9135fd5f8",
+      "package_path": "Sources/RelativeSeekBenchmark/Harness.swift",
+      "role": "current benchmark harness",
+      "sha256": "ccb13681ad19cebb7868211fdd01b59ce6f0db13e321eb92324953989eadaacc",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Persistence/MediaContentVersion.swift": {
+      "git_blob": "8db30c6aa0b412b8b8f9dfcbd045d9733ee52a11",
+      "package_path": "Sources/IlliquidCore/Persistence/MediaContentVersion.swift",
+      "role": "production",
+      "sha256": "ff4447d03b40b358d4e2d8e37a44191b2894bda841c6109017341e91b19e07ca",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift": {
+      "git_blob": "6d510af3716ccc8482179a1fbd0a7e07d0a220f0",
+      "package_path": "Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift",
+      "role": "production",
+      "sha256": "29828b13da06fa30ace37200604dd259c77435896dbbe4d5f8310b996b5c9e81",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/MediaSource.swift": {
+      "git_blob": "f0651daabf51d342e4d61e78f541415f38bd3951",
+      "package_path": "Sources/IlliquidCore/Player/MediaSource.swift",
+      "role": "production",
+      "sha256": "44021e7858cd85af052a480659983097f013d70dde1def1211d96e8a306b0e9c",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/MediaTrack.swift": {
+      "git_blob": "d6ecdb2d96f197a0d19fa8b784a49f2bc8519905",
+      "package_path": "Sources/IlliquidCore/Player/MediaTrack.swift",
+      "role": "production",
+      "sha256": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/PictureInPictureState.swift": {
+      "git_blob": "f51a3f244e621567db9c24f3581fbc1f866ac62b",
+      "package_path": "Sources/IlliquidCore/Player/PictureInPictureState.swift",
+      "role": "production",
+      "sha256": "3ade14b77f7f6e54e99f4e1f0e4485a4a6772ffcf7a8b9339d8ddb81d8491396",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/PlaybackCommand.swift": {
+      "git_blob": "6e268f18d72d687c5a46232d0a8054994e1daa08",
+      "package_path": "Sources/IlliquidCore/Player/PlaybackCommand.swift",
+      "role": "production",
+      "sha256": "a1f47604c10c2e14054c797c2707b41846b2697a1f3cab7bd49313b4b056ad80",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/PlaybackModels.swift": {
+      "git_blob": "eaf55128a490782e77c23363a37ae256d8c456cc",
+      "package_path": "Sources/IlliquidCore/Player/PlaybackModels.swift",
+      "role": "production",
+      "sha256": "fbe90597e20f22923c627fdc951665137f6ed4b67fac0684d2fcc2c1d14201d0",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/PlaybackPhase.swift": {
+      "git_blob": "72df924051cd23d2c0245d7a9738a011ffc6a4bd",
+      "package_path": "Sources/IlliquidCore/Player/PlaybackPhase.swift",
+      "role": "production",
+      "sha256": "a56bb1a2d3d76c11db788092c29eef25c8dfdb3427af6c675b09aabda97ef13e",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/SubtitleFallbackEncoding.swift": {
+      "git_blob": "6129fc1ad207e8bd096451b5b416db079712b9c3",
+      "package_path": "Sources/IlliquidCore/Player/SubtitleFallbackEncoding.swift",
+      "role": "production",
+      "sha256": "ac0f998bc02788ba12ac7552db2a0cbf4492ec8ea6772a6bd900d6ee44230824",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/TrackSelectionPreferences.swift": {
+      "git_blob": "a915f20eea5f4b5331f5440ad2e181164030a5a0",
+      "package_path": "Sources/IlliquidCore/Player/TrackSelectionPreferences.swift",
+      "role": "production",
+      "sha256": "2603803b929d0a0ce4c8d91b6b17e34819b5cd78021109177e2660465c8e969f",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/VideoColorSample.swift": {
+      "git_blob": "810fd7db958048ec9fc84d5b163d0601d74b6d47",
+      "package_path": "Sources/IlliquidCore/Player/VideoColorSample.swift",
+      "role": "production",
+      "sha256": "e296cb8ddb45850b8c6356bdec8b6f128e22fe48119bc5c24c6c42f1e32fad06",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Player/VideoPresentationGeometry.swift": {
+      "git_blob": "16e35e578852012c890e4ebdcec407e8d44bc3f2",
+      "package_path": "Sources/IlliquidCore/Player/VideoPresentationGeometry.swift",
+      "role": "production",
+      "sha256": "f2fd065b34c5d4c64c2847674a3e5ea9ce2c9ae5742de7854011537796234664",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": {
+      "git_blob": "b2fe49ea21a1d38bd1a8ae9dea2936ef34d6d206",
+      "package_path": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+      "role": "production",
+      "sha256": "7d9591b8d12f8e03e950c9688f22b37c77c6f97de3e94b5f000321d182c05678",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": {
+      "git_blob": "585e7a75bc1f2e080323509626482540d14d0b75",
+      "package_path": "Sources/IlliquidCore/Playlist/PlaylistMutation.swift",
+      "role": "production",
+      "sha256": "918dc63fe1e48e2a4eb09b3874bdce19c9e4a5f3c52a383e9173e533a6574174",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+      "git_blob": "3e31506bdec552337ce25dfeaf54da2afc6e6c1d",
+      "package_path": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+      "role": "production",
+      "sha256": "392fdfb0ea35cd2a30804a3f07f23c489130f026e22ba32dd2b9f40216c60a4c",
+      "transformation": "none"
+    },
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": {
+      "git_blob": "ee5bb383869da68ec1f2cd842ae766603f7ef419",
+      "package_path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+      "role": "production",
+      "sha256": "95c2bd8da2ebf9ba8010b73840c71b3acc25d41b46712f0ebf2d743d39868b14",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlayback/Module.swift": {
+      "git_blob": "9b98be77a8505b5ef5bf8d841d269d90a117ddb6",
+      "package_path": "Sources/IlliquidPlayback/Module.swift",
+      "role": "production",
+      "sha256": "70dd073cc952d0b7f889e9f10fe9ec018ec2fcdb371a7a420a4aedbffd956efb",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlayback/PlaybackCapabilities.swift": {
+      "git_blob": "8100bf43141d4769e2ec769507c9b40838677a91",
+      "package_path": "Sources/IlliquidPlayback/PlaybackCapabilities.swift",
+      "role": "production",
+      "sha256": "35eac176c3abd8523ae0b384e1a793b1afe07695e263eaac25d2ac8cec693e54",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlayback/PlaybackRuntime.swift": {
+      "git_blob": "d1b272c6d904f8554a7db54127f58d3a8b31b9be",
+      "package_path": "Sources/IlliquidPlayback/PlaybackRuntime.swift",
+      "role": "production",
+      "sha256": "3df0a25354ad340264bbad565c979bc8e2d9ce4aa48aba5637ebe309430cca12",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlayback/PlaybackRuntimeEvent.swift": {
+      "git_blob": "65490ffca2105a6ce32bc1485456293aa8a4d845",
+      "package_path": "Sources/IlliquidPlayback/PlaybackRuntimeEvent.swift",
+      "role": "production",
+      "sha256": "20c635de7ad8eed8a667a401e73a982b5027bc6349d47c1cb0b06d75041a0772",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlayback/PlaybackSurfaceHost.swift": {
+      "git_blob": "00708d21a9cb95dc5f01e3608ea2632b6d84994c",
+      "package_path": "Sources/IlliquidPlayback/PlaybackSurfaceHost.swift",
+      "role": "production",
+      "sha256": "e3b35a107e6f484d583d3ba6b1a474bf27cfefa14a73de7f0d1c02c855948b72",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/EventsAndEffects.swift": {
+      "git_blob": "08a000431798225b267c535f1476f7422aa307ac",
+      "package_path": "Sources/IlliquidPlaybackCore/EventsAndEffects.swift",
+      "role": "production",
+      "sha256": "f17fb90da6f1c907aa2bfc0e87c3a12606385abd07a96608452fa2c7b027218b",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/IdentityAndTime.swift": {
+      "git_blob": "d1d35510b05be2b833901af6b94308b7117ed8fc",
+      "package_path": "Sources/IlliquidPlaybackCore/IdentityAndTime.swift",
+      "role": "production",
+      "sha256": "c1c1ee83d7cfbfb909e30fccba6d239ddc412a9f1138015b431b7cda3df723bb",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift": {
+      "git_blob": "410f6901d1b2164f4ce5e48b01763af3dc111b8b",
+      "package_path": "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift",
+      "role": "production",
+      "sha256": "da35a412ca1a6919c9aa73a1c2eb06e7296ffa4643e27a9506b9294976ffffc4",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackCore.swift": {
+      "git_blob": "0f736f8e40287d17df41c65c5a25a596361474a5",
+      "package_path": "Sources/IlliquidPlaybackCore/PlaybackCore.swift",
+      "role": "production",
+      "sha256": "3b105a0451d650a6ad45282b44178f0af5f2228324a10e47e7deb8c6014d8249",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift": {
+      "git_blob": "19fd2bfa20017fcd964587fc4ea572e9b97429fd",
+      "package_path": "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift",
+      "role": "production",
+      "sha256": "1da16f43aa75d2a9b525edba5c36c3cdaaaac95afd948e51fbfe52bbe1673c1f",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift": {
+      "git_blob": "0c5e271ff7fe43291958e390ba08b5493e65b6c5",
+      "package_path": "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift",
+      "role": "production",
+      "sha256": "f7b17fed9682332abc4634e68185e9595cdbb0b645e450a6df9d76be73e3fc41",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift": {
+      "git_blob": "d0569b8ffe61c48b0745a677b96bf0801f5d6e64",
+      "package_path": "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift",
+      "role": "production",
+      "sha256": "54a12cac94e739f0ca681b262283c125b3df291be0e3f1a7d1e0eb1b496d2ffb",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackReplay.swift": {
+      "git_blob": "afc05b32c9cbe85ee85d906c23d17fe6a118e3c8",
+      "package_path": "Sources/IlliquidPlaybackCore/PlaybackReplay.swift",
+      "role": "production",
+      "sha256": "d173b424ce4e40d72cba7d7b141ac5cc1f9b491e57c99834a07a6149a65d2195",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/RecoveryCore.swift": {
+      "git_blob": "f49c866fd7fece16676b108d89d7979add15519c",
+      "package_path": "Sources/IlliquidPlaybackCore/RecoveryCore.swift",
+      "role": "production",
+      "sha256": "40732caafa700c6d8dbb8752c7e2465c5a1021055e8dc504000032d5a426cdf8",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/SeekCore.swift": {
+      "git_blob": "a93f9771093d28eba5356f10a49be1b3c35c35c1",
+      "package_path": "Sources/IlliquidPlaybackCore/SeekCore.swift",
+      "role": "production",
+      "sha256": "08e138ead38382839cb27a2a923247ec2716a2ea8b036bc8045df38feb78eb4b",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/SubtitleCore.swift": {
+      "git_blob": "0b148cdc69e522e4de6b7a2833d5af0278e555a7",
+      "package_path": "Sources/IlliquidPlaybackCore/SubtitleCore.swift",
+      "role": "production",
+      "sha256": "87e13ceedada39f64dd80c40b98040b9102db55bbe59784ec01b2111db12311b",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/SynchronizationCore.swift": {
+      "git_blob": "a7442ff137ac45d9cf96c8db4fb96d29b8411979",
+      "package_path": "Sources/IlliquidPlaybackCore/SynchronizationCore.swift",
+      "role": "production",
+      "sha256": "9337d8cc2936e9155a61d8fdd0dd4d2e2c9312ede2f9047c2d9bd83629459e20",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift": {
+      "git_blob": "e99f0a3220fd32d8908e61f9e6dd3416767a4823",
+      "package_path": "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift",
+      "role": "production",
+      "sha256": "18f1e2274b9d6eb9e78a8916913f2bd538896363437089e16a3f81f49cf92f8d",
+      "transformation": "none"
+    },
+    "Sources/IlliquidPlayer/Player/PlaybackRuntimeDriver.swift": {
+      "git_blob": "93a63b8ef4fc39fa920b98bc51b0f09e199ce7c1",
+      "package_path": "Sources/IlliquidPlayer/Player/PlaybackRuntimeDriver.swift",
+      "role": "production",
+      "sha256": "7aa25655916e20f78d07baecc671f50c4c3e8405eab913fb0956b4547796665b",
+      "transformation": "none"
+    },
+    "generated:Package.swift": {
+      "git_blob": "fce8f1cc257459ec0479fa6d3fe4b2fa540daf95",
+      "package_path": "Package.swift",
+      "role": "generated package manifest",
+      "sha256": "67752ab8ef6d6b281866f2caedf13a84ea010413b0a5011fcbc4a586743040ce",
+      "transformation": "generated"
+    }
+  },
+  "status": "passed"
+}
