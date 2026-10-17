@@ -1,0 +1,63 @@
+{
+  "allocation_scope": "cumulative successful malloc/calloc/realloc requested bytes; not RSS",
+  "arguments": {
+    "allocations": false,
+    "build_only": false,
+    "iterations": 100000,
+    "occupancies": [
+      1,
+      7,
+      11,
+      16,
+      32
+    ],
+    "output": "/Users/runner/work/_temp/planar-ownership/tests",
+    "rounds": 8,
+    "seeds": [
+      1,
+      7,
+      42,
+      2026,
+      65537
+    ],
+    "steps": 2000,
+    "swiftc": null,
+    "tests_only": true,
+    "warmup": 10000,
+    "workloads": [
+      "pipeline",
+      "lifecycle-mixed"
+    ]
+  },
+  "baseline_blob_sha1": "0c597cde8a1219d53d3ce0dad760d6d20c8453e3",
+  "baseline_commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "binary_sha256": {
+    "baseline-debug": "f16f6487f50f54057ecc82b13a4bb87bc6272c06b1c255b102e1b1c19dabf035",
+    "baseline-release": "e6cd16134f121caa27a40616fbead0150a55e301feeb8d96ebb47da82cfc9347",
+    "candidate-debug": "73d93eb1d687b836fb9f248893ca6a96dbb88f30517145e9e46ca79d47170c87",
+    "candidate-release": "5fbbcd828d7d92ca7924bf4f0c936b8a721bdabd2778ddf26f9b231a76945908"
+  },
+  "checkout_head": "29687646b40136c403104a2ef4dfd5b6db55a2bc",
+  "clock": "DispatchTime.now().uptimeNanoseconds",
+  "compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "cpu_model": "Apple M1 (Virtual)",
+  "execution_started_utc": "2026-10-17T16:00:06Z",
+  "framework_boundary": "actual CoreMedia/CoreVideo",
+  "harness_sha256": {
+    "Harness.swift": "237c0fc1418c9661ed22ac009cfa3b107cddc8dc0638d1330724791a9333371b",
+    "Platform.swift": "206dd3bc95bc0a21c7d361ea54fa01899f8834c42a421dd6b4aecdd756b72ba6",
+    "run.py": "3c518d657ea0617fa0f3575fa431fbe436c203916b757b609ff790553a092e8b"
+  },
+  "machine": "arm64",
+  "native_source_sha256": {
+    "Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift": "f0a218021dfa5917b8c08f2a56d096daecb5e9a6a4e93c43af5a0e7f9c83fc4f",
+    "Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift": "0c7e429aaac17c3f1af74feaedfd164f286080bb681159b921d4ce182a133096"
+  },
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.15.0",
+  "source_path": "Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift",
+  "source_sha256": {
+    "baseline": "9c6803e96f2220301611379d5e321620aa13d064176b5c7190a55729c3f1667f",
+    "candidate": "0df2febee469bb1fa1c3febd9da3586706398ee38116907d3c7eb31f975b4069"
+  }
+}

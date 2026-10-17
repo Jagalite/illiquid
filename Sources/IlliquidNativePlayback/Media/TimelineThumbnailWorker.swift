@@ -18,13 +18,15 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
         let id: UUID
         let input: Input
         let cancellation: FFmpegInputCancellationSignal
+        let expiresAt: ContinuousClock.Instant
         var continuation: CheckedContinuation<CGImage?, Never>?
         var deadline: DispatchWorkItem?
         init(id: UUID, input: Input, cancellation: FFmpegInputCancellationSignal,
-             continuation: CheckedContinuation<CGImage?, Never>) {
+             expiresAt: ContinuousClock.Instant, continuation: CheckedContinuation<CGImage?, Never>) {
             self.id = id
             self.input = input
             self.cancellation = cancellation
+            self.expiresAt = expiresAt
             self.continuation = continuation
         }
     }
@@ -34,6 +36,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
     private let decode: @Sendable (Input, FFmpegInputCancellationSignal) -> CGImage?
     private let release: @Sendable () -> Void
     private let requestTimeout: TimeInterval
+    private let now: @Sendable () -> ContinuousClock.Instant
     private let prioritizesForeground: Bool
     private var active: Request?
     private var pending: Request?
@@ -63,11 +66,13 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
 
     init(requestTimeout: TimeInterval = 1.5,
          prioritizesForeground: Bool = false,
+         now: @escaping @Sendable () -> ContinuousClock.Instant = { .now },
          release: @escaping @Sendable () -> Void = {},
          decode: @escaping @Sendable (Input, FFmpegInputCancellationSignal) -> CGImage?) {
         self.release = release
         self.prioritizesForeground = prioritizesForeground
         self.requestTimeout = requestTimeout
+        self.now = now
         self.decode = decode
     }
 
@@ -77,7 +82,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
         return await withTaskCancellationHandler {
             await withCheckedContinuation { continuation in
                 enqueue(Request(id: id, input: input, cancellation: cancellation,
-                                continuation: continuation))
+                                expiresAt: now().advanced(by: .seconds(requestTimeout)), continuation: continuation))
             }
         } onCancel: {
             cancellation.requestCancellation()
@@ -182,7 +187,7 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
             lock.lock()
             guard let request = active else { lock.unlock(); return }
             lock.unlock()
-            let image = request.cancellation.cancellationRequested
+            let image = request.cancellation.cancellationRequested || now() >= request.expiresAt
                 ? nil : decode(request.input, request.cancellation)
             lock.lock()
             request.deadline?.cancel()
@@ -192,7 +197,10 @@ final class TimelineThumbnailWorker: @unchecked Sendable {
             pending = nil
             let next = active
             lock.unlock()
-            continuation?.resume(returning: request.cancellation.cancellationRequested ? nil : image)
+            // Timer callbacks may be delayed by unrelated work. Enforce the
+            // admission deadline independently when native ownership returns.
+            continuation?.resume(returning: request.cancellation.cancellationRequested
+                || now() >= request.expiresAt ? nil : image)
             // A pending hover must get its own foreground work item even when
             // it arrived while a background native call was still returning.
             if prioritizesForeground {

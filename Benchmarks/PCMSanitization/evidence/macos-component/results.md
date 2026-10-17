@@ -1,0 +1,61 @@
+# Complete native macOS PCM sanitization results
+
+Apple M1 virtual runner, macOS 26.6.2, Apple Swift 6.3.3; 55 cases, six balanced pairs, 660 observations. Times are separate medians and percentages are median paired reductions; positive means less time. VM control variation and component boundaries are described in the research report.
+
+| Case | Baseline µs | Candidate µs | Wall reduction | Process CPU reduction |
+| --- | ---: | ---: | ---: | ---: |
+| `healthy_sine/1024x1` | 1.313 | 0.494 | +60.3% | +66.4% |
+| `silence/1024x1` | 1.193 | 0.458 | +59.9% | +61.8% |
+| `sparse_invalid/1024x1` | 1.355 | 0.712 | +53.2% | +51.6% |
+| `dense_invalid/1024x1` | 3.132 | 3.610 | -17.0% | -10.9% |
+| `subnormals/1024x1` | 3.929 | 4.117 | -11.0% | -9.1% |
+| `shared_healthy/1024x1` | 1.358 | 0.933 | +36.3% | +47.3% |
+| `sparse_restore_control/1024x1` | 0.206 | 0.249 | -23.9% | -15.0% |
+| `dense_restore_control/1024x1` | 0.800 | 1.015 | -12.1% | -2.5% |
+| `subnormal_restore_control/1024x1` | 1.063 | 1.191 | -2.2% | -1.5% |
+| `healthy_sine/1024x2` | 2.847 | 0.749 | +70.9% | +68.6% |
+| `silence/1024x2` | 2.513 | 0.558 | +73.3% | +72.9% |
+| `sparse_invalid/1024x2` | 2.476 | 0.942 | +57.7% | +59.9% |
+| `dense_invalid/1024x2` | 7.393 | 6.057 | +8.7% | +1.1% |
+| `subnormals/1024x2` | 8.096 | 8.346 | -8.2% | -5.4% |
+| `shared_healthy/1024x2` | 3.045 | 1.094 | +60.9% | +60.8% |
+| `sparse_restore_control/1024x2` | 0.243 | 0.221 | -7.2% | -3.7% |
+| `dense_restore_control/1024x2` | 1.786 | 1.676 | -8.4% | +2.8% |
+| `subnormal_restore_control/1024x2` | 2.019 | 2.263 | -25.8% | -23.0% |
+| `healthy_sine/1024x6` | 7.107 | 1.784 | +75.9% | +75.8% |
+| `silence/1024x6` | 8.129 | 1.693 | +73.4% | +73.3% |
+| `sparse_invalid/1024x6` | 6.369 | 3.045 | +57.8% | +64.5% |
+| `dense_invalid/1024x6` | 18.803 | 19.770 | -3.9% | -9.5% |
+| `subnormals/1024x6` | 24.585 | 24.391 | -7.7% | -7.7% |
+| `shared_healthy/1024x6` | 7.718 | 2.877 | +53.1% | +51.7% |
+| `sparse_restore_control/1024x6` | 0.267 | 0.270 | -3.4% | -0.7% |
+| `dense_restore_control/1024x6` | 4.102 | 4.033 | +1.3% | +3.5% |
+| `subnormal_restore_control/1024x6` | 5.097 | 6.015 | +4.2% | +0.7% |
+| `healthy_sine/1024x8` | 8.171 | 2.282 | +72.1% | +74.3% |
+| `silence/1024x8` | 9.182 | 1.958 | +75.0% | +75.0% |
+| `sparse_invalid/1024x8` | 8.579 | 3.158 | +69.9% | +70.1% |
+| `dense_invalid/1024x8` | 22.400 | 22.858 | -10.4% | -7.5% |
+| `subnormals/1024x8` | 30.585 | 32.100 | -9.1% | -11.2% |
+| `shared_healthy/1024x8` | 9.421 | 3.707 | +58.8% | +59.4% |
+| `sparse_restore_control/1024x8` | 0.201 | 0.257 | -16.0% | -10.0% |
+| `dense_restore_control/1024x8` | 5.108 | 4.855 | -7.9% | -7.5% |
+| `subnormal_restore_control/1024x8` | 6.532 | 6.941 | -11.6% | -11.1% |
+| `healthy_sine/4096x8` | 32.051 | 7.255 | +75.6% | +74.5% |
+| `silence/4096x8` | 35.938 | 7.862 | +72.2% | +73.7% |
+| `sparse_invalid/4096x8` | 32.715 | 7.721 | +74.9% | +74.2% |
+| `dense_invalid/4096x8` | 95.801 | 93.535 | +5.3% | -2.4% |
+| `subnormals/4096x8` | 138.597 | 123.709 | +2.6% | -9.3% |
+| `shared_healthy/4096x8` | 84.726 | 67.017 | +16.4% | +15.4% |
+| `sparse_restore_control/4096x8` | 0.361 | 0.340 | +1.4% | +1.9% |
+| `dense_restore_control/4096x8` | 21.735 | 21.272 | -10.0% | -15.4% |
+| `subnormal_restore_control/4096x8` | 30.582 | 33.524 | -5.5% | -3.9% |
+| `tiny_tail/0` | 0.103 | 0.102 | +11.3% | +9.3% |
+| `tiny_restore_control/0` | 0.083 | 0.082 | +12.6% | +8.7% |
+| `tiny_tail/1` | 0.214 | 0.211 | -2.0% | -2.2% |
+| `tiny_restore_control/1` | 0.193 | 0.180 | +8.6% | +9.4% |
+| `tiny_tail/7` | 0.304 | 0.284 | -4.5% | -4.7% |
+| `tiny_restore_control/7` | 0.260 | 0.236 | -0.4% | -0.4% |
+| `tiny_tail/8` | 0.345 | 0.326 | -11.9% | -4.1% |
+| `tiny_restore_control/8` | 0.295 | 0.248 | +12.6% | +11.7% |
+| `tiny_tail/9` | 0.362 | 0.346 | -1.5% | -1.2% |
+| `tiny_restore_control/9` | 0.323 | 0.252 | +14.8% | +3.2% |

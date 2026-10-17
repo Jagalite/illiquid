@@ -1,0 +1,89 @@
+{
+  "additional_budget_receipt_check": "All 120 baseline/candidate pairs have identical budget_reserved_bytes.",
+  "baseline_commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "baseline_counter_note": "The old atlasClearBytes reports active upload bytes; baseline reset ranges follow the original resizeAndClear source and high-water buffer lengths, not that counter.",
+  "baseline_debug": {
+    "exit_code": 1,
+    "expected_failed_assertions": 4,
+    "expected_failures": [
+      {
+        "baseline_reported": 1024,
+        "expected_logical_clear_bytes": 8192,
+        "stage": "new small slot allocation to high water",
+        "strategy": "metalR8Atlas"
+      },
+      {
+        "baseline_reported": 1024,
+        "expected_logical_clear_bytes": 8192,
+        "stage": "previous large slot first reuse",
+        "strategy": "metalR8Atlas"
+      },
+      {
+        "baseline_reported": 256,
+        "expected_logical_clear_bytes": 8192,
+        "stage": "new small slot allocation to high water",
+        "strategy": "metalBGRA"
+      },
+      {
+        "baseline_reported": 256,
+        "expected_logical_clear_bytes": 8192,
+        "stage": "previous large slot first reuse",
+        "strategy": "metalBGRA"
+      }
+    ],
+    "failing_function": "clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:)",
+    "passing_functions": 5,
+    "suite_seconds": 0.021,
+    "unexpected_failed_assertions": 0
+  },
+  "cases_including_parameters": 10,
+  "debug": {
+    "exit_code": 0,
+    "manifest": {
+      "generated_sha256": {
+        "SubtitleFramePacker.swift": "55ce7c18b822527bbc2c2d6c0f972452e65e60d6ed218fe0dc2b5d917f541700",
+        "SubtitleMemoryBudget.swift": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83",
+        "SubtitleRenderedRegion.swift": "76c305231d22dd43d0e0cd759c62bacd6399f39ee3651a98b35da660461b7cb4"
+      },
+      "source_ref": "working-tree",
+      "source_sha256": {
+        "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "089275255bd99ad57b2166489532a24373b0e218c0a6c346067c1d98b4a229f8",
+        "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "42ec2d4371fd595d442f7a2d109ef36c10824b478dc87728fbb89ce6bee5e7f7",
+        "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83"
+      },
+      "test_sha256": "bc7f4c5ddc5d458a24fc1acaeb63ff519e6bc96731e88b2b912265fa69a01276"
+    },
+    "test_functions_passed": 6
+  },
+  "native_status": "See the pull request Checks and subtitle-staging-macos-evidence artifact for native execution; this file records Linux component validation.",
+  "paired_cases": 12,
+  "pairs_per_case": 10,
+  "per_case_orders": {
+    "baseline_first": 5,
+    "candidate_first": 5
+  },
+  "platform": "x86_64-unknown-linux-gnu",
+  "release": {
+    "exit_code": 0,
+    "manifest": {
+      "generated_sha256": {
+        "SubtitleFramePacker.swift": "55ce7c18b822527bbc2c2d6c0f972452e65e60d6ed218fe0dc2b5d917f541700",
+        "SubtitleMemoryBudget.swift": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83",
+        "SubtitleRenderedRegion.swift": "76c305231d22dd43d0e0cd759c62bacd6399f39ee3651a98b35da660461b7cb4"
+      },
+      "source_ref": "working-tree",
+      "source_sha256": {
+        "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "089275255bd99ad57b2166489532a24373b0e218c0a6c346067c1d98b4a229f8",
+        "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "42ec2d4371fd595d442f7a2d109ef36c10824b478dc87728fbb89ce6bee5e7f7",
+        "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83"
+      },
+      "test_sha256": "bc7f4c5ddc5d458a24fc1acaeb63ff519e6bc96731e88b2b912265fa69a01276"
+    },
+    "test_functions_passed": 6
+  },
+  "source_sha256": "42ec2d4371fd595d442f7a2d109ef36c10824b478dc87728fbb89ce6bee5e7f7",
+  "test_functions": 6,
+  "test_sha256": "bc7f4c5ddc5d458a24fc1acaeb63ff519e6bc96731e88b2b912265fa69a01276",
+  "timing_observations": 240,
+  "toolchain": "Swift 6.3.2; Testing 6.3.2 (70eff261d7f462c)"
+}

@@ -1,0 +1,52 @@
+name: Planar ownership performance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift
+      - Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift
+      - Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift
+      - Benchmarks/PlanarOwnership/**
+      - .github/workflows/planar-ownership-performance.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: planar-ownership-performance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          # The comparison reads the pinned baseline file through git show.
+          fetch-depth: 0
+      - name: Verify phase accounting and native ownership lifetimes
+        run: |
+          python3 Benchmarks/PlanarOwnership/run.py --tests-only \
+            --output "$RUNNER_TEMP/planar-ownership/tests"
+          cat "$RUNNER_TEMP/planar-ownership/tests/native-tests.json"
+      - name: Measure native component frame lifecycles
+        run: |
+          python3 Benchmarks/PlanarOwnership/run.py \
+            --rounds 8 --iterations 100000 --warmup 10000 \
+            --occupancies 1,7,11,16,32 --workloads pipeline,lifecycle-mixed \
+            --output "$RUNNER_TEMP/planar-ownership/timing"
+          cat "$RUNNER_TEMP/planar-ownership/timing/summary.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: planar-ownership-macos
+          path: |
+            ${{ runner.temp }}/planar-ownership/**/*.json
+            ${{ runner.temp }}/planar-ownership/**/*.jsonl
+            ${{ runner.temp }}/planar-ownership/**/*.txt
+          retention-days: 7

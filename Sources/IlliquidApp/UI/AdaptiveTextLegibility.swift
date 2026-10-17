@@ -100,20 +100,62 @@ struct AdaptiveTextLegibility {
 
     func readableOpacity(for foreground: AdaptiveRainbowTextColor, preferred: Double) -> Double {
         let preferred = preferred.isFinite ? min(1, max(0, preferred)) : 1
-        let opaqueScore = score(foreground)
+        let foregroundLuminance = SampledVideoColor(red: foreground.red,
+            green: foreground.green, blue: foreground.blue).relativeLuminance
+        let opaqueScore = score(luminance: foregroundLuminance)
         // When even opaque text misses the target, fading can only worsen the
         // vulnerable part of the region. Preserve full opacity immediately.
         guard opaqueScore >= Self.minimumTextContrast else { return 1 }
         let target = Self.minimumTextContrast
-        guard preferred < 1, opacityScore(foreground, opacity: preferred) < target else { return preferred }
+        guard preferred < 1 else { return preferred }
+        // Palette outputs are finite normalized RGB. Keep the numerical scoring
+        // path for other callers, including its existing NaN comparisons.
+        let usesThresholdCheck = (0...1).contains(foreground.red)
+            && (0...1).contains(foreground.green) && (0...1).contains(foreground.blue)
+        let needsCorrection = usesThresholdCheck
+            ? !opacityMeetsMinimumContrast(foreground, luminance: foregroundLuminance, opacity: preferred)
+            : opacityScore(foreground, opacity: preferred) < target
+        guard needsCorrection else { return preferred }
         var low = preferred
         var high = 1.0
         for _ in 0..<10 {
             let midpoint = (low + high) / 2
-            if opacityScore(foreground, opacity: midpoint) >= target { high = midpoint }
+            let isReadable = usesThresholdCheck
+                ? opacityMeetsMinimumContrast(foreground, luminance: foregroundLuminance, opacity: midpoint)
+                : opacityScore(foreground, opacity: midpoint) >= target
+            if isReadable { high = midpoint }
             else { low = midpoint }
         }
         return high
+    }
+
+    private func opacityMeetsMinimumContrast(_ foreground: AdaptiveRainbowTextColor,
+                                             luminance: Double, opacity: Double) -> Bool {
+        guard !backgrounds.isEmpty else { return false }
+        let rank = Int(Double(backgrounds.count - 1) * 0.10)
+        let inverse = 1 - opacity
+        var failures = 0
+        for index in backgrounds.indices {
+            let backgroundLuminance = luminances[index]
+            let linearLuminance = luminance * opacity + backgroundLuminance * inverse
+            let linearIsReadable = Self.contrast(linearLuminance, backgroundLuminance)
+                >= Self.minimumTextContrast
+            if linearIsReadable {
+                let background = backgrounds[index]
+                let gammaLuminance = 0.2126 * Self.linear(foreground.red * opacity + background.red * inverse)
+                    + 0.7152 * Self.linear(foreground.green * opacity + background.green * inverse)
+                    + 0.0722 * Self.linear(foreground.blue * opacity + background.blue * inverse)
+                if Self.contrast(gammaLuminance, backgroundLuminance) >= Self.minimumTextContrast {
+                    continue
+                }
+            }
+            // The sorted ratio at rank k passes exactly when no more than k
+            // ratios are below the target. A failed linear blend already makes
+            // min(gamma, linear) fail, so it needs no gamma conversion.
+            failures += 1
+            if failures > rank { return false }
+        }
+        return true
     }
 
     func opacityScore(_ foreground: AdaptiveRainbowTextColor, opacity: Double) -> Double {

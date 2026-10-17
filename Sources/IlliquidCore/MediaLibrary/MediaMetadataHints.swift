@@ -68,7 +68,12 @@ extension RecognizedMediaName {
         }
         // A show title without an episode number cannot identify a movie/file.
         guard hints.content != .show || resolvedKind == .episode else { return self }
-        let ids = hints.catalogIDs.isEmpty ? catalogIDs : hints.catalogIDs
+        let changedIdentity = (kind == .movie && resolvedKind != .movie)
+            || (kind != .movie && resolvedKind == .movie)
+        let previousIDs = changedIdentity ? [] : catalogIDs
+        let providers = Set(hints.catalogIDs.compactMap { $0.split(separator: "-").first })
+        let ids = previousIDs.filter { !providers.contains($0.split(separator: "-").first ?? "") }
+            + hints.catalogIDs
         return .init(kind: resolvedKind, title: resolvedTitle,
             year: hints.year ?? year, season: resolvedKind == .episode ? (resolvedSeason ?? (airDate == nil ? 1 : nil)) : nil,
             episode: resolvedKind == .episode ? resolvedEpisode : nil,

@@ -1,0 +1,3082 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/swiftc",
+        "--version"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 1.1028455830000041,
+      "returncode": 0,
+      "stderr_sha256": "542ca724f46d8a3dffb85c3cd4b6e0d2fdf6c1bd4c484e6978dd9ed2f22cd639",
+      "stdout_sha256": "b674f79b747370a1c05ae7cec551fffe557816c6c807f35f39f933ecbcca80d7"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548:Sources/IlliquidNativePlayback/Media/AudioDecoder.swift"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 0.038166707999977234,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "2554d8452a63992b30142679de1a09f45ba7bc8b1f6020cbad1e975a4503682e"
+    },
+    {
+      "argv": [
+        "/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-cache-path",
+        "/Users/runner/work/_temp/pcm-component/results/module-cache",
+        "-module-name",
+        "IlliquidNativePlayback",
+        "-emit-object",
+        "-emit-module",
+        "-emit-module-path",
+        "/Users/runner/work/_temp/pcm-component/results/baseline/IlliquidNativePlayback.swiftmodule",
+        "/Users/runner/work/_temp/pcm-component/results/baseline/Sanitizer.swift",
+        "-o",
+        "/Users/runner/work/_temp/pcm-component/results/baseline/IlliquidNativePlayback.o"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 4.2871662910000055,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-cache-path",
+        "/Users/runner/work/_temp/pcm-component/results/module-cache",
+        "-I",
+        "/Users/runner/work/_temp/pcm-component/results/baseline",
+        "/Users/runner/work/_temp/pcm-component/results/baseline/Harness.swift",
+        "/Users/runner/work/_temp/pcm-component/results/baseline/IlliquidNativePlayback.o",
+        "-o",
+        "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 4.803776583000001,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-cache-path",
+        "/Users/runner/work/_temp/pcm-component/results/module-cache",
+        "-module-name",
+        "IlliquidNativePlayback",
+        "-emit-object",
+        "-emit-module",
+        "-emit-module-path",
+        "/Users/runner/work/_temp/pcm-component/results/candidate/IlliquidNativePlayback.swiftmodule",
+        "/Users/runner/work/_temp/pcm-component/results/candidate/Sanitizer.swift",
+        "-o",
+        "/Users/runner/work/_temp/pcm-component/results/candidate/IlliquidNativePlayback.o"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 0.6824478340000155,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-cache-path",
+        "/Users/runner/work/_temp/pcm-component/results/module-cache",
+        "-I",
+        "/Users/runner/work/_temp/pcm-component/results/candidate",
+        "/Users/runner/work/_temp/pcm-component/results/candidate/Harness.swift",
+        "/Users/runner/work/_temp/pcm-component/results/candidate/IlliquidNativePlayback.o",
+        "-o",
+        "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 3.2860518749999983,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+        "--verify"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 0.8827767079999944,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "61545dc6994904181f2918c8537b2b0d2d306609caf674b1e60451c876e4965d"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark",
+        "--verify"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 1.1266365829999927,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "61545dc6994904181f2918c8537b2b0d2d306609caf674b1e60451c876e4965d"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548:Sources/IlliquidNativePlayback/Media/AudioDecoder.swift"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 0.07357604200001333,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "2554d8452a63992b30142679de1a09f45ba7bc8b1f6020cbad1e975a4503682e"
+    },
+    {
+      "argv": [
+        "/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-baseline",
+        "--scratch-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-baseline/build",
+        "--cache-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-baseline/cache",
+        "--disable-sandbox",
+        "--disable-xctest",
+        "--enable-swift-testing",
+        "--jobs",
+        "2",
+        "-c",
+        "debug"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 22.58660412499998,
+      "returncode": 0,
+      "stderr_sha256": "b096ee841107a4be01a82a1a16e30a3a04b902241ea94f416965970642157b61",
+      "stdout_sha256": "7e0a6e18a277fafcef5d44981b96e98fdc4b2a7e90e2a0d1cd890fb44c7b3c4a"
+    },
+    {
+      "argv": [
+        "/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-baseline",
+        "--scratch-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-baseline/build",
+        "--cache-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-baseline/cache",
+        "--disable-sandbox",
+        "--disable-xctest",
+        "--enable-swift-testing",
+        "--jobs",
+        "2",
+        "-c",
+        "release"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 16.20036533299998,
+      "returncode": 0,
+      "stderr_sha256": "b1a15f43e0a6caebd0a21a89c87b05292a500a9b3bec3888c468d0424a9aa0a0",
+      "stdout_sha256": "70fc8565b763a5040abd9cb584a12347ddde5a2979bd35750bdf9d8c24f6a4b9"
+    },
+    {
+      "argv": [
+        "/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-candidate",
+        "--scratch-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-candidate/build",
+        "--cache-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-candidate/cache",
+        "--disable-sandbox",
+        "--disable-xctest",
+        "--enable-swift-testing",
+        "--jobs",
+        "2",
+        "-c",
+        "debug"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 9.692625249999992,
+      "returncode": 0,
+      "stderr_sha256": "f9749370b52a0923ec7b28ccfa25c9b4c9dda0e4d3dc3e5b8d0f52090a169971",
+      "stdout_sha256": "ae064004db5ad4879cae143b8494c4722101c2c3501207d69a40b0bb17b55253"
+    },
+    {
+      "argv": [
+        "/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-candidate",
+        "--scratch-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-candidate/build",
+        "--cache-path",
+        "/Users/runner/work/_temp/pcm-component/results/tests-candidate/cache",
+        "--disable-sandbox",
+        "--disable-xctest",
+        "--enable-swift-testing",
+        "--jobs",
+        "2",
+        "-c",
+        "release"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 15.92602741600001,
+      "returncode": 0,
+      "stderr_sha256": "b39a6b2b75408a2c2dae2c84639eb5aeac6fe32be1361cbed8bb023a709ee84b",
+      "stdout_sha256": "85fd392d776d38a3d8dd5738ecd8693753c4181504bd697ccf0a569d2707dad0"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+        "--iterations",
+        "512"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 1.0899492500000179,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "16e9e0194569e259be3c14445a05aed486d9c61f97a6032202a47a3bfbf3bd91"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 5.502510124999958,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "106556653b9b136fb49bc97e94c163692e99ba9ea79a9fad521d12ba4b2482b1"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 3.618172333000018,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "9898207b493216aea33a9e1ab4a50a07a5e9febac0a55cab208ed93e6fbcb7c1"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json",
+        "--reverse"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 3.872540958000002,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "dffe7b334caa54209b8848d17145d4c30da5a61beb58c57c7dd0425cdbf84884"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json",
+        "--reverse"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 5.242190832999995,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "fa238ad0f7a0fde0c6a78b6c7d8037e6c65f10bda7897545e50d2ccebef98e3b"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 5.041156041000022,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "649866fbc8b8311c804cdd08e76abbbb6e261c160fc839354fa62cb4e0a45add"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 4.4633227090000105,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "5495a5444921599d398c62f1554fa1e0ff9fb3bbdc7a0772a478760653c8dbb6"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json",
+        "--reverse"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 3.5735394579999706,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "2edb7ea26c7f6dec4b750495c5c4cc0997d6141a9fa360b787cc3841c9857294"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json",
+        "--reverse"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 4.623454624999965,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "327323f299f1b895b1325fc37135ee8e1e0e304189c63b84631859f5fba081d8"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 3.517346249999946,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "bca983479946b41e104dc707253df6b3b4d158b01ea96ca385627efa44270381"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 2.7904286670000147,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "1d29904bb36e7587c8e013e9b4c44c0c785e42555db2203d90f4ec1ffc4c03a9"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json",
+        "--reverse"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 2.4876659580000364,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "ee7ca434bf841e54e91c188597feef8af847e91b7d54ce48f182b3ba003ec40b"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+        "--iterations-file",
+        "/Users/runner/work/_temp/pcm-component/results/iterations.json",
+        "--cases-file",
+        "/Users/runner/work/_temp/pcm-component/results/cases.json",
+        "--reverse"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 2.998866915999997,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "12bde9e487011b1aee4a1f1c095e99348b01f2955f72ab838aae1e883edd05d8"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 0.034172875000024305,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "6a49ea30be2c1ca16f337f560fc6c69d6fbc0acb4585620d1551afb60d6fd175"
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--short",
+        "--",
+        "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift",
+        "Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift",
+        "Benchmarks/PCMSanitization"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "elapsed_seconds": 1.6339311670000143,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "environment": {
+    "affinity": null,
+    "candidate_git_head": "a178c2df8506ef464db518019bf2dc7bbadce237",
+    "candidate_git_status": [],
+    "controlled_environment": {
+      "ASAN_OPTIONS": null,
+      "CLANG_MODULE_CACHE_PATH": "/Users/runner/work/_temp/pcm-component/results/module-cache",
+      "LD_LIBRARY_PATH": null,
+      "SWIFT_MODULECACHE_PATH": "/Users/runner/work/_temp/pcm-component/results/module-cache"
+    },
+    "cpu_model": null,
+    "libc": [
+      "",
+      ""
+    ],
+    "logical_cpus": 3,
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.15.0 (main, Oct  9 2026, 11:16:41) [Clang 21.0.0 (clang-2100.3.34.2)]",
+    "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "error": null,
+  "finished_at_utc": "2026-10-17T17:58:36.019979+00:00",
+  "invocation": [
+    "Benchmarks/PCMSanitization/run.py",
+    "--mode",
+    "all",
+    "--test-variant",
+    "both",
+    "--test-configuration",
+    "both",
+    "--pairs",
+    "6",
+    "--target-ms",
+    "80",
+    "--output",
+    "/Users/runner/work/_temp/pcm-component/results"
+  ],
+  "results": {
+    "benchmark": {
+      "balanced_order": true,
+      "cases": 55,
+      "fresh_processes": 12,
+      "measurement_records": 660,
+      "pairs": 6,
+      "raw_sha256": "28d4fd91c8da2baff3cee5da4bf8c60152c98ed4211fc55f588d5085e3f732a9",
+      "summary": [
+        {
+          "baseline_median_cpu_ns": 1270.9977879944483,
+          "baseline_median_ns": 1313.1011125086745,
+          "baseline_samples_ns": [
+            1719.1435201249133,
+            1404.4559008501042,
+            1300.8969031922277,
+            911.3408657182512,
+            1325.3053218251214,
+            877.2079393650243
+          ],
+          "candidate_median_cpu_ns": 456.8442054129077,
+          "candidate_median_ns": 493.7543372657877,
+          "candidate_samples_ns": [
+            852.1959251387925,
+            1890.1375130117974,
+            573.8916442574601,
+            322.3776674184594,
+            413.6170302741152,
+            276.5725299271339
+          ],
+          "case": "healthy_sine/1024x1",
+          "iterations_per_process": 92224,
+          "median_paired_cpu_reduction_percent": 66.39689992895933,
+          "median_paired_ratio": 0.39744534723772884,
+          "median_paired_reduction_percent": 60.25546527622711,
+          "paired_cpu_ratios": [
+            0.33486985388958196,
+            0.3881687333745871,
+            0.40873851708940295,
+            0.3371921475312314,
+            0.3135648350200512,
+            0.3152794601142066
+          ],
+          "paired_ratios": [
+            0.4957095874560094,
+            1.345814782698207,
+            0.44115074980131513,
+            0.3537399446741426,
+            0.31209188061246873,
+            0.31528730819209605
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 1146.2179602079227,
+          "baseline_median_ns": 1193.1611119824342,
+          "baseline_samples_ns": [
+            1347.611668757842,
+            1500.4168309732927,
+            1083.4042839218498,
+            1044.2120227639361,
+            1250.383222799785,
+            1135.9390011650833
+          ],
+          "candidate_median_cpu_ns": 443.9471679512458,
+          "candidate_median_ns": 457.9725141154329,
+          "candidate_samples_ns": [
+            426.79672656390034,
+            643.4807537193045,
+            635.420404642409,
+            440.010810629145,
+            475.9342176017207,
+            299.9972889406704
+          ],
+          "case": "silence/1024x1",
+          "iterations_per_process": 89264,
+          "median_paired_cpu_reduction_percent": 61.751072307662966,
+          "median_paired_ratio": 0.40100569889173854,
+          "median_paired_reduction_percent": 59.899430110826145,
+          "paired_cpu_ratios": [
+            0.36792224513306027,
+            0.3974534546284522,
+            0.4345275088746801,
+            0.38284330908772235,
+            0.3821352447590183,
+            0.2642969220293488
+          ],
+          "paired_ratios": [
+            0.3167060188468829,
+            0.42886799217114246,
+            0.5865035001912955,
+            0.4213807167863051,
+            0.3806306809971719,
+            0.2640963015029647
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 1343.7090343019445,
+          "baseline_median_ns": 1355.1674746012673,
+          "baseline_samples_ns": [
+            3131.5340288398515,
+            2199.555863556915,
+            1456.7174595805113,
+            1021.1644636224602,
+            1253.6174896220232,
+            1014.232739785886
+          ],
+          "candidate_median_cpu_ns": 681.1434891850557,
+          "candidate_median_ns": 711.8734501310903,
+          "candidate_samples_ns": [
+            715.2280833515404,
+            1026.4979790255627,
+            826.0380298230282,
+            708.5188169106401,
+            587.4953299104217,
+            464.52370548394146
+          ],
+          "case": "sparse_invalid/1024x1",
+          "iterations_per_process": 73232,
+          "median_paired_cpu_reduction_percent": 51.64204810913445,
+          "median_paired_ratio": 0.46766211417915404,
+          "median_paired_reduction_percent": 53.23378858208459,
+          "paired_cpu_ratios": [
+            0.4348035795802004,
+            0.6573186917077251,
+            0.49944823912174885,
+            0.6593746236904428,
+            0.46771079869556204,
+            0.45802369413031774
+          ],
+          "paired_ratios": [
+            0.22839543711313684,
+            0.46668420476741457,
+            0.5670543895731853,
+            0.6938341884687735,
+            0.4686400235908935,
+            0.45800503894402655
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 3096.9362745098038,
+          "baseline_median_ns": 3132.437193627451,
+          "baseline_samples_ns": [
+            4300.0817401960785,
+            3850.469791666667,
+            3648.3379289215686,
+            2616.5364583333335,
+            2606.410845588235,
+            2251.005943627451
+          ],
+          "candidate_median_cpu_ns": 3408.0882352941176,
+          "candidate_median_ns": 3609.6890318627447,
+          "candidate_samples_ns": [
+            3955.992156862745,
+            3512.5944852941175,
+            4309.515441176471,
+            3706.7835784313725,
+            3142.5270833333334,
+            2609.627757352941
+          ],
+          "case": "dense_invalid/1024x1",
+          "iterations_per_process": 16320,
+          "median_paired_cpu_reduction_percent": -10.855753282772884,
+          "median_paired_ratio": 1.170271646250339,
+          "median_paired_reduction_percent": -17.027164625033908,
+          "paired_cpu_ratios": [
+            0.9798193124486683,
+            0.8783113684771032,
+            1.0574722474043412,
+            1.4008587316111776,
+            1.2045604137282557,
+            1.1596428182511163
+          ],
+          "paired_ratios": [
+            0.9199806877816133,
+            0.9122508876439462,
+            1.1812270478053941,
+            1.4166756846157222,
+            1.2056913777244904,
+            1.1593162446952843
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 3735.345008389262,
+          "baseline_median_ns": 3929.4635591442957,
+          "baseline_samples_ns": [
+            4433.447357382551,
+            4875.5854656040265,
+            4526.9352453859065,
+            3425.47976090604,
+            3278.584626677852,
+            3058.239828020134
+          ],
+          "candidate_median_cpu_ns": 4095.165687919463,
+          "candidate_median_ns": 4117.075005243289,
+          "candidate_samples_ns": [
+            4837.621906459732,
+            4183.731386325503,
+            8384.392040687919,
+            3867.6397336409395,
+            4050.4186241610737,
+            3187.0783347315437
+          ],
+          "case": "subnormals/1024x1",
+          "iterations_per_process": 19072,
+          "median_paired_cpu_reduction_percent": -9.099711919656794,
+          "median_paired_ratio": 1.1101222840261018,
+          "median_paired_reduction_percent": -11.01222840261018,
+          "paired_cpu_ratios": [
+            1.1043276759908836,
+            0.8956986320016334,
+            1.3383961883634163,
+            1.0776665624022521,
+            1.2352555491588306,
+            1.0421224069946855
+          ],
+          "paired_ratios": [
+            1.091164846787715,
+            0.8580982562690426,
+            1.8521122097414002,
+            1.1290797212644887,
+            1.235416829324095,
+            1.0421283201961364
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 1314.178515007899,
+          "baseline_median_ns": 1357.6059439178516,
+          "baseline_samples_ns": [
+            1435.5951816745655,
+            1279.6167061611375,
+            1901.3955371248026,
+            1033.9569510268561,
+            1735.317140600316,
+            962.6036729857819
+          ],
+          "candidate_median_cpu_ns": 761.9470774091627,
+          "candidate_median_ns": 933.0918246445497,
+          "candidate_samples_ns": [
+            1003.9453001579778,
+            862.2383491311216,
+            1141.1104857819905,
+            1146.6767377567141,
+            534.5493680884676,
+            421.3896129541864
+          ],
+          "case": "shared_healthy/1024x1",
+          "iterations_per_process": 10128,
+          "median_paired_cpu_reduction_percent": 47.26641858510048,
+          "median_paired_ratio": 0.636984575454479,
+          "median_paired_reduction_percent": 36.301542454552106,
+          "paired_cpu_ratios": [
+            0.5916872138076787,
+            0.6893360160965796,
+            0.46298441449031175,
+            0.6724335691072453,
+            0.30809488594345524,
+            0.43848839597453276
+          ],
+          "paired_ratios": [
+            0.6993233976913429,
+            0.6738254861628409,
+            0.600143664746117,
+            1.109017872183085,
+            0.30804131163226195,
+            0.4377602379670231
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 204.41550058304182,
+          "baseline_median_ns": 205.88082729468601,
+          "baseline_samples_ns": [
+            281.5660732133933,
+            216.8164188738964,
+            270.7772842745294,
+            178.0556784107946,
+            178.51464892553724,
+            194.9452357154756
+          ],
+          "candidate_median_cpu_ns": 231.70185740463103,
+          "candidate_median_ns": 249.21727573713144,
+          "candidate_samples_ns": [
+            254.84315134099617,
+            299.8977073963018,
+            324.97223471597533,
+            243.5914001332667,
+            228.25410211560887,
+            202.46751624187905
+          ],
+          "case": "sparse_restore_control/1024x1",
+          "iterations_per_process": 480240,
+          "median_paired_cpu_reduction_percent": -15.028557873076931,
+          "median_paired_ratio": 1.2393876926223673,
+          "median_paired_reduction_percent": -23.938769262236725,
+          "paired_cpu_ratios": [
+            0.9013241385915762,
+            1.3460898987836536,
+            0.9215924025283183,
+            1.2669839591045302,
+            1.2806705999182195,
+            1.0335871983570084
+          ],
+          "paired_ratios": [
+            0.9050918259880538,
+            1.3831872556235085,
+            1.2001458526576403,
+            1.3680630817697021,
+            1.278629532587094,
+            1.038586634337565
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 744.6475266942689,
+          "baseline_median_ns": 799.6743775877098,
+          "baseline_samples_ns": [
+            875.6140090433646,
+            1101.920012529963,
+            1087.0273480061016,
+            723.734746132055,
+            565.3581117890608,
+            600.306670843321
+          ],
+          "candidate_median_cpu_ns": 923.9996458923513,
+          "candidate_median_ns": 1015.3370015253868,
+          "candidate_samples_ns": [
+            882.5985576923077,
+            1148.075445358466,
+            1363.3584250381348,
+            1176.0400209740685,
+            678.4921006755285,
+            613.319834114186
+          ],
+          "case": "dense_restore_control/1024x1",
+          "iterations_per_process": 146848,
+          "median_paired_cpu_reduction_percent": -2.4939455437605007,
+          "median_paired_ratio": 1.1209983432345527,
+          "median_paired_reduction_percent": -12.099834323455273,
+          "paired_cpu_ratios": [
+            0.9438661348380193,
+            0.9914008765475542,
+            1.0478236574885837,
+            1.6930845708532598,
+            1.147137190600774,
+            1.0020552533866263
+          ],
+          "paired_ratios": [
+            1.0079767438355332,
+            1.0418863731520147,
+            1.2542080266323548,
+            1.624960010914668,
+            1.2001103133170907,
+            1.021677525676308
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 1019.8460372615704,
+          "baseline_median_ns": 1062.959758058554,
+          "baseline_samples_ns": [
+            1191.9724789294692,
+            1636.7293360934495,
+            1434.0325299423332,
+            921.8372671151856,
+            933.9470371876387,
+            700.3791309330179
+          ],
+          "candidate_median_cpu_ns": 1136.7967248262605,
+          "candidate_median_ns": 1191.4759490980334,
+          "candidate_samples_ns": [
+            1237.8413241165163,
+            1646.202221647198,
+            1247.795911577702,
+            1145.1105740795506,
+            783.9704550495343,
+            739.9125665385184
+          ],
+          "case": "subnormal_restore_control/1024x1",
+          "iterations_per_process": 108208,
+          "median_paired_cpu_reduction_percent": -1.4897647127027458,
+          "median_paired_ratio": 1.0221345777257025,
+          "median_paired_reduction_percent": -2.2134577725702487,
+          "paired_cpu_ratios": [
+            1.0392104561216324,
+            0.9905848381324224,
+            0.8596808773535128,
+            1.3483222222222222,
+            0.8419840584457481,
+            1.0530894019192438
+          ],
+          "paired_ratios": [
+            1.038481463287007,
+            1.005787692164398,
+            0.8701308272469104,
+            1.242204687236263,
+            0.8394163949706147,
+            1.0564457646715366
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 2646.7045834727332,
+          "baseline_median_ns": 2847.0938545500167,
+          "baseline_samples_ns": [
+            2886.5719304115087,
+            2807.6157786885246,
+            2978.8939653730345,
+            1962.002174640348,
+            3560.6163641686185,
+            1685.3549891267983
+          ],
+          "candidate_median_cpu_ns": 744.8352291736367,
+          "candidate_median_ns": 748.7876589160255,
+          "candidate_samples_ns": [
+            789.781281365005,
+            1112.4243894279023,
+            859.538788056206,
+            575.3727208096353,
+            491.9426856808297,
+            707.7940364670459
+          ],
+          "case": "healthy_sine/1024x2",
+          "iterations_per_process": 47824,
+          "median_paired_cpu_reduction_percent": 68.61929723795693,
+          "median_paired_ratio": 0.2909004354052798,
+          "median_paired_reduction_percent": 70.90995645947203,
+          "paired_cpu_ratios": [
+            0.2890632844905494,
+            0.3907174382571133,
+            0.3239047892536932,
+            0.30370926598716835,
+            0.14241875836021717,
+            0.4201065825269252
+          ],
+          "paired_ratios": [
+            0.27360526617897724,
+            0.39621674656192835,
+            0.2885429283645447,
+            0.29325794244601494,
+            0.13816222680751938,
+            0.4199673309382506
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 2308.1580812854445,
+          "baseline_median_ns": 2512.6360369407685,
+          "baseline_samples_ns": [
+            2421.9751102709515,
+            2603.296963610586,
+            2850.6821439823566,
+            2819.908829552615,
+            1790.6443564902331,
+            1715.5575574984248
+          ],
+          "candidate_median_cpu_ns": 548.6767485822306,
+          "candidate_median_ns": 558.2491434310018,
+          "candidate_samples_ns": [
+            745.2306041272842,
+            803.7693958727158,
+            640.2377323566477,
+            476.260554505356,
+            464.13403827977316,
+            470.9431120037807
+          ],
+          "case": "silence/1024x2",
+          "iterations_per_process": 50784,
+          "median_paired_cpu_reduction_percent": 72.86673298188249,
+          "median_paired_ratio": 0.2668563024982378,
+          "median_paired_reduction_percent": 73.31436975017623,
+          "paired_cpu_ratios": [
+            0.31418814032909037,
+            0.31093637191198165,
+            0.26973556495243883,
+            0.1931358251265833,
+            0.2597322461572365,
+            0.27292977540991137
+          ],
+          "paired_ratios": [
+            0.3076954015617087,
+            0.3087505601965384,
+            0.22459106277708185,
+            0.16889218173089512,
+            0.25919945331271854,
+            0.27451315168375695
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 2376.311094290658,
+          "baseline_median_ns": 2476.404249567474,
+          "baseline_samples_ns": [
+            3164.659493944637,
+            3236.6412467560554,
+            2682.9213073096885,
+            2269.8871918252594,
+            1882.0251676038063,
+            1773.4735348183392
+          ],
+          "candidate_median_cpu_ns": 885.6644679930796,
+          "candidate_median_ns": 942.1935823961937,
+          "candidate_samples_ns": [
+            1432.0832882785467,
+            1475.4924578287198,
+            1038.4565041089966,
+            837.6000216262976,
+            845.930660683391,
+            703.4685607698962
+          ],
+          "case": "sparse_invalid/1024x2",
+          "iterations_per_process": 36992,
+          "median_paired_cpu_reduction_percent": 59.93995170934466,
+          "median_paired_ratio": 0.4230701840529016,
+          "median_paired_reduction_percent": 57.692981594709835,
+          "paired_cpu_ratios": [
+            0.40759708604918665,
+            0.5194292328492642,
+            0.3539478037885681,
+            0.3918479841207631,
+            0.4506884037098911,
+            0.39360387976392003
+          ],
+          "paired_ratios": [
+            0.45252365729037886,
+            0.45587148693341956,
+            0.38706185726718667,
+            0.369005131463281,
+            0.44947893112419407,
+            0.3966614369816091
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 6585.082697201018,
+          "baseline_median_ns": 7392.6294926844785,
+          "baseline_samples_ns": [
+            7363.927321882951,
+            7421.331663486005,
+            10075.789201653944,
+            8827.694258905853,
+            5568.099316157761,
+            4587.378737277354
+          ],
+          "candidate_median_cpu_ns": 5902.67175572519,
+          "candidate_median_ns": 6056.912293256997,
+          "candidate_samples_ns": [
+            6132.590489821883,
+            7364.417700381679,
+            6778.344386132316,
+            5403.307888040713,
+            5981.234096692112,
+            5571.813374681934
+          ],
+          "case": "dense_invalid/1024x2",
+          "iterations_per_process": 12576,
+          "median_paired_cpu_reduction_percent": 1.083392090050439,
+          "median_paired_ratio": 0.9125595279018218,
+          "median_paired_reduction_percent": 8.744047209817818,
+          "paired_cpu_ratios": [
+            0.946891995927186,
+            1.0347850612264085,
+            0.8340703368452294,
+            0.6684077986975938,
+            1.0314401622718052,
+            1.2095243053747766
+          ],
+          "paired_ratios": [
+            0.8327880248896569,
+            0.9923310309139868,
+            0.6727358274843273,
+            0.6120859795964915,
+            1.0741967334051492,
+            1.2145963291421735
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 7763.392857142857,
+          "baseline_median_ns": 8095.671237244898,
+          "baseline_samples_ns": [
+            7632.722066326531,
+            9726.078826530613,
+            10334.938392857142,
+            8558.620408163266,
+            6446.029974489796,
+            6282.897576530612
+          ],
+          "candidate_median_cpu_ns": 7756.313775510203,
+          "candidate_median_ns": 8346.245216836734,
+          "candidate_samples_ns": [
+            9017.511734693877,
+            9698.08137755102,
+            11571.051275510205,
+            7341.980229591837,
+            6727.540433673469,
+            7674.978698979592
+          ],
+          "case": "subnormals/1024x2",
+          "iterations_per_process": 7840,
+          "median_paired_cpu_reduction_percent": -5.3546085022442735,
+          "median_paired_ratio": 1.0816385810522504,
+          "median_paired_reduction_percent": -8.163858105225042,
+          "paired_cpu_ratios": [
+            1.0340648103133225,
+            1.0590679989388982,
+            1.154480581194929,
+            0.8768114835458503,
+            1.0480241711059872,
+            1.217815344603381
+          ],
+          "paired_ratios": [
+            1.181428022183155,
+            0.9971214042700104,
+            1.1196052492685766,
+            0.8578462274818276,
+            1.0436719128359242,
+            1.2215667381956083
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 2929.460352422908,
+          "baseline_median_ns": 3045.492593612335,
+          "baseline_samples_ns": [
+            3001.4018722466963,
+            3188.3283039647577,
+            3089.5833149779737,
+            3983.1612885462555,
+            2423.4375,
+            1822.2053964757708
+          ],
+          "candidate_median_cpu_ns": 1084.5264317180618,
+          "candidate_median_ns": 1093.6467511013216,
+          "candidate_samples_ns": [
+            1154.125385462555,
+            1557.9937775330397,
+            2076.1587004405287,
+            1033.1681167400882,
+            937.013601321586,
+            721.0122797356828
+          ],
+          "case": "shared_healthy/1024x2",
+          "iterations_per_process": 18160,
+          "median_paired_cpu_reduction_percent": 60.825429158109614,
+          "median_paired_ratio": 0.39116380671326745,
+          "median_paired_reduction_percent": 60.883619328673255,
+          "paired_cpu_ratios": [
+            0.3840087582572553,
+            0.43790148008658775,
+            0.6463261341560964,
+            0.264558126370905,
+            0.38879751461988304,
+            0.39469390221792466
+          ],
+          "paired_ratios": [
+            0.3845287750815707,
+            0.4886553795591375,
+            0.6719866366365751,
+            0.25938395206616555,
+            0.38664648926229206,
+            0.39568112416424284
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 230.070745586869,
+          "baseline_median_ns": 243.40510558609478,
+          "baseline_samples_ns": [
+            252.99188990399506,
+            212.83094127438835,
+            233.8183212681945,
+            330.82675073552184,
+            255.35511671570146,
+            163.15459023691545
+          ],
+          "candidate_median_cpu_ns": 215.7933957881697,
+          "candidate_median_ns": 220.9716848288944,
+          "candidate_samples_ns": [
+            294.0238415531124,
+            281.87886148962525,
+            239.79785730876432,
+            202.14551234902447,
+            192.8595540414989,
+            182.5678906008052
+          ],
+          "case": "sparse_restore_control/1024x2",
+          "iterations_per_process": 206656,
+          "median_paired_cpu_reduction_percent": -3.666200781842921,
+          "median_paired_ratio": 1.0722802911074374,
+          "median_paired_reduction_percent": -7.228029110743739,
+          "paired_cpu_ratios": [
+            1.0229019859064703,
+            1.254670442607226,
+            1.0504220297303883,
+            0.7271034218679292,
+            0.755097400136436,
+            1.1164328716747234
+          ],
+          "paired_ratios": [
+            1.1621868260863544,
+            1.3244261374863637,
+            1.0255734281562614,
+            0.6110313386072849,
+            0.7552601902871533,
+            1.1189871540586132
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 1699.3095930232557,
+          "baseline_median_ns": 1785.7744670542636,
+          "baseline_samples_ns": [
+            1348.5974745639535,
+            1887.5893289728683,
+            1847.8051114341085,
+            1723.7438226744187,
+            1970.8595869670542,
+            874.5092054263566
+          ],
+          "candidate_median_cpu_ns": 1651.1627906976744,
+          "candidate_median_ns": 1676.0171844718993,
+          "candidate_samples_ns": [
+            1762.7810985949613,
+            2211.9494004360463,
+            1842.3356044089148,
+            1589.2532703488373,
+            1004.2860041182171,
+            1166.6338723352712
+          ],
+          "case": "dense_restore_control/1024x2",
+          "iterations_per_process": 33024,
+          "median_paired_cpu_reduction_percent": 2.8376355530874253,
+          "median_paired_ratio": 1.0844391304234753,
+          "median_paired_reduction_percent": -8.443913042347528,
+          "paired_cpu_ratios": [
+            1.342054734309575,
+            0.9535133901647895,
+            0.9726371560417022,
+            0.9706101328965492,
+            0.5296729270474,
+            1.334014264940101
+          ],
+          "paired_ratios": [
+            1.3071217556335164,
+            1.1718382629550457,
+            0.997039997891905,
+            0.921977645079002,
+            0.5095675058534778,
+            1.3340441302347328
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 1608.7926405559065,
+          "baseline_median_ns": 2019.0402124131397,
+          "baseline_samples_ns": [
+            1616.9572015161086,
+            2373.1608101705624,
+            2484.3601942514215,
+            3963.278466519267,
+            1664.919614655717,
+            1145.976468730259
+          ],
+          "candidate_median_cpu_ns": 2175.734365129501,
+          "candidate_median_ns": 2262.651512160455,
+          "candidate_samples_ns": [
+            2363.323199620973,
+            3054.9605969677827,
+            3051.21801958307,
+            2161.9798246999367,
+            1508.4080464308277,
+            1474.9042561591914
+          ],
+          "case": "subnormal_restore_control/1024x2",
+          "iterations_per_process": 25328,
+          "median_paired_cpu_reduction_percent": -22.997710311049644,
+          "median_paired_ratio": 1.257599471567284,
+          "median_paired_reduction_percent": -25.7599471567284,
+          "paired_cpu_ratios": [
+            1.3804035296450523,
+            1.172130546387972,
+            1.1762589287304726,
+            1.4621738314248172,
+            0.9284586036791329,
+            1.2836952774905206
+          ],
+          "paired_ratios": [
+            1.461586736745443,
+            1.2872960752913405,
+            1.2281705473478866,
+            0.5455028817590721,
+            0.9059945195869088,
+            1.2870283957866815
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 6314.5663784333665,
+          "baseline_median_ns": 7107.143025178027,
+          "baseline_samples_ns": [
+            8138.423512207528,
+            7830.97024415056,
+            7381.522316887081,
+            6832.7637334689725,
+            6165.236075788403,
+            5845.0640259409965
+          ],
+          "candidate_median_cpu_ns": 1641.308494404883,
+          "candidate_median_ns": 1783.564089521872,
+          "candidate_samples_ns": [
+            1904.8909587995931,
+            2347.4402975584944,
+            2003.6532299084436,
+            1662.2372202441506,
+            1308.1658825025431,
+            1395.8730925737539
+          ],
+          "case": "healthy_sine/1024x6",
+          "iterations_per_process": 15728,
+          "median_paired_cpu_reduction_percent": 75.77781012484783,
+          "median_paired_ratio": 0.2410433950870799,
+          "median_paired_reduction_percent": 75.89566049129202,
+          "paired_cpu_ratios": [
+            0.24651501605907092,
+            0.2832025693966506,
+            0.3012798002263061,
+            0.22346836113317448,
+            0.2018623523903657,
+            0.23792878144397256
+          ],
+          "paired_ratios": [
+            0.2340614193820562,
+            0.2997636594663278,
+            0.2714417357141338,
+            0.24327450576140996,
+            0.2121842321074877,
+            0.23881228441274985
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 6889.547413793103,
+          "baseline_median_ns": 8128.863970588234,
+          "baseline_samples_ns": [
+            8732.064021298174,
+            7948.835763184584,
+            8308.892177991886,
+            10959.933823529413,
+            4990.6582783975655,
+            4724.349264705882
+          ],
+          "candidate_median_cpu_ns": 1622.210953346856,
+          "candidate_median_ns": 1692.7162461967546,
+          "candidate_samples_ns": [
+            1443.1071247464504,
+            2387.9759761663286,
+            1942.3253676470588,
+            4059.317444219067,
+            1260.4298301217038,
+            1322.9826952332658
+          ],
+          "case": "silence/1024x6",
+          "iterations_per_process": 15776,
+          "median_paired_cpu_reduction_percent": 73.34444442175152,
+          "median_paired_ratio": 0.2662963677638148,
+          "median_paired_reduction_percent": 73.37036322361851,
+          "paired_cpu_ratios": [
+            0.17402830928120244,
+            0.3069516102279374,
+            0.22613057362694833,
+            0.37897500729359135,
+            0.25301128197300976,
+            0.28009982959195995
+          ],
+          "paired_ratios": [
+            0.16526529366099485,
+            0.30041833135191376,
+            0.23376466152633177,
+            0.3703779155586042,
+            0.25255783101350937,
+            0.2800349045141202
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 5961.299313893654,
+          "baseline_median_ns": 6369.403033876501,
+          "baseline_samples_ns": [
+            8019.1225343053175,
+            8121.10045025729,
+            6539.384112349914,
+            6199.421955403088,
+            5314.652980274443,
+            4531.317002572899
+          ],
+          "candidate_median_cpu_ns": 1996.8910806174958,
+          "candidate_median_ns": 3045.4946933962265,
+          "candidate_samples_ns": [
+            3330.309283876501,
+            3059.560784734134,
+            3031.428602058319,
+            3814.541273584906,
+            1956.5421312178387,
+            1945.3615994854201
+          ],
+          "case": "sparse_invalid/1024x6",
+          "iterations_per_process": 9328,
+          "median_paired_cpu_reduction_percent": 64.4808477707205,
+          "median_paired_ratio": 0.4223054019730462,
+          "median_paired_reduction_percent": 57.76945980269538,
+          "paired_cpu_ratios": [
+            0.2736250857534873,
+            0.3448179114527804,
+            0.44398127583968294,
+            0.3348899012908125,
+            0.3655651331328098,
+            0.423055995836389
+          ],
+          "paired_ratios": [
+            0.41529597155170545,
+            0.376742142702742,
+            0.4635648480004918,
+            0.6153059593338946,
+            0.3681410881349407,
+            0.429314832394387
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 18384.33908045977,
+          "baseline_median_ns": 18803.071120689652,
+          "baseline_samples_ns": [
+            19859.79406130268,
+            23355.553639846745,
+            23552.10320881226,
+            16190.363505747126,
+            17746.348180076628,
+            12813.547653256705
+          ],
+          "candidate_median_cpu_ns": 18267.36111111111,
+          "candidate_median_ns": 19769.521312260535,
+          "candidate_samples_ns": [
+            20851.263170498085,
+            24019.7658045977,
+            18687.779454022988,
+            23106.09219348659,
+            14753.901340996168,
+            18339.36997126437
+          ],
+          "case": "dense_invalid/1024x6",
+          "iterations_per_process": 4176,
+          "median_paired_cpu_reduction_percent": -9.462318143046744,
+          "median_paired_ratio": 1.0391812933061995,
+          "median_paired_reduction_percent": -3.918129330619946,
+          "paired_cpu_ratios": [
+            1.0666857755290247,
+            1.12256058733191,
+            0.8059447334734765,
+            1.3475562587904362,
+            0.8385950581988972,
+            1.4187737100783016
+          ],
+          "paired_ratios": [
+            1.0499234335529848,
+            1.028439153059414,
+            0.7934654195567029,
+            1.4271509213047981,
+            0.8313767537571475,
+            1.431248430765637
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 22009.642857142855,
+          "baseline_median_ns": 24585.483571428573,
+          "baseline_samples_ns": [
+            28178.928571428572,
+            27719.092142857142,
+            35997.247142857144,
+            21451.875,
+            19325.66964285714,
+            16710.654642857142
+          ],
+          "candidate_median_cpu_ns": 23659.821428571428,
+          "candidate_median_ns": 24391.369107142855,
+          "candidate_samples_ns": [
+            22201.012142857144,
+            30896.636785714287,
+            25538.006071428572,
+            27390.505714285715,
+            20102.604285714286,
+            23244.73214285714
+          ],
+          "case": "subnormals/1024x6",
+          "iterations_per_process": 2800,
+          "median_paired_cpu_reduction_percent": -7.7019155402217265,
+          "median_paired_ratio": 1.077418001343894,
+          "median_paired_reduction_percent": -7.741800134389409,
+          "paired_cpu_ratios": [
+            0.8673457423420783,
+            1.1053412852713993,
+            1.048697025533035,
+            1.1673058240016363,
+            1.0401789841539857,
+            1.3841172824995192
+          ],
+          "paired_ratios": [
+            0.7878586329704313,
+            1.114633791990044,
+            0.7094433074306912,
+            1.2768350418919425,
+            1.0402022106977444,
+            1.391012658668818
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 7567.0336787564775,
+          "baseline_median_ns": 7717.977493523316,
+          "baseline_samples_ns": [
+            9504.398639896373,
+            8128.467778497409,
+            9203.246437823835,
+            7307.4872085492225,
+            5865.197215025907,
+            5076.802784974093
+          ],
+          "candidate_median_cpu_ns": 2865.6897668393785,
+          "candidate_median_ns": 2876.6394106217617,
+          "candidate_samples_ns": [
+            2477.8646373056995,
+            2769.875323834197,
+            4464.506476683938,
+            3316.83128238342,
+            2983.4034974093265,
+            2606.089378238342
+          ],
+          "case": "shared_healthy/1024x6",
+          "iterations_per_process": 6176,
+          "median_paired_cpu_reduction_percent": 51.74476643652536,
+          "median_paired_ratio": 0.4694980891201342,
+          "median_paired_reduction_percent": 53.05019108798659,
+          "paired_cpu_ratios": [
+            0.28311644978311645,
+            0.34383739310177114,
+            0.5052433775838031,
+            0.4598612936856897,
+            0.5088489466854413,
+            0.5086740225779706
+          ],
+          "paired_ratios": [
+            0.26070714531105943,
+            0.3407622936221103,
+            0.485101263651438,
+            0.45389491458883036,
+            0.5086620940496624,
+            0.5133327979474863
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 247.7853701176872,
+          "baseline_median_ns": 266.62826731195634,
+          "baseline_samples_ns": [
+            249.72328053044515,
+            303.2817030530445,
+            328.9831357666724,
+            283.5332540934675,
+            183.74698852976292,
+            173.4791222497015
+          ],
+          "candidate_median_cpu_ns": 247.36429728807775,
+          "candidate_median_ns": 270.23270403377114,
+          "candidate_samples_ns": [
+            257.3003688384786,
+            285.34968765990106,
+            352.9960557734948,
+            283.1650392290636,
+            190.73444162544772,
+            192.62349692989937
+          ],
+          "case": "sparse_restore_control/1024x6",
+          "iterations_per_process": 187616,
+          "median_paired_cpu_reduction_percent": -0.6884833658332035,
+          "median_paired_ratio": 1.0341847584535744,
+          "median_paired_reduction_percent": -3.418475845357438,
+          "paired_cpu_ratios": [
+            0.9757432141318396,
+            0.8607262519242959,
+            1.3095130700002149,
+            0.9266751191025051,
+            1.0380264531848242,
+            1.1087498845052204
+          ],
+          "paired_ratios": [
+            1.0303419380521461,
+            0.9408734018154498,
+            1.072991340272996,
+            0.9987013344675171,
+            1.0380275788550024,
+            1.110355496568872
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 4046.2903911564626,
+          "baseline_median_ns": 4102.477040816327,
+          "baseline_samples_ns": [
+            5162.189094387755,
+            4617.20525085034,
+            5542.1051232993195,
+            3587.748830782313,
+            2895.1291454081634,
+            2230.419961734694
+          ],
+          "candidate_median_cpu_ns": 3874.7874149659865,
+          "candidate_median_ns": 4033.446694302721,
+          "candidate_samples_ns": [
+            3549.9973426870747,
+            5349.339285714285,
+            4516.896045918367,
+            5420.001594387755,
+            2330.458971088435,
+            2772.5916241496598
+          ],
+          "case": "dense_restore_control/1024x6",
+          "iterations_per_process": 9408,
+          "median_paired_cpu_reduction_percent": 3.5178848724641942,
+          "median_paired_ratio": 0.9867904963946903,
+          "median_paired_reduction_percent": 1.3209503605309703,
+          "paired_cpu_ratios": [
+            0.6779114235050313,
+            1.0542436886640714,
+            0.8753986138866447,
+            1.5173306053676736,
+            0.8052587124967868,
+            1.230343247243042
+          ],
+          "paired_ratios": [
+            0.6876922324574611,
+            1.1585664910021294,
+            0.8150145017872512,
+            1.5106970554585666,
+            0.8049585541925387,
+            1.2430805282038884
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 4884.721643035863,
+          "baseline_median_ns": 5097.314168056714,
+          "baseline_samples_ns": [
+            6368.490669307756,
+            6991.5206943286075,
+            8470.500625521268,
+            3682.34815471226,
+            3826.1376668056714,
+            2941.3204753961636
+          ],
+          "candidate_median_cpu_ns": 5418.317347789825,
+          "candidate_median_ns": 6014.6270068807335,
+          "candidate_samples_ns": [
+            5921.870673477898,
+            6336.678117180984,
+            6970.861134278565,
+            6107.38334028357,
+            3776.777939949958,
+            3300.862698081735
+          ],
+          "case": "subnormal_restore_control/1024x6",
+          "iterations_per_process": 19184,
+          "median_paired_cpu_reduction_percent": 0.6603501192109063,
+          "median_paired_ratio": 0.9584848436696214,
+          "median_paired_reduction_percent": 4.151515633037861,
+          "paired_cpu_ratios": [
+            0.8875305837886188,
+            0.813140243902439,
+            1.0152044112369083,
+            1.6164631258700115,
+            0.9715885863788735,
+            1.114765719146523
+          ],
+          "paired_ratios": [
+            0.929870354056999,
+            0.9063376043957333,
+            0.8229573956084306,
+            1.658556737083108,
+            0.9870993332822439,
+            1.122238370722641
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 7967.134831460674,
+          "baseline_median_ns": 8171.292696629213,
+          "baseline_samples_ns": [
+            9640.724438202247,
+            10636.27106741573,
+            10941.93595505618,
+            6701.86095505618,
+            6663.635252808989,
+            5915.56643258427
+          ],
+          "candidate_median_cpu_ns": 2065.379213483146,
+          "candidate_median_ns": 2281.823525280899,
+          "candidate_samples_ns": [
+            2681.9171348314608,
+            7477.978651685393,
+            3183.4386235955058,
+            1881.729915730337,
+            1754.4710674157304,
+            1468.7675561797753
+          ],
+          "case": "healthy_sine/1024x8",
+          "iterations_per_process": 7120,
+          "median_paired_cpu_reduction_percent": 74.27402949678822,
+          "median_paired_ratio": 0.2794817451797953,
+          "median_paired_reduction_percent": 72.05182548202048,
+          "paired_cpu_ratios": [
+            0.2505709575449582,
+            0.22935286036004132,
+            0.2827637894008619,
+            0.2870981754995656,
+            0.2639484525192775,
+            0.24850342075256557
+          ],
+          "paired_ratios": [
+            0.27818626619013404,
+            0.7030639407634334,
+            0.2909392484722472,
+            0.28077722416945655,
+            0.26329038142898814,
+            0.24828857437716756
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 8874.529569892473,
+          "baseline_median_ns": 9182.09005376344,
+          "baseline_samples_ns": [
+            10779.642741935484,
+            9899.187903225806,
+            10853.914650537634,
+            8464.992204301076,
+            5949.865591397849,
+            6160.153494623656
+          ],
+          "candidate_median_cpu_ns": 1826.747311827957,
+          "candidate_median_ns": 1957.6024865591398,
+          "candidate_samples_ns": [
+            3279.5138440860214,
+            1899.3783602150538,
+            2130.6002688172043,
+            2015.8266129032259,
+            1555.9307795698924,
+            1796.0573924731182
+          ],
+          "case": "silence/1024x8",
+          "iterations_per_process": 7440,
+          "median_paired_cpu_reduction_percent": 75.00185951028793,
+          "median_paired_ratio": 0.24982186637059728,
+          "median_paired_reduction_percent": 75.01781336294027,
+          "paired_cpu_ratios": [
+            0.2791305396604173,
+            0.19057203536874837,
+            0.19433730588660167,
+            0.23839689310498507,
+            0.26156591668925633,
+            0.29158303516886286
+          ],
+          "paired_ratios": [
+            0.30423214596230536,
+            0.19187213928893213,
+            0.19629786463372162,
+            0.2381368540279318,
+            0.2615068787132627,
+            0.2915604934261212
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 8104.646793587175,
+          "baseline_median_ns": 8579.038326653306,
+          "baseline_samples_ns": [
+            10785.618111222444,
+            10947.373872745491,
+            10203.897419839679,
+            6954.1792334669335,
+            6512.138902805611,
+            6457.769664328657
+          ],
+          "candidate_median_cpu_ns": 2932.051603206413,
+          "candidate_median_ns": 3158.1574398797593,
+          "candidate_samples_ns": [
+            3283.060871743487,
+            3841.2657815631264,
+            3033.254008016032,
+            3290.2836923847694,
+            1874.0449649298598,
+            1827.8639779559119
+          ],
+          "case": "sparse_invalid/1024x8",
+          "iterations_per_process": 7984,
+          "median_paired_cpu_reduction_percent": 70.11909668566601,
+          "median_paired_ratio": 0.30082836158570675,
+          "median_paired_reduction_percent": 69.91716384142931,
+          "paired_cpu_ratios": [
+            0.30944722420776744,
+            0.3365227963525836,
+            0.2867874502872293,
+            0.4640821397252266,
+            0.2881708420789124,
+            0.28315648581016856
+          ],
+          "paired_ratios": [
+            0.3043924639170619,
+            0.35088468030915765,
+            0.2972642592543516,
+            0.47313760286049356,
+            0.28777717934156305,
+            0.28304880368413304
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 21207.888719512193,
+          "baseline_median_ns": 22400.358803353658,
+          "baseline_samples_ns": [
+            26150.62881097561,
+            30915.952362804877,
+            25245.744283536584,
+            19554.973323170732,
+            17855.611661585364,
+            16797.38300304878
+          ],
+          "candidate_median_cpu_ns": 22405.29725609756,
+          "candidate_median_ns": 22858.033155487807,
+          "candidate_samples_ns": [
+            21968.321265243903,
+            21342.067073170732,
+            28389.89443597561,
+            27967.209603658535,
+            23747.745045731706,
+            18200.076219512193
+          ],
+          "case": "dense_invalid/1024x8",
+          "iterations_per_process": 2624,
+          "median_paired_cpu_reduction_percent": -7.454698981003061,
+          "median_paired_ratio": 1.1040242203812687,
+          "median_paired_reduction_percent": -10.402422038126868,
+          "paired_cpu_ratios": [
+            0.9164373570268208,
+            0.8629351792398166,
+            1.0655167659809133,
+            1.354874149059306,
+            1.3591796661939564,
+            1.0835772136391477
+          ],
+          "paired_ratios": [
+            0.8400685667651571,
+            0.6903253965046042,
+            1.1245417887912859,
+            1.4301839814079482,
+            1.32998776495698,
+            1.0835066519712517
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 28449.013157894737,
+          "baseline_median_ns": 30584.60115131579,
+          "baseline_samples_ns": [
+            32091.796875,
+            38812.15707236842,
+            34894.73684210526,
+            29077.40542763158,
+            24522.615131578947,
+            23193.46217105263
+          ],
+          "candidate_median_cpu_ns": 29553.45394736842,
+          "candidate_median_ns": 32100.345805921053,
+          "candidate_samples_ns": [
+            35512.33552631579,
+            29659.402138157893,
+            34764.28865131579,
+            34541.28947368421,
+            29055.269736842107,
+            24962.61595394737
+          ],
+          "case": "subnormals/1024x8",
+          "iterations_per_process": 1216,
+          "median_paired_cpu_reduction_percent": -11.249587288699914,
+          "median_paired_ratio": 1.091432099218189,
+          "median_paired_reduction_percent": -9.143209921818896,
+          "paired_cpu_ratios": [
+            1.2076772784737386,
+            0.8041306543944327,
+            0.8958183218624992,
+            1.1493427175430433,
+            1.1742805393439324,
+            1.0756490282309548
+          ],
+          "paired_ratios": [
+            1.1065860744613039,
+            0.7641781435351693,
+            0.9962616657239819,
+            1.1879082389125555,
+            1.1848356947634937,
+            1.076278123975074
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 9317.274305555555,
+          "baseline_median_ns": 9420.603918650793,
+          "baseline_samples_ns": [
+            11572.57564484127,
+            9939.447916666666,
+            11734.044270833334,
+            8901.75992063492,
+            6822.084821428572,
+            6823.257688492064
+          ],
+          "candidate_median_cpu_ns": 3607.390873015873,
+          "candidate_median_ns": 3706.8039434523807,
+          "candidate_samples_ns": [
+            4302.9978918650795,
+            3223.534722222222,
+            5575.494915674603,
+            4190.07316468254,
+            3080.796378968254,
+            2293.1495535714284
+          ],
+          "case": "shared_healthy/1024x8",
+          "iterations_per_process": 8064,
+          "median_paired_cpu_reduction_percent": 59.430793742191355,
+          "median_paired_ratio": 0.41170939122538075,
+          "median_paired_reduction_percent": 58.82906087746193,
+          "paired_cpu_ratios": [
+            0.35976184032476316,
+            0.32246961789258943,
+            0.48068464545939227,
+            0.4606366349296575,
+            0.4516222848314096,
+            0.33619874963652224
+          ],
+          "paired_ratios": [
+            0.3718271561943287,
+            0.32431728092431916,
+            0.4751554354991913,
+            0.47070165922691853,
+            0.45159162625643273,
+            0.33607840393291866
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 194.9341707021792,
+          "baseline_median_ns": 200.84221776634382,
+          "baseline_samples_ns": [
+            290.2106915859564,
+            247.41829978813558,
+            198.67037114104116,
+            203.01406439164649,
+            181.73166048728814,
+            179.57242168583534
+          ],
+          "candidate_median_cpu_ns": 242.11419869854723,
+          "candidate_median_ns": 256.5858831151634,
+          "candidate_samples_ns": [
+            257.4024430614407,
+            247.50755712772397,
+            326.51158160562954,
+            255.7693231688862,
+            192.68449228208232,
+            284.57969033746974
+          ],
+          "case": "sparse_restore_control/1024x8",
+          "iterations_per_process": 211456,
+          "median_paired_cpu_reduction_percent": -10.045809109835325,
+          "median_paired_ratio": 1.1600646866402258,
+          "median_paired_reduction_percent": -16.006468664022577,
+          "paired_cpu_ratios": [
+            0.9591068113665572,
+            0.9870599029014872,
+            1.2740554788502572,
+            1.1547470954113368,
+            1.0461690867853697,
+            1.5861623616236162
+          ],
+          "paired_ratios": [
+            0.8869502417529013,
+            1.0003607548013418,
+            1.6434840269857385,
+            1.259860118240214,
+            1.0602692550402373,
+            1.5847627807534177
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 4783.094262295082,
+          "baseline_median_ns": 5107.893647540984,
+          "baseline_samples_ns": [
+            6350.960553278688,
+            5230.088831967213,
+            4985.698463114754,
+            5303.983094262295,
+            3927.279713114754,
+            3142.0509221311477
+          ],
+          "candidate_median_cpu_ns": 4799.897540983606,
+          "candidate_median_ns": 4854.992725409837,
+          "candidate_samples_ns": [
+            7669.441598360656,
+            4184.029200819672,
+            7009.605532786885,
+            5525.95625,
+            3200.8324795081967,
+            3509.2043032786887
+          ],
+          "case": "dense_restore_control/1024x8",
+          "iterations_per_process": 9760,
+          "median_paired_cpu_reduction_percent": -7.531890466059443,
+          "median_paired_ratio": 1.0793508907738607,
+          "median_paired_reduction_percent": -7.9350890773860705,
+          "paired_cpu_ratios": [
+            1.2284653589524908,
+            0.801306392271824,
+            1.364724135499189,
+            1.0290454819218589,
+            0.8149993478544412,
+            1.12159232739933
+          ],
+          "paired_ratios": [
+            1.2076034064486987,
+            0.7999919954028615,
+            1.4059425343601144,
+            1.041850275876224,
+            0.8150253389946582,
+            1.1168515056714974
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 6357.613469985359,
+          "baseline_median_ns": 6531.995378843338,
+          "baseline_samples_ns": [
+            6644.834370424597,
+            7138.085651537335,
+            7169.484352122987,
+            6419.156387262079,
+            4520.112737920937,
+            4139.568814055637
+          ],
+          "candidate_median_cpu_ns": 6782.622620790629,
+          "candidate_median_ns": 6941.459599194729,
+          "candidate_samples_ns": [
+            9163.94051976574,
+            6579.3565153733525,
+            8809.94152635432,
+            7303.562683016105,
+            4803.642752562226,
+            4527.139824304539
+          ],
+          "case": "subnormal_restore_control/1024x8",
+          "iterations_per_process": 10928,
+          "median_paired_cpu_reduction_percent": -11.114634392307288,
+          "median_paired_ratio": 1.1157010158030816,
+          "median_paired_reduction_percent": -11.570101580308156,
+          "paired_cpu_ratios": [
+            1.2819437841264354,
+            0.8986908772922508,
+            1.230966243072272,
+            1.126774133245136,
+            1.06267079613773,
+            1.0955185546010096
+          ],
+          "paired_ratios": [
+            1.379107440292778,
+            0.9217256329722453,
+            1.2288110404684223,
+            1.1377760943025172,
+            1.0627263148245503,
+            1.093625937303646
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 29605.0,
+          "baseline_median_ns": 32051.0105,
+          "baseline_samples_ns": [
+            45050.3335,
+            34746.4585,
+            29355.5625,
+            35792.375,
+            27985.4165,
+            24979.4585
+          ],
+          "candidate_median_cpu_ns": 7106.0,
+          "candidate_median_ns": 7255.2185,
+          "candidate_samples_ns": [
+            6365.146,
+            10067.625,
+            6047.625,
+            7624.6455,
+            8138.7085,
+            6885.7915
+          ],
+          "case": "healthy_sine/4096x8",
+          "iterations_per_process": 2000,
+          "median_paired_cpu_reduction_percent": 74.48691754271596,
+          "median_paired_ratio": 0.24434122682874293,
+          "median_paired_reduction_percent": 75.56587731712571,
+          "paired_cpu_ratios": [
+            0.1542727746091716,
+            0.278034262485482,
+            0.2118711980475722,
+            0.2344775689263185,
+            0.29094742861227263,
+            0.27578408021936235
+          ],
+          "paired_ratios": [
+            0.14128965327193416,
+            0.28974535635048965,
+            0.2060129149288146,
+            0.21302429637597392,
+            0.2908196310031691,
+            0.27565815728151194
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 32828.263274336285,
+          "baseline_median_ns": 35937.81111725664,
+          "baseline_samples_ns": [
+            36855.45685840708,
+            37193.39988938053,
+            35020.1653761062,
+            56919.93915929204,
+            25690.01216814159,
+            23114.352876106193
+          ],
+          "candidate_median_cpu_ns": 7634.402654867256,
+          "candidate_median_ns": 7861.783185840708,
+          "candidate_samples_ns": [
+            12904.337389380531,
+            11805.470685840708,
+            6843.565265486725,
+            5521.800884955752,
+            8880.00110619469,
+            5506.429756637168
+          ],
+          "case": "silence/4096x8",
+          "iterations_per_process": 1808,
+          "median_paired_cpu_reduction_percent": 73.71643230417533,
+          "median_paired_ratio": 0.2778166210007328,
+          "median_paired_reduction_percent": 72.21833789992672,
+          "paired_cpu_ratios": [
+            0.34891434538251287,
+            0.2873710380967977,
+            0.21547074741065597,
+            0.1494187525247236,
+            0.3457406729672127,
+            0.23830031581969566
+          ],
+          "paired_ratios": [
+            0.35013369767622154,
+            0.3174076777318604,
+            0.19541784546100405,
+            0.09700995760910493,
+            0.345659669138143,
+            0.23822556426960512
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 31731.651376146787,
+          "baseline_median_ns": 32715.41714449541,
+          "baseline_samples_ns": [
+            50618.14334862385,
+            34197.08027522936,
+            31233.754013761467,
+            199121.65538990826,
+            27874.856651376147,
+            27668.936353211007
+          ],
+          "candidate_median_cpu_ns": 7633.887614678899,
+          "candidate_median_ns": 7720.840596330276,
+          "candidate_samples_ns": [
+            7686.807339449541,
+            13756.235665137614,
+            7145.546444954129,
+            7754.873853211009,
+            8420.298165137614,
+            7576.59633027523
+          ],
+          "case": "sparse_invalid/4096x8",
+          "iterations_per_process": 1744,
+          "median_paired_cpu_reduction_percent": 74.21779488782903,
+          "median_paired_ratio": 0.2513034179061899,
+          "median_paired_reduction_percent": 74.869658209381,
+          "paired_cpu_ratios": [
+            0.15568403455001392,
+            0.3773266792554627,
+            0.24164849711882883,
+            0.19486300339859847,
+            0.3021246837656061,
+            0.27399560512459054
+          ],
+          "paired_ratios": [
+            0.15185873741966321,
+            0.4022634550792904,
+            0.22877642059311312,
+            0.03894540670639702,
+            0.3020750302126456,
+            0.2738304152192666
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 88465.27777777778,
+          "baseline_median_ns": 95800.52864583334,
+          "baseline_samples_ns": [
+            91399.8125,
+            100201.24479166667,
+            103045.93576388889,
+            118683.95486111111,
+            70783.71006944444,
+            86636.35590277778
+          ],
+          "candidate_median_cpu_ns": 92723.09027777778,
+          "candidate_median_ns": 93535.01128472222,
+          "candidate_samples_ns": [
+            89076.60590277778,
+            123881.51041666667,
+            94835.64756944444,
+            95159.50520833333,
+            92234.375,
+            77136.71875
+          ],
+          "case": "dense_invalid/4096x8",
+          "iterations_per_process": 576,
+          "median_paired_cpu_reduction_percent": -2.42474708838456,
+          "median_paired_ratio": 0.9474529652343535,
+          "median_paired_reduction_percent": 5.254703476564648,
+          "paired_cpu_ratios": [
+            1.012221335134803,
+            1.2069331385236206,
+            1.0362736066328881,
+            0.9863859339690237,
+            1.3028200098087297,
+            0.8922060713138452
+          ],
+          "paired_ratios": [
+            0.974581932569914,
+            1.2363270603497472,
+            0.920323997898793,
+            0.801789132487984,
+            1.3030452191543895,
+            0.8903504532965566
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 118250.0,
+          "baseline_median_ns": 138596.6681034483,
+          "baseline_samples_ns": [
+            143602.9094827586,
+            125440.01293103448,
+            143349.8556034483,
+            151213.99137931035,
+            113462.6422413793,
+            133843.4806034483
+          ],
+          "candidate_median_cpu_ns": 123352.37068965517,
+          "candidate_median_ns": 123709.05172413793,
+          "candidate_samples_ns": [
+            158157.86637931035,
+            171181.8426724138,
+            127103.3599137931,
+            115129.13146551725,
+            120314.74353448275,
+            117546.78663793103
+          ],
+          "case": "subnormals/4096x8",
+          "iterations_per_process": 464,
+          "median_paired_cpu_reduction_percent": -9.318180099952533,
+          "median_paired_ratio": 0.97352811682476,
+          "median_paired_reduction_percent": 2.6471883175239963,
+          "paired_cpu_ratios": [
+            1.201212184544647,
+            1.3474221382520792,
+            1.1297042237311543,
+            0.9296652141194589,
+            1.0566593782678961,
+            0.8767293166481455
+          ],
+          "paired_ratios": [
+            1.1013555849876373,
+            1.364651028587885,
+            0.8866654199178393,
+            0.7613656012605566,
+            1.0603908137316806,
+            0.8782406592234318
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 80270.83333333333,
+          "baseline_median_ns": 84726.06169871794,
+          "baseline_samples_ns": [
+            85423.47756410256,
+            84028.64583333333,
+            74572.51602564103,
+            106979.09935897436,
+            115226.96314102564,
+            57397.770833333336
+          ],
+          "candidate_median_cpu_ns": 65326.92307692308,
+          "candidate_median_ns": 67016.59294871795,
+          "candidate_samples_ns": [
+            75468.34935897436,
+            66204.52724358975,
+            67828.65865384616,
+            64337.605769230766,
+            87894.96634615384,
+            62506.8108974359
+          ],
+          "case": "shared_healthy/4096x8",
+          "iterations_per_process": 624,
+          "median_paired_cpu_reduction_percent": 15.387886665891992,
+          "median_paired_ratio": 0.8356709497475974,
+          "median_paired_reduction_percent": 16.432905025240263,
+          "paired_cpu_ratios": [
+            0.9048268006427598,
+            0.7874154660394003,
+            0.931339653658207,
+            0.7289287556177706,
+            0.7567605163587804,
+            1.085166368914694
+          ],
+          "paired_ratios": [
+            0.8834614500719924,
+            0.7878804494232022,
+            0.9095664497966508,
+            0.601403509234475,
+            0.7627986015615085,
+            1.0890111234273845
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 334.35315664486063,
+          "baseline_median_ns": 361.39101846043553,
+          "baseline_samples_ns": [
+            531.9664424455597,
+            358.0666166323147,
+            364.71542028855634,
+            512.481517161036,
+            246.4306193431311,
+            240.4242791692804
+          ],
+          "candidate_median_cpu_ns": 311.7872905278251,
+          "candidate_median_ns": 339.58377626803474,
+          "candidate_samples_ns": [
+            371.8251299399588,
+            321.5228683125728,
+            392.0260299982077,
+            357.6446842234967,
+            286.27175654180485,
+            304.4445626848284
+          ],
+          "case": "sparse_restore_control/4096x8",
+          "iterations_per_process": 357088,
+          "median_paired_cpu_reduction_percent": 1.8899619385275401,
+          "median_paired_ratio": 0.9864117266396617,
+          "median_paired_reduction_percent": 1.3588273360338299,
+          "paired_cpu_ratios": [
+            0.9586860090561744,
+            0.9330751215997118,
+            1.0035147521732748,
+            0.8962670895298503,
+            1.1486035043065246,
+            1.2689309056956117
+          ],
+          "paired_ratios": [
+            0.6989635064772166,
+            0.8979414817738586,
+            1.074881971505465,
+            0.6978684542707416,
+            1.161672836374277,
+            1.2662804427936827
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 20276.299504950497,
+          "baseline_median_ns": 21735.445080445545,
+          "baseline_samples_ns": [
+            89251.63737623762,
+            23733.524133663366,
+            22625.606126237624,
+            20845.284034653465,
+            14345.645111386139,
+            15047.467821782178
+          ],
+          "candidate_median_cpu_ns": 20909.498762376235,
+          "candidate_median_ns": 21272.290068069306,
+          "candidate_samples_ns": [
+            21389.090655940596,
+            21155.48948019802,
+            23071.91089108911,
+            32806.20853960396,
+            16944.023205445545,
+            19602.116955445545
+          ],
+          "case": "dense_restore_control/4096x8",
+          "iterations_per_process": 3232,
+          "median_paired_cpu_reduction_percent": -15.350027245690967,
+          "median_paired_ratio": 1.1004261304329161,
+          "median_paired_reduction_percent": -10.042613043291615,
+          "paired_cpu_ratios": [
+            0.9601129895385313,
+            0.8963347449189555,
+            1.1340944809096791,
+            1.4070189226769845,
+            1.1729060640041404,
+            1.3014707394836984
+          ],
+          "paired_ratios": [
+            0.2396492802230117,
+            0.891375817643167,
+            1.0197256489996938,
+            1.5737952279789762,
+            1.1811266118661385,
+            1.3026854210693322
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 29083.022388059704,
+          "baseline_median_ns": 30581.963152985074,
+          "baseline_samples_ns": [
+            39715.116138059704,
+            28483.888992537315,
+            32680.037313432837,
+            38381.549440298506,
+            20697.955690298506,
+            23455.72947761194
+          ],
+          "candidate_median_cpu_ns": 31082.089552238805,
+          "candidate_median_ns": 33524.27308768657,
+          "candidate_samples_ns": [
+            32137.904384328358,
+            34910.64179104478,
+            38252.87639925373,
+            39631.91837686567,
+            21860.074626865673,
+            24739.019589552237
+          ],
+          "case": "subnormal_restore_control/4096x8",
+          "iterations_per_process": 2144,
+          "median_paired_cpu_reduction_percent": -3.8758493990304066,
+          "median_paired_ratio": 1.0554288569980765,
+          "median_paired_reduction_percent": -5.542885699807654,
+          "paired_cpu_ratios": [
+            0.8160004311332067,
+            1.2336534220080757,
+            1.2092570629200496,
+            1.0262039570749424,
+            1.0445040335301274,
+            1.0330129544504807
+          ],
+          "paired_ratios": [
+            0.8092108876783576,
+            1.225627645164298,
+            1.1705273171010189,
+            1.0325773439269845,
+            1.0561465564017936,
+            1.0547111575943597
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 99.94137831444604,
+          "baseline_median_ns": 102.76952996066674,
+          "baseline_samples_ns": [
+            111.8838981186049,
+            119.82397162779183,
+            134.00935884035647,
+            93.65516180272857,
+            64.78813675871933,
+            91.19267968148311
+          ],
+          "candidate_median_cpu_ns": 96.97849048300142,
+          "candidate_median_ns": 102.31267706843437,
+          "candidate_samples_ns": [
+            97.31994890802068,
+            107.30540522884806,
+            117.59629084607768,
+            134.90673478930574,
+            71.37827662559137,
+            79.01069974694686
+          ],
+          "case": "tiny_tail/0",
+          "iterations_per_process": 581696,
+          "median_paired_cpu_reduction_percent": 9.274761318102875,
+          "median_paired_ratio": 0.8865241655862359,
+          "median_paired_reduction_percent": 11.347583441376408,
+          "paired_cpu_ratios": [
+            0.8545623270027679,
+            0.8836749263765357,
+            0.9308298472614067,
+            1.327413055607216,
+            1.0955741880704735,
+            0.8657980087494344
+          ],
+          "paired_ratios": [
+            0.8698298016471914,
+            0.8955253591674454,
+            0.8775229720050265,
+            1.4404623535162728,
+            1.1017183113540476,
+            0.8664149361869247
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 76.80437871865703,
+          "baseline_median_ns": 82.56425059100084,
+          "baseline_samples_ns": [
+            361.71292631746707,
+            99.16985962069698,
+            90.52322168508287,
+            66.45916615756481,
+            49.16519801848704,
+            74.60527949691883
+          ],
+          "candidate_median_cpu_ns": 68.7387112197195,
+          "candidate_median_ns": 81.99054232628559,
+          "candidate_samples_ns": [
+            90.00699406342966,
+            73.97409058914153,
+            90.65015073841904,
+            98.70897026402464,
+            52.84532710900977,
+            45.62811437526562
+          ],
+          "case": "tiny_restore_control/0",
+          "iterations_per_process": 602368,
+          "median_paired_cpu_reduction_percent": 8.69535859029098,
+          "median_paired_ratio": 0.8736676848819535,
+          "median_paired_reduction_percent": 12.633231511804654,
+          "paired_cpu_ratios": [
+            0.7512371709702887,
+            0.7453710006807353,
+            1.1076124858211152,
+            1.3114397006816667,
+            1.0748556572238916,
+            0.6118691984061617
+          ],
+          "paired_ratios": [
+            0.24883543692998297,
+            0.7459331985754163,
+            1.0014021711884906,
+            1.485257429050499,
+            1.0748523190965067,
+            0.611593638988378
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 205.89401347958238,
+          "baseline_median_ns": 213.95215037333156,
+          "baseline_samples_ns": [
+            226.66763991674375,
+            266.5285573873398,
+            260.04137620589404,
+            201.23666082991937,
+            144.75632268402273,
+            148.32479433725388
+          ],
+          "candidate_median_cpu_ns": 200.2258986388265,
+          "candidate_median_ns": 211.41448889916745,
+          "candidate_samples_ns": [
+            207.14206835601956,
+            216.83275241178802,
+            267.57115600634336,
+            215.6869094423153,
+            146.46673880005287,
+            153.11292041099512
+          ],
+          "case": "tiny_tail/1",
+          "iterations_per_process": 242144,
+          "median_paired_cpu_reduction_percent": -2.2024841304580045,
+          "median_paired_ratio": 1.0203859567998133,
+          "median_paired_reduction_percent": -2.0385956799813254,
+          "paired_cpu_ratios": [
+            0.8945680766498338,
+            0.8776786647618384,
+            1.053106518931412,
+            1.0944762864521007,
+            1.0118392149031468,
+            1.0322104677060133
+          ],
+          "paired_ratios": [
+            0.9138581423978472,
+            0.8135441640374393,
+            1.0289560834906806,
+            1.0718072370750027,
+            1.0118158301089457,
+            1.032281359938071
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 189.61183032079464,
+          "baseline_median_ns": 193.32909101394995,
+          "baseline_samples_ns": [
+            266.0692748195191,
+            259.84008440536286,
+            188.05750284969875,
+            198.60067917820115,
+            136.4419102480595,
+            149.52126418064375
+          ],
+          "candidate_median_cpu_ns": 177.3411632198882,
+          "candidate_median_ns": 180.42862013515713,
+          "candidate_samples_ns": [
+            311.23162962058296,
+            159.32614802149487,
+            218.24324553547197,
+            201.53109224881942,
+            111.02446330673615,
+            120.60699940292027
+          ],
+          "case": "tiny_restore_control/1",
+          "iterations_per_process": 294768,
+          "median_paired_cpu_reduction_percent": 9.363921651595142,
+          "median_paired_ratio": 0.9142338110842081,
+          "median_paired_reduction_percent": 8.57661889157919,
+          "paired_cpu_ratios": [
+            0.9990126514492268,
+            0.7105874697899237,
+            1.1002735728615722,
+            1.0303583656699382,
+            0.8137089155188703,
+            0.8069450748978666
+          ],
+          "paired_ratios": [
+            1.1697390832958767,
+            0.6131700133415079,
+            1.160513365477891,
+            1.0147553023622284,
+            0.8137123198061877,
+            0.8066210519542505
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 298.1193451581116,
+          "baseline_median_ns": 304.31074475947327,
+          "baseline_samples_ns": [
+            353.9954369345158,
+            331.13858281823883,
+            328.61210024187045,
+            280.0093892770761,
+            238.24544253336916,
+            233.54380542864823
+          ],
+          "candidate_median_cpu_ns": 278.6521320433575,
+          "candidate_median_ns": 284.10331564095674,
+          "candidate_samples_ns": [
+            401.2807880945982,
+            347.90667831228166,
+            277.0053693003673,
+            291.20126198154617,
+            246.21937427214905,
+            259.457633476664
+          ],
+          "case": "tiny_tail/7",
+          "iterations_per_process": 178608,
+          "median_paired_cpu_reduction_percent": -4.7291767046632405,
+          "median_paired_ratio": 1.0453036657298913,
+          "median_paired_reduction_percent": -4.530366572989131,
+          "paired_cpu_ratios": [
+            1.0700967625092708,
+            1.0611209562528232,
+            0.8497463704740248,
+            1.0331691097459603,
+            1.0334625778404418,
+            1.112247353224254
+          ],
+          "paired_ratios": [
+            1.1335761601040908,
+            1.0506376978222642,
+            0.8429554757614868,
+            1.0399696336375186,
+            1.0334693988434345,
+            1.1109591753052637
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 234.45829346637507,
+          "baseline_median_ns": 260.44505407668123,
+          "baseline_samples_ns": [
+            252.365854804538,
+            268.5242533488245,
+            460.42527935347186,
+            280.0913665254237,
+            185.66843220338984,
+            170.758547191088
+          ],
+          "candidate_median_cpu_ns": 224.28154045926738,
+          "candidate_median_ns": 235.76633833378895,
+          "candidate_samples_ns": [
+            290.5699707832149,
+            247.5221945051941,
+            224.01048216238382,
+            882.916796234281,
+            187.7326151585566,
+            170.14025338299618
+          ],
+          "case": "tiny_restore_control/7",
+          "iterations_per_process": 234112,
+          "median_paired_cpu_reduction_percent": -0.36377051321010434,
+          "median_paired_ratio": 1.0037483551611162,
+          "median_paired_reduction_percent": -0.3748355161116157,
+          "paired_cpu_ratios": [
+            1.0586295014226943,
+            0.90562213746549,
+            0.8839419801472473,
+            1.0755355129650508,
+            1.0109273275207618,
+            0.9963480827434403
+          ],
+          "paired_ratios": [
+            1.1513838550316828,
+            0.9217871064467766,
+            0.48652950263056544,
+            3.1522456660731786,
+            1.011117576265768,
+            0.9963791340564644
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 290.02911208151386,
+          "baseline_median_ns": 345.3335955561264,
+          "baseline_samples_ns": [
+            431.15447598253274,
+            441.2435835687987,
+            329.74204234095384,
+            360.9251487712989,
+            260.39815587807175,
+            228.61435054371094
+          ],
+          "candidate_median_cpu_ns": 300.1086351571196,
+          "candidate_median_ns": 326.44452114907097,
+          "candidate_samples_ns": [
+            313.7176823786283,
+            339.17135991951363,
+            392.5753970802295,
+            440.74277549447726,
+            272.9681319034164,
+            273.1108346176899
+          ],
+          "case": "tiny_tail/8",
+          "iterations_per_process": 186864,
+          "median_paired_cpu_reduction_percent": -4.098319988360011,
+          "median_paired_ratio": 1.1194125989286168,
+          "median_paired_reduction_percent": -11.941259892861677,
+          "paired_cpu_ratios": [
+            0.9726531959622634,
+            0.7921115102890585,
+            1.1050654076915511,
+            1.0316718823227056,
+            1.0502945174444949,
+            1.1940151728013486
+          ],
+          "paired_ratios": [
+            0.7276224644629176,
+            0.7686714833930951,
+            1.1905530586673139,
+            1.2211473126627566,
+            1.0482721391899197,
+            1.1946355684503334
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 263.5851855663031,
+          "baseline_median_ns": 294.60678208822117,
+          "baseline_samples_ns": [
+            292.11597036427247,
+            444.2732986897167,
+            313.9649233381354,
+            297.09759381216986,
+            187.87605474377443,
+            199.30387768402278
+          ],
+          "candidate_median_cpu_ns": 219.14445702133497,
+          "candidate_median_ns": 248.1105208547712,
+          "candidate_samples_ns": [
+            279.83956746930096,
+            289.2429340742265,
+            262.29855680181106,
+            233.92248490773136,
+            184.47100740893188,
+            181.92561483844412
+          ],
+          "case": "tiny_restore_control/8",
+          "iterations_per_process": 233232,
+          "median_paired_cpu_reduction_percent": 11.709004616470441,
+          "median_paired_ratio": 0.8741221214886516,
+          "median_paired_reduction_percent": 12.587787851134834,
+          "paired_cpu_ratios": [
+            0.9248170326014638,
+            0.7846770453004769,
+            0.8103538235773683,
+            0.845783481747476,
+            0.9822683706070288,
+            0.9200364259231152
+          ],
+          "paired_ratios": [
+            0.9579742152417662,
+            0.6510473056276012,
+            0.8354390484548477,
+            0.7873590691401597,
+            0.981876097305288,
+            0.9128051945224557
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 309.655767430978,
+          "baseline_median_ns": 362.45320542817035,
+          "baseline_samples_ns": [
+            353.10800040945253,
+            594.9710458586804,
+            441.9226354117922,
+            371.79841044688817,
+            270.0144332007487,
+            264.18307645063175
+          ],
+          "candidate_median_cpu_ns": 327.3536207299953,
+          "candidate_median_ns": 345.7083053053346,
+          "candidate_samples_ns": [
+            353.0348838909687,
+            338.3817267197005,
+            513.2596806270473,
+            399.62503655825924,
+            234.52154012634534,
+            272.2786031820309
+          ],
+          "case": "tiny_tail/9",
+          "iterations_per_process": 136768,
+          "median_paired_cpu_reduction_percent": -1.2032731665083896,
+          "median_paired_ratio": 1.0152182789550834,
+          "median_paired_reduction_percent": -1.521827895508343,
+          "paired_cpu_ratios": [
+            0.9921721228026515,
+            0.9931310320841666,
+            1.5640330965805083,
+            1.2094166609498984,
+            0.8687281687471231,
+            1.0309344312460011
+          ],
+          "paired_ratios": [
+            0.9997929344042076,
+            0.5687364604967249,
+            1.161424284476358,
+            1.0748433165110214,
+            0.868551867195872,
+            1.030643623505959
+          ],
+          "pairs": 6
+        },
+        {
+          "baseline_median_cpu_ns": 258.64477217089154,
+          "baseline_median_ns": 323.28108218826503,
+          "baseline_samples_ns": [
+            320.3009851535971,
+            892.1926824212272,
+            1085.935239477217,
+            326.261179222933,
+            214.43501737345022,
+            166.52496939903656
+          ],
+          "candidate_median_cpu_ns": 249.0153399668325,
+          "candidate_median_ns": 251.58259545526337,
+          "candidate_samples_ns": [
+            317.2429420358525,
+            252.76005389718077,
+            293.41594112769485,
+            250.40513701334598,
+            200.7762526652452,
+            204.04960811024245
+          ],
+          "case": "tiny_restore_control/9",
+          "iterations_per_process": 202608,
+          "median_paired_cpu_reduction_percent": 3.167250495319429,
+          "median_paired_ratio": 0.851901251816685,
+          "median_paired_reduction_percent": 14.809874818331503,
+          "paired_cpu_ratios": [
+            0.9774686060168036,
+            0.8125645494448748,
+            1.070224934745893,
+            0.9591863840768077,
+            0.936271576524741,
+            1.225670668445235
+          ],
+          "paired_ratios": [
+            0.990452595341603,
+            0.2833020925605913,
+            0.27019653701352303,
+            0.7674990251973715,
+            0.9363034784359985,
+            1.225339412141174
+          ],
+          "pairs": 6
+        }
+      ],
+      "target_ms_per_baseline_case": 80.0
+    },
+    "build": {
+      "binaries": {
+        "baseline": {
+          "build_fingerprint": "cbea9d6109a424687bfd911c5cf80ff4af590dbeebe7821b4fcbabdd73a32e65",
+          "path": "/Users/runner/work/_temp/pcm-component/results/baseline/benchmark",
+          "sha256": "19e6fd818d1eb17b6668d5d3a2c78926823ebd903eae8b6c03277cd713be3119"
+        },
+        "candidate": {
+          "build_fingerprint": "8efaa230c43dc114bcbeb0fde30b12913c08446a3c192f71800c6945068c0811",
+          "path": "/Users/runner/work/_temp/pcm-component/results/candidate/benchmark",
+          "sha256": "4f8abfeef0181ca7d73efe5d145e399dfda843f3ecf29c489280950175a8fce6"
+        }
+      },
+      "compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing"
+      ],
+      "harness_sha256": "cca767a35ef09bfb3023bc3a80ea53d0440048c764e8f23e81646ebfd321c880",
+      "runner_sha256": "cb0dd6cd4436cd90fb04f1a593aef7ec8302450bddce586c679c4cd5b76a5f3a",
+      "sources": {
+        "baseline": {
+          "declarations": {
+            "AudioSampleSanitizationResult": "723e8e2a4c4f3cc84b9be853573303eebd7a0380ed1cf85cd04af6c73fd221f2",
+            "sanitizeInterleavedFloatPCM": "7262c800fb645a985cd052db1e0b48dceae169aeb0148eca861d3e74dbbd4796"
+          },
+          "files": {
+            "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+              "bytes": 18503,
+              "sha256": "2554d8452a63992b30142679de1a09f45ba7bc8b1f6020cbad1e975a4503682e"
+            }
+          },
+          "generated": {
+            "Sanitizer.swift": "202ce4f34118c63521c1d1f440562b9825659860d98d6906402f68578a9dd06b"
+          },
+          "revision": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+          "source_kind": "git_revision"
+        },
+        "candidate": {
+          "declarations": {
+            "AudioSampleSanitizationResult": "723e8e2a4c4f3cc84b9be853573303eebd7a0380ed1cf85cd04af6c73fd221f2",
+            "sanitizeInterleavedFloatPCM": "e9b319576c4a8c1c8a5de6c5d5f58f17fb90b4bec3e556334625848fd7648f7c"
+          },
+          "files": {
+            "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+              "bytes": 20477,
+              "sha256": "e8825bfd1dab808470f237f011d74f9d711cf39f8b492760f9f55185d526b918"
+            }
+          },
+          "generated": {
+            "Sanitizer.swift": "8db8a71d81a65fb14f4cfda4d37e45c3e5fcad3c96028c8f8bb93e29c5da6787"
+          },
+          "revision": null,
+          "source_kind": "working_tree"
+        }
+      }
+    },
+    "tests": {
+      "baseline": {
+        "configurations": [
+          "debug",
+          "release"
+        ],
+        "module_shape": {
+          "IlliquidNativePlayback": [
+            "AudioSampleSanitizationResult",
+            "sanitizeInterleavedFloatPCM"
+          ]
+        },
+        "production_sources": {
+          "declarations": {
+            "AudioSampleSanitizationResult": "723e8e2a4c4f3cc84b9be853573303eebd7a0380ed1cf85cd04af6c73fd221f2",
+            "sanitizeInterleavedFloatPCM": "7262c800fb645a985cd052db1e0b48dceae169aeb0148eca861d3e74dbbd4796"
+          },
+          "files": {
+            "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+              "bytes": 18503,
+              "sha256": "2554d8452a63992b30142679de1a09f45ba7bc8b1f6020cbad1e975a4503682e"
+            }
+          },
+          "generated": {
+            "Sanitizer.swift": "202ce4f34118c63521c1d1f440562b9825659860d98d6906402f68578a9dd06b"
+          },
+          "revision": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+          "source_kind": "git_revision"
+        },
+        "sanitizer": null,
+        "test_sha256": "476072d0639f602779f94d5ba6ef9d65c7597d4bd9f165ac40371b3ae8e18286",
+        "test_source": "Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift"
+      },
+      "candidate": {
+        "configurations": [
+          "debug",
+          "release"
+        ],
+        "module_shape": {
+          "IlliquidNativePlayback": [
+            "AudioSampleSanitizationResult",
+            "sanitizeInterleavedFloatPCM"
+          ]
+        },
+        "production_sources": {
+          "declarations": {
+            "AudioSampleSanitizationResult": "723e8e2a4c4f3cc84b9be853573303eebd7a0380ed1cf85cd04af6c73fd221f2",
+            "sanitizeInterleavedFloatPCM": "e9b319576c4a8c1c8a5de6c5d5f58f17fb90b4bec3e556334625848fd7648f7c"
+          },
+          "files": {
+            "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+              "bytes": 20477,
+              "sha256": "e8825bfd1dab808470f237f011d74f9d711cf39f8b492760f9f55185d526b918"
+            }
+          },
+          "generated": {
+            "Sanitizer.swift": "8db8a71d81a65fb14f4cfda4d37e45c3e5fcad3c96028c8f8bb93e29c5da6787"
+          },
+          "revision": null,
+          "source_kind": "working_tree"
+        },
+        "sanitizer": null,
+        "test_sha256": "476072d0639f602779f94d5ba6ef9d65c7597d4bd9f165ac40371b3ae8e18286",
+        "test_source": "Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift"
+      }
+    },
+    "verification": {
+      "cases": 55,
+      "compared_output_bytes": 28904816,
+      "exact_byte_equality": true,
+      "inputs": 880,
+      "output_sha256": "d9ddcde6e2a8443e1b1d811e82edb6db41d1c57bf17bd85950ff87ada7251955",
+      "restoration_and_shared_alias_checks": true
+    }
+  },
+  "runner_sha256": "cb0dd6cd4436cd90fb04f1a593aef7ec8302450bddce586c679c4cd5b76a5f3a",
+  "scope": "Exact portable PCM sanitation component work. Dirty envelopes include restoration and expose restore-only controls; shared cases include Data COW. No audio decoding, resampling, playback, app-level CPU, or memory claim.",
+  "started_at_utc": "2026-10-17T17:56:18.665977+00:00"
+}

@@ -1,0 +1,75 @@
+Test Suite 'All tests' started at 2026-10-17 15:55:34.350.
+Test Suite 'All tests' passed at 2026-10-17 15:55:34.355.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.005) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Relative seek effect lifetime" started.
+◇ Test burstRetainsOnlyDispatchedWorkAndTheLatestDeferredSeek() started.
+✔ Test burstRetainsOnlyDispatchedWorkAndTheLatestDeferredSeek() passed after 0.028 seconds.
+◇ Test retiredCancellationIsDuplicateAndPreservesTheLatestTarget() started.
+✔ Test retiredCancellationIsDuplicateAndPreservesTheLatestTarget() passed after 0.001 seconds.
+◇ Test exactSeekAndStopRetireUndispatchedRelativeWork(stop:) started.
+◇ Test case passing 1 argument stop → false to exactSeekAndStopRetireUndispatchedRelativeWork(stop:) started.
+◇ Test case passing 1 argument stop → true to exactSeekAndStopRetireUndispatchedRelativeWork(stop:) started.
+✔ Test exactSeekAndStopRetireUndispatchedRelativeWork(stop:) with 2 test cases passed after 0.001 seconds.
+◇ Test dispatchedSeekRemainsNativeOwnedUntilItsLateResultArrives() started.
+✔ Test dispatchedSeekRemainsNativeOwnedUntilItsLateResultArrives() passed after 0.001 seconds.
+◇ Test sleepDispatchesTheCurrentDeferredSeekWithoutCancellingItsEffect() started.
+✔ Test sleepDispatchesTheCurrentDeferredSeekWithoutCancellingItsEffect() passed after 0.001 seconds.
+◇ Test observerCanReenterWithDuplicateCancellationAfterRetirement() started.
+✔ Test observerCanReenterWithDuplicateCancellationAfterRetirement() passed after 0.001 seconds.
+◇ Test shutdownFinalizesWithoutDispatchingTheDeferredSeek() started.
+✔ Test shutdownFinalizesWithoutDispatchingTheDeferredSeek() passed after 0.092 seconds.
+✔ Suite "Relative seek effect lifetime" passed after 0.124 seconds.
+✔ Test run with 7 tests in 1 suite passed after 0.124 seconds.
+Building for debugging...
+[0/10] /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-relative-seek-od2vlw7s/.build/arm64-apple-macosx/debug/RelativeSeekCoalescingPackageTests.derived/runner.swift
+[1/10] Write swift-version-7974D3F7F03D5E95.txt
+[2/10] Write sources
+[9/11] Emitting module IlliquidCore
+[10/27] Compiling IlliquidCore MediaContentVersion.swift
+[11/27] Compiling IlliquidCore MediaPlaybackSettings.swift
+[12/27] Compiling IlliquidCore MediaSource.swift
+[13/27] Compiling IlliquidCore MediaTrack.swift
+[14/27] Compiling IlliquidCore PictureInPictureState.swift
+[15/27] Compiling IlliquidCore PlaybackCommand.swift
+[16/27] Compiling IlliquidCore PlaybackModels.swift
+[17/27] Compiling IlliquidCore PlaybackPhase.swift
+[18/27] Compiling IlliquidCore SubtitleFallbackEncoding.swift
+[19/27] Compiling IlliquidCore TrackSelectionPreferences.swift
+[20/27] Compiling IlliquidCore VideoColorSample.swift
+[21/27] Compiling IlliquidCore VideoPresentationGeometry.swift
+[22/27] Compiling IlliquidCore FolderPlaylist.swift
+[23/27] Compiling IlliquidCore PlaylistMutation.swift
+[24/27] Compiling IlliquidCore NaturalFilenameOrdering.swift
+[25/27] Compiling IlliquidCore NormalizedFileURL.swift
+[26/28] Emitting module IlliquidPlaybackCore
+[27/41] Compiling IlliquidPlaybackCore EventsAndEffects.swift
+[28/41] Compiling IlliquidPlaybackCore IdentityAndTime.swift
+[29/41] Compiling IlliquidPlaybackCore LoadingAndDrainCore.swift
+[30/41] Compiling IlliquidPlaybackCore PlaybackCore.swift
+[31/41] Compiling IlliquidPlaybackCore PlaybackCoreState.swift
+[32/41] Compiling IlliquidPlaybackCore PlaybackInvariants.swift
+[33/41] Compiling IlliquidPlaybackCore PlaybackModelRuntime.swift
+[34/41] Compiling IlliquidPlaybackCore PlaybackReplay.swift
+[35/41] Compiling IlliquidPlaybackCore RecoveryCore.swift
+[36/41] Compiling IlliquidPlaybackCore SeekCore.swift
+[37/41] Compiling IlliquidPlaybackCore SubtitleCore.swift
+[38/41] Compiling IlliquidPlaybackCore SynchronizationCore.swift
+[39/41] Compiling IlliquidPlaybackCore TrackSelectionCore.swift
+[40/42] Emitting module IlliquidPlayback
+[41/47] Compiling IlliquidPlayback Module.swift
+[42/47] Compiling IlliquidPlayback PlaybackCapabilities.swift
+[43/47] Compiling IlliquidPlayback PlaybackRuntime.swift
+[44/47] Compiling IlliquidPlayback PlaybackRuntimeEvent.swift
+[45/47] Compiling IlliquidPlayback PlaybackSurfaceHost.swift
+[46/48] Emitting module IlliquidPlayer
+[47/49] Compiling IlliquidPlayer PlaybackRuntimeDriver.swift
+[48/50] Emitting module IlliquidPlayerTests
+[49/51] Compiling IlliquidPlayerTests RelativeSeekEffectLifetimeTests.swift
+[50/52] Emitting module RelativeSeekCoalescingPackageTests
+[51/53] Compiling RelativeSeekCoalescingPackageTests runner.swift
+[51/53] Write Objects.LinkFileList
+[52/53] Linking RelativeSeekCoalescingPackageTests
+Build complete! (31.68s)

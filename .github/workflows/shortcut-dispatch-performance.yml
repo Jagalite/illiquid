@@ -1,0 +1,47 @@
+name: Shortcut dispatch performance
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/PlayerShortcutBindings.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Tests/IlliquidAppTests/PlayerShortcut*Tests.swift'
+      - 'Benchmarks/ShortcutDispatch/**'
+      - '.github/workflows/shortcut-dispatch-performance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shortcut-dispatch-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record native environment
+        run: |
+          mkdir -p "$RUNNER_TEMP/shortcut-dispatch"
+          sw_vers > "$RUNNER_TEMP/shortcut-dispatch/system.txt"
+          xcrun swiftc --version >> "$RUNNER_TEMP/shortcut-dispatch/system.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/shortcut-dispatch/revision.txt"
+      - name: Check actual AppKit shortcuts in debug and release
+        run: |
+          python3 Benchmarks/ShortcutDispatch/run.py test --configuration debug --output "$RUNNER_TEMP/shortcut-dispatch/debug"
+          python3 Benchmarks/ShortcutDispatch/run.py test --configuration release --output "$RUNNER_TEMP/shortcut-dispatch/release"
+      - name: Compare dispatch parity and native paired timings
+        run: python3 Benchmarks/ShortcutDispatch/run.py benchmark --rounds 10 --iterations 10000 --output "$RUNNER_TEMP/shortcut-dispatch/benchmark"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: shortcut-dispatch-native
+          path: |
+            ${{ runner.temp }}/shortcut-dispatch/**/*.json
+            ${{ runner.temp }}/shortcut-dispatch/**/*.jsonl
+            ${{ runner.temp }}/shortcut-dispatch/**/*.log
+            ${{ runner.temp }}/shortcut-dispatch/**/*.txt
+          retention-days: 14

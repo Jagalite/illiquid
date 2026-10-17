@@ -1,0 +1,84 @@
+{
+  "started_utc": "2026-10-17T12:49:33.375924+00:00",
+  "base_revision": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "baseline_git_blob": "7694b209c13e86406fc2eac6bef2c7ed09974569",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "cpu_count": 9,
+  "swift_version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "harness_sha256": "28907f58d00304b31890e0931e05df89cf646650b098342bcbbd742c02a0b46c",
+  "runner_sha256": "d030f619b40e6a898c5c509c47c1b70e3af5d222725c919df36547af15569b86",
+  "rounds": 6,
+  "iterations": 500000,
+  "counts": [
+    1,
+    4,
+    32,
+    128
+  ],
+  "modes": [
+    "resize-same",
+    "resize-change",
+    "acquire-release",
+    "preflight",
+    "snapshot"
+  ],
+  "candidate_source": "/workspace/scratch/064194114664/illiquid/Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift",
+  "swift_language_version": "6",
+  "variants": {
+    "baseline": {
+      "command": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "-swift-version",
+        "6",
+        "-O",
+        "-whole-module-optimization",
+        "-warnings-as-errors",
+        "/tmp/illiquid-budget-final-064194114664/build/baseline/SubtitleMemoryBudget.swift",
+        "/tmp/illiquid-budget-final-064194114664/build/baseline/Harness.swift",
+        "-o",
+        "/tmp/illiquid-budget-final-064194114664/build/baseline/budget-benchmark"
+      ],
+      "source_sha256": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83",
+      "source_git_blob": "7694b209c13e86406fc2eac6bef2c7ed09974569",
+      "binary_sha256": "a744614cefbbdfe807a7c50e4eae7e654f88101e9e595afc4ad244f7cd808d12"
+    },
+    "same-size-only": {
+      "command": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "-swift-version",
+        "6",
+        "-O",
+        "-whole-module-optimization",
+        "-warnings-as-errors",
+        "/tmp/illiquid-budget-final-064194114664/build/same-size-only/SubtitleMemoryBudget.swift",
+        "/tmp/illiquid-budget-final-064194114664/build/same-size-only/Harness.swift",
+        "-o",
+        "/tmp/illiquid-budget-final-064194114664/build/same-size-only/budget-benchmark"
+      ],
+      "source_sha256": "67dbf7b6e0763d7609eef28718fd8e1610fbe8a06a84a9e2e91ce6245f7b79fc",
+      "source_git_blob": "638218f673446e4cff001dd83b813d9af4a65c2c",
+      "binary_sha256": "df477869505b961bdb7b940d6858b0410a02889a608533eab447acd3fe456b85"
+    },
+    "candidate": {
+      "command": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "-swift-version",
+        "6",
+        "-O",
+        "-whole-module-optimization",
+        "-warnings-as-errors",
+        "/tmp/illiquid-budget-final-064194114664/build/candidate/SubtitleMemoryBudget.swift",
+        "/tmp/illiquid-budget-final-064194114664/build/candidate/Harness.swift",
+        "-o",
+        "/tmp/illiquid-budget-final-064194114664/build/candidate/budget-benchmark"
+      ],
+      "source_sha256": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+      "source_git_blob": "755d3b631cc5fc6ee036f90de2b4876dcdc8a31d",
+      "binary_sha256": "f9fc697670769e1f25a522a87f95e35a6e7dfd8f4c848d8f7e58d815c0d80e95"
+    }
+  },
+  "scope": "Linux/macOS Swift reservation bookkeeping only; no native playback or pixel memory",
+  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "cgroup_cpu_max": "800000 100000"
+}

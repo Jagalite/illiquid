@@ -4,6 +4,16 @@ import IlliquidCore
 
 @Suite("Local media sidecars")
 struct MediaSidecarTests {
+    @Test func sidecarIdentifiersMergeWithoutErasingOtherProviders() throws {
+        var hints = MediaMetadataHints()
+        hints.content = .movie
+        hints.catalogIDs = ["imdb-tt999"]
+        let movie = MediaNameRecognition.recognize(relativePath: "Movie {tmdb-123}.mkv")
+        let resolved = movie.applying(hints)
+        #expect(resolved.catalogIDs.contains("imdb-tt999"))
+        #expect(resolved.catalogIDs.contains("tmdb-123"))
+    }
+
     @Test func plexMappingsAndPrecedence() throws {
         let plex = try #require(PlexMatchHints.parse("""
             # Explicit identities, including filenames with colons
@@ -67,7 +77,7 @@ struct MediaSidecarTests {
     }
 
     @Test func readersBoundSizeAndCacheSharedMetadata() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString)
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: root) }
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         try Data("title: Correct Show\nseason: 4\nep: 1: opaque.mkv".utf8).write(to: root.appendingPathComponent(".plexmatch"))
@@ -87,9 +97,9 @@ struct MediaSidecarTests {
     }
 
     @Test func filenameNFOOverridesSeriesHintsAndNewScanSeesEdits() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString)
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: root) }
-        let season = root.appendingPathComponent("Season 2")
+        let season = root.appendingPathComponent("Season 2", isDirectory: true)
         try FileManager.default.createDirectory(at: season, withIntermediateDirectories: true)
         try Data("<tvshow><title>The Series</title><year>2010</year></tvshow>".utf8).write(to: root.appendingPathComponent("tvshow.nfo"))
         try Data("season: 3\nep: 7: Season 2/opaque.mkv".utf8).write(to: root.appendingPathComponent(".plexmatch"))
@@ -110,7 +120,7 @@ struct MediaSidecarTests {
     }
 
     @Test func hintsIdentifyNumberedFilesWithOpaqueFolderNames() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString)
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: root) }
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         try Data("title: Real Show\nyear: 2020".utf8).write(to: root.appendingPathComponent(".plexmatch"))
@@ -122,9 +132,9 @@ struct MediaSidecarTests {
     }
 
     @Test func explicitMappedSeasonWinsOverGeneralChildHint() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString)
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: root) }
-        let child = root.appendingPathComponent("Season 2")
+        let child = root.appendingPathComponent("Season 2", isDirectory: true)
         try FileManager.default.createDirectory(at: child, withIntermediateDirectories: true)
         try Data("title: Show\nep: S03E04: Season 2/opaque.mkv\nep: 8: Season 2/implicit.mkv".utf8)
             .write(to: root.appendingPathComponent(".plexmatch"))
@@ -134,9 +144,9 @@ struct MediaSidecarTests {
     }
 
     @Test func readerDoesNotFollowSidecarLinksOrReadAboveSourceBoundary() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString)
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("sidecar-" + UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: root) }
-        let child = root.appendingPathComponent("child")
+        let child = root.appendingPathComponent("child", isDirectory: true)
         try FileManager.default.createDirectory(at: child, withIntermediateDirectories: true)
         let outside = root.appendingPathComponent("outside.nfo")
         try Data("<movie><title>Wrong Movie</title></movie>".utf8).write(to: outside)

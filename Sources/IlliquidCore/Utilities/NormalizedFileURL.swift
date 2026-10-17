@@ -6,7 +6,7 @@ public enum NormalizedFileURL {
     /// Standardizes URL path segments and Unicode without querying the filesystem.
     /// Call `resolveFilesystemIdentity` during preparation before storing new URLs.
     public static func normalize(_ url: URL) -> URL? {
-        guard url.isFileURL else { return nil }
+        guard isSupportedLocalFileURL(url) else { return nil }
         let lexical = url.absoluteURL.standardized
         return URL(fileURLWithPath: lexical.path.precomposedStringWithCanonicalMapping,
                    isDirectory: lexical.hasDirectoryPath)
@@ -15,8 +15,21 @@ public enum NormalizedFileURL {
     /// May block on mounted storage. Use only inside bounded background preparation.
     /// No alias cache is used: a symlink may point elsewhere on the next open.
     public static func resolveFilesystemIdentity(_ url: URL) -> URL? {
-        guard url.isFileURL else { return nil }
+        guard isSupportedLocalFileURL(url) else { return nil }
         return normalize(url.resolvingSymlinksInPath())
+    }
+
+    /// A path-only identity cannot retain a remote authority, credentials or a
+    /// port. Accept only explicit local authorities without DNS/network lookups;
+    /// mounted shares remain supported through their local /Volumes paths.
+    /// Validate before symlink resolution, which may discard URL authority.
+    private static func isSupportedLocalFileURL(_ url: URL) -> Bool {
+        let absolute = url.absoluteURL
+        guard absolute.isFileURL, absolute.path.hasPrefix("/"),
+              absolute.user == nil, absolute.password == nil, absolute.port == nil
+        else { return false }
+        let host = absolute.host ?? ""
+        return host.isEmpty || host.lowercased() == "localhost"
     }
 
     public static func persistenceKey(for url: URL) -> String? { normalize(url)?.path }

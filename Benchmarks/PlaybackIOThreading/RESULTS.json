@@ -1,0 +1,266 @@
+{
+  "baseline": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "library": "FFmpeg 8.1.2; minimized Linux x86_64 build, external x86 assembly disabled",
+  "scope": "No native VideoToolbox, pixel conversion, renderer, A/V output, physical disk or energy measurements.",
+  "primary_processes": {
+    "timing": 272,
+    "verification": 252
+  },
+  "io_scan": [
+    {
+      "container": "mp4",
+      "role": "audio0",
+      "all": {
+        "samples": 5,
+        "read_ns": 7388715,
+        "logical_avio_bytes": 37186975,
+        "returned_packets": 7687
+      },
+      "selected": {
+        "samples": 5,
+        "read_ns": 4629811,
+        "logical_avio_bytes": 36840096,
+        "returned_packets": 3004
+      }
+    },
+    {
+      "container": "mp4",
+      "role": "subtitle",
+      "all": {
+        "samples": 5,
+        "read_ns": 7578876,
+        "logical_avio_bytes": 37186975,
+        "returned_packets": 7687
+      },
+      "selected": {
+        "samples": 5,
+        "read_ns": 391070,
+        "logical_avio_bytes": 131072,
+        "returned_packets": 10
+      }
+    },
+    {
+      "container": "mkv",
+      "role": "audio0",
+      "all": {
+        "samples": 5,
+        "read_ns": 7820765,
+        "logical_avio_bytes": 37087475,
+        "returned_packets": 7684
+      },
+      "selected": {
+        "samples": 5,
+        "read_ns": 5784166,
+        "logical_avio_bytes": 37087475,
+        "returned_packets": 3008
+      }
+    },
+    {
+      "container": "mkv",
+      "role": "subtitle",
+      "all": {
+        "samples": 5,
+        "read_ns": 7820285,
+        "logical_avio_bytes": 37087475,
+        "returned_packets": 7684
+      },
+      "selected": {
+        "samples": 5,
+        "read_ns": 4662662,
+        "logical_avio_bytes": 37087475,
+        "returned_packets": 13
+      }
+    },
+    {
+      "container": "ts",
+      "role": "audio0",
+      "all": {
+        "samples": 5,
+        "read_ns": 20459243,
+        "logical_avio_bytes": 38544888,
+        "returned_packets": 7681
+      },
+      "selected": {
+        "samples": 5,
+        "read_ns": 7484156,
+        "logical_avio_bytes": 38544888,
+        "returned_packets": 3001
+      }
+    }
+  ],
+  "decoder": [
+    {
+      "fixture": "h264-slices-1.mp4",
+      "packet_arrival_us": 0,
+      "threads": 1,
+      "strategy": "default",
+      "samples": 6,
+      "full_ns": 992811579.0,
+      "cpu_ns": 992155111.0,
+      "first_ns": 19815837.5,
+      "packets_to_first": 3.0,
+      "process_peak_RSS_KiB": 26998.0
+    },
+    {
+      "fixture": "h264-slices-1.mp4",
+      "packet_arrival_us": 0,
+      "threads": 4,
+      "strategy": "frame",
+      "samples": 6,
+      "full_ns": 324238849.0,
+      "cpu_ns": 1131884114.0,
+      "first_ns": 12143161.0,
+      "packets_to_first": 6.0,
+      "process_peak_RSS_KiB": 49924.0
+    },
+    {
+      "fixture": "h264-slices-1.mp4",
+      "packet_arrival_us": 0,
+      "threads": 4,
+      "strategy": "slice",
+      "samples": 6,
+      "full_ns": 995340823.0,
+      "cpu_ns": 995267581.5,
+      "first_ns": 19328040.5,
+      "packets_to_first": 3.0,
+      "process_peak_RSS_KiB": 27216.0
+    },
+    {
+      "fixture": "h264-slices-4.mp4",
+      "packet_arrival_us": 0,
+      "threads": 1,
+      "strategy": "default",
+      "samples": 6,
+      "full_ns": 975724252.0,
+      "cpu_ns": 975638977.0,
+      "first_ns": 19101150.5,
+      "packets_to_first": 3.0,
+      "process_peak_RSS_KiB": 27068.0
+    },
+    {
+      "fixture": "h264-slices-4.mp4",
+      "packet_arrival_us": 0,
+      "threads": 4,
+      "strategy": "frame",
+      "samples": 6,
+      "full_ns": 316994659.0,
+      "cpu_ns": 1126305133.5,
+      "first_ns": 12212811.5,
+      "packets_to_first": 6.0,
+      "process_peak_RSS_KiB": 50262.0
+    },
+    {
+      "fixture": "h264-slices-4.mp4",
+      "packet_arrival_us": 0,
+      "threads": 4,
+      "strategy": "slice",
+      "samples": 6,
+      "full_ns": 532550807.5,
+      "cpu_ns": 1074486726.0,
+      "first_ns": 12562396.0,
+      "packets_to_first": 3.0,
+      "process_peak_RSS_KiB": 27540.0
+    },
+    {
+      "fixture": "h264-slices-1.mp4",
+      "packet_arrival_us": 16667,
+      "threads": 1,
+      "strategy": "default",
+      "samples": 3,
+      "full_ns": 2988940978,
+      "cpu_ns": 1047835790,
+      "first_ns": 41919538,
+      "packets_to_first": 3,
+      "process_peak_RSS_KiB": 27120
+    },
+    {
+      "fixture": "h264-slices-1.mp4",
+      "packet_arrival_us": 16667,
+      "threads": 4,
+      "strategy": "frame",
+      "samples": 3,
+      "full_ns": 2989382716,
+      "cpu_ns": 1143303210,
+      "first_ns": 83448008,
+      "packets_to_first": 6,
+      "process_peak_RSS_KiB": 49904
+    },
+    {
+      "fixture": "h264-slices-1.mp4",
+      "packet_arrival_us": 16667,
+      "threads": 4,
+      "strategy": "slice",
+      "samples": 3,
+      "full_ns": 2988772196,
+      "cpu_ns": 1071208390,
+      "first_ns": 41865800,
+      "packets_to_first": 3,
+      "process_peak_RSS_KiB": 27232
+    },
+    {
+      "fixture": "h264-slices-4.mp4",
+      "packet_arrival_us": 16667,
+      "threads": 1,
+      "strategy": "default",
+      "samples": 3,
+      "full_ns": 2989111226,
+      "cpu_ns": 1060821138,
+      "first_ns": 41994626,
+      "packets_to_first": 3,
+      "process_peak_RSS_KiB": 26936
+    },
+    {
+      "fixture": "h264-slices-4.mp4",
+      "packet_arrival_us": 16667,
+      "threads": 4,
+      "strategy": "frame",
+      "samples": 3,
+      "full_ns": 2989609758,
+      "cpu_ns": 1122448416,
+      "first_ns": 83460669,
+      "packets_to_first": 6,
+      "process_peak_RSS_KiB": 49672
+    },
+    {
+      "fixture": "h264-slices-4.mp4",
+      "packet_arrival_us": 16667,
+      "threads": 4,
+      "strategy": "slice",
+      "samples": 3,
+      "full_ns": 2986676170,
+      "cpu_ns": 1196792819,
+      "first_ns": 38766885,
+      "packets_to_first": 3,
+      "process_peak_RSS_KiB": 27648
+    }
+  ],
+  "verification": {
+    "semantic_comparisons": 96,
+    "packet_receipt_differences": 18,
+    "buffer_packet_comparisons_passed": 66,
+    "decode_variants_receipts_equal": 6,
+    "aac_comparisons": 24,
+    "aac_early_hash_differences": 10,
+    "aac_late_hash_differences": 6,
+    "aac_window_counts_and_first_timestamps_equal": true
+  },
+  "production_policy_changes": false,
+  "subagents_used": false,
+  "evidence_files": {
+    "evidence/audio-reproduction/audio-seek-verification.json": "d4869ddc645d05f95f6e5e65bac6ab454d7e0902d99f705351563fe617128433",
+    "evidence/audio-reproduction/manifest.json": "6c0216d98213a822b711e07ccb05995e981e29d91a3c24ab243873189dcf43a5",
+    "evidence/audio-seek-verification.json": "322f4dab4b5790bc03aab7800592254134ce3be67fa095d80a4ace3d4b5f34f5",
+    "evidence/decode-modes-final/manifest.json": "dd4381ec13288852595c7a5c8a5f3d52706d32ee1a07797a857378d36f8e6e17",
+    "evidence/decode-modes-final/rows.jsonl": "25276314eb2d97bc770d80c36e46141bccd20ed45decf10c70deb9462ab3c621",
+    "evidence/decode-modes-final/summary.json": "75c247d120673d3ad2c8ed998ab211de7789d949faee11a5aa03f2adcebf3e9e",
+    "evidence/decode-modes-final/verification.json": "8d64238e5f9615eb4dcc55985cb7ece702722ed72c98f76524aa36defebd9776",
+    "evidence/environment.json": "f68023e58c0d7ee133ae8c4f9ff68d2926401e8b314066f75ea99414394c08cc",
+    "evidence/fixture-generation.json": "f4164cb91d44423b79f53f2f7e8c70a2695249c11b13bb5531b39589d62d848b",
+    "evidence/fixtures.json": "5cc5a378c225f10dd7c962a80b56b1d61e0ad733fc8cc2e0c0b80e481adebaaa",
+    "evidence/io-final/manifest.json": "ab760ab479c328d16745494e32d41c024cfa4535a1d088519e3c367220e9df49",
+    "evidence/io-final/rows.jsonl": "0eb3ffe0b57af93947f1fa6edd9d820d72f6c664b63fac142d61e3a711ae9a12",
+    "evidence/io-final/semantic-comparison.json": "6f5eec785235b2abe94b3e4f42a273af8dc48792cc6f61a1f083d2e46c249c31",
+    "evidence/io-final/summary.json": "637109713a0d57ef36f619eed917351c04f1e088bd54c11ee8495645ad53bac9",
+    "evidence/receipt-validation.json": "226f6b92de6569bce3cd494cf5cafc386c32ee0fa1cf412beabdd3c7ed3cdd2b"
+  }
+}

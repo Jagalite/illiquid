@@ -1,0 +1,60 @@
+name: Adaptive text legibility
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift'
+      - 'Sources/IlliquidApp/UI/PlayerTheme.swift'
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Tests/IlliquidAppTests/Adaptive*Tests.swift'
+      - 'Benchmarks/AdaptiveTextLegibility/**'
+      - '.github/workflows/adaptive-text-legibility.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: adaptive-text-legibility-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-legibility:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Compare exact decisions and measure native numeric computation
+        run: |
+          python3 Benchmarks/AdaptiveTextLegibility/run.py \
+            --output "$RUNNER_TEMP/adaptive-text-legibility/benchmark" \
+            --rounds 6 --target-ms 80 --receipt-samples 240 \
+            --kernels style_miss,init_score
+      - name: Prepare native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app and run adaptive text regressions
+        run: |
+          set -o pipefail
+          mkdir -p "$RUNNER_TEMP/adaptive-text-legibility"
+          swift test --force-resolved-versions --filter \
+            'AdaptiveTextLegibilityPerformanceTests|AdaptiveTextLegibilityTests|AdaptiveRainbowTextColorTests|AdaptiveTextColorAuditTests' \
+            2>&1 | tee "$RUNNER_TEMP/adaptive-text-legibility/native-tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: adaptive-text-legibility-evidence
+          path: |
+            ${{ runner.temp }}/adaptive-text-legibility/**/*.json
+            ${{ runner.temp }}/adaptive-text-legibility/**/*.jsonl
+            ${{ runner.temp }}/adaptive-text-legibility/**/sources/**
+            ${{ runner.temp }}/adaptive-text-legibility/*.log
+          retention-days: 14

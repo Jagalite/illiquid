@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+    "-O",
+    "-whole-module-optimization",
+    "-module-cache-path",
+    "/tmp/illiquid-legibility-hxbnfn7f/swift-module-cache",
+    "-parse-as-library",
+    "-emit-module",
+    "-emit-library",
+    "-module-name",
+    "IlliquidCore",
+    "-emit-module-path",
+    "/tmp/illiquid-legibility-hxbnfn7f/IlliquidCore.swiftmodule",
+    "/tmp/illiquid-legibility-pr/Benchmarks/AdaptiveTextLegibility/evidence/final/sources/VideoColorSample.swift",
+    "-o",
+    "/tmp/illiquid-legibility-hxbnfn7f/libIlliquidCore.so"
+  ],
+  "returncode": 1,
+  "stage": "Compile standalone IlliquidCore before timing or decision receipts",
+  "stderr": "<module-includes>:1:10: note: in file included from <module-includes>:1:\n1 | #include \"dispatch.h\"\n  |          `- note: in file included from <module-includes>:1:\n2 | \n\n/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/dispatch/dispatch.h:32:10: note: in file included from /tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/dispatch/dispatch.h:32:\n30 | #include <os/generic_win_base.h>\n31 | #elif defined(__unix__)\n32 | #include <os/generic_unix_base.h>\n   |          `- note: in file included from /tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/dispatch/dispatch.h:32:\n33 | #endif\n34 | \n\n/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/os/generic_unix_base.h:26:10: note: in file included from /tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/os/generic_unix_base.h:26:\n 24 | #include <fcntl.h>\n 25 | #endif\n 26 | #include <sys/param.h>\n    |          `- note: in file included from /tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/os/generic_unix_base.h:26:\n 27 | \n 28 | #if __has_include(<sys/cdefs.h>)\n\n/usr/include/x86_64-linux-gnu/sys/param.h:23:10: error: 'stddef.h' file not found\n 21 | \n 22 | #define __need_NULL\n 23 | #include <stddef.h>\n    |          `- error: 'stddef.h' file not found\n 24 | \n 25 | #include <sys/types.h>\n\n<unknown>:0: error: could not build C module 'CDispatch'\n",
+  "timed_observations": 0
+}

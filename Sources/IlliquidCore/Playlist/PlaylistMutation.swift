@@ -23,14 +23,32 @@ public enum PlaylistMutation {
         _ items: [FolderPlaylistItem],
         ids: [FolderPlaylistItem.ID]
     ) -> [FolderPlaylistItem] {
-        let unique = deduplicated(items)
-        let byID = Dictionary(uniqueKeysWithValues: unique.map { ($0.id, $0) })
-        var seen: Set<FolderPlaylistItem.ID> = []
-        let restored = ids.compactMap { id -> FolderPlaylistItem? in
-            guard seen.insert(id).inserted else { return nil }
-            return byID[id]
+        guard !items.isEmpty else { return [] }
+        guard !ids.isEmpty else { return deduplicated(items) }
+
+        // Compute each identity once, keeping the first item's complete metadata.
+        // Re-reading item.id in separate deduplication, indexing and filtering
+        // passes repeats URL normalization on the main-actor shuffle path.
+        var byID: [FolderPlaylistItem.ID: FolderPlaylistItem] = [:]
+        var currentOrder: [FolderPlaylistItem.ID] = []
+        for item in items {
+            let id = item.id
+            guard byID[id] == nil else { continue }
+            byID[id] = item
+            currentOrder.append(id)
         }
-        return restored + unique.filter { !seen.contains($0.id) }
+
+        var restored: [FolderPlaylistItem] = []
+        restored.reserveCapacity(byID.count)
+        for id in ids {
+            if let item = byID.removeValue(forKey: id) { restored.append(item) }
+        }
+        // Taking entries out of the map also deduplicates saved IDs. Remaining
+        // entries are new additions and must retain their current relative order.
+        for id in currentOrder {
+            if let item = byID.removeValue(forKey: id) { restored.append(item) }
+        }
+        return restored
     }
 
     public static func deduplicatedSubtitleURLs(_ urls: [URL]) -> [URL] {

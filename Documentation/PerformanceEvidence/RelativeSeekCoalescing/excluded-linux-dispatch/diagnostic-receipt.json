@@ -1,0 +1,135 @@
+{
+  "created_utc": "2026-10-17T15:37:33.802693+00:00",
+  "classification": "Linux libdispatch workqueue monitor cannot use namespace-local thread IDs with this mounted proc filesystem",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "scope": "No production, test, or benchmark harness sources were modified for this diagnosis. No sandbox settings, mounts, preloads, or system libraries were changed.",
+  "runtime_library": {
+    "path": "/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libdispatch.so",
+    "sha256": "8a32f60d801a84a8d9a8cf66e8ae17f75d21df8caa19847722f36e789b170eb1"
+  },
+  "failed_primary_cohort": {
+    "path": "/tmp/illiquid-perf-1507-primary/measurements.jsonl",
+    "sha256": "eeef918a918fe0836e88e166df8fecd6e65ba6b6080a8b304e909ba0c2c3ebd3",
+    "last_command": [
+      "/tmp/illiquid-perf-1507-benchmark-baseline-build-final/RelativeSeekBenchmark",
+      "--burst",
+      "256",
+      "--ticks",
+      "4096"
+    ],
+    "last_returncode": -4,
+    "process_wall_seconds": 0.03144340900325915,
+    "discarded_for_performance_conclusions": true
+  },
+  "namespace_observation": {
+    "getpid": 5,
+    "get_native_id": 5,
+    "proc_self": "117759",
+    "proc_self_task_ids": [
+      "117759"
+    ],
+    "proc_status_pid_lines": [
+      "Tgid:\t117759",
+      "Pid:\t117759",
+      "NStgid:\t117759\t5",
+      "NSpid:\t117759\t5"
+    ],
+    "namespace_tid_stat": {
+      "path": "/proc/5/stat",
+      "exists": true,
+      "contents_read": false
+    }
+  },
+  "trap": {
+    "elf_offset": "0x232c0",
+    "symbol": "_dispatch_workq_monitor_pools.cold.1",
+    "instruction": "UD2",
+    "direct_reproducer": "signal=4 image=/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libdispatch.so offset=0x232c0 pc=0x7f4be8fde2c0",
+    "terminating_signal_observer_exitcode": 132,
+    "original_stack_offsets": [
+      "0x232c0",
+      "0x2c048",
+      "0x37696",
+      "0x2eff6",
+      "0x31fe0",
+      "0x31f1d",
+      "0x35125"
+    ],
+    "resolved_stack_symbols": "_dispatch_workq_monitor_pools.cold.1\nworkqueue.c:?\n_dispatch_continuation_pop\ncrtstuff.c:?\n_dispatch_source_invoke\ncrtstuff.c:?\n_dispatch_lane_serial_drain\ncrtstuff.c:?\n_dispatch_mgr_invoke\nqueue.c:?\n_dispatch_mgr_thread\ncrtstuff.c:?\n_dispatch_worker_thread\nqueue.c:?\n",
+    "conditional_path": "open(\"/proc/<stored thread ID>/stat\", O_RDONLY|O_NONBLOCK) returns -1 at0x3d718; branch0x3d71b reaches0x3d846; call at0x3d846 enters trap0x232c0"
+  },
+  "independent_reproduction": {
+    "source": "minimal-dispatch.c",
+    "description": "64 ordinary C libdispatch callbacks, each sleeping20ms, and a dispatch_group_wait; no Illiquid code, Swift code, or CPU clock reads",
+    "returncode": -4,
+    "address_confirming_source": "minimal-dispatch-address.c"
+  },
+  "cpu_clock_control": {
+    "source": "minimal-clock.c",
+    "description": "100000 CLOCK_PROCESS_CPUTIME_ID reads with monotonicity checks; libc only",
+    "returncode": 0,
+    "stdout": "100000 process CPU-clock reads passed"
+  },
+  "limits_observed_during_diagnosis": {
+    "cgroup_pids_current": 55,
+    "cgroup_pids_max": "max",
+    "rlimit_nproc": 39792,
+    "cgroup_memory_oom": 0,
+    "cgroup_memory_oom_kill": 0,
+    "note": "These observations are not a per-instruction record at the failing open; most cgroup memory was file cache."
+  },
+  "interpretation_limits": [
+    "The original failed open errno was not captured. Its failed-open branch is identified from the exact matching loaded library and reproduced trap address; independent namespace observations show the incompatible IDs directly.",
+    "No unsupported environment option or syscall interposition is used as a workaround. The native macOS runtime still requires separate validation.",
+    "The libc CPU-clock control supports retaining that measurement; it does not qualify every CPU clock or prove freedom from unrelated runtime faults.",
+    "The terminating diagnostic signal observer only reports the loaded image/offset then exits; it does not resume execution.",
+    "A separate synchronous MainActor diagnostic was exploratory only and is excluded because it does not service the same asynchronous task cleanup."
+  ],
+  "next_step": "Run unchanged asynchronous benchmark and focused regressions on native macOS CI; do not reuse partial successful rows from the failed Linux cohort.",
+  "files": {
+    "minimal-clock.c": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-clock.c",
+      "sha256": "4e593eac62816d37daada6562688e6b5b50c4e7ceef06a81080f7e1118ebf932"
+    },
+    "minimal-dispatch.c": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-dispatch.c",
+      "sha256": "0fa356d17a872d50e3a6c25e17f53b103f9d2acd763939e496e943d0060983a3"
+    },
+    "minimal-dispatch-address.c": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-dispatch-address.c",
+      "sha256": "6513c5d40d6ade55e7a6448ba37826fa224f5807fd4aecea24aa2b7b84ca3b75"
+    },
+    "minimal-command-0.json": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-command-0.json",
+      "sha256": "cba80954fa99b60f0d4b0bdce14461dce70e6bd740d0cbbf203b416e27c755a9"
+    },
+    "minimal-command-1.json": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-command-1.json",
+      "sha256": "ee34ce475830a19b4d78b28605dcba073e289c6c608d85b9052300453c0b44e4"
+    },
+    "minimal-command-2.json": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-command-2.json",
+      "sha256": "48b1387597c21a25219733d8b19ae007082886fcfc4ccf815ce896e524358aa8"
+    },
+    "minimal-command-3.json": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-command-3.json",
+      "sha256": "e5d2d6d343c84dce9bd866ceb47d119c6d4926c9aa8db197a03ffb6f2802f772"
+    },
+    "minimal-dispatch-address-command-0.json": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-dispatch-address-command-0.json",
+      "sha256": "0ba9378b157e1ce3b6af16131f6572553c92fa5da6ddb2a943c1d28b4361de85"
+    },
+    "minimal-dispatch-address-command-1.json": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/minimal-dispatch-address-command-1.json",
+      "sha256": "887c368ffb707a6c2c1a8b2d60e49c2549bcd79678844f0d07e8997efa04db1d"
+    },
+    "namespace-observation.json": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/namespace-observation.json",
+      "sha256": "703e6cc51d73ee4fad5907ed908d9bdc0fe9d340ac88343714f04dec5ab64b66"
+    },
+    "elf-inspection.json": {
+      "path": "/tmp/illiquid-perf-1507-crash-diagnosis/elf-inspection.json",
+      "sha256": "c516e8c1c6f99e9762419cc8b71b7047b45bf9638df408e79592c5353e1c7850"
+    }
+  }
+}

@@ -1,0 +1,1381 @@
+﻿2026-10-17T18:06:43.3941180Z Current runner version: '2.337.0'
+2026-10-17T18:06:43.3964080Z ##[group]Runner Image Provisioner
+2026-10-17T18:06:43.3964810Z Hosted Compute Agent
+2026-10-17T18:06:43.3965330Z Version: 20261012.601
+2026-10-17T18:06:43.3966120Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-17T18:06:43.3966660Z Build Date: 2026-10-12T17:48:21Z
+2026-10-17T18:06:43.3967150Z Worker ID: {32523d9a-6cc0-4244-88a4-b55976ad7bef}
+2026-10-17T18:06:43.3967750Z Region: westus
+2026-10-17T18:06:43.3968180Z Cloud: MacCloud
+2026-10-17T18:06:43.3968580Z ##[endgroup]
+2026-10-17T18:06:43.3969830Z ##[group]Operating System
+2026-10-17T18:06:43.3970410Z macOS
+2026-10-17T18:06:43.3970910Z 26.6.2
+2026-10-17T18:06:43.3971590Z 25G83
+2026-10-17T18:06:43.3972220Z ##[endgroup]
+2026-10-17T18:06:43.3972710Z ##[group]Runner Image
+2026-10-17T18:06:43.3973120Z Image: macos-26-arm64
+2026-10-17T18:06:43.3973580Z Version: 20261013.0424.1
+2026-10-17T18:06:43.3975090Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20261013.0424/images/macos/macos-26-arm64-Readme.md
+2026-10-17T18:06:43.3976310Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20261013.0424
+2026-10-17T18:06:43.3977120Z ##[endgroup]
+2026-10-17T18:06:43.3977910Z ##[group]GITHUB_TOKEN Permissions
+2026-10-17T18:06:43.3979910Z Contents: read
+2026-10-17T18:06:43.3980810Z Metadata: read
+2026-10-17T18:06:43.3981220Z ##[endgroup]
+2026-10-17T18:06:43.3982660Z Secret source: Actions
+2026-10-17T18:06:43.3983710Z Cache mode: write
+2026-10-17T18:06:43.3984230Z Prepare workflow directory
+2026-10-17T18:06:43.4266240Z Prepare all required actions
+2026-10-17T18:06:43.4300840Z Getting action download info
+2026-10-17T18:06:43.5689960Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-17T18:06:43.8566700Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-17T18:06:44.0831120Z Complete job name: native-audio
+2026-10-17T18:06:44.1290450Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-17T18:06:44.1291260Z with:
+2026-10-17T18:06:44.1291650Z   persist-credentials: false
+2026-10-17T18:06:44.1292160Z   repository: Jagalite/illiquid
+2026-10-17T18:06:44.1295150Z   token: ***
+2026-10-17T18:06:44.1295490Z   ssh-strict: true
+2026-10-17T18:06:44.1295880Z   ssh-user: git
+2026-10-17T18:06:44.1296240Z   clean: true
+2026-10-17T18:06:44.1296750Z   sparse-checkout-cone-mode: true
+2026-10-17T18:06:44.1297280Z   fetch-depth: 1
+2026-10-17T18:06:44.1297730Z   fetch-tags: false
+2026-10-17T18:06:44.1298190Z   show-progress: true
+2026-10-17T18:06:44.1298750Z   lfs: false
+2026-10-17T18:06:44.1299210Z   submodules: false
+2026-10-17T18:06:44.1299640Z   set-safe-directory: true
+2026-10-17T18:06:44.1300130Z   allow-unsafe-pr-checkout: false
+2026-10-17T18:06:44.1300980Z env:
+2026-10-17T18:06:44.1301550Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T18:06:44.1302350Z ##[endgroup]
+2026-10-17T18:06:44.4876710Z Syncing repository: Jagalite/illiquid
+2026-10-17T18:06:44.4878950Z ##[group]Getting Git version info
+2026-10-17T18:06:44.4879680Z Working directory is '/Users/runner/work/illiquid/illiquid'
+2026-10-17T18:06:44.4889060Z [command]/opt/homebrew/bin/git version
+2026-10-17T18:06:44.5218390Z git version 2.56.0
+2026-10-17T18:06:44.5243170Z ##[endgroup]
+2026-10-17T18:06:44.5255920Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/f672dd80-6d8c-4f9b-ad96-2facd179383c/.gitconfig'
+2026-10-17T18:06:44.5257690Z Temporarily overriding HOME='/Users/runner/work/_temp/f672dd80-6d8c-4f9b-ad96-2facd179383c' before making global git config changes
+2026-10-17T18:06:44.5259420Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T18:06:44.5261470Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-17T18:06:44.5386160Z Deleting the contents of '/Users/runner/work/illiquid/illiquid'
+2026-10-17T18:06:44.5390090Z ##[group]Initializing the repository
+2026-10-17T18:06:44.5393880Z [command]/opt/homebrew/bin/git init /Users/runner/work/illiquid/illiquid
+2026-10-17T18:06:44.5667120Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-17T18:06:44.5669920Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-17T18:06:44.5674050Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-17T18:06:44.5675360Z hint: call:
+2026-10-17T18:06:44.5677050Z hint:
+2026-10-17T18:06:44.5678010Z hint: 	git config --global init.defaultBranch <name>
+2026-10-17T18:06:44.5678660Z hint:
+2026-10-17T18:06:44.5679400Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-17T18:06:44.5680430Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-17T18:06:44.5683140Z hint:
+2026-10-17T18:06:44.5683920Z hint: 	git branch -m <name>
+2026-10-17T18:06:44.5684770Z hint:
+2026-10-17T18:06:44.5685650Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-17T18:06:44.5688930Z Initialized empty Git repository in /Users/runner/work/illiquid/illiquid/.git/
+2026-10-17T18:06:44.5691180Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Jagalite/illiquid
+2026-10-17T18:06:44.5975670Z ##[endgroup]
+2026-10-17T18:06:44.5977610Z ##[group]Disabling automatic garbage collection
+2026-10-17T18:06:44.5978610Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-17T18:06:44.6062250Z ##[endgroup]
+2026-10-17T18:06:44.6063070Z ##[group]Setting up auth
+2026-10-17T18:06:44.6066950Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T18:06:44.6144210Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T18:06:44.7618330Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T18:06:44.7729920Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T18:06:44.9478730Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T18:06:44.9485610Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T18:06:45.1524480Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-17T18:06:45.1653750Z ##[endgroup]
+2026-10-17T18:06:45.1656510Z ##[group]Fetching the repository
+2026-10-17T18:06:45.1666100Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +921e4f243a8c859391ce7efc5923a6553dc2701a:refs/remotes/pull/32/merge
+2026-10-17T18:06:52.3089560Z From https://github.com/Jagalite/illiquid
+2026-10-17T18:06:52.3096310Z  * [new ref]         921e4f243a8c859391ce7efc5923a6553dc2701a -> pull/32/merge
+2026-10-17T18:06:52.3110960Z ##[endgroup]
+2026-10-17T18:06:52.3112960Z ##[group]Determining the checkout info
+2026-10-17T18:06:52.3115320Z ##[endgroup]
+2026-10-17T18:06:52.3125340Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-17T18:06:52.3315600Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-17T18:06:52.3395860Z ##[group]Checking out the ref
+2026-10-17T18:06:52.3398120Z [command]/opt/homebrew/bin/git checkout --progress --force refs/remotes/pull/32/merge
+2026-10-17T18:06:53.2640590Z HEAD is now at 921e4f2 Merge 0152643c280572ca7b10b07a5991c26e75824e4b into 8c3cc3d4008d5d1b8d436bcf2d51d891382b6548
+2026-10-17T18:06:53.2748530Z ##[endgroup]
+2026-10-17T18:06:53.3135940Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-17T18:06:53.3237340Z 921e4f243a8c859391ce7efc5923a6553dc2701a
+2026-10-17T18:06:53.3368470Z ##[group]Removing auth
+2026-10-17T18:06:53.3369300Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T18:06:53.3371590Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T18:06:53.4465830Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T18:06:53.4532580Z http.https://github.com/.extraheader
+2026-10-17T18:06:53.4548750Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-17T18:06:53.4728430Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T18:06:53.5624980Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T18:06:53.5730490Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T18:06:53.7005970Z ##[endgroup]
+2026-10-17T18:06:53.7427770Z ##[group]Run if ! xcrun -sdk macosx metal --version; then
+2026-10-17T18:06:53.7428480Z [36;1mif ! xcrun -sdk macosx metal --version; then[0m
+2026-10-17T18:06:53.7429000Z [36;1m  xcodebuild -downloadComponent MetalToolchain[0m
+2026-10-17T18:06:53.7429320Z [36;1mfi[0m
+2026-10-17T18:06:53.7429700Z [36;1mpython3 Scripts/verify-corresponding-source.py DependencySources[0m
+2026-10-17T18:06:53.7430130Z [36;1mpython3 Scripts/install-ci-native-sdk.py[0m
+2026-10-17T18:06:53.7498350Z shell: /bin/bash -e {0}
+2026-10-17T18:06:53.7499200Z env:
+2026-10-17T18:06:53.7499940Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T18:06:53.7500940Z ##[endgroup]
+2026-10-17T18:06:58.7962580Z Apple metal version 32023.883 (metalfe-32023.883)
+2026-10-17T18:06:58.8064770Z Target: air64-apple-darwin25.6.0
+2026-10-17T18:06:58.8340840Z Thread model: posix
+2026-10-17T18:06:58.8460230Z InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.aEk0LU/Metal.xctoolchain/usr/metal/current/bin
+2026-10-17T18:07:08.2881730Z Verified 28 source/resource/patch inputs and 114 notice documents
+2026-10-17T18:07:09.2400560Z Installed checksum-verified SDK on ephemeral runner
+2026-10-17T18:07:09.2560360Z ##[group]Run mkdir -p "$RUNNER_TEMP/pcm-native-audio"
+2026-10-17T18:07:09.2560890Z [36;1mmkdir -p "$RUNNER_TEMP/pcm-native-audio"[0m
+2026-10-17T18:07:09.2561290Z [36;1mset -o pipefail[0m
+2026-10-17T18:07:09.2561620Z [36;1mswift test --force-resolved-versions --filter \[0m
+2026-10-17T18:07:09.2562470Z [36;1m  'AudioSampleSanitizationTests|AudioResamplerDrainTests|MultichannelAudioTests|AudioDelayTests|audioSanitizationZerosInvalidSamplesOnly' \[0m
+2026-10-17T18:07:09.2563460Z [36;1m  2>&1 | tee "$RUNNER_TEMP/pcm-native-audio/tests.log"[0m
+2026-10-17T18:07:09.2618030Z shell: /bin/bash -e {0}
+2026-10-17T18:07:09.2618510Z env:
+2026-10-17T18:07:09.2620490Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T18:07:09.2623620Z   PKG_CONFIG_LIBDIR: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-17T18:07:09.2636700Z   PKG_CONFIG_PATH: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-17T18:07:09.2639660Z ##[endgroup]
+2026-10-17T18:07:20.0873160Z Fetching https://github.com/swiftlang/swift-syntax.git
+2026-10-17T18:07:20.0900650Z Fetching https://github.com/swiftlang/swift-testing.git
+2026-10-17T18:07:21.2995930Z [1/44850] Fetching swift-testing
+2026-10-17T18:07:21.9119160Z [36778/125652] Fetching swift-testing, swift-syntax
+2026-10-17T18:07:25.1356840Z Fetched https://github.com/swiftlang/swift-testing.git from cache (5.04s)
+2026-10-17T18:07:25.1472410Z Fetched https://github.com/swiftlang/swift-syntax.git from cache (5.04s)
+2026-10-17T18:07:25.1574980Z Fetching https://github.com/sparkle-project/Sparkle.git
+2026-10-17T18:07:26.1379600Z [1/44174] Fetching sparkle
+2026-10-17T18:07:28.1053480Z Fetched https://github.com/sparkle-project/Sparkle.git from cache (2.95s)
+2026-10-17T18:07:28.1357790Z Creating working copy for https://github.com/swiftlang/swift-syntax.git
+2026-10-17T18:07:28.1360160Z Creating working copy for https://github.com/sparkle-project/Sparkle.git
+2026-10-17T18:07:28.2570720Z Creating working copy for https://github.com/swiftlang/swift-testing.git
+2026-10-17T18:07:28.6248960Z Working copy of https://github.com/swiftlang/swift-testing.git resolved at swift-6.3.2-RELEASE (70eff26)
+2026-10-17T18:07:28.6915740Z Working copy of https://github.com/swiftlang/swift-syntax.git resolved at 603.0.2
+2026-10-17T18:07:28.8769300Z Working copy of https://github.com/sparkle-project/Sparkle.git resolved at 2.10.0
+2026-10-17T18:07:35.3453770Z Downloading binary artifact https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+2026-10-17T18:07:35.6725750Z [32750/10193895] Downloading https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+2026-10-17T18:07:36.4011860Z Downloaded https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip (1.06s)
+2026-10-17T18:07:36.9581600Z Downloading package prebuilt https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip
+2026-10-17T18:07:37.9931690Z Downloaded https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip (1.03s)
+2026-10-17T18:07:39.7934380Z Building for debugging...
+2026-10-17T18:07:39.8203210Z [0/61] /Users/runner/work/illiquid/illiquid/.build/arm64-apple-macosx/debug/IlliquidPackageTests.derived/runner.swift
+2026-10-17T18:07:40.0437520Z [1/61] Write swift-version-7974D3F7F03D5E95.txt
+2026-10-17T18:07:40.4758560Z [2/61] Compiling _TestingInternals WillThrow.cpp
+2026-10-17T18:07:40.4917430Z [3/61] Compiling _TestingInternals ExecutablePath.cpp
+2026-10-17T18:07:40.5019880Z [4/61] Write sources
+2026-10-17T18:07:40.5993900Z [7/61] Compiling _TestingInternals Discovery.cpp
+2026-10-17T18:07:40.6518720Z [8/61] Copying Sparkle.framework
+2026-10-17T18:07:40.6654850Z [8/62] Copying NativePlaybackShaders.metal
+2026-10-17T18:07:40.6774610Z [8/65] Copying Resources
+2026-10-17T18:07:40.6847840Z [8/65] Write sources
+2026-10-17T18:07:40.6912540Z [8/65] Write IlliquidStateSpaceExplorer-entitlement.plist
+2026-10-17T18:07:40.6949830Z [8/65] Write sources
+2026-10-17T18:07:40.6964950Z [8/65] Write IlliquidRenderProfile-entitlement.plist
+2026-10-17T18:07:40.6977080Z [8/65] Write sources
+2026-10-17T18:07:40.6977920Z [8/65] Write IlliquidPlaybackStress-entitlement.plist
+2026-10-17T18:07:40.6982330Z [8/65] Write sources
+2026-10-17T18:07:40.6983070Z [29/70] Write IlliquidDifferentialHarness-entitlement.plist
+2026-10-17T18:07:40.6983620Z [29/70] Write sources
+2026-10-17T18:07:40.6984090Z [33/72] Write IlliquidArchitectureCheck-entitlement.plist
+2026-10-17T18:07:41.6337770Z [34/112] Compiling _TestingInternals Versions.cpp
+2026-10-17T18:07:41.6440700Z [35/112] Write sources
+2026-10-17T18:07:41.6541890Z [35/112] Write Illiquid-entitlement.plist
+2026-10-17T18:07:47.9076960Z [39/112] Compiling IlliquidCore MediaMetadataHints.swift
+2026-10-17T18:07:47.9174880Z [40/112] Compiling IlliquidCore MediaNameRecognition.swift
+2026-10-17T18:07:47.9275300Z [41/112] Compiling IlliquidCore MediaSidecarReader.swift
+2026-10-17T18:07:47.9375920Z [42/112] Compiling IlliquidCore NFOMetadataHints.swift
+2026-10-17T18:07:47.9481270Z [43/112] Compiling IlliquidCore PlexMatchHints.swift
+2026-10-17T18:07:47.9583030Z [44/112] Compiling IlliquidCore CoalescingPersistenceWriter.swift
+2026-10-17T18:07:47.9707060Z [45/112] Compiling IlliquidCore LegacyPreferencesMigration.swift
+2026-10-17T18:07:47.9810620Z [46/112] Compiling IlliquidCore MediaContentVersion.swift
+2026-10-17T18:07:47.9915390Z [47/112] Compiling IlliquidCore MediaPlaybackSettings.swift
+2026-10-17T18:07:48.0017530Z [48/112] Compiling IlliquidCore PlaybackPersistenceStore.swift
+2026-10-17T18:07:48.0119250Z [49/112] Compiling IlliquidCore PlaybackPreferences.swift
+2026-10-17T18:07:48.0220840Z [50/112] Emitting module TestingMacros
+2026-10-17T18:07:48.0323810Z [51/112] Compiling IlliquidCore PlaybackRestoreTarget.swift
+2026-10-17T18:07:48.0433090Z [52/112] Compiling IlliquidCore PlaybackSessionStore.swift
+2026-10-17T18:07:48.0453940Z [53/112] Compiling IlliquidCore MediaSource.swift
+2026-10-17T18:07:48.0555440Z [54/112] Compiling IlliquidCore MediaTrack.swift
+2026-10-17T18:07:48.0656620Z [55/112] Compiling IlliquidCore OpenVideoTabs.swift
+2026-10-17T18:07:48.0779270Z [56/112] Compiling IlliquidCore PictureInPictureState.swift
+2026-10-17T18:07:48.0882300Z [57/112] Compiling IlliquidCore PlaybackCommand.swift
+2026-10-17T18:07:48.0984850Z [58/112] Compiling IlliquidCore PlaybackModels.swift
+2026-10-17T18:07:48.1091620Z [59/112] Compiling IlliquidCore PlaybackPhase.swift
+2026-10-17T18:07:48.1194800Z [60/112] Compiling IlliquidCore PlaybackRecoveryIssue.swift
+2026-10-17T18:07:49.5836000Z [60/122] Compiling CNativeAudio AudioOutputDevice.m
+2026-10-17T18:07:51.3642650Z [62/127] Compiling _TestDiscovery WinSDKAdditions.swift
+2026-10-17T18:07:51.3749210Z [63/127] Compiling _TestDiscovery DiscoverableAsTestContent.swift
+2026-10-17T18:07:52.0606970Z [64/128] Compiling _TestDiscovery SectionBounds.swift
+2026-10-17T18:07:52.0709790Z [65/128] Compiling _TestDiscovery TestContentKind.swift
+2026-10-17T18:07:52.0811860Z [66/128] Emitting module _TestDiscovery
+2026-10-17T18:07:52.2016830Z [67/128] Compiling TestingMacros DiagnosticMessage+Diagnosing.swift
+2026-10-17T18:07:52.2118640Z [68/128] Compiling TestingMacros DiagnosticMessage.swift
+2026-10-17T18:07:52.2220140Z [69/128] Compiling TestingMacros EffectfulExpressionHandling.swift
+2026-10-17T18:07:52.2321490Z [70/128] Compiling TestingMacros SHA256.swift
+2026-10-17T18:07:52.2423080Z [71/128] Compiling TestingMacros SourceCodeCapturing.swift
+2026-10-17T18:07:52.2524220Z [72/128] Compiling TestingMacros SourceLocationGeneration.swift
+2026-10-17T18:07:52.2651440Z [73/128] Compiling TestingMacros TestContentGeneration.swift
+2026-10-17T18:07:52.2753090Z [74/128] Compiling TestingMacros TagMacro.swift
+2026-10-17T18:07:52.2941130Z [75/128] Compiling TestingMacros TestDeclarationMacro.swift
+2026-10-17T18:07:52.3042130Z [76/128] Compiling TestingMacros TestingMacrosMain.swift
+2026-10-17T18:07:52.3143340Z [76/128] Write Objects.LinkFileList
+2026-10-17T18:07:53.1104650Z [77/128] Linking TestingMacros-tool
+2026-10-17T18:07:53.3845820Z [79/128] Compiling _TestDiscovery TestContentRecord.swift
+2026-10-17T18:07:54.9184740Z [80/175] Compiling Testing ABI.Record+Streaming.swift
+2026-10-17T18:07:54.9286760Z [81/175] Compiling Testing ABI.Record.swift
+2026-10-17T18:07:54.9287230Z [82/175] Compiling Testing ABI.swift
+2026-10-17T18:07:54.9388470Z [83/175] Compiling Testing ABI.EncodedAttachment.swift
+2026-10-17T18:07:54.9489670Z [84/175] Compiling Testing ABI.EncodedBacktrace.swift
+2026-10-17T18:07:54.9590860Z [85/175] Compiling Testing ABI.EncodedError.swift
+2026-10-17T18:07:54.9828430Z [86/175] Compiling Testing ABI.EncodedEvent.swift
+2026-10-17T18:07:54.9829000Z [87/175] Compiling Testing ABI.EncodedInstant.swift
+2026-10-17T18:07:54.9829740Z [88/175] Compiling Testing ABI.EncodedIssue.swift
+2026-10-17T18:07:54.9930510Z [89/175] Compiling Testing ABI.EncodedMessage.swift
+2026-10-17T18:07:55.0032450Z [90/175] Compiling Testing ABI.EncodedSourceLocation.swift
+2026-10-17T18:07:55.0133850Z [91/175] Compiling Testing ABI.EncodedTest.swift
+2026-10-17T18:07:55.0236430Z [92/175] Compiling Testing ABIEntryPoint.swift
+2026-10-17T18:07:55.0337940Z [93/175] Compiling Testing EntryPoint.swift
+2026-10-17T18:07:55.0439850Z [94/175] Emitting module IlliquidCore
+2026-10-17T18:07:55.1891190Z [95/189] Compiling Testing SwiftPMEntryPoint.swift
+2026-10-17T18:07:55.1992470Z [96/189] Compiling Testing Attachable.swift
+2026-10-17T18:07:55.2093570Z [97/189] Compiling Testing AttachableWrapper.swift
+2026-10-17T18:07:55.2194120Z [98/189] Compiling Testing Attachment.swift
+2026-10-17T18:07:55.2295610Z [99/189] Compiling Testing AttachableAsImage.swift
+2026-10-17T18:07:55.2396370Z [100/189] Compiling Testing AttachableImageFormat.swift
+2026-10-17T18:07:55.2497420Z [101/189] Compiling Testing Attachment+AttachableAsImage.swift
+2026-10-17T18:07:55.2598090Z [102/189] Compiling Testing ImageAttachmentError.swift
+2026-10-17T18:07:55.2699180Z [103/189] Compiling Testing _AttachableImageWrapper.swift
+2026-10-17T18:07:55.2806900Z [104/189] Compiling Testing Discovery+Macro.swift
+2026-10-17T18:07:55.2908580Z [105/189] Compiling Testing Clock.swift
+2026-10-17T18:07:55.3010330Z [106/189] Compiling Testing Event+FallbackHandler.swift
+2026-10-17T18:07:55.3130550Z [107/189] Compiling Testing Event.swift
+2026-10-17T18:07:55.3225220Z [108/189] Compiling Testing Event.AdvancedConsoleOutputRecorder.swift
+2026-10-17T18:07:57.3157970Z [109/189] Compiling IlliquidCore VideoColorSample.swift
+2026-10-17T18:07:57.3245240Z [110/189] Compiling IlliquidCore VideoPresentationGeometry.swift
+2026-10-17T18:07:57.3346560Z [111/189] Compiling IlliquidCore ExternalSubtitleMatcher.swift
+2026-10-17T18:07:57.3451930Z [112/189] Compiling IlliquidCore FolderPlaylist.swift
+2026-10-17T18:07:57.3565810Z [113/189] Compiling IlliquidCore FolderPlaylistDiscovery.swift
+2026-10-17T18:07:57.3669030Z [114/189] Compiling IlliquidCore PlaylistMutation.swift
+2026-10-17T18:07:57.3771200Z [115/189] Compiling IlliquidCore AspectFitWindowSizing.swift
+2026-10-17T18:07:57.3871870Z [116/189] Compiling IlliquidCore LifecyclePerformance.swift
+2026-10-17T18:07:57.3973530Z [117/189] Compiling IlliquidCore MediaFileSupport.swift
+2026-10-17T18:07:57.4073390Z [118/189] Compiling IlliquidCore NaturalFilenameOrdering.swift
+2026-10-17T18:07:57.4173920Z [119/189] Compiling IlliquidCore NonDecodePerformance.swift
+2026-10-17T18:07:57.4274450Z [120/189] Compiling IlliquidCore NormalizedFileURL.swift
+2026-10-17T18:07:57.4375750Z [121/189] Compiling IlliquidCore PlaybackTimeInput.swift
+2026-10-17T18:07:57.4476510Z [122/189] Compiling IlliquidCore SourcePreparationExecutor.swift
+2026-10-17T18:08:01.1580740Z [123/199] Compiling IlliquidPlaybackCore PlaybackInvariants.swift
+2026-10-17T18:08:01.1683500Z [124/199] Compiling IlliquidPlaybackCore PlaybackModelRuntime.swift
+2026-10-17T18:08:01.1783790Z [125/199] Compiling IlliquidPlaybackCore PlaybackReplay.swift
+2026-10-17T18:08:01.1885860Z [126/199] Compiling IlliquidPlaybackCore RecoveryCore.swift
+2026-10-17T18:08:03.3849750Z [127/203] Compiling IlliquidPlaybackCore SeekCore.swift
+2026-10-17T18:08:03.3964110Z [128/203] Compiling IlliquidPlaybackCore SubtitleCore.swift
+2026-10-17T18:08:03.4117410Z [129/203] Compiling IlliquidPlaybackCore SynchronizationCore.swift
+2026-10-17T18:08:03.4279510Z [130/203] Compiling IlliquidPlaybackCore TrackSelectionCore.swift
+2026-10-17T18:08:03.4423130Z [131/203] Emitting module Testing
+2026-10-17T18:08:03.4524500Z [151/203] Compiling Testing ExpectationChecking+Macro.swift
+2026-10-17T18:08:03.4626320Z [152/203] Compiling Testing Confirmation.swift
+2026-10-17T18:08:03.4729160Z [153/203] Compiling Testing ErrorSnapshot.swift
+2026-10-17T18:08:03.4829740Z [154/203] Compiling Testing Issue+Recording.swift
+2026-10-17T18:08:03.4931600Z [155/203] Compiling IlliquidPlaybackCore EventsAndEffects.swift
+2026-10-17T18:08:03.5032010Z [156/203] Compiling IlliquidPlaybackCore IdentityAndTime.swift
+2026-10-17T18:08:03.5166730Z [157/203] Compiling IlliquidPlaybackCore LoadingAndDrainCore.swift
+2026-10-17T18:08:03.5269430Z [158/203] Compiling IlliquidPlaybackCore PlaybackCore.swift
+2026-10-17T18:08:03.5371500Z [159/203] Compiling IlliquidPlaybackCore PlaybackCoreState.swift
+2026-10-17T18:08:04.7622100Z [178/270] Emitting module IlliquidPlaybackCore
+2026-10-17T18:08:07.3422010Z [184/283] Compiling IlliquidPlaybackStateSpace PlaybackSearchModel.swift
+2026-10-17T18:08:07.3524150Z [185/283] Compiling IlliquidPlaybackStateSpace PlaybackSearchModels.swift
+2026-10-17T18:08:07.3624880Z [186/283] Compiling IlliquidPlaybackStateSpace PlaybackSearchTrend.swift
+2026-10-17T18:08:08.1495080Z [187/286] Compiling Testing Test+Discovery.swift
+2026-10-17T18:08:08.1596930Z [188/286] Compiling Testing Test+Macro.swift
+2026-10-17T18:08:08.1698570Z [189/286] Compiling Testing Test.ID.Selection.swift
+2026-10-17T18:08:08.1799880Z [190/286] Compiling Testing Test.ID.swift
+2026-10-17T18:08:08.1901770Z [191/286] Compiling Testing Test.swift
+2026-10-17T18:08:08.2003260Z [192/286] Compiling Testing AttachmentSavingTrait.swift
+2026-10-17T18:08:08.2104600Z [193/286] Compiling Testing Bug.swift
+2026-10-17T18:08:08.2205630Z [194/286] Compiling Testing Comment+Macro.swift
+2026-10-17T18:08:08.2306850Z [195/286] Compiling Testing Comment.swift
+2026-10-17T18:08:08.2413540Z [196/286] Compiling Testing ConditionTrait+Macro.swift
+2026-10-17T18:08:08.2520240Z [197/286] Compiling Testing ConditionTrait.swift
+2026-10-17T18:08:08.2624110Z [198/286] Compiling Testing HiddenTrait.swift
+2026-10-17T18:08:08.2725930Z [199/286] Compiling Testing IssueHandlingTrait.swift
+2026-10-17T18:08:08.2827840Z [200/286] Compiling Testing ParallelizationTrait.swift
+2026-10-17T18:08:08.2929880Z [201/286] Compiling Testing Tag+Macro.swift
+2026-10-17T18:08:08.3033060Z [202/286] Compiling Testing Tag+Predefined.swift
+2026-10-17T18:08:08.3135610Z [203/286] Compiling Testing Tag.Color+Loading.swift
+2026-10-17T18:08:08.3237750Z [204/286] Compiling Testing Tag.Color.swift
+2026-10-17T18:08:08.3339330Z [205/286] Compiling Testing Tag.List.swift
+2026-10-17T18:08:08.3441140Z [206/286] Compiling Testing Tag.swift
+2026-10-17T18:08:08.3543570Z [207/286] Compiling Testing TimeLimitTrait.swift
+2026-10-17T18:08:08.3645980Z [208/286] Compiling Testing Trait.swift
+2026-10-17T18:08:08.3748180Z [209/286] Compiling Testing ArrayAdditions.swift
+2026-10-17T18:08:08.3849980Z [210/286] Compiling Testing CollectionDifferenceAdditions.swift
+2026-10-17T18:08:08.3952680Z [211/286] Compiling Testing CommandLineAdditions.swift
+2026-10-17T18:08:08.4055020Z [212/286] Compiling Testing CopyableAdditions.swift
+2026-10-17T18:08:08.4156660Z [213/286] Compiling Testing NumericAdditions.swift
+2026-10-17T18:08:08.4259640Z [214/286] Compiling Testing ResultAdditions.swift
+2026-10-17T18:08:08.4368900Z [215/286] Compiling Testing TaskAdditions.swift
+2026-10-17T18:08:08.4471130Z [216/286] Compiling Testing WinSDKAdditions.swift
+2026-10-17T18:08:08.4598220Z [217/286] Compiling Testing CError.swift
+2026-10-17T18:08:08.4704410Z [218/286] Compiling Testing CartesianProduct.swift
+2026-10-17T18:08:08.4809650Z [219/286] Compiling Testing CustomIssueRepresentable.swift
+2026-10-17T18:08:08.4911350Z [220/286] Compiling Testing Environment.swift
+2026-10-17T18:08:08.5042580Z [221/286] Compiling Testing FileHandle.swift
+2026-10-17T18:08:08.5147040Z [222/286] Compiling Testing GetSymbol.swift
+2026-10-17T18:08:08.5276970Z [223/286] Compiling Testing Graph.swift
+2026-10-17T18:08:08.5386320Z [224/286] Compiling Testing JSON.swift
+2026-10-17T18:08:08.5489590Z [225/286] Compiling Testing Locked.swift
+2026-10-17T18:08:08.5591080Z [226/286] Compiling Testing Serializer.swift
+2026-10-17T18:08:08.5591460Z [227/286] Compiling Testing VersionNumber.swift
+2026-10-17T18:08:08.5592140Z [228/286] Compiling Testing Versions.swift
+2026-10-17T18:08:08.5693840Z [229/286] Compiling Testing Test+Cancellation.swift
+2026-10-17T18:08:08.5797970Z [230/286] Compiling Testing Test+Discovery+Legacy.swift
+2026-10-17T18:08:09.9445370Z [231/286] Compiling IlliquidPlayback Module.swift
+2026-10-17T18:08:09.9563800Z [232/286] Compiling IlliquidPlayback PlaybackCapabilities.swift
+2026-10-17T18:08:09.9665730Z [233/286] Compiling IlliquidPlayback PlaybackRuntime.swift
+2026-10-17T18:08:09.9768430Z [234/286] Compiling IlliquidPlayback PlaybackRuntimeEvent.swift
+2026-10-17T18:08:09.9870100Z [235/286] Emitting module IlliquidPlaybackStateSpace
+2026-10-17T18:08:11.2964720Z [236/286] Compiling IlliquidPlaybackStateSpace PlaybackSearchTypes.swift
+2026-10-17T18:08:11.3092770Z [237/286] Compiling IlliquidPlaybackStateSpace PlaybackStateSpaceExplorer.swift
+2026-10-17T18:08:11.3210070Z [238/286] Compiling IlliquidPlaybackStateSpace SearchAction.swift
+2026-10-17T18:08:11.7845810Z [239/288] Compiling Testing Issue.swift
+2026-10-17T18:08:11.7949520Z [240/288] Compiling Testing KnownIssue.swift
+2026-10-17T18:08:11.8047680Z [241/288] Compiling Testing CustomTestArgumentEncodable.swift
+2026-10-17T18:08:11.8149880Z [242/288] Compiling Testing Test.Case.Generator.swift
+2026-10-17T18:08:11.8251030Z [243/288] Compiling Testing Test.Case.ID.swift
+2026-10-17T18:08:11.8353440Z [244/288] Compiling Testing Test.Case.swift
+2026-10-17T18:08:11.8454710Z [245/288] Compiling Testing TypeInfo.swift
+2026-10-17T18:08:11.8555910Z [246/288] Compiling Testing Configuration+EventHandling.swift
+2026-10-17T18:08:11.8690680Z [247/288] Compiling Testing Configuration.TestFilter.swift
+2026-10-17T18:08:11.8822270Z [248/288] Compiling Testing Configuration.swift
+2026-10-17T18:08:11.8924200Z [249/288] Compiling Testing Runner.Plan+Dumping.swift
+2026-10-17T18:08:11.9061010Z [250/288] Compiling Testing Runner.Plan.swift
+2026-10-17T18:08:11.9183780Z [251/288] Compiling Testing Runner.RuntimeState.swift
+2026-10-17T18:08:11.9355250Z [252/288] Compiling Testing Runner.swift
+2026-10-17T18:08:11.9472210Z [253/288] Compiling Testing SkipInfo.swift
+2026-10-17T18:08:11.9574910Z [254/288] Compiling Testing Backtrace+Symbolication.swift
+2026-10-17T18:08:11.9678960Z [255/288] Compiling Testing Backtrace.swift
+2026-10-17T18:08:11.9821970Z [256/288] Compiling Testing CustomTestStringConvertible.swift
+2026-10-17T18:08:11.9823110Z [257/288] Compiling Testing Expression+Macro.swift
+2026-10-17T18:08:11.9924720Z [258/288] Compiling Testing Expression.swift
+2026-10-17T18:08:12.0026440Z [259/288] Compiling Testing SourceContext.swift
+2026-10-17T18:08:12.0127810Z [260/288] Compiling Testing SourceLocation+Macro.swift
+2026-10-17T18:08:12.0223680Z [261/288] Compiling Testing SourceLocation.swift
+2026-10-17T18:08:12.2902850Z [262/290] Emitting module IlliquidStateSpaceExplorer
+2026-10-17T18:08:12.3006010Z [263/290] Compiling IlliquidStateSpaceExplorer main.swift
+2026-10-17T18:08:13.1167270Z [264/293] Emitting module IlliquidPlayback
+2026-10-17T18:08:13.4309880Z [269/294] Compiling IlliquidPlayback PlaybackSurfaceHost.swift
+2026-10-17T18:08:14.6364060Z [270/315] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+2026-10-17T18:08:14.6465920Z [271/315] Emitting module IlliquidPlaybackStateSpaceTests
+2026-10-17T18:08:15.7840870Z [272/317] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+2026-10-17T18:08:15.7941530Z [273/317] Emitting module IlliquidPlaybackTests
+2026-10-17T18:08:23.9978140Z [274/358] Emitting module IlliquidPlaybackCoreTests
+2026-10-17T18:08:24.0074190Z [275/358] Compiling IlliquidPlaybackCoreTests PlaybackCoreTests.swift
+2026-10-17T18:08:24.0176260Z [276/358] Compiling IlliquidPlaybackCoreTests PlaybackParityCoreTests.swift
+2026-10-17T18:08:24.0492100Z [276/358] Write Objects.LinkFileList
+2026-10-17T18:08:24.3234090Z [278/358] Emitting module IlliquidNativePlayback
+2026-10-17T18:08:25.9785010Z [278/378] Linking IlliquidStateSpaceExplorer
+2026-10-17T18:08:26.0369080Z [279/378] Applying IlliquidStateSpaceExplorer
+2026-10-17T18:08:32.6300660Z [281/378] Emitting module IlliquidCoreTests
+2026-10-17T18:08:37.3924390Z [282/388] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+2026-10-17T18:08:37.4021190Z [283/388] Compiling IlliquidNativePlayback DeterministicRaceQualification.swift
+2026-10-17T18:08:37.4123340Z [284/388] Compiling IlliquidNativePlayback DeterministicSemanticQualification.swift
+2026-10-17T18:08:37.4229270Z [285/388] Compiling IlliquidNativePlayback DifferentialAcceptanceContract.swift
+2026-10-17T18:08:37.4329310Z [286/388] Compiling IlliquidNativePlayback DifferentialHarnessContract.swift
+2026-10-17T18:08:37.4433460Z [287/388] Compiling IlliquidNativePlayback NativeDifferentialRunner.swift
+2026-10-17T18:08:37.4537480Z [288/388] Compiling IlliquidNativePlayback NativePlaybackSignposts.swift
+2026-10-17T18:08:37.4640230Z [289/388] Compiling IlliquidNativePlayback PlanarBufferOwnershipDiagnostics.swift
+2026-10-17T18:08:37.4740410Z [290/388] Compiling IlliquidNativePlayback PlaybackDiagnostics.swift
+2026-10-17T18:08:37.4840800Z [291/388] Compiling IlliquidNativePlayback PlaybackQualification.swift
+2026-10-17T18:08:37.4943400Z [292/388] Compiling IlliquidNativePlayback RendererObservationJournal.swift
+2026-10-17T18:08:37.5046590Z [293/388] Compiling IlliquidNativePlayback StagedInputAdapter.swift
+2026-10-17T18:08:37.5154990Z [294/388] Compiling IlliquidNativePlayback AudioDecoder.swift
+2026-10-17T18:08:37.5248320Z [295/388] Compiling IlliquidNativePlayback AudioDelayTimeline.swift
+2026-10-17T18:08:37.5352960Z [296/388] Compiling IlliquidNativePlayback FFmpegDemuxer.swift
+2026-10-17T18:08:37.5454520Z [297/388] Compiling IlliquidNativePlayback FFmpegError.swift
+2026-10-17T18:08:37.5563500Z [298/388] Compiling IlliquidNativePlayback FFmpegInputExecutor.swift
+2026-10-17T18:08:37.5661140Z [299/388] Compiling IlliquidNativePlayback FFmpegPacket.swift
+2026-10-17T18:08:37.5762750Z [300/388] Compiling IlliquidNativePlayback FFmpegStreamInfo.swift
+2026-10-17T18:08:37.5864580Z [301/388] Compiling IlliquidNativePlayback MediaReadAheadGate.swift
+2026-10-17T18:08:39.9998130Z [302/388] Compiling IlliquidCoreTests PlaybackStateTests.swift
+2026-10-17T18:08:40.0100830Z [303/388] Compiling IlliquidCoreTests PlaybackToolsTests.swift
+2026-10-17T18:08:40.0201820Z [304/388] Compiling IlliquidCoreTests PlaylistMutationTests.swift
+2026-10-17T18:08:40.0322140Z [305/388] Compiling IlliquidCoreTests SourcePreparationExecutorTests.swift
+2026-10-17T18:08:40.0424720Z [306/388] Compiling IlliquidCoreTests TemporaryDirectory.swift
+2026-10-17T18:08:40.0526660Z [307/388] Compiling IlliquidCoreTests ThumbnailPolicyTests.swift
+2026-10-17T18:08:40.0628330Z [308/388] Compiling IlliquidCoreTests ThumbnailSchedulingPolicyRegressionTests.swift
+2026-10-17T18:08:40.0728290Z [309/388] Compiling IlliquidCoreTests TrackRestorationRegressionTests.swift
+2026-10-17T18:08:40.0829470Z [310/388] Compiling IlliquidCoreTests TrackSelectionPreferencesTests.swift
+2026-10-17T18:08:40.0929770Z [311/388] Compiling IlliquidCoreTests UtilitiesTests.swift
+2026-10-17T18:08:40.1031770Z [312/388] Compiling IlliquidNativePlayback NativeTrackSelection.swift
+2026-10-17T18:08:40.1134070Z [313/388] Compiling IlliquidNativePlayback SubtitleDecoder.swift
+2026-10-17T18:08:40.1234690Z [314/388] Compiling IlliquidNativePlayback ThumbnailBlockingReader.swift
+2026-10-17T18:08:40.1337300Z [315/388] Compiling IlliquidNativePlayback ThumbnailDecodeObservation.swift
+2026-10-17T18:08:40.1438020Z [316/388] Compiling IlliquidNativePlayback ThumbnailPacketWindow.swift
+2026-10-17T18:08:40.1537880Z [317/388] Compiling IlliquidNativePlayback ThumbnailPromotionMailbox.swift
+2026-10-17T18:08:40.1639060Z [318/388] Compiling IlliquidNativePlayback TimelineThumbnailWorker.swift
+2026-10-17T18:08:40.1742230Z [319/388] Compiling IlliquidNativePlayback VideoDecoder.swift
+2026-10-17T18:08:40.1844520Z [320/388] Compiling IlliquidNativePlayback VideoDeinterlacer.swift
+2026-10-17T18:08:40.1942840Z [321/388] Compiling IlliquidNativePlayback FixedRingBuffer.swift
+2026-10-17T18:08:41.7345820Z [342/408] Compiling IlliquidNativePlayback PacketQueue.swift
+2026-10-17T18:08:41.7448090Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:41.7572880Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:41.7648300Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:41.7748830Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:41.7850670Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:41.7951120Z 1153 |                     completion(.failure(
+2026-10-17T18:08:41.8052700Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:41.8153140Z 
+2026-10-17T18:08:41.8255270Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:41.8376070Z 243 |  */
+2026-10-17T18:08:41.8477540Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:41.8577650Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:41.8679310Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:41.8779230Z 246 | 
+2026-10-17T18:08:41.8879660Z 247 | /*!
+2026-10-17T18:08:41.8981010Z 
+2026-10-17T18:08:41.9083630Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:41.9182690Z    4 | import CoreVideo
+2026-10-17T18:08:41.9283480Z    5 | import Foundation
+2026-10-17T18:08:41.9384000Z    6 | import Metal
+2026-10-17T18:08:41.9485010Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:41.9585290Z    7 | import OSLog
+2026-10-17T18:08:41.9685760Z    8 | import QuartzCore
+2026-10-17T18:08:41.9786560Z 
+2026-10-17T18:08:41.9887750Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:41.9988380Z [343/408] Compiling IlliquidNativePlayback PlaybackGeneration.swift
+2026-10-17T18:08:42.0091870Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:42.0190180Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:42.0290760Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:42.0392430Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:42.0492490Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:42.0594080Z 1153 |                     completion(.failure(
+2026-10-17T18:08:42.0695500Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:42.0795380Z 
+2026-10-17T18:08:42.0897120Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:42.0997570Z 243 |  */
+2026-10-17T18:08:42.1098290Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:42.1198940Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:42.1299830Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:42.1400950Z 246 | 
+2026-10-17T18:08:42.1540050Z 247 | /*!
+2026-10-17T18:08:42.1640420Z 
+2026-10-17T18:08:42.1743250Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:42.1852150Z    4 | import CoreVideo
+2026-10-17T18:08:42.1954220Z    5 | import Foundation
+2026-10-17T18:08:42.2055880Z    6 | import Metal
+2026-10-17T18:08:42.2157640Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:42.2259910Z    7 | import OSLog
+2026-10-17T18:08:42.2381970Z    8 | import QuartzCore
+2026-10-17T18:08:42.2483090Z 
+2026-10-17T18:08:42.2585060Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:42.2687120Z [344/408] Compiling IlliquidNativePlayback SeekCoordinator.swift
+2026-10-17T18:08:42.2790290Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:42.2893370Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:42.2993670Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:42.3095600Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:42.3200850Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:42.3297720Z 1153 |                     completion(.failure(
+2026-10-17T18:08:42.3398760Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:42.3499540Z 
+2026-10-17T18:08:42.3605750Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:42.3704250Z 243 |  */
+2026-10-17T18:08:42.3807070Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:42.3908570Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:42.4018710Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:42.4121660Z 246 | 
+2026-10-17T18:08:42.4226280Z 247 | /*!
+2026-10-17T18:08:42.4324270Z 
+2026-10-17T18:08:42.4425940Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:42.4528340Z    4 | import CoreVideo
+2026-10-17T18:08:42.4636310Z    5 | import Foundation
+2026-10-17T18:08:42.4737460Z    6 | import Metal
+2026-10-17T18:08:42.4838410Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:42.4938970Z    7 | import OSLog
+2026-10-17T18:08:42.5039140Z    8 | import QuartzCore
+2026-10-17T18:08:42.5140050Z 
+2026-10-17T18:08:42.5241280Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:42.5341930Z [345/408] Compiling IlliquidNativePlayback SeekPerformanceTimings.swift
+2026-10-17T18:08:42.5445930Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:42.5545030Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:42.5646020Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:42.5747780Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:42.5848260Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:42.5948930Z 1153 |                     completion(.failure(
+2026-10-17T18:08:42.6050260Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:42.6150510Z 
+2026-10-17T18:08:42.6252870Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:42.6355580Z 243 |  */
+2026-10-17T18:08:42.6457870Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:42.6559800Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:42.6661290Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:42.6763980Z 246 | 
+2026-10-17T18:08:42.6865380Z 247 | /*!
+2026-10-17T18:08:42.6966060Z 
+2026-10-17T18:08:42.7068460Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:42.7170850Z    4 | import CoreVideo
+2026-10-17T18:08:42.7290170Z    5 | import Foundation
+2026-10-17T18:08:42.7392570Z    6 | import Metal
+2026-10-17T18:08:42.7494410Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:42.7595980Z    7 | import OSLog
+2026-10-17T18:08:42.7697360Z    8 | import QuartzCore
+2026-10-17T18:08:42.7799950Z 
+2026-10-17T18:08:42.7901310Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:42.8002710Z [346/408] Compiling IlliquidNativePlayback SeekPrerollDecodePolicy.swift
+2026-10-17T18:08:42.8107160Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:42.8211030Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:42.8312800Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:42.8413980Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:42.8516100Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:42.8618460Z 1153 |                     completion(.failure(
+2026-10-17T18:08:42.8719650Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:42.8820850Z 
+2026-10-17T18:08:42.8925870Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:42.9028810Z 243 |  */
+2026-10-17T18:08:42.9131090Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:42.9613860Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:42.9946120Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.0146850Z 246 | 
+2026-10-17T18:08:43.0249030Z 247 | /*!
+2026-10-17T18:08:43.0351260Z 
+2026-10-17T18:08:43.0452930Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.0555060Z    4 | import CoreVideo
+2026-10-17T18:08:43.0555390Z    5 | import Foundation
+2026-10-17T18:08:43.0656360Z    6 | import Metal
+2026-10-17T18:08:43.0758070Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.0859390Z    7 | import OSLog
+2026-10-17T18:08:43.0960460Z    8 | import QuartzCore
+2026-10-17T18:08:43.1061260Z 
+2026-10-17T18:08:43.1163550Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.1266790Z [347/408] Compiling IlliquidNativePlayback SoftwareSeekAccelerationPolicy.swift
+2026-10-17T18:08:43.1369330Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.1471340Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.1577390Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.1678840Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.1743510Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.1754800Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.1756260Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.1857040Z 
+2026-10-17T18:08:43.1958530Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.2060780Z 243 |  */
+2026-10-17T18:08:43.2162970Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.2230940Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.2232560Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.2258850Z 246 | 
+2026-10-17T18:08:43.2259410Z 247 | /*!
+2026-10-17T18:08:43.2260400Z 
+2026-10-17T18:08:43.2279130Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.2281010Z    4 | import CoreVideo
+2026-10-17T18:08:43.2282250Z    5 | import Foundation
+2026-10-17T18:08:43.2283140Z    6 | import Metal
+2026-10-17T18:08:43.2294050Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.2295080Z    7 | import OSLog
+2026-10-17T18:08:43.2295750Z    8 | import QuartzCore
+2026-10-17T18:08:43.2296900Z 
+2026-10-17T18:08:43.2297650Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.2299270Z [348/408] Compiling IlliquidNativePlayback NativeAudioDeviceMonitor.swift
+2026-10-17T18:08:43.2404710Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.2536740Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.2656640Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.2758340Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.2859800Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.2911310Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.2982870Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.3006170Z 
+2026-10-17T18:08:43.3028220Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.3034600Z 243 |  */
+2026-10-17T18:08:43.3035350Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.3036280Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.3037220Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.3038150Z 246 | 
+2026-10-17T18:08:43.3038770Z 247 | /*!
+2026-10-17T18:08:43.3039130Z 
+2026-10-17T18:08:43.3040190Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.3041480Z    4 | import CoreVideo
+2026-10-17T18:08:43.3161170Z    5 | import Foundation
+2026-10-17T18:08:43.3324540Z    6 | import Metal
+2026-10-17T18:08:43.3528390Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.3629730Z    7 | import OSLog
+2026-10-17T18:08:43.3730780Z    8 | import QuartzCore
+2026-10-17T18:08:43.3833840Z 
+2026-10-17T18:08:43.3941030Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4015990Z [349/408] Compiling IlliquidNativePlayback NativeMetalShaderLibrary.swift
+2026-10-17T18:08:43.4088890Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4186400Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4216050Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4216970Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4218380Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4219480Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4220010Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4220410Z 
+2026-10-17T18:08:43.4222630Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4229220Z 243 |  */
+2026-10-17T18:08:43.4238060Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4238830Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4240000Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4241040Z 246 | 
+2026-10-17T18:08:43.4242260Z 247 | /*!
+2026-10-17T18:08:43.4250490Z 
+2026-10-17T18:08:43.4251570Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4256870Z    4 | import CoreVideo
+2026-10-17T18:08:43.4257970Z    5 | import Foundation
+2026-10-17T18:08:43.4258250Z    6 | import Metal
+2026-10-17T18:08:43.4258650Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4259110Z    7 | import OSLog
+2026-10-17T18:08:43.4259370Z    8 | import QuartzCore
+2026-10-17T18:08:43.4259480Z 
+2026-10-17T18:08:43.4260000Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4261110Z [350/408] Compiling IlliquidNativePlayback NativePictureInPictureController.swift
+2026-10-17T18:08:43.4262560Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4264890Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4265820Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4266320Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4267100Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4270570Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4271190Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4271560Z 
+2026-10-17T18:08:43.4272740Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4274700Z 243 |  */
+2026-10-17T18:08:43.4277960Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4278550Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4279100Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4280070Z 246 | 
+2026-10-17T18:08:43.4280300Z 247 | /*!
+2026-10-17T18:08:43.4281090Z 
+2026-10-17T18:08:43.4281820Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4283530Z    4 | import CoreVideo
+2026-10-17T18:08:43.4283770Z    5 | import Foundation
+2026-10-17T18:08:43.4284660Z    6 | import Metal
+2026-10-17T18:08:43.4285140Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4285890Z    7 | import OSLog
+2026-10-17T18:08:43.4286440Z    8 | import QuartzCore
+2026-10-17T18:08:43.4286630Z 
+2026-10-17T18:08:43.4287080Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4287710Z [351/408] Compiling IlliquidNativePlayback NativePlayerView.swift
+2026-10-17T18:08:43.4288840Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4289790Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4290140Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4290580Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4291240Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4292470Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4295740Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4295990Z 
+2026-10-17T18:08:43.4296900Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4298080Z 243 |  */
+2026-10-17T18:08:43.4298310Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4298710Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4299180Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4301440Z 246 | 
+2026-10-17T18:08:43.4301790Z 247 | /*!
+2026-10-17T18:08:43.4301910Z 
+2026-10-17T18:08:43.4302600Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4303370Z    4 | import CoreVideo
+2026-10-17T18:08:43.4303610Z    5 | import Foundation
+2026-10-17T18:08:43.4303850Z    6 | import Metal
+2026-10-17T18:08:43.4304360Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4307400Z    7 | import OSLog
+2026-10-17T18:08:43.4309500Z    8 | import QuartzCore
+2026-10-17T18:08:43.4309680Z 
+2026-10-17T18:08:43.4310140Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4310740Z [352/408] Compiling IlliquidNativePlayback NativePresentationCoordinator.swift
+2026-10-17T18:08:43.4312680Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4313770Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4314290Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4339030Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4339720Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4340360Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4340670Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4340870Z 
+2026-10-17T18:08:43.4346220Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4347330Z 243 |  */
+2026-10-17T18:08:43.4347530Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4347810Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4348210Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4348650Z 246 | 
+2026-10-17T18:08:43.4348860Z 247 | /*!
+2026-10-17T18:08:43.4348970Z 
+2026-10-17T18:08:43.4349640Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4350540Z    4 | import CoreVideo
+2026-10-17T18:08:43.4352130Z    5 | import Foundation
+2026-10-17T18:08:43.4352730Z    6 | import Metal
+2026-10-17T18:08:43.4353670Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4354890Z    7 | import OSLog
+2026-10-17T18:08:43.4355470Z    8 | import QuartzCore
+2026-10-17T18:08:43.4355870Z 
+2026-10-17T18:08:43.4358140Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4358810Z [353/408] Compiling IlliquidNativePlayback NativeScreenshot.swift
+2026-10-17T18:08:43.4359730Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4360710Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4360960Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4361270Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4361850Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4362380Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4362630Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4362790Z 
+2026-10-17T18:08:43.4363520Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4364370Z 243 |  */
+2026-10-17T18:08:43.4364510Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4364760Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4365140Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4365460Z 246 | 
+2026-10-17T18:08:43.4365570Z 247 | /*!
+2026-10-17T18:08:43.4365660Z 
+2026-10-17T18:08:43.4366270Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4367080Z    4 | import CoreVideo
+2026-10-17T18:08:43.4367330Z    5 | import Foundation
+2026-10-17T18:08:43.4367580Z    6 | import Metal
+2026-10-17T18:08:43.4367990Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4368400Z    7 | import OSLog
+2026-10-17T18:08:43.4368580Z    8 | import QuartzCore
+2026-10-17T18:08:43.4368720Z 
+2026-10-17T18:08:43.4369100Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4370150Z [354/408] Compiling IlliquidNativePlayback PiPSubtitleCompositionPolicy.swift
+2026-10-17T18:08:43.4372270Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4374910Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4375710Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4376560Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4378210Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4380190Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4380900Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4381640Z 
+2026-10-17T18:08:43.4382480Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4383580Z 243 |  */
+2026-10-17T18:08:43.4383760Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4384020Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4385430Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4385880Z 246 | 
+2026-10-17T18:08:43.4386100Z 247 | /*!
+2026-10-17T18:08:43.4386240Z 
+2026-10-17T18:08:43.4386990Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4387930Z    4 | import CoreVideo
+2026-10-17T18:08:43.4388140Z    5 | import Foundation
+2026-10-17T18:08:43.4388320Z    6 | import Metal
+2026-10-17T18:08:43.4388700Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4389090Z    7 | import OSLog
+2026-10-17T18:08:43.4389240Z    8 | import QuartzCore
+2026-10-17T18:08:43.4389400Z 
+2026-10-17T18:08:43.4389710Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4390400Z [355/408] Compiling IlliquidNativePlayback PiPSubtitleCompositor.swift
+2026-10-17T18:08:43.4391490Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4392390Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4392720Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4393030Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4393590Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4394110Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4394350Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4394540Z 
+2026-10-17T18:08:43.4395270Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4396210Z 243 |  */
+2026-10-17T18:08:43.4396470Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4396850Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4397230Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4397880Z 246 | 
+2026-10-17T18:08:43.4398020Z 247 | /*!
+2026-10-17T18:08:43.4398090Z 
+2026-10-17T18:08:43.4398660Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4399480Z    4 | import CoreVideo
+2026-10-17T18:08:43.4399700Z    5 | import Foundation
+2026-10-17T18:08:43.4399970Z    6 | import Metal
+2026-10-17T18:08:43.4400410Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4400900Z    7 | import OSLog
+2026-10-17T18:08:43.4401050Z    8 | import QuartzCore
+2026-10-17T18:08:43.4401150Z 
+2026-10-17T18:08:43.4401480Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4403370Z [356/408] Compiling IlliquidNativePlayback PiPVideoMapping.swift
+2026-10-17T18:08:43.4405470Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4406730Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4406980Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4407570Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4408160Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4408680Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4408940Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4409110Z 
+2026-10-17T18:08:43.4409840Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4410690Z 243 |  */
+2026-10-17T18:08:43.4410870Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4411110Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4411540Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4412250Z 246 | 
+2026-10-17T18:08:43.4412370Z 247 | /*!
+2026-10-17T18:08:43.4412450Z 
+2026-10-17T18:08:43.4414110Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4415360Z    4 | import CoreVideo
+2026-10-17T18:08:43.4415530Z    5 | import Foundation
+2026-10-17T18:08:43.4415690Z    6 | import Metal
+2026-10-17T18:08:43.4416020Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4416380Z    7 | import OSLog
+2026-10-17T18:08:43.4416550Z    8 | import QuartzCore
+2026-10-17T18:08:43.4416660Z 
+2026-10-17T18:08:43.4417010Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4417600Z [357/408] Compiling IlliquidNativePlayback SampleBufferAudioPresenter.swift
+2026-10-17T18:08:43.4418540Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4419410Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4419650Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4419930Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4420800Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4421320Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4421570Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4421730Z 
+2026-10-17T18:08:43.4423410Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4425860Z 243 |  */
+2026-10-17T18:08:43.4426320Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4426960Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4427930Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4428790Z 246 | 
+2026-10-17T18:08:43.4429170Z 247 | /*!
+2026-10-17T18:08:43.4429630Z 
+2026-10-17T18:08:43.4431240Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4433200Z    4 | import CoreVideo
+2026-10-17T18:08:43.4433690Z    5 | import Foundation
+2026-10-17T18:08:43.4434710Z    6 | import Metal
+2026-10-17T18:08:43.4435590Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4436600Z    7 | import OSLog
+2026-10-17T18:08:43.4437020Z    8 | import QuartzCore
+2026-10-17T18:08:43.4437300Z 
+2026-10-17T18:08:43.4438080Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4439550Z [358/408] Compiling IlliquidNativePlayback SampleBufferVideoPresenter.swift
+2026-10-17T18:08:43.4442020Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4444630Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4444900Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4445220Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4445900Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4446430Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4446680Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4446860Z 
+2026-10-17T18:08:43.4447630Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4448490Z 243 |  */
+2026-10-17T18:08:43.4448640Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4448870Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4449210Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4449540Z 246 | 
+2026-10-17T18:08:43.4449680Z 247 | /*!
+2026-10-17T18:08:43.4449770Z 
+2026-10-17T18:08:43.4450470Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4451270Z    4 | import CoreVideo
+2026-10-17T18:08:43.4451710Z    5 | import Foundation
+2026-10-17T18:08:43.4451920Z    6 | import Metal
+2026-10-17T18:08:43.4453070Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4453640Z    7 | import OSLog
+2026-10-17T18:08:43.4453800Z    8 | import QuartzCore
+2026-10-17T18:08:43.4453940Z 
+2026-10-17T18:08:43.4454460Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4455070Z [359/408] Compiling IlliquidNativePlayback VideoFrameColorSampler.swift
+2026-10-17T18:08:43.4456650Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4457730Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4458060Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4458380Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4459000Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4459590Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4459850Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4460010Z 
+2026-10-17T18:08:43.4460760Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4463970Z 243 |  */
+2026-10-17T18:08:43.4464430Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4465080Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4466010Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4467130Z 246 | 
+2026-10-17T18:08:43.4467320Z 247 | /*!
+2026-10-17T18:08:43.4467420Z 
+2026-10-17T18:08:43.4468100Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4468950Z    4 | import CoreVideo
+2026-10-17T18:08:43.4469140Z    5 | import Foundation
+2026-10-17T18:08:43.4469310Z    6 | import Metal
+2026-10-17T18:08:43.4469650Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4470050Z    7 | import OSLog
+2026-10-17T18:08:43.4470210Z    8 | import QuartzCore
+2026-10-17T18:08:43.4470320Z 
+2026-10-17T18:08:43.4470640Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4472040Z [360/408] Compiling IlliquidNativePlayback VideoViewport.swift
+2026-10-17T18:08:43.4473660Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4474810Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4475170Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4475510Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4476170Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4476950Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4477330Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4477510Z 
+2026-10-17T18:08:43.4480470Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4481520Z 243 |  */
+2026-10-17T18:08:43.4481690Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4482020Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4482630Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4483350Z 246 | 
+2026-10-17T18:08:43.4483500Z 247 | /*!
+2026-10-17T18:08:43.4483580Z 
+2026-10-17T18:08:43.4484170Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4484930Z    4 | import CoreVideo
+2026-10-17T18:08:43.4485110Z    5 | import Foundation
+2026-10-17T18:08:43.4485270Z    6 | import Metal
+2026-10-17T18:08:43.4485650Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4486050Z    7 | import OSLog
+2026-10-17T18:08:43.4486210Z    8 | import QuartzCore
+2026-10-17T18:08:43.4486350Z 
+2026-10-17T18:08:43.4486760Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:43.4487450Z [361/408] Compiling IlliquidNativePlayback NativeOperationTransaction.swift
+2026-10-17T18:08:43.4490870Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4494470Z 1150 |             self.workQueue.async {
+2026-10-17T18:08:43.4494740Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-17T18:08:43.4495030Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-17T18:08:43.4495620Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-17T18:08:43.4496180Z 1153 |                     completion(.failure(
+2026-10-17T18:08:43.4496420Z 1154 |                         commandBuffer.error
+2026-10-17T18:08:43.4496590Z 
+2026-10-17T18:08:43.4497300Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4500130Z 243 |  */
+2026-10-17T18:08:43.4500580Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-17T18:08:43.4501210Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-17T18:08:43.4502180Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-17T18:08:43.4503080Z 246 | 
+2026-10-17T18:08:43.4503430Z 247 | /*!
+2026-10-17T18:08:43.4503630Z 
+2026-10-17T18:08:43.4505230Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4507390Z    4 | import CoreVideo
+2026-10-17T18:08:43.4507980Z    5 | import Foundation
+2026-10-17T18:08:43.4508430Z    6 | import Metal
+2026-10-17T18:08:43.4509340Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-17T18:08:43.4510400Z    7 | import OSLog
+2026-10-17T18:08:43.4510840Z    8 | import QuartzCore
+2026-10-17T18:08:43.4511130Z 
+2026-10-17T18:08:43.4511930Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-17T18:08:51.9540770Z [372/408] Compiling IlliquidNativePlayback NativePausedReadbackDiagnostic.swift
+2026-10-17T18:08:51.9542310Z [373/408] Compiling IlliquidNativePlayback NativePlaybackRuntime.swift
+2026-10-17T18:08:51.9563280Z [374/408] Compiling IlliquidNativePlayback NativePlaybackSurfaceHost.swift
+2026-10-17T18:08:51.9590260Z [375/408] Compiling IlliquidNativePlayback NativeRecoveryController.swift
+2026-10-17T18:08:51.9621770Z [376/408] Compiling IlliquidNativePlayback NativeSynchronizationController.swift
+2026-10-17T18:08:51.9724690Z [377/408] Compiling IlliquidNativePlayback PlaybackRuntimeMetadata.swift
+2026-10-17T18:08:51.9758450Z [378/408] Compiling IlliquidNativePlayback RendererDemandGate.swift
+2026-10-17T18:08:51.9772270Z [379/408] Compiling IlliquidNativePlayback VideoFrameCapacityGate.swift
+2026-10-17T18:08:51.9817900Z [380/408] Compiling IlliquidNativePlayback BitmapSubtitleTimeline.swift
+2026-10-17T18:08:51.9847710Z [381/408] Compiling IlliquidNativePlayback FontAttachmentStore.swift
+2026-10-17T18:08:51.9853120Z [382/408] Compiling IlliquidNativePlayback LibassContext.swift
+2026-10-17T18:08:51.9853940Z [383/408] Compiling IlliquidNativePlayback MetalASSSubtitleCompositor.swift
+2026-10-17T18:08:51.9855840Z [384/408] Compiling IlliquidNativePlayback PGSSubtitlePresentation.swift
+2026-10-17T18:08:51.9881780Z [385/408] Compiling IlliquidNativePlayback PreparedExternalSubtitle.swift
+2026-10-17T18:08:51.9891410Z [386/408] Compiling IlliquidNativePlayback SubtitleGeometry.swift
+2026-10-17T18:08:51.9894230Z [387/408] Compiling IlliquidNativePlayback SubtitleMemoryBudget.swift
+2026-10-17T18:08:51.9895060Z [388/408] Compiling IlliquidNativePlayback SubtitleOverlayView.swift
+2026-10-17T18:08:51.9938330Z [389/408] Compiling IlliquidNativePlayback SubtitlePipeline.swift
+2026-10-17T18:08:51.9968450Z [390/408] Compiling IlliquidNativePlayback SubtitleRevisionFence.swift
+2026-10-17T18:08:52.0004380Z [391/408] Compiling IlliquidNativePlayback resource_bundle_accessor.swift
+2026-10-17T18:08:55.4597350Z [392/454] Compiling IlliquidNativePlaybackTests AudioDelayTests.swift
+2026-10-17T18:08:55.4716280Z [393/454] Compiling IlliquidNativePlaybackTests AudioOutputNotificationTests.swift
+2026-10-17T18:08:55.4838330Z [394/454] Compiling IlliquidNativePlaybackTests AudioResamplerDrainTests.swift
+2026-10-17T18:08:55.4940170Z [395/454] Emitting module IlliquidPlayer
+2026-10-17T18:08:56.7881550Z [396/456] Compiling IlliquidPlayer PlaybackVideoColorStore.swift
+2026-10-17T18:08:56.7983710Z [397/456] Compiling IlliquidPlayer PlayerCapabilityModel.swift
+2026-10-17T18:08:58.0602920Z [398/456] Compiling IlliquidRenderProfile main.swift
+2026-10-17T18:08:58.0704060Z [399/456] Emitting module IlliquidRenderProfile
+2026-10-17T18:09:02.2334120Z [400/458] Compiling IlliquidNativePlaybackTests AudioSampleSanitizationTests.swift
+2026-10-17T18:09:02.2428110Z [401/458] Compiling IlliquidNativePlaybackTests BitmapSubtitleTests.swift
+2026-10-17T18:09:02.2530580Z [402/458] Compiling IlliquidNativePlaybackTests DifferentialHarnessTests.swift
+2026-10-17T18:09:02.2734360Z [402/458] Write Objects.LinkFileList
+2026-10-17T18:09:03.4921290Z [404/461] Emitting module IlliquidDifferentialHarness
+2026-10-17T18:09:03.5021050Z [405/461] Compiling IlliquidDifferentialHarness main.swift
+2026-10-17T18:09:05.9169840Z [405/461] Linking IlliquidRenderProfile
+2026-10-17T18:09:07.1140570Z [407/463] Emitting module IlliquidPlaybackStress
+2026-10-17T18:09:07.1241890Z [408/463] Compiling IlliquidPlaybackStress main.swift
+2026-10-17T18:09:07.2288390Z [408/463] Applying IlliquidRenderProfile
+2026-10-17T18:09:08.0209270Z [410/465] Compiling IlliquidArchitectureCheck main.swift
+2026-10-17T18:09:08.0314470Z [411/465] Emitting module IlliquidArchitectureCheck
+2026-10-17T18:09:30.6891950Z [412/501] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+2026-10-17T18:09:30.6995820Z [413/501] Compiling IlliquidPlayerTests ThumbnailDeadlineQualificationTests.swift
+2026-10-17T18:09:30.7098510Z [414/501] Emitting module IlliquidPlayerTests
+2026-10-17T18:09:30.7841810Z [414/501] Write Objects.LinkFileList
+2026-10-17T18:09:31.7016180Z [417/501] Compiling IlliquidApp AppDelegate.swift
+2026-10-17T18:09:31.7125030Z [418/501] Compiling IlliquidApp AppModel.swift
+2026-10-17T18:09:31.7226190Z [419/501] Compiling IlliquidApp AppUpdateController.swift
+2026-10-17T18:09:31.7336950Z [420/501] Compiling IlliquidApp BenchmarkPlaybackControl.swift
+2026-10-17T18:09:31.7438590Z [421/501] Compiling IlliquidApp DefaultVideoPlayer.swift
+2026-10-17T18:09:31.7539690Z [422/501] Compiling IlliquidApp IlliquidApp.swift
+2026-10-17T18:09:31.7639890Z [423/501] Compiling IlliquidApp LaunchOpenQueue.swift
+2026-10-17T18:09:31.7741150Z [424/501] Compiling IlliquidApp NowPlayingCoordinator.swift
+2026-10-17T18:09:31.7844020Z [425/501] Compiling IlliquidApp OpenVideoTabStore.swift
+2026-10-17T18:09:31.7948670Z [426/501] Compiling IlliquidApp PlaybackChromeController.swift
+2026-10-17T18:09:31.8050660Z [427/501] Compiling IlliquidApp PlaybackOSD.swift
+2026-10-17T18:09:31.8153390Z [428/501] Compiling IlliquidApp PlaybackSystemCoordinator.swift
+2026-10-17T18:09:31.8260710Z [429/501] Compiling IlliquidApp PlayerCommands.swift
+2026-10-17T18:09:31.8362820Z [430/501] Compiling IlliquidApp PlayerInteractionModel.swift
+2026-10-17T18:09:31.8484190Z [431/501] Compiling IlliquidApp PlayerShortcutBindings.swift
+2026-10-17T18:09:31.8587310Z [432/501] Compiling IlliquidApp PlayerUXPolicy.swift
+2026-10-17T18:09:31.8689900Z [433/501] Compiling IlliquidApp ReadOnlyStartupLoader.swift
+2026-10-17T18:09:31.8792330Z [434/501] Compiling IlliquidApp SourceRootIndex.swift
+2026-10-17T18:09:36.9520600Z [434/518] Linking IlliquidPlaybackStress
+2026-10-17T18:09:40.5813520Z [435/518] Linking IlliquidDifferentialHarness
+2026-10-17T18:09:40.6644430Z [436/518] Applying IlliquidPlaybackStress
+2026-10-17T18:09:40.7815920Z [437/518] Applying IlliquidDifferentialHarness
+2026-10-17T18:09:40.7953830Z [438/518] Write Objects.LinkFileList
+2026-10-17T18:09:43.6052970Z [439/518] Linking IlliquidArchitectureCheck
+2026-10-17T18:09:43.6774650Z [440/518] Applying IlliquidArchitectureCheck
+2026-10-17T18:09:46.5246890Z [442/518] Compiling IlliquidApp SourceRootPruning.swift
+2026-10-17T18:09:46.5247960Z [443/518] Compiling IlliquidApp SourceStartupSnapshot.swift
+2026-10-17T18:09:46.5351100Z [444/518] Compiling IlliquidApp ThumbnailBackgroundScheduler.swift
+2026-10-17T18:09:46.5452900Z [445/518] Compiling IlliquidApp ThumbnailWindowObservation.swift
+2026-10-17T18:09:46.5554400Z [446/518] Compiling IlliquidApp WindowCloseBehavior.swift
+2026-10-17T18:09:46.5676380Z [447/518] Compiling IlliquidApp AdaptiveTextLegibility.swift
+2026-10-17T18:09:46.5751890Z [448/518] Compiling IlliquidApp ElasticPlaybackControlBar.swift
+2026-10-17T18:09:46.5854320Z [449/518] Compiling IlliquidApp GoToTimeView.swift
+2026-10-17T18:09:46.5955490Z [450/518] Compiling IlliquidApp IlliquidMotion.swift
+2026-10-17T18:09:46.6056710Z [451/518] Compiling IlliquidApp OpenVideoTabBar.swift
+2026-10-17T18:09:46.6157920Z [452/518] Compiling IlliquidApp PlaybackControlBar.swift
+2026-10-17T18:09:46.6259230Z [453/518] Compiling IlliquidApp PlaybackControlBarHost.swift
+2026-10-17T18:09:46.6360800Z [454/518] Compiling IlliquidApp PlaybackRecoveryView.swift
+2026-10-17T18:09:46.6462040Z [455/518] Compiling IlliquidApp PlayerInterfaceScale.swift
+2026-10-17T18:09:46.6566360Z [456/518] Compiling IlliquidApp PlayerOverlayMaterial.swift
+2026-10-17T18:09:46.6668790Z [457/518] Compiling IlliquidApp PlayerRootView.swift
+2026-10-17T18:09:46.6770720Z [458/518] Compiling IlliquidApp PlayerTheme.swift
+2026-10-17T18:09:46.6873440Z [459/518] Emitting module IlliquidApp
+2026-10-17T18:09:55.0285200Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.0385190Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.0487640Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.0588800Z 168 |         weak var released = first
+2026-10-17T18:09:55.0690030Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.0794770Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.0897650Z 170 |         first = nil
+2026-10-17T18:09:55.1001640Z 
+2026-10-17T18:09:55.1102930Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.1207180Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.1311530Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.1413870Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.1514990Z 168 |         weak var released = first
+2026-10-17T18:09:55.1617460Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.1719480Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.1820510Z 170 |         first = nil
+2026-10-17T18:09:55.1932490Z 
+2026-10-17T18:09:55.2033850Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.2135950Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.2239920Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.2345550Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.2446780Z 168 |         weak var released = first
+2026-10-17T18:09:55.2548370Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.2549000Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.2651100Z 170 |         first = nil
+2026-10-17T18:09:55.2752090Z 
+2026-10-17T18:09:55.2861380Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.2974590Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.3083450Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.3200960Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.3303300Z 168 |         weak var released = first
+2026-10-17T18:09:55.3406550Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.3514440Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.3616660Z 170 |         first = nil
+2026-10-17T18:09:55.3738160Z 
+2026-10-17T18:09:55.3839280Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.3955050Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.4057780Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.4160030Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.4262180Z 168 |         weak var released = first
+2026-10-17T18:09:55.4365240Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.4468960Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.4590710Z 170 |         first = nil
+2026-10-17T18:09:55.4693020Z 
+2026-10-17T18:09:55.4814480Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.4936080Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.5065810Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.5167370Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.5276530Z 168 |         weak var released = first
+2026-10-17T18:09:55.5380790Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.5492830Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.5594100Z 170 |         first = nil
+2026-10-17T18:09:55.5695450Z 
+2026-10-17T18:09:55.5797860Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.5900470Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.6006580Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.6108410Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.6210000Z 168 |         weak var released = first
+2026-10-17T18:09:55.6311620Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.6413460Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.6516550Z 170 |         first = nil
+2026-10-17T18:09:55.6619820Z 
+2026-10-17T18:09:55.6721020Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.6822990Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.6924810Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.7027540Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.7129490Z 168 |         weak var released = first
+2026-10-17T18:09:55.7232040Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.7334190Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.7436240Z 170 |         first = nil
+2026-10-17T18:09:55.7537900Z 
+2026-10-17T18:09:55.7639410Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.7741840Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.7844420Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.7948250Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.8049470Z 168 |         weak var released = first
+2026-10-17T18:09:55.8179120Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.8281830Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.8401270Z 170 |         first = nil
+2026-10-17T18:09:55.8502330Z 
+2026-10-17T18:09:55.8604100Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.8607320Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.8729160Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.8868570Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.8986700Z 168 |         weak var released = first
+2026-10-17T18:09:55.9088300Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.9190010Z 169 |         ring.append(first!)
+2026-10-17T18:09:55.9291130Z 170 |         first = nil
+2026-10-17T18:09:55.9391710Z 
+2026-10-17T18:09:55.9492740Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:55.9594770Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:55.9698490Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:55.9800910Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:55.9916770Z 168 |         weak var released = first
+2026-10-17T18:09:56.0019210Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.0121520Z 169 |         ring.append(first!)
+2026-10-17T18:09:56.0222640Z 170 |         first = nil
+2026-10-17T18:09:56.0329890Z 
+2026-10-17T18:09:56.0432050Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:56.0557770Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.0682350Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:56.0783590Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:56.0884730Z 168 |         weak var released = first
+2026-10-17T18:09:56.0986400Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.1087930Z 169 |         ring.append(first!)
+2026-10-17T18:09:56.1190100Z 170 |         first = nil
+2026-10-17T18:09:56.1291420Z 
+2026-10-17T18:09:56.1392650Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:56.1495060Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.1597530Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:56.1699760Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:56.1801620Z 168 |         weak var released = first
+2026-10-17T18:09:56.1921170Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.2023870Z 169 |         ring.append(first!)
+2026-10-17T18:09:56.2125840Z 170 |         first = nil
+2026-10-17T18:09:56.2126040Z 
+2026-10-17T18:09:56.2227080Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:56.2328980Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.2430590Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:56.2532370Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:56.2633810Z 168 |         weak var released = first
+2026-10-17T18:09:56.2735060Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.2839270Z 169 |         ring.append(first!)
+2026-10-17T18:09:56.2941820Z 170 |         first = nil
+2026-10-17T18:09:56.3071010Z 
+2026-10-17T18:09:56.3173840Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:56.3319850Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.3431960Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:56.3538810Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:56.3551620Z 168 |         weak var released = first
+2026-10-17T18:09:56.3553020Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.3659710Z 169 |         ring.append(first!)
+2026-10-17T18:09:56.3779710Z 170 |         first = nil
+2026-10-17T18:09:56.3880790Z 
+2026-10-17T18:09:56.3982190Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:56.4095100Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.4203680Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:56.4306440Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:56.4423380Z 168 |         weak var released = first
+2026-10-17T18:09:56.4667060Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.4680270Z 169 |         ring.append(first!)
+2026-10-17T18:09:56.4825160Z 170 |         first = nil
+2026-10-17T18:09:56.4953020Z 
+2026-10-17T18:09:56.5063970Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:56.5167370Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.5269230Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:56.5377170Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:56.5478670Z 168 |         weak var released = first
+2026-10-17T18:09:56.5585390Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.5688170Z 169 |         ring.append(first!)
+2026-10-17T18:09:56.5789750Z 170 |         first = nil
+2026-10-17T18:09:56.5891100Z 
+2026-10-17T18:09:56.5992200Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:56.6093700Z [477/518] Compiling IlliquidApp PlayerWindowControls.swift
+2026-10-17T18:09:56.6195590Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.6297920Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:56.6401540Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:56.6504670Z 168 |         weak var released = first
+2026-10-17T18:09:56.6606470Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:56.6708030Z 169 |         ring.append(first!)
+2026-10-17T18:09:56.6809680Z 170 |         first = nil
+2026-10-17T18:09:56.6911020Z 
+2026-10-17T18:09:56.7012290Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:57.4346500Z [496/536] Emitting module IlliquidNativePlaybackTests
+2026-10-17T18:09:57.4456250Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:57.4555980Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-17T18:09:57.4657370Z 167 |         var first: Value? = Value()
+2026-10-17T18:09:57.4758750Z 168 |         weak var released = first
+2026-10-17T18:09:57.4861020Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-17T18:09:57.4961640Z 169 |         ring.append(first!)
+2026-10-17T18:09:57.5064190Z 170 |         first = nil
+2026-10-17T18:09:57.5164660Z 
+2026-10-17T18:09:57.5265710Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-17T18:09:58.3069690Z [498/536] Compiling IlliquidNativePlaybackTests RendererObservationBoundsTests.swift
+2026-10-17T18:09:58.3071200Z [499/536] Compiling IlliquidNativePlaybackTests RuntimeAuthorityFenceTests.swift
+2026-10-17T18:09:58.3072040Z [500/536] Compiling IlliquidNativePlaybackTests SeekPerformanceQualificationTests.swift
+2026-10-17T18:09:58.3072670Z [501/536] Compiling IlliquidNativePlaybackTests SeekPrerollDecodeTests.swift
+2026-10-17T18:09:58.3073470Z [502/536] Compiling IlliquidNativePlaybackTests SoftwareSeekAccelerationTests.swift
+2026-10-17T18:09:58.3074180Z [503/536] Compiling IlliquidNativePlaybackTests SoftwareVideoColorConversionTests.swift
+2026-10-17T18:09:58.3074850Z [504/536] Compiling IlliquidNativePlaybackTests SubtitleSeekRegressionTests.swift
+2026-10-17T18:09:58.3075840Z [505/536] Compiling IlliquidNativePlaybackTests ThumbnailCacheQualificationTests.swift
+2026-10-17T18:09:58.3077390Z [506/536] Compiling IlliquidNativePlaybackTests ThumbnailInventoryRegressionTests.swift
+2026-10-17T18:09:58.3078420Z [507/536] Compiling IlliquidNativePlaybackTests ThumbnailOptimizationQualificationTests.swift
+2026-10-17T18:09:58.3079360Z [508/536] Compiling IlliquidNativePlaybackTests ThumbnailPacketWindowTests.swift
+2026-10-17T18:09:58.3080050Z [509/536] Compiling IlliquidNativePlaybackTests ThumbnailPhysicalEntryTests.swift
+2026-10-17T18:09:58.3080860Z [510/536] Compiling IlliquidNativePlaybackTests ThumbnailPlaybackAdmissionTests.swift
+2026-10-17T18:09:58.3081680Z [511/536] Compiling IlliquidNativePlaybackTests ThumbnailPriorityTests.swift
+2026-10-17T18:09:58.3082460Z [512/536] Compiling IlliquidNativePlaybackTests ThumbnailPromotionMailboxTests.swift
+2026-10-17T18:09:58.3083280Z [513/536] Compiling IlliquidNativePlaybackTests ThumbnailReleaseRegressionTests.swift
+2026-10-17T18:09:58.4432960Z [513/536] Write Objects.LinkFileList
+2026-10-17T18:10:00.5720950Z [514/536] Linking Illiquid
+2026-10-17T18:10:00.6754360Z [515/536] Applying Illiquid
+2026-10-17T18:10:03.8741120Z [517/560] Emitting module IlliquidAppTests
+2026-10-17T18:10:13.8944090Z [518/571] Compiling IlliquidAppTests SourceRootPruningTests.swift
+2026-10-17T18:10:13.9106780Z [519/571] Compiling IlliquidAppTests SourceStartupSnapshotTests.swift
+2026-10-17T18:10:13.9107330Z [520/571] Compiling IlliquidAppTests SourceTabMergeTests.swift
+2026-10-17T18:10:13.9107810Z [521/571] Compiling IlliquidAppTests SourcesSidebarResizeCancellationTests.swift
+2026-10-17T18:10:13.9108590Z [522/571] Compiling IlliquidAppTests ThumbnailBackgroundSchedulerTests.swift
+2026-10-17T18:10:13.9109500Z [523/571] Compiling IlliquidAppTests ThumbnailLifecycleRegressionTests.swift
+2026-10-17T18:10:13.9110090Z [524/571] Compiling IlliquidAppTests TimelineDesignRegressionTests.swift
+2026-10-17T18:10:13.9110580Z [525/571] Compiling IlliquidAppTests TimelineThumbnailHoverPolicyTests.swift
+2026-10-17T18:10:13.9111100Z [526/571] Compiling IlliquidAppTests UXVerificationProbeTests.swift
+2026-10-17T18:10:13.9111820Z [527/571] Compiling IlliquidAppTests WindowAccessorTests.swift
+2026-10-17T18:10:13.9112290Z [528/571] Compiling IlliquidAppTests WindowCloseBehaviorTests.swift
+2026-10-17T18:10:13.9667070Z [545/571] Compiling IlliquidNativePlaybackTests VideoDeinterlacerTests.swift
+2026-10-17T18:10:13.9667850Z [546/571] Compiling IlliquidNativePlaybackTests VideoFrameColorSamplerTests.swift
+2026-10-17T18:10:31.6875500Z [547/571] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+2026-10-17T18:10:31.6878690Z [548/571] Compiling IlliquidAppTests AdaptiveTextColorAuditTests.swift
+2026-10-17T18:10:31.6891310Z [549/571] Compiling IlliquidAppTests AdaptiveTextLegibilityTests.swift
+2026-10-17T18:10:31.6893270Z [550/571] Compiling IlliquidAppTests AppUpdateControllerTests.swift
+2026-10-17T18:10:31.6894320Z [551/571] Compiling IlliquidAppTests DefaultVideoPlayerTests.swift
+2026-10-17T18:10:31.6895600Z [552/571] Compiling IlliquidAppTests GlassTextVisualQualificationTests.swift
+2026-10-17T18:10:31.6897580Z [553/571] Compiling IlliquidAppTests LaunchOpenQueueTests.swift
+2026-10-17T18:10:31.6898810Z [554/571] Compiling IlliquidAppTests OpenVideoTabStoreTests.swift
+2026-10-17T18:10:31.6900090Z [555/571] Compiling IlliquidAppTests PlaybackChromeAndSidebarTests.swift
+2026-10-17T18:10:31.6901370Z [556/571] Compiling IlliquidAppTests PlaybackOSDTitlebarTests.swift
+2026-10-17T18:10:31.6902750Z [557/571] Compiling IlliquidAppTests PlayerInterfaceScaleTests.swift
+2026-10-17T18:10:31.6903940Z [558/571] Compiling IlliquidAppTests PlayerShortcutBindingsTests.swift
+2026-10-17T18:10:31.6909470Z [559/571] Compiling IlliquidAppTests PlayerUXPolicyTests.swift
+2026-10-17T18:10:31.6910070Z [560/571] Compiling IlliquidAppTests PlayerWindowControlsTests.swift
+2026-10-17T18:10:31.6910560Z [561/571] Compiling IlliquidAppTests ProductMetadataTests.swift
+2026-10-17T18:10:31.6911010Z [562/571] Compiling IlliquidAppTests ReadOnlyStartupLoaderTests.swift
+2026-10-17T18:10:31.6911510Z [563/571] Compiling IlliquidAppTests SourceBrowserFilterTests.swift
+2026-10-17T18:10:31.6912950Z [564/571] Compiling IlliquidAppTests SourceEmptyFolderVisibilityTests.swift
+2026-10-17T18:10:31.6913480Z [565/571] Compiling IlliquidAppTests SourceFilesystemMonitorTests.swift
+2026-10-17T18:10:31.6914030Z [566/571] Compiling IlliquidAppTests SourceItemPreparationTests.swift
+2026-10-17T18:10:31.6914600Z [567/571] Compiling IlliquidAppTests SourceMediaOrganizationTests.swift
+2026-10-17T18:10:31.6915140Z [568/571] Compiling IlliquidAppTests SourceMediaPresenceScannerTests.swift
+2026-10-17T18:10:31.6915610Z [569/571] Compiling IlliquidAppTests SourceNavigationStateTests.swift
+2026-10-17T18:10:35.9027320Z [570/573] Compiling IlliquidPackageTests runner.swift
+2026-10-17T18:10:35.9128610Z [571/573] Emitting module IlliquidPackageTests
+2026-10-17T18:10:35.9229950Z [571/573] Write Objects.LinkFileList
+2026-10-17T18:10:39.4639360Z [572/573] Linking IlliquidPackageTests
+2026-10-17T18:10:39.4967160Z Build complete! (199.33s)
+2026-10-17T18:10:42.8118160Z Test Suite 'Selected tests' started at 2026-10-17 18:10:41.969.
+2026-10-17T18:10:42.8228800Z Test Suite 'IlliquidPackageTests.xctest' started at 2026-10-17 18:10:41.975.
+2026-10-17T18:10:42.8398350Z Test Suite 'IlliquidPackageTests.xctest' passed at 2026-10-17 18:10:41.975.
+2026-10-17T18:10:42.8499990Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+2026-10-17T18:10:42.8601460Z Test Suite 'Selected tests' passed at 2026-10-17 18:10:41.975.
+2026-10-17T18:10:42.8702850Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.006) seconds
+2026-10-17T18:10:42.8813340Z ◇ Test run started.
+2026-10-17T18:10:42.8920040Z ↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+2026-10-17T18:10:42.9021570Z ◇ Suite "Signed audio delay" started.
+2026-10-17T18:10:42.9123510Z ◇ Suite "Audio sample sanitization" started.
+2026-10-17T18:10:42.9225890Z ◇ Suite "Negotiated multichannel PCM" started.
+2026-10-17T18:10:42.9327540Z ◇ Suite "Native damaged-stream hardening policies" started.
+2026-10-17T18:10:42.9427830Z ◇ Suite "Audio resampler completion" started.
+2026-10-17T18:10:42.9531690Z ◇ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() started.
+2026-10-17T18:10:42.9637600Z ◇ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() started.
+2026-10-17T18:10:42.9739860Z ◇ Test unalignedExternalStorageAndPartialTailMatchReference() started.
+2026-10-17T18:10:42.9844890Z ◇ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() started.
+2026-10-17T18:10:42.9946980Z ◇ Test incompleteTrailingBytesRemainUntouched() started.
+2026-10-17T18:10:43.0052100Z ◇ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() started.
+2026-10-17T18:10:43.0150730Z ◇ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() started.
+2026-10-17T18:10:43.0252360Z ◇ Test decoderAndSampleBufferPreserveEachCanonicalChannel(channels:) started.
+2026-10-17T18:10:43.0354150Z ◇ Test routeCapacityChangeRevisesFormatAndRetainsTheMediaTimeFloor() started.
+2026-10-17T18:10:43.0454960Z ◇ Test speakerPositionsDistinguishSurroundFromArbitraryChannelCounts() started.
+2026-10-17T18:10:43.0562220Z ◇ Test discoveryRequiresBothStreamCapacityAndPreferredSpeakerLayout() started.
+2026-10-17T18:10:43.0658570Z ◇ Test everyDirtyLaneAndShortTailMatchesScalarClassification() started.
+2026-10-17T18:10:43.0760850Z ◇ Test surroundOutputNeverUpmixesAndUnknownRoutesKeepStereo() started.
+2026-10-17T18:10:43.0866060Z ◇ Test audioSanitizationZerosInvalidSamplesOnly() started.
+2026-10-17T18:10:43.0965640Z ◇ Test pausedMutedSessionSubmitsNegotiatedPCMAndShutsDown() started.
+2026-10-17T18:10:43.1068500Z ◇ Test positiveDelayAddsBoundedSilenceWithoutChangingSamples() started.
+2026-10-17T18:10:43.1171670Z ◇ Test case passing 1 argument channels → 6 to decoderAndSampleBufferPreserveEachCanonicalChannel(channels:) started.
+2026-10-17T18:10:43.1273560Z ◇ Test case passing 1 argument channels → 8 to decoderAndSampleBufferPreserveEachCanonicalChannel(channels:) started.
+2026-10-17T18:10:43.1375860Z ◇ Test eofPreservesAFullSecond(rate:) started.
+2026-10-17T18:10:43.1380160Z ◇ Test outputFormatChangePreservesBothTailsAndRevisions() started.
+2026-10-17T18:10:43.1489270Z ◇ Test seekFlushDiscardsOldTailAndRestartsGeneration() started.
+2026-10-17T18:10:43.1591560Z ✔ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() passed after 0.170 seconds.
+2026-10-17T18:10:43.1693320Z ✔ Test unalignedExternalStorageAndPartialTailMatchReference() passed after 0.171 seconds.
+2026-10-17T18:10:43.1795250Z ✔ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() passed after 0.171 seconds.
+2026-10-17T18:10:43.1896970Z ✔ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() passed after 0.171 seconds.
+2026-10-17T18:10:43.1998810Z ✔ Test incompleteTrailingBytesRemainUntouched() passed after 0.171 seconds.
+2026-10-17T18:10:43.2100550Z ✔ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() passed after 0.171 seconds.
+2026-10-17T18:10:43.2202500Z ✔ Test decoderAndSampleBufferPreserveEachCanonicalChannel(channels:) with 2 test cases passed after 0.171 seconds.
+2026-10-17T18:10:43.2304210Z ✔ Test routeCapacityChangeRevisesFormatAndRetainsTheMediaTimeFloor() passed after 0.171 seconds.
+2026-10-17T18:10:43.2406110Z ✔ Test speakerPositionsDistinguishSurroundFromArbitraryChannelCounts() passed after 0.171 seconds.
+2026-10-17T18:10:43.2507820Z ✔ Test discoveryRequiresBothStreamCapacityAndPreferredSpeakerLayout() passed after 0.172 seconds.
+2026-10-17T18:10:43.2609510Z ✔ Test surroundOutputNeverUpmixesAndUnknownRoutesKeepStereo() passed after 0.171 seconds.
+2026-10-17T18:10:43.2680370Z ◇ Test case passing 1 argument rate → 32000 to eofPreservesAFullSecond(rate:) started.
+2026-10-17T18:10:43.2755380Z ◇ Test case passing 1 argument rate → 44100 to eofPreservesAFullSecond(rate:) started.
+2026-10-17T18:10:43.2786230Z ◇ Test case passing 1 argument rate → 48000 to eofPreservesAFullSecond(rate:) started.
+2026-10-17T18:10:43.2787330Z ◇ Test case passing 1 argument rate → 96000 to eofPreservesAFullSecond(rate:) started.
+2026-10-17T18:10:43.2788200Z ✔ Test audioSanitizationZerosInvalidSamplesOnly() passed after 0.357 seconds.
+2026-10-17T18:10:43.2789090Z ✔ Test positiveDelayAddsBoundedSilenceWithoutChangingSamples() passed after 0.355 seconds.
+2026-10-17T18:10:43.2789900Z ✔ Test eofPreservesAFullSecond(rate:) with 4 test cases passed after 0.188 seconds.
+2026-10-17T18:10:43.2795630Z ✔ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() passed after 0.358 seconds.
+2026-10-17T18:10:43.2796580Z ✔ Test everyDirtyLaneAndShortTailMatchesScalarClassification() passed after 0.358 seconds.
+2026-10-17T18:10:43.2798250Z ✔ Test pausedMutedSessionSubmitsNegotiatedPCMAndShutsDown() passed after 0.358 seconds.
+2026-10-17T18:10:43.2799350Z ✔ Suite "Native damaged-stream hardening policies" passed after 0.358 seconds.
+2026-10-17T18:10:43.2800240Z ✔ Suite "Audio sample sanitization" passed after 0.359 seconds.
+2026-10-17T18:10:43.2801010Z ✔ Suite "Negotiated multichannel PCM" passed after 0.358 seconds.
+2026-10-17T18:10:43.2801720Z ◇ Test negativeDelayTrimsAtSampleBoundaryAndPadsExhaustedTail() started.
+2026-10-17T18:10:43.2802580Z ✔ Test negativeDelayTrimsAtSampleBoundaryAndPadsExhaustedTail() passed after 0.001 seconds.
+2026-10-17T18:10:43.2803340Z ◇ Test seekUsesMappedSourceSamplesAndCancelsLargeSilence() started.
+2026-10-17T18:10:43.2804140Z ✔ Test seekUsesMappedSourceSamplesAndCancelsLargeSilence() passed after 0.001 seconds.
+2026-10-17T18:10:43.2804990Z ◇ Test extremeOffsetsPrepareSeekAndReleaseWithoutVideoBackpressure() started.
+2026-10-17T18:10:43.2805830Z ✔ Test extremeOffsetsPrepareSeekAndReleaseWithoutVideoBackpressure() passed after 0.002 seconds.
+2026-10-17T18:10:43.2806730Z ◇ Test runtimeDelayReplacementPublishesCommittedValueAndStopWins() started.
+2026-10-17T18:10:43.2807550Z ✔ Test runtimeDelayReplacementPublishesCommittedValueAndStopWins() passed after 0.007 seconds.
+2026-10-17T18:10:43.2808340Z ✔ Suite "Signed audio delay" passed after 0.371 seconds.
+2026-10-17T18:10:43.2809020Z ✔ Test seekFlushDiscardsOldTailAndRestartsGeneration() passed after 0.212 seconds.
+2026-10-17T18:10:43.2810110Z ✔ Test outputFormatChangePreservesBothTailsAndRevisions() passed after 0.281 seconds.
+2026-10-17T18:10:43.2810880Z ✔ Suite "Audio resampler completion" passed after 0.453 seconds.
+2026-10-17T18:10:43.2811490Z ✔ Test run with 23 tests in 5 suites passed after 0.453 seconds.
+2026-10-17T18:10:43.3118420Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-17T18:10:43.3119000Z with:
+2026-10-17T18:10:43.3119260Z   name: pcm-sanitization-native-audio
+2026-10-17T18:10:43.3119690Z   path: /Users/runner/work/_temp/pcm-native-audio/
+2026-10-17T18:10:43.3120130Z   retention-days: 14
+2026-10-17T18:10:43.3120370Z   if-no-files-found: warn
+2026-10-17T18:10:43.3120630Z   compression-level: 6
+2026-10-17T18:10:43.3120870Z   overwrite: false
+2026-10-17T18:10:43.3121170Z   include-hidden-files: false
+2026-10-17T18:10:43.3121450Z env:
+2026-10-17T18:10:43.3121710Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T18:10:43.3124980Z   PKG_CONFIG_LIBDIR: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-17T18:10:43.3130630Z   PKG_CONFIG_PATH: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-17T18:10:43.3133590Z ##[endgroup]
+2026-10-17T18:10:44.1526400Z (node:8004) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-17T18:10:44.1583290Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-17T18:10:44.2731740Z With the provided path, there will be 1 file uploaded
+2026-10-17T18:10:44.2934270Z Artifact name is valid!
+2026-10-17T18:10:44.3034380Z Root directory input is valid!
+2026-10-17T18:10:44.4375290Z (node:8004) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-17T18:10:44.4427350Z Beginning upload of artifact content to blob storage
+2026-10-17T18:10:44.4823260Z Uploaded bytes 8377
+2026-10-17T18:10:44.5039630Z Finished uploading artifact content to blob storage!
+2026-10-17T18:10:44.5040410Z SHA256 digest of uploaded artifact zip is 1f44a97583b1c2b9840703ea6fb373fd5c8a94765ebc77c5e66909243e063761
+2026-10-17T18:10:44.5041940Z Finalizing artifact upload
+2026-10-17T18:10:44.7516410Z Artifact pcm-sanitization-native-audio.zip successfully finalized. Artifact ID 12109816301
+2026-10-17T18:10:44.7517680Z Artifact pcm-sanitization-native-audio has been successfully uploaded! Final size is 8377 bytes. Artifact ID is 12109816301
+2026-10-17T18:10:44.7518700Z Artifact download URL: https://github.com/Jagalite/illiquid/actions/runs/39056657414/artifacts/12109816301
+2026-10-17T18:10:44.7762120Z Post job cleanup.
+2026-10-17T18:10:44.9154840Z [command]/opt/homebrew/bin/git version
+2026-10-17T18:10:44.9410480Z git version 2.56.0
+2026-10-17T18:10:44.9513800Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/9310ee1f-4e8a-490e-99c1-64667a6f8c47/.gitconfig'
+2026-10-17T18:10:44.9562320Z Temporarily overriding HOME='/Users/runner/work/_temp/9310ee1f-4e8a-490e-99c1-64667a6f8c47' before making global git config changes
+2026-10-17T18:10:44.9644440Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T18:10:44.9745780Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-17T18:10:45.0051220Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T18:10:45.0359080Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T18:10:45.2041140Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T18:10:45.2345420Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T18:10:45.3660300Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T18:10:45.3880940Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T18:10:45.5041120Z Cleaning up orphan processes
+2026-10-17T18:10:48.5951080Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

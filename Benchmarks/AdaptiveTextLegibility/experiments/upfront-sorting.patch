@@ -1,0 +1,16 @@
+--- a/Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift
++++ b/Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift
+@@ -10,0 +11 @@
++    private let sortedLuminances: [Double]
+@@ -32,0 +34,3 @@
++        // Keep the original order for the RGB/luminance pairs used by opacity
++        // checks, and sort once for all of this region's opaque color scores.
++        sortedLuminances = luminances.sorted()
+@@ -43,3 +47,4 @@
+-        let ratios = luminances.map { Self.contrast(luminance, $0) }.sorted()
+-        guard !ratios.isEmpty else { return 1 }
+-        return ratios[Int(Double(ratios.count - 1) * 0.10)]
++        guard !sortedLuminances.isEmpty else { return 1 }
++        return AdaptiveRainbowTextColor.contrastQuantile(
++            luminance: luminance, sortedBackgrounds: sortedLuminances,
++            rank: Int(Double(sortedLuminances.count - 1) * 0.10))

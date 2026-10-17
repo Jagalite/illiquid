@@ -135,7 +135,9 @@ final class PlanarBufferOwnershipLedger: @unchecked Sendable {
             guard phase.rawValue >= checkout.phase.rawValue else { return }
             checkout.phase = phase
             checkouts[checkoutID] = checkout
-            updatePeaksLocked()
+            // Phase changes preserve both ownership lifetimes and buffer identity.
+            // Peaks can only grow on checkout or renderer attachment, which record
+            // them separately; avoid rescanning all owners for each frame phase.
         }
     }
 

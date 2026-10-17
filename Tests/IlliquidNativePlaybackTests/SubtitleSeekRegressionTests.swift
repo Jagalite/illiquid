@@ -25,8 +25,15 @@ struct SubtitleSeekRegressionTests {
             private let lock = NSLock()
             private var generations: [Int] = []
             private var failures = 0
+            private var releaseTimedOut = false
             init(errorCode: Int32) { self.errorCode = errorCode }
-            func waitUntilStarted() -> Bool { started.wait(timeout: .now() + 2) == .success }
+            func waitUntilStarted() async -> Bool {
+                await withCheckedContinuation { continuation in
+                    Thread.detachNewThread {
+                        continuation.resume(returning: self.started.wait(timeout: .now() + 3) == .success)
+                    }
+                }
+            }
             func read(_ generation: Int) throws -> FFmpegPacket? {
                 let first = lock.withLock {
                     generations.append(generation)
@@ -34,13 +41,19 @@ struct SubtitleSeekRegressionTests {
                 }
                 if first {
                     started.signal()
-                    _ = release.wait(timeout: .now() + 3)
+                    // Other MainActor tests can delay the control action under
+                    // a complete parallel run. A timeout is a harness failure,
+                    // never evidence that cancellation handled the injected error.
+                    if release.wait(timeout: .now() + 30) != .success {
+                        lock.withLock { releaseTimedOut = true }
+                    }
                     throw FFmpegError(operation: "Read media packet", code: errorCode)
                 }
                 return nil
             }
             func failed() { lock.withLock { failures += 1 } }
             var snapshot: ([Int], Int) { lock.withLock { (generations, failures) } }
+            var timedOut: Bool { lock.withLock { releaseTimedOut } }
         }
         let probe = Probe(errorCode: errorCode)
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("subtitle-seek-\(UUID()).srt")
@@ -59,7 +72,7 @@ struct SubtitleSeekRegressionTests {
             presentation.terminate()
         }
         session.start(rate: 0)
-        let started = await Task.detached { probe.waitUntilStarted() }.value
+        let started = await probe.waitUntilStarted()
         try #require(started)
         let generation: Int?
         switch action {
@@ -85,6 +98,7 @@ struct SubtitleSeekRegressionTests {
             #expect(session.waitForShutdown(timeout: .now() + 3))
             #expect(probe.snapshot.0 == [0])
         }
+        #expect(!probe.timedOut, "Test control action did not release the injected read")
         #expect(probe.snapshot.1 == 0)
     }
 

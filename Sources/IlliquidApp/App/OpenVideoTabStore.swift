@@ -24,7 +24,7 @@ final class OpenVideoTabStore {
     func add(_ source: MediaSource) -> UUID {
         let count = storage.items.count
         let id = storage.add(source)
-        if storage.items.count != count { publishMembership() }
+        if storage.items.count != count { publishAddedTab() }
         return id
     }
 
@@ -33,7 +33,7 @@ final class OpenVideoTabStore {
         let count = storage.items.count
         storage.record(source: source, position: position, wasPaused: wasPaused,
                        playlist: playlist, folder: folder)
-        if storage.items.count != count { publishMembership() }
+        if storage.items.count != count { publishAddedTab() }
     }
 
     @discardableResult
@@ -50,6 +50,13 @@ final class OpenVideoTabStore {
         if storage.items.count != count { publishMembership() }
         if selectedID != storage.selectedID { selectedID = storage.selectedID }
         return next
+    }
+
+    private func publishAddedTab() {
+        // Admission adds at most one tab. Existing sources and titles are
+        // immutable, so opening a batch need not rebuild its growing prefix.
+        guard let tab = storage.items.last else { return }
+        items.append(Item(id: tab.id, source: tab.source, title: tab.title))
     }
 
     private func publishMembership() {

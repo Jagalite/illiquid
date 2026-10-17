@@ -1,0 +1,49 @@
+{
+  "platform": "linux-value-stubs",
+  "sources": {
+    "PlatformStubs.swift": {
+      "compiled_sha256": "c6af29f4bfbafb5c33321965b6ba05ea17dd1000ca999a09aae24f31c95bed0a",
+      "import_adaptation": false,
+      "input_sha256": "c6af29f4bfbafb5c33321965b6ba05ea17dd1000ca999a09aae24f31c95bed0a"
+    },
+    "PlayerKeyboardAction.swift": {
+      "compiled_sha256": "d2519cd77d457486eb361cb9a7a0030bcae657da935740bd6488f4a4ff14a358",
+      "import_adaptation": true,
+      "input_sha256": "2b6c7e05552d1e7be64b9d5f294b7d06a0dc5fdeb665b03f0e64acffda923b5a"
+    },
+    "PlayerShortcutBindings.swift": {
+      "compiled_sha256": "8cf37a91d34028aa2e2b476a7643b021910ff661199ee2a9e1aa96ec49822c81",
+      "import_adaptation": true,
+      "input_sha256": "232dd622c574e4da38d225c921837704f3b6cad437d8e6c489a0a4aebb0c0db3"
+    },
+    "PlayerShortcutBindingsTests.swift": {
+      "compiled_sha256": "2f5b7106efff5d00f6d494d0384ddf0a5e7f4b2524f8fc43155c7879282a878a",
+      "input_sha256": "666fc809ad73de5b7a4b2b405b5d3530258ce04c9b480e349a13270add90a613"
+    },
+    "PlayerShortcutDispatchTests.swift": {
+      "compiled_sha256": "d32834a3f357eb1bb1f0edae342a4ac5856489dcc3c4b9a2ada33503eef40eaa",
+      "input_sha256": "b90cada348676dc01024642bef81decfcedb1e91679b1f8554bcb3af42b44c69"
+    }
+  },
+  "test_command": [
+    "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+    "test",
+    "--package-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/release/candidate-release",
+    "--configuration",
+    "release",
+    "--jobs",
+    "2",
+    "--cache-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/release/package-cache",
+    "--config-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/release/package-config",
+    "--security-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/release/package-security",
+    "-Xswiftc",
+    "-warnings-as-errors",
+    "--use-integrated-swift-driver"
+  ],
+  "test_log_sha256": "8730734ce40b94cbd240131f6fd1e13d69325e50e09c2ea4bfb4c7502dc1f820",
+  "variant": "candidate"
+}

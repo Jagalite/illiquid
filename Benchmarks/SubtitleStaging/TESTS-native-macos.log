@@ -1,0 +1,425 @@
+# Contiguous test-output excerpt from GitHub Actions native-regressions.
+# Run: https://github.com/Jagalite/illiquid/actions/runs/39043712484
+# Job: https://github.com/Jagalite/illiquid/actions/runs/39043712484/job/117428142606
+# Implementation commit: 2b889057daf791ee5d749963a374ccd04d043309
+# Build/dependency setup and checkout cleanup are omitted.
+2026-10-17T15:14:09.0318020Z ◇ Test run started.
+2026-10-17T15:14:09.0318860Z ↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+2026-10-17T15:14:09.0319290Z ◇ Suite "Subtitle staging storage reuse" started.
+2026-10-17T15:14:09.0319880Z ◇ Test emptyAndInvalidAtlasCallsPreserveReusableSnapshots() started.
+2026-10-17T15:14:09.0320380Z ◇ Suite "Metal ASS subtitle compositor" started.
+2026-10-17T15:14:09.0320950Z ◇ Test clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) started.
+2026-10-17T15:14:09.0321670Z ◇ Test bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) started.
+2026-10-17T15:14:09.0322370Z ◇ Suite "Production PiP independent subtitle pipelines" started.
+2026-10-17T15:14:09.0322940Z ◇ Test atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) started.
+2026-10-17T15:14:09.0323610Z ◇ Test rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) started.
+2026-10-17T15:14:09.0324440Z ◇ Test case passing 1 argument strategy → .metalR8Atlas to clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) started.
+2026-10-17T15:14:09.0325250Z ◇ Test sourceRetirementReleasesBothPoolsAndPreservesPublishedSnapshots() started.
+2026-10-17T15:14:09.0347650Z ◇ Test case passing 1 argument strategy → .metalBGRA to clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) started.
+2026-10-17T15:14:09.0351660Z ◇ Test case passing 1 argument retainSnapshots → false to bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) started.
+2026-10-17T15:14:09.0354540Z ◇ Test case passing 1 argument retainSnapshots → true to bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) started.
+2026-10-17T15:14:09.0357280Z ◇ Test case passing 1 argument retainSnapshots → false to atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) started.
+2026-10-17T15:14:09.0360030Z ◇ Test case passing 1 argument retainSnapshots → true to atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) started.
+2026-10-17T15:14:09.0362460Z ◇ Test case passing 1 argument strategy → .metalR8Atlas to rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) started.
+2026-10-17T15:14:09.0364750Z ◇ Test case passing 1 argument strategy → .metalBGRA to rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) started.
+2026-10-17T15:14:09.0366520Z ◇ Test supersededSubtitleChangeRemainsPendingUntilPresented() started.
+2026-10-17T15:14:09.0368390Z ✔ Test clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) with 2 test cases passed after 0.044 seconds.
+2026-10-17T15:14:09.0385260Z ✔ Test emptyAndInvalidAtlasCallsPreserveReusableSnapshots() passed after 0.045 seconds.
+2026-10-17T15:14:09.0390160Z ✔ Test bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) with 2 test cases passed after 0.044 seconds.
+2026-10-17T15:14:09.0393500Z ✔ Test rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) with 2 test cases passed after 0.044 seconds.
+2026-10-17T15:14:09.0394260Z ◇ Test bitmapSubtitleUsesPremultipliedColorAndClearsInPiP() started.
+2026-10-17T15:14:09.0395020Z ✔ Test sourceRetirementReleasesBothPoolsAndPreservesPublishedSnapshots() passed after 0.041 seconds.
+2026-10-17T15:14:09.0395720Z ✔ Test supersededSubtitleChangeRemainsPendingUntilPresented() passed after 0.001 seconds.
+2026-10-17T15:14:09.0396320Z ◇ Test olderSubtitleCommitCannotAcknowledgeNewerContent() started.
+2026-10-17T15:14:09.0396900Z ✔ Test olderSubtitleCommitCannotAcknowledgeNewerContent() passed after 0.001 seconds.
+2026-10-17T15:14:09.0397510Z ◇ Test metalIsTheOnlyCompositorAndFailureCannotSwitchIt() started.
+2026-10-17T15:14:09.0397930Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0398200Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0398870Z ✔ Test atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) with 2 test cases passed after 0.125 seconds.
+2026-10-17T15:14:09.0399540Z ✔ Suite "Subtitle staging storage reuse" passed after 0.127 seconds.
+2026-10-17T15:14:09.0400010Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0400390Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0400750Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0401060Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0401370Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0401750Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0402050Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0405690Z [ass-compositor] failure reason=texture-allocation revision=9 media=fixture.mkv
+2026-10-17T15:14:09.0406340Z ✔ Test metalIsTheOnlyCompositorAndFailureCannotSwitchIt() passed after 1.465 seconds.
+2026-10-17T15:14:09.0406960Z ◇ Test r8AtlasPreservesTopDownRowsAndReplicatesOnePixelPadding() started.
+2026-10-17T15:14:09.0410250Z ✔ Test r8AtlasPreservesTopDownRowsAndReplicatesOnePixelPadding() passed after 0.001 seconds.
+2026-10-17T15:14:09.0410880Z ◇ Test r8AtlasRejectsMalformedBitmapGeometryBeforeCopying() started.
+2026-10-17T15:14:09.0420400Z ✔ Test r8AtlasRejectsMalformedBitmapGeometryBeforeCopying() passed after 0.001 seconds.
+2026-10-17T15:14:09.0421670Z ◇ Test r8AtlasRejectsFramesBeyondItsByteBudgetBeforeAllocating() started.
+2026-10-17T15:14:09.0427350Z ✔ Test r8AtlasRejectsFramesBeyondItsByteBudgetBeforeAllocating() passed after 0.001 seconds.
+2026-10-17T15:14:09.0428110Z ◇ Test framePackerSerializesConcurrentStorageMutation() started.
+2026-10-17T15:14:09.0428730Z ✔ Test framePackerSerializesConcurrentStorageMutation() passed after 0.002 seconds.
+2026-10-17T15:14:09.0429270Z ◇ Test r8AtlasPacksTallMasksTogetherAndDoesNotShrinkStorage() started.
+2026-10-17T15:14:09.0429900Z ✔ Test r8AtlasPacksTallMasksTogetherAndDoesNotShrinkStorage() passed after 0.001 seconds.
+2026-10-17T15:14:09.0430510Z ◇ Test bgraSurfaceUsesInvertedAlphaPremultiplicationAndLinkedListOrder() started.
+2026-10-17T15:14:09.0431270Z ✔ Test bgraSurfaceUsesInvertedAlphaPremultiplicationAndLinkedListOrder() passed after 0.001 seconds.
+2026-10-17T15:14:09.0431910Z ◇ Test singleMetalDrawPreservesOverlappingImageOrder() started.
+2026-10-17T15:14:09.0432430Z ✔ Test singleMetalDrawPreservesOverlappingImageOrder() passed after 0.141 seconds.
+2026-10-17T15:14:09.0433020Z ◇ Test coverageRampIdentifiesSamplingColorAndAlphaTransforms() started.
+2026-10-17T15:14:09.0433660Z metal ASS diagnostic variant=baseline-linear-edge-straight scale=1.0 linearMax=0 linearBytes=0 nearestMax=0 nearestBytes=0
+2026-10-17T15:14:09.0434850Z metal ASS diagnostic variant=nearest scale=1.0 linearMax=0 linearBytes=0 nearestMax=0 nearestBytes=0
+2026-10-17T15:14:09.0435470Z metal ASS diagnostic variant=texel-centers scale=1.0 linearMax=26 linearBytes=24 nearestMax=26 nearestBytes=24
+2026-10-17T15:14:09.0436200Z metal ASS diagnostic variant=offset-minus-half scale=1.0 linearMax=255 linearBytes=40 nearestMax=255 nearestBytes=40
+2026-10-17T15:14:09.0436880Z metal ASS diagnostic variant=offset-plus-half scale=1.0 linearMax=32 linearBytes=20 nearestMax=32 nearestBytes=20
+2026-10-17T15:14:09.0437590Z metal ASS diagnostic variant=srgb-drawable scale=1.0 linearMax=73 linearBytes=12 nearestMax=73 nearestBytes=12
+2026-10-17T15:14:09.0438310Z metal ASS diagnostic variant=premultiplied-fragment scale=1.0 linearMax=0 linearBytes=0 nearestMax=0 nearestBytes=0
+2026-10-17T15:14:09.0438960Z metal ASS diagnostic variant=padding-two scale=1.0 linearMax=0 linearBytes=0 nearestMax=0 nearestBytes=0
+2026-10-17T15:14:09.0439720Z metal ASS diagnostic variant=baseline-linear-edge-straight scale=2.0 linearMax=0 linearBytes=0 nearestMax=16 nearestBytes=80
+2026-10-17T15:14:09.0440390Z metal ASS diagnostic variant=nearest scale=2.0 linearMax=16 linearBytes=80 nearestMax=0 nearestBytes=0
+2026-10-17T15:14:09.0441070Z metal ASS diagnostic variant=texel-centers scale=2.0 linearMax=23 linearBytes=96 nearestMax=39 nearestBytes=96
+2026-10-17T15:14:09.0441840Z metal ASS diagnostic variant=offset-minus-half scale=2.0 linearMax=255 linearBytes=128 nearestMax=255 nearestBytes=104
+2026-10-17T15:14:09.0442520Z metal ASS diagnostic variant=offset-plus-half scale=2.0 linearMax=16 linearBytes=80 nearestMax=32 nearestBytes=40
+2026-10-17T15:14:09.0443210Z metal ASS diagnostic variant=srgb-drawable scale=2.0 linearMax=73 linearBytes=60 nearestMax=88 nearestBytes=80
+2026-10-17T15:14:09.0443890Z metal ASS diagnostic variant=premultiplied-fragment scale=2.0 linearMax=0 linearBytes=0 nearestMax=16 nearestBytes=80
+2026-10-17T15:14:09.0444630Z metal ASS diagnostic variant=padding-two scale=2.0 linearMax=0 linearBytes=0 nearestMax=16 nearestBytes=80
+2026-10-17T15:14:09.0445320Z ✔ Test coverageRampIdentifiesSamplingColorAndAlphaTransforms() passed after 0.384 seconds.
+2026-10-17T15:14:09.0445920Z ◇ Test urgentClearRejectsAnInFlightMetalFrame() started.
+2026-10-17T15:14:09.0446540Z ✔ Test bitmapSubtitleUsesPremultipliedColorAndClearsInPiP() passed after 2.006 seconds.
+2026-10-17T15:14:09.0447140Z ◇ Test applicationSubtitleBudgetAccountsForAllOwnersAndReleasesLeases() started.
+2026-10-17T15:14:09.0447840Z ✔ Test applicationSubtitleBudgetAccountsForAllOwnersAndReleasesLeases() passed after 0.001 seconds.
+2026-10-17T15:14:09.0448830Z ◇ Test subtitleBudgetPreflightsAggregateAndOwnerCapacityWithoutRejecting() started.
+2026-10-17T15:14:09.0449660Z ✔ Test subtitleBudgetPreflightsAggregateAndOwnerCapacityWithoutRejecting() passed after 0.001 seconds.
+2026-10-17T15:14:09.0450590Z ◇ Test independentContextsRenderMainAndPiPSimultaneouslyAcrossSeekAndCueChange() started.
+2026-10-17T15:14:09.0451080Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0451520Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0451780Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0452200Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0452910Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0453940Z [ass] Added subtitle file: <memory> (2 styles, 10 events)
+2026-10-17T15:14:09.0455060Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0455890Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0456530Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0457500Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0458420Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0459120Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0460100Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0460730Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0463030Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0463850Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0464620Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:09.0465450Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:09.0466800Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:09.0468210Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:09.0469990Z ✔ Test urgentClearRejectsAnInFlightMetalFrame() passed after 0.228 seconds.
+2026-10-17T15:14:09.0471680Z ◇ Test concurrentDelayToggleRenderAndReadOperationsShareOneLockBoundary() started.
+2026-10-17T15:14:09.0473300Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0474140Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0474850Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0475640Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0476550Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0477340Z [ass] Added subtitle file: <memory> (2 styles, 1 events)
+2026-10-17T15:14:09.0478390Z [ass] fontselect: (sans-serif, 400, 0) -> /System/Library/Fonts/Helvetica.ttc, -1, Helvetica
+2026-10-17T15:14:09.0480200Z ✔ Test concurrentDelayToggleRenderAndReadOperationsShareOneLockBoundary() passed after 0.115 seconds.
+2026-10-17T15:14:09.0482470Z ◇ Test minimalGlyphAtBackingResolutionMatchesIndependentReference() started.
+2026-10-17T15:14:09.0483690Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0484730Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0485450Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0486240Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0487120Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0488190Z [ass] Added subtitle file: <memory> (2 styles, 1 events)
+2026-10-17T15:14:09.0489470Z [ass] fontselect: (sans-serif, 400, 0) -> /System/Library/Fonts/Helvetica.ttc, -1, Helvetica
+2026-10-17T15:14:09.0528960Z metal ASS minimal logical=320x180 backing=640x360 regions=1 maxDifference=0 differentBytes=0
+2026-10-17T15:14:09.0529960Z ✔ Test minimalGlyphAtBackingResolutionMatchesIndependentReference() passed after 0.224 seconds.
+2026-10-17T15:14:09.0530670Z ◇ Test retinaCoordinateContractUsesBackingPixelsEndToEnd() started.
+2026-10-17T15:14:09.0531170Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0531610Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0532780Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0533240Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0533590Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0534060Z [ass] Added subtitle file: <memory> (2 styles, 1 events)
+2026-10-17T15:14:09.0534590Z [ass] fontselect: (sans-serif, 400, 0) -> /System/Library/Fonts/Helvetica.ttc, -1, Helvetica
+2026-10-17T15:14:09.0535340Z ✔ Test independentContextsRenderMainAndPiPSimultaneouslyAcrossSeekAndCueChange() passed after 0.573 seconds.
+2026-10-17T15:14:09.0536100Z ◇ Test disablingSubtitlesHidesOnlyTheMainOverlayUntilReenabled() started.
+2026-10-17T15:14:09.0536560Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0536970Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0537280Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0537630Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0538030Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0538340Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0538690Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0538950Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0539310Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0539650Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0540250Z [ass-compositor] failure reason=invalid-backing-geometry revision=1 media=unknown
+2026-10-17T15:14:09.0540890Z ✔ Test retinaCoordinateContractUsesBackingPixelsEndToEnd() passed after 0.033 seconds.
+2026-10-17T15:14:09.0541540Z ◇ Test backingResolutionLibassMatchesIndependentCPUReference() started.
+2026-10-17T15:14:09.0541960Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0543010Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0543330Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0543800Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0544210Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0544580Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0544900Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0545260Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0545630Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0545980Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0546260Z [ass] Added subtitle file: <memory> (2 styles, 10 events)
+2026-10-17T15:14:09.0546600Z [ass] Added subtitle file: <memory> (2 styles, 10 events)
+2026-10-17T15:14:09.0547080Z [ass] fontselect: (sans-serif, 400, 0) -> /System/Library/Fonts/Helvetica.ttc, -1, Helvetica
+2026-10-17T15:14:09.0547610Z [ass] fontselect: (sans-serif, 400, 0) -> /System/Library/Fonts/Helvetica.ttc, -1, Helvetica
+2026-10-17T15:14:09.0548450Z metal ASS backing t=0.25 logicalImages=33 backingImages=33 cpuMax=3 cpuBytes=97962 logicalScaledMax=185 logicalScaledBytes=309224
+2026-10-17T15:14:09.0549250Z metal ASS backing t=0.75 logicalImages=33 backingImages=33 cpuMax=3 cpuBytes=72304 logicalScaledMax=185 logicalScaledBytes=303981
+2026-10-17T15:14:09.0549990Z metal ASS backing t=1.25 logicalImages=33 backingImages=33 cpuMax=3 cpuBytes=72038 logicalScaledMax=185 logicalScaledBytes=301722
+2026-10-17T15:14:09.0550760Z metal ASS backing t=1.75 logicalImages=33 backingImages=33 cpuMax=3 cpuBytes=72104 logicalScaledMax=185 logicalScaledBytes=303041
+2026-10-17T15:14:09.0551500Z metal ASS backing t=2.5 logicalImages=33 backingImages=33 cpuMax=3 cpuBytes=71694 logicalScaledMax=185 logicalScaledBytes=297019
+2026-10-17T15:14:09.0552360Z ✔ Test backingResolutionLibassMatchesIndependentCPUReference() passed after 10.212 seconds.
+2026-10-17T15:14:09.0552990Z ◇ Test assFeatureMatrixRecordsBGRAQuantizationDifference() started.
+2026-10-17T15:14:09.0553790Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=1 last-failure=invalid-backing-geometry drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:09.0568220Z [ass-profile-summary] epoch=1792250047.575369 selected=metal-r8 failure-count=1 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:09.0572410Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:09.0578990Z [ass-profile-summary] epoch=1792250047.575931 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:09.0582710Z ✔ Test disablingSubtitlesHidesOnlyTheMainOverlayUntilReenabled() passed after 10.248 seconds.
+2026-10-17T15:14:09.0587970Z ◇ Test nonauthoritativeCandidateCanPrepareWithoutRenderingOrClearing() started.
+2026-10-17T15:14:09.0597430Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0600440Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0601330Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0602480Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0603150Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0603960Z [ass] Added subtitle file: <memory> (2 styles, 10 events)
+2026-10-17T15:14:09.0605070Z [ass] fontselect: (sans-serif, 400, 0) -> /System/Library/Fonts/Helvetica.ttc, -1, Helvetica
+2026-10-17T15:14:09.0606570Z metal ASS matrix t=0.25 regions=33 maxDifference=4 differentBytes=38435
+2026-10-17T15:14:09.0607500Z metal ASS matrix t=0.75 regions=33 maxDifference=4 differentBytes=32085
+2026-10-17T15:14:09.0608100Z metal ASS matrix t=1.25 regions=33 maxDifference=4 differentBytes=31771
+2026-10-17T15:14:09.0608630Z metal ASS matrix t=1.75 regions=33 maxDifference=4 differentBytes=32047
+2026-10-17T15:14:09.0609060Z metal ASS matrix t=2.5 regions=33 maxDifference=4 differentBytes=31665
+2026-10-17T15:14:09.0609710Z ✔ Test assFeatureMatrixRecordsBGRAQuantizationDifference() passed after 1.427 seconds.
+2026-10-17T15:14:09.0610240Z ◇ Test heavyAnimatedFixtureCostsAreRecorded() started.
+2026-10-17T15:14:09.0610670Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:09.0610980Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:09.0611360Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:09.0611690Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:09.0612100Z [ass] Using font provider coretext
+2026-10-17T15:14:09.0612510Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:09.0612940Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:11.0477110Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0481120Z [ass-profile-summary] epoch=1792250049.015715 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=9.253 libass-copy-ms=0.014 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=12544 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0484140Z ✔ Test nonauthoritativeCandidateCanPrepareWithoutRenderingOrClearing() passed after 1.429 seconds.
+2026-10-17T15:14:11.0484860Z ◇ Test compositorWritesBothIndependentSubtitleCuesIntoOutputPixels() started.
+2026-10-17T15:14:11.0485480Z ✔ Test heavyAnimatedFixtureCostsAreRecorded() passed after 0.016 seconds.
+2026-10-17T15:14:11.0486020Z ✔ Suite "Metal ASS subtitle compositor" passed after 14.309 seconds.
+2026-10-17T15:14:11.0486480Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:11.0486880Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0487160Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0487500Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0487860Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0488490Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:11.0494800Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:11.0495690Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0498410Z [ass-profile-summary] epoch=1792250049.217664 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=2 libass-changed=2 libass-unchanged=0 libass-config-requests=2 libass-geometry-changes=1 libass-render-ms=2.402 libass-copy-ms=0.031 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=6 mask-bytes=40256 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0500910Z ✔ Test compositorWritesBothIndependentSubtitleCuesIntoOutputPixels() passed after 0.204 seconds.
+2026-10-17T15:14:11.0501600Z ◇ Test pausedSameFrameReentryImmediatelyRestoresTheCompositedSubtitleFrame() started.
+2026-10-17T15:14:11.0502030Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:11.0502410Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0502700Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0503070Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0503400Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0503710Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:11.0504030Z [native-pip-subtitles] start-request
+2026-10-17T15:14:11.0504420Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:11.0504840Z [native-pip-subtitles] first-sample
+2026-10-17T15:14:11.0505070Z [native-pip-subtitles] stop-request
+2026-10-17T15:14:11.0506530Z [native-pip-subtitles] received=0 composed=1 immediate=1 visible=1 coalesced=0 unsupported=0 pool-allocations=1 pool-reuses=0 pool-misses=0 enqueue-failures=0 stale-compositions=0 cpu-ms-per-frame=5.8412 gpu-ms-per-frame=36.4761
+2026-10-17T15:14:11.0508100Z [native-pip-subtitles] start-request
+2026-10-17T15:14:11.0508350Z [native-pip-subtitles] first-sample
+2026-10-17T15:14:11.0508620Z [native-pip-subtitles] stop-request
+2026-10-17T15:14:11.0509260Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0519190Z [ass-profile-summary] epoch=1792250049.724025 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=3.191 libass-copy-ms=0.038 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=12544 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0526580Z [native-pip-subtitles] received=0 composed=1 immediate=1 visible=1 coalesced=0 unsupported=0 pool-allocations=1 pool-reuses=0 pool-misses=0 enqueue-failures=0 stale-compositions=0 cpu-ms-per-frame=0.5229 gpu-ms-per-frame=2.4274
+2026-10-17T15:14:11.0529910Z ✔ Test pausedSameFrameReentryImmediatelyRestoresTheCompositedSubtitleFrame() passed after 0.502 seconds.
+2026-10-17T15:14:11.0530860Z ◇ Test exhaustedAggregatePiPStagingBudgetFallsBackToVideoOnly() started.
+2026-10-17T15:14:11.0531490Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:11.0531790Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0532530Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0532810Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0533100Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0533360Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:11.0533830Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:11.0534510Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0536970Z [ass-profile-summary] epoch=1792250049.843209 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=2.598 libass-copy-ms=0.011 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=12544 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0539580Z ✔ Test exhaustedAggregatePiPStagingBudgetFallsBackToVideoOnly() passed after 0.120 seconds.
+2026-10-17T15:14:11.0540180Z ◇ Test compositorRebindInvalidatesPreparedSubtitlesFromThePreviousPipeline() started.
+2026-10-17T15:14:11.0540610Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:11.0540880Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0541100Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0541370Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0541650Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0541900Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:11.0542160Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0542380Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0542640Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0542930Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0543170Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:11.0543540Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:11.0544210Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0546810Z [ass-profile-summary] epoch=1792250050.057496 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=4.091 libass-copy-ms=0.025 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=12544 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0549220Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0551680Z [ass-profile-summary] epoch=1792250050.057647 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=0.002 libass-copy-ms=0.003 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0554090Z ✔ Test compositorRebindInvalidatesPreparedSubtitlesFromThePreviousPipeline() passed after 0.215 seconds.
+2026-10-17T15:14:11.0554640Z ◇ Test compositorFillsThePiPViewportWithoutEdgeSlivers() started.
+2026-10-17T15:14:11.0555040Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:11.0555330Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0555540Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0555810Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0556100Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0556790Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0559180Z [ass-profile-summary] epoch=1792250050.064702 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0561540Z ✔ Test compositorFillsThePiPViewportWithoutEdgeSlivers() passed after 0.004 seconds.
+2026-10-17T15:14:11.0562060Z ◇ Test composedPiPFanoutPreservesTheMainRendererDemandSource() started.
+2026-10-17T15:14:11.0562600Z ✔ Test composedPiPFanoutPreservesTheMainRendererDemandSource() passed after 0.497 seconds.
+2026-10-17T15:14:11.0563160Z ◇ Test returnedPoolBufferResumesPausedCaptionWithoutVideoOnlyFallback() started.
+2026-10-17T15:14:11.0563570Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:11.0563830Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0564050Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0564370Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0564650Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0564890Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:11.0565470Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:11.0565860Z [native-pip-subtitles] start-request
+2026-10-17T15:14:11.0566090Z [native-pip-subtitles] first-sample
+2026-10-17T15:14:11.0566310Z [native-pip-subtitles] stop-request
+2026-10-17T15:14:11.0567650Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0574610Z [ass-profile-summary] epoch=1792250050.797981 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=2.443 libass-copy-ms=0.015 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=12544 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0581270Z ✔ Test returnedPoolBufferResumesPausedCaptionWithoutVideoOnlyFallback() passed after 0.234 seconds.
+2026-10-17T15:14:11.0583850Z [native-pip-subtitles] received=0 composed=1 immediate=1 visible=1 coalesced=0 unsupported=0 pool-allocations=1 pool-reuses=0 pool-misses=1 enqueue-failures=0 stale-compositions=0 cpu-ms-per-frame=0.3181 gpu-ms-per-frame=1.6669
+2026-10-17T15:14:11.0587520Z ◇ Test compositionFenceRejectsResultsFromBeforeInvalidation() started.
+2026-10-17T15:14:11.0588890Z ✔ Test compositionFenceRejectsResultsFromBeforeInvalidation() passed after 0.001 seconds.
+2026-10-17T15:14:11.0590210Z ◇ Test presentationFlushInvalidatesPendingPiPComposition() started.
+2026-10-17T15:14:11.0591510Z ✔ Test presentationFlushInvalidatesPendingPiPComposition() passed after 0.002 seconds.
+2026-10-17T15:14:11.0592850Z ◇ Test compositorAppliesCropRotationAndMirrorToColoredPixels() started.
+2026-10-17T15:14:11.0593850Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:11.0594610Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0595200Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0595910Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0596990Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0598580Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0606610Z [ass-profile-summary] epoch=1792250050.850253 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=3 libass-changed=3 libass-unchanged=0 libass-config-requests=3 libass-geometry-changes=3 libass-render-ms=0.004 libass-copy-ms=0.007 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0614470Z ✔ Test compositorAppliesCropRotationAndMirrorToColoredPixels() passed after 0.049 seconds.
+2026-10-17T15:14:11.0640110Z ◇ Test compositorInterpretsColoredNV12UsingSourceMatrixAndRange() started.
+2026-10-17T15:14:11.0640730Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:11.0641160Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0641500Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0641890Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0642220Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0642810Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0646320Z [ass-profile-summary] epoch=1792250050.907818 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=0.001 libass-copy-ms=0.001 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0649230Z ✔ Test compositorInterpretsColoredNV12UsingSourceMatrixAndRange() passed after 0.057 seconds.
+2026-10-17T15:14:11.0649800Z ◇ Test p010CompositionPreservesLowBitsMatrixRangeAndPoolTransitions() started.
+2026-10-17T15:14:11.0650170Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0650400Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0650680Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0651010Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0651620Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:11.0655350Z [ass-profile-summary] epoch=1792250051.011395 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=0.003 libass-copy-ms=0.003 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:11.0658480Z ✔ Test p010CompositionPreservesLowBitsMatrixRangeAndPoolTransitions() passed after 0.102 seconds.
+2026-10-17T15:14:11.0659030Z ◇ Test p010BitmapCompositionBlendsAndExpiresAtTenBits() started.
+2026-10-17T15:14:11.0659400Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0659640Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0659910Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0660200Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0660410Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:11.0660620Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:11.0660950Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:11.0661300Z [ass] Using font provider coretext
+2026-10-17T15:14:11.0661960Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:13.1508540Z [ass-profile-summary] epoch=1792250051.047391 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:13.1514790Z ✔ Test p010BitmapCompositionBlendsAndExpiresAtTenBits() passed after 0.036 seconds.
+2026-10-17T15:14:13.1615150Z ◇ Test p010TextCompositionIsAcceptedByAppleRenderer(transfer:) started.
+2026-10-17T15:14:13.1628470Z ◇ Test case passing 1 argument transfer → 1 to p010TextCompositionIsAcceptedByAppleRenderer(transfer:) started.
+2026-10-17T15:14:13.1629050Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:13.1629270Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:13.1629570Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:13.1630880Z [ass] Using font provider coretext
+2026-10-17T15:14:13.1631770Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:13.1632840Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:13.1633980Z IOServiceMatchingfailed for: AppleM2ScalerParavirtDriver
+2026-10-17T15:14:13.1634850Z [pip-ten-bit-renderer] submitted=1815162994 displayed=1111970369
+2026-10-17T15:14:13.1636470Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:13.1644040Z [ass-profile-summary] epoch=1792250051.641124 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=3.075 libass-copy-ms=0.016 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=12544 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:13.1653480Z ◇ Test case passing 1 argument transfer → 16 to p010TextCompositionIsAcceptedByAppleRenderer(transfer:) started.
+2026-10-17T15:14:13.1654690Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:13.1655240Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:13.1655960Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:13.1656760Z [ass] Using font provider coretext
+2026-10-17T15:14:13.1657580Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:13.1658110Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:13.1658850Z [pip-ten-bit-renderer] submitted=2016686640 displayed=2016686640
+2026-10-17T15:14:13.1677800Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:13.1682910Z [ass-profile-summary] epoch=1792250052.026709 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=4.191 libass-copy-ms=0.019 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=12544 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:13.1685710Z ◇ Test case passing 1 argument transfer → 18 to p010TextCompositionIsAcceptedByAppleRenderer(transfer:) started.
+2026-10-17T15:14:13.1686210Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:13.1686440Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:13.1687380Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:13.1688200Z [ass] Using font provider coretext
+2026-10-17T15:14:13.1688840Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:13.1689860Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:13.1690960Z [pip-ten-bit-renderer] submitted=2016686640 displayed=2016686640
+2026-10-17T15:14:13.1693270Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:13.1699330Z [ass-profile-summary] epoch=1792250052.306550 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=4.638 libass-copy-ms=0.011 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=12544 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:13.1702750Z ✔ Test p010TextCompositionIsAcceptedByAppleRenderer(transfer:) with 3 test cases passed after 1.258 seconds.
+2026-10-17T15:14:13.1703420Z ◇ Test hdrPQAndHLGCompositionRoundTripTenBitCodesAndTags() started.
+2026-10-17T15:14:13.1703750Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:13.1703980Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:13.1704250Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:13.1704550Z [ass] Using font provider coretext
+2026-10-17T15:14:13.1705550Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:13.1708920Z [ass-profile-summary] epoch=1792250052.500499 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=0.001 libass-copy-ms=0.001 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:13.1711230Z ✔ Test hdrPQAndHLGCompositionRoundTripTenBitCodesAndTags() passed after 0.194 seconds.
+2026-10-17T15:14:13.1711730Z ◇ Test hdrBitmapGraphicsWhiteAndAlphaUseLinearLuminance() started.
+2026-10-17T15:14:13.1712050Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:13.1712270Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:13.1712530Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:13.1712890Z [ass] Using font provider coretext
+2026-10-17T15:14:13.1713140Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:13.1713350Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:13.1713620Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:13.1723300Z [ass] Using font provider coretext
+2026-10-17T15:14:13.1725240Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:13.1731360Z [ass-profile-summary] epoch=1792250052.646717 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:13.1733940Z ✔ Test hdrBitmapGraphicsWhiteAndAlphaUseLinearLuminance() passed after 0.145 seconds.
+2026-10-17T15:14:13.1734980Z ◇ Test compositorNormalizesAnamorphicFramesToSquarePixelDisplaySize() started.
+2026-10-17T15:14:13.1735400Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:13.1735670Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:13.1735890Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:13.1736160Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:13.1736480Z [ass] Using font provider coretext
+2026-10-17T15:14:13.1736770Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:13.1737260Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:13.1738000Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:13.1740640Z [ass-profile-summary] epoch=1792250052.859669 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=4.369 libass-copy-ms=0.021 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=18624 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:13.1744050Z ✔ Test compositorNormalizesAnamorphicFramesToSquarePixelDisplaySize() passed after 0.213 seconds.
+2026-10-17T15:14:13.1744650Z ◇ Test compositorAcceptsSDRVideoRangeAndFullRangeNV12() started.
+2026-10-17T15:14:13.1745000Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:13.1745260Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:13.1745480Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:13.1745800Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:13.1746100Z [ass] Using font provider coretext
+2026-10-17T15:14:13.1746400Z [ass] Added subtitle file: <memory> (2 styles, 2 events)
+2026-10-17T15:14:13.1747960Z [ass] fontselect: (Arial, 400, 0) -> /System/Library/Fonts/Supplemental/Arial.ttf, -1, ArialMT
+2026-10-17T15:14:13.1748680Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:13.1752060Z [ass-profile-summary] epoch=1792250052.995961 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=1 libass-changed=1 libass-unchanged=0 libass-config-requests=1 libass-geometry-changes=1 libass-render-ms=1.778 libass-copy-ms=0.009 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=3 mask-bytes=12544 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:13.1754770Z ✔ Test compositorAcceptsSDRVideoRangeAndFullRangeNV12() passed after 0.135 seconds.
+2026-10-17T15:14:13.1755370Z ◇ Test compositorEligibilityTracksLatestFrameAndRejectsUnqualifiedVideo() started.
+2026-10-17T15:14:13.1757600Z [ass-compositor] selected=metal-r8 activation=success
+2026-10-17T15:14:13.1758410Z [ass] libass API version: 0x1705000
+2026-10-17T15:14:13.1759010Z [ass] libass source: tarball: 0.17.5
+2026-10-17T15:14:13.1759810Z [ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+2026-10-17T15:14:13.1760630Z [ass] Using font provider coretext
+2026-10-17T15:14:13.1762400Z [ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+2026-10-17T15:14:13.1771690Z [ass-profile-summary] epoch=1792250053.043846 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+2026-10-17T15:14:13.1781510Z ✔ Test compositorEligibilityTracksLatestFrameAndRejectsUnqualifiedVideo() passed after 0.047 seconds.
+2026-10-17T15:14:13.1782190Z ◇ Test mediaSessionMirrorsEmbeddedPacketsAndSeekInvalidationToBothPipelines() started.
+2026-10-17T15:14:13.1783630Z ✔ Test mediaSessionMirrorsEmbeddedPacketsAndSeekInvalidationToBothPipelines() passed after 0.001 seconds.
+2026-10-17T15:14:13.1784240Z ◇ Test hiddenHostKeepsViewAndDisplayLayerGeometryInSync() started.
+2026-10-17T15:14:13.1784730Z [native-pip-subtitles] host-attached panel=true visible=true onscreen=false bounds=640x360 scale=1.0
+2026-10-17T15:14:13.1785370Z [native-pip-subtitles] host-detached panel-visible=false window=false superlayer=false
+2026-10-17T15:14:13.1786000Z [native-pip-subtitles] host-owner-deinit
+2026-10-17T15:14:13.1786250Z [native-pip-subtitles] host-view-deinit
+2026-10-17T15:14:13.1786710Z ✔ Test hiddenHostKeepsViewAndDisplayLayerGeometryInSync() passed after 0.011 seconds.
+2026-10-17T15:14:13.1787280Z ✔ Suite "Production PiP independent subtitle pipelines" passed after 18.347 seconds.
+2026-10-17T15:14:13.1787760Z ✔ Test run with 51 tests in 3 suites passed after 18.349 seconds.
+

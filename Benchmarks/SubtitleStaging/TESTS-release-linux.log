@@ -1,0 +1,46 @@
+Building for production...
+[0/9] Write sources
+[2/9] Write swift-version-79F5DDD9F357E4C6.txt
+[4/10] Compiling IlliquidNativePlayback SubtitleFramePacker.swift
+[5/11] Compiling IlliquidNativePlaybackTests SubtitleStagingReuseTests.swift
+[5/11] /tmp/illiquid-subtitle-staging-e683/release-final/package/.build/x86_64-unknown-linux-gnu/release/SubtitleStagingRegressionsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/11] Write sources
+[8/12] Compiling SubtitleStagingRegressionsPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+[8/12] /tmp/illiquid-subtitle-staging-e683/release-final/package/.build/x86_64-unknown-linux-gnu/release/SubtitleStagingRegressionsPackageTests.derived/runner.swift
+[9/12] Write sources
+[11/13] Compiling SubtitleStagingRegressionsPackageTests runner.swift
+[11/13] Write Objects.LinkFileList
+[12/13] Linking SubtitleStagingRegressionsPackageTests.xctest
+Build complete! (14.96s)
+Test Suite 'All tests' started at 2026-10-17 08:32:52.819
+Test Suite 'release.xctest' started at 2026-10-17 08:32:52.821
+Test Suite 'release.xctest' passed at 2026-10-17 08:32:52.821
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-17 08:32:52.821
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Subtitle staging storage reuse" started.
+◇ Test clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) started.
+◇ Test sourceRetirementReleasesBothPoolsAndPreservesPublishedSnapshots() started.
+◇ Test atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) started.
+◇ Test emptyAndInvalidAtlasCallsPreserveReusableSnapshots() started.
+◇ Test bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) started.
+◇ Test rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) started.
+◇ Test case passing 1 argument retainSnapshots → false to atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) started.
+◇ Test case passing 1 argument retainSnapshots → false to bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) started.
+◇ Test case passing 1 argument retainSnapshots → true to bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) started.
+◇ Test case passing 1 argument retainSnapshots → true to atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) started.
+◇ Test case passing 1 argument strategy → .metalBGRA to clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) started.
+◇ Test case passing 1 argument strategy → .metalR8Atlas to clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) started.
+◇ Test case passing 1 argument strategy → .metalR8Atlas to rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) started.
+◇ Test case passing 1 argument strategy → .metalBGRA to rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) started.
+✔ Test clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) with 2 test cases passed after 0.001 seconds.
+✔ Test rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) with 2 test cases passed after 0.001 seconds.
+✔ Test sourceRetirementReleasesBothPoolsAndPreservesPublishedSnapshots() passed after 0.001 seconds.
+✔ Test emptyAndInvalidAtlasCallsPreserveReusableSnapshots() passed after 0.001 seconds.
+✔ Test bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) with 2 test cases passed after 0.001 seconds.
+✔ Test atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) with 2 test cases passed after 0.015 seconds.
+✔ Suite "Subtitle staging storage reuse" passed after 0.015 seconds.
+✔ Test run with 6 tests in 1 suite passed after 0.016 seconds.

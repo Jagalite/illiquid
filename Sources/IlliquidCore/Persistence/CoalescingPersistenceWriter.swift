@@ -3,6 +3,8 @@ import Foundation
 /// Serializes writes off the caller's executor and retains only the newest
 /// pending value or snapshot factory. Flush waits for write callbacks and reports
 /// their errors. The destination defines durability (UserDefaults.set is not fsync).
+/// Requests must be replacement snapshots: intermediate requests may be coalesced,
+/// and a successful later write supersedes an earlier failure.
 public final class CoalescingPersistenceWriter<Value: Sendable>: @unchecked Sendable {
     private let lock = NSLock()
     private let queue: DispatchQueue
@@ -44,10 +46,13 @@ public final class CoalescingPersistenceWriter<Value: Sendable>: @unchecked Send
 
     private func enqueue(_ request: Pending) {
         lock.lock()
+        // Superseded values and snapshot captures can run arbitrary deinit code,
+        // including submitting another request. Do not release them under lock.
+        let superseded = pending
         pending = request
         let needsSchedule = !scheduled
         scheduled = true
-        lock.unlock()
+        withExtendedLifetime(superseded) { lock.unlock() }
         if needsSchedule {
             queue.asyncAfter(deadline: .now() + delay) { self.drain() }
         }

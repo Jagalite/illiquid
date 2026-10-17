@@ -1,0 +1,49 @@
+{
+  "platform": "linux-value-stubs",
+  "sources": {
+    "PlatformStubs.swift": {
+      "compiled_sha256": "c6af29f4bfbafb5c33321965b6ba05ea17dd1000ca999a09aae24f31c95bed0a",
+      "import_adaptation": false,
+      "input_sha256": "c6af29f4bfbafb5c33321965b6ba05ea17dd1000ca999a09aae24f31c95bed0a"
+    },
+    "PlayerKeyboardAction.swift": {
+      "compiled_sha256": "d2519cd77d457486eb361cb9a7a0030bcae657da935740bd6488f4a4ff14a358",
+      "import_adaptation": true,
+      "input_sha256": "2b6c7e05552d1e7be64b9d5f294b7d06a0dc5fdeb665b03f0e64acffda923b5a"
+    },
+    "PlayerShortcutBindings.swift": {
+      "compiled_sha256": "7c6deef502e343dc4cef1cc7a727c65474d1c228b069f8928816ab42e12e4ebf",
+      "import_adaptation": true,
+      "input_sha256": "35ba093161ad5b33bb9b28663c4eb68aec414e33c462f25066d6cca03253c0ee"
+    },
+    "PlayerShortcutBindingsTests.swift": {
+      "compiled_sha256": "2f5b7106efff5d00f6d494d0384ddf0a5e7f4b2524f8fc43155c7879282a878a",
+      "input_sha256": "666fc809ad73de5b7a4b2b405b5d3530258ce04c9b480e349a13270add90a613"
+    },
+    "PlayerShortcutDispatchTests.swift": {
+      "compiled_sha256": "d32834a3f357eb1bb1f0edae342a4ac5856489dcc3c4b9a2ada33503eef40eaa",
+      "input_sha256": "b90cada348676dc01024642bef81decfcedb1e91679b1f8554bcb3af42b44c69"
+    }
+  },
+  "test_command": [
+    "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+    "test",
+    "--package-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/release/baseline-release",
+    "--configuration",
+    "release",
+    "--jobs",
+    "2",
+    "--cache-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/release/package-cache",
+    "--config-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/release/package-config",
+    "--security-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/release/package-security",
+    "-Xswiftc",
+    "-warnings-as-errors",
+    "--use-integrated-swift-driver"
+  ],
+  "test_log_sha256": "154e03905e9eab7b5707899652624b1296448aa0b45edd8bba43fb88da9efd95",
+  "variant": "baseline"
+}

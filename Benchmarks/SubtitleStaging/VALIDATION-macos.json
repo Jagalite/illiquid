@@ -1,0 +1,96 @@
+{
+  "additional_checks": {
+    "all_120_pairs_match": [
+      "active_bytes",
+      "retained_bytes",
+      "budget_reserved_bytes",
+      "checksum",
+      "held_count",
+      "iterations"
+    ],
+    "candidate_source_and_driver_match_tested_implementation": true,
+    "independent_evidence_review": "Passed without data or arithmetic mismatches.",
+    "macos_linux_complete_verification_receipt_matches": true,
+    "macos_linux_source_generated_driver_runner_hashes_match": true,
+    "paired_cases": 12,
+    "pairs_per_case": 10,
+    "per_case_orders": {
+      "baseline_first": 5,
+      "candidate_first": 5
+    },
+    "summary_medians_ranges_percentages_recomputed": true,
+    "timing_observations": 240
+  },
+  "artifact": {
+    "byte_length": 114611,
+    "downloaded_archive_sha256": "c68ae1763a30b59ea2c85e207f40637ed6fe1a608f13ff6a1c47d9392b0ad991",
+    "id": 12104988454,
+    "name": "subtitle-staging-macos-evidence",
+    "retention_days": 14
+  },
+  "baseline_commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "candidate_source_sha256": {
+    "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "089275255bd99ad57b2166489532a24373b0e218c0a6c346067c1d98b4a229f8",
+    "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "42ec2d4371fd595d442f7a2d109ef36c10824b478dc87728fbb89ce6bee5e7f7",
+    "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83"
+  },
+  "driver_sha256": "19da111cd794905493b8b32b9955c5271645e73b4727ebe25f9e1d7817e26b56",
+  "environment": {
+    "compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "runner_sha256": "9408dff4c3ca298cae172d6f6bdf49a7514765464365afe5047aed889ea9e865",
+    "timestamp_utc": "2026-10-17T15:12:03Z"
+  },
+  "evidence_sha256": {
+    "RESULTS-macos.json": "d991fcfb6dfacc95262c83062021f67156570f20c1d8cd865d81aa78ece272c9",
+    "TESTS-debug-macos.log": "678b97ba5bb0e32bbb8740f3428329dc915e4b8aabac1d10e59bc1749a7cecd8",
+    "TESTS-native-macos.log": "0594a137cb220bc5dbd7c8a40481081ec77a2e51c0f1c378971f2f14515db0b0",
+    "TESTS-release-macos.log": "6f13ba787805d731de16a807a129cf192b1505f5f76e94f9e7fe21a8c96b6481"
+  },
+  "schema": 1,
+  "scope_notes": [
+    "Component timings measure synthetic changed-frame CPU preparation after allocation and first cleanup; they do not measure whole-player CPU, energy, real-media prevalence, or physical memory traffic.",
+    "Retained-snapshot timing differs by platform; no specific Foundation allocation or virtual-memory mechanism was instrumented.",
+    "Some native media-fixture-dependent tests return early when fixtures are unavailable. Suite success does not certify every real-media scenario or interactive GUI behavior.",
+    "The evidence follow-up leaves production, regression tests, benchmark driver, runner, and workflow unchanged from the tested implementation commit."
+  ],
+  "test_sha256": "bc7f4c5ddc5d458a24fc1acaeb63ff519e6bc96731e88b2b912265fa69a01276",
+  "tested_implementation_commit": "2b889057daf791ee5d749963a374ccd04d043309",
+  "verification": {
+    "frame_count": 24,
+    "independent_snapshot_checks": 69,
+    "malformed_input_rejected": true,
+    "maximum_held_snapshots": 3,
+    "schema": 1,
+    "source_retirement_released_storage": true,
+    "status": "passed"
+  },
+  "verification_receipt_sha256": "35590c73a7d09c1fb5c568a975c3d102e4a27316f9a2a5be90b8a8c5e38cfa11",
+  "workflow": {
+    "component_and_benchmark": {
+      "cases_including_parameters": 10,
+      "conclusion": "success",
+      "debug_test_functions": 6,
+      "job_id": 117428142441,
+      "release_test_functions": 6
+    },
+    "conclusion": "success",
+    "native_regressions": {
+      "conclusion": "success",
+      "job_id": 117428142606,
+      "native_app_graph_built": true,
+      "pinned_native_sdk_installed": true,
+      "reported_seconds": 18.349,
+      "reported_suites": 3,
+      "reported_tests": 51,
+      "suites": [
+        "SubtitleStagingReuseTests",
+        "MetalASSSubtitleCompositorTests",
+        "PiPSubtitlePipelineTests"
+      ]
+    },
+    "run_id": 39043712484,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39043712484"
+  }
+}

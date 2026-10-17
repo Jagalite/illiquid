@@ -10,7 +10,8 @@ public enum NFOMetadataHints {
         parser.shouldResolveExternalEntities = false
         let delegate = MetadataDelegate()
         parser.delegate = delegate
-        guard parser.parse(), delegate.valid, delegate.hasValue else { return nil }
+        // Some Foundation implementations report an error while parse() returns true.
+        guard parser.parse(), parser.parserError == nil, delegate.valid, delegate.hasValue else { return nil }
         var result = delegate.hints
         result.sources = ["NFO"]
         return result
@@ -42,14 +43,30 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
         if stack.count == 2, name == "uniqueid" { idProvider = attributeDict["type"] }
     }
 
+    // Only retain fields consumed by didEndElement. Long plots, outlines and
+    // other unsupported metadata must not invalidate useful identification hints.
+    // The whole-document byte and nesting limits still apply to every element.
+    private var capturesText: Bool {
+        guard stack.count == 2, let name = stack.last else { return false }
+        switch name {
+        case "title", "uniqueid": return true
+        case "season", "episode": return hints.content == .episode
+        case "showtitle": return hints.content == .episode
+        case "year": return hints.content != .episode
+        default: return false
+        }
+    }
+
     func parser(_ parser: XMLParser, foundCharacters string: String) {
-        guard stack.count == 2 else { return }
+        guard capturesText else { return }
         guard text.count + string.count <= 4096 else { valid = false; parser.abortParsing(); return }
         text += string
     }
 
     func parser(_ parser: XMLParser, foundCDATA CDATABlock: Data) {
-        if let value = String(data: CDATABlock, encoding: .utf8) { self.parser(parser, foundCharacters: value) }
+        if capturesText, let value = String(data: CDATABlock, encoding: .utf8) {
+            self.parser(parser, foundCharacters: value)
+        }
     }
 
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
@@ -65,9 +82,10 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
         case "showtitle" where hints.content == .episode: hints.title = value; hasValue = true
         case "year" where hints.content != .episode:
             if let year = MediaMetadataHints.number(value), (1800...2099).contains(year) { hints.year = year; hasValue = true }
-        case "season":
+        // In tvshow NFOs these fields are library totals, not episode identity.
+        case "season" where hints.content == .episode:
             if let season = MediaMetadataHints.number(value, maximum: 999) { hints.season = season; hasValue = true }
-        case "episode":
+        case "episode" where hints.content == .episode:
             if let episode = MediaMetadataHints.number(value) { hints.episode = episode; hasValue = true }
         case "uniqueid":
             if let provider = idProvider, let id = MediaMetadataHints.catalogID(provider: provider, value: value) {

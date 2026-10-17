@@ -1,0 +1,279 @@
+{
+  "baseline_commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "scope": "Real FFmpeg C ownership kernel, not the Swift native runtime; warm OS-cache unpaced demux; no decoding/display",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "ffmpeg": "7.1.5-0+deb13u1",
+  "swift": "6.2.1",
+  "rounds_per_observation": 100,
+  "retained_packets": 96,
+  "observations": 81,
+  "uses_development_headers": false,
+  "schedule_verified": true,
+  "fixtures": {
+    "h264-aac.mkv": {
+      "bytes": 1116971,
+      "sha256": "c619a66beda838a4ebd501eace6d0d60d86b8e6c9657b0e15a6357e938d64589"
+    },
+    "h264-aac.mp4": {
+      "bytes": 1124096,
+      "sha256": "ed69b6435352b187249d2d1bc87be2ba04a53b18b6919940207e54f6a70036d8"
+    },
+    "mpeg2-mp2.ts": {
+      "bytes": 3056316,
+      "sha256": "e79fe745692aacde5ca85e845ec884dcb871b563c617cc3b53cf88f80be5828a"
+    }
+  },
+  "timed_source_sha256": "b4cb0dd79589c6ccde94c0ca02792fb8438ccd938def0cc4234eee69c0d6debc",
+  "final_source_sha256": "000b726c8a58b1c62c6bca4dd13776ba2c00dfd2d8d5d58d0f044bc4885605c4",
+  "fallback_preprocessed_source_identical": true,
+  "runner_sha256": "726b7b0aeec78ee4c974747adf3343b1ecbdee3c4b7fecefab141f8314f88095",
+  "binary_sha256": "765eceaa511c017b39f0959c40fd36237ebb736150f8f640ed82f4995e59ec0e",
+  "columns": [
+    "fixture",
+    "variant",
+    "repeat",
+    "order",
+    "packets",
+    "explicit_header_allocations",
+    "explicit_moves",
+    "demux_wall_ns",
+    "demux_cpu_ns",
+    "open_probe_seek_ns"
+  ],
+  "correctness": [
+    {
+      "fixture": "h264-aac.mkv",
+      "retention": 1,
+      "seek": null,
+      "packets": 856,
+      "trace_sha256": "5ea9ad2735ea001a385e84e1328f59a96e318b6be6aead5e8293c365fe8a8abc",
+      "trace_bytes": 1145274,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "h264-aac.mkv",
+      "retention": 1,
+      "seek": 3.0,
+      "packets": 642,
+      "trace_sha256": "5297ad724702d8213278ef90e1276588eaaf3aa802758dbae343b9b81007d3b4",
+      "trace_bytes": 873311,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "h264-aac.mkv",
+      "retention": 96,
+      "seek": null,
+      "packets": 856,
+      "trace_sha256": "5ea9ad2735ea001a385e84e1328f59a96e318b6be6aead5e8293c365fe8a8abc",
+      "trace_bytes": 1145274,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "h264-aac.mkv",
+      "retention": 96,
+      "seek": 3.0,
+      "packets": 642,
+      "trace_sha256": "5297ad724702d8213278ef90e1276588eaaf3aa802758dbae343b9b81007d3b4",
+      "trace_bytes": 873311,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "h264-aac.mp4",
+      "retention": 1,
+      "seek": null,
+      "packets": 856,
+      "trace_sha256": "cd4f84234683d550eb99a4b2d7ef551729487dfb85533773ae1306e57c4e64e9",
+      "trace_bytes": 1149080,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "h264-aac.mp4",
+      "retention": 1,
+      "seek": 3.0,
+      "packets": 643,
+      "trace_sha256": "f6222ab4222688874e850def5018554c7f238aff984d2d865df9172d271df691",
+      "trace_bytes": 876621,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "h264-aac.mp4",
+      "retention": 96,
+      "seek": null,
+      "packets": 856,
+      "trace_sha256": "cd4f84234683d550eb99a4b2d7ef551729487dfb85533773ae1306e57c4e64e9",
+      "trace_bytes": 1149080,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "h264-aac.mp4",
+      "retention": 96,
+      "seek": 3.0,
+      "packets": 643,
+      "trace_sha256": "f6222ab4222688874e850def5018554c7f238aff984d2d865df9172d271df691",
+      "trace_bytes": 876621,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "mpeg2-mp2.ts",
+      "retention": 1,
+      "seek": null,
+      "packets": 814,
+      "trace_sha256": "f1273b839183d65b4cd1b01d6b41acf549b0652a4377e95b56d5591207e616d8",
+      "trace_bytes": 2947881,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "mpeg2-mp2.ts",
+      "retention": 1,
+      "seek": 3.0,
+      "packets": 655,
+      "trace_sha256": "77990362cfbc4b8f9a7ad8d8a34ac20c8c90118e35b8b85dd72f0d58718fc8bf",
+      "trace_bytes": 2431442,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "mpeg2-mp2.ts",
+      "retention": 96,
+      "seek": null,
+      "packets": 814,
+      "trace_sha256": "f1273b839183d65b4cd1b01d6b41acf549b0652a4377e95b56d5591207e616d8",
+      "trace_bytes": 2947881,
+      "all_three_variants_match": true
+    },
+    {
+      "fixture": "mpeg2-mp2.ts",
+      "retention": 96,
+      "seek": 3.0,
+      "packets": 655,
+      "trace_sha256": "77990362cfbc4b8f9a7ad8d8a34ac20c8c90118e35b8b85dd72f0d58718fc8bf",
+      "trace_bytes": 2431442,
+      "all_three_variants_match": true
+    }
+  ],
+  "swift_packet_probe": [
+    {
+      "variant": "baseline",
+      "optimization": "Onone",
+      "source_sha256": "6c88023c6a7e167951396b71f5bf669ab1626624412a734cf8fd63b01b58bfb5",
+      "result": {
+        "checks": 8004,
+        "oversized_replay_count": 1,
+        "buffer_release_count": 1
+      }
+    },
+    {
+      "variant": "baseline",
+      "optimization": "O",
+      "source_sha256": "6c88023c6a7e167951396b71f5bf669ab1626624412a734cf8fd63b01b58bfb5",
+      "result": {
+        "checks": 8004,
+        "oversized_replay_count": 1,
+        "buffer_release_count": 1
+      }
+    },
+    {
+      "variant": "candidate",
+      "optimization": "Onone",
+      "source_sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+      "result": {
+        "checks": 8014,
+        "oversized_replay_count": 0,
+        "buffer_release_count": 1
+      }
+    },
+    {
+      "variant": "candidate",
+      "optimization": "O",
+      "source_sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+      "result": {
+        "checks": 8014,
+        "oversized_replay_count": 0,
+        "buffer_release_count": 1
+      }
+    }
+  ],
+  "rows": [
+    ["h264-aac.mkv","baseline",0,0,85600,171300,85600,139052464,139227767,298252603],
+    ["h264-aac.mkv","adopt",0,1,85600,85700,0,132424649,132654591,311839232],
+    ["h264-aac.mkv","scratch",0,2,85600,85700,85600,127855317,128065793,296198229],
+    ["h264-aac.mkv","adopt",1,0,85600,85700,0,161636890,161905216,342405978],
+    ["h264-aac.mkv","scratch",1,1,85600,85700,85600,127610517,127792710,318547951],
+    ["h264-aac.mkv","baseline",1,2,85600,171300,85600,154388613,155047243,332989490],
+    ["h264-aac.mkv","scratch",2,0,85600,85700,85600,125274206,125492333,313916629],
+    ["h264-aac.mkv","baseline",2,1,85600,171300,85600,157551387,158134059,381740858],
+    ["h264-aac.mkv","adopt",2,2,85600,85700,0,127660924,127952991,346134183],
+    ["h264-aac.mkv","baseline",3,0,85600,171300,85600,143111886,143369304,312326783],
+    ["h264-aac.mkv","adopt",3,1,85600,85700,0,136338686,136544079,333507476],
+    ["h264-aac.mkv","scratch",3,2,85600,85700,85600,132444052,132634875,334192862],
+    ["h264-aac.mkv","adopt",4,0,85600,85700,0,131805776,131992609,323036267],
+    ["h264-aac.mkv","scratch",4,1,85600,85700,85600,136603785,136831968,337714332],
+    ["h264-aac.mkv","baseline",4,2,85600,171300,85600,145305563,145497386,327828116],
+    ["h264-aac.mkv","scratch",5,0,85600,85700,85600,148651384,148843153,348495663],
+    ["h264-aac.mkv","baseline",5,1,85600,171300,85600,175348964,175564628,340913158],
+    ["h264-aac.mkv","adopt",5,2,85600,85700,0,356229861,356414624,488138591],
+    ["h264-aac.mkv","baseline",6,0,85600,171300,85600,183093526,183132298,449732005],
+    ["h264-aac.mkv","adopt",6,1,85600,85700,0,169677972,169947116,517046997],
+    ["h264-aac.mkv","scratch",6,2,85600,85700,85600,147008173,147210595,368507830],
+    ["h264-aac.mkv","adopt",7,0,85600,85700,0,211822014,211989700,502500791],
+    ["h264-aac.mkv","scratch",7,1,85600,85700,85600,209550245,209768611,533353294],
+    ["h264-aac.mkv","baseline",7,2,85600,171300,85600,152164070,152388336,351459889],
+    ["h264-aac.mkv","scratch",8,0,85600,85700,85600,151596674,151784871,395792175],
+    ["h264-aac.mkv","baseline",8,1,85600,171300,85600,146071516,146285462,326731997],
+    ["h264-aac.mkv","adopt",8,2,85600,85700,0,148418839,148621262,349495088],
+    ["h264-aac.mp4","baseline",0,0,85600,171300,85600,135167368,135347826,332816076],
+    ["h264-aac.mp4","adopt",0,1,85600,85700,0,114673466,114865343,341510910],
+    ["h264-aac.mp4","scratch",0,2,85600,85700,85600,123900471,124127137,373181994],
+    ["h264-aac.mp4","adopt",1,0,85600,85700,0,151055667,151265973,382728002],
+    ["h264-aac.mp4","scratch",1,1,85600,85700,85600,124829100,125033376,318685770],
+    ["h264-aac.mp4","baseline",1,2,85600,171300,85600,126488528,126684306,308175611],
+    ["h264-aac.mp4","scratch",2,0,85600,85700,85600,114178704,114777159,315893883],
+    ["h264-aac.mp4","baseline",2,1,85600,171300,85600,133887330,134091016,313485284],
+    ["h264-aac.mp4","adopt",2,2,85600,85700,0,110960499,111154194,316512659],
+    ["h264-aac.mp4","baseline",3,0,85600,171300,85600,153288606,153551486,360739386],
+    ["h264-aac.mp4","adopt",3,1,85600,85700,0,119106329,119304460,313525236],
+    ["h264-aac.mp4","scratch",3,2,85600,85700,85600,117105432,117300157,324593287],
+    ["h264-aac.mp4","adopt",4,0,85600,85700,0,114336190,114530265,311693272],
+    ["h264-aac.mp4","scratch",4,1,85600,85700,85600,121571202,121759848,306706497],
+    ["h264-aac.mp4","baseline",4,2,85600,171300,85600,126444733,126633071,334409519],
+    ["h264-aac.mp4","scratch",5,0,85600,85700,85600,115133815,115355570,303522661],
+    ["h264-aac.mp4","baseline",5,1,85600,171300,85600,135369929,135560463,326731101],
+    ["h264-aac.mp4","adopt",5,2,85600,85700,0,119343637,119530825,312786301],
+    ["h264-aac.mp4","baseline",6,0,85600,171300,85600,139844524,140188621,437839638],
+    ["h264-aac.mp4","adopt",6,1,85600,85700,0,127235323,127433543,476626933],
+    ["h264-aac.mp4","scratch",6,2,85600,85700,85600,133210698,133495770,353824339],
+    ["h264-aac.mp4","adopt",7,0,85600,85700,0,118072987,118010369,313373459],
+    ["h264-aac.mp4","scratch",7,1,85600,85700,85600,143806180,143358370,395544801],
+    ["h264-aac.mp4","baseline",7,2,85600,171300,85600,125680029,125857302,312499556],
+    ["h264-aac.mp4","scratch",8,0,85600,85700,85600,118692387,118910373,314637629],
+    ["h264-aac.mp4","baseline",8,1,85600,171300,85600,128565614,128772782,313951402],
+    ["h264-aac.mp4","adopt",8,2,85600,85700,0,120221786,120480396,333012372],
+    ["mpeg2-mp2.ts","baseline",0,0,81400,162900,81400,329657829,329614957,73306941],
+    ["mpeg2-mp2.ts","adopt",0,1,81400,81500,0,320924645,320531430,69978342],
+    ["mpeg2-mp2.ts","scratch",0,2,81400,81500,81400,349999011,350082378,73670352],
+    ["mpeg2-mp2.ts","adopt",1,0,81400,81500,0,416247218,416487118,76461941],
+    ["mpeg2-mp2.ts","scratch",1,1,81400,81500,81400,338972568,339250321,68600236],
+    ["mpeg2-mp2.ts","baseline",1,2,81400,162900,81400,348281587,348494749,69226757],
+    ["mpeg2-mp2.ts","scratch",2,0,81400,81500,81400,324088828,324280101,70776644],
+    ["mpeg2-mp2.ts","baseline",2,1,81400,162900,81400,333744687,334122031,69639109],
+    ["mpeg2-mp2.ts","adopt",2,2,81400,81500,0,335320544,335494423,70679190],
+    ["mpeg2-mp2.ts","baseline",3,0,81400,162900,81400,367300122,367623403,103536156],
+    ["mpeg2-mp2.ts","adopt",3,1,81400,81500,0,320163077,320281682,71609775],
+    ["mpeg2-mp2.ts","scratch",3,2,81400,81500,81400,325571298,325778867,72090309],
+    ["mpeg2-mp2.ts","adopt",4,0,81400,81500,0,347166170,347384207,74262137],
+    ["mpeg2-mp2.ts","scratch",4,1,81400,81500,81400,339574003,339599081,71291546],
+    ["mpeg2-mp2.ts","baseline",4,2,81400,162900,81400,327078154,327279240,66367982],
+    ["mpeg2-mp2.ts","scratch",5,0,81400,81500,81400,357915401,358221745,77857393],
+    ["mpeg2-mp2.ts","baseline",5,1,81400,162900,81400,339146321,338196121,75346456],
+    ["mpeg2-mp2.ts","adopt",5,2,81400,81500,0,354356690,354628580,78695551],
+    ["mpeg2-mp2.ts","baseline",6,0,81400,162900,81400,321702573,321893599,68492241],
+    ["mpeg2-mp2.ts","adopt",6,1,81400,81500,0,341481707,341682308,77753739],
+    ["mpeg2-mp2.ts","scratch",6,2,81400,81500,81400,323682539,323903502,69526065],
+    ["mpeg2-mp2.ts","adopt",7,0,81400,81500,0,428886758,429109300,84943839],
+    ["mpeg2-mp2.ts","scratch",7,1,81400,81500,81400,326598366,326741586,69351796],
+    ["mpeg2-mp2.ts","baseline",7,2,81400,162900,81400,346428690,346300435,74237544],
+    ["mpeg2-mp2.ts","scratch",8,0,81400,81500,81400,368745779,368933386,79541247],
+    ["mpeg2-mp2.ts","baseline",8,1,81400,162900,81400,338393995,338586076,70988677],
+    ["mpeg2-mp2.ts","adopt",8,2,81400,81500,0,358946754,359319855,79005370]
+  ]
+}

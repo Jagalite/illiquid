@@ -5,6 +5,12 @@ import Foundation
 final class ThumbnailBlockingReader<Value: Sendable>: @unchecked Sendable {
     private final class Reply: @unchecked Sendable {
         private let lock = NSLock()
+        private let expiresAt: ContinuousClock.Instant
+        private let now: @Sendable () -> ContinuousClock.Instant
+        init(timeout: Double, now: @escaping @Sendable () -> ContinuousClock.Instant) {
+            self.now = now
+            expiresAt = now().advanced(by: .seconds(timeout))
+        }
         private var finished = false
         private var continuation: CheckedContinuation<Value?, Never>?
         private var deadline: DispatchWorkItem?
@@ -28,16 +34,22 @@ final class ThumbnailBlockingReader<Value: Sendable>: @unchecked Sendable {
                 defer { continuation = nil }
                 return continuation
             }
-            reply?.resume(returning: key)
+            // The dispatch timer is only a wakeup mechanism. Queue contention
+            // must not turn a late native result into an on-time response.
+            reply?.resume(returning: now() < expiresAt ? key : nil)
         }
     }
     private let lock = NSLock()
     private var busy = false
     private let queue = DispatchQueue(label: "com.illiquid.thumbnail-file-identity", qos: .utility)
     private let timeout: Double
-    init(timeout: Double = 3) { self.timeout = timeout }
+    private let now: @Sendable () -> ContinuousClock.Instant
+    init(timeout: Double = 3, now: @escaping @Sendable () -> ContinuousClock.Instant = { .now }) {
+        self.timeout = timeout
+        self.now = now
+    }
     func read(_ operation: @escaping @Sendable () -> Value?) async -> Value? {
-        let reply = Reply()
+        let reply = Reply(timeout: timeout, now: now)
         return await withTaskCancellationHandler {
             await withCheckedContinuation { continuation in
                 reply.install(continuation)

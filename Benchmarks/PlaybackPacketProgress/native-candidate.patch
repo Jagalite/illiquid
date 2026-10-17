@@ -1,0 +1,213 @@
+diff --git a/Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift b/Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift
+--- a/Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift
++++ b/Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift
+@@ -160,6 +160,84 @@
+                 generation: generation
+             )
+             return packet
++        }
++    }
++
++    /// Experimental secondary-reader API. Keep the main readPacket body intact;
++    /// the lab verifies identical retry/EOF policy to prevent prototype drift.
++    /// One completed demux packet per result. Unselected payloads are released
++    /// here, but their timing still reaches the caller's read-ahead gate.
++    /// Never sets stream discard flags or injects an I/O error to yield.
++    func readPacketStep(generation: Int, keepingStream: Int32?) throws -> FFmpegPacketReadStep? {
++        guard let context else { return nil }
++        var ownedPacket = av_packet_alloc()
++        guard let temporary = ownedPacket else {
++            throw FFmpegError(
++                operation: "Allocate demux packet",
++                code: illiquid_averror_nomem()
++            )
++        }
++        // On EOF/error this frees the input packet; successful delivery clears
++        // the slot by transferring its header directly to FFmpegPacket.
++        defer { av_packet_free(&ownedPacket) }
++
++        var retryPolicy = FFmpegDemuxReadRetryPolicy()
++        let noProgressStart = ProcessInfo.processInfo.systemUptime
++        while true {
++            let result = av_read_frame(context, temporary)
++            if result == illiquid_averror_eof() {
++                if let input = context.pointee.pb,
++                   input.pointee.error < 0,
++                   input.pointee.error != illiquid_averror_eof()
++                {
++                    try checkFFmpeg(input.pointee.error, operation: "Read media input")
++                }
++                if terminalPacketWasCorrupt {
++                    throw FFmpegError(operation: "Read truncated media packet", code: illiquid_averror_invaliddata())
++                }
++                return nil
++            }
++            if result < 0,
++               retryPolicy.decision(
++                for: result,
++                elapsedNoProgressSeconds:
++                    ProcessInfo.processInfo.systemUptime - noProgressStart
++               ) == .retry
++            {
++                // Matroska resynchronization commonly reports INVALIDDATA, while
++                // custom and remote AVIO sources can transiently report EAGAIN or
++                // another read error. Keep all retries bounded by both a count and
++                // elapsed no-progress time, and never retry interruption.
++                av_packet_unref(temporary)
++                if result == illiquid_averror_eagain() {
++                    Thread.sleep(forTimeInterval: 0.001)
++                }
++                continue
++            }
++            try checkFFmpeg(result, operation: "Read media packet")
++
++            let index = Int(temporary.pointee.stream_index)
++            guard index >= 0, index < Int(context.pointee.nb_streams),
++                  let stream = context.pointee.streams[index]
++            else {
++                av_packet_unref(temporary)
++                continue
++            }
++            // Some demuxers return a partial packet followed by EOF with no
++            // AVIO error. Preserve FFmpeg's explicit corruption signal only
++            // at physical input EOF; a later healthy packet clears it.
++            terminalPacketWasCorrupt = temporary.pointee.flags & AV_PKT_FLAG_CORRUPT != 0
++                && (context.pointee.pb?.pointee.eof_reached ?? 0) != 0
++            if let keepingStream, temporary.pointee.stream_index != keepingStream {
++                return .progress(FFmpegPacketProgress(
++                    packet: temporary, timeBase: stream.pointee.time_base, generation: generation
++                ))
++            }
++            return .packet(try FFmpegPacket(
++                taking: &ownedPacket,
++                timeBase: stream.pointee.time_base,
++                generation: generation
++            ))
+         }
+     }
+ 
+diff --git a/Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift b/Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift
+--- a/Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift
++++ b/Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift
+@@ -379,6 +379,13 @@
+         }
+     }
+ 
++    /// Uses the same serialized context and cancellation token as payload reads.
++    func readPacketStep(generation: Int, keepingStream: Int32) throws -> FFmpegPacketReadStep? {
++        try perform(kind: .read) { demuxer in
++            try demuxer.readPacketStep(generation: generation, keepingStream: keepingStream)
++        }
++    }
++
+     func seek(to seconds: Double, exact: Bool) throws {
+         try perform(kind: .seek) { demuxer in
+             try demuxer.seek(to: seconds, exact: exact)
+diff --git a/Sources/IlliquidNativePlayback/Media/FFmpegPacketReadStep.swift b/Sources/IlliquidNativePlayback/Media/FFmpegPacketReadStep.swift
+new file mode 100644
+--- /dev/null
++++ b/Sources/IlliquidNativePlayback/Media/FFmpegPacketReadStep.swift
+@@ -0,0 +1,60 @@
++import CFFmpeg
++import Foundation
++
++/// A value-only pacing observation. It never retains the AVPacket, side data,
++/// or payload. Optional times retain FFmpeg's missing-timestamp semantics.
++struct FFmpegPacketProgress: Equatable, Sendable {
++    let streamIndex: Int32
++    let presentationTimestamp: Int64
++    let decodeTimestamp: Int64
++    let timeBase: FFmpegRational
++    let generation: Int
++
++    init(packet: UnsafePointer<AVPacket>, timeBase: AVRational, generation: Int) {
++        streamIndex = packet.pointee.stream_index
++        presentationTimestamp = packet.pointee.pts
++        decodeTimestamp = packet.pointee.dts
++        self.timeBase = FFmpegRational(timeBase)
++        self.generation = generation
++    }
++
++    var presentationSeconds: Double? {
++        presentationTimestamp == illiquid_nopts_value()
++            ? nil : MediaTime.seconds(presentationTimestamp, timeBase: timeBase)
++    }
++
++    var decodeSeconds: Double? {
++        decodeTimestamp == illiquid_nopts_value()
++            ? nil : MediaTime.seconds(decodeTimestamp, timeBase: timeBase)
++    }
++}
++
++/// Progress is not EOF: only a nil read result denotes end of input. Errors
++/// and cancellation are still thrown by the existing bounded read policy.
++enum FFmpegPacketReadStep: Sendable {
++    case packet(FFmpegPacket)
++    case progress(FFmpegPacketProgress)
++
++    var generation: Int {
++        switch self {
++        case .packet(let packet): packet.generation
++        case .progress(let progress): progress.generation
++        }
++    }
++    var decodeSeconds: Double? {
++        switch self {
++        case .packet(let packet): packet.decodeSeconds
++        case .progress(let progress): progress.decodeSeconds
++        }
++    }
++    var presentationSeconds: Double? {
++        switch self {
++        case .packet(let packet): packet.presentationSeconds
++        case .progress(let progress): progress.presentationSeconds
++        }
++    }
++    var packet: FFmpegPacket? {
++        guard case .packet(let packet) = self else { return nil }
++        return packet
++    }
++}
+diff --git a/Sources/IlliquidNativePlayback/Media/MediaSession.swift b/Sources/IlliquidNativePlayback/Media/MediaSession.swift
+--- a/Sources/IlliquidNativePlayback/Media/MediaSession.swift
++++ b/Sources/IlliquidNativePlayback/Media/MediaSession.swift
+@@ -1727,28 +1727,31 @@
+             }
+ 
+             do {
+-                let nextPacket: FFmpegPacket?
++                let nextStep: FFmpegPacketReadStep?
+                 if let subtitlePacketReader {
+-                    nextPacket = try subtitlePacketReader(activeGeneration)
++                    nextStep = try subtitlePacketReader(activeGeneration).map(FFmpegPacketReadStep.packet)
+                 } else {
+-                    nextPacket = try subtitleInput.readPacket(generation: activeGeneration)
+-                }
+-                guard let packet = nextPacket else {
++                    nextStep = try subtitleInput.readPacketStep(
++                        generation: activeGeneration, keepingStream: selectedSubtitle.index
++                    )
++                }
++                guard let step = nextStep else {
+                     atEndOfFile = true
+                     continue
+                 }
+-                guard generation.accepts(packet.generation) else {
++                guard generation.accepts(step.generation) else {
+                     incrementStalePacket()
+                     continue
+                 }
+-                if let timestamp = packet.decodeSeconds ?? packet.presentationSeconds,
++                if let timestamp = step.decodeSeconds ?? step.presentationSeconds,
+                    timestamp.isFinite,
+                    !subtitleReadAhead.wait(
+                        until: timestamp - subtitleTimelineOrigin, generation: activeGeneration
+                    ) {
+                     continue
+                 }
+-                guard packet.streamIndex == selectedSubtitle.index else { continue }
++                guard let packet = step.packet,
++                      packet.streamIndex == selectedSubtitle.index else { continue }
+                 let pruneBefore = subtitleReadAhead.currentPosition - 30
+                 subtitles.pruneEmbeddedEvents(before: pruneBefore)
+                 pictureInPictureSubtitles?.pruneEmbeddedEvents(before: pruneBefore)

@@ -1,0 +1,36 @@
+--- candidate/SubtitleMemoryBudget.swift
++++ deliberately-broken/SubtitleMemoryBudget.swift
+@@ -145,31 +145,8 @@
+     }
+ 
+     private func resize(id: UInt64, to bytes: Int) -> Bool {
+-        let requested = max(0, bytes)
+-        return lock.withLock {
+-            guard let existing = state.reservations[id] else { return false }
+-            // Limits are immutable, so an admitted, unchanged reservation is
+-            // still valid. Reused staging storage commonly takes this path.
+-            guard requested != existing.bytes else { return true }
+-            var reserved = 0
+-            var ownerReserved = 0
+-            for reservation in state.reservations.values {
+-                reserved += reservation.bytes
+-                if reservation.owner == existing.owner { ownerReserved += reservation.bytes }
+-            }
+-            let available = limitBytes - (reserved - existing.bytes)
+-            let ownerAvailable = ownerLimitsBytes[existing.owner].map {
+-                $0 - (ownerReserved - existing.bytes)
+-            } ?? Int.max
+-            guard requested <= available,
+-                  requested <= ownerAvailable
+-            else {
+-                state.rejectedAcquisitions += 1
+-                return false
+-            }
+-            state.reservations[id] = (existing.owner, requested)
+-            return true
+-        }
++        // Negative control: incorrectly report success for every live lease.
++        lock.withLock { state.reservations[id] != nil }
+     }
+ 
+     private func release(id: UInt64) {

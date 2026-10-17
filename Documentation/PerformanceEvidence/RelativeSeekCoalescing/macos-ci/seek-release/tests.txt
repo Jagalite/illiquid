@@ -1,0 +1,38 @@
+Test Suite 'All tests' started at 2026-10-17 15:56:35.785.
+Test Suite 'All tests' passed at 2026-10-17 15:56:35.791.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.006) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Relative seek effect lifetime" started.
+◇ Test burstRetainsOnlyDispatchedWorkAndTheLatestDeferredSeek() started.
+✔ Test burstRetainsOnlyDispatchedWorkAndTheLatestDeferredSeek() passed after 0.008 seconds.
+◇ Test retiredCancellationIsDuplicateAndPreservesTheLatestTarget() started.
+✔ Test retiredCancellationIsDuplicateAndPreservesTheLatestTarget() passed after 0.001 seconds.
+◇ Test exactSeekAndStopRetireUndispatchedRelativeWork(stop:) started.
+◇ Test case passing 1 argument stop → false to exactSeekAndStopRetireUndispatchedRelativeWork(stop:) started.
+◇ Test case passing 1 argument stop → true to exactSeekAndStopRetireUndispatchedRelativeWork(stop:) started.
+✔ Test exactSeekAndStopRetireUndispatchedRelativeWork(stop:) with 2 test cases passed after 0.001 seconds.
+◇ Test dispatchedSeekRemainsNativeOwnedUntilItsLateResultArrives() started.
+✔ Test dispatchedSeekRemainsNativeOwnedUntilItsLateResultArrives() passed after 0.001 seconds.
+◇ Test sleepDispatchesTheCurrentDeferredSeekWithoutCancellingItsEffect() started.
+✔ Test sleepDispatchesTheCurrentDeferredSeekWithoutCancellingItsEffect() passed after 0.001 seconds.
+◇ Test observerCanReenterWithDuplicateCancellationAfterRetirement() started.
+✔ Test observerCanReenterWithDuplicateCancellationAfterRetirement() passed after 0.001 seconds.
+◇ Test shutdownFinalizesWithoutDispatchingTheDeferredSeek() started.
+✔ Test shutdownFinalizesWithoutDispatchingTheDeferredSeek() passed after 0.142 seconds.
+✔ Suite "Relative seek effect lifetime" passed after 0.153 seconds.
+✔ Test run with 7 tests in 1 suite passed after 0.154 seconds.
+Building for production...
+[0/10] /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-relative-seek-y1rsael6/.build/arm64-apple-macosx/release/RelativeSeekCoalescingPackageTests.derived/runner.swift
+[1/10] Write swift-version-7974D3F7F03D5E95.txt
+[2/10] Write sources
+[9/11] Compiling IlliquidCore MediaContentVersion.swift
+[10/12] Compiling IlliquidPlaybackCore EventsAndEffects.swift
+[11/13] Compiling IlliquidPlayback Module.swift
+[12/14] Compiling IlliquidPlayer PlaybackRuntimeDriver.swift
+[13/15] Compiling IlliquidPlayerTests RelativeSeekEffectLifetimeTests.swift
+[14/16] Compiling RelativeSeekCoalescingPackageTests runner.swift
+[14/16] Write Objects.LinkFileList
+[15/16] Linking RelativeSeekCoalescingPackageTests
+Build complete! (54.24s)

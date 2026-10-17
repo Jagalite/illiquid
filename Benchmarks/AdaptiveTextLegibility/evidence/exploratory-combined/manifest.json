@@ -1,0 +1,57 @@
+{
+  "arguments": {
+    "cases": "one-rainbow,one-mono,local9-bright-rainbow,overall96-bright-rainbow,overall96-dark-rainbow,overall96-mixed-rainbow,letterbox224-rainbow",
+    "kernels": "style_miss,init_score",
+    "list_cases": false,
+    "output": "/tmp/illiquid-legibility-quick-1",
+    "receipt_samples": 40,
+    "receipts_only": false,
+    "rounds": 2,
+    "swiftc": "swiftc",
+    "target_ms": 30.0
+  },
+  "baseline": {
+    "commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+    "sha256": "f6c312edecdf8861e3f915689eef4d938447bddd28a751304151a36511e84b90",
+    "source": "Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift"
+  },
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "environment": {
+    "logical_cpu_count": 9,
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14"
+  },
+  "flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-module-cache-path",
+    "/tmp/illiquid-legibility-bv_5shzp/swift-module-cache"
+  ],
+  "git_head": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "runner_sha256": "d9040d63c2ba51b930a700259bc38e245010448b2cd4fc5ec1fb7a92fa8e9d9e",
+  "scope": "Numeric style cache miss: context init+resolve, second context init+two readableOpacity calls (.96/.90). Excludes UI, sample generation/region extraction, cache lookup, video decode.",
+  "sources": {
+    "Driver.swift": {
+      "original": "Benchmarks/AdaptiveTextLegibility/Driver.swift",
+      "sha256": "4f3e2ed0d670486ddebbe30acf907c468a98767121752c30f37fd7294cac7b5e"
+    },
+    "PlayerTheme.swift": {
+      "original": "Sources/IlliquidApp/UI/PlayerTheme.swift",
+      "sha256": "333630303cbd6725d4140fa3358035f0b005f2052392c1933bc06cdf00464e1d"
+    },
+    "VideoColorSample.swift": {
+      "original": "Sources/IlliquidCore/Player/VideoColorSample.swift",
+      "sha256": "e296cb8ddb45850b8c6356bdec8b6f128e22fe48119bc5c24c6c42f1e32fad06"
+    },
+    "baseline.swift": {
+      "original": "Benchmarks/AdaptiveTextLegibility/baseline/AdaptiveTextLegibility.swift",
+      "sha256": "f6c312edecdf8861e3f915689eef4d938447bddd28a751304151a36511e84b90"
+    },
+    "candidate.swift": {
+      "original": "Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift",
+      "sha256": "308c2f44a429f1b331f0abed42656ade0c4db1188c9f774f32fb3fa72b1d7156"
+    }
+  },
+  "support_sha256": "e1474131ed52562b0e2a4800bfa36c6aa5a3f028fddf55ff50ad108de15c0e03"
+}

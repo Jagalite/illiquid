@@ -1,0 +1,28 @@
+name: Folder discovery filesystem regressions
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/**'
+      - 'Tests/IlliquidCoreTests/Folder*Tests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/TemporaryDirectory.swift'
+      - 'Scripts/test-folder-discovery-regressions.sh'
+      - '.github/workflows/folder-discovery-regressions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  filesystem:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: swift --version
+      - name: Debug filesystem tests
+        run: bash Scripts/test-folder-discovery-regressions.sh -c debug
+      - name: Release filesystem tests
+        run: bash Scripts/test-folder-discovery-regressions.sh -c release

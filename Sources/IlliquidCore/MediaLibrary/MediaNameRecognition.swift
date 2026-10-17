@@ -110,10 +110,15 @@ public enum MediaNameRecognition {
             }
         }
         if let token = match(date, raw) ?? match(reverseDate, raw) {
-            let parts = (1...3).compactMap { capture(token, $0, in: raw).flatMap(Int.init) }
-            let y = parts[0] > 31 ? parts[0] : parts[2]
-            let d = parts[0] > 31 ? parts[2] : parts[0]
-            let m = parts[1]
+            // Regex \d also matches Unicode digits that Int cannot parse. Keep
+            // those date-like names on the same unclassified path as invalid dates.
+            guard let first = capture(token, 1, in: raw).flatMap(Int.init),
+                  let m = capture(token, 2, in: raw).flatMap(Int.init),
+                  let last = capture(token, 3, in: raw).flatMap(Int.init) else {
+                return result(.unknown, raw)
+            }
+            let y = first > 31 ? first : last
+            let d = first > 31 ? last : first
             var calendar = Calendar(identifier: .gregorian)
             calendar.timeZone = TimeZone(secondsFromGMT: 0)!
             let components = DateComponents(year: y, month: m, day: d)

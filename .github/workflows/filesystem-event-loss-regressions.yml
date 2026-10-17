@@ -1,0 +1,34 @@
+name: Filesystem event-loss recovery regressions
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceFilesystem*.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystemMonitorTests.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystemEventLossTests.swift'
+      - 'Scripts/test-filesystem-event-loss-regressions.sh'
+      - 'Validation/SourceFilesystemEventLoss/**'
+      - '.github/workflows/filesystem-event-loss-regressions.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: filesystem-event-loss-regressions-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  focused-event-loss:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: swift --version
+      - name: Debug event-loss regressions
+        run: bash Scripts/test-filesystem-event-loss-regressions.sh --jobs 2 -Xswiftc -warnings-as-errors
+      - name: Release event-loss regressions
+        run: bash Scripts/test-filesystem-event-loss-regressions.sh --jobs 2 --configuration release -Xswiftc -warnings-as-errors
+      - name: Baseline parity and event-loss invariants
+        run: bash Validation/SourceFilesystemEventLoss/run.sh
