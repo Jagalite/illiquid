@@ -63,7 +63,10 @@ public struct FolderPlaylist: Equatable, Sendable {
     }
 
     public func index(of mediaURL: URL) -> Int? {
-        items.firstIndex { NormalizedFileURL.representsSameFile($0.url, mediaURL) }
+        guard !items.isEmpty,
+              let mediaKey = NormalizedFileURL.persistenceKey(for: mediaURL)
+        else { return nil }
+        return items.firstIndex { NormalizedFileURL.persistenceKey(for: $0.url) == mediaKey }
     }
 
     /// Returns the last watched file when it is still in this playlist, otherwise
