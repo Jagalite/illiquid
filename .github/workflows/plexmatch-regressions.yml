@@ -1,0 +1,41 @@
+name: PlexMatch mapping regressions
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Scripts/test-plexmatch-regressions.sh'
+      - '.github/workflows/plexmatch-regressions.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: plexmatch-regressions-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  metadata-hints:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Run mapping and filesystem regressions in both configurations
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/revision.txt
+          swift --version > evidence/swift-version.txt
+          git ls-files -s Sources/IlliquidCore/MediaLibrary Tests/IlliquidCoreTests/PlexMatchHintsRegressionTests.swift Tests/IlliquidCoreTests/PlexMatchReaderRegressionTests.swift Tests/IlliquidCoreTests/MediaSidecarTests.swift Scripts/test-plexmatch-regressions.sh > evidence/source-blobs.txt
+          bash Scripts/test-plexmatch-regressions.sh 2>&1 | tee evidence/debug.log
+          bash Scripts/test-plexmatch-regressions.sh --configuration release 2>&1 | tee evidence/release.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: plexmatch-mapping-regressions
+          path: evidence/
+          retention-days: 7
