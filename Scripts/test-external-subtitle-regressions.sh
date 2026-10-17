@@ -9,6 +9,7 @@ mkdir -p "$work/Sources/IlliquidNativePlayback" "$work/Tests/IlliquidNativePlayb
 cp "$root/Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift" \
     "$work/Sources/IlliquidNativePlayback/"
 cp "$root/Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift" \
+    "$root/Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift" \
     "$work/Tests/IlliquidNativePlaybackTests/"
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1

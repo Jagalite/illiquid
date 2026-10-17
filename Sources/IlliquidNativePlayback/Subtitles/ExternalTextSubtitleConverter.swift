@@ -87,17 +87,41 @@ enum ExternalTextSubtitleConverter {
                   let end = parseTimestamp(timing[1], format: format, allowsSettings: true),
                   end.milliseconds > start.milliseconds
             else { continue }
-            let text = lines.dropFirst(timingIndex + 1).map { line in
-                line.replacingOccurrences(of: "\\", with: "\\\\")
-                    .replacingOccurrences(of: "{", with: "\\{")
-                    .replacingOccurrences(of: "}", with: "\\}")
-            }.joined(separator: "\\N")
+            let text = lines.dropFirst(timingIndex + 1).map(escapeASSPayload)
+                .joined(separator: "\\N")
             events.append(
                 "Dialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
             )
         }
         guard !events.isEmpty else { throw ConversionError.noValidCues(format) }
         return defaultASSHeader + "\n" + events.joined(separator: "\n")
+    }
+
+    private static func escapeASSPayload(_ line: Substring) -> String {
+        let bytes = line.utf8
+        var escapeCount = 0
+        var isASCII = true
+        for byte in bytes {
+            if byte >= 0x80 { isASCII = false }
+            if byte == 0x5C || byte == 0x7B || byte == 0x7D { escapeCount += 1 }
+            if !isASCII, escapeCount > 0 { break }
+        }
+        guard escapeCount > 0 else { return String(line) }
+        guard isASCII else {
+            // Foundation's nonliteral matching can leave a backslash or brace
+            // attached to a combining mark untouched. Retain that behavior for
+            // Unicode payloads instead of treating every UTF-8 byte as a match.
+            return line.replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "{", with: "\\{")
+                .replacingOccurrences(of: "}", with: "\\}")
+        }
+        var escaped: [UInt8] = []
+        escaped.reserveCapacity(bytes.count + escapeCount)
+        for byte in bytes {
+            if byte == 0x5C || byte == 0x7B || byte == 0x7D { escaped.append(0x5C) }
+            escaped.append(byte)
+        }
+        return String(decoding: escaped, as: UTF8.self)
     }
 
     private struct Timestamp {
