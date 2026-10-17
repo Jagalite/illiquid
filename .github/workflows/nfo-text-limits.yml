@@ -1,0 +1,99 @@
+name: NFO text limit performance
+
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/MediaLibrary/**
+      - Tests/IlliquidCoreTests/*NFO*Tests.swift
+      - Tests/IlliquidCoreTests/MediaSidecarTests.swift
+      - Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift
+      - Benchmarks/NFOTextLimits/**
+      - .github/workflows/nfo-text-limits.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nfo-text-limits-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regressions-and-benchmarks:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            Sources/IlliquidCore
+            Tests/IlliquidCoreTests
+            Benchmarks/NFOTextLimits
+      - name: Fetch pinned baseline
+        run: git fetch --no-tags --depth=1 origin 68274d1b09dcc866296321a5a8858efc297c4f19
+      - name: Test debug and release and compare matched release workloads
+        run: python3 Benchmarks/NFOTextLimits/run.py --output "$RUNNER_TEMP/nfo-text-limits" --rounds 12
+      - name: Export portable research evidence to the run log
+        if: always()
+        shell: python3 {0}
+        run: |
+          import base64
+          import hashlib
+          import io
+          import json
+          import os
+          from pathlib import Path
+          import zipfile
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "nfo-text-limits"
+          names = [
+              "manifest.json", "measurements.jsonl", "summary.json",
+              "receipts.json", "differential.json", "differential-mismatch.json",
+              "baseline-debug-tests.txt", "baseline-release-tests.txt",
+              "candidate-debug-tests.txt", "candidate-release-tests.txt",
+              "baseline-compile.txt", "candidate-compile.txt",
+          ]
+          files = {name: (root / name).read_bytes()
+                   for name in names if (root / name).is_file()}
+          print("NFO_EVIDENCE_FILES " + json.dumps(sorted(files)))
+          missing = [name for name in names
+                     if name != "differential-mismatch.json" and name not in files]
+          print("NFO_EVIDENCE_MISSING " + json.dumps(missing))
+
+          def git_blob(value):
+              return hashlib.sha1(
+                  b"blob " + str(len(value)).encode("ascii") + b"\0" + value
+              ).hexdigest()
+
+          def emit(label, value):
+              print("::group::" + label)
+              for offset in range(0, len(value), 4000):
+                  print(label + "_CHUNK " + value[offset:offset + 4000])
+              print("::endgroup::")
+
+          # Preserve the exact evidence files without publishing binaries or caches.
+          audit = {
+              name: {"content": files[name].decode("utf-8"),
+                     "git_blob": git_blob(files[name])}
+              for name in ("manifest.json", "measurements.jsonl", "summary.json")
+              if name in files
+          }
+          emit("NFO_AUDIT", json.dumps(audit, ensure_ascii=True, separators=(",", ":")))
+          buffer = io.BytesIO()
+          with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+              for name, value in sorted(files.items()):
+                  archive.writestr(name, value)
+          archive_bytes = buffer.getvalue()
+          print("NFO_ZIP_GIT_BLOB " + git_blob(archive_bytes))
+          print("NFO_ZIP_SHA256 " + hashlib.sha256(archive_bytes).hexdigest())
+          emit("NFO_ZIP", base64.b64encode(archive_bytes).decode("ascii"))
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: nfo-text-limits
+          path: ${{ runner.temp }}/nfo-text-limits/
+          retention-days: 14
