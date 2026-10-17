@@ -1,0 +1,48 @@
+name: Video tab admission
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/OpenVideoTabs.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidApp/App/OpenVideoTabStore.swift'
+      - 'Tests/IlliquidCoreTests/OpenVideoTab*Tests.swift'
+      - 'Tests/IlliquidAppTests/OpenVideoTab*Tests.swift'
+      - 'Benchmarks/VideoTabAdmission/**'
+      - '.github/workflows/video-tab-admission.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-tab-admission-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component-qualification:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test and measure exact tab sources on macOS
+        run: |
+          python3 Benchmarks/VideoTabAdmission/run.py \
+            --output "$RUNNER_TEMP/video-tab-admission" \
+            --samples 6
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-tab-admission-evidence
+          path: |
+            ${{ runner.temp }}/video-tab-admission/*.json
+            ${{ runner.temp }}/video-tab-admission/*.jsonl
+            ${{ runner.temp }}/video-tab-admission/*.txt
+          retention-days: 7
