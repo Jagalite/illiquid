@@ -34,6 +34,20 @@ struct MediaNameRecognitionTests {
         #expect(MediaNameRecognition.recognize(relativePath: "News - 2023-02-29.mkv").kind == .unknown)
     }
 
+    @Test(arguments: [
+        "News - 2024-０２-29.mkv", "News - 2024-02-٢٩.mkv", "News - 20２４-02-29.mkv",
+        "News - 29.０２.2024.mkv", "News - ٢٩.02.2024.mkv", "News - 29.02.20２４.mkv",
+        "News - 2024-٠٢-٢٩.mkv", "News - ٢٩.٠٢.2024.mkv",
+        "News - 20２４-٠٢-٢٩.mkv", "News - ٢٩.٠٢.20２４.mkv"
+    ])
+    func unparseableUnicodeDateComponentsStayIntact(_ path: String) {
+        let media = MediaNameRecognition.recognize(relativePath: path)
+        #expect(media.kind == .unknown)
+        #expect(media.displayName == (path as NSString).deletingPathExtension)
+        #expect(media.airDate == nil)
+        #expect(media.year == nil)
+    }
+
     @Test func moviesEditionsAndVersions() {
         let media = MediaNameRecognition.recognize(relativePath:
             "Movies/Blade Runner (1982) {imdb-tt0083658}/Blade.Runner.1982.{edition-Final Cut}.part2.2160p.HEVC.mkv")
