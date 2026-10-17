@@ -1,0 +1,29 @@
+name: Source filesystem regressions
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/source-filesystem-regressions.yml'
+      - 'Scripts/test-source-filesystem-regressions.sh'
+      - 'Sources/IlliquidApp/UI/SourceFilesystem*.swift'
+      - 'Sources/IlliquidCore/Utilities/LifecyclePerformance.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystem*.swift'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: source-filesystem-regressions-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  event-routing:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Debug routing tests and native adapter compilation
+        run: bash Scripts/test-source-filesystem-regressions.sh --jobs 2 -Xswiftc -warnings-as-errors
+      - name: Release routing tests and native adapter compilation
+        run: bash Scripts/test-source-filesystem-regressions.sh -c release --jobs 2 -Xswiftc -warnings-as-errors
