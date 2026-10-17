@@ -183,7 +183,7 @@ struct ExternalSubtitleMatcherTests {
                 }
             )
             #expect(Set(complete.keys) == Set(media))
-            #expect(complete.values.allSatisfy(\.isEmpty))
+            #expect(complete.values.allSatisfy { $0.isEmpty })
             // Initial admission, every original input (including duplicates),
             // and a final check before publishing must all observe cancellation.
             #expect(checkpointCount >= media.count + 2)
