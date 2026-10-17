@@ -44,8 +44,13 @@ jobs:
           python3 Scripts/install-ci-native-sdk.py
       - name: Build app graph and run targeted regressions
         run: |
+          export ILLIQUID_PACKET_OWNERSHIP_FIXTURE="$RUNNER_TEMP/packet-ownership.mp4"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'testsrc2=size=320x180:rate=24' \
+            -f lavfi -i 'sine=frequency=440:sample_rate=48000' -t 3 \
+            -c:v libx264 -preset ultrafast -c:a aac "$ILLIQUID_PACKET_OWNERSHIP_FIXTURE"
           swift test --force-resolved-versions --filter \
-            'TrackRestorationRegressionTests|InterruptedMigrationRegressionTests|ThumbnailSchedulingPolicyRegressionTests|ThumbnailLifecycleRegressionTests|ThumbnailBackgroundSchedulerTests|LegacyPreferencesMigrationTests|DeferredHistoryStoreTests|DeferredPersistenceWriterTests|IdempotentPersistenceTests|PlaybackStatePublicationTests|NonDecodePerformanceTests|QueuedThumbnailPromotionTests|ThumbnailInventoryRegressionTests|ThumbnailPhysicalEntryTests|ThumbnailPromotionMailboxTests|NativeThumbnailCacheTests|ExternalTextSubtitleConverterTests|ExternalSubtitleEncodingTests|RendererRecoveryRegressionTests|PacketOwnershipTests|PacketQueueWakeupTests|PlaybackBufferRegressionTests|ElasticPlaybackControlBarGeometryTests|ElasticPlaybackControlBarPlacementTests|TimelineDesignRegressionTests|ElasticGeometryPerformanceRegressionTests|PlayerShortcutBindingsTests|PlayerShortcutDispatchTests|PersistenceWriterLifetimeTests'
+            'TrackRestorationRegressionTests|InterruptedMigrationRegressionTests|ThumbnailSchedulingPolicyRegressionTests|ThumbnailLifecycleRegressionTests|ThumbnailBackgroundSchedulerTests|LegacyPreferencesMigrationTests|DeferredHistoryStoreTests|DeferredPersistenceWriterTests|IdempotentPersistenceTests|PlaybackStatePublicationTests|NonDecodePerformanceTests|QueuedThumbnailPromotionTests|ThumbnailInventoryRegressionTests|ThumbnailPhysicalEntryTests|ThumbnailPromotionMailboxTests|NativeThumbnailCacheTests|ExternalTextSubtitleConverterTests|ExternalSubtitleEncodingTests|RendererRecoveryRegressionTests|PacketOwnershipTests|PacketQueueWakeupTests|PlaybackBufferRegressionTests|ElasticPlaybackControlBarGeometryTests|ElasticPlaybackControlBarPlacementTests|TimelineDesignRegressionTests|ElasticGeometryPerformanceRegressionTests|PlayerShortcutBindingsTests|PlayerShortcutDispatchTests|PersistenceWriterLifetimeTests|NativePlaybackFoundationTests'
   native-presentation-research:
     runs-on: macos-26
     timeout-minutes: 15
