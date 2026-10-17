@@ -215,10 +215,13 @@ public struct RecoveryMachineState: Codable, Equatable, Sendable {
     }
 
     if failure.domain == .presentation,
+      failure.recoverability == .retryable || failure.recoverability == .fallbackAvailable,
       failure.stage == .flush || failure.stage == .enqueue || failure.stage == .render
     {
       let current = revisions.presentation ?? PresentationRevisionID(rawValue: 0)
-      // A recovery flush advances the presentation revision. Do not grant a\n      // new flush attempt merely because that recovery changed its own ID.\n      if presentationFlushConsumed.isEmpty {
+      // A recovery flush advances the presentation revision. Do not grant a
+      // new flush attempt merely because that recovery changed its own ID.
+      if presentationFlushConsumed.isEmpty {
         presentationFlushConsumed.insert(current)
         guard current.rawValue < UInt64.max else { return .failTerminal }
         return .flushAndReprimePresentation(
