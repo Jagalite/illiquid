@@ -1,0 +1,56 @@
+name: Media name recognition performance
+
+on:
+  push:
+    branches:
+      - perf/media-name-recognition-20261017
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift
+      - Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift
+      - Scripts/test-media-name-recognition.sh
+      - Benchmarks/MediaNameRecognition/**
+      - .github/workflows/media-name-recognition-performance.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-name-recognition-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  recognition-and-measurements:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify recognition in debug and release
+        run: |
+          bash Scripts/test-media-name-recognition.sh --jobs 2 -Xswiftc -warnings-as-errors
+          bash Scripts/test-media-name-recognition.sh --jobs 2 -c release -Xswiftc -warnings-as-errors
+      - name: Verify related metadata integration
+        run: bash Scripts/test-nfo-metadata-regressions.sh --jobs 2 -Xswiftc -warnings-as-errors
+      - name: Compare exact metadata and measure production recognition on macOS
+        run: |
+          python3 Benchmarks/MediaNameRecognition/run.py \
+            --output "$RUNNER_TEMP/media-name-recognition" --rounds 6 --iterations 16
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-name-recognition-evidence
+          path: |
+            ${{ runner.temp }}/media-name-recognition/manifest.json
+            ${{ runner.temp }}/media-name-recognition/equivalence.json
+            ${{ runner.temp }}/media-name-recognition/measurements.jsonl
+            ${{ runner.temp }}/media-name-recognition/summary.json
+            ${{ runner.temp }}/media-name-recognition/fixtures.json
+            ${{ runner.temp }}/media-name-recognition/commands.jsonl
+            ${{ runner.temp }}/media-name-recognition/sources/
+            ${{ runner.temp }}/media-name-recognition/logs/
+          retention-days: 14

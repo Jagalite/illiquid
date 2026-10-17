@@ -94,9 +94,17 @@ public enum MediaNameRecognition {
            let season = capture(token, 1, in: raw).flatMap(Int.init),
            let first = capture(token, 2, in: raw).flatMap(Int.init) {
             let prefixTitle = clean(prefix(raw, before: token))
-            let namedParent = titleAndYear(parent).1 != nil ? parent : ""
-            var show = titleAndYear(prefixTitle.isEmpty ? (showFolder ?? namedParent) : prefixTitle)
             let folderShow = titleAndYear(showFolder ?? parent)
+            // Parse the relevant folder once. A bare episode may inherit a
+            // season's show folder, but a direct parent still needs a year.
+            var show: (String, Int?)
+            if !prefixTitle.isEmpty {
+                show = titleAndYear(prefixTitle)
+            } else if showFolder != nil || folderShow.1 != nil {
+                show = folderShow
+            } else {
+                show = ("", nil)
+            }
             if show.1 == nil, show.0.localizedCaseInsensitiveCompare(folderShow.0) == .orderedSame {
                 show = folderShow
             }
@@ -164,10 +172,10 @@ public enum MediaNameRecognition {
         let text = tags.stringByReplacingMatches(in: original,
             range: NSRange(original.startIndex..., in: original), withTemplate: "")
         if let token = matches(explicitYear, text).last ?? matches(year, text).last, let value = capture(token, 1, in: text).flatMap(Int.init) {
-            let title = clean(prefix(text, before: token))
+            let title = cleanTagless(prefix(text, before: token))
             if !title.isEmpty { return (title, value) }
         }
-        return (clean(text), nil)
+        return (cleanTagless(text), nil)
     }
 
     private static func cleanRelease(_ text: String) -> String {
@@ -175,7 +183,12 @@ public enum MediaNameRecognition {
     }
     private static func clean(_ text: String) -> String {
         let stripped = tags.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: "")
-        return stripped.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "_", with: " ")
+        return cleanTagless(stripped)
+    }
+    // Call only after tag removal; preserve the existing Unicode whitespace
+    // and punctuation rules without another regular-expression replacement.
+    private static func cleanTagless(_ text: String) -> String {
+        text.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "_", with: " ")
             .split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
             .trimmingCharacters(in: CharacterSet(charactersIn: " -()[]"))
     }
