@@ -170,12 +170,18 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--rounds", type=int, default=6)
     parser.add_argument("--iterations", type=int, default=16, help="complete workload cycles per observation")
+    parser.add_argument("--workloads", nargs="+", help="time only these workload names; full equivalence still runs")
     parser.add_argument("--verify-only", action="store_true")
     args = parser.parse_args()
     if args.rounds < 6 or args.rounds % 2:
         parser.error("--rounds must be even and at least 6 for balanced AB/BA pairs")
     if args.iterations < 1:
         parser.error("--iterations must be positive")
+    if args.workloads is not None:
+        if any(not name.strip() for name in args.workloads):
+            parser.error("--workloads must not contain empty names")
+        if len(args.workloads) != len(set(args.workloads)):
+            parser.error("--workloads must not contain duplicate names")
     out = args.output.resolve()
     if out.exists() and any(out.iterdir()):
         parser.error("--output must be absent or empty; use a fresh directory for each cohort")
@@ -192,6 +198,7 @@ def main() -> None:
         "logical_cpu_count": os.cpu_count(), "python": sys.version,
         "compiler": command([swiftc, "--version"], out, "compiler-version").strip(),
         "rounds": args.rounds, "iterations": args.iterations,
+        "requested_workloads": args.workloads,
         "timer_scope": "recognize(relativePath:) and append; inputs/reservation/warmup/full-result digest excluded",
         "builds": {},
     })
@@ -210,16 +217,22 @@ def main() -> None:
     equivalence["source_sha256"] = manifest["source_sha256"]
     write_json(out / "equivalence.json", equivalence)
     print(f"PASS: {equivalence['checks']} exact UTF-8 / metadata comparisons", flush=True)
+    available = {item["name"]: item for item in catalog["workloads"]}
+    selected_names = list(available) if args.workloads is None else args.workloads
+    unknown = [name for name in selected_names if name not in available]
+    if unknown:
+        parser.error(f"Unknown workloads: {', '.join(unknown)}; available: {', '.join(available)}")
+    selected_workloads = [available[name] for name in selected_names]
+    manifest["workloads"] = [{"name": item["name"], "paths": len(item["paths"])} for item in selected_workloads]
     if args.verify_only:
         write_json(out / "manifest.json", manifest)
         emit_evidence(out, ["manifest.json", "equivalence.json"])
         return
     builds = {variant: build(variant, out, swiftc) for variant in ("baseline", "candidate")}
     manifest["builds"].update(builds)
-    manifest["workloads"] = [{"name": item["name"], "paths": len(item["paths"])} for item in catalog["workloads"]]
     write_json(out / "manifest.json", manifest)
     rows: list[dict[str, object]] = []
-    for item in catalog["workloads"]:
+    for item in selected_workloads:
         workload = item["name"]
         for round_index in range(args.rounds):
             order = ("baseline", "candidate") if round_index % 2 == 0 else ("candidate", "baseline")
@@ -237,7 +250,7 @@ def main() -> None:
     saved_rows = [json.loads(line) for line in (out / "measurements.jsonl").read_text().splitlines()]
     if saved_rows != rows:
         raise RuntimeError("Persisted timing rows differ from the completed in-memory cohort")
-    summary = summarize(saved_rows, [item["name"] for item in catalog["workloads"]], args.rounds)
+    summary = summarize(saved_rows, selected_names, args.rounds)
     write_json(out / "summary.json", summary)
     for name, expected in manifest["source_sha256"].items():
         if sha256((out / "sources" / name).read_bytes()) != expected:

@@ -12,7 +12,19 @@ python3 Benchmarks/MediaNameRecognition/run.py \
 # Exact-output verification without the timing campaign:
 python3 Benchmarks/MediaNameRecognition/run.py \
   --output /tmp/illiquid-name-recognition-check --verify-only
+
+# Longer targeted follow-up; the complete equivalence corpus still runs first:
+python3 Benchmarks/MediaNameRecognition/run.py \
+  --output /tmp/illiquid-name-recognition-mixed \
+  --workloads mixed-library --rounds 12 --iterations 128
 ```
+
+Omitting `--workloads` times all eight cases. The option accepts one or more
+space-separated case names in the desired order and rejects unknown, duplicate,
+or empty names. It filters only the timing campaign after full equivalence;
+the complete fixture catalog remains saved, and the manifest records the
+requested names and the selected timed workloads. Keep targeted follow-ups
+separate from earlier cohorts.
 
 Use a new output directory for every run. The runner requires Python 3 and a
 Swift 6 compiler available as `swiftc` or selected by `SWIFTC`. macOS builds

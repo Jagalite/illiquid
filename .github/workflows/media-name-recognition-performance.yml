@@ -39,7 +39,8 @@ jobs:
       - name: Compare exact metadata and measure production recognition on macOS
         run: |
           python3 Benchmarks/MediaNameRecognition/run.py \
-            --output "$RUNNER_TEMP/media-name-recognition" --rounds 6 --iterations 16
+            --output "$RUNNER_TEMP/media-name-recognition" \
+            --workloads mixed-library --rounds 12 --iterations 128
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
