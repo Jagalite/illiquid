@@ -59,7 +59,11 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         guard capturesText else { return }
-        guard text.count + string.count <= 4096 else { valid = false; parser.abortParsing(); return }
+        // UTF-8 bytes bound the number of Characters without rescanning the
+        // accumulated text on every XML fragment. Keep the exact character
+        // check for larger Unicode values, including split grapheme clusters.
+        guard text.utf8.count + string.utf8.count <= 4096
+            || text.count + string.count <= 4096 else { valid = false; parser.abortParsing(); return }
         text += string
     }
 
