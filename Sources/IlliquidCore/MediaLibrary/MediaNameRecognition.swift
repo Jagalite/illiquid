@@ -94,17 +94,9 @@ public enum MediaNameRecognition {
            let season = capture(token, 1, in: raw).flatMap(Int.init),
            let first = capture(token, 2, in: raw).flatMap(Int.init) {
             let prefixTitle = clean(prefix(raw, before: token))
+            let namedParent = titleAndYear(parent).1 != nil ? parent : ""
+            var show = titleAndYear(prefixTitle.isEmpty ? (showFolder ?? namedParent) : prefixTitle)
             let folderShow = titleAndYear(showFolder ?? parent)
-            // Parse the relevant folder once. A bare episode may inherit a
-            // season's show folder, but a direct parent still needs a year.
-            var show: (String, Int?)
-            if !prefixTitle.isEmpty {
-                show = titleAndYear(prefixTitle)
-            } else if showFolder != nil || folderShow.1 != nil {
-                show = folderShow
-            } else {
-                show = ("", nil)
-            }
             if show.1 == nil, show.0.localizedCaseInsensitiveCompare(folderShow.0) == .orderedSame {
                 show = folderShow
             }
