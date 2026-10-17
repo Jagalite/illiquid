@@ -1,0 +1,49 @@
+name: Playlist selection performance
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/TemporaryDirectory.swift'
+      - 'Benchmarks/PlaylistSelection/**'
+      - '.github/workflows/playlist-selection-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playlist-selection-performance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component-qualification:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test and measure exact playlist selection sources
+        run: |
+          python3 Benchmarks/PlaylistSelection/run.py \
+            --output "$RUNNER_TEMP/playlist-selection" \
+            --samples 8
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-selection-evidence
+          path: |
+            ${{ runner.temp }}/playlist-selection/*.json
+            ${{ runner.temp }}/playlist-selection/*.jsonl
+            ${{ runner.temp }}/playlist-selection/*.gz
+            ${{ runner.temp }}/playlist-selection/commands/**
+            ${{ runner.temp }}/playlist-selection/sources/**
+          retention-days: 7

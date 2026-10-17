@@ -1,0 +1,320 @@
+{
+  "baseline_commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "binaries": {
+    "baseline": {
+      "driver": {
+        "git_blob": "6438fcc2a985e7cd1b44046e76c07745f8d22fb6",
+        "sha256": "a75cca08229e4fd0cd9e23c58c2ed7f41915797db097c9ba9b34af4bbc06bd7a"
+      },
+      "library": {
+        "git_blob": "4803a125b5aa9c1d39b15e3f5ae2bce7236ee64d",
+        "sha256": "50f848edf0a1679b705e38c6d05e86170b92fad171e98760daa7bee2822e7765"
+      }
+    },
+    "candidate": {
+      "driver": {
+        "git_blob": "9f5fe41701ddc83b871e1d11aa0376078d982a45",
+        "sha256": "637881b25b55611343a15ac971c936cf5b03cb97a8ab8c7720a3c6c058f696b9"
+      },
+      "library": {
+        "git_blob": "e0643bcb17f9b6502d89e3ea522a1b86e2f815ad",
+        "sha256": "68da157d648ef0f3e0d2a53411ea3e9b63a477dfaee93bcf0898141996bc9ce1"
+      }
+    }
+  },
+  "cases": [
+    {
+      "iterations": 10000,
+      "size": 1,
+      "workload": "head"
+    },
+    {
+      "iterations": 10000,
+      "size": 100,
+      "workload": "head"
+    },
+    {
+      "iterations": 10000,
+      "size": 1000,
+      "workload": "head"
+    },
+    {
+      "iterations": 10000,
+      "size": 10000,
+      "workload": "head"
+    },
+    {
+      "iterations": 10000,
+      "size": 1,
+      "workload": "middle"
+    },
+    {
+      "iterations": 196,
+      "size": 100,
+      "workload": "middle"
+    },
+    {
+      "iterations": 19,
+      "size": 1000,
+      "workload": "middle"
+    },
+    {
+      "iterations": 1,
+      "size": 10000,
+      "workload": "middle"
+    },
+    {
+      "iterations": 10000,
+      "size": 1,
+      "workload": "tail"
+    },
+    {
+      "iterations": 100,
+      "size": 100,
+      "workload": "tail"
+    },
+    {
+      "iterations": 10,
+      "size": 1000,
+      "workload": "tail"
+    },
+    {
+      "iterations": 1,
+      "size": 10000,
+      "workload": "tail"
+    },
+    {
+      "iterations": 10000,
+      "size": 1,
+      "workload": "missing"
+    },
+    {
+      "iterations": 100,
+      "size": 100,
+      "workload": "missing"
+    },
+    {
+      "iterations": 10,
+      "size": 1000,
+      "workload": "missing"
+    },
+    {
+      "iterations": 1,
+      "size": 10000,
+      "workload": "missing"
+    },
+    {
+      "iterations": 10000,
+      "size": 1,
+      "workload": "invalid-current"
+    },
+    {
+      "iterations": 100,
+      "size": 100,
+      "workload": "invalid-current"
+    },
+    {
+      "iterations": 10,
+      "size": 1000,
+      "workload": "invalid-current"
+    },
+    {
+      "iterations": 1,
+      "size": 10000,
+      "workload": "invalid-current"
+    },
+    {
+      "iterations": 10000,
+      "size": 1,
+      "workload": "nil-current"
+    },
+    {
+      "iterations": 10000,
+      "size": 100,
+      "workload": "nil-current"
+    },
+    {
+      "iterations": 10000,
+      "size": 1000,
+      "workload": "nil-current"
+    },
+    {
+      "iterations": 10000,
+      "size": 10000,
+      "workload": "nil-current"
+    },
+    {
+      "iterations": 10000,
+      "size": 1,
+      "workload": "tail-unicode"
+    },
+    {
+      "iterations": 100,
+      "size": 100,
+      "workload": "tail-unicode"
+    },
+    {
+      "iterations": 10,
+      "size": 1000,
+      "workload": "tail-unicode"
+    },
+    {
+      "iterations": 1,
+      "size": 10000,
+      "workload": "tail-unicode"
+    },
+    {
+      "iterations": 10000,
+      "size": 1,
+      "workload": "missing-unicode"
+    },
+    {
+      "iterations": 100,
+      "size": 100,
+      "workload": "missing-unicode"
+    },
+    {
+      "iterations": 10,
+      "size": 1000,
+      "workload": "missing-unicode"
+    },
+    {
+      "iterations": 1,
+      "size": 10000,
+      "workload": "missing-unicode"
+    },
+    {
+      "iterations": 10000,
+      "size": 1,
+      "workload": "all-invalid-items"
+    },
+    {
+      "iterations": 100,
+      "size": 100,
+      "workload": "all-invalid-items"
+    },
+    {
+      "iterations": 10,
+      "size": 1000,
+      "workload": "all-invalid-items"
+    },
+    {
+      "iterations": 1,
+      "size": 10000,
+      "workload": "all-invalid-items"
+    },
+    {
+      "iterations": 10000,
+      "size": 0,
+      "workload": "empty"
+    }
+  ],
+  "compilerExecutables": {
+    "swift": {
+      "git_blob": "f713f91cfb8c2e9faf080fdf137997c49e42105a",
+      "sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de"
+    },
+    "swiftc": {
+      "git_blob": "f713f91cfb8c2e9faf080fdf137997c49e42105a",
+      "sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de"
+    }
+  },
+  "environment": {
+    "CLANG_MODULE_CACHE_PATH": "/workspace/scratch/ee5e8e0e13a8/playlist-selection-publication/module-cache",
+    "DEVELOPER_DIR": null,
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "LD_LIBRARY_PATH": "/dev/shm/illiquid-swift-toolchain-ee5e8e0e13a8/usr/lib/swift/linux:/dev/shm/illiquid-swift-toolchain-ee5e8e0e13a8/usr/lib/swift/host:/dev/shm/illiquid-swift-toolchain-ee5e8e0e13a8/dependencies/usr/lib/x86_64-linux-gnu",
+    "SDKROOT": null,
+    "SWIFTPM_MODULECACHE_OVERRIDE": "/workspace/scratch/ee5e8e0e13a8/playlist-selection-publication/module-cache",
+    "SWIFT_EXEC": null,
+    "TZ": "America/Los_Angeles"
+  },
+  "machine": "x86_64",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "samples": 8,
+  "sizes": [
+    1,
+    100,
+    1000,
+    10000
+  ],
+  "sources": {
+    "sources/Harness.swift": {
+      "git_blob": "f0a80429ead52784be3add3d2b40634fbe7e05e2",
+      "sha256": "e65475afda6d89ca0774fdc38198d25f2d5e134ed15f65df2c44fda7fb23eae8"
+    },
+    "sources/baseline-manifest.json": {
+      "git_blob": "77722dae7d04fdfe154900e16c9f81dac1a7e7ae",
+      "sha256": "1a8ed7d56b447e906735654c29f0a11983609dfb4fb88d6279e21f34cfa68dc3"
+    },
+    "sources/baseline/FolderPlaylist.swift": {
+      "git_blob": "b2fe49ea21a1d38bd1a8ae9dea2936ef34d6d206",
+      "sha256": "7d9591b8d12f8e03e950c9688f22b37c77c6f97de3e94b5f000321d182c05678"
+    },
+    "sources/baseline/NaturalFilenameOrdering.swift": {
+      "git_blob": "3e31506bdec552337ce25dfeaf54da2afc6e6c1d",
+      "sha256": "392fdfb0ea35cd2a30804a3f07f23c489130f026e22ba32dd2b9f40216c60a4c"
+    },
+    "sources/baseline/NormalizedFileURL.swift": {
+      "git_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+      "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "sources/baseline/PlaylistMutation.swift": {
+      "git_blob": "f77d16acbefb1a86d828bac6de24d109816c77e1",
+      "sha256": "e03b3a9f92bb8b709dc37d12e092b4bfae63e68be5e43d5c5de243fd5bff9bb4"
+    },
+    "sources/candidate/FolderPlaylist.swift": {
+      "git_blob": "b2fe49ea21a1d38bd1a8ae9dea2936ef34d6d206",
+      "sha256": "7d9591b8d12f8e03e950c9688f22b37c77c6f97de3e94b5f000321d182c05678"
+    },
+    "sources/candidate/NaturalFilenameOrdering.swift": {
+      "git_blob": "3e31506bdec552337ce25dfeaf54da2afc6e6c1d",
+      "sha256": "392fdfb0ea35cd2a30804a3f07f23c489130f026e22ba32dd2b9f40216c60a4c"
+    },
+    "sources/candidate/NormalizedFileURL.swift": {
+      "git_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+      "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "sources/candidate/PlaylistMutation.swift": {
+      "git_blob": "1ce9254b8e35887702656ea205d9ecb40394607f",
+      "sha256": "7cf9e88a30e9db2b111a45514e24a054a36230543941b7ce5a3bff753804d9e1"
+    },
+    "sources/run.py": {
+      "git_blob": "dca260281f7af7a6a72df9ee21939bddcbde0af9",
+      "sha256": "f1f3f0c0fb50ed83128a3cb44cffcc6a60f110f09e320a2da1e1661ef8ceda90"
+    },
+    "sources/tests/FolderPlaylistTests.swift": {
+      "git_blob": "2342edd66ef57ae549e83637d15a4e7429c990f1",
+      "sha256": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d"
+    },
+    "sources/tests/PlaylistMutationTests.swift": {
+      "git_blob": "9e611546bb55ea8124aa6222b53319410f7096ae",
+      "sha256": "08b3ea822f18722007b7c32e5316911949a4198767e6bade300c8f88b2d0147f"
+    },
+    "sources/tests/PlaylistOrderRestorationTests.swift": {
+      "git_blob": "bdbfd5522dfb8f1adc006c4ac2f67564c6f3d82b",
+      "sha256": "79a1d9de1abef31e1168ce0b2cb49775c8c653b9a8d298fc3894846efd129045"
+    },
+    "sources/tests/PlaylistSelectionIdentityTests.swift": {
+      "git_blob": "afcd2e6119b839c594e6c7d797b978f4afb8fb7f",
+      "sha256": "f89a53ef0944f52ebfb77ecc528cfad8ad30fedafdbb9174eeab2da75c9cdde5"
+    },
+    "sources/tests/TestSupport/TemporaryDirectory.swift": {
+      "git_blob": "b0ef8f39f0a34484615d2fdbf5cfe3b85d05e0d0",
+      "sha256": "594fb60baced7f9b7618a4b31b9c8bf8eb47165962086282460bb014397bac24"
+    }
+  },
+  "swift": "/dev/shm/illiquid-swift-toolchain-ee5e8e0e13a8/usr/bin/swift",
+  "swiftc": "/dev/shm/illiquid-swift-toolchain-ee5e8e0e13a8/usr/bin/swiftc",
+  "testsOnly": false,
+  "toolchains": {
+    "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu\n",
+    "swiftc": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu\n"
+  },
+  "verification": {
+    "lines": 7297,
+    "sha256": "97826363033c07b13c47dcdf2f3c8824b46fbdffc0a791e9ab998db4edffc179"
+  }
+}

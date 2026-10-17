@@ -103,16 +103,23 @@ public enum PlaylistMutation {
         fallbackIndex: Int?,
         in items: [FolderPlaylistItem]
     ) -> Int? {
-        if let currentURL,
-           let index = items.firstIndex(where: {
-               NormalizedFileURL.representsSameFile($0.url, currentURL)
-           })
-        {
-            return index
+        guard !items.isEmpty else { return nil }
+        if let currentURL {
+            // Normalize the invariant current URL once, when the first local
+            // item needs it. Empty or entirely unsupported lists need no key.
+            var cachedCurrentKey: String?
+            for (index, item) in items.enumerated() {
+                guard let itemKey = NormalizedFileURL.persistenceKey(for: item.url) else { continue }
+                if cachedCurrentKey == nil {
+                    cachedCurrentKey = NormalizedFileURL.persistenceKey(for: currentURL)
+                }
+                guard let currentKey = cachedCurrentKey else { break }
+                if itemKey == currentKey { return index }
+            }
         }
         if let fallbackIndex, items.indices.contains(fallbackIndex) {
             return fallbackIndex
         }
-        return items.isEmpty ? nil : items.startIndex
+        return items.startIndex
     }
 }
