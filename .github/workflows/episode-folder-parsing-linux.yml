@@ -19,20 +19,22 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Install the Python benchmark driver runtime
+        run: apt-get update && apt-get install --yes --no-install-recommends python3
       - name: Compare exact sources in Linux Swift
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           python3 Benchmarks/MediaNameRecognition/run.py \
-            --output "$RUNNER_TEMP/episode-folder-parsing-linux" \
+            --output /tmp/episode-folder-parsing-linux \
             --pairs 6 --target-ms 200
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: episode-folder-parsing-linux
           path: |
-            ${{ runner.temp }}/episode-folder-parsing-linux/*.json
-            ${{ runner.temp }}/episode-folder-parsing-linux/*.jsonl
-            ${{ runner.temp }}/episode-folder-parsing-linux/*.stdout
-            ${{ runner.temp }}/episode-folder-parsing-linux/*.stderr
-            ${{ runner.temp }}/episode-folder-parsing-linux/inputs/**
+            /tmp/episode-folder-parsing-linux/*.json
+            /tmp/episode-folder-parsing-linux/*.jsonl
+            /tmp/episode-folder-parsing-linux/*.stdout
+            /tmp/episode-folder-parsing-linux/*.stderr
+            /tmp/episode-folder-parsing-linux/inputs/**
           retention-days: 14
