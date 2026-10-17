@@ -133,7 +133,10 @@ def main() -> None:
     parser.add_argument("--swift", default="swift")
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=750)
-    parser.add_argument("--tests-only", action="store_true")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--tests-only", action="store_true")
+    modes.add_argument("--correctness-only", action="store_true",
+                       help="run tests and complete output comparison without calibration or timing")
     args = parser.parse_args()
     if args.pairs < 2 or args.pairs > 30 or args.pairs % 2:
         parser.error("pairs must be an even number from 2 to 30")
@@ -153,6 +156,7 @@ def main() -> None:
         raise RuntimeError("Frozen baseline does not match its manifest")
     manifest = {
         "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "mode": "tests-only" if args.tests_only else "correctness-only" if args.correctness_only else "benchmark",
         "platform": platform.platform(), "machine": platform.machine(), "logical_cpus": os.cpu_count(),
         "python": sys.version, "swift": execute([args.swift, "--version"], output, env).strip(),
         "head": execute(["git", "rev-parse", "HEAD"], output, env).strip(),
@@ -217,6 +221,13 @@ def main() -> None:
         "comparison": "Every input and complete stored/derived result field; explicit null optionals",
         "archives": {variant: digest((output / f"differential-{variant}.json.gz").read_bytes()) for variant in VARIANTS}})
     print(f"Exact output parity: {len(differential['baseline'])} paths", flush=True)
+
+    if args.correctness_only:
+        for variant in VARIANTS:
+            verify(packages[variant], hashes[variant])
+            if digest(binaries[variant].read_bytes()) != manifest["binary_sha256"][variant]:
+                raise RuntimeError(f"Binary changed: {variant}")
+        return
 
     rows, expected, iterations = [], {}, {}
 
