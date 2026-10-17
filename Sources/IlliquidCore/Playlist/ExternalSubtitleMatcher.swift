@@ -22,6 +22,12 @@ public enum ExternalSubtitleMatcher {
             result[mediaURL] = []
         }
 
+        // Without subtitle files, the complete association map is already built.
+        // Avoid tokenizing media names and constructing an unused search index.
+        guard !subtitleURLs.isEmpty else {
+            return isCancelled() ? [:] : result
+        }
+
         let index = TokenIndex()
         var media: [(url: URL, raw: [String], tokens: [String])] = []
         for url in result.keys where MediaFileSupport.isSupportedMediaFile(url) {

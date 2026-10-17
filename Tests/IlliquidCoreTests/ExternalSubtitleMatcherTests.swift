@@ -114,6 +114,105 @@ struct ExternalSubtitleMatcherTests {
         #expect(unrelated.allSatisfy { matches[$0] == [] })
     }
 
+    @Test func noSubtitlesRetainEveryDistinctOriginalMediaKey() throws {
+        let first = url("Show Episode 1.mkv")
+        let second = url("Show Episode 2.mp4")
+        let unsupported = url("Show Episode 1.pdf")
+        let remote = try #require(URL(string: "https://example.invalid/Show%20Episode%203.mkv"))
+        let media = [first, second, first, unsupported, remote, unsupported, remote]
+
+        let matches = ExternalSubtitleMatcher.associate(subtitleURLs: [], with: media)
+
+        // Support filtering determines which keys can receive subtitles, not
+        // which original inputs appear in the returned association dictionary.
+        #expect(matches.count == 4)
+        #expect(Set(matches.keys) == Set(media))
+        for original in media {
+            #expect(matches[original] == [])
+        }
+        #expect(ExternalSubtitleMatcher.matchingSubtitles(for: first, among: []).isEmpty)
+    }
+
+    @Test func noSubtitlesPreserveOriginalURLRepresentations() throws {
+        let relative = try #require(URL(
+            string: "../Season%202/Episode%2001.mkv", relativeTo: folderURL
+        ))
+        let dotted = try #require(URL(
+            string: "file:///tmp/Shows/Season%202/../Season%201/Episode%2002.mkv"
+        ))
+        let escaped = try #require(URL(
+            string: "file:///tmp/Shows/Episode%20%252003.mkv?edition=wide%20screen#scene%202"
+        ))
+        let decomposed = url("Cafe\u{301} Episode 4.mkv")
+        let media = [relative, dotted, escaped, decomposed]
+        #expect(Set(media).count == media.count)
+
+        let matches = ExternalSubtitleMatcher.associate(subtitleURLs: [], with: media)
+
+        #expect(matches.count == media.count)
+        for original in media {
+            let returnedKey = try #require(matches.keys.first { $0 == original })
+            // URL equality alone can hide a changed representation. Preserve
+            // relative bases, dot segments, percent escapes, and Unicode bytes.
+            #expect(Array(returnedKey.relativeString.utf8) == Array(original.relativeString.utf8))
+            #expect(Array(returnedKey.absoluteString.utf8) == Array(original.absoluteString.utf8))
+            #expect(returnedKey.baseURL == original.baseURL)
+            #expect(matches[returnedKey] == [])
+        }
+    }
+
+    @Test func emptySubtitleAndMediaInventoriesReturnAnEmptyDictionary() {
+        #expect(ExternalSubtitleMatcher.associate(subtitleURLs: [], with: []).isEmpty)
+    }
+
+    @Test(arguments: [false, true])
+    func noSubtitleCancellationAtEveryCheckpointDiscardsInitializedKeys(
+        _ singleObservation: Bool
+    ) throws {
+        let movie = url("Movie.mkv")
+        let unsupported = url("Movie.pdf")
+        let remote = try #require(URL(string: "https://example.invalid/Movie.mkv"))
+        let inventories: [[URL]] = [[], [movie], [movie, movie, unsupported, remote]]
+
+        for media in inventories {
+            var checkpointCount = 0
+            let complete = ExternalSubtitleMatcher.associate(
+                subtitleURLs: [], with: media, isCancelled: {
+                    checkpointCount += 1
+                    return false
+                }
+            )
+            #expect(Set(complete.keys) == Set(media))
+            #expect(complete.values.allSatisfy(\.isEmpty))
+            // Initial admission, every original input (including duplicates),
+            // and a final check before publishing must all observe cancellation.
+            #expect(checkpointCount >= media.count + 2)
+
+            for cancelAt in 1...checkpointCount {
+                var checkpoint = 0
+                let cancelled = ExternalSubtitleMatcher.associate(
+                    subtitleURLs: [], with: media, isCancelled: {
+                        checkpoint += 1
+                        return singleObservation ? checkpoint == cancelAt : checkpoint >= cancelAt
+                    }
+                )
+                #expect(checkpoint == cancelAt)
+                #expect(cancelled.isEmpty,
+                        "Returned initialized keys at checkpoint \(cancelAt) of \(checkpointCount)")
+            }
+        }
+    }
+
+    @Test func noSubtitleMatchingObservesDefaultTaskCancellation() async {
+        let media = [url("Movie.mkv"), url("Another Movie.mp4")]
+        let task = Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return ExternalSubtitleMatcher.associate(subtitleURLs: [], with: media)
+        }
+        let matches = await task.value
+        #expect(matches.isEmpty)
+    }
+
     @Test func cancelledMatchingDoesNotReturnPartialAssociations() {
         #expect(ExternalSubtitleMatcher.associate(
             subtitleURLs: [url("Show.srt")], with: [url("Show.mkv")], isCancelled: { true }

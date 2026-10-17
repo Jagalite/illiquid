@@ -1,0 +1,61 @@
+name: Empty subtitle association performance
+
+on:
+  push:
+    branches: ['perf/empty-subtitle-association']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/**'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift'
+      - 'Tests/IlliquidCoreTests/Folder*Tests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/TemporaryDirectory.swift'
+      - 'Benchmarks/EmptySubtitleAssociation/run.py'
+      - 'Benchmarks/EmptySubtitleAssociation/Harness.swift'
+      - 'Benchmarks/EmptySubtitleAssociation/baseline/**'
+      - '.github/workflows/empty-subtitle-association.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/**'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift'
+      - 'Tests/IlliquidCoreTests/Folder*Tests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/TemporaryDirectory.swift'
+      - 'Benchmarks/EmptySubtitleAssociation/run.py'
+      - 'Benchmarks/EmptySubtitleAssociation/Harness.swift'
+      - 'Benchmarks/EmptySubtitleAssociation/baseline/**'
+      - '.github/workflows/empty-subtitle-association.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: empty-subtitle-association-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test baseline and candidate in debug
+        run: python3 Benchmarks/EmptySubtitleAssociation/run.py test --configuration debug --output "$RUNNER_TEMP/empty-subtitle-association/debug"
+      - name: Test baseline and candidate in release
+        run: python3 Benchmarks/EmptySubtitleAssociation/run.py test --configuration release --output "$RUNNER_TEMP/empty-subtitle-association/release"
+      - name: Verify complete outputs and measure balanced pairs
+        run: python3 Benchmarks/EmptySubtitleAssociation/run.py benchmark --pairs 6 --target-ms 60 --output "$RUNNER_TEMP/empty-subtitle-association/benchmark"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: empty-subtitle-association-native
+          path: |
+            ${{ runner.temp }}/empty-subtitle-association/**/*.json
+            ${{ runner.temp }}/empty-subtitle-association/**/*.jsonl
+            ${{ runner.temp }}/empty-subtitle-association/**/*.log
+            ${{ runner.temp }}/empty-subtitle-association/**/*.txt
+          retention-days: 14
