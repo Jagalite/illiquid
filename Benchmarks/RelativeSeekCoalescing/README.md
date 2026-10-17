@@ -16,13 +16,21 @@ and [the regression suite](../../Tests/IlliquidPlayerTests/RelativeSeekEffectLif
 
 The pinned baseline is `8c3cc3d4008d5d1b8d436bcf2d51d891382b6548`.
 
-| Validation | Result before native CI |
+| Validation | Result |
 | --- | --- |
 | Candidate selected-source tests, Swift 6.3.2 on Linux, debug | All 7 test functions / 8 cases passed |
 | Candidate selected-source tests, Swift 6.3.2 on Linux, release | All 7 test functions / 8 cases passed |
 | Current regression suite against pinned baseline, debug | 4 functions / 5 cases failed, with 16 assertion issues |
-| Native macOS selected-source tests and timings | Pending CI |
-| Full macOS app graph and coordinator tests | Pending CI |
+| Native macOS selected-source tests, Apple Swift 6.3.3, debug and release | All 7 functions / 8 invocations passed in each configuration |
+| Native macOS matched timings | 40 observations / 20 pairs passed; all five workloads complete |
+| Separate callback replay verification | Six runs passed; 10,554 retired callbacks all reported duplicate |
+| Full macOS app graph and coordinator tests | Build and 83 tests passed |
+
+The complete native results, controls, ranges, and interpretation are in the
+[research report](../../Documentation/RELATIVE_SEEK_COALESCING_PERFORMANCE.md).
+[Canonical run 39047099141](https://github.com/Jagalite/illiquid/actions/runs/39047099141)
+used macOS 26.6.2 arm64. Raw outputs, manifests, and independent audits are
+[committed with the research](../../Documentation/PerformanceEvidence/RelativeSeekCoalescing/macos-ci).
 
 Baseline failures demonstrate retained pending/outstanding payloads and missing
 retirement acknowledgements. Native-dispatched completion ownership, sleep, and
@@ -31,9 +39,9 @@ shutdown preservation cases pass on both versions.
 **No Linux timing cohort is accepted.** Optimized timing attempts encountered a
 libdispatch trap independently reproduced outside the player, associated with a
 `/proc` and thread-ID namespace incompatibility in the execution environment.
-These failed runs are excluded from performance conclusions. Successful local
-regression runs establish component behavior; macOS measurements remain pending.
-There is no claimed native speedup or app-memory reduction yet.
+These failed runs are excluded from performance conclusions. The reported native
+measurements come from the complete macOS cohort. They establish component
+service-time changes, without measuring total app memory or normal-playback speed.
 
 ## Reproduce on macOS
 
@@ -83,11 +91,17 @@ retains extra effect contexts and must remain separate from headline timings.
 ```
 
 [`relative-seek-lifetime.yml`](../../.github/workflows/relative-seek-lifetime.yml)
-runs focused debug/release tests, a shorter matched cohort with bursts
-`0,32,256,2048,8192`, four repeats and 2,048 clock events, and a separate app-integration
-job. The integration job prepares the existing native SDK and runs the lifetime
-suite together with coordinator tests. Focused build receipts, test logs, and
-measurement files are uploaded as workflow artifacts.
+runs focused debug/release tests and a separate app-integration job on relevant
+PRs. The integration job prepares the existing native SDK and runs the lifetime
+suite together with coordinator tests. Manual `workflow_dispatch` additionally
+runs a shorter matched cohort with bursts `0,32,256,2048,8192`, four repeats and
+2,048 clock events, followed by separate callback verification. Its `baseline_ref`
+input defaults to the pinned research baseline. The strict paired-source guard
+requires a matched baseline when other selected components change. Keeping this
+historic comparison manual prevents it from blocking unrelated future core fixes.
+Focused build receipts, test logs, and measurement files are uploaded as artifacts.
+The initial research run completed the entire cohort before this manual-only
+timing condition was added; its committed evidence remains canonical.
 
 ## What is measured
 
@@ -175,5 +189,8 @@ The report must account for that residual growth.
 | Measurement `validation.json` | Ordering, pairing and receipt-validation outcome |
 | Measurement `summary.json` | Per-workload summary statistics derived from the raw results |
 
-Native CI results should be assessed from these artifacts before adding numerical
-performance conclusions to this document or the PR description.
+The canonical native cohort was independently audited for source identities,
+receipt accounting, pair ordering, semantic checksums, and all summary statistics.
+The report discloses the +10% zero-history median with overlapping ranges and the
+best-effort drain's observed 25.2–180.4 ms duration alongside the larger gains after
+seek history accumulates.

@@ -10,6 +10,12 @@ on:
       - Benchmarks/RelativeSeekCoalescing/**
       - .github/workflows/relative-seek-lifetime.yml
   workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: Matched baseline commit for the manual performance comparison
+        required: true
+        type: string
+        default: 8c3cc3d4008d5d1b8d436bcf2d51d891382b6548
 
 permissions:
   contents: read
@@ -34,8 +40,11 @@ jobs:
           python3 Benchmarks/RelativeSeekCoalescing/run.py test --configuration debug --output "$RUNNER_TEMP/seek-debug"
           python3 Benchmarks/RelativeSeekCoalescing/run.py test --configuration release --output "$RUNNER_TEMP/seek-release"
       - name: Measure matched driver workloads with macOS frameworks
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          RELATIVE_SEEK_BASE: ${{ inputs.baseline_ref }}
         run: |
-          python3 Benchmarks/RelativeSeekCoalescing/run.py build --source-ref 8c3cc3d4008d5d1b8d436bcf2d51d891382b6548 --output "$RUNNER_TEMP/seek-baseline-build"
+          python3 Benchmarks/RelativeSeekCoalescing/run.py build --source-ref "$RELATIVE_SEEK_BASE" --output "$RUNNER_TEMP/seek-baseline-build"
           python3 Benchmarks/RelativeSeekCoalescing/run.py build --output "$RUNNER_TEMP/seek-candidate-build"
           python3 Benchmarks/RelativeSeekCoalescing/measure.py --baseline-build "$RUNNER_TEMP/seek-baseline-build" --candidate-build "$RUNNER_TEMP/seek-candidate-build" --output "$RUNNER_TEMP/seek-measurements" --bursts 0,32,256,2048,8192 --repeats 4 --ticks 2048
           python3 - "$RUNNER_TEMP/seek-measurements/summary.json" <<'PY'
@@ -51,6 +60,7 @@ jobs:
               }, sort_keys=True))
           PY
       - name: Verify retired callbacks outside the timing cohort
+        if: github.event_name == 'workflow_dispatch'
         run: |
           for burst in 0 32 256 2048 8192; do
             "$RUNNER_TEMP/seek-candidate-build/RelativeSeekBenchmark" --burst "$burst" --ticks 64 --verify > "$RUNNER_TEMP/seek-measurements/verify-$burst.json"
