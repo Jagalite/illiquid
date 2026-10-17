@@ -73,6 +73,12 @@ enum SourceFilesystemInvalidationPlanner {
         let rootPaths = Set(roots.map(normalizedPath))
         guard !rootPaths.isEmpty else { return SourceFilesystemInvalidationPlan() }
 
+        // Event loss invalidates the whole stream, including roots unrelated to
+        // the marker path. Full rescans supersede all targeted work.
+        if events.contains(where: { $0.flags.contains(.eventsDropped) }) {
+            return SourceFilesystemInvalidationPlan(rootsToRescan: rootPaths)
+        }
+
         var plan = SourceFilesystemInvalidationPlan()
         for event in events {
             let eventPath = normalizedPath(event.path)
