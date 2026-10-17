@@ -1,0 +1,71 @@
+{
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "executable_sha256": "f05d96fea239dbb3f4a6ae0b34d39c5efa0c59a5c4cfedf9d0925620040cc06a",
+  "harness_command": [
+    "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+    "-swift-version",
+    "6",
+    "-O",
+    "-whole-module-optimization",
+    "-warnings-as-errors",
+    "-module-cache-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/module-cache",
+    "-parse-as-library",
+    "-I",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/baseline",
+    "-L",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/baseline",
+    "-lIlliquidApp",
+    "-Xlinker",
+    "-rpath",
+    "-Xlinker",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/baseline",
+    "/workspace/scratch/85ec14d23ddc/illiquid/Benchmarks/ShortcutDispatch/Harness.swift",
+    "-o",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/baseline/shortcut-dispatch"
+  ],
+  "harness_sha256": "f0feddef472d8dfd4722e3526abc605a68b65610cd40bdb3ef002723ff6381c2",
+  "library_sha256": "87a3795e9ae104917afaac66f5830d1eb1b4d453b2f9742af867edd55bc096f4",
+  "module_command": [
+    "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+    "-swift-version",
+    "6",
+    "-O",
+    "-whole-module-optimization",
+    "-warnings-as-errors",
+    "-module-cache-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/module-cache",
+    "-emit-library",
+    "-emit-module",
+    "-enable-testing",
+    "-module-name",
+    "IlliquidApp",
+    "-emit-module-path",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/baseline/IlliquidApp.swiftmodule",
+    "-o",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/baseline/libIlliquidApp.so",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/baseline/sources/PlatformStubs.swift",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/baseline/sources/PlayerKeyboardAction.swift",
+    "/workspace/scratch/85ec14d23ddc/shortcut-validation/final-linux/build/baseline/sources/PlayerShortcutBindings.swift"
+  ],
+  "platform": "linux-value-stubs",
+  "runner_sha256": "612d088f3aa913c1f3d00187850b52465956374c84f1eb99528e375e87a85f4a",
+  "sources": {
+    "PlatformStubs.swift": {
+      "compiled_sha256": "c6af29f4bfbafb5c33321965b6ba05ea17dd1000ca999a09aae24f31c95bed0a",
+      "import_adaptation": false,
+      "input_sha256": "c6af29f4bfbafb5c33321965b6ba05ea17dd1000ca999a09aae24f31c95bed0a"
+    },
+    "PlayerKeyboardAction.swift": {
+      "compiled_sha256": "d2519cd77d457486eb361cb9a7a0030bcae657da935740bd6488f4a4ff14a358",
+      "import_adaptation": true,
+      "input_sha256": "2b6c7e05552d1e7be64b9d5f294b7d06a0dc5fdeb665b03f0e64acffda923b5a"
+    },
+    "PlayerShortcutBindings.swift": {
+      "compiled_sha256": "7c6deef502e343dc4cef1cc7a727c65474d1c228b069f8928816ab42e12e4ebf",
+      "import_adaptation": true,
+      "input_sha256": "35ba093161ad5b33bb9b28663c4eb68aec414e33c462f25066d6cca03253c0ee"
+    }
+  },
+  "variant": "baseline"
+}

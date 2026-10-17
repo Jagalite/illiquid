@@ -67,14 +67,28 @@ struct PlayerShortcutChord: Equatable {
         let flags = event.modifierFlags.intersection([.command, .option, .control, .shift])
         if key == "?", modifiers.isEmpty, event.characters == "?", flags.isSubset(of: [.shift, .option]) { return true }
         guard flags == modifiers else { return false }
-        let navigation: [UInt16: String] = [49: "space", 123: "left", 124: "right", 125: "down", 126: "up", 116: "pageup", 121: "pagedown", 51: "delete"]
-        return (navigation[event.keyCode] ?? event.charactersIgnoringModifiers?.lowercased()) == key
+        let navigation: String?
+        switch event.keyCode {
+        case 49: navigation = "space"
+        case 123: navigation = "left"
+        case 124: navigation = "right"
+        case 125: navigation = "down"
+        case 126: navigation = "up"
+        case 116: navigation = "pageup"
+        case 121: navigation = "pagedown"
+        case 51: navigation = "delete"
+        default: navigation = nil
+        }
+        return (navigation ?? event.charactersIgnoringModifiers?.lowercased()) == key
     }
 }
 
 @Observable @MainActor
 final class PlayerShortcutBindings {
     private(set) var overrides: [String: String]
+    @ObservationIgnored private var compiledBindings: [
+        (action: PlayerKeyboardAction, chord: PlayerShortcutChord)
+    ] = []
     private let defaults: UserDefaults
     private static let storageKey = "player.shortcut-overrides.v1"
 
@@ -97,6 +111,7 @@ final class PlayerShortcutBindings {
                 $0.id != definition.id && PlayerShortcutChord(key(for: $0)) == PlayerShortcutChord(key(for: definition))
             }
         }) { overrides.removeValue(forKey: conflicting.id) }
+        rebuildCompiledBindings()
     }
 
     func key(for definition: PlayerShortcutDefinition) -> String {
@@ -118,11 +133,24 @@ final class PlayerShortcutBindings {
             $0.id != definition.id && PlayerShortcutChord(key(for: $0)) == chord
         }) { return "Already used by \(conflict.title). Change that shortcut first." }
         overrides[definition.id] = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        rebuildCompiledBindings()
         defaults.set(overrides, forKey: Self.storageKey)
         return nil
     }
 
-    func reset() { overrides = [:]; defaults.removeObject(forKey: Self.storageKey) }
+    func reset() {
+        overrides = [:]
+        rebuildCompiledBindings()
+        defaults.removeObject(forKey: Self.storageKey)
+    }
+
+    private func rebuildCompiledBindings() {
+        // Keep definition order: layout-dependent "?" can overlap a valid
+        // user chord. Parsing belongs to settings changes, not key events.
+        compiledBindings = PlayerShortcutDefinition.all.compactMap { definition in
+            PlayerShortcutChord(key(for: definition)).map { (definition.action, $0) }
+        }
+    }
 
     func menuShortcut(for action: PlayerKeyboardAction) -> KeyboardShortcut? {
         guard let definition = PlayerShortcutDefinition.all.first(where: { $0.action == action }),
@@ -138,15 +166,15 @@ final class PlayerShortcutBindings {
     }
 
     func resolve(_ event: NSEvent) -> PlayerKeyboardAction? {
-        for definition in PlayerShortcutDefinition.all {
-            if PlayerShortcutChord(key(for: definition))?.matches(event) == true {
+        for binding in compiledBindings {
+            if binding.chord.matches(event) {
                 if event.isARepeat {
-                    switch definition.action {
+                    switch binding.action {
                     case .seek, .volume, .stepFrame: break
                     default: return nil
                     }
                 }
-                return definition.action
+                return binding.action
             }
         }
         let fallback = PlayerKeyboardAction.resolve(keyCode: event.keyCode, characters: event.characters,
