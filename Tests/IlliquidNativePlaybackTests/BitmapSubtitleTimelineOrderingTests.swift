@@ -20,9 +20,14 @@ struct BitmapSubtitleTimelineOrderingTests {
             }
             var timeline = BitmapSubtitleTimeline(maximumEntries: capacity, maximumBytes: capacity * 64)
             var oracle = TimelineSortedArrayOracle(maximumEntries: capacity, maximumBytes: capacity * 64)
-            let queries = [-1.0] + (0..<capacity).flatMap {
-                [Double($0), Double($0) + 0.125, Double($0) + 0.25]
-            } + [Double(capacity + 1)]
+            var queries: [Double] = [-1.0]
+            for index in 0..<capacity {
+                let start = Double(index)
+                queries.append(start)
+                queries.append(start + 0.125)
+                queries.append(start + 0.25)
+            }
+            queries.append(Double(capacity + 1))
             for index in order {
                 let display = timelineDisplay(UInt8(index), bytes: index.isMultiple(of: 2) ? 4 : 64,
                                               duration: index.isMultiple(of: 3) ? 0.25 : nil)

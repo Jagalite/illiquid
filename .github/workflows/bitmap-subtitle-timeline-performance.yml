@@ -48,6 +48,24 @@ jobs:
           python3 Benchmarks/BitmapSubtitleTimeline/run.py \
             --pairs 8 --target-ms 80 --max-sample-ms 1500 \
             --output "$RUNNER_TEMP/bitmap-subtitle-timeline/timing"
+      - name: Emit review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "bitmap-subtitle-timeline"
+          files = {str(p.relative_to(root)): p.read_text()
+                   for p in sorted(root.rglob("*")) if p.is_file() and "build" not in p.parts}
+          # Print compact, unmodified source records for remote review even when
+          # a reviewer's local execution environment is unavailable.
+          review = {name: value for name, value in files.items() if "/receipts/" not in name}
+          print("TIMELINE_REVIEW_JSON " + json.dumps(review, sort_keys=True))
+          # Preserve complete receipts and logs as an exact, reproducible bundle.
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print("TIMELINE_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          print("TIMELINE_BUNDLE_BASE64 " + base64.b64encode(packed).decode())
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
