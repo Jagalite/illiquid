@@ -115,6 +115,13 @@ def toolchain(args: argparse.Namespace, out: Path) -> dict[str, str]:
     frontend = Path(swiftc).parent / "swift-frontend"
     if frontend.exists():
         receipt.update({"swift_frontend": str(frontend), "swift_frontend_sha256": file_digest(frontend.resolve())})
+    if NATIVE:
+        receipt.update({
+            "macos_sdk_path": command(["xcrun", "--sdk", "macosx", "--show-sdk-path"],
+                                      out / "sdk-path.log", out / "cache").strip(),
+            "macos_sdk_version": command(["xcrun", "--sdk", "macosx", "--show-sdk-version"],
+                                         out / "sdk-version.log", out / "cache").strip(),
+        })
     return receipt
 
 
@@ -127,7 +134,8 @@ def build(variant: str, out: Path, compiler: dict[str, str]) -> Path:
     flags = ["-swift-version", "6", "-O", "-whole-module-optimization", "-warnings-as-errors",
              "-module-cache-path", str(out / "cache/modules")]
     if NATIVE:
-        flags += ["-target", f"{platform.machine()}-apple-macosx26.0"]
+        flags += ["-target", f"{platform.machine()}-apple-macosx26.0",
+                  "-sdk", compiler["macos_sdk_path"]]
     module_args = [compiler["swiftc"], *flags, "-emit-library", "-emit-module",
                    "-module-name", "IlliquidCore", "-emit-module-path", str(folder / "IlliquidCore.swiftmodule"),
                    "-o", str(library), *map(str, sources)]
