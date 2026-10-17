@@ -1,0 +1,47 @@
+{
+  "repository": "Jagalite/illiquid",
+  "run_id": 39071181652,
+  "job_id": 117508966085,
+  "head_sha": "5e61e45f5191463514e2fed8d63dc51f50b31bb5",
+  "job_conclusion": "failure",
+  "container": "swift:6.3.3-noble",
+  "container_digest": "sha256:c2f3ac2eb806ce43f68859c3d52bd3bb1cfc88672fb3a948b76e136d98e39278",
+  "evidence_source": "Full decoded GitHub Actions job log",
+  "python_install": "passed",
+  "tests": {
+    "baseline_debug": "passed",
+    "baseline_release": "passed",
+    "candidate_debug": "passed",
+    "candidate_release": "passed"
+  },
+  "failure": {
+    "command": "baseline dump (receipts-baseline)",
+    "returncode": -4,
+    "signal": "SIGILL",
+    "utc": "2026-10-17T21:31:44.7551677Z",
+    "stack": [
+      "String._startOfLastPathComponent.getter in libFoundation.so",
+      "NSString.deletingLastPathComponent.getter in libFoundation.so"
+    ],
+    "exact_trigger_path": "not established"
+  },
+  "candidate_dump_reached": false,
+  "timings_reached": false,
+  "artifact": {
+    "id": 12115047126,
+    "name": "episode-folder-parsing-linux",
+    "reported_size_bytes": 33594,
+    "reported_sha256": "88f87aa031dadf1135082d86f42b7ef15351ea6e5b51ae55a228694ce24ca505",
+    "archive_download_succeeded": true,
+    "archive_contents_inspected": false,
+    "archive_digest_locally_verified": false
+  },
+  "earlier_setup_failure": {
+    "run_id": 39070932709,
+    "job_id": 117508209335,
+    "head_sha": "6604d288e4bd591d09fb61e2eef32733d93b83f5",
+    "reason": "python3 missing from Swift container",
+    "tests_reached": false
+  },
+  "scope": "No Linux parity or speedup claim. Supplemental Linux workflow removed; native macOS qualification passed."
+}

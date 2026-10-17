@@ -1,0 +1,547 @@
+﻿2026-10-17T21:24:45.1364490Z Current runner version: '2.337.0'
+2026-10-17T21:24:45.1382550Z ##[group]Runner Image Provisioner
+2026-10-17T21:24:45.1383110Z Hosted Compute Agent
+2026-10-17T21:24:45.1383470Z Version: 20261012.601
+2026-10-17T21:24:45.1383870Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-17T21:24:45.1384320Z Build Date: 2026-10-12T17:48:21Z
+2026-10-17T21:24:45.1384750Z Worker ID: {668264dc-0ad8-46e1-a952-250623cba471}
+2026-10-17T21:24:45.1385180Z Region: westus
+2026-10-17T21:24:45.1385530Z Cloud: MacCloud
+2026-10-17T21:24:45.1385860Z ##[endgroup]
+2026-10-17T21:24:45.1386700Z ##[group]Operating System
+2026-10-17T21:24:45.1387070Z macOS
+2026-10-17T21:24:45.1387380Z 26.6.2
+2026-10-17T21:24:45.1387690Z 25G83
+2026-10-17T21:24:45.1388020Z ##[endgroup]
+2026-10-17T21:24:45.1388350Z ##[group]Runner Image
+2026-10-17T21:24:45.1388710Z Image: macos-26-arm64
+2026-10-17T21:24:45.1389260Z Version: 20261013.0424.1
+2026-10-17T21:24:45.1390080Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20261013.0424/images/macos/macos-26-arm64-Readme.md
+2026-10-17T21:24:45.1391090Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20261013.0424
+2026-10-17T21:24:45.1391740Z ##[endgroup]
+2026-10-17T21:24:45.1392550Z ##[group]GITHUB_TOKEN Permissions
+2026-10-17T21:24:45.1393580Z Contents: read
+2026-10-17T21:24:45.1393950Z Metadata: read
+2026-10-17T21:24:45.1394330Z ##[endgroup]
+2026-10-17T21:24:45.1395690Z Secret source: Actions
+2026-10-17T21:24:45.1396240Z Cache mode: write
+2026-10-17T21:24:45.1396670Z Prepare workflow directory
+2026-10-17T21:24:45.1648440Z Prepare all required actions
+2026-10-17T21:24:45.1682030Z Getting action download info
+2026-10-17T21:24:45.5511350Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-17T21:24:45.7240210Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-17T21:24:45.8927410Z Complete job name: native-recognition
+2026-10-17T21:24:45.9357340Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-17T21:24:45.9358040Z with:
+2026-10-17T21:24:45.9358370Z   persist-credentials: false
+2026-10-17T21:24:45.9358770Z   repository: Jagalite/illiquid
+2026-10-17T21:24:45.9361610Z   token: ***
+2026-10-17T21:24:45.9361930Z   ssh-strict: true
+2026-10-17T21:24:45.9362250Z   ssh-user: git
+2026-10-17T21:24:45.9362570Z   clean: true
+2026-10-17T21:24:45.9362900Z   sparse-checkout-cone-mode: true
+2026-10-17T21:24:45.9363290Z   fetch-depth: 1
+2026-10-17T21:24:45.9363620Z   fetch-tags: false
+2026-10-17T21:24:45.9363960Z   show-progress: true
+2026-10-17T21:24:45.9364290Z   lfs: false
+2026-10-17T21:24:45.9364620Z   submodules: false
+2026-10-17T21:24:45.9364960Z   set-safe-directory: true
+2026-10-17T21:24:45.9365350Z   allow-unsafe-pr-checkout: false
+2026-10-17T21:24:45.9365840Z env:
+2026-10-17T21:24:45.9366250Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T21:24:45.9366800Z ##[endgroup]
+2026-10-17T21:24:46.3840290Z Syncing repository: Jagalite/illiquid
+2026-10-17T21:24:46.3842250Z ##[group]Getting Git version info
+2026-10-17T21:24:46.3842890Z Working directory is '/Users/runner/work/illiquid/illiquid'
+2026-10-17T21:24:46.3843760Z [command]/opt/homebrew/bin/git version
+2026-10-17T21:24:46.4134390Z git version 2.56.0
+2026-10-17T21:24:46.4145620Z ##[endgroup]
+2026-10-17T21:24:46.4156690Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/01d167e6-8150-43fa-80cb-a78213588ce1/.gitconfig'
+2026-10-17T21:24:46.4171130Z Temporarily overriding HOME='/Users/runner/work/_temp/01d167e6-8150-43fa-80cb-a78213588ce1' before making global git config changes
+2026-10-17T21:24:46.4172310Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T21:24:46.4179500Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-17T21:24:46.4383990Z Deleting the contents of '/Users/runner/work/illiquid/illiquid'
+2026-10-17T21:24:46.4389050Z ##[group]Initializing the repository
+2026-10-17T21:24:46.4392580Z [command]/opt/homebrew/bin/git init /Users/runner/work/illiquid/illiquid
+2026-10-17T21:24:46.4656860Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-17T21:24:46.4659960Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-17T21:24:46.4660940Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-17T21:24:46.4663800Z hint: call:
+2026-10-17T21:24:46.4664950Z hint:
+2026-10-17T21:24:46.4666460Z hint: 	git config --global init.defaultBranch <name>
+2026-10-17T21:24:46.4667770Z hint:
+2026-10-17T21:24:46.4669520Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-17T21:24:46.4671740Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-17T21:24:46.4673300Z hint:
+2026-10-17T21:24:46.4674830Z hint: 	git branch -m <name>
+2026-10-17T21:24:46.4675620Z hint:
+2026-10-17T21:24:46.4676170Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-17T21:24:46.4677470Z Initialized empty Git repository in /Users/runner/work/illiquid/illiquid/.git/
+2026-10-17T21:24:46.4695630Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Jagalite/illiquid
+2026-10-17T21:24:46.4808380Z ##[endgroup]
+2026-10-17T21:24:46.4809130Z ##[group]Disabling automatic garbage collection
+2026-10-17T21:24:46.4829250Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-17T21:24:46.4897420Z ##[endgroup]
+2026-10-17T21:24:46.4900180Z ##[group]Setting up auth
+2026-10-17T21:24:46.4902470Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T21:24:46.4978610Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T21:24:46.5995290Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T21:24:46.6069560Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T21:24:46.6935460Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T21:24:46.7006940Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T21:24:46.7845660Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-17T21:24:46.7914060Z ##[endgroup]
+2026-10-17T21:24:46.7914790Z ##[group]Fetching the repository
+2026-10-17T21:24:46.7919930Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +f8386f9be6636432c68a9ced7825544306560a60:refs/remotes/origin/perf/media-name-folder-parsing
+2026-10-17T21:24:52.0298760Z From https://github.com/Jagalite/illiquid
+2026-10-17T21:24:52.0300070Z  * [new ref]         f8386f9be6636432c68a9ced7825544306560a60 -> origin/perf/media-name-folder-parsing
+2026-10-17T21:24:52.0302600Z ##[endgroup]
+2026-10-17T21:24:52.0303400Z ##[group]Determining the checkout info
+2026-10-17T21:24:52.0304300Z ##[endgroup]
+2026-10-17T21:24:52.0306490Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-17T21:24:52.0383710Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-17T21:24:52.0449010Z ##[group]Checking out the ref
+2026-10-17T21:24:52.0451450Z [command]/opt/homebrew/bin/git checkout --progress --force -B perf/media-name-folder-parsing refs/remotes/origin/perf/media-name-folder-parsing
+2026-10-17T21:24:52.5854730Z Switched to a new branch 'perf/media-name-folder-parsing'
+2026-10-17T21:24:52.5869630Z branch 'perf/media-name-folder-parsing' set up to track 'origin/perf/media-name-folder-parsing'.
+2026-10-17T21:24:52.5928030Z ##[endgroup]
+2026-10-17T21:24:52.6043500Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-17T21:24:52.6126110Z f8386f9be6636432c68a9ced7825544306560a60
+2026-10-17T21:24:52.6134280Z ##[group]Removing auth
+2026-10-17T21:24:52.6137640Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T21:24:52.6207780Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T21:24:52.7076060Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T21:24:52.7131660Z http.https://github.com/.extraheader
+2026-10-17T21:24:52.7137560Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-17T21:24:52.7200590Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T21:24:52.7934870Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T21:24:52.7993140Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T21:24:52.8751280Z ##[endgroup]
+2026-10-17T21:24:52.8957720Z ##[group]Run python3 Benchmarks/MediaNameRecognition/run.py \
+2026-10-17T21:24:52.8958190Z [36;1mpython3 Benchmarks/MediaNameRecognition/run.py \[0m
+2026-10-17T21:24:52.8958580Z [36;1m  --output "$RUNNER_TEMP/media-name-recognition" \[0m
+2026-10-17T21:24:52.8958890Z [36;1m  --pairs 6 --target-ms 200[0m
+2026-10-17T21:24:52.8997170Z shell: /bin/bash -e {0}
+2026-10-17T21:24:52.8997420Z env:
+2026-10-17T21:24:52.8997710Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T21:24:52.8998060Z ##[endgroup]
+2026-10-17T21:25:17.4626250Z Passed baseline debug recognition tests
+2026-10-17T21:25:32.0188860Z Passed baseline release recognition tests
+2026-10-17T21:25:41.7939820Z Passed candidate debug recognition tests
+2026-10-17T21:25:55.0863190Z Passed candidate release recognition tests
+2026-10-17T21:26:12.8965580Z episode_prefixed: 46.92 -> 43.99 us/name; 6.2% reduction
+2026-10-17T21:26:15.5714970Z episode_bare_season: 37.19 -> 26.78 us/name; 28.0% reduction
+2026-10-17T21:26:17.8818250Z episode_bare_parent_year: 60.65 -> 41.52 us/name; 31.5% reduction
+2026-10-17T21:26:20.7743400Z episode_explicit_year: 47.35 -> 43.54 us/name; 8.1% reduction
+2026-10-17T21:26:22.9950350Z episode_specials_multiple: 43.17 -> 31.50 us/name; 27.0% reduction
+2026-10-17T21:26:25.9931590Z episode_alternate: 45.75 -> 38.90 us/name; 15.0% reduction
+2026-10-17T21:26:29.1607500Z episode_unicode_tags: 76.51 -> 69.07 us/name; 9.7% reduction
+2026-10-17T21:26:32.1630840Z movies: 34.81 -> 32.61 us/name; 6.3% reduction
+2026-10-17T21:26:35.3086800Z dates: 42.71 -> 39.97 us/name; 6.4% reduction
+2026-10-17T21:26:38.2669960Z extras: 20.80 -> 20.37 us/name; 2.1% reduction
+2026-10-17T21:26:41.3295910Z unknown: 34.77 -> 32.38 us/name; 6.9% reduction
+2026-10-17T21:26:44.3301050Z mixed: 46.81 -> 38.69 us/name; 17.3% reduction
+2026-10-17T21:26:44.3572440Z ##[group]Run set -o pipefail
+2026-10-17T21:26:44.3572910Z [36;1mset -o pipefail[0m
+2026-10-17T21:26:44.3573340Z [36;1mbash Scripts/test-nfo-metadata-regressions.sh -c debug \[0m
+2026-10-17T21:26:44.3573820Z [36;1m  2>&1 | tee "$RUNNER_TEMP/media-name-recognition/sidecar-debug.stdout"[0m
+2026-10-17T21:26:44.3574300Z [36;1mbash Scripts/test-nfo-metadata-regressions.sh -c release \[0m
+2026-10-17T21:26:44.3574810Z [36;1m  2>&1 | tee "$RUNNER_TEMP/media-name-recognition/sidecar-release.stdout"[0m
+2026-10-17T21:26:44.3778940Z shell: /bin/bash -e {0}
+2026-10-17T21:26:44.3783110Z env:
+2026-10-17T21:26:44.3783480Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T21:26:44.3783980Z ##[endgroup]
+2026-10-17T21:26:45.6710340Z Building for debugging...
+2026-10-17T21:26:45.6759850Z [0/7] /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-nfo-regressions.4uVRFm/.build/arm64-apple-macosx/debug/IlliquidNFOMetadataRegressionsPackageTests.derived/runner.swift
+2026-10-17T21:26:45.6767380Z [1/7] Write sources
+2026-10-17T21:26:45.8179380Z [4/7] Write swift-version-7974D3F7F03D5E95.txt
+2026-10-17T21:26:50.9913760Z [6/12] Emitting module IlliquidCore
+2026-10-17T21:26:50.9989400Z [7/12] Compiling IlliquidCore MediaMetadataHints.swift
+2026-10-17T21:26:50.9991110Z [8/12] Compiling IlliquidCore MediaNameRecognition.swift
+2026-10-17T21:26:51.0007350Z [9/12] Compiling IlliquidCore MediaSidecarReader.swift
+2026-10-17T21:26:51.0017580Z [10/12] Compiling IlliquidCore NFOMetadataHints.swift
+2026-10-17T21:26:51.2871750Z [11/13] Compiling IlliquidCore PlexMatchHints.swift
+2026-10-17T21:26:55.0848510Z [12/16] Emitting module IlliquidCoreTests
+2026-10-17T21:26:55.0950790Z [13/16] Compiling IlliquidCoreTests MediaNameRecognitionTests.swift
+2026-10-17T21:26:55.1052530Z [14/16] Compiling IlliquidCoreTests MediaSidecarTests.swift
+2026-10-17T21:26:57.1406120Z [15/17] Compiling IlliquidCoreTests NFOEpisodeScopeRegressionTests.swift
+2026-10-17T21:26:58.4425180Z [16/19] Compiling IlliquidNFOMetadataRegressionsPackageTests runner.swift
+2026-10-17T21:26:58.5941120Z [17/19] Emitting module IlliquidNFOMetadataRegressionsPackageTests
+2026-10-17T21:26:58.5974360Z [17/19] Write Objects.LinkFileList
+2026-10-17T21:26:58.9557920Z [18/19] Linking IlliquidNFOMetadataRegressionsPackageTests
+2026-10-17T21:26:58.9576210Z Build complete! (13.34s)
+2026-10-17T21:26:59.1642620Z Test Suite 'All tests' started at 2026-10-17 21:26:59.111.
+2026-10-17T21:26:59.1644530Z Test Suite 'All tests' passed at 2026-10-17 21:26:59.112.
+2026-10-17T21:26:59.1645020Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+2026-10-17T21:26:59.1648650Z ◇ Test run started.
+2026-10-17T21:26:59.1649080Z ↳ Testing Library Version: 1902
+2026-10-17T21:26:59.1649510Z ↳ Target Platform: arm64e-apple-macos14.0
+2026-10-17T21:26:59.1649940Z ◇ Suite "NFO episode field scope" started.
+2026-10-17T21:26:59.1650290Z ◇ Suite "Local media sidecars" started.
+2026-10-17T21:26:59.1650640Z ◇ Suite "Local media naming recognition" started.
+2026-10-17T21:26:59.1651050Z ◇ Test sidecarIdentifiersMergeWithoutErasingOtherProviders() started.
+2026-10-17T21:26:59.1652460Z ◇ Test invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:26:59.1652880Z ◇ Test nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:26:59.1653470Z ◇ Test explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1653910Z ◇ Test readersBoundSizeAndCacheSharedMetadata() started.
+2026-10-17T21:26:59.1654490Z ◇ Test caseCDATAAndNestedFieldsRespectScope() started.
+2026-10-17T21:26:59.1655100Z ◇ Test explicitMappedSeasonWinsOverGeneralChildHint() started.
+2026-10-17T21:26:59.1655690Z ◇ Test explicitEpisodeSidecarStillOverridesFilenameRangeAndDate() started.
+2026-10-17T21:26:59.1656240Z ◇ Test implicitPlexMappingsUseDirectoryOrDefaultSeasonNotTotals() started.
+2026-10-17T21:26:59.1656790Z ◇ Test nfoMovieAndEpisodeFieldsAreScoped() started.
+2026-10-17T21:26:59.1657130Z ◇ Test plexMappingsAndPrecedence() started.
+2026-10-17T21:26:59.1659430Z ◇ Test readerDoesNotFollowSidecarLinksOrReadAboveSourceBoundary() started.
+2026-10-17T21:26:59.1660100Z ◇ Test validDocumentsAtTheLimitsStillParse() started.
+2026-10-17T21:26:59.1660610Z ◇ Test malformedNFOIsIgnored(_:) started.
+2026-10-17T21:26:59.1661100Z ◇ Test childShowTotalsDoNotOverrideExplicitPlexSeasonOrRange() started.
+2026-10-17T21:26:59.1662880Z ◇ Test hintsIdentifyNumberedFilesWithOpaqueFolderNames() started.
+2026-10-17T21:26:59.1663460Z ◇ Test malformedFileCannotReplaceFilename(_:) started.
+2026-10-17T21:26:59.1663860Z ◇ Test titleOnlyEpisodeSidecarPreservesRangeAndDate() started.
+2026-10-17T21:26:59.1676260Z ◇ Test filenameNFOOverridesSeriesHintsAndNewScanSeesEdits() started.
+2026-10-17T21:26:59.1677510Z ◇ Test showTotalsPreserveFilenameIdentityAndClassification() started.
+2026-10-17T21:26:59.1678080Z ◇ Test ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:26:59.1678560Z ◇ Test everyIncompleteDocumentPrefixIsRejected(_:) started.
+2026-10-17T21:26:59.1679130Z ◇ Test parserLimitsAndMalformedInputRemainRejected() started.
+2026-10-17T21:26:59.1679860Z ◇ Test case passing 1 argument fields → "<season>-1</season><episode>-2</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:26:59.1680770Z ◇ Test case passing 1 argument fields → "<season>1000</season><episode>10000</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:26:59.1681930Z ◇ Test case passing 1 argument fields → "<season>５</season><episode>٦٢</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:26:59.1682730Z ◇ Test case passing 1 argument fields → "<season>1x</season><episode>2.5</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:26:59.1683740Z ◇ Test case passing 2 arguments root → "tvshow", count → 0 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:26:59.1684460Z ◇ Test case passing 2 arguments root → "tvshow", count → 1 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:26:59.1685300Z ◇ Test case passing 2 arguments root → "tvshow", count → 5 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:26:59.1686130Z ◇ Test case passing 2 arguments season → 0, episode → 1 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1686750Z ◇ Test case passing 2 arguments season → 0, episode → 0 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1687490Z ◇ Test case passing 2 arguments root → "tvshow", count → 999 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:26:59.1688220Z ◇ Test case passing 2 arguments season → 0, episode → 62 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1689010Z ◇ Test case passing 2 arguments root → "movie", count → 0 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:26:59.1689680Z ◇ Test case passing 2 arguments season → 0, episode → 9999 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1690660Z ◇ Test case passing 2 arguments root → "movie", count → 1 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:26:59.1691330Z ◇ Test case passing 2 arguments season → 1, episode → 0 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1692240Z ◇ Test case passing 2 arguments season → 1, episode → 1 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1693040Z ◇ Test case passing 2 arguments root → "movie", count → 5 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:26:59.1693780Z ◇ Test case passing 2 arguments season → 1, episode → 62 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1694600Z ◇ Test case passing 2 arguments season → 1, episode → 9999 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1695510Z ◇ Test case passing 2 arguments season → 999, episode → 0 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1696210Z ◇ Test case passing 2 arguments season → 999, episode → 1 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1697500Z ◇ Test case passing 2 arguments root → "movie", count → 999 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:26:59.1698250Z ◇ Test case passing 2 arguments season → 999, episode → 62 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1699080Z ◇ Test case passing 2 arguments season → 999, episode → 9999 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:26:59.1699720Z ◇ Test folderEvidenceMustRelateToTheFile() started.
+2026-10-17T21:26:59.1700250Z ◇ Test moviesEditionsAndVersions() started.
+2026-10-17T21:26:59.1700590Z ◇ Test ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:26:59.1701050Z ◇ Test datedEpisodesPreserveUnicodeTitles(_:) started.
+2026-10-17T21:26:59.1701920Z ◇ Test unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1702380Z ◇ Test datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1702790Z ◇ Test episodes(_:) started.
+2026-10-17T21:26:59.1703080Z ◇ Test extrasTakePriority(_:) started.
+2026-10-17T21:26:59.1703500Z ◇ Test multiEpisodeSpecialAndDate() started.
+2026-10-17T21:26:59.1704040Z ◇ Test case passing 1 argument text → "<movie><title>Broken" to malformedNFOIsIgnored(_:) started.
+2026-10-17T21:26:59.1704940Z ◇ Test case passing 1 argument text → "<unexpected><title>Wrong root</title></unexpected>" to malformedNFOIsIgnored(_:) started.
+2026-10-17T21:26:59.1705870Z ◇ Test case passing 1 argument text → "<!DOCTYPE movie [<!ENTITY x SYSTEM 'file:///etc/passwd'>]><movie><title>&x;</title></movie>" to malformedNFOIsIgnored(_:) started.
+2026-10-17T21:26:59.1707210Z ◇ Test case passing 1 argument text → "<movie><year>-1</year><uniqueid type='imdb'>bad</uniqueid></movie>" to malformedNFOIsIgnored(_:) started.
+2026-10-17T21:26:59.1708280Z ◇ Test case passing 1 argument rootName → "tvshow" to malformedFileCannotReplaceFilename(_:) started.
+2026-10-17T21:26:59.1709130Z ◇ Test case passing 1 argument rootName → "movie" to malformedFileCannotReplaceFilename(_:) started.
+2026-10-17T21:26:59.1711410Z ◇ Test case passing 1 argument rootName → "episodedetails" to malformedFileCannotReplaceFilename(_:) started.
+2026-10-17T21:26:59.1712880Z ◇ Test case passing 2 arguments root → "tvshow", fields → "<season>5</season>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:26:59.1713990Z ◇ Test case passing 1 argument rootName → "tvshow" to everyIncompleteDocumentPrefixIsRejected(_:) started.
+2026-10-17T21:26:59.1714850Z ◇ Test case passing 2 arguments root → "tvshow", fields → "<episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:26:59.1715770Z ◇ Test case passing 1 argument rootName → "movie" to everyIncompleteDocumentPrefixIsRejected(_:) started.
+2026-10-17T21:26:59.1716870Z ◇ Test case passing 2 arguments root → "tvshow", fields → "<season>5</season><episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:26:59.1717900Z ◇ Test case passing 2 arguments root → "movie", fields → "<season>5</season>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:26:59.1718920Z ◇ Test case passing 2 arguments root → "movie", fields → "<episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:26:59.1719830Z ◇ Test case passing 2 arguments root → "movie", fields → "<season>5</season><episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:26:59.1720750Z ◇ Test case passing 1 argument rootName → "episodedetails" to everyIncompleteDocumentPrefixIsRejected(_:) started.
+2026-10-17T21:26:59.1723040Z ✔ Test sidecarIdentifiersMergeWithoutErasingOtherProviders() passed after 0.026 seconds.
+2026-10-17T21:26:59.1723830Z ✔ Test invalidEpisodeNumbersStayIgnored(_:) with 4 test cases passed after 0.026 seconds.
+2026-10-17T21:26:59.1724600Z ✔ Test nonEpisodeNumbersAreNotIdentity(_:_:) with 8 test cases passed after 0.026 seconds.
+2026-10-17T21:26:59.1725250Z ✔ Test explicitEpisodeNumbersStillWork(_:_:) with 12 test cases passed after 0.026 seconds.
+2026-10-17T21:26:59.1726280Z ✔ Test caseCDATAAndNestedFieldsRespectScope() passed after 0.026 seconds.
+2026-10-17T21:26:59.1726970Z ✔ Test explicitEpisodeSidecarStillOverridesFilenameRangeAndDate() passed after 0.026 seconds.
+2026-10-17T21:26:59.1727780Z ✔ Test explicitMappedSeasonWinsOverGeneralChildHint() passed after 0.026 seconds.
+2026-10-17T21:26:59.1728420Z ✔ Test nfoMovieAndEpisodeFieldsAreScoped() passed after 0.026 seconds.
+2026-10-17T21:26:59.1729000Z ◇ Test case passing 1 argument path → "vacation.mp4" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:26:59.1729750Z ◇ Test case passing 1 argument path → "Anime - 012 [1080p].mkv" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:26:59.1730720Z ◇ Test case passing 1 argument path → "S01E01.mkv" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:26:59.1731560Z ◇ Test case passing 1 argument path → "clip1920x1080.mp4" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:26:59.1732170Z ◇ Test case passing 1 argument path → "2024.mp4" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:26:59.1733040Z ◇ Test case passing 1 argument path → "family.mov" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:26:59.1733830Z ◇ Test case passing 1 argument date → "2024-02-29" to datedEpisodesPreserveUnicodeTitles(_:) started.
+2026-10-17T21:26:59.1734530Z ◇ Test case passing 1 argument date → "29.02.2024" to datedEpisodesPreserveUnicodeTitles(_:) started.
+2026-10-17T21:26:59.1735610Z ◇ Test case passing 1 argument path → "News - 2024-０２-29.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1736740Z ◇ Test case passing 1 argument path → "News - 2024-02-٢٩.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1737710Z ✔ Test readersBoundSizeAndCacheSharedMetadata() passed after 0.027 seconds.
+2026-10-17T21:26:59.1738420Z ◇ Test case passing 1 argument path → "News - 20２４-02-29.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1739230Z ◇ Test case passing 1 argument path → "News - 29.０２.2024.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1739960Z ◇ Test case passing 1 argument path → "News - ٢٩.02.2024.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1740860Z ◇ Test case passing 1 argument path → "News - 29.02.20２４.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1741680Z ◇ Test case passing 1 argument path → "News - ٢٩.٠٢.2024.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1742590Z ◇ Test case passing 1 argument path → "News - 20２４-٠٢-٢٩.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1743580Z ◇ Test case passing 1 argument path → "News - 2024-٠٢-٢٩.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1744320Z ◇ Test case passing 1 argument path → "News - ٢٩.٠٢.20２４.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:26:59.1745080Z ◇ Test case passing 1 argument date → "20２４-02-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1745790Z ◇ Test case passing 1 argument date → "2024-０２-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1746510Z ◇ Test case passing 1 argument date → "2024-02-２９" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1747280Z ◇ Test case passing 1 argument date → "20２４-０２-２９" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1748940Z ◇ Test case passing 1 argument date → "29.０２.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1751770Z ◇ Test case passing 1 argument date → "２９.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1752570Z ◇ Test case passing 1 argument date → "２９.０２.20２４" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1753340Z ◇ Test case passing 1 argument date → "20٢٤-02-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1754480Z ◇ Test case passing 1 argument date → "29.02.20２４" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1755190Z ◇ Test case passing 1 argument date → "2024-٠٢-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1755820Z ◇ Test case passing 1 argument date → "2024-02-٢٩" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1756450Z ◇ Test case passing 1 argument date → "29.02.20٢٤" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1757020Z ◇ Test case passing 1 argument date → "29.٠٢.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1757630Z ◇ Test case passing 1 argument date → "٢٩.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1758500Z ◇ Test case passing 1 argument date → "2024-०२-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1759140Z ◇ Test case passing 1 argument date → "२९.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1759750Z ◇ Test case passing 1 argument date → "2024-𝟘𝟚-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1760440Z ◇ Test case passing 1 argument date → "𝟚𝟡.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:26:59.1761240Z ◇ Test case passing 1 argument path → "TV/The Office (2005)/Season 01/The.Office.S01E02.Diversity.Day.1080p.WEB-DL.mkv" to episodes(_:) started.
+2026-10-17T21:26:59.1827320Z ◇ Test case passing 1 argument path → "TV/The Office (2005)/Season 01/S01E02 - Diversity Day.mkv" to episodes(_:) started.
+2026-10-17T21:26:59.1828650Z ◇ Test case passing 1 argument path → "The Office (2005) - 1x02 - Diversity Day.mp4" to episodes(_:) started.
+2026-10-17T21:26:59.1829480Z ◇ Test case passing 1 argument path → "Movie (2020)-trailer.mp4" to extrasTakePriority(_:) started.
+2026-10-17T21:26:59.1830620Z ◇ Test case passing 1 argument path → "Movie (2020)/Behind The Scenes/Making of.mkv" to extrasTakePriority(_:) started.
+2026-10-17T21:26:59.1831600Z ◇ Test case passing 1 argument path → "Show S01E01-deleted.mkv" to extrasTakePriority(_:) started.
+2026-10-17T21:26:59.1832140Z ✔ Test plexMappingsAndPrecedence() passed after 0.027 seconds.
+2026-10-17T21:26:59.1832890Z ✔ Test implicitPlexMappingsUseDirectoryOrDefaultSeasonNotTotals() passed after 0.027 seconds.
+2026-10-17T21:26:59.1833710Z ✔ Test malformedNFOIsIgnored(_:) with 4 test cases passed after 0.027 seconds.
+2026-10-17T21:26:59.1834350Z ✔ Test validDocumentsAtTheLimitsStillParse() passed after 0.027 seconds.
+2026-10-17T21:26:59.1835900Z ✔ Test readerDoesNotFollowSidecarLinksOrReadAboveSourceBoundary() passed after 0.027 seconds.
+2026-10-17T21:26:59.1836710Z ✔ Test childShowTotalsDoNotOverrideExplicitPlexSeasonOrRange() passed after 0.027 seconds.
+2026-10-17T21:26:59.1837520Z ✔ Test hintsIdentifyNumberedFilesWithOpaqueFolderNames() passed after 0.027 seconds.
+2026-10-17T21:26:59.1838470Z ✔ Test titleOnlyEpisodeSidecarPreservesRangeAndDate() passed after 0.027 seconds.
+2026-10-17T21:26:59.1839160Z ✔ Test malformedFileCannotReplaceFilename(_:) with 3 test cases passed after 0.027 seconds.
+2026-10-17T21:26:59.1839830Z ✔ Test ignoredNumbersAloneDoNotProduceHints(_:_:) with 6 test cases passed after 0.027 seconds.
+2026-10-17T21:26:59.1840470Z ✔ Test filenameNFOOverridesSeriesHintsAndNewScanSeesEdits() passed after 0.028 seconds.
+2026-10-17T21:26:59.1841110Z ✔ Test showTotalsPreserveFilenameIdentityAndClassification() passed after 0.028 seconds.
+2026-10-17T21:26:59.1841730Z ✔ Test everyIncompleteDocumentPrefixIsRejected(_:) with 3 test cases passed after 0.027 seconds.
+2026-10-17T21:26:59.1842820Z ✔ Test parserLimitsAndMalformedInputRemainRejected() passed after 0.028 seconds.
+2026-10-17T21:26:59.1843360Z ✔ Test moviesEditionsAndVersions() passed after 0.014 seconds.
+2026-10-17T21:26:59.1843990Z ✔ Test folderEvidenceMustRelateToTheFile() passed after 0.015 seconds.
+2026-10-17T21:26:59.1844460Z ✔ Test ambiguousNamesStayIntact(_:) with 6 test cases passed after 0.014 seconds.
+2026-10-17T21:26:59.1845960Z ✔ Test datedEpisodesPreserveUnicodeTitles(_:) with 2 test cases passed after 0.014 seconds.
+2026-10-17T21:26:59.1846640Z ✔ Test unparseableUnicodeDateComponentsStayIntact(_:) with 10 test cases passed after 0.014 seconds.
+2026-10-17T21:26:59.1847240Z ✔ Test datesWithNonASCIIDigitsStayIntact(_:) with 18 test cases passed after 0.014 seconds.
+2026-10-17T21:26:59.1847850Z ✔ Test episodes(_:) with 3 test cases passed after 0.014 seconds.
+2026-10-17T21:26:59.1848330Z ✔ Test extrasTakePriority(_:) with 3 test cases passed after 0.014 seconds.
+2026-10-17T21:26:59.1848750Z ✔ Test multiEpisodeSpecialAndDate() passed after 0.014 seconds.
+2026-10-17T21:26:59.1849130Z ✔ Suite "Local media sidecars" passed after 0.028 seconds.
+2026-10-17T21:26:59.1850000Z ✔ Suite "Local media naming recognition" passed after 0.028 seconds.
+2026-10-17T21:26:59.1850430Z ✔ Suite "NFO episode field scope" passed after 0.028 seconds.
+2026-10-17T21:26:59.1850880Z ✔ Test run with 32 tests in 3 suites passed after 0.029 seconds.
+2026-10-17T21:27:00.3680680Z Building for production...
+2026-10-17T21:27:00.3727990Z [0/7] Write sources
+2026-10-17T21:27:00.3731710Z [0/7] /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-nfo-regressions.4mWvRo/.build/arm64-apple-macosx/release/IlliquidNFOMetadataRegressionsPackageTests.derived/runner.swift
+2026-10-17T21:27:00.3732520Z [2/7] Write sources
+2026-10-17T21:27:00.5055310Z [4/7] Write swift-version-7974D3F7F03D5E95.txt
+2026-10-17T21:27:06.5034660Z [6/8] Compiling IlliquidCore MediaMetadataHints.swift
+2026-10-17T21:27:15.1341070Z [7/9] Compiling IlliquidCoreTests MediaNameRecognitionTests.swift
+2026-10-17T21:27:16.2474940Z [8/10] Compiling IlliquidNFOMetadataRegressionsPackageTests runner.swift
+2026-10-17T21:27:16.2500420Z [8/10] Write Objects.LinkFileList
+2026-10-17T21:27:16.6281190Z [9/10] Linking IlliquidNFOMetadataRegressionsPackageTests
+2026-10-17T21:27:16.6300320Z Build complete! (16.31s)
+2026-10-17T21:27:16.7980370Z Test Suite 'All tests' started at 2026-10-17 21:27:16.749.
+2026-10-17T21:27:16.7982010Z Test Suite 'All tests' passed at 2026-10-17 21:27:16.750.
+2026-10-17T21:27:16.7983400Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+2026-10-17T21:27:16.7986810Z ◇ Test run started.
+2026-10-17T21:27:16.7987480Z ↳ Testing Library Version: 1902
+2026-10-17T21:27:16.7988710Z ↳ Target Platform: arm64e-apple-macos14.0
+2026-10-17T21:27:16.7989290Z ◇ Suite "Local media sidecars" started.
+2026-10-17T21:27:16.7990000Z ◇ Suite "Local media naming recognition" started.
+2026-10-17T21:27:16.7993920Z ◇ Test readerDoesNotFollowSidecarLinksOrReadAboveSourceBoundary() started.
+2026-10-17T21:27:16.7994810Z ◇ Suite "NFO episode field scope" started.
+2026-10-17T21:27:16.7995690Z ◇ Test hintsIdentifyNumberedFilesWithOpaqueFolderNames() started.
+2026-10-17T21:27:16.7996530Z ◇ Test readersBoundSizeAndCacheSharedMetadata() started.
+2026-10-17T21:27:16.7997080Z ◇ Test ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:27:16.7997660Z ◇ Test filenameNFOOverridesSeriesHintsAndNewScanSeesEdits() started.
+2026-10-17T21:27:16.7998290Z ◇ Test malformedNFOIsIgnored(_:) started.
+2026-10-17T21:27:16.7998710Z ◇ Test plexMappingsAndPrecedence() started.
+2026-10-17T21:27:16.7999240Z ◇ Test sidecarIdentifiersMergeWithoutErasingOtherProviders() started.
+2026-10-17T21:27:16.7999790Z ◇ Test episodes(_:) started.
+2026-10-17T21:27:16.8000180Z ◇ Test datedEpisodesPreserveUnicodeTitles(_:) started.
+2026-10-17T21:27:16.8001060Z ◇ Test explicitMappedSeasonWinsOverGeneralChildHint() started.
+2026-10-17T21:27:16.8001540Z ◇ Test datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8002040Z ◇ Test folderEvidenceMustRelateToTheFile() started.
+2026-10-17T21:27:16.8002660Z ◇ Test nfoMovieAndEpisodeFieldsAreScoped() started.
+2026-10-17T21:27:16.8003120Z ◇ Test moviesEditionsAndVersions() started.
+2026-10-17T21:27:16.8003630Z ◇ Test extrasTakePriority(_:) started.
+2026-10-17T21:27:16.8003950Z ◇ Test multiEpisodeSpecialAndDate() started.
+2026-10-17T21:27:16.8004610Z ◇ Test unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8011090Z ◇ Test case passing 1 argument path → "vacation.mp4" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:27:16.8012030Z ◇ Test case passing 1 argument path → "Anime - 012 [1080p].mkv" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:27:16.8012690Z ◇ Test case passing 1 argument path → "S01E01.mkv" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:27:16.8013380Z ◇ Test case passing 1 argument path → "clip1920x1080.mp4" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:27:16.8014100Z ◇ Test case passing 1 argument path → "2024.mp4" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:27:16.8014690Z ◇ Test case passing 1 argument text → "<movie><title>Broken" to malformedNFOIsIgnored(_:) started.
+2026-10-17T21:27:16.8024850Z ◇ Test case passing 1 argument path → "family.mov" to ambiguousNamesStayIntact(_:) started.
+2026-10-17T21:27:16.8025720Z ◇ Test case passing 1 argument text → "<unexpected><title>Wrong root</title></unexpected>" to malformedNFOIsIgnored(_:) started.
+2026-10-17T21:27:16.8026840Z ◇ Test case passing 1 argument text → "<!DOCTYPE movie [<!ENTITY x SYSTEM 'file:///etc/passwd'>]><movie><title>&x;</title></movie>" to malformedNFOIsIgnored(_:) started.
+2026-10-17T21:27:16.8027860Z ◇ Test case passing 1 argument text → "<movie><year>-1</year><uniqueid type='imdb'>bad</uniqueid></movie>" to malformedNFOIsIgnored(_:) started.
+2026-10-17T21:27:16.8028810Z ◇ Test case passing 1 argument path → "TV/The Office (2005)/Season 01/The.Office.S01E02.Diversity.Day.1080p.WEB-DL.mkv" to episodes(_:) started.
+2026-10-17T21:27:16.8033040Z ◇ Test case passing 1 argument path → "TV/The Office (2005)/Season 01/S01E02 - Diversity Day.mkv" to episodes(_:) started.
+2026-10-17T21:27:16.8034560Z ◇ Test case passing 1 argument path → "The Office (2005) - 1x02 - Diversity Day.mp4" to episodes(_:) started.
+2026-10-17T21:27:16.8035310Z ◇ Test case passing 1 argument date → "2024-02-29" to datedEpisodesPreserveUnicodeTitles(_:) started.
+2026-10-17T21:27:16.8036090Z ◇ Test case passing 1 argument date → "29.02.2024" to datedEpisodesPreserveUnicodeTitles(_:) started.
+2026-10-17T21:27:16.8037280Z ◇ Test case passing 1 argument date → "20２４-02-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8038270Z ◇ Test case passing 1 argument date → "2024-０２-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8039140Z ◇ Test case passing 1 argument date → "2024-02-２９" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8039960Z ◇ Test case passing 1 argument date → "20２４-０２-２９" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8040770Z ◇ Test case passing 1 argument date → "29.02.20２４" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8041400Z ◇ Test case passing 1 argument date → "29.０２.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8042090Z ◇ Test case passing 1 argument date → "２９.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8042710Z ◇ Test case passing 1 argument date → "２９.０２.20２４" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8043360Z ◇ Test case passing 1 argument date → "20٢٤-02-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8044000Z ◇ Test case passing 1 argument date → "2024-٠٢-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8044690Z ◇ Test case passing 1 argument date → "2024-02-٢٩" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8045350Z ◇ Test case passing 1 argument date → "29.02.20٢٤" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8045950Z ◇ Test case passing 1 argument date → "٢٩.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8046710Z ◇ Test case passing 1 argument date → "2024-०२-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8047310Z ◇ Test case passing 1 argument date → "२९.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8048370Z ◇ Test case passing 1 argument date → "2024-𝟘𝟚-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8049220Z ◇ Test case passing 1 argument date → "𝟚𝟡.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8050030Z ◇ Test case passing 1 argument path → "Movie (2020)-trailer.mp4" to extrasTakePriority(_:) started.
+2026-10-17T21:27:16.8050930Z ◇ Test case passing 1 argument path → "Movie (2020)/Behind The Scenes/Making of.mkv" to extrasTakePriority(_:) started.
+2026-10-17T21:27:16.8051770Z ◇ Test case passing 1 argument path → "Show S01E01-deleted.mkv" to extrasTakePriority(_:) started.
+2026-10-17T21:27:16.8052740Z ◇ Test titleOnlyEpisodeSidecarPreservesRangeAndDate() started.
+2026-10-17T21:27:16.8053270Z ◇ Test everyIncompleteDocumentPrefixIsRejected(_:) started.
+2026-10-17T21:27:16.8053930Z ◇ Test parserLimitsAndMalformedInputRemainRejected() started.
+2026-10-17T21:27:16.8054660Z ◇ Test case passing 1 argument path → "News - 2024-０２-29.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8055560Z ◇ Test implicitPlexMappingsUseDirectoryOrDefaultSeasonNotTotals() started.
+2026-10-17T21:27:16.8056330Z ◇ Test case passing 1 argument path → "News - 2024-02-٢٩.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8057260Z ◇ Test case passing 1 argument path → "News - 20２４-02-29.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8057950Z ◇ Test nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:27:16.8058600Z ◇ Test case passing 1 argument path → "News - 29.０２.2024.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8059380Z ◇ Test showTotalsPreserveFilenameIdentityAndClassification() started.
+2026-10-17T21:27:16.8060020Z ◇ Test case passing 1 argument path → "News - ٢٩.02.2024.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8060620Z ◇ Test ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:27:16.8061320Z ◇ Test case passing 1 argument path → "News - 29.02.20２４.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8062110Z ◇ Test case passing 1 argument path → "News - 2024-٠٢-٢٩.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8062830Z ◇ Test case passing 1 argument date → "29.٠٢.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+2026-10-17T21:27:16.8063340Z ◇ Test malformedFileCannotReplaceFilename(_:) started.
+2026-10-17T21:27:16.8064040Z ◇ Test case passing 1 argument path → "News - ٢٩.٠٢.2024.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8064750Z ◇ Test caseCDATAAndNestedFieldsRespectScope() started.
+2026-10-17T21:27:16.8065370Z ◇ Test case passing 1 argument path → "News - 20２４-٠٢-٢٩.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8066050Z ◇ Test childShowTotalsDoNotOverrideExplicitPlexSeasonOrRange() started.
+2026-10-17T21:27:16.8066550Z ◇ Test explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8067140Z ◇ Test explicitEpisodeSidecarStillOverridesFilenameRangeAndDate() started.
+2026-10-17T21:27:16.8067630Z ◇ Test invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:27:16.8068120Z ◇ Test validDocumentsAtTheLimitsStillParse() started.
+2026-10-17T21:27:16.8068580Z ✔ Test readersBoundSizeAndCacheSharedMetadata() passed after 0.013 seconds.
+2026-10-17T21:27:16.8069920Z ✔ Test readerDoesNotFollowSidecarLinksOrReadAboveSourceBoundary() passed after 0.013 seconds.
+2026-10-17T21:27:16.8070850Z ✔ Test ambiguousNamesStayIntact(_:) with 6 test cases passed after 0.013 seconds.
+2026-10-17T21:27:16.8071980Z ✔ Test malformedNFOIsIgnored(_:) with 4 test cases passed after 0.013 seconds.
+2026-10-17T21:27:16.8073600Z ✔ Test plexMappingsAndPrecedence() passed after 0.013 seconds.
+2026-10-17T21:27:16.8074180Z ✔ Test sidecarIdentifiersMergeWithoutErasingOtherProviders() passed after 0.013 seconds.
+2026-10-17T21:27:16.8075530Z ✔ Test hintsIdentifyNumberedFilesWithOpaqueFolderNames() passed after 0.013 seconds.
+2026-10-17T21:27:16.8078050Z ✔ Test episodes(_:) with 3 test cases passed after 0.013 seconds.
+2026-10-17T21:27:16.8080830Z ✔ Test datedEpisodesPreserveUnicodeTitles(_:) with 2 test cases passed after 0.013 seconds.
+2026-10-17T21:27:16.8081570Z ✔ Test folderEvidenceMustRelateToTheFile() passed after 0.013 seconds.
+2026-10-17T21:27:16.8082180Z ✔ Test datesWithNonASCIIDigitsStayIntact(_:) with 18 test cases passed after 0.013 seconds.
+2026-10-17T21:27:16.8082810Z ✔ Test filenameNFOOverridesSeriesHintsAndNewScanSeesEdits() passed after 0.013 seconds.
+2026-10-17T21:27:16.8083400Z ✔ Test nfoMovieAndEpisodeFieldsAreScoped() passed after 0.013 seconds.
+2026-10-17T21:27:16.8083920Z ✔ Test moviesEditionsAndVersions() passed after 0.013 seconds.
+2026-10-17T21:27:16.8084550Z ✔ Test explicitMappedSeasonWinsOverGeneralChildHint() passed after 0.013 seconds.
+2026-10-17T21:27:16.8085100Z ✔ Test extrasTakePriority(_:) with 3 test cases passed after 0.013 seconds.
+2026-10-17T21:27:16.8085620Z ✔ Test multiEpisodeSpecialAndDate() passed after 0.013 seconds.
+2026-10-17T21:27:16.8086240Z ◇ Test case passing 1 argument rootName → "tvshow" to everyIncompleteDocumentPrefixIsRejected(_:) started.
+2026-10-17T21:27:16.8087150Z ◇ Test case passing 1 argument path → "News - ٢٩.٠٢.20２４.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+2026-10-17T21:27:16.8088040Z ◇ Test case passing 1 argument rootName → "movie" to everyIncompleteDocumentPrefixIsRejected(_:) started.
+2026-10-17T21:27:16.8089100Z ◇ Test case passing 1 argument rootName → "episodedetails" to everyIncompleteDocumentPrefixIsRejected(_:) started.
+2026-10-17T21:27:16.8090100Z ✔ Test unparseableUnicodeDateComponentsStayIntact(_:) with 10 test cases passed after 0.016 seconds.
+2026-10-17T21:27:16.8090800Z ◇ Test case passing 2 arguments root → "tvshow", count → 0 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:27:16.8091590Z ◇ Test case passing 2 arguments root → "tvshow", count → 1 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:27:16.8092280Z ◇ Test case passing 2 arguments root → "tvshow", count → 5 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:27:16.8093080Z ◇ Test case passing 2 arguments root → "tvshow", count → 999 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:27:16.8093860Z ◇ Test case passing 2 arguments root → "movie", count → 0 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:27:16.8094510Z ◇ Test case passing 2 arguments root → "movie", count → 1 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:27:16.8095420Z ◇ Test case passing 2 arguments root → "movie", count → 5 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:27:16.8096750Z ◇ Test case passing 2 arguments root → "movie", count → 999 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+2026-10-17T21:27:16.8097790Z ◇ Test case passing 2 arguments root → "tvshow", fields → "<season>5</season>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:27:16.8099000Z ◇ Test case passing 2 arguments root → "tvshow", fields → "<episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:27:16.8099920Z ◇ Test case passing 2 arguments root → "tvshow", fields → "<season>5</season><episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:27:16.8100810Z ◇ Test case passing 2 arguments root → "movie", fields → "<season>5</season>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:27:16.8101710Z ◇ Test case passing 2 arguments root → "movie", fields → "<episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:27:16.8103000Z ◇ Test case passing 2 arguments root → "movie", fields → "<season>5</season><episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+2026-10-17T21:27:16.8103780Z ◇ Test case passing 1 argument rootName → "tvshow" to malformedFileCannotReplaceFilename(_:) started.
+2026-10-17T21:27:16.8104680Z ◇ Test case passing 1 argument rootName → "movie" to malformedFileCannotReplaceFilename(_:) started.
+2026-10-17T21:27:16.8105390Z ◇ Test case passing 1 argument rootName → "episodedetails" to malformedFileCannotReplaceFilename(_:) started.
+2026-10-17T21:27:16.8106360Z ◇ Test case passing 2 arguments season → 0, episode → 0 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8108560Z ◇ Test case passing 2 arguments season → 0, episode → 1 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8109470Z ◇ Test case passing 2 arguments season → 0, episode → 62 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8110230Z ◇ Test case passing 2 arguments season → 0, episode → 9999 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8111730Z ◇ Test case passing 1 argument fields → "<season>-1</season><episode>-2</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:27:16.8112950Z ◇ Test case passing 1 argument fields → "<season>1000</season><episode>10000</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:27:16.8113790Z ◇ Test case passing 2 arguments season → 1, episode → 0 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8114870Z ◇ Test case passing 1 argument fields → "<season>５</season><episode>٦٢</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:27:16.8115730Z ◇ Test case passing 2 arguments season → 1, episode → 1 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8116750Z ◇ Test case passing 1 argument fields → "<season>1x</season><episode>2.5</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+2026-10-17T21:27:16.8117680Z ◇ Test case passing 2 arguments season → 1, episode → 62 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8118460Z ◇ Test case passing 2 arguments season → 1, episode → 9999 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8119190Z ◇ Test case passing 2 arguments season → 999, episode → 0 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8119880Z ◇ Test case passing 2 arguments season → 999, episode → 1 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8120560Z ◇ Test case passing 2 arguments season → 999, episode → 62 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8121280Z ◇ Test case passing 2 arguments season → 999, episode → 9999 to explicitEpisodeNumbersStillWork(_:_:) started.
+2026-10-17T21:27:16.8122040Z ✔ Test everyIncompleteDocumentPrefixIsRejected(_:) with 3 test cases passed after 0.010 seconds.
+2026-10-17T21:27:16.8122680Z ✔ Test titleOnlyEpisodeSidecarPreservesRangeAndDate() passed after 0.010 seconds.
+2026-10-17T21:27:16.8123300Z ✔ Test parserLimitsAndMalformedInputRemainRejected() passed after 0.010 seconds.
+2026-10-17T21:27:16.8123890Z ✔ Test nonEpisodeNumbersAreNotIdentity(_:_:) with 8 test cases passed after 0.010 seconds.
+2026-10-17T21:27:16.8125160Z ✔ Test ignoredNumbersAloneDoNotProduceHints(_:_:) with 6 test cases passed after 0.010 seconds.
+2026-10-17T21:27:16.8125920Z ✔ Test implicitPlexMappingsUseDirectoryOrDefaultSeasonNotTotals() passed after 0.010 seconds.
+2026-10-17T21:27:16.8126710Z ✔ Test malformedFileCannotReplaceFilename(_:) with 3 test cases passed after 0.010 seconds.
+2026-10-17T21:27:16.8127360Z ✔ Test caseCDATAAndNestedFieldsRespectScope() passed after 0.010 seconds.
+2026-10-17T21:27:16.8127960Z ✔ Test childShowTotalsDoNotOverrideExplicitPlexSeasonOrRange() passed after 0.010 seconds.
+2026-10-17T21:27:16.8131610Z ✔ Test showTotalsPreserveFilenameIdentityAndClassification() passed after 0.010 seconds.
+2026-10-17T21:27:16.8132830Z ✔ Test explicitEpisodeNumbersStillWork(_:_:) with 12 test cases passed after 0.010 seconds.
+2026-10-17T21:27:16.8133610Z ✔ Test explicitEpisodeSidecarStillOverridesFilenameRangeAndDate() passed after 0.010 seconds.
+2026-10-17T21:27:16.8134180Z ✔ Suite "Local media sidecars" passed after 0.023 seconds.
+2026-10-17T21:27:16.8134670Z ✔ Suite "Local media naming recognition" passed after 0.023 seconds.
+2026-10-17T21:27:16.8135330Z ✔ Test invalidEpisodeNumbersStayIgnored(_:) with 4 test cases passed after 0.010 seconds.
+2026-10-17T21:27:16.8136320Z ✔ Test validDocumentsAtTheLimitsStillParse() passed after 0.013 seconds.
+2026-10-17T21:27:16.8136880Z ✔ Suite "NFO episode field scope" passed after 0.027 seconds.
+2026-10-17T21:27:16.8137350Z ✔ Test run with 32 tests in 3 suites passed after 0.027 seconds.
+2026-10-17T21:27:16.9890530Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-17T21:27:16.9890990Z with:
+2026-10-17T21:27:16.9891200Z   name: media-name-recognition-native
+2026-10-17T21:27:16.9892200Z   path: /Users/runner/work/_temp/media-name-recognition/*.json
+/Users/runner/work/_temp/media-name-recognition/*.jsonl
+/Users/runner/work/_temp/media-name-recognition/*.stdout
+/Users/runner/work/_temp/media-name-recognition/*.stderr
+/Users/runner/work/_temp/media-name-recognition/inputs/**
+
+2026-10-17T21:27:16.9893180Z   retention-days: 14
+2026-10-17T21:27:16.9893370Z   if-no-files-found: warn
+2026-10-17T21:27:16.9893540Z   compression-level: 6
+2026-10-17T21:27:16.9893710Z   overwrite: false
+2026-10-17T21:27:16.9893890Z   include-hidden-files: false
+2026-10-17T21:27:16.9894070Z env:
+2026-10-17T21:27:16.9894280Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-17T21:27:16.9894550Z ##[endgroup]
+2026-10-17T21:27:17.4460940Z (node:4938) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-17T21:27:17.4462510Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-17T21:27:17.5951390Z With the provided path, there will be 356 files uploaded
+2026-10-17T21:27:17.5951820Z Artifact name is valid!
+2026-10-17T21:27:17.5952020Z Root directory input is valid!
+2026-10-17T21:27:18.0125830Z Beginning upload of artifact content to blob storage
+2026-10-17T21:27:18.2520780Z (node:4938) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-17T21:27:18.8198220Z Uploaded bytes 458586
+2026-10-17T21:27:18.8898550Z Finished uploading artifact content to blob storage!
+2026-10-17T21:27:18.8899140Z SHA256 digest of uploaded artifact zip is 08ea93ad10f09b665a2bc02217a2646af18e9177872e5c656e0bd5b5254e2610
+2026-10-17T21:27:18.8899820Z Finalizing artifact upload
+2026-10-17T21:27:19.1677090Z Artifact media-name-recognition-native.zip successfully finalized. Artifact ID 12115540648
+2026-10-17T21:27:19.1678070Z Artifact media-name-recognition-native has been successfully uploaded! Final size is 458586 bytes. Artifact ID is 12115540648
+2026-10-17T21:27:19.1691460Z Artifact download URL: https://github.com/Jagalite/illiquid/actions/runs/39069954591/artifacts/12115540648
+2026-10-17T21:27:19.1887020Z Post job cleanup.
+2026-10-17T21:27:19.3025100Z [command]/opt/homebrew/bin/git version
+2026-10-17T21:27:19.3174120Z git version 2.56.0
+2026-10-17T21:27:19.3202450Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/ccce6b29-915c-4455-b1e1-abfd21555020/.gitconfig'
+2026-10-17T21:27:19.3210740Z Temporarily overriding HOME='/Users/runner/work/_temp/ccce6b29-915c-4455-b1e1-abfd21555020' before making global git config changes
+2026-10-17T21:27:19.3211820Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T21:27:19.3215380Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-17T21:27:19.3362460Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T21:27:19.3474260Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T21:27:19.4564790Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T21:27:19.4636650Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T21:27:19.5675490Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T21:27:19.5743930Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T21:27:19.6956650Z Cleaning up orphan processes
+2026-10-17T21:27:20.8243270Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

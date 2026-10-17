@@ -1,0 +1,228 @@
+﻿2026-10-17T21:26:18.0391304Z Current runner version: '2.337.0'
+2026-10-17T21:26:18.0416842Z ##[group]Runner Image Provisioner
+2026-10-17T21:26:18.0417747Z Hosted Compute Agent
+2026-10-17T21:26:18.0418492Z Version: 20261012.601
+2026-10-17T21:26:18.0419149Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-17T21:26:18.0419887Z Build Date: 2026-10-12T17:48:21Z
+2026-10-17T21:26:18.0420729Z Worker ID: {08359562-3171-425a-8afa-bd028ba7c619}
+2026-10-17T21:26:18.0421467Z Region: westcentralus
+2026-10-17T21:26:18.0422097Z Cloud: Azure
+2026-10-17T21:26:18.0422679Z ##[endgroup]
+2026-10-17T21:26:18.0424320Z ##[group]Operating System
+2026-10-17T21:26:18.0425083Z Ubuntu
+2026-10-17T21:26:18.0425655Z 24.04.5
+2026-10-17T21:26:18.0426442Z LTS
+2026-10-17T21:26:18.0427102Z ##[endgroup]
+2026-10-17T21:26:18.0427740Z ##[group]Runner Image
+2026-10-17T21:26:18.0428421Z Image: ubuntu-24.04
+2026-10-17T21:26:18.0429028Z Version: 20261012.334.1
+2026-10-17T21:26:18.0430389Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-17T21:26:18.0432025Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-17T21:26:18.0433438Z ##[endgroup]
+2026-10-17T21:26:18.0434618Z ##[group]GITHUB_TOKEN Permissions
+2026-10-17T21:26:18.0437141Z Contents: read
+2026-10-17T21:26:18.0437765Z Metadata: read
+2026-10-17T21:26:18.0438361Z ##[endgroup]
+2026-10-17T21:26:18.0440582Z Secret source: Actions
+2026-10-17T21:26:18.0441544Z Cache mode: write
+2026-10-17T21:26:18.0442359Z Prepare workflow directory
+2026-10-17T21:26:18.0857979Z Prepare all required actions
+2026-10-17T21:26:18.0906569Z Getting action download info
+2026-10-17T21:26:18.3815279Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-17T21:26:18.4807187Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-17T21:26:18.7048498Z Complete job name: linux-component
+2026-10-17T21:26:18.7548516Z ##[group]Checking docker version
+2026-10-17T21:26:18.7561687Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+2026-10-17T21:26:18.8349457Z '1.48'
+2026-10-17T21:26:18.8360427Z Docker daemon API version: '1.48'
+2026-10-17T21:26:18.8361625Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+2026-10-17T21:26:18.8535139Z '1.48'
+2026-10-17T21:26:18.8548925Z Docker client API version: '1.48'
+2026-10-17T21:26:18.8554323Z ##[endgroup]
+2026-10-17T21:26:18.8558003Z ##[group]Clean up resources from previous jobs
+2026-10-17T21:26:18.8563283Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=57d2e9"
+2026-10-17T21:26:18.8721280Z ##[command]/usr/bin/docker network prune --force --filter "label=57d2e9"
+2026-10-17T21:26:18.8865665Z ##[endgroup]
+2026-10-17T21:26:18.8866480Z ##[group]Create local container network
+2026-10-17T21:26:18.8876890Z ##[command]/usr/bin/docker network create --label 57d2e9 github_network_57cbbc920f1a40bd95ae935f7e9d2983
+2026-10-17T21:26:18.9387496Z a1a01d8f14a178625f84468d8b9b3a4696024749810f4bf9dfde079e950042d6
+2026-10-17T21:26:18.9403713Z ##[endgroup]
+2026-10-17T21:26:18.9429635Z ##[group]Starting job container
+2026-10-17T21:26:18.9453289Z ##[command]/usr/bin/docker pull swift:6.3.3-noble
+2026-10-17T21:26:19.8539535Z 6.3.3-noble: Pulling from library/swift
+2026-10-17T21:26:20.0579559Z f2b4ef06ff01: Pulling fs layer
+2026-10-17T21:26:20.0581868Z 0db33c3f39af: Pulling fs layer
+2026-10-17T21:26:20.0583480Z f1d96a23cea2: Pulling fs layer
+2026-10-17T21:26:20.0584653Z 4a5dc31b2d0a: Pulling fs layer
+2026-10-17T21:26:20.0585806Z 4a5dc31b2d0a: Waiting
+2026-10-17T21:26:20.7619324Z f2b4ef06ff01: Verifying Checksum
+2026-10-17T21:26:20.7620953Z f2b4ef06ff01: Download complete
+2026-10-17T21:26:21.0335184Z 4a5dc31b2d0a: Verifying Checksum
+2026-10-17T21:26:21.0338013Z 4a5dc31b2d0a: Download complete
+2026-10-17T21:26:21.1434646Z 0db33c3f39af: Verifying Checksum
+2026-10-17T21:26:21.1435417Z 0db33c3f39af: Download complete
+2026-10-17T21:26:22.0628676Z f2b4ef06ff01: Pull complete
+2026-10-17T21:26:24.2378593Z f1d96a23cea2: Verifying Checksum
+2026-10-17T21:26:24.2380434Z f1d96a23cea2: Download complete
+2026-10-17T21:26:29.3878768Z 0db33c3f39af: Pull complete
+2026-10-17T21:26:48.4866398Z f1d96a23cea2: Pull complete
+2026-10-17T21:26:48.4966851Z 4a5dc31b2d0a: Pull complete
+2026-10-17T21:26:48.5004059Z Digest: sha256:c2f3ac2eb806ce43f68859c3d52bd3bb1cfc88672fb3a948b76e136d98e39278
+2026-10-17T21:26:48.5013216Z Status: Downloaded newer image for swift:6.3.3-noble
+2026-10-17T21:26:48.5020901Z docker.io/library/swift:6.3.3-noble
+2026-10-17T21:26:48.5105363Z ##[command]/usr/bin/docker create --name 55059d51a5284910b32d697f58ddf94f_swift633noble_aaf61a --label 57d2e9 --workdir /__w/illiquid/illiquid --network github_network_57cbbc920f1a40bd95ae935f7e9d2983  -e "HOME=/github/home" -e GITHUB_ACTIONS=true -e CI=true -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work":"/__w" -v "/home/runner/actions-runner/cached/2.337.0/externals":"/__e":ro -v "/home/runner/work/_temp":"/__w/_temp" -v "/home/runner/work/_actions":"/__w/_actions" -v "/opt/hostedtoolcache":"/__t" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" --entrypoint "tail" swift:6.3.3-noble "-f" "/dev/null"
+2026-10-17T21:26:48.5395346Z 7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017
+2026-10-17T21:26:48.5418832Z ##[command]/usr/bin/docker start 7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017
+2026-10-17T21:26:48.7260252Z 7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017
+2026-10-17T21:26:48.7280104Z ##[command]/usr/bin/docker ps --all --filter id=7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+2026-10-17T21:26:48.7409678Z 7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017 Up Less than a second
+2026-10-17T21:26:48.7430409Z ##[command]/usr/bin/docker inspect --format "{{range .Config.Env}}{{println .}}{{end}}" 7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017
+2026-10-17T21:26:48.7557006Z HOME=/github/home
+2026-10-17T21:26:48.7557556Z GITHUB_ACTIONS=true
+2026-10-17T21:26:48.7558009Z CI=true
+2026-10-17T21:26:48.7558397Z PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2026-10-17T21:26:48.7558907Z SWIFT_SIGNING_KEY=52BB7E3DE28A71BE22EC05FFEF80A866B47A981F
+2026-10-17T21:26:48.7559355Z SWIFT_PLATFORM=ubuntu24.04
+2026-10-17T21:26:48.7559709Z SWIFT_BRANCH=swift-6.3.3-release
+2026-10-17T21:26:48.7560039Z SWIFT_VERSION=swift-6.3.3-RELEASE
+2026-10-17T21:26:48.7560632Z SWIFT_WEBROOT=https://download.swift.org
+2026-10-17T21:26:48.7581158Z ##[endgroup]
+2026-10-17T21:26:48.7590899Z ##[group]Waiting for all services to be ready
+2026-10-17T21:26:48.7592701Z ##[endgroup]
+2026-10-17T21:26:48.7912602Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-17T21:26:48.7913339Z with:
+2026-10-17T21:26:48.7913664Z   persist-credentials: false
+2026-10-17T21:26:48.7913979Z   repository: Jagalite/illiquid
+2026-10-17T21:26:48.7917002Z   token: ***
+2026-10-17T21:26:48.7917279Z   ssh-strict: true
+2026-10-17T21:26:48.7917547Z   ssh-user: git
+2026-10-17T21:26:48.7917799Z   clean: true
+2026-10-17T21:26:48.7918087Z   sparse-checkout-cone-mode: true
+2026-10-17T21:26:48.7918403Z   fetch-depth: 1
+2026-10-17T21:26:48.7918660Z   fetch-tags: false
+2026-10-17T21:26:48.7918927Z   show-progress: true
+2026-10-17T21:26:48.7919192Z   lfs: false
+2026-10-17T21:26:48.7919434Z   submodules: false
+2026-10-17T21:26:48.7919697Z   set-safe-directory: true
+2026-10-17T21:26:48.7920005Z   allow-unsafe-pr-checkout: false
+2026-10-17T21:26:48.7920519Z ##[endgroup]
+2026-10-17T21:26:48.7985237Z ##[command]/usr/bin/docker exec  7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017 sh -c "cat /etc/*release | grep ^ID"
+2026-10-17T21:26:49.0016583Z Syncing repository: Jagalite/illiquid
+2026-10-17T21:26:49.0019817Z ##[group]Getting Git version info
+2026-10-17T21:26:49.0020914Z Working directory is '/__w/illiquid/illiquid'
+2026-10-17T21:26:49.0021833Z [command]/usr/bin/git version
+2026-10-17T21:26:49.0022309Z git version 2.43.0
+2026-10-17T21:26:49.0023917Z ##[endgroup]
+2026-10-17T21:26:49.0033971Z Temporarily overriding HOME='/__w/_temp/be8afd8e-9cee-467e-87b5-c6f0e1430b4b' before making global git config changes
+2026-10-17T21:26:49.0035207Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T21:26:49.0039221Z [command]/usr/bin/git config --global --add safe.directory /__w/illiquid/illiquid
+2026-10-17T21:26:49.0076885Z Deleting the contents of '/__w/illiquid/illiquid'
+2026-10-17T21:26:49.0080451Z ##[group]Initializing the repository
+2026-10-17T21:26:49.0084170Z [command]/usr/bin/git init /__w/illiquid/illiquid
+2026-10-17T21:26:49.0125125Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-17T21:26:49.0126489Z hint: is subject to change. To configure the initial branch name to use in all
+2026-10-17T21:26:49.0127723Z hint: of your new repositories, which will suppress this warning, call:
+2026-10-17T21:26:49.0128395Z hint: 
+2026-10-17T21:26:49.0128939Z hint: 	git config --global init.defaultBranch <name>
+2026-10-17T21:26:49.0129488Z hint: 
+2026-10-17T21:26:49.0130008Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-17T21:26:49.0130831Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-17T21:26:49.0131482Z hint: 
+2026-10-17T21:26:49.0131851Z hint: 	git branch -m <name>
+2026-10-17T21:26:49.0247437Z Initialized empty Git repository in /__w/illiquid/illiquid/.git/
+2026-10-17T21:26:49.0273277Z [command]/usr/bin/git remote add origin https://github.com/Jagalite/illiquid
+2026-10-17T21:26:49.0275513Z ##[endgroup]
+2026-10-17T21:26:49.0276866Z ##[group]Disabling automatic garbage collection
+2026-10-17T21:26:49.0277722Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-17T21:26:49.0279700Z ##[endgroup]
+2026-10-17T21:26:49.0280576Z ##[group]Setting up auth
+2026-10-17T21:26:49.0281405Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T21:26:49.0294130Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T21:26:49.0544766Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T21:26:49.0576072Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T21:26:49.0849318Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T21:26:49.0887889Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T21:26:49.1145110Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-17T21:26:49.1189661Z ##[endgroup]
+2026-10-17T21:26:49.1190302Z ##[group]Fetching the repository
+2026-10-17T21:26:49.1198577Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +6604d288e4bd591d09fb61e2eef32733d93b83f5:refs/remotes/origin/perf/media-name-folder-parsing
+2026-10-17T21:26:53.0348010Z From https://github.com/Jagalite/illiquid
+2026-10-17T21:26:53.0348699Z  * [new ref]         6604d288e4bd591d09fb61e2eef32733d93b83f5 -> origin/perf/media-name-folder-parsing
+2026-10-17T21:26:53.0369633Z ##[endgroup]
+2026-10-17T21:26:53.0370256Z ##[group]Determining the checkout info
+2026-10-17T21:26:53.0373630Z ##[endgroup]
+2026-10-17T21:26:53.0380859Z [command]/usr/bin/git sparse-checkout disable
+2026-10-17T21:26:53.0426733Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-17T21:26:53.0462396Z ##[group]Checking out the ref
+2026-10-17T21:26:53.0467613Z [command]/usr/bin/git checkout --progress --force -B perf/media-name-folder-parsing refs/remotes/origin/perf/media-name-folder-parsing
+2026-10-17T21:26:53.5055371Z Switched to a new branch 'perf/media-name-folder-parsing'
+2026-10-17T21:26:53.5056445Z branch 'perf/media-name-folder-parsing' set up to track 'origin/perf/media-name-folder-parsing'.
+2026-10-17T21:26:53.5137561Z ##[endgroup]
+2026-10-17T21:26:53.5197696Z [command]/usr/bin/git log -1 --format=%H
+2026-10-17T21:26:53.5224565Z 6604d288e4bd591d09fb61e2eef32733d93b83f5
+2026-10-17T21:26:53.5232188Z ##[group]Removing auth
+2026-10-17T21:26:53.5236823Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T21:26:53.5275162Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T21:26:53.5527560Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T21:26:53.5563021Z http.https://github.com/.extraheader
+2026-10-17T21:26:53.5570224Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-17T21:26:53.5628237Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T21:26:53.5843873Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T21:26:53.5880825Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T21:26:53.6133100Z ##[endgroup]
+2026-10-17T21:26:53.6390343Z ##[group]Run git config --global --add safe.directory "$GITHUB_WORKSPACE"
+2026-10-17T21:26:53.6390960Z [36;1mgit config --global --add safe.directory "$GITHUB_WORKSPACE"[0m
+2026-10-17T21:26:53.6391470Z [36;1mpython3 Benchmarks/MediaNameRecognition/run.py \[0m
+2026-10-17T21:26:53.6391918Z [36;1m  --output "$RUNNER_TEMP/episode-folder-parsing-linux" \[0m
+2026-10-17T21:26:53.6392307Z [36;1m  --pairs 6 --target-ms 200[0m
+2026-10-17T21:26:53.6396227Z shell: sh -e {0}
+2026-10-17T21:26:53.6396537Z ##[endgroup]
+2026-10-17T21:26:53.7139223Z /__w/_temp/2f34d13e-a88a-4f38-9375-0a7e75abc3ef.sh: 2: python3: not found
+2026-10-17T21:26:53.7177711Z ##[error]Process completed with exit code 127.
+2026-10-17T21:26:53.7291610Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-17T21:26:53.7292056Z with:
+2026-10-17T21:26:53.7292297Z   name: episode-folder-parsing-linux
+2026-10-17T21:26:53.7293492Z   path: /home/runner/work/_temp/episode-folder-parsing-linux/*.json
+/home/runner/work/_temp/episode-folder-parsing-linux/*.jsonl
+/home/runner/work/_temp/episode-folder-parsing-linux/*.stdout
+/home/runner/work/_temp/episode-folder-parsing-linux/*.stderr
+/home/runner/work/_temp/episode-folder-parsing-linux/inputs/**
+
+2026-10-17T21:26:53.7294768Z   retention-days: 14
+2026-10-17T21:26:53.7295009Z   if-no-files-found: warn
+2026-10-17T21:26:53.7295253Z   compression-level: 6
+2026-10-17T21:26:53.7295480Z   overwrite: false
+2026-10-17T21:26:53.7295705Z   include-hidden-files: false
+2026-10-17T21:26:53.7296190Z ##[endgroup]
+2026-10-17T21:26:53.7301041Z ##[command]/usr/bin/docker exec  7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017 sh -c "cat /etc/*release | grep ^ID"
+2026-10-17T21:26:53.9986833Z (node:238) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-17T21:26:53.9987613Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-17T21:26:54.0039098Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-17T21:26:54.0041917Z The least common ancestor is /. This will be the root directory of the artifact
+2026-10-17T21:26:54.0064872Z ##[warning]No files were found with the provided path: /__w/_temp/episode-folder-parsing-linux/*.json
+/home/runner/work/_temp/episode-folder-parsing-linux/*.jsonl
+/home/runner/work/_temp/episode-folder-parsing-linux/*.stdout
+/home/runner/work/_temp/episode-folder-parsing-linux/*.stderr
+/home/runner/work/_temp/episode-folder-parsing-linux/inputs/**. No artifacts will be uploaded.
+2026-10-17T21:26:54.0368996Z Post job cleanup.
+2026-10-17T21:26:54.0382749Z ##[command]/usr/bin/docker exec  7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017 sh -c "cat /etc/*release | grep ^ID"
+2026-10-17T21:26:54.2245028Z [command]/usr/bin/git version
+2026-10-17T21:26:54.2286866Z git version 2.43.0
+2026-10-17T21:26:54.2320531Z Copying '/github/home/.gitconfig' to '/__w/_temp/e25f5c2e-30cf-40a7-b96c-edce7afdbe92/.gitconfig'
+2026-10-17T21:26:54.2331728Z Temporarily overriding HOME='/__w/_temp/e25f5c2e-30cf-40a7-b96c-edce7afdbe92' before making global git config changes
+2026-10-17T21:26:54.2333020Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T21:26:54.2339055Z [command]/usr/bin/git config --global --add safe.directory /__w/illiquid/illiquid
+2026-10-17T21:26:54.2376278Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T21:26:54.2413033Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T21:26:54.2689476Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T21:26:54.2725791Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T21:26:54.2991883Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T21:26:54.3029369Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T21:26:54.3457954Z Stop and remove container: 55059d51a5284910b32d697f58ddf94f_swift633noble_aaf61a
+2026-10-17T21:26:54.3462827Z ##[command]/usr/bin/docker rm --force 7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017
+2026-10-17T21:26:54.6935447Z 7c2843d20c2e541ace817d5b53a191727d50faed116f8da64e8524afd0e7c017
+2026-10-17T21:26:54.6962661Z Remove container network: github_network_57cbbc920f1a40bd95ae935f7e9d2983
+2026-10-17T21:26:54.6967298Z ##[command]/usr/bin/docker network rm github_network_57cbbc920f1a40bd95ae935f7e9d2983
+2026-10-17T21:26:54.7952082Z github_network_57cbbc920f1a40bd95ae935f7e9d2983
+2026-10-17T21:26:54.8024079Z Cleaning up orphan processes
+2026-10-17T21:26:54.8391869Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -1,4 +1,4 @@
-# Media-name recognition performance
+# Episode folder parsing performance
 
 This experiment measures the complete filename recognizer used by source scans
 and media-browser projection. It compares the exact production source with a
@@ -15,15 +15,17 @@ temporary standalone package from the actual production source; it does not
 build the macOS player or require its native dependencies.
 
 ```sh
-python3 Benchmarks/MediaNameRecognition/run.py \
+python3 Benchmarks/EpisodeFolderParsing/run.py \
   --output /tmp/illiquid-media-name-results --pairs 6 --target-ms 200
 ```
 
 The output directory must not already exist. `--mode test` runs only the
 regressions; `--mode benchmark` runs exact-output comparisons and timings.
-Both platforms can run the component. Native macOS results are the relevant
-qualification for the player; compare baseline and candidate within the same
-platform because Foundation behavior can differ across platforms.
+Run the complete benchmark on macOS, the player's supported platform. A
+supplementary Linux attempt passed the regression tests, then the frozen
+baseline trapped in Foundation path handling during the full corpus dump.
+Linux is therefore not qualified for this benchmark; the corpus is preserved
+without filtering those edge paths.
 
 The workflow also runs the existing sidecar/NFO integration regressions:
 
@@ -84,4 +86,7 @@ performance threshold. `build/` contains reproducible intermediate binaries
 and packages and is excluded from CI artifacts.
 
 Research results and retained evidence are recorded in
-`Documentation/MEDIA_NAME_RECOGNITION_PERFORMANCE.md` after qualification.
+[`Documentation/EPISODE_FOLDER_PARSING_PERFORMANCE.md`](../../Documentation/EPISODE_FOLDER_PARSING_PERFORMANCE.md).
+The first native run passed all correctness checks and found approximately
+27–28% less median recognition time for bare-season and specials/multi-episode
+workloads. The report includes every workload and discusses control variability.

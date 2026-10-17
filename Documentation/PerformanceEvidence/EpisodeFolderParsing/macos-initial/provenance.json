@@ -1,0 +1,67 @@
+{
+  "repository": "Jagalite/illiquid",
+  "run_id": 39069954591,
+  "job_id": 117505317729,
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/39069954591",
+  "measured_commit": "f8386f9be6636432c68a9ced7825544306560a60",
+  "baseline_commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "source_path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+  "baseline_source_sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+  "candidate_source_sha256": "f5fb2c51878046d33c341d6b8cde6426011e10730b30dbd564becc4619967b96",
+  "platform": {
+    "cpu": "Apple M1 (Virtual)",
+    "os": "macOS 26.6.2",
+    "swift": "Apple Swift 6.3.3",
+    "language_mode": "6",
+    "optimization": "-O"
+  },
+  "artifact": {
+    "id": 12115540648,
+    "name": "media-name-recognition-native",
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39069954591/artifacts/12115540648",
+    "zip_bytes": 458586,
+    "file_count": 356,
+    "uncompressed_bytes": 12252983,
+    "sha256": "08ea93ad10f09b665a2bc02217a2646af18e9177872e5c656e0bd5b5254e2610",
+    "retention_days": 14,
+    "archive_mirrored_in_repository": false,
+    "locally_downloaded_and_verified": true
+  },
+  "correctness": {
+    "recognition_test_functions_per_configuration": 19,
+    "configurations": [
+      "baseline-debug",
+      "baseline-release",
+      "candidate-debug",
+      "candidate-release"
+    ],
+    "sidecar_nfo_tests_per_configuration": 32,
+    "sidecar_configurations": [
+      "debug",
+      "release"
+    ],
+    "exact_receipt_count": 7936,
+    "receipt_sha256": "fe9e02dfb3d2f377ac7d38499e16ddea5be50f934038f23364f6b75d5067f3e1",
+    "all_receipts_equal": true,
+    "all_timing_checksums_equal": true
+  },
+  "measurements": {
+    "workload_count": 12,
+    "pairs_per_workload": 6,
+    "observation_count": 144,
+    "target_ms": 200,
+    "order": "alternating AB/BA"
+  },
+  "audit": {
+    "status": "passed",
+    "command_records_verified": 170,
+    "archive_members_compared": 356,
+    "executable_bytes_uploaded": false,
+    "record_kind": "provenance summary of completed audit; original machine-readable audit not duplicated here"
+  },
+  "paths": {
+    "measured_benchmark": "Benchmarks/MediaNameRecognition",
+    "final_benchmark": "Benchmarks/EpisodeFolderParsing",
+    "runtime_driver_corpus_runner_and_test_bytes_unchanged": true
+  }
+}
