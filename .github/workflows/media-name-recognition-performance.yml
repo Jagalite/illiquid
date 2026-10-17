@@ -37,7 +37,7 @@ jobs:
       - name: Test, compare complete outputs, and measure native Foundation
         run: |
           python3 Benchmarks/MediaNameRecognition/run.py \
-            --pairs 6 --target-ms 150 \
+            --pairs 8 --target-ms 750 \
             --output "$RUNNER_TEMP/media-name-recognition"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

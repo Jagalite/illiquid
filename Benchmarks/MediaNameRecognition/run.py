@@ -92,29 +92,38 @@ def verify(package: Path, hashes: dict) -> None:
             raise RuntimeError(f"Staged source changed: {package / name}")
 
 
+def metric_summary(selected: list[dict], field: str) -> dict:
+    by_variant = {
+        variant: [row[field] / row["operations"] for row in selected if row["variant"] == variant]
+        for variant in VARIANTS
+    }
+    pairs = []
+    for pair in sorted({row["pair"] for row in selected}):
+        values = {row["variant"]: row[field] / row["operations"]
+                  for row in selected if row["pair"] == pair}
+        pairs.append(100 * (1 - values["candidate"] / values["baseline"]))
+    medians = {variant: statistics.median(values) for variant, values in by_variant.items()}
+    return {
+        "ns_per_filename": {variant: {"median": medians[variant], "min": min(values), "max": max(values)}
+                            for variant, values in by_variant.items()},
+        "reduction_from_separate_medians_percent": 100 * (1 - medians["candidate"] / medians["baseline"]),
+        "paired_reduction_percent": {"median": statistics.median(pairs), "min": min(pairs), "max": max(pairs)},
+        "candidate_faster_pairs": sum(value > 0 for value in pairs),
+    }
+
+
 def summary(rows: list[dict], cases: list[dict]) -> dict:
     summaries = []
     for case in cases:
         selected = [row for row in rows if row["case"] == case["name"]]
-        by_variant = {
-            variant: [row["elapsed_ns"] / row["operations"] for row in selected if row["variant"] == variant]
-            for variant in VARIANTS
-        }
-        pairs = []
-        for pair in sorted({row["pair"] for row in selected}):
-            values = {row["variant"]: row["elapsed_ns"] / row["operations"]
-                      for row in selected if row["pair"] == pair}
-            pairs.append(100 * (1 - values["candidate"] / values["baseline"]))
-        medians = {variant: statistics.median(values) for variant, values in by_variant.items()}
-        summaries.append({
+        record = {
             "case": case["name"], "filenames_per_batch": case["count"],
-            "iterations": selected[0]["iterations"], "pairs": len(pairs),
-            "ns_per_filename": {variant: {"median": medians[variant], "min": min(values), "max": max(values)}
-                                for variant, values in by_variant.items()},
-            "reduction_from_separate_medians_percent": 100 * (1 - medians["candidate"] / medians["baseline"]),
-            "paired_reduction_percent": {"median": statistics.median(pairs), "min": min(pairs), "max": max(pairs)},
-            "candidate_faster_pairs": sum(value > 0 for value in pairs),
-        })
+            "iterations": selected[0]["iterations"], "pairs": len({row["pair"] for row in selected}),
+            **metric_summary(selected, "elapsed_ns"),
+        }
+        if all("cpu_ns" in row for row in selected):
+            record["process_cpu"] = metric_summary(selected, "cpu_ns")
+        summaries.append(record)
     return {"measurements": len(rows), "cases": summaries}
 
 
@@ -122,8 +131,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path, help="new or empty output directory")
     parser.add_argument("--swift", default="swift")
-    parser.add_argument("--pairs", type=int, default=6)
-    parser.add_argument("--target-ms", type=float, default=150)
+    parser.add_argument("--pairs", type=int, default=8)
+    parser.add_argument("--target-ms", type=float, default=750)
     parser.add_argument("--tests-only", action="store_true")
     args = parser.parse_args()
     if args.pairs < 2 or args.pairs > 30 or args.pairs % 2:
@@ -150,7 +159,7 @@ def main() -> None:
         "working_tree_status": execute(["git", "status", "--short"], output, env),
         "locale": execute(["locale"], output, env).strip(),
         "baseline": retained, "pairs": args.pairs, "target_ms": args.target_ms,
-        "timing": "DispatchTime.uptimeNanoseconds; warmed in-memory recognition and bounded batch result handling",
+        "timing": "DispatchTime.uptimeNanoseconds and CLOCK_PROCESS_CPUTIME_ID; warmed in-memory recognition and bounded batch result handling",
         "ordering": "Rotate case order per pair; alternate baseline/candidate process order per case and pair",
         "calibration": "One fresh process per variant/case at one batch; slower calibration selects equal iterations; excluded from summary",
         "driver_sources": {name: digest((HERE / name).read_bytes()) for name in ["run.py", "Driver.swift", "Corpus.swift"]},
@@ -215,7 +224,8 @@ def main() -> None:
         row = json.loads(execute([binaries[variant], "--case", case["name"], "--iterations", count], output, env))
         if (row["case"] != case["name"] or row["iterations"] != count
                 or row["operations"] != count * case["count"]
-                or type(row["elapsed_ns"]) is not int or row["elapsed_ns"] <= 0):
+                or type(row["elapsed_ns"]) is not int or row["elapsed_ns"] <= 0
+                or type(row["cpu_ns"]) is not int or row["cpu_ns"] <= 0):
             raise RuntimeError(f"Invalid benchmark record: {row}")
         key = (case["name"], count)
         checksums = (row["checksum"], row["semantic_checksum"])

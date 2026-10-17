@@ -1,6 +1,11 @@
 import Dispatch
 import Foundation
 import IlliquidCore
+#if canImport(Darwin)
+import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#endif
 
 /// Both isolated packages use the same module name and this exact driver.
 /// Only the complete production MediaNameRecognition.swift differs between them.
@@ -47,11 +52,13 @@ enum RecognitionBenchmarkDriver {
         guard retained == expected else { throw DriverError("recognition output changed during warmup") }
 
         var checksum: UInt64 = 0
+        let cpuStart = cpuNanoseconds()
         let start = DispatchTime.now().uptimeNanoseconds
         for _ in 0..<iterations {
             recognizeBatch(workload.paths, retained: &retained, checksum: &checksum)
         }
         let elapsed = DispatchTime.now().uptimeNanoseconds - start
+        let cpuElapsed = cpuNanoseconds() - cpuStart
 
         // Retain a complete batch across the timer boundary and consume all its
         // stored/derived fields afterwards. No JSON encoding or corpus generation
@@ -61,7 +68,7 @@ enum RecognitionBenchmarkDriver {
             throw DriverError("timed recognition output differs from preflight")
         }
         try emit(Measurement(caseName: workload.name, iterations: iterations, operations: operations,
-                             elapsedNS: elapsed, checksum: hexadecimal(checksum),
+                             elapsedNS: elapsed, cpuNS: cpuElapsed, checksum: hexadecimal(checksum),
                              semanticChecksum: semanticChecksum))
         withExtendedLifetime(retained) {}
     }
@@ -87,6 +94,12 @@ enum RecognitionBenchmarkDriver {
         case .unknown: kind = 4
         }
         return UInt64(result.title.utf8.count) &+ UInt64(result.year ?? 0) &+ kind
+    }
+
+    private static func cpuNanoseconds() -> UInt64 {
+        var timestamp = timespec()
+        precondition(clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &timestamp) == 0)
+        return UInt64(timestamp.tv_sec) * 1_000_000_000 + UInt64(timestamp.tv_nsec)
     }
 
     private static func stableChecksum(_ data: Data) -> String {
@@ -130,6 +143,7 @@ private struct Measurement: Encodable {
     let iterations: Int
     let operations: Int
     let elapsedNS: UInt64
+    let cpuNS: UInt64
     let checksum: String
     let semanticChecksum: String
 
@@ -137,6 +151,7 @@ private struct Measurement: Encodable {
         case caseName = "case"
         case iterations, operations
         case elapsedNS = "elapsed_ns"
+        case cpuNS = "cpu_ns"
         case checksum
         case semanticChecksum = "semantic_checksum"
     }

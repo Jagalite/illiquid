@@ -22,7 +22,7 @@ macOS/native dependencies.
 
 ```sh
 python3 Benchmarks/MediaNameRecognition/run.py \
-  --pairs 6 --target-ms 150 \
+  --pairs 8 --target-ms 750 \
   --output /tmp/illiquid-media-name-results
 
 # Only the baseline/candidate debug and release regression suites:
@@ -51,10 +51,11 @@ mismatch; there is no noisy wall-time threshold in CI.
   Warm the recognizer before each timed sample.
 - Use one calibration process per variant/workload to select an equal batch
   count for both variants. Calibration is retained and excluded from summaries.
-- Take six fresh-process pairs per case, alternate baseline/candidate order,
+- Take eight fresh-process pairs per case, alternate baseline/candidate order,
   and rotate case order per pair. Record all observations without outlier
   deletion, subtraction, or selecting favorable reruns.
-- Report nanoseconds per filename, absolute median/range for each variant,
+- Record both process CPU time (`CLOCK_PROCESS_CPUTIME_ID`) and elapsed time
+  (`DispatchTime.uptimeNanoseconds`). Report nanoseconds per filename, absolute median/range for each variant,
   reduction from those medians, median/range of paired percentage reductions,
   and the number of pairs in which the candidate was faster.
 
@@ -72,6 +73,25 @@ The new workflow runs the focused tests, whole-output differential, and timing
 on macOS. Existing repository workflows provide broader native integration
 checks when the pull request is opened.
 
-## Results
+## Initial observations and measurement follow-up
 
-Native results will be recorded here after the research workflow completes.
+The first native run used six pairs with a 150 ms target and elapsed timing
+only. Both variants passed all 17 test functions in debug and release, and all
+7,497 complete differential outputs agreed. It produced 144 timed processes.
+The median paired elapsed reductions were 19.8% for plain movie names, 15.8%
+for named episodes, and 10.9% for the mixed corpus. However, unclassified names
+were 5.5% slower and malformed-tag inputs were 8.4% slower. Pair ranges were
+wide, including a 49% slowdown in one malformed-tag pair. These observations
+are insufficient to dismiss a regression as scheduling noise.
+
+Before opening a PR, the measurement protocol was extended to record process
+CPU time alongside elapsed time and to use eight pairs targeting 750 ms each.
+The production candidate, baseline, input corpus, correctness checks, warmup,
+and recognition loop remain unchanged. Every initial observation is retained;
+the follow-up covers all 12 workloads and does not discard or replace the
+initial cohort. Its purpose is to distinguish extra recognition work from
+elapsed-time interference and to assess the two unfavorable controls.
+
+Initial native workflow: [39069913567](https://github.com/Jagalite/illiquid/actions/runs/39069913567),
+implementation commit `2c2e73cead0eb2843ada0a89451ac411b210fdcc`.
+Final measurements will be recorded after the follow-up completes.
