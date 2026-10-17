@@ -1,0 +1,35 @@
+name: Playlist restoration qualification
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Scripts/test-playlist-restoration.sh'
+      - 'Benchmarks/PlaylistRestoration/**'
+      - '.github/workflows/playlist-restoration.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: playlist-restoration-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  focused-playlist:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Debug playlist tests
+        run: bash Scripts/test-playlist-restoration.sh
+      - name: Release playlist tests
+        run: bash Scripts/test-playlist-restoration.sh -c release
+      - name: Benchmark parity smoke (no performance threshold)
+        run: >-
+          python3 Benchmarks/PlaylistRestoration/run.py --sizes 100
+          --repeats 1 --rounds 1 --output "$RUNNER_TEMP/playlist-restoration-smoke.json"
