@@ -94,9 +94,17 @@ public enum MediaNameRecognition {
            let season = capture(token, 1, in: raw).flatMap(Int.init),
            let first = capture(token, 2, in: raw).flatMap(Int.init) {
             let prefixTitle = clean(prefix(raw, before: token))
-            let namedParent = titleAndYear(parent).1 != nil ? parent : ""
-            var show = titleAndYear(prefixTitle.isEmpty ? (showFolder ?? namedParent) : prefixTitle)
             let folderShow = titleAndYear(showFolder ?? parent)
+            // Empty prefixes and year enrichment share the same folder evidence.
+            // Reuse its parsed title/year instead of parsing the folder again.
+            var show: (String, Int?)
+            if !prefixTitle.isEmpty {
+                show = titleAndYear(prefixTitle)
+            } else if showFolder != nil || folderShow.1 != nil {
+                show = folderShow
+            } else {
+                show = ("", nil)
+            }
             if show.1 == nil, show.0.localizedCaseInsensitiveCompare(folderShow.0) == .orderedSame {
                 show = folderShow
             }
