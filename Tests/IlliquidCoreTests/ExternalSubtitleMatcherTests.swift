@@ -33,6 +33,52 @@ struct ExternalSubtitleMatcherTests {
 
     private let folderURL = URL(fileURLWithPath: "/tmp/Shows", isDirectory: true)
 
+    @Test(arguments: [".srt", ".en.srt", ".en.forced.ass", ".en.sdh.vtt"])
+    func titleWordsAreNotMistakenForSubtitleSuffixes(_ suffix: String) {
+        let shorter = url("The Last of.mkv")
+        let full = url("The Last of Us.mkv")
+        let subtitle = url("The Last of Us" + suffix)
+        for media in [[shorter, full], [full, shorter]] {
+            let matches = ExternalSubtitleMatcher.associate(subtitleURLs: [subtitle], with: media)
+            #expect(matches[shorter] == [])
+            #expect(matches[full] == [subtitle])
+        }
+    }
+
+    @Test(arguments: ["1080p", "1080i", "HEVC", "1080p.WEB-DL.x265"])
+    func releaseSuffixDoesNotReduceTitleSpecificity(_ release: String) {
+        let shorter = url("The Last of.mkv")
+        let full = url("The Last of Us." + release + ".mkv")
+        let subtitle = url("THE.LAST.OF.US.eng.srt")
+        let matches = ExternalSubtitleMatcher.associate(subtitleURLs: [subtitle], with: [shorter, full])
+        #expect(matches[shorter] == [])
+        #expect(matches[full] == [subtitle])
+    }
+
+    @Test(arguments: ["I", "P"])
+    func standaloneLettersRemainPartOfTheMediaTitle(_ letter: String) {
+        let shorter = url("Chapter.mkv")
+        let full = url("Chapter " + letter + ".mkv")
+        let shorterSubtitle = url("Chapter.srt")
+        let fullSubtitle = url("Chapter " + letter + ".en.srt")
+        let matches = ExternalSubtitleMatcher.associate(
+            subtitleURLs: [shorterSubtitle, fullSubtitle], with: [shorter, full]
+        )
+        #expect(matches[shorter] == [shorterSubtitle])
+        #expect(matches[full] == [fullSubtitle])
+        #expect(ExternalSubtitleMatcher.matchingSubtitles(
+            for: full, among: [url("Chapter II.en.srt")]
+        ).isEmpty)
+    }
+
+    @Test func identicalStemsInDifferentContainersRemainAmbiguous() {
+        let media = [url("The Last of Us.mkv"), url("The Last of Us.mp4")]
+        let matches = ExternalSubtitleMatcher.associate(
+            subtitleURLs: [url("The Last of Us.en.srt")], with: media
+        )
+        #expect(media.allSatisfy { matches[$0] == [] })
+    }
+
     @Test("Matches exact, language, forced, and quality-suffixed names")
     func matchesExactLanguageForcedAndQualitySuffixedNames() {
         let mediaURL = url("Show.S01E02.1080p.mkv")

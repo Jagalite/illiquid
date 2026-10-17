@@ -1,6 +1,6 @@
 import Foundation
 
-/// Associates external SRT and ASS files with the most closely related media
+/// Associates supported external subtitle files with the most closely related media
 /// filename in a folder.
 public enum ExternalSubtitleMatcher {
     /// Returns subtitle associations keyed by the original media URLs.
@@ -129,12 +129,14 @@ public enum ExternalSubtitleMatcher {
     ) -> Int? {
         guard !mediaTokens.isEmpty, !subtitleTokens.isEmpty else { return nil }
 
-        if mediaTokens == subtitleTokens {
-            return 10_000 + tokenWeight(mediaTokens)
+        // A language code may also be part of a title, e.g. "The Last of Us".
+        // Rank full media stems before treating suffixes as language qualifiers.
+        if hasOnlySubtitleQualifiers(after: rawMediaTokens, in: rawSubtitleTokens) {
+            return 10_000 + tokenWeight(rawMediaTokens)
         }
 
-        if rawMediaTokens == subtitleTokens || mediaTokens == rawSubtitleTokens {
-            return 9_000 + tokenWeight(mediaTokens)
+        if hasOnlySubtitleQualifiers(after: mediaTokens, in: rawSubtitleTokens) {
+            return 10_000 + tokenWeight(mediaTokens)
         }
 
         let sharedCount: Int
@@ -202,10 +204,16 @@ public enum ExternalSubtitleMatcher {
         }
 
         if token.hasSuffix("p") || token.hasSuffix("i") {
-            return token.dropLast().allSatisfy(\.isNumber)
+            let resolution = token.dropLast()
+            return !resolution.isEmpty && resolution.allSatisfy(\.isNumber)
         }
 
         return false
+    }
+
+    private static func hasOnlySubtitleQualifiers(after stem: [String], in tokens: [String]) -> Bool {
+        isPrefix(stem, of: tokens)
+            && tokens.dropFirst(stem.count).allSatisfy(subtitleQualifiers.contains)
     }
 
     private static func isPrefix(_ prefix: [String], of values: [String]) -> Bool {
