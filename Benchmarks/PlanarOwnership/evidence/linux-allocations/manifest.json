@@ -1,0 +1,65 @@
+{
+  "allocation_interposer_sha256": "b3ef266d628e2f8c2d474a804de16c090f7503d7f6fc72b4fef42a3998cb4acc",
+  "allocation_scope": "cumulative successful malloc/calloc/realloc requested bytes; not RSS",
+  "arguments": {
+    "allocations": true,
+    "build_only": false,
+    "iterations": 100000,
+    "occupancies": [
+      1,
+      7,
+      11,
+      16,
+      32
+    ],
+    "output": "/tmp/illiquid-planar-final-allocations",
+    "rounds": 4,
+    "seeds": [
+      1,
+      7,
+      42,
+      2026,
+      65537
+    ],
+    "steps": 2000,
+    "swiftc": null,
+    "tests_only": false,
+    "warmup": 10000,
+    "workloads": [
+      "pipeline",
+      "lifecycle-mixed"
+    ]
+  },
+  "baseline_blob_sha1": "0c597cde8a1219d53d3ce0dad760d6d20c8453e3",
+  "baseline_commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "binary_sha256": {
+    "baseline-release": "1158409cc7dedd552dc9a8a62dc99ab91baf5fb977e2a877f8cbde1b5bbfbbdb",
+    "candidate-release": "bac7974f8359e19582ea62e71523fac11f710c97957aef7bfc37a28704d9d8e9"
+  },
+  "checkout_head": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "clock": "DispatchTime.now().uptimeNanoseconds",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "cpu_affinity": [
+    0
+  ],
+  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "execution_started_utc": "2026-10-17T15:25:38Z",
+  "framework_boundary": "Linux identity objects; real ledger, Foundation, locks, ARC; inert signposts",
+  "harness_sha256": {
+    "Harness.swift": "237c0fc1418c9661ed22ac009cfa3b107cddc8dc0638d1330724791a9333371b",
+    "Platform.swift": "206dd3bc95bc0a21c7d361ea54fa01899f8834c42a421dd6b4aecdd756b72ba6",
+    "run.py": "3c518d657ea0617fa0f3575fa431fbe436c203916b757b609ff790553a092e8b"
+  },
+  "machine": "x86_64",
+  "native_source_sha256": {
+    "Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift": "f0a218021dfa5917b8c08f2a56d096daecb5e9a6a4e93c43af5a0e7f9c83fc4f",
+    "Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift": "0c7e429aaac17c3f1af74feaedfd164f286080bb681159b921d4ce182a133096"
+  },
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "source_path": "Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift",
+  "source_sha256": {
+    "baseline": "9c6803e96f2220301611379d5e321620aa13d064176b5c7190a55729c3f1667f",
+    "candidate": "0df2febee469bb1fa1c3febd9da3586706398ee38116907d3c7eb31f975b4069"
+  }
+}
