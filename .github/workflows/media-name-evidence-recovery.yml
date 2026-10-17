@@ -1,0 +1,103 @@
+name: Collect numeric media-name evidence
+
+on:
+  push:
+    branches:
+      - 'perf/media-name-tag-fast-path'
+    paths:
+      - '.github/workflows/media-name-evidence-recovery.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: media-name-recognition-evidence
+          run-id: 39070945382
+          github-token: ${{ github.token }}
+          path: evidence
+      - name: Emit validated numeric results and hash receipts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import gzip, hashlib, json, re
+          root = Path('evidence')
+          cases = {'movies_plain', 'movies_release', 'episodes_named', 'episodes_folders',
+                   'unknown_plain', 'unicode_names', 'tagged_movies', 'tagged_episodes',
+                   'extras', 'dated_episodes', 'malformed_tags', 'mixed_library'}
+          variants = {'baseline', 'candidate'}
+          def emit(value):
+              print('ILLQ_NUMERIC ' + json.dumps(value, sort_keys=True), flush=True)
+          def digest(value):
+              assert type(value) is str and re.fullmatch('[0-9a-f]{64}', value)
+              return value
+          def positive(value):
+              assert type(value) is int and 0 <= value <= 10**16
+              return value
+          def receipt(path):
+              data = path.read_bytes()
+              return {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
+          for filename in ('measurements.jsonl', 'calibration.jsonl'):
+              path = root / filename
+              emit({'kind': 'receipt', 'file': filename, **receipt(path)})
+              for line in path.read_bytes().decode('utf-8').splitlines():
+                  record = json.loads(line)
+                  required = {'case', 'variant', 'checksum', 'semantic_checksum',
+                              'elapsed_ns', 'cpu_ns', 'iterations', 'operations'}
+                  if filename == 'measurements.jsonl':
+                      required |= {'pair', 'position'}
+                  assert set(record) == required
+                  assert record['case'] in cases and record['variant'] in variants
+                  safe = {'case': record['case'], 'variant': record['variant']}
+                  for key in ('checksum', 'semantic_checksum'):
+                      assert re.fullmatch('[0-9a-f]{16}', record[key])
+                      safe[key] = record[key]
+                  for key in required - {'case', 'variant', 'checksum', 'semantic_checksum'}:
+                      safe[key] = positive(record[key])
+                  assert safe['operations'] == safe['iterations'] * 128
+                  if filename == 'measurements.jsonl':
+                      assert safe['pair'] < 8 and safe['position'] < 2
+                  emit({'kind': 'measurement' if filename.startswith('measurements') else 'calibration',
+                        'record': safe})
+          known_sources = [
+              'Package.swift', 'Sources/IlliquidCore/MediaNameRecognition.swift',
+              'Sources/RecognitionBenchmark/Corpus.swift',
+              'Sources/RecognitionBenchmark/Driver.swift',
+              'Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift',
+              'Tests/IlliquidCoreTests/MediaNameRecognitionFastPathTests.swift']
+          for variant in sorted(variants):
+              entries = json.loads((root / (variant + '-sources.json')).read_bytes())
+              assert set(entries) == set(known_sources)
+              emit({'kind': 'sources', 'variant': variant,
+                    'hashes': {path: digest(entries[path]['sha256']) for path in known_sources}})
+          manifest = json.loads((root / 'manifest.json').read_bytes())
+          assert re.fullmatch('[0-9a-f]{40}', manifest['head'])
+          emit({'kind': 'provenance', 'head': manifest['head'],
+                'binary_sha256': {v: digest(manifest['binary_sha256'][v]) for v in sorted(variants)},
+                'driver_sources': {p: digest(manifest['driver_sources'][p])
+                                   for p in ('Corpus.swift', 'Driver.swift', 'run.py')},
+                'pairs': positive(manifest['pairs']), 'target_ms': float(manifest['target_ms'])})
+          for variant in sorted(variants):
+              for configuration in ('debug', 'release'):
+                  data = (root / ('tests-' + variant + '-' + configuration + '.txt')).read_bytes()
+                  matches = re.findall(r'Test run with (\d+) tests in (\d+) suites passed', data.decode('utf-8'))
+                  assert len(matches) == 1
+                  emit({'kind': 'tests', 'variant': variant, 'configuration': configuration,
+                        'passed': True, 'tests': positive(int(matches[0][0])),
+                        'suites': positive(int(matches[0][1])),
+                        'log_sha256': hashlib.sha256(data).hexdigest()})
+          payloads = {}
+          for variant in sorted(variants):
+              path = root / ('differential-' + variant + '.json.gz')
+              emit({'kind': 'differential_archive', 'variant': variant, **receipt(path)})
+              payloads[variant] = gzip.decompress(path.read_bytes())
+          assert payloads['baseline'] == payloads['candidate']
+          emit({'kind': 'complete', 'differential_rows': len(json.loads(payloads['baseline'])),
+                'differential_sha256': hashlib.sha256(payloads['baseline']).hexdigest()})
+          PY
