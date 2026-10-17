@@ -1,0 +1,57 @@
+Building for production...
+[0/9] Write sources
+[2/9] Write swift-version--393CCDFAED8FB69E.txt
+[4/10] Compiling IlliquidNativePlayback SubtitleMemoryBudget.swift
+[5/11] Compiling IlliquidNativePlaybackTests SubtitleMemoryBudgetAccountingTests.swift
+[5/11] /tmp/illiquid-subtitle-memory-budget.3bSWLH/.build/x86_64-unknown-linux-gnu/release/IlliquidSubtitleMemoryBudgetTestsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/11] Write sources
+[8/12] Compiling IlliquidSubtitleMemoryBudgetTestsPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+[8/12] /tmp/illiquid-subtitle-memory-budget.3bSWLH/.build/x86_64-unknown-linux-gnu/release/IlliquidSubtitleMemoryBudgetTestsPackageTests.derived/runner.swift
+[9/12] Write sources
+[11/13] Compiling IlliquidSubtitleMemoryBudgetTestsPackageTests runner.swift
+[11/13] Write Objects.LinkFileList
+[12/13] Linking IlliquidSubtitleMemoryBudgetTestsPackageTests.xctest
+Build complete! (14.86s)
+Test Suite 'All tests' started at 2026-10-17 08:48:41.232
+Test Suite 'release.xctest' started at 2026-10-17 08:48:41.234
+Test Suite 'release.xctest' passed at 2026-10-17 08:48:41.234
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-17 08:48:41.234
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Subtitle memory budget accounting" started.
+◇ Test mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test concurrentResizesOfSharedLeasesKeepZeroByteOwnersAndReleaseExactlyOnce() started.
+◇ Test aliasesReleaseAReservationOnlyWhenTheFinalReferenceIsDropped() started.
+◇ Test zeroByteReservationsKeepTheirOwnerUntilTheLastLeaseIsReleased() started.
+◇ Test leasesDoNotKeepAnOrphanedBudgetAlive() started.
+◇ Test previouslyReturnedSnapshotsDoNotChangeAfterUpdates() started.
+◇ Test accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) started.
+◇ Test concurrentReservationsRespectLimitsAndReturnToKnownBaseline() started.
+◇ Test rejectedGrowthPreservesBothTheLeaseAndOtherReservations() started.
+◇ Test preflightCombinesDuplicateOwnersAndDoesNotReserveOrReject() started.
+◇ Test case passing 1 argument seed → 1 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 1311768467463790320 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 3735928559 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument limit → -7 to nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test case passing 1 argument limit → 0 to nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test case passing 1 argument seed → 42 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument limit → -9223372036854775808 to nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test case passing 1 argument withOwnerLimit → false to accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) started.
+◇ Test case passing 1 argument withOwnerLimit → true to accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) started.
+✔ Test nonpositiveGlobalLimitsStillAllowOneByte(limit:) with 3 test cases passed after 0.110 seconds.
+✔ Test aliasesReleaseAReservationOnlyWhenTheFinalReferenceIsDropped() passed after 0.111 seconds.
+✔ Test zeroByteReservationsKeepTheirOwnerUntilTheLastLeaseIsReleased() passed after 0.111 seconds.
+✔ Test leasesDoNotKeepAnOrphanedBudgetAlive() passed after 0.111 seconds.
+✔ Test previouslyReturnedSnapshotsDoNotChangeAfterUpdates() passed after 0.111 seconds.
+✔ Test accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) with 2 test cases passed after 0.111 seconds.
+✔ Test rejectedGrowthPreservesBothTheLeaseAndOtherReservations() passed after 0.111 seconds.
+✔ Test preflightCombinesDuplicateOwnersAndDoesNotReserveOrReject() passed after 0.111 seconds.
+✔ Test concurrentResizesOfSharedLeasesKeepZeroByteOwnersAndReleaseExactlyOnce() passed after 0.111 seconds.
+✔ Test mixedOperationsMatchAnIndependentScanOracle(seed:) with 4 test cases passed after 0.111 seconds.
+✔ Test concurrentReservationsRespectLimitsAndReturnToKnownBaseline() passed after 0.142 seconds.
+✔ Suite "Subtitle memory budget accounting" passed after 0.143 seconds.
+✔ Test run with 11 tests in 1 suite passed after 0.144 seconds.

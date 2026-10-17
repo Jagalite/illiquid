@@ -82,10 +82,12 @@ final class SubtitleMemoryBudget: @unchecked Sendable {
     ) -> Lease? {
         let requested = max(0, bytes)
         return lock.withLock {
-            let reserved = state.reservations.values.reduce(0) { $0 + $1.bytes }
-            let ownerReserved = state.reservations.values
-                .filter { $0.owner == owner }
-                .reduce(0) { $0 + $1.bytes }
+            var reserved = 0
+            var ownerReserved = 0
+            for reservation in state.reservations.values {
+                reserved += reservation.bytes
+                if reservation.owner == owner { ownerReserved += reservation.bytes }
+            }
             let ownerAvailable = ownerLimitsBytes[owner].map { $0 - ownerReserved }
                 ?? Int.max
             guard requested <= limitBytes - reserved,
@@ -146,11 +148,16 @@ final class SubtitleMemoryBudget: @unchecked Sendable {
         let requested = max(0, bytes)
         return lock.withLock {
             guard let existing = state.reservations[id] else { return false }
-            let reserved = state.reservations.values.reduce(0) { $0 + $1.bytes }
+            // Limits are immutable, so an admitted, unchanged reservation is
+            // still valid. Reused staging storage commonly takes this path.
+            guard requested != existing.bytes else { return true }
+            var reserved = 0
+            var ownerReserved = 0
+            for reservation in state.reservations.values {
+                reserved += reservation.bytes
+                if reservation.owner == existing.owner { ownerReserved += reservation.bytes }
+            }
             let available = limitBytes - (reserved - existing.bytes)
-            let ownerReserved = state.reservations.values
-                .filter { $0.owner == existing.owner }
-                .reduce(0) { $0 + $1.bytes }
             let ownerAvailable = ownerLimitsBytes[existing.owner].map {
                 $0 - (ownerReserved - existing.bytes)
             } ?? Int.max
