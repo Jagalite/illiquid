@@ -22,6 +22,12 @@ public enum ExternalSubtitleMatcher {
             result[mediaURL] = []
         }
 
+        // Media-only opens still need every original key, but no filename
+        // tokens or matching index. Preserve the final cancellation check.
+        guard !subtitleURLs.isEmpty else {
+            return isCancelled() ? [:] : result
+        }
+
         let index = TokenIndex()
         var media: [(url: URL, raw: [String], tokens: [String])] = []
         for url in result.keys where MediaFileSupport.isSupportedMediaFile(url) {

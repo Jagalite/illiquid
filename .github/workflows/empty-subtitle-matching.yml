@@ -1,0 +1,52 @@
+name: Empty subtitle matching performance
+
+on:
+  push:
+    branches:
+      - codex/perf-empty-subtitle-matching-20261017
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/Playlist/**
+      - Sources/IlliquidCore/Utilities/**
+      - Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift
+      - Tests/IlliquidCoreTests/EmptySubtitleMatchingTests.swift
+      - Tests/IlliquidCoreTests/Folder*Tests.swift
+      - Tests/IlliquidCoreTests/TestSupport/TemporaryDirectory.swift
+      - Benchmarks/EmptySubtitleMatching/**
+      - Benchmarks/FolderDiscovery/**
+      - .github/workflows/empty-subtitle-matching.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: empty-subtitle-matching-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regressions-and-benchmarks:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            Sources/IlliquidCore
+            Tests/IlliquidCoreTests
+            Benchmarks/EmptySubtitleMatching
+            Benchmarks/FolderDiscovery
+      - name: Fetch pinned baseline
+        run: git fetch --no-tags --depth=1 origin 68274d1b09dcc866296321a5a8858efc297c4f19
+      - name: Test debug and release and compare matched release workloads
+        run: python3 Benchmarks/EmptySubtitleMatching/run.py --output "$RUNNER_TEMP/empty-subtitle-matching" --rounds 12
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: empty-subtitle-matching
+          path: ${{ runner.temp }}/empty-subtitle-matching/
+          retention-days: 14
