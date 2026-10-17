@@ -1,0 +1,123 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "--version"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.05286223100119969,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "1d762e32f31ac0d0550e913ae47faf3b2ca9c548411ab9ec48a84588438d92cf"
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate",
+        "--scratch-path",
+        "/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build",
+        "--cache-path",
+        "/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/cache",
+        "--disable-sandbox",
+        "--jobs",
+        "2",
+        "-c",
+        "release",
+        "--sanitize",
+        "address"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 13.63623421399825,
+      "returncode": 1,
+      "stderr_sha256": "06571aae90d07affff08f96127b85aa26ca688df570457a22cc38c68bf1e0b2c",
+      "stdout_sha256": "f627360158a2a0567bf5b5cc7081bddf15f8e02fdc94d625100c58025e838732"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.001832830996136181,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "d5bcddc5aa41ce0112d2450577b46a41acc16f136a87ed809b4dfac1ab044924"
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--short",
+        "--",
+        "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift",
+        "Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift",
+        "Benchmarks/PCMSanitization"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.0026577050011837855,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "cb2dba6fed52d3d328802816645bcd4a450e194da8f962f9fd334a87459d72b1"
+    }
+  ],
+  "environment": {
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "candidate_git_head": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+    "candidate_git_status": [
+      " M Sources/IlliquidNativePlayback/Media/AudioDecoder.swift",
+      "?? Benchmarks/PCMSanitization/",
+      "?? Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift"
+    ],
+    "controlled_environment": {
+      "ASAN_OPTIONS": null,
+      "CLANG_MODULE_CACHE_PATH": "/workspace/scratch/8c644fa96010/pcm-address-sanitizer/module-cache",
+      "LD_LIBRARY_PATH": "/tmp/illiquid-swift-toolchain/dependencies/usr/lib/x86_64-linux-gnu",
+      "SWIFT_MODULECACHE_PATH": "/workspace/scratch/8c644fa96010/pcm-address-sanitizer/module-cache"
+    },
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "libc": [
+      "glibc",
+      "2.39"
+    ],
+    "logical_cpus": 9,
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+  },
+  "error": "Command failed (1): ['/tmp/illiquid-swift-6.3.2/usr/bin/swift', 'test', '--package-path', '/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate', '--scratch-path', '/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build', '--cache-path', '/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/cache', '--disable-sandbox', '--jobs', '2', '-c', 'release', '--sanitize', 'address']\nswift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fdc6) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)\n    #3 0x7fb646334718  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libXCTest.so+0x26718) (BuildId: adc8f53f5733b9962c9ea58eaed07eb36ab83f97)\n\nIndirect leak of 40 byte(s) in 1 object(s) allocated from:\n    #0 0x563614c14854  (/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageTests.xctest+0xf3854) (BuildId: a579070f15bd89ca128567cc2d0dd3466c8823f5)\n    #1 0x7fb647b97a6e  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fa6e) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)\n    #2 0x7fb647b97dc6  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fdc6) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)\n    #3 0x7fb64788ccea  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x164cea) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)\n    #4 0x7fb647a15f18  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x2edf18) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)\n    #5 0x7fb64633abb3  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libXCTest.so+0x2cbb3) (BuildId: adc8f53f5733b9962c9ea58eaed07eb36ab83f97)\n\nIndirect leak of 40 byte(s) in 1 object(s) allocated from:\n    #0 0x563614c14854  (/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageTests.xctest+0xf3854) (BuildId: a579070f15bd89ca128567cc2d0dd3466c8823f5)\n    #1 0x7fb647b97a6e  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fa6e) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)\n    #2 0x7fb647b97dc6  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fdc6) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)\n    #3 0x7fb64788ccea  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x164cea) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)\n    #4 0x7fb647a15f18  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x2edf18) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)\n    #5 0x7fb646334767  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libXCTest.so+0x26767) (BuildId: adc8f53f5733b9962c9ea58eaed07eb36ab83f97)\n\nSUMMARY: AddressSanitizer: 368 byte(s) leaked in 6 allocation(s).\n\u25c7 Test run started.\n\u21b3 Testing Library Version: 6.3.2 (70eff261d7f462c)\n\u21b3 Target Platform: x86_64-unknown-linux-gnu\n\u25c7 Suite \"Audio sample sanitization\" started.\n\u25c7 Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() started.\n\u25c7 Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() started.\n\u25c7 Test everyDirtyLaneAndShortTailMatchesScalarClassification() started.\n\u25c7 Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() started.\n\u25c7 Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() started.\n\u25c7 Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() started.\n\u25c7 Test unalignedExternalStorageAndPartialTailMatchReference() started.\n\u25c7 Test incompleteTrailingBytesRemainUntouched() started.\n\u2714 Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() passed after 0.004 seconds.\n\u2714 Test unalignedExternalStorageAndPartialTailMatchReference() passed after 0.004 seconds.\n\u2714 Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() passed after 0.005 seconds.\n\u2714 Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() passed after 0.005 seconds.\n\u2714 Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() passed after 0.005 seconds.\n\u2714 Test incompleteTrailingBytesRemainUntouched() passed after 0.004 seconds.\n\u2714 Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() passed after 0.008 seconds.\n\u2714 Test everyDirtyLaneAndShortTailMatchesScalarClassification() passed after 0.022 seconds.\n\u2714 Suite \"Audio sample sanitization\" passed after 0.023 seconds.\n\u2714 Test run with 8 tests in 1 suite passed after 0.024 seconds.\n\nBuilding for production...\n[0/9] Write sources\n[2/9] Write swift-version--393CCDFAED8FB69E.txt\n[4/10] Compiling IlliquidNativePlayback Sanitizer.swift\n[5/11] Compiling IlliquidNativePlaybackTests AudioSampleSanitizationTests.swift\n/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift:117:13: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]\n115 |             var slice = backing[prefixCount..<(prefixCount + payload.count)]\n116 |             #expect(slice.startIndex == prefixCount)\n117 |             withExtendedLifetime(backing) {\n    |             `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]\n118 |                 expectReferenceResult(&slice, scenario: \"slice-prefix-\\(prefixCount)\")\n119 |             }\n\n/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift:153:13: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]\n151 |             let snapshot = data\n152 |             let originalBytes = Array(snapshot)\n153 |             withExtendedLifetime(snapshot) {\n    |             `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]\n154 |                 expectReferenceResult(&data, scenario: \"retained snapshot\")\n155 |             }\n[5/11] /workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageDiscoveredTests.derived/all-discovered-tests.swift\n[6/11] Write sources\n[8/12] Compiling PCMSanitizationValidationPackageDiscoveredTests IlliquidNativePlaybackTests.swift\n[8/12] /workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageTests.derived/runner.swift\n[9/12] Write sources\n[11/13] Compiling PCMSanitizationValidationPackageTests runner.swift\n[11/13] Write Objects.LinkFileList\n/usr/bin/ld.gold: warning: Cannot export local symbol '__asan_extra_spill_area'\n[12/13] Linking PCMSanitizationValidationPackageTests.xctest\nBuild complete! (13.08s)\n",
+  "finished_at_utc": "2026-10-17T15:43:30.819588+00:00",
+  "invocation": [
+    "Benchmarks/PCMSanitization/run.py",
+    "--mode",
+    "test",
+    "--test-variant",
+    "candidate",
+    "--test-configuration",
+    "release",
+    "--sanitize",
+    "address",
+    "--swiftc",
+    "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+    "--output",
+    "/workspace/scratch/8c644fa96010/pcm-address-sanitizer"
+  ],
+  "results": {},
+  "runner_sha256": "8e32a1f2fbf1ca665a774da2468c9fab3a59aaa12dc318ef382de649461160c2",
+  "scope": "Exact portable PCM sanitation component work. Dirty envelopes include restoration and expose restore-only controls; shared cases include Data COW. No audio decoding, resampling, playback, app-level CPU, or memory claim.",
+  "started_at_utc": "2026-10-17T15:43:17.121354+00:00"
+}
