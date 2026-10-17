@@ -53,9 +53,7 @@ public struct FolderPlaylist: Equatable, Sendable {
 
     public init(folderURL: URL, items: [FolderPlaylistItem]) {
         self.folderURL = NormalizedFileURL.normalize(folderURL) ?? folderURL
-        self.items = items.sorted {
-            NaturalFilenameOrdering.areInIncreasingOrder($0.url, $1.url)
-        }
+        self.items = NaturalFilenameOrdering.sort(items, by: { $0.url })
     }
 
     public subscript(index: Int) -> FolderPlaylistItem {

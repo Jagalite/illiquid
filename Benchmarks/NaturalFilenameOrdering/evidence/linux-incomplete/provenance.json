@@ -1,0 +1,21 @@
+{
+  "finding": "The final summary includes this pair, but its two entries are absent from observations.jsonl and commands.jsonl. Both individual command logs exist with successful receipts. The cause is undetermined. Files are retained as observed and have not been repaired or used to support a speed claim.",
+  "missing_observations": [
+    {
+      "case": "sort-natural-reversed-10000",
+      "sample": 5,
+      "variant": "candidate"
+    },
+    {
+      "case": "sort-natural-reversed-10000",
+      "sample": 5,
+      "variant": "baseline"
+    }
+  ],
+  "persisted_observations": 454,
+  "retention": "Top-level result files and both command logs corresponding to missing aggregate rows retained unchanged. Other duplicate individual logs and executables omitted.",
+  "source_snapshot": "All exact staged source/driver files have the same hashes as the macos evidence snapshot. The local checkout was the original baseline with candidate production changes in the working tree.",
+  "status": "incomplete-persisted-evidence",
+  "summary_claimed_observations": 456,
+  "used_for_performance_conclusions": false
+}
