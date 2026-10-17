@@ -1,5 +1,10 @@
 # External subtitle conversion research
 
+The [completed native macOS report](../../Documentation/EXTERNAL_SUBTITLE_CONVERSION_PERFORMANCE.md)
+records the measured improvement, fallback costs, exact correctness checks,
+and links to both retained evidence cohorts. Its headline results use a fresh
+decoded input for every conversion.
+
 This experiment compares **complete in-memory SRT/WebVTT-to-ASS conversion**
 against `main` at `68274d1b09dcc866296321a5a8858efc297c4f19`. The frozen baseline
 is the entire production `ExternalTextSubtitleConverter.swift` file, captured
