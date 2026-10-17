@@ -121,6 +121,17 @@ It is **not** exhaustive over all invalid two-digit month/day spellings 00–99.
 Both variants' canonical outputs are streamed to gzip files, avoiding a large
 uncompressed output-file requirement.
 
+An exploratory corpus also contained the directory-only string `.`. Swift 6.3.2
+on the Linux qualification host traps inside
+`NSString.deletingLastPathComponent` for that input. Independent probes reproduced
+the same trap with the frozen baseline, the candidate, and Foundation alone;
+both recognizer variants succeeded on the `.mkv` control. The final corpus omits
+only that directory-only fixture, which is outside the actual media-file caller
+contract. Empty paths, `/`, `.mkv`, and all other fixtures remain. This is a
+documented pre-existing platform edge case, not a candidate correctness failure
+or a fixed Foundation bug. Probe sources, commands, and outcomes are retained
+with the qualification evidence.
+
 ## Timing method
 
 The default is six pairs across eight workloads: **96 fresh processes**, one

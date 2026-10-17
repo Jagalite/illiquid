@@ -397,6 +397,7 @@ def main() -> None:
     environment = {"schemaVersion": 1, "timestampUTC": dt.datetime.now(dt.timezone.utc).isoformat(),
                    "platform": platform.platform(), "machine": platform.machine(), "processor": platform.processor(),
                    "logicalCPUs": os.cpu_count(), "python": sys.version, "compilerVersion": compiler_version,
+                   "cpuAffinity": sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else None,
                    "swiftc": str(args.swiftc), "gitRevision": git_revision, "gitStatus": git_status,
                    "settings": {"mode": args.mode, "pairs": args.pairs, "iterations": args.iterations,
                                 "warmup": args.warmup, "exhaustiveDates": args.exhaustive_dates,

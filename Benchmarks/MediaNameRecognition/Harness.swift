@@ -150,7 +150,7 @@ private enum Fixtures {
                 try visit("TV/Show (2020)/Season 01/S01E02 - A\(first).B_\(second).mkv")
             }
         }
-        for path in ["", "/", ".", ".mkv", "S01E01.mkv", "2024.mkv", "2001 A Space Odyssey (1968).mkv",
+        for path in ["", "/", ".mkv", "S01E01.mkv", "2024.mkv", "2001 A Space Odyssey (1968).mkv",
                      "Movie (2020)-trailer.mp4", "Show S01E01-deleted.mkv", "Movie (2020)/Extras/Clip.mkv",
                      "Arrival (2016)/movie.mkv", "Arrival (2016)/random.mkv", "Film {imdb-tt01234}.mkv",
                      "Show {tvdb-123}.mkv", "News - 2024-02-29 - 2023-02-29.mkv",
