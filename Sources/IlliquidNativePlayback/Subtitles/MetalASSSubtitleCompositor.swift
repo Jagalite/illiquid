@@ -83,6 +83,8 @@ struct ASSCompositionMetrics: Equatable, Sendable {
     let atlasWidth: Int
     let atlasHeight: Int
     let atlasReallocated: Bool
+    /// Bytes initialized on growth or explicitly cleared on buffer reuse.
+    /// Includes a previous larger frame's dirty prefix on its first reuse.
     let atlasClearBytes: Int
 
     init(
@@ -140,6 +142,10 @@ final class ASSSubtitleFramePacker: Sendable {
     private struct State: Sendable {
         var atlasStorage = [Data(), Data()]
         var bgraStorage = [Data(), Data()]
+        // Bytes outside each slot's last active prefix remain zero. Keep this
+        // per slot because the two grow-only buffers can hold different frames.
+        var atlasActiveBytes = [0, 0]
+        var bgraActiveBytes = [0, 0]
         var nextAtlasStorageIndex = 0
         var nextBGRAStorageIndex = 0
     }
@@ -202,6 +208,8 @@ final class ASSSubtitleFramePacker: Sendable {
         state.withLock {
             $0.atlasStorage = [Data(), Data()]
             $0.bgraStorage = [Data(), Data()]
+            $0.atlasActiveBytes = [0, 0]
+            $0.bgraActiveBytes = [0, 0]
             $0.nextAtlasStorageIndex = 0
             $0.nextBGRAStorageIndex = 0
             _ = memoryLease?.resize(to: 0)
@@ -244,10 +252,12 @@ final class ASSSubtitleFramePacker: Sendable {
         guard memoryLease?.resize(to: projectedStorageBytes) ?? true else {
             return nil
         }
-        _ = resizeAndClear(
+        let clearedBytes = resizeAndClear(
             &state.atlasStorage[storageIndex],
-            byteCount: requestedStorage
+            storageByteCount: requestedStorage,
+            clearByteCount: max(byteCount, state.atlasActiveBytes[storageIndex])
         )
+        state.atlasActiveBytes[storageIndex] = byteCount
         let atlasReallocated = byteCount > previousMaximumStorage
 
         var copiedBytes = 0
@@ -308,7 +318,7 @@ final class ASSSubtitleFramePacker: Sendable {
                 atlasWidth: packed.width,
                 atlasHeight: packed.height,
                 atlasReallocated: atlasReallocated,
-                atlasClearBytes: byteCount
+                atlasClearBytes: clearedBytes
             ),
             usesBitmapAtlas: bytesPerPixel == 4
         )
@@ -341,10 +351,12 @@ final class ASSSubtitleFramePacker: Sendable {
         guard memoryLease?.resize(to: projectedStorageBytes) ?? true else {
             return nil
         }
-        _ = resizeAndClear(
+        let clearedBytes = resizeAndClear(
             &state.bgraStorage[storageIndex],
-            byteCount: requestedStorage
+            storageByteCount: requestedStorage,
+            clearByteCount: max(byteCount, state.bgraActiveBytes[storageIndex])
         )
+        state.bgraActiveBytes[storageIndex] = byteCount
         let atlasReallocated = byteCount > previousMaximumStorage
 
         var copiedBytes = 0
@@ -382,7 +394,7 @@ final class ASSSubtitleFramePacker: Sendable {
                 atlasWidth: width,
                 atlasHeight: height,
                 atlasReallocated: atlasReallocated,
-                atlasClearBytes: byteCount
+                atlasClearBytes: clearedBytes
             )
         )
     }
@@ -602,13 +614,19 @@ final class ASSSubtitleFramePacker: Sendable {
         }
     }
 
-    private func resizeAndClear(_ data: inout Data, byteCount: Int) -> Bool {
-        if data.count < byteCount {
-            data = Data(count: byteCount)
-            return true
+    private func resizeAndClear(
+        _ data: inout Data,
+        storageByteCount: Int,
+        clearByteCount: Int
+    ) -> Int {
+        if data.count < storageByteCount {
+            data = Data(count: storageByteCount)
+            return storageByteCount
         } else {
-            data.resetBytes(in: 0..<byteCount)
-            return false
+            // Preserve the zero tail of the full Data snapshot without
+            // clearing its historical high-water capacity on every frame.
+            data.resetBytes(in: 0..<clearByteCount)
+            return clearByteCount
         }
     }
 
