@@ -1,0 +1,190 @@
+name: Export empty subtitle evidence
+
+"on":
+  push:
+    branches: [perf/empty-subtitle-association]
+    paths: [.github/workflows/export-empty-subtitle-evidence.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 7062f5285ee4c91a2a1ce72d855c6d53365b25c6
+          persist-credentials: false
+      - name: Audit and export the exact native artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python3 - <<'PY'
+          import ast, base64, hashlib, io, json, os, pathlib, statistics, subprocess, urllib.error, urllib.parse, urllib.request, zipfile
+          REPO = "Jagalite/illiquid"
+          RUN = 39071401573
+          ARTIFACT = 12115623236
+          HEAD = "7062f5285ee4c91a2a1ce72d855c6d53365b25c6"
+          ZIP_SHA = "39632aae1ec701965ca55a235043ea39b57ea57faa08fa0a9652491ac25d28fa"
+          ZIP_BYTES = 1113883
+          def need(condition, message):
+              if not condition:
+                  raise SystemExit("EVIDENCE_AUDIT_FAILED: " + message)
+          def sha(data):
+              return hashlib.sha256(data).hexdigest()
+          def canonical(value):
+              return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+          need(os.environ["GITHUB_REPOSITORY"] == REPO, "wrong repository")
+          root = pathlib.Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          need(subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip() == HEAD, "checkout head")
+          headers = {"Authorization": "Bearer " + os.environ["GH_TOKEN"], "Accept": "application/vnd.github+json",
+                     "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "illiquid-evidence-export"}
+          api_root = "https://api.github.com/repos/" + REPO
+          def api(path):
+              with urllib.request.urlopen(urllib.request.Request(api_root + path, headers=headers), timeout=60) as response:
+                  return json.load(response)
+          run = api("/actions/runs/" + str(RUN))
+          need(run["head_sha"] == HEAD and run["status"] == "completed" and run["conclusion"] == "success", "native run state/head")
+          listed = api("/actions/runs/" + str(RUN) + "/artifacts?per_page=100")
+          matches = [item for item in listed["artifacts"] if item["id"] == ARTIFACT]
+          need(len(matches) == 1, "artifact does not belong to fixed native run")
+          artifact = matches[0]
+          need(not artifact["expired"] and artifact["digest"] == "sha256:" + ZIP_SHA and artifact["size_in_bytes"] == ZIP_BYTES, "artifact metadata")
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, request, response, code, message, response_headers, new_url):
+                  return None
+          # The authenticated request is NEVER followed automatically to storage.
+          try:
+              urllib.request.build_opener(NoRedirect()).open(
+                  urllib.request.Request(api_root + "/actions/artifacts/" + str(ARTIFACT) + "/zip", headers=headers), timeout=60)
+              raise SystemExit("EVIDENCE_AUDIT_FAILED: expected artifact redirect")
+          except urllib.error.HTTPError as error:
+              need(error.code == 302, "artifact API did not redirect")
+              signed_url = error.headers["Location"]
+          parts = urllib.parse.urlsplit(signed_url)
+          need(parts.scheme == "https" and parts.hostname and not parts.username and not parts.password, "invalid storage URL")
+          # Fresh Request/default opener: no Authorization and no reused authenticated headers.
+          with urllib.request.urlopen(urllib.request.Request(signed_url, headers={"User-Agent": "illiquid-evidence-export"}), timeout=60) as response:
+              archive = response.read(ZIP_BYTES + 1)
+          need(len(archive) == ZIP_BYTES and sha(archive) == ZIP_SHA, "download bytes/digest")
+          z = zipfile.ZipFile(io.BytesIO(archive))
+          infos = [entry for entry in z.infolist() if not entry.is_dir()]
+          names = [entry.filename for entry in infos]
+          need(len(names) == len(set(names)), "duplicate archive members")
+          for name in names:
+              path = pathlib.PurePosixPath(name)
+              need(not path.is_absolute() and ".." not in path.parts, "unsafe archive member")
+          contents = {name: z.read(name) for name in names}
+          def document(name):
+              return json.loads(contents[name])
+          def lines(name):
+              return [json.loads(line) for line in contents[name].splitlines() if line]
+          def unique(suffix):
+              found = [name for name in names if name.endswith(suffix)]
+              need(len(found) == 1, "expected one " + suffix)
+              return found[0]
+          source_count = 0
+          runner_ast = ast.parse((root / "Benchmarks/EmptySubtitleAssociation/run.py").read_text())
+          package = next(ast.literal_eval(node.value).encode() for node in runner_ast.body
+                         if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "PACKAGE" for t in node.targets))
+          for name in names:
+              if name.endswith(("/baseline-sources.json", "/candidate-sources.json")):
+                  manifest = document(name)
+                  need(manifest["shared_source_equality_verified"], "shared source audit flag")
+                  for relative, entry in manifest["files"].items():
+                      if "origin" in entry:
+                          origin = pathlib.PurePosixPath(entry["origin"])
+                          need(not origin.is_absolute() and ".." not in origin.parts, "unsafe source origin")
+                          data = (root / origin).read_bytes()
+                      else:
+                          need(relative == "Package.swift", "unknown generated source")
+                          data = package
+                      git_blob = hashlib.sha1(("blob " + str(len(data)) + "\0").encode() + data).hexdigest()
+                      need(sha(data) == entry["sha256"] and git_blob == entry["git_blob"], "source mismatch: " + name + "/" + relative)
+                      source_count += 1
+          for name in names:
+              if name.endswith("/environment.json"):
+                  need(document(name)["head"] == HEAD, "environment head")
+          commands = {}
+          log_count = 0
+          for name in names:
+              if name.endswith("/commands.jsonl"):
+                  prefix = name.rsplit("/", 1)[0] + "/"
+                  for row in lines(name):
+                      need(row["returncode"] == 0, "recorded subprocess failure")
+                      for stream in ("stdout", "stderr"):
+                          log_path = prefix + row[stream + "_path"]
+                          need(sha(contents[log_path]) == row[stream + "_sha256"], "log hash: " + log_path)
+                          log_count += 1
+                      commands[(prefix, row["label"])] = row
+          tests = [document(name) for name in names if name.endswith("/tests.json")]
+          need(len(tests) == 2 and {item["configuration"] for item in tests} == {"debug", "release"}, "missing test configurations")
+          for result in tests:
+              need(result["passed"] and result["source_readback_passed"] and result["variants"] == ["baseline", "candidate"], "test receipt")
+          validation_path = unique("/validation.json")
+          prefix = validation_path.rsplit("/", 1)[0] + "/"
+          validation = document(validation_path)
+          need(validation["passed"] and validation["observations"] == 240 and validation["cells"] == 20 and validation["pairs"] == 6, "timing validation")
+          differential = document(prefix + "differential.json")
+          need(differential["passed"] and differential["comparisons"] == 72 and len(differential["results"]) == 72, "differential receipt")
+          for variant in ("baseline", "candidate"):
+              log_path = prefix + commands[(prefix, "differential-" + variant)]["stdout_path"]
+              need(json.loads(contents[log_path]) == differential["results"], "full differential output")
+          workloads = document(prefix + "workloads.json")
+          rows = lines(prefix + "measurements.jsonl")
+          calibration = lines(prefix + "calibration.jsonl")
+          def identity(work):
+              return "-".join(str(work[key]) for key in ("operation", "style", "mode", "media_count"))
+          expected_order = [(identity(work), pair, position, variant) for work in workloads for pair in range(6)
+                            for position, variant in enumerate(("baseline", "candidate") if pair % 2 == 0 else ("candidate", "baseline"))]
+          need(len(workloads) == 20 and len(rows) == 240, "workload/measurement count")
+          need([(row["workload"], row["pair"], row["process_order"], row["variant"]) for row in rows] == expected_order, "actual AB/BA ordering")
+          receipt_hashes = {}
+          for work in workloads:
+              key = identity(work)
+              receipt_hashes[key] = sha(canonical(document(prefix + "receipts/" + key + ".json")))
+          for row in rows + calibration:
+              need(row["result_sha256"] == receipt_hashes[row["workload"]], "full result receipt digest")
+              need(row["iterations"] > 0 and row["elapsed_ns"] >= 0 and row["cpu_ns"] >= 0, "invalid timing fields")
+              if row["phase"] == "measurement":
+                  need(row["elapsed_ns"] > 0 and row["cpu_ns"] > 0, "zero measured duration")
+          need(sum(row["selected_for_loop_count"] for row in calibration) == 40, "final calibration count")
+          summary = document(prefix + "summary.json")
+          need(summary["complete"] and len(summary["cells"]) == 20, "summary completeness")
+          for cell in summary["cells"]:
+              selected = [row for row in rows if row["workload"] == cell["workload"]]
+              for variant in ("baseline", "candidate"):
+                  wall = [row["elapsed_ns"] / row["iterations"] / 1e6 for row in selected if row["variant"] == variant]
+                  cpu = [row["cpu_ns"] / row["iterations"] / 1e6 for row in selected if row["variant"] == variant]
+                  need(cell[variant] == {"median_ms": statistics.median(wall), "min_ms": min(wall), "max_ms": max(wall),
+                                        "cpu_median_ms": statistics.median(cpu)}, "independent medians/ranges")
+          # Export the original verified ZIP byte-for-byte, with no rewritten archive.
+          export_manifest = {"repository": REPO, "run_id": RUN, "head": HEAD, "artifact_id": ARTIFACT, "artifact_name": artifact["name"],
+                             "archive_bytes": len(archive), "archive_sha256": sha(archive), "source_entries_checked": source_count,
+                             "command_logs_checked": log_count, "differential_outputs": 72, "measured_observations": len(rows),
+                             "calibration_attempts": len(calibration), "members": [{"path": name, "bytes": len(contents[name]), "sha256": sha(contents[name])} for name in sorted(names)]}
+          export_id = 0
+          def emit(name, data):
+              global export_id
+              export_id += 1
+              encoded = base64.b64encode(data).decode("ascii")
+              chunks = [encoded[i:i + 3600] for i in range(0, len(encoded), 3600)]
+              label = str(export_id).zfill(3)
+              print("ILLIQUID_EXPORT_META " + json.dumps({"id": label, "name": name, "bytes": len(data), "sha256": sha(data), "chunks": len(chunks)}, separators=(",", ":")))
+              for index, chunk in enumerate(chunks):
+                  print("ILLIQUID_EXPORT_DATA " + label + " " + str(index).zfill(5) + " " + chunk)
+              print("ILLIQUID_EXPORT_END " + label)
+          emit("empty-subtitle-native-evidence.zip", archive)
+          emit("export-manifest.json", canonical(export_manifest))
+          selected_suffixes = ("/calibration.jsonl", "/measurements.jsonl", "/summary.json", "/environment.json", "/baseline-sources.json",
+                               "/candidate-sources.json", "/tests.json", "/validation.json", "/workloads.json")
+          for name in sorted(names):
+              if name.endswith(selected_suffixes):
+                  emit(name, contents[name])
+          print("ILLIQUID_EXPORT_COMPLETE " + json.dumps({"files": export_id, "archive_sha256": ZIP_SHA}, separators=(",", ":")))
+          PY
