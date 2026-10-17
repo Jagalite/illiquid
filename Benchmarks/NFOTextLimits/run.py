@@ -41,6 +41,7 @@ CASE_ITERATIONS = {
     "ascii-fragmented-4096": 20,
     "unicode-fragmented-4095-bytes": 8,
     "unicode-fallback-2500": 300,
+    "unicode-fallback-fragmented": 8,
     "combining-cdata": 30,
     "ignored-long-plot": 100,
     "ascii-over-limit-4097": 400,

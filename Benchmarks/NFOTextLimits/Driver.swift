@@ -116,7 +116,7 @@ private func movie(_ title: String) -> String {
 private let benchmarkNames = [
     "movie-small", "episode-small", "unicode-small", "ascii-boundary-4096",
     "ascii-fragmented-4096", "unicode-fragmented-4095-bytes", "unicode-fallback-2500",
-    "combining-cdata", "ignored-long-plot", "ascii-over-limit-4097",
+    "unicode-fallback-fragmented", "combining-cdata", "ignored-long-plot", "ascii-over-limit-4097",
     "malformed-xml", "doctype-rejected",
 ]
 
@@ -140,6 +140,11 @@ private func benchmarkFixture(_ name: String) throws -> Fixture {
         return fixture(name, movie(String(repeating: "é&amp;", count: 1365)))
     case "unicode-fallback-2500":
         return fixture(name, movie(String(repeating: "界", count: 2500)))
+    case "unicode-fallback-fragmented":
+        // The prefix already exceeds the byte shortcut; subsequent entity
+        // callbacks exercise the unchanged Character-count fallback repeatedly.
+        return fixture(name, movie(String(repeating: "界", count: 1500)
+                                   + String(repeating: "&amp;", count: 1500)))
     case "combining-cdata":
         return fixture(name, movie(String(repeating: "e<![CDATA[\u{0301}]]>", count: 800)))
     case "ignored-long-plot":
