@@ -87,17 +87,41 @@ enum ExternalTextSubtitleConverter {
                   let end = parseTimestamp(timing[1], format: format, allowsSettings: true),
                   end.milliseconds > start.milliseconds
             else { continue }
-            let text = lines.dropFirst(timingIndex + 1).map { line in
-                line.replacingOccurrences(of: "\\", with: "\\\\")
-                    .replacingOccurrences(of: "{", with: "\\{")
-                    .replacingOccurrences(of: "}", with: "\\}")
-            }.joined(separator: "\\N")
+            let text = escapedText(lines.dropFirst(timingIndex + 1))
             events.append(
                 "Dialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
             )
         }
         guard !events.isEmpty else { throw ConversionError.noValidCues(format) }
         return defaultASSHeader + "\n" + events.joined(separator: "\n")
+    }
+
+    private static func escapedText(_ lines: ArraySlice<Substring>) -> String {
+        var bytes: [UInt8] = []
+        bytes.reserveCapacity(lines.reduce(0) { $0 + $1.utf8.count }
+            + max(0, lines.count - 1) * 2)
+        var needsLineBreak = false
+        for line in lines {
+            if needsLineBreak { bytes.append(contentsOf: [0x5C, 0x4E]) } // \N
+            needsLineBreak = true
+            for byte in line.utf8 {
+                // Foundation's nonliteral search can leave a delimiter joined
+                // to a combining mark untouched. Preserve that behavior for
+                // Unicode captions instead of treating them as ASCII bytes.
+                guard byte < 0x80 else {
+                    return lines.map { line in
+                        line.replacingOccurrences(of: "\\", with: "\\\\")
+                            .replacingOccurrences(of: "{", with: "\\{")
+                            .replacingOccurrences(of: "}", with: "\\}")
+                    }.joined(separator: "\\N")
+                }
+                if byte == 0x5C || byte == 0x7B || byte == 0x7D {
+                    bytes.append(0x5C)
+                }
+                bytes.append(byte)
+            }
+        }
+        return String(decoding: bytes, as: UTF8.self)
     }
 
     private struct Timestamp {

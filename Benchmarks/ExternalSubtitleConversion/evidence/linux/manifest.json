@@ -1,0 +1,116 @@
+{
+  "arguments": {
+    "cases": "all",
+    "cpu": 0,
+    "list_cases": false,
+    "output": "/workspace/scratch/5858fc291152/subtitle-final-linux-verified",
+    "rounds": 6,
+    "swiftc": "swiftc",
+    "target_ms": 200.0,
+    "verify_only": false
+  },
+  "baseline": {
+    "git_blob_sha": "e3312c55e833ecfc32ddcb42635f16ce4ff601ae",
+    "revision": "68274d1b09dcc866296321a5a8858efc297c4f19",
+    "sha256": "1f858588bd87afd61b0f8a091fc74f950f06a0299c62b38255b25f148ce30899",
+    "source_path": "Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift"
+  },
+  "binary_sha256": {
+    "baseline": "4eea3b16de4317c8fab20b7578843f7e77a0cac656f4514c96439dbe26c273b7",
+    "candidate": "63d599f97cc840de85c7e26249a131a6c63f4a4c770d8bf348f9b4c7025482de"
+  },
+  "clocks": {
+    "cpu": "clock_gettime(CLOCK_PROCESS_CPUTIME_ID)",
+    "wall": "DispatchTime.uptimeNanoseconds"
+  },
+  "compiler": {
+    "flags": [
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/tmp/illiquid-subtitle-zp1k5pc8/swift-module-cache"
+    ],
+    "path": "/workspace/scratch/5858fc291152/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+    "target_info": {
+      "compilerVersion": "Swift version 6.3.2 (swift-6.3.2-RELEASE)",
+      "paths": {
+        "runtimeLibraryImportPaths": [
+          "/workspace/scratch/5858fc291152/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/linux",
+          "/workspace/scratch/5858fc291152/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/linux/x86_64"
+        ],
+        "runtimeLibraryPaths": [
+          "/workspace/scratch/5858fc291152/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/linux"
+        ],
+        "runtimeResourcePath": "/workspace/scratch/5858fc291152/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift"
+      },
+      "swiftCompilerTag": "swift-6.3.2-RELEASE",
+      "target": {
+        "arch": "x86_64",
+        "compatibilityLibraries": [],
+        "librariesRequireRPath": false,
+        "moduleTriple": "x86_64-unknown-linux-gnu",
+        "openbsdBTCFIEnabled": false,
+        "platform": "linux",
+        "pointerWidthInBits": 64,
+        "pointerWidthInBytes": 8,
+        "triple": "x86_64-unknown-linux-gnu",
+        "unversionedTriple": "x86_64-unknown-linux-gnu"
+      }
+    },
+    "version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+  },
+  "environment": {
+    "allowed_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "logical_cpu_count": 9,
+    "machine": "x86_64",
+    "module_cache_environment": {
+      "CLANG_MODULE_CACHE_PATH": "/tmp/illiquid-subtitle-zp1k5pc8/clang-module-cache"
+    },
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "runtime_overrides": {
+      "LANG": "C.UTF-8",
+      "LC_ALL": "C.UTF-8",
+      "LD_LIBRARY_PATH": "/workspace/scratch/5858fc291152/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/linux:/workspace/scratch/5858fc291152/toolchains/dependencies/usr/lib/x86_64-linux-gnu"
+    }
+  },
+  "git_head": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "limitations": "Synthetic full-converter workloads; no file I/O, decoding, renderer, playback, allocation, or peak-memory measurements. Platform-specific Foundation costs can differ.",
+  "measurement_scope": "Full convert() plus a no-inline UTF-8 count/first/last-byte sink and returned-string lifetime. Input generation, process startup, warmup, verification, and JSON output are outside both clocks.",
+  "sources": {
+    "Driver.swift": {
+      "original_path": "Benchmarks/ExternalSubtitleConversion/Driver.swift",
+      "sha256": "39610810b0dc001efe98d74b94ce9fa5f2c17ad955efa4a6912f2bf13806e49d"
+    },
+    "baseline-manifest.json": {
+      "original_path": "Benchmarks/ExternalSubtitleConversion/baseline/manifest.json",
+      "sha256": "08846a45ad68eeb43f968851e711587ea6dbf9853fcaa8069fbdd7ee4411a4c3"
+    },
+    "baseline.swift": {
+      "original_path": "Benchmarks/ExternalSubtitleConversion/baseline/ExternalTextSubtitleConverter.swift",
+      "sha256": "1f858588bd87afd61b0f8a091fc74f950f06a0299c62b38255b25f148ce30899"
+    },
+    "candidate.swift": {
+      "original_path": "Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift",
+      "sha256": "c22e49aae8ea62d096c9c55f6cff2b6f701e8ab6c89d7a1e6d310a92f11b14ea"
+    },
+    "run.py": {
+      "original_path": "Benchmarks/ExternalSubtitleConversion/run.py",
+      "sha256": "9c8571d5d6f4c98e08c1083c4acaa17d1a76fbd1daf1427bf79319959ccb9980"
+    }
+  }
+}

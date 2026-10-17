@@ -50,6 +50,98 @@ struct ExternalTextSubtitleConverterTests {
         #expect(dialogueLines(try Converter.convert(vtt, format: .webVTT)) == expected)
     }
 
+    @Test func cueEscapingPreservesLiteralDelimitersAndASSLookingTextByteForByte() throws {
+        let cases = [
+            (#"\"#, #"\\"#),
+            ("{", #"\{"#),
+            ("}", #"\}"#),
+            (#"\\"#, #"\\\\"#),
+            (#"\{}\"#, #"\\\{\}\\"#),
+            ("{{}}", #"\{\{\}\}"#),
+            (#"\N\h{\an8}"#, #"\\N\\h\{\\an8\}"#),
+        ]
+        for format in [Converter.Format.srt, .webVTT] {
+            for (payload, escaped) in cases {
+                let converted = try Converter.convert(
+                    timedCue(payloadSuffix: "\n" + payload, format: format), format: format
+                )
+                #expect(Array(converted.utf8) == Array(expectedASS(payload: escaped).utf8))
+            }
+        }
+    }
+
+    @Test func cueEscapingPreservesEmptyWhitespaceAndTrailingLineBoundaries() throws {
+        let cases = [
+            ("", ""),
+            ("\n", ""),
+            ("\n\nUntimed text", ""),
+            ("\n  Leading and trailing \t ", "  Leading and trailing \t "),
+            ("\nFirst\n", #"First\N"#),
+            ("\nFirst\n \t \nLast\n", "First\\N \t \\NLast\\N"),
+            ("\nFirst\n\nUntimed text", "First"),
+        ]
+        for format in [Converter.Format.srt, .webVTT] {
+            for (suffix, escaped) in cases {
+                let converted = try Converter.convert(
+                    timedCue(payloadSuffix: suffix, format: format), format: format
+                )
+                #expect(Array(converted.utf8) == Array(expectedASS(payload: escaped).utf8))
+            }
+        }
+    }
+
+    @Test func cueEscapingPreservesUnescapedUnicodeBytesWithoutNormalization() throws {
+        // String equality treats canonically equivalent text as equal. Compare
+        // UTF-8 so decomposed marks, embedded NUL, and multiscalar emoji cannot
+        // be normalized, dropped, or replaced unnoticed.
+        let payload = "Café Cafe\u{301} 日本語 العربية 👩🏽‍💻 👨‍👩‍👧‍👦\u{0}｛｝＼\u{2028}next\u{FEFF}"
+        for format in [Converter.Format.srt, .webVTT] {
+            let converted = try Converter.convert(
+                timedCue(payloadSuffix: "\n" + payload, format: format), format: format
+            )
+            #expect(Array(converted.utf8) == Array(expectedASS(payload: payload).utf8))
+        }
+    }
+
+    @Test func mixedUnicodeDelimiterCorpusMatchesLegacyFoundationEscaping() throws {
+        // Delimiters next to combining marks and joiners may be searched as
+        // grapheme clusters by Foundation. The old three-pass implementation
+        // is a compatibility oracle, independent of the optimized escaper.
+        let atoms = [
+            "a", #"\"#, "{", "}", "\u{301}", "\u{FE0F}", "\u{200D}",
+            "é", "e\u{301}", "日本語", "👩🏽‍💻", "\u{0}", "\u{A0}",
+            "\u{2028}", "\u{2060}", "｛｝＼",
+        ]
+        var payloads: [[String]] = []
+        for left in atoms {
+            for right in atoms {
+                payloads.append([
+                    "Start" + left + right + "End",
+                    "Next" + left + #"}\{"# + right + "End",
+                ])
+            }
+        }
+        let expected = Converter.defaultASSHeader + "\n" + payloads.map { lines in
+            let escaped = lines.map { line in
+                line.replacingOccurrences(of: "\\", with: "\\\\")
+                    .replacingOccurrences(of: "{", with: "\\{")
+                    .replacingOccurrences(of: "}", with: "\\}")
+            }.joined(separator: "\\N")
+            return "Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,," + escaped
+        }.joined(separator: "\n")
+        for format in [Converter.Format.srt, .webVTT] {
+            let separator = format == .srt ? "," : "."
+            let blocks = payloads.map { lines in
+                "00:00:01\(separator)000 --> 00:00:02\(separator)000\n"
+                    + lines.joined(separator: "\n")
+            }
+            let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                + blocks.joined(separator: "\n\n")
+            let converted = try Converter.convert(source, format: format)
+            #expect(Array(converted.utf8) == Array(expected.utf8))
+        }
+    }
+
     @Test func legacySubRipFractionVariantsRemainSupported() throws {
         let cases = [
             ("00:00:01", "0:00:01.00"),
@@ -246,6 +338,16 @@ struct ExternalTextSubtitleConverterTests {
     private func cue(start: String, end: String, format: Converter.Format) -> String {
         let header = format == .webVTT ? "WEBVTT\n\n" : "1\n"
         return header + start + " --> " + end + "\nCaption"
+    }
+
+    private func timedCue(payloadSuffix: String, format: Converter.Format) -> String {
+        let header = format == .webVTT ? "WEBVTT\n\n" : "1\n"
+        let separator = format == .srt ? "," : "."
+        return header + "00:00:01\(separator)000 --> 00:00:02\(separator)000" + payloadSuffix
+    }
+
+    private func expectedASS(payload: String) -> String {
+        Converter.defaultASSHeader + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,," + payload
     }
 
     private func dialogueLines(_ ass: String) -> [String] {

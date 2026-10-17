@@ -1,0 +1,91 @@
+{
+  "toolchain": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "tests_sha256": "3ed99234d3c55b34a9da260b686430d8f18a0fd0e727ce895da2938dabc7e7cf",
+  "source_adaptations": [],
+  "runs": [
+    {
+      "variant": "baseline",
+      "configuration": "debug",
+      "test_functions": 19,
+      "exit_code": 0,
+      "source_sha256": "1f858588bd87afd61b0f8a091fc74f950f06a0299c62b38255b25f148ce30899",
+      "log": "baseline-debug.log",
+      "log_sha256": "1160f3285c9c7927b56b517653534ba3b96cfed6cea960667637ce4a31168c0a",
+      "command": [
+        "swift",
+        "test",
+        "--package-path",
+        "/workspace/scratch/5858fc291152/subtitle-validation/baseline",
+        "--no-parallel",
+        "--jobs",
+        "2",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ]
+    },
+    {
+      "variant": "baseline",
+      "configuration": "release",
+      "test_functions": 19,
+      "exit_code": 0,
+      "source_sha256": "1f858588bd87afd61b0f8a091fc74f950f06a0299c62b38255b25f148ce30899",
+      "log": "baseline-release.log",
+      "log_sha256": "4b10fad8e09417a0ecac53c1d264f2fcfe9b1ebfe09a9e857a5d20b9a8001507",
+      "command": [
+        "swift",
+        "test",
+        "--package-path",
+        "/workspace/scratch/5858fc291152/subtitle-validation/baseline",
+        "--no-parallel",
+        "--jobs",
+        "2",
+        "-c",
+        "release",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ]
+    },
+    {
+      "variant": "candidate",
+      "configuration": "debug",
+      "test_functions": 19,
+      "exit_code": 0,
+      "source_sha256": "c22e49aae8ea62d096c9c55f6cff2b6f701e8ab6c89d7a1e6d310a92f11b14ea",
+      "log": "candidate-debug.log",
+      "log_sha256": "38f8c854ca42cc9acb7074287745645906af36f6ccee6f0f8382ba3aa2c963ab",
+      "command": [
+        "swift",
+        "test",
+        "--package-path",
+        "/workspace/scratch/5858fc291152/subtitle-validation/candidate",
+        "--no-parallel",
+        "--jobs",
+        "2",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ]
+    },
+    {
+      "variant": "candidate",
+      "configuration": "release",
+      "test_functions": 19,
+      "exit_code": 0,
+      "source_sha256": "c22e49aae8ea62d096c9c55f6cff2b6f701e8ab6c89d7a1e6d310a92f11b14ea",
+      "log": "candidate-release.log",
+      "log_sha256": "23c03c187f4342553b6fb7f5eddeaa1f30230f91759def73a4bd65a98ad215e5",
+      "command": [
+        "swift",
+        "test",
+        "--package-path",
+        "/workspace/scratch/5858fc291152/subtitle-validation/candidate",
+        "--no-parallel",
+        "--jobs",
+        "2",
+        "-c",
+        "release",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ]
+    }
+  ]
+}
