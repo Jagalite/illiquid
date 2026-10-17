@@ -1,7 +1,5 @@
 name: Empty subtitle association performance
 on:
-  push:
-    branches: [perf/empty-subtitle-association-ed13]
   pull_request:
     paths:
       - Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift
@@ -35,7 +33,7 @@ jobs:
         if: always()
         run: |
           python3 - <<'PY'
-          import base64, hashlib, os, pathlib, zipfile
+          import hashlib, os, pathlib, zipfile
           root = pathlib.Path(os.environ['RUNNER_TEMP'])
           source = root / 'empty-subtitle-association'
           archive = root / 'empty-subtitle-association-evidence.zip'
@@ -45,9 +43,6 @@ jobs:
                       output.write(path, path.relative_to(source))
           data = archive.read_bytes()
           print('EVIDENCE_ARCHIVE_SHA256 ' + hashlib.sha256(data).hexdigest())
-          encoded = base64.b64encode(data).decode('ascii')
-          for offset in range(0, len(encoded), 4000):
-              print('EVIDENCE_ARCHIVE_BASE64 ' + encoded[offset:offset+4000])
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

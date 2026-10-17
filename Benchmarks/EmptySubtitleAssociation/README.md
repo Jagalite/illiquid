@@ -65,10 +65,11 @@ The runner retains frozen and candidate sources, harness/test inputs, source
 hashes, all four test logs, complete parity records, calibration, raw timings,
 summaries, and command receipts. The workflow packages the entire result
 directory as a ZIP, publishes its SHA-256, and uploads it as an artifact.
-A portable copy is also emitted in chunked base64 in the qualification log so
-the exact archive can be preserved without rebuilding or altering its contents.
-
-The research report records the accepted native results and controls. These
+The accepted native archive is committed unchanged at
+[evidence/macos/qualification.zip](evidence/macos/qualification.zip), alongside
+readable raw measurements and receipts. See the
+[research report](../../Documentation/EMPTY_SUBTITLE_ASSOCIATION_PERFORMANCE.md)
+for the measured improvements, all nonempty controls, provenance, and limits. These
 component timings do not measure total folder-scan latency, filesystem I/O,
 playback FPS, memory use, or battery life. The fast path remains linear because
 the public API returns an entry for each distinct media URL.
