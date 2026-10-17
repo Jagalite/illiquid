@@ -6,7 +6,9 @@ The first native qualification met the predefined performance target with exact 
 
 The expanded campaign and unchanged-source PR replication both passed correctness checks and retained large fragmented-field gains. They identified a repeated Unicode fallback cost worth removing: the paired median change was +3.05% and then +9.01%. The ignored-plot control was +6.37% in one cohort and -2.80% in the next. Every result remains in the evidence record.
 
-The current candidate therefore stops trying the UTF-8 shortcut for a field after its first miss. It resets that decision at the same two locations as the accumulated text. This refinement is under native qualification. The next campaign uses 64 parses per repeated-fallback observation and 1,000 per ignored-plot observation, fixed before measurement to investigate the controls with longer batches. Earlier 8/100-parse cohorts are kept separate.
+The current candidate stops trying the UTF-8 shortcut for a field after its first miss and resets that decision at the same two locations as the accumulated text. Its first native campaign passed all correctness checks and kept 95–98% fragmented-field improvements. With longer fallback and ignored-plot batches, their paired median changes were -0.34% and +1.75%. However, the small-movie control was +12.12% by independent medians and +14.81% by paired medians. That ordinary control still requires investigation before final acceptance.
+
+Protocol 3 retains the exact production source and all other protocol-2 counts, but fixes movie, episode, and short-Unicode observations at 100,000, 50,000, and 50,000 parses. Twelve balanced AB/BA pairs remain fixed before measurement. This follow-up lengthens the short ordinary batches rather than treating their variation as proof that the regression is noise. Earlier cohorts and unfavorable results are preserved separately; their samples are not pooled.
 
 ## Production change
 
@@ -68,6 +70,23 @@ All three targeted fragmented workloads exceeded the predefined 25% improvement 
 
 The [initial artifact](https://github.com/Jagalite/illiquid/actions/runs/39071387820/artifacts/12114899396) contains all timing records, manifests, complete outputs, and test/compiler logs. Its ZIP SHA-256 is `d0dffbd981455d5521aa14c1e82c1450316a92fe914b6fad4db0282a72352214`. Actions artifact retention is 14 days. [The expanded branch summary](evidence/expanded-summary.json) preserves all thirteen workloads from run 39071828452. [The original byte-guard PR cohort](evidence/original-byte-guard/manifest.json), [raw timings](evidence/original-byte-guard/measurements.jsonl), [summary](evidence/original-byte-guard/summary.json), and [complete evidence ZIP](evidence/original-byte-guard/native-evidence.zip) preserve run 39073093655, including the slower controls. These cohorts precede the per-field refinement and longer control batches.
 
+## Refined candidate, first campaign
+
+[Run 39074402470](https://github.com/Jagalite/illiquid/actions/runs/39074402470) tested source blob `051c475fd33bcd16ec33f6b4b93ee98fffdb21d3` using protocol `2-longer-fallback-controls`. All four 52-test runs passed, all 136 differential outputs matched, and every benchmark receipt matched. An independent audit verified all 338 timing records, exact summary recomputation, all archive/hash checks, and the complete saved outputs.
+
+| Workload | Median change | Paired median change | Faster pairs |
+|---|---:|---:|---:|
+| Movie, small | **+12.12%** | **+14.81%** | 4/12 |
+| ASCII fragmented | -95.43% | -95.13% | 12/12 |
+| Unicode fragmented | -96.02% | -96.17% | 12/12 |
+| Combining CDATA | -98.02% | -97.97% | 12/12 |
+| Repeated Unicode fallback | -1.19% | -0.34% | 6/12 |
+| Ignored long plot | +2.05% | +1.75% | 3/12 |
+
+The small-movie paired ratios range from 0.647 to 1.902, with measured process batches of 78–233 ms. This variation alone does not resolve the regression. Protocol 3 investigates it using longer ordinary control batches and unchanged production code.
+
+The [manifest](evidence/refined-short-controls/manifest.json), [all thirteen summaries](evidence/refined-short-controls/summary.json), [raw observations](evidence/refined-short-controls/measurements.jsonl), [complete evidence ZIP](evidence/refined-short-controls/native-evidence.zip), and [provenance](evidence/refined-short-controls/provenance.json) retain this cohort permanently.
+
 ## Reproduce
 
 Run on macOS with Python 3.10+ and Swift 6.1+. The runner uses the actual five MediaLibrary sources, including the Darwin-based sidecar reader.
@@ -106,9 +125,9 @@ The same fixed parse count is used for each implementation within a workload.
 
 | Workload | Parses per observation | Input and purpose |
 |---|---:|---|
-| `movie-small` | 5,000 | Ordinary movie title, year, IMDb ID, and ignored plot. |
-| `episode-small` | 3,000 | Ordinary episode/show titles, season, episode, and episode-level ID. |
-| `unicode-small` | 3,000 | Short Japanese and accented episode/show titles. |
+| `movie-small` | 100,000 | Ordinary movie title, year, IMDb ID, and ignored plot. |
+| `episode-small` | 50,000 | Ordinary episode/show titles, season, episode, and episode-level ID. |
+| `unicode-small` | 50,000 | Short Japanese and accented episode/show titles. |
 | `ascii-boundary-4096` | 400 | A contiguous ASCII title at the character limit. |
 | `ascii-fragmented-4096` | 20 | 2,048 repetitions of `A&amp;`: 4,096 decoded characters and bytes. |
 | `unicode-fragmented-4095-bytes` | 8 | 1,365 repetitions of `é&amp;`: 2,730 characters and 4,095 UTF-8 bytes. |

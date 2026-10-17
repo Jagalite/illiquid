@@ -34,9 +34,9 @@ TESTS = [
     "NFOTextLimitPerformanceTests.swift",
 ]
 CASE_ITERATIONS = {
-    "movie-small": 5_000,
-    "episode-small": 3_000,
-    "unicode-small": 3_000,
+    "movie-small": 100_000,
+    "episode-small": 50_000,
+    "unicode-small": 50_000,
     "ascii-boundary-4096": 400,
     "ascii-fragmented-4096": 20,
     "unicode-fragmented-4095-bytes": 8,
@@ -160,12 +160,13 @@ def main() -> None:
         "driver_blob": blob(driver.read_bytes()),
         "runner_blob": blob(Path(__file__).read_bytes()),
         "rounds": args.rounds,
-        "protocol_revision": "2-longer-fallback-controls",
+        "protocol_revision": "3-longer-ordinary-controls",
         "protocol_change": (
-            "After the original byte-guard cohorts, fix repeated Unicode fallback at "
-            "64 parses and ignored plot at 1000 parses per observation to investigate "
-            "control variation with longer batches. Do not pool these samples with "
-            "the earlier 8/100-parse protocol."
+            "After protocol 2 showed a 12.12% small-movie median regression in short "
+            "batches, retain the same production source and fix movie/episode/Unicode "
+            "ordinary controls at 100000/50000/50000 parses per observation. Keep "
+            "protocol 2's other counts, including fallback 64 and ignored plot 1000. "
+            "This investigates the ordinary control without pooling earlier cohorts."
         ),
         "iterations": CASE_ITERATIONS,
         "skipped_tests": args.skip_tests,
