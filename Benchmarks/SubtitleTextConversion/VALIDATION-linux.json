@@ -1,0 +1,165 @@
+{
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "source_sha256": {
+    "baseline": "1f858588bd87afd61b0f8a091fc74f950f06a0299c62b38255b25f148ce30899",
+    "candidate": "7df7b36b36f2307cd0aec1340061514cb4e59e1145f7f61e97141bb14e372b17"
+  },
+  "tests_sha256": "45e93dc8d1c019219f33bbfb7b2b5cfaaeb9b16013647a19dd38bc958b94a875",
+  "component_tests": [
+    {
+      "run": "baseline-debug",
+      "tests": 18,
+      "suites": 1,
+      "result": "passed",
+      "log": "baseline-debug.log.gz",
+      "log_sha256": "750870f0b02e62250e2db7f36bccc2cd2b39498d7a336df45590f8c8896b869a",
+      "flags": [
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--disable-xctest",
+        "--enable-swift-testing",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ],
+      "compression": "gzip",
+      "uncompressed_log_sha256": "b637c8fa590adb5335e2b6d567c721798a16f63ae25010f837149131485f1cd8"
+    },
+    {
+      "run": "candidate-debug",
+      "tests": 18,
+      "suites": 1,
+      "result": "passed",
+      "log": "candidate-debug.log.gz",
+      "log_sha256": "e927f1e8e1653f2d629a8c3a31cc6fae9e360e4642cb0183fb8a67a64722e562",
+      "flags": [
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--disable-xctest",
+        "--enable-swift-testing",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ],
+      "compression": "gzip",
+      "uncompressed_log_sha256": "3a082af558bf2964776243a7527a85f006f9b8b0aa7d9f42cb5daabd18ce6366"
+    },
+    {
+      "run": "candidate-release",
+      "tests": 18,
+      "suites": 1,
+      "result": "passed",
+      "log": "candidate-release.log.gz",
+      "log_sha256": "8386626821b6a88f6513715ebce8599303b56387cc9dcf47b7c766b5d3252376",
+      "flags": [
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--disable-xctest",
+        "--enable-swift-testing",
+        "-Xswiftc",
+        "-warnings-as-errors",
+        "-c",
+        "release"
+      ],
+      "compression": "gzip",
+      "uncompressed_log_sha256": "d68689e0561366b2a94d77ca4cbf11d053fa477bf47b6d282ffd1001b8d6669c"
+    }
+  ],
+  "differential": {
+    "manifest": {
+      "schema": 1,
+      "status": "complete",
+      "started_utc": "2026-10-17T20:28:19Z",
+      "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "baseline_commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+      "source_path": "Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift",
+      "checkout_commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+      "baseline_original_sha256": "1f858588bd87afd61b0f8a091fc74f950f06a0299c62b38255b25f148ce30899",
+      "baseline_compiled_sha256": "27ea3c4e08c56f78e974ecb2763a0aceedcc4dc1d5333d25c6df48c98f88d096",
+      "baseline_transformation": "Rename enum ExternalTextSubtitleConverter to BaselineExternalTextSubtitleConverter only",
+      "candidate_sha256": "7df7b36b36f2307cd0aec1340061514cb4e59e1145f7f61e97141bb14e372b17",
+      "driver_sha256": "780c2bb5647ad8696c4ee525859186934e2e80b0395dddc369f054b18b03bbbd",
+      "runner_sha256": "3051f02986d37eadab33bb9f499da707a857e327fc8bd49a6c17040fb8c68d00",
+      "configuration": "release",
+      "compiler_flags": [
+        "-O",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-parse-as-library"
+      ],
+      "corpus_sha256": "e248167ed0b0eca110d77221284427a563fec020ab28e9aa46254672634ebc63",
+      "corpus_bytes": 5428940,
+      "corpus_cases": 18779,
+      "random_seed": 17895453,
+      "commands": [
+        {
+          "command": [
+            "/workspace/scratch/ec20e03a9156/tools/swift-6.3.2/usr/bin/swiftc",
+            "--version"
+          ],
+          "returncode": 0,
+          "stdout": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/workspace/scratch/ec20e03a9156/tools/swift-6.3.2/usr/bin/swiftc",
+            "-O",
+            "-swift-version",
+            "6",
+            "-warnings-as-errors",
+            "-parse-as-library",
+            "/workspace/scratch/ec20e03a9156/subtitle-review/final-release-complete/BaselineConverter.swift",
+            "/workspace/scratch/ec20e03a9156/subtitle-review/final-release-complete/ExternalTextSubtitleConverter.swift",
+            "/workspace/scratch/ec20e03a9156/subtitle-review/final-release-complete/Differential.swift",
+            "-o",
+            "/workspace/scratch/ec20e03a9156/subtitle-review/final-release-complete/differential"
+          ],
+          "returncode": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/workspace/scratch/ec20e03a9156/subtitle-review/final-release-complete/differential",
+            "/workspace/scratch/ec20e03a9156/subtitle-review/final-release-complete/cases.json",
+            "/workspace/scratch/ec20e03a9156/subtitle-review/final-release-complete/report.json"
+          ],
+          "returncode": 0,
+          "stdout": "Checked 18779 cases; 0 differences; baseline checksum e5487dbf0b19c031\n",
+          "stderr": ""
+        }
+      ],
+      "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+      "executable_sha256": "2a88138059447da62617fee530374c18d179c6159b8628e61d77c5cc5965f149",
+      "report_sha256": "2bae20ad93d70d6475e0f9a71846c1719a4d5d8231fc79bbdb82b1282a69497d"
+    },
+    "report": {
+      "baseline_outcomes": {
+        "missingWebVTTSignature": 58,
+        "noValidCues.srt": 87,
+        "noValidCues.webVTT": 98,
+        "success": 18536
+      },
+      "baseline_output_checksum_fnv1a64": "e5487dbf0b19c031",
+      "cases": 18779,
+      "categories": {
+        "exhaustive-short-payload": 14762,
+        "long-payloads": 48,
+        "malformed-timestamps": 168,
+        "metadata-recovery": 64,
+        "newline-boundaries": 420,
+        "seeded-file-mutations": 1200,
+        "unicode-adjacency": 2040,
+        "vtt-signatures": 77
+      },
+      "comparison": "Exact UTF-8 bytes of complete ASS output or matched typed conversion errors",
+      "differences": 0,
+      "failure_examples": []
+    }
+  }
+}

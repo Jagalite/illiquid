@@ -50,6 +50,41 @@ struct ExternalTextSubtitleConverterTests {
         #expect(dialogueLines(try Converter.convert(vtt, format: .webVTT)) == expected)
     }
 
+    @Test func backslashesAndBracesStayLiteralAtEveryLinePosition() throws {
+        let cases = [
+            (#"\"#, #"\\"#),
+            ("{", #"\{"#),
+            ("}", #"\}"#),
+            (#"\\{{}}"#, #"\\\\\{\{\}\}"#),
+            (#"a{b}c\d"#, #"a\{b\}c\\d"#),
+            (#"\{literal\}"#, #"\\\{literal\\\}"#),
+            (#"\N\h{\an8}"#, #"\\N\\h\{\\an8\}"#),
+        ]
+        for (source, expected) in cases {
+            try assertConvertedPayload(source, expected: expected)
+        }
+    }
+
+    @Test func escapingPreservesUnicodeAndControlBytes() throws {
+        let plain = "e\u{301} é 日本語 👩🏽‍💻 \u{0}\t "
+        try assertConvertedPayload(plain, expected: plain)
+        // Keep Foundation's existing nonliteral matching: these combining
+        // sequences do not match a standalone backslash or opening brace.
+        try assertConvertedPayload(
+            "e\u{301}\\\u{301}{\u{FE0F}日}\u{200D}👩🏽‍💻\u{0}\t ",
+            expected: "e\u{301}\\\u{301}{\u{FE0F}日\\}\u{200D}👩🏽‍💻\u{0}\t "
+        )
+    }
+
+    @Test(arguments: ["\n", "\r\n", "\r"])
+    func emptyAndTrailingCaptionLinesKeepTheirExistingMeaning(newline: String) throws {
+        try assertConvertedPayload("", expected: "", newline: newline)
+        try assertConvertedPayload(#"\N"# + "\n", expected: #"\\N\N"#, newline: newline)
+        try assertConvertedPayload(
+            " \n\t\n{x}", expected: #" \N"# + "\t" + #"\N\{x\}"#, newline: newline
+        )
+    }
+
     @Test func legacySubRipFractionVariantsRemainSupported() throws {
         let cases = [
             ("00:00:01", "0:00:01.00"),
@@ -240,6 +275,23 @@ struct ExternalTextSubtitleConverterTests {
             #expect(throws: Converter.ConversionError.noValidCues(format)) {
                 _ = try Converter.convert(cue(start: start, end: end, format: format), format: format)
             }
+        }
+    }
+
+    private func assertConvertedPayload(
+        _ text: String, expected: String, newline: String = "\n"
+    ) throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let header = format == .srt
+                ? "1\n00:00:01,000 --> 00:00:02,000\n"
+                : "WEBVTT\n\n00:01.000 --> 00:02.000\n"
+            let source = (header + text).replacingOccurrences(of: "\n", with: newline)
+            let converted = try Converter.convert(source, format: format)
+            let expectedASS = Converter.defaultASSHeader
+                + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,," + expected
+            // String equality allows canonical Unicode equivalence. Require
+            // identical bytes to catch normalization or control-byte loss.
+            #expect(Array(converted.utf8) == Array(expectedASS.utf8))
         }
     }
 

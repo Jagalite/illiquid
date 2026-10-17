@@ -87,17 +87,37 @@ enum ExternalTextSubtitleConverter {
                   let end = parseTimestamp(timing[1], format: format, allowsSettings: true),
                   end.milliseconds > start.milliseconds
             else { continue }
-            let text = lines.dropFirst(timingIndex + 1).map { line in
-                line.replacingOccurrences(of: "\\", with: "\\\\")
-                    .replacingOccurrences(of: "{", with: "\\{")
-                    .replacingOccurrences(of: "}", with: "\\}")
-            }.joined(separator: "\\N")
+            let text = lines.dropFirst(timingIndex + 1)
+                .map(escapedASSLine).joined(separator: "\\N")
             events.append(
                 "Dialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
             )
         }
         guard !events.isEmpty else { throw ConversionError.noValidCues(format) }
         return defaultASSHeader + "\n" + events.joined(separator: "\n")
+    }
+
+    private static func escapedASSLine(_ line: Substring) -> String {
+        let bytes = line.utf8
+        guard let firstEscape = bytes.firstIndex(where: { $0 == 92 || $0 == 123 || $0 == 125 }) else {
+            return String(line)
+        }
+        // Foundation's default search treats some combining sequences as a
+        // unit. Preserve that behavior for non-ASCII lines containing escapes.
+        if bytes.contains(where: { $0 >= 128 }) {
+            return line.replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "{", with: "\\{")
+                .replacingOccurrences(of: "}", with: "\\}")
+        }
+        // Escape each original special byte once, without re-escaping additions.
+        var escaped: [UInt8] = []
+        escaped.reserveCapacity(bytes.count + 1)
+        escaped.append(contentsOf: bytes[..<firstEscape])
+        for byte in bytes[firstEscape...] {
+            if byte == 92 || byte == 123 || byte == 125 { escaped.append(92) }
+            escaped.append(byte)
+        }
+        return String(decoding: escaped, as: UTF8.self)
     }
 
     private struct Timestamp {

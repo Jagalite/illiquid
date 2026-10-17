@@ -1,0 +1,54 @@
+name: Subtitle text conversion performance
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift
+      - Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift
+      - Scripts/test-external-subtitle-regressions.sh
+      - Benchmarks/SubtitleTextConversion/**
+      - .github/workflows/subtitle-text-conversion.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: subtitle-text-conversion-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  component-and-benchmark:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Run production converter regressions in debug and release
+        run: |
+          bash Scripts/test-external-subtitle-regressions.sh
+          bash Scripts/test-external-subtitle-regressions.sh -c release
+      - name: Verify byte and error parity against the original converter
+        run: >-
+          python3 Benchmarks/SubtitleTextConversion/verify.py
+          --output "$RUNNER_TEMP/subtitle-text-verification"
+      - name: Compare complete conversions on macOS (no timing threshold)
+        run: >-
+          python3 Benchmarks/SubtitleTextConversion/run.py
+          --sizes 50 1500 --repeats 8 --rounds 3
+          --output "$RUNNER_TEMP/subtitle-text-conversion"
+      - name: Validate process order and summarize paired results
+        run: >-
+          python3 Benchmarks/SubtitleTextConversion/analyze.py
+          --input "$RUNNER_TEMP/subtitle-text-conversion/results.json"
+          --output "$RUNNER_TEMP/subtitle-text-conversion/paired.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-text-conversion-macos-evidence
+          path: |
+            ${{ runner.temp }}/subtitle-text-conversion/results.json
+            ${{ runner.temp }}/subtitle-text-conversion/paired.json
+            ${{ runner.temp }}/subtitle-text-verification/manifest.json
+            ${{ runner.temp }}/subtitle-text-verification/report.json
+          retention-days: 14
