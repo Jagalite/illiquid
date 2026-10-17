@@ -4,6 +4,8 @@ import Foundation
 /// filename in a folder.
 public enum ExternalSubtitleMatcher {
     /// Returns subtitle associations keyed by the original media URLs.
+    /// Returns an empty dictionary if cancellation is observed; partial
+    /// associations are never published after observing cancellation.
     ///
     /// A subtitle is left unassigned if two media files are equally good matches.
     /// This prevents a generic filename such as `Show.srt` from being loaded for
@@ -13,8 +15,10 @@ public enum ExternalSubtitleMatcher {
         with mediaURLs: [URL],
         isCancelled: () -> Bool = { Task.isCancelled }
     ) -> [URL: [URL]] {
+        guard !isCancelled() else { return [:] }
         var result: [URL: [URL]] = [:]
         for mediaURL in mediaURLs {
+            guard !isCancelled() else { return [:] }
             result[mediaURL] = []
         }
 
@@ -28,13 +32,17 @@ public enum ExternalSubtitleMatcher {
             index.insert(tokens, index: media.count)
             media.append((url, raw, tokens))
         }
-        for subtitleURL in subtitleURLs where MediaFileSupport.isSupportedSubtitleFile(subtitleURL) {
+        for subtitleURL in subtitleURLs {
             guard !isCancelled() else { return [:] }
+            guard MediaFileSupport.isSupportedSubtitleFile(subtitleURL) else { continue }
             let raw = filenameTokens(subtitleURL)
             let tokens = removingTrailingSubtitleQualifiers(from: raw)
             var best: (index: Int, score: Int)?
             var tied = false
-            for candidate in index.candidates(for: tokens, isCancelled: isCancelled) {
+            guard let candidates = index.candidates(for: tokens, isCancelled: isCancelled) else {
+                return [:]
+            }
+            for candidate in candidates {
                 guard !isCancelled() else { return [:] }
                 let item = media[candidate]
                 guard let score = matchScore(
@@ -54,9 +62,11 @@ public enum ExternalSubtitleMatcher {
         }
 
         for mediaURL in Array(result.keys) {
+            guard !isCancelled() else { return [:] }
             result[mediaURL] = NaturalFilenameOrdering.sort(result[mediaURL, default: []])
         }
 
+        guard !isCancelled() else { return [:] }
         return result
     }
 
@@ -75,18 +85,21 @@ public enum ExternalSubtitleMatcher {
             node.terminal.append(index)
         }
 
-        func candidates(for tokens: [String], isCancelled: () -> Bool) -> [Int] {
+        // nil distinguishes an interrupted traversal from a completed lookup
+        // with no candidates, so the caller can discard all earlier matches.
+        func candidates(for tokens: [String], isCancelled: () -> Bool) -> [Int]? {
             guard !tokens.isEmpty else { return [] }
             var result: [Int] = []
             var node = self
             for token in tokens {
+                guard !isCancelled() else { return nil }
                 result.append(contentsOf: node.terminal)
                 guard let child = node.children[token] else { return result }
                 node = child
             }
             var pending = [node]
             while let current = pending.popLast() {
-                guard !isCancelled() else { return [] }
+                guard !isCancelled() else { return nil }
                 result.append(contentsOf: current.terminal)
                 pending.append(contentsOf: current.children.values)
             }

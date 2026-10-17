@@ -36,9 +36,14 @@ done
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1
 import PackageDescription
-let package = Package(name: "IlliquidRestorationRegressions", targets: [
-    .target(name: "IlliquidCore"),
-    .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])
-])
+let package = Package(
+    name: "IlliquidRestorationRegressions",
+    // Match the app manifest: the copied sources use Swift concurrency APIs.
+    platforms: [.macOS("26.0")],
+    targets: [
+        .target(name: "IlliquidCore"),
+        .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])
+    ]
+)
 SWIFT
 swift test --package-path "$work" "$@"
