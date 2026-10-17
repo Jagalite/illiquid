@@ -1,0 +1,81 @@
+name: Bitmap subtitle palette performance
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/CFFmpeg/include/ffmpeg_shim.h'
+      - 'Sources/IlliquidNativePlayback/Media/SubtitleDecoder.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/PGSSubtitlePresentation.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PGSSubtitleCropTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalVobSubTests.swift'
+      - 'Benchmarks/BitmapSubtitlePalette/**'
+      - 'BuildInputs/native-sdk.*'
+      - '.github/workflows/bitmap-subtitle-palette.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-palette-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Select the project's Xcode on macOS
+        if: runner.os == 'macOS'
+        run: echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
+      - name: Check exact bytes, sanitizers, and paired release measurements
+        run: |
+          python3 Benchmarks/BitmapSubtitlePalette/run.py \
+            --pairs 6 --target-ms 60 \
+            --output "$RUNNER_TEMP/bitmap-subtitle-palette"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-palette-${{ runner.os }}
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-palette/results.json
+            ${{ runner.temp }}/bitmap-subtitle-palette/sources/
+          retention-days: 14
+
+  native-subtitles:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run native bitmap subtitle regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/bitmap-subtitle-native"
+          set -o pipefail
+          swift test --force-resolved-versions --no-parallel --filter \
+            'BitmapSubtitleTests|PGSSubtitleCropTests|ExternalVobSubTests' \
+            2>&1 | tee "$RUNNER_TEMP/bitmap-subtitle-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-native
+          path: ${{ runner.temp }}/bitmap-subtitle-native/
+          retention-days: 14
