@@ -18,6 +18,13 @@ This change adds no persistent cache and does not change regexes or other media
 classification paths. It is independent of the separate tag/date optimization
 on `perf/media-name-recognition`.
 
+Another branch, `perf/media-name-folder-parsing`, appeared during the investigation
+with overlapping folder-result reuse. A second pinned reference at
+`f8386f9be6636432c68a9ced7825544306560a60` measures the incremental difference:
+this candidate also avoids folder parsing when the filename already supplies a
+title and year. The reference retains two title/year parses in that case; the
+candidate needs one. Both retain the original locale comparison behavior.
+
 ## Reproduction
 
 Swift 6.1+ and Python 3 are required. Run from the repository root:
@@ -28,6 +35,7 @@ python3 Benchmarks/EpisodeNameRecognition/run.py test --implementation baseline 
 python3 Benchmarks/EpisodeNameRecognition/run.py test --configuration debug --output /tmp/episode-candidate-debug
 python3 Benchmarks/EpisodeNameRecognition/run.py test --configuration release --output /tmp/episode-candidate-release
 python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --output /tmp/episode-benchmark
+python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --reference folder-reuse --scenarios named-episode-with-year named-episode-no-year bare-season-episode movie-controls --output /tmp/episode-folder-reuse-comparison
 ```
 
 The test runner copies the exact source and existing/new Swift Testing suites to

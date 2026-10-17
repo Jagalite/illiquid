@@ -19,7 +19,6 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 SOURCE = ROOT / "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift"
-BASELINE = HERE / "baseline/MediaNameRecognition.swift"
 TESTS = ["MediaNameRecognitionTests.swift", "EpisodeNameRecognitionRegressionTests.swift"]
 SCENARIOS = [
     "named-episode-no-year", "named-episode-with-year", "bare-season-episode",
@@ -54,9 +53,11 @@ def run(command: list[str], output: Path, label: str) -> str:
     return result.stdout
 
 
-def environment(output: Path) -> dict:
-    manifest = json.loads((HERE / "baseline/manifest.json").read_text())
-    if sha256(BASELINE) != manifest["sha256"]:
+def environment(output: Path, reference: str) -> dict:
+    reference_directory = HERE / ("baseline" if reference == "main" else "folder-reuse")
+    reference_source = reference_directory / "MediaNameRecognition.swift"
+    manifest = json.loads((reference_directory / "manifest.json").read_text())
+    if sha256(reference_source) != manifest["sha256"]:
         raise RuntimeError("Pinned baseline failed its SHA-256 receipt")
     swift = shutil.which("swift")
     swiftc = shutil.which("swiftc")
@@ -70,9 +71,11 @@ def environment(output: Path) -> dict:
         "toolchain": run([swiftc, "--version"], output, "toolchain").strip(),
         "revision": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
         "baseline": manifest,
+        "reference_name": reference,
+        "reference_source": str(reference_source.relative_to(ROOT)),
         "source_sha256": {
             str(path.relative_to(ROOT)): sha256(path)
-            for path in [SOURCE, BASELINE, HERE / "Driver.swift", Path(__file__).resolve()]
+            for path in [SOURCE, reference_source, HERE / "Driver.swift", Path(__file__).resolve()]
         },
     }
     if platform.system() == "Darwin":
@@ -82,7 +85,7 @@ def environment(output: Path) -> dict:
 
 
 def test(args: argparse.Namespace, metadata: dict) -> None:
-    original = BASELINE if args.implementation == "baseline" else SOURCE
+    original = ROOT / metadata["reference_source"] if args.implementation == "baseline" else SOURCE
     with tempfile.TemporaryDirectory(prefix="episode-recognition-tests-") as work:
         package = Path(work)
         (package / "Package.swift").write_text(PACKAGE, encoding="utf-8")
@@ -111,7 +114,8 @@ def benchmark(args: argparse.Namespace, metadata: dict) -> None:
     # retained verbatim and checked above; the candidate is compiled in place.
     with tempfile.TemporaryDirectory(prefix="episode-recognition-benchmark-") as work:
         build = Path(work)
-        renamed = re.sub(r"\bRecognizedMediaName\b", "BaselineRecognizedMediaName", BASELINE.read_text())
+        reference_source = ROOT / metadata["reference_source"]
+        renamed = re.sub(r"\bRecognizedMediaName\b", "BaselineRecognizedMediaName", reference_source.read_text())
         renamed = re.sub(r"\bMediaNameRecognition\b", "BaselineMediaNameRecognition", renamed)
         baseline_source = build / "Baseline.swift"
         baseline_source.write_text(renamed, encoding="utf-8")
@@ -188,12 +192,13 @@ def main() -> None:
     bench.add_argument("--scenarios", nargs="+", choices=SCENARIOS, default=SCENARIOS)
     for command in [tests, bench]:
         command.add_argument("--output", type=Path, required=True)
+        command.add_argument("--reference", choices=["main", "folder-reuse"], default="main")
     args = parser.parse_args()
     args.output = args.output.resolve()
     if args.output.exists() and any(args.output.iterdir()):
         parser.error("--output must be empty; use a fresh directory for each run")
     args.output.mkdir(parents=True, exist_ok=True)
-    metadata = environment(args.output)
+    metadata = environment(args.output, args.reference)
     write_json(args.output / "environment.json", metadata)
     if args.command == "test":
         test(args, metadata)
