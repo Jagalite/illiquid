@@ -1,5 +1,12 @@
 # Media filename recognition performance research
 
+The [research report](../../Documentation/MEDIA_NAME_RECOGNITION_PERFORMANCE.md)
+records the completed macOS and Linux experiments, correctness qualification,
+and limitations. The native cohort measured lower median paired wall and CPU
+costs in seven of eight workloads; ambiguous names were slightly slower.
+[Archived evidence](evidence/README.md) includes every observation and the
+separately identified incomplete and exploratory runs.
+
 This runner compares the complete production `MediaNameRecognition.recognize`
 implementation against the exact source frozen from main at
 `68274d1b09dcc866296321a5a8858efc297c4f19`. It exercises the filename recognition

@@ -1,0 +1,2230 @@
+{
+  "auditScriptSHA256": "c63e0cb015972501a3101af7b61048b03a75aaf687201b306a5afe0847a69f18",
+  "auditedAtUTC": "2026-10-17T21:28:59.974913+00:00",
+  "cohorts": {
+    "linux": {
+      "archive": {
+        "buildProductsIncludedInArchive": false,
+        "copiedFilesVerified": 122,
+        "originalBuildProductsRehashedAtArchiveTime": 6
+      },
+      "corpus": {
+        "byteExactEqual": true,
+        "canonicalSHA256": "fbf984532089621409c852091c6430b46578736021001f3db108af26b76a0c5d",
+        "exhaustiveDates": true,
+        "independentlyValidatedGregorianRecords": 184800,
+        "invalidDateRecords": 38702,
+        "records": 188534,
+        "validDateRecords": 146098
+      },
+      "sources": [
+        {
+          "bytes": 11654,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/MediaNameRecognition.swift",
+          "currentSHA256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "matchesCurrent": true,
+          "path": "sources/baseline.swift",
+          "role": "baseline",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 12320,
+          "currentPath": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "currentSHA256": "47b01794217ab979973e045a8d03e14f21d6d4eeeaf43bcd7e90bbd5a82d4295",
+          "matchesCurrent": true,
+          "path": "sources/candidate.swift",
+          "role": "candidate",
+          "sha256": "47b01794217ab979973e045a8d03e14f21d6d4eeeaf43bcd7e90bbd5a82d4295",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 11320,
+          "currentPath": "Benchmarks/MediaNameRecognition/Harness.swift",
+          "currentSHA256": "fd5abac9b0c734a92706efa8669397d330e677399301497675414ea4c3fab118",
+          "matchesCurrent": true,
+          "path": "sources/Harness.swift",
+          "role": "harness",
+          "sha256": "fd5abac9b0c734a92706efa8669397d330e677399301497675414ea4c3fab118",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 22939,
+          "currentPath": "Benchmarks/MediaNameRecognition/run.py",
+          "currentSHA256": "b37b1865e2ffc150e36005a4808a5a89d1dd30fcb8b04ba4adc491b529831bc9",
+          "matchesCurrent": true,
+          "path": "sources/run.py",
+          "role": "runner",
+          "sha256": "b37b1865e2ffc150e36005a4808a5a89d1dd30fcb8b04ba4adc491b529831bc9",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 296,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/manifest.json",
+          "currentSHA256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "matchesCurrent": true,
+          "path": "sources/baseline-manifest.json",
+          "role": "baselineManifest",
+          "sha256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 8753,
+          "currentPath": "Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift",
+          "currentSHA256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "matchesCurrent": true,
+          "path": "sources/tests/MediaNameRecognitionTests.swift",
+          "role": "test",
+          "sha256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 340,
+          "path": "sources/Package.swift",
+          "role": "generatedPackage",
+          "sha256": "a9b3284f4874a417470added984101c987110950bfd610e4174e0409fbac8dca",
+          "snapshotVerified": true
+        }
+      ],
+      "status": "complete",
+      "timings": {
+        "allMeasurementsMatchProcessTranscripts": true,
+        "allSummariesIndependentlyRecomputed": true,
+        "iterationsPerProcess": 4000,
+        "pairedComparisons": 48,
+        "processes": 96,
+        "workloads": {
+          "ambiguous": {
+            "checksum": "fab8a2c2dd96176b",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9501466053028005,
+              "medianPairedReductionPercent": 4.985339469719952,
+              "pairedCandidateOverBaseline": [
+                0.9225851008355641,
+                0.9839290730846106,
+                0.9556079198618593,
+                0.9746345854365203,
+                0.9446852907437417,
+                0.9377350231185813
+              ],
+              "pairedRatioRange": [
+                0.9225851008355641,
+                0.9839290730846106
+              ],
+              "pairedReductionPercentRange": [
+                1.607092691538936,
+                7.741489916443589
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 32647.45075,
+                  "median": 32604.681625,
+                  "min": 32196.04275
+                },
+                "candidate": {
+                  "max": 31759.312,
+                  "median": 30902.57725,
+                  "min": 30097.9525
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 6,
+            "wallNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9501729182385992,
+              "medianPairedReductionPercent": 4.982708176140083,
+              "pairedCandidateOverBaseline": [
+                0.9228257807074675,
+                0.9839662081586219,
+                0.9557526863217037,
+                0.974698401765176,
+                0.9445931501554945,
+                0.9377340848679019
+              ],
+              "pairedRatioRange": [
+                0.9228257807074675,
+                0.9839662081586219
+              ],
+              "pairedReductionPercentRange": [
+                1.6033791841378098,
+                7.717421929253254
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 32644.4055,
+                  "median": 32603.90425,
+                  "min": 32193.27375
+                },
+                "candidate": {
+                  "max": 31758.6375,
+                  "median": 30902.153,
+                  "min": 30106.977
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "02573b3c582e51c1"
+          },
+          "dated-forward": {
+            "checksum": "6bdf38c56e56b525",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9263645479486389,
+              "medianPairedReductionPercent": 7.363545205136113,
+              "pairedCandidateOverBaseline": [
+                0.9400785497235665,
+                0.9108307316300014,
+                0.9405074349180688,
+                0.9088905706954927,
+                0.9298136055378202,
+                0.9229154903594575
+              ],
+              "pairedRatioRange": [
+                0.9088905706954927,
+                0.9405074349180688
+              ],
+              "pairedReductionPercentRange": [
+                5.949256508193123,
+                9.110942930450728
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38180.17275,
+                  "median": 37014.567375,
+                  "min": 36048.631
+                },
+                "candidate": {
+                  "max": 34701.599,
+                  "median": 34233.4795,
+                  "min": 33888.54475
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 6,
+            "wallNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9263828920154632,
+              "medianPairedReductionPercent": 7.3617107984536805,
+              "pairedCandidateOverBaseline": [
+                0.9401160696988545,
+                0.9106714346104122,
+                0.9405032375868853,
+                0.9088656539025493,
+                0.929847797910131,
+                0.9229179861207955
+              ],
+              "pairedRatioRange": [
+                0.9088656539025493,
+                0.9405032375868853
+              ],
+              "pairedReductionPercentRange": [
+                5.949676241311474,
+                9.113434609745074
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38181.645,
+                  "median": 37011.477625,
+                  "min": 36047.9095
+                },
+                "candidate": {
+                  "max": 34701.98575,
+                  "median": 34231.267374999996,
+                  "min": 33889.219
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "4c298ef8bf426b91"
+          },
+          "dated-invalid": {
+            "checksum": "5b701797cf0d6cfc",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9047980302512679,
+              "medianPairedReductionPercent": 9.520196974873208,
+              "pairedCandidateOverBaseline": [
+                0.9094274004118238,
+                0.9678612333631424,
+                0.8787424950413475,
+                0.9026794659060398,
+                0.8961093177284141,
+                0.906916594596496
+              ],
+              "pairedRatioRange": [
+                0.8787424950413475,
+                0.9678612333631424
+              ],
+              "pairedReductionPercentRange": [
+                3.213876663685755,
+                12.125750495865251
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 23931.3425,
+                  "median": 23571.242875,
+                  "min": 23057.80125
+                },
+                "candidate": {
+                  "max": 22605.70475,
+                  "median": 21321.082875,
+                  "min": 20969.39625
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 6,
+            "wallNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9046954840808522,
+              "medianPairedReductionPercent": 9.53045159191478,
+              "pairedCandidateOverBaseline": [
+                0.9094273893098185,
+                0.9681425363139847,
+                0.8787398141184484,
+                0.9025908361713926,
+                0.8961113464413415,
+                0.9068001319903118
+              ],
+              "pairedRatioRange": [
+                0.8787398141184484,
+                0.9681425363139847
+              ],
+              "pairedReductionPercentRange": [
+                3.1857463686015275,
+                12.126018588155162
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 23930.32025,
+                  "median": 23571.56525,
+                  "min": 23055.455
+                },
+                "candidate": {
+                  "max": 22611.2025,
+                  "median": 21319.5715,
+                  "min": 20967.26225
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "51a51d29600b0759"
+          },
+          "dated-reverse": {
+            "checksum": "b770486b7d2ffcd9",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9285098755630288,
+              "medianPairedReductionPercent": 7.1490124436971225,
+              "pairedCandidateOverBaseline": [
+                0.9749558580012471,
+                0.9283341649378718,
+                0.8979327457423276,
+                0.9397418782389492,
+                0.9267331883638992,
+                0.9286855861881856
+              ],
+              "pairedRatioRange": [
+                0.8979327457423276,
+                0.9749558580012471
+              ],
+              "pairedReductionPercentRange": [
+                2.5044141998752933,
+                10.206725425767239
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38735.40675,
+                  "median": 37967.443625,
+                  "min": 37193.17875
+                },
+                "candidate": {
+                  "max": 36261.7075,
+                  "median": 35468.365375,
+                  "min": 34601.1465
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 6,
+            "wallNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9285371177012905,
+              "medianPairedReductionPercent": 7.146288229870946,
+              "pairedCandidateOverBaseline": [
+                0.9748895375654351,
+                0.9283147605591018,
+                0.8984734791150043,
+                0.9397061630269308,
+                0.9266408682067103,
+                0.9287594748434793
+              ],
+              "pairedRatioRange": [
+                0.8984734791150043,
+                0.9748895375654351
+              ],
+              "pairedReductionPercentRange": [
+                2.511046243456494,
+                10.15265208849957
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38736.09775,
+                  "median": 37965.085625,
+                  "min": 37192.56475
+                },
+                "candidate": {
+                  "max": 36258.64225,
+                  "median": 35466.904,
+                  "min": 34622.0385
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "210b08de9669afc9"
+          },
+          "dated-unicode": {
+            "checksum": "ffc6eb214d6c303f",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9685966154191052,
+              "medianPairedReductionPercent": 3.1403384580894755,
+              "pairedCandidateOverBaseline": [
+                0.9991593743896748,
+                0.9237147717372928,
+                0.963949822746826,
+                0.9788172998960355,
+                0.9579386065507013,
+                0.9732434080913844
+              ],
+              "pairedRatioRange": [
+                0.9237147717372928,
+                0.9991593743896748
+              ],
+              "pairedReductionPercentRange": [
+                0.0840625610325163,
+                7.628522826270723
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 31803.903,
+                  "median": 30190.38125,
+                  "min": 29090.5365
+                },
+                "candidate": {
+                  "max": 29719.59525,
+                  "median": 29221.908625,
+                  "min": 28817.165
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 6,
+            "wallNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9685708178999131,
+              "medianPairedReductionPercent": 3.142918210008694,
+              "pairedCandidateOverBaseline": [
+                0.9991390944156021,
+                0.9236559768149015,
+                0.9639462076672719,
+                0.9789777631427076,
+                0.9581535870462647,
+                0.9731954281325543
+              ],
+              "pairedRatioRange": [
+                0.9236559768149015,
+                0.9991390944156021
+              ],
+              "pairedReductionPercentRange": [
+                0.08609055843978863,
+                7.6344023185098475
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 31803.0135,
+                  "median": 30186.069875,
+                  "min": 29090.298
+                },
+                "candidate": {
+                  "max": 29721.8645,
+                  "median": 29220.14875,
+                  "min": 28814.59525
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "84683e6b3887b9b5"
+          },
+          "episodes": {
+            "checksum": "73fd20b8fe692bf7",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9313153873507445,
+              "medianPairedReductionPercent": 6.868461264925552,
+              "pairedCandidateOverBaseline": [
+                0.915620212963739,
+                0.9368975611765915,
+                0.8718795095602181,
+                0.9342220356172293,
+                0.9284087390842596,
+                0.9345904496399396
+              ],
+              "pairedRatioRange": [
+                0.8718795095602181,
+                0.9368975611765915
+              ],
+              "pairedReductionPercentRange": [
+                6.310243882340849,
+                12.812049043978192
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 44168.3175,
+                  "median": 41708.148,
+                  "min": 41377.86575
+                },
+                "candidate": {
+                  "max": 39338.3305,
+                  "median": 38818.554875,
+                  "min": 37886.41025
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 6,
+            "wallNanoseconds": {
+              "candidateWins": 6,
+              "medianPairedRatio": 0.9313514710547499,
+              "medianPairedReductionPercent": 6.864852894525009,
+              "pairedCandidateOverBaseline": [
+                0.9156233732480564,
+                0.936928509295306,
+                0.8718524483067542,
+                0.9343060117747943,
+                0.9283969303347055,
+                0.9346019758350973
+              ],
+              "pairedRatioRange": [
+                0.8718524483067542,
+                0.936928509295306
+              ],
+              "pairedReductionPercentRange": [
+                6.307149070469398,
+                12.814755169324577
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 44166.20275,
+                  "median": 41706.698124999995,
+                  "min": 41375.5845
+                },
+                "candidate": {
+                  "max": 39338.29625,
+                  "median": 38817.077875,
+                  "min": 37884.45225
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "db6b856867af412d"
+          },
+          "movies": {
+            "checksum": "84f2e41486f0f3f2",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 5,
+              "medianPairedRatio": 0.9580992539002918,
+              "medianPairedReductionPercent": 4.190074609970818,
+              "pairedCandidateOverBaseline": [
+                1.000736353822261,
+                0.9352940412965334,
+                0.9556282218892944,
+                0.9598795798275537,
+                0.9603521896923675,
+                0.95631892797303
+              ],
+              "pairedRatioRange": [
+                0.9352940412965334,
+                1.000736353822261
+              ],
+              "pairedReductionPercentRange": [
+                -0.07363538222608934,
+                6.470595870346663
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 33629.7235,
+                  "median": 33449.43975,
+                  "min": 32887.04325
+                },
+                "candidate": {
+                  "max": 32911.25975,
+                  "median": 32044.723625,
+                  "min": 31453.68
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 6,
+            "wallNanoseconds": {
+              "candidateWins": 5,
+              "medianPairedRatio": 0.9582047854550854,
+              "medianPairedReductionPercent": 4.179521454491464,
+              "pairedCandidateOverBaseline": [
+                1.0014731399399932,
+                0.935255647307443,
+                0.955576732631545,
+                0.9599143852086612,
+                0.9606349526809633,
+                0.9564951857015095
+              ],
+              "pairedRatioRange": [
+                0.935255647307443,
+                1.0014731399399932
+              ],
+              "pairedReductionPercentRange": [
+                -0.14731399399932066,
+                6.474435269255697
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 33628.16075,
+                  "median": 33446.576625,
+                  "min": 32886.896
+                },
+                "candidate": {
+                  "max": 32935.343,
+                  "median": 32047.671000000002,
+                  "min": 31450.92725
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "5f3f441889493dc5"
+          },
+          "tags": {
+            "checksum": "cbfb6982a4691210",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 5,
+              "medianPairedRatio": 0.9854177854882484,
+              "medianPairedReductionPercent": 1.4582214511751568,
+              "pairedCandidateOverBaseline": [
+                0.9943077307472469,
+                0.9946085012702011,
+                1.019110152979136,
+                0.9671339823835006,
+                0.9506201956409317,
+                0.9765278402292499
+              ],
+              "pairedRatioRange": [
+                0.9506201956409317,
+                1.019110152979136
+              ],
+              "pairedReductionPercentRange": [
+                -1.9110152979135986,
+                4.93798043590683
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 36515.2115,
+                  "median": 35524.103375,
+                  "min": 35003.02225
+                },
+                "candidate": {
+                  "max": 36210.891,
+                  "median": 34969.207125,
+                  "min": 34349.05475
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 6,
+            "wallNanoseconds": {
+              "candidateWins": 5,
+              "medianPairedRatio": 0.9861487574331448,
+              "medianPairedReductionPercent": 1.3851242566855215,
+              "pairedCandidateOverBaseline": [
+                0.9942831748806124,
+                0.9961703288690988,
+                1.0192211853436175,
+                0.9669853070773141,
+                0.9507049862878432,
+                0.9780143399856772
+              ],
+              "pairedRatioRange": [
+                0.9507049862878432,
+                1.0192211853436175
+              ],
+              "pairedReductionPercentRange": [
+                -1.9221185343617497,
+                4.929501371215683
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 36512.21725,
+                  "median": 35523.867750000005,
+                  "min": 35002.80975
+                },
+                "candidate": {
+                  "max": 36211.7905,
+                  "median": 34995.02875,
+                  "min": 34346.20825
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "9c4db1deb3acb599"
+          }
+        }
+      },
+      "usedAsFinalTiming": true
+    },
+    "linux-date-only": {
+      "archive": {
+        "buildProductsIncludedInArchive": false,
+        "copiedFilesVerified": 58,
+        "originalBuildProductsRehashedAtArchiveTime": 0
+      },
+      "corpus": {
+        "byteExactEqual": true,
+        "canonicalSHA256": "0aca8eda7e55efa6b71163dedaa938962f00185e0d008532544d745ce80da583",
+        "exhaustiveDates": false,
+        "independentlyValidatedGregorianRecords": 0,
+        "invalidDateRecords": 0,
+        "records": 3734,
+        "validDateRecords": 0
+      },
+      "sources": [
+        {
+          "bytes": 11654,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/MediaNameRecognition.swift",
+          "currentSHA256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "matchesCurrent": true,
+          "path": "sources/baseline.swift",
+          "role": "baseline",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 12044,
+          "currentPath": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "currentSHA256": "47b01794217ab979973e045a8d03e14f21d6d4eeeaf43bcd7e90bbd5a82d4295",
+          "matchesCurrent": false,
+          "path": "sources/candidate.swift",
+          "role": "candidate",
+          "sha256": "3254b7088aa738fe12dbe34596cfaaecaffa42d4b7c1d9310773292041777958",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 11320,
+          "currentPath": "Benchmarks/MediaNameRecognition/Harness.swift",
+          "currentSHA256": "fd5abac9b0c734a92706efa8669397d330e677399301497675414ea4c3fab118",
+          "matchesCurrent": true,
+          "path": "sources/Harness.swift",
+          "role": "harness",
+          "sha256": "fd5abac9b0c734a92706efa8669397d330e677399301497675414ea4c3fab118",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 22939,
+          "currentPath": "Benchmarks/MediaNameRecognition/run.py",
+          "currentSHA256": "b37b1865e2ffc150e36005a4808a5a89d1dd30fcb8b04ba4adc491b529831bc9",
+          "matchesCurrent": true,
+          "path": "sources/run.py",
+          "role": "runner",
+          "sha256": "b37b1865e2ffc150e36005a4808a5a89d1dd30fcb8b04ba4adc491b529831bc9",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 296,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/manifest.json",
+          "currentSHA256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "matchesCurrent": true,
+          "path": "sources/baseline-manifest.json",
+          "role": "baselineManifest",
+          "sha256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 8753,
+          "currentPath": "Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift",
+          "currentSHA256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "matchesCurrent": true,
+          "path": "sources/tests/MediaNameRecognitionTests.swift",
+          "role": "test",
+          "sha256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 340,
+          "path": "sources/Package.swift",
+          "role": "generatedPackage",
+          "sha256": "a9b3284f4874a417470added984101c987110950bfd610e4174e0409fbac8dca",
+          "snapshotVerified": true
+        }
+      ],
+      "status": "complete",
+      "timings": {
+        "allMeasurementsMatchProcessTranscripts": true,
+        "allSummariesIndependentlyRecomputed": true,
+        "iterationsPerProcess": 4000,
+        "pairedComparisons": 16,
+        "processes": 32,
+        "workloads": {
+          "ambiguous": {
+            "checksum": "fab8a2c2dd96176b",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 1.0208411121098688,
+              "medianPairedReductionPercent": -2.084111210986883,
+              "pairedCandidateOverBaseline": [
+                0.9965731119510409,
+                1.0451091122686966
+              ],
+              "pairedRatioRange": [
+                0.9965731119510409,
+                1.0451091122686966
+              ],
+              "pairedReductionPercentRange": [
+                -4.510911226869663,
+                0.3426888048959076
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 34541.9075,
+                  "median": 33891.3235,
+                  "min": 33240.7395
+                },
+                "candidate": {
+                  "max": 34740.19975,
+                  "median": 34581.868,
+                  "min": 34423.53625
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 1.020881547533722,
+              "medianPairedReductionPercent": -2.0881547533722067,
+              "pairedCandidateOverBaseline": [
+                0.9965746456652175,
+                1.0451884494022268
+              ],
+              "pairedRatioRange": [
+                0.9965746456652175,
+                1.0451884494022268
+              ],
+              "pairedReductionPercentRange": [
+                -4.518844940222677,
+                0.34253543347825266
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 34538.9815,
+                  "median": 33889.578625,
+                  "min": 33240.17575
+                },
+                "candidate": {
+                  "max": 34742.24775,
+                  "median": 34581.4605,
+                  "min": 34420.67325
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "02573b3c582e51c1"
+          },
+          "dated-forward": {
+            "checksum": "6bdf38c56e56b525",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9430461855638981,
+              "medianPairedReductionPercent": 5.695381443610192,
+              "pairedCandidateOverBaseline": [
+                0.9574800255557913,
+                0.9286123455720049
+              ],
+              "pairedRatioRange": [
+                0.9286123455720049,
+                0.9574800255557913
+              ],
+              "pairedReductionPercentRange": [
+                4.251997444420875,
+                7.13876544279951
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 39364.96825,
+                  "median": 38399.963625000004,
+                  "min": 37434.959
+                },
+                "candidate": {
+                  "max": 36554.7955,
+                  "median": 36199.010500000004,
+                  "min": 35843.2255
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9436402152930479,
+              "medianPairedReductionPercent": 5.635978470695213,
+              "pairedCandidateOverBaseline": [
+                0.9574847866226737,
+                0.929795643963422
+              ],
+              "pairedRatioRange": [
+                0.929795643963422,
+                0.9574847866226737
+              ],
+              "pairedReductionPercentRange": [
+                4.251521337732633,
+                7.020435603657804
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 39361.75625,
+                  "median": 38396.725625,
+                  "min": 37431.695
+                },
+                "candidate": {
+                  "max": 36598.3895,
+                  "median": 36219.334,
+                  "min": 35840.2785
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "4c298ef8bf426b91"
+          },
+          "dated-invalid": {
+            "checksum": "5b701797cf0d6cfc",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 0.9789140252327808,
+              "medianPairedReductionPercent": 2.1085974767219184,
+              "pairedCandidateOverBaseline": [
+                0.9572443684932449,
+                1.0005836819723168
+              ],
+              "pairedRatioRange": [
+                0.9572443684932449,
+                1.0005836819723168
+              ],
+              "pairedReductionPercentRange": [
+                -0.05836819723168407,
+                4.275563150675509
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 24492.335,
+                  "median": 23924.61625,
+                  "min": 23356.8975
+                },
+                "candidate": {
+                  "max": 23445.14975,
+                  "median": 23407.840125000002,
+                  "min": 23370.5305
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 0.9794197587154978,
+              "medianPairedReductionPercent": 2.05802412845022,
+              "pairedCandidateOverBaseline": [
+                0.9572180744206856,
+                1.00162144301031
+              ],
+              "pairedRatioRange": [
+                0.9572180744206856,
+                1.00162144301031
+              ],
+              "pairedReductionPercentRange": [
+                -0.16214430103100863,
+                4.278192557931437
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 24492.99525,
+                  "median": 23923.673375,
+                  "min": 23354.3515
+                },
+                "candidate": {
+                  "max": 23445.13775,
+                  "median": 23418.6785,
+                  "min": 23392.21925
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "51a51d29600b0759"
+          },
+          "dated-reverse": {
+            "checksum": "b770486b7d2ffcd9",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 0.9979149196494208,
+              "medianPairedReductionPercent": 0.20850803505791937,
+              "pairedCandidateOverBaseline": [
+                1.0453634990305778,
+                0.9504663402682638
+              ],
+              "pairedRatioRange": [
+                0.9504663402682638,
+                1.0453634990305778
+              ],
+              "pairedReductionPercentRange": [
+                -4.536349903057779,
+                4.953365973173618
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38624.372,
+                  "median": 38201.40075,
+                  "min": 37778.4295
+                },
+                "candidate": {
+                  "max": 39492.19125,
+                  "median": 38101.678375,
+                  "min": 36711.1655
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 0.9978335784195536,
+              "medianPairedReductionPercent": 0.21664215804464426,
+              "pairedCandidateOverBaseline": [
+                1.0451028236768065,
+                0.9505643331623007
+              ],
+              "pairedRatioRange": [
+                0.9505643331623007,
+                1.0451028236768065
+              ],
+              "pairedReductionPercentRange": [
+                -4.510282367680651,
+                4.943566683769928
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38621.2905,
+                  "median": 38203.096000000005,
+                  "min": 37784.9015
+                },
+                "candidate": {
+                  "max": 39489.10725,
+                  "median": 38100.564249999996,
+                  "min": 36712.02125
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "210b08de9669afc9"
+          },
+          "dated-unicode": {
+            "checksum": "ffc6eb214d6c303f",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9623510631458498,
+              "medianPairedReductionPercent": 3.764893685415016,
+              "pairedCandidateOverBaseline": [
+                0.9799158590589447,
+                0.9447862672327548
+              ],
+              "pairedRatioRange": [
+                0.9447862672327548,
+                0.9799158590589447
+              ],
+              "pairedReductionPercentRange": [
+                2.008414094105526,
+                5.521373276724518
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 31465.297,
+                  "median": 30984.290374999997,
+                  "min": 30503.28375
+                },
+                "candidate": {
+                  "max": 29890.6515,
+                  "median": 29809.316,
+                  "min": 29727.9805
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9623519367282598,
+              "medianPairedReductionPercent": 3.7648063271740195,
+              "pairedCandidateOverBaseline": [
+                0.9799153410412692,
+                0.9447885324152503
+              ],
+              "pairedRatioRange": [
+                0.9447885324152503,
+                0.9799153410412692
+              ],
+              "pairedReductionPercentRange": [
+                2.0084658958730794,
+                5.521146758474971
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 31462.44025,
+                  "median": 30981.584875,
+                  "min": 30500.7295
+                },
+                "candidate": {
+                  "max": 29888.13275,
+                  "median": 29806.742749999998,
+                  "min": 29725.35275
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "84683e6b3887b9b5"
+          },
+          "episodes": {
+            "checksum": "73fd20b8fe692bf7",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 1.0062785728076804,
+              "medianPairedReductionPercent": -0.6278572807680405,
+              "pairedCandidateOverBaseline": [
+                0.9816738375852465,
+                1.0308833080301145
+              ],
+              "pairedRatioRange": [
+                0.9816738375852465,
+                1.0308833080301145
+              ],
+              "pairedReductionPercentRange": [
+                -3.088330803011452,
+                1.8326162414753489
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 43066.36775,
+                  "median": 42685.54875,
+                  "min": 42304.72975
+                },
+                "candidate": {
+                  "max": 43611.23975,
+                  "median": 42944.183124999996,
+                  "min": 42277.1265
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 1.0072249870651437,
+              "medianPairedReductionPercent": -0.722498706514374,
+              "pairedCandidateOverBaseline": [
+                0.9812153347347594,
+                1.0332346393955278
+              ],
+              "pairedRatioRange": [
+                0.9812153347347594,
+                1.0332346393955278
+              ],
+              "pairedReductionPercentRange": [
+                -3.3234639395527843,
+                1.8784665265240585
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 43085.636,
+                  "median": 42693.517625,
+                  "min": 42301.39925
+                },
+                "candidate": {
+                  "max": 43707.271,
+                  "median": 42991.778875,
+                  "min": 42276.28675
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "db6b856867af412d"
+          },
+          "movies": {
+            "checksum": "84f2e41486f0f3f2",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 1.0100085904969816,
+              "medianPairedReductionPercent": -1.000859049698155,
+              "pairedCandidateOverBaseline": [
+                1.0230199684387309,
+                0.9969972125552322
+              ],
+              "pairedRatioRange": [
+                0.9969972125552322,
+                1.0230199684387309
+              ],
+              "pairedReductionPercentRange": [
+                -2.3019968438730887,
+                0.3002787444767785
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 34013.23,
+                  "median": 33796.02225,
+                  "min": 33578.8145
+                },
+                "candidate": {
+                  "max": 34351.79775,
+                  "median": 34131.446625,
+                  "min": 33911.0955
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 1.0093812557523711,
+              "medianPairedReductionPercent": -0.9381255752371143,
+              "pairedCandidateOverBaseline": [
+                1.0217074163600706,
+                0.9970550951446716
+              ],
+              "pairedRatioRange": [
+                0.9970550951446716,
+                1.0217074163600706
+              ],
+              "pairedReductionPercentRange": [
+                -2.1707416360070564,
+                0.29449048553283896
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 34010.35175,
+                  "median": 33814.678625,
+                  "min": 33619.0055
+                },
+                "candidate": {
+                  "max": 34348.78725,
+                  "median": 34129.490875,
+                  "min": 33910.1945
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "5f3f441889493dc5"
+          },
+          "tags": {
+            "checksum": "cbfb6982a4691210",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 0.9919148929096452,
+              "medianPairedReductionPercent": 0.8085107090354815,
+              "pairedCandidateOverBaseline": [
+                1.02550787347216,
+                0.9583219123471303
+              ],
+              "pairedRatioRange": [
+                0.9583219123471303,
+                1.02550787347216
+              ],
+              "pairedReductionPercentRange": [
+                -2.5507873472160103,
+                4.167808765286973
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38032.14325,
+                  "median": 37132.61025,
+                  "min": 36233.07725
+                },
+                "candidate": {
+                  "max": 37157.306,
+                  "median": 36802.17112499999,
+                  "min": 36447.03625
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 0.9921279680432752,
+              "medianPairedReductionPercent": 0.7872031956724812,
+              "pairedCandidateOverBaseline": [
+                1.026339627952424,
+                0.9579163081341264
+              ],
+              "pairedRatioRange": [
+                0.9579163081341264,
+                1.026339627952424
+              ],
+              "pairedReductionPercentRange": [
+                -2.633962795242395,
+                4.208369186587357
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38044.83825,
+                  "median": 37137.481375,
+                  "min": 36230.1245
+                },
+                "candidate": {
+                  "max": 37184.4125,
+                  "median": 36814.09175,
+                  "min": 36443.771
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "9c4db1deb3acb599"
+          }
+        }
+      },
+      "usedAsFinalTiming": false
+    },
+    "linux-dot-diagnostic": {
+      "archive": {
+        "buildProductsIncludedInArchive": false,
+        "copiedFilesVerified": 19,
+        "originalBuildProductsRehashedAtArchiveTime": 0
+      },
+      "note": "The directory-only dot input traps in both variants and a direct Linux Foundation probe; .mkv controls complete identically.",
+      "returnCodes": {
+        "baseline-control": 0,
+        "baseline-dot": -4,
+        "build-baseline": 0,
+        "build-candidate": 0,
+        "build-foundation": 0,
+        "candidate-control": 0,
+        "candidate-dot": -4,
+        "foundation-dot": -4
+      },
+      "sourceHashesVerified": 2,
+      "status": "diagnostic",
+      "usedAsFinalTiming": false
+    },
+    "linux-interrupted": {
+      "archive": {
+        "buildProductsIncludedInArchive": false,
+        "copiedFilesVerified": 111,
+        "originalBuildProductsRehashedAtArchiveTime": 0
+      },
+      "causeReportedByResearchSession": "Disk exhaustion while recording the next timing process; preserved command receipts precede that failure.",
+      "corpus": {
+        "byteExactEqual": true,
+        "canonicalSHA256": "fbf984532089621409c852091c6430b46578736021001f3db108af26b76a0c5d",
+        "exhaustiveDates": true,
+        "independentlyValidatedGregorianRecords": 184800,
+        "invalidDateRecords": 38702,
+        "records": 188534,
+        "validDateRecords": 146098
+      },
+      "expectedProcesses": 96,
+      "missingProcessIndexes": [
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95
+      ],
+      "note": "No statistics are computed from this incomplete attempt.",
+      "overallVerified": false,
+      "recordedProcesses": 86,
+      "sources": [
+        {
+          "bytes": 11654,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/MediaNameRecognition.swift",
+          "currentSHA256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "matchesCurrent": true,
+          "path": "sources/baseline.swift",
+          "role": "baseline",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 12320,
+          "currentPath": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "currentSHA256": "47b01794217ab979973e045a8d03e14f21d6d4eeeaf43bcd7e90bbd5a82d4295",
+          "matchesCurrent": true,
+          "path": "sources/candidate.swift",
+          "role": "candidate",
+          "sha256": "47b01794217ab979973e045a8d03e14f21d6d4eeeaf43bcd7e90bbd5a82d4295",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 11320,
+          "currentPath": "Benchmarks/MediaNameRecognition/Harness.swift",
+          "currentSHA256": "fd5abac9b0c734a92706efa8669397d330e677399301497675414ea4c3fab118",
+          "matchesCurrent": true,
+          "path": "sources/Harness.swift",
+          "role": "harness",
+          "sha256": "fd5abac9b0c734a92706efa8669397d330e677399301497675414ea4c3fab118",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 22939,
+          "currentPath": "Benchmarks/MediaNameRecognition/run.py",
+          "currentSHA256": "b37b1865e2ffc150e36005a4808a5a89d1dd30fcb8b04ba4adc491b529831bc9",
+          "matchesCurrent": true,
+          "path": "sources/run.py",
+          "role": "runner",
+          "sha256": "b37b1865e2ffc150e36005a4808a5a89d1dd30fcb8b04ba4adc491b529831bc9",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 296,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/manifest.json",
+          "currentSHA256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "matchesCurrent": true,
+          "path": "sources/baseline-manifest.json",
+          "role": "baselineManifest",
+          "sha256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 8753,
+          "currentPath": "Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift",
+          "currentSHA256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "matchesCurrent": true,
+          "path": "sources/tests/MediaNameRecognitionTests.swift",
+          "role": "test",
+          "sha256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 340,
+          "path": "sources/Package.swift",
+          "role": "generatedPackage",
+          "sha256": "a9b3284f4874a417470added984101c987110950bfd610e4174e0409fbac8dca",
+          "snapshotVerified": true
+        }
+      ],
+      "status": "incomplete",
+      "usedAsFinalTiming": false
+    },
+    "linux-tags-only": {
+      "archive": {
+        "buildProductsIncludedInArchive": false,
+        "copiedFilesVerified": 58,
+        "originalBuildProductsRehashedAtArchiveTime": 0
+      },
+      "corpus": {
+        "byteExactEqual": true,
+        "canonicalSHA256": "0aca8eda7e55efa6b71163dedaa938962f00185e0d008532544d745ce80da583",
+        "exhaustiveDates": false,
+        "independentlyValidatedGregorianRecords": 0,
+        "invalidDateRecords": 0,
+        "records": 3734,
+        "validDateRecords": 0
+      },
+      "sources": [
+        {
+          "bytes": 11654,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/MediaNameRecognition.swift",
+          "currentSHA256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "matchesCurrent": true,
+          "path": "sources/baseline.swift",
+          "role": "baseline",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 11930,
+          "currentPath": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "currentSHA256": "47b01794217ab979973e045a8d03e14f21d6d4eeeaf43bcd7e90bbd5a82d4295",
+          "matchesCurrent": false,
+          "path": "sources/candidate.swift",
+          "role": "candidate",
+          "sha256": "88b286f07536dad87321f59cb5b9d19bf859b6ba3b5b9fa08da141f3d63200ca",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 11320,
+          "currentPath": "Benchmarks/MediaNameRecognition/Harness.swift",
+          "currentSHA256": "fd5abac9b0c734a92706efa8669397d330e677399301497675414ea4c3fab118",
+          "matchesCurrent": true,
+          "path": "sources/Harness.swift",
+          "role": "harness",
+          "sha256": "fd5abac9b0c734a92706efa8669397d330e677399301497675414ea4c3fab118",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 22939,
+          "currentPath": "Benchmarks/MediaNameRecognition/run.py",
+          "currentSHA256": "b37b1865e2ffc150e36005a4808a5a89d1dd30fcb8b04ba4adc491b529831bc9",
+          "matchesCurrent": true,
+          "path": "sources/run.py",
+          "role": "runner",
+          "sha256": "b37b1865e2ffc150e36005a4808a5a89d1dd30fcb8b04ba4adc491b529831bc9",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 296,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/manifest.json",
+          "currentSHA256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "matchesCurrent": true,
+          "path": "sources/baseline-manifest.json",
+          "role": "baselineManifest",
+          "sha256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 8753,
+          "currentPath": "Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift",
+          "currentSHA256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "matchesCurrent": true,
+          "path": "sources/tests/MediaNameRecognitionTests.swift",
+          "role": "test",
+          "sha256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 340,
+          "path": "sources/Package.swift",
+          "role": "generatedPackage",
+          "sha256": "a9b3284f4874a417470added984101c987110950bfd610e4174e0409fbac8dca",
+          "snapshotVerified": true
+        }
+      ],
+      "status": "complete",
+      "timings": {
+        "allMeasurementsMatchProcessTranscripts": true,
+        "allSummariesIndependentlyRecomputed": true,
+        "iterationsPerProcess": 4000,
+        "pairedComparisons": 16,
+        "processes": 32,
+        "workloads": {
+          "ambiguous": {
+            "checksum": "fab8a2c2dd96176b",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9532978936274884,
+              "medianPairedReductionPercent": 4.670210637251159,
+              "pairedCandidateOverBaseline": [
+                0.9633549653074932,
+                0.9432408219474836
+              ],
+              "pairedRatioRange": [
+                0.9432408219474836,
+                0.9633549653074932
+              ],
+              "pairedReductionPercentRange": [
+                3.6645034692506795,
+                5.67591780525164
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 33091.33175,
+                  "median": 33073.838625000004,
+                  "min": 33056.3455
+                },
+                "candidate": {
+                  "max": 31878.69875,
+                  "median": 31529.396625,
+                  "min": 31180.0945
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9532971995489545,
+              "medianPairedReductionPercent": 4.670280045104547,
+              "pairedCandidateOverBaseline": [
+                0.963356472135405,
+                0.943237926962504
+              ],
+              "pairedRatioRange": [
+                0.943237926962504,
+                0.963356472135405
+              ],
+              "pairedReductionPercentRange": [
+                3.6643527864595016,
+                5.676207303749603
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 33088.5035,
+                  "median": 33070.99575,
+                  "min": 33053.488
+                },
+                "candidate": {
+                  "max": 31876.024,
+                  "median": 31526.66375,
+                  "min": 31177.3035
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "02573b3c582e51c1"
+          },
+          "dated-forward": {
+            "checksum": "6bdf38c56e56b525",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9341528321131769,
+              "medianPairedReductionPercent": 6.58471678868231,
+              "pairedCandidateOverBaseline": [
+                0.9425257016913887,
+                0.9257799625349651
+              ],
+              "pairedRatioRange": [
+                0.9257799625349651,
+                0.9425257016913887
+              ],
+              "pairedReductionPercentRange": [
+                5.747429830861128,
+                7.422003746503492
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38455.98975,
+                  "median": 37656.475625,
+                  "min": 36856.9615
+                },
+                "candidate": {
+                  "max": 35601.78475,
+                  "median": 35170.209125,
+                  "min": 34738.6335
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.934129941214471,
+              "medianPairedReductionPercent": 6.587005878552898,
+              "pairedCandidateOverBaseline": [
+                0.9424816895657618,
+                0.9257781928631803
+              ],
+              "pairedRatioRange": [
+                0.9257781928631803,
+                0.9424816895657618
+              ],
+              "pairedReductionPercentRange": [
+                5.751831043423817,
+                7.4221807136819695
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38452.86325,
+                  "median": 37654.261249999996,
+                  "min": 36855.65925
+                },
+                "candidate": {
+                  "max": 35598.82225,
+                  "median": 35167.303125,
+                  "min": 34735.784
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "4c298ef8bf426b91"
+          },
+          "dated-invalid": {
+            "checksum": "5b701797cf0d6cfc",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 1.0393260538149014,
+              "medianPairedReductionPercent": -3.9326053814901396,
+              "pairedCandidateOverBaseline": [
+                1.1379533729056228,
+                0.9406987347241801
+              ],
+              "pairedRatioRange": [
+                0.9406987347241801,
+                1.1379533729056228
+              ],
+              "pairedReductionPercentRange": [
+                -13.795337290562282,
+                5.930126527581992
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 23605.525,
+                  "median": 23552.27225,
+                  "min": 23499.0195
+                },
+                "candidate": {
+                  "max": 26740.7885,
+                  "median": 24473.237999999998,
+                  "min": 22205.6875
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 1.0405312117530952,
+              "medianPairedReductionPercent": -4.053121175309515,
+              "pairedCandidateOverBaseline": [
+                1.1403700629177609,
+                0.9406923605884292
+              ],
+              "pairedRatioRange": [
+                0.9406923605884292,
+                1.1403700629177609
+              ],
+              "pairedReductionPercentRange": [
+                -14.037006291776088,
+                5.93076394115708
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 23603.22825,
+                  "median": 23549.886625,
+                  "min": 23496.545
+                },
+                "candidate": {
+                  "max": 26794.7565,
+                  "median": 24499.0665,
+                  "min": 22203.3765
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "51a51d29600b0759"
+          },
+          "dated-reverse": {
+            "checksum": "b770486b7d2ffcd9",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9514344704263982,
+              "medianPairedReductionPercent": 4.856552957360183,
+              "pairedCandidateOverBaseline": [
+                0.93849073054029,
+                0.9643782103125063
+              ],
+              "pairedRatioRange": [
+                0.93849073054029,
+                0.9643782103125063
+              ],
+              "pairedReductionPercentRange": [
+                3.5621789687493743,
+                6.150926945971003
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38295.55725,
+                  "median": 38173.258,
+                  "min": 38050.95875
+                },
+                "candidate": {
+                  "max": 36695.5155,
+                  "median": 36317.7705,
+                  "min": 35940.0255
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9515889044748382,
+              "medianPairedReductionPercent": 4.841109552516176,
+              "pairedCandidateOverBaseline": [
+                0.938491781968186,
+                0.9646860269814906
+              ],
+              "pairedRatioRange": [
+                0.938491781968186,
+                0.9646860269814906
+              ],
+              "pairedReductionPercentRange": [
+                3.531397301850936,
+                6.1508218031814055
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 38292.51725,
+                  "median": 38170.226125,
+                  "min": 38047.935
+                },
+                "candidate": {
+                  "max": 36704.31125,
+                  "median": 36320.762,
+                  "min": 35937.21275
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "210b08de9669afc9"
+          },
+          "dated-unicode": {
+            "checksum": "ffc6eb214d6c303f",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9512560345418755,
+              "medianPairedReductionPercent": 4.874396545812454,
+              "pairedCandidateOverBaseline": [
+                0.9248390612262464,
+                0.9776730078575046
+              ],
+              "pairedRatioRange": [
+                0.9248390612262464,
+                0.9776730078575046
+              ],
+              "pairedReductionPercentRange": [
+                2.232699214249545,
+                7.516093877375363
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 32024.87275,
+                  "median": 31152.278,
+                  "min": 30279.68325
+                },
+                "candidate": {
+                  "max": 29617.85325,
+                  "median": 29610.741125,
+                  "min": 29603.629
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9510869491270935,
+              "medianPairedReductionPercent": 4.891305087290654,
+              "pairedCandidateOverBaseline": [
+                0.9248325831763969,
+                0.97734131507779
+              ],
+              "pairedRatioRange": [
+                0.9248325831763969,
+                0.97734131507779
+              ],
+              "pairedReductionPercentRange": [
+                2.2658684922210015,
+                7.516741682360307
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 32022.13275,
+                  "median": 31154.68575,
+                  "min": 30287.23875
+                },
+                "candidate": {
+                  "max": 29615.11175,
+                  "median": 29608.04075,
+                  "min": 29600.96975
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "84683e6b3887b9b5"
+          },
+          "episodes": {
+            "checksum": "73fd20b8fe692bf7",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9079703679896043,
+              "medianPairedReductionPercent": 9.202963201039571,
+              "pairedCandidateOverBaseline": [
+                0.8941997366094233,
+                0.9217409993697853
+              ],
+              "pairedRatioRange": [
+                0.8941997366094233,
+                0.9217409993697853
+              ],
+              "pairedReductionPercentRange": [
+                7.825900063021473,
+                10.58002633905767
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 42816.75875,
+                  "median": 42801.229,
+                  "min": 42785.69925
+                },
+                "candidate": {
+                  "max": 39465.962,
+                  "median": 38862.461500000005,
+                  "min": 38258.961
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9079682944493574,
+              "medianPairedReductionPercent": 9.203170555064254,
+              "pairedCandidateOverBaseline": [
+                0.8941961358364247,
+                0.9217404530622901
+              ],
+              "pairedRatioRange": [
+                0.8941961358364247,
+                0.9217404530622901
+              ],
+              "pairedReductionPercentRange": [
+                7.825954693770987,
+                10.580386416357534
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 42813.32925,
+                  "median": 42797.826875,
+                  "min": 42782.3245
+                },
+                "candidate": {
+                  "max": 39462.7775,
+                  "median": 38859.283375,
+                  "min": 38255.78925
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "db6b856867af412d"
+          },
+          "movies": {
+            "checksum": "84f2e41486f0f3f2",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9375326219666915,
+              "medianPairedReductionPercent": 6.2467378033308485,
+              "pairedCandidateOverBaseline": [
+                0.9392748494939155,
+                0.9357903944394677
+              ],
+              "pairedRatioRange": [
+                0.9357903944394677,
+                0.9392748494939155
+              ],
+              "pairedReductionPercentRange": [
+                6.072515050608452,
+                6.420960556053235
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 34314.4765,
+                  "median": 34151.58225,
+                  "min": 33988.688
+                },
+                "candidate": {
+                  "max": 32230.72475,
+                  "median": 32018.50625,
+                  "min": 31806.28775
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 2,
+              "medianPairedRatio": 0.9380472851947386,
+              "medianPairedReductionPercent": 6.195271480526143,
+              "pairedCandidateOverBaseline": [
+                0.9395102151094266,
+                0.9365843552800507
+              ],
+              "pairedRatioRange": [
+                0.9365843552800507,
+                0.9395102151094266
+              ],
+              "pairedReductionPercentRange": [
+                6.048978489057344,
+                6.341564471994932
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 34302.9365,
+                  "median": 34144.353125,
+                  "min": 33985.76975
+                },
+                "candidate": {
+                  "max": 32227.95925,
+                  "median": 32029.24975,
+                  "min": 31830.54025
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "5f3f441889493dc5"
+          },
+          "tags": {
+            "checksum": "cbfb6982a4691210",
+            "checksumsRecomputedFromCorpus": true,
+            "cpuNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 0.9818872359447042,
+              "medianPairedReductionPercent": 1.8112764055295827,
+              "pairedCandidateOverBaseline": [
+                1.0061574318680224,
+                0.9576170400213859
+              ],
+              "pairedRatioRange": [
+                0.9576170400213859,
+                1.0061574318680224
+              ],
+              "pairedReductionPercentRange": [
+                -0.6157431868022423,
+                4.238295997861408
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 36496.9495,
+                  "median": 35697.6325,
+                  "min": 34898.3155
+                },
+                "candidate": {
+                  "max": 35113.1995,
+                  "median": 35031.650125,
+                  "min": 34950.10075
+                }
+              },
+              "ties": 0
+            },
+            "pairs": 2,
+            "wallNanoseconds": {
+              "candidateWins": 1,
+              "medianPairedRatio": 0.981706643399382,
+              "medianPairedReductionPercent": 1.8293356600618038,
+              "pairedCandidateOverBaseline": [
+                1.0056742602646591,
+                0.9577390265341047
+              ],
+              "pairedRatioRange": [
+                0.9577390265341047,
+                1.0056742602646591
+              ],
+              "pairedReductionPercentRange": [
+                -0.5674260264659114,
+                4.22609734658953
+              ],
+              "perOperation": {
+                "baseline": {
+                  "max": 36493.8825,
+                  "median": 35703.04925,
+                  "min": 34912.216
+                },
+                "candidate": {
+                  "max": 35110.317,
+                  "median": 35030.96625,
+                  "min": 34951.6155
+                }
+              },
+              "ties": 0
+            },
+            "warmupChecksum": "9c4db1deb3acb599"
+          }
+        }
+      },
+      "usedAsFinalTiming": false
+    },
+    "linux-validation": {
+      "archive": {
+        "buildProductsIncludedInArchive": false,
+        "copiedFilesVerified": 25,
+        "originalBuildProductsRehashedAtArchiveTime": 0
+      },
+      "note": "Harness and runner snapshots precede the directory-dot corpus exclusion; current production and tests are identical.",
+      "originalFailure": {
+        "command": [
+          "/workspace/scratch/d20b36c4b51b/media-name-tests-linux-verified/build/baseline/harness",
+          "corpus",
+          "--exhaustive-dates"
+        ],
+        "cwd": "/workspace/scratch/d20b36c4b51b/illiquid",
+        "elapsedSeconds": 0.28036306399962996,
+        "log": "logs/corpus-baseline.log",
+        "name": "corpus-baseline",
+        "returncode": -4,
+        "stdout": "differential/baseline.jsonl.gz"
+      },
+      "overallVerified": false,
+      "partialBaselineCorpusRecords": 3108,
+      "reportedTestInvocations": 48,
+      "sources": [
+        {
+          "bytes": 11654,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/MediaNameRecognition.swift",
+          "currentSHA256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "matchesCurrent": true,
+          "path": "sources/baseline.swift",
+          "role": "baseline",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 12320,
+          "currentPath": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "currentSHA256": "47b01794217ab979973e045a8d03e14f21d6d4eeeaf43bcd7e90bbd5a82d4295",
+          "matchesCurrent": true,
+          "path": "sources/candidate.swift",
+          "role": "candidate",
+          "sha256": "47b01794217ab979973e045a8d03e14f21d6d4eeeaf43bcd7e90bbd5a82d4295",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 11325,
+          "currentPath": "Benchmarks/MediaNameRecognition/Harness.swift",
+          "currentSHA256": "fd5abac9b0c734a92706efa8669397d330e677399301497675414ea4c3fab118",
+          "matchesCurrent": false,
+          "path": "sources/Harness.swift",
+          "role": "harness",
+          "sha256": "4b8a4e8667b26f45da67d1805b11a8a66e8c89b6494bc837f2864c648bc4e400",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 22826,
+          "currentPath": "Benchmarks/MediaNameRecognition/run.py",
+          "currentSHA256": "b37b1865e2ffc150e36005a4808a5a89d1dd30fcb8b04ba4adc491b529831bc9",
+          "matchesCurrent": false,
+          "path": "sources/run.py",
+          "role": "runner",
+          "sha256": "775fe4c7d123af1a5f500b102c9fa2fca195fa2e8b1326b17a4be65a7615c662",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 296,
+          "currentPath": "Benchmarks/MediaNameRecognition/baseline/manifest.json",
+          "currentSHA256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "matchesCurrent": true,
+          "path": "sources/baseline-manifest.json",
+          "role": "baselineManifest",
+          "sha256": "b56758c9c7944267de1ef395fde511b67ec748def6efee1df15067bf3f956b9b",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 8753,
+          "currentPath": "Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift",
+          "currentSHA256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "matchesCurrent": true,
+          "path": "sources/tests/MediaNameRecognitionTests.swift",
+          "role": "test",
+          "sha256": "6850282f759af9c10c2a41db95d2450a49a56c4b453b82b18defce512d254acf",
+          "snapshotVerified": true
+        },
+        {
+          "bytes": 340,
+          "path": "sources/Package.swift",
+          "role": "generatedPackage",
+          "sha256": "a9b3284f4874a417470added984101c987110950bfd610e4174e0409fbac8dca",
+          "snapshotVerified": true
+        }
+      ],
+      "status": "tests_passed_then_original_corpus_failed",
+      "testRuns": [
+        {
+          "configuration": "debug",
+          "log": "logs/tests-baseline-debug.log",
+          "passSummaryVerified": true,
+          "reportedSuites": 1,
+          "reportedTests": 12,
+          "returncode": 0,
+          "variant": "baseline"
+        },
+        {
+          "configuration": "release",
+          "log": "logs/tests-baseline-release.log",
+          "passSummaryVerified": true,
+          "reportedSuites": 1,
+          "reportedTests": 12,
+          "returncode": 0,
+          "variant": "baseline"
+        },
+        {
+          "configuration": "debug",
+          "log": "logs/tests-candidate-debug.log",
+          "passSummaryVerified": true,
+          "reportedSuites": 1,
+          "reportedTests": 12,
+          "returncode": 0,
+          "variant": "candidate"
+        },
+        {
+          "configuration": "release",
+          "log": "logs/tests-candidate-release.log",
+          "passSummaryVerified": true,
+          "reportedSuites": 1,
+          "reportedTests": 12,
+          "returncode": 0,
+          "variant": "candidate"
+        }
+      ],
+      "usedAsFinalTiming": false
+    }
+  },
+  "finalCohort": "linux",
+  "finalTotals": {
+    "cpuNanoseconds": {
+      "candidateWinningPairs": 46,
+      "pairedComparisons": 48,
+      "workloadsWinningEveryPair": [
+        "dated-forward",
+        "dated-reverse",
+        "dated-invalid",
+        "dated-unicode",
+        "episodes",
+        "ambiguous"
+      ]
+    },
+    "wallNanoseconds": {
+      "candidateWinningPairs": 46,
+      "pairedComparisons": 48,
+      "workloadsWinningEveryPair": [
+        "dated-forward",
+        "dated-reverse",
+        "dated-invalid",
+        "dated-unicode",
+        "episodes",
+        "ambiguous"
+      ]
+    }
+  },
+  "method": "Independent Python audit; no benchmark runner import, compiler invocation, or new measurement.",
+  "schemaVersion": 1,
+  "success": true
+}

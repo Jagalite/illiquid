@@ -1,0 +1,432 @@
+{
+  "balancedVariantOrder": true,
+  "processes": 96,
+  "schemaVersion": 1,
+  "scope": "Optimized full recognizer calls plus append into a pre-reserved result array; all-field serialization and validation outside timing.",
+  "workloads": {
+    "ambiguous": {
+      "checksum": "fab8a2c2dd96176b",
+      "cpuNanoseconds": {
+        "medianPairedRatio": 1.0114608251573878,
+        "medianPairedReductionPercent": -1.1460825157387777,
+        "pairedCandidateOverBaseline": [
+          1.0314166688778623,
+          1.0144408544246994,
+          1.0084807958900759,
+          0.8788968548529627,
+          1.0293130352736246,
+          0.9988955414753241
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 32534.25,
+            "median": 28060.125,
+            "min": 27556.0
+          },
+          "candidate": {
+            "max": 30072.0,
+            "median": 28479.0,
+            "min": 27825.75
+          }
+        }
+      },
+      "iterationsPerProcess": 4000,
+      "pairs": 6,
+      "wallNanoseconds": {
+        "medianPairedRatio": 1.0052366780745068,
+        "medianPairedReductionPercent": -0.5236678074506784,
+        "pairedCandidateOverBaseline": [
+          1.0416119036769602,
+          1.0029902152672356,
+          1.007483140881778,
+          0.8790290309446336,
+          1.0266645849130014,
+          0.9988297655701527
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 32567.9895,
+            "median": 28390.447874999998,
+            "min": 27626.0
+          },
+          "candidate": {
+            "max": 30104.84375,
+            "median": 28500.223875,
+            "min": 27832.72925
+          }
+        }
+      }
+    },
+    "dated-forward": {
+      "checksum": "6bdf38c56e56b525",
+      "cpuNanoseconds": {
+        "medianPairedRatio": 0.8678575699828954,
+        "medianPairedReductionPercent": 13.214243001710457,
+        "pairedCandidateOverBaseline": [
+          0.8913995074575602,
+          0.8241468521116335,
+          0.9152693768462512,
+          0.8470073593012208,
+          0.8313392347230154,
+          0.8887077806645699
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 45706.25,
+            "median": 35362.875,
+            "min": 34210.25
+          },
+          "candidate": {
+            "max": 40619.5,
+            "median": 30180.875,
+            "min": 29113.5
+          }
+        }
+      },
+      "iterationsPerProcess": 4000,
+      "pairs": 6,
+      "wallNanoseconds": {
+        "medianPairedRatio": 0.8680650628694806,
+        "medianPairedReductionPercent": 13.19349371305194,
+        "pairedCandidateOverBaseline": [
+          0.9770451728660162,
+          0.7800564680322161,
+          1.147479653008341,
+          0.8468139536531784,
+          0.8311437894682394,
+          0.8893161720857827
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 45820.8335,
+            "median": 35432.765625,
+            "min": 34694.5
+          },
+          "candidate": {
+            "max": 40836.54175,
+            "median": 31885.786500000002,
+            "min": 29124.1355
+          }
+        }
+      }
+    },
+    "dated-invalid": {
+      "checksum": "5b701797cf0d6cfc",
+      "cpuNanoseconds": {
+        "medianPairedRatio": 0.8350280694868594,
+        "medianPairedReductionPercent": 16.497193051314063,
+        "pairedCandidateOverBaseline": [
+          1.0025745202944607,
+          0.851358231414122,
+          0.8102178812922615,
+          0.815067045534603,
+          0.8186979075595967,
+          0.8989899850841679
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 29331.25,
+            "median": 21862.75,
+            "min": 21291.5
+          },
+          "candidate": {
+            "max": 26368.5,
+            "median": 18185.125,
+            "min": 17354.0
+          }
+        }
+      },
+      "iterationsPerProcess": 4000,
+      "pairs": 6,
+      "wallNanoseconds": {
+        "medianPairedRatio": 0.8462469641262003,
+        "medianPairedReductionPercent": 15.375303587379975,
+        "pairedCandidateOverBaseline": [
+          1.0112238081175504,
+          0.8737132257593653,
+          0.8125949287695636,
+          0.8152700717444168,
+          0.8187807024930354,
+          0.9004278508020126
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 29351.9375,
+            "median": 21960.760374999998,
+            "min": 21290.54175
+          },
+          "candidate": {
+            "max": 26429.302,
+            "median": 18523.619749999998,
+            "min": 17357.5415
+          }
+        }
+      }
+    },
+    "dated-reverse": {
+      "checksum": "b770486b7d2ffcd9",
+      "cpuNanoseconds": {
+        "medianPairedRatio": 0.8503875561727695,
+        "medianPairedReductionPercent": 14.961244382723049,
+        "pairedCandidateOverBaseline": [
+          0.8370345747931036,
+          0.8572430611094358,
+          0.7987928367009515,
+          0.876318542411298,
+          0.8435320512361032,
+          0.9347683749205454
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 52309.75,
+            "median": 37893.375,
+            "min": 34413.0
+          },
+          "candidate": {
+            "max": 48897.5,
+            "median": 31424.5,
+            "min": 29420.5
+          }
+        }
+      },
+      "iterationsPerProcess": 4000,
+      "pairs": 6,
+      "wallNanoseconds": {
+        "medianPairedRatio": 0.8599045040332206,
+        "medianPairedReductionPercent": 14.009549596677939,
+        "pairedCandidateOverBaseline": [
+          1.1129473987208638,
+          0.836599807600105,
+          0.7963720957543553,
+          0.8765952037067465,
+          0.8432138043596947,
+          0.935123114825486
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 55042.03125,
+            "median": 38507.859375,
+            "min": 34423.71875
+          },
+          "candidate": {
+            "max": 61258.8855,
+            "median": 31495.786500000002,
+            "min": 29435.53125
+          }
+        }
+      }
+    },
+    "dated-unicode": {
+      "checksum": "ffc6eb214d6c303f",
+      "cpuNanoseconds": {
+        "medianPairedRatio": 0.9236521590487886,
+        "medianPairedReductionPercent": 7.634784095121139,
+        "pairedCandidateOverBaseline": [
+          0.8000637567846447,
+          0.949740997839901,
+          0.9263517013083523,
+          0.9209526167892249,
+          0.9959469089613397,
+          0.8904220137031821
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 31598.5,
+            "median": 23530.875,
+            "min": 22203.5
+          },
+          "candidate": {
+            "max": 28136.0,
+            "median": 22502.125,
+            "min": 20568.25
+          }
+        }
+      },
+      "iterationsPerProcess": 4000,
+      "pairs": 6,
+      "wallNanoseconds": {
+        "medianPairedRatio": 0.9258015305194889,
+        "medianPairedReductionPercent": 7.419846948051112,
+        "pairedCandidateOverBaseline": [
+          0.8048327156466268,
+          1.0461519894100395,
+          0.9312897465348706,
+          0.9203133145041071,
+          0.9963797484553176,
+          0.9096182973503809
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 31810.573,
+            "median": 23646.041624999998,
+            "min": 22228.15625
+          },
+          "candidate": {
+            "max": 28935.47925,
+            "median": 23546.974000000002,
+            "min": 20700.854
+          }
+        }
+      }
+    },
+    "episodes": {
+      "checksum": "73fd20b8fe692bf7",
+      "cpuNanoseconds": {
+        "medianPairedRatio": 0.8138327281899242,
+        "medianPairedReductionPercent": 18.616727181007576,
+        "pairedCandidateOverBaseline": [
+          0.8079484321899809,
+          0.8197170241898677,
+          0.8252500107300742,
+          0.8350788280383541,
+          0.7989192950565914,
+          0.8022063631178443
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 36340.5,
+            "median": 35412.0,
+            "min": 34948.5
+          },
+          "candidate": {
+            "max": 29741.75,
+            "median": 28836.875,
+            "min": 28128.75
+          }
+        }
+      },
+      "iterationsPerProcess": 4000,
+      "pairs": 6,
+      "wallNanoseconds": {
+        "medianPairedRatio": 0.810178538879843,
+        "medianPairedReductionPercent": 18.9821461120157,
+        "pairedCandidateOverBaseline": [
+          0.5563458499860032,
+          0.8194828160829499,
+          0.8273784180472179,
+          0.8350248568815657,
+          0.7969869580450878,
+          0.8008742616767363
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 52802.15625,
+            "median": 35473.25525,
+            "min": 35002.625
+          },
+          "candidate": {
+            "max": 29760.52075,
+            "median": 28902.53125,
+            "min": 28138.60425
+          }
+        }
+      }
+    },
+    "movies": {
+      "checksum": "84f2e41486f0f3f2",
+      "cpuNanoseconds": {
+        "medianPairedRatio": 0.9501297406450959,
+        "medianPairedReductionPercent": 4.987025935490408,
+        "pairedCandidateOverBaseline": [
+          1.0152405467779158,
+          0.9210999394744211,
+          0.9727373696835071,
+          0.9251090386865713,
+          0.9711974140266632,
+          0.9290620672635288
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 36468.5,
+            "median": 27919.625,
+            "min": 26759.75
+          },
+          "candidate": {
+            "max": 33881.5,
+            "median": 26072.25,
+            "min": 25490.75
+          }
+        }
+      },
+      "iterationsPerProcess": 4000,
+      "pairs": 6,
+      "wallNanoseconds": {
+        "medianPairedRatio": 0.950346344331976,
+        "medianPairedReductionPercent": 4.965365566802404,
+        "pairedCandidateOverBaseline": [
+          1.043577216828911,
+          0.917590018354567,
+          0.9836149654143758,
+          0.9272610893576908,
+          0.9734315993062611,
+          0.6840078990795225
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 50069.125,
+            "median": 28015.140625,
+            "min": 26758.771
+          },
+          "candidate": {
+            "max": 34247.677,
+            "median": 26274.911500000002,
+            "min": 25496.15625
+          }
+        }
+      }
+    },
+    "tags": {
+      "checksum": "cbfb6982a4691210",
+      "cpuNanoseconds": {
+        "medianPairedRatio": 0.9039754829281592,
+        "medianPairedReductionPercent": 9.602451707184079,
+        "pairedCandidateOverBaseline": [
+          0.9039374940628859,
+          0.8999859947439097,
+          0.9635435893649661,
+          0.9449991801934743,
+          0.9040134717934325,
+          0.9018288338215501
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 37893.0,
+            "median": 31038.0,
+            "min": 30345.75
+          },
+          "candidate": {
+            "max": 34173.0,
+            "median": 29090.75,
+            "min": 27310.75
+          }
+        }
+      },
+      "iterationsPerProcess": 4000,
+      "pairs": 6,
+      "wallNanoseconds": {
+        "medianPairedRatio": 0.9029652356519134,
+        "medianPairedReductionPercent": 9.703476434808655,
+        "pairedCandidateOverBaseline": [
+          0.9006399340520939,
+          0.8955025695727513,
+          0.9565186848743175,
+          0.9455919262828678,
+          0.9032713196352091,
+          0.9026591516686178
+        ],
+        "perOperation": {
+          "baseline": {
+            "max": 37932.323,
+            "median": 31327.77075,
+            "min": 30499.26025
+          },
+          "candidate": {
+            "max": 34239.9585,
+            "median": 29132.375125,
+            "min": 27327.78125
+          }
+        }
+      }
+    }
+  }
+}
