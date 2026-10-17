@@ -89,6 +89,14 @@ errors. **Cross-module optimization is not enabled.** The driver loads its input
 from a file at runtime; the compiler cannot precompute conversion from fixture
 constants or inspect the converter body across the module boundary.
 
+Fixture `Data` is loaded once per process. Inside each warmup or measured
+iteration's autorelease pool, the driver decodes a **fresh `String`** from that
+data before the conversion timer starts. Each newly decoded string is converted
+once, matching production's source lifetime while warming code and the runtime.
+The input string stays alive through result consumption and is released after
+timing; no previously converted string value is reused. Source lifetime is
+recorded in the manifest, raw timing rows, and summary.
+
 The differential executable combines complete baseline and candidate files. Its
 only baseline adaptation renames the enum declaration to
 `BaselineExternalTextSubtitleConverter`; the exact one-line transformation and
@@ -119,7 +127,7 @@ median of paired candidate/baseline ratios. It does not estimate tail latency
 from this small cohort.
 
 `clock_gettime(CLOCK_MONOTONIC)` brackets **each full `convert` call**. Fixture
-construction, file I/O, source/fixture hashing, warmup, output UTF-8 counting,
+construction, file I/O, source/fixture hashing, per-iteration UTF-8 decoding, warmup, output UTF-8 counting,
 output checksum consumption, and returned-string destruction are outside the
 timer. On macOS, each warmup and measured iteration runs inside an autorelease
 pool, drained after consumption and after the conversion timer stops; Linux

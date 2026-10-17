@@ -42,7 +42,6 @@ enum ConversionBenchmark {
                 fatalError("measure FIXTURE_PATH FORMAT ITERATIONS WARMUPS")
             }
             let data = try Data(contentsOf: URL(fileURLWithPath: args[2]))
-            guard let source = String(data: data, encoding: .utf8) else { fatalError("Invalid UTF-8") }
             let productionFormat: ExternalTextSubtitleConverter.Format = format == .srt ? .srt : .webVTT
             var expectedDigest: String?
             var outputBytes = 0
@@ -55,13 +54,19 @@ enum ConversionBenchmark {
             }
             for _ in 0..<warmups {
                 try scopedAutoreleasePool {
+                    guard let source = String(data: data, encoding: .utf8) else { fatalError("Invalid UTF-8") }
                     consume(try ExternalTextSubtitleConverter.convert(source, format: productionFormat))
+                    withExtendedLifetime(source) {}
                 }
             }
             var observations: [UInt64] = []
             observations.reserveCapacity(iterations)
             for _ in 0..<iterations {
                 try scopedAutoreleasePool {
+                    // Production converts a newly decoded String once. Reuse
+                    // fixture Data, but do not reuse a warmed String value or
+                    // its representation/bridging/index caches across calls.
+                    guard let source = String(data: data, encoding: .utf8) else { fatalError("Invalid UTF-8") }
                     let start = monotonicNanoseconds()
                     let output = try ExternalTextSubtitleConverter.convert(source, format: productionFormat)
                     let elapsed = monotonicNanoseconds() - start
@@ -69,6 +74,7 @@ enum ConversionBenchmark {
                     // autorelease-pool draining all follow the conversion timer.
                     consume(output)
                     observations.append(elapsed)
+                    withExtendedLifetime(source) {}
                 }
             }
             let total = observations.reduce(UInt64(0), +)
@@ -79,6 +85,7 @@ enum ConversionBenchmark {
                 "input_bytes": data.count, "output_bytes": outputBytes,
                 "output_fnv1a64": expectedDigest!, "format": format.rawValue,
                 "timer": "clock_gettime(CLOCK_MONOTONIC)",
+                "source_lifetime": "Fresh String decoded from preloaded Data before each conversion; decoding excluded; code/runtime warmed",
             ])
         default: fatalError("Unknown operation: \(args[1])")
         }

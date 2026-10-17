@@ -19,6 +19,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PRODUCTION = "Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift"
 FLAGS = ["-O", "-whole-module-optimization", "-swift-version", "6", "-warnings-as-errors", "-parse-as-library"]
+SOURCE_LIFETIME = "Fresh String decoded from preloaded Data before each conversion; decoding excluded; code/runtime warmed"
 
 
 def sha(data: bytes) -> str:
@@ -31,6 +32,9 @@ def write_json(path: Path, value: object) -> None:
 
 def summarize(output: Path) -> dict:
     rows = [json.loads(line) for line in (output / "measurements.jsonl").read_text().splitlines()]
+    source_lifetimes = {row.get("source_lifetime", "Preloaded String reused across warmups and timed conversions (legacy cohort)") for row in rows}
+    if len(source_lifetimes) != 1:
+        raise ValueError("Timing rows mix different source lifetimes")
     grouped: dict[str, dict[int, dict]] = {}
     for row in rows:
         grouped.setdefault(row["workload"], {}).setdefault(row["sample"], {})[row["variant"]] = row
@@ -63,6 +67,7 @@ def summarize(output: Path) -> dict:
         }
     summary = {
         "scope": "Full in-memory SRT/WebVTT conversion elapsed latency; not player startup, rendering, footprint or energy",
+        "source_lifetime": next(iter(source_lifetimes)),
         "unit_of_replication": "Fresh process per variant/workload/sample; repeated conversions averaged within each process",
         "workloads": result,
     }
@@ -92,6 +97,7 @@ class Runner:
             "python": platform.python_version(), "logical_cpu_count": os.cpu_count(),
             "swiftc": self.swiftc, "swift_version": self.command([self.swiftc, "--version"], "compiler-version").strip(),
             "compiler_flags": FLAGS, "cross_module_optimization": False,
+            "source_lifetime": SOURCE_LIFETIME,
             "settings": {"samples": args.samples, "iterations": args.iterations, "warmups": args.warmups,
                          "random_cases": args.random_cases, "seed": str(args.seed)},
             "source_snapshots": {}, "binaries": {},
