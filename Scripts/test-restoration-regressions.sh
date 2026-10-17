@@ -7,6 +7,7 @@ work="$(mktemp -d "${TMPDIR:-/tmp}/illiquid-regressions.XXXXXX")"
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/Sources/IlliquidCore" "$work/Tests/IlliquidCoreTests"
 for file in \
+    MediaLibrary/MediaNameRecognition.swift \
     Player/MediaTrack.swift \
     Player/ThumbnailPolicy.swift \
     Player/ThumbnailPassCursor.swift \
@@ -15,7 +16,7 @@ for file in \
     Persistence/LegacyPreferencesMigration.swift; do
     cp "$root/Sources/IlliquidCore/$file" "$work/Sources/IlliquidCore/"
 done
-for file in TrackRestorationRegressionTests InterruptedMigrationRegressionTests ThumbnailSchedulingPolicyRegressionTests; do
+for file in MediaNameRecognitionTests TrackRestorationRegressionTests InterruptedMigrationRegressionTests ThumbnailSchedulingPolicyRegressionTests; do
     cp "$root/Tests/IlliquidCoreTests/$file.swift" "$work/Tests/IlliquidCoreTests/"
 done
 cat > "$work/Package.swift" <<'SWIFT'

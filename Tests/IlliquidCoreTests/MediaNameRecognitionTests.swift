@@ -34,6 +34,33 @@ struct MediaNameRecognitionTests {
         #expect(MediaNameRecognition.recognize(relativePath: "News - 2023-02-29.mkv").kind == .unknown)
     }
 
+    @Test(arguments: [
+        "20２４-02-29", "2024-０２-29", "2024-02-２９", "20２４-０２-２９",
+        "29.02.20２４", "29.０２.2024", "２９.02.2024", "２９.０２.20２４",
+        "20٢٤-02-29", "2024-٠٢-29", "2024-02-٢٩",
+        "29.02.20٢٤", "29.٠٢.2024", "٢٩.02.2024",
+        "2024-०२-29", "२९.02.2024",
+        "2024-𝟘𝟚-29", "𝟚𝟡.02.2024"
+    ])
+    func datesWithNonASCIIDigitsStayIntact(_ date: String) {
+        let filename = "News - \(date) - Headlines"
+        let media = MediaNameRecognition.recognize(relativePath: filename + ".mkv")
+        #expect(media.kind == .unknown)
+        #expect(media.title == filename)
+        #expect(media.displayName == filename)
+        #expect(media.year == nil)
+        #expect(media.airDate == nil)
+    }
+
+    @Test(arguments: ["2024-02-29", "29.02.2024"])
+    func datedEpisodesPreserveUnicodeTitles(_ date: String) {
+        let media = MediaNameRecognition.recognize(relativePath: "📰 世界のニュース - \(date) - 今日の話題.mkv")
+        #expect(media.kind == .episode)
+        #expect(media.title == "📰 世界のニュース")
+        #expect(media.airDate == "2024-02-29")
+        #expect(media.episodeTitle == "今日の話題")
+    }
+
     @Test func moviesEditionsAndVersions() {
         let media = MediaNameRecognition.recognize(relativePath:
             "Movies/Blade Runner (1982) {imdb-tt0083658}/Blade.Runner.1982.{edition-Final Cut}.part2.2160p.HEVC.mkv")
