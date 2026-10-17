@@ -1,0 +1,80 @@
+{
+  "arguments": {
+    "cases": "all",
+    "cpu": 2,
+    "kernels": "style_miss,init_score",
+    "list_cases": false,
+    "output": "Benchmarks/AdaptiveTextLegibility/evidence/final",
+    "receipt_samples": 320,
+    "receipts_only": false,
+    "rounds": 8,
+    "swiftc": "swiftc",
+    "target_ms": 150.0,
+    "tests_only": false
+  },
+  "baseline": {
+    "commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+    "sha256": "f6c312edecdf8861e3f915689eef4d938447bddd28a751304151a36511e84b90",
+    "source": "Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift"
+  },
+  "binary_sha256": {
+    "IlliquidCore": "8e959c10e9f22a055944052942bc15f53e4436c5a4cc99c8187e0af9a9f820a0",
+    "baseline": "5eabc726379863970fb72ba38429a6b760604d7a93654faf8a2248e716d34f1e",
+    "candidate": "b6dfad344ab56f323c10a8d47c6a714a1c4c5b33c9f8649840ef50693e03de46"
+  },
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "environment": {
+    "allowed_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "logical_cpu_count": 9,
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14"
+  },
+  "flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-module-cache-path",
+    "/tmp/illiquid-legibility-i2tuo2ft/swift-module-cache"
+  ],
+  "git_head": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "runner_sha256": "76fd413125acf8966e98a2381efa9e733fe468d7d0aa3cd5439ca376ccbf6fc9",
+  "scope": "Numeric style cache miss: context init+resolve, second context init+two readableOpacity calls (.96/.90). Excludes UI, sample generation/region extraction, cache lookup, video decode.",
+  "sources": {
+    "Driver.swift": {
+      "original": "Benchmarks/AdaptiveTextLegibility/Driver.swift",
+      "sha256": "dd83754193c49af8027bc9d39df09993b3ac2a4389a4f31db4d43c20efec7bd0"
+    },
+    "PlayerTheme.swift": {
+      "original": "Sources/IlliquidApp/UI/PlayerTheme.swift",
+      "sha256": "333630303cbd6725d4140fa3358035f0b005f2052392c1933bc06cdf00464e1d"
+    },
+    "VideoColorSample.swift": {
+      "original": "Sources/IlliquidCore/Player/VideoColorSample.swift",
+      "sha256": "e296cb8ddb45850b8c6356bdec8b6f128e22fe48119bc5c24c6c42f1e32fad06"
+    },
+    "baseline.swift": {
+      "original": "Benchmarks/AdaptiveTextLegibility/baseline/AdaptiveTextLegibility.swift",
+      "sha256": "f6c312edecdf8861e3f915689eef4d938447bddd28a751304151a36511e84b90"
+    },
+    "candidate.swift": {
+      "original": "Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift",
+      "sha256": "bbec0383526b1688c46e2e10bc6929774473d8e43e294134dff7fab77a206359"
+    },
+    "run.py": {
+      "original": "Benchmarks/AdaptiveTextLegibility/run.py",
+      "sha256": "76fd413125acf8966e98a2381efa9e733fe468d7d0aa3cd5439ca376ccbf6fc9"
+    }
+  },
+  "support_sha256": "e1474131ed52562b0e2a4800bfa36c6aa5a3f028fddf55ff50ad108de15c0e03"
+}
