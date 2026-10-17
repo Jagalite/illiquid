@@ -19,6 +19,10 @@ jobs:
           persist-credentials: false
       - run: bash Scripts/test-restoration-regressions.sh
       - run: bash Scripts/test-external-subtitle-regressions.sh
+      - name: Run deterministic recovery regressions (debug)
+        run: bash Scripts/test-renderer-recovery.sh
+      - name: Run deterministic recovery regressions (release)
+        run: bash Scripts/test-renderer-recovery.sh --configuration release
       - run: python3 -m unittest discover -s Validation/ReleaseQualification -p 'test_*.py' -v
   native-lifecycle:
     runs-on: macos-26
@@ -41,4 +45,4 @@ jobs:
       - name: Build app graph and run targeted regressions
         run: |
           swift test --force-resolved-versions --filter \
-            'TrackRestorationRegressionTests|InterruptedMigrationRegressionTests|ThumbnailSchedulingPolicyRegressionTests|ThumbnailLifecycleRegressionTests|ThumbnailBackgroundSchedulerTests|LegacyPreferencesMigrationTests|DeferredHistoryStoreTests|DeferredPersistenceWriterTests|IdempotentPersistenceTests|PlaybackStatePublicationTests|NonDecodePerformanceTests|QueuedThumbnailPromotionTests|ThumbnailInventoryRegressionTests|ThumbnailPhysicalEntryTests|ThumbnailPromotionMailboxTests|NativeThumbnailCacheTests|ExternalTextSubtitleConverterTests|ExternalSubtitleEncodingTests'
+            'TrackRestorationRegressionTests|InterruptedMigrationRegressionTests|ThumbnailSchedulingPolicyRegressionTests|ThumbnailLifecycleRegressionTests|ThumbnailBackgroundSchedulerTests|LegacyPreferencesMigrationTests|DeferredHistoryStoreTests|DeferredPersistenceWriterTests|IdempotentPersistenceTests|PlaybackStatePublicationTests|NonDecodePerformanceTests|QueuedThumbnailPromotionTests|ThumbnailInventoryRegressionTests|ThumbnailPhysicalEntryTests|ThumbnailPromotionMailboxTests|NativeThumbnailCacheTests|ExternalTextSubtitleConverterTests|ExternalSubtitleEncodingTests|RendererRecoveryRegressionTests'

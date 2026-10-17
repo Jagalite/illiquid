@@ -236,7 +236,8 @@ public struct PlaybackCore: Sendable {
       session.phase != .probing,
       session.phase != .configuring,
       session.phase != .stopping,
-      session.phase != .stopped
+      session.phase != .stopped,
+      session.phase != .failed
     else {
       return (.invalid(reason: "transportNotReady"), [])
     }
@@ -495,6 +496,9 @@ public struct PlaybackCore: Sendable {
     guard var session = state.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
+    guard session.phase != .failed else {
+      return (.stale(reason: .operationMismatch), [])
+    }
     let directives = session.synchronization.observe(event)
     if session.synchronization.isBuffering {
       session.phase = .buffering
@@ -556,6 +560,9 @@ public struct PlaybackCore: Sendable {
     guard var session = state.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
+    guard session.phase != .failed else {
+      return (.stale(reason: .operationMismatch), [])
+    }
     let desiredRate: Int32 = session.desiredTransport == .playing ? state.playbackMilliRate : 0
     let directive = session.lifecycleState.observe(
       event,
@@ -590,6 +597,9 @@ public struct PlaybackCore: Sendable {
     guard var session = state.activeSession else {
       return (.invalid(reason: "drainRequiresSession"), [])
     }
+    guard session.phase != .failed else {
+      return (.stale(reason: .operationMismatch), [])
+    }
     if let loop = state.loopRange, loop.sessionID == session.id,
       session.desiredTransport == .playing, session.seek == nil {
       return beginSeek(target: loop.start, mode: .exact)
@@ -613,6 +623,12 @@ public struct PlaybackCore: Sendable {
     guard var session = state.activeSession else {
       return (.stale(reason: .sessionMismatch), [])
     }
+    // A queued observation is not a user retry. In particular, do not erase
+    // the terminal error or interrupt teardown by starting another recovery.
+    guard session.phase != .failed,
+      session.phase != .stopping,
+      session.phase != .stopped
+    else { return (.stale(reason: .operationMismatch), []) }
     guard let operationID = state.allocator.allocateOperation() else {
       return allocationFailure()
     }
@@ -971,6 +987,22 @@ public struct PlaybackCore: Sendable {
       !authorityIsCurrent(record.effect.context.authority)
     {
       return (.stale(reason: staleAuthorityReason(record.effect.context.authority)), [])
+    }
+
+    // Terminal failure does not necessarily advance session authority. Retire
+    // late playback results without allowing them to clear the error, resume,
+    // or issue more work. A pending replacement has its own session authority;
+    // persistence and resource cleanup must still be able to settle.
+    if !record.effect.isCleanup,
+      state.activeSession?.phase == .failed,
+      authorityMatchesActiveSession(record.effect.context.authority)
+    {
+      switch record.effect.kind {
+      case .persistCheckpoint, .cancelSession, .releaseLease, .mirrorDiagnostic:
+        break
+      default:
+        return (.stale(reason: .operationMismatch), [])
+      }
     }
 
     return apply(result: result, to: record.effect)
@@ -1585,6 +1617,9 @@ public struct PlaybackCore: Sendable {
   ) -> (EventDisposition, [PlaybackEffect]) {
     guard var session = state.activeSession else {
       return (.stale(reason: .expiredDeadline), [])
+    }
+    guard session.phase != .failed else {
+      return (.stale(reason: .operationMismatch), [])
     }
     guard session.activeOperationID == operationID else {
       return (.stale(reason: .operationMismatch), [])

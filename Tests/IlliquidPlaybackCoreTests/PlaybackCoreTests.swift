@@ -846,6 +846,39 @@ struct PlaybackCoreTests {
   }
 
   @Test
+  func presentationRecoveryBudgetSurvivesRevisionAdvances() {
+    let failure = PlaybackFailure(
+      domain: .presentation,
+      stage: .enqueue,
+      stableCode: "requiresFlushToResumeDecoding",
+      recoverability: .retryable
+    )
+    var recovery = RecoveryMachineState()
+    let session = PlaybackSessionID(rawValue: 1)
+    let initial = PlaybackRevisionSet(
+      presentation: PresentationRevisionID(rawValue: 8),
+      presentationGraph: PresentationGraphRevisionID(rawValue: 3)
+    )
+    #expect(recovery.classify(failure, sessionID: session, revisions: initial)
+      == .flushAndReprimePresentation(revision: PresentationRevisionID(rawValue: 9)))
+
+    // The core commits revision 9 when dispatching the recovery flush.
+    let afterFlush = PlaybackRevisionSet(
+      presentation: PresentationRevisionID(rawValue: 9),
+      presentationGraph: PresentationGraphRevisionID(rawValue: 3)
+    )
+    #expect(recovery.classify(failure, sessionID: session, revisions: afterFlush)
+      == .rebuildPresentationGraph(revision: PresentationGraphRevisionID(rawValue: 4)))
+
+    let afterRebuild = PlaybackRevisionSet(
+      presentation: PresentationRevisionID(rawValue: 9),
+      presentationGraph: PresentationGraphRevisionID(rawValue: 4)
+    )
+    #expect(recovery.classify(failure, sessionID: session, revisions: afterRebuild)
+      == .failTerminal)
+  }
+
+  @Test
   func synchronizationOwnsPrerollBufferingDriftAndRateAcknowledgment() throws {
     var synchronization = SynchronizationMachineState(desiredMilliRate: 1_000)
     _ = synchronization.observe(.require([.video, .audio]))
