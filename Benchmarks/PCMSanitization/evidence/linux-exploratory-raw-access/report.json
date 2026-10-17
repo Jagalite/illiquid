@@ -1,0 +1,677 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "--version"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.09156796200113604,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "1d762e32f31ac0d0550e913ae47faf3b2ca9c548411ab9ec48a84588438d92cf"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548:Sources/IlliquidNativePlayback/Media/AudioDecoder.swift"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.0034790789941325784,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "2554d8452a63992b30142679de1a09f45ba7bc8b1f6020cbad1e975a4503682e"
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-cache-path",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/module-cache",
+        "-module-name",
+        "IlliquidNativePlayback",
+        "-emit-object",
+        "-emit-module",
+        "-emit-module-path",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/IlliquidNativePlayback.swiftmodule",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/Sanitizer.swift",
+        "-o",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/IlliquidNativePlayback.o"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 1.2624001080039307,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-cache-path",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/module-cache",
+        "-I",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/Harness.swift",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/IlliquidNativePlayback.o",
+        "-o",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/benchmark"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 2.859082747003413,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-cache-path",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/module-cache",
+        "-module-name",
+        "IlliquidNativePlayback",
+        "-emit-object",
+        "-emit-module",
+        "-emit-module-path",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/IlliquidNativePlayback.swiftmodule",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/Sanitizer.swift",
+        "-o",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/IlliquidNativePlayback.o"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.3782045810003183,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-cache-path",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/module-cache",
+        "-I",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/Harness.swift",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/IlliquidNativePlayback.o",
+        "-o",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/benchmark"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 2.8041560999990907,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/benchmark",
+        "--verify"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 3.854216075997101,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "61545dc6994904181f2918c8537b2b0d2d306609caf674b1e60451c876e4965d"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/benchmark",
+        "--verify"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 3.88422026400076,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "61545dc6994904181f2918c8537b2b0d2d306609caf674b1e60451c876e4965d"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/benchmark",
+        "--iterations",
+        "512"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.5224490620021243,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "ffbb7df337eaa3e22aa9df715f798ef856a8bc8b7ed313bdb983d1019fb02f49"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/benchmark",
+        "--iterations-file",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/iterations.json",
+        "--cases-file",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/cases.json"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.5483581360022072,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "2073eed0b86e266a3a0675eaf694833d008069189459f67e3108f1f23fbf4d12"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/benchmark",
+        "--iterations-file",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/iterations.json",
+        "--cases-file",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/cases.json"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.503835446004814,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "d4263d67d2118636420b3a16046ccb08c6119a3b00069a840e138f1b9f19d5e2"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/benchmark",
+        "--iterations-file",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/iterations.json",
+        "--cases-file",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/cases.json",
+        "--reverse"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.5365649109953665,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "b8da2432b3073a3b53ed6dd551980a8541a1ee446e727bf046d77aa5d04bb957"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/benchmark",
+        "--iterations-file",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/iterations.json",
+        "--cases-file",
+        "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/cases.json",
+        "--reverse"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.5520791509989067,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "befb5f32b91bfb0ae45b1be6fdc300d997423e7f1a684955cb3764451bc28247"
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.0026622119985404424,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "d5bcddc5aa41ce0112d2450577b46a41acc16f136a87ed809b4dfac1ab044924"
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--short",
+        "--",
+        "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift",
+        "Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift",
+        "Benchmarks/PCMSanitization"
+      ],
+      "cwd": "/workspace/scratch/8c644fa96010/illiquid-pcm",
+      "elapsed_seconds": 0.0034646690037334338,
+      "returncode": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "cb2dba6fed52d3d328802816645bcd4a450e194da8f962f9fd334a87459d72b1"
+    }
+  ],
+  "environment": {
+    "affinity": [
+      4
+    ],
+    "candidate_git_head": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+    "candidate_git_status": [
+      " M Sources/IlliquidNativePlayback/Media/AudioDecoder.swift",
+      "?? Benchmarks/PCMSanitization/",
+      "?? Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift"
+    ],
+    "controlled_environment": {
+      "ASAN_OPTIONS": null,
+      "CLANG_MODULE_CACHE_PATH": "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/module-cache",
+      "LD_LIBRARY_PATH": "/tmp/illiquid-swift-toolchain/dependencies/usr/lib/x86_64-linux-gnu",
+      "SWIFT_MODULECACHE_PATH": "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/module-cache"
+    },
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "libc": [
+      "glibc",
+      "2.39"
+    ],
+    "logical_cpus": 9,
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+  },
+  "error": null,
+  "finished_at_utc": "2026-10-17T15:41:08.932640+00:00",
+  "invocation": [
+    "Benchmarks/PCMSanitization/run.py",
+    "--mode",
+    "benchmark",
+    "--exploratory",
+    "--pairs",
+    "2",
+    "--target-ms",
+    "30",
+    "--swiftc",
+    "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+    "--output",
+    "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory",
+    "--case",
+    "healthy_sine/1024x2",
+    "--case",
+    "healthy_sine/1024x8",
+    "--case",
+    "dense_invalid/1024x2",
+    "--case",
+    "dense_invalid/1024x8",
+    "--case",
+    "subnormals/1024x2",
+    "--case",
+    "subnormals/1024x8",
+    "--case",
+    "dense_restore_control/1024x2",
+    "--case",
+    "dense_restore_control/1024x8",
+    "--case",
+    "subnormal_restore_control/1024x2",
+    "--case",
+    "subnormal_restore_control/1024x8"
+  ],
+  "results": {
+    "benchmark": {
+      "balanced_order": true,
+      "cases": 10,
+      "fresh_processes": 4,
+      "measurement_records": 40,
+      "pairs": 2,
+      "raw_sha256": "42e79fa8786c1aa960806db4856df6ba0de893f121962568f0f00e8fa3797bf1",
+      "summary": [
+        {
+          "baseline_median_cpu_ns": 2006.894379621072,
+          "baseline_median_ns": 2006.5219212107208,
+          "baseline_samples_ns": [
+            1957.5631353974122,
+            2055.4807070240295
+          ],
+          "candidate_median_cpu_ns": 492.466612754159,
+          "candidate_median_ns": 492.1299965341959,
+          "candidate_samples_ns": [
+            438.6354551756007,
+            545.6245378927912
+          ],
+          "case": "healthy_sine/1024x2",
+          "iterations_per_process": 17312,
+          "median_paired_cpu_reduction_percent": 75.51125454412951,
+          "median_paired_ratio": 0.24476040912521335,
+          "median_paired_reduction_percent": 75.52395908747866,
+          "paired_cpu_ratios": [
+            0.22428787807857603,
+            0.2654870310388337
+          ],
+          "paired_ratios": [
+            0.2240721881425049,
+            0.2654486301079218
+          ],
+          "pairs": 2
+        },
+        {
+          "baseline_median_cpu_ns": 2821.6130736714977,
+          "baseline_median_ns": 2821.833735909823,
+          "baseline_samples_ns": [
+            2926.330112721417,
+            2717.3373590982287
+          ],
+          "candidate_median_cpu_ns": 3116.0573671497586,
+          "candidate_median_ns": 3115.8164251207727,
+          "candidate_samples_ns": [
+            3055.299214975845,
+            3176.3336352657007
+          ],
+          "case": "dense_invalid/1024x2",
+          "iterations_per_process": 9936,
+          "median_paired_cpu_reduction_percent": -10.665261419962446,
+          "median_paired_ratio": 1.1064929711998337,
+          "median_paired_reduction_percent": -10.64929711998337,
+          "paired_cpu_ratios": [
+            1.0443529360651322,
+            1.1689522923341167
+          ],
+          "paired_ratios": [
+            1.0440719595146735,
+            1.1689139828849937
+          ],
+          "pairs": 2
+        },
+        {
+          "baseline_median_cpu_ns": 3737.089602803738,
+          "baseline_median_ns": 3736.8216121495325,
+          "baseline_samples_ns": [
+            3736.4683411214955,
+            3737.17488317757
+          ],
+          "candidate_median_cpu_ns": 4323.594684579439,
+          "candidate_median_ns": 4323.211507009346,
+          "candidate_samples_ns": [
+            4132.89964953271,
+            4513.523364485981
+          ],
+          "case": "subnormals/1024x2",
+          "iterations_per_process": 8560,
+          "median_paired_cpu_reduction_percent": -15.693589160100485,
+          "median_paired_ratio": 1.1569172956825997,
+          "median_paired_reduction_percent": -15.691729568259971,
+          "paired_cpu_ratios": [
+            1.1061707731601034,
+            1.2077010100419066
+          ],
+          "paired_ratios": [
+            1.106097863602459,
+            1.2077367277627407
+          ],
+          "pairs": 2
+        },
+        {
+          "baseline_median_cpu_ns": 1231.1909575272066,
+          "baseline_median_ns": 1231.243765114873,
+          "baseline_samples_ns": [
+            1185.9354972793228,
+            1276.5520329504232
+          ],
+          "candidate_median_cpu_ns": 1227.5752153869407,
+          "candidate_median_ns": 1227.484507255139,
+          "candidate_samples_ns": [
+            1162.7098322249094,
+            1292.2591822853688
+          ],
+          "case": "dense_restore_control/1024x2",
+          "iterations_per_process": 26464,
+          "median_paired_cpu_reduction_percent": 0.3524929966610246,
+          "median_paired_ratio": 0.9963600491935791,
+          "median_paired_reduction_percent": 0.36399508064208774,
+          "paired_cpu_ratios": [
+            0.9804580514968927,
+            1.0124920885698867
+          ],
+          "paired_ratios": [
+            0.9804157434298106,
+            1.0123043549573476
+          ],
+          "pairs": 2
+        },
+        {
+          "baseline_median_cpu_ns": 1587.7986688440224,
+          "baseline_median_ns": 1587.6860154394299,
+          "baseline_samples_ns": [
+            1638.3044833729216,
+            1537.0675475059381
+          ],
+          "candidate_median_cpu_ns": 1590.344517022961,
+          "candidate_median_ns": 1590.2090756136186,
+          "candidate_samples_ns": [
+            1553.726543942993,
+            1626.691607284244
+          ],
+          "case": "subnormal_restore_control/1024x2",
+          "iterations_per_process": 20208,
+          "median_paired_cpu_reduction_percent": -0.33575832545280626,
+          "median_paired_ratio": 1.0033415923235223,
+          "median_paired_reduction_percent": -0.3341592323522269,
+          "paired_cpu_ratios": [
+            0.9483738632370394,
+            1.0583413032720166
+          ],
+          "paired_ratios": [
+            0.9483747128276176,
+            1.0583084718194269
+          ],
+          "pairs": 2
+        },
+        {
+          "baseline_median_cpu_ns": 7387.599040354331,
+          "baseline_median_ns": 7388.096333661417,
+          "baseline_samples_ns": [
+            7287.721456692913,
+            7488.471210629921
+          ],
+          "candidate_median_cpu_ns": 1535.0520423228345,
+          "candidate_median_ns": 1577.5601624015749,
+          "candidate_samples_ns": [
+            1641.2374507874015,
+            1513.882874015748
+          ],
+          "case": "healthy_sine/1024x8",
+          "iterations_per_process": 4064,
+          "median_paired_cpu_reduction_percent": 79.19742528019701,
+          "median_paired_ratio": 0.2136838249263471,
+          "median_paired_reduction_percent": 78.63161750736529,
+          "paired_cpu_ratios": [
+            0.2253414845179501,
+            0.19071000987810974
+          ],
+          "paired_ratios": [
+            0.2252058425312233,
+            0.2021618073214709
+          ],
+          "pairs": 2
+        },
+        {
+          "baseline_median_cpu_ns": 9863.376862582782,
+          "baseline_median_ns": 9862.334644039734,
+          "baseline_samples_ns": [
+            9379.922599337748,
+            10344.746688741721
+          ],
+          "candidate_median_cpu_ns": 13724.169701986755,
+          "candidate_median_ns": 13722.856167218542,
+          "candidate_samples_ns": [
+            11304.25165562914,
+            16141.460678807947
+          ],
+          "case": "dense_invalid/1024x8",
+          "iterations_per_process": 2416,
+          "median_paired_cpu_reduction_percent": -38.2738832050737,
+          "median_paired_ratio": 1.3827537226666125,
+          "median_paired_reduction_percent": -38.27537226666124,
+          "paired_cpu_ratios": [
+            1.2051301329391257,
+            1.5603475311623485
+          ],
+          "paired_ratios": [
+            1.2051540442804138,
+            1.5603534010528108
+          ],
+          "pairs": 2
+        },
+        {
+          "baseline_median_cpu_ns": 14225.351501937985,
+          "baseline_median_ns": 14223.352228682172,
+          "baseline_samples_ns": [
+            14504.074612403101,
+            13942.62984496124
+          ],
+          "candidate_median_cpu_ns": 15807.183624031008,
+          "candidate_median_ns": 15804.845687984496,
+          "candidate_samples_ns": [
+            16060.950096899225,
+            15548.741279069767
+          ],
+          "case": "subnormals/1024x8",
+          "iterations_per_process": 2064,
+          "median_paired_cpu_reduction_percent": -11.127645326244417,
+          "median_paired_ratio": 1.1112674279392953,
+          "median_paired_reduction_percent": -11.126742793929534,
+          "paired_cpu_ratios": [
+            1.1073170396100502,
+            1.115235866914838
+          ],
+          "paired_ratios": [
+            1.1073405595393704,
+            1.1151942963392205
+          ],
+          "pairs": 2
+        },
+        {
+          "baseline_median_cpu_ns": 4209.955208333333,
+          "baseline_median_ns": 4211.737955729166,
+          "baseline_samples_ns": [
+            4268.489322916666,
+            4154.986588541667
+          ],
+          "candidate_median_cpu_ns": 4480.751497395833,
+          "candidate_median_ns": 4482.8458984375,
+          "candidate_samples_ns": [
+            4309.184765625,
+            4656.50703125
+          ],
+          "case": "dense_restore_control/1024x8",
+          "iterations_per_process": 7680,
+          "median_paired_cpu_reduction_percent": -6.510015408959102,
+          "median_paired_ratio": 1.0651185927692255,
+          "median_paired_reduction_percent": -6.511859276922549,
+          "paired_cpu_ratios": [
+            1.0095389957167031,
+            1.1206613124624787
+          ],
+          "paired_ratios": [
+            1.0095339216358932,
+            1.1207032639025578
+          ],
+          "pairs": 2
+        },
+        {
+          "baseline_median_cpu_ns": 5377.940972222223,
+          "baseline_median_ns": 5377.0105860433605,
+          "baseline_samples_ns": [
+            5269.835535230352,
+            5484.185636856369
+          ],
+          "candidate_median_cpu_ns": 5973.510162601626,
+          "candidate_median_ns": 5972.878641598916,
+          "candidate_samples_ns": [
+            5743.674796747968,
+            6202.0824864498645
+          ],
+          "case": "subnormal_restore_control/1024x8",
+          "iterations_per_process": 5904,
+          "median_paired_cpu_reduction_percent": -11.033022089982424,
+          "median_paired_ratio": 1.110409235027015,
+          "median_paired_reduction_percent": -11.040923502701494,
+          "paired_cpu_ratios": [
+            1.08973176516989,
+            1.1309286766297586
+          ],
+          "paired_ratios": [
+            1.0899153793984395,
+            1.1309030906555904
+          ],
+          "pairs": 2
+        }
+      ],
+      "target_ms_per_baseline_case": 30.0
+    },
+    "build": {
+      "binaries": {
+        "baseline": {
+          "build_fingerprint": "31bae0a76dbe9e16de0b2d93838c43a2e3699a86805e4c5d62843f5b97bfb5e3",
+          "path": "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/baseline/benchmark",
+          "sha256": "a92564ee8a65833fb90b1d4a4b0e2ed2374863bf8124f7ba42c4984e33b980f0"
+        },
+        "candidate": {
+          "build_fingerprint": "e8af8bc21cc1941e57d569b5a8b6ca9b86e9afce83a386ddeee7da3bdd4009a0",
+          "path": "/workspace/scratch/8c644fa96010/pcm-unaligned-exploratory/candidate/benchmark",
+          "sha256": "f85eb93880f815b3e74dd48fc550466eb0c361bef781cec83f80acf0ed113e3a"
+        }
+      },
+      "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-enable-testing"
+      ],
+      "harness_sha256": "cca767a35ef09bfb3023bc3a80ea53d0440048c764e8f23e81646ebfd321c880",
+      "runner_sha256": "8e32a1f2fbf1ca665a774da2468c9fab3a59aaa12dc318ef382de649461160c2",
+      "sources": {
+        "baseline": {
+          "declarations": {
+            "AudioSampleSanitizationResult": "723e8e2a4c4f3cc84b9be853573303eebd7a0380ed1cf85cd04af6c73fd221f2",
+            "sanitizeInterleavedFloatPCM": "7262c800fb645a985cd052db1e0b48dceae169aeb0148eca861d3e74dbbd4796"
+          },
+          "files": {
+            "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+              "bytes": 18503,
+              "sha256": "2554d8452a63992b30142679de1a09f45ba7bc8b1f6020cbad1e975a4503682e"
+            }
+          },
+          "generated": {
+            "Sanitizer.swift": "202ce4f34118c63521c1d1f440562b9825659860d98d6906402f68578a9dd06b"
+          },
+          "revision": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+          "source_kind": "git_revision"
+        },
+        "candidate": {
+          "declarations": {
+            "AudioSampleSanitizationResult": "723e8e2a4c4f3cc84b9be853573303eebd7a0380ed1cf85cd04af6c73fd221f2",
+            "sanitizeInterleavedFloatPCM": "e9b319576c4a8c1c8a5de6c5d5f58f17fb90b4bec3e556334625848fd7648f7c"
+          },
+          "files": {
+            "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+              "bytes": 20477,
+              "sha256": "e8825bfd1dab808470f237f011d74f9d711cf39f8b492760f9f55185d526b918"
+            }
+          },
+          "generated": {
+            "Sanitizer.swift": "8db8a71d81a65fb14f4cfda4d37e45c3e5fcad3c96028c8f8bb93e29c5da6787"
+          },
+          "revision": null,
+          "source_kind": "working_tree"
+        }
+      }
+    },
+    "verification": {
+      "cases": 55,
+      "compared_output_bytes": 28904816,
+      "exact_byte_equality": true,
+      "inputs": 880,
+      "output_sha256": "d9ddcde6e2a8443e1b1d811e82edb6db41d1c57bf17bd85950ff87ada7251955",
+      "restoration_and_shared_alias_checks": true
+    }
+  },
+  "runner_sha256": "8e32a1f2fbf1ca665a774da2468c9fab3a59aaa12dc318ef382de649461160c2",
+  "scope": "Exact portable PCM sanitation component work. Dirty envelopes include restoration and expose restore-only controls; shared cases include Data COW. No audio decoding, resampling, playback, app-level CPU, or memory claim.",
+  "started_at_utc": "2026-10-17T15:40:43.136402+00:00"
+}

@@ -1,0 +1,61 @@
+# Complete Linux PCM sanitization results
+
+55 cases, six balanced pairs, 660 observations. Times are separate medians; percentages are median paired reductions. Positive means less time, negative means more time. See the research report for measured operation boundaries and limitations.
+
+| Case | Baseline µs | Candidate µs | Wall reduction | Process CPU reduction |
+| --- | ---: | ---: | ---: | ---: |
+| `healthy_sine/1024x1` | 1.005 | 0.281 | +72.8% | +72.8% |
+| `silence/1024x1` | 0.986 | 0.270 | +72.3% | +72.3% |
+| `sparse_invalid/1024x1` | 1.194 | 0.474 | +60.6% | +60.6% |
+| `dense_invalid/1024x1` | 1.491 | 1.668 | -7.8% | -7.8% |
+| `subnormals/1024x1` | 2.013 | 2.089 | -4.2% | -4.2% |
+| `shared_healthy/1024x1` | 1.144 | 0.401 | +65.3% | +65.2% |
+| `sparse_restore_control/1024x1` | 0.243 | 0.243 | +2.7% | +2.7% |
+| `dense_restore_control/1024x1` | 0.709 | 0.717 | +0.7% | +0.7% |
+| `subnormal_restore_control/1024x1` | 0.861 | 0.865 | +0.8% | +0.8% |
+| `healthy_sine/1024x2` | 1.870 | 0.462 | +75.1% | +75.1% |
+| `silence/1024x2` | 1.813 | 0.459 | +74.7% | +74.7% |
+| `sparse_invalid/1024x2` | 2.028 | 0.661 | +67.4% | +67.4% |
+| `dense_invalid/1024x2` | 2.627 | 2.978 | -13.5% | -13.5% |
+| `subnormals/1024x2` | 3.603 | 3.836 | -7.4% | -7.4% |
+| `shared_healthy/1024x2` | 1.986 | 0.602 | +70.1% | +70.1% |
+| `sparse_restore_control/1024x2` | 0.240 | 0.241 | -1.6% | -1.6% |
+| `dense_restore_control/1024x2` | 1.179 | 1.150 | +1.4% | +2.0% |
+| `subnormal_restore_control/1024x2` | 1.515 | 1.478 | +3.5% | +3.5% |
+| `healthy_sine/1024x6` | 5.371 | 1.067 | +81.3% | +81.3% |
+| `silence/1024x6` | 5.314 | 1.128 | +78.3% | +78.3% |
+| `sparse_invalid/1024x6` | 5.583 | 1.375 | +76.9% | +76.9% |
+| `dense_invalid/1024x6` | 7.634 | 8.550 | -12.0% | -12.0% |
+| `subnormals/1024x6` | 10.732 | 11.127 | -7.1% | -7.1% |
+| `shared_healthy/1024x6` | 5.771 | 1.589 | +72.5% | +72.5% |
+| `sparse_restore_control/1024x6` | 0.241 | 0.243 | -1.0% | -1.0% |
+| `dense_restore_control/1024x6` | 3.154 | 3.138 | +0.8% | +0.8% |
+| `subnormal_restore_control/1024x6` | 4.001 | 4.157 | -1.5% | -1.5% |
+| `healthy_sine/1024x8` | 7.003 | 1.508 | +78.5% | +78.5% |
+| `silence/1024x8` | 7.069 | 1.573 | +77.1% | +77.1% |
+| `sparse_invalid/1024x8` | 7.379 | 1.779 | +75.6% | +75.6% |
+| `dense_invalid/1024x8` | 9.940 | 11.058 | -12.2% | -12.3% |
+| `subnormals/1024x8` | 13.987 | 14.739 | -8.1% | -8.2% |
+| `shared_healthy/1024x8` | 8.000 | 2.198 | +72.6% | +72.6% |
+| `sparse_restore_control/1024x8` | 0.254 | 0.244 | +5.4% | +5.4% |
+| `dense_restore_control/1024x8` | 4.250 | 3.987 | +0.3% | +0.3% |
+| `subnormal_restore_control/1024x8` | 5.396 | 5.243 | +0.9% | +0.9% |
+| `healthy_sine/4096x8` | 27.633 | 5.709 | +79.7% | +79.7% |
+| `silence/4096x8` | 30.228 | 5.908 | +80.7% | +80.7% |
+| `sparse_invalid/4096x8` | 28.363 | 6.297 | +78.5% | +78.5% |
+| `dense_invalid/4096x8` | 38.481 | 43.095 | -11.3% | -11.3% |
+| `subnormals/4096x8` | 55.478 | 56.925 | -1.8% | -1.8% |
+| `shared_healthy/4096x8` | 32.470 | 8.221 | +74.7% | +74.7% |
+| `sparse_restore_control/4096x8` | 0.326 | 0.314 | +2.3% | +2.3% |
+| `dense_restore_control/4096x8` | 15.687 | 15.388 | +2.7% | +2.7% |
+| `subnormal_restore_control/4096x8` | 20.831 | 20.387 | +3.1% | +3.1% |
+| `tiny_tail/0` | 0.085 | 0.086 | -2.0% | -2.1% |
+| `tiny_restore_control/0` | 0.063 | 0.061 | +3.6% | +3.6% |
+| `tiny_tail/1` | 0.191 | 0.195 | +1.6% | +1.6% |
+| `tiny_restore_control/1` | 0.170 | 0.175 | -1.1% | -1.0% |
+| `tiny_tail/7` | 0.319 | 0.302 | +3.5% | +3.5% |
+| `tiny_restore_control/7` | 0.243 | 0.247 | +0.5% | +0.5% |
+| `tiny_tail/8` | 0.315 | 0.309 | +1.4% | +1.4% |
+| `tiny_restore_control/8` | 0.244 | 0.252 | +1.9% | +1.9% |
+| `tiny_tail/9` | 0.306 | 0.305 | +0.5% | +0.5% |
+| `tiny_restore_control/9` | 0.250 | 0.242 | -0.1% | -0.1% |

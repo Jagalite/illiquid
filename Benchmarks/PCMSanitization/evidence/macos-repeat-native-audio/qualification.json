@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "qualification": "Native app/audio repeat after correcting the legacy sanitizer selector",
+  "repository": "Jagalite/illiquid",
+  "source_head": "0152643c280572ca7b10b07a5991c26e75824e4b",
+  "tested_merge_commit": "921e4f243a8c859391ce7efc5923a6553dc2701a",
+  "baseline_commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "run_id": 39056657414,
+  "job_id": 117465890854,
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/39056657414/job/117465890854",
+  "result": "success",
+  "reported_tests": 23,
+  "reported_suites": 5,
+  "build_duration_seconds": 199.33,
+  "legacy_test_explicitly_started_and_passed": "audioSanitizationZerosInvalidSamplesOnly",
+  "log": {
+    "path": "job.log",
+    "bytes": 133946,
+    "sha256": "55d4e2fb26eadfec33910116e6f91f8ee07f589123ad21bd7d32aa41e4f72fce",
+    "source": "GitHub completed job log"
+  },
+  "artifact": {
+    "id": 12109816301,
+    "name": "pcm-sanitization-native-audio",
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39056657414/artifacts/12109816301"
+  },
+  "fixture_qualification": {
+    "note": "The workflow does not generate media fixtures or set ILLIQUID_NATIVE_FIXTURE_DIR. These three existing methods return early without their required fixture and are included in the reported pass count; their playback assertions are not qualification evidence.",
+    "methods": [
+      "pausedMutedSessionSubmitsNegotiatedPCMAndShutsDown",
+      "extremeOffsetsPrepareSeekAndReleaseWithoutVideoBackpressure",
+      "runtimeDelayReplacementPublishesCommittedValueAndStopWins"
+    ],
+    "observed_coverage": "The remaining selected tests cover the new sanitizer, legacy basic sanitizer, in-memory FFmpeg decoding/resampling, channel layouts/sample buffers, and audio-delay timeline behavior."
+  }
+}

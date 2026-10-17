@@ -1,0 +1,97 @@
+Test Suite 'All tests' started at 2026-10-17 11:43:30.727
+Test Suite 'release.xctest' started at 2026-10-17 11:43:30.731
+Test Suite 'release.xctest' passed at 2026-10-17 11:43:30.731
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-17 11:43:30.731
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+
+=================================================================
+==119970==ERROR: LeakSanitizer: detected memory leaks
+
+Indirect leak of 192 byte(s) in 2 object(s) allocated from:
+    #0 0x563614c14854  (/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageTests.xctest+0xf3854) (BuildId: a579070f15bd89ca128567cc2d0dd3466c8823f5)
+    #1 0x7fb647b97a6e  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fa6e) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #2 0x7fb647b97dc6  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fdc6) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #3 0x7fb64633ac25  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libXCTest.so+0x2cc25) (BuildId: adc8f53f5733b9962c9ea58eaed07eb36ab83f97)
+
+Indirect leak of 48 byte(s) in 1 object(s) allocated from:
+    #0 0x563614c14854  (/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageTests.xctest+0xf3854) (BuildId: a579070f15bd89ca128567cc2d0dd3466c8823f5)
+    #1 0x7fb647b97a6e  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fa6e) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #2 0x7fb647b97dc6  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fdc6) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #3 0x7fb64633463f  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libXCTest.so+0x2663f) (BuildId: adc8f53f5733b9962c9ea58eaed07eb36ab83f97)
+
+Indirect leak of 48 byte(s) in 1 object(s) allocated from:
+    #0 0x563614c14854  (/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageTests.xctest+0xf3854) (BuildId: a579070f15bd89ca128567cc2d0dd3466c8823f5)
+    #1 0x7fb647b97a6e  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fa6e) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #2 0x7fb647b97dc6  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fdc6) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #3 0x7fb646334718  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libXCTest.so+0x26718) (BuildId: adc8f53f5733b9962c9ea58eaed07eb36ab83f97)
+
+Indirect leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x563614c14854  (/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageTests.xctest+0xf3854) (BuildId: a579070f15bd89ca128567cc2d0dd3466c8823f5)
+    #1 0x7fb647b97a6e  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fa6e) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #2 0x7fb647b97dc6  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fdc6) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #3 0x7fb64788ccea  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x164cea) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #4 0x7fb647a15f18  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x2edf18) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #5 0x7fb64633abb3  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libXCTest.so+0x2cbb3) (BuildId: adc8f53f5733b9962c9ea58eaed07eb36ab83f97)
+
+Indirect leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x563614c14854  (/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageTests.xctest+0xf3854) (BuildId: a579070f15bd89ca128567cc2d0dd3466c8823f5)
+    #1 0x7fb647b97a6e  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fa6e) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #2 0x7fb647b97dc6  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x46fdc6) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #3 0x7fb64788ccea  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x164cea) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #4 0x7fb647a15f18  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libswiftCore.so+0x2edf18) (BuildId: 7338a3c81c5415f0377dee2eec7895c59ddff670)
+    #5 0x7fb646334767  (/tmp/illiquid-swift-6.3.2/usr/lib/swift/linux/libXCTest.so+0x26767) (BuildId: adc8f53f5733b9962c9ea58eaed07eb36ab83f97)
+
+SUMMARY: AddressSanitizer: 368 byte(s) leaked in 6 allocation(s).
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Audio sample sanitization" started.
+◇ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() started.
+◇ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() started.
+◇ Test everyDirtyLaneAndShortTailMatchesScalarClassification() started.
+◇ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() started.
+◇ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() started.
+◇ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() started.
+◇ Test unalignedExternalStorageAndPartialTailMatchReference() started.
+◇ Test incompleteTrailingBytesRemainUntouched() started.
+✔ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() passed after 0.004 seconds.
+✔ Test unalignedExternalStorageAndPartialTailMatchReference() passed after 0.004 seconds.
+✔ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() passed after 0.005 seconds.
+✔ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() passed after 0.005 seconds.
+✔ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() passed after 0.005 seconds.
+✔ Test incompleteTrailingBytesRemainUntouched() passed after 0.004 seconds.
+✔ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() passed after 0.008 seconds.
+✔ Test everyDirtyLaneAndShortTailMatchesScalarClassification() passed after 0.022 seconds.
+✔ Suite "Audio sample sanitization" passed after 0.023 seconds.
+✔ Test run with 8 tests in 1 suite passed after 0.024 seconds.
+Building for production...
+[0/9] Write sources
+[2/9] Write swift-version--393CCDFAED8FB69E.txt
+[4/10] Compiling IlliquidNativePlayback Sanitizer.swift
+[5/11] Compiling IlliquidNativePlaybackTests AudioSampleSanitizationTests.swift
+/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift:117:13: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+115 |             var slice = backing[prefixCount..<(prefixCount + payload.count)]
+116 |             #expect(slice.startIndex == prefixCount)
+117 |             withExtendedLifetime(backing) {
+    |             `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+118 |                 expectReferenceResult(&slice, scenario: "slice-prefix-\(prefixCount)")
+119 |             }
+
+/workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/Tests/IlliquidNativePlaybackTests/AudioSampleSanitizationTests.swift:153:13: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+151 |             let snapshot = data
+152 |             let originalBytes = Array(snapshot)
+153 |             withExtendedLifetime(snapshot) {
+    |             `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+154 |                 expectReferenceResult(&data, scenario: "retained snapshot")
+155 |             }
+[5/11] /workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/11] Write sources
+[8/12] Compiling PCMSanitizationValidationPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+[8/12] /workspace/scratch/8c644fa96010/pcm-address-sanitizer/tests-candidate/build/x86_64-unknown-linux-gnu/release/PCMSanitizationValidationPackageTests.derived/runner.swift
+[9/12] Write sources
+[11/13] Compiling PCMSanitizationValidationPackageTests runner.swift
+[11/13] Write Objects.LinkFileList
+/usr/bin/ld.gold: warning: Cannot export local symbol '__asan_extra_spill_area'
+[12/13] Linking PCMSanitizationValidationPackageTests.xctest
+Build complete! (13.08s)
