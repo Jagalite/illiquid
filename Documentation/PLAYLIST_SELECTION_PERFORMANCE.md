@@ -6,9 +6,10 @@ Caching the current URL's canonical identity within one
 `PlaylistMutation.indexPreservingCurrentIdentity` invocation reduced component
 selection time by **45.0–51.1%** for the measured middle, last, and missing
 selection cases at 100, 1,000, and 10,000 items. These are the medians of eight
-paired time reductions for each case. The publication cohort ran on Linux;
-macOS timing and Foundation qualification are pending the accompanying workflow.
-No whole-application, playback, or frame-rate improvement is claimed.
+paired time reductions for each case. The publication cohort ran on Linux.
+The focused macOS component workflow subsequently passed; its original artifact
+and the limits of its inspection are recorded below. No whole-application,
+playback, or frame-rate improvement is claimed.
 
 The production change is confined to
 [`PlaylistMutation.swift`](../Sources/IlliquidCore/Playlist/PlaylistMutation.swift).
@@ -164,6 +165,36 @@ complete run evidence. Native results should be evaluated using that run's
 recorded toolchain, actual corpus count, and measurements. A passing component
 workflow does not constitute a full application build or physical-device
 playback test; neither was run in this Linux environment.
+
+## Native qualification
+
+The [focused macOS run](https://github.com/Jagalite/illiquid/actions/runs/39071244395)
+completed successfully on 2026-10-17 at 21:40:57 UTC, on macOS 26.6.2 with the
+`macos-26-arm64` image and Xcode 26.6. The test-and-measure step completed every
+requested workload and size, reached the runner's audited completion path, and
+uploaded its evidence. The runner requires both variants' debug/release tests,
+complete baseline/candidate parity, matched timing-pair outputs, and receipt
+integrity checks before reporting completion.
+
+The tested checkout was GitHub merge commit
+`8c37d371342ebd948397562df04a4014d4f806c2`, merging the production change
+`f7e490297bec7dd79edd704d115eda2661ff26ff` into the pinned main baseline.
+This later report update changes no production, test, or benchmark code.
+
+The [original native artifact](https://github.com/Jagalite/illiquid/actions/runs/39071244395/artifacts/12115636846)
+is `playlist-selection-evidence`, artifact ID `12115636846`, containing 1,234
+files in a 561,754-byte ZIP. GitHub's artifact metadata and upload log both
+report SHA-256
+`5c72b00e912bbd4b466b89d5abc94b20c79a1bf5ef10d96241ced2910cfae007`.
+Its configured expiration is 2026-10-24 at 21:40:50 UTC.
+
+The native ZIP was retrieved through the GitHub connector, but the local
+execution service disconnected before its contents could be inspected. Native
+timing statistics and the downloaded ZIP digest have therefore not been
+independently checked in this session. The successful native workflow qualifies
+the component's automated gates; all numerical speedup claims in this report
+remain the fully inspected Linux cohort. The original native artifact is linked
+for review, and no native speedup estimate is inferred from the Linux numbers.
 
 ## Complete case medians
 
