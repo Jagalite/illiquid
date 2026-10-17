@@ -1,0 +1,342 @@
+{
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "swift": "Swift version 6.2.1 (swift-6.2.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "method": "Fresh processes; one excluded warm-up pair per fixture; alternating pair order; warm local filesystem; discover-only timer.",
+  "driver_blob": "9d7050068b9c09d602e49d95d26f18038c68b133",
+  "source_blobs": {
+    "baseline": {
+      "Playlist/ExternalSubtitleMatcher.swift": "235144b4871c356ff005c60ed7a42ac71a621192",
+      "Playlist/FolderPlaylist.swift": "b2fe49ea21a1d38bd1a8ae9dea2936ef34d6d206",
+      "Playlist/FolderPlaylistDiscovery.swift": "e507e9b1c1a7179d7f31f4e8bdfcc4deeb9e82a2",
+      "Playlist/PlaylistMutation.swift": "585e7a75bc1f2e080323509626482540d14d0b75",
+      "Utilities/MediaFileSupport.swift": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+      "Utilities/NaturalFilenameOrdering.swift": "3e31506bdec552337ce25dfeaf54da2afc6e6c1d",
+      "Utilities/NormalizedFileURL.swift": "ee5bb383869da68ec1f2cd842ae766603f7ef419"
+    },
+    "candidate": {
+      "Playlist/ExternalSubtitleMatcher.swift": "235144b4871c356ff005c60ed7a42ac71a621192",
+      "Playlist/FolderPlaylist.swift": "b2fe49ea21a1d38bd1a8ae9dea2936ef34d6d206",
+      "Playlist/FolderPlaylistDiscovery.swift": "da37f7ca86db7e3e5e7ed5f2626585dec72ec672",
+      "Playlist/PlaylistMutation.swift": "585e7a75bc1f2e080323509626482540d14d0b75",
+      "Utilities/MediaFileSupport.swift": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+      "Utilities/NaturalFilenameOrdering.swift": "3e31506bdec552337ce25dfeaf54da2afc6e6c1d",
+      "Utilities/NormalizedFileURL.swift": "ee5bb383869da68ec1f2cd842ae766603f7ef419"
+    }
+  },
+  "all_receipts_equal": true,
+  "base_commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "rounds": [
+    -1,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "first_variant_by_round": [
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline",
+    "candidate",
+    "baseline"
+  ],
+  "warmup_round": -1,
+  "fixtures": {
+    "empty": {
+      "summary": {
+        "baseline": {
+          "median_ms": 1.118399,
+          "min_ms": 0.974711,
+          "max_ms": 1.915583
+        },
+        "candidate": {
+          "median_ms": 1.274424,
+          "min_ms": 1.041703,
+          "max_ms": 1.524521
+        },
+        "candidate_delta_percent": 13.950745664114518,
+        "media_count": 0
+      },
+      "receipt_sha256": "3152f95e70fc58e8efffb7c75b2a6e123e6d438fde3bf6c670b94380352956dd",
+      "baseline_nanoseconds": [
+        1358401,
+        1231309,
+        1317018,
+        1348115,
+        1118399,
+        1915583,
+        1052078,
+        1059630,
+        989084,
+        974711
+      ],
+      "candidate_nanoseconds": [
+        4619194,
+        1291019,
+        1274424,
+        1524521,
+        1358190,
+        1139650,
+        1043926,
+        1073551,
+        1041703,
+        1350699
+      ]
+    },
+    "small": {
+      "summary": {
+        "baseline": {
+          "median_ms": 2.573246,
+          "min_ms": 2.32465,
+          "max_ms": 8.172153
+        },
+        "candidate": {
+          "median_ms": 2.459323,
+          "min_ms": 2.327384,
+          "max_ms": 3.352121
+        },
+        "candidate_delta_percent": -4.427209835359703,
+        "media_count": 3
+      },
+      "receipt_sha256": "9782325c69b7ade5f364acabbe89c34343750a845a11430a43bc3bb94e12a0ac",
+      "baseline_nanoseconds": [
+        2568599,
+        2371811,
+        3030565,
+        2324650,
+        2573246,
+        2571332,
+        2639245,
+        2604742,
+        2454536,
+        8172153
+      ],
+      "candidate_nanoseconds": [
+        2371451,
+        2697002,
+        2355086,
+        2429638,
+        2328565,
+        2327384,
+        2459323,
+        2643181,
+        2762220,
+        3352121
+      ]
+    },
+    "media-only": {
+      "summary": {
+        "baseline": {
+          "median_ms": 49.034431,
+          "min_ms": 46.282556,
+          "max_ms": 58.480603
+        },
+        "candidate": {
+          "median_ms": 48.131138,
+          "min_ms": 46.023566,
+          "max_ms": 50.611913
+        },
+        "candidate_delta_percent": -1.8421606646154332,
+        "media_count": 250
+      },
+      "receipt_sha256": "e057ab4916deb3a77f9f44cca93527d8935fb2996834f14d4c8852fc33d7b6d7",
+      "baseline_nanoseconds": [
+        57789184,
+        49034431,
+        47435958,
+        46282556,
+        46518142,
+        49935723,
+        58480603,
+        46964766,
+        55631030,
+        52096404
+      ],
+      "candidate_nanoseconds": [
+        51083795,
+        46023566,
+        48541938,
+        50611913,
+        47728729,
+        48184808,
+        50520114,
+        48131138,
+        47230718,
+        47618033
+      ]
+    },
+    "mixed": {
+      "summary": {
+        "baseline": {
+          "median_ms": 508.140478,
+          "min_ms": 473.478445,
+          "max_ms": 533.537272
+        },
+        "candidate": {
+          "median_ms": 218.335758,
+          "min_ms": 199.792391,
+          "max_ms": 238.36034
+        },
+        "candidate_delta_percent": -57.03240197290482,
+        "media_count": 25
+      },
+      "receipt_sha256": "8ffbe73f3a5a225e17f460b349331a8eb92fba03df6dc1dc871384bd8774f99c",
+      "baseline_nanoseconds": [
+        526191132,
+        533537272,
+        525855589,
+        490851636,
+        508140478,
+        505579342,
+        492590776,
+        523196862,
+        521457936,
+        473478445
+      ],
+      "candidate_nanoseconds": [
+        215599643,
+        220762011,
+        227381641,
+        222162486,
+        218335758,
+        238360340,
+        199792391,
+        200513211,
+        210365474,
+        200620564
+      ]
+    },
+    "unsupported-only": {
+      "summary": {
+        "baseline": {
+          "median_ms": 497.839815,
+          "min_ms": 482.05022,
+          "max_ms": 525.160202
+        },
+        "candidate": {
+          "median_ms": 199.877311,
+          "min_ms": 195.669188,
+          "max_ms": 206.125046
+        },
+        "candidate_delta_percent": -59.85107960880951,
+        "media_count": 0
+      },
+      "receipt_sha256": "4fd4c4f969c3a566540e28ed9685a8336bd52cb97b3ad5232355a6dd7905a211",
+      "baseline_nanoseconds": [
+        529742130,
+        493228881,
+        497675557,
+        525160202,
+        495584118,
+        482050220,
+        497839815,
+        502544695,
+        520191001,
+        501569214
+      ],
+      "candidate_nanoseconds": [
+        217107150,
+        197049010,
+        206125046,
+        200205777,
+        202370496,
+        196671360,
+        195972685,
+        195669188,
+        203517734,
+        199877311
+      ]
+    },
+    "subtitle-heavy": {
+      "summary": {
+        "baseline": {
+          "median_ms": 127.237801,
+          "min_ms": 118.914102,
+          "max_ms": 155.439176
+        },
+        "candidate": {
+          "median_ms": 82.978099,
+          "min_ms": 80.455008,
+          "max_ms": 89.306133
+        },
+        "candidate_delta_percent": -34.78502587450407,
+        "media_count": 25
+      },
+      "receipt_sha256": "dd33a45ae1ff187e29aceab6c2fbb305e74ad50a65a55e65181a7519a34c5732",
+      "baseline_nanoseconds": [
+        121870977,
+        124324242,
+        155439176,
+        123308899,
+        118914102,
+        129323320,
+        127237801,
+        129739148,
+        129932069,
+        125867952
+      ],
+      "candidate_nanoseconds": [
+        84599888,
+        81854742,
+        82678485,
+        87264835,
+        82242347,
+        80455008,
+        86367706,
+        88216168,
+        82978099,
+        89306133
+      ]
+    },
+    "symlink-rich": {
+      "summary": {
+        "baseline": {
+          "median_ms": 42.351421,
+          "min_ms": 40.020211,
+          "max_ms": 50.353004
+        },
+        "candidate": {
+          "median_ms": 43.017077,
+          "min_ms": 40.399554,
+          "max_ms": 55.283549
+        },
+        "candidate_delta_percent": 1.5717441924793851,
+        "media_count": 100
+      },
+      "receipt_sha256": "3bac2a0fe2ecaf4b302e43c9923f3eb37ef9ebbec0c2ca94fade2152814db208",
+      "baseline_nanoseconds": [
+        48462489,
+        43111869,
+        50353004,
+        43966349,
+        41997017,
+        40020211,
+        40488168,
+        42403430,
+        41915904,
+        42351421
+      ],
+      "candidate_nanoseconds": [
+        43107203,
+        45627989,
+        42353495,
+        42982294,
+        43685857,
+        41591974,
+        40399554,
+        45416951,
+        55283549,
+        43017077
+      ]
+    }
+  }
+}
