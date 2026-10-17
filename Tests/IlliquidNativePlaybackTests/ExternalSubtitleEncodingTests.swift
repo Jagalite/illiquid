@@ -116,7 +116,8 @@ struct ExternalSubtitleEncodingTests {
         let source = header + "00:00:01\(separator)000 --> 00:00:02\(separator)000\nCaption"
         let input = Data(source.utf8)
         try withSubtitleFile(extension: fileExtension, data: input) { url in
-            #expect(try SubtitlePipeline.prepareExternalData(url: url).count > input.count)
+            let converted = try SubtitlePipeline.prepareExternalData(url: url)
+            #expect(converted.count > input.count)
             #expect(throws: PresentationError.self) {
                 _ = try SubtitlePipeline.prepareExternalData(url: url, maximumBytes: input.count)
             }
