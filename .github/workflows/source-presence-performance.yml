@@ -1,0 +1,100 @@
+name: Source presence performance
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceMediaPresence*.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaPresence*.swift'
+      - 'Benchmarks/SourceMediaPresence/**'
+      - 'Scripts/test-source-presence-regressions.sh'
+      - '.github/workflows/source-presence-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-presence-performance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Run deterministic debug and release regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/source-presence"
+          set -o pipefail
+          bash Scripts/test-source-presence-regressions.sh --jobs 2 -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/source-presence/tests-debug.txt"
+          bash Scripts/test-source-presence-regressions.sh -c release --jobs 2 -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/source-presence/tests-release.txt"
+      - name: Measure paired release publication workloads
+        run: |
+          python3 Benchmarks/SourceMediaPresence/run.py \
+            --pairs 10 --target-ms 30 \
+            --output "$RUNNER_TEMP/source-presence/benchmark"
+      - name: Summarize measured publication cost
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          result = json.loads((Path(os.environ["RUNNER_TEMP"]) / "source-presence/benchmark/summary.json").read_text())
+          lines = ["## Source presence publication benchmark", "",
+                   "Component timings exclude filesystem traversal and SwiftUI rendering.", "",
+                   "| Workload | Baseline median (ms) | Candidate median (ms) | Median paired speedup |",
+                   "| --- | ---: | ---: | ---: |"]
+          for row in result["cases"]:
+              lines.append(f'| {row["case"]} | {row["baseline"]["median"] / 1e6:.6f} | '
+                           f'{row["candidate"]["median"] / 1e6:.6f} | {row["median_paired_speedup"]:.2f}x |')
+          text = "\n".join(lines) + "\n"
+          print(text)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as output:
+              output.write(text)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-presence-component
+          path: |
+            ${{ runner.temp }}/source-presence/
+            !${{ runner.temp }}/source-presence/benchmark/build/**
+          retention-days: 14
+
+  native-scanner:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run source scanner regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/source-presence-native"
+          set -o pipefail
+          swift test --force-resolved-versions --filter \
+            'SourceMediaPresenceScannerTests|SourceMediaPresenceRecomputationTests' \
+            2>&1 | tee "$RUNNER_TEMP/source-presence-native/tests.txt"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-presence-native-scanner
+          path: ${{ runner.temp }}/source-presence-native/
+          retention-days: 14

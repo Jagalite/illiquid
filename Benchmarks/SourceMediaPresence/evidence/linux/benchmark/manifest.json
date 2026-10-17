@@ -1,0 +1,96 @@
+{
+  "arguments": {
+    "baseline_source": null,
+    "case": null,
+    "output": "Benchmarks/SourceMediaPresence/evidence/linux/benchmark",
+    "ownership": "shared",
+    "pairs": 10,
+    "quick": false,
+    "seeds": [
+      1,
+      17,
+      65
+    ],
+    "swiftc": null,
+    "target_ms": 30.0,
+    "tests_only": false,
+    "warmup": 2
+  },
+  "baseline_commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "baseline_source_sha256": "189923662492651098f89f5a4deebc7c9f8891ded3b30b339e183b36c7de26f5",
+  "binary_sha256": {
+    "baseline-debug": "589787bd18171dc36f674d195c8c4258c9759121916d8a2bcf6a243f6922d83a",
+    "baseline-release": "e4bb3ea475575c379f6c01b9c73cdf9bede6de81932d153824c3cd3cdf3f2c8b",
+    "candidate-debug": "8d662645bcba890db5e0fb84cdd4b5afc372791ab9d22ee955e2a39e50f3a11c",
+    "candidate-release": "1e75ceba6402694c83e5d3d839c1002d6e0f0eb0e1c5cd17f4dd5a2539d8d7e9"
+  },
+  "checkout_head": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "clock": "DispatchTime.now().uptimeNanoseconds; one bracket per publication",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "environment": {
+    "SWIFT_DETERMINISTIC_HASHING": "1"
+  },
+  "generated_sources": {
+    "baseline": {
+      "fragments": {
+        "publication_loop_sha256": "dc5c0eea3fcef011f4eb31aa15e049419b7dec6d4e576d3754a7483a15aa7445",
+        "recompute_sha256": "74f8d10b89f11dff4acd58629563981728bc6a613791172cf72dad92f49bfc1e",
+        "summary_sha256": "0e51200b4498bdb841aeba7c8dc59d8257de5328ba5640fe83f866325ecc6ecc"
+      },
+      "sha256": "f90fd2d0c47546ec7937d84cacfd26a8abea95edee4df13e8f9d8cd8e596aa45"
+    },
+    "candidate": {
+      "fragments": {
+        "publication_loop_sha256": "7170a585ec084e3770160d3751dbb6f0aa6dcb7019afe38a3e9bf5f40c665a53",
+        "recompute_sha256": "a663c56bfc3b35339a84ee51e2c28c853299c9ebfbd6ecb420dc68b3ebb909a5",
+        "summary_sha256": "0e51200b4498bdb841aeba7c8dc59d8257de5328ba5640fe83f866325ecc6ecc"
+      },
+      "sha256": "b58fb1bbb5a29883387cd59f5b114c0a061ea944c56138a3f6c571a300fa0b84"
+    }
+  },
+  "machine": "x86_64",
+  "ownership": "Initial result snapshot retained: first mutation CoW is timed",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "scope": "Actual publication ordering and recompute bodies, real Foundation and @MainActor @Observable result setters; no subscribed view. Excludes scanning, acceptance gates, async scheduling, fixture/reset work and verification.",
+  "source_snapshots": {
+    "baseline/SourceMediaPresenceScanner.swift": {
+      "bytes": 13938,
+      "git_blob_sha1": "8eb38b74b96e42bdd11a052839c390c56d974282",
+      "sha256": "189923662492651098f89f5a4deebc7c9f8891ded3b30b339e183b36c7de26f5"
+    },
+    "candidate/SourceMediaPresenceRecomputation.swift": {
+      "bytes": 1595,
+      "git_blob_sha1": "a23762e0e254837b020497b1676c45dab360629d",
+      "sha256": "5702a74a421ad1fe34107a51c64b623b118ef5f753c26cc1c1f4b9e41cf5da98"
+    },
+    "candidate/SourceMediaPresenceScanner.swift": {
+      "bytes": 13753,
+      "git_blob_sha1": "a0399a4baff787faac95634b02e3e4005f1462c2",
+      "sha256": "a90ba7735ac9790bf7f7d3aa42233f4558c7712b4e22cab9c9fff92d87a6db1b"
+    },
+    "harness/Driver.swift": {
+      "bytes": 8510,
+      "git_blob_sha1": "b8c88b26289dbff602f87c84fe1d572fff065947",
+      "sha256": "f3f0e412107ba5eca6ee27f460a1c702b7b58bb52a356bb27f95d80eb11a01f6"
+    },
+    "harness/run.py": {
+      "bytes": 17407,
+      "git_blob_sha1": "c7842f2431a259cec6122d3117605bac43e92f6f",
+      "sha256": "a6a3cef59bfd609bd57959bfc3a13f27168bbec21ab46b0595493001250fead5"
+    }
+  },
+  "started_utc": "2026-10-17T21:21:40Z"
+}
