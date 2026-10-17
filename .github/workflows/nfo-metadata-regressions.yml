@@ -1,0 +1,35 @@
+name: NFO metadata regressions
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Tests/IlliquidCoreTests/NFOMetadataFieldSelectionTests.swift'
+      - 'Scripts/test-nfo-metadata-regressions.py'
+      - '.github/workflows/nfo-metadata-regressions.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nfo-metadata-regressions-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  nfo-metadata:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Run real sidecar sources on macOS in debug and release
+        run: |
+          python3 Scripts/test-nfo-metadata-regressions.py --output "$RUNNER_TEMP/nfo-metadata/debug"
+          python3 Scripts/test-nfo-metadata-regressions.py --configuration release --output "$RUNNER_TEMP/nfo-metadata/release"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: nfo-metadata-regressions
+          path: ${{ runner.temp }}/nfo-metadata/
+          retention-days: 7

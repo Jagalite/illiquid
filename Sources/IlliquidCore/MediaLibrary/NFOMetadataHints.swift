@@ -42,14 +42,29 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
         if stack.count == 2, name == "uniqueid" { idProvider = attributeDict["type"] }
     }
 
+    // Only retain fields consumed by didEndElement. Long plots, outlines and
+    // other unsupported metadata must not invalidate useful identification hints.
+    // The whole-document byte and nesting limits still apply to every element.
+    private var capturesText: Bool {
+        guard stack.count == 2, let name = stack.last else { return false }
+        switch name {
+        case "title", "season", "episode", "uniqueid": return true
+        case "showtitle": return hints.content == .episode
+        case "year": return hints.content != .episode
+        default: return false
+        }
+    }
+
     func parser(_ parser: XMLParser, foundCharacters string: String) {
-        guard stack.count == 2 else { return }
+        guard capturesText else { return }
         guard text.count + string.count <= 4096 else { valid = false; parser.abortParsing(); return }
         text += string
     }
 
     func parser(_ parser: XMLParser, foundCDATA CDATABlock: Data) {
-        if let value = String(data: CDATABlock, encoding: .utf8) { self.parser(parser, foundCharacters: value) }
+        if capturesText, let value = String(data: CDATABlock, encoding: .utf8) {
+            self.parser(parser, foundCharacters: value)
+        }
     }
 
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
