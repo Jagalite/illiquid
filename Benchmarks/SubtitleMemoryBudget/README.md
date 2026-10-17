@@ -50,13 +50,15 @@ python3 Benchmarks/SubtitleMemoryBudget/run.py \
 ```
 
 In `evidence/cached-experiment`, the label `candidate` means this rejected
-prototype. In `evidence/final-linux`, `candidate` means the final production
-single-pass implementation. Each cohort has its own baseline, source identities,
-and compiler commands; compare variants within a cohort.
+prototype. In `evidence/final-linux` and `evidence/final-macos`, `candidate` means
+the final production single-pass implementation. Each cohort has its own baseline,
+source identities, and compiler commands; compare variants within a cohort.
 
 `evidence/validation` retains debug/release and original-source equivalence logs,
 plus a deliberately broken resize diff and the resulting failed test. Those
 files are evidence, not changes to apply to the player.
 
-The macOS workflow uploads equivalent platform-specific evidence separately.
+`evidence/final-macos` preserves the successful macOS Actions run's original
+manifest, observations, and summary, plus its run/artifact provenance.
+The macOS workflow also uploads platform-specific evidence on subsequent runs.
 Timings are informational; the workflow does not enforce a noisy speed threshold.

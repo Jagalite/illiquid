@@ -6,7 +6,7 @@ Date: October 17, 2026. Baseline: `8c3cc3d4008d5d1b8d436bcf2d51d891382b6548`.
 
 Adopt the small change in `SubtitleMemoryBudget`: return immediately for an unchanged, admitted resize, and accumulate total/owner reservations in one pass for acquisition and actual size changes. Keep the original reservation table and ownership model.
 
-The final optimized Linux Swift 6 experiment found 66–86% less time for unchanged resizes, 25–29% less for actual size changes, and 57–68% less for acquisition/release with 32–128 live leases. Small-count acquisition/release results were close to baseline, with overlapping ranges. These are component bookkeeping improvements. The absolute savings are fractions of a microsecond in most cases; whole-player CPU, responsiveness, physical memory and energy gains have not been measured.
+The final optimized macOS arm64 experiment found 61–81% less time for unchanged resizes, 23–41% less for actual size changes, and 51–62% less for acquisition/release with 32–128 live leases. Linux results corroborated those improvements. Small-count acquisition/release results were close to baseline, with overlapping ranges. These are component bookkeeping improvements. The absolute savings are fractions of a microsecond in most cases; whole-player CPU, responsiveness, physical memory and energy gains have not been measured.
 
 A larger cached-total prototype was rejected after it made low-count acquisition/release substantially slower. Its source and all measurements are retained below.
 
@@ -27,6 +27,31 @@ The unchanged-size return occurs after lookup of an existing lease under the ori
 For requests that require accounting, a single loop computes the same nonnegative total and owner sums as the previous reductions/filter. There are no cached totals to maintain. The source-level temporary filtered collection is removed; allocation counts or RSS savings were not measured.
 
 Reservation admission, failure counters, aggregate/owner limits, zero-byte reservations, weak budget ownership, release, preflight and snapshot semantics are preserved. The final production diff is 15 added lines and eight removed lines in one file. Acquisition and changing-resize accounting remain O(live leases); an unchanged resize performs only the existing dictionary lookup and validation of equality.
+
+## Final macOS measurements
+
+The [macOS qualification run](https://github.com/Jagalite/illiquid/actions/runs/39043771647) passed all 11 accounting test functions in both debug and release, with warnings as errors, and completed all 360 benchmark processes. It used macOS 26.6.2 arm64, Apple Swift 6.3.3, explicit Swift 6 language mode, and optimized whole-module builds. The hosted runner exposed three CPUs. The production source, baseline, harness, and runner hashes match the Linux qualification inputs; absolute timings are compared only within each platform cohort.
+
+These are median nanoseconds per operation from six fresh processes per variant/workload, using the balanced method described below. The live count is the retained set before a temporary acquisition. Negative values in the last column indicate more time.
+
+| Operation | Live leases | Baseline median (ns) | Final median (ns) | Less time |
+|---|---:|---:|---:|---:|
+| Unchanged resize | 1 | 257.9 | 99.9 | 61.3% |
+| Unchanged resize | 4 | 274.2 | 93.8 | 65.8% |
+| Unchanged resize | 32 | 298.9 | 108.3 | 63.8% |
+| Unchanged resize | 128 | 520.3 | 98.9 | 81.0% |
+| Changing resize | 1 | 255.4 | 164.8 | 35.5% |
+| Changing resize | 4 | 259.3 | 189.2 | 27.0% |
+| Changing resize | 32 | 324.5 | 189.9 | 41.5% |
+| Changing resize | 128 | 530.1 | 408.6 | 22.9% |
+| Acquire + release | 1 | 442.3 | 454.2 | -2.7% |
+| Acquire + release | 4 | 501.2 | 454.1 | 9.4% |
+| Acquire + release | 32 | 1032.5 | 503.7 | 51.2% |
+| Acquire + release | 128 | 1863.5 | 702.1 | 62.3% |
+
+Unchanged-resize ranges and dense-set acquisition/release ranges are completely separated from baseline in this cohort. Actual-resize medians are lower at every count, but the ranges overlap at 1, 4, and 32 leases; this is not a claim that every run was faster. Small-set lifecycle ranges overlap substantially, including the 2.7% higher median at one lease. The unchanged preflight/snapshot controls range from 6.9% more time to 14.7% less time, with overlapping ranges, so no gain is attributed to those methods. The shared macOS runner was noisier than the Linux cohort.
+
+The same-size-only ablation reproduces the unchanged-resize improvement. Its acquisition/release and changing-resize results remain near baseline, supporting the combined accounting loop as the cause of the additional improvements. The [native summary](../Benchmarks/SubtitleMemoryBudget/evidence/final-macos/summary.json), [360 raw observations](../Benchmarks/SubtitleMemoryBudget/evidence/final-macos/measurements.jsonl), [manifest](../Benchmarks/SubtitleMemoryBudget/evidence/final-macos/manifest.json), and [Actions provenance](../Benchmarks/SubtitleMemoryBudget/evidence/final-macos/provenance.json) are preserved in Git, beyond the artifact's retention period. A separate review checked the source identities, balanced orders, receipts, timing arithmetic, and summaries.
 
 ## Final Linux measurements
 
@@ -56,7 +81,7 @@ The same-size-only ablation isolates the first optimization. It delivers essenti
 - Actual production Swift source, not a reimplementation. The frozen baseline Git blob is `7694b209c13e86406fc2eac6bef2c7ed09974569`.
 - Swift 6.3.2 on Linux x86_64, AMD EPYC 9V74 host, with an eight-CPU cgroup quota. The final build explicitly uses Swift 6 language mode, `-O`, whole-module optimization, and warnings as errors.
 - Three variants: baseline, baseline plus unchanged-size return, final production source. Four live counts (1, 4, 32, 128) and five operations. All six variant permutations are used for every case; each variant occupies every position twice. Case order reverses between rounds.
-- 360 final timing processes. Each performs 2,000 warmup operations and 500,000 timed operations. Setup, final state verification, JSON serialization and process startup are outside the timer. The snapshot workload consumes all owner values through a stable weighted receipt.
+- 360 final timing processes per platform cohort. Each performs 2,000 warmup operations and 500,000 timed operations. Setup, final state verification, JSON serialization and process startup are outside the timer. The snapshot workload consumes all owner values through a stable weighted receipt.
 - Every process verifies successful operations and final complete-snapshot parity. The runner compares receipts between variants. A separate post-run check verified all 360 identities, permutations, timing arithmetic, receipts, source hashes and medians.
 - Synthetic reservation sizes represent bookkeeping cardinality. They do not allocate corresponding pixel buffers, invoke libass, render subtitles, or model whole-player event frequencies. Reported per-operation results include loop/call overhead. The shared-host environment and process-specific hashing limit interpretation of small differences.
 
@@ -87,7 +112,7 @@ The [regular native-target test file](../Tests/IlliquidNativePlaybackTests/Subti
 
 ## macOS qualification and reproduction
 
-A dedicated [macOS workflow](../.github/workflows/subtitle-memory-budget.yml) runs the actual-source accounting tests in debug/release and the same balanced three-variant benchmark with the repository's pinned Xcode environment. It uploads platform-specific raw evidence. CI status and any native results are recorded in the PR; Linux timings are not substituted for macOS measurements.
+A dedicated [macOS workflow](../.github/workflows/subtitle-memory-budget.yml) runs the actual-source accounting tests in debug/release and the same balanced three-variant benchmark with the repository's pinned Xcode environment. It uploads platform-specific raw evidence. The successful run and its measurements are recorded above; subsequent CI status is available in the PR.
 
 ```sh
 bash Scripts/test-subtitle-memory-budget.sh --jobs 2 -Xswiftc -warnings-as-errors
