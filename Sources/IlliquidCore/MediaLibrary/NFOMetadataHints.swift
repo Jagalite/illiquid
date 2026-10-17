@@ -22,6 +22,7 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
     var hints = MediaMetadataHints()
     var valid = true
     var hasValue = false
+    private var checksUTF8Bound = true
     private var stack: [String] = []
     private var text = ""
     private var idProvider: String?
@@ -32,6 +33,7 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
         stack.append(name)
         guard stack.count <= 32 else { valid = false; parser.abortParsing(); return }
         text = ""
+        checksUTF8Bound = true
         if stack.count == 1 {
             switch name {
             case "movie": hints.content = .movie
@@ -59,11 +61,17 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         guard capturesText else { return }
-        // UTF-8 bytes bound the number of Characters without rescanning the
-        // accumulated text on every XML fragment. Keep the exact character
-        // check for larger Unicode values, including split grapheme clusters.
-        guard text.utf8.count + string.utf8.count <= 4096
-            || text.count + string.count <= 4096 else { valid = false; parser.abortParsing(); return }
+        // UTF-8 bytes bound Character counts without rescanning accumulated text.
+        // After the first miss, stop probing this field and keep the exact
+        // per-callback character check, including split grapheme clusters.
+        if checksUTF8Bound {
+            checksUTF8Bound = text.utf8.count + string.utf8.count <= 4096
+        }
+        guard checksUTF8Bound || text.count + string.count <= 4096 else {
+            valid = false
+            parser.abortParsing()
+            return
+        }
         text += string
     }
 
@@ -74,7 +82,11 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
     }
 
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        defer { stack.removeLast(); text = "" }
+        defer {
+            stack.removeLast()
+            text = ""
+            checksUTF8Bound = true
+        }
         guard stack.count == 2 else { return }
         let value = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !value.isEmpty else { return }

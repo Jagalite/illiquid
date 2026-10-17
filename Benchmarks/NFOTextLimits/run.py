@@ -41,9 +41,9 @@ CASE_ITERATIONS = {
     "ascii-fragmented-4096": 20,
     "unicode-fragmented-4095-bytes": 8,
     "unicode-fallback-2500": 300,
-    "unicode-fallback-fragmented": 8,
+    "unicode-fallback-fragmented": 64,
     "combining-cdata": 30,
-    "ignored-long-plot": 100,
+    "ignored-long-plot": 1_000,
     "ascii-over-limit-4097": 400,
     "malformed-xml": 5_000,
     "doctype-rejected": 20_000,
@@ -160,6 +160,13 @@ def main() -> None:
         "driver_blob": blob(driver.read_bytes()),
         "runner_blob": blob(Path(__file__).read_bytes()),
         "rounds": args.rounds,
+        "protocol_revision": "2-longer-fallback-controls",
+        "protocol_change": (
+            "After the original byte-guard cohorts, fix repeated Unicode fallback at "
+            "64 parses and ignored plot at 1000 parses per observation to investigate "
+            "control variation with longer batches. Do not pool these samples with "
+            "the earlier 8/100-parse protocol."
+        ),
         "iterations": CASE_ITERATIONS,
         "skipped_tests": args.skip_tests,
         "method": (

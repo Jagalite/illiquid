@@ -4,7 +4,9 @@
 
 The first native qualification met the predefined performance target with exact output equality and passing baseline/candidate regressions. Complete parsing of the three intentionally fragmented fields took **95–98% less time**. The ordinary movie control was approximately unchanged. These measurements describe the parser and the fixtures below; they do not measure whole-library loading or playback.
 
-The current driver adds a thirteenth workload, `unicode-fallback-fragmented`, to check the cost of repeatedly missing the shortcut. Its expanded native campaign is pending. The table below records the completed first campaign separately.
+The expanded campaign and unchanged-source PR replication both passed correctness checks and retained large fragmented-field gains. They identified a repeated Unicode fallback cost worth removing: the paired median change was +3.05% and then +9.01%. The ignored-plot control was +6.37% in one cohort and -2.80% in the next. Every result remains in the evidence record.
+
+The current candidate therefore stops trying the UTF-8 shortcut for a field after its first miss. It resets that decision at the same two locations as the accumulated text. This refinement is under native qualification. The next campaign uses 64 parses per repeated-fallback observation and 1,000 per ignored-plot observation, fixed before measurement to investigate the controls with longer batches. Earlier 8/100-parse cohorts are kept separate.
 
 ## Production change
 
@@ -14,18 +16,26 @@ The current driver adds a thirteenth workload, `unicode-fallback-fragmented`, to
 text.count + string.count <= 4096
 ```
 
-Repeated entities and CDATA can produce many callbacks, making the repeated scans expensive. The candidate first checks a sufficient UTF-8 byte bound:
+Repeated entities and CDATA can produce many callbacks, making the repeated scans expensive. The candidate tries a sufficient UTF-8 byte bound while the field remains eligible:
 
 ```swift
-text.utf8.count + string.utf8.count <= 4096
-    || text.count + string.count <= 4096
+if checksUTF8Bound {
+    checksUTF8Bound = text.utf8.count + string.utf8.count <= 4096
+}
+guard checksUTF8Bound || text.count + string.count <= 4096 else {
+    valid = false
+    parser.abortParsing()
+    return
+}
 ```
+
+A failed shortcut disables further byte probes until the next text reset. Thereafter every callback uses the exact old character expression. This conservative policy preserves acceptance regardless of whether subsequent appends could change byte-count eligibility.
 
 Each Swift `Character` occupies at least one UTF-8 byte. A byte sum at or below 4,096 therefore proves that the original expression accepts the chunk. Larger byte sums still evaluate the original expression unchanged. A 4,096-character multibyte field remains eligible through that fallback.
 
 Keeping the exact expression matters when a combining mark, regional indicator, newline, or joiner merges with preceding text after appending. Summing callback character counts permanently, or counting only the concatenated result, could change the original acceptance boundary. The regression tests cover both permitted grapheme joins and a split grapheme that the old parser rejects at the limit.
 
-The change adds four net production lines. It preserves the document-size and nesting limits, captured-field selection, XML validation, declaration rejection, and metadata interpretation.
+The change preserves the document-size and nesting limits, captured-field selection, XML validation, declaration rejection, and metadata interpretation.
 
 ## Completed first native campaign
 
@@ -56,7 +66,7 @@ Times are milliseconds per complete parse. Change is candidate/baseline minus on
 
 All three targeted fragmented workloads exceeded the predefined 25% improvement target and favored the candidate in every measured pair. No ordinary or fallback control in this first campaign showed a 5% median regression. Small differences near zero should not be interpreted as reliable improvements.
 
-The [initial artifact](https://github.com/Jagalite/illiquid/actions/runs/39071387820/artifacts/12114899396) contains all timing records, manifests, complete outputs, and test/compiler logs. Its ZIP SHA-256 is `d0dffbd981455d5521aa14c1e82c1450316a92fe914b6fad4db0282a72352214`. Actions artifact retention is 14 days; the permanent expanded evidence will be recorded alongside this report.
+The [initial artifact](https://github.com/Jagalite/illiquid/actions/runs/39071387820/artifacts/12114899396) contains all timing records, manifests, complete outputs, and test/compiler logs. Its ZIP SHA-256 is `d0dffbd981455d5521aa14c1e82c1450316a92fe914b6fad4db0282a72352214`. Actions artifact retention is 14 days. [The expanded branch summary](evidence/expanded-summary.json) preserves all thirteen workloads from run 39071828452. [The original byte-guard PR cohort](evidence/original-byte-guard/manifest.json), [raw timings](evidence/original-byte-guard/measurements.jsonl), [summary](evidence/original-byte-guard/summary.json), and [complete evidence ZIP](evidence/original-byte-guard/native-evidence.zip) preserve run 39073093655, including the slower controls. These cohorts precede the per-field refinement and longer control batches.
 
 ## Reproduce
 
@@ -103,14 +113,14 @@ The same fixed parse count is used for each implementation within a workload.
 | `ascii-fragmented-4096` | 20 | 2,048 repetitions of `A&amp;`: 4,096 decoded characters and bytes. |
 | `unicode-fragmented-4095-bytes` | 8 | 1,365 repetitions of `é&amp;`: 2,730 characters and 4,095 UTF-8 bytes. |
 | `unicode-fallback-2500` | 300 | A contiguous 2,500-character title made from `界`, occupying 7,500 bytes. |
-| `unicode-fallback-fragmented` | 8 | 1,500 `界` characters followed by 1,500 `&amp;` entities: 3,000 characters and 6,000 bytes. |
+| `unicode-fallback-fragmented` | 64 | 1,500 `界` characters followed by 1,500 `&amp;` entities: 3,000 characters and 6,000 bytes. |
 | `combining-cdata` | 30 | 800 repetitions of `e` followed by a combining acute accent in CDATA. |
-| `ignored-long-plot` | 100 | A short supported title plus 100,000 ignored ASCII plot characters. |
+| `ignored-long-plot` | 1,000 | A short supported title plus 100,000 ignored ASCII plot characters. |
 | `ascii-over-limit-4097` | 400 | An over-limit supported title that must be rejected. |
 | `malformed-xml` | 5,000 | Mismatched XML after a usable title, requiring rejection of partial metadata. |
 | `doctype-rejected` | 20,000 | Declaration/entity input rejected by the existing preflight checks. |
 
-The fragmented fallback control starts with a 4,500-byte prefix. Subsequent entity callbacks repeatedly perform the added byte check and then the original character check. This checks overhead when the shortcut cannot help, while the existing contiguous Unicode case can benefit from earlier short chunks.
+The fragmented fallback control starts with a 4,500-byte prefix. Subsequent entity callbacks repeatedly exercised both checks in the first candidate. The refined candidate disables the byte probe after a miss and uses the original character check for the rest of that field. The contiguous Unicode case can still benefit from earlier short chunks.
 
 A full expanded campaign has 13 workloads, 312 measured process observations, 26 excluded warmup observations, and 338 retained timing records. The current differential corpus contains 136 fixtures, covering multibyte and split-grapheme boundaries, captured fields, root/field scope, malformed data, file-size and nesting limits, and invalid UTF-8.
 
