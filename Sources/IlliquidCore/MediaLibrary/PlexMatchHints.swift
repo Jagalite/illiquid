@@ -68,21 +68,25 @@ public struct PlexMatchHints: Sendable {
             && !path.split(separator: "/").contains(where: { $0 == ".." || $0 == "." })
     }
 
+    // Match the ASCII numeric contract used by the other metadata hints. ICU
+    // \d also accepts digits that Int cannot parse; treating those captures as
+    // absent would silently change the season, episode, or range of a mapping.
     private static let episodePattern = try! NSRegularExpression(
-        pattern: #"(?i)^(?:S(\d{1,3})E|SP|E)?(\d{1,4})(?:-(?:S(\d{1,3})E|E)?(\d{1,4}))?$"#)
+        pattern: #"(?i)^(?:S([0-9]{1,3})E|SP|E)?([0-9]{1,4})(?:-(?:S([0-9]{1,3})E|E)?([0-9]{1,4}))?$"#)
 
     private static func episodeNumber(_ text: String) -> MediaMetadataHints? {
         guard let match = episodePattern.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) else { return nil }
         func number(_ index: Int) -> Int? {
             Range(match.range(at: index), in: text).flatMap { Int(text[$0]) }
         }
+        guard let first = number(2) else { return nil }
         var hint = MediaMetadataHints()
         hint.content = .episode
         hint.season = text.uppercased().hasPrefix("SP") ? 0 : number(1)
-        hint.episode = number(2)
+        hint.episode = first
         hint.lastEpisode = number(4)
         if let endSeason = number(3), endSeason != hint.season { return nil }
-        if let last = hint.lastEpisode, last <= (hint.episode ?? 0) { return nil }
+        if let last = hint.lastEpisode, last <= first { return nil }
         return hint
     }
 }
