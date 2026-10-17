@@ -24,18 +24,44 @@ public struct OpenVideoTab: Identifiable, Equatable, Sendable {
 }
 
 public struct OpenVideoTabs: Equatable, Sendable {
+    /// Mirrors `MediaSource.representsSameResource` without normalizing every
+    /// existing URL for every admission. Sources are immutable while open.
+    private enum ResourceKey: Hashable, Sendable {
+        case local(String)
+        case remote(String)
+
+        init?(_ source: MediaSource) {
+            switch source {
+            case let .localFile(url):
+                // Direct enum construction can supply a non-file URL. Such a
+                // source never matches another local source, including itself.
+                guard let path = NormalizedFileURL.persistenceKey(for: url) else { return nil }
+                self = .local(path)
+            case let .remoteStream(url):
+                self = .remote(url.absoluteURL.absoluteString)
+            }
+        }
+    }
+
     public private(set) var items: [OpenVideoTab] = []
     public private(set) var selectedID: UUID?
+    private var resourceIDs: [ResourceKey: UUID] = [:]
     public var selected: OpenVideoTab? { items.first { $0.id == selectedID } }
     public init() {}
 
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.items == rhs.items && lhs.selectedID == rhs.selectedID
+    }
+
     @discardableResult
     public mutating func add(_ source: MediaSource) -> UUID {
-        if let existing = items.first(where: { $0.source.representsSameResource(as: source) }) {
-            return existing.id
+        let key = ResourceKey(source)
+        if let key, let id = resourceIDs[key] {
+            return id
         }
         let tab = OpenVideoTab(source: source)
         items.append(tab)
+        if let key { resourceIDs[key] = tab.id }
         return tab.id
     }
 
@@ -62,7 +88,11 @@ public struct OpenVideoTabs: Equatable, Sendable {
     public mutating func close(_ id: UUID) -> OpenVideoTab? {
         guard let index = items.firstIndex(where: { $0.id == id }) else { return selected }
         let wasSelected = selectedID == id
+        if let key = ResourceKey(items[index].source) {
+            resourceIDs.removeValue(forKey: key)
+        }
         items.remove(at: index)
+        if items.isEmpty { resourceIDs = [:] }
         if wasSelected {
             selectedID = items.isEmpty ? nil : items[min(index, items.count - 1)].id
         }
