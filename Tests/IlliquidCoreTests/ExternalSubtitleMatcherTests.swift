@@ -41,7 +41,7 @@ struct ExternalSubtitleMatcherTests {
                 }
             )
             #expect(Set(complete.keys) == Set(inventory))
-            #expect(complete.values.allSatisfy(\.isEmpty))
+            #expect(complete.values.allSatisfy { $0.isEmpty })
             // Include cancellation before population, during every input item,
             // and immediately before the completed dictionary is returned.
             #expect(checkpointCount >= inventory.count + 2)
