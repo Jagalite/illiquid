@@ -148,12 +148,7 @@ public enum MediaNameRecognition {
             }
             let y = first > 31 ? first : last
             let d = first > 31 ? last : first
-            var calendar = Calendar(identifier: .gregorian)
-            calendar.timeZone = TimeZone(secondsFromGMT: 0)!
-            let components = DateComponents(year: y, month: m, day: d)
-            let valid = calendar.date(from: components).map {
-                calendar.dateComponents([.year, .month, .day], from: $0) == components
-            } ?? false
+            let valid = isValidAirDate(year: y, month: m, day: d)
             let show = titleAndYear(clean(prefix(raw, before: token)))
             if valid, !show.0.isEmpty {
                 let tail = cleanRelease(suffix(raw, after: token))
@@ -224,6 +219,22 @@ public enum MediaNameRecognition {
         guard hasOpener else { return text }
         return tags.stringByReplacingMatches(in: text,
             range: NSRange(text.startIndex..., in: text), withTemplate: "")
+    }
+    private static func isValidAirDate(year: Int, month: Int, day: Int) -> Bool {
+        // Date tokens cover 1900...2099. Validate Gregorian month lengths
+        // without constructing and round-tripping calendar values per file.
+        guard day >= 1 else { return false }
+        let maximumDay: Int
+        switch month {
+        case 2:
+            let leapYear = year.isMultiple(of: 4)
+                && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
+            maximumDay = leapYear ? 29 : 28
+        case 4, 6, 9, 11: maximumDay = 30
+        case 1, 3, 5, 7, 8, 10, 12: maximumDay = 31
+        default: return false
+        }
+        return day <= maximumDay
     }
     private static func regex(_ pattern: String) -> NSRegularExpression { try! NSRegularExpression(pattern: pattern) }
     private static func matches(_ regex: NSRegularExpression, _ text: String) -> [NSTextCheckingResult] {

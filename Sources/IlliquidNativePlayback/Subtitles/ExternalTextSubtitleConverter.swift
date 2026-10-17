@@ -42,8 +42,10 @@ enum ExternalTextSubtitleConverter {
 
     static func convert(_ source: String, format: Format) throws -> String {
         var normalized = source
-            .replacingOccurrences(of: "\r\n", with: "\n")
-            .replacingOccurrences(of: "\r", with: "\n")
+        if source.utf8.contains(0x0D) {
+            normalized = source.replacingOccurrences(of: "\r\n", with: "\n")
+                .replacingOccurrences(of: "\r", with: "\n")
+        }
         if format == .webVTT {
             // A UTF-8 decoder may retain the optional WebVTT byte-order mark.
             if normalized.first == "\u{FEFF}" { normalized.removeFirst() }
