@@ -1,0 +1,52 @@
+name: Empty subtitle association performance
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift
+      - Sources/IlliquidCore/Utilities/MediaFileSupport.swift
+      - Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift
+      - Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift
+      - Tests/IlliquidCoreTests/ExternalSubtitleMatcherEmptyTests.swift
+      - Benchmarks/EmptySubtitleAssociation/**
+      - .github/workflows/empty-subtitle-association.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: empty-subtitle-association-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test both implementations and measure paired release associations
+        run: |
+          python3 Benchmarks/EmptySubtitleAssociation/run.py \
+            --output "$RUNNER_TEMP/empty-subtitle-association" --pairs 6
+      - name: Package complete evidence for review
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, os, pathlib, zipfile
+          root = pathlib.Path(os.environ['RUNNER_TEMP'])
+          source = root / 'empty-subtitle-association'
+          archive = root / 'empty-subtitle-association-evidence.zip'
+          with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as output:
+              for path in sorted(source.rglob('*')):
+                  if path.is_file():
+                      output.write(path, path.relative_to(source))
+          data = archive.read_bytes()
+          print('EVIDENCE_ARCHIVE_SHA256 ' + hashlib.sha256(data).hexdigest())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: empty-subtitle-association
+          path: ${{ runner.temp }}/empty-subtitle-association-evidence.zip
+          retention-days: 14

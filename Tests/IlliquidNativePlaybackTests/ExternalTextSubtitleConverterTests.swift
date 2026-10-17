@@ -50,6 +50,30 @@ struct ExternalTextSubtitleConverterTests {
         #expect(dialogueLines(try Converter.convert(vtt, format: .webVTT)) == expected)
     }
 
+    @Test func unescapedPayloadPreservesExactUnicodeAndControlBytes() throws {
+        // String equality alone would hide a change in Unicode normalization.
+        let payload = "Café Cafe\u{0301} 日本語 👩\u{200D}💻\t\u{0000}\u{FEFF}\u{202E}caption\u{202C}"
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(start: "00:00:01.000", end: "00:00:02.000", format: format)
+                .replacingOccurrences(of: "Caption", with: payload)
+            let expected = Converter.defaultASSHeader + "\n"
+                + "Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,," + payload
+            #expect(Array(try Converter.convert(source, format: format).utf8) == Array(expected.utf8))
+        }
+    }
+
+    @Test func mixedPayloadLinesEscapeOriginalASSMetacharactersExactlyOnce() throws {
+        let payload = "Plain Café\n" + #"{\an8} \N \\ {literal}"# + "\n日本語"
+        let escapedPayload = #"Plain Café\N\{\\an8\} \\N \\\\ \{literal\}\N日本語"#
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(start: "00:00:01.000", end: "00:00:02.000", format: format)
+                .replacingOccurrences(of: "Caption", with: payload)
+            let expected = Converter.defaultASSHeader + "\n"
+                + "Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,," + escapedPayload
+            #expect(Array(try Converter.convert(source, format: format).utf8) == Array(expected.utf8))
+        }
+    }
+
     @Test func legacySubRipFractionVariantsRemainSupported() throws {
         let cases = [
             ("00:00:01", "0:00:01.00"),

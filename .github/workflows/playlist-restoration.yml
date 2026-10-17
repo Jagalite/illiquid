@@ -6,8 +6,11 @@ on:
       - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
       - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
       - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
       - 'Scripts/test-playlist-restoration.sh'
       - 'Benchmarks/PlaylistRestoration/**'
+      - 'Benchmarks/NaturalFilenameOrdering/**'
       - '.github/workflows/playlist-restoration.yml'
   workflow_dispatch:
 permissions:
@@ -33,3 +36,18 @@ jobs:
         run: >-
           python3 Benchmarks/PlaylistRestoration/run.py --sizes 100
           --repeats 1 --rounds 1 --output "$RUNNER_TEMP/playlist-restoration-smoke.json"
+      - name: Natural filename ordering parity smoke (no timing threshold)
+        run: >-
+          python3 Benchmarks/NaturalFilenameOrdering/run.py --quick --samples 2
+          --output "$RUNNER_TEMP/natural-filename-ordering"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: natural-filename-ordering-macos
+          path: |
+            ${{ runner.temp }}/natural-filename-ordering/*.json
+            ${{ runner.temp }}/natural-filename-ordering/*.jsonl
+            ${{ runner.temp }}/natural-filename-ordering/logs/
+            ${{ runner.temp }}/natural-filename-ordering/sources/
+            ${{ runner.temp }}/natural-filename-ordering/driver/
+          retention-days: 14

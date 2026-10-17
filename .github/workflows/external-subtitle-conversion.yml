@@ -1,0 +1,46 @@
+name: External subtitle conversion performance
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/External*Subtitle*Tests.swift'
+      - 'Scripts/test-external-subtitle-regressions.sh'
+      - 'Benchmarks/ExternalSubtitleConversion/**'
+      - '.github/workflows/external-subtitle-conversion.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: external-subtitle-conversion-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check converter behavior in debug and release
+        run: |
+          bash Scripts/test-external-subtitle-regressions.sh -c debug -Xswiftc -warnings-as-errors
+          bash Scripts/test-external-subtitle-regressions.sh -c release -Xswiftc -warnings-as-errors
+      - name: Compare native Foundation output and paired conversion timings
+        run: >-
+          python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark
+          --rounds 10 --target-ms 100
+          --output "$RUNNER_TEMP/external-subtitle-conversion"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: external-subtitle-conversion-native
+          path: |
+            ${{ runner.temp }}/external-subtitle-conversion/**/*.json
+            ${{ runner.temp }}/external-subtitle-conversion/**/*.jsonl
+            ${{ runner.temp }}/external-subtitle-conversion/**/*.gz
+            ${{ runner.temp }}/external-subtitle-conversion/**/*.log
+            ${{ runner.temp }}/external-subtitle-conversion/**/*.swift
+            ${{ runner.temp }}/external-subtitle-conversion/runner.snapshot.py
+          retention-days: 14

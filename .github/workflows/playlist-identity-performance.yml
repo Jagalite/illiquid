@@ -1,0 +1,57 @@
+name: Playlist identity lookup performance
+
+on:
+  push:
+    branches: ['perf/playlist-identity-lookup']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Benchmarks/PlaylistIdentityLookup/**'
+      - '.github/workflows/playlist-identity-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Benchmarks/PlaylistIdentityLookup/**'
+      - '.github/workflows/playlist-identity-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playlist-identity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test both implementations and measure native lookup times
+        run: >-
+          python3 Benchmarks/PlaylistIdentityLookup/run.py --mode all
+          --pairs 8 --output "$RUNNER_TEMP/playlist-identity"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-identity-native
+          path: |
+            ${{ runner.temp }}/playlist-identity/**/*.json
+            ${{ runner.temp }}/playlist-identity/**/*.jsonl
+            ${{ runner.temp }}/playlist-identity/**/*.log
+            ${{ runner.temp }}/playlist-identity/**/*.txt
+            ${{ runner.temp }}/playlist-identity/**/*.swift
+            ${{ runner.temp }}/playlist-identity/**/*.py
+          retention-days: 14

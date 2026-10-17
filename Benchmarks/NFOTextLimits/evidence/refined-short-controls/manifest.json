@@ -1,0 +1,130 @@
+{
+  "baseline_commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "candidate_commit": "958f26e89987d756519f65ff5bd9784de4c8ecec",
+  "candidate_status": "",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "processor_count": 3,
+  "swift": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "compile_flags": [
+    "-swift-version",
+    "6",
+    "-O",
+    "-parse-as-library"
+  ],
+  "driver_blob": "66b8c7f727538beaab6f80558d894482922c9037",
+  "runner_blob": "30b7354c5167c2de668281c88a56295afc2fe481",
+  "rounds": 12,
+  "protocol_revision": "2-longer-fallback-controls",
+  "protocol_change": "After the original byte-guard cohorts, fix repeated Unicode fallback at 64 parses and ignored plot at 1000 parses per observation to investigate control variation with longer batches. Do not pool these samples with the earlier 8/100-parse protocol.",
+  "iterations": {
+    "movie-small": 5000,
+    "episode-small": 3000,
+    "unicode-small": 3000,
+    "ascii-boundary-4096": 400,
+    "ascii-fragmented-4096": 20,
+    "unicode-fragmented-4095-bytes": 8,
+    "unicode-fallback-2500": 300,
+    "unicode-fallback-fragmented": 64,
+    "combining-cdata": 30,
+    "ignored-long-plot": 1000,
+    "ascii-over-limit-4097": 400,
+    "malformed-xml": 5000,
+    "doctype-rejected": 20000
+  },
+  "skipped_tests": false,
+  "method": "Real unmodified production sources compiled in separate executables with -O; same current tests for both versions, in debug and release unless skipped. Three untimed warmups per fresh process plus one excluded warm-up pair per case, then fresh processes in balanced alternating AB/BA order; XML Data fixture creation and full receipt serialization are untimed. The driver consumes each result during the timer. All samples retained.",
+  "scope": "Complete warmed in-memory NFO XML parsing, including input validation and output construction; excludes file I/O, whole app startup, playback, GPU, energy, and NAS latency.",
+  "research_acceptance": {
+    "correctness": "All debug/release regressions and exact differential/receipt equality must pass.",
+    "primary": "At least 25% lower median complete-parse time for fragmented fields within the UTF-8 bound.",
+    "controls": "Investigate any consistent material (5% or greater) regression on ordinary and fallback controls.",
+    "integration": "Run existing real sidecar reader regressions with both parser versions."
+  },
+  "test_blobs": {
+    "MediaSidecarTests.swift": "593ce32d63f9930331cea5e8a9d28ae3026576c2",
+    "NFOMetadataFieldSelectionTests.swift": "ab6af145a4518da19f5a6b8e679225258abedd36",
+    "NFOEpisodeScopeRegressionTests.swift": "92ee23fc8699a5d9d9699f05438ec3a0cb719a43",
+    "MediaNameRecognitionTests.swift": "a01a3c00d11b168ab312285f279f86e00dd28f97",
+    "NFOTextLimitPerformanceTests.swift": "2c027a08fca7573492a0b3f448166e607fdd696c"
+  },
+  "source_blobs": {
+    "baseline": {
+      "MediaLibrary/MediaNameRecognition.swift": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+      "MediaLibrary/MediaMetadataHints.swift": "a4870452b6d680c5b2b7903ce2e66f4ee3506fb3",
+      "MediaLibrary/NFOMetadataHints.swift": "55e84590829c678f6ac5cb1328e64dead63651b6",
+      "MediaLibrary/PlexMatchHints.swift": "bc310a8ad8338ceff65db817671acc2ffd40fd16",
+      "MediaLibrary/MediaSidecarReader.swift": "93fc031fc6e278b13aae8b4f19bee79ed1d9154b"
+    },
+    "candidate": {
+      "MediaLibrary/MediaNameRecognition.swift": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+      "MediaLibrary/MediaMetadataHints.swift": "a4870452b6d680c5b2b7903ce2e66f4ee3506fb3",
+      "MediaLibrary/NFOMetadataHints.swift": "051c475fd33bcd16ec33f6b4b93ee98fffdb21d3",
+      "MediaLibrary/PlexMatchHints.swift": "bc310a8ad8338ceff65db817671acc2ffd40fd16",
+      "MediaLibrary/MediaSidecarReader.swift": "93fc031fc6e278b13aae8b4f19bee79ed1d9154b"
+    }
+  },
+  "tests": {
+    "baseline": {
+      "debug": {
+        "command": [
+          "swift",
+          "test",
+          "--package-path",
+          "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-nfo-text-limits-wya0m5wn/tests-baseline",
+          "--configuration",
+          "debug",
+          "--no-parallel"
+        ],
+        "summary": "\u2714 Test run with 52 tests in 5 suites passed after 0.350 seconds.",
+        "test_count": 52
+      },
+      "release": {
+        "command": [
+          "swift",
+          "test",
+          "--package-path",
+          "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-nfo-text-limits-wya0m5wn/tests-baseline",
+          "--configuration",
+          "release",
+          "--no-parallel"
+        ],
+        "summary": "\u2714 Test run with 52 tests in 5 suites passed after 0.588 seconds.",
+        "test_count": 52
+      }
+    },
+    "candidate": {
+      "debug": {
+        "command": [
+          "swift",
+          "test",
+          "--package-path",
+          "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-nfo-text-limits-wya0m5wn/tests-candidate",
+          "--configuration",
+          "debug",
+          "--no-parallel"
+        ],
+        "summary": "\u2714 Test run with 52 tests in 5 suites passed after 0.354 seconds.",
+        "test_count": 52
+      },
+      "release": {
+        "command": [
+          "swift",
+          "test",
+          "--package-path",
+          "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-nfo-text-limits-wya0m5wn/tests-candidate",
+          "--configuration",
+          "release",
+          "--no-parallel"
+        ],
+        "summary": "\u2714 Test run with 52 tests in 5 suites passed after 0.333 seconds.",
+        "test_count": 52
+      }
+    }
+  },
+  "changed_sources": [
+    "MediaLibrary/NFOMetadataHints.swift"
+  ],
+  "differential_sha256": "90881f4d9672c015b4cd96a1a194bc9bffe05a4a4f7c806069bf4e8a46481b9b",
+  "all_receipts_equal": true
+}

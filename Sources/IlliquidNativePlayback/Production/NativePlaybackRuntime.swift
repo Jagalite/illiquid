@@ -183,8 +183,65 @@ struct RuntimeObservationRequest: Sendable {
     let urgency: RuntimeObservationUrgency
 }
 
+/// Inline counters keep retained observation snapshots independent without a
+/// dictionary copy on the next request. Optional values preserve the distinction
+/// between an absent source and an explicitly recorded zero.
+struct RuntimeObservationSourceCounts: Equatable, Sendable {
+    private var presentationClock: Int?
+    private var videoEnqueue: Int?
+    private var audioEnqueue: Int?
+    private var subtitlePacket: Int?
+    private var preroll: Int?
+    private var decoderDrain: Int?
+    private var rendererFailure: Int?
+
+    subscript(_ source: RuntimeObservationSource) -> Int? {
+        get {
+            switch source {
+            case .presentationClock: presentationClock
+            case .videoEnqueue: videoEnqueue
+            case .audioEnqueue: audioEnqueue
+            case .subtitlePacket: subtitlePacket
+            case .preroll: preroll
+            case .decoderDrain: decoderDrain
+            case .rendererFailure: rendererFailure
+            }
+        }
+        set {
+            switch source {
+            case .presentationClock: presentationClock = newValue
+            case .videoEnqueue: videoEnqueue = newValue
+            case .audioEnqueue: audioEnqueue = newValue
+            case .subtitlePacket: subtitlePacket = newValue
+            case .preroll: preroll = newValue
+            case .decoderDrain: decoderDrain = newValue
+            case .rendererFailure: rendererFailure = newValue
+            }
+        }
+    }
+
+    subscript(
+        _ source: RuntimeObservationSource,
+        default defaultValue: @autoclosure () -> Int
+    ) -> Int {
+        get { self[source] ?? defaultValue() }
+        _modify {
+            // Dictionary also evaluates an absent key's default on assignment.
+            var value = self[source] ?? defaultValue()
+            defer { self[source] = value }
+            yield &value
+        }
+    }
+
+    var total: Int {
+        (presentationClock ?? 0) + (videoEnqueue ?? 0) + (audioEnqueue ?? 0)
+            + (subtitlePacket ?? 0) + (preroll ?? 0) + (decoderDrain ?? 0)
+            + (rendererFailure ?? 0)
+    }
+}
+
 struct RuntimeObservationMetricsSnapshot: Equatable, Sendable {
-    var requestsBySource: [RuntimeObservationSource: Int] = [:]
+    var requestsBySource = RuntimeObservationSourceCounts()
     var scheduledDeliveries = 0
     var coalescedRequests = 0
     var deliveredObservations = 0
@@ -192,7 +249,7 @@ struct RuntimeObservationMetricsSnapshot: Equatable, Sendable {
     var maximumDelayNanoseconds: UInt64 = 0
     var maximumUrgentDelayNanoseconds: UInt64 = 0
 
-    var totalRequests: Int { requestsBySource.values.reduce(0, +) }
+    var totalRequests: Int { requestsBySource.total }
 }
 
 struct RuntimeObservationMetricsLedger: Sendable {

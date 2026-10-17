@@ -62,14 +62,25 @@ public enum MediaNameRecognition {
     /// may itself be a show/movie. Ancestors are only consulted for explicit naming cues.
     public static func recognize(relativePath: String) -> RecognizedMediaName {
         let path = relativePath as NSString
-        let raw = (path.lastPathComponent as NSString).deletingPathExtension
+        var raw = (path.lastPathComponent as NSString).deletingPathExtension
         let folders = (path.deletingLastPathComponent as NSString).pathComponents.filter { $0 != "/" && $0 != "." }
         let parent = folders.last ?? ""
         let seasonParent = match(seasonFolder, parent) != nil || parent.lowercased() == "specials"
         let showFolder = seasonParent ? folders.dropLast().last : nil
-        let evidence = [raw, showFolder ?? parent].joined(separator: "/")
-        let ids = Array(Set(matches(id, evidence).compactMap { capture($0, 1, in: evidence)?.lowercased() })).sorted()
-        let editionName = match(edition, evidence).flatMap { capture($0, 1, in: evidence) }
+        var ancestor = showFolder ?? parent
+        // Materialize UTF-8 once for a bridged filename; later scans reuse it.
+        let rawHasBrace = raw.withUTF8 { $0.contains(0x7B) }
+        let ids: [String]
+        let editionName: String?
+        if rawHasBrace || ancestor.withUTF8({ $0.contains(0x7B) }) {
+            // Preserve joined evidence: an edition match can span the separator.
+            let evidence = [raw, ancestor].joined(separator: "/")
+            ids = Array(Set(matches(id, evidence).compactMap { capture($0, 1, in: evidence)?.lowercased() })).sorted()
+            editionName = match(edition, evidence).flatMap { capture($0, 1, in: evidence) }
+        } else {
+            ids = []
+            editionName = nil
+        }
         var variantParts: [String] = []
         if let editionName { variantParts.append(editionName) }
         if let m = match(part, raw), let value = capture(m, 1, in: raw) { variantParts.append(clean(value)) }
@@ -94,11 +105,29 @@ public enum MediaNameRecognition {
            let season = capture(token, 1, in: raw).flatMap(Int.init),
            let first = capture(token, 2, in: raw).flatMap(Int.init) {
             let prefixTitle = clean(prefix(raw, before: token))
-            let namedParent = titleAndYear(parent).1 != nil ? parent : ""
-            var show = titleAndYear(prefixTitle.isEmpty ? (showFolder ?? namedParent) : prefixTitle)
-            let folderShow = titleAndYear(showFolder ?? parent)
-            if show.1 == nil, show.0.localizedCaseInsensitiveCompare(folderShow.0) == .orderedSame {
-                show = folderShow
+            var show: (String, Int?)
+            if prefixTitle.isEmpty {
+                // A season folder supplies show context even without a year.
+                // Otherwise a year supplies explicit context in the parent.
+                let folderShow = titleAndYear(showFolder ?? parent)
+                if showFolder != nil || folderShow.1 != nil {
+                    show = folderShow
+                } else {
+                    // Retain the original empty-title comparison: a nonempty
+                    // folder can compare equal to empty under the user's locale.
+                    show = "".localizedCaseInsensitiveCompare(folderShow.0) == .orderedSame
+                        ? folderShow : ("", nil)
+                }
+            } else {
+                show = titleAndYear(prefixTitle)
+                // A filename year already settles identity. Consult the folder
+                // only when it can supply the matching title's year or spelling.
+                if show.1 == nil {
+                    let folderShow = titleAndYear(showFolder ?? parent)
+                    if show.0.localizedCaseInsensitiveCompare(folderShow.0) == .orderedSame {
+                        show = folderShow
+                    }
+                }
             }
             // An isolated S01E01 without a show folder remains unclassified.
             if !show.0.isEmpty {
@@ -119,12 +148,7 @@ public enum MediaNameRecognition {
             }
             let y = first > 31 ? first : last
             let d = first > 31 ? last : first
-            var calendar = Calendar(identifier: .gregorian)
-            calendar.timeZone = TimeZone(secondsFromGMT: 0)!
-            let components = DateComponents(year: y, month: m, day: d)
-            let valid = calendar.date(from: components).map {
-                calendar.dateComponents([.year, .month, .day], from: $0) == components
-            } ?? false
+            let valid = isValidAirDate(year: y, month: m, day: d)
             let show = titleAndYear(clean(prefix(raw, before: token)))
             if valid, !show.0.isEmpty {
                 let tail = cleanRelease(suffix(raw, after: token))
@@ -151,7 +175,9 @@ public enum MediaNameRecognition {
         }
         // Movie IDs on the filename are explicit evidence; a TVDB ID alone
         // does not establish movie identity or an episode number.
-        let filenameIDs = matches(id, raw).compactMap { capture($0, 1, in: raw)?.lowercased() }
+        let filenameIDs = rawHasBrace
+            ? matches(id, raw).compactMap { capture($0, 1, in: raw)?.lowercased() }
+            : []
         if filenameIDs.contains(where: { $0.hasPrefix("imdb-") || $0.hasPrefix("tmdb-") }), !seasonParent {
             return result(.movie, filenameTitle)
         }
@@ -161,23 +187,54 @@ public enum MediaNameRecognition {
     private static func titleAndYear(_ original: String) -> (String, Int?) {
         // Edition dates and IDs are not release years. Parenthesized years win
         // over incidental numbers; the last year handles numeric movie titles.
-        let text = tags.stringByReplacingMatches(in: original,
-            range: NSRange(original.startIndex..., in: original), withTemplate: "")
+        let text = strippingTags(original)
         if let token = matches(explicitYear, text).last ?? matches(year, text).last, let value = capture(token, 1, in: text).flatMap(Int.init) {
-            let title = clean(prefix(text, before: token))
+            let title = cleanTagless(prefix(text, before: token))
             if !title.isEmpty { return (title, value) }
         }
-        return (clean(text), nil)
+        return (cleanTagless(text), nil)
     }
 
     private static func cleanRelease(_ text: String) -> String {
         clean(match(release, text).map { prefix(text, before: $0) } ?? text)
     }
     private static func clean(_ text: String) -> String {
-        let stripped = tags.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: "")
-        return stripped.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "_", with: " ")
+        return cleanTagless(strippingTags(text))
+    }
+    // Call only after tag removal; preserve the existing Unicode whitespace
+    // and punctuation rules without another regular-expression replacement.
+    private static func cleanTagless(_ text: String) -> String {
+        text.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "_", with: " ")
             .split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
             .trimmingCharacters(in: CharacterSet(charactersIn: " -()[]"))
+    }
+    private static func strippingTags(_ original: String) -> String {
+        var text = original
+        // Every tag match starts with an ASCII brace or bracket. Scan bytes so
+        // delimiters joined to combining characters still take the regex path.
+        // Return the contiguous representation for reuse by subsequent cleanup.
+        let hasOpener = text.withUTF8 { bytes in
+            bytes.contains { $0 == 0x7B || $0 == 0x5B }
+        }
+        guard hasOpener else { return text }
+        return tags.stringByReplacingMatches(in: text,
+            range: NSRange(text.startIndex..., in: text), withTemplate: "")
+    }
+    private static func isValidAirDate(year: Int, month: Int, day: Int) -> Bool {
+        // Date tokens cover 1900...2099. Validate Gregorian month lengths
+        // without constructing and round-tripping calendar values per file.
+        guard day >= 1 else { return false }
+        let maximumDay: Int
+        switch month {
+        case 2:
+            let leapYear = year.isMultiple(of: 4)
+                && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
+            maximumDay = leapYear ? 29 : 28
+        case 4, 6, 9, 11: maximumDay = 30
+        case 1, 3, 5, 7, 8, 10, 12: maximumDay = 31
+        default: return false
+        }
+        return day <= maximumDay
     }
     private static func regex(_ pattern: String) -> NSRegularExpression { try! NSRegularExpression(pattern: pattern) }
     private static func matches(_ regex: NSRegularExpression, _ text: String) -> [NSTextCheckingResult] {

@@ -1,0 +1,6989 @@
+{
+  "differential": {
+    "cases": 16300,
+    "checksum": "9601960839749614061",
+    "locale_identifier": "en_US",
+    "mode": "differential",
+    "ok": true,
+    "preferred_languages": [
+      "en-US"
+    ]
+  },
+  "environment": {
+    "baseline": {
+      "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+      "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+      "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+      "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+    },
+    "baseline_adaptation": "Rename the two top-level types only",
+    "compiled_baseline_sha256": "85bdf0df2513c6bcdec9d43a4b0c76d14841d83dc2bca786d045e18b1937c897",
+    "compiler_flags": [
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-parse-as-library"
+    ],
+    "cpu_count": 3,
+    "hardware": "Apple M1 (Virtual)",
+    "machine": "arm64",
+    "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "reference_name": "main",
+    "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+    "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+    "source_sha256": {
+      "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+      "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+      "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+      "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+    },
+    "swift": "/usr/bin/swift",
+    "swiftc": "/usr/bin/swiftc",
+    "timestamp_utc": "2026-10-17T21:32:42.455121+00:00",
+    "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "method": "Median of per-process medians; paired candidate/baseline ratios; balanced alternating order; all observations retained",
+  "observations": [
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        69197.00622558594,
+        57233.68835449219,
+        52702.38244628906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        46743.626953125,
+        54718.6533203125,
+        59181.77795410156
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        55478.74963378906,
+        55933.598876953125,
+        54597.137451171875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        61235.890625,
+        59747.583984375,
+        53849.90954589844
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        61380.99157714844,
+        62798.868896484375,
+        58852.10681152344
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        55294.036865234375,
+        50007.70568847656,
+        52052.75476074219
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        50754.39453125,
+        58232.259033203125,
+        63041.117431640625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        71863.08288574219,
+        64635.162353515625,
+        65487.335205078125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        62926.04064941406,
+        58360.59069824219,
+        54577.62145996094
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        57140.19775390625,
+        57478.052734375,
+        56640.85900878906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        58669.830322265625,
+        59585.74426269531,
+        55736.53662109375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        58834.77783203125,
+        62313.82751464844,
+        77892.03381347656
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        85328.54211425781,
+        99722.93090820312,
+        93690.07873535156
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        111774.26147460938,
+        96784.13391113281,
+        59279.52575683594
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        73317.01147460938,
+        70107.35583496094,
+        81347.10180664062
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        78680.2724609375,
+        82314.13781738281,
+        98021.49450683594
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        77306.37609863281,
+        77720.67761230469,
+        79124.72534179688
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        83508.06164550781,
+        84070.28198242188,
+        85775.76196289062
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        73826.41088867188,
+        61193.78662109375,
+        74473.96850585938
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        79552.09350585938,
+        85931.36596679688,
+        87226.34375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        106538.90478515625,
+        122191.97595214844,
+        107472.33581542969
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        94021.06225585938,
+        102535.20703125,
+        129697.61157226562
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        86117.85375976562,
+        68694.64611816406,
+        70281.48400878906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        86564.42260742188,
+        88769.79064941406,
+        72553.171875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "named-episode-no-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        68093.99914550781,
+        77482.89990234375,
+        86373.9013671875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        80533.45739746094,
+        92915.17639160156,
+        52387.4765625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        63857.59484863281,
+        60117.975830078125,
+        56397.90344238281
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        115474.49230957031,
+        110013.46337890625,
+        83565.72973632812
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        70671.55456542969,
+        79253.23486328125,
+        76762.3291015625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        56630.67626953125,
+        54697.85046386719,
+        68280.91430664062
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        59210.0830078125,
+        47814.00048828125,
+        48436.3759765625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        58081.57861328125,
+        60617.50793457031,
+        69763.92614746094
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        69299.74365234375,
+        69143.29016113281,
+        65866.28723144531
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        50119.61364746094,
+        53093.16003417969,
+        48190.12451171875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        47600.29602050781,
+        47080.09851074219,
+        44120.30029296875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        73278.27954101562,
+        69095.98791503906,
+        67060.26708984375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        67953.80651855469,
+        72863.96789550781,
+        64661.916015625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        47771.703125,
+        56476.24206542969,
+        45895.76208496094
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        44443.781494140625,
+        70795.27282714844,
+        72803.34973144531
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        80040.12548828125,
+        70651.17395019531,
+        88557.91723632812
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        68097.75280761719,
+        68483.5712890625,
+        54746.22082519531
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        48853.78015136719,
+        48326.416015625,
+        51928.995849609375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        56400.03967285156,
+        54943.82727050781,
+        64326.97033691406
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        89595.62683105469,
+        79216.46630859375,
+        83643.19860839844
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        65966.26281738281,
+        64551.21862792969,
+        76113.34741210938
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        62316.42150878906,
+        62502.56848144531,
+        58116.5771484375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        57338.15515136719,
+        48420.674560546875,
+        51743.67272949219
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        60730.81970214844,
+        87667.97888183594,
+        79625.193359375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "named-episode-with-year"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        72868.05224609375,
+        77712.62609863281,
+        74869.19152832031
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        46169.62170410156,
+        66149.25134277344,
+        50069.798828125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        107226.099609375,
+        69173.30932617188,
+        109794.38269042969
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        72214.89965820312,
+        64315.87731933594,
+        71480.15344238281
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        66271.29614257812,
+        74784.77478027344,
+        65035.222412109375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        48848.50061035156,
+        53814.10217285156,
+        41493.921875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        48689.21911621094,
+        72821.68579101562,
+        52245.59533691406
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        63023.0712890625,
+        54027.65905761719,
+        49901.40783691406
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        66254.93884277344,
+        47019.11926269531,
+        52949.981689453125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        33420.94934082031,
+        38362.6455078125,
+        37854.827880859375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        59157.318115234375,
+        60589.06042480469,
+        54983.87145996094
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        54026.84533691406,
+        61287.328125,
+        57184.71276855469
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        51849.58386230469,
+        45510.78283691406,
+        49785.837890625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        38240.727783203125,
+        45927.947998046875,
+        44605.84521484375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        50096.150634765625,
+        35323.857666015625,
+        36622.13134765625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        52183.23779296875,
+        45830.62744140625,
+        47889.71447753906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        39937.68310546875,
+        38768.00537109375,
+        42385.01989746094
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        40436.187744140625,
+        32978.78015136719,
+        37095.219970703125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        35276.214599609375,
+        35523.72229003906,
+        37442.26574707031
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        49595.743896484375,
+        58369.913818359375,
+        63766.94738769531
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        52922.47009277344,
+        55804.595947265625,
+        56013.0615234375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        40466.990234375,
+        40956.97021484375,
+        37880.17272949219
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        33310.150146484375,
+        38138.371826171875,
+        37275.517822265625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        47665.730712890625,
+        50184.59582519531,
+        44218.16516113281
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "bare-season-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        40237.126708984375,
+        40884.72497558594,
+        44837.57019042969
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        35766.68298339844,
+        34766.58117675781,
+        35419.88623046875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        36798.583984375,
+        33108.769775390625,
+        31692.19970703125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        45597.20861816406,
+        49088.04833984375,
+        41808.085205078125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        39390.18249511719,
+        47603.47497558594,
+        48248.06726074219
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        36752.61950683594,
+        37079.52880859375,
+        35652.948974609375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        44967.02575683594,
+        43089.82336425781,
+        43181.864501953125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        49470.37756347656,
+        44929.77392578125,
+        45357.60498046875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        42251.28173828125,
+        41866.31262207031,
+        47550.16076660156
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        37364.008544921875,
+        35409.0322265625,
+        33290.79187011719
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        39006.64270019531,
+        38631.49011230469,
+        33490.59558105469
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        137926.06103515625,
+        53098.68359375,
+        41217.45300292969
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        41816.69616699219,
+        45096.68994140625,
+        46488.56604003906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        48483.02209472656,
+        44705.53076171875,
+        37830.169677734375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        40846.82214355469,
+        47427.312255859375,
+        42623.784423828125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        70904.541015625,
+        59548.62463378906,
+        60828.45556640625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        50171.97155761719,
+        57659.423828125,
+        57784.97314453125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        46286.65661621094,
+        50338.312744140625,
+        38756.69348144531
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        43204.060791015625,
+        44154.49523925781,
+        36001.932861328125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        46294.72863769531,
+        45545.69494628906,
+        42022.88818359375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        45489.583251953125,
+        50457.524658203125,
+        53758.697509765625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        37518.32580566406,
+        34754.43005371094,
+        38737.01989746094
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        37637.6953125,
+        36310.17053222656,
+        35054.94689941406
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "4484148703025791872",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        46906.209228515625,
+        42307.38830566406,
+        41922.393798828125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "bare-parent-year-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        70484.67004394531,
+        88195.82116699219,
+        77141.70837402344
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        55244.93408203125,
+        46647.92883300781,
+        46624.47607421875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        48035.56823730469,
+        47147.674560546875,
+        64545.2626953125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        72294.2861328125,
+        70925.9287109375,
+        70386.0830078125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        64056.50842285156,
+        53368.33190917969,
+        51785.319091796875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        44108.32727050781,
+        43288.055419921875,
+        44171.96154785156
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        45740.6259765625,
+        44352.874755859375,
+        44514.56701660156
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        54978.02734375,
+        56766.357421875,
+        57820.98388671875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        50860.5703125,
+        57116.3330078125,
+        58384.46044921875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        60980.21447753906,
+        63570.337890625,
+        63358.41369628906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        61550.02331542969,
+        53303.192138671875,
+        49249.57775878906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        76728.271484375,
+        76443.07458496094,
+        78087.31579589844
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        71032.04345703125,
+        68338.60778808594,
+        60270.2890625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        57525.67541503906,
+        67963.75024414062,
+        73273.61047363281
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        92423.71118164062,
+        89150.07019042969,
+        97297.62268066406
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        96497.66540527344,
+        86386.22546386719,
+        94397.35913085938
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        96380.3203125,
+        95335.15930175781,
+        99433.87854003906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        91292.31262207031,
+        88808.19702148438,
+        89901.38757324219
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        93349.91455078125,
+        82988.77465820312,
+        79531.45849609375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        94390.73693847656,
+        93256.4697265625,
+        101516.73889160156
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        101258.79406738281,
+        85553.46166992188,
+        130442.75402832031
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        80251.42419433594,
+        68765.66052246094,
+        70668.87414550781
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        81055.47583007812,
+        67750.57482910156,
+        72899.91259765625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "14068415184385218048",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        93965.52014160156,
+        86597.25439453125,
+        98206.33435058594
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "unclassified-bare-episode"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        59358.256103515625,
+        65728.06811523438,
+        48918.52307128906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        59562.41857910156,
+        56120.73767089844,
+        46870.71740722656
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        49658.0556640625,
+        52608.08312988281,
+        61301.20849609375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        61247.49255371094,
+        66911.92114257812,
+        48455.9580078125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        57831.573486328125,
+        60087.05139160156,
+        63582.173583984375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        40318.5068359375,
+        36093.938232421875,
+        32561.533569335938
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        34567.326904296875,
+        32575.139404296875,
+        35128.95202636719
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        59334.84899902344,
+        67463.53662109375,
+        63337.21923828125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        60533.99157714844,
+        55110.86022949219,
+        60641.326904296875
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        49972.905517578125,
+        45920.659423828125,
+        47004.694580078125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        44261.77978515625,
+        45443.7255859375,
+        42412.38903808594
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        39786.41259765625,
+        45993.10302734375,
+        42779.40368652344
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        35465.047119140625,
+        35063.90380859375,
+        36461.5224609375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        41692.047119140625,
+        36419.05712890625,
+        40243.76940917969
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        30604.888916015625,
+        31712.259887695312,
+        37797.43957519531
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        40610.712646484375,
+        35039.83557128906,
+        41058.929443359375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        42276.41809082031,
+        41776.77917480469,
+        37931.18798828125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        33144.20068359375,
+        33884.92333984375,
+        34415.69519042969
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        36565.9892578125,
+        37752.51770019531,
+        35235.56005859375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        38513.24462890625,
+        64645.60949707031,
+        37915.75622558594
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        40255.126953125,
+        41104.05480957031,
+        41503.68762207031
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        53741.07861328125,
+        41027.01318359375,
+        42410.675048828125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        40060.04333496094,
+        33081.16149902344,
+        34008.59582519531
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "9327424719396747008",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        39018.68688964844,
+        37304.31103515625,
+        35615.91589355469
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "mixed-library"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        30839.594482421875,
+        33306.04553222656,
+        34382.06481933594
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        42015.889404296875,
+        46129.302978515625,
+        31927.739501953125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 0,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        52795.61364746094,
+        28282.460571289062,
+        29259.613037109375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        31171.991943359375,
+        31328.43017578125,
+        32494.776489257812
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 1,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        38627.532958984375,
+        52344.33996582031,
+        53037.34338378906
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        36401.90625,
+        52163.9404296875,
+        47063.77673339844
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 2,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        33483.062744140625,
+        40896.91162109375,
+        35590.44396972656
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        29919.596313476562,
+        39370.051025390625,
+        33405.97033691406
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 3,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        37608.9580078125,
+        43166.14794921875,
+        34845.28601074219
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        39376.83605957031,
+        36806.00988769531,
+        31485.763549804688
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 4,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        33046.7275390625,
+        37907.65881347656,
+        34398.82922363281
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        36366.41442871094,
+        38856.87756347656,
+        35235.310791015625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 5,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        42834.248779296875,
+        37463.32800292969,
+        32725.377319335938
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        54806.681396484375,
+        42667.57702636719,
+        43329.986572265625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 6,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        37764.48571777344,
+        40355.47375488281,
+        36561.014892578125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        44469.95544433594,
+        33741.668701171875,
+        29821.955444335938
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 7,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        31837.40234375,
+        29301.457763671875,
+        27408.009887695312
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        27492.685913085938,
+        30873.692749023438,
+        29647.39990234375
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 8,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        31095.621826171875,
+        33594.52307128906,
+        30152.008056640625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        28361.17041015625,
+        27613.515258789062,
+        27692.123413085938
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 9,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        29916.17333984375,
+        31540.705444335938,
+        30130.645751953125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "baseline",
+        "candidate"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        30999.247192382812,
+        28650.141479492188,
+        28164.922119140625
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 10,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "candidate",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        28022.313354492188,
+        28785.181640625,
+        28186.34033203125
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    },
+    {
+      "checksum": "8511257203527383808",
+      "corpus_size": 64,
+      "execution_order": [
+        "candidate",
+        "baseline"
+      ],
+      "implementation": "baseline",
+      "iterations": 128,
+      "locale_identifier": "en_US",
+      "mode": "benchmark",
+      "nanoseconds_per_operation": [
+        28472.330810546875,
+        27844.874145507812,
+        27453.882934570312
+      ],
+      "ok": true,
+      "operations_per_round": 8192,
+      "preferred_languages": [
+        "en-US"
+      ],
+      "repeat": 11,
+      "rounds": 3,
+      "scenario": "movie-controls"
+    }
+  ],
+  "summary": {
+    "bare-parent-year-episode": {
+      "baseline_median_ns_per_file": 45571.45178222656,
+      "candidate_median_ns_per_file": 38074.907958984375,
+      "paired_median_candidate_over_baseline": 0.8204088946818513,
+      "paired_median_reduction_percent": 17.959110531814872,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.7355519714398709,
+        0.9074612934627586
+      ],
+      "pairs": 12
+    },
+    "bare-season-episode": {
+      "baseline_median_ns_per_file": 54916.127502441406,
+      "candidate_median_ns_per_file": 42536.417724609375,
+      "paired_median_candidate_over_baseline": 0.7733686616032363,
+      "paired_median_reduction_percent": 22.663133839676377,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.7200359419154043,
+        0.9479216275798847
+      ],
+      "pairs": 12
+    },
+    "mixed-library": {
+      "baseline_median_ns_per_file": 42278.09143066406,
+      "candidate_median_ns_per_file": 38404.879333496094,
+      "paired_median_candidate_over_baseline": 0.885297938862512,
+      "paired_median_reduction_percent": 11.470206113748805,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.7786924651232388,
+        0.9906137213405779
+      ],
+      "pairs": 12
+    },
+    "movie-controls": {
+      "baseline_median_ns_per_file": 33356.00793457031,
+      "candidate_median_ns_per_file": 34994.63659667969,
+      "paired_median_candidate_over_baseline": 1.0120347364783542,
+      "paired_median_reduction_percent": -1.203473647835418,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.9483796894385541,
+        1.1210644681726234
+      ],
+      "pairs": 12
+    },
+    "named-episode-no-year": {
+      "baseline_median_ns_per_file": 71604.0064086914,
+      "candidate_median_ns_per_file": 64475.657165527344,
+      "paired_median_candidate_over_baseline": 0.935037018588969,
+      "paired_median_reduction_percent": 6.496298141103097,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.8741731716400404,
+        0.9675727430138995
+      ],
+      "pairs": 12
+    },
+    "named-episode-with-year": {
+      "baseline_median_ns_per_file": 72952.80963134766,
+      "candidate_median_ns_per_file": 54071.856201171875,
+      "paired_median_candidate_over_baseline": 0.7211362737297006,
+      "paired_median_reduction_percent": 27.886372627029942,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.6778327933779593,
+        0.8417732763633988
+      ],
+      "pairs": 12
+    },
+    "unclassified-bare-episode": {
+      "baseline_median_ns_per_file": 76934.98992919922,
+      "candidate_median_ns_per_file": 65661.08197021484,
+      "paired_median_candidate_over_baseline": 0.8053302024601487,
+      "paired_median_reduction_percent": 19.466979753985125,
+      "paired_ratio_bootstrap_95_percent_interval": [
+        0.6963021899652859,
+        0.9559347792137562
+      ],
+      "pairs": 12
+    }
+  },
+  "folder_reuse_comparison": {
+    "differential": {
+      "cases": 16300,
+      "checksum": "9601960839749614061",
+      "locale_identifier": "en_US",
+      "mode": "differential",
+      "ok": true,
+      "preferred_languages": [
+        "en-US"
+      ]
+    },
+    "environment": {
+      "baseline": {
+        "branch_at_capture": "perf/media-name-folder-parsing",
+        "commit": "f8386f9be6636432c68a9ced7825544306560a60",
+        "git_blob_sha": "17857027cf8d9a1fc621095149f527d722901675",
+        "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+        "sha256": "f5fb2c51878046d33c341d6b8cde6426011e10730b30dbd564becc4619967b96"
+      },
+      "baseline_adaptation": "Rename the two top-level types only",
+      "compiled_baseline_sha256": "bd4bbb49f84f106394d4b18fce18e6664b66d999b3dfdaa9ca2f40afa6d3c476",
+      "compiler_flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library"
+      ],
+      "cpu_count": 3,
+      "hardware": "Apple M1 (Virtual)",
+      "machine": "arm64",
+      "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "processor": "arm",
+      "reference_name": "folder-reuse",
+      "reference_source": "Benchmarks/EpisodeNameRecognition/folder-reuse/MediaNameRecognition.swift",
+      "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+      "source_sha256": {
+        "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+        "Benchmarks/EpisodeNameRecognition/folder-reuse/MediaNameRecognition.swift": "f5fb2c51878046d33c341d6b8cde6426011e10730b30dbd564becc4619967b96",
+        "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+        "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+      },
+      "swift": "/usr/bin/swift",
+      "swiftc": "/usr/bin/swiftc",
+      "timestamp_utc": "2026-10-17T21:36:53.678378+00:00",
+      "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+    },
+    "method": "Median of per-process medians; paired candidate/baseline ratios; balanced alternating order; all observations retained",
+    "observations": [
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          53727.72717285156,
+          61232.30993652344,
+          45522.80676269531
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 0,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          44053.78723144531,
+          35968.816162109375,
+          36876.55139160156
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 0,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          41796.82922363281,
+          44283.37609863281,
+          39092.402099609375
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 1,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          56150.390625,
+          53860.36682128906,
+          47085.77990722656
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 1,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          48125.422119140625,
+          46382.415771484375,
+          51110.21423339844
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 2,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          47322.27575683594,
+          42506.047607421875,
+          43559.86022949219
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 2,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          44137.690185546875,
+          42149.332763671875,
+          38582.341552734375
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 3,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          43106.57751464844,
+          46747.4873046875,
+          48434.148193359375
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 3,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          52023.09167480469,
+          50543.8232421875,
+          63430.39440917969
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 4,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          41201.314208984375,
+          41105.99267578125,
+          37900.054931640625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 4,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          40723.92272949219,
+          42155.55310058594,
+          47254.94384765625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 5,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          58921.64611816406,
+          49573.15576171875,
+          44388.53955078125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 5,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          48445.11926269531,
+          41508.244873046875,
+          41147.0693359375
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 6,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          43763.12255859375,
+          45627.88391113281,
+          51240.34118652344
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 6,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          47978.56652832031,
+          48737.335205078125,
+          44199.94091796875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 7,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          44970.51501464844,
+          44542.65856933594,
+          48283.610107421875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 7,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          47080.052734375,
+          46714.996337890625,
+          45777.11486816406
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 8,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          47599.9755859375,
+          37622.75183105469,
+          47047.12927246094
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 8,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          51881.708740234375,
+          43144.27185058594,
+          45530.47180175781
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 9,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          40393.09191894531,
+          45319.580078125,
+          46272.710205078125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 9,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          47106.526611328125,
+          46649.861572265625,
+          43866.3583984375
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 10,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          38153.98156738281,
+          37761.55090332031,
+          38276.41296386719
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 10,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          42588.42468261719,
+          44813.45617675781,
+          39507.405517578125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 11,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          54835.1796875,
+          45448.83215332031,
+          42125.74255371094
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 11,
+        "rounds": 3,
+        "scenario": "named-episode-with-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          43219.060302734375,
+          45580.22058105469,
+          50678.248046875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 0,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          51679.88586425781,
+          48732.503173828125,
+          44645.721435546875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 0,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          44821.48229980469,
+          38016.03186035156,
+          39458.658935546875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 1,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          39986.37902832031,
+          43319.47326660156,
+          44573.48132324219
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 1,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          50768.849609375,
+          40148.54431152344,
+          37457.77893066406
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 2,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          38862.36572265625,
+          40476.033447265625,
+          45014.95361328125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 2,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          38606.597900390625,
+          38492.34521484375,
+          38308.75646972656
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 3,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          46776.68762207031,
+          39804.18395996094,
+          40859.771728515625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 3,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          48213.42468261719,
+          42333.71984863281,
+          39368.51501464844
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 4,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          41689.946533203125,
+          43410.883544921875,
+          44710.34240722656
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 4,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          46816.0400390625,
+          48391.94226074219,
+          43396.26574707031
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 5,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          39342.315673828125,
+          40393.89538574219,
+          36647.8525390625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 5,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          46078.20642089844,
+          49616.71447753906,
+          46686.492919921875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 6,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          47416.27502441406,
+          38644.33288574219,
+          44309.941650390625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 6,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          45407.928466796875,
+          43959.981201171875,
+          49054.24499511719
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 7,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          42544.464111328125,
+          39005.80847167969,
+          37669.00634765625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 7,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          41811.74719238281,
+          45902.08947753906,
+          47705.01208496094
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 8,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          43407.09436035156,
+          44384.81140136719,
+          47207.270263671875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 8,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          44332.72302246094,
+          37753.55529785156,
+          42049.72839355469
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 9,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          42494.82727050781,
+          47612.01989746094,
+          48172.28186035156
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 9,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          42500.10681152344,
+          43512.43591308594,
+          38599.77722167969
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 10,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          38531.03137207031,
+          37451.532958984375,
+          40891.79992675781
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 10,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          47956.634521484375,
+          50137.76647949219,
+          47537.02294921875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 11,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          40160.858154296875,
+          44300.593017578125,
+          41058.98034667969
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 11,
+        "rounds": 3,
+        "scenario": "named-episode-no-year"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          37009.43493652344,
+          28315.129516601562,
+          27316.98095703125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 0,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          30137.852905273438,
+          34470.08264160156,
+          33473.19030761719
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 0,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27825.154663085938,
+          25946.121215820312,
+          30124.30322265625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 1,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          33889.216064453125,
+          29557.047607421875,
+          27596.455932617188
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 1,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          36189.570068359375,
+          28093.460083007812,
+          29141.682983398438
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 2,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          34940.40930175781,
+          31797.917724609375,
+          27868.072509765625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 2,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          30761.342407226562,
+          30293.192626953125,
+          30518.59033203125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 3,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          34019.35827636719,
+          36135.70153808594,
+          29775.751708984375
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 3,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          29839.10107421875,
+          39557.96301269531,
+          36150.543212890625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 4,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          32518.849609375,
+          27492.691040039062,
+          26041.78369140625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 4,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27895.940185546875,
+          32208.770751953125,
+          32955.79016113281
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 5,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          30162.139892578125,
+          33978.34265136719,
+          32964.56396484375
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 5,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          37627.960205078125,
+          36969.80285644531,
+          39800.15051269531
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 6,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          44234.51232910156,
+          55400.62463378906,
+          45949.554443359375
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 6,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          33876.032470703125,
+          35607.60998535156,
+          34971.21179199219
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 7,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          36251.85656738281,
+          36819.7021484375,
+          39239.08996582031
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 7,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          43810.75537109375,
+          51362.1318359375,
+          34057.271240234375
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 8,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          34928.56848144531,
+          31451.319458007812,
+          31554.768798828125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 8,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          33964.19775390625,
+          29816.355346679688,
+          28018.366455078125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 9,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          31644.8466796875,
+          31219.61474609375,
+          27522.715209960938
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 9,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27967.46826171875,
+          32441.40625,
+          34923.48742675781
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 10,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27968.95849609375,
+          29431.523559570312,
+          35161.20397949219
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 10,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          30589.981079101562,
+          26319.869995117188,
+          26039.3779296875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 11,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "4484148703025791872",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27833.307983398438,
+          29719.792602539062,
+          27492.075561523438
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 11,
+        "rounds": 3,
+        "scenario": "bare-season-episode"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          28250.691772460938,
+          36073.24719238281,
+          29613.459350585938
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 0,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          29008.661865234375,
+          29360.198974609375,
+          28850.850463867188
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 0,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          29469.782470703125,
+          26948.257446289062,
+          28398.691772460938
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 1,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27153.849243164062,
+          26329.859375,
+          25292.958618164062
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 1,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          32042.861938476562,
+          30898.493530273438,
+          31322.93701171875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 2,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          28060.516357421875,
+          28714.838623046875,
+          28886.5712890625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 2,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          30220.403076171875,
+          29130.783081054688,
+          28072.81494140625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 3,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          28191.340209960938,
+          26594.568969726562,
+          27448.516845703125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 3,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          28178.024291992188,
+          26820.805908203125,
+          25105.336547851562
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 4,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27101.974487304688,
+          28052.668212890625,
+          28283.233642578125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 4,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27027.216552734375,
+          26415.018676757812,
+          26805.246948242188
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 5,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          29058.013916015625,
+          25543.218017578125,
+          26799.10791015625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 5,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          29543.340087890625,
+          27896.209716796875,
+          26607.157470703125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 6,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          26973.770141601562,
+          26966.339111328125,
+          26779.159545898438
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 6,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27564.687133789062,
+          31124.374389648438,
+          30750.935913085938
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 7,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          29279.23583984375,
+          28123.580932617188,
+          27877.03955078125
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 7,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          28489.71044921875,
+          32419.204711914062,
+          30324.111938476562
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 8,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          29309.895751953125,
+          27734.995483398438,
+          31420.237182617188
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 8,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27734.456298828125,
+          26416.600463867188,
+          26673.324584960938
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 9,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          25715.281127929688,
+          24980.778930664062,
+          26140.156982421875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 9,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27556.365966796875,
+          28179.061889648438,
+          27900.314331054688
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 10,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "baseline",
+          "candidate"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          27450.3681640625,
+          25496.088623046875,
+          27759.623291015625
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 10,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "candidate",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          28943.9697265625,
+          29763.559936523438,
+          28472.676635742188
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 11,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      },
+      {
+        "checksum": "8511257203527383808",
+        "corpus_size": 64,
+        "execution_order": [
+          "candidate",
+          "baseline"
+        ],
+        "implementation": "baseline",
+        "iterations": 128,
+        "locale_identifier": "en_US",
+        "mode": "benchmark",
+        "nanoseconds_per_operation": [
+          28384.104370117188,
+          27306.5185546875,
+          27489.471435546875
+        ],
+        "ok": true,
+        "operations_per_round": 8192,
+        "preferred_languages": [
+          "en-US"
+        ],
+        "repeat": 11,
+        "rounds": 3,
+        "scenario": "movie-controls"
+      }
+    ],
+    "summary": {
+      "bare-season-episode": {
+        "baseline_median_ns_per_file": 32702.985107421875,
+        "candidate_median_ns_per_file": 31036.679565429688,
+        "paired_median_candidate_over_baseline": 0.9477105475403687,
+        "paired_median_reduction_percent": 5.228945245963135,
+        "paired_ratio_bootstrap_95_percent_interval": [
+          0.9021578910637902,
+          1.034110768778024
+        ],
+        "pairs": 12
+      },
+      "movie-controls": {
+        "baseline_median_ns_per_file": 27692.840576171875,
+        "candidate_median_ns_per_file": 28556.765197753906,
+        "paired_median_candidate_over_baseline": 1.01874243978492,
+        "paired_median_reduction_percent": -1.8742439784920073,
+        "paired_ratio_bootstrap_95_percent_interval": [
+          0.973121857555174,
+          1.0570995801232517
+        ],
+        "pairs": 12
+      },
+      "named-episode-no-year": {
+        "baseline_median_ns_per_file": 42416.913330078125,
+        "candidate_median_ns_per_file": 43860.41259765625,
+        "paired_median_candidate_over_baseline": 0.9875511371100247,
+        "paired_median_reduction_percent": 1.2448862889975265,
+        "paired_ratio_bootstrap_95_percent_interval": [
+          0.926467750481739,
+          1.116645740216635
+        ],
+        "pairs": 12
+      },
+      "named-episode-with-year": {
+        "baseline_median_ns_per_file": 46731.24182128906,
+        "candidate_median_ns_per_file": 42371.98889160156,
+        "paired_median_candidate_over_baseline": 0.9033852400387514,
+        "paired_median_reduction_percent": 9.661475996124857,
+        "paired_ratio_bootstrap_95_percent_interval": [
+          0.8040144112471608,
+          1.0058816031280335
+        ],
+        "pairs": 12
+      }
+    }
+  },
+  "validation": {
+    "baseline-debug": {
+      "compiled_source_sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+      "configuration": "debug",
+      "environment": {
+        "baseline": {
+          "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+          "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+          "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        },
+        "cpu_count": 3,
+        "hardware": "Apple M1 (Virtual)",
+        "machine": "arm64",
+        "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+        "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "processor": "arm",
+        "reference_name": "main",
+        "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+        "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+        "source_sha256": {
+          "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+          "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+        },
+        "swift": "/usr/bin/swift",
+        "swiftc": "/usr/bin/swiftc",
+        "timestamp_utc": "2026-10-17T21:30:54.281833+00:00",
+        "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+      },
+      "exit_code": 0,
+      "implementation": "baseline",
+      "source_adaptations": [],
+      "test_sha256": {
+        "EpisodeNameRecognitionRegressionTests.swift": "331ec30c99a1ceb40cae3c9347689e3d5e9da6feb88d2909bb41fec68a92b6e2",
+        "MediaNameRecognitionTests.swift": "e4d4717dddd679a8214b0b7a5746651e60910aeeebb46aa2c554270bf785ab7c"
+      }
+    },
+    "baseline-release": {
+      "compiled_source_sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+      "configuration": "release",
+      "environment": {
+        "baseline": {
+          "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+          "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+          "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        },
+        "cpu_count": 3,
+        "hardware": "Apple M1 (Virtual)",
+        "machine": "arm64",
+        "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+        "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "processor": "arm",
+        "reference_name": "main",
+        "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+        "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+        "source_sha256": {
+          "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+          "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+        },
+        "swift": "/usr/bin/swift",
+        "swiftc": "/usr/bin/swiftc",
+        "timestamp_utc": "2026-10-17T21:31:31.793307+00:00",
+        "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+      },
+      "exit_code": 0,
+      "implementation": "baseline",
+      "source_adaptations": [],
+      "test_sha256": {
+        "EpisodeNameRecognitionRegressionTests.swift": "331ec30c99a1ceb40cae3c9347689e3d5e9da6feb88d2909bb41fec68a92b6e2",
+        "MediaNameRecognitionTests.swift": "e4d4717dddd679a8214b0b7a5746651e60910aeeebb46aa2c554270bf785ab7c"
+      }
+    },
+    "candidate-debug": {
+      "compiled_source_sha256": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04",
+      "configuration": "debug",
+      "environment": {
+        "baseline": {
+          "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+          "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+          "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        },
+        "cpu_count": 3,
+        "hardware": "Apple M1 (Virtual)",
+        "machine": "arm64",
+        "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+        "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "processor": "arm",
+        "reference_name": "main",
+        "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+        "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+        "source_sha256": {
+          "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+          "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+        },
+        "swift": "/usr/bin/swift",
+        "swiftc": "/usr/bin/swiftc",
+        "timestamp_utc": "2026-10-17T21:31:59.892916+00:00",
+        "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+      },
+      "exit_code": 0,
+      "implementation": "candidate",
+      "source_adaptations": [],
+      "test_sha256": {
+        "EpisodeNameRecognitionRegressionTests.swift": "331ec30c99a1ceb40cae3c9347689e3d5e9da6feb88d2909bb41fec68a92b6e2",
+        "MediaNameRecognitionTests.swift": "e4d4717dddd679a8214b0b7a5746651e60910aeeebb46aa2c554270bf785ab7c"
+      }
+    },
+    "candidate-release": {
+      "compiled_source_sha256": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04",
+      "configuration": "release",
+      "environment": {
+        "baseline": {
+          "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+          "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+          "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+          "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        },
+        "cpu_count": 3,
+        "hardware": "Apple M1 (Virtual)",
+        "machine": "arm64",
+        "os_version": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+        "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+        "processor": "arm",
+        "reference_name": "main",
+        "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+        "revision": "458ca99746f6678c12272757a5df1bf63d469d90",
+        "source_sha256": {
+          "Benchmarks/EpisodeNameRecognition/Driver.swift": "b1b18bb08b88495f4dac818c38eff70a952d45076298374c1112128b2fc709a8",
+          "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+          "Benchmarks/EpisodeNameRecognition/run.py": "ac596ebcfd5b6c3428c0343f3e473f33eaec0b92c1e566d92243b38436158cea",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "9467cc4b4ddbf096d77156394b0a4a7a0427662057e2169227f6fc937949ee04"
+        },
+        "swift": "/usr/bin/swift",
+        "swiftc": "/usr/bin/swiftc",
+        "timestamp_utc": "2026-10-17T21:32:20.236322+00:00",
+        "toolchain": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+      },
+      "exit_code": 0,
+      "implementation": "candidate",
+      "source_adaptations": [],
+      "test_sha256": {
+        "EpisodeNameRecognitionRegressionTests.swift": "331ec30c99a1ceb40cae3c9347689e3d5e9da6feb88d2909bb41fec68a92b6e2",
+        "MediaNameRecognitionTests.swift": "e4d4717dddd679a8214b0b7a5746651e60910aeeebb46aa2c554270bf785ab7c"
+      }
+    }
+  },
+  "github_run": {
+    "id": "39070382355",
+    "attempt": "1",
+    "sha": "458ca99746f6678c12272757a5df1bf63d469d90",
+    "event": "push",
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39070382355"
+  }
+}

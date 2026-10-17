@@ -1,0 +1,112 @@
+Test Suite 'All tests' started at 2026-10-17 21:16:34.092.
+Test Suite 'All tests' passed at 2026-10-17 21:16:34.094.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Media name recognition fast path boundaries" started.
+◇ Test untaggedUnicodeTitleKeepsExistingCleanup() started.
+✔ Test untaggedUnicodeTitleKeepsExistingCleanup() passed after 0.002 seconds.
+◇ Test untaggedUnknownNamesStayIntact(_:) started.
+◇ Test case passing 1 argument filename → "旅行 👨‍👩‍👧‍👦" to untaggedUnknownNamesStayIntact(_:) started.
+◇ Test case passing 1 argument filename → "Café_vacation" to untaggedUnknownNamesStayIntact(_:) started.
+◇ Test case passing 1 argument filename → "closing ] and brace }" to untaggedUnknownNamesStayIntact(_:) started.
+✔ Test untaggedUnknownNamesStayIntact(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test tagOpenersWithinGraphemeClustersStillMatch(_:) started.
+◇ Test case passing 1 argument tag → "{́note}" to tagOpenersWithinGraphemeClustersStillMatch(_:) started.
+◇ Test case passing 1 argument tag → "[́note]" to tagOpenersWithinGraphemeClustersStillMatch(_:) started.
+◇ Test case passing 1 argument tag → "{‍note}" to tagOpenersWithinGraphemeClustersStillMatch(_:) started.
+◇ Test case passing 1 argument tag → "[‍note]" to tagOpenersWithinGraphemeClustersStillMatch(_:) started.
+✔ Test tagOpenersWithinGraphemeClustersStillMatch(_:) with 4 test cases passed after 0.002 seconds.
+◇ Test filenameCatalogIDsAndEditionKeepTheirSemantics() started.
+✔ Test filenameCatalogIDsAndEditionKeepTheirSemantics() passed after 0.001 seconds.
+◇ Test ancestorMetadataIsRetainedForTagFreeNames() started.
+✔ Test ancestorMetadataIsRetainedForTagFreeNames() passed after 0.001 seconds.
+◇ Test editionEvidenceCanSpanFilenameAndAncestor() started.
+✔ Test editionEvidenceCanSpanFilenameAndAncestor() passed after 0.001 seconds.
+◇ Test lookalikeDelimitersRemainLiteral() started.
+✔ Test lookalikeDelimitersRemainLiteral() passed after 0.001 seconds.
+◇ Test unmatchedOpenersRemainLiteral(_:) started.
+◇ Test case passing 1 argument tag → "{open" to unmatchedOpenersRemainLiteral(_:) started.
+◇ Test case passing 1 argument tag → "[open" to unmatchedOpenersRemainLiteral(_:) started.
+✔ Test unmatchedOpenersRemainLiteral(_:) with 2 test cases passed after 0.001 seconds.
+✔ Suite "Media name recognition fast path boundaries" passed after 0.007 seconds.
+◇ Suite "Local media naming recognition" started.
+◇ Test episodes(_:) started.
+◇ Test case passing 1 argument path → "TV/The Office (2005)/Season 01/The.Office.S01E02.Diversity.Day.1080p.WEB-DL.mkv" to episodes(_:) started.
+◇ Test case passing 1 argument path → "TV/The Office (2005)/Season 01/S01E02 - Diversity Day.mkv" to episodes(_:) started.
+◇ Test case passing 1 argument path → "The Office (2005) - 1x02 - Diversity Day.mp4" to episodes(_:) started.
+✔ Test episodes(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test multiEpisodeSpecialAndDate() started.
+✔ Test multiEpisodeSpecialAndDate() passed after 0.001 seconds.
+◇ Test datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "20２４-02-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "2024-０２-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "2024-02-２９" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "20２４-０２-２９" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "29.02.20２４" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "29.０２.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "２９.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "２９.０２.20２４" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "20٢٤-02-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "2024-٠٢-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "2024-02-٢٩" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "29.02.20٢٤" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "29.٠٢.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "٢٩.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "2024-०२-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "२९.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "2024-𝟘𝟚-29" to datesWithNonASCIIDigitsStayIntact(_:) started.
+◇ Test case passing 1 argument date → "𝟚𝟡.02.2024" to datesWithNonASCIIDigitsStayIntact(_:) started.
+✔ Test datesWithNonASCIIDigitsStayIntact(_:) with 18 test cases passed after 0.001 seconds.
+◇ Test datedEpisodesPreserveUnicodeTitles(_:) started.
+◇ Test case passing 1 argument date → "2024-02-29" to datedEpisodesPreserveUnicodeTitles(_:) started.
+◇ Test case passing 1 argument date → "29.02.2024" to datedEpisodesPreserveUnicodeTitles(_:) started.
+✔ Test datedEpisodesPreserveUnicodeTitles(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - 2024-０２-29.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - 2024-02-٢٩.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - 20２４-02-29.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - 29.０２.2024.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - ٢٩.02.2024.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - 29.02.20２４.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - 2024-٠٢-٢٩.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - ٢٩.٠٢.2024.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - 20２４-٠٢-٢٩.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+◇ Test case passing 1 argument path → "News - ٢٩.٠٢.20２４.mkv" to unparseableUnicodeDateComponentsStayIntact(_:) started.
+✔ Test unparseableUnicodeDateComponentsStayIntact(_:) with 10 test cases passed after 0.001 seconds.
+◇ Test moviesEditionsAndVersions() started.
+✔ Test moviesEditionsAndVersions() passed after 0.001 seconds.
+◇ Test folderEvidenceMustRelateToTheFile() started.
+✔ Test folderEvidenceMustRelateToTheFile() passed after 0.001 seconds.
+◇ Test extrasTakePriority(_:) started.
+◇ Test case passing 1 argument path → "Movie (2020)-trailer.mp4" to extrasTakePriority(_:) started.
+◇ Test case passing 1 argument path → "Movie (2020)/Behind The Scenes/Making of.mkv" to extrasTakePriority(_:) started.
+◇ Test case passing 1 argument path → "Show S01E01-deleted.mkv" to extrasTakePriority(_:) started.
+✔ Test extrasTakePriority(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test ambiguousNamesStayIntact(_:) started.
+◇ Test case passing 1 argument path → "vacation.mp4" to ambiguousNamesStayIntact(_:) started.
+◇ Test case passing 1 argument path → "Anime - 012 [1080p].mkv" to ambiguousNamesStayIntact(_:) started.
+◇ Test case passing 1 argument path → "S01E01.mkv" to ambiguousNamesStayIntact(_:) started.
+◇ Test case passing 1 argument path → "clip1920x1080.mp4" to ambiguousNamesStayIntact(_:) started.
+◇ Test case passing 1 argument path → "2024.mp4" to ambiguousNamesStayIntact(_:) started.
+◇ Test case passing 1 argument path → "family.mov" to ambiguousNamesStayIntact(_:) started.
+✔ Test ambiguousNamesStayIntact(_:) with 6 test cases passed after 0.001 seconds.
+✔ Suite "Local media naming recognition" passed after 0.005 seconds.
+✔ Test run with 17 tests in 2 suites passed after 0.013 seconds.
+
+STDERR
+Building for production...
+[0/10] Write swift-version-7974D3F7F03D5E95.txt
+[1/10] Write sources
+[2/10] /Users/runner/work/_temp/media-name-recognition/build/baseline/arm64-apple-macosx/release/MediaNameRecognitionQualificationPackageTests.derived/runner.swift
+[3/10] Write sources
+[7/11] Compiling IlliquidCore MediaNameRecognition.swift
+[8/12] Compiling RecognitionBenchmark Corpus.swift
+[9/13] Compiling IlliquidCoreTests MediaNameRecognitionFastPathTests.swift
+[9/13] Write Objects.LinkFileList
+[11/14] Compiling MediaNameRecognitionQualificationPackageTests runner.swift
+[11/14] Linking RecognitionBenchmark
+[12/14] Write Objects.LinkFileList
+[13/14] Linking MediaNameRecognitionQualificationPackageTests
+Build complete! (13.77s)

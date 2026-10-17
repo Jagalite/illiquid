@@ -113,7 +113,10 @@ struct PresentationTimeObservationTests {
         var deliveries = 0
         let operation: @MainActor @Sendable () -> Void = { deliveries += 1 }
         coalescer.request(.init(source: .videoEnqueue, urgency: .routine), operation: operation)
-        for _ in 0..<100 where deliveries == 0 { await Task.yield() }
+        let deadline0 = ContinuousClock.now + .seconds(3)
+        while deliveries == 0, ContinuousClock.now < deadline0 {
+            try await Task.sleep(for: .milliseconds(1))
+        }
         #expect(deliveries == 1)
         for _ in 0..<1_000 {
             coalescer.request(.init(source: .audioEnqueue, urgency: .routine), operation: operation)
@@ -121,16 +124,25 @@ struct PresentationTimeObservationTests {
         try await Task.sleep(for: .milliseconds(50))
         #expect(deliveries == 1)
         coalescer.request(.init(source: .preroll, urgency: .urgent), operation: operation)
-        for _ in 0..<100 where deliveries == 1 { await Task.yield() }
+        let deadline1 = ContinuousClock.now + .seconds(3)
+        while deliveries == 1, ContinuousClock.now < deadline1 {
+            try await Task.sleep(for: .milliseconds(1))
+        }
         #expect(deliveries == 2)
         // The replaced timer must not produce an extra stale delivery.
         try await Task.sleep(for: .milliseconds(1_100))
         #expect(deliveries == 2)
         coalescer.request(.init(source: .videoEnqueue, urgency: .routine), operation: operation)
-        for _ in 0..<100 where deliveries == 2 { await Task.yield() }
+        let deadline2 = ContinuousClock.now + .seconds(3)
+        while deliveries == 2, ContinuousClock.now < deadline2 {
+            try await Task.sleep(for: .milliseconds(1))
+        }
         #expect(deliveries == 3)
         coalescer.request(.init(source: .audioEnqueue, urgency: .routine), operation: operation)
-        try await Task.sleep(for: .milliseconds(1_100))
+        let trailingDeadline = ContinuousClock.now + .seconds(3)
+        while deliveries == 3, ContinuousClock.now < trailingDeadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
         #expect(deliveries == 4) // Last routine request is delivered even at pause/EOF.
         #expect(coalescer.snapshot().requestsBySource[.audioEnqueue] == 1_001)
     }
