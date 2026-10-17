@@ -110,6 +110,14 @@ struct SourceMediaPresenceScannerTests {
         }
         let scanner = SourceMediaPresenceScanner()
         defer { scanner.stop() }
+        func waitForScan() async throws {
+            // Each invalidation starts a distinct operation with its own bound.
+            let deadline = ContinuousClock.now + .seconds(5)
+            while scanner.isScanning && ContinuousClock.now < deadline {
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            try #require(!scanner.isScanning)
+        }
         scanner.setRoots([root])
         let deadline = ContinuousClock.now + .seconds(5)
         while scanner.startedJobCount == 0 && ContinuousClock.now < deadline {
@@ -124,9 +132,7 @@ struct SourceMediaPresenceScannerTests {
         try Data().write(to: media)
         for _ in 0..<20 { scanner.invalidate(paths: [changedID]) }
         #expect(scanner.startedJobCount == 1)
-        while scanner.isScanning && ContinuousClock.now < deadline {
-            try await Task.sleep(for: .milliseconds(10))
-        }
+        try await waitForScan()
         #expect(!scanner.isScanning)
         #expect(scanner.startedJobCount == 2)
         #expect(scanner.results[changedID] == true)
@@ -137,16 +143,12 @@ struct SourceMediaPresenceScannerTests {
         scanner.invalidate(paths: [changedID])
         #expect(scanner.results[rootID] == nil)
         #expect(scanner.results[siblingID] == false)
-        while scanner.isScanning && ContinuousClock.now < deadline {
-            try await Task.sleep(for: .milliseconds(10))
-        }
+        try await waitForScan()
         #expect(scanner.results[rootID] == false)
 
         try FileManager.default.removeItem(at: changed)
         scanner.invalidate(paths: [rootID], trees: [changedID])
-        while scanner.isScanning && ContinuousClock.now < deadline {
-            try await Task.sleep(for: .milliseconds(10))
-        }
+        try await waitForScan()
         #expect(scanner.results[changedID] == nil)
         #expect(scanner.results[rootID] == false)
         #expect(scanner.results[siblingID] == false)
