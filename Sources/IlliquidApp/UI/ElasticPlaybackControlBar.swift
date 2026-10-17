@@ -388,6 +388,16 @@ struct ElasticPlaybackControlBarGeometry {
 
     private func rawPoint(at s: CGFloat) -> CGPoint {
         guard s != 0 else { return center }
+        // At either end of the bend, every tangent has the same angle. Evaluate
+        // that straight line directly; partially bent bars keep the existing
+        // midpoint integration and its sampling precision.
+        if bendProgress == 0 || bendProgress == 1 {
+            let angle = tangentAngle(at: 0)
+            return CGPoint(
+                x: center.x + cos(angle) * s,
+                y: center.y + sin(angle) * s
+            )
+        }
         let steps = max(1, Int(ceil(abs(s) / 6)))
         let step = s / CGFloat(steps)
         var point = center
