@@ -13,7 +13,7 @@ cp "$root/Tests/IlliquidPlaybackCoreTests/"*.swift "$work/Tests/IlliquidPlayback
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1
 import PackageDescription
-let package = Package(name: "IlliquidRendererRecoveryRegressions", targets: [
+let package = Package(name: "IlliquidRendererRecoveryRegressions", platforms: [.macOS("26.0")], targets: [
     .target(name: "IlliquidCore"),
     .target(name: "IlliquidPlaybackCore", dependencies: ["IlliquidCore"]),
     .testTarget(name: "IlliquidPlaybackCoreTests", dependencies: ["IlliquidPlaybackCore"])

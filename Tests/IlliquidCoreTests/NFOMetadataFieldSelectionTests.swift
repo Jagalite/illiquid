@@ -4,6 +4,15 @@ import IlliquidCore
 
 @Suite("NFO metadata field selection")
 struct NFOMetadataFieldSelectionTests {
+    @Test func ignoredShowTotalsDoNotConsumeEpisodeFieldBudget() throws {
+        let longTotal = String(repeating: "9", count: 5_000)
+        let xml = "<tvshow><title>Series</title><season>\(longTotal)</season><episode>\(longTotal)</episode></tvshow>"
+        let hints = try #require(NFOMetadataHints.parse(Data(xml.utf8)))
+        #expect(hints.title == "Series")
+        #expect(hints.season == nil)
+        #expect(hints.episode == nil)
+    }
+
     private func parse(_ xml: String) -> MediaMetadataHints? {
         NFOMetadataHints.parse(Data(xml.utf8))
     }

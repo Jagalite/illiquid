@@ -49,7 +49,8 @@ private final class MetadataDelegate: NSObject, XMLParserDelegate {
     private var capturesText: Bool {
         guard stack.count == 2, let name = stack.last else { return false }
         switch name {
-        case "title", "season", "episode", "uniqueid": return true
+        case "title", "uniqueid": return true
+        case "season", "episode": return hints.content == .episode
         case "showtitle": return hints.content == .episode
         case "year": return hints.content != .episode
         default: return false

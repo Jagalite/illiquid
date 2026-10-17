@@ -179,7 +179,7 @@ struct PersistenceWriterLifetimeTests {
         #expect(writes.read() == [2])
     }
 
-    @Test func newerPendingSnapshotSupersedesAnInFlightWriteFailure() async throws {
+    @Test func newerPendingSnapshotSupersedesAnInFlightWriteFailure() throws {
         let entered = DispatchSemaphore(value: 0), release = DispatchSemaphore(value: 0)
         let attempts = Locked([Int]()), callbackTimedOut = Locked(false)
         let writer = CoalescingPersistenceWriter<Int>(label: "test.persistence.latest-result", delay: 0) { value in
@@ -197,7 +197,7 @@ struct PersistenceWriterLifetimeTests {
         try #require(entered.wait(timeout: .now() + 5) == .success)
         writer.submitSnapshot { 2 }
         release.signal()
-        try await writer.flush().get()
+        try writer.flushSynchronously().get()
         #expect(!callbackTimedOut.read())
         #expect(attempts.read() == [1, 2])
     }

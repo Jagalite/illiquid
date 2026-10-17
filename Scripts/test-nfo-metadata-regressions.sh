@@ -29,7 +29,7 @@ fi
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1
 import PackageDescription
-let package = Package(name: "IlliquidNFOMetadataRegressions", targets: [
+let package = Package(name: "IlliquidNFOMetadataRegressions", platforms: [.macOS("26.0")], targets: [
     .target(name: "IlliquidCore"),
     .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])
 ])
