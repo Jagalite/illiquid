@@ -1,0 +1,42 @@
+name: Natural filename ordering
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/**'
+      - 'Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift'
+      - 'Tests/IlliquidCoreTests/UtilitiesTests.swift'
+      - 'Scripts/test-natural-filename-ordering.sh'
+      - 'Benchmarks/NaturalFilenameOrdering/**'
+      - '.github/workflows/natural-filename-ordering.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: natural-filename-ordering-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Debug ordering regressions
+        run: bash Scripts/test-natural-filename-ordering.sh --jobs 2 -Xswiftc -warnings-as-errors
+      - name: Release ordering regressions
+        run: bash Scripts/test-natural-filename-ordering.sh -c release --jobs 2 -Xswiftc -warnings-as-errors
+      - name: Measure actual sorting and playlist construction
+        run: python3 Benchmarks/NaturalFilenameOrdering/run.py --output "$RUNNER_TEMP/natural-filename-ordering"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: natural-filename-ordering-macos
+          path: ${{ runner.temp }}/natural-filename-ordering/
+          retention-days: 7

@@ -1,0 +1,82 @@
+Building for production...
+[0/9] Write sources
+[2/9] Write swift-version--7EF636258D2A4BDC.txt
+[4/10] Compiling IlliquidCore ExternalSubtitleMatcher.swift
+[5/11] Compiling IlliquidCoreTests FolderDiscoveryFilesystemRegressionTests.swift
+[5/11] /tmp/illiquid-folder-discovery.egELMt/.build/x86_64-unknown-linux-gnu/release/IlliquidFolderDiscoveryRegressionsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/11] Write sources
+[8/12] Compiling IlliquidFolderDiscoveryRegressionsPackageDiscoveredTests IlliquidCoreTests.swift
+[8/12] /tmp/illiquid-folder-discovery.egELMt/.build/x86_64-unknown-linux-gnu/release/IlliquidFolderDiscoveryRegressionsPackageTests.derived/runner.swift
+[9/12] Write sources
+[11/13] Compiling IlliquidFolderDiscoveryRegressionsPackageTests runner.swift
+[11/13] Write Objects.LinkFileList
+[12/13] Linking IlliquidFolderDiscoveryRegressionsPackageTests.xctest
+Build complete! (16.70s)
+Test Suite 'All tests' started at 2026-10-17 13:37:32.293
+Test Suite 'release.xctest' started at 2026-10-17 13:37:32.294
+Test Suite 'release.xctest' passed at 2026-10-17 13:37:32.294
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-17 13:37:32.294
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Folder playlist discovery" started.
+◇ Suite "Folder discovery filesystem regressions" started.
+◇ Test "Discovery attaches only related external subtitles" started.
+◇ Test "Discovery rejects a file URL as a folder" started.
+◇ Test "Discovery preserves title words when attaching external subtitles" started.
+◇ Test "Opening a symlinked folder keeps its canonical identity" started.
+◇ Test "Directory links are not traversed" started.
+◇ Test "Symlinks are classified by their targets" started.
+◇ Test "Relative and chained symlinks retain target identity" started.
+◇ Test "Symlink retargeting is observed on the next discovery" started.
+◇ Test "Missing folder errors propagate" started.
+◇ Test "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test "Multiple media aliases keep one canonical identity" started.
+◇ Test "Discovery is shallow, filters unsupported files, and naturally sorts" started.
+◇ Test "Extensionless subtitle symlinks are retained" started.
+◇ Test "Hidden entries stay hidden but visible aliases retain target identity" started.
+◇ Test "Named pipes with media extensions are excluded without reading content" started.
+◇ Test "Cancellation is checked before touching a missing folder" started.
+◇ Test "Media-looking links to unsupported files are excluded" started.
+◇ Test "Unsupported files do not change the playlist" started.
+◇ Test case passing 1 argument name → "shortcut" to "Symlinks are classified by their targets" started.
+◇ Test case passing 1 argument name → "alias.txt" to "Symlinks are classified by their targets" started.
+◇ Test "Broken links are ignored" started.
+◇ Test case passing 1 argument name → "alias.MKV" to "Symlinks are classified by their targets" started.
+◇ Test case passing 1 argument stopAt → 3 to "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test case passing 1 argument stopAt → 4 to "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test case passing 1 argument stopAt → 12 to "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test case passing 1 argument stopAt → 40 to "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test case passing 1 argument ext → "srt" to "Extensionless subtitle symlinks are retained" started.
+◇ Test case passing 1 argument ext → "ass" to "Extensionless subtitle symlinks are retained" started.
+◇ Test case passing 1 argument ext → "vtt" to "Extensionless subtitle symlinks are retained" started.
+◇ Test case passing 1 argument ext → "idx" to "Extensionless subtitle symlinks are retained" started.
+◇ Test case passing 1 argument ext → "ssa" to "Extensionless subtitle symlinks are retained" started.
+◇ Test case passing 1 argument unrelatedCount → 0 to "Unsupported files do not change the playlist" started.
+◇ Test case passing 1 argument unrelatedCount → 250 to "Unsupported files do not change the playlist" started.
+◇ Test case passing 1 argument name → "missing" to "Broken links are ignored" started.
+◇ Test case passing 1 argument name → "missing.mkv" to "Broken links are ignored" started.
+✔ Test "Opening a symlinked folder keeps its canonical identity" passed after 0.014 seconds.
+✔ Test "Directory links are not traversed" passed after 0.014 seconds.
+✔ Test "Relative and chained symlinks retain target identity" passed after 0.014 seconds.
+✔ Test "Symlinks are classified by their targets" with 3 test cases passed after 0.014 seconds.
+✔ Test "Multiple media aliases keep one canonical identity" passed after 0.014 seconds.
+✔ Test "Discovery rejects a file URL as a folder" passed after 0.014 seconds.
+✔ Test "Missing folder errors propagate" passed after 0.014 seconds.
+✔ Test "Discovery attaches only related external subtitles" passed after 0.014 seconds.
+✔ Test "Discovery preserves title words when attaching external subtitles" passed after 0.014 seconds.
+✔ Test "Symlink retargeting is observed on the next discovery" passed after 0.014 seconds.
+✔ Test "Hidden entries stay hidden but visible aliases retain target identity" passed after 0.014 seconds.
+✔ Test "Discovery is shallow, filters unsupported files, and naturally sorts" passed after 0.014 seconds.
+✔ Test "Extensionless subtitle symlinks are retained" with 5 test cases passed after 0.014 seconds.
+✔ Test "Media-looking links to unsupported files are excluded" passed after 0.014 seconds.
+✔ Test "Cancellation is checked before touching a missing folder" passed after 0.014 seconds.
+✔ Test "Broken links are ignored" with 2 test cases passed after 0.014 seconds.
+✔ Suite "Folder playlist discovery" passed after 0.015 seconds.
+✔ Test "Named pipes with media extensions are excluded without reading content" passed after 0.015 seconds.
+✔ Test "Cancellation during scanning throws rather than returning partial results" with 4 test cases passed after 0.018 seconds.
+✔ Test "Unsupported files do not change the playlist" with 2 test cases passed after 0.033 seconds.
+✔ Suite "Folder discovery filesystem regressions" passed after 0.034 seconds.
+✔ Test run with 19 tests in 2 suites passed after 0.035 seconds.
