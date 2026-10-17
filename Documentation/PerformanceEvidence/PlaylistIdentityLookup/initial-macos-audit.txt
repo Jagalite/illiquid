@@ -1,0 +1,28 @@
+Playlist identity native evidence audit: PASSED
+Audit date: 2026-10-17
+Implementation commit: 6d2e617ffdda47e20ffdb67ab6551619de2c7634
+Archive SHA-256: 5f742a028d04f0843a462b6178818338ae775d6c3e2fb8f81e128da42c73677b
+
+Coverage: 29 workloads, 8 balanced baseline/candidate pairs each.
+Measurement processes: 464
+Calibration processes: 61
+Successful command/log pairs: 541
+Source receipts: 15
+Tests: 22 test functions in 4 suites passed for baseline/candidate, debug/release.
+
+Checks performed on the extracted original artifact:
+- Archive SHA-256 matches the Actions artifact digest.
+- Recorded candidate working tree is clean.
+- All source hashes match snapshots and the recorded candidate Git commit.
+- Frozen baseline source bytes match the baseline commit and manifest hashes.
+- Measurement records cover each workload/pair/variant exactly once.
+- Pair order is balanced; paired iterations, expected indices and checksums agree.
+- Per-call timing arithmetic matches recorded elapsed times and iteration counts.
+- Medians, ranges, paired reductions and faster-pair counts recompute from raw rows.
+- Every command start has a successful finish and a matching log.
+- Each raw benchmark observation matches the JSON receipt in its process log.
+
+Initial two-function candidate; superseded by the separately measured final refinement.
+
+This records an evidence-integrity audit of the campaign, not a second performance experiment.
+Full raw data, command logs, source receipts and the original summary are in the adjacent ZIP.
