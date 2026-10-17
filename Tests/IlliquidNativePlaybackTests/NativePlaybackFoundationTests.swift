@@ -498,27 +498,28 @@ struct NativePlaybackFoundationTests {
         #expect(gate.acquire(while: { true }) == nil)
     }
 
-    @Test func videoFrameCapacityGateCloseCancelsBlockedAcquisition() {
+    @Test func videoFrameCapacityGateCloseCancelsBlockedAcquisition() throws {
         let gate = VideoFrameCapacityGate(capacity: 1)
         var held = gate.acquire(while: { true })
         #expect(held != nil)
         let started = DispatchSemaphore(value: 0)
         let cancelled = DispatchSemaphore(value: 0)
-        DispatchQueue.global().async {
+        Thread.detachNewThread {
             started.signal()
             if gate.acquire(while: { true }) == nil {
                 cancelled.signal()
             }
         }
-        #expect(started.wait(timeout: .now() + 1) == .success)
-        let waitDeadline = Date().addingTimeInterval(1)
+        defer { gate.close() }
+        try #require(started.wait(timeout: .now() + 3) == .success)
+        let waitDeadline = Date().addingTimeInterval(3)
         while gate.snapshot.waitingAcquisitions == 0, Date() < waitDeadline {
             Thread.sleep(forTimeInterval: 0.001)
         }
-        #expect(gate.snapshot.waitingAcquisitions == 1)
+        try #require(gate.snapshot.waitingAcquisitions == 1)
 
         gate.close()
-        #expect(cancelled.wait(timeout: .now() + 1) == .success)
+        try #require(cancelled.wait(timeout: .now() + 3) == .success)
         held = nil
         #expect(gate.snapshot.inUse == 0)
     }
@@ -589,22 +590,30 @@ struct NativePlaybackFoundationTests {
         queue.close()
     }
 
-    @Test func queueInvalidationPreemptsAProducerBlockedOnDataCapacity() async {
+    @Test func queueInvalidationPreemptsAProducerBlockedOnDataCapacity() throws {
         let queue = BoundedQueue<Int>(capacity: 1)
+        defer { queue.close() }
         #expect(queue.push(1))
-        let blocked = Task.detached { queue.push(2) }
-        #expect(queue.waitForBlockedProducer(timeout: 1))
+        let rejected = DispatchSemaphore(value: 0)
+        let finished = DispatchSemaphore(value: 0)
+        // Blocking queue operations need an independent OS thread, rather than
+        // depending on a free cooperative Swift executor while this test waits.
+        Thread.detachNewThread {
+            if !queue.push(2) { rejected.signal() }
+            finished.signal()
+        }
+        try #require(queue.waitForBlockedProducer(timeout: 3))
         let contention = queue.contentionSnapshot
         #expect(contention.waitingProducers == 1)
         #expect(contention.peakWaitingProducers == 1)
         #expect(contention.producerWaits >= 1)
         queue.removeAll()
-        #expect(await blocked.value == false)
+        try #require(finished.wait(timeout: .now() + 3) == .success)
+        #expect(rejected.wait(timeout: .now()) == .success)
         #expect(queue.contentionSnapshot.producerWaitSeconds >= 0)
         #expect(queue.count == 0)
-        #expect(queue.push(3))
+        try #require(queue.tryPush(3) == .pushed)
         if case let .value(value) = queue.pop() { #expect(value == 3) }
-        queue.close()
     }
 
     @Test func nonblockingQueuePushReportsCapacityWithoutSleeping() {

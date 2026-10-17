@@ -40,7 +40,7 @@ private enum PlaybackBufferChecks {
                     r.check(q.push(10), "initial enqueue")
                     let result = BufferCheckBox<Bool?>(nil)
                     let finished = DispatchSemaphore(value: 0)
-                    DispatchQueue.global().async {
+                    Thread.detachNewThread {
                         let accepted = first ? q.pushFirst(20) : q.push(20)
                         result.update { $0 = accepted }
                         finished.signal()
@@ -109,12 +109,12 @@ private enum PlaybackBufferChecks {
             let values = BufferCheckBox<[Int]>([])
             for p in 0..<4 {
                 producers.enter()
-                DispatchQueue.global().async {
+                Thread.detachNewThread {
                     defer { producers.leave() }
                     for i in 0..<2_000 { if !q.push(p * 2_000 + i) { return } }
                 }
             }
-            DispatchQueue.global().async {
+            Thread.detachNewThread {
                 var received: [Int] = []
                 for _ in 0..<8_000 {
                     if case .value(let value) = q.pop() { received.append(value) }
@@ -138,7 +138,7 @@ private enum PlaybackBufferChecks {
             let q = BoundedQueue<Int>(capacity: 1)
             let ended = DispatchSemaphore(value: 0)
             let closed = BufferCheckBox(false)
-            DispatchQueue.global().async {
+            Thread.detachNewThread {
                 if case .closed = q.pop() { closed.update { $0 = true } }
                 ended.signal()
             }
