@@ -49,7 +49,10 @@ jobs:
             -f lavfi -i 'testsrc2=size=320x180:rate=24' \
             -f lavfi -i 'sine=frequency=440:sample_rate=48000' -t 3 \
             -c:v libx264 -preset ultrafast -c:a aac "$ILLIQUID_PACKET_OWNERSHIP_FIXTURE"
-          swift test --force-resolved-versions -c release
+          # Deadline tests intentionally block native workers. Isolate unrelated
+          # test cases from each other on the shared runner; concurrency inside
+          # each test (producers, cancellation, bursts) still runs normally.
+          swift test --force-resolved-versions -c release --no-parallel
 
   native-presentation-research:
     runs-on: macos-26
