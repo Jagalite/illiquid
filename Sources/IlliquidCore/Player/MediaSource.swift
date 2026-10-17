@@ -18,6 +18,7 @@ public enum MediaSource: Hashable, Codable, Sendable {
 
     public init?(url: URL) {
         if url.isFileURL {
+            guard NormalizedFileURL.normalize(url) != nil else { return nil }
             self = .localFile(url)
             return
         }
@@ -53,7 +54,12 @@ public struct MediaLoadRequest: Equatable, Sendable {
     public let origin: MediaSourceOrigin
 
     public init?(source: MediaSource, origin: MediaSourceOrigin) {
-        guard !(source.isRemote && origin == .restoredSession) else { return nil }
+        // Public enum cases and decoded session records can pair a source kind
+        // with an incompatible URL. Revalidate before trusting that kind for
+        // restoration policy; do not silently reclassify a malformed record.
+        guard MediaSource(url: source.url) == source,
+              !(source.isRemote && origin == .restoredSession)
+        else { return nil }
         self.source = source
         self.origin = origin
     }
