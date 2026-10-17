@@ -1,0 +1,35 @@
+name: Elastic control geometry
+on:
+  pull_request:
+    paths:
+      - .github/workflows/elastic-control-geometry.yml
+      - Benchmarks/ElasticControlGeometry/**
+      - Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift
+      - Tests/IlliquidAppTests/**
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: elastic-control-geometry-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  geometry-regressions-and-timings:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Run geometry regressions and paired release timings
+        run: |
+          python3 Benchmarks/ElasticControlGeometry/run.py \
+            --output "$RUNNER_TEMP/elastic-geometry" \
+            --rounds 6 --iterations 4000
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: elastic-control-geometry
+          path: ${{ runner.temp }}/elastic-geometry/
+          retention-days: 7
