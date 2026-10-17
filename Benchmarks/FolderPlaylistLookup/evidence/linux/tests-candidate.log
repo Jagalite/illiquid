@@ -1,0 +1,164 @@
+{
+  "variant": "candidate",
+  "implementation": "Lazy query normalization after first valid item identity",
+  "production_git_blob": "35e4ba72001a72199682fd629154f611b6995ac1",
+  "baseline_revision": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "source_sha256": {
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "30fb32025e1192803c7113a4a829946a841d5058f6bc3e708a2895bb4c26b139",
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "392fdfb0ea35cd2a30804a3f07f23c489130f026e22ba32dd2b9f40216c60a4c",
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "Sources/IlliquidCore/Utilities/MediaFileSupport.swift": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+    "Tests/IlliquidCoreTests/UtilitiesTests.swift": "659d0a915e34411e754eaa1c23f5fafef9ab2aa7967849a3a6620c866aca88f9",
+    "Tests/IlliquidCoreTests/FolderPlaylistTests.swift": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d",
+    "Tests/IlliquidCoreTests/FolderPlaylistLookupTests.swift": "f3becac9488c2b12890933ab74c188098aa1fc5fee6870e4a646db3a64a1880f"
+  },
+  "package_sha256": "2a65cf238767822894038a9911b49b9d12933153f5868f2825b91d1344a0d6ad",
+  "workspace": "/workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya",
+  "free_disk_bytes_before_build": 1568837632,
+  "scratch_environment": {
+    "ILLQ_SWIFT_TOOLCHAIN": "/workspace/scratch/a03e8283f011/swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04",
+    "SWIFTPM_MODULECACHE_OVERRIDE": "/workspace/scratch/a03e8283f011/swift-toolchain/module-cache",
+    "CLANG_MODULE_CACHE_PATH": "/workspace/scratch/a03e8283f011/swift-toolchain/module-cache",
+    "TMPDIR": "/workspace/scratch/a03e8283f011/swift-toolchain/tmp"
+  },
+  "support_snapshot_verification": "The other three production sources and all three test files match the original qualification SHA-256 receipts."
+}
+
+### candidate debug
+$ /workspace/scratch/a03e8283f011/swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift test --package-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/candidate --scratch-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/candidate-build --cache-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/swiftpm-cache --config-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/swiftpm-config --security-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/swiftpm-security --disable-sandbox --configuration debug --jobs 2 --no-parallel
+[0/1] Planning build
+Building for debugging...
+[0/5] Write sources
+[1/5] Write swift-version-58B309EBDC5BF08.txt
+[3/7] Emitting module IlliquidCore
+[4/7] Compiling IlliquidCore FolderPlaylist.swift
+[5/7] Write Objects.LinkFileList
+[6/7] Linking FolderPlaylistLookupQualificationPackageTests.xctest
+Build complete! (0.58s)
+Test Suite 'All tests' started at 2026-10-17 14:02:37.658
+Test Suite 'debug.xctest' started at 2026-10-17 14:02:37.665
+Test Suite 'debug.xctest' passed at 2026-10-17 14:02:37.665
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-17 14:02:37.666
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Folder playlist identity lookup" started.
+◇ Test emptyAndSingletonPlaylistsKeepLookupAndRestorePolicy() started.
+✔ Test emptyAndSingletonPlaylistsKeepLookupAndRestorePolicy() passed after 0.001 seconds.
+◇ Test duplicateIdentitiesReturnTheFirstCompleteItemInPlaylistOrder() started.
+✔ Test duplicateIdentitiesReturnTheFirstCompleteItemInPlaylistOrder() passed after 0.002 seconds.
+◇ Test decodedRawItemsAreNormalizedDuringLookup() started.
+✔ Test decodedRawItemsAreNormalizedDuringLookup() passed after 0.001 seconds.
+◇ Test unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "https://example.invalid/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "ftp://example.invalid/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://media-server.example/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://localhost.example/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://127.0.0.1/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://[::1]/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://user@localhost/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://user:password@localhost/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://localhost:1234/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file:relative.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file:" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://localhost" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+✔ Test unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) with 13 test cases passed after 0.001 seconds.
+◇ Test relativeQueriesValidateTheirAbsoluteBase() started.
+✔ Test relativeQueriesValidateTheirAbsoluteBase() passed after 0.001 seconds.
+◇ Test mixedStoredRepresentationsMatchTheOriginalIdentityPredicate() started.
+✔ Test mixedStoredRepresentationsMatchTheOriginalIdentityPredicate() passed after 0.058 seconds.
+✔ Suite "Folder playlist identity lookup" passed after 0.065 seconds.
+◇ Suite "Folder playlist" started.
+◇ Test "Initial index restores the last file or falls back to first" started.
+✔ Test "Initial index restores the last file or falls back to first" passed after 0.001 seconds.
+◇ Test "Initial index is nil for an empty playlist" started.
+✔ Test "Initial index is nil for an empty playlist" passed after 0.001 seconds.
+◇ Test "Next and previous stop at playlist boundaries" started.
+✔ Test "Next and previous stop at playlist boundaries" passed after 0.001 seconds.
+✔ Suite "Folder playlist" passed after 0.001 seconds.
+◇ Suite "Core utilities" started.
+◇ Test "Natural ordering sorts numbers by value" started.
+✔ Test "Natural ordering sorts numbers by value" passed after 0.001 seconds.
+◇ Test "Media and subtitle extension checks are case insensitive" started.
+✔ Test "Media and subtitle extension checks are case insensitive" passed after 0.001 seconds.
+◇ Test "Normalized file identity standardizes path segments" started.
+✔ Test "Normalized file identity standardizes path segments" passed after 0.001 seconds.
+◇ Test lexicalKeysDoNotResolveAliasesAndPreparationObservesRetargeting() started.
+✔ Test lexicalKeysDoNotResolveAliasesAndPreparationObservesRetargeting() passed after 0.001 seconds.
+✔ Suite "Core utilities" passed after 0.002 seconds.
+✔ Test run with 13 tests in 3 suites passed after 0.068 seconds.
+
+Exit status: 0
+
+### candidate release
+$ /workspace/scratch/a03e8283f011/swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift test --package-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/candidate --scratch-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/candidate-build --cache-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/swiftpm-cache --config-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/swiftpm-config --security-path /workspace/scratch/a03e8283f011/playlist-lookup-tests-nzddmnya/swiftpm-security --disable-sandbox --configuration release --jobs 2 --no-parallel
+[0/1] Planning build
+Building for production...
+[0/4] Write sources
+[1/4] Write swift-version-58B309EBDC5BF08.txt
+[3/5] Compiling IlliquidCore FolderPlaylist.swift
+[3/5] Write Objects.LinkFileList
+[4/5] Linking FolderPlaylistLookupQualificationPackageTests.xctest
+Build complete! (1.46s)
+Test Suite 'All tests' started at 2026-10-17 14:02:39.525
+Test Suite 'release.xctest' started at 2026-10-17 14:02:39.527
+Test Suite 'release.xctest' passed at 2026-10-17 14:02:39.527
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-17 14:02:39.527
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Folder playlist identity lookup" started.
+◇ Test emptyAndSingletonPlaylistsKeepLookupAndRestorePolicy() started.
+✔ Test emptyAndSingletonPlaylistsKeepLookupAndRestorePolicy() passed after 0.001 seconds.
+◇ Test duplicateIdentitiesReturnTheFirstCompleteItemInPlaylistOrder() started.
+✔ Test duplicateIdentitiesReturnTheFirstCompleteItemInPlaylistOrder() passed after 0.001 seconds.
+◇ Test decodedRawItemsAreNormalizedDuringLookup() started.
+✔ Test decodedRawItemsAreNormalizedDuringLookup() passed after 0.001 seconds.
+◇ Test unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "https://example.invalid/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "ftp://example.invalid/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://media-server.example/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://localhost.example/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://127.0.0.1/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://[::1]/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://user@localhost/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://user:password@localhost/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://localhost:1234/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file:relative.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file:" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://localhost" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+✔ Test unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) with 13 test cases passed after 0.002 seconds.
+◇ Test relativeQueriesValidateTheirAbsoluteBase() started.
+✔ Test relativeQueriesValidateTheirAbsoluteBase() passed after 0.001 seconds.
+◇ Test mixedStoredRepresentationsMatchTheOriginalIdentityPredicate() started.
+✔ Test mixedStoredRepresentationsMatchTheOriginalIdentityPredicate() passed after 0.114 seconds.
+✔ Suite "Folder playlist identity lookup" passed after 0.120 seconds.
+◇ Suite "Folder playlist" started.
+◇ Test "Initial index restores the last file or falls back to first" started.
+✔ Test "Initial index restores the last file or falls back to first" passed after 0.001 seconds.
+◇ Test "Initial index is nil for an empty playlist" started.
+✔ Test "Initial index is nil for an empty playlist" passed after 0.001 seconds.
+◇ Test "Next and previous stop at playlist boundaries" started.
+✔ Test "Next and previous stop at playlist boundaries" passed after 0.001 seconds.
+✔ Suite "Folder playlist" passed after 0.001 seconds.
+◇ Suite "Core utilities" started.
+◇ Test "Natural ordering sorts numbers by value" started.
+✔ Test "Natural ordering sorts numbers by value" passed after 0.001 seconds.
+◇ Test "Media and subtitle extension checks are case insensitive" started.
+✔ Test "Media and subtitle extension checks are case insensitive" passed after 0.001 seconds.
+◇ Test "Normalized file identity standardizes path segments" started.
+✔ Test "Normalized file identity standardizes path segments" passed after 0.001 seconds.
+◇ Test lexicalKeysDoNotResolveAliasesAndPreparationObservesRetargeting() started.
+✔ Test lexicalKeysDoNotResolveAliasesAndPreparationObservesRetargeting() passed after 0.001 seconds.
+✔ Suite "Core utilities" passed after 0.002 seconds.
+✔ Test run with 13 tests in 3 suites passed after 0.124 seconds.
+
+Exit status: 0
