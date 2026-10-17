@@ -1,0 +1,46 @@
+name: Subtitle memory accounting
+
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift
+      - Scripts/test-subtitle-memory-budget.sh
+      - Benchmarks/SubtitleMemoryBudget/**
+      - .github/workflows/subtitle-memory-budget.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-memory-budget-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  accounting-and-measurements:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify production accounting in debug and release
+        run: |
+          bash Scripts/test-subtitle-memory-budget.sh --jobs 2 -Xswiftc -warnings-as-errors
+          bash Scripts/test-subtitle-memory-budget.sh --jobs 2 -c release -Xswiftc -warnings-as-errors
+      - name: Measure actual Swift bookkeeping on macOS
+        run: |
+          python3 Benchmarks/SubtitleMemoryBudget/run.py \
+            --output "$RUNNER_TEMP/subtitle-memory-budget" --rounds 6 --iterations 500000
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-memory-budget-evidence
+          path: |
+            ${{ runner.temp }}/subtitle-memory-budget/manifest.json
+            ${{ runner.temp }}/subtitle-memory-budget/measurements.jsonl
+            ${{ runner.temp }}/subtitle-memory-budget/summary.json
+          retention-days: 14
