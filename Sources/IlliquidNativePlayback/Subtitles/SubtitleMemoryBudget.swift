@@ -146,6 +146,9 @@ final class SubtitleMemoryBudget: @unchecked Sendable {
         let requested = max(0, bytes)
         return lock.withLock {
             guard let existing = state.reservations[id] else { return false }
+            // Reusable subtitle staging commonly keeps its high-water size.
+            // This admitted reservation already satisfies the immutable limits.
+            if requested == existing.bytes { return true }
             let reserved = state.reservations.values.reduce(0) { $0 + $1.bytes }
             let available = limitBytes - (reserved - existing.bytes)
             let ownerReserved = state.reservations.values

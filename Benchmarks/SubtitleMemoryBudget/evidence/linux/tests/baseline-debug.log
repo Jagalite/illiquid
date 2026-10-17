@@ -1,0 +1,67 @@
+warning: 'illiquid-subtitle-budget-tests.onp5m5': <unknown>:0: warning: legacy driver is now deprecated; consider avoiding specifying '-disallow-use-new-driver'
+Building for debugging...
+[0/13] Write sources
+[2/13] Write swift-version--393CCDFAED8FB69E.txt
+<unknown>:0: warning: legacy driver is now deprecated; consider avoiding specifying '-disallow-use-new-driver'
+<unknown>:0: warning: option '-incremental' is only supported in swift-driver
+[4/14] Compiling IlliquidNativePlayback SubtitleMemoryBudget.swift
+[5/15] Merging module IlliquidNativePlayback
+<unknown>:0: warning: legacy driver is now deprecated; consider avoiding specifying '-disallow-use-new-driver'
+<unknown>:0: warning: option '-incremental' is only supported in swift-driver
+[5/16] Wrapping AST for IlliquidNativePlayback for debugging
+[7/16] Compiling IlliquidNativePlaybackTests SubtitleMemoryBudgetTests.swift
+[8/17] Merging module IlliquidNativePlaybackTests
+[8/17] /tmp/illiquid-subtitle-budget-tests.ONp5m5/.build/x86_64-unknown-linux-gnu/debug/IlliquidSubtitleBudgetTestsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[9/17] Write sources
+<unknown>:0: warning: legacy driver is now deprecated; consider avoiding specifying '-disallow-use-new-driver'
+<unknown>:0: warning: option '-incremental' is only supported in swift-driver
+[10/19] Wrapping AST for IlliquidNativePlaybackTests for debugging
+[12/19] Compiling IlliquidSubtitleBudgetTestsPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+[13/19] Compiling IlliquidSubtitleBudgetTestsPackageDiscoveredTests all-discovered-tests.swift
+[14/20] Merging module IlliquidSubtitleBudgetTestsPackageDiscoveredTests
+[14/20] /tmp/illiquid-subtitle-budget-tests.ONp5m5/.build/x86_64-unknown-linux-gnu/debug/IlliquidSubtitleBudgetTestsPackageTests.derived/runner.swift
+[15/20] Write sources
+<unknown>:0: warning: legacy driver is now deprecated; consider avoiding specifying '-disallow-use-new-driver'
+<unknown>:0: warning: option '-incremental' is only supported in swift-driver
+[16/21] Wrapping AST for IlliquidSubtitleBudgetTestsPackageDiscoveredTests for debugging
+[18/21] Compiling IlliquidSubtitleBudgetTestsPackageTests runner.swift
+[19/22] Merging module IlliquidSubtitleBudgetTestsPackageTests
+[19/22] Wrapping AST for IlliquidSubtitleBudgetTestsPackageTests for debugging
+[20/22] Write Objects.LinkFileList
+<unknown>:0: warning: legacy driver is now deprecated; consider avoiding specifying '-disallow-use-new-driver'
+[21/22] Linking IlliquidSubtitleBudgetTestsPackageTests.xctest
+Build complete! (10.80s)
+Test Suite 'All tests' started at 2026-10-17 08:38:40.826
+Test Suite 'debug.xctest' started at 2026-10-17 08:38:40.828
+Test Suite 'debug.xctest' passed at 2026-10-17 08:38:40.828
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-17 08:38:40.828
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Subtitle memory budget accounting" started.
+◇ Test leaseCanOutliveItsBudget() started.
+◇ Test mixedOperationsMatchIndependentReservationModel(seed:) started.
+◇ Test nonpositiveGlobalLimitStillAllowsOneByte(limit:) started.
+◇ Test concurrentAdmissionResizeAndReleasePreserveAccounting() started.
+◇ Test zeroByteOwnerKeySurvivesUntilItsLastLeaseIsReleased() started.
+◇ Test retainedSnapshotsRemainStableAcrossMutationsAndRelease() started.
+◇ Test case passing 1 argument limit → -7 to nonpositiveGlobalLimitStillAllowsOneByte(limit:) started.
+◇ Test admissionAndResizeRespectGlobalAndOwnerLimits() started.
+◇ Test case passing 1 argument seed → 1 to mixedOperationsMatchIndependentReservationModel(seed:) started.
+◇ Test batchAdmissionAggregatesDuplicateOwnersWithoutMutatingState() started.
+◇ Test case passing 1 argument limit → 0 to nonpositiveGlobalLimitStillAllowsOneByte(limit:) started.
+◇ Test case passing 1 argument seed → 12648430 to mixedOperationsMatchIndependentReservationModel(seed:) started.
+◇ Test case passing 1 argument seed → 3735928559 to mixedOperationsMatchIndependentReservationModel(seed:) started.
+◇ Test case passing 1 argument seed → 7 to mixedOperationsMatchIndependentReservationModel(seed:) started.
+✔ Test leaseCanOutliveItsBudget() passed after 0.005 seconds.
+✔ Test nonpositiveGlobalLimitStillAllowsOneByte(limit:) with 2 test cases passed after 0.005 seconds.
+✔ Test zeroByteOwnerKeySurvivesUntilItsLastLeaseIsReleased() passed after 0.005 seconds.
+✔ Test retainedSnapshotsRemainStableAcrossMutationsAndRelease() passed after 0.005 seconds.
+✔ Test admissionAndResizeRespectGlobalAndOwnerLimits() passed after 0.005 seconds.
+✔ Test batchAdmissionAggregatesDuplicateOwnersWithoutMutatingState() passed after 0.005 seconds.
+✔ Test concurrentAdmissionResizeAndReleasePreserveAccounting() passed after 0.037 seconds.
+✔ Test mixedOperationsMatchIndependentReservationModel(seed:) with 4 test cases passed after 0.068 seconds.
+✔ Suite "Subtitle memory budget accounting" passed after 0.069 seconds.
+✔ Test run with 8 tests in 1 suite passed after 0.069 seconds.

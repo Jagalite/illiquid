@@ -1,0 +1,67 @@
+name: Subtitle memory budget
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetTests.swift'
+      - 'Scripts/test-subtitle-memory-budget.sh'
+      - 'Benchmarks/SubtitleMemoryBudget/**'
+      - '.github/workflows/subtitle-memory-budget.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: subtitle-memory-budget-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  budget-regressions-and-benchmark:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Compare original and optimized budget behavior
+        run: |
+          bash Scripts/test-subtitle-memory-budget.sh --configuration debug
+          bash Scripts/test-subtitle-memory-budget.sh --configuration release
+          SUBTITLE_BUDGET_SOURCE="$GITHUB_WORKSPACE/Benchmarks/SubtitleMemoryBudget/baseline/SubtitleMemoryBudget.swift" \
+            bash Scripts/test-subtitle-memory-budget.sh --configuration release
+      - name: Measure optimized Swift on macOS
+        run: |
+          python3 Benchmarks/SubtitleMemoryBudget/run.py \
+            --rounds 8 --iterations 1000000 \
+            --counts 1 2 5 9 128 \
+            --scenarios resize-unchanged resize-changing resize-rejected acquire-release \
+            --output "$RUNNER_TEMP/subtitle-budget-performance"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-budget-performance
+          path: |
+            ${{ runner.temp }}/subtitle-budget-performance/manifest.json
+            ${{ runner.temp }}/subtitle-budget-performance/measurements.jsonl
+            ${{ runner.temp }}/subtitle-budget-performance/summary.json
+          retention-days: 14
+  native-subtitle-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build app graph and exercise subtitle consumers
+        run: |
+          swift test --force-resolved-versions --filter \
+            'SubtitleMemoryBudgetTests|MetalASSSubtitleCompositorTests|PiPSubtitlePipelineTests|BitmapSubtitleTests|PGSSubtitleCropTests'

@@ -1,0 +1,67 @@
+{
+  "baseline_commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "baseline_git_blob": "7694b209c13e86406fc2eac6bef2c7ed09974569",
+  "binary_sha256": {
+    "baseline": "296fb32e361650a3cfffffa56c01860ca142afbc0f89aeb642c4ab780c3076b2",
+    "candidate": "a1d81aa25cdf1e07ae54f4169a75a997c28a2ebbda4298ffa4cdf11b7fe1678d"
+  },
+  "compile_commands": [
+    [
+      "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-parse-as-library",
+      "-module-name",
+      "SubtitleBudgetBenchmark",
+      "-module-cache-path",
+      "/workspace/scratch/175a3034ded7/budget-final-linux/build/module-cache",
+      "/workspace/scratch/175a3034ded7/illiquid/Benchmarks/SubtitleMemoryBudget/baseline/SubtitleMemoryBudget.swift",
+      "/workspace/scratch/175a3034ded7/illiquid/Benchmarks/SubtitleMemoryBudget/BudgetBenchmark.swift",
+      "-o",
+      "/workspace/scratch/175a3034ded7/budget-final-linux/build/baseline"
+    ],
+    [
+      "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-parse-as-library",
+      "-module-name",
+      "SubtitleBudgetBenchmark",
+      "-module-cache-path",
+      "/workspace/scratch/175a3034ded7/budget-final-linux/build/module-cache",
+      "/workspace/scratch/175a3034ded7/illiquid/Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift",
+      "/workspace/scratch/175a3034ded7/illiquid/Benchmarks/SubtitleMemoryBudget/BudgetBenchmark.swift",
+      "-o",
+      "/workspace/scratch/175a3034ded7/budget-final-linux/build/candidate"
+    ]
+  ],
+  "counts": [
+    1,
+    2,
+    5,
+    9,
+    128
+  ],
+  "cpu_count": 9,
+  "harness_sha256": "5ce72bf3009561b767fb9275aa352ecfba3538266ef56b3795f51d1b72b67f47",
+  "iterations": 1000000,
+  "machine": "x86_64",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "rounds": 8,
+  "runner_sha256": "6b198b3591bf0e7007756f57fc30f7380af5c59d7b1a558c198d68a64d933491",
+  "scenarios": [
+    "resize-unchanged",
+    "resize-changing",
+    "resize-rejected",
+    "acquire-release"
+  ],
+  "source_sha256": {
+    "baseline": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83",
+    "candidate": "3e0ea604aa0fe2e486bc826c4942381d68330a317fea8f6acf00ba0ed637e1a8"
+  },
+  "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "swift_deterministic_hashing": true,
+  "timestamp_utc": "2026-10-17T12:39:16Z",
+  "timing_scope": "single-thread budget API only; no decoder, native renderer, or pixel storage"
+}

@@ -1,0 +1,81 @@
+{
+  "baseline_commit": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+  "baseline_git_blob": "7694b209c13e86406fc2eac6bef2c7ed09974569",
+  "binary_sha256": {
+    "baseline": "be6d72f2dd96fea56f74090227a58fd65529470bac6f5e72c2a5e1baed904ea2",
+    "candidate": "f1f0aced285c555290dc20c64333038c65df7ba8ac19bc1a8eab2b7432af610e",
+    "unchanged-only": "75b2e25cde3a848354fdb9736e1f2e24a7cd4f3bcdc4dbc4205d1d99b5bcb6be"
+  },
+  "compile_commands": [
+    [
+      "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/workspace/scratch/175a3034ded7/budget-three-way-experiment/build/module-cache",
+      "/workspace/scratch/175a3034ded7/illiquid/Benchmarks/SubtitleMemoryBudget/baseline/SubtitleMemoryBudget.swift",
+      "/workspace/scratch/175a3034ded7/illiquid/Benchmarks/SubtitleMemoryBudget/BudgetBenchmark.swift",
+      "-o",
+      "/workspace/scratch/175a3034ded7/budget-three-way-experiment/build/baseline"
+    ],
+    [
+      "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/workspace/scratch/175a3034ded7/budget-three-way-experiment/build/module-cache",
+      "/workspace/scratch/175a3034ded7/illiquid/Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift",
+      "/workspace/scratch/175a3034ded7/illiquid/Benchmarks/SubtitleMemoryBudget/BudgetBenchmark.swift",
+      "-o",
+      "/workspace/scratch/175a3034ded7/budget-three-way-experiment/build/candidate"
+    ],
+    [
+      "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/workspace/scratch/175a3034ded7/budget-three-way-experiment/build/module-cache",
+      "/workspace/scratch/175a3034ded7/budget-three-way-experiment/build/UnchangedOnly.swift",
+      "/workspace/scratch/175a3034ded7/illiquid/Benchmarks/SubtitleMemoryBudget/BudgetBenchmark.swift",
+      "-o",
+      "/workspace/scratch/175a3034ded7/budget-three-way-experiment/build/unchanged-only"
+    ]
+  ],
+  "counts": [
+    1,
+    2,
+    5,
+    9,
+    32,
+    128
+  ],
+  "cpu_count": 9,
+  "harness_sha256": "5ce72bf3009561b767fb9275aa352ecfba3538266ef56b3795f51d1b72b67f47",
+  "iterations": 100000,
+  "machine": "x86_64",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "rounds": 6,
+  "runner_sha256": "3e86a247505362291161abc898c2ad2c21b71a0fe16dabe047ab7a99d31714bc",
+  "scenarios": [
+    "resize-unchanged",
+    "resize-changing",
+    "resize-rejected",
+    "acquire-release",
+    "preflight",
+    "snapshot",
+    "held-snapshot-resize"
+  ],
+  "source_sha256": {
+    "baseline": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83",
+    "candidate": "5262a1668bf266ec82597f477f466124e06ba0bcebb1c0bee0d787c87ea53117",
+    "unchanged-only": "660b43c7b6e9dd0292a5a22355817d46124d9833fc53ef5577a05b41c3e92d83"
+  },
+  "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "swift_deterministic_hashing": true,
+  "timestamp_utc": "2026-10-17T12:35:13Z",
+  "timing_scope": "single-thread budget API only; no decoder, native renderer, or pixel storage"
+}
