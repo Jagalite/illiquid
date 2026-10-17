@@ -419,9 +419,14 @@ final class SubtitlePipeline: @unchecked Sendable {
                     ? "SRT encoding is unsupported or invalid. Save it as UTF-8 or Unicode with a byte-order mark."
                     : "External VTT is not valid UTF-8")
             }
-            let converted = try (fileExtension == "srt"
-                ? Self.convertSRTToASS(source)
-                : Self.convertWebVTTToASS(source))
+            let converted: String
+            do {
+                converted = try ExternalTextSubtitleConverter.convert(
+                    source, format: fileExtension == "srt" ? .srt : .webVTT
+                )
+            } catch let error as ExternalTextSubtitleConverter.ConversionError {
+                throw PresentationError(error.localizedDescription)
+            }
             guard converted.utf8.count <= maximumBytes else {
                 throw PresentationError(
                     "Converted external subtitle exceeds the bounded byte limit"
@@ -1086,133 +1091,5 @@ final class SubtitlePipeline: @unchecked Sendable {
         return output
     }
 
-    private static let defaultASSHeader = """
-    [Script Info]
-    ScriptType: v4.00+
-    PlayResX: 1920
-    PlayResY: 1080
-    ScaledBorderAndShadow: yes
-
-    [V4+ Styles]
-    Format: Name,Fontname,Fontsize,PrimaryColour,SecondaryColour,OutlineColour,BackColour,Bold,Italic,Underline,StrikeOut,ScaleX,ScaleY,Spacing,Angle,BorderStyle,Outline,Shadow,Alignment,MarginL,MarginR,MarginV,Encoding
-    Style: Default,sans-serif,52,&H00FFFFFF,&H000000FF,&H00101010,&H80000000,0,0,0,0,100,100,0,0,1,3,1,2,48,48,40,1
-
-    [Events]
-    Format: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text
-    """
-
-    private static func convertSRTToASS(_ source: String) throws -> String {
-        let normalized = source
-            .replacingOccurrences(of: "\r\n", with: "\n")
-            .replacingOccurrences(of: "\r", with: "\n")
-        let blocks = normalized.components(separatedBy: "\n\n")
-        var events: [String] = []
-        for block in blocks {
-            var lines = block.split(separator: "\n", omittingEmptySubsequences: false)
-                .map(String.init)
-            guard !lines.isEmpty else { continue }
-            if Int(lines[0].trimmingCharacters(in: .whitespaces)) != nil {
-                lines.removeFirst()
-            }
-            guard let timingIndex = lines.firstIndex(where: { $0.contains("-->") }) else {
-                continue
-            }
-            let timing = lines[timingIndex].components(separatedBy: "-->")
-            guard timing.count == 2,
-                  let start = parseSRTTimestamp(timing[0]),
-                  let end = parseSRTTimestamp(timing[1]),
-                  end > start
-            else { continue }
-            let text = lines.dropFirst(timingIndex + 1).map { line in
-                line.replacingOccurrences(of: "\\", with: "\\\\")
-                    .replacingOccurrences(of: "{", with: "\\{")
-                    .replacingOccurrences(of: "}", with: "\\}")
-            }.joined(separator: "\\N")
-            events.append(
-                "Dialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
-            )
-        }
-        guard !events.isEmpty else {
-            throw PresentationError("External SRT contained no valid timed cues")
-        }
-        return defaultASSHeader + "\n" + events.joined(separator: "\n")
-    }
-
-    private static func convertWebVTTToASS(_ source: String) throws -> String {
-        let normalized = source
-            .replacingOccurrences(of: "\r\n", with: "\n")
-            .replacingOccurrences(of: "\r", with: "\n")
-        guard normalized.split(separator: "\n", maxSplits: 1).first?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .hasPrefix("WEBVTT") == true
-        else {
-            throw PresentationError("External WebVTT is missing its WEBVTT signature")
-        }
-        var events: [String] = []
-        for block in normalized.components(separatedBy: "\n\n") {
-            let lines = block.split(separator: "\n", omittingEmptySubsequences: false)
-                .map(String.init)
-            guard let timingIndex = lines.firstIndex(where: { $0.contains("-->") }) else {
-                continue
-            }
-            let timing = lines[timingIndex].components(separatedBy: "-->")
-            guard timing.count == 2,
-                  let start = parseWebVTTTimestamp(timing[0]),
-                  let end = parseWebVTTTimestamp(timing[1]),
-                  end > start
-            else { continue }
-            let text = lines.dropFirst(timingIndex + 1).map { line in
-                line.replacingOccurrences(of: "\\", with: "\\\\")
-                    .replacingOccurrences(of: "{", with: "\\{")
-                    .replacingOccurrences(of: "}", with: "\\}")
-            }.joined(separator: "\\N")
-            events.append(
-                "Dialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
-            )
-        }
-        guard !events.isEmpty else {
-            throw PresentationError("External WebVTT contained no valid timed cues")
-        }
-        return defaultASSHeader + "\n" + events.joined(separator: "\n")
-    }
-
-    private static func parseWebVTTTimestamp(_ value: String) -> Double? {
-        let timestamp = value.trimmingCharacters(in: .whitespaces)
-            .split(whereSeparator: { $0.isWhitespace }).first.map(String.init) ?? ""
-        let parts = timestamp.split(separator: ":")
-        guard parts.count == 2 || parts.count == 3 else { return nil }
-        let hours = parts.count == 3 ? Double(parts[0]) ?? 0 : 0
-        let minutesIndex = parts.count == 3 ? 1 : 0
-        guard let minutes = Double(parts[minutesIndex]),
-              let seconds = Double(parts[minutesIndex + 1]),
-              minutes < 60,
-              seconds < 60
-        else { return nil }
-        return hours * 3_600 + minutes * 60 + seconds
-    }
-
-    private static func parseSRTTimestamp(_ value: String) -> Double? {
-        let cleaned = value.trimmingCharacters(in: .whitespaces)
-            .replacingOccurrences(of: ".", with: ",")
-        let parts = cleaned.split(separator: ":")
-        guard parts.count == 3,
-              let hours = Double(parts[0]),
-              let minutes = Double(parts[1])
-        else { return nil }
-        let secondsParts = parts[2].split(separator: ",", omittingEmptySubsequences: false)
-        guard let seconds = Double(secondsParts[0]) else { return nil }
-        let milliseconds = secondsParts.count > 1
-            ? Double(secondsParts[1].prefix(3)) ?? 0
-            : 0
-        return hours * 3_600 + minutes * 60 + seconds + milliseconds / 1_000
-    }
-
-    private static func assTimestamp(_ seconds: Double) -> String {
-        let centiseconds = max(Int((seconds * 100).rounded()), 0)
-        let hours = centiseconds / 360_000
-        let minutes = (centiseconds / 6_000) % 60
-        let wholeSeconds = (centiseconds / 100) % 60
-        let fraction = centiseconds % 100
-        return String(format: "%d:%02d:%02d.%02d", hours, minutes, wholeSeconds, fraction)
-    }
+    private static let defaultASSHeader = ExternalTextSubtitleConverter.defaultASSHeader
 }

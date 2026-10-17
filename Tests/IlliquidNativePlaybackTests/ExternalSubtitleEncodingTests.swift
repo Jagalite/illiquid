@@ -68,4 +68,68 @@ struct ExternalSubtitleEncodingTests {
             }
         }
     }
+
+    @Test func utf8ByteOrderMarkWebVTTMatchesUnmarkedInput() throws {
+        let source = "WEBVTT\n\n00:01.000 --> 00:02.000\nCafé 日本語\n"
+        try withSubtitleFile(extension: "vtt", data: Data(source.utf8)) { url in
+            let reference = try SubtitlePipeline.prepareExternalData(url: url)
+            try (Data([0xEF, 0xBB, 0xBF]) + Data(source.utf8)).write(to: url)
+            #expect(try SubtitlePipeline.prepareExternalData(url: url) == reference)
+        }
+    }
+
+    @Test(arguments: ["srt", "vtt"])
+    func invalidTimestampImportsReturnPresentationErrors(fileExtension: String) throws {
+        let header = fileExtension == "vtt" ? "WEBVTT\n\n" : "1\n"
+        let separator = fileExtension == "vtt" ? "." : ","
+        let invalidEnds = [
+            "inf:00:00", "9999999999999999999:00:00", "bad:00:02", "00:00:60",
+        ]
+        for end in invalidEnds {
+            let source = header
+                + "00:00:01\(separator)000 --> \(end)\(separator)000\nInvalid cue\n"
+            try withSubtitleFile(extension: fileExtension, data: Data(source.utf8)) { url in
+                #expect(throws: PresentationError.self) {
+                    _ = try SubtitlePipeline.prepareExternalData(url: url)
+                }
+            }
+        }
+    }
+
+    @Test(arguments: ["srt", "vtt"])
+    func fileImportKeepsValidCuesAroundMalformedTimestamps(fileExtension: String) throws {
+        let header = fileExtension == "vtt" ? "WEBVTT\n\n" : ""
+        let separator = fileExtension == "vtt" ? "." : ","
+        let good = "00:00:02\(separator)000 --> 00:00:03\(separator)000\nCafé 日本語"
+        let bad = "00:00:01\(separator)000 --> inf:00:00\(separator)000\nInvalid cue"
+        try withSubtitleFile(extension: fileExtension, data: Data((header + good).utf8)) { url in
+            let reference = try SubtitlePipeline.prepareExternalData(url: url)
+            try Data((header + bad + "\n\n" + good).utf8).write(to: url)
+            #expect(try SubtitlePipeline.prepareExternalData(url: url) == reference)
+        }
+    }
+
+    @Test(arguments: ["srt", "vtt"])
+    func convertedSubtitlesStillRespectTheByteLimit(fileExtension: String) throws {
+        let header = fileExtension == "vtt" ? "WEBVTT\n\n" : "1\n"
+        let separator = fileExtension == "vtt" ? "." : ","
+        let source = header + "00:00:01\(separator)000 --> 00:00:02\(separator)000\nCaption"
+        let input = Data(source.utf8)
+        try withSubtitleFile(extension: fileExtension, data: input) { url in
+            #expect(try SubtitlePipeline.prepareExternalData(url: url).count > input.count)
+            #expect(throws: PresentationError.self) {
+                _ = try SubtitlePipeline.prepareExternalData(url: url, maximumBytes: input.count)
+            }
+        }
+    }
+
+    private func withSubtitleFile(
+        extension fileExtension: String, data: Data, body: (URL) throws -> Void
+    ) throws {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString).appendingPathExtension(fileExtension)
+        defer { try? FileManager.default.removeItem(at: url) }
+        try data.write(to: url)
+        try body(url)
+    }
 }
