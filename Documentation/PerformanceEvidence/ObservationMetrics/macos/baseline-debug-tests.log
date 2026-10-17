@@ -1,0 +1,47 @@
+Test Suite 'All tests' started at 2026-10-17 20:32:49.136.
+Test Suite 'All tests' passed at 2026-10-17 20:32:49.143.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.007) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Production observation coalescer" started.
+◇ Test busyMainActorCoalescesClockCallbacks() started.
+✔ Test busyMainActorCoalescesClockCallbacks() passed after 0.001 seconds.
+◇ Test requestDuringDeliveryStillGetsAFollowUp() started.
+✔ Test requestDuringDeliveryStillGetsAFollowUp() passed after 0.001 seconds.
+◇ Test routineEnqueuesHaveTrailingDeliveryAndUrgentEdgesPreempt() started.
+✔ Test routineEnqueuesHaveTrailingDeliveryAndUrgentEdgesPreempt() passed after 2.533 seconds.
+◇ Test subtitleAndClockRequestsBypassEnqueueDelay() started.
+✔ Test subtitleAndClockRequestsBypassEnqueueDelay() passed after 0.001 seconds.
+◇ Test overdueEnqueueTimerDoesNotRestartItsWaitOnTheActor() started.
+✔ Test overdueEnqueueTimerDoesNotRestartItsWaitOnTheActor() passed after 0.150 seconds.
+◇ Test concurrentEnqueueAndUrgentRequestsRetainTheirFinalDelivery() started.
+✔ Test concurrentEnqueueAndUrgentRequestsRetainTheirFinalDelivery() passed after 0.238 seconds.
+✔ Suite "Production observation coalescer" passed after 2.924 seconds.
+◇ Suite "Runtime observation metrics" started.
+◇ Test sourceLookupsAndMutationsKeepDictionarySemantics() started.
+✔ Test sourceLookupsAndMutationsKeepDictionarySemantics() passed after 0.001 seconds.
+◇ Test snapshotEqualityIncludesEveryCounterAndIgnoresInsertionOrder() started.
+✔ Test snapshotEqualityIncludesEveryCounterAndIgnoresInsertionOrder() passed after 0.001 seconds.
+◇ Test deliveryTracksEarliestRequestsAndClearsPendingWindows() started.
+✔ Test deliveryTracksEarliestRequestsAndClearsPendingWindows() passed after 0.001 seconds.
+◇ Test delayArithmeticPreservesUnsignedWrapAndNumericOldestTime() started.
+✔ Test delayArithmeticPreservesUnsignedWrapAndNumericOldestTime() passed after 0.001 seconds.
+◇ Test tenThousandMixedEventsMatchJournalOracleAndRetainOldSnapshots() started.
+✔ Test tenThousandMixedEventsMatchJournalOracleAndRetainOldSnapshots() passed after 0.382 seconds.
+✔ Suite "Runtime observation metrics" passed after 0.384 seconds.
+✔ Test run with 11 tests in 2 suites passed after 3.309 seconds.
+Building for debugging...
+[0/7] /Users/runner/work/_temp/observation-metrics/baseline/tests/build/arm64-apple-macosx/debug/ObservationMetricsQualificationPackageTests.derived/runner.swift
+[1/7] Write sources
+[4/7] Write swift-version-7974D3F7F03D5E95.txt
+[6/9] Compiling IlliquidNativePlayback Observation.swift
+[7/9] Emitting module IlliquidNativePlayback
+[8/11] Emitting module IlliquidNativePlaybackTests
+[9/11] Compiling IlliquidNativePlaybackTests ObservationCoalescerTests.swift
+[10/12] Compiling IlliquidNativePlaybackTests RuntimeObservationMetricsTests.swift
+[11/14] Compiling ObservationMetricsQualificationPackageTests runner.swift
+[12/14] Emitting module ObservationMetricsQualificationPackageTests
+[12/14] Write Objects.LinkFileList
+[13/14] Linking ObservationMetricsQualificationPackageTests
+Build complete! (15.09s)

@@ -7,9 +7,10 @@ per-source counts change on every audio, video, clock, and related observation.
 This investigation starts from integrated `main` at
 `68274d1b09dcc866296321a5a8858efc297c4f19` and does not reuse earlier PR gains.
 
-Linux qualification found 78–90% lower component time across request workloads.
-Native macOS qualification is pending the PR checks. No whole-player performance
-measurement has been made.
+Native macOS qualification found **81–86% lower component time** across request
+workloads, saving about **21–90 ns per request**. The native component tests and
+the full app graph's focused observation tests pass. Linux qualification found
+78–90% lower component time. No whole-player performance measurement has been made.
 
 ## Cause and change
 
@@ -41,8 +42,56 @@ across the next mutation. Both shared and unshared storage cases are measured.
 
 The timed unit is one observation request, including amortized delivery and
 publication work. Separate cases measure snapshot reads and an unchanged loop
-control. Independent semantic checking and fixture generation are untimed.
+control. Independent expected-state generation and full semantic validation
+are untimed.
 The fixture is not an observed distribution of events from a playback trace.
+
+### Native macOS qualification
+
+Host: GitHub Actions Apple M1 (Virtual), arm64, macOS 26.6.2, Apple Swift 6.3.3
+from Xcode 26.6. Six paired rounds, **4,000,000 operations per process**, 84 raw
+observations. Medians, with no control subtraction:
+
+| Workload | Baseline ns/op | Candidate ns/op | Reduction |
+| --- | ---: | ---: | ---: |
+| One request per publication | 111.39 | 21.52 | 80.7% |
+| Four requests per publication | 45.81 | 8.14 | 82.2% |
+| Sixteen requests per publication | 31.95 | 4.54 | 85.8% |
+| Sixteen requests without retained publication | 25.68 | 4.52 | 82.4% |
+| Four requests, 64 retained snapshots | 60.07 | 11.11 | 81.5% |
+| Snapshot lookup control | 28.74 | 1.41 | 95.1% |
+| Unchanged loop control | 1.42 | 1.42 | -0.2% |
+
+Every request workload improves in all six pairs. The unchanged control is
+noise-sensitive and receives no performance interpretation. Both variants pass
+all **11 component tests in debug and release**, including the six unchanged
+asynchronous coalescer tests. All 84 benchmark observations pass semantic
+validation and matching paired checksums.
+
+The separate native integration job compiled and linked the full **debug app
+graph**, then passed **18 test functions across three suites**: two native
+playback foundations tests, eleven presentation timeline observation tests, and
+five metrics tests. The cadence test includes 24/30/60 fps cases. These tests
+qualify observation behavior and diagnostic formatting; they do not measure
+visible playback or rendering quality.
+
+The [native workflow](https://github.com/Jagalite/illiquid/actions/runs/39066595745)
+tested PR head `b920401012cbfab160a2b52eb108ac5e7d576b42` through GitHub's merge
+commit `963e5c225cefe49985c2800e956953d3e38b4b3b`. The
+[retained native evidence](PerformanceEvidence/ObservationMetrics/macos) includes
+source/compiler provenance, raw measurements, summaries, all four successful
+component logs, and the integration log.
+
+**Initial failure and retry:** the first component attempt stopped in an
+unchanged baseline release test,
+`routineEnqueuesHaveTrailingDeliveryAndUrgentEdgesPreempt`: its final assertion
+observed three deliveries instead of four after a 1,100 ms wait for a 1,000 ms
+timer. All five metrics tests passed; the candidate and benchmarks had not yet
+run. This is consistent with delayed main-actor scheduling, but the log does
+not establish whether the fourth delivery would have arrived later. One exact,
+unchanged job retry passed all baseline/candidate tests and produced the
+measurements above. The original failure logs and manifest are retained beside
+the successful evidence. No test deadline or production scheduling was changed.
 
 ### Linux qualification
 
@@ -70,10 +119,6 @@ state in the pre-existing asynchronous coalescer tests; this reproduced on the
 unchanged baseline. Final Linux runs explicitly use `--ledger-only-tests`.
 Asynchronous coalescer qualification remains a native macOS gate, with no runtime
 shims or altered concurrency tests.
-
-### Native macOS qualification
-
-Pending the PR's native component and app integration jobs.
 
 ## Correctness
 

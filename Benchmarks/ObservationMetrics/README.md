@@ -31,7 +31,8 @@ dependencies. On macOS, both the temporary package and benchmark target macOS 26
 The canonical cloud Linux run adds `--ledger-only-tests`: that host can fail
 libdispatch thread inspection in the unchanged asynchronous tests. This option
 filters execution to the five ledger tests. The native macOS workflow leaves
-it off and runs all eleven component tests and the full app integration suite.
+it off. Its component job runs all eleven component tests; its integration job
+builds the full app graph and runs focused observation tests.
 
 ## Workloads
 
