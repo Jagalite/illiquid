@@ -1,0 +1,30 @@
+name: Source volume regressions
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/source-volume-regressions.yml'
+      - 'Scripts/test-source-volume-regressions.sh'
+      - 'Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift'
+      - 'Sources/IlliquidApp/UI/SourceFilesystem*.swift'
+      - 'Sources/IlliquidCore/Utilities/LifecyclePerformance.swift'
+      - 'Tests/IlliquidAppTests/SourceVolumeChangePolicyTests.swift'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: source-volume-regressions-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  volume-routing:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Debug selection and native adapter integration
+        run: bash Scripts/test-source-volume-regressions.sh --jobs 2 -Xswiftc -warnings-as-errors
+      - name: Release selection and native adapter integration
+        run: bash Scripts/test-source-volume-regressions.sh -c release --jobs 2 -Xswiftc -warnings-as-errors

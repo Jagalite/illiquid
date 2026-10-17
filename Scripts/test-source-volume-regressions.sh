@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
-# Exercise the actual event-routing code and repository tests without the player.
-# macOS also compiles the real FSEvents adapter and its real logging dependency.
-# Tests do not start FSEvents, mount a volume, or launch the native application.
+# Test actual volume-root selection without launching the player or mounting disks.
+# macOS additionally compiles the real FSEvents adapter and runs plan integration.
 set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
-work="$(mktemp -d "${TMPDIR:-/tmp}/illiquid-source-filesystem.XXXXXX")"
+work="$(mktemp -d "${TMPDIR:-/tmp}/illiquid-source-volume.XXXXXX")"
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/Sources/IlliquidApp" "$work/Tests/IlliquidAppTests"
-cp "$root/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift" "$work/Sources/IlliquidApp/"
+cp "$root/Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift" "$work/Sources/IlliquidApp/"
 if [[ "$(uname -s)" == "Darwin" ]]; then
     mkdir -p "$work/Sources/IlliquidCore"
     cp "$root/Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift" "$work/Sources/IlliquidApp/"
     cp "$root/Sources/IlliquidCore/Utilities/LifecyclePerformance.swift" "$work/Sources/IlliquidCore/"
+    # Support the separate planner extraction when it is present after merging.
+    if [[ -f "$root/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift" ]]; then
+        cp "$root/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift" "$work/Sources/IlliquidApp/"
+    fi
 fi
-for test in SourceFilesystemMonitorTests SourceFilesystemRootInvalidationTests; do
-    cp "$root/Tests/IlliquidAppTests/$test.swift" "$work/Tests/IlliquidAppTests/"
-done
+cp "$root/Tests/IlliquidAppTests/SourceVolumeChangePolicyTests.swift" "$work/Tests/IlliquidAppTests/"
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1
 import PackageDescription
@@ -27,7 +28,7 @@ let nativeTargets: [Target] = []
 let appDependencies: [Target.Dependency] = []
 #endif
 let package = Package(
-    name: "IlliquidSourceFilesystemRegressions",
+    name: "IlliquidSourceVolumeRegressions",
     platforms: [.macOS("26.0")],
     targets: nativeTargets + [
         .target(name: "IlliquidApp", dependencies: appDependencies),
