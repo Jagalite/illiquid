@@ -1,0 +1,73 @@
+{
+  "baseline": "3c7b84c425cf15cdbaccfd2b4829f3181130963f",
+  "date": "2026-10-17",
+  "scope": "Experimental Swift packet/executor paths on Linux; production not enabled; no decode/render/energy claim",
+  "primary_processes": {
+    "timing": 448,
+    "allocation": 48,
+    "verification": 72
+  },
+  "additional_absent_selection_processes": 16,
+  "regression_checks_per_variant_configuration": 40,
+  "read_timing_columns": ["route", "case", "baseline_median_ms", "candidate_median_ms"],
+  "read_timings": [
+    ["executor", "normal.mp4|subtitle|full", 1.688, 1.576],
+    ["executor", "normal.mkv|subtitle|full", 1.781, 1.653],
+    ["executor", "normal.ts|audio|full", 3.356, 3.179],
+    ["executor", "normal.mp4|audio|full", 2.08, 1.765],
+    ["executor", "normal.mkv|audio|full", 1.721, 1.831],
+    ["executor", "sparse.mkv|subtitle|horizon", 2.88, 2.701],
+    ["executor", "sparse.mp4|subtitle|horizon", 2.546, 2.514],
+    ["executor", "audio-gap.mkv|subtitle|horizon", 2.753, 2.33],
+    ["executor", "video-gap.mkv|subtitle|horizon", 2.506, 2.228],
+    ["executor", "sparse.mkv|subtitle|resume", 6.091, 5.158],
+    ["executor", "sparse.mp4|subtitle|resume", 5.074, 4.703],
+    ["executor", "audio-gap.mkv|subtitle|resume", 4.395, 3.997],
+    ["executor", "video-gap.mkv|subtitle|resume", 4.329, 4.033],
+    ["executor", "normal.mp4|all|full", 1.77, 1.71],
+    ["executor", "normal.mkv|all|full", 1.768, 1.698],
+    ["executor", "normal.ts|all|full", 3.013, 3.157],
+    ["direct", "normal.mp4|subtitle|full", 1.286, 1.258],
+    ["direct", "normal.mkv|subtitle|full", 1.252, 1.264],
+    ["direct", "normal.ts|audio|full", 2.636, 2.523],
+    ["direct", "normal.mp4|audio|full", 1.271, 1.323],
+    ["direct", "normal.mkv|audio|full", 1.268, 1.344],
+    ["direct", "sparse.mkv|subtitle|horizon", 1.867, 1.578],
+    ["direct", "sparse.mp4|subtitle|horizon", 1.547, 1.378],
+    ["direct", "audio-gap.mkv|subtitle|horizon", 1.647, 1.416],
+    ["direct", "video-gap.mkv|subtitle|horizon", 1.459, 1.28],
+    ["direct", "sparse.mkv|subtitle|resume", 3.365, 3.107],
+    ["direct", "sparse.mp4|subtitle|resume", 3.003, 2.435],
+    ["direct", "audio-gap.mkv|subtitle|resume", 2.622, 2.353],
+    ["direct", "video-gap.mkv|subtitle|resume", 2.558, 2.348],
+    ["direct", "normal.mp4|all|full", 1.167, 1.185],
+    ["direct", "normal.mkv|all|full", 1.244, 1.214],
+    ["direct", "normal.ts|all|full", 2.615, 2.792]
+  ],
+  "allocation_scope": "malloc/calloc/realloc only; excludes aligned APIs and live/peak memory",
+  "executor_allocation_columns": ["case", "baseline_requests", "candidate_requests", "baseline_requested_bytes", "candidate_requested_bytes"],
+  "executor_allocations": [
+    ["normal.mp4|subtitle|full", 3747, 2823, 181672, 113296],
+    ["normal.mkv|subtitle|full", 4703, 3779, 4566947, 4498571],
+    ["sparse.mkv|subtitle|horizon", 11667, 9355, 2505279, 2334191],
+    ["normal.mkv|all|full", 4703, 4703, 4566947, 4566947]
+  ],
+  "native_ci": {
+    "source": "Previously completed native CI, independently rechecked; not newly run locally",
+    "run": 38989970053,
+    "artifact": 12084653162,
+    "sha256": "599cd8c56a6ee8909536ef1541cc37db9560bde7815f81c662484901d3b8d48b",
+    "platform": "macOS 26.6.2 arm64 VirtualMac2,1; Xcode 26.6; Swift 6.3.3",
+    "timing_rows": 70,
+    "checks": 85,
+    "columns": ["scenario", "fresh_median_us_per_frame", "reuse_median_us_per_frame"],
+    "results": [
+      ["420v", 7.951, 6.362],
+      ["bgra", 8.62, 7.563],
+      ["hdr10", 8.836, 7.12],
+      ["alternating-color", 8.954, 9.499],
+      ["reset90", 6.751, 5.762]
+    ]
+  },
+  "scope_notes": ["Logical read bytes, selected packets and progress boundaries match in final cohort.", "Initial main-reader shared-wrapper design rejected; final main readPacket body unchanged.", "All raw ranges/commands, failed-control medians and rejected design retained in downloadable evidence.", "Queue/recovery/ownership fixes inherited from PR #5."]
+}
