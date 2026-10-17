@@ -1,0 +1,39 @@
+Building for production...
+[0/7] /Users/runner/work/_temp/subtitle-staging/release/package/.build/arm64-apple-macosx/release/SubtitleStagingRegressionsPackageTests.derived/runner.swift
+[1/7] Write sources
+[4/7] Write swift-version-7974D3F7F03D5E95.txt
+[6/8] Compiling IlliquidNativePlayback SubtitleFramePacker.swift
+[7/9] Compiling IlliquidNativePlaybackTests SubtitleStagingReuseTests.swift
+[8/10] Compiling SubtitleStagingRegressionsPackageTests runner.swift
+[8/10] Write Objects.LinkFileList
+[9/10] Linking SubtitleStagingRegressionsPackageTests
+Build complete! (11.58s)
+Test Suite 'All tests' started at 2026-10-17 15:12:03.668.
+Test Suite 'All tests' passed at 2026-10-17 15:12:03.669.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Subtitle staging storage reuse" started.
+◇ Test bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) started.
+◇ Test atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) started.
+◇ Test emptyAndInvalidAtlasCallsPreserveReusableSnapshots() started.
+◇ Test sourceRetirementReleasesBothPoolsAndPreservesPublishedSnapshots() started.
+◇ Test clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) started.
+◇ Test rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) started.
+◇ Test case passing 1 argument retainSnapshots → false to atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) started.
+◇ Test case passing 1 argument retainSnapshots → false to bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) started.
+◇ Test case passing 1 argument retainSnapshots → true to atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) started.
+◇ Test case passing 1 argument retainSnapshots → true to bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) started.
+◇ Test case passing 1 argument strategy → .metalR8Atlas to clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) started.
+◇ Test case passing 1 argument strategy → .metalBGRA to clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) started.
+◇ Test case passing 1 argument strategy → .metalR8Atlas to rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) started.
+◇ Test case passing 1 argument strategy → .metalBGRA to rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) started.
+✔ Test bgraSnapshotsMatchFreshPackingThroughClippingOverlapsAndEmptyFrames(retainSnapshots:) with 2 test cases passed after 0.002 seconds.
+✔ Test emptyAndInvalidAtlasCallsPreserveReusableSnapshots() passed after 0.002 seconds.
+✔ Test sourceRetirementReleasesBothPoolsAndPreservesPublishedSnapshots() passed after 0.002 seconds.
+✔ Test clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(strategy:) with 2 test cases passed after 0.002 seconds.
+✔ Test rejectedGrowthDoesNotCorruptTheNextReuseOrBudget(strategy:) with 2 test cases passed after 0.002 seconds.
+✔ Test atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(retainSnapshots:) with 2 test cases passed after 0.005 seconds.
+✔ Suite "Subtitle staging storage reuse" passed after 0.005 seconds.
+✔ Test run with 6 tests in 1 suite passed after 0.005 seconds.

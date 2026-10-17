@@ -15,10 +15,11 @@ The baseline is `main` at `8c3cc3d4008d5d1b8d436bcf2d51d891382b6548`.
 The measured candidate compositor SHA-256 is
 `42ec2d4371fd595d442f7a2d109ef36c10824b478dc87728fbb89ce6bee5e7f7`.
 
-The Linux component measurements show the largest benefit after a large-to-small
-transition: a 16 MiB R8 slot preparing a 64 KiB texture fell from 470.717 to
-2.419 microseconds per preparation. This is a synthetic, reproducible workload;
-the frequency of this state in users' media has not been measured.
+The Apple Silicon macOS measurements show the largest benefit after a
+large-to-small transition: a 16 MiB R8 slot preparing a 64 KiB texture fell from
+298.337 to 2.679 microseconds per preparation. The same workload fell from
+470.717 to 2.419 microseconds on Linux. These are synthetic, reproducible
+workloads; the frequency of this state in users' media has not been measured.
 
 ## Why this path matters
 
@@ -66,24 +67,66 @@ actual packer, rendered-region type, and memory budget. There is no translated
 packer implementation or simulated renderer. Foundation provides geometry types
 on Linux; macOS additionally imports their original CoreGraphics module.
 
-The pinned baseline and candidate are separate executables, built with Swift
-6.3.2, Swift 6 language mode, `-O`, and whole-module optimization. The identical
-driver alternates prebuilt input pixel variants of equal geometry. A production
-`SubtitleMemoryBudget` remains alive throughout each run.
+The pinned baseline and candidate are separate executables, built with Swift 6
+language mode, `-O`, and whole-module optimization. The recorded compilers are
+Apple Swift 6.3.3 on macOS and Swift 6.3.2 on Linux. The identical driver alternates
+prebuilt input pixel variants of equal geometry. A production
+`SubtitleMemoryBudget` remains alive throughout each run. The production,
+generated-source, driver, and runner hashes match between platforms.
 
 There are 12 workloads, each with 10 fresh-process baseline/candidate pairs:
-five baseline-first and five candidate-first, for **240 timing observations**.
+five baseline-first and five candidate-first, for **240 timing observations per
+platform**, or 480 in total.
 Every process fills both slots, then performs at least eight warm-up preparations
 before timing. Initial allocations and the first per-slot cleanup are excluded
 from the steady-state table and captured separately in the transition evidence.
 The ordinary workloads retain one prior frame; two additional workloads retain
-three frames to force snapshot copying beyond the two-slot pool.
+three frames to exercise reuse while both slots remain externally shared.
 
 Each observation reports average time per preparation over its timed batch. The
 table reports the median of those ten batch averages, **not a per-frame latency
 percentile**. Full ranges, raw durations, iterations, order, checksums, storage
 and budget receipts, compiler settings, and source/executable hashes are in
+[`RESULTS-macos.json`](../Benchmarks/SubtitleStaging/RESULTS-macos.json) and
 [`RESULTS-linux.json`](../Benchmarks/SubtitleStaging/RESULTS-linux.json).
+
+## macOS results
+
+Measured on an Apple Silicon GitHub Actions runner using macOS 26.6.2 and Apple
+Swift 6.3.3, targeting `arm64-apple-macosx26.0`. Times are microseconds per changed
+subtitle preparation, including the real memory-budget resize check.
+
+| Workload | Historical slot → active bytes | Baseline median | Candidate median | Change |
+| --- | --- | ---: | ---: | ---: |
+| R8 medium → small | 2 MiB → 64 KiB | 21.726 | 2.669 | -87.7% |
+| R8 large → small | 16 MiB → 64 KiB | 298.337 | 2.679 | -99.1% |
+| Bitmap atlas large → small | 16 MiB → 512 KiB | 284.088 | 14.436 | -94.9% |
+| CPU BGRA canvas large → small | 1920×1080 → 640×360 | 227.968 | 92.858 | -59.3% |
+| R8 small, stable size | 64 KiB → 64 KiB | 2.633 | 2.643 | +0.4% |
+| R8 large, stable size | 16 MiB → 16 MiB | 1039.616 | 1017.036 | -2.2% |
+| Bitmap atlas small, stable size | 512 KiB → 512 KiB | 13.844 | 13.963 | +0.9% |
+| Bitmap atlas large, stable size | 16 MiB → 16 MiB | 969.662 | 977.497 | +0.8% |
+| CPU BGRA small, stable size | 640×360 → 640×360 | 90.810 | 90.869 | +0.1% |
+| CPU BGRA large, stable size | 1920×1080 → 1920×1080 | 210.483 | 210.724 | +0.1% |
+| R8 large → small, three held frames | 16 MiB → 64 KiB | 2146.610 | 16.977 | -99.2% |
+| Bitmap large → small, three held frames | 16 MiB → 512 KiB | 2221.679 | 82.935 | -96.3% |
+
+All three small stable-size controls changed by less than 1% in their medians;
+the stable-size ranges overlap. Large-to-small timings separate substantially
+and reproduce the intended benefit on the application's target platform.
+
+The three-held-frame workloads show much lower candidate times on macOS than on
+Linux. These workloads preserve snapshots beyond the two-slot pool and exercise
+`Data`'s value semantics. Physical copying, allocation behavior, and DRAM traffic
+were not instrumented, so the platform difference does not establish a specific
+Foundation or virtual-memory mechanism.
+
+The benchmark and debug/release component tests passed in
+[workflow run 39043712484](https://github.com/Jagalite/illiquid/actions/runs/39043712484).
+[`VALIDATION-macos.json`](../Benchmarks/SubtitleStaging/VALIDATION-macos.json)
+records the tested implementation commit, downloaded artifact checksum, source
+identity checks, paired-output checks, and native test results. The committed
+raw results preserve the evidence after the workflow artifact expires.
 
 ## Linux results
 
@@ -108,13 +151,15 @@ changed subtitle preparation, including the real memory-budget resize check.
 Stable-size control ranges overlap substantially on this shared host. Their
 median changes do not establish a general stable-size improvement or regression.
 The large-to-small cases show the intended change in cleared footprint and a
-much larger timing separation. Holding three snapshots leaves substantial
-full-buffer copy-on-write cost even after clearing is reduced.
+much larger timing separation. With three held snapshots, the Linux candidate
+still takes approximately 1.25–1.34 milliseconds per preparation. Those costs
+are platform-dependent; the macOS results above are materially lower.
 
 The large R8 and bitmap workloads retain the same 32 MiB across their two staging
-slots before and after the change. All 120 paired observations agree on active
-bytes, retained staging bytes, budget reservations, and output checksums. Those
-logical staging counts exclude independently retained snapshot copies and are
+slots before and after the change. All 120 paired observations on each platform
+agree on active bytes, retained staging bytes, budget reservations, and output
+checksums. Those logical staging counts exclude independently retained snapshot
+copies and are
 not process-memory measurements.
 
 [`TRANSITIONS-linux.json`](../Benchmarks/SubtitleStaging/TRANSITIONS-linux.json)
@@ -126,9 +171,10 @@ the baseline helper and high-water `Data.count`, not that erroneous counter.
 ## Correctness and review
 
 [`SubtitleStagingReuseTests.swift`](../Tests/IlliquidNativePlaybackTests/SubtitleStagingReuseTests.swift)
-contains six test functions with ten parameter cases. Debug and optimized Linux
-builds pass. The independent oracle compares each reused frame's entire `Data`
-with a freshly prepared frame extended with zeros to the historical size.
+contains six test functions with ten parameter cases. Debug and optimized
+component builds pass on both Linux and macOS. The independent oracle compares
+each reused frame's entire `Data` with a freshly prepared frame extended with
+zeros to the historical size.
 Coverage includes both slots, retained snapshots, source strides, padding,
 mixed R8/bitmap formats, BGRA clipping/overlap/order, empty and invalid inputs,
 failed memory reservations followed by recovery, and retirement of both pools.
@@ -155,11 +201,22 @@ the final measurements.
 
 The dedicated
 [`subtitle-staging-performance.yml`](../.github/workflows/subtitle-staging-performance.yml)
-workflow runs macOS debug/release component tests, the same paired benchmark,
-and the native application dependency graph with the new regression suite plus
-`MetalASSSubtitleCompositorTests` and `PiPSubtitlePipelineTests`. The PR's Checks
-and `subtitle-staging-macos-evidence` artifact contain the execution outcomes;
-the checked-in Linux files above do not imply native success.
+workflow passed both jobs in
+[run 39043712484](https://github.com/Jagalite/illiquid/actions/runs/39043712484)
+for implementation commit `2b889057daf791ee5d749963a374ccd04d043309`. The
+component job passed macOS debug/release regressions and the paired benchmark.
+The native job built the full application dependency graph using the pinned
+native SDK and passed **51 tests in three suites**: `SubtitleStagingReuseTests`,
+`MetalASSSubtitleCompositorTests`, and `PiPSubtitlePipelineTests`.
+
+The native tests exercised actual Metal composition and PiP consumers, including
+SDR and HDR paths. Some media-fixture-dependent tests return early when their
+fixture is unavailable; the suite result does not certify every real-media
+scenario or interactive GUI behavior. The contiguous native test-output excerpt
+is preserved in
+[`TESTS-native-macos.log`](../Benchmarks/SubtitleStaging/TESTS-native-macos.log).
+The subsequent evidence-only commit leaves the production, test, and benchmark
+code exactly as tested.
 
 These measurements establish CPU staging savings for changed subtitle frames
 following larger allocations. Whole-player CPU, visible frame pacing, battery

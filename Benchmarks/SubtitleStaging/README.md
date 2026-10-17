@@ -12,7 +12,8 @@ python3 Benchmarks/SubtitleStaging/run.py benchmark --output /tmp/subtitle-stagi
 ```
 
 The benchmark requires Swift 6.1 or newer and a checkout containing baseline
-commit `8c3cc3d4008d5d1b8d436bcf2d51d891382b6548`. Recorded runs use Swift 6.3.2.
+commit `8c3cc3d4008d5d1b8d436bcf2d51d891382b6548`. Recorded runs use Swift 6.3.2
+on Linux and Apple Swift 6.3.3 on macOS.
 macOS builds target the application's macOS 26 deployment version. The portable
 component build needs no native media SDK or third-party package downloads.
 
@@ -31,11 +32,14 @@ quick smoke run. The built driver also supports:
 /tmp/subtitle-staging-run/candidate/subtitle-staging transition r8-large-to-small 1
 ```
 
-The checked-in `RESULTS-linux.json` contains all 240 timing observations,
-source/compiler/executable receipts, summary ranges, and output verification.
+The checked-in `RESULTS-linux.json` and `RESULTS-macos.json` each contain all
+240 timing observations, source/compiler/executable receipts, summary ranges,
+and output verification.
 `TRANSITIONS-linux.json` records the first six smaller frames for three
 large-to-small workloads. `VALIDATION.json` and the test logs record the focused
-debug/release checks and the expected old-counter failures.
+debug/release checks and the expected old-counter failures. `VALIDATION-macos.json`
+records the successful macOS component, benchmark, and native regression jobs;
+`TESTS-*-macos.log` preserves their test output.
 
 The baseline clear counter is inaccurate: it reports active upload bytes when
 the original helper clears the historical allocation. The research report
