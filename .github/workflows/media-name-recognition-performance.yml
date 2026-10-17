@@ -1,0 +1,58 @@
+name: Media name recognition performance
+
+on:
+  push:
+    branches: ['perf/media-name-folder-parsing']
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Benchmarks/MediaNameRecognition/**'
+      - '.github/workflows/media-name-recognition-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Benchmarks/MediaNameRecognition/**'
+      - '.github/workflows/media-name-recognition-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-name-recognition-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-recognition:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Compare baseline and candidate tests, exact outputs, and timings
+        run: |
+          python3 Benchmarks/MediaNameRecognition/run.py \
+            --output "$RUNNER_TEMP/media-name-recognition" \
+            --pairs 6 --target-ms 200
+      - name: Check recognition with sidecar and NFO metadata
+        run: |
+          set -o pipefail
+          bash Scripts/test-nfo-metadata-regressions.sh -c debug \
+            2>&1 | tee "$RUNNER_TEMP/media-name-recognition/sidecar-debug.stdout"
+          bash Scripts/test-nfo-metadata-regressions.sh -c release \
+            2>&1 | tee "$RUNNER_TEMP/media-name-recognition/sidecar-release.stdout"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-name-recognition-native
+          path: |
+            ${{ runner.temp }}/media-name-recognition/*.json
+            ${{ runner.temp }}/media-name-recognition/*.jsonl
+            ${{ runner.temp }}/media-name-recognition/*.stdout
+            ${{ runner.temp }}/media-name-recognition/*.stderr
+            ${{ runner.temp }}/media-name-recognition/inputs/**
+          retention-days: 14
