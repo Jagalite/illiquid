@@ -67,9 +67,19 @@ public enum MediaNameRecognition {
         let parent = folders.last ?? ""
         let seasonParent = match(seasonFolder, parent) != nil || parent.lowercased() == "specials"
         let showFolder = seasonParent ? folders.dropLast().last : nil
-        let evidence = [raw, showFolder ?? parent].joined(separator: "/")
-        let ids = Array(Set(matches(id, evidence).compactMap { capture($0, 1, in: evidence)?.lowercased() })).sorted()
-        let editionName = match(edition, evidence).flatMap { capture($0, 1, in: evidence) }
+        let ancestor = showFolder ?? parent
+        let rawHasBrace = raw.utf8.contains(0x7B)
+        let ids: [String]
+        let editionName: String?
+        if rawHasBrace || ancestor.utf8.contains(0x7B) {
+            // Preserve joined evidence: an edition match can span the separator.
+            let evidence = [raw, ancestor].joined(separator: "/")
+            ids = Array(Set(matches(id, evidence).compactMap { capture($0, 1, in: evidence)?.lowercased() })).sorted()
+            editionName = match(edition, evidence).flatMap { capture($0, 1, in: evidence) }
+        } else {
+            ids = []
+            editionName = nil
+        }
         var variantParts: [String] = []
         if let editionName { variantParts.append(editionName) }
         if let m = match(part, raw), let value = capture(m, 1, in: raw) { variantParts.append(clean(value)) }
@@ -151,7 +161,9 @@ public enum MediaNameRecognition {
         }
         // Movie IDs on the filename are explicit evidence; a TVDB ID alone
         // does not establish movie identity or an episode number.
-        let filenameIDs = matches(id, raw).compactMap { capture($0, 1, in: raw)?.lowercased() }
+        let filenameIDs = rawHasBrace
+            ? matches(id, raw).compactMap { capture($0, 1, in: raw)?.lowercased() }
+            : []
         if filenameIDs.contains(where: { $0.hasPrefix("imdb-") || $0.hasPrefix("tmdb-") }), !seasonParent {
             return result(.movie, filenameTitle)
         }
@@ -161,8 +173,7 @@ public enum MediaNameRecognition {
     private static func titleAndYear(_ original: String) -> (String, Int?) {
         // Edition dates and IDs are not release years. Parenthesized years win
         // over incidental numbers; the last year handles numeric movie titles.
-        let text = tags.stringByReplacingMatches(in: original,
-            range: NSRange(original.startIndex..., in: original), withTemplate: "")
+        let text = strippingTags(original)
         if let token = matches(explicitYear, text).last ?? matches(year, text).last, let value = capture(token, 1, in: text).flatMap(Int.init) {
             let title = clean(prefix(text, before: token))
             if !title.isEmpty { return (title, value) }
@@ -174,10 +185,17 @@ public enum MediaNameRecognition {
         clean(match(release, text).map { prefix(text, before: $0) } ?? text)
     }
     private static func clean(_ text: String) -> String {
-        let stripped = tags.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: "")
+        let stripped = strippingTags(text)
         return stripped.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "_", with: " ")
             .split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
             .trimmingCharacters(in: CharacterSet(charactersIn: " -()[]"))
+    }
+    private static func strippingTags(_ text: String) -> String {
+        // Every tag match starts with an ASCII brace or bracket. Scan bytes so
+        // delimiters joined to combining characters still take the regex path.
+        guard text.utf8.contains(where: { $0 == 0x7B || $0 == 0x5B }) else { return text }
+        return tags.stringByReplacingMatches(in: text,
+            range: NSRange(text.startIndex..., in: text), withTemplate: "")
     }
     private static func regex(_ pattern: String) -> NSRegularExpression { try! NSRegularExpression(pattern: pattern) }
     private static func matches(_ regex: NSRegularExpression, _ text: String) -> [NSTextCheckingResult] {

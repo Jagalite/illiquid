@@ -1,0 +1,51 @@
+name: Media name recognition performance
+
+on:
+  push:
+    branches:
+      - 'perf/media-name-tag-fast-path'
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Benchmarks/MediaNameRecognition/**'
+      - '.github/workflows/media-name-recognition-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Benchmarks/MediaNameRecognition/**'
+      - '.github/workflows/media-name-recognition-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-name-recognition-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test, compare complete outputs, and measure native Foundation
+        run: |
+          python3 Benchmarks/MediaNameRecognition/run.py \
+            --pairs 6 --target-ms 150 \
+            --output "$RUNNER_TEMP/media-name-recognition"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-name-recognition-evidence
+          path: |
+            ${{ runner.temp }}/media-name-recognition/*.json
+            ${{ runner.temp }}/media-name-recognition/*.jsonl
+            ${{ runner.temp }}/media-name-recognition/*.txt
+            ${{ runner.temp }}/media-name-recognition/*.gz
+          retention-days: 14
