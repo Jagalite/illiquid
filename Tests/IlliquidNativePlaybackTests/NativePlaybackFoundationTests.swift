@@ -249,7 +249,12 @@ struct NativePlayerClickRoutingTests {
         view.onInteraction = { interactions.append($0) }
         try click(view, window: window)
         #expect(interactions.isEmpty)
-        try await waitForSingleClick()
+        // A sleeping test and the delayed click can become runnable together.
+        // Wait for delivery instead of assuming which resumes first under load.
+        let deadline = ContinuousClock.now + .seconds(NSEvent.doubleClickInterval + 3)
+        while interactions.isEmpty, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
         #expect(interactions == [.primaryClick])
     }
 

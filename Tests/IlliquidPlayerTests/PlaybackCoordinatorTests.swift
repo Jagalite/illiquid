@@ -160,13 +160,19 @@ struct PlaybackCoordinatorTests {
         for delta in [10.0, 10.0, -5.0] { fixture.coordinator.seek(relative: delta) }
         fixture.coordinator.pause()
         #expect(fixture.coordinator.state.position == 295)
-        try await Task.sleep(for: .milliseconds(80))
+        let deadline295 = ContinuousClock.now + .seconds(3)
+        while fixture.runtime.seeks.last?.value != 295, ContinuousClock.now < deadline295 {
+            try await Task.sleep(for: .milliseconds(10))
+        }
         #expect(fixture.runtime.seeks.last?.value == 295)
         #expect(fixture.coordinator.state.isPauseDesired)
         fixture.coordinator.seek(to: 5)
         for delta in [-10.0, -10.0, 5.0] { fixture.coordinator.seek(relative: delta) }
         #expect(fixture.coordinator.state.position == 5)
-        try await Task.sleep(for: .milliseconds(80))
+        let deadline5 = ContinuousClock.now + .seconds(3)
+        while fixture.runtime.seeks.last?.value != 5, ContinuousClock.now < deadline5 {
+            try await Task.sleep(for: .milliseconds(10))
+        }
         #expect(fixture.runtime.seeks.last?.value == 5)
         await fixture.coordinator.shutdown()
     }

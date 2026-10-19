@@ -75,8 +75,10 @@ public struct TrackSelectionPreferences: Codable, Equatable, Sendable {
            !preferences.prefersAccessibleTracks {
             return eligible.first { $0.track.id == fallbackID }?.track.id
         }
+        // A lone eligible track needs no ranking, including language normalization.
+        guard eligible.count > 1 else { return eligible.first?.track.id }
         func rank(_ candidate: TrackSelectionCandidate) -> [Int] {
-            let languageRank = languages.firstIndex(of:
+            let languageRank = languages.isEmpty ? 0 : languages.firstIndex(of:
                 Self.normalizedLanguage(candidate.track.languageCode) ?? "")
                 .map { languages.count - $0 } ?? 0
             return [languageRank,
@@ -87,10 +89,18 @@ public struct TrackSelectionPreferences: Codable, Equatable, Sendable {
                     kind == .subtitle && candidate.track.isForced ? 1 : 0,
                     candidate.track.id == fallbackID ? 1 : 0]
         }
-        return eligible.max {
-            let left = rank($0), right = rank($1)
-            return left == right ? $0.track.id > $1.track.id : left.lexicographicallyPrecedes(right)
-        }?.track.id
+        // Retain the incumbent's rank instead of normalizing it again for every comparison.
+        var best = eligible[0]
+        var bestRank = rank(best)
+        for candidate in eligible.dropFirst() {
+            let candidateRank = rank(candidate)
+            if bestRank == candidateRank ? best.track.id > candidate.track.id
+                : bestRank.lexicographicallyPrecedes(candidateRank) {
+                best = candidate
+                bestRank = candidateRank
+            }
+        }
+        return best.track.id
     }
 }
 

@@ -22,6 +22,12 @@ public enum ExternalSubtitleMatcher {
             result[mediaURL] = []
         }
 
+        // Preserve every input key and the final cancellation poll without
+        // building a media-name index when there are no subtitle candidates.
+        if subtitleURLs.isEmpty {
+            return isCancelled() ? [:] : result
+        }
+
         let index = TokenIndex()
         var media: [(url: URL, raw: [String], tokens: [String])] = []
         for url in result.keys where MediaFileSupport.isSupportedMediaFile(url) {

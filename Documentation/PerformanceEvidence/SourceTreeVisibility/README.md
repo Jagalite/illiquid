@@ -5,8 +5,10 @@
 `linux/` retains the original text evidence from the 2026-10-17 20:23 UTC run
 against baseline `68274d1b09dcc866296321a5a8858efc297c4f19`. The source manifests
 identify the exact candidate by content hashes; the worktree was not committed
-when this local run started. The same candidate sources are committed with this
-report.
+when this local run started. The exact original runner, retained baseline,
+shared sources, tests, and candidate were subsequently committed at
+`daa5ea76d0bb570783cc91c521f34790ed8e1539`. The two changed production files
+remain identical after integration with the newer `main`.
 
 The run passed both source variants' component tests in debug/release and the
 expected baseline cache-count failure. It completed 29 six-pair workload/size
@@ -29,8 +31,11 @@ incomplete control is not included in any six-pair result.
 
 The duplicate runner copy and compressed staged-source archive are omitted from
 Git. The runner, tests, candidate source, retained baseline declarations, and
-staging rules are already committed; their exact hashes remain in the manifests.
-CI artifacts additionally contain that compressed archive.
+staging rules are retained in the original commit identified above; their exact
+hashes remain in the manifests. CI artifacts additionally contain that compressed
+archive. The current native runner uses a refreshed baseline at
+`33fff16155c3472960f88e04c72dfdfdefd56dcf`, including the newer shared recognition
+and sidecar code; this does not revise the historical Linux observations.
 
 Earlier local setup attempts exposed two Linux-specific issues: the Swift
 standalone driver intermittently trapped while inspecting a child thread, and

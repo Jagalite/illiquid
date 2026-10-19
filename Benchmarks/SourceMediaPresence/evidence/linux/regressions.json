@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "scope": "Actual unmodified helper built as enable-testing IlliquidApp module; repository Swift Testing regression suite linked to standalone runner. No full app or filesystem scanner integration.",
+  "started_utc": "2026-10-17T21:17:18.481950+00:00",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu\n",
+  "source_sha256": {
+    "Sources/IlliquidApp/UI/SourceMediaPresenceRecomputation.swift": "5702a74a421ad1fe34107a51c64b623b118ef5f753c26cc1c1f4b9e41cf5da98",
+    "Tests/IlliquidAppTests/SourceMediaPresenceRecomputationTests.swift": "d51ebb1e6b14fd4aa75886f839db8954309aa4fa6cba21cc7afa48624cfc5b53"
+  },
+  "runner_sha256": "ceb4d53d11541393039172b7c893136e933f5ffe6486833bd8394d73e31378f5",
+  "runner_source": "import Testing\nimport Glibc\n@main struct TestRunner {\n    static func main() async {\n        let result: CInt = await Testing.__swiftPMEntryPoint()\n        exit(result)\n    }\n}\n",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/scratch/c5a9eeabe5af/toolchains/swift-6.3.2/usr/bin/swiftc",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-parse-as-library",
+        "-module-cache-path",
+        "/workspace/scratch/c5a9eeabe5af/toolchains/module-cache",
+        "-Onone",
+        "-g",
+        "-emit-library",
+        "-emit-module",
+        "-module-name",
+        "IlliquidApp",
+        "-enable-testing",
+        "-emit-module-path",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/debug/IlliquidApp.swiftmodule",
+        "-o",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/debug/libIlliquidApp.so",
+        "/workspace/scratch/c5a9eeabe5af/illiquid/Sources/IlliquidApp/UI/SourceMediaPresenceRecomputation.swift"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.210999360999267,
+      "log": "Benchmarks/SourceMediaPresence/evidence/linux/tests-debug-module-build.txt"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/c5a9eeabe5af/toolchains/swift-6.3.2/usr/bin/swiftc",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-parse-as-library",
+        "-module-cache-path",
+        "/workspace/scratch/c5a9eeabe5af/toolchains/module-cache",
+        "-Onone",
+        "-g",
+        "-I",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/debug",
+        "-L",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/debug",
+        "-lIlliquidApp",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/debug",
+        "/workspace/scratch/c5a9eeabe5af/illiquid/Tests/IlliquidAppTests/SourceMediaPresenceRecomputationTests.swift",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/TestRunner.swift",
+        "-o",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/debug/PresenceRegressions"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.2825449870006196,
+      "log": "Benchmarks/SourceMediaPresence/evidence/linux/tests-debug-runner-build.txt"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/debug/PresenceRegressions"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.5787241319994791,
+      "log": "Benchmarks/SourceMediaPresence/evidence/linux/tests-debug.txt"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/c5a9eeabe5af/toolchains/swift-6.3.2/usr/bin/swiftc",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-parse-as-library",
+        "-module-cache-path",
+        "/workspace/scratch/c5a9eeabe5af/toolchains/module-cache",
+        "-O",
+        "-emit-library",
+        "-emit-module",
+        "-module-name",
+        "IlliquidApp",
+        "-enable-testing",
+        "-emit-module-path",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/release/IlliquidApp.swiftmodule",
+        "-o",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/release/libIlliquidApp.so",
+        "/workspace/scratch/c5a9eeabe5af/illiquid/Sources/IlliquidApp/UI/SourceMediaPresenceRecomputation.swift"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.7227600509995682,
+      "log": "Benchmarks/SourceMediaPresence/evidence/linux/tests-release-module-build.txt"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/c5a9eeabe5af/toolchains/swift-6.3.2/usr/bin/swiftc",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-parse-as-library",
+        "-module-cache-path",
+        "/workspace/scratch/c5a9eeabe5af/toolchains/module-cache",
+        "-O",
+        "-I",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/release",
+        "-L",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/release",
+        "-lIlliquidApp",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/release",
+        "/workspace/scratch/c5a9eeabe5af/illiquid/Tests/IlliquidAppTests/SourceMediaPresenceRecomputationTests.swift",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/TestRunner.swift",
+        "-o",
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/release/PresenceRegressions"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.369049414000074,
+      "log": "Benchmarks/SourceMediaPresence/evidence/linux/tests-release-runner-build.txt"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/c5a9eeabe5af/source-presence-tests/release/PresenceRegressions"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.2816752490007275,
+      "log": "Benchmarks/SourceMediaPresence/evidence/linux/tests-release.txt"
+    }
+  ],
+  "configurations": {
+    "debug": {
+      "passed": true,
+      "test_log": "tests-debug.txt",
+      "helper_sha256": "5702a74a421ad1fe34107a51c64b623b118ef5f753c26cc1c1f4b9e41cf5da98",
+      "tests_sha256": "d51ebb1e6b14fd4aa75886f839db8954309aa4fa6cba21cc7afa48624cfc5b53",
+      "summary": "\u2714 Test run with 13 tests in 1 suite passed after 0.558 seconds."
+    },
+    "release": {
+      "passed": true,
+      "test_log": "tests-release.txt",
+      "helper_sha256": "5702a74a421ad1fe34107a51c64b623b118ef5f753c26cc1c1f4b9e41cf5da98",
+      "tests_sha256": "d51ebb1e6b14fd4aa75886f839db8954309aa4fa6cba21cc7afa48624cfc5b53",
+      "summary": "\u2714 Test run with 13 tests in 1 suite passed after 0.270 seconds."
+    }
+  },
+  "completed_utc": "2026-10-17T21:17:27.986671+00:00"
+}

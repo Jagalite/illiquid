@@ -19,10 +19,15 @@ Matcher initialization still compiles rules; that work does not change the raw
 rows produced here.
 The other visibility settings are applied in the subsequent visibility pass.
 
-This research starts from consolidated `main` at
-`68274d1b09dcc866296321a5a8858efc297c4f19`. It addresses visibility-setting changes
-after the tree exists. The previously implemented empty-search projection cache
-remains in use.
+The initial Linux investigation used consolidated `main` at
+`68274d1b09dcc866296321a5a8858efc297c4f19`. Before native qualification, `main`
+advanced to `33fff16155c3472960f88e04c72dfdfdefd56dcf`. The native benchmark
+baseline was refreshed to that revision so its shared media-recognition and
+sidecar dependencies match the current project. The production change is the
+same in both cohorts. Results identify their baseline separately.
+
+This change addresses visibility-setting edits after the tree exists. The
+previously implemented empty-search projection cache remains in use.
 
 ## Change
 
@@ -173,6 +178,8 @@ or energy improvement is claimed.
 
 See [`Benchmarks/SourceTreeVisibility`](../Benchmarks/SourceTreeVisibility) for
 the runner, baseline receipt, source extraction boundaries, raw observations,
-and measured results. The `source-tree-visibility` job in
+and measured results. The original Linux runner and retained baseline are
+available at commit `daa5ea76d0bb570783cc91c521f34790ed8e1539`; the current
+runner qualifies the baseline from the newer consolidation. The `source-tree-visibility` job in
 `.github/workflows/non-decoding-performance.yml` retains its evidence as a
 GitHub Actions artifact.

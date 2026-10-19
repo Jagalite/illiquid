@@ -1,0 +1,1146 @@
+{
+  "baseline_revision": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "coalescer_test_bodies_sha256": "37c8d43362363bc551ef84050e00b26107619ec0b33e94393fe1229b8229a0b6",
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/swiftc",
+        "--version"
+      ],
+      "elapsed_seconds": 2.8247595840000486,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "sw_vers"
+      ],
+      "elapsed_seconds": 0.015532958999983748,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "sysctl",
+        "-n",
+        "machdep.cpu.brand_string"
+      ],
+      "elapsed_seconds": 0.00465350000001763,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "68274d1b09dcc866296321a5a8858efc297c4f19:Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift"
+      ],
+      "elapsed_seconds": 0.010911875000033433,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests",
+        "--scratch-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests/build",
+        "--cache-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests/cache",
+        "--config-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests/config",
+        "--security-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests/security",
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--no-parallel",
+        "--configuration",
+        "debug"
+      ],
+      "elapsed_seconds": 27.49849341700002,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests",
+        "--scratch-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests/build",
+        "--cache-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests/cache",
+        "--config-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests/config",
+        "--security-path",
+        "/Users/runner/work/_temp/observation-metrics/baseline/tests/security",
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--no-parallel",
+        "--configuration",
+        "release"
+      ],
+      "elapsed_seconds": 19.30223424999997,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests",
+        "--scratch-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests/build",
+        "--cache-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests/cache",
+        "--config-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests/config",
+        "--security-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests/security",
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--no-parallel",
+        "--configuration",
+        "debug"
+      ],
+      "elapsed_seconds": 14.50165095799997,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests",
+        "--scratch-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests/build",
+        "--cache-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests/cache",
+        "--config-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests/config",
+        "--security-path",
+        "/Users/runner/work/_temp/observation-metrics/candidate/tests/security",
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--no-parallel",
+        "--configuration",
+        "release"
+      ],
+      "elapsed_seconds": 13.718758417000004,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-target",
+        "arm64-apple-macosx26.0",
+        "-module-cache-path",
+        "/Users/runner/work/_temp/observation-metrics/module-cache",
+        "/Users/runner/work/_temp/observation-metrics/baseline/Observation.swift",
+        "/Users/runner/work/illiquid/illiquid/Benchmarks/ObservationMetrics/Harness.swift",
+        "-o",
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark"
+      ],
+      "elapsed_seconds": 3.7757953340000086,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-target",
+        "arm64-apple-macosx26.0",
+        "-module-cache-path",
+        "/Users/runner/work/_temp/observation-metrics/module-cache",
+        "/Users/runner/work/_temp/observation-metrics/candidate/Observation.swift",
+        "/Users/runner/work/illiquid/illiquid/Benchmarks/ObservationMetrics/Harness.swift",
+        "-o",
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark"
+      ],
+      "elapsed_seconds": 1.4456141249999632,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.6667074999999727,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.372524124999984,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.2876526659999854,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1327207500000327,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.17477241699998558,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.05251041699995085,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.13434341700002506,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.035937875000001895,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3259633750000148,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.12826754200000323,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.13013987499999757,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.021132209000029434,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.02404508300003272,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.023170040999957564,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.023904667000010704,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.021075666999990972,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.022072083000011844,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.14653691699999172,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1445689589999688,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.354257500000017,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.03382375000001048,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.10900875000004362,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.044327250000037566,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1582955419999621,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1070600410000111,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.25594904199999746,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3222436670000093,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.6834840829999962,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.6592872080000234,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.31329558400000224,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.24721229199997197,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.10119954200001757,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1417915840000319,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.04271145900003148,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.10732470799996463,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.03000341599999956,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.2929003749999879,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.11232762499997762,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1134363330000383,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.01653895800001237,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.01624349999997321,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.016189416000031542,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.016295374999970136,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.016152040999998007,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.016317833000016435,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.11329062499999054,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.11232445799998914,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.2869433329999538,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.030122040999970068,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.11316658399999824,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.04781241699998873,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.18699216700002808,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.11307187500000282,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.2441060840000091,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3428102920000242,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.7459005000000047,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.7432874579999975,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.34886608400000796,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.27240975000000844,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.10808845799999744,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1569119579999665,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.047742749999997613,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.12814962500004867,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.03273016700001108,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3242070840000224,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.12559287499999527,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1278416659999948,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.018370958000048176,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.021737749999999778,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.01810116699999753,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.019701208000014958,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.018066040999997313,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.01780787499995995,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.12747512499998948,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.12525029200003246,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3198859159999756,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.03523925000001782,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.11980299999999033,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.04676937499999667,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.14243016599999692,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.09648066699998026,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.25092349999999897,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3418197500000133,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/observation-metrics/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.6997125840000535,
+      "returncode": 0
+    }
+  ],
+  "cpu_count": 3,
+  "cpu_model": "Apple M1 (Virtual)",
+  "finished_utc": "2026-10-17T20:33:59.653262+00:00",
+  "flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-parse-as-library"
+  ],
+  "harness_sha256": "bdefc77d380f6e541c0012556c0b220d764c75673addfca428181a0a00aa9eff",
+  "host": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83\n",
+  "iterations": 4000000,
+  "ledger_only_tests": false,
+  "machine": "arm64",
+  "pairs": 6,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "runner_sha256": "f8edfee395488a9ab8e457b324fb1865ef2bcb82ec86fe9f706beba70cca2683",
+  "scenarios": [
+    "steady-1",
+    "steady-4",
+    "steady-16",
+    "batch-16",
+    "retained-64",
+    "snapshot-only",
+    "control"
+  ],
+  "scope": "Observation accounting component only; no playback, decoder, renderer, or UI CPU measurement",
+  "sources": {
+    "baseline": {
+      "binary_sha256": "640c9ab1a589d85918ee6717ef795e0a67ed92d8b043ffa6f1e5faca7c8d4dcd",
+      "extracted_bytes": 7828,
+      "extracted_sha256": "9d4c15b1db6483b96f1012a25ac59adacdb233bb0900a92d2ad6e3c7d5d70459",
+      "path": "Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift",
+      "whole_file_sha256": "beaf96a9fa24cd649a27a2ed99496bee71fcac7c64ffc761a082ce56c96ff08e"
+    },
+    "candidate": {
+      "binary_sha256": "a94151e01c0e8d3bfbb2b8df5f731ab9dee80bc3e5514a2ee3b41708e4ece472",
+      "extracted_bytes": 9901,
+      "extracted_sha256": "75497399eb0fe651a8fdacdff73bd948147355f00053794083b9e8522049e362",
+      "path": "Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift",
+      "whole_file_sha256": "dd42babcadcd8ef788f0aaaaade5efce65e3e53bc1ad3d84d000467fc0558c7d"
+    }
+  },
+  "started_utc": "2026-10-17T20:32:22.062877+00:00",
+  "swift_version": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "test_sha256": "d517dde123cdde2383823ef6943ae7ab4cb57bad32e641c1f4b7d6759b40fe31"
+}

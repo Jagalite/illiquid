@@ -1,0 +1,74 @@
+name: Observation metrics performance
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift'
+      - 'Tests/IlliquidNativePlaybackTests/RuntimeObservationMetricsTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PresentationTimeObservationTests.swift'
+      - 'Benchmarks/ObservationMetrics/**'
+      - '.github/workflows/observation-metrics-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: observation-metrics-performance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify both ledgers and measure paired optimized runs
+        run: |
+          python3 Benchmarks/ObservationMetrics/run.py --mode all \
+            --pairs 6 --iterations 4000000 \
+            --output "$RUNNER_TEMP/observation-metrics"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: observation-metrics-component
+          path: |
+            ${{ runner.temp }}/observation-metrics/
+            !${{ runner.temp }}/observation-metrics/module-cache/**
+            !${{ runner.temp }}/observation-metrics/*/tests/**
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and verify observation integration
+        run: |
+          mkdir -p "$RUNNER_TEMP/observation-native"
+          set -o pipefail
+          swift test --force-resolved-versions --no-parallel --filter \
+            'RuntimeObservationMetricsTests|PresentationTimeObservationTests|observationMetricsSeparateSourcesCoalescingAndUrgentDelay|periodicMetricsExposeObservationSourceCounts' \
+            2>&1 | tee "$RUNNER_TEMP/observation-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: observation-metrics-native
+          path: ${{ runner.temp }}/observation-native/
+          retention-days: 14

@@ -1,0 +1,98 @@
+name: Episode name recognition performance
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift'
+      - 'Tests/IlliquidCoreTests/EpisodeNameRecognitionRegressionTests.swift'
+      - 'Benchmarks/EpisodeNameRecognition/Driver.swift'
+      - 'Benchmarks/EpisodeNameRecognition/run.py'
+      - 'Benchmarks/EpisodeNameRecognition/baseline/**'
+      - 'Benchmarks/EpisodeNameRecognition/folder-reuse/**'
+      - '.github/workflows/episode-name-recognition-performance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: episode-name-recognition-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Baseline and candidate regression tests in debug and release
+        run: |
+          for implementation in baseline candidate; do
+            for configuration in debug release; do
+              python3 Benchmarks/EpisodeNameRecognition/run.py test \
+                --implementation "$implementation" --configuration "$configuration" \
+                --output "$RUNNER_TEMP/episode-name-recognition/$implementation-$configuration"
+            done
+          done
+      - name: Differential corpus and balanced paired native benchmarks
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == pull_request ]]; then
+            python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --repeats 2 --iterations 8 --rounds 1 \
+              --output "$RUNNER_TEMP/episode-name-recognition/benchmark"
+          else
+            python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --repeats 12 --iterations 128 --rounds 3 \
+              --output "$RUNNER_TEMP/episode-name-recognition/benchmark"
+          fi
+      - name: Compare with concurrent folder-parsing reuse
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == pull_request ]]; then
+            python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --reference folder-reuse \
+              --repeats 2 --iterations 8 --rounds 1 \
+              --scenarios named-episode-with-year named-episode-no-year bare-season-episode movie-controls \
+              --output "$RUNNER_TEMP/episode-name-recognition/folder-reuse-comparison"
+          else
+            python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --reference folder-reuse \
+              --repeats 12 --iterations 128 --rounds 3 \
+              --scenarios named-episode-with-year named-episode-no-year bare-season-episode movie-controls \
+              --output "$RUNNER_TEMP/episode-name-recognition/folder-reuse-comparison"
+          fi
+      - name: Publish machine-readable evidence in the run log
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'episode-name-recognition'
+          evidence = json.loads((root / 'benchmark/results.json').read_text())
+          evidence['folder_reuse_comparison'] = json.loads((root / 'folder-reuse-comparison/results.json').read_text())
+          evidence['validation'] = {
+              path.parent.name: json.loads(path.read_text())
+              for path in sorted(root.glob('*/receipt.json'))
+          }
+          evidence['github_run'] = {
+              'id': os.environ['GITHUB_RUN_ID'], 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'sha': os.environ['GITHUB_SHA'], 'event': os.environ['GITHUB_EVENT_NAME'],
+              'url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          }
+          (root / 'evidence.json').write_text(json.dumps(evidence, indent=2) + '\n')
+          serialized = json.dumps(evidence, separators=(',', ':'))
+          chunks = [serialized[start:start + 12000] for start in range(0, len(serialized), 12000)]
+          for index, chunk in enumerate(chunks):
+              print('EPISODE_EVIDENCE_PART=' + json.dumps({'index': index, 'parts': len(chunks), 'chunk': chunk}))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('## Episode name recognition\n\n')
+              summary.write(f"Differential cases: {evidence['differential']['cases']}. Baseline/candidate tests passed in debug/release.\n\n")
+              for title, report in [('Against original main', evidence), ('Against concurrent folder reuse', evidence['folder_reuse_comparison'])]:
+                  summary.write(f'### {title}\n\n')
+                  summary.write('| Scenario | Baseline µs/file | Candidate µs/file | Paired reduction |\n|---|---:|---:|---:|\n')
+                  for name, result in report['summary'].items():
+                      summary.write(f"| {name} | {result['baseline_median_ns_per_file']/1000:.2f} | {result['candidate_median_ns_per_file']/1000:.2f} | {result['paired_median_reduction_percent']:.1f}% |\n")
+                  summary.write('\n')
+              summary.write('\nComponent timings only. Pull-request runs are parity smoke checks, not performance evidence.\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: episode-name-recognition-native
+          path: ${{ runner.temp }}/episode-name-recognition/
+          retention-days: 14

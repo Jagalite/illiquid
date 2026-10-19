@@ -1,8 +1,18 @@
 # Source-tree visibility benchmark
 
 Measure the real background browser projection when visibility settings change
-without changing the underlying source tree. The research baseline is
-`68274d1b09dcc866296321a5a8858efc297c4f19`.
+without changing the underlying source tree. The current baseline for native
+qualification is consolidated `main` at
+`33fff16155c3472960f88e04c72dfdfdefd56dcf`.
+
+The original Linux measurements used
+`68274d1b09dcc866296321a5a8858efc297c4f19` and remain historical evidence with
+their original manifests. The retained baseline was refreshed on October 19,
+2026 to include the media-name recognition and NFO parser changes subsequently
+merged into `main`. Both variants in new runs use those same updated shared
+dependencies. The source-browser filter and tree-input baseline implementations
+are unchanged between the two revisions; new native measurements identify the
+refreshed baseline independently of the original Linux cohort.
 
 ## Run
 
@@ -69,7 +79,7 @@ the measurement.
 
 ## Sources and verification
 
-`baseline/manifest.json` records the original revision, source Git blob IDs,
+`baseline/manifest.json` records the current baseline revision, source Git blob IDs,
 SHA-256 hashes, and extraction boundaries. The retained baseline consists of
 complete small production files and guarded verbatim Foundation declarations
 from `AppModel.swift` and `SourcesSidebar.swift`. The candidate stages the same

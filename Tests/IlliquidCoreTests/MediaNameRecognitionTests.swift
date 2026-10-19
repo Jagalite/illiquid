@@ -115,4 +115,66 @@ struct MediaNameRecognitionTests {
         #expect(media.kind == .unknown)
         #expect(media.displayName == (path as NSString).deletingPathExtension)
     }
+
+    @Test func dateBoundariesMatchGregorianCalendar() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        // Every supported year, all month lengths, and malformed two-digit
+        // endpoints exercise both date conventions through the public parser.
+        for year in 1900...2099 {
+            for month in 0...13 {
+                for day in [0, 1, 28, 29, 30, 31, 32, 99] {
+                    let components = DateComponents(year: year, month: month, day: day)
+                    let valid = calendar.date(from: components).map {
+                        calendar.dateComponents([.year, .month, .day], from: $0) == components
+                    } ?? false
+                    let forward = String(format: "%04d-%02d-%02d", year, month, day)
+                    let reverse = String(format: "%02d.%02d.%04d", day, month, year)
+                    for date in [forward, reverse] {
+                        let name = "Daily News - \(date) - Bulletin"
+                        let media = MediaNameRecognition.recognize(relativePath: name + ".mkv")
+                        if valid {
+                            #expect(media.kind == .episode)
+                            #expect(media.title == "Daily News")
+                            #expect(media.airDate == forward)
+                            #expect(media.episodeTitle == "Bulletin")
+                        } else {
+                            #expect(media.kind == .unknown)
+                            #expect(media.title == name)
+                            #expect(media.airDate == nil)
+                            #expect(media.year == nil)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test(arguments: [
+        "Film[\u{0301}tag] (2024).mkv",
+        "Film{\u{0301}tag} (2024).mkv",
+        "Film[\u{FE0F}tag] (2024).mkv",
+        "Film{\u{FE0F}tag} (2024).mkv",
+        "Film[outer[inner] (2024).mkv",
+        "Film{outer{inner} (2024).mkv",
+        "Film[year 1999] (2024).mkv",
+        "Film{edition-1999 Remaster} (2024).mkv"
+    ])
+    func tagOpenersRetainRegexSemantics(_ path: String) {
+        let media = MediaNameRecognition.recognize(relativePath: path)
+        #expect(media.kind == .movie)
+        #expect(media.title == "Film")
+        #expect(media.year == 2024)
+    }
+
+    @Test(arguments: [
+        "Cafe\u{0301} 世界", "Café 世界", "👩\u{200D}🚀 Expedition",
+        "［Fullwidth］ ｛braces｝", "Closing} marker", "Unclosed{marker"
+    ])
+    func titleCleanupPreservesUnicodeBytes(_ title: String) {
+        let media = MediaNameRecognition.recognize(relativePath: "\(title) (2024).mkv")
+        #expect(media.kind == .movie)
+        #expect(Array(media.title.utf8) == Array(title.utf8))
+        #expect(media.year == 2024)
+    }
 }
