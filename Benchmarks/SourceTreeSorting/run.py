@@ -42,14 +42,23 @@ def section(source: str, start: str, end: str) -> str:
     return source[source.index(start):source.index(end)].rstrip() + "\n"
 
 
+def selected_tool(name: str) -> str | None:
+    configured = os.environ.get(name.upper())
+    if configured:
+        return configured
+    if sys.platform == "darwin":
+        return subprocess.check_output(["xcrun", "--find", name], text=True).strip()
+    return shutil.which(name)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--mode", choices=["all", "test", "benchmark"], default="all")
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--target-ms", type=float, default=40)
-    parser.add_argument("--swiftc", default=os.environ.get("SWIFTC") or shutil.which("swiftc"))
-    parser.add_argument("--swift", default=os.environ.get("SWIFT") or shutil.which("swift"))
+    parser.add_argument("--swiftc", default=selected_tool("swiftc"))
+    parser.add_argument("--swift", default=selected_tool("swift"))
     args = parser.parse_args()
     if not args.swiftc or (args.mode != "benchmark" and not args.swift):
         parser.error("Swift toolchain required; set SWIFTC/SWIFT or use PATH")
@@ -87,7 +96,9 @@ def main() -> None:
              "-parse-as-library", "-enable-testing", "-warnings-as-errors",
              "-module-cache-path", str(out / "module-cache")]
     if sys.platform == "darwin":
-        flags += ["-target", f"{platform.machine()}-apple-macosx26.0"]
+        sdk = run(["xcrun", "--sdk", "macosx", "--show-sdk-path"]).strip()
+        receipt["native_sdk"] = sdk
+        flags += ["-target", f"{platform.machine()}-apple-macosx26.0", "-sdk", sdk]
     receipt["flags"] = flags
     binaries = {}
     for variant in ["baseline", "candidate"]:
