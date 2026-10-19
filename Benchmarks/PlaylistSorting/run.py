@@ -189,7 +189,7 @@ class Runner:
                         elapsed = result["elapsed_ns"] / iterations
                         timings[variant].append(elapsed)
                         observations.append({"size": size, "workload": workload, "pair": pair,
-                                             "order": order, "variant": variant,
+                                             "execution_order": order, "variant": variant,
                                              "nanoseconds_per_sort": elapsed, **result})
                     if results["baseline"]["checksum"] != results["candidate"]["checksum"]:
                         raise AssertionError(f"Benchmark output parity failed: {workload}/{size}")

@@ -37,6 +37,8 @@ the full exact fixture before timing each size/workload.
 Fixtures cover shuffled, sorted, reverse-sorted, and repeated names; unique,
 tied, and missing dates; and items with populated subtitle metadata. Setup,
 normalization in item construction, and two warmup sorts are outside timing.
+The missing-date fixture starts in ascending natural-name order in both
+directions, matching the output of folder playlist construction.
 Each measured call includes key preparation, sorting, result construction and
 destruction, plus the same small count/endpoint checksum in both variants.
 
@@ -59,3 +61,17 @@ graph and runs the complete native release suite.
 
 These are complete sorter component timings. They do not measure disk discovery,
 SwiftUI rendering, decoding, frame rate, energy, or whole-player CPU usage.
+
+## Retained study
+
+The completed October 19 Linux study, source receipts, exact ordering traces,
+and original runner snapshot are in [`Results/linux/`](Results/linux/).
+See [the report](../../Documentation/PLAYLIST_SORTING_PERFORMANCE.md) for results,
+limitations, and the current native qualification link.
+
+The original Linux observation field `order` contains the playlist sort mode;
+the original execution-order field was overwritten when merging harness output.
+Execution order remains recoverable from observation-array sequence and the
+retained command log, which were audited for six balanced pairs per case. The
+current runner uses a distinct `execution_order` field for native and future
+studies. This reporting correction does not change the measured Swift code.
