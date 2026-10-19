@@ -11,6 +11,7 @@ on:
       - 'Scripts/test-playlist-restoration.sh'
       - 'Benchmarks/PlaylistRestoration/**'
       - 'Benchmarks/NaturalFilenameOrdering/**'
+      - 'Benchmarks/PlaylistSorting/**'
       - '.github/workflows/playlist-restoration.yml'
   workflow_dispatch:
 permissions:
@@ -21,13 +22,15 @@ concurrency:
 jobs:
   focused-playlist:
     runs-on: macos-26
-    timeout-minutes: 10
+    timeout-minutes: 20
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+          # The paired sorting study reads its pinned baseline from Git.
+          fetch-depth: 0
       - name: Debug playlist tests
         run: bash Scripts/test-playlist-restoration.sh
       - name: Release playlist tests
@@ -40,6 +43,22 @@ jobs:
         run: >-
           python3 Benchmarks/NaturalFilenameOrdering/run.py --quick --samples 2
           --output "$RUNNER_TEMP/natural-filename-ordering"
+      - name: Qualify playlist sorting against the pinned baseline
+        run: >-
+          python3 Benchmarks/PlaylistSorting/run.py
+          --output "$RUNNER_TEMP/playlist-sorting" --pairs 6 --target-ms 60
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-sorting-macos
+          path: |
+            ${{ runner.temp }}/playlist-sorting/*.json
+            ${{ runner.temp }}/playlist-sorting/*.log
+            ${{ runner.temp }}/playlist-sorting/*.py
+            ${{ runner.temp }}/playlist-sorting/verified-fixtures/
+            ${{ runner.temp }}/playlist-sorting/baseline/Sources/
+            ${{ runner.temp }}/playlist-sorting/candidate/Sources/
+          retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
