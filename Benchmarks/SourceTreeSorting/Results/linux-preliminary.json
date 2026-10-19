@@ -1,0 +1,385 @@
+{
+  "receipt": {
+    "architecture": "x86_64",
+    "baseline": "68274d1b09dcc866296321a5a8858efc297c4f19",
+    "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+    "flags": [
+      "-swift-version",
+      "6",
+      "-O",
+      "-whole-module-optimization",
+      "-parse-as-library",
+      "-enable-testing",
+      "-warnings-as-errors",
+      "-module-cache-path",
+      "/workspace/scratch/8ff088483b23/sort-validation-linux/module-cache"
+    ],
+    "harness_sha256": "d7d7bb31dd9178d0b1794c1015559ff882be0911829061df4af735a346426dfd",
+    "head": "68274d1b09dcc866296321a5a8858efc297c4f19",
+    "locale_environment": {
+      "LANG": "C.UTF-8",
+      "LC_ALL": "C.UTF-8",
+      "LC_COLLATE": null
+    },
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "runner_sha256": "56f797db8144ea74320d569dd892cbc36911becb17ddc736abb79e4afb246d53",
+    "sources": {
+      "baseline": {
+        "binary_sha256": "d7b590ea6a792c65f316783daf0ae291c8605c3435fdb2b8227b2a9080c68713",
+        "extracted_sha256": "c1e05cdf990ca2385bd551c8d5ed7ff9ce676b9668f62dd5375b0a13c3a50865",
+        "input_sha256": {
+          "Sources/IlliquidApp/UI/SourcesSidebar.swift": "9bb2b266cab3ca143e629e71a6119cb5e2b89349bb529bc3b2657c2f3c5a13d3",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        }
+      },
+      "candidate": {
+        "binary_sha256": "abadfb3cbed7e516e59f4f8e40762ffcec3bfdf6337793723681e0eb592ed7a6",
+        "extracted_sha256": "340c7cad8a56bdce6073fd9a463b3e3935758bd1f23a2c8fe007ca5de22153f6",
+        "input_sha256": {
+          "Sources/IlliquidApp/UI/SourcesSidebar.swift": "564a0b989f9ad7ca848497b26c1ec9e58447685346b1e44e6a01b7b86c6ba1e4",
+          "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+        }
+      }
+    },
+    "started_utc": "2026-10-17T20:15:25Z",
+    "test_sha256": "2d72df2e8510f36590064e3ab84d4bea84c4455eecd2b91c34cb857d66465e6d",
+    "working_tree": " M Sources/IlliquidApp/UI/SourcesSidebar.swift\n?? Benchmarks/SourceTreeSorting/\n?? Tests/IlliquidAppTests/SourceTreeSortingTests.swift\n"
+  },
+  "status": "preliminary_completed_before_extended_fixtures",
+  "summary": [
+    {
+      "baseline": {
+        "max_ns": 31.372852019158742,
+        "median_ns": 28.83466790002951,
+        "min_ns": 27.21121717022677
+      },
+      "candidate": {
+        "max_ns": 13.176775701995323,
+        "median_ns": 10.424576646312396,
+        "min_ns": 9.143423830386126
+      },
+      "count": 0,
+      "iterations": 176212,
+      "paired_reduction_percent": 62.9356478063277,
+      "pairs": 6,
+      "scenario": "name-0"
+    },
+    {
+      "baseline": {
+        "max_ns": 218.44842452971838,
+        "median_ns": 192.00964157782974,
+        "min_ns": 155.29302245769074
+      },
+      "candidate": {
+        "max_ns": 13.862143669161966,
+        "median_ns": 11.04009995495592,
+        "min_ns": 8.714313292293173
+      },
+      "count": 1,
+      "iterations": 46621,
+      "paired_reduction_percent": 94.50285206535348,
+      "pairs": 6,
+      "scenario": "name-1"
+    },
+    {
+      "baseline": {
+        "max_ns": 72330.83956043956,
+        "median_ns": 46673.53956043956,
+        "min_ns": 42390.212087912085
+      },
+      "candidate": {
+        "max_ns": 52251.338461538464,
+        "median_ns": 32950.00384615385,
+        "min_ns": 32234.724175824176
+      },
+      "count": 8,
+      "iterations": 910,
+      "paired_reduction_percent": 30.396308724615217,
+      "pairs": 6,
+      "scenario": "name-8"
+    },
+    {
+      "baseline": {
+        "max_ns": 1016308.1333333333,
+        "median_ns": 734007.9583333333,
+        "min_ns": 647374.6833333333
+      },
+      "candidate": {
+        "max_ns": 813210.3,
+        "median_ns": 510865.625,
+        "min_ns": 434151.55
+      },
+      "count": 32,
+      "iterations": 60,
+      "paired_reduction_percent": 29.30807395109529,
+      "pairs": 6,
+      "scenario": "name-32"
+    },
+    {
+      "baseline": {
+        "max_ns": 5870687.5,
+        "median_ns": 5372979.5,
+        "min_ns": 3515968.9166666665
+      },
+      "candidate": {
+        "max_ns": 3897458.0833333335,
+        "median_ns": 3173311.583333333,
+        "min_ns": 2324914.8333333335
+      },
+      "count": 128,
+      "iterations": 12,
+      "paired_reduction_percent": 38.940546108828734,
+      "pairs": 6,
+      "scenario": "name-128"
+    },
+    {
+      "baseline": {
+        "max_ns": 72226798.0,
+        "median_ns": 53412102.5,
+        "min_ns": 51546471.0
+      },
+      "candidate": {
+        "max_ns": 45279392.0,
+        "median_ns": 36115762.5,
+        "min_ns": 31653953.0
+      },
+      "count": 1000,
+      "iterations": 1,
+      "paired_reduction_percent": 36.61644209584458,
+      "pairs": 6,
+      "scenario": "name-1000"
+    },
+    {
+      "baseline": {
+        "max_ns": 596157914.0,
+        "median_ns": 516636994.5,
+        "min_ns": 504136838.0
+      },
+      "candidate": {
+        "max_ns": 379377175.0,
+        "median_ns": 360156403.5,
+        "min_ns": 327356781.0
+      },
+      "count": 10000,
+      "iterations": 1,
+      "paired_reduction_percent": 31.275876976673167,
+      "pairs": 6,
+      "scenario": "name-10000"
+    },
+    {
+      "baseline": {
+        "max_ns": 43222150.0,
+        "median_ns": 41186033.5,
+        "min_ns": 39000403.0
+      },
+      "candidate": {
+        "max_ns": 52877030.0,
+        "median_ns": 37936909.0,
+        "min_ns": 36738975.0
+      },
+      "count": 10000,
+      "iterations": 1,
+      "paired_reduction_percent": 3.6990836681765726,
+      "pairs": 6,
+      "scenario": "name-sorted-10000"
+    },
+    {
+      "baseline": {
+        "max_ns": 57832383.5,
+        "median_ns": 43596862.25,
+        "min_ns": 38327745.5
+      },
+      "candidate": {
+        "max_ns": 48931054.5,
+        "median_ns": 37860309.75,
+        "min_ns": 34884321.5
+      },
+      "count": 10000,
+      "iterations": 2,
+      "paired_reduction_percent": 12.837891597397933,
+      "pairs": 6,
+      "scenario": "name-reversed-10000"
+    },
+    {
+      "baseline": {
+        "max_ns": 90285764.0,
+        "median_ns": 65122732.0,
+        "min_ns": 61958001.0
+      },
+      "candidate": {
+        "max_ns": 54455437.0,
+        "median_ns": 50235250.5,
+        "min_ns": 48270916.0
+      },
+      "count": 1000,
+      "iterations": 1,
+      "paired_reduction_percent": 23.004662598832915,
+      "pairs": 6,
+      "scenario": "equal-basenames-1000"
+    },
+    {
+      "baseline": {
+        "max_ns": 47393223.0,
+        "median_ns": 36832877.75,
+        "min_ns": 33855017.0
+      },
+      "candidate": {
+        "max_ns": 38708859.5,
+        "median_ns": 25721989.75,
+        "min_ns": 22660263.5
+      },
+      "count": 1000,
+      "iterations": 2,
+      "paired_reduction_percent": 34.86413351329085,
+      "pairs": 6,
+      "scenario": "duplicate-urls-1000"
+    },
+    {
+      "baseline": {
+        "max_ns": 620886233.0,
+        "median_ns": 512169423.0,
+        "min_ns": 477159445.0
+      },
+      "candidate": {
+        "max_ns": 429451269.0,
+        "median_ns": 355241701.0,
+        "min_ns": 306029306.0
+      },
+      "count": 10000,
+      "iterations": 1,
+      "paired_reduction_percent": 32.54440505570649,
+      "pairs": 6,
+      "scenario": "type-name-10000"
+    },
+    {
+      "baseline": {
+        "max_ns": 32102308.666666668,
+        "median_ns": 25786710.5,
+        "min_ns": 21168349.333333332
+      },
+      "candidate": {
+        "max_ns": 18905374.333333332,
+        "median_ns": 15873334.5,
+        "min_ns": 13586162.666666666
+      },
+      "count": 10000,
+      "iterations": 3,
+      "paired_reduction_percent": 32.13923674866409,
+      "pairs": 6,
+      "scenario": "unique-date-name-10000"
+    },
+    {
+      "baseline": {
+        "max_ns": 415891386.0,
+        "median_ns": 359192428.0,
+        "min_ns": 298893402.0
+      },
+      "candidate": {
+        "max_ns": 290733551.0,
+        "median_ns": 248131010.0,
+        "min_ns": 188134621.0
+      },
+      "count": 10000,
+      "iterations": 1,
+      "paired_reduction_percent": 32.817198390568734,
+      "pairs": 6,
+      "scenario": "tied-date-name-10000"
+    },
+    {
+      "baseline": {
+        "max_ns": 394344367.0,
+        "median_ns": 280864566.0,
+        "min_ns": 243591634.0
+      },
+      "candidate": {
+        "max_ns": 228277209.0,
+        "median_ns": 197219167.0,
+        "min_ns": 170022553.0
+      },
+      "count": 10000,
+      "iterations": 1,
+      "paired_reduction_percent": 31.822570154179175,
+      "pairs": 6,
+      "scenario": "type-date-name-10000"
+    },
+    {
+      "baseline": {
+        "max_ns": 30042195.666666668,
+        "median_ns": 23885457.333333332,
+        "min_ns": 21308734.0
+      },
+      "candidate": {
+        "max_ns": 19955801.333333332,
+        "median_ns": 15207145.333333332,
+        "min_ns": 14022196.333333334
+      },
+      "count": 10000,
+      "iterations": 3,
+      "paired_reduction_percent": 32.679617601021384,
+      "pairs": 6,
+      "scenario": "date-only-10000"
+    },
+    {
+      "baseline": {
+        "max_ns": 13673821.8,
+        "median_ns": 13284321.3,
+        "min_ns": 12458054.6
+      },
+      "candidate": {
+        "max_ns": 9260018.2,
+        "median_ns": 8258174.699999999,
+        "min_ns": 7761500.0
+      },
+      "count": 10000,
+      "iterations": 5,
+      "paired_reduction_percent": 38.2780993041532,
+      "pairs": 6,
+      "scenario": "type-only-10000"
+    },
+    {
+      "baseline": {
+        "max_ns": 1700.4954419148833,
+        "median_ns": 1532.2442962999073,
+        "min_ns": 1462.3540925266905
+      },
+      "candidate": {
+        "max_ns": 15.952396041534637,
+        "median_ns": 10.707600058499487,
+        "min_ns": 8.469629015746111
+      },
+      "count": 8,
+      "iterations": 41026,
+      "paired_reduction_percent": 99.29880858578862,
+      "pairs": 6,
+      "scenario": "off-8"
+    },
+    {
+      "baseline": {
+        "max_ns": 2722253.9791666665,
+        "median_ns": 2402401.145833333,
+        "min_ns": 1977289.0208333333
+      },
+      "candidate": {
+        "max_ns": 60395.1875,
+        "median_ns": 54131.41666666667,
+        "min_ns": 38257.625
+      },
+      "count": 10000,
+      "iterations": 48,
+      "paired_reduction_percent": 97.88691601867427,
+      "pairs": 6,
+      "scenario": "off-10000"
+    }
+  ],
+  "tests": {
+    "baseline_debug": 8,
+    "baseline_release": 8,
+    "candidate_debug": 8,
+    "candidate_release": 8
+  },
+  "verification": {
+    "cases": 3907,
+    "passed": true,
+    "sha256": "0258ca7cf59108bda143de2e8c86b65ff1ed1e2417e25ba7d6f74176257caaef"
+  }
+}
