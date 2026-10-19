@@ -129,7 +129,8 @@ def build(out: Path, variant: str, swift: str, env: dict[str, str], meter: bool)
         "oracle_sha256": hashlib.sha256(oracle.encode()).hexdigest(),
         "harness_sha256": digest(harness / "Harness.swift"),
         "compiled_sources": {str(path.relative_to(package)): digest(path)
-                             for path in sorted((package / "Sources").rglob("*.swift"))},
+                             for path in sorted((package / "Sources").rglob("*"))
+                             if path.is_file() and path.suffix in (".swift", ".c", ".h")},
         "allocation_instrumented": meter,
     })
     return binary
