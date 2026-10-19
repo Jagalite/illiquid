@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "repository": "Jagalite/illiquid",
+  "workflow": ".github/workflows/restoration-regressions.yml",
+  "run": {
+    "id": 39320261271,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39320261271"
+  },
+  "job": {
+    "id": 118292176099,
+    "name": "native-lifecycle",
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39320261271/job/118292176099",
+    "status": "completed",
+    "conclusion": "success",
+    "status_verified_with": "GitHub Actions run jobs and job steps APIs",
+    "successful_steps": 6
+  },
+  "log": {
+    "path": "native-lifecycle.log.gz",
+    "compression": "gzip",
+    "bytes": 95275,
+    "sha256": "aa4400df6fb0acd274be642dd3734ce6c240fd95c0d54df565a14af66fb9d235",
+    "uncompressed_bytes": 644749,
+    "uncompressed_sha256": "bc593fddc49e9f825bd990fa3064fd993d7e35cee8066c3377e5519a4ef1d824",
+    "uncompressed_lines": 5285,
+    "line_numbers_reference": "Decompressed UTF-8 log, including its initial BOM"
+  },
+  "checkout": {
+    "ref": "refs/remotes/pull/55/merge",
+    "tested_merge_sha": "f9ed5ee80bcf7c62f330a46306e21367b509b639",
+    "pr_head_sha": "6cd039e9a24310e4ab42e50298131d7dbfb56203",
+    "base_sha": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+    "checkout_log_lines": [
+      103,
+      104,
+      107
+    ]
+  },
+  "environment": {
+    "os": "macOS 26.6.2 (25G83)",
+    "runner_image": "macos-26-arm64",
+    "runner_image_version": "20261013.0424.1",
+    "developer_dir": "/Applications/Xcode_26.6.app/Contents/Developer",
+    "testing_library_version": "6.3.2 (70eff261d7f462c)",
+    "working_directory": "/Users/runner/work/illiquid/illiquid"
+  },
+  "commands": {
+    "prepare_native_dependencies": "if ! xcrun -sdk macosx metal --version; then\n  xcodebuild -downloadComponent MetalToolchain\nfi\npython3 Scripts/verify-corresponding-source.py DependencySources\npython3 Scripts/install-ci-native-sdk.py",
+    "prepare_packet_fixture": "export ILLIQUID_PACKET_OWNERSHIP_FIXTURE=\"$RUNNER_TEMP/packet-ownership.mp4\"\nffmpeg -hide_banner -loglevel error -y \\\n  -f lavfi -i 'testsrc2=size=320x180:rate=24' \\\n  -f lavfi -i 'sine=frequency=440:sample_rate=48000' -t 3 \\\n  -c:v libx264 -preset ultrafast -c:a aac \"$ILLIQUID_PACKET_OWNERSHIP_FIXTURE\"",
+    "test": "swift test --force-resolved-versions -c release --no-parallel"
+  },
+  "build": {
+    "configuration": "release",
+    "scope": "Root package app and native dependency graph, with no package-path override or test filter",
+    "app_link_marker": {
+      "line": 256,
+      "message": "[66/70] Linking Illiquid"
+    },
+    "test_link_marker": {
+      "line": 286,
+      "message": "[71/72] Linking IlliquidPackageTests"
+    },
+    "completion_marker": {
+      "line": 287,
+      "message": "Build complete! (427.49s)"
+    }
+  },
+  "tests": {
+    "swift_testing": {
+      "reported_tests": 1397,
+      "reported_suites": 193,
+      "result": "passed",
+      "duration_seconds": 100.872,
+      "summary_line": 5269,
+      "summary": "✔ Test run with 1397 tests in 193 suites passed after 100.872 seconds."
+    },
+    "xctest": {
+      "executed_tests": 68,
+      "failures": 0,
+      "unexpected_failures": 0,
+      "result": "passed",
+      "summary_line": 453,
+      "summary": "Executed 68 tests, with 0 failures (0 unexpected) in 1.332 (1.367) seconds",
+      "count_note": "The repeated package and All tests totals each report the same 68 tests; count once."
+    },
+    "source_browser_search": {
+      "target": "IlliquidAppTests",
+      "suite": "Source browser search equivalence",
+      "result": "passed",
+      "tests": 9,
+      "empty_query_parameter_cases": 3,
+      "duration_seconds": 0.409,
+      "log_lines": [
+        1155,
+        1179
+      ],
+      "passed_test_functions": [
+        "emptyQueryPreservesAllRowsExactly(query:)",
+        "unionKeepsDuplicateRowsAndEveryMatchingRowsAncestors()",
+        "matchingFolderIncludesAncestorsWithoutExpandingDescendants()",
+        "recognizedMediaControlsAdditionalSearchFields()",
+        "unicodeAndLocaleMatchingAgreeWithOriginalPredicate()",
+        "seededRowsMatchOriginalSearchIncludingDuplicateIdentities()",
+        "actorSearchPreservesVisibilityMetadataAndReusesItsProjection()",
+        "actorMediaViewSearchGroupsOnlyMatchingFilesAndReusesTree()",
+        "cancellationBeforeSearchDoesNotPublishOrReplaceCachedProjection()"
+      ]
+    }
+  },
+  "native_fixture_scope": {
+    "enabled": {
+      "variable": "ILLIQUID_PACKET_OWNERSHIP_FIXTURE",
+      "value": "$RUNNER_TEMP/packet-ownership.mp4",
+      "generated_content": "3 seconds of 320x180/24 fps H.264 test video and 48 kHz AAC sine audio",
+      "passing_test": "demuxedPacketsRemainImmutableAcrossFurtherReadsAndSeek()",
+      "passing_log_line": 3920
+    },
+    "not_configured_by_workflow": [
+      "ILLIQUID_NATIVE_FIXTURE_DIR",
+      "ILLIQUID_NATIVE_REQUIRE_FIXTURES",
+      "ILLIQUID_BITMAP_FIXTURE_DIR",
+      "ILLIQUID_THUMBNAIL_FIXTURES",
+      "ILLIQUID_NATIVE_LONG_RUN_SECONDS",
+      "ILLIQUID_SUBTITLE_REGRESSION_MEDIA"
+    ],
+    "explicit_skipped_test_log_entries": [
+      {
+        "line": 2872,
+        "message": "➜ Test generatedContainersRestoreSpanningCaptionsAndClearAtSeekTargets(name:) skipped: \"Generate fixtures with Scripts/generate-bitmap-subtitle-fixtures.py\""
+      },
+      {
+        "line": 2883,
+        "message": "➜ Test bitmapForcedPolicyDistinguishesAutomaticAndExplicitSelection(explicit:) skipped: \"Generate fixtures with Scripts/generate-bitmap-subtitle-fixtures.py\""
+      },
+      {
+        "line": 2886,
+        "message": "➜ Test nativeSessionDeliversBitmapCaptionsAcrossPausedSeeks(name:) skipped: \"Generate fixtures with Scripts/generate-bitmap-subtitle-fixtures.py\""
+      },
+      {
+        "line": 2975,
+        "message": "➜ Test headlessPlaybackContention() skipped."
+      },
+      {
+        "line": 2976,
+        "message": "➜ Test previewMemoryLifecycle() skipped."
+      },
+      {
+        "line": 2977,
+        "message": "➜ Test decoderRouteCosts() skipped."
+      },
+      {
+        "line": 2978,
+        "message": "➜ Test cachedImageDependsOnSourceMetadata() skipped."
+      },
+      {
+        "line": 2979,
+        "message": "➜ Test subtitleRenderLockWaits() skipped."
+      },
+      {
+        "line": 2980,
+        "message": "➜ Test sessionConstructionAndRelease() skipped."
+      },
+      {
+        "line": 4252,
+        "message": "➜ Test measureWarmConversionCostWithoutRendererOrAllocation() skipped: \"Opt-in conversion-only timing; does not measure decode, renderer, energy or playback\""
+      },
+      {
+        "line": 4671,
+        "message": "➜ Test realMediaTextSubtitleSeeksRemainUsable() skipped."
+      },
+      {
+        "line": 4672,
+        "message": "➜ Test realMediaCancelledSubtitleReadsRecover() skipped."
+      }
+    ],
+    "explicit_skipped_suite": {
+      "line": 2974,
+      "message": "➜ Suite \"Efficiency component observations\" skipped."
+    },
+    "not_run_markers": [
+      {
+        "line": 636,
+        "message": "NOT RUN: real-window glass font qualification (opt-in)"
+      },
+      {
+        "line": 3585,
+        "message": "NOT RUN: optional long native playback gate (duration not configured)"
+      },
+      {
+        "line": 3587,
+        "message": "NOT RUN: optional long native playback gate (duration not configured)"
+      },
+      {
+        "line": 3589,
+        "message": "NOT RUN: optional long native playback gate (duration not configured)"
+      }
+    ]
+  },
+  "limits": [
+    "This is the unfiltered root-package release suite and a linked app build, separate from the isolated source-browser component checks.",
+    "Swift Testing totals are reported exactly as printed. Explicit skips and fixture-dependent early returns mean these totals do not prove every generated-media assertion executed.",
+    "The generated codec, seek, audio, bitmap and thumbnail fixture qualification matrix was not enabled by this workflow. Many tests in NativePlaybackFixtureIntegrationTests return immediately without ILLIQUID_NATIVE_FIXTURE_DIR; its strict manifest check requires ILLIQUID_NATIVE_REQUIRE_FIXTURES=1.",
+    "The log explicitly records three optional long native playback cases and the real-window glass font qualification as NOT RUN. Efficiency observations, conversion-only timing and real-media subtitle opt-ins also have explicit skipped entries.",
+    "The command serializes test cases with --no-parallel; concurrency exercised inside individual tests remains active.",
+    "This run does not establish signed app packaging, installation, sustained playback qualification or user-visible UI performance."
+  ]
+}

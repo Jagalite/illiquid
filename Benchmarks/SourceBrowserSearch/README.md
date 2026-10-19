@@ -1,5 +1,9 @@
 # Source-browser search performance
 
+See the [research report](../../Documentation/SOURCE_BROWSER_SEARCH_PERFORMANCE.md)
+for the measured results and the [evidence index](evidence/README.md) for retained
+raw records, test logs, and exact qualification archives.
+
 This benchmark compares the complete `SourceBrowserFilter.search` method at
 main revision `68274d1b09dcc866296321a5a8858efc297c4f19` with the working-tree
 implementation. It also measures cached actor `project` calls, which include
@@ -100,6 +104,7 @@ finished matrix from a partial run. No observations are removed as outliers.
 Summaries include separate medians and within-pair reductions; the ratio of two
 separate medians need not equal the median of paired reductions.
 
-The focused macOS workflow runs the same component tests and benchmark. The
+The focused workflow runs the component tests and timing matrix on macOS and
+Linux, with a separate allocation cohort on Linux. The
 repository's existing restoration workflow also compiles the complete app graph
 and runs the native release test suite containing the new search tests.
