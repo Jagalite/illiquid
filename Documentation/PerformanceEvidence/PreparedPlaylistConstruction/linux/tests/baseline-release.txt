@@ -1,0 +1,319 @@
+Building for production...
+[0/9] Write sources
+[2/9] Write swift-version--393CCDFAED8FB69E.txt
+[4/10] Compiling IlliquidCore ExternalSubtitleMatcher.swift
+[5/11] Compiling IlliquidCoreTests ExternalSubtitleMatcherEmptyTests.swift
+/tmp/illiquid-prepared-playlist-tests.sEHMLv/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 97 |             nil,
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+101 |         ]
+
+/tmp/illiquid-prepared-playlist-tests.sEHMLv/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+101 |         ]
+102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+[5/11] /tmp/illiquid-prepared-playlist-tests.sEHMLv/build/x86_64-unknown-linux-gnu/release/IlliquidPreparedPlaylistConstructionTestsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/11] Write sources
+[8/12] Compiling IlliquidPreparedPlaylistConstructionTestsPackageDiscoveredTests IlliquidCoreTests.swift
+[8/12] /tmp/illiquid-prepared-playlist-tests.sEHMLv/build/x86_64-unknown-linux-gnu/release/IlliquidPreparedPlaylistConstructionTestsPackageTests.derived/runner.swift
+[9/12] Write sources
+[11/13] Compiling IlliquidPreparedPlaylistConstructionTestsPackageTests runner.swift
+[11/13] Write Objects.LinkFileList
+[12/13] Linking IlliquidPreparedPlaylistConstructionTestsPackageTests.xctest
+Build complete! (52.86s)
+Test Suite 'All tests' started at 2026-10-19 16:38:34.901
+Test Suite 'release.xctest' started at 2026-10-19 16:38:34.902
+Test Suite 'release.xctest' passed at 2026-10-19 16:38:34.902
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-19 16:38:34.902
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Folder discovery filesystem regressions" started.
+◇ Suite "Folder playlist" started.
+◇ Suite "External subtitle matching with an empty subtitle inventory" started.
+◇ Suite "Folder playlist discovery" started.
+◇ Suite "External subtitle matching" started.
+◇ Suite "Playlist mutation" started.
+◇ Suite "Core utilities" started.
+◇ Suite "Playlist order restoration" started.
+◇ Suite "Natural filename ordering parity" started.
+◇ Test "Missing folder errors propagate" started.
+◇ Test "Broken links are ignored" started.
+◇ Suite "Playlist identity lookup" started.
+◇ Test "Symlinks are classified by their targets" started.
+◇ Test "Extensionless subtitle symlinks are retained" started.
+◇ Test "Cancellation is checked before touching a missing folder" started.
+◇ Test "Directory links are not traversed" started.
+◇ Suite "Folder playlist identity lookup" started.
+◇ Suite "Prepared folder playlist construction" started.
+◇ Test "Multiple media aliases keep one canonical identity" started.
+◇ Test "Symlink retargeting is observed on the next discovery" started.
+◇ Test "Named pipes with media extensions are excluded without reading content" started.
+◇ Test "Unsupported files do not change the playlist" started.
+◇ Test emptyInputsReturnAnEmptyDictionary() started.
+◇ Test "Hidden entries stay hidden but visible aliases retain target identity" started.
+◇ Test emptyInventoryPreservesEveryOriginalMediaKey() started.
+◇ Test "Relative and chained symlinks retain target identity" started.
+◇ Test cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) started.
+◇ Test cancellationDuringInsertionDiscardsEarlierKeys() started.
+◇ Test "Discovery is shallow, filters unsupported files, and naturally sorts" started.
+◇ Test "Discovery attaches only related external subtitles" started.
+◇ Test "Media-looking links to unsupported files are excluded" started.
+◇ Test releaseSpecificSubtitlesDisambiguateOtherwiseEqualEncodes() started.
+◇ Test "Discovery preserves title words when attaching external subtitles" started.
+◇ Test nonemptySubtitleInventoryStillMatchesAndSorts() started.
+◇ Test "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test duplicateMediaKeysKeepOneEmptyValue() started.
+◇ Test cancellationAtTheEmptyReturnBoundaryDiscardsAllKeys() started.
+◇ Test "Next and previous stop at playlist boundaries" started.
+◇ Test "Opening a symlinked folder keeps its canonical identity" started.
+◇ Test "Matches exact, language, forced, and quality-suffixed names" started.
+◇ Test "Initial index is nil for an empty playlist" started.
+◇ Test cancelledMatchingDoesNotReturnPartialAssociations() started.
+◇ Test "Initial index restores the last file or falls back to first" started.
+◇ Test cancellationBeforeInsertionReturnsNoKeys() started.
+◇ Test sortingIsStableAndDefinesPlaybackOrder() started.
+◇ Test defaultCancellationPredicateObservesTheCurrentTask() started.
+◇ Test cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) started.
+◇ Test "Episode one subtitle does not match episode ten" started.
+◇ Test deduplicationAndReorderingPreserveResourceIdentity() started.
+◇ Test cancellationWithOnlyUnsupportedFilesReturnsNoAssociations() started.
+◇ Test identicalStemsInDifferentContainersRemainAmbiguous() started.
+◇ Test lexicalKeysDoNotResolveAliasesAndPreparationObservesRetargeting() started.
+◇ Test "Matches WebVTT and ignores unsupported bitmap subtitle formats" started.
+◇ Test "Media and subtitle extension checks are case insensitive" started.
+◇ Test "Natural ordering sorts numbers by value" started.
+◇ Test "Normalized file identity standardizes path segments" started.
+◇ Test "Ambiguous generic subtitle is not assigned to every episode" started.
+◇ Test indexedMatchingPreservesExhaustiveScoresAndAmbiguity() started.
+◇ Test allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument name → "missing" to "Broken links are ignored" started.
+◇ Test duplicateMediaAndUnrelatedInputsDoNotCreateAmbiguity() started.
+◇ Test releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test "Discovery rejects a file URL as a folder" started.
+◇ Test indexedMatchingAgreesWithExhaustiveScoringAcrossAllSubsets() started.
+◇ Test case passing 1 argument name → "missing.mkv" to "Broken links are ignored" started.
+◇ Test titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test standaloneLettersRemainPartOfTheMediaTitle(_:) started.
+◇ Test case passing 1 argument ext → "vtt" to "Extensionless subtitle symlinks are retained" started.
+◇ Test case passing 1 argument name → "alias.txt" to "Symlinks are classified by their targets" started.
+◇ Test case passing 1 argument ext → "srt" to "Extensionless subtitle symlinks are retained" started.
+◇ Test case passing 1 argument name → "shortcut" to "Symlinks are classified by their targets" started.
+◇ Test case passing 1 argument ext → "ssa" to "Extensionless subtitle symlinks are retained" started.
+◇ Test case passing 1 argument ext → "ass" to "Extensionless subtitle symlinks are retained" started.
+◇ Test case passing 1 argument name → "alias.MKV" to "Symlinks are classified by their targets" started.
+◇ Test case passing 1 argument ext → "idx" to "Extensionless subtitle symlinks are retained" started.
+◇ Test savedOrderPrecedesNewEntriesWithoutResurrectingRemovals() started.
+◇ Test repeatedShuffleEditsPreservePlaybackIdentityAndNewItemOrder() started.
+◇ Test allSmallQueueAndSavedOrderSequencesMatchAnIndependentModel() started.
+◇ Test emptyBaseKeepsFirstOccurrencesInCurrentOrder() started.
+◇ Test emptyQueueDoesNotRestoreRemovedEntries() started.
+◇ Test normalizedAliasesKeepTheFirstCompleteItem() started.
+◇ Test nonFileIdentitiesRetainDistinctQueryStrings() started.
+◇ Test repeatedAndMissingSavedIDsDoNotDuplicateOrReplaceMetadata() started.
+◇ Test case passing 1 argument unrelatedCount → 0 to "Unsupported files do not change the playlist" started.
+◇ Test case passing 1 argument unrelatedCount → 250 to "Unsupported files do not change the playlist" started.
+◇ Test case passing 1 argument singleObservation → false to cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) started.
+◇ Test case passing 1 argument singleObservation → true to cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) started.
+◇ Test case passing 1 argument stopAt → 3 to "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test case passing 1 argument stopAt → 4 to "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test case passing 1 argument stopAt → 12 to "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test case passing 1 argument stopAt → 40 to "Cancellation during scanning throws rather than returning partial results" started.
+◇ Test boundedSeededInputsMatchTheOriginalComparator() started.
+◇ Test playlistSortingPreservesCompleteItemsAndEqualKeyOrder() started.
+◇ Test identicalNamesUseTheOriginalLiteralPathTieBreak() started.
+◇ Test relativeEscapedAndRootURLRepresentationsArePreserved() started.
+◇ Test numbersRetainTheirNaturalOrder() started.
+◇ Test emptySingletonAndReversedPlaylistsKeepTheirMetadata() started.
+◇ Test emptySingletonAndPairInputsKeepEveryValue() started.
+◇ Test equalRemoteKeysAndExactDuplicatesKeepTheirInputOrder() started.
+◇ Test case passing 1 argument singleObservation → false to cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) started.
+◇ Test case passing 1 argument singleObservation → true to cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) started.
+◇ Test unicodeCaseAndNumericVariantsMatchTheReference() started.
+◇ Test case passing 1 argument fileExtension → "ass" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "idx" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "srt" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "ssa" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "vtt" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "1080p" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "1080i" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "HEVC" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test matchesOverrideFallbackAndMissingTargetsRespectItsBounds() started.
+◇ Test case passing 1 argument release → "1080p.WEB-DL.x265" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test localAliasesSelectTheSameItem() started.
+◇ Test allSmallQueuesMatchIndependentIdentityLabels() started.
+◇ Test identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test emptyPlaylistsHaveNoSelection() started.
+◇ Test supportedTargetDoesNotMatchAnAllUnsupportedPlaylist() started.
+◇ Test decodedRawItemsAreNormalizedDuringLookup() started.
+◇ Test firstDuplicateWinsWithoutReplacingItsMetadata() started.
+◇ Test distinctPathsRemainDistinct() started.
+◇ Test case passing 1 argument suffix → ".srt" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument suffix → ".en.srt" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument letter → "I" to standaloneLettersRemainPartOfTheMediaTitle(_:) started.
+◇ Test case passing 1 argument suffix → ".en.forced.ass" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument suffix → ".en.sdh.vtt" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument letter → "P" to standaloneLettersRemainPartOfTheMediaTitle(_:) started.
+✔ Test "Missing folder errors propagate" passed after 0.056 seconds.
+✔ Test "Broken links are ignored" with 2 test cases passed after 0.056 seconds.
+✔ Test "Symlinks are classified by their targets" with 3 test cases passed after 0.056 seconds.
+✔ Test "Extensionless subtitle symlinks are retained" with 5 test cases passed after 0.056 seconds.
+◇ Test decodedRawItemsAreNormalizedDuringLookup() started.
+◇ Test mixedStoredRepresentationsMatchTheOriginalIdentityPredicate() started.
+◇ Test duplicateIdentitiesReturnTheFirstCompleteItemInPlaylistOrder() started.
+◇ Test relativeQueriesValidateTheirAbsoluteBase() started.
+◇ Test unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test emptyAndSingletonPlaylistsKeepLookupAndRestorePolicy() started.
+◇ Test publicInitializerStillSortsUnpreparedItemsAndPreservesDuplicateMetadata() started.
+◇ Test emptySingletonAndDuplicateListingsKeepCompleteModels() started.
+◇ Test encodedSegmentsPreserveTheFinalOrderAfterItemNormalization() started.
+◇ Test canonicalAliasesDeduplicateAfterNormalizationAndUseCanonicalDates() started.
+◇ Test equalFilenamesKeepLiteralPathTiesAndAmbiguousSubtitles() started.
+◇ Test shuffledSortedAndReverseListingsMatchTheOriginalPipeline(seed:) started.
+◇ Test relativeURLsUseTheirAbsoluteAuthorityAndFolderPolicyIsPreserved() started.
+◇ Test rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+✔ Test "Symlink retargeting is observed on the next discovery" passed after 0.059 seconds.
+✔ Test "Cancellation is checked before touching a missing folder" passed after 0.059 seconds.
+✔ Test emptyInputsReturnAnEmptyDictionary() passed after 0.059 seconds.
+✔ Test "Directory links are not traversed" passed after 0.059 seconds.
+✔ Test emptyInventoryPreservesEveryOriginalMediaKey() passed after 0.059 seconds.
+✔ Test cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) with 2 test cases passed after 0.059 seconds.
+✔ Test "Named pipes with media extensions are excluded without reading content" passed after 0.060 seconds.
+✔ Test cancellationDuringInsertionDiscardsEarlierKeys() passed after 0.059 seconds.
+✔ Test "Hidden entries stay hidden but visible aliases retain target identity" passed after 0.059 seconds.
+✔ Test "Multiple media aliases keep one canonical identity" passed after 0.059 seconds.
+✔ Test duplicateMediaKeysKeepOneEmptyValue() passed after 0.059 seconds.
+✔ Test releaseSpecificSubtitlesDisambiguateOtherwiseEqualEncodes() passed after 0.059 seconds.
+✔ Test nonemptySubtitleInventoryStillMatchesAndSorts() passed after 0.059 seconds.
+✔ Test "Discovery attaches only related external subtitles" passed after 0.059 seconds.
+✔ Test "Media-looking links to unsupported files are excluded" passed after 0.060 seconds.
+✔ Test "Next and previous stop at playlist boundaries" passed after 0.059 seconds.
+✔ Test cancellationAtTheEmptyReturnBoundaryDiscardsAllKeys() passed after 0.059 seconds.
+✔ Test "Discovery preserves title words when attaching external subtitles" passed after 0.059 seconds.
+✔ Test "Relative and chained symlinks retain target identity" passed after 0.060 seconds.
+✔ Test "Initial index is nil for an empty playlist" passed after 0.059 seconds.
+✔ Test cancelledMatchingDoesNotReturnPartialAssociations() passed after 0.059 seconds.
+✔ Test "Initial index restores the last file or falls back to first" passed after 0.059 seconds.
+✔ Test "Matches exact, language, forced, and quality-suffixed names" passed after 0.060 seconds.
+✔ Test "Discovery is shallow, filters unsupported files, and naturally sorts" passed after 0.079 seconds.
+✔ Test cancellationBeforeInsertionReturnsNoKeys() passed after 0.078 seconds.
+✔ Test sortingIsStableAndDefinesPlaybackOrder() passed after 0.081 seconds.
+✔ Test "Episode one subtitle does not match episode ten" passed after 0.096 seconds.
+✔ Test deduplicationAndReorderingPreserveResourceIdentity() passed after 0.096 seconds.
+✔ Test "Opening a symlinked folder keeps its canonical identity" passed after 0.097 seconds.
+✔ Test cancellationWithOnlyUnsupportedFilesReturnsNoAssociations() passed after 0.097 seconds.
+✔ Test identicalStemsInDifferentContainersRemainAmbiguous() passed after 0.096 seconds.
+✔ Test "Matches WebVTT and ignores unsupported bitmap subtitle formats" passed after 0.096 seconds.
+✔ Test "Natural ordering sorts numbers by value" passed after 0.096 seconds.
+✔ Test "Media and subtitle extension checks are case insensitive" passed after 0.096 seconds.
+✔ Test "Normalized file identity standardizes path segments" passed after 0.096 seconds.
+✔ Test "Ambiguous generic subtitle is not assigned to every episode" passed after 0.096 seconds.
+✔ Test cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) with 2 test cases passed after 0.097 seconds.
+✔ Test allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) with 5 test cases passed after 0.096 seconds.
+✔ Test releaseSuffixDoesNotReduceTitleSpecificity(_:) with 4 test cases passed after 0.096 seconds.
+✔ Test "Discovery rejects a file URL as a folder" passed after 0.098 seconds.
+◇ Test case passing 1 argument spelling → "https://example.invalid/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://media-server.example/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://127.0.0.1/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://user@localhost/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://user:example@localhost/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://localhost:1234/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file://localhost:0/Media/A.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+◇ Test case passing 1 argument spelling → "file:relative.mkv" to identicalUnsupportedURLsDoNotBecomeMatches(_:) started.
+✔ Test duplicateMediaAndUnrelatedInputsDoNotCreateAmbiguity() passed after 0.099 seconds.
+✔ Test titleWordsAreNotMistakenForSubtitleSuffixes(_:) with 4 test cases passed after 0.099 seconds.
+✔ Test standaloneLettersRemainPartOfTheMediaTitle(_:) with 2 test cases passed after 0.099 seconds.
+✔ Test lexicalKeysDoNotResolveAliasesAndPreparationObservesRetargeting() passed after 0.100 seconds.
+✔ Test savedOrderPrecedesNewEntriesWithoutResurrectingRemovals() passed after 0.092 seconds.
+✔ Test repeatedShuffleEditsPreservePlaybackIdentityAndNewItemOrder() passed after 0.092 seconds.
+◇ Test case passing 1 argument input → "https://example.invalid/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "ftp://example.invalid/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://media-server.example/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://localhost.example/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://127.0.0.1/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://[::1]/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://user@localhost/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://user:password@localhost/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://localhost:1234/Media/Episode%202.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file:relative.mkv" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file:" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+◇ Test case passing 1 argument input → "file://localhost" to unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) started.
+✔ Test emptyBaseKeepsFirstOccurrencesInCurrentOrder() passed after 0.093 seconds.
+✔ Test emptyQueueDoesNotRestoreRemovedEntries() passed after 0.093 seconds.
+✔ Test normalizedAliasesKeepTheFirstCompleteItem() passed after 0.093 seconds.
+✔ Test nonFileIdentitiesRetainDistinctQueryStrings() passed after 0.093 seconds.
+◇ Test case passing 1 argument seed → 0 to shuffledSortedAndReverseListingsMatchTheOriginalPipeline(seed:) started.
+◇ Test case passing 1 argument seed → 1 to shuffledSortedAndReverseListingsMatchTheOriginalPipeline(seed:) started.
+◇ Test case passing 1 argument seed → 223192289592679 to shuffledSortedAndReverseListingsMatchTheOriginalPipeline(seed:) started.
+◇ Test case passing 1 argument seed → 18446744073709551615 to shuffledSortedAndReverseListingsMatchTheOriginalPipeline(seed:) started.
+◇ Test case passing 1 argument spelling → "https://example.invalid/tmp/PreparedPlaylist/Movie.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+◇ Test case passing 1 argument spelling → "file://archive.example/tmp/PreparedPlaylist/Movie.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+◇ Test case passing 1 argument spelling → "file://localhost.example/tmp/PreparedPlaylist/Movie.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+◇ Test case passing 1 argument spelling → "file://127.0.0.1/tmp/PreparedPlaylist/Movie.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+◇ Test case passing 1 argument spelling → "file://[::1]/tmp/PreparedPlaylist/Movie.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+◇ Test case passing 1 argument spelling → "file://user@localhost/tmp/PreparedPlaylist/Movie.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+◇ Test case passing 1 argument spelling → "file://user:example@localhost/tmp/PreparedPlaylist/Movie.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+◇ Test case passing 1 argument spelling → "file://localhost:1234/tmp/PreparedPlaylist/Movie.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+◇ Test case passing 1 argument spelling → "file:relative.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+◇ Test case passing 1 argument spelling → "Movie.mkv" to rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) started.
+✔ Test repeatedAndMissingSavedIDsDoNotDuplicateOrReplaceMetadata() passed after 0.210 seconds.
+✔ Test indexedMatchingPreservesExhaustiveScoresAndAmbiguity() passed after 0.219 seconds.
+✔ Test playlistSortingPreservesCompleteItemsAndEqualKeyOrder() passed after 0.175 seconds.
+✔ Test identicalNamesUseTheOriginalLiteralPathTieBreak() passed after 0.175 seconds.
+✔ Test relativeEscapedAndRootURLRepresentationsArePreserved() passed after 0.175 seconds.
+✔ Test "Cancellation during scanning throws rather than returning partial results" with 4 test cases passed after 0.222 seconds.
+✔ Test emptySingletonAndPairInputsKeepEveryValue() passed after 0.176 seconds.
+✔ Test numbersRetainTheirNaturalOrder() passed after 0.176 seconds.
+✔ Test emptySingletonAndReversedPlaylistsKeepTheirMetadata() passed after 0.176 seconds.
+✔ Test equalRemoteKeysAndExactDuplicatesKeepTheirInputOrder() passed after 0.176 seconds.
+✔ Test localAliasesSelectTheSameItem() passed after 0.170 seconds.
+✔ Test matchesOverrideFallbackAndMissingTargetsRespectItsBounds() passed after 0.171 seconds.
+✔ Test identicalUnsupportedURLsDoNotBecomeMatches(_:) with 8 test cases passed after 0.170 seconds.
+✔ Test emptyPlaylistsHaveNoSelection() passed after 0.170 seconds.
+✔ Test supportedTargetDoesNotMatchAnAllUnsupportedPlaylist() passed after 0.170 seconds.
+✔ Test decodedRawItemsAreNormalizedDuringLookup() passed after 0.170 seconds.
+✔ Test firstDuplicateWinsWithoutReplacingItsMetadata() passed after 0.170 seconds.
+✔ Test distinctPathsRemainDistinct() passed after 0.170 seconds.
+✔ Test decodedRawItemsAreNormalizedDuringLookup() passed after 0.167 seconds.
+✔ Test duplicateIdentitiesReturnTheFirstCompleteItemInPlaylistOrder() passed after 0.166 seconds.
+✔ Test relativeQueriesValidateTheirAbsoluteBase() passed after 0.166 seconds.
+✔ Test unsupportedURLsNeverMatchEvenAnIdenticalStoredURL(_:) with 13 test cases passed after 0.167 seconds.
+✔ Test emptyAndSingletonPlaylistsKeepLookupAndRestorePolicy() passed after 0.167 seconds.
+✔ Test publicInitializerStillSortsUnpreparedItemsAndPreservesDuplicateMetadata() passed after 0.166 seconds.
+✔ Test emptySingletonAndDuplicateListingsKeepCompleteModels() passed after 0.166 seconds.
+✔ Test canonicalAliasesDeduplicateAfterNormalizationAndUseCanonicalDates() passed after 0.166 seconds.
+✔ Test equalFilenamesKeepLiteralPathTiesAndAmbiguousSubtitles() passed after 0.166 seconds.
+✔ Test encodedSegmentsPreserveTheFinalOrderAfterItemNormalization() passed after 0.166 seconds.
+✔ Test unicodeCaseAndNumericVariantsMatchTheReference() passed after 0.176 seconds.
+✔ Test allSmallQueuesMatchIndependentIdentityLabels() passed after 0.171 seconds.
+✔ Test "Unsupported files do not change the playlist" with 2 test cases passed after 0.224 seconds.
+✔ Test relativeURLsUseTheirAbsoluteAuthorityAndFolderPolicyIsPreserved() passed after 0.166 seconds.
+✔ Test rejectedAuthoritiesCannotBecomeMediaOrSubtitleIdentities(_:) with 10 test cases passed after 0.166 seconds.
+✔ Suite "External subtitle matching with an empty subtitle inventory" passed after 0.225 seconds.
+✔ Suite "Folder playlist discovery" passed after 0.225 seconds.
+✔ Suite "Folder playlist" passed after 0.226 seconds.
+✔ Suite "Playlist mutation" passed after 0.225 seconds.
+✔ Test defaultCancellationPredicateObservesTheCurrentTask() passed after 0.224 seconds.
+✔ Suite "Core utilities" passed after 0.226 seconds.
+✔ Suite "Folder discovery filesystem regressions" passed after 0.226 seconds.
+✔ Suite "Playlist identity lookup" passed after 0.226 seconds.
+✔ Test mixedStoredRepresentationsMatchTheOriginalIdentityPredicate() passed after 0.203 seconds.
+✔ Suite "Folder playlist identity lookup" passed after 0.261 seconds.
+✔ Test shuffledSortedAndReverseListingsMatchTheOriginalPipeline(seed:) with 4 test cases passed after 0.260 seconds.
+✔ Suite "Prepared folder playlist construction" passed after 0.319 seconds.
+✔ Test boundedSeededInputsMatchTheOriginalComparator() passed after 0.275 seconds.
+✔ Suite "Natural filename ordering parity" passed after 0.322 seconds.
+✔ Test indexedMatchingAgreesWithExhaustiveScoringAcrossAllSubsets() passed after 0.703 seconds.
+✔ Suite "External subtitle matching" passed after 0.707 seconds.
+✔ Test allSmallQueueAndSavedOrderSequencesMatchAnIndependentModel() passed after 1.320 seconds.
+✔ Suite "Playlist order restoration" passed after 1.330 seconds.
+✔ Test run with 93 tests in 12 suites passed after 1.331 seconds.

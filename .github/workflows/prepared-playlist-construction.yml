@@ -1,0 +1,66 @@
+name: Prepared playlist construction
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidCoreTests/PreparedPlaylistConstructionTests.swift'
+      - 'Scripts/test-prepared-playlist-construction.sh'
+      - 'Benchmarks/PreparedPlaylistConstruction/**'
+      - '.github/workflows/prepared-playlist-construction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prepared-playlist-construction-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-foundation:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test baseline and candidate playlist behavior
+        run: |
+          mkdir -p "$RUNNER_TEMP/prepared-playlist/tests"
+          set -o pipefail
+          for configuration in debug release; do
+            bash Scripts/test-prepared-playlist-construction.sh --baseline -c "$configuration" \
+              2>&1 | tee "$RUNNER_TEMP/prepared-playlist/tests/baseline-$configuration.txt"
+            bash Scripts/test-prepared-playlist-construction.sh -c "$configuration" \
+              2>&1 | tee "$RUNNER_TEMP/prepared-playlist/tests/candidate-$configuration.txt"
+          done
+      - name: Measure paired native playlist construction
+        run: |
+          python3 Benchmarks/PreparedPlaylistConstruction/run.py \
+            --pairs 6 --target-ms 50 \
+            --output "$RUNNER_TEMP/prepared-playlist/measurements"
+          cat "$RUNNER_TEMP/prepared-playlist/measurements/summary.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: prepared-playlist-construction-macos
+          path: |
+            ${{ runner.temp }}/prepared-playlist/tests/
+            ${{ runner.temp }}/prepared-playlist/measurements/*.json
+            ${{ runner.temp }}/prepared-playlist/measurements/*.jsonl
+            ${{ runner.temp }}/prepared-playlist/measurements/*.gz
+            ${{ runner.temp }}/prepared-playlist/measurements/*.log
+            ${{ runner.temp }}/prepared-playlist/measurements/*.txt
+            ${{ runner.temp }}/prepared-playlist/measurements/run.py
+            ${{ runner.temp }}/prepared-playlist/measurements/logs/
+            ${{ runner.temp }}/prepared-playlist/measurements/build/*/*.swift
+          retention-days: 14
