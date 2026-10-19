@@ -1,0 +1,79 @@
+{
+  "root": "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p",
+  "source_sha256": {
+    "Sources/IlliquidNativePlayback/Media/ThumbnailDiskEvictionHeap.swift": "8b787deafdc370568e00a43ec620ce34e8a8d97b22519812973ad7f7e240cd86",
+    "Tests/IlliquidNativePlaybackTests/ThumbnailDiskEvictionTests.swift": "101d47d4f2c7cd6b1aca60b8ff51ce00f11756aa8567516f36a7257e81bc1b78"
+  },
+  "swift_version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "environment": {
+    "LD_LIBRARY_PATH": "/tmp/illiquid-swift-deps/usr/lib/x86_64-linux-gnu",
+    "SWIFTPM_MODULECACHE_OVERRIDE": "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/module-cache",
+    "CLANG_MODULE_CACHE_PATH": "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/clang-cache"
+  },
+  "runs": [
+    {
+      "configuration": "debug",
+      "command": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p",
+        "--scratch-path",
+        "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/build",
+        "--cache-path",
+        "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/cache",
+        "--disable-sandbox",
+        "--configuration",
+        "debug",
+        "--jobs",
+        "2"
+      ],
+      "exit_code": 1,
+      "log": "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/debug.log"
+    },
+    {
+      "configuration": "debug",
+      "command": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p",
+        "--scratch-path",
+        "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/build",
+        "--cache-path",
+        "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/cache",
+        "--disable-sandbox",
+        "--configuration",
+        "debug",
+        "--jobs",
+        "1",
+        "--use-integrated-swift-driver",
+        "--disable-swift-testing"
+      ],
+      "exit_code": 0,
+      "log": "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/debug-integrated-driver.log"
+    },
+    {
+      "configuration": "release",
+      "command": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p",
+        "--scratch-path",
+        "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/build",
+        "--cache-path",
+        "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/cache",
+        "--disable-sandbox",
+        "--configuration",
+        "release",
+        "--jobs",
+        "1",
+        "--use-integrated-swift-driver",
+        "--disable-swift-testing"
+      ],
+      "exit_code": 0,
+      "log": "/tmp/illiquid-thumbnail-eviction-tests-p88o_l1p/release-integrated-driver.log"
+    }
+  ]
+}

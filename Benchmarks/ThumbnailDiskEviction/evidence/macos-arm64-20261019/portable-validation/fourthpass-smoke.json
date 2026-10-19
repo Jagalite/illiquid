@@ -1,0 +1,33 @@
+{
+  "root": "/tmp/illiquid-fourthpass-heap-smoke-rzjmfe5t",
+  "environment": {
+    "PATH": "/tmp/illiquid-swift-6.3.2/usr/bin:/root/.codex/tmp/arg0/codex-arg0iQghy4:/opt/codex/codex-path:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+    "LD_LIBRARY_PATH": "/tmp/illiquid-swift-deps/usr/lib/x86_64-linux-gnu",
+    "SWIFTPM_MODULECACHE_OVERRIDE": "/tmp/illiquid-fourthpass-heap-smoke-rzjmfe5t/module-cache",
+    "CLANG_MODULE_CACHE_PATH": "/tmp/illiquid-fourthpass-heap-smoke-rzjmfe5t/clang-cache"
+  },
+  "commands": [
+    {
+      "label": "build",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/33f42739f1a8/illiquid/Benchmarks/NonDecodeFourthPass/build.py",
+        "--output",
+        "/tmp/illiquid-fourthpass-heap-smoke-rzjmfe5t/build",
+        "--variants",
+        "v4"
+      ],
+      "exit_code": 0,
+      "log": "/tmp/illiquid-fourthpass-heap-smoke-rzjmfe5t/build.log"
+    },
+    {
+      "label": "tests",
+      "command": [
+        "/tmp/illiquid-fourthpass-heap-smoke-rzjmfe5t/build/v4/disk",
+        "tests"
+      ],
+      "exit_code": 0,
+      "log": "/tmp/illiquid-fourthpass-heap-smoke-rzjmfe5t/tests.log"
+    }
+  ]
+}

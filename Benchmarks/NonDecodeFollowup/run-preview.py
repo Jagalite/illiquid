@@ -66,7 +66,7 @@ def main():
   if 'preferredFilename(for digest:' in disk:
    disk=disk.replace('files[key.digest]?.background', 'preferredFilename(for: key.digest).flatMap { files[$0]?.background }')
   (d/'Cache.swift').write_text(cache);(d/'Disk.swift').write_text(disk)
-  inputs=[d/'Cache.swift',d/'Disk.swift',src/'ThumbnailPromotionMailbox.swift',R/'Sources/IlliquidCore/Player/ThumbnailPolicy.swift',R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',H/'PreviewAdapters.swift',H/'PreviewHarness.swift']
+  inputs=[d/'Cache.swift',d/'Disk.swift',src/'ThumbnailDiskEvictionHeap.swift',src/'ThumbnailPromotionMailbox.swift',R/'Sources/IlliquidCore/Player/ThumbnailPolicy.swift',R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',H/'PreviewAdapters.swift',H/'PreviewHarness.swift']
   defines=['-D','CANDIDATE'] if variant=='candidate' else []
   libs=['-lcrypto'] if platform.system()=='Linux' else []
   run(['swiftc','-O','-swift-version','6','-warnings-as-errors',*defines,*inputs,*libs,'-o',d/'preview'])

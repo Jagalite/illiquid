@@ -1,0 +1,70 @@
+{
+  "artifact_id": 12221206624,
+  "artifact_sha256": "2246ff1a34b8ba1cd9ea1bed15ca1d28d8cd04a9a193120c4c65f66388c59fd3",
+  "artifact_url": "https://github.com/Jagalite/illiquid/actions/runs/39322698431/artifacts/12221206624",
+  "checked_at": "2026-10-19T20:59:46.660Z",
+  "conclusion": "success",
+  "configuration": "debug",
+  "developer_dir": "/Applications/Xcode_26.6.app/Contents/Developer",
+  "event": "push",
+  "head_branch": "perf/thumbnail-disk-eviction-33f42739",
+  "head_sha": "52767f6e09a9e3a59ad2eb66cfa35a7e3707a7f6",
+  "html_url": "https://github.com/Jagalite/illiquid/actions/runs/39322698431",
+  "job_id": 118300525894,
+  "job_log_file": "native-job.log",
+  "job_log_sha256": "fae3f68ccfd48d7b25687b3805df81f7bcbb0dec920aac8867365b0a0fd7adf9",
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/39322698431/job/118300525894",
+  "missing_new_tests": [],
+  "new_test_pass_count": 8,
+  "new_tests": [
+    {
+      "seconds": 0.003,
+      "test": "ThumbnailDiskEvictionDiskTests.testBackgroundAdmissionCannotEvictForegroundEntries"
+    },
+    {
+      "seconds": 0.004,
+      "test": "ThumbnailDiskEvictionDiskTests.testBudgetShrinkRemovesOnlyTheOrderedVictimPrefix"
+    },
+    {
+      "seconds": 1.902,
+      "test": "ThumbnailDiskEvictionDiskTests.testCountCapEvictsOneEntryToAdmitTheNextThumbnail"
+    },
+    {
+      "seconds": 0.004,
+      "test": "ThumbnailDiskEvictionDiskTests.testFailedUnlinkStopsTrimAndKeepsTheVictimForRetry"
+    },
+    {
+      "seconds": 0.467,
+      "test": "ThumbnailDiskEvictionTests.testCompleteDrainMatchesLegacyOrderThroughFullInventorySize"
+    },
+    {
+      "seconds": 0.004,
+      "test": "ThumbnailDiskEvictionTests.testEligibilityWithOnlyOneMetadataTier"
+    },
+    {
+      "seconds": 0,
+      "test": "ThumbnailDiskEvictionTests.testEmptyAndSingletonAreConsumedExactlyOnce"
+    },
+    {
+      "seconds": 0,
+      "test": "ThumbnailDiskEvictionTests.testOrderUsesMetadataTierThenDateThenLiteralFilename"
+    }
+  ],
+  "os_version": "26.6.2",
+  "path": ".github/workflows/thumbnail-disk-eviction.yml",
+  "run_attempt": 1,
+  "run_id": 39322698431,
+  "runner_image": "macos-26-arm64",
+  "runner_image_version": "20261013.0424.1",
+  "swift_testing_total": {
+    "suites": 1,
+    "tests": 19
+  },
+  "test_log_file": "native-tests.log",
+  "test_log_sha256": "8f59d1448f36d412f2fc2b33dc314d78ad7736afe714e4d6c821a4c5016d3143",
+  "xctest_total": {
+    "failures": 0,
+    "tests": 35,
+    "unexpected": 0
+  }
+}
