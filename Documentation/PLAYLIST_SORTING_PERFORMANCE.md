@@ -26,10 +26,8 @@ reduce the sorting portion of those operations; the experiment does not measure
 disk discovery, UI rendering, decoding, playback frame rate, or energy.
 
 This method is separate from the source-browser sorter and the optimized
-`NaturalFilenameOrdering.sort` used during playlist construction. It also
-remains useful when an already ordered `FolderPlaylist` avoids a redundant
-constructor sort: subsequent user-requested and date-based reordering still
-go through `PlaylistMutation.sorted`.
+`NaturalFilenameOrdering.sort` used during playlist construction. Subsequent
+user-requested and date-based reordering goes through `PlaylistMutation.sorted`.
 
 The original comparator repeatedly extracts basenames and, when names tie,
 normalizes item IDs. It also sorts the complete item records. The candidate:
@@ -37,15 +35,16 @@ normalizes item IDs. It also sorts the complete item records. The candidate:
 - Prepares basename keys once for name sorting.
 - Creates basename keys lazily for date ties, leaving unique-date comparisons
   free of basename extraction.
-- Caches normalized IDs lazily when natural names compare equal.
+- Caches normalized IDs lazily when natural names compare equal in name mode.
 - Sorts original integer indices and materializes the final item array once.
 
 All caches are local to one call. There is no persistent invalidation state,
 public API change, or change to stored item metadata. On the measured Linux
 runtime, an item has a 40-byte stride and an integer index an 8-byte stride.
 This explains a data-movement opportunity; memory usage and allocation counts
-were not measured. Unique-date gains come from index sorting, not filename
-caching, because those comparisons do not read filenames.
+were not measured. Unique-date comparisons do not use filename caching; their
+measured gains are consistent with reduced record movement from index sorting.
+The experiment does not isolate the individual costs within that change.
 
 ## Ordering and metadata contracts
 
