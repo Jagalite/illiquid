@@ -19,7 +19,13 @@ refreshed baseline independently of the original Linux cohort.
 Swift 6.1 or later and Python 3 are required. Use macOS 26 and the repository's
 pinned Xcode for native qualification. The isolated package uses Foundation and
 the toolchain's Testing module; it does not resolve the native player SDK or
-other remote packages.
+other remote packages. Production declarations are staged in an `IlliquidApp`
+library target, and the benchmark driver is a separate executable target.
+Both variants compile the library with `-enable-testing` so the driver can use
+`@testable import` without changing production access levels. The test bundle
+depends only on libraries; it never links the benchmark's command-line entry
+point. This layout is required by the native release test-loader behavior
+observed and retained in the first macOS attempt.
 
 ```sh
 # Semantic tests for both variants in debug/release, plus the full timing matrix.

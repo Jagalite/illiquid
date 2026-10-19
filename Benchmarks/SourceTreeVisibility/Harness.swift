@@ -1,8 +1,9 @@
 import Foundation
 import IlliquidCore
+@testable import IlliquidApp
 
-// This driver lives beside the unchanged production sources in an isolated
-// IlliquidApp target. No replacement actor, matcher, row builder or sorter is used.
+// This driver imports the unchanged production sources from an isolated
+// IlliquidApp library. No replacement actor, matcher, row builder or sorter is used.
 private struct Fixture {
     let inputs: [SourceTreeProjectionInput]
     let queries: [String]

@@ -1,0 +1,77 @@
+{
+  "output": "/tmp/illiquid-source-tree-package-fix-20261019-x17eeeuy",
+  "platforms": {
+    "Darwin": {
+      "baseline": {
+        "adaptations": [],
+        "package_sha256": "0995db40e89ada5104dcc9f02de6d5386d32bf63831585da52bbf2ba618d2bb8",
+        "production_files": 12,
+        "staged_files": 17
+      },
+      "candidate": {
+        "adaptations": [],
+        "package_sha256": "0995db40e89ada5104dcc9f02de6d5386d32bf63831585da52bbf2ba618d2bb8",
+        "production_files": 12,
+        "staged_files": 17
+      }
+    },
+    "Linux": {
+      "baseline": {
+        "adaptations": [
+          {
+            "changes": [
+              "Darwin import -> Glibc"
+            ],
+            "file": "Sources/IlliquidCore/MediaSidecarReader.swift"
+          },
+          {
+            "changes": [
+              "add FoundationXML import"
+            ],
+            "file": "Sources/IlliquidCore/NFOMetadataHints.swift"
+          },
+          {
+            "changes": [
+              "explicit directory hint for sidecarsReachRowsForFoldersAndExplicitFiles fixture root"
+            ],
+            "file": "Tests/IlliquidAppTests/SourceMediaOrganizationTests.swift"
+          }
+        ],
+        "package_sha256": "0995db40e89ada5104dcc9f02de6d5386d32bf63831585da52bbf2ba618d2bb8",
+        "production_files": 12,
+        "staged_files": 17
+      },
+      "candidate": {
+        "adaptations": [
+          {
+            "changes": [
+              "add FoundationXML import"
+            ],
+            "file": "Sources/IlliquidCore/NFOMetadataHints.swift"
+          },
+          {
+            "changes": [
+              "Darwin import -> Glibc"
+            ],
+            "file": "Sources/IlliquidCore/MediaSidecarReader.swift"
+          },
+          {
+            "changes": [
+              "explicit directory hint for sidecarsReachRowsForFoldersAndExplicitFiles fixture root"
+            ],
+            "file": "Tests/IlliquidAppTests/SourceMediaOrganizationTests.swift"
+          }
+        ],
+        "package_sha256": "0995db40e89ada5104dcc9f02de6d5386d32bf63831585da52bbf2ba618d2bb8",
+        "production_files": 12,
+        "staged_files": 17
+      }
+    }
+  },
+  "purpose": "Source staging only; no Swift compilation, tests, or timing was performed",
+  "sha256": {
+    "Harness.swift": "34f08b4f7004f9916555fea972d706438430dd9ec80e1d8a284983d6c84be0f1",
+    "baseline/manifest.json": "c8968a18d12d9684562498198bad9be65ec7af39d8666c6eebcf11d6f0668a8a",
+    "run.py": "7e78afe5a1f4e067eaf625dea93260451ab596151885302d185df870b7633cbc"
+  }
+}

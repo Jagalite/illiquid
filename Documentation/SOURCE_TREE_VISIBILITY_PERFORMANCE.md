@@ -77,7 +77,9 @@ accepted replacement works.
 ## Measurement scope
 
 The benchmark runs the actual background actor and row-building sources in an
-isolated Swift package. It measures complete projection calls after constructing
+isolated Swift library, with a separate executable driver. Both variants enable
+testability on that library so the driver can access internal declarations;
+production source APIs are unchanged. It measures complete projection calls after constructing
 the fixture inputs. Visibility evaluation, path-set construction, and media
 grouping remain within the measured call when the requested operation requires
 them. Result verification is outside the timed interval.
@@ -110,8 +112,17 @@ an incomplete Linux run, not a passing complete matrix.
 The failed command and the partial cell remain in the raw evidence. Only
 complete six-pair cells appear below.
 
-Native macOS component and full application qualification is pending the PR's
-CI. The PR remains a draft until those results are reviewed.
+The first native attempt passed both debug suites and compiled the baseline in
+release mode, then failed during release test loading: the test helper invoked
+the benchmark command-line entry point and it rejected the testing arguments.
+No timing observations were collected. The
+[failed artifact and receipt](PerformanceEvidence/SourceTreeVisibility/macos-attempt-1)
+are retained. The package now keeps the production library and executable driver
+in separate targets, removing the benchmark entry point from the test dependency
+graph. It does not suppress argument errors or skip test discovery.
+
+Native macOS component and application qualification is being rerun with that
+packaging correction. The PR remains a draft until those results are reviewed.
 
 Each time below is the median of six fresh-process average call durations.
 The reduction is the median of the six paired reductions, so it need not equal

@@ -45,6 +45,15 @@ a guarded directory hint to that staged test only. Both variants then passed
 all component tests in both build configurations. No macOS production source
 or canonical test fixture was changed for these host accommodations.
 
-Native macOS qualification is pending PR CI. See the
+## First macOS attempt
+
+`macos-attempt-1/qualification.zip` is the exact downloaded artifact from job
+118291027788 in run 39319927060. Its SHA-256 matches the GitHub artifact digest.
+`qualification.json` records source identity, the successful debug tests, and
+the baseline release test-loader failure. No benchmark timings were collected.
+The correction separates the production library target from the executable
+entry point; the production cache implementation is unchanged.
+
+Native macOS qualification is being rerun. See the
 [research report](../../SOURCE_TREE_VISIBILITY_PERFORMANCE.md) and
 [reproduction instructions](../../../Benchmarks/SourceTreeVisibility/README.md).

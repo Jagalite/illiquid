@@ -51,10 +51,13 @@ import PackageDescription
 let package = Package(
     name: "SourceTreeVisibilityQualification",
     platforms: [.macOS("26.0")],
-    products: [.executable(name: "SourceTreeBenchmark", targets: ["IlliquidApp"])],
+    products: [.executable(name: "SourceTreeBenchmark", targets: ["SourceTreeBenchmark"])],
     targets: [
         .target(name: "IlliquidCore"),
-        .executableTarget(name: "IlliquidApp", dependencies: ["IlliquidCore"]),
+        // The driver needs internal APIs; tests never link its @main entry point.
+        .target(name: "IlliquidApp", dependencies: ["IlliquidCore"],
+                swiftSettings: [.unsafeFlags(["-enable-testing"])]),
+        .executableTarget(name: "SourceTreeBenchmark", dependencies: ["IlliquidCore", "IlliquidApp"]),
         .testTarget(name: "IlliquidAppTests", dependencies: ["IlliquidCore", "IlliquidApp"]),
     ]
 )
@@ -157,7 +160,7 @@ class Runner:
             manifest = {"variant": variant, "baseline_revision": BASELINE, "production": records,
                         "staged": {}, "adaptations": []}
             staging = dict(files)
-            staging["Sources/IlliquidApp/Harness.swift"] = (HERE / "Harness.swift").read_bytes()
+            staging["Sources/SourceTreeBenchmark/Harness.swift"] = (HERE / "Harness.swift").read_bytes()
             for name in TESTS:
                 staging["Tests/IlliquidAppTests/" + name] = (ROOT / "Tests/IlliquidAppTests" / name).read_bytes()
             staging["Package.swift"] = PACKAGE.encode()
