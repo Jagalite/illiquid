@@ -1,0 +1,1138 @@
+{
+  "baseline_revision": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "cgroup_cpu_max": "800000 100000",
+  "coalescer_test_bodies_sha256": "37c8d43362363bc551ef84050e00b26107619ec0b33e94393fe1229b8229a0b6",
+  "commands": [
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "--version"
+      ],
+      "elapsed_seconds": 0.06677292598760687,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "68274d1b09dcc866296321a5a8858efc297c4f19:Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift"
+      ],
+      "elapsed_seconds": 0.0038813549908809364,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests",
+        "--scratch-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests/build",
+        "--cache-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests/cache",
+        "--config-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests/config",
+        "--security-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests/security",
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--no-parallel",
+        "--configuration",
+        "debug",
+        "--use-integrated-swift-driver",
+        "--filter",
+        "RuntimeObservationMetricsTests"
+      ],
+      "elapsed_seconds": 9.56672827899456,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests",
+        "--scratch-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests/build",
+        "--cache-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests/cache",
+        "--config-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests/config",
+        "--security-path",
+        "/tmp/illiquid-observation-final-733e/baseline/tests/security",
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--no-parallel",
+        "--configuration",
+        "release",
+        "--use-integrated-swift-driver",
+        "--filter",
+        "RuntimeObservationMetricsTests"
+      ],
+      "elapsed_seconds": 14.20836031199724,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests",
+        "--scratch-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests/build",
+        "--cache-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests/cache",
+        "--config-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests/config",
+        "--security-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests/security",
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--no-parallel",
+        "--configuration",
+        "debug",
+        "--use-integrated-swift-driver",
+        "--filter",
+        "RuntimeObservationMetricsTests"
+      ],
+      "elapsed_seconds": 9.172787062998395,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+        "test",
+        "--package-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests",
+        "--scratch-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests/build",
+        "--cache-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests/cache",
+        "--config-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests/config",
+        "--security-path",
+        "/tmp/illiquid-observation-final-733e/candidate/tests/security",
+        "--jobs",
+        "2",
+        "--disable-sandbox",
+        "--no-parallel",
+        "--configuration",
+        "release",
+        "--use-integrated-swift-driver",
+        "--filter",
+        "RuntimeObservationMetricsTests"
+      ],
+      "elapsed_seconds": 16.77280542399967,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-module-cache-path",
+        "/tmp/illiquid-observation-final-733e/module-cache",
+        "/tmp/illiquid-observation-final-733e/baseline/Observation.swift",
+        "/workspace/scratch/733e26f08a8e/illiquid/Benchmarks/ObservationMetrics/Harness.swift",
+        "-o",
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark"
+      ],
+      "elapsed_seconds": 3.2823433199955616,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-module-cache-path",
+        "/tmp/illiquid-observation-final-733e/module-cache",
+        "/tmp/illiquid-observation-final-733e/candidate/Observation.swift",
+        "/workspace/scratch/733e26f08a8e/illiquid/Benchmarks/ObservationMetrics/Harness.swift",
+        "-o",
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark"
+      ],
+      "elapsed_seconds": 2.074775329005206,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.857524677994661,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.371391799999401,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3555816860025516,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.09673812899563927,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.18031666199385654,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.04325998399872333,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1486500140017597,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.03371409900137223,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3718334659934044,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1255014690104872,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.180235926003661,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.022681668007862754,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.019350187008967623,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.021019859006628394,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.024265069005195983,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.02120896099950187,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.029649875999893993,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.11937723899609409,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.159810988989193,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.42330555799708236,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.05907714799104724,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.20829645000048913,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.05031232400506269,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.2600471589976223,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.08636255199962761,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3703905189904617,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3134054480033228,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.6400884009926813,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.7784672959969612,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.27710581599967554,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.27204719399742316,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.08846819800965022,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.2071410049975384,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.04404532100306824,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.14067726700159255,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.035084235001704656,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3799322749982821,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.12357014599547256,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.16131824799231254,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.026581881000311114,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.023160605007433333,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.020611483007087372,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.024322633995325305,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.024405513002420776,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.03265514399390668,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.18829155099228956,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.15339278799365275,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.31936670099094044,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.05744578399753664,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.2007651599997189,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.046930591997806914,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.2402926040085731,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.08904448000248522,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.29563210099877324,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3063864790019579,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.7070035689976066,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.7494036559946835,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.31650900599197485,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.32894136900722515,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.13066540300496854,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.22056360999704339,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.044882508998853154,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.16859296399343293,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.03732123698864598,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.35013623599661514,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.10578373300086241,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.1320136279973667,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.02084358100546524,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.019288875002530403,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.019621212006313726,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.019382995989872143,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "control",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.01889787899563089,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.02111442800378427,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "snapshot-only",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.12730950600234792,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.10684387999936007,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "retained-64",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3752681059995666,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.040170794003643095,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "batch-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.16579740100132767,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.05270693000056781,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-16",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.20787906399345957,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.09119181000278331,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-4",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.26037038599315565,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/candidate/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.3039935080014402,
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/tmp/illiquid-observation-final-733e/baseline/observation-benchmark",
+        "--scenario",
+        "steady-1",
+        "--iterations",
+        "4000000"
+      ],
+      "elapsed_seconds": 0.6572696890070802,
+      "returncode": 0
+    }
+  ],
+  "cpu_count": 9,
+  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "finished_utc": "2026-10-17T20:22:36.240158+00:00",
+  "flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-parse-as-library"
+  ],
+  "harness_sha256": "bdefc77d380f6e541c0012556c0b220d764c75673addfca428181a0a00aa9eff",
+  "iterations": 4000000,
+  "ledger_only_tests": true,
+  "machine": "x86_64",
+  "pairs": 6,
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "runner_sha256": "f8edfee395488a9ab8e457b324fb1865ef2bcb82ec86fe9f706beba70cca2683",
+  "scenarios": [
+    "steady-1",
+    "steady-4",
+    "steady-16",
+    "batch-16",
+    "retained-64",
+    "snapshot-only",
+    "control"
+  ],
+  "scope": "Observation accounting component only; no playback, decoder, renderer, or UI CPU measurement",
+  "sources": {
+    "baseline": {
+      "binary_sha256": "0f79648e3557e40a5490810388e21f1c62e5aa7b40129302fe51bf5593f2043a",
+      "extracted_bytes": 7828,
+      "extracted_sha256": "9d4c15b1db6483b96f1012a25ac59adacdb233bb0900a92d2ad6e3c7d5d70459",
+      "path": "Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift",
+      "whole_file_sha256": "beaf96a9fa24cd649a27a2ed99496bee71fcac7c64ffc761a082ce56c96ff08e"
+    },
+    "candidate": {
+      "binary_sha256": "dc184acc0f63701e643650ea5609191aa8088c06b5af5ff58f19558ef909eec7",
+      "extracted_bytes": 9901,
+      "extracted_sha256": "75497399eb0fe651a8fdacdff73bd948147355f00053794083b9e8522049e362",
+      "path": "Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift",
+      "whole_file_sha256": "dd42babcadcd8ef788f0aaaaade5efce65e3e53bc1ad3d84d000467fc0558c7d"
+    }
+  },
+  "started_utc": "2026-10-17T20:21:25.122234+00:00",
+  "swift_version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "test_sha256": "d517dde123cdde2383823ef6943ae7ab4cb57bad32e641c1f4b7d6759b40fe31"
+}

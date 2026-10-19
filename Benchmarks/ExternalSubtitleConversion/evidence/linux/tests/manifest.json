@@ -1,0 +1,40 @@
+{
+  "baseline_source_sha256": "1f858588bd87afd61b0f8a091fc74f950f06a0299c62b38255b25f148ce30899",
+  "configurations": [
+    "debug",
+    "release"
+  ],
+  "linux_flags": [
+    "--use-integrated-swift-driver",
+    "--disable-sandbox",
+    "-Xswiftc",
+    "-warnings-as-errors"
+  ],
+  "receipt_encoding": "gzip-compressed original stdout/stderr bytes, including embedded CR test arguments",
+  "receipt_files": [
+    "baseline-debug.txt.gz",
+    "baseline-release.txt.gz",
+    "candidate-debug.txt.gz",
+    "candidate-release.txt.gz"
+  ],
+  "receipt_sha256": {
+    "baseline-debug.txt.gz": "aae7012b1ba5b69c4e1d508a564855f1d672813d8e853b401851a8185bedafc8",
+    "baseline-release.txt.gz": "4b0757406951db94eb3e21282ebf4c759960eb59b81b8f202947b7416771d2cf",
+    "candidate-debug.txt.gz": "c3ce76193e88beaef1a85b91a29925ec898bba4ff3e5140f461d08aa499787c6",
+    "candidate-release.txt.gz": "4678ea0fda84cbb96c4d798f96fb8201f509bc1e1df49ce40a68779145743c63"
+  },
+  "sources": {
+    "Scripts/test-external-subtitle-regressions.sh": "0e93d85c7e594a0422d500c1127470434551d0cc968ca47a573c70e4681aa5fe",
+    "Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift": "1ad108175e1c999f347a139c25bb2b692f321603842dfd219efb1a188a6c8317",
+    "Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift": "f7ed4f6586f93f310e3bee6c3e6f719c89bde9c14d9199a14979915b093fad6d",
+    "Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift": "9223c1fddff6bfcb7676333f748778cc69553b650e1f32359fc83813d9b0efb3"
+  },
+  "suites": 2,
+  "swift_version": "6.2.1",
+  "test_functions": 23,
+  "variants": [
+    "baseline",
+    "candidate"
+  ],
+  "warnings_as_errors": true
+}

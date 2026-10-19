@@ -85,6 +85,12 @@ frame latency, memory footprint, energy, or GPU rendering savings.
 
 ## Evidence
 
+The [19 October 2026 qualification](results/2026-10-19/) retains the accepted
+native macOS VM cohort and its full command journal. See the
+[research report](../../Documentation/PIP_SUBTITLE_UPLOAD_PERFORMANCE.md) for
+the results, changing-caption controls, and limits of the virtualized Metal
+environment. Raw generated receipts are folded in PR diffs.
+
 - `source-receipt.json`: pinned baseline, extracted block/type/shader hashes,
   candidate source hash, compiler commands, module and executable hashes.
 - `environment.json`: compiler, Xcode, OS, hardware, source revision and scope.

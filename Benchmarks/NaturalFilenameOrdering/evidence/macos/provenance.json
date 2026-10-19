@@ -1,0 +1,36 @@
+{
+  "artifact_id": 12114136334,
+  "artifact_name": "natural-filename-ordering-macos",
+  "audit": {
+    "cases": 38,
+    "pairs_per_case": 6,
+    "production_sources_match_pr_candidate": true,
+    "raw_observations": 456,
+    "raw_rows_match_command_receipts": true,
+    "staged_sources_match_recorded_hashes": true,
+    "summary_recomputed_from_raw": true
+  },
+  "baseline_commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "github_digest_matches": true,
+  "head_sha": "65aeb04b0399741cf974ccab4f740ad0cb428c71",
+  "job_id": 117496818931,
+  "post_measurement_change": "The current run.py additionally compares the on-disk observation log to completed observations before reporting success. The measured driver is retained under driver/run.py; production Swift sources and Harness.swift are unchanged.",
+  "repo": "Jagalite/illiquid",
+  "retention": "All top-level result files and exact staged sources/driver retained unchanged. commands.jsonl includes every command stdout/stderr; individual duplicate logs and executables are omitted.",
+  "run_id": 39067064223,
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/39067064223",
+  "tests": {
+    "debug": {
+      "conclusion": "success",
+      "suites": 4,
+      "tests": 22
+    },
+    "release": {
+      "conclusion": "success",
+      "suites": 4,
+      "tests": 22
+    }
+  },
+  "zip_bytes": 334749,
+  "zip_sha256": "ca4c2fafac0dc13bcddfc610e5330962cb57de120a62ea17c45ae0473aecac7b"
+}

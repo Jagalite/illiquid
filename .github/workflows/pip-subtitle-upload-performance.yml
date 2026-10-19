@@ -1,12 +1,13 @@
 name: PiP subtitle upload performance
 
 on:
-  push:
-    branches: ['perf/pip-subtitle-upload-reuse']
   pull_request:
     paths:
       - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift'
       - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleUploadCache.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift'
+      - 'Sources/IlliquidNativePlayback/Resources/NativePlaybackShaders.metal'
       - 'Tests/IlliquidNativePlaybackTests/PiPSubtitleUploadReuseTests.swift'
       - 'Benchmarks/PiPSubtitleUpload/**'
       - '.github/workflows/pip-subtitle-upload-performance.yml'

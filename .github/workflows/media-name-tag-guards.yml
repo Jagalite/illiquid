@@ -1,0 +1,51 @@
+name: Media name tag guards
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Benchmarks/MediaNameTagGuards/**'
+      - '.github/workflows/media-name-tag-guards.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-name-tag-guards-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test and compare complete recognition outputs
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 Benchmarks/MediaNameTagGuards/run.py \
+            --correctness-only \
+            --output "$RUNNER_TEMP/media-name-tag-guards"
+      - name: Test, compare outputs, and measure native Foundation
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/MediaNameTagGuards/run.py \
+            --pairs 8 --target-ms 750 \
+            --output "$RUNNER_TEMP/media-name-tag-guards"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-name-tag-guards-evidence
+          path: |
+            ${{ runner.temp }}/media-name-tag-guards/*.json
+            ${{ runner.temp }}/media-name-tag-guards/*.jsonl
+            ${{ runner.temp }}/media-name-tag-guards/*.txt
+            ${{ runner.temp }}/media-name-tag-guards/*.gz
+          retention-days: 14

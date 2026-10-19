@@ -53,9 +53,7 @@ public struct FolderPlaylist: Equatable, Sendable {
 
     public init(folderURL: URL, items: [FolderPlaylistItem]) {
         self.folderURL = NormalizedFileURL.normalize(folderURL) ?? folderURL
-        self.items = items.sorted {
-            NaturalFilenameOrdering.areInIncreasingOrder($0.url, $1.url)
-        }
+        self.items = NaturalFilenameOrdering.sort(items, by: { $0.url })
     }
 
     public subscript(index: Int) -> FolderPlaylistItem {
@@ -63,7 +61,19 @@ public struct FolderPlaylist: Equatable, Sendable {
     }
 
     public func index(of mediaURL: URL) -> Int? {
-        items.firstIndex { NormalizedFileURL.representsSameFile($0.url, mediaURL) }
+        var queryKey: String?
+        for index in items.indices {
+            // Decoded items can bypass the normalizing initializer. As in the
+            // original predicate, reject an invalid item before reading the query.
+            guard let itemKey = NormalizedFileURL.persistenceKey(for: items[index].url)
+            else { continue }
+            if queryKey == nil {
+                queryKey = NormalizedFileURL.persistenceKey(for: mediaURL)
+            }
+            guard let queryKey else { return nil }
+            if itemKey == queryKey { return index }
+        }
+        return nil
     }
 
     /// Returns the last watched file when it is still in this playlist, otherwise

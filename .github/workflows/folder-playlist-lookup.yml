@@ -1,0 +1,59 @@
+name: Folder playlist lookup qualification
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistLookupTests.swift'
+      - 'Tests/IlliquidCoreTests/UtilitiesTests.swift'
+      - 'Scripts/test-folder-playlist-lookup.sh'
+      - 'Benchmarks/FolderPlaylistLookup/**'
+      - '.github/workflows/folder-playlist-lookup.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: folder-playlist-lookup-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  folder-playlist-lookup:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch the pinned benchmark baseline
+        run: git fetch --no-tags --depth=1 origin 68274d1b09dcc866296321a5a8858efc297c4f19
+      - name: Original-source debug and release identity regressions
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/folder-playlist-lookup"
+          ILLIQUID_LOOKUP_SOURCE_REVISION=68274d1b09dcc866296321a5a8858efc297c4f19 \
+            bash Scripts/test-folder-playlist-lookup.sh --jobs 2 --no-parallel 2>&1 |
+            tee "$RUNNER_TEMP/folder-playlist-lookup/tests-baseline.log"
+      - name: Candidate debug and release playlist and identity regressions
+        shell: bash
+        run: |
+          bash Scripts/test-folder-playlist-lookup.sh --jobs 2 --no-parallel 2>&1 |
+            tee "$RUNNER_TEMP/folder-playlist-lookup/tests-candidate.log"
+      - name: Paired production-source benchmark and exact output parity
+        run: >-
+          python3 Benchmarks/FolderPlaylistLookup/run.py
+          --rounds 8 --target-ms 50
+          --output "$RUNNER_TEMP/folder-playlist-lookup/results.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: folder-playlist-lookup
+          path: ${{ runner.temp }}/folder-playlist-lookup/
+          retention-days: 7

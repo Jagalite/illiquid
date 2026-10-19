@@ -1,0 +1,50 @@
+{
+  "status": "passed",
+  "method": "Independent in-memory decode and recomputation from exact native archive bytes; UInt64 checksums calculated with BigInt.",
+  "measured_records": 132,
+  "cases": 11,
+  "pairs_per_case": 6,
+  "pair_order": {
+    "per_case_AB": 3,
+    "per_case_BA": 3,
+    "total_AB": 33,
+    "total_BA": 33
+  },
+  "test_configurations": 4,
+  "tests_per_configuration": 25,
+  "suites_per_configuration": 2,
+  "calibration_pilots": 11,
+  "command_receipts": 161,
+  "nonzero_command_exit_statuses": 0,
+  "full_output": {
+    "records": 15,
+    "media_keys": 13114,
+    "subtitle_associations": 276,
+    "baseline_candidate_byte_identical": true,
+    "independent_exact_mapping_check": "passed",
+    "canonical_sha256": "c5b5fb5d105f3e4d9c31c098f7994e46a6d81679c0cf07bffa7c190bdb8e2702"
+  },
+  "archive": {
+    "sha256": "e833f7a9fe23d0da9957873d6cc45b68c06b01a7858b8092bb4092e959c676cd",
+    "bytes": 142463,
+    "uncompressed_bytes": 7383618,
+    "entries": 28,
+    "all_crc32": "passed"
+  },
+  "verified": [
+    "all timing divisions",
+    "all wall and CPU medians and ranges",
+    "all paired ratios and faster-pair counts",
+    "all calibration counts",
+    "all exact UInt64 FNV and preflight checksums",
+    "paired equality",
+    "ten production/test/harness input files against recorded source receipts",
+    "three frozen baseline Git blob identities",
+    "all archived result files against native stdout records"
+  ],
+  "caveats": [
+    "Nonempty controls do not establish neutrality: unsupported_256 median wall time +11.73%, CPU +12.00%.",
+    "Some candidate batches are short (minimum 5.13 ms); no samples excluded.",
+    "Component-only benchmark; excludes filesystem discovery, app UI, playback, memory, and energy."
+  ]
+}

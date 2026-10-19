@@ -1,0 +1,64 @@
+name: Bitmap subtitle timeline performance
+
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/**
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift
+      - Benchmarks/BitmapSubtitleTimeline/**
+      - .github/workflows/bitmap-subtitle-timeline-performance.yml
+      - '!Benchmarks/BitmapSubtitleTimeline/README.md'
+      - '!Benchmarks/BitmapSubtitleTimeline/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-timeline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify baseline and candidate in debug and release
+        run: |
+          python3 Benchmarks/BitmapSubtitleTimeline/run.py --tests-only \
+            --output "$RUNNER_TEMP/bitmap-subtitle-timeline/tests"
+      - name: Measure paired native components
+        run: |
+          python3 Benchmarks/BitmapSubtitleTimeline/run.py \
+            --pairs 8 --target-ms 80 --max-sample-ms 1500 \
+            --output "$RUNNER_TEMP/bitmap-subtitle-timeline/timing"
+      - name: Emit review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "bitmap-subtitle-timeline"
+          files = {str(p.relative_to(root)): p.read_text()
+                   for p in sorted(root.rglob("*")) if p.is_file() and "build" not in p.parts}
+          # Print compact, unmodified source records for remote review even when
+          # a reviewer's local execution environment is unavailable.
+          review = {name: value for name, value in files.items() if "/receipts/" not in name}
+          print("TIMELINE_REVIEW_JSON " + json.dumps(review, sort_keys=True))
+          # Preserve complete receipts and logs as an exact, reproducible bundle.
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print("TIMELINE_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          print("TIMELINE_BUNDLE_BASE64 " + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-timeline-macos
+          path: ${{ runner.temp }}/bitmap-subtitle-timeline
+          retention-days: 14

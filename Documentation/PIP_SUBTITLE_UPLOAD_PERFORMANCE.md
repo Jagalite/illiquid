@@ -96,9 +96,100 @@ work before an allocation failure is outside those successful-operation counts.
 
 ## Evidence and result
 
-Native benchmark and integration qualification are pending. This section will
-be replaced with the measured results and exact CI/source receipts before the
-research is presented as successful.
+The native Metal component qualification passed on 19 October 2026 at commit
+`8f8677024a7c5b852005d51651558ccdfc79ad6b` in
+[Actions run 39319056032](https://github.com/Jagalite/illiquid/actions/runs/39319056032).
+The measured production helper is unchanged in the subsequent evidence commit;
+its SHA-256 is recorded in the source receipt.
+
+The runner was a **macOS VM**: macOS 26.6.2, `VirtualMac2,1`, arm64, Xcode 26.6,
+Swift 6.3.3, and the Metal device `Apple Paravirtual device`. These are real
+macOS Metal API calls on that environment, not measurements of a named physical
+Apple GPU. Absolute timings may differ substantially on physical Macs.
+
+### Unchanged captions
+
+CPU time below is the median per helper call, after the caption's first upload.
+Each variant/workload has 14 fresh-process observations.
+
+| Atlas | Baseline CPU, microseconds/call | Reuse CPU, microseconds/call | CPU reduction | Texture bytes requested per reused call, before → after |
+| --- | ---: | ---: | ---: | ---: |
+| R8, 64 KiB | 3.246 | 0.0433 | 98.67% | 65,536 → 0 |
+| R8, 1 MiB | 36.927 | 0.0438 | 99.88% | 1,048,576 → 0 |
+| R8, 4 MiB | 174.626 | 0.0473 | 99.97% | 4,194,304 → 0 |
+| BGRA, 1 MiB | 35.157 | 0.0430 | 99.88% | 1,048,576 → 0 |
+
+All unchanged-caption observations recorded zero additional candidate texture
+uploads and vertex copies. The baseline performed one of each on every call.
+The eight-quad input also avoided its repeated 1,536-byte vertex copy. The
+baseline and candidate timing ranges did not overlap in any unchanged workload.
+
+This supports reusing the existing GPU resources while a caption stays unchanged.
+The absolute component savings matter more than the large percentages: for
+example, the 1 MiB R8 case saves about 36.9 microseconds per reused call on this
+runner. This does not make the player, a full frame, or its GPU draw 99.88% faster.
+
+### Changing-caption controls
+
+Changed captions still need their texture upload and vertex rebuild. They are
+included to expose miss-path costs, with the same alternating pixels and geometry
+for both variants. CPU ranges below are the minimum and maximum fresh-process
+observations, not confidence intervals.
+
+| Atlas | Baseline CPU median (range), microseconds/call | Candidate CPU median (range), microseconds/call | CPU median change | Wall median change |
+| --- | ---: | ---: | ---: | ---: |
+| R8, 64 KiB | 3.248 (2.837–5.041) | 3.196 (2.593–3.556) | −1.62% | −5.92% |
+| R8, 1 MiB | 38.073 (25.800–46.478) | 39.497 (33.992–57.129) | +3.74% | +3.34% |
+| R8, 4 MiB | 165.819 (130.251–214.540) | 167.173 (131.266–231.393) | +0.82% | +6.90% |
+| BGRA, 1 MiB | 36.746 (31.739–51.124) | 40.127 (31.895–49.633) | +9.20% | −2.16% |
+
+These controls show no consistent benefit. All ranges overlap. In particular,
+the BGRA control's CPU median increased 9.20%, while its wall median decreased
+2.16%; the median of its individual paired CPU ratios is 1.013. The cohort is
+variable, and it does not establish that the changed-caption path is free of
+regressions. The benefit being accepted is the avoided work on unchanged frames;
+no speedup is claimed for animated or otherwise changing captions.
+
+### Validation and retained evidence
+
+The component run completed all 224 accepted observations in balanced order.
+The shortest timed process CPU interval was 46.109 ms; calibration and warmup
+are excluded. All 18 correctness transitions matched, including 17 actual
+GPU draws per variant with exact texture, vertex, and rendered-output equality.
+Every timed observation also passed its post-timing byte and counter checks.
+An independent audit recomputed the cohort's summaries and checked source and
+binary hashes against the receipt.
+
+The [native regression job](https://github.com/Jagalite/illiquid/actions/runs/39319056032/job/118288020817)
+also passed after building the complete app/test graph in release configuration.
+Swift Testing reported 59 passing tests across five suites. All eight new upload
+tests executed and passed, including their exact pixel and upload-count checks.
+Two existing optional-fixture tests returned early because their media fixtures
+were not configured: `heavyAnimatedFixtureCostsAreRecorded` and
+`mediaSessionMirrorsEmbeddedPacketsAndSeekInvalidationToBothPipelines`. Their
+fixture bodies are not claimed as exercised. The
+[original native test log](../Benchmarks/PiPSubtitleUpload/results/2026-10-19/native-tests.log)
+is retained.
+
+Before opening the PR, the branch also incorporates main at
+`33fff16155c3472960f88e04c72dfdfdefd56dcf`. The measured upload baseline, prepared
+frame declarations, subtitle pipeline, and shaders did not change between the
+research baseline and that main revision. The repository's normal PR checks
+qualify the integrated branch, separately from the pinned measurement above.
+
+The [retained evidence directory](../Benchmarks/PiPSubtitleUpload/results/2026-10-19/)
+contains the original raw observations, calibration, environment, source and
+binary hashes, correctness receipts, full command journal, and summary. The
+[CI receipt](../Benchmarks/PiPSubtitleUpload/results/2026-10-19/ci-receipt.json)
+links the run and records the downloaded artifact's verified SHA-256 plus hashes
+of the retained files. Generated binaries and module caches remain in the
+Actions artifact rather than being checked into the repository.
+
+The timed interval covers the upload helper and accumulation of returned counters.
+It excludes the surrounding compositor's synchronization and metric updates,
+packing, video conversion, actual draw encoding/completion, and presentation.
+Full-player CPU, playback smoothness, energy, process footprint, physical DRAM
+traffic, and performance on physical hardware remain unmeasured.
 
 ## Reproduction
 

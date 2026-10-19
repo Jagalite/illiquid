@@ -1,0 +1,41 @@
+{
+  "description": "Exact native qualification archive, plus byte-preserving JSON records extracted from the job log.",
+  "repository": "Jagalite/illiquid",
+  "baseline_commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "tested_commit": "775aa70d030364692be8a9a7782c66041cbcbf8b",
+  "branch": "perf/empty-subtitle-association-ed13",
+  "run_id": 39073621804,
+  "job_id": 117516148310,
+  "attempt": 1,
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/39073621804",
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/39073621804/job/117516148310",
+  "conclusion": "success",
+  "created_at": "2026-10-17T22:05:20Z",
+  "completed_by": "2026-10-17T22:13:54Z",
+  "qualification_archive": {
+    "path": "qualification.zip",
+    "bytes": 142463,
+    "entries": 28,
+    "sha256": "e833f7a9fe23d0da9957873d6cc45b68c06b01a7858b8092bb4092e959c676cd",
+    "git_blob": "c81410006446cb87ffe77181c9f182d824b71736"
+  },
+  "actions_wrapper_artifact": {
+    "id": 12116815554,
+    "bytes": 49381,
+    "sha256": "3332b1e7420a2a9f6131205a304eddaab5fc9096b984b96a4a28bd83c542b05e",
+    "note": "Actions wrapper ZIP contains qualification.zip; its size/digest differ from the inner qualification archive.",
+    "expires_at": "2026-10-31T22:13:47Z"
+  },
+  "source_sha256": {
+    "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift": "38f10f619d3a8f09bb0b0e4b0c92ff9696338722292e59c5e1fbd561a6d928eb",
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "392fdfb0ea35cd2a30804a3f07f23c489130f026e22ba32dd2b9f40216c60a4c",
+    "Sources/IlliquidCore/Utilities/MediaFileSupport.swift": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+    "Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift": "8e87e9870e636aa622ce977fdc3e36814e77607b250987fa1592484a3aa0c370",
+    "Tests/IlliquidCoreTests/ExternalSubtitleMatcherEmptyTests.swift": "335fd5ed2057a0399663cd7d650b3755515479b2899cb1a9ac159953451a873d"
+  },
+  "harness_sha256": {
+    "Driver.swift": "d2692e68e406b826d46d41b1dc23495b9a316b968fe8102ca9d4684dd880614f",
+    "run.py": "6e766b964977e843deb72550eb2d272bff2f9760771edc5ba653d98b762ca20b"
+  },
+  "note": "The later evidence/report commit leaves the qualified production, tests, driver, and runner unchanged. Workflow cleanup removes only the temporary branch-specific push trigger and base64 log transport; tests and six-pair measurement commands remain unchanged."
+}
