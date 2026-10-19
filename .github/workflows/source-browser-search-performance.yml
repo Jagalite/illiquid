@@ -21,6 +21,55 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  linux-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record Linux host
+        run: |
+          mkdir -p "$RUNNER_TEMP/source-search"
+          uname -a > "$RUNNER_TEMP/source-search/host.txt"
+          lscpu >> "$RUNNER_TEMP/source-search/host.txt"
+          swift --version >> "$RUNNER_TEMP/source-search/host.txt"
+          python3 --version >> "$RUNNER_TEMP/source-search/host.txt"
+          printf 'ImageOS=%s\nImageVersion=%s\n' "$ImageOS" "$ImageVersion" >> "$RUNNER_TEMP/source-search/host.txt"
+      - name: Verify baseline and candidate behavior in debug and release
+        run: |
+          for configuration in debug release; do
+            python3 Scripts/test-source-browser-search.py \
+              --configuration "$configuration" --baseline-ref \
+              --output "$RUNNER_TEMP/source-search/baseline-$configuration"
+            python3 Scripts/test-source-browser-search.py \
+              --configuration "$configuration" \
+              --output "$RUNNER_TEMP/source-search/candidate-$configuration"
+          done
+      - name: Measure complete search and cached projection workloads
+        run: |
+          search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
+          python3 Benchmarks/SourceBrowserSearch/run.py \
+            --pairs 6 --target-ms 120 --cpu "$search_cpu" \
+            --output "$RUNNER_TEMP/source-search/timing"
+      - name: Measure allocation requests separately from timing
+        run: |
+          search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
+          python3 Benchmarks/SourceBrowserSearch/run.py \
+            --allocations --pairs 2 --cpu "$search_cpu" \
+            --output "$RUNNER_TEMP/source-search/allocations"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-browser-search-linux
+          path: |
+            ${{ runner.temp }}/source-search/
+            !${{ runner.temp }}/source-search/**/.build/**
+            !${{ runner.temp }}/source-search/**/cache/**
+            !${{ runner.temp }}/source-search/**/module-cache/**
+          retention-days: 14
+
   native-component:
     runs-on: macos-26
     timeout-minutes: 30
