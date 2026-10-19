@@ -2429,31 +2429,53 @@ enum SourceTreeSorting {
         _ entries: [SourceTreeEntry],
         using configuration: SourceTreeSortConfiguration
     ) -> [SourceTreeEntry] {
-        entries
-            .enumerated()
+        guard entries.count > 1 else { return entries }
+        guard configuration.name != .off
+            || configuration.dateCreated != .off
+            || configuration.type != .off
+        else { return entries }
+
+        // Date ordering can resolve every comparison without reading a name.
+        // Otherwise, derive each filename once for this sort instead of once
+        // per comparison. Keep these keys local to the immutable input.
+        let names: [String] = configuration.name != .off && configuration.dateCreated == .off
+            ? entries.map { $0.url.lastPathComponent } : []
+        func filename(at index: Int) -> String {
+            names.isEmpty ? entries[index].url.lastPathComponent : names[index]
+        }
+
+        // Entries carry optional recognized-media metadata. Sort lightweight
+        // offsets, then materialize the original entries in their final order.
+        return entries.indices
             .sorted { left, right in
                 for criterion in criterionPrecedence {
                     let direction = configuration.direction(for: criterion)
                     guard direction != .off else { continue }
                     if let precedes = orderedBefore(
-                        left.element,
-                        right.element,
+                        entries[left],
+                        entries[right],
                         by: criterion,
-                        direction: direction
+                        direction: direction,
+                        nameComparison: naturalComparison(
+                            entries[left].url, entries[right].url,
+                            leftName: filename(at: left),
+                            rightName: filename(at: right)
+                        )
                     ) {
                         return precedes
                     }
                 }
-                return left.offset < right.offset
+                return left < right
             }
-            .map(\.element)
+            .map { entries[$0] }
     }
 
     private static func orderedBefore(
         _ left: SourceTreeEntry,
         _ right: SourceTreeEntry,
         by criterion: SourceTreeSortCriterion,
-        direction: SourceTreeSortDirection
+        direction: SourceTreeSortDirection,
+        nameComparison: @autoclosure () -> ComparisonResult
     ) -> Bool? {
         switch criterion {
         case .type:
@@ -2478,7 +2500,7 @@ enum SourceTreeSorting {
             }
 
         case .name:
-            let comparison = naturalComparison(left.url, right.url)
+            let comparison = nameComparison()
             guard comparison != .orderedSame else { return nil }
             return direction == .ascending
                 ? comparison == .orderedAscending
@@ -2488,11 +2510,11 @@ enum SourceTreeSorting {
 
     private static func naturalComparison(
         _ left: URL,
-        _ right: URL
+        _ right: URL,
+        leftName: String,
+        rightName: String
     ) -> ComparisonResult {
-        let nameComparison = left.lastPathComponent.localizedStandardCompare(
-            right.lastPathComponent
-        )
+        let nameComparison = leftName.localizedStandardCompare(rightName)
         guard nameComparison == .orderedSame else { return nameComparison }
         return left.path.compare(right.path, options: [.literal])
     }

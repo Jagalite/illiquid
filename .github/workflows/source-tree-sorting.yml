@@ -1,0 +1,79 @@
+name: Source tree sorting
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeSortingTests.swift'
+      - 'Benchmarks/SourceTreeSorting/**'
+      - '.github/workflows/source-tree-sorting.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-tree-sorting-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          # The paired experiment reads its exact baseline from Git.
+          fetch-depth: 0
+      - name: Test both revisions and measure complete native sorts
+        run: |
+          python3 Benchmarks/SourceTreeSorting/run.py \
+            --output "$RUNNER_TEMP/source-tree-sorting" \
+            --pairs 6 --target-ms 60
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-tree-sorting-component
+          path: |
+            ${{ runner.temp }}/source-tree-sorting/*.json
+            ${{ runner.temp }}/source-tree-sorting/*.log
+            ${{ runner.temp }}/source-tree-sorting/*.py
+            ${{ runner.temp }}/source-tree-sorting/verified-fixtures/
+            ${{ runner.temp }}/source-tree-sorting/baseline/Sources/
+            ${{ runner.temp }}/source-tree-sorting/candidate/Sources/
+          retention-days: 14
+
+  browser-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run source-browser regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/source-tree-sorting-integration"
+          set -o pipefail
+          swift test --force-resolved-versions --configuration release --filter \
+            'SourceTreeSortingTests|SourcesSidebarFolderModelTests|SourceBrowserFilterTests|SourceMediaOrganizationTests|SourceEmptyFolderVisibilityTests' \
+            2>&1 | tee "$RUNNER_TEMP/source-tree-sorting-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-tree-sorting-browser-integration
+          path: ${{ runner.temp }}/source-tree-sorting-integration/
+          retention-days: 14
