@@ -1,0 +1,65 @@
+name: Source browser search performance
+
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
+      - Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift
+      - Sources/IlliquidApp/UI/SourcesSidebar.swift
+      - Tests/IlliquidAppTests/SourceBrowserSearchTests.swift
+      - Scripts/test-source-browser-search.py
+      - Benchmarks/SourceBrowserSearch/Harness.swift
+      - Benchmarks/SourceBrowserSearch/run.py
+      - .github/workflows/source-browser-search-performance.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-browser-search-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record native host
+        run: |
+          mkdir -p "$RUNNER_TEMP/source-search"
+          sw_vers > "$RUNNER_TEMP/source-search/host.txt"
+          uname -a >> "$RUNNER_TEMP/source-search/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/source-search/host.txt"
+          swift --version >> "$RUNNER_TEMP/source-search/host.txt"
+      - name: Verify baseline and candidate behavior in debug and release
+        run: |
+          for configuration in debug release; do
+            python3 Scripts/test-source-browser-search.py \
+              --configuration "$configuration" --baseline-ref \
+              --output "$RUNNER_TEMP/source-search/baseline-$configuration"
+            python3 Scripts/test-source-browser-search.py \
+              --configuration "$configuration" \
+              --output "$RUNNER_TEMP/source-search/candidate-$configuration"
+          done
+      - name: Measure complete search and cached projection workloads
+        run: |
+          python3 Benchmarks/SourceBrowserSearch/run.py \
+            --pairs 6 --target-ms 120 \
+            --output "$RUNNER_TEMP/source-search/timing"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-browser-search-macos
+          path: |
+            ${{ runner.temp }}/source-search/
+            !${{ runner.temp }}/source-search/**/.build/**
+            !${{ runner.temp }}/source-search/**/cache/**
+            !${{ runner.temp }}/source-search/**/module-cache/**
+          retention-days: 14
