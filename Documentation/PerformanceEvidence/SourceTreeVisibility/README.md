@@ -1,5 +1,35 @@
 # Source-tree visibility qualification evidence
 
+## Completed macOS qualification
+
+`macos/` retains the completed native qualification from October 19, 2026.
+Both variants passed all three component suites in debug and release, and all
+30 workload/size cells completed six balanced pairs: 360 process observations,
+4,992 timed projection calls, and 60 separate diagnostic observations.
+
+The baseline is `33fff16155c3472960f88e04c72dfdfdefd56dcf`. The measured PR
+head is `833c79a2d2e2ca675990c1009f0f7891f29c3bb0`; GitHub checked out merge
+`d851a023d30a178bec587458a44415ba68ffbc88`, which has the identical tree.
+The environment was macOS 26.6.2 arm64 with Apple Swift 6.3.3, using the
+workflow's selected Xcode 26.6.
+
+- `qualification.zip` is the exact artifact from
+  [job 118301206085](https://github.com/Jagalite/illiquid/actions/runs/39322896553/job/118301206085).
+  Its 156,358 bytes have SHA-256
+  `51c4cf57bbbda5a6e2bd3f6a4afeb371b6d6b7bf649e72a4dca86ef741046640`,
+  matching the GitHub artifact digest. It includes the original observations,
+  diagnostics, command/test logs, source manifests, runner, and staged sources.
+- `summary.json` and `environment.json` are unchanged copies from that ZIP for
+  convenient review.
+- `qualification.json` records source identity, artifact member hashes, coverage,
+  test results, the numerical review, and related integration checks.
+- `independent-audit.json` records the separate source, result, and statistics
+  audit, including the limits of binary verification from the compact artifact.
+
+The native results are a separate cohort from Linux: the baseline shared sources,
+compiler, platform, and benchmark module layout differ. The source cache change
+itself is identical.
+
 ## Linux run
 
 `linux/` retains the original text evidence from the 2026-10-17 20:23 UTC run
@@ -54,6 +84,6 @@ the baseline release test-loader failure. No benchmark timings were collected.
 The correction separates the production library target from the executable
 entry point; the production cache implementation is unchanged.
 
-Native macOS qualification is being rerun. See the
+The corrected native run completed successfully. See the
 [research report](../../SOURCE_TREE_VISIBILITY_PERFORMANCE.md) and
 [reproduction instructions](../../../Benchmarks/SourceTreeVisibility/README.md).

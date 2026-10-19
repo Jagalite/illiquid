@@ -125,3 +125,17 @@ for findings and qualification status.
 
 Retained observations and qualification receipts are under
 [`Documentation/PerformanceEvidence/SourceTreeVisibility`](../../Documentation/PerformanceEvidence/SourceTreeVisibility).
+
+## Retained native qualification
+
+The completed run on October 19, 2026 used Apple Swift 6.3.3 on macOS 26.6.2
+arm64 and passed both variants' debug/release tests plus all 30 six-pair timing
+cells. Its exact runner and candidate sources are at commit
+`833c79a2d2e2ca675990c1009f0f7891f29c3bb0`; the tested synthetic merge
+`d851a023d30a178bec587458a44415ba68ffbc88` has the same tree.
+
+The [native evidence](../../Documentation/PerformanceEvidence/SourceTreeVisibility/macos)
+retains the original artifact ZIP and readable receipts. Reproduce this cohort
+from that source commit. Historical Linux results use the earlier original
+commit `daa5ea76d0bb570783cc91c521f34790ed8e1539` and its original module layout;
+the two cohorts should not be combined.

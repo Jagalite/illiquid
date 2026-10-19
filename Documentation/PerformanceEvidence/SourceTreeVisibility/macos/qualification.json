@@ -1,0 +1,264 @@
+{
+  "status": "complete_component_qualification",
+  "started_utc": "2026-10-19T21:07:43Z",
+  "artifact_created_utc": "2026-10-19T21:16:42Z",
+  "baseline": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+  "pr_url": "https://github.com/Jagalite/illiquid/pull/58",
+  "candidate_head": "833c79a2d2e2ca675990c1009f0f7891f29c3bb0",
+  "tested_merge": "d851a023d30a178bec587458a44415ba68ffbc88",
+  "candidate_and_tested_merge_tree": "d14de7f52c5abde0ce612337eb3cebfae8f60bb0",
+  "tree_identity_verification": "GitHub Git commit metadata confirms the tested merge and candidate head have the same tree; the merge parents are the recorded baseline and candidate.",
+  "job": {
+    "run_id": 39322896553,
+    "job_id": 118301206085,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39322896553/job/118301206085",
+    "conclusion": "success",
+    "qualification_step": "success",
+    "upload_step": "success"
+  },
+  "artifact": {
+    "id": 12222481457,
+    "name": "source-tree-visibility",
+    "file": "qualification.zip",
+    "bytes": 156358,
+    "sha256": "51c4cf57bbbda5a6e2bd3f6a4afeb371b6d6b7bf649e72a4dca86ef741046640",
+    "download_sha256_matches_github_digest": true,
+    "original_artifact_expires_utc": "2026-10-26T21:16:41Z",
+    "retention": "Exact downloaded ZIP retained in this repository."
+  },
+  "coverage": {
+    "sizes": [
+      100,
+      1000,
+      10000
+    ],
+    "cases": [
+      "tree_rules",
+      "tree_show_hidden",
+      "tree_manual_hide",
+      "tree_always_show",
+      "files_rules",
+      "media_rules",
+      "same_input_search",
+      "preview_only",
+      "cold_tree",
+      "changed_sort"
+    ],
+    "complete_cells": 30,
+    "pairs_per_cell": 6,
+    "process_observations": 360,
+    "timed_projection_calls": 4992,
+    "diagnostic_observations": 60,
+    "ordering": "AB for pairs 0, 2, 4; BA for pairs 1, 3, 5; each member is a fresh process."
+  },
+  "root_numerical_audit": {
+    "passed": true,
+    "all_record_keys_unique": true,
+    "durations_match_iteration_counts_and_elapsed_sums": true,
+    "balanced_process_order": true,
+    "all_timed_receipts_match_within_each_cell": true,
+    "all_30_summary_medians_ranges_and_paired_reductions_match_raw": true,
+    "all_visibility_pairs_favor_candidate": true
+  },
+  "tests": {
+    "runs": [
+      {
+        "configuration": "debug",
+        "filter": null,
+        "passed": true,
+        "skip": "reuseTreeAcrossVisibilityChanges",
+        "variant": "baseline",
+        "test_methods": 15,
+        "suites": 3
+      },
+      {
+        "configuration": "debug",
+        "filter": null,
+        "passed": true,
+        "skip": null,
+        "variant": "candidate",
+        "test_methods": 16,
+        "suites": 3
+      },
+      {
+        "configuration": "release",
+        "filter": null,
+        "passed": true,
+        "skip": "reuseTreeAcrossVisibilityChanges",
+        "variant": "baseline",
+        "test_methods": 15,
+        "suites": 3
+      },
+      {
+        "configuration": "release",
+        "filter": null,
+        "passed": true,
+        "skip": null,
+        "variant": "candidate",
+        "test_methods": 16,
+        "suites": 3
+      }
+    ],
+    "suites": [
+      "SourceBrowserFilterTests.swift",
+      "SourceMediaOrganizationTests.swift",
+      "SourceTreeVisibilityCacheTests.swift"
+    ]
+  },
+  "driver_hashes": {
+    "Harness.swift": "34f08b4f7004f9916555fea972d706438430dd9ec80e1d8a284983d6c84be0f1",
+    "run.py": "7e78afe5a1f4e067eaf625dea93260451ab596151885302d185df870b7633cbc"
+  },
+  "binary_stability_verification": "Both binary hashes are recorded in the source manifests. The runner rehashes them after all measurements and fails on a change; the qualification step succeeded. The compact artifact omits executables, so review does not independently rehash native binary bytes.",
+  "artifact_members": {
+    "baseline-sources.json": {
+      "bytes": 10171,
+      "sha256": "39a64129cd2e76f743c393c378f3a186d95c9163b8f5904fcc300328667d5d15"
+    },
+    "candidate-sources.json": {
+      "bytes": 10172,
+      "sha256": "1b50bae66613c3f4e5fe0621b7a0d8e3e353650653058dbf471ca1767280b187"
+    },
+    "commands.jsonl": {
+      "bytes": 923074,
+      "sha256": "55c351b0eb31409cedb0b597650eb771d3c8b81df12f640af9859e912849d243"
+    },
+    "diagnostics.jsonl": {
+      "bytes": 27682,
+      "sha256": "165115ffcdee2c05f291e2a45d0a06d5c67187df323dbb2b8354a914c16fb2bb"
+    },
+    "environment.json": {
+      "bytes": 1474,
+      "sha256": "52c30b31f2c48a7631a25840cb6ffa148d2ea25a754e3bfaec3f18cb4a222d13"
+    },
+    "measurements.jsonl": {
+      "bytes": 741558,
+      "sha256": "3ab5c3faecd605fb54833c1a192fc79d25a983e15f9e054646a1c2380ba025cc"
+    },
+    "runner.py": {
+      "bytes": 24035,
+      "sha256": "7e78afe5a1f4e067eaf625dea93260451ab596151885302d185df870b7633cbc"
+    },
+    "staged-sources.tar.gz": {
+      "bytes": 60723,
+      "sha256": "a34906c234ee3d7365ac9afcf0ee6fcdebd410cf6e72463655433e8b362fd962"
+    },
+    "summary.json": {
+      "bytes": 12792,
+      "sha256": "648f6da783addffd3e8d868c760fd75ab15751b8bf4bd2669d9a79292a867422"
+    },
+    "tests-baseline-debug.txt": {
+      "bytes": 6001,
+      "sha256": "b8b9013a5cd2ad5f66dd18489afb22e2da934a39420d3d4e1e16ad071fde51c4"
+    },
+    "tests-baseline-release.txt": {
+      "bytes": 4941,
+      "sha256": "fc49c6294ef4e8ad600da6eaa2903697827e37ee0ef3c9a52d061f5946502201"
+    },
+    "tests-candidate-debug.txt": {
+      "bytes": 6567,
+      "sha256": "5dd237a768b5da3d7f0207f7b77781f6f7bf265d442a65c27ff178e6bb92fc4e"
+    },
+    "tests-candidate-release.txt": {
+      "bytes": 5528,
+      "sha256": "efc6aca8388bdad4cea67f53fe7d4ae53cf769a04731f182ef9a872e639c8ca2"
+    },
+    "tests.json": {
+      "bytes": 775,
+      "sha256": "79396c5886ab59123f947dec5d2136ae4cfcb01ddc4a8c0563c00de65ddbd5dd"
+    }
+  },
+  "integration": {
+    "status": "all_recorded_jobs_passed",
+    "tested_merge": "d851a023d30a178bec587458a44415ba68ffbc88",
+    "focused_core": {
+      "job_id": 118301557329,
+      "conclusion": "success",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/39322896654/job/118301557329"
+    },
+    "elastic_geometry": {
+      "job_id": 118301211907,
+      "conclusion": "success",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/39322896768/job/118301211907"
+    },
+    "component_regressions": {
+      "job_id": 118301206578,
+      "conclusion": "success",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/39322896553/job/118301206578"
+    },
+    "native_lifecycle": {
+      "job_id": 118301557712,
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/39322896654/job/118301557712",
+      "status": "completed",
+      "conclusion": "success",
+      "command": "swift test --force-resolved-versions -c release --no-parallel",
+      "build_seconds": 385.58,
+      "xctest_tests": 68,
+      "xctest_failures": 0,
+      "swift_testing_reported_tests": 1392,
+      "swift_testing_suites": 193,
+      "swift_testing_seconds": 87.884,
+      "new_cache_test_methods_passed": 4,
+      "parameterized_view_modes_per_test": 4,
+      "existing_optional_tests_skipped": true,
+      "skip_scope_note": "The configured suite skips existing generated-bitmap-fixture, opt-in efficiency/conversion-timing, and opt-in real-media subtitle cases. Counts above are the actual successful runner summaries.",
+      "verified_log_excerpt": [
+        "2026-10-19T21:32:06.1238740Z Build complete! (385.58s)",
+        "2026-10-19T21:32:10.7244240Z \t Executed 68 tests, with 0 failures (0 unexpected) in 1.150 (1.165) seconds",
+        "2026-10-19T21:32:10.7245890Z \t Executed 68 tests, with 0 failures (0 unexpected) in 1.150 (1.174) seconds",
+        "2026-10-19T21:32:28.1776000Z \u25c7 Test visibilityChangesMatchFreshProjection(mode:) started.",
+        "2026-10-19T21:32:28.1777200Z \u25c7 Test case passing 1 argument mode \u2192 .tree to visibilityChangesMatchFreshProjection(mode:) started.",
+        "2026-10-19T21:32:28.1777940Z \u25c7 Test case passing 1 argument mode \u2192 .filesOnly to visibilityChangesMatchFreshProjection(mode:) started.",
+        "2026-10-19T21:32:28.1779570Z \u25c7 Test case passing 1 argument mode \u2192 .foldersOnly to visibilityChangesMatchFreshProjection(mode:) started.",
+        "2026-10-19T21:32:28.1780430Z \u25c7 Test case passing 1 argument mode \u2192 .media to visibilityChangesMatchFreshProjection(mode:) started.",
+        "2026-10-19T21:32:28.1781150Z \u2714 Test visibilityChangesMatchFreshProjection(mode:) with 4 test cases passed after 0.087 seconds.",
+        "2026-10-19T21:32:28.1781710Z \u25c7 Test reuseTreeAcrossVisibilityChanges(mode:) started.",
+        "2026-10-19T21:32:28.1782220Z \u25c7 Test case passing 1 argument mode \u2192 .tree to reuseTreeAcrossVisibilityChanges(mode:) started.",
+        "2026-10-19T21:32:28.1783200Z \u25c7 Test case passing 1 argument mode \u2192 .filesOnly to reuseTreeAcrossVisibilityChanges(mode:) started.",
+        "2026-10-19T21:32:28.1784550Z \u25c7 Test case passing 1 argument mode \u2192 .foldersOnly to reuseTreeAcrossVisibilityChanges(mode:) started.",
+        "2026-10-19T21:32:28.1785270Z \u25c7 Test case passing 1 argument mode \u2192 .media to reuseTreeAcrossVisibilityChanges(mode:) started.",
+        "2026-10-19T21:32:28.1785970Z \u2714 Test reuseTreeAcrossVisibilityChanges(mode:) with 4 test cases passed after 0.004 seconds.",
+        "2026-10-19T21:32:28.1786790Z \u25c7 Test treeDependenciesRebuildAndMatchFreshProjection() started.",
+        "2026-10-19T21:32:28.1787380Z \u2714 Test treeDependenciesRebuildAndMatchFreshProjection() passed after 0.005 seconds.",
+        "2026-10-19T21:32:28.1787880Z \u25c7 Test cancelledRequestLeavesThePreviousTreeAvailable() started.",
+        "2026-10-19T21:32:28.1788440Z \u2714 Test cancelledRequestLeavesThePreviousTreeAvailable() passed after 0.001 seconds.",
+        "2026-10-19T21:33:37.8255020Z \u2714 Test run with 1392 tests in 193 suites passed after 87.884 seconds."
+      ]
+    },
+    "native_presentation_research": {
+      "job_id": 118301557799,
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/39322896654/job/118301557799",
+      "conclusion": "success",
+      "verification_checks": 85,
+      "timing_scenarios": 5,
+      "samples_per_variant_per_scenario": 7
+    }
+  },
+  "limits": [
+    "Component projection measurements; no SwiftUI layout, disk I/O, playback, or energy measurements.",
+    "Synthetic wide-folder fixtures with recognition metadata preloaded.",
+    "Six pairs per cell on one native CI runner; control variation is retained, and no control-path speedup or zero overhead is claimed.",
+    "Separate cohort from historical Linux measurements: shared baseline dependencies, compiler, platform, and benchmark module layout differ."
+  ],
+  "independent_audit": {
+    "status": "passed",
+    "file": "independent-audit.json",
+    "bytes": 27245,
+    "sha256": "aec9e821d04010a3888c28d79d2c02308120e1f4692ccf2301fd5530d0788f82",
+    "blockers": []
+  },
+  "report_followup": {
+    "scope": "Retain native evidence and update documentation after all measured-code checks passed.",
+    "measured_source_commit": "833c79a2d2e2ca675990c1009f0f7891f29c3bb0",
+    "unchanged_paths_verified": [
+      "Sources",
+      "Tests",
+      "Package.swift",
+      ".github/workflows",
+      "Benchmarks/SourceTreeVisibility/run.py",
+      "Benchmarks/SourceTreeVisibility/Harness.swift",
+      "Benchmarks/SourceTreeVisibility/baseline"
+    ],
+    "verification": "git diff --exit-code against the measured commit for every listed source path; follow-up includes only report, README and retained-evidence files."
+  }
+}
