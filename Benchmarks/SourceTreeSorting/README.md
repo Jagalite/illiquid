@@ -34,9 +34,19 @@ and 10,000 entries. The runner does not download a toolchain or dependencies.
 In a shallow checkout that lacks the baseline, fetch the pinned commit first.
 `--baseline` selects a different full commit SHA and records it in the receipt.
 The retained October 17 Linux study used `68274d1b09dcc866296321a5a8858efc297c4f19`;
-its measured production declarations and runner are archived beside its results.
+its measured production declarations, complete recognition source, and runner are
+archived beside its results as `production-snapshot.swift`,
+`recognition-snapshot.swift`, and `runner.snapshot.py`.
 After a subsequent integration, the unchanged sorter patch was applied to the
 new main revision above for the native comparison.
+
+The recognition implementation changed upstream between these two studies,
+although the entry representation and sorting declarations did not. The current
+runner takes candidate sources from the working tree, so selecting the old SHA
+with `--baseline` alone does not recreate both original Linux fixture modules.
+Use the archived sources and their receipt hashes when reconstructing that study;
+the default native comparison uses the same current recognition source on both
+sides.
 
 ## What is compiled and checked
 
@@ -46,6 +56,8 @@ with the complete actual `MediaNameRecognition.swift` core source. This avoids
 unrelated SwiftUI/native dependencies without replacing the entry representation
 or comparator with a benchmark model. Extraction fails if its unique declaration
 boundaries change. Source hashes and the staged Swift files are retained.
+The isolated package declares the app's macOS 26 deployment target for both
+variants, so native builds do not inherit SwiftPM's older default target.
 
 Both revisions run the same 12 repository semantic tests in debug and release.
 The standalone harness additionally compares complete output ordinal sequences

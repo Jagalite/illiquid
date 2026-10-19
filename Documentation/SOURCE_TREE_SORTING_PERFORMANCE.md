@@ -21,9 +21,13 @@ Tree view retain source order without using this sorter.
 Before publication, the patch was applied to newer integrated `main`
 `33fff16155c3472960f88e04c72dfdfdefd56dcf`. The sorter, entry, and configuration
 declarations were unchanged upstream, and other browser updates were preserved.
-The native paired comparison uses this newer baseline. The original measured
-Linux source declarations and runner are archived with their evidence so the
-two source contexts remain explicit.
+The native paired comparison uses this newer baseline. The recognition
+implementation changed upstream, while its data representation remained the
+same; both native variants use the current recognition source. The original
+measured Linux sorting declarations, complete recognition source, and runner
+are archived with their evidence so the two source contexts remain explicit.
+The native isolated package also uses the app's macOS 26 deployment target for
+both variants; the archived Linux runner retains its original manifest.
 
 **macOS qualification:** the PR's `Source tree sorting` workflow runs both the
 paired component study and real application/browser integration tests. Native

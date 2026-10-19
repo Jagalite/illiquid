@@ -33,7 +33,8 @@ WORKLOADS = [
 ]
 PACKAGE = '''// swift-tools-version: 6.1
 import PackageDescription
-let package = Package(name: "SourceTreeSortingQualification", targets: [
+let package = Package(name: "SourceTreeSortingQualification",
+    platforms: [.macOS("26.0")], targets: [
     .target(name: "IlliquidCore"),
     .executableTarget(name: "IlliquidApp", dependencies: ["IlliquidCore"]),
     .testTarget(name: "IlliquidAppTests", dependencies: ["IlliquidApp"]),
