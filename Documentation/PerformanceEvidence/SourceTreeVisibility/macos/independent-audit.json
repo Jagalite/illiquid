@@ -1,0 +1,854 @@
+{
+  "artifact": {
+    "all_extracted_bytes_equal_zip_entries": true,
+    "directory": "/tmp/illiquid-source-tree-macos-qualified",
+    "exported_files": 14,
+    "github_artifact_id": "12222481457",
+    "github_job_id": "118301206085",
+    "github_metadata_and_successful_qualification_step": "Verified separately by parent /root; not independently fetched by this auditor.",
+    "github_run_id": "39322896553",
+    "zip": "/tmp/source-tree-visibility-macos-qualified.zip",
+    "zip_bytes": 156358,
+    "zip_independently_rehashed": true,
+    "zip_sha256": "51c4cf57bbbda5a6e2bd3f6a4afeb371b6d6b7bf649e72a4dca86ef741046640"
+  },
+  "audited_at_utc": "2026-10-19T21:25:22.894202+00:00",
+  "auditor": "/root/audit_native",
+  "binary_stability": {
+    "guard_success_basis": "The unchanged archived runner raises on any post-measurement mismatch. Parent independently verified the full qualification step succeeded; summary.json existence alone would not establish that the final guards passed.",
+    "native_executable_bytes_exported": false,
+    "native_executables_independently_rehashed": false,
+    "recorded_sha256": {
+      "baseline": "5cd8fc0d63ec399c46730b1f8693c06aaff299c53e0adc386aaf4d276c49cf9d",
+      "candidate": "87d9dfb44f8da9ca365d01b10bdd067a15e14c4b0ab2e880c35016616ef6b073"
+    },
+    "reviewed_guard_order": [
+      "write summary.json",
+      "recheck driver and staged source hashes",
+      "recheck both release executable hashes",
+      "export evidence"
+    ]
+  },
+  "blockers": [],
+  "cohort": {
+    "baseline": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+    "branch_tree_independently_verified": "d14de7f52c5abde0ce612337eb3cebfae8f60bb0",
+    "driver_layout": "Separate IlliquidApp library with symmetric -enable-testing, plus executable using @testable import; debug and release tests link the library, not the benchmark @main.",
+    "exploratory": false,
+    "historical_cohorts_combined": false,
+    "machine": "arm64",
+    "measured_branch_head": "833c79a2d2e2ca675990c1009f0f7891f29c3bb0",
+    "measured_merge": "d851a023d30a178bec587458a44415ba68ffbc88",
+    "merge_tree_identity": "Parent verified the merge has the same tree; synthetic merge object is unavailable locally. Archived candidate bytes were independently checked against the measured branch head and frozen worktree.",
+    "native_worktree_clean": true,
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "coverage": {
+    "all_command_labels_and_execution_order_verified": true,
+    "all_iteration_counts_and_duration_sums_valid": true,
+    "all_raw_command_json_stdout_equals_retained_observation": true,
+    "all_timed_cache_diagnostic_fields_absent": true,
+    "balanced_order_per_cell": {
+      "baseline_then_candidate": 3,
+      "candidate_then_baseline": 3
+    },
+    "cases": 10,
+    "cells": 30,
+    "complete_pairs_per_cell": 6,
+    "diagnostic_processes": 60,
+    "diagnostic_receipts": 120,
+    "duplicates_or_missing_cells_records_pairs": 0,
+    "fresh_timed_processes": 360,
+    "logged_commands": 431,
+    "nonzero_command_exits": 0,
+    "sizes": [
+      100,
+      1000,
+      10000
+    ],
+    "timed_actor_calls": 4992,
+    "timed_or_diagnostic_stderr_records": 0,
+    "timed_receipts": 4992
+  },
+  "diagnostics": {
+    "all_60_records_match_expected": true,
+    "changed_sort": [
+      3,
+      3,
+      3,
+      3
+    ],
+    "cold_tree": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "counter_tuple_order": [
+      "baseline_tree",
+      "candidate_tree",
+      "baseline_visibility",
+      "candidate_visibility"
+    ],
+    "preview_only": [
+      1,
+      1,
+      3,
+      3
+    ],
+    "same_input_search": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "scope": "Two diagnostic calls following one warmup. Cold counts sum only the two newly created actors.",
+    "visibility_edit_cases": {
+      "cases": [
+        "tree_rules",
+        "tree_show_hidden",
+        "tree_manual_hide",
+        "tree_always_show",
+        "files_rules",
+        "media_rules"
+      ],
+      "counts": [
+        3,
+        1,
+        3,
+        3
+      ]
+    }
+  },
+  "evidence_file_sha256": {
+    "baseline-sources.json": "39a64129cd2e76f743c393c378f3a186d95c9163b8f5904fcc300328667d5d15",
+    "candidate-sources.json": "1b50bae66613c3f4e5fe0621b7a0d8e3e353650653058dbf471ca1767280b187",
+    "commands.jsonl": "55c351b0eb31409cedb0b597650eb771d3c8b81df12f640af9859e912849d243",
+    "diagnostics.jsonl": "165115ffcdee2c05f291e2a45d0a06d5c67187df323dbb2b8354a914c16fb2bb",
+    "environment.json": "52c30b31f2c48a7631a25840cb6ffa148d2ea25a754e3bfaec3f18cb4a222d13",
+    "measurements.jsonl": "3ab5c3faecd605fb54833c1a192fc79d25a983e15f9e054646a1c2380ba025cc",
+    "runner.py": "7e78afe5a1f4e067eaf625dea93260451ab596151885302d185df870b7633cbc",
+    "staged-sources.tar.gz": "a34906c234ee3d7365ac9afcf0ee6fcdebd410cf6e72463655433e8b362fd962",
+    "summary.json": "648f6da783addffd3e8d868c760fd75ab15751b8bf4bd2669d9a79292a867422",
+    "tests-baseline-debug.txt": "b8b9013a5cd2ad5f66dd18489afb22e2da934a39420d3d4e1e16ad071fde51c4",
+    "tests-baseline-release.txt": "fc49c6294ef4e8ad600da6eaa2903697827e37ee0ef3c9a52d061f5946502201",
+    "tests-candidate-debug.txt": "5dd237a768b5da3d7f0207f7b77781f6f7bf265d442a65c27ff178e6bb92fc4e",
+    "tests-candidate-release.txt": "efc6aca8388bdad4cea67f53fe7d4ae53cf769a04731f182ef9a872e639c8ca2",
+    "tests.json": "79396c5886ab59123f947dec5d2136ae4cfcb01ddc4a8c0563c00de65ddbd5dd"
+  },
+  "interpretation": [
+    "The six visibility edit workloads improve in every one of the 108 native pairs, with matching outputs and a measured drop from 3 raw-tree builds to 1 in every diagnostic cell.",
+    "Controls are mixed. The 1,000-file search control records a 22.224786 percent paired median reduction with 5 of 6 favorable pairs and a wide pair range. Both variants build the tree and visibility once; the recorded change cannot be attributed to avoided tree rebuilds.",
+    "The 1,000-file search result includes a retained extreme baseline observation, but the cause is unproven and the measured improvement must not be dismissed as established noise.",
+    "Other control medians span slowdowns and speedups: no across-the-board search, preview, initial-load or sort improvement is established.",
+    "These are synthetic one-folder component timings around awaited projection calls. Fixture construction, recognition, receipt generation, diagnostics, compilation and filesystem scanning are outside the timer. Cold means a new filter actor in an already initialized process.",
+    "The release benchmark uses an isolated library with testability enabled in both variants. It does not measure whole-player frame rate, CPU, memory, energy or end-to-end UI latency.",
+    "Keep this complete native cohort separate from historical incomplete Linux data and failed native packaging attempt 1."
+  ],
+  "outlier_review": {
+    "additional_large_calls_ms": [
+      48.452458,
+      35.022167
+    ],
+    "all_observations_retained": true,
+    "case": "same_input_search",
+    "cause": "Unproven. No attribution to host contention, scheduler or runtime is established by this artifact.",
+    "cell_variant_median_ms": 4.486236166666666,
+    "descriptive_rule": "Flag a process mean strictly greater than twice the median of the 6 process means for the same case, size and variant. This is descriptive, not an exclusion rule.",
+    "flagged_processes": 1,
+    "largest_individual_call_ms": 124.555541,
+    "pair": 4,
+    "process_mean_ms": 13.929161458333335,
+    "size": 1000,
+    "variant": "baseline"
+  },
+  "parity": {
+    "all_alternating_state_receipts_repeat_consistently": true,
+    "all_diagnostic_receipts_equal_across_variants_and_timed_first_two_states": true,
+    "all_timed_receipts_equal_across_variants_and_pairs": true,
+    "receipt_scope": "Stable row-field checksum plus row, hidden, media-path, thumbnail and regex counts; complete projection values are separately compared by the regression tests."
+  },
+  "schema": "illiquid.source-tree-visibility.independent-audit.v1",
+  "scope": "Read-only independent audit of the completed native component benchmark artifact; no timings or tests rerun and no repository files changed.",
+  "source_provenance": {
+    "all_staged_source_and_compiled_hashes_match_archived_bytes": true,
+    "archive_files_independently_rehashed": 34,
+    "baseline_retained_snapshot_and_manifest_match_frozen_git": true,
+    "candidate_original_source_bytes_match_frozen_git_and_worktree": true,
+    "driver_sha256": {
+      "Harness.swift": "34f08b4f7004f9916555fea972d706438430dd9ec80e1d8a284983d6c84be0f1",
+      "run.py": "7e78afe5a1f4e067eaf625dea93260451ab596151885302d185df870b7633cbc"
+    },
+    "excerpt_fragment_hashes_independently_checked": 8,
+    "harness_and_all_test_files_match_frozen_git_and_worktree": true,
+    "macos_source_adaptations": [],
+    "only_different_staged_files": [
+      "Sources/IlliquidApp/SourceBrowserFilter.swift",
+      "Sources/IlliquidApp/SourceTreeProjectionInput.swift"
+    ],
+    "package_bytes_match_archived_runner_literal": true,
+    "production_records_independently_checked_against_git": 24,
+    "runner_matches_frozen_git_and_worktree": true,
+    "staged_files_per_variant": 17
+  },
+  "statistics": {
+    "all_reported_summary_values_exactly_equal_recomputation": true,
+    "discarded_observations": 0,
+    "independently_recomputed_cells": 30,
+    "method": "For each process, sum actual per-call durations and divide by its iteration count. Report median/min/max of 6 process means per variant. Pair explicitly by pair index; percentage reduction is 100 * (1 - median(candidate process mean / baseline process mean)).",
+    "recomputed_cells": [
+      {
+        "baseline_ms_min_median_max": [
+          4.75419775,
+          5.904041708333334,
+          6.339968833333333
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          0.7168436666666667,
+          0.8987048333333334,
+          1.2164653333333333
+        ],
+        "case": "tree_rules",
+        "paired_reduction_percent": 84.67381370801918,
+        "paired_reduction_percent_min_max": [
+          79.12487969184706,
+          88.69326197791771
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          4.785413083333333,
+          5.07009375,
+          5.1699235833333335
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          0.710139,
+          0.9868835416666666,
+          1.385139
+        ],
+        "case": "tree_show_hidden",
+        "paired_reduction_percent": 80.54301944395624,
+        "paired_reduction_percent_min_max": [
+          71.6258664329518,
+          86.26403294839157
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          4.715576333333333,
+          4.962446041666667,
+          5.365069583333333
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          0.6608435833333334,
+          0.8447430833333334,
+          1.0669655
+        ],
+        "case": "tree_manual_hide",
+        "paired_reduction_percent": 82.70039494368228,
+        "paired_reduction_percent_min_max": [
+          79.57824978825147,
+          86.13446620567345
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          5.484104083333333,
+          5.959508541666667,
+          6.445576583333333
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          0.7541494166666667,
+          1.13605725,
+          1.34216675
+        ],
+        "case": "tree_always_show",
+        "paired_reduction_percent": 80.7792436248728,
+        "paired_reduction_percent_min_max": [
+          77.25769215205601,
+          87.81507043939027
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          5.382979083333333,
+          6.739873125,
+          7.97841325
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          0.9900105,
+          1.657706625,
+          1.8542221666666667
+        ],
+        "case": "files_rules",
+        "paired_reduction_percent": 76.13765847752607,
+        "paired_reduction_percent_min_max": [
+          66.66524758463595,
+          86.65676612208617
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          6.52821175,
+          8.308131791666668,
+          9.94851025
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          1.5891739166666667,
+          2.3774339583333335,
+          3.3178020833333335
+        ],
+        "case": "media_rules",
+        "paired_reduction_percent": 75.5219776348147,
+        "paired_reduction_percent_min_max": [
+          49.17747446943134,
+          80.9547746371886
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          0.29793254999999996,
+          0.396479155,
+          0.49075998
+        ],
+        "candidate_faster_pairs": 4,
+        "candidate_ms_min_median_max": [
+          0.29819794,
+          0.353884765,
+          0.4587487
+        ],
+        "case": "same_input_search",
+        "paired_reduction_percent": 1.8249640444975457,
+        "paired_reduction_percent_min_max": [
+          -53.97736836743754,
+          33.170512089307046
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          0.87623711,
+          0.9292291800000001,
+          1.32836673
+        ],
+        "candidate_faster_pairs": 3,
+        "candidate_ms_min_median_max": [
+          0.83464375,
+          0.910378535,
+          1.12906171
+        ],
+        "case": "preview_only",
+        "paired_reduction_percent": -1.0726023986503241,
+        "paired_reduction_percent_min_max": [
+          -8.55531939200267,
+          36.3875779996387
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          3.3923575,
+          3.85282475,
+          6.12659375
+        ],
+        "candidate_faster_pairs": 2,
+        "candidate_ms_min_median_max": [
+          3.8796458333333335,
+          4.375789833333333,
+          6.173263833333333
+        ],
+        "case": "cold_tree",
+        "paired_reduction_percent": -7.697438251190403,
+        "paired_reduction_percent_min_max": [
+          -50.157803276874205,
+          3.576057250409337
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          4.063579833333334,
+          5.732980916666666,
+          6.681625
+        ],
+        "candidate_faster_pairs": 4,
+        "candidate_ms_min_median_max": [
+          4.2785866666666665,
+          5.1407865,
+          5.494333166666667
+        ],
+        "case": "changed_sort",
+        "paired_reduction_percent": 9.200788087131585,
+        "paired_reduction_percent_min_max": [
+          -33.99610177257468,
+          28.847145889027626
+        ],
+        "size": 100
+      },
+      {
+        "baseline_ms_min_median_max": [
+          50.275875,
+          64.04233316666667,
+          70.56131966666668
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          7.175715333333333,
+          8.014986166666667,
+          10.695187333333333
+        ],
+        "case": "tree_rules",
+        "paired_reduction_percent": 86.5097121710232,
+        "paired_reduction_percent_min_max": [
+          84.1597612033878,
+          88.97857749344153
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          46.301374833333334,
+          51.41932641666667,
+          56.450180333333336
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          6.6782705,
+          8.061645833333333,
+          9.199340333333334
+        ],
+        "case": "tree_show_hidden",
+        "paired_reduction_percent": 84.96234190262302,
+        "paired_reduction_percent_min_max": [
+          81.02897130211339,
+          86.91327810924243
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          42.20695833333333,
+          42.94992366666666,
+          46.99228466666666
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          5.408562333333333,
+          5.717666833333334,
+          6.714361333333333
+        ],
+        "case": "tree_manual_hide",
+        "paired_reduction_percent": 87.13742977088798,
+        "paired_reduction_percent_min_max": [
+          84.27230567939056,
+          87.94595918597054
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          44.946715166666664,
+          45.68208683333333,
+          55.21436816666667
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          7.1833265,
+          7.230656166666666,
+          8.497875333333335
+        ],
+        "case": "tree_always_show",
+        "paired_reduction_percent": 84.03086958620452,
+        "paired_reduction_percent_min_max": [
+          82.38367278679138,
+          84.60930439757605
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          55.5360765,
+          57.660993,
+          99.07950016666668
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          7.665888833333333,
+          8.226614583333333,
+          14.432902666666665
+        ],
+        "case": "files_rules",
+        "paired_reduction_percent": 85.53421692396128,
+        "paired_reduction_percent_min_max": [
+          84.59250471825162,
+          86.524424973128
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          100.71836816666668,
+          127.4574825,
+          143.301007
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          22.41643033333333,
+          24.172319416666664,
+          42.53163883333334
+        ],
+        "case": "media_rules",
+        "paired_reduction_percent": 77.58018276229741,
+        "paired_reduction_percent_min_max": [
+          70.32006981407093,
+          82.04366409601674
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          2.9868020833333335,
+          4.486236166666666,
+          13.929161458333335
+        ],
+        "candidate_faster_pairs": 5,
+        "candidate_ms_min_median_max": [
+          3.2686267916666667,
+          3.485966083333333,
+          5.313956541666667
+        ],
+        "case": "same_input_search",
+        "paired_reduction_percent": 22.224785948644556,
+        "paired_reduction_percent_min_max": [
+          -14.872373950678863,
+          61.85013320749822
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          7.6612570416666665,
+          10.3753073125,
+          20.52947575
+        ],
+        "candidate_faster_pairs": 3,
+        "candidate_ms_min_median_max": [
+          7.276984333333333,
+          11.278224854166668,
+          14.329402833333335
+        ],
+        "case": "preview_only",
+        "paired_reduction_percent": 0.655298741187571,
+        "paired_reduction_percent_min_max": [
+          -10.692099271415788,
+          38.405855906963424
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          43.453388833333335,
+          46.411875,
+          49.011090333333335
+        ],
+        "candidate_faster_pairs": 4,
+        "candidate_ms_min_median_max": [
+          42.008625,
+          43.82486466666667,
+          53.85988183333333
+        ],
+        "case": "cold_tree",
+        "paired_reduction_percent": 2.0803269229815013,
+        "paired_reduction_percent_min_max": [
+          -9.893253684059022,
+          10.171158578244876
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          42.87048633333334,
+          53.67094091666667,
+          63.7911735
+        ],
+        "candidate_faster_pairs": 2,
+        "candidate_ms_min_median_max": [
+          46.28363916666667,
+          50.43369066666667,
+          89.29166683333332
+        ],
+        "case": "changed_sort",
+        "paired_reduction_percent": -6.159864258667946,
+        "paired_reduction_percent_min_max": [
+          -39.97495567836407,
+          7.3130998707844235
+        ],
+        "size": 1000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          421.112062,
+          434.62867725,
+          545.118041
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          55.428604,
+          56.89028125,
+          66.5436875
+        ],
+        "case": "tree_rules",
+        "paired_reduction_percent": 87.08129699637358,
+        "paired_reduction_percent_min_max": [
+          84.28496833371061,
+          89.40275020176777
+        ],
+        "size": 10000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          428.9453335,
+          477.372771,
+          571.960729
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          60.6668545,
+          65.02147925,
+          102.740458
+        ],
+        "case": "tree_show_hidden",
+        "paired_reduction_percent": 85.89243679225063,
+        "paired_reduction_percent_min_max": [
+          78.48254340866245,
+          89.03193561738398
+        ],
+        "size": 10000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          423.49575,
+          481.43091675,
+          597.6876045
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          52.4893125,
+          59.3451045,
+          68.6390215
+        ],
+        "case": "tree_manual_hide",
+        "paired_reduction_percent": 88.12147890909357,
+        "paired_reduction_percent_min_max": [
+          85.75292175385403,
+          88.81664593731757
+        ],
+        "size": 10000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          441.660417,
+          489.50537525,
+          596.2583545
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          68.1557295,
+          70.42355225,
+          72.8806455
+        ],
+        "case": "tree_always_show",
+        "paired_reduction_percent": 85.74198508278408,
+        "paired_reduction_percent_min_max": [
+          84.13912743932896,
+          87.8398196124354
+        ],
+        "size": 10000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          551.5330835,
+          602.94831275,
+          758.343583
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          75.76425,
+          83.28962475,
+          92.2156035
+        ],
+        "case": "files_rules",
+        "paired_reduction_percent": 86.222030750712,
+        "paired_reduction_percent_min_max": [
+          83.91925527535632,
+          88.23884582141972
+        ],
+        "size": 10000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          629.3005835,
+          638.123469,
+          651.364125
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          145.8294585,
+          148.17283325,
+          154.172396
+        ],
+        "case": "media_rules",
+        "paired_reduction_percent": 76.74369192136557,
+        "paired_reduction_percent_min_max": [
+          75.7105705909456,
+          77.34691248396848
+        ],
+        "size": 10000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          25.0083125,
+          25.612802,
+          28.0326665
+        ],
+        "candidate_faster_pairs": 5,
+        "candidate_ms_min_median_max": [
+          24.96951075,
+          25.455978875,
+          27.8521875
+        ],
+        "case": "same_input_search",
+        "paired_reduction_percent": 0.3809156130901492,
+        "paired_reduction_percent_min_max": [
+          -6.999566436080862,
+          7.465769444373049
+        ],
+        "size": 10000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          69.20342725,
+          76.462062375,
+          85.109302
+        ],
+        "candidate_faster_pairs": 2,
+        "candidate_ms_min_median_max": [
+          68.60055225,
+          74.03005225,
+          85.542823
+        ],
+        "case": "preview_only",
+        "paired_reduction_percent": -0.42984989796117645,
+        "paired_reduction_percent_min_max": [
+          -13.266647717810631,
+          13.025583785845441
+        ],
+        "size": 10000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          402.0729795,
+          409.79554175,
+          437.271646
+        ],
+        "candidate_faster_pairs": 2,
+        "candidate_ms_min_median_max": [
+          405.319583,
+          414.72708325,
+          465.799292
+        ],
+        "case": "cold_tree",
+        "paired_reduction_percent": -0.8287900192064601,
+        "paired_reduction_percent_min_max": [
+          -15.108396509860178,
+          2.263329551517368
+        ],
+        "size": 10000
+      },
+      {
+        "baseline_ms_min_median_max": [
+          409.2249165,
+          424.4609375,
+          468.1566455
+        ],
+        "candidate_faster_pairs": 6,
+        "candidate_ms_min_median_max": [
+          404.637979,
+          407.66307325,
+          417.9259785
+        ],
+        "case": "changed_sort",
+        "paired_reduction_percent": 4.359505137892262,
+        "paired_reduction_percent_min_max": [
+          0.07678638013723926,
+          12.838691403345681
+        ],
+        "size": 10000
+      }
+    ],
+    "visibility_edit_10000_median_reduction_range_percent": [
+      76.74369192136557,
+      88.12147890909357
+    ],
+    "visibility_edit_median_reduction_range_percent": [
+      75.5219776348147,
+      88.12147890909357
+    ],
+    "visibility_pairs_favoring_candidate": 108,
+    "visibility_pairs_total": 108
+  },
+  "status": "passed",
+  "test_discovery": {
+    "actual_test_logs_equal_command_stdout_plus_stderr": true,
+    "all_runs_passed_with_actual_nonempty_swift_testing_discovery": true,
+    "baseline_skip": "Only reuseTreeAcrossVisibilityChanges, the optimization-specific cache count test. Behavioral parity, structural invalidation and cancellation tests execute in both variants.",
+    "candidate_cache_count_test_modes": [
+      "tree",
+      "filesOnly",
+      "foldersOnly",
+      "media"
+    ],
+    "candidate_skip": null,
+    "runs": [
+      {
+        "configuration": "debug",
+        "suites": 3,
+        "tests": 15,
+        "variant": "baseline"
+      },
+      {
+        "configuration": "debug",
+        "suites": 3,
+        "tests": 16,
+        "variant": "candidate"
+      },
+      {
+        "configuration": "release",
+        "suites": 3,
+        "tests": 15,
+        "variant": "baseline"
+      },
+      {
+        "configuration": "release",
+        "suites": 3,
+        "tests": 16,
+        "variant": "candidate"
+      }
+    ],
+    "scope": "Three staged app test suites, not the full application test suite.",
+    "unexpected_failures_or_discovery_errors": 0
+  }
+}

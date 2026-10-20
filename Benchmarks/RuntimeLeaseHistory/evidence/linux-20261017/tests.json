@@ -1,0 +1,32 @@
+[
+  {
+    "variant": "candidate",
+    "configuration": "debug",
+    "passed": 7
+  },
+  {
+    "variant": "baseline",
+    "configuration": "debug",
+    "compatible_passed": [
+      "snapshotsPreserveFullProvenanceAndSortLiveAndReleasedEvidence",
+      "supersessionMatchesCompleteAuthorityAndKeepsRequestedReleasesPending"
+    ],
+    "expected_failed": "completedHistoryRemainsBoundedAcrossManySessionReplacements",
+    "expected_issues": 2
+  },
+  {
+    "variant": "candidate",
+    "configuration": "release",
+    "passed": 7
+  },
+  {
+    "variant": "baseline",
+    "configuration": "release",
+    "compatible_passed": [
+      "snapshotsPreserveFullProvenanceAndSortLiveAndReleasedEvidence",
+      "supersessionMatchesCompleteAuthorityAndKeepsRequestedReleasesPending"
+    ],
+    "expected_failed": "completedHistoryRemainsBoundedAcrossManySessionReplacements",
+    "expected_issues": 2
+  }
+]

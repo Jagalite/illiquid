@@ -77,19 +77,32 @@ public enum FolderPlaylistDiscovery {
     ) -> FolderPlaylist {
         let normalizedMediaURLs = mediaURLs.compactMap(NormalizedFileURL.normalize)
         let normalizedSubtitleURLs = subtitleURLs.compactMap(NormalizedFileURL.normalize)
+        let mediaSortLocale = normalizedMediaURLs.count > 2 ? Locale.current : nil
         let sortedMediaURLs = NaturalFilenameOrdering.sort(normalizedMediaURLs)
         let associations = ExternalSubtitleMatcher.associate(
             subtitleURLs: normalizedSubtitleURLs,
             with: sortedMediaURLs
         )
 
-        let items = PlaylistMutation.deduplicated(sortedMediaURLs.map { mediaURL in
+        let preparedItems = sortedMediaURLs.map { mediaURL in
             FolderPlaylistItem(
                 url: mediaURL,
                 externalSubtitleURLs: associations[mediaURL, default: []],
                 dateAdded: metadataDates[mediaURL]
             )
-        })
+        }
+        let items = PlaylistMutation.deduplicated(preparedItems)
+
+        // Normalization during item construction can expose new path segments.
+        // Skip the second sort only when the exact URL representations survived;
+        // deduplication then leaves a sorted subsequence. A changed locale or URL
+        // takes the original sorting path. Tiny lists need no extra checks.
+        if items.count > 2, let mediaSortLocale, mediaSortLocale == Locale.current,
+           zip(sortedMediaURLs, preparedItems).allSatisfy({ original, item in
+               original.absoluteString.utf8.elementsEqual(item.url.absoluteString.utf8)
+           }) {
+            return FolderPlaylist(folderURL: folderURL, sortedItems: items)
+        }
 
         return FolderPlaylist(folderURL: folderURL, items: items)
     }

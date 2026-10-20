@@ -35,6 +35,8 @@ struct RuntimeLeaseSnapshot: Sendable, Equatable {
 /// Runtime mirror of the core's logical lease ledger. It never owns policy:
 /// callers request/supersede/release leases and physical executors report the
 /// final release only after their workers or platform borrows have settled.
+/// Unreleased leases are retained without a limit; completed release evidence
+/// is a bounded diagnostic history, not a lifetime resource inventory.
 final class RuntimeResourceLeaseLedger: @unchecked Sendable {
     private struct Record {
         let provenance: RuntimeResourceProvenance
@@ -42,8 +44,13 @@ final class RuntimeResourceLeaseLedger: @unchecked Sendable {
         var activeBorrows: Set<ResourceBorrowID>
     }
 
+    private static let releasedHistoryLimit = 128
     private let lock = NSLock()
     private var records: [ResourceLeaseID: Record] = [:]
+    // Grow only as releases complete. Once full, overwrite the oldest release
+    // completion, which need not have the smallest lease ID.
+    private var recentReleasedSnapshots: [RuntimeLeaseSnapshot] = []
+    private var nextReleasedSnapshotIndex = 0
     private var nextLease: UInt64 = 1
     private var nextBorrow: UInt64 = 1
 
@@ -95,7 +102,7 @@ final class RuntimeResourceLeaseLedger: @unchecked Sendable {
 
     func requestRelease(_ leaseID: ResourceLeaseID) {
         lock.withLock {
-            guard var record = records[leaseID], record.disposition != .released else { return }
+            guard var record = records[leaseID] else { return }
             record.disposition = .releaseRequested
             records[leaseID] = record
         }
@@ -104,26 +111,43 @@ final class RuntimeResourceLeaseLedger: @unchecked Sendable {
     @discardableResult
     func observePhysicalRelease(_ leaseID: ResourceLeaseID) -> Bool {
         lock.withLock {
-            guard var record = records[leaseID],
+            guard let record = records[leaseID],
                   record.disposition == .releaseRequested,
                   record.activeBorrows.isEmpty
             else { return false }
-            record.disposition = .released
-            records[leaseID] = record
+            records.removeValue(forKey: leaseID)
+            let released = RuntimeLeaseSnapshot(
+                leaseID: leaseID,
+                provenance: record.provenance,
+                disposition: .released,
+                activeBorrows: record.activeBorrows
+            )
+            if recentReleasedSnapshots.count < Self.releasedHistoryLimit {
+                recentReleasedSnapshots.append(released)
+            } else {
+                recentReleasedSnapshots[nextReleasedSnapshotIndex] = released
+                nextReleasedSnapshotIndex =
+                    (nextReleasedSnapshotIndex + 1) % Self.releasedHistoryLimit
+            }
             return true
         }
     }
 
+    /// All unresolved leases plus the most recent completed releases, sorted
+    /// by lease ID for stable inspection. Released history never participates
+    /// in custody decisions and cannot make a late callback current again.
     func snapshots() -> [RuntimeLeaseSnapshot] {
         lock.withLock {
-            records.map { id, record in
+            var snapshots = records.map { id, record in
                 RuntimeLeaseSnapshot(
                     leaseID: id,
                     provenance: record.provenance,
                     disposition: record.disposition,
                     activeBorrows: record.activeBorrows
                 )
-            }.sorted { $0.leaseID.rawValue < $1.leaseID.rawValue }
+            }
+            snapshots.append(contentsOf: recentReleasedSnapshots)
+            return snapshots.sorted { $0.leaseID.rawValue < $1.leaseID.rawValue }
         }
     }
 }

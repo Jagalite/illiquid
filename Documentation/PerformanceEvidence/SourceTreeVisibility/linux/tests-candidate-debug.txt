@@ -1,0 +1,83 @@
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Source browser background filtering" started.
+◇ Test expandedFolderCycleDoesNotRecurseOrDuplicateMedia() started.
+✔ Test expandedFolderCycleDoesNotRecurseOrDuplicateMedia() passed after 0.001 seconds.
+◇ Test immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) started.
+◇ Test case passing 1 argument count → 1000 to immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) started.
+SOURCE_TREE_PROJECTION count=1000 rows_search_and_replacement=0.016807275 seconds
+◇ Test case passing 1 argument count → 10000 to immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) started.
+SOURCE_TREE_PROJECTION count=10000 rows_search_and_replacement=0.173303892 seconds
+◇ Test case passing 1 argument count → 100000 to immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) started.
+SOURCE_TREE_PROJECTION count=100000 rows_search_and_replacement=1.866967515 seconds
+✔ Test immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) with 3 test cases passed after 2.859 seconds.
+◇ Test searchingReusesVisibilityAndKeepsMatchingAncestors() started.
+✔ Test searchingReusesVisibilityAndKeepsMatchingAncestors() passed after 0.001 seconds.
+✔ Suite "Source browser background filtering" passed after 2.864 seconds.
+◇ Suite "Source media organization" started.
+◇ Test groupingKeepsFilesAndSortsEpisodesNumerically() started.
+✔ Test groupingKeepsFilesAndSortsEpisodesNumerically() passed after 0.003 seconds.
+◇ Test searchUsesShowAndRawFilenameWithoutRebuildingRecognition() started.
+✔ Test searchUsesShowAndRawFilenameWithoutRebuildingRecognition() passed after 0.001 seconds.
+◇ Test hiddenAncestorsDoNotLeakGroupTitlesAndPreviewRestoresThem() started.
+✔ Test hiddenAncestorsDoNotLeakGroupTitlesAndPreviewRestoresThem() passed after 0.001 seconds.
+◇ Test recursiveEntriesOverlapExplicitFilesWithoutDuplication() started.
+✔ Test recursiveEntriesOverlapExplicitFilesWithoutDuplication() passed after 0.001 seconds.
+◇ Test largeLibraryReusesRecognitionForSearch() started.
+MEDIA_LIBRARY count=10000 projection=1.53824671 seconds search=0.087179081 seconds
+✔ Test largeLibraryReusesRecognitionForSearch() passed after 1.704 seconds.
+◇ Test filesystemScanFeedsRecognitionAndExcludesSidecars() started.
+✔ Test filesystemScanFeedsRecognitionAndExcludesSidecars() passed after 0.003 seconds.
+◇ Test sidecarsReachRowsForFoldersAndExplicitFiles() started.
+✔ Test sidecarsReachRowsForFoldersAndExplicitFiles() passed after 0.004 seconds.
+◇ Test fileHeavyTabsDeduplicateWatchRootsWithoutLosingDirectories() started.
+SOURCE_WATCH_ROOTS files=10000 unique_directories=5000 duration=0.07738599 seconds
+✔ Test fileHeavyTabsDeduplicateWatchRootsWithoutLosingDirectories() passed after 0.170 seconds.
+◇ Test modePersistsWithoutChangingLegacyDefaults() started.
+✔ Test modePersistsWithoutChangingLegacyDefaults() passed after 0.001 seconds.
+✔ Suite "Source media organization" passed after 1.888 seconds.
+◇ Suite "Source tree cache visibility boundaries" started.
+◇ Test visibilityChangesMatchFreshProjection(mode:) started.
+◇ Test case passing 1 argument mode → .tree to visibilityChangesMatchFreshProjection(mode:) started.
+◇ Test case passing 1 argument mode → .filesOnly to visibilityChangesMatchFreshProjection(mode:) started.
+◇ Test case passing 1 argument mode → .foldersOnly to visibilityChangesMatchFreshProjection(mode:) started.
+◇ Test case passing 1 argument mode → .media to visibilityChangesMatchFreshProjection(mode:) started.
+✔ Test visibilityChangesMatchFreshProjection(mode:) with 4 test cases passed after 0.147 seconds.
+◇ Test reuseTreeAcrossVisibilityChanges(mode:) started.
+◇ Test case passing 1 argument mode → .tree to reuseTreeAcrossVisibilityChanges(mode:) started.
+◇ Test case passing 1 argument mode → .filesOnly to reuseTreeAcrossVisibilityChanges(mode:) started.
+◇ Test case passing 1 argument mode → .foldersOnly to reuseTreeAcrossVisibilityChanges(mode:) started.
+◇ Test case passing 1 argument mode → .media to reuseTreeAcrossVisibilityChanges(mode:) started.
+✔ Test reuseTreeAcrossVisibilityChanges(mode:) with 4 test cases passed after 0.009 seconds.
+◇ Test treeDependenciesRebuildAndMatchFreshProjection() started.
+✔ Test treeDependenciesRebuildAndMatchFreshProjection() passed after 0.010 seconds.
+◇ Test cancelledRequestLeavesThePreviousTreeAvailable() started.
+✔ Test cancelledRequestLeavesThePreviousTreeAvailable() passed after 0.001 seconds.
+✔ Suite "Source tree cache visibility boundaries" passed after 0.168 seconds.
+✔ Test run with 16 tests in 3 suites passed after 4.921 seconds.
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/22] Write swift-version-79F5DDD9F357E4C6.txt
+[1/22] Emitting module for IlliquidCore
+[2/22] Compiling IlliquidCore MediaFileSupport.swift
+[3/22] Emitting module for IlliquidApp
+[4/22] Wrapping AST for IlliquidCore for debugging
+[5/22] Wrapping AST for IlliquidApp for debugging
+[6/22] Compiling IlliquidApp AppValues.swift
+[7/22] Write Objects.LinkFileList
+[8/22] Linking SourceTreeBenchmark
+[9/22] Emitting module for IlliquidAppTests
+[10/22] Compiling IlliquidAppTests SourceBrowserFilterTests.swift
+[11/22] Wrapping AST for IlliquidAppTests for debugging
+[12/22] /tmp/illiquid-source-tree-formal2-53c9/build/candidate/x86_64-unknown-linux-gnu/debug/SourceTreeVisibilityQualificationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[13/22] Compiling SourceTreeVisibilityQualificationPackageDiscoveredTests IlliquidAppTests.swift
+[14/22] Emitting module for SourceTreeVisibilityQualificationPackageDiscoveredTests
+[15/22] /tmp/illiquid-source-tree-formal2-53c9/build/candidate/x86_64-unknown-linux-gnu/debug/SourceTreeVisibilityQualificationPackageTests.derived/runner.swift
+[16/22] Wrapping AST for SourceTreeVisibilityQualificationPackageDiscoveredTests for debugging
+[17/22] Compiling SourceTreeVisibilityQualificationPackageTests runner.swift
+[18/22] Emitting module for SourceTreeVisibilityQualificationPackageTests
+[19/22] Wrapping AST for SourceTreeVisibilityQualificationPackageTests for debugging
+[20/22] Write Objects.LinkFileList
+[21/22] Linking SourceTreeVisibilityQualificationPackageTests.xctest
+Build complete! (14.64s)

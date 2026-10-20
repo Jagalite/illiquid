@@ -32,13 +32,15 @@ actor SourceBrowserFilter {
     func project(input: SourceTreeProjectionInput, revealsRulePreview: Bool,
                  query: String) -> SourceBrowserProjection? {
         guard !Task.isCancelled else { return nil }
-        if input != cachedInput {
+        if cachedInput.map({ input.hasSameTree(as: $0) }) != true {
             let rows = input.rows()
             guard !Task.isCancelled else { return nil }
             cachedRows = rows
-            cachedInput = input
             treeBuildCount += 1
         }
+        // Retain the current snapshot even on a tree cache hit, so removed
+        // visibility rules and path sets are released with the old snapshot.
+        cachedInput = input
         return project(rows: cachedRows, configuration: input.visibility,
                        roots: input.roots, revealsRulePreview: revealsRulePreview, query: query)
     }
@@ -228,7 +230,11 @@ actor SourceBrowserFilter {
                 return false
             }
         }
-        let visibleIDs = Set(matchingRows.flatMap { [$0.id] + $0.ancestorIDs })
+        var visibleIDs = Set<String>(minimumCapacity: matchingRows.count)
+        for row in matchingRows {
+            visibleIDs.insert(row.id)
+            visibleIDs.formUnion(row.ancestorIDs)
+        }
         return rows.filter { visibleIDs.contains($0.id) }
     }
 }

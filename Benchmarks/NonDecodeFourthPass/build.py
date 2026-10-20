@@ -76,7 +76,7 @@ def build(output, harness='DiskHarness.swift', variants=('v3','accounting','v4')
             disk=disk.replace('    func testStats()', '    func testEntryCount() -> Int { files.count }\n    func testStats()')
         cache+='\nextension NativeThumbnailCache { func testDisk() -> NativeThumbnailDiskCache { disk } }\n'
         (d/'Disk.swift').write_text(disk);(d/'Cache.swift').write_text(cache)
-        inputs=[d/'Cache.swift',d/'Disk.swift',src/'ThumbnailPromotionMailbox.swift',R/'Sources/IlliquidCore/Player/ThumbnailPolicy.swift',R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',R/'Benchmarks/NonDecodeFollowup/PreviewAdapters.swift',H/harness]
+        inputs=[d/'Cache.swift',d/'Disk.swift',src/'ThumbnailDiskEvictionHeap.swift',src/'ThumbnailPromotionMailbox.swift',R/'Sources/IlliquidCore/Player/ThumbnailPolicy.swift',R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',R/'Benchmarks/NonDecodeFollowup/PreviewAdapters.swift',H/harness]
         defines=['-D','CANDIDATE'] if v!='v3' else []
         if v=='v4':defines+=['-D','DIRECT_LOOKUP']
         libs=['-lcrypto'] if platform.system()=='Linux' else []

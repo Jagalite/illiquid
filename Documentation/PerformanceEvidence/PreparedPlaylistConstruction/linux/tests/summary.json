@@ -1,0 +1,48 @@
+{
+  "baseline": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+  "swift": "Swift 6.3.2",
+  "platform": "Ubuntu 24.04 x86_64",
+  "scope": "Exact Foundation sources; no GUI or native playback graph",
+  "runs": [
+    {
+      "variant": "baseline",
+      "configuration": "debug",
+      "tests": 93,
+      "suites": 12,
+      "result": "passed",
+      "command": "bash Scripts/test-prepared-playlist-construction.sh --baseline -c debug --jobs 2",
+      "log": "baseline-debug.txt",
+      "sha256": "b795f2fe1a3749f0258dfaa25218f06b1d410a1c3a6df21814417c48cc0123f4"
+    },
+    {
+      "variant": "baseline",
+      "configuration": "release",
+      "tests": 93,
+      "suites": 12,
+      "result": "passed",
+      "command": "bash Scripts/test-prepared-playlist-construction.sh --baseline -c release --jobs 2",
+      "log": "baseline-release.txt",
+      "sha256": "b514a09111d77929d1896d8dc6f957ddeffc1b91aa0c16c8a4377559eb8a33db"
+    },
+    {
+      "variant": "candidate",
+      "configuration": "debug",
+      "tests": 93,
+      "suites": 12,
+      "result": "passed",
+      "command": "bash Scripts/test-prepared-playlist-construction.sh -c debug --jobs 2",
+      "log": "candidate-debug.txt",
+      "sha256": "bba4eeadf57b86cc8c3ee310dd2f0459dfa8927eb1073963f48c4a85fc7c5a48"
+    },
+    {
+      "variant": "candidate",
+      "configuration": "release",
+      "tests": 93,
+      "suites": 12,
+      "result": "passed",
+      "command": "bash Scripts/test-prepared-playlist-construction.sh -c release --jobs 2",
+      "log": "candidate-release.txt",
+      "sha256": "7e81ad35ae1ed0ce19c4d7909668a4b7944fcd6ae24538d43355057012c3050c"
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+warning: /root/.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /root/.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Building for debugging...
+[0/13] Write sources
+[2/13] Write swift-version--393CCDFAED8FB69E.txt
+swift-runtime: failed to suspend thread 14142 while processing a crash; backtraces will be missing information
+swift-runtime: failed to suspend thread 14143 while processing a crash; backtraces will be missing information
+swift-runtime: failed to suspend thread 14144 while processing a crash; backtraces will be missing information
+swift-runtime: failed to suspend thread 14145 while processing a crash; backtraces will be missing information
+swift-runtime: failed to suspend thread 14146 while processing a crash; backtraces will be missing information
+
+*** Signal 4: Backtracing from 0x7f603cede2c0...4261
+{
+  "command_arguments" : [
+    "-frontend",
+    "-emit-module",
+    "-experimental-skip-non-inlinable-function-bodies-without-types",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/Sources\/IlliquidNativePlayback\/ThumbnailDiskEvictionHeap.swift",
+    "-target",
+    "x86_64-unknown-linux-gnu",
+    "-disable-objc-interop",
+    "-I",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/Modules",
+    "-no-color-diagnostics",
+    "-Xcc",
+    "-fno-color-diagnostics",
+    "-enable-testing",
+    "-g",
+    "-debug-info-format=dwarf",
+    "-dwarf-version=4",
+    "-module-cache-path",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/ModuleCache",
+    "-swift-version",
+    "6",
+    "-Onone",
+    "-D",
+    "SWIFT_PACKAGE",
+    "-D",
+    "DEBUG",
+    "-D",
+    "SWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+    "-empty-abi-descriptor",
+    "-disable-sandbox",
+    "-enable-anonymous-context-mangled-names",
+    "-file-compilation-dir",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p",
+    "-Xcc",
+    "-fPIC",
+    "-Xcc",
+    "-g",
+    "-Xcc",
+    "-fno-omit-frame-pointer",
+    "-no-auto-bridging-header-chaining",
+    "-module-name",
+    "IlliquidNativePlayback",
+    "-package-name",
+    "illiquid_thumbnail_eviction_tests_p88o_l1p",
+    "-in-process-plugin-server-path",
+    "\/tmp\/illiquid-swift-6.3.2\/usr\/lib\/swift\/host\/libSwiftInProcPluginServer.so",
+    "-plugin-path",
+    "\/tmp\/illiquid-swift-6.3.2\/usr\/lib\/swift\/host\/plugins",
+    "-plugin-path",
+    "\/tmp\/illiquid-swift-6.3.2\/usr\/local\/lib\/swift\/host\/plugins",
+    "-emit-module-doc-path",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidNativePlayback.swiftdoc",
+    "-emit-module-source-info-path",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidNativePlayback.swiftsourceinfo",
+    "-emit-objc-header-path",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidNativePlayback.build\/include\/IlliquidNativePlayback-Swift.h",
+    "-serialize-diagnostics-path",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidNativePlayback.build\/IlliquidNativePlayback.emit-module.dia",
+    "-emit-dependencies-path",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidNativePlayback.build\/IlliquidNativePlayback.emit-module.d",
+    "-parse-as-library",
+    "-o",
+    "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidNativePlayback.swiftmodule"
+  ],
+  "command_executable" : "\/tmp\/illiquid-swift-6.3.2\/usr\/bin\/swift-frontend",
+  "inputs" : [
+
+  ],
+  "kind" : "began",
+  "name" : "emit-module",
+  "outputs" : [
+    {
+      "path" : "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidNativePlayback.swiftmodule",
+      "type" : "swiftmodule"
+    },
+    {
+      "path" : "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidNativePlayback.swiftdoc",
+      "type" : "swiftdoc"
+    },
+    {
+      "path" : "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/Modules\/IlliquidNativePlayback.swiftsourceinfo",
+      "type" : "swiftsourceinfo"
+    },
+    {
+      "path" : "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidNativePlayback.build\/include\/IlliquidNativePlayback-Swift.h",
+      "type" : "objc-header"
+    },
+    {
+      "path" : "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidNativePlayback.build\/IlliquidNativePlayback.emit-module.dia",
+      "type" : "emit-module-diagnostics"
+    },
+    {
+      "path" : "\/tmp\/illiquid-thumbnail-eviction-tests-p88o_l1p\/build\/x86_64-unknown-linux-gnu\/debug\/IlliquidNativePlayback.build\/IlliquidNativePlayback.emit-module.d",
+      "type" : "emit-module.d"
+    }
+  ],
+  "pid" : 70,
+  "process" : {
+    "real_pid" : 70
+  }
+}
+ done ***
+
+*** Program crashed: Illegal instruction at 0x00007f603cede2c0 ***
+
+Platform: x86_64 Linux (Ubuntu 24.04.3 LTS)
+
+Thread 0 crashed:
+
+  0      0x00007f603cede2c0
+  1 [ra] 0x00007f603cee7048
+  2 [ra] 0x00007f603cef2696
+  3 [ra] 0x00007f603cee9ff6
+  4 [ra] 0x00007f603ceecfe0
+  5 [ra] 0x00007f603ceecf1d
+  6 [ra] 0x00007f603cef0125
+  7 [ra] 0x00007f603b8f8aa4
+...
+
+
+Registers:
+
+rax 0x00000000ffffffff  4294967295
+rdx 0x00007f60392d0a70  2f 70 72 6f 63 2f 36 36 2f 73 74 61 74 00 00 00  /proc/66/stat···
+rcx 0x0000000000000000  0
+rbx 0x0000000000000000  0
+rsi 0x00007f60392d19c8  00 00 00 00 81 00 00 00 00 00 00 00 00 00 00 00  ················
+rdi 0x00007f60392d0a70  2f 70 72 6f 63 2f 36 36 2f 73 74 61 74 00 00 00  /proc/66/stat···
+rbp 0x00007f60392d0b50  a0 0b 2d 39 60 7f 00 00 48 70 ee 3c 60 7f 00 00   ·-9`···Hpî<`···
+rsp 0x00007f60392cfa68  4b 88 ef 3c 60 7f 00 00 00 00 00 00 00 00 00 00  K·ï<`···········
+ r8 0x0000000000000000  0
+ r9 0x0000000000000000  0
+r10 0x0000000000000000  0
+r11 0x0000000000000293  659
+r12 0x00007f603cf18f50  c0 65 f1 3c 60 7f 00 00 00 00 00 00 09 00 00 00  Àeñ<`···········
+r13 0x00007f603cf18fc8  c0 68 f1 3c 60 7f 00 00 00 00 00 00 09 00 00 00  Àhñ<`···········
+r14 0x00007f603cf18fd8  40 00 00 80 00 00 00 00 90 13 00 24 60 7f 00 00  @··········$`···
+r15 0x0000000000000000  0
+rip 0x00007f603cede2c0  0f 0b 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ················
+
+rflags 0x0000000000010246  ZF PF
+
+cs 0x0033  fs 0x0000  gs 0x0000
+
+
+Images:
+
+
+
+Backtrace took 0.00s
+
+error: fatalError

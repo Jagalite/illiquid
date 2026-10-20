@@ -69,16 +69,37 @@ public enum PlaylistMutation {
         by order: PlaylistSortOrder,
         ascending: Bool
     ) -> [FolderPlaylistItem] {
-        func precedes(_ lhs: FolderPlaylistItem, _ rhs: FolderPlaylistItem) -> Bool {
-            switch order {
-            case .name:
-                let comparison = lhs.url.lastPathComponent.localizedStandardCompare(
-                    rhs.url.lastPathComponent
-                )
-                if comparison == .orderedSame { return lhs.id < rhs.id }
-                return comparison == .orderedAscending
-            case .dateAdded:
-                switch (lhs.dateAdded, rhs.dateAdded) {
+        guard items.count > 1 else { return items }
+
+        // Keep keys local to this sort. Date ordering needs filenames only
+        // when dates tie, and normalized identities only break name-order ties.
+        var filenames: [String?] = order == .name
+            ? items.map { $0.url.lastPathComponent } : []
+        var identities: [FolderPlaylistItem.ID?] = []
+
+        func filename(at index: Int) -> String {
+            if filenames.isEmpty {
+                filenames = Array(repeating: nil, count: items.count)
+            }
+            if let cached = filenames[index] { return cached }
+            let value = items[index].url.lastPathComponent
+            filenames[index] = value
+            return value
+        }
+
+        func identity(at index: Int) -> FolderPlaylistItem.ID {
+            if identities.isEmpty {
+                identities = Array(repeating: nil, count: items.count)
+            }
+            if let cached = identities[index] { return cached }
+            let value = items[index].id
+            identities[index] = value
+            return value
+        }
+
+        func precedes(_ lhs: Int, _ rhs: Int) -> Bool {
+            if order == .dateAdded {
+                switch (items[lhs].dateAdded, items[rhs].dateAdded) {
                 case let (left?, right?) where left != right:
                     return left < right
                 case (_?, nil):
@@ -86,16 +107,28 @@ public enum PlaylistMutation {
                 case (nil, _?):
                     return false
                 default:
-                    return NaturalFilenameOrdering.areInIncreasingOrder(
-                        lhs.url,
-                        rhs.url
-                    )
+                    break
                 }
             }
+
+            let comparison = filename(at: lhs).localizedStandardCompare(filename(at: rhs))
+            guard comparison == .orderedSame else { return comparison == .orderedAscending }
+            switch order {
+            case .name:
+                return identity(at: lhs) < identity(at: rhs)
+            case .dateAdded:
+                // Date ties use the original literal paths, whereas name ties
+                // use normalized identities. These are distinct contracts.
+                return items[lhs].url.path.compare(items[rhs].url.path, options: [.literal]) == .orderedAscending
+            }
         }
-        return items.sorted { lhs, rhs in
+
+        // Move indices during the stable sort, then retain each original item
+        // and its subtitle metadata in the result. Complete ties stay in order.
+        let indices = items.indices.sorted { lhs, rhs in
             ascending ? precedes(lhs, rhs) : precedes(rhs, lhs)
         }
+        return indices.map { items[$0] }
     }
 
     public static func indexPreservingCurrentIdentity(

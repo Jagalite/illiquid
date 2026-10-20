@@ -1,0 +1,203 @@
+{
+  "adaptations": [
+    {
+      "changes": [
+        "add FoundationXML import"
+      ],
+      "file": "Sources/IlliquidCore/NFOMetadataHints.swift"
+    },
+    {
+      "changes": [
+        "Darwin import -> Glibc"
+      ],
+      "file": "Sources/IlliquidCore/MediaSidecarReader.swift"
+    },
+    {
+      "changes": [
+        "explicit directory hint for sidecarsReachRowsForFoldersAndExplicitFiles fixture root"
+      ],
+      "file": "Tests/IlliquidAppTests/SourceMediaOrganizationTests.swift"
+    }
+  ],
+  "baseline_revision": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "binary_sha256": "96f33a732b2770083307977f089bdc332411a4ed3e7cf49e8c41c89ebb99860e",
+  "production": {
+    "Sources/IlliquidApp/AppValues.swift": {
+      "excerpts": [
+        {
+          "end": "\nenum SourceTabStore {",
+          "sha256": "e556083a58babb1a9648a2c2dc3e677f46f9ac21669c536077454ad71a4bc029",
+          "start": "struct SourceTabItem:"
+        }
+      ],
+      "git_blob": "bd8b27e24a01a595963259ccc74a9ff5f3fe2334",
+      "repository_path": "Sources/IlliquidApp/App/AppModel.swift",
+      "snapshot_sha256": "f4ccb48676680e0f37a6d99e53e1fb0e19df7c442eb31c77c991b997c0fa6d4f",
+      "source_sha256": "91f93b79f623ed35671afe07844cbd415acefab7185383cf77cf671f97db32cc"
+    },
+    "Sources/IlliquidApp/SidebarValues.swift": {
+      "excerpts": [
+        {
+          "end": "\nstruct SourceDirectoryListing:",
+          "sha256": "e928b8895e8f9738fb1969124ca3966e16c3e30b1dc94c712214934185f758a8",
+          "start": "struct SourceTreeEntry:"
+        },
+        {
+          "end": "\nstruct SourceTreeDisplayRow:",
+          "sha256": "c1f7e663132ff50aaecd4c079b0774d188cc6fcef6a0b9768268263b33f2bb13",
+          "start": "enum SourceRecursiveMediaLoader {"
+        },
+        {
+          "end": "\nstruct SourcesSidebarExpansionSnapshot:",
+          "sha256": "83dc19ee0e6afe96406a83dec864e956c6788dd6ff4dc96dae550f2d3038f719",
+          "start": "struct SourceTreeDisplayRow:"
+        }
+      ],
+      "git_blob": "d6521c61fbda2fa282a33055d2c33c3426827ffd",
+      "repository_path": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "snapshot_sha256": "27e4f534f970b499576476474ee3d899066f2b86f75a29eba34d62e8bf3783da",
+      "source_sha256": "9bb2b266cab3ca143e629e71a6119cb5e2b89349bb529bc3b2657c2f3c5a13d3"
+    },
+    "Sources/IlliquidApp/SourceBrowserFilter.swift": {
+      "excerpts": [],
+      "git_blob": "6a55034560e1b0f1bbb64f876f16919a65e4098a",
+      "repository_path": "Sources/IlliquidApp/UI/SourceBrowserFilter.swift",
+      "snapshot_sha256": "4d8d1adbe1ac00ee4c45c69e12f7aad5511b34e64fbf1a395fa7163b91673583",
+      "source_sha256": "4d8d1adbe1ac00ee4c45c69e12f7aad5511b34e64fbf1a395fa7163b91673583"
+    },
+    "Sources/IlliquidApp/SourceTreeProjectionInput.swift": {
+      "excerpts": [],
+      "git_blob": "4e7f524820d8680309c3c15cc55d26a8eb80035a",
+      "repository_path": "Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift",
+      "snapshot_sha256": "2f83cf6d9db1981f0623679a5979a688eb6292e4fcb6ebe280a88d6424e599e5",
+      "source_sha256": "2f83cf6d9db1981f0623679a5979a688eb6292e4fcb6ebe280a88d6424e599e5"
+    },
+    "Sources/IlliquidCore/MediaFileSupport.swift": {
+      "excerpts": [],
+      "git_blob": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+      "repository_path": "Sources/IlliquidCore/Utilities/MediaFileSupport.swift",
+      "snapshot_sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+      "source_sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+    },
+    "Sources/IlliquidCore/MediaMetadataHints.swift": {
+      "excerpts": [],
+      "git_blob": "a4870452b6d680c5b2b7903ce2e66f4ee3506fb3",
+      "repository_path": "Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift",
+      "snapshot_sha256": "9caf3eb7e9a404445a22fd6129ac37a85e9f89010d7d310e9eda51ecd4f4025a",
+      "source_sha256": "9caf3eb7e9a404445a22fd6129ac37a85e9f89010d7d310e9eda51ecd4f4025a"
+    },
+    "Sources/IlliquidCore/MediaNameRecognition.swift": {
+      "excerpts": [],
+      "git_blob": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+      "repository_path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+      "snapshot_sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+      "source_sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+    },
+    "Sources/IlliquidCore/MediaSidecarReader.swift": {
+      "excerpts": [],
+      "git_blob": "93fc031fc6e278b13aae8b4f19bee79ed1d9154b",
+      "repository_path": "Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift",
+      "snapshot_sha256": "15fd4c5d9bd9200cfa85e89d91ac22c1ed7f19fbbeb79443d8ac71e3d25c904e",
+      "source_sha256": "15fd4c5d9bd9200cfa85e89d91ac22c1ed7f19fbbeb79443d8ac71e3d25c904e"
+    },
+    "Sources/IlliquidCore/NFOMetadataHints.swift": {
+      "excerpts": [],
+      "git_blob": "55e84590829c678f6ac5cb1328e64dead63651b6",
+      "repository_path": "Sources/IlliquidCore/MediaLibrary/NFOMetadataHints.swift",
+      "snapshot_sha256": "9eeef568c6d43d5f7ae8adbfd1b41e59fecf99abd7db69bcbd5d678909d3736f",
+      "source_sha256": "9eeef568c6d43d5f7ae8adbfd1b41e59fecf99abd7db69bcbd5d678909d3736f"
+    },
+    "Sources/IlliquidCore/NormalizedFileURL.swift": {
+      "excerpts": [],
+      "git_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+      "repository_path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+      "snapshot_sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+      "source_sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "Sources/IlliquidCore/PlexMatchHints.swift": {
+      "excerpts": [],
+      "git_blob": "bc310a8ad8338ceff65db817671acc2ffd40fd16",
+      "repository_path": "Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift",
+      "snapshot_sha256": "76657ad55168894cbe31ac6fd80bf42d4dcac86fc896bc0cd764ca8ac0d8cc42",
+      "source_sha256": "76657ad55168894cbe31ac6fd80bf42d4dcac86fc896bc0cd764ca8ac0d8cc42"
+    },
+    "Sources/IlliquidCore/SourcePreparationExecutor.swift": {
+      "excerpts": [],
+      "git_blob": "ae1108042b2f658c8685f686958dc4b3b1ec2539",
+      "repository_path": "Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift",
+      "snapshot_sha256": "a73b214f098929651be66874bab9eeb13e4077181bffa98449fb94bbb8cddce3",
+      "source_sha256": "a73b214f098929651be66874bab9eeb13e4077181bffa98449fb94bbb8cddce3"
+    }
+  },
+  "staged": {
+    "Package.swift": {
+      "compiled_sha256": "4679eb053aa1a73d8656b3f6f91e9eee185c457364c14ff2d5c58ab948c3f485",
+      "source_sha256": "4679eb053aa1a73d8656b3f6f91e9eee185c457364c14ff2d5c58ab948c3f485"
+    },
+    "Sources/IlliquidApp/AppValues.swift": {
+      "compiled_sha256": "f4ccb48676680e0f37a6d99e53e1fb0e19df7c442eb31c77c991b997c0fa6d4f",
+      "source_sha256": "f4ccb48676680e0f37a6d99e53e1fb0e19df7c442eb31c77c991b997c0fa6d4f"
+    },
+    "Sources/IlliquidApp/Harness.swift": {
+      "compiled_sha256": "80ccab1adfbd77204218aaacd519ef37baff659cf9bcc3b79bf4c3821de01d37",
+      "source_sha256": "80ccab1adfbd77204218aaacd519ef37baff659cf9bcc3b79bf4c3821de01d37"
+    },
+    "Sources/IlliquidApp/SidebarValues.swift": {
+      "compiled_sha256": "27e4f534f970b499576476474ee3d899066f2b86f75a29eba34d62e8bf3783da",
+      "source_sha256": "27e4f534f970b499576476474ee3d899066f2b86f75a29eba34d62e8bf3783da"
+    },
+    "Sources/IlliquidApp/SourceBrowserFilter.swift": {
+      "compiled_sha256": "4d8d1adbe1ac00ee4c45c69e12f7aad5511b34e64fbf1a395fa7163b91673583",
+      "source_sha256": "4d8d1adbe1ac00ee4c45c69e12f7aad5511b34e64fbf1a395fa7163b91673583"
+    },
+    "Sources/IlliquidApp/SourceTreeProjectionInput.swift": {
+      "compiled_sha256": "2f83cf6d9db1981f0623679a5979a688eb6292e4fcb6ebe280a88d6424e599e5",
+      "source_sha256": "2f83cf6d9db1981f0623679a5979a688eb6292e4fcb6ebe280a88d6424e599e5"
+    },
+    "Sources/IlliquidCore/MediaFileSupport.swift": {
+      "compiled_sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+      "source_sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+    },
+    "Sources/IlliquidCore/MediaMetadataHints.swift": {
+      "compiled_sha256": "9caf3eb7e9a404445a22fd6129ac37a85e9f89010d7d310e9eda51ecd4f4025a",
+      "source_sha256": "9caf3eb7e9a404445a22fd6129ac37a85e9f89010d7d310e9eda51ecd4f4025a"
+    },
+    "Sources/IlliquidCore/MediaNameRecognition.swift": {
+      "compiled_sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+      "source_sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+    },
+    "Sources/IlliquidCore/MediaSidecarReader.swift": {
+      "compiled_sha256": "2a6c2d54b3c71401552edd09734a457fa6c260c20d45dc02ecee44ff08ad41f9",
+      "source_sha256": "15fd4c5d9bd9200cfa85e89d91ac22c1ed7f19fbbeb79443d8ac71e3d25c904e"
+    },
+    "Sources/IlliquidCore/NFOMetadataHints.swift": {
+      "compiled_sha256": "426e4bad0f0b29dc488ff7d7d06bfdc64f69d03c604ff52f92014dc5f0bd7ee6",
+      "source_sha256": "9eeef568c6d43d5f7ae8adbfd1b41e59fecf99abd7db69bcbd5d678909d3736f"
+    },
+    "Sources/IlliquidCore/NormalizedFileURL.swift": {
+      "compiled_sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+      "source_sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "Sources/IlliquidCore/PlexMatchHints.swift": {
+      "compiled_sha256": "76657ad55168894cbe31ac6fd80bf42d4dcac86fc896bc0cd764ca8ac0d8cc42",
+      "source_sha256": "76657ad55168894cbe31ac6fd80bf42d4dcac86fc896bc0cd764ca8ac0d8cc42"
+    },
+    "Sources/IlliquidCore/SourcePreparationExecutor.swift": {
+      "compiled_sha256": "a73b214f098929651be66874bab9eeb13e4077181bffa98449fb94bbb8cddce3",
+      "source_sha256": "a73b214f098929651be66874bab9eeb13e4077181bffa98449fb94bbb8cddce3"
+    },
+    "Tests/IlliquidAppTests/SourceBrowserFilterTests.swift": {
+      "compiled_sha256": "54e83961990c31f064543337798a637eeaf5a812455f8585501034eb02e2a830",
+      "source_sha256": "54e83961990c31f064543337798a637eeaf5a812455f8585501034eb02e2a830"
+    },
+    "Tests/IlliquidAppTests/SourceMediaOrganizationTests.swift": {
+      "compiled_sha256": "5c1df01399a5ce9b6a6461da0e3eb1f5a17a09f4b8a969461e3503f0e1e88160",
+      "source_sha256": "517339c32382ae1a546d63a11ab1971fcab6ceb46c96b0087a26ac93947dc48d"
+    },
+    "Tests/IlliquidAppTests/SourceTreeVisibilityCacheTests.swift": {
+      "compiled_sha256": "69d98d02086bdb3511ff1338c92acf13f6b128c263df892faefa4db29c594204",
+      "source_sha256": "69d98d02086bdb3511ff1338c92acf13f6b128c263df892faefa4db29c594204"
+    }
+  },
+  "variant": "candidate"
+}
