@@ -11,7 +11,7 @@ rows=[];logs=[];manifest={}
 for variant in ['v2','v3']:
     src=R/'Sources/IlliquidNativePlayback/Media'
     inputs=[a.inventory_build/variant/'Cache.swift',a.inventory_build/variant/'Disk.swift',
-        src/'ThumbnailPromotionMailbox.swift',R/'Sources/IlliquidCore/Player/ThumbnailPolicy.swift',
+        src/'ThumbnailDiskEvictionHeap.swift',src/'ThumbnailPromotionMailbox.swift',R/'Sources/IlliquidCore/Player/ThumbnailPolicy.swift',
         R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',
         R/'Benchmarks/NonDecodeFollowup/PreviewAdapters.swift',H/'InventoryEdgeCases.swift']
     binary=a.output/variant

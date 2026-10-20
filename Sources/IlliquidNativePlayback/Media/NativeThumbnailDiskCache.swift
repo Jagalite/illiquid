@@ -305,27 +305,26 @@ actor NativeThumbnailDiskCache {
                 && (diskBytes > limit || files.count >= 8192)
         }
         guard diskBytes + incoming > limit || files.count >= 8192 else { return }
-        let victims = files.filter { !background || $0.value.background }.sorted {
-            if $0.value.background != $1.value.background { return $0.value.background }
-            if $0.value.used != $1.value.used { return $0.value.used < $1.value.used }
-            return $0.key < $1.key
-        }
-        for victim in victims {
-            guard diskBytes + incoming > limit || files.count >= 8192 else { break }
+        var victims = ThumbnailDiskEvictionHeap(files.compactMap { entry in
+            guard !background || entry.value.background else { return nil }
+            return .init(filename: entry.key, used: entry.value.used, background: entry.value.background)
+        })
+        while diskBytes + incoming > limit || files.count >= 8192 {
+            guard let victim = victims.popFirst() else { break }
             // Initial inventory and reconfiguration also evict entries. Honor
             // queued foreground claims on those paths, not just insertions.
             // Explicitly disabling the disk cache must still remove everything.
             if preferences.diskMiB > 0 {
-                let digest = String(decoding: victim.key.utf8.dropFirst(2).prefix(64), as: UTF8.self)
+                let digest = String(decoding: victim.filename.utf8.dropFirst(2).prefix(64), as: UTF8.self)
                 guard promotions.beginEviction(digest, epoch: generation) else {
                     skippedReservation = true
                     continue
                 }
-                let removed = removeDisk(victim.key)
+                let removed = removeDisk(victim.filename)
                 promotions.endEviction(digest)
                 guard removed else { break }
             } else {
-                guard removeDisk(victim.key) else { break }
+                guard removeDisk(victim.filename) else { break }
             }
         }
     }

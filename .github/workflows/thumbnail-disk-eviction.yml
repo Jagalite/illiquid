@@ -1,0 +1,81 @@
+name: Thumbnail disk eviction
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift'
+      - 'Sources/IlliquidNativePlayback/Media/ThumbnailDiskEvictionHeap.swift'
+      - 'Sources/IlliquidNativePlayback/Media/ThumbnailPromotionMailbox.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ThumbnailDiskEvictionTests.swift'
+      - 'Benchmarks/ThumbnailDiskEviction/run.py'
+      - 'Benchmarks/ThumbnailDiskEviction/Harness.swift'
+      - '.github/workflows/thumbnail-disk-eviction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-disk-eviction-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record native host
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-disk-component"
+          sw_vers > "$RUNNER_TEMP/thumbnail-disk-component/host.txt"
+          uname -a >> "$RUNNER_TEMP/thumbnail-disk-component/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/thumbnail-disk-component/host.txt"
+          swift --version >> "$RUNNER_TEMP/thumbnail-disk-component/host.txt"
+      - name: Verify survivors and measure paired native runs
+        run: |
+          python3 Benchmarks/ThumbnailDiskEviction/run.py \
+            --pairs 8 --output "$RUNNER_TEMP/thumbnail-disk-component/results"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-disk-eviction-component
+          path: |
+            ${{ runner.temp }}/thumbnail-disk-component/
+            !${{ runner.temp }}/thumbnail-disk-component/results/module-cache/**
+          retention-days: 14
+
+  native-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run thumbnail regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-disk-native"
+          set -o pipefail
+          swift test --force-resolved-versions --filter \
+            'ThumbnailDiskEviction|NativeThumbnailCacheTests|ThumbnailPhysicalEntryTests|ThumbnailInventoryRegressionTests|ThumbnailPromotionMailboxTests|QueuedThumbnailPromotionTests' \
+            2>&1 | tee "$RUNNER_TEMP/thumbnail-disk-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-disk-eviction-native-regressions
+          path: ${{ runner.temp }}/thumbnail-disk-native/
+          retention-days: 14

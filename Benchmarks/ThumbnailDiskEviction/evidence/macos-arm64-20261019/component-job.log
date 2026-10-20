@@ -1,0 +1,360 @@
+﻿2026-10-19T21:14:26.8279610Z Current runner version: '2.337.0'
+2026-10-19T21:14:26.8296120Z ##[group]Runner Image Provisioner
+2026-10-19T21:14:26.8296670Z Hosted Compute Agent
+2026-10-19T21:14:26.8297030Z Version: 20261012.601
+2026-10-19T21:14:26.8297420Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-19T21:14:26.8297880Z Build Date: 2026-10-12T17:48:21Z
+2026-10-19T21:14:26.8298310Z Worker ID: {9b45b7b7-4c6a-4ee8-8350-d6bdc6a38bc4}
+2026-10-19T21:14:26.8298780Z Region: westus
+2026-10-19T21:14:26.8299190Z Cloud: MacCloud
+2026-10-19T21:14:26.8299530Z ##[endgroup]
+2026-10-19T21:14:26.8300420Z ##[group]Operating System
+2026-10-19T21:14:26.8300800Z macOS
+2026-10-19T21:14:26.8301110Z 26.6.2
+2026-10-19T21:14:26.8301420Z 25G83
+2026-10-19T21:14:26.8301740Z ##[endgroup]
+2026-10-19T21:14:26.8302070Z ##[group]Runner Image
+2026-10-19T21:14:26.8302430Z Image: macos-26-arm64
+2026-10-19T21:14:26.8302790Z Version: 20261013.0424.1
+2026-10-19T21:14:26.8303580Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20261013.0424/images/macos/macos-26-arm64-Readme.md
+2026-10-19T21:14:26.8304720Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20261013.0424
+2026-10-19T21:14:26.8305450Z ##[endgroup]
+2026-10-19T21:14:26.8306190Z ##[group]GITHUB_TOKEN Permissions
+2026-10-19T21:14:26.8307240Z Contents: read
+2026-10-19T21:14:26.8307610Z Metadata: read
+2026-10-19T21:14:26.8307960Z ##[endgroup]
+2026-10-19T21:14:26.8309600Z Secret source: Actions
+2026-10-19T21:14:26.8310200Z Cache mode: write
+2026-10-19T21:14:26.8310620Z Prepare workflow directory
+2026-10-19T21:14:26.8746440Z Prepare all required actions
+2026-10-19T21:14:26.8797640Z Getting action download info
+2026-10-19T21:14:27.2947640Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-19T21:14:27.5306580Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-19T21:14:27.7118650Z Complete job name: component
+2026-10-19T21:14:27.8488110Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-19T21:14:27.8489070Z with:
+2026-10-19T21:14:27.8489460Z   persist-credentials: false
+2026-10-19T21:14:27.8489880Z   fetch-depth: 0
+2026-10-19T21:14:27.8490290Z   repository: Jagalite/illiquid
+2026-10-19T21:14:27.8493660Z   token: ***
+2026-10-19T21:14:27.8494060Z   ssh-strict: true
+2026-10-19T21:14:27.8494480Z   ssh-user: git
+2026-10-19T21:14:27.8494870Z   clean: true
+2026-10-19T21:14:27.8495290Z   sparse-checkout-cone-mode: true
+2026-10-19T21:14:27.8495760Z   fetch-tags: false
+2026-10-19T21:14:27.8496110Z   show-progress: true
+2026-10-19T21:14:27.8496520Z   lfs: false
+2026-10-19T21:14:27.8496900Z   submodules: false
+2026-10-19T21:14:27.8497380Z   set-safe-directory: true
+2026-10-19T21:14:27.8497830Z   allow-unsafe-pr-checkout: false
+2026-10-19T21:14:27.8498460Z env:
+2026-10-19T21:14:27.8498950Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-19T21:14:27.8499600Z ##[endgroup]
+2026-10-19T21:14:28.4405240Z Syncing repository: Jagalite/illiquid
+2026-10-19T21:14:28.4432660Z ##[group]Getting Git version info
+2026-10-19T21:14:28.4433850Z Working directory is '/Users/runner/work/illiquid/illiquid'
+2026-10-19T21:14:28.4435080Z [command]/opt/homebrew/bin/git version
+2026-10-19T21:14:28.4766300Z git version 2.56.0
+2026-10-19T21:14:28.4789060Z ##[endgroup]
+2026-10-19T21:14:28.4795940Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/a7951b09-cb4c-402d-9ea0-bf55ad2fbc36/.gitconfig'
+2026-10-19T21:14:28.4803490Z Temporarily overriding HOME='/Users/runner/work/_temp/a7951b09-cb4c-402d-9ea0-bf55ad2fbc36' before making global git config changes
+2026-10-19T21:14:28.4806380Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T21:14:28.4809080Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-19T21:14:28.4921000Z Deleting the contents of '/Users/runner/work/illiquid/illiquid'
+2026-10-19T21:14:28.4923420Z ##[group]Initializing the repository
+2026-10-19T21:14:28.4927580Z [command]/opt/homebrew/bin/git init /Users/runner/work/illiquid/illiquid
+2026-10-19T21:14:28.5140580Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-19T21:14:28.5141670Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-19T21:14:28.5142390Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-19T21:14:28.5142940Z hint: call:
+2026-10-19T21:14:28.5143260Z hint:
+2026-10-19T21:14:28.5143800Z hint: 	git config --global init.defaultBranch <name>
+2026-10-19T21:14:28.5144400Z hint:
+2026-10-19T21:14:28.5144830Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-19T21:14:28.5145650Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-19T21:14:28.5146270Z hint:
+2026-10-19T21:14:28.5146750Z hint: 	git branch -m <name>
+2026-10-19T21:14:28.5147420Z hint:
+2026-10-19T21:14:28.5148290Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-19T21:14:28.5149390Z Initialized empty Git repository in /Users/runner/work/illiquid/illiquid/.git/
+2026-10-19T21:14:28.5156910Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Jagalite/illiquid
+2026-10-19T21:14:28.5239140Z ##[endgroup]
+2026-10-19T21:14:28.5239880Z ##[group]Disabling automatic garbage collection
+2026-10-19T21:14:28.5241440Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-19T21:14:28.5313570Z ##[endgroup]
+2026-10-19T21:14:28.5314130Z ##[group]Setting up auth
+2026-10-19T21:14:28.5318840Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T21:14:28.5387790Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T21:14:28.6822910Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T21:14:28.6886910Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T21:14:28.7866900Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T21:14:28.8138310Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T21:14:28.9134620Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-19T21:14:28.9218840Z ##[endgroup]
+2026-10-19T21:14:28.9220170Z ##[group]Fetching the repository
+2026-10-19T21:14:28.9234590Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-10-19T21:14:33.3390490Z From https://github.com/Jagalite/illiquid
+2026-10-19T21:14:33.3417750Z  * [new branch]      codex/illiquid-update-hosting -> origin/codex/illiquid-update-hosting
+2026-10-19T21:14:33.3418870Z  * [new branch]      codex/perf-empty-subtitle-matching-20261017 -> origin/codex/perf-empty-subtitle-matching-20261017
+2026-10-19T21:14:33.3420140Z  * [new branch]      codex/perf-nfo-text-limits-20261017 -> origin/codex/perf-nfo-text-limits-20261017
+2026-10-19T21:14:33.3420880Z  * [new branch]      docs/agent-hierarchy-v2 -> origin/docs/agent-hierarchy-v2
+2026-10-19T21:14:33.3421520Z  * [new branch]      feat/playback-reliability-tools -> origin/feat/playback-reliability-tools
+2026-10-19T21:14:33.3422180Z  * [new branch]      feat/recovery-captions-automation -> origin/feat/recovery-captions-automation
+2026-10-19T21:14:33.3422900Z  * [new branch]      fix/external-text-subtitle-import -> origin/fix/external-text-subtitle-import
+2026-10-19T21:14:33.3424460Z  * [new branch]      fix/filesystem-event-loss-recovery -> origin/fix/filesystem-event-loss-recovery
+2026-10-19T21:14:33.3425310Z  * [new branch]      fix/local-media-source-validation -> origin/fix/local-media-source-validation
+2026-10-19T21:14:33.3426020Z  * [new branch]      fix/nfo-episode-field-scope -> origin/fix/nfo-episode-field-scope
+2026-10-19T21:14:33.3426640Z  * [new branch]      fix/nfo-unused-field-limits -> origin/fix/nfo-unused-field-limits
+2026-10-19T21:14:33.3427470Z  * [new branch]      fix/persistence-superseded-request-lifetime -> origin/fix/persistence-superseded-request-lifetime
+2026-10-19T21:14:33.3428470Z  * [new branch]      fix/plexmatch-numeric-validation -> origin/fix/plexmatch-numeric-validation
+2026-10-19T21:14:33.3429300Z  * [new branch]      fix/renderer-recovery-budget-revision -> origin/fix/renderer-recovery-budget-revision
+2026-10-19T21:14:33.3430060Z  * [new branch]      fix/sidecar-catalog-id-merge -> origin/fix/sidecar-catalog-id-merge
+2026-10-19T21:14:33.3431420Z  * [new branch]      fix/source-filesystem-root-invalidation -> origin/fix/source-filesystem-root-invalidation
+2026-10-19T21:14:33.3432380Z  * [new branch]      fix/source-filesystem-root-volume-routing -> origin/fix/source-filesystem-root-volume-routing
+2026-10-19T21:14:33.3433190Z  * [new branch]      fix/subtitle-exact-stem-priority -> origin/fix/subtitle-exact-stem-priority
+2026-10-19T21:14:33.3433900Z  * [new branch]      fix/subtitle-filename-association -> origin/fix/subtitle-filename-association
+2026-10-19T21:14:33.3434820Z  * [new branch]      fix/subtitle-filename-specificity -> origin/fix/subtitle-filename-specificity
+2026-10-19T21:14:33.3435650Z  * [new branch]      fix/track-restoration-thumbnail-lifecycle -> origin/fix/track-restoration-thumbnail-lifecycle
+2026-10-19T21:14:33.3436430Z  * [new branch]      fix/unicode-date-filename-crash -> origin/fix/unicode-date-filename-crash
+2026-10-19T21:14:33.3437430Z  * [new branch]      fix/unicode-date-media-recognition -> origin/fix/unicode-date-media-recognition
+2026-10-19T21:14:33.3438180Z  * [new branch]      integrate/open-prs-20261017 -> origin/integrate/open-prs-20261017
+2026-10-19T21:14:33.3438700Z  * [new branch]      main                    -> origin/main
+2026-10-19T21:14:33.3439220Z  * [new branch]      perf/adaptive-text-opacity -> origin/perf/adaptive-text-opacity
+2026-10-19T21:14:33.3440070Z  * [new branch]      perf/batch-source-presence-recomputation-20261017 -> origin/perf/batch-source-presence-recomputation-20261017
+2026-10-19T21:14:33.3440870Z  * [new branch]      perf/bitmap-subtitle-palette -> origin/perf/bitmap-subtitle-palette
+2026-10-19T21:14:33.3441680Z  * [new branch]      perf/bitmap-subtitle-timeline-insertion -> origin/perf/bitmap-subtitle-timeline-insertion
+2026-10-19T21:14:33.3442410Z  * [new branch]      perf/bound-runtime-lease-history -> origin/perf/bound-runtime-lease-history
+2026-10-19T21:14:33.3443130Z  * [new branch]      perf/cache-natural-filename-keys -> origin/perf/cache-natural-filename-keys
+2026-10-19T21:14:33.3443840Z  * [new branch]      perf/cache-natural-filename-sort-keys -> origin/perf/cache-natural-filename-sort-keys
+2026-10-19T21:14:33.3444510Z  * [new branch]      perf/compiled-player-shortcuts -> origin/perf/compiled-player-shortcuts
+2026-10-19T21:14:33.3445170Z  * [new branch]      perf/elastic-control-bar-geometry -> origin/perf/elastic-control-bar-geometry
+2026-10-19T21:14:33.3445890Z  * [new branch]      perf/empty-subtitle-association -> origin/perf/empty-subtitle-association
+2026-10-19T21:14:33.3446720Z  * [new branch]      perf/empty-subtitle-association-ed13 -> origin/perf/empty-subtitle-association-ed13
+2026-10-19T21:14:33.3447550Z  * [new branch]      perf/external-subtitle-conversion -> origin/perf/external-subtitle-conversion
+2026-10-19T21:14:33.3448280Z  * [new branch]      perf/external-subtitle-escaping -> origin/perf/external-subtitle-escaping
+2026-10-19T21:14:33.3449070Z  * [new branch]      perf/folder-discovery-selective-io -> origin/perf/folder-discovery-selective-io
+2026-10-19T21:14:33.3450120Z  * [new branch]      perf/media-name-episode-recognition-20261017 -> origin/perf/media-name-episode-recognition-20261017
+2026-10-19T21:14:33.3450880Z  * [new branch]      perf/media-name-folder-evidence -> origin/perf/media-name-folder-evidence
+2026-10-19T21:14:33.3451490Z  * [new branch]      perf/media-name-folder-parsing -> origin/perf/media-name-folder-parsing
+2026-10-19T21:14:33.3452100Z  * [new branch]      perf/media-name-recognition -> origin/perf/media-name-recognition
+2026-10-19T21:14:33.3452860Z  * [new branch]      perf/media-name-recognition-20261017 -> origin/perf/media-name-recognition-20261017
+2026-10-19T21:14:33.3453680Z  * [new branch]      perf/media-name-recognition-linux-9200ebe -> origin/perf/media-name-recognition-linux-9200ebe
+2026-10-19T21:14:33.3454460Z  * [new branch]      perf/media-name-tag-fast-path -> origin/perf/media-name-tag-fast-path
+2026-10-19T21:14:33.3455270Z  * [new branch]      perf/non-decoding-memory-responsiveness -> origin/perf/non-decoding-memory-responsiveness
+2026-10-19T21:14:33.3456070Z  * [new branch]      perf/observation-metrics-counters -> origin/perf/observation-metrics-counters
+2026-10-19T21:14:33.3456830Z  * [new branch]      perf/pcm-sanitizer      -> origin/perf/pcm-sanitizer
+2026-10-19T21:14:33.3457540Z  * [new branch]      perf/pip-subtitle-upload-reuse -> origin/perf/pip-subtitle-upload-reuse
+2026-10-19T21:14:33.3458280Z  * [new branch]      perf/planar-ownership-transitions -> origin/perf/planar-ownership-transitions
+2026-10-19T21:14:33.3458970Z  * [new branch]      perf/playback-pipeline-phase1 -> origin/perf/playback-pipeline-phase1
+2026-10-19T21:14:33.3459760Z  * [new branch]      perf/playlist-identity-lookup -> origin/perf/playlist-identity-lookup
+2026-10-19T21:14:33.3460510Z  * [new branch]      perf/playlist-lookup-query-20261017-a03e8 -> origin/perf/playlist-lookup-query-20261017-a03e8
+2026-10-19T21:14:33.3461340Z  * [new branch]      perf/playlist-selection-identity-scan -> origin/perf/playlist-selection-identity-scan
+2026-10-19T21:14:33.3462500Z  * [new branch]      perf/playlist-shuffle-restoration-20261017 -> origin/perf/playlist-shuffle-restoration-20261017
+2026-10-19T21:14:33.3465320Z  * [new branch]      perf/playlist-sorting-20261019 -> origin/perf/playlist-sorting-20261019
+2026-10-19T21:14:33.3467080Z  * [new branch]      perf/prepared-playlist-construction-20261019 -> origin/perf/prepared-playlist-construction-20261019
+2026-10-19T21:14:33.3468590Z  * [new branch]      perf/relative-seek-effect-retirement -> origin/perf/relative-seek-effect-retirement
+2026-10-19T21:14:33.3470860Z  * [new branch]      perf/skip-empty-subtitle-association -> origin/perf/skip-empty-subtitle-association
+2026-10-19T21:14:33.3474170Z  * [new branch]      perf/source-browser-sorting -> origin/perf/source-browser-sorting
+2026-10-19T21:14:33.3475440Z  * [new branch]      perf/source-search-id-set-3a8b4b -> origin/perf/source-search-id-set-3a8b4b
+2026-10-19T21:14:33.3477420Z  * [new branch]      perf/source-tree-sorting-20261017 -> origin/perf/source-tree-sorting-20261017
+2026-10-19T21:14:33.3479140Z  * [new branch]      perf/source-tree-visibility-cache -> origin/perf/source-tree-visibility-cache
+2026-10-19T21:14:33.3480140Z  * [new branch]      perf/subtitle-escaping-20261017 -> origin/perf/subtitle-escaping-20261017
+2026-10-19T21:14:33.3481500Z  * [new branch]      perf/subtitle-memory-accounting -> origin/perf/subtitle-memory-accounting
+2026-10-19T21:14:33.3482530Z  * [new branch]      perf/subtitle-memory-budget-accounting-20261017 -> origin/perf/subtitle-memory-budget-accounting-20261017
+2026-10-19T21:14:33.3484100Z  * [new branch]      perf/subtitle-staging-dirty-prefix -> origin/perf/subtitle-staging-dirty-prefix
+2026-10-19T21:14:33.3485290Z  * [new branch]      perf/text-subtitle-escaping -> origin/perf/text-subtitle-escaping
+2026-10-19T21:14:33.3486800Z  * [new branch]      perf/thumbnail-disk-eviction-33f42739 -> origin/perf/thumbnail-disk-eviction-33f42739
+2026-10-19T21:14:33.3489520Z  * [new branch]      perf/track-selection-ranking-20261017 -> origin/perf/track-selection-ranking-20261017
+2026-10-19T21:14:33.3491220Z  * [new branch]      perf/video-tab-resource-lookup-b7d0ac7d -> origin/perf/video-tab-resource-lookup-b7d0ac7d
+2026-10-19T21:14:33.3493210Z  * [new branch]      research/playback-packet-progress -> origin/research/playback-packet-progress
+2026-10-19T21:14:33.3494890Z  * [new branch]      review/new-branch-consolidation-20261017 -> origin/review/new-branch-consolidation-20261017
+2026-10-19T21:14:33.3496260Z  * [new branch]      work/illiquid-product-review -> origin/work/illiquid-product-review
+2026-10-19T21:14:33.3497340Z  * [new branch]      work/playback-integration-qualification -> origin/work/playback-integration-qualification
+2026-10-19T21:14:33.3498170Z  * [new branch]      work/pr3-integration-qualification -> origin/work/pr3-integration-qualification
+2026-10-19T21:14:33.3499580Z  * [new tag]         appcast                 -> appcast
+2026-10-19T21:14:33.3500090Z  * [new tag]         v0.1.0                  -> v0.1.0
+2026-10-19T21:14:33.3500560Z  * [new tag]         v0.1.1                  -> v0.1.1
+2026-10-19T21:14:33.3501020Z  * [new tag]         v0.1.2                  -> v0.1.2
+2026-10-19T21:14:33.3501880Z  * [new tag]         v0.1.3                  -> v0.1.3
+2026-10-19T21:14:33.3503980Z [command]/opt/homebrew/bin/git branch --list --remote origin/perf/thumbnail-disk-eviction-33f42739
+2026-10-19T21:14:33.3573690Z   origin/perf/thumbnail-disk-eviction-33f42739
+2026-10-19T21:14:33.3589460Z [command]/opt/homebrew/bin/git rev-parse refs/remotes/origin/perf/thumbnail-disk-eviction-33f42739
+2026-10-19T21:14:33.3661440Z 52767f6e09a9e3a59ad2eb66cfa35a7e3707a7f6
+2026-10-19T21:14:33.3664960Z ##[endgroup]
+2026-10-19T21:14:33.3666080Z ##[group]Determining the checkout info
+2026-10-19T21:14:33.3667670Z ##[endgroup]
+2026-10-19T21:14:33.3668710Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-19T21:14:33.3770680Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-19T21:14:33.3853020Z ##[group]Checking out the ref
+2026-10-19T21:14:33.3856160Z [command]/opt/homebrew/bin/git checkout --progress --force -B perf/thumbnail-disk-eviction-33f42739 refs/remotes/origin/perf/thumbnail-disk-eviction-33f42739
+2026-10-19T21:14:34.1030330Z Switched to a new branch 'perf/thumbnail-disk-eviction-33f42739'
+2026-10-19T21:14:34.1038590Z branch 'perf/thumbnail-disk-eviction-33f42739' set up to track 'origin/perf/thumbnail-disk-eviction-33f42739'.
+2026-10-19T21:14:34.1085120Z ##[endgroup]
+2026-10-19T21:14:34.1293250Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-19T21:14:34.1403260Z 52767f6e09a9e3a59ad2eb66cfa35a7e3707a7f6
+2026-10-19T21:14:34.1417730Z ##[group]Removing auth
+2026-10-19T21:14:34.1421580Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T21:14:34.1503000Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T21:14:34.2586920Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T21:14:34.2659370Z http.https://github.com/.extraheader
+2026-10-19T21:14:34.2668000Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-19T21:14:34.2745960Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T21:14:34.3750480Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T21:14:34.3829780Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T21:14:34.5769710Z ##[endgroup]
+2026-10-19T21:14:34.5884330Z ##[group]Run mkdir -p "$RUNNER_TEMP/thumbnail-disk-component"
+2026-10-19T21:14:34.5895970Z [36;1mmkdir -p "$RUNNER_TEMP/thumbnail-disk-component"[0m
+2026-10-19T21:14:34.5896320Z [36;1msw_vers > "$RUNNER_TEMP/thumbnail-disk-component/host.txt"[0m
+2026-10-19T21:14:34.5896710Z [36;1muname -a >> "$RUNNER_TEMP/thumbnail-disk-component/host.txt"[0m
+2026-10-19T21:14:34.5897200Z [36;1msysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/thumbnail-disk-component/host.txt"[0m
+2026-10-19T21:14:34.5897730Z [36;1mswift --version >> "$RUNNER_TEMP/thumbnail-disk-component/host.txt"[0m
+2026-10-19T21:14:34.5946240Z shell: /bin/bash -e {0}
+2026-10-19T21:14:34.5946450Z env:
+2026-10-19T21:14:34.5946780Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-19T21:14:34.5947080Z ##[endgroup]
+2026-10-19T21:14:38.3259900Z swift-driver version: 1.148.6 
+2026-10-19T21:14:38.3544720Z ##[group]Run python3 Benchmarks/ThumbnailDiskEviction/run.py \
+2026-10-19T21:14:38.3545170Z [36;1mpython3 Benchmarks/ThumbnailDiskEviction/run.py \[0m
+2026-10-19T21:14:38.3545840Z [36;1m  --pairs 8 --output "$RUNNER_TEMP/thumbnail-disk-component/results"[0m
+2026-10-19T21:14:38.3639060Z shell: /bin/bash -e {0}
+2026-10-19T21:14:38.3640030Z env:
+2026-10-19T21:14:38.3640950Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-19T21:14:38.3642340Z ##[endgroup]
+2026-10-19T21:14:38.8359010Z Staging frozen baseline and unchanged production dependencies
+2026-10-19T21:14:40.1958300Z Compiling shared core and two exact-source native disk-cache executables
+2026-10-19T21:15:02.9588900Z Verifying all nine workloads against the independent full-survivor oracle
+2026-10-19T21:15:04.4044180Z   verified byte-foreground-1000: 32 evictions
+2026-10-19T21:15:09.1534670Z   verified byte-foreground-4000: 32 evictions
+2026-10-19T21:15:18.7364720Z   verified byte-foreground-8191: 32 evictions
+2026-10-19T21:15:22.7636940Z   verified byte-background-4000: 32 evictions
+2026-10-19T21:15:30.6930290Z   verified count-foreground-8192: 32 evictions
+2026-10-19T21:15:39.2372870Z   verified count-background-8192: 32 evictions
+2026-10-19T21:15:42.6984130Z   verified no-trim-4000: 0 evictions
+2026-10-19T21:15:48.9696960Z   verified shrink-8191-to-4096: 4095 evictions
+2026-10-19T21:15:51.3269800Z   verified disable-4096: 4096 evictions
+2026-10-19T21:15:52.5302550Z   pair 1/8: byte-foreground-1000
+2026-10-19T21:15:57.1619090Z   pair 1/8: byte-foreground-4000
+2026-10-19T21:16:10.2540910Z   pair 1/8: byte-foreground-8191
+2026-10-19T21:16:14.7465480Z   pair 1/8: byte-background-4000
+2026-10-19T21:16:24.0260280Z   pair 1/8: count-foreground-8192
+2026-10-19T21:16:31.9959060Z   pair 1/8: count-background-8192
+2026-10-19T21:16:35.9331220Z   pair 1/8: no-trim-4000
+2026-10-19T21:16:41.3617310Z   pair 1/8: shrink-8191-to-4096
+2026-10-19T21:16:43.7124150Z   pair 1/8: disable-4096
+2026-10-19T21:16:47.4074880Z   pair 2/8: byte-foreground-4000
+2026-10-19T21:16:55.1097600Z   pair 2/8: byte-foreground-8191
+2026-10-19T21:16:58.5061750Z   pair 2/8: byte-background-4000
+2026-10-19T21:17:07.3043950Z   pair 2/8: count-foreground-8192
+2026-10-19T21:17:15.7637570Z   pair 2/8: count-background-8192
+2026-10-19T21:17:18.7916100Z   pair 2/8: no-trim-4000
+2026-10-19T21:17:24.0988200Z   pair 2/8: shrink-8191-to-4096
+2026-10-19T21:17:27.2156060Z   pair 2/8: disable-4096
+2026-10-19T21:17:28.1063270Z   pair 2/8: byte-foreground-1000
+2026-10-19T21:17:38.1064700Z   pair 3/8: byte-foreground-8191
+2026-10-19T21:17:44.5075880Z   pair 3/8: byte-background-4000
+2026-10-19T21:17:55.7804420Z   pair 3/8: count-foreground-8192
+2026-10-19T21:18:05.1719770Z   pair 3/8: count-background-8192
+2026-10-19T21:18:09.1055590Z   pair 3/8: no-trim-4000
+2026-10-19T21:18:16.1147980Z   pair 3/8: shrink-8191-to-4096
+2026-10-19T21:18:19.2174740Z   pair 3/8: disable-4096
+2026-10-19T21:18:20.3512820Z   pair 3/8: byte-foreground-1000
+2026-10-19T21:18:24.9553620Z   pair 3/8: byte-foreground-4000
+2026-10-19T21:18:29.3972010Z   pair 4/8: byte-background-4000
+2026-10-19T21:18:37.8166000Z   pair 4/8: count-foreground-8192
+2026-10-19T21:18:45.4570820Z   pair 4/8: count-background-8192
+2026-10-19T21:18:48.7840360Z   pair 4/8: no-trim-4000
+2026-10-19T21:18:56.4235020Z   pair 4/8: shrink-8191-to-4096
+2026-10-19T21:18:59.4098180Z   pair 4/8: disable-4096
+2026-10-19T21:19:00.9067150Z   pair 4/8: byte-foreground-1000
+2026-10-19T21:19:06.1530330Z   pair 4/8: byte-foreground-4000
+2026-10-19T21:19:15.5602800Z   pair 4/8: byte-foreground-8191
+2026-10-19T21:19:23.9087230Z   pair 5/8: count-foreground-8192
+2026-10-19T21:19:32.2482750Z   pair 5/8: count-background-8192
+2026-10-19T21:19:35.8712650Z   pair 5/8: no-trim-4000
+2026-10-19T21:19:42.2938240Z   pair 5/8: shrink-8191-to-4096
+2026-10-19T21:19:44.8739640Z   pair 5/8: disable-4096
+2026-10-19T21:19:45.9033990Z   pair 5/8: byte-foreground-1000
+2026-10-19T21:19:50.5867710Z   pair 5/8: byte-foreground-4000
+2026-10-19T21:20:00.9918990Z   pair 5/8: byte-foreground-8191
+2026-10-19T21:20:05.5288970Z   pair 5/8: byte-background-4000
+2026-10-19T21:20:15.4064670Z   pair 6/8: count-background-8192
+2026-10-19T21:20:19.0703420Z   pair 6/8: no-trim-4000
+2026-10-19T21:20:27.0218540Z   pair 6/8: shrink-8191-to-4096
+2026-10-19T21:20:30.3653270Z   pair 6/8: disable-4096
+2026-10-19T21:20:31.5127820Z   pair 6/8: byte-foreground-1000
+2026-10-19T21:20:36.4531050Z   pair 6/8: byte-foreground-4000
+2026-10-19T21:20:46.4652370Z   pair 6/8: byte-foreground-8191
+2026-10-19T21:20:50.7702740Z   pair 6/8: byte-background-4000
+2026-10-19T21:21:00.6588640Z   pair 6/8: count-foreground-8192
+2026-10-19T21:21:03.6742590Z   pair 7/8: no-trim-4000
+2026-10-19T21:21:11.0602910Z   pair 7/8: shrink-8191-to-4096
+2026-10-19T21:21:13.9833900Z   pair 7/8: disable-4096
+2026-10-19T21:21:15.3984540Z   pair 7/8: byte-foreground-1000
+2026-10-19T21:21:21.2664490Z   pair 7/8: byte-foreground-4000
+2026-10-19T21:21:31.0607660Z   pair 7/8: byte-foreground-8191
+2026-10-19T21:21:36.5003830Z   pair 7/8: byte-background-4000
+2026-10-19T21:21:46.2319340Z   pair 7/8: count-foreground-8192
+2026-10-19T21:21:55.9702970Z   pair 7/8: count-background-8192
+2026-10-19T21:22:02.5637440Z   pair 8/8: shrink-8191-to-4096
+2026-10-19T21:22:05.3135390Z   pair 8/8: disable-4096
+2026-10-19T21:22:06.6389090Z   pair 8/8: byte-foreground-1000
+2026-10-19T21:22:10.6986220Z   pair 8/8: byte-foreground-4000
+2026-10-19T21:22:19.4829460Z   pair 8/8: byte-foreground-8191
+2026-10-19T21:22:24.2458000Z   pair 8/8: byte-background-4000
+2026-10-19T21:22:33.8754070Z   pair 8/8: count-foreground-8192
+2026-10-19T21:22:43.5705390Z   pair 8/8: count-background-8192
+2026-10-19T21:22:46.7238160Z   pair 8/8: no-trim-4000
+2026-10-19T21:22:46.7335970Z 
+2026-10-19T21:22:46.7358940Z Native cache results (per operation):
+2026-10-19T21:22:46.7367890Z byte-foreground-1000: 9.357 -> 0.811 ms; paired reduction 91.5% (8/8 pairs faster)
+2026-10-19T21:22:46.7369090Z byte-foreground-4000: 40.798 -> 2.521 ms; paired reduction 94.2% (8/8 pairs faster)
+2026-10-19T21:22:46.7369820Z byte-foreground-8191: 89.594 -> 3.940 ms; paired reduction 95.9% (8/8 pairs faster)
+2026-10-19T21:22:46.7371310Z byte-background-4000: 29.259 -> 2.425 ms; paired reduction 92.4% (8/8 pairs faster)
+2026-10-19T21:22:46.7372470Z count-foreground-8192: 65.602 -> 3.528 ms; paired reduction 94.5% (8/8 pairs faster)
+2026-10-19T21:22:46.7373680Z count-background-8192: 61.859 -> 3.846 ms; paired reduction 94.2% (8/8 pairs faster)
+2026-10-19T21:22:46.7374650Z no-trim-4000: 0.625 -> 0.333 ms; paired reduction 23.6% (5/8 pairs faster)
+2026-10-19T21:22:46.7375770Z shrink-8191-to-4096: 359.236 -> 300.053 ms; paired reduction 14.7% (7/8 pairs faster)
+2026-10-19T21:22:46.7376490Z disable-4096: 255.594 -> 259.716 ms; paired reduction 0.5% (5/8 pairs faster)
+2026-10-19T21:22:46.7688260Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-19T21:22:46.7688680Z with:
+2026-10-19T21:22:46.7688900Z   name: thumbnail-disk-eviction-component
+2026-10-19T21:22:46.7689490Z   path: /Users/runner/work/_temp/thumbnail-disk-component/
+!/Users/runner/work/_temp/thumbnail-disk-component/results/module-cache/**
+
+2026-10-19T21:22:46.7690020Z   retention-days: 14
+2026-10-19T21:22:46.7701790Z   if-no-files-found: warn
+2026-10-19T21:22:46.7702080Z   compression-level: 6
+2026-10-19T21:22:46.7702300Z   overwrite: false
+2026-10-19T21:22:46.7702630Z   include-hidden-files: false
+2026-10-19T21:22:46.7702920Z env:
+2026-10-19T21:22:46.7703310Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-19T21:22:46.7703630Z ##[endgroup]
+2026-10-19T21:22:47.2216710Z (node:11883) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T21:22:47.2218180Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T21:22:47.2453080Z With the provided path, there will be 62 files uploaded
+2026-10-19T21:22:47.2454630Z Artifact name is valid!
+2026-10-19T21:22:47.2455100Z Root directory input is valid!
+2026-10-19T21:22:47.6575380Z Beginning upload of artifact content to blob storage
+2026-10-19T21:22:47.9602800Z (node:11883) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-19T21:22:48.8082580Z Uploaded bytes 4181628
+2026-10-19T21:22:48.8802180Z Finished uploading artifact content to blob storage!
+2026-10-19T21:22:48.8804760Z SHA256 digest of uploaded artifact zip is ba01282f79eb4f6b0da60a14d6195019a654ba18fc6e21ad6beb9a0ed5261f6e
+2026-10-19T21:22:48.8805370Z Finalizing artifact upload
+2026-10-19T21:22:49.1482540Z Artifact thumbnail-disk-eviction-component.zip successfully finalized. Artifact ID 12223040559
+2026-10-19T21:22:49.1484060Z Artifact thumbnail-disk-eviction-component has been successfully uploaded! Final size is 4181628 bytes. Artifact ID is 12223040559
+2026-10-19T21:22:49.1544960Z Artifact download URL: https://github.com/Jagalite/illiquid/actions/runs/39322698431/artifacts/12223040559
+2026-10-19T21:22:49.2046850Z Post job cleanup.
+2026-10-19T21:22:49.3302400Z [command]/opt/homebrew/bin/git version
+2026-10-19T21:22:49.3550120Z git version 2.56.0
+2026-10-19T21:22:49.3568980Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/f9c670f2-e74d-4eb4-bb23-5e5a8ab02e23/.gitconfig'
+2026-10-19T21:22:49.3578530Z Temporarily overriding HOME='/Users/runner/work/_temp/f9c670f2-e74d-4eb4-bb23-5e5a8ab02e23' before making global git config changes
+2026-10-19T21:22:49.3580290Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T21:22:49.3581700Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-19T21:22:49.3790560Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T21:22:49.3869200Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T21:22:49.4951810Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T21:22:49.5021550Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T21:22:49.5879280Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T21:22:49.5949980Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T21:22:49.6948040Z Cleaning up orphan processes
+2026-10-19T21:22:53.7434320Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
