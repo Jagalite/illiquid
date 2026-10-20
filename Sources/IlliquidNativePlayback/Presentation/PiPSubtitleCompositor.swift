@@ -189,6 +189,11 @@ struct PiPSubtitleCompositionMetrics: Equatable, Sendable {
     var composedFrames = 0
     var immediatelyDisplayedFrames = 0
     var subtitleVisibleFrames = 0
+    var subtitleTextureUploads = 0
+    var subtitleTextureUploadBytes = 0
+    var subtitleVertexBuilds = 0
+    var subtitleVertexUploadBytes = 0
+    var subtitleResourceReuses = 0
     var coalescedFrames = 0
     var unsupportedFrames = 0
     var outputPoolMisses = 0
@@ -223,7 +228,7 @@ struct PiPSubtitleCompositionFence: Equatable, Sendable {
     }
 }
 
-private enum PiPSubtitleCompositorError: LocalizedError {
+enum PiPSubtitleCompositorError: LocalizedError {
     case metalUnavailable
     case textureCacheCreation(CVReturn)
     case pipelineCreation(String)
@@ -264,12 +269,6 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         subsystem: "com.illiquid.pip-subtitles",
         category: "compositor"
     )
-
-    private struct SubtitleVertex {
-        var position: SIMD2<Float>
-        var textureCoordinate: SIMD2<Float>
-        var color: SIMD4<Float>
-    }
 
     private final class MetalFrameResources: @unchecked Sendable {
         let outputPixelBuffer: CVPixelBuffer
@@ -339,6 +338,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
     private var hdrLinearTexture: (any MTLTexture)?
     private let sampler: any MTLSamplerState
     private let subtitlePacker: ASSSubtitleFramePacker
+    private let subtitleUploadCache: PiPSubtitleUploadCache
     private let workQueue = DispatchQueue(
         label: "com.illiquid.pip-subtitles",
         qos: .userInteractive
@@ -360,10 +360,11 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
     private var outputPoolSize = CGSize.zero
     private var outputPoolPixelFormat: OSType = kCVPixelFormatType_32BGRA
     private var observedOutputBuffers: Set<UInt> = []
-    private var preparedSubtitleFrame: ASSPreparedSubtitleFrame?
-    private var subtitleTexture: (any MTLTexture)?
-    private var subtitleVertexBuffer: (any MTLBuffer)?
-    private var subtitleVertexCapacity = 0
+    private var preparedSubtitleFrame: ASSPreparedSubtitleFrame? {
+        // Every replacement invalidates uploads, even nil/empty frames and
+        // same-size cue changes. Unchanged libass/bitmap output keeps both.
+        didSet { subtitleUploadCache.invalidate() }
+    }
     private var lastSourceSize = CGSize.zero
     private var lastEnqueuedGeneration: Int?
     private var compositionFence = PiPSubtitleCompositionFence()
@@ -399,6 +400,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             memoryBudget: memoryBudget,
             memoryOwner: .pictureInPictureStaging
         )
+        subtitleUploadCache = PiPSubtitleUploadCache(device: device)
         self.device = device
         self.commandQueue = commandQueue
         textureCache = cache
@@ -518,9 +520,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             guard let self else { return }
             preparedSubtitleFrame = nil
             preparedSubtitlePipelineRevision = nil
-            subtitleTexture = nil
-            subtitleVertexBuffer = nil
-            subtitleVertexCapacity = 0
+            subtitleUploadCache.retireSource()
             subtitlePacker.retireSource()
             if shouldStartWorker {
                 consumePendingFrame()
@@ -1177,53 +1177,16 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         let textureWidth = Int(frame.textureSize.width)
         let textureHeight = Int(frame.textureSize.height)
         guard textureWidth > 0, textureHeight > 0 else { return }
-        let pixelFormat: MTLPixelFormat = frame.strategy == .metalBGRA ? .bgra8Unorm : .r8Unorm
-        if subtitleTexture == nil
-            || subtitleTexture!.width < textureWidth
-            || subtitleTexture!.height < textureHeight
-            || subtitleTexture!.pixelFormat != pixelFormat
-        {
-            let descriptor = MTLTextureDescriptor.texture2DDescriptor(
-                pixelFormat: pixelFormat,
-                width: textureWidth,
-                height: textureHeight,
-                mipmapped: false
-            )
-            descriptor.usage = [.shaderRead]
-            descriptor.storageMode = .shared
-            subtitleTexture = device.makeTexture(descriptor: descriptor)
-        }
-        guard let subtitleTexture else {
-            throw PiPSubtitleCompositorError.textureCreation
-        }
-        frame.pixels.withUnsafeBytes { bytes in
-            guard let baseAddress = bytes.baseAddress else { return }
-            subtitleTexture.replace(
-                region: MTLRegionMake2D(0, 0, textureWidth, textureHeight),
-                mipmapLevel: 0,
-                withBytes: baseAddress,
-                bytesPerRow: frame.bytesPerRow
-            )
-        }
-
-        let vertices = subtitleVertices(frame, texture: subtitleTexture)
-        let requiredBytes = vertices.count * MemoryLayout<SubtitleVertex>.stride
-        if subtitleVertexBuffer == nil || subtitleVertexCapacity < requiredBytes {
-            subtitleVertexCapacity = max(requiredBytes, max(subtitleVertexCapacity * 2, 4_096))
-            subtitleVertexBuffer = device.makeBuffer(
-                length: subtitleVertexCapacity,
-                options: .storageModeShared
-            )
-        }
-        guard let subtitleVertexBuffer else {
-            throw PiPSubtitleCompositorError.commandEncoding
-        }
-        vertices.withUnsafeBytes { bytes in
-            guard let baseAddress = bytes.baseAddress else { return }
-            subtitleVertexBuffer.contents().copyMemory(
-                from: baseAddress,
-                byteCount: requiredBytes
-            )
+        let upload = try subtitleUploadCache.resources(for: frame)
+        stateLock.withLock {
+            if upload.didUpload {
+                metrics.subtitleTextureUploads += 1
+                metrics.subtitleTextureUploadBytes += upload.textureUploadBytes
+                metrics.subtitleVertexBuilds += 1
+                metrics.subtitleVertexUploadBytes += upload.vertexUploadBytes
+            } else {
+                metrics.subtitleResourceReuses += 1
+            }
         }
 
         let subtitlePass = MTLRenderPassDescriptor()
@@ -1247,67 +1210,20 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         } else {
             encoder.setRenderPipelineState(frame.strategy == .metalBGRA ? bitmapSubtitlePipeline : subtitlePipeline)
         }
-        encoder.setVertexBuffer(subtitleVertexBuffer, offset: 0, index: 0)
+        encoder.setVertexBuffer(upload.vertexBuffer, offset: 0, index: 0)
         encoder.setVertexBytes(
             &viewport,
             length: MemoryLayout<SIMD2<Float>>.size,
             index: 1
         )
-        encoder.setFragmentTexture(subtitleTexture, index: 0)
+        encoder.setFragmentTexture(upload.texture, index: 0)
         encoder.setFragmentSamplerState(sampler, index: 0)
         encoder.drawPrimitives(
             type: .triangle,
             vertexStart: 0,
-            vertexCount: vertices.count
+            vertexCount: upload.vertexCount
         )
         encoder.endEncoding()
-    }
-
-    private func subtitleVertices(
-        _ frame: ASSPreparedSubtitleFrame,
-        texture: any MTLTexture
-    ) -> [SubtitleVertex] {
-        var vertices: [SubtitleVertex] = []
-        vertices.reserveCapacity(frame.quads.count * 6)
-        for quad in frame.quads {
-            let alpha = Float(255 - UInt8(quad.color & 0xff)) / 255
-            let color = SIMD4<Float>(
-                Float((quad.color >> 24) & 0xff) / 255,
-                Float((quad.color >> 16) & 0xff) / 255,
-                Float((quad.color >> 8) & 0xff) / 255,
-                alpha
-            )
-            let x0 = Float(quad.destination.minX)
-            let y0 = Float(quad.destination.minY)
-            let x1 = Float(quad.destination.maxX)
-            let y1 = Float(quad.destination.maxY)
-            let u0 = Float(quad.source.minX) / Float(texture.width)
-            let v0 = Float(quad.source.minY) / Float(texture.height)
-            let u1 = Float(quad.source.maxX) / Float(texture.width)
-            let v1 = Float(quad.source.maxY) / Float(texture.height)
-            let topLeft = SubtitleVertex(
-                position: SIMD2(x0, y0),
-                textureCoordinate: SIMD2(u0, v0),
-                color: color
-            )
-            let bottomLeft = SubtitleVertex(
-                position: SIMD2(x0, y1),
-                textureCoordinate: SIMD2(u0, v1),
-                color: color
-            )
-            let topRight = SubtitleVertex(
-                position: SIMD2(x1, y0),
-                textureCoordinate: SIMD2(u1, v0),
-                color: color
-            )
-            let bottomRight = SubtitleVertex(
-                position: SIMD2(x1, y1),
-                textureCoordinate: SIMD2(u1, v1),
-                color: color
-            )
-            vertices += [topLeft, bottomLeft, topRight, topRight, bottomLeft, bottomRight]
-        }
-        return vertices
     }
 
     private func checkoutOutputPixelBuffer(
@@ -1463,6 +1379,11 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             "composed=\(snapshot.composedFrames)",
             "immediate=\(snapshot.immediatelyDisplayedFrames)",
             "visible=\(snapshot.subtitleVisibleFrames)",
+            "subtitle-texture-uploads=\(snapshot.subtitleTextureUploads)",
+            "subtitle-upload-bytes=\(snapshot.subtitleTextureUploadBytes)",
+            "subtitle-vertex-builds=\(snapshot.subtitleVertexBuilds)",
+            "subtitle-vertex-bytes=\(snapshot.subtitleVertexUploadBytes)",
+            "subtitle-resource-reuses=\(snapshot.subtitleResourceReuses)",
             "coalesced=\(snapshot.coalescedFrames)",
             "unsupported=\(snapshot.unsupportedFrames)",
             "pool-allocations=\(snapshot.outputPixelBufferAllocations)",

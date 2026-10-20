@@ -1,0 +1,51 @@
+{
+  "baseline_sha": "68274d1b09dcc866296321a5a8858efc297c4f19",
+  "benchmark": {
+    "artifact_bytes": 17551267,
+    "artifact_id": 12219338310,
+    "artifact_name": "pip-subtitle-upload-component",
+    "artifact_zip_sha256": "4cf218e2b0395770e71aee8c4f086d1ab95426531346fb077215f48c68144ac8",
+    "conclusion": "success",
+    "job_id": 118288020585,
+    "job_url": "https://github.com/Jagalite/illiquid/actions/runs/39319056032/job/118288020585"
+  },
+  "event": "push",
+  "head_sha": "8f8677024a7c5b852005d51651558ccdfc79ad6b",
+  "integration_main_sha": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+  "integration_note": "The final branch also incorporates this main revision. The measured upload baseline, shared prepared-frame declarations, SubtitlePipeline, and shaders are unchanged between the baseline and this main revision. Full PR checks qualify the integrated branch.",
+  "native_regressions": {
+    "artifact_bytes": 7754,
+    "artifact_id": 12219622545,
+    "artifact_name": "pip-subtitle-native-regressions",
+    "artifact_zip_sha256": "c417f8090fd7f0b784e8def11fdc67ee6b74e11d6516ab379796cf070c6e3c90",
+    "build_seconds": 417.67,
+    "command": "swift test --force-resolved-versions -c release --no-parallel --filter 'PiPSubtitleUploadReuseTests|PiPSubtitlePipelineTests|PiPVideoMappingTests|PiPSubtitleCompositionPolicyTests|MetalASSSubtitleCompositorTests'",
+    "conclusion": "success",
+    "existing_tests_with_optional_fixture_bodies_not_exercised": [
+      "heavyAnimatedFixtureCostsAreRecorded",
+      "mediaSessionMirrorsEmbeddedPacketsAndSeekInvalidationToBothPipelines"
+    ],
+    "job_id": 118288020817,
+    "job_url": "https://github.com/Jagalite/illiquid/actions/runs/39319056032/job/118288020817",
+    "native_tests_log_sha256": "bc6fde8a9130eec4b4f144bef35130d5bcde6c1c742a10b933fdf2117b9130cd",
+    "new_tests_executed_and_passed": 8,
+    "reported_suites_passed": 5,
+    "reported_tests_passed": 59,
+    "test_seconds": 7.375
+  },
+  "retained_artifact_file_sha256": {
+    "calibration.json": "3da246d87108abdd936de0e5cb54ae4458d5445c2f3dc838e4c18233bae2fabe",
+    "commands.jsonl": "11cf41bbdb98d400c2387146db2a0656a10184decde06bb093d8126a1e8f2c62",
+    "environment.json": "e9b2eb846e07bcd7d53ee9272b2014ffcfc440ddce54c3d8ac2b3f42779f0d4a",
+    "iteration-counts.json": "4bbc01871986eb110ad404f8ba315571ac9095f5ec7d3799f14dbd6a7ffa188d",
+    "measurements.jsonl": "91d16f047cae613c224f7f73b5eb6a7cd10371ade14fda41bc7f1d91076840b8",
+    "source-receipt.json": "ea39f58164b6fa421de0a756f8da437295bb9673ffc46f55c5a0f067514fd94e",
+    "summary.json": "05c88b283541d2dbeb7a9a701e51bc44dda4e8c8695c50186397aaeb3389d15f",
+    "validation.json": "036ef39f702e71e092f91f47e83152b3cee73efed50dcdc36d99095582dfe080",
+    "verification-baseline.json": "71d483310f225529b5350aca1289ca05375e462c55588bbd6487548b4956cfdf",
+    "verification-candidate.json": "820f24d9a42eb01a209db5a13bcb082fb6768e4c7d806fa93e19fb6dfdcd60a3",
+    "verification.json": "c56e502b6a3fea1e7dcee3bd90208a35367dfa679dd301d287fe6486f2b41255"
+  },
+  "run_id": 39319056032,
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/39319056032"
+}
