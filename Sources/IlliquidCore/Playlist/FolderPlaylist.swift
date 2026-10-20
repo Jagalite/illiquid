@@ -56,6 +56,13 @@ public struct FolderPlaylist: Equatable, Sendable {
         self.items = NaturalFilenameOrdering.sort(items, by: { $0.url })
     }
 
+    /// Used by discovery after verifying that preparation preserved the sorted
+    /// URLs and that deduplication retained their relative order.
+    init(folderURL: URL, sortedItems: [FolderPlaylistItem]) {
+        self.folderURL = NormalizedFileURL.normalize(folderURL) ?? folderURL
+        self.items = sortedItems
+    }
+
     public subscript(index: Int) -> FolderPlaylistItem {
         items[index]
     }
