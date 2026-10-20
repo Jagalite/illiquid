@@ -1,0 +1,287 @@
+{
+  "audit_version": 1,
+  "auditor": "independent scout_diagnostics subagent",
+  "completed_checks": {
+    "all_analytical_input_output_counts_and_checksums_match": true,
+    "all_logged_command_return_codes_zero": true,
+    "all_oracle_equal_flags_true": true,
+    "all_paired_and_cross_cohort_fingerprints_match": true,
+    "all_raw_records_and_calibrations_accounted_for_once": true,
+    "allocations": {
+      "cases": 18,
+      "commands": 116,
+      "measurement_and_calibration_outputs": 108,
+      "measurements": 72,
+      "pairs_per_case": 2,
+      "summary_exactly_recomputed": true
+    },
+    "balanced_ab_ba_order": true,
+    "outstanding_failures": [],
+    "test_runs": [
+      {
+        "audited_log_passed": true,
+        "configuration": "debug",
+        "swift_exit_code": 0,
+        "test_count": 9,
+        "variant": "baseline"
+      },
+      {
+        "audited_log_passed": true,
+        "configuration": "release",
+        "swift_exit_code": 0,
+        "test_count": 9,
+        "variant": "baseline"
+      },
+      {
+        "audited_log_passed": true,
+        "configuration": "debug",
+        "swift_exit_code": 0,
+        "test_count": 9,
+        "variant": "candidate"
+      },
+      {
+        "audited_log_passed": true,
+        "configuration": "release",
+        "swift_exit_code": 0,
+        "test_count": 9,
+        "variant": "candidate"
+      }
+    ],
+    "timing": {
+      "cases": 18,
+      "commands": 260,
+      "measurement_and_calibration_outputs": 252,
+      "measurements": 216,
+      "pairs_per_case": 6,
+      "summary_exactly_recomputed": true
+    }
+  },
+  "controls_and_claim_strength": {
+    "allocation_control_result": "No-match and blank direct-search allocation counts and requested bytes are identical. Sparse requested-byte reductions are about 1%.",
+    "blank_result": "Complete search and cached blank projection essentially unchanged. Allocation projection median differs by only 32 requested bytes (nominal 16%); do not headline this tiny fixed-overhead variation.",
+    "broad_match_result": "Consistent improvement across all six pairs in every broad-match case, including flat input; metadata and Unicode complete-search cases also improve in all six pairs.",
+    "no_match_result": "Small mixed controls: flat search 1.328% slower; depth-two search paired 0.119% faster despite a slightly slower separate candidate median. Cached projection 1.107% faster. These do not support a changed-path improvement claim.",
+    "percentage_definition": "Timing percentage is median within-pair reduction; absolute savings shown are differences between separate medians and need not equal the paired percentage.",
+    "sparse_match_result": "Complete search paired reductions 0.799% flat and 0.768% depth two; only 3/6 and 4/6 wins. Cached sparse projection is 0.586% slower. No reliable sparse speedup claim."
+  },
+  "created_utc": "2026-10-19T20:52:25.937682+00:00",
+  "environment": {
+    "compiler": "Swift 6.4 (swift-6.4-RELEASE), x86_64-unknown-linux-gnu",
+    "cpu_affinity": [
+      0
+    ],
+    "locale": "C.UTF-8",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "processor": "Intel Xeon Platinum 8370C @ 2.80GHz"
+  },
+  "evidence_root": "linux",
+  "key_allocation_results": [
+    {
+      "baseline_requested_bytes_per_operation": 197794839,
+      "baseline_requests_per_operation": 500058,
+      "candidate_requested_bytes_per_operation": 183999975,
+      "candidate_requests_per_operation": 300040,
+      "case": "search/100000/0/broad",
+      "fewer_requested_bytes_per_operation": 13794864,
+      "paired_requested_bytes_reduction_percent": 6.974
+    },
+    {
+      "baseline_requested_bytes_per_operation": 213850487,
+      "baseline_requests_per_operation": 506058,
+      "candidate_requested_bytes_per_operation": 184239975,
+      "candidate_requests_per_operation": 306040,
+      "case": "search/100000/2/broad",
+      "fewer_requested_bytes_per_operation": 29610512,
+      "paired_requested_bytes_reduction_percent": 13.846,
+      "paired_requests_reduction_percent": 39.525
+    },
+    {
+      "baseline_requested_bytes_per_operation": 274698647,
+      "baseline_requests_per_operation": 524058,
+      "candidate_requested_bytes_per_operation": 184959975,
+      "candidate_requests_per_operation": 324040,
+      "case": "search/100000/8/broad",
+      "fewer_requested_bytes_per_operation": 89738672,
+      "paired_requested_bytes_reduction_percent": 32.668
+    },
+    {
+      "baseline_requested_bytes_per_operation": 289412910,
+      "baseline_requests_per_operation": 1106093,
+      "candidate_requested_bytes_per_operation": 259801834,
+      "candidate_requests_per_operation": 906074.5,
+      "case": "project/100000/2/broad",
+      "fewer_requested_bytes_per_operation": 29611076,
+      "paired_requested_bytes_reduction_percent": 10.231
+    }
+  ],
+  "key_timing_results": [
+    {
+      "baseline_median_ms": 2.2238,
+      "candidate_faster_pairs": 6,
+      "candidate_median_ms": 1.9422,
+      "case": "search/1000/2/broad",
+      "paired_reduction_percent": 12.414,
+      "total_pairs": 6
+    },
+    {
+      "baseline_median_ms": 286.064,
+      "candidate_faster_pairs": 6,
+      "candidate_median_ms": 258.5563,
+      "case": "search/100000/0/broad",
+      "pair_reduction_range_percent": [
+        9.09,
+        10.472
+      ],
+      "paired_reduction_percent": 9.65,
+      "separate_median_saving_ms": 27.5077,
+      "total_pairs": 6
+    },
+    {
+      "baseline_median_ms": 330.9297,
+      "candidate_faster_pairs": 6,
+      "candidate_median_ms": 297.0247,
+      "case": "search/100000/2/broad",
+      "pair_reduction_range_percent": [
+        9.171,
+        10.925
+      ],
+      "paired_cpu_reduction_percent": 10.315,
+      "paired_reduction_percent": 10.316,
+      "separate_median_saving_ms": 33.905,
+      "total_pairs": 6
+    },
+    {
+      "baseline_median_ms": 442.3413,
+      "candidate_faster_pairs": 6,
+      "candidate_median_ms": 378.7,
+      "case": "search/100000/8/broad",
+      "pair_reduction_range_percent": [
+        12.818,
+        16.005
+      ],
+      "paired_reduction_percent": 14.528,
+      "separate_median_saving_ms": 63.6413,
+      "total_pairs": 6
+    },
+    {
+      "baseline_median_ms": 471.1242,
+      "candidate_faster_pairs": 6,
+      "candidate_median_ms": 439.8347,
+      "case": "project/100000/0/broad",
+      "paired_reduction_percent": 6.818,
+      "separate_median_saving_ms": 31.2895,
+      "total_pairs": 6
+    },
+    {
+      "baseline_median_ms": 528.8806,
+      "candidate_faster_pairs": 6,
+      "candidate_median_ms": 494.129,
+      "case": "project/100000/2/broad",
+      "pair_reduction_range_percent": [
+        4.655,
+        9.116
+      ],
+      "paired_cpu_reduction_percent": 7.052,
+      "paired_reduction_percent": 7.046,
+      "separate_median_saving_ms": 34.7516,
+      "total_pairs": 6
+    }
+  ],
+  "limits": [
+    "Measurements are Linux Swift 6.4 component results; macOS qualification remained pending at audit time.",
+    "Constructed expanded-row workloads are not measured user-library distributions. Depth eight is a stress case.",
+    "Complete search and cached actor projection are separate measured boundaries; no whole-player CPU, FPS, native rendering, typing latency, or memory-footprint claim follows.",
+    "Allocation cohort has two balanced pairs per case and measures intercepted successful malloc/calloc/realloc requests and requested bytes, not live/peak/RSS memory or every allocator API.",
+    "Case order is fixed; variant process order is balanced AB/BA. Six pairs show consistency within this runner, not portability across hardware.",
+    "The artifact excludes .build binaries. Recorded executable hashes were inspected as receipt fields, but executable bytes were unavailable for independent hash recomputation.",
+    "The earlier wiped local Linux run is not part of this verified evidence."
+  ],
+  "method": {
+    "benchmark_or_test_reruns": 0,
+    "output_validation": "Every measurement and calibration consumed one matching process-log output; pair checks, independent analytical checksums, output counts, and cross-cohort fingerprints checked.",
+    "read_only_review_before_this_report": true,
+    "summary_recomputation": "Independent Python implementation; no import or execution of benchmark summarizer."
+  },
+  "observed_check_counts": {
+    "raw_and_summary_audit": {
+      "all-process-output-accounted": 2,
+      "analytic-checksum": 36,
+      "case-fields": 36,
+      "case-rows": 36,
+      "case-shape": 36,
+      "command-success": 2,
+      "completion": 2,
+      "cross-cohort-fingerprints": 1,
+      "exact-summary-recomputation": 2,
+      "fingerprint": 36,
+      "logged-calibration": 72,
+      "logged-measurement": 288,
+      "order": 144,
+      "pair-equality": 720,
+      "process-count": 2,
+      "recognizer-CI-merge-blob": 1,
+      "recognizer-test-receipt": 4,
+      "row-count": 2
+    },
+    "source_audit": {
+      "build-receipt": 12,
+      "compiled-file": 32,
+      "compiled-path-set": 4,
+      "current-harness": 4,
+      "current-meter": 2,
+      "environment-source": 8,
+      "filter-source": 4,
+      "only-filter-diff": 2,
+      "pinned-GitHub-blob": 1,
+      "pinned-oracle": 4,
+      "portable-support": 4,
+      "runner-copy": 2,
+      "shared-build": 6,
+      "test-compiled": 20,
+      "test-identity": 4,
+      "test-input": 28,
+      "test-log": 4,
+      "test-result": 4,
+      "test-runner": 4,
+      "test-runner-copy": 2,
+      "test-slice": 72
+    }
+  },
+  "provenance": {
+    "all_compiled_files_and_final_manifest_harness_oracle_hashes_verified": true,
+    "allocation_meter_c_sha256": "b3ef266d628e2f8c2d474a804de16c090f7503d7f6fc72b4fef42a3998cb4acc",
+    "allocation_meter_header_sha256": "ac1829d9b8a927bb5e0a7c3a6df3a6c946987cbc0f84a138360c34d32564bd1d",
+    "baseline_commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+    "baseline_filter_authentication": "Recomputed Git blob SHA-1 from staged bytes; matches previously fetched pinned GitHub blob. Local partial clone lacked this blob, so no successful local git-show comparison was claimed.",
+    "baseline_filter_git_blob_sha1": "a7367fc7f81886c825ac82ccbcbef7329b5d4b65",
+    "candidate_filter_matches_reviewed_branch": true,
+    "candidate_filter_sha256": "fe1f6f18c8870963a95867370bf84ab686cccb37f3e605e0b07c9ce82f500f5e",
+    "ci_merge_commit": "f9ed5ee80bcf7c62f330a46306e21367b509b639",
+    "ci_merge_message": "Merge 6cd039e9a24310e4ab42e50298131d7dbfb56203 into 33fff16155c3472960f88e04c72dfdfdefd56dcf",
+    "ci_merge_recognizer_distinction": {
+      "git_blob_sha1": "9f4caaa3fdc377eabe54e8a36706f7c25dee94a6",
+      "github_verification_ref": "f9ed5ee80bcf7c62f330a46306e21367b509b639",
+      "initial_branch_comparison_mismatches": 8,
+      "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+      "recognition_fixture_construction_outside_benchmark_timing": true,
+      "resolution": "CI tested the PR merge with the newer main recognizer. All four test receipts and both benchmark variants use identical authenticated CI recognizer bytes. The initial mismatches were four original-source plus four compiled-source comparisons against the older unmerged branch, not mismatches between baseline and candidate.",
+      "sha256": "546229819194a5844bc052e3837a21296921f4b11e6191ebdc82c0c7c5e64910"
+    },
+    "harness_matches_reviewed_branch": true,
+    "harness_sha256": "f55afe57f552be02fcd6c55a2586c8f37b0127bf2531f5acdab062dab7705162",
+    "only_baseline_candidate_source_difference": "Sources/IlliquidApp/SourceBrowserFilter.swift",
+    "oracle_independently_reconstructed_from_pinned_filter": true,
+    "oracle_sha256": "c4f8c0d7845df2afb216b47ab1322a86663ea09dc1951a1c31b35de4600f3e4b",
+    "portable_support_sha256": "3cbf14011e80f5415239a50dba92a339b2ba82157926e8a5794f1e8f2c23fd0d",
+    "reviewed_branch_head": "6cd039e9a24310e4ab42e50298131d7dbfb56203",
+    "runner_sha256": "f4d5d875bcb628954b9f74e104763c217c17585c4d2d4ad4065ad6c3ca83e899",
+    "test_runner_sha256": "1dbc17e778d5d011abc72224714be6cae795cd09444bb85740a313ac5472695b",
+    "test_source_sha256": "2a18b01e1751481be3818393d8888bcb76a3ae81af7348d327df4296b357ee1a"
+  },
+  "status": "passed with documented platform and provenance limits",
+  "upstream_artifact": {
+    "audit_scope": "Extracted source files, receipts, logs, and raw records; archive digest verification was performed by the parent agent.",
+    "sha256_reported_verified_by_parent": "b4812096ba73ca4a9a690e244a25e7d4a848aad1915a4010518e6e2cabb81e00",
+    "workflow_run_id": 39320261280
+  }
+}

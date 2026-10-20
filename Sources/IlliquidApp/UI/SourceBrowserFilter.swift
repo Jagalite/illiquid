@@ -228,7 +228,11 @@ actor SourceBrowserFilter {
                 return false
             }
         }
-        let visibleIDs = Set(matchingRows.flatMap { [$0.id] + $0.ancestorIDs })
+        var visibleIDs = Set<String>(minimumCapacity: matchingRows.count)
+        for row in matchingRows {
+            visibleIDs.insert(row.id)
+            visibleIDs.formUnion(row.ancestorIDs)
+        }
         return rows.filter { visibleIDs.contains($0.id) }
     }
 }
