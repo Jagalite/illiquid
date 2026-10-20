@@ -63,9 +63,11 @@ The duplicate runner copy and compressed staged-source archive are omitted from
 Git. The runner, tests, candidate source, retained baseline declarations, and
 staging rules are retained in the original commit identified above; their exact
 hashes remain in the manifests. CI artifacts additionally contain that compressed
-archive. The current native runner uses a refreshed baseline at
-`33fff16155c3472960f88e04c72dfdfdefd56dcf`, including the newer shared recognition
-and sidecar code; this does not revise the historical Linux observations.
+archive. The current native runner uses integration baseline
+`ad647a61f995541789f2f77014894614ed2d0b4a`, including the shared recognition,
+sidecar, search-ID construction, and source-sorting changes in both variants.
+The [integration refresh receipt](integration-baseline-refresh.json) records
+the updated snapshots. Historical Linux and macOS observations are unchanged.
 
 Earlier local setup attempts exposed two Linux-specific issues: the Swift
 standalone driver intermittently trapped while inspecting a child thread, and

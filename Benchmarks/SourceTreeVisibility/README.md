@@ -2,8 +2,11 @@
 
 Measure the real background browser projection when visibility settings change
 without changing the underlying source tree. The current baseline for native
-qualification is consolidated `main` at
-`33fff16155c3472960f88e04c72dfdfdefd56dcf`.
+qualification is integration ancestor
+`ad647a61f995541789f2f77014894614ed2d0b4a`, which combines PRs #55 and #57
+before adding the visibility-cache change from #58. Both variants therefore
+use the reviewed search-ID construction and source-tree sorting. The strict
+shared-source equality checks remain enabled.
 
 The original Linux measurements used
 `68274d1b09dcc866296321a5a8858efc297c4f19` and remain historical evidence with
@@ -12,7 +15,11 @@ their original manifests. The retained baseline was refreshed on October 19,
 merged into `main`. Both variants in new runs use those same updated shared
 dependencies. The source-browser filter and tree-input baseline implementations
 are unchanged between the two revisions; new native measurements identify the
-refreshed baseline independently of the original Linux cohort.
+refreshed baseline independently of the original Linux cohort. The October 20
+integration refresh adds the search and sorting changes to both variants;
+only the original visibility-cache production diff remains between them.
+The retained October 19 native measurements still identify baseline
+`33fff16155c3472960f88e04c72dfdfdefd56dcf` and have not been rewritten.
 
 ## Run
 

@@ -369,82 +369,62 @@ struct SourceTreeSortConfiguration: Equatable, Sendable {
 }
 
 enum SourceTreeSorting {
-    private static let criterionPrecedence: [SourceTreeSortCriterion] = [
-        .type,
-        .dateCreated,
-        .name,
-    ]
-
     static func sorted(
         _ entries: [SourceTreeEntry],
         using configuration: SourceTreeSortConfiguration
     ) -> [SourceTreeEntry] {
-        entries
-            .enumerated()
-            .sorted { left, right in
-                for criterion in criterionPrecedence {
-                    let direction = configuration.direction(for: criterion)
-                    guard direction != .off else { continue }
-                    if let precedes = orderedBefore(
-                        left.element,
-                        right.element,
-                        by: criterion,
-                        direction: direction
-                    ) {
-                        return precedes
-                    }
-                }
-                return left.offset < right.offset
-            }
-            .map(\.element)
-    }
+        guard entries.count > 1,
+              configuration.type != .off
+                || configuration.dateCreated != .off
+                || configuration.name != .off
+        else { return entries }
 
-    private static func orderedBefore(
-        _ left: SourceTreeEntry,
-        _ right: SourceTreeEntry,
-        by criterion: SourceTreeSortCriterion,
-        direction: SourceTreeSortDirection
-    ) -> Bool? {
-        switch criterion {
-        case .type:
-            guard left.kind != right.kind else { return nil }
-            let foldersFirst = direction == .ascending
-            return foldersFirst
-                ? left.kind == .folder
-                : left.kind == .media
-
-        case .dateCreated:
-            switch (left.creationDate, right.creationDate) {
-            case let (leftDate?, rightDate?) where leftDate != rightDate:
-                return direction == .ascending
-                    ? leftDate < rightDate
-                    : leftDate > rightDate
-            case (_?, nil):
-                return true
-            case (nil, _?):
-                return false
-            default:
-                return nil
-            }
-
-        case .name:
-            let comparison = naturalComparison(left.url, right.url)
-            guard comparison != .orderedSame else { return nil }
-            return direction == .ascending
-                ? comparison == .orderedAscending
-                : comparison == .orderedDescending
+        // Resolve a filename only if earlier criteria tie, and at most once
+        // per entry. A date sort with distinct dates need not read any names.
+        var names: [String?] = configuration.name == .off
+            ? [] : Array(repeating: nil, count: entries.count)
+        func name(at index: Int) -> String {
+            if let cached = names[index] { return cached }
+            let value = entries[index].url.lastPathComponent
+            names[index] = value
+            return value
         }
-    }
 
-    private static func naturalComparison(
-        _ left: URL,
-        _ right: URL
-    ) -> ComparisonResult {
-        let nameComparison = left.lastPathComponent.localizedStandardCompare(
-            right.lastPathComponent
-        )
-        guard nameComparison == .orderedSame else { return nameComparison }
-        return left.path.compare(right.path, options: [.literal])
+        // Move indices during sorting instead of complete entries and their
+        // metadata. The original index also preserves the order of full ties.
+        return entries.indices.sorted { leftIndex, rightIndex in
+            let left = entries[leftIndex], right = entries[rightIndex]
+            if configuration.type != .off, left.kind != right.kind {
+                return configuration.type == .ascending
+                    ? left.kind == .folder : left.kind == .media
+            }
+
+            if configuration.dateCreated != .off {
+                switch (left.creationDate, right.creationDate) {
+                case let (leftDate?, rightDate?) where leftDate != rightDate:
+                    return configuration.dateCreated == .ascending
+                        ? leftDate < rightDate : leftDate > rightDate
+                case (_?, nil):
+                    return true
+                case (nil, _?):
+                    return false
+                default:
+                    break
+                }
+            }
+
+            if configuration.name != .off {
+                var comparison = name(at: leftIndex).localizedStandardCompare(name(at: rightIndex))
+                if comparison == .orderedSame {
+                    comparison = left.url.path.compare(right.url.path, options: [.literal])
+                }
+                if comparison != .orderedSame {
+                    return configuration.name == .ascending
+                        ? comparison == .orderedAscending : comparison == .orderedDescending
+                }
+            }
+            return leftIndex < rightIndex
+        }.map { entries[$0] }
     }
 }
 
