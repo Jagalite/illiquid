@@ -88,14 +88,17 @@ jobs:
             -metadata:s:a:2 language=eng -metadata:s:a:2 title=Commentary \
             "$RUNNER_TEMP/lease-history-native/fixtures/multiple-audio-flags.mkv"
           test -s "$RUNNER_TEMP/lease-history-native/fixtures/multiple-audio-flags.mkv"
-          ffprobe -v error -show_streams -show_format -of json \
-            "$RUNNER_TEMP/lease-history-native/fixtures/multiple-audio-flags.mkv" \
-            > "$RUNNER_TEMP/lease-history-native/fixture.json"
+          # The pinned SDK supplies ffmpeg, but does not include ffprobe.
+          # Decode each required stream so a missing/corrupt track fails here.
+          ffmpeg -hide_banner -nostdin -v error -xerror -threads 2 \
+            -i "$RUNNER_TEMP/lease-history-native/fixtures/multiple-audio-flags.mkv" \
+            -map 0:v:0 -map 0:a:0 -map 0:a:1 -map 0:a:2 -threads 2 -f null - \
+            2> "$RUNNER_TEMP/lease-history-native/fixture-validation.log"
       - name: Build the native app graph and test replacement cleanup
         run: |
           export ILLIQUID_NATIVE_FIXTURE_DIR="$RUNNER_TEMP/lease-history-native/fixtures"
           set -o pipefail
-          swift test --force-resolved-versions -c release --no-parallel --filter \
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
             'RuntimeLeaseHistoryTests|RuntimeAuthorityFenceTests|DifferentialHarnessTests|stopDuringInFlightAudioTrackCandidateCannotResurrectSession|shutdownDuringAudioTrackCandidatePreparationReleasesEveryRuntimeLease|rapidRepeatedAudioTrackReplacementsConvergeToLatestSelectionAndReleaseLeases' \
             2>&1 | tee "$RUNNER_TEMP/lease-history-native/tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
