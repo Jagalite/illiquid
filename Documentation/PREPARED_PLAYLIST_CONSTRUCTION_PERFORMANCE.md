@@ -49,7 +49,49 @@ guard or final sort. Input generation and verification stay outside timing.
 Fresh workers and alternating baseline/candidate order limit persistent-process
 bias; both wall and process CPU time are retained.
 
-Results and native qualification will be added after the paired runs complete.
+The native study completed on October 19 in [workflow run
+39322226036](https://github.com/Jagalite/illiquid/actions/runs/39322226036).
+An independent October 20 audit matched all 14 baseline/candidate production
+source hashes to baseline `33fff16155c3472960f88e04c72dfdfdefd56dcf` and PR head
+`dd370843dceb180c6216604b6acc7f6cdb9b56bd`. The workflow checked out their synthetic
+merge `4d0c46079bae104d34e391883358b61b7116a073`; its measured source bytes match
+those intended revisions. Later documentation-only changes do not alter them.
+
+Environment: macOS 26.6.2 arm64, Apple Swift 6.3.3, locale `en_US`, three logical
+CPUs on the hosted runner. All 97 complete-output comparisons passed. All four
+baseline/candidate debug/release runs passed 93 tests across 12 suites. The audit
+checked complete snapshot hashes, alternating pair order, matching iteration
+counts and output witnesses, and recomputed every wall/CPU median and paired
+speedup from 1,020 samples (510 pairs).
+
+The timing result is mixed: 49 of 85 case medians improved, and the candidate was
+faster in 288 of 510 matched pairs. Among the 43 construction cases with more
+than two inputs, 32 medians improved. The eight unchanged public-constructor
+controls split evenly between higher and lower medians, consistent with runner noise.
+These data do not establish a dependable improvement for every workload.
+
+At 10,000 media URLs without subtitles, eight of nine medians improved:
+
+- Unique names, shuffled: 386.796 to 350.787 ms, a 9.3% reduction. Individual
+  paired speedups ranged from 0.877 to 1.486, including slower candidate pairs.
+- Identical basenames in distinct directories, sorted: 214.682 to 176.985 ms,
+  a 17.6% reduction; all six pairs improved (1.059 to 1.357 speedup).
+- Multilingual names, sorted: 283.898 to 309.113 ms, an 8.9% regression in the
+  median; paired speedups ranged from 0.860 to 1.187. This case establishes no
+  dependable benefit.
+
+Both subtitle-present 1,000-item cases had higher candidate medians: unique
+names increased 2.3%, and multilingual names increased 1.5%. Their paired ranges
+crossed parity. Skipping a redundant sort is correct, but these results support
+only workload-specific performance claims and leave small/noisy differences
+unresolved. No completed Linux timing study was present on the reviewed head.
+
+The [permanent native receipts](PerformanceEvidence/PreparedPlaylistConstruction/macos)
+retain the unmodified manifest, all timing samples, all 85 summaries, output
+hashes and audit receipt. The [full native artifact](https://github.com/Jagalite/illiquid/actions/runs/39322226036/artifacts/12221017949)
+also contains complete output snapshots and native test logs; it expires
+November 2, 2026. Those files were audited, and their hashes are retained, but
+their bytes remain in the hosted artifact.
 
 ## Validation and reproduction
 

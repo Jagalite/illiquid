@@ -1,0 +1,170 @@
+{
+  "arguments": {
+    "baseline": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+    "max_media_size": 10000,
+    "max_subtitle_size": 1000,
+    "output": "/Users/runner/work/_temp/prepared-playlist/measurements",
+    "pairs": 6,
+    "quick": false,
+    "swift": "swiftc",
+    "target_ms": 50.0,
+    "verify_only": false
+  },
+  "baseline_commit": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+  "binaries": {
+    "baseline": {
+      "path": "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/benchmark",
+      "sha256": "549f2a609b14ef2cf3f472d13ad9f08586979dac45db0d5837e8da610e40523e"
+    },
+    "candidate": {
+      "path": "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/benchmark",
+      "sha256": "4fd275ec13596831191a997a96d96a3cf15b77c0b293a4b46fd9c40993862a58"
+    }
+  },
+  "candidate_head": "4d0c46079bae104d34e391883358b61b7116a073",
+  "candidate_status": "",
+  "compile_commands": {
+    "baseline": [
+      "/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-module-cache-path",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/module-cache",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/FolderPlaylist.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/FolderPlaylistDiscovery.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/PlaylistMutation.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/ExternalSubtitleMatcher.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/NaturalFilenameOrdering.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/NormalizedFileURL.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/MediaFileSupport.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/Harness.swift",
+      "-o",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/baseline/benchmark"
+    ],
+    "candidate": [
+      "/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-module-cache-path",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/module-cache",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/FolderPlaylist.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/FolderPlaylistDiscovery.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/PlaylistMutation.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/ExternalSubtitleMatcher.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/NaturalFilenameOrdering.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/NormalizedFileURL.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/MediaFileSupport.swift",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/Harness.swift",
+      "-o",
+      "/Users/runner/work/_temp/prepared-playlist/measurements/build/candidate/benchmark"
+    ]
+  },
+  "environment": {
+    "LANG": "en_US.UTF-8",
+    "LC_ALL": "en_US.UTF-8",
+    "LC_COLLATE": null,
+    "SWIFT_DETERMINISTIC_HASHING": null
+  },
+  "harness_sha256": "f4470508127de50d713eed1d104fce85814ab49ef3fb132e250b969a62737dfd",
+  "platform": {
+    "machine": "arm64",
+    "node": "sat12-bq153-5af1e5d0-dc98-4f08-9a80-3dd08f136f2a-167AFC2AAA83.local",
+    "processor": "arm",
+    "release": "25.6.0",
+    "system": "Darwin",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:16:43 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_VMAPPLE"
+  },
+  "process_policy": "Fresh baseline/candidate workers for every timed pair",
+  "python": "3.15.0 (main, Oct  9 2026, 11:16:41) [Clang 21.0.0 (clang-2100.3.34.2)]",
+  "runner_sha256": "2b58e3e4b733e842e78e08f4ffafc30c858a4852776ae5f2a65e543981ecd4b7",
+  "runtime": {
+    "baseline": {
+      "locale": "en_US",
+      "os": "Version 26.6.2 (Build 25G83)",
+      "processors": 3
+    },
+    "candidate": {
+      "locale": "en_US",
+      "os": "Version 26.6.2 (Build 25G83)",
+      "processors": 3
+    }
+  },
+  "sources": {
+    "baseline": [
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+        "sha256": "a671d9a01e72a20d84c842319741862134d15b5fd307af4a3b2b4b9163690e4e"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift",
+        "sha256": "01d07be209499c26cd9c6f9a5c49637a0fe8a45939f65709f518e2b614ea5b4c"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Playlist/PlaylistMutation.swift",
+        "sha256": "a5971108548cba592f11b620e5ce6c05d42735ee867d9af46704c0124407a162"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift",
+        "sha256": "38f10f619d3a8f09bb0b0e4b0c92ff9696338722292e59c5e1fbd561a6d928eb"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Utilities/MediaFileSupport.swift",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+      }
+    ],
+    "candidate": [
+      {
+        "origin": "working-tree",
+        "path": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      {
+        "origin": "working-tree",
+        "path": "Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift",
+        "sha256": "3748bf70b9c26c7e4a812733d81f4e1df3719c783d4b2a389b8163024d2bded3"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Playlist/PlaylistMutation.swift",
+        "sha256": "a5971108548cba592f11b620e5ce6c05d42735ee867d9af46704c0124407a162"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift",
+        "sha256": "38f10f619d3a8f09bb0b0e4b0c92ff9696338722292e59c5e1fbd561a6d928eb"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      },
+      {
+        "origin": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+        "path": "Sources/IlliquidCore/Utilities/MediaFileSupport.swift",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+      }
+    ]
+  },
+  "swift_compiler": "/usr/bin/swiftc",
+  "swift_version": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+}
