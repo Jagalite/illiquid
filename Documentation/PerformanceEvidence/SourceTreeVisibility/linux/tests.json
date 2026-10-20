@@ -1,0 +1,42 @@
+{
+  "runs": [
+    {
+      "configuration": "debug",
+      "filter": null,
+      "passed": true,
+      "skip": "reuseTreeAcrossVisibilityChanges",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "filter": null,
+      "passed": true,
+      "skip": null,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "filter": null,
+      "passed": true,
+      "skip": "reuseTreeAcrossVisibilityChanges",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "filter": null,
+      "passed": true,
+      "skip": null,
+      "variant": "candidate"
+    },
+    {
+      "expected_cache_count_failure": true,
+      "returncode": 1,
+      "variant": "baseline"
+    }
+  ],
+  "suites": [
+    "SourceBrowserFilterTests.swift",
+    "SourceMediaOrganizationTests.swift",
+    "SourceTreeVisibilityCacheTests.swift"
+  ]
+}

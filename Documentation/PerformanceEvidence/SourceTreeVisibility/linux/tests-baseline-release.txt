@@ -1,0 +1,67 @@
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Source browser background filtering" started.
+◇ Test expandedFolderCycleDoesNotRecurseOrDuplicateMedia() started.
+✔ Test expandedFolderCycleDoesNotRecurseOrDuplicateMedia() passed after 0.001 seconds.
+◇ Test immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) started.
+◇ Test case passing 1 argument count → 1000 to immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) started.
+SOURCE_TREE_PROJECTION count=1000 rows_search_and_replacement=0.015900363 seconds
+◇ Test case passing 1 argument count → 10000 to immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) started.
+SOURCE_TREE_PROJECTION count=10000 rows_search_and_replacement=0.175067367 seconds
+◇ Test case passing 1 argument count → 100000 to immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) started.
+SOURCE_TREE_PROJECTION count=100000 rows_search_and_replacement=1.815113716 seconds
+✔ Test immutableTreeSnapshotBuildsOffUIAndReusesRowsForSearch(count:) with 3 test cases passed after 2.682 seconds.
+◇ Test searchingReusesVisibilityAndKeepsMatchingAncestors() started.
+✔ Test searchingReusesVisibilityAndKeepsMatchingAncestors() passed after 0.001 seconds.
+✔ Suite "Source browser background filtering" passed after 2.687 seconds.
+◇ Suite "Source media organization" started.
+◇ Test groupingKeepsFilesAndSortsEpisodesNumerically() started.
+✔ Test groupingKeepsFilesAndSortsEpisodesNumerically() passed after 0.003 seconds.
+◇ Test searchUsesShowAndRawFilenameWithoutRebuildingRecognition() started.
+✔ Test searchUsesShowAndRawFilenameWithoutRebuildingRecognition() passed after 0.001 seconds.
+◇ Test hiddenAncestorsDoNotLeakGroupTitlesAndPreviewRestoresThem() started.
+✔ Test hiddenAncestorsDoNotLeakGroupTitlesAndPreviewRestoresThem() passed after 0.001 seconds.
+◇ Test recursiveEntriesOverlapExplicitFilesWithoutDuplication() started.
+✔ Test recursiveEntriesOverlapExplicitFilesWithoutDuplication() passed after 0.001 seconds.
+◇ Test largeLibraryReusesRecognitionForSearch() started.
+MEDIA_LIBRARY count=10000 projection=1.072227648 seconds search=0.074262036 seconds
+✔ Test largeLibraryReusesRecognitionForSearch() passed after 1.219 seconds.
+◇ Test filesystemScanFeedsRecognitionAndExcludesSidecars() started.
+✔ Test filesystemScanFeedsRecognitionAndExcludesSidecars() passed after 0.004 seconds.
+◇ Test sidecarsReachRowsForFoldersAndExplicitFiles() started.
+✔ Test sidecarsReachRowsForFoldersAndExplicitFiles() passed after 0.004 seconds.
+◇ Test fileHeavyTabsDeduplicateWatchRootsWithoutLosingDirectories() started.
+SOURCE_WATCH_ROOTS files=10000 unique_directories=5000 duration=0.112832505 seconds
+✔ Test fileHeavyTabsDeduplicateWatchRootsWithoutLosingDirectories() passed after 0.189 seconds.
+◇ Test modePersistsWithoutChangingLegacyDefaults() started.
+✔ Test modePersistsWithoutChangingLegacyDefaults() passed after 0.001 seconds.
+✔ Suite "Source media organization" passed after 1.424 seconds.
+◇ Suite "Source tree cache visibility boundaries" started.
+◇ Test visibilityChangesMatchFreshProjection(mode:) started.
+◇ Test case passing 1 argument mode → .tree to visibilityChangesMatchFreshProjection(mode:) started.
+◇ Test case passing 1 argument mode → .filesOnly to visibilityChangesMatchFreshProjection(mode:) started.
+◇ Test case passing 1 argument mode → .foldersOnly to visibilityChangesMatchFreshProjection(mode:) started.
+◇ Test case passing 1 argument mode → .media to visibilityChangesMatchFreshProjection(mode:) started.
+✔ Test visibilityChangesMatchFreshProjection(mode:) with 4 test cases passed after 0.133 seconds.
+◇ Test treeDependenciesRebuildAndMatchFreshProjection() started.
+✔ Test treeDependenciesRebuildAndMatchFreshProjection() passed after 0.006 seconds.
+◇ Test cancelledRequestLeavesThePreviousTreeAvailable() started.
+✔ Test cancelledRequestLeavesThePreviousTreeAvailable() passed after 0.001 seconds.
+✔ Suite "Source tree cache visibility boundaries" passed after 0.140 seconds.
+✔ Test run with 15 tests in 3 suites passed after 4.252 seconds.
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for production...
+[0/12] Write swift-version-79F5DDD9F357E4C6.txt
+[1/12] Compiling IlliquidCore MediaFileSupport.swift
+[2/12] Compiling IlliquidApp AppValues.swift
+[3/12] Write Objects.LinkFileList
+[4/12] Linking SourceTreeBenchmark
+[5/12] Compiling IlliquidAppTests SourceBrowserFilterTests.swift
+[6/12] /tmp/illiquid-source-tree-formal2-53c9/build/baseline/x86_64-unknown-linux-gnu/release/SourceTreeVisibilityQualificationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[7/12] Compiling SourceTreeVisibilityQualificationPackageDiscoveredTests IlliquidAppTests.swift
+[8/12] /tmp/illiquid-source-tree-formal2-53c9/build/baseline/x86_64-unknown-linux-gnu/release/SourceTreeVisibilityQualificationPackageTests.derived/runner.swift
+[9/12] Compiling SourceTreeVisibilityQualificationPackageTests runner.swift
+[10/12] Write Objects.LinkFileList
+[11/12] Linking SourceTreeVisibilityQualificationPackageTests.xctest
+Build complete! (24.81s)

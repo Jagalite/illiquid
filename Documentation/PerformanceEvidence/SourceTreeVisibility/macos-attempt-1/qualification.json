@@ -1,0 +1,19 @@
+{
+  "artifact_id": 12221040408,
+  "artifact_sha256": "de9c3c0f7c115588b302b17ce62eb26291b6019a0369bd0534967d456f83eaef",
+  "baseline": "33fff16155c3472960f88e04c72dfdfdefd56dcf",
+  "failure": "swiftpm-testing-helper exited with signal 5 after the benchmark main raised HarnessFailure.invalidArguments during baseline release test loading",
+  "fix": "Separate the IlliquidApp production library from the SourceTreeBenchmark executable; enable testing for the library equally in both variants. No argument suppression or skipped test discovery.",
+  "head_commit": "d7a7b51d6fdf30fff996b394f8f7b980ce58bd5f",
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/39319927060/job/118291027788",
+  "passed": [
+    "baseline debug component tests",
+    "candidate debug component tests",
+    "baseline release compilation"
+  ],
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/39319927060",
+  "status": "failed before timing: executable entry point invoked during release test loading",
+  "tested_merge": "6c00f029060e4f5cc0f12106cda1af5883efbb83",
+  "tested_tree": "308503824a8a18ef55cba03848c43a0a3c86e697",
+  "timed_observations": 0
+}

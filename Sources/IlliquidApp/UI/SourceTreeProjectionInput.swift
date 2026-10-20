@@ -5,7 +5,7 @@ import IlliquidCore
 /// execute on the existing browser actor, with no SwiftUI/AppModel access.
 struct SourceTreeProjectionInput: Equatable, Sendable {
     let items: [SourceTabItem]
-    let visibility: SourceVisibilityConfiguration
+    private(set) var visibility: SourceVisibilityConfiguration
     let roots: [URL]
     let directoryContents: [String: [SourceTreeEntry]]
     let directoryErrors: [String: String]
@@ -13,6 +13,17 @@ struct SourceTreeProjectionInput: Equatable, Sendable {
     let expandedFolderIDs: Set<String>
     let sortConfiguration: SourceTreeSortConfiguration
     var mediaPresence: [String: Bool] = [:]
+
+    /// Visibility rules are applied after row construction. Only the view mode
+    /// changes the tree shape or media recognition performed by `rows()`.
+    /// Keep the full synthesized equality for other consumers, and compare all
+    /// remaining fields here so new tree inputs participate automatically.
+    func hasSameTree(as other: Self) -> Bool {
+        guard visibility.viewMode == other.visibility.viewMode else { return false }
+        var treeInput = other
+        treeInput.visibility = visibility
+        return self == treeInput
+    }
 
     func rows() -> [SourceTreeDisplayRow] {
         if visibility.viewMode.scansRecursively {
