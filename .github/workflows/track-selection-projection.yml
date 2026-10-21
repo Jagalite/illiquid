@@ -1,0 +1,87 @@
+name: Track selection projection
+
+on:
+  push:
+    branches: ['perf/track-selection-projection']
+    paths:
+      - 'Sources/IlliquidCore/Player/PlaybackState.swift'
+      - 'Tests/IlliquidCoreTests/TrackSelectionProjectionTests.swift'
+      - 'Benchmarks/TrackSelectionProjection/Harness.swift'
+      - 'Benchmarks/TrackSelectionProjection/run.py'
+      - '.github/workflows/track-selection-projection.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/PlaybackState.swift'
+      - 'Sources/IlliquidCore/Player/PlaybackViewStore.swift'
+      - 'Tests/IlliquidCoreTests/TrackSelectionProjectionTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaybackStatePublicationTests.swift'
+      - 'Benchmarks/TrackSelectionProjection/Harness.swift'
+      - 'Benchmarks/TrackSelectionProjection/run.py'
+      - '.github/workflows/track-selection-projection.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: track-selection-projection-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record host and compiler
+        run: |
+          mkdir -p "$RUNNER_TEMP/track-projection"
+          sw_vers > "$RUNNER_TEMP/track-projection/host.txt"
+          uname -a >> "$RUNNER_TEMP/track-projection/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/track-projection/host.txt"
+          swift --version >> "$RUNNER_TEMP/track-projection/host.txt"
+      - name: Compare behavior and measure alternating release processes
+        run: python3 Benchmarks/TrackSelectionProjection/run.py --pairs 8 --output "$RUNNER_TEMP/track-projection/results"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: track-selection-projection-component
+          path: |
+            ${{ runner.temp }}/track-projection/host.txt
+            ${{ runner.temp }}/track-projection/results/evidence/
+          retention-days: 14
+
+  native-core:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run core regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/track-projection-native"
+          set -o pipefail
+          swift test --force-resolved-versions --filter \
+            'PlaybackStateTests|PlaybackStatePublicationTests|TrackSelectionProjectionTests|coreTrackAndSubtitleCommandsPublishOnlyAcknowledgedValues|externalLanguageRestoreWaitsForTheInstalledSidecarCatalog|perFileTrackSubtitleVisibilityAndDelayRestoreByMetadata' \
+            2>&1 | tee "$RUNNER_TEMP/track-projection-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: track-selection-projection-native-core
+          path: ${{ runner.temp }}/track-projection-native/
+          retention-days: 14
