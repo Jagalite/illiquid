@@ -38,16 +38,17 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Test, compare complete outputs, and measure native projection
+      - name: Confirm media projection timing with longer paired batches
         run: >-
           python3 Benchmarks/MediaSectionGrouping/run.py
-          --pairs 6 --target-ms 60 --output "$RUNNER_TEMP/media-section-grouping"
+          --mode benchmark --sizes 1000 --pairs 12 --target-ms 250
+          --output "$RUNNER_TEMP/media-section-grouping-confirmation"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: media-section-grouping-macos
+          name: media-section-grouping-macos-confirmation
           path: |
-            ${{ runner.temp }}/media-section-grouping/
-            !${{ runner.temp }}/media-section-grouping/build/**
-            !${{ runner.temp }}/media-section-grouping/cache/**
+            ${{ runner.temp }}/media-section-grouping-confirmation/
+            !${{ runner.temp }}/media-section-grouping-confirmation/build/**
+            !${{ runner.temp }}/media-section-grouping-confirmation/cache/**
           retention-days: 14
