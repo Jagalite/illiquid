@@ -9,6 +9,8 @@ final class MediaReadAheadGate: @unchecked Sendable {
     private var position: TimeInterval = 0
     private var closed = false
     private var waitingReaders = 0
+    private var waitingObservers = 0
+    private var earliestWaitingTimestamp: TimeInterval?
 
     init(lookahead: TimeInterval = 30) { self.lookahead = max(0, lookahead) }
 
@@ -17,7 +19,13 @@ final class MediaReadAheadGate: @unchecked Sendable {
         condition.lock()
         if position > self.position {
             self.position = position
-            condition.broadcast()
+            if let earliestWaitingTimestamp,
+               earliestWaitingTimestamp <= position + lookahead {
+                // Signaled readers remain runnable if another update arrives
+                // first. Those still blocked re-register under this same lock.
+                self.earliestWaitingTimestamp = nil
+                condition.broadcast()
+            }
         }
         condition.unlock()
     }
@@ -32,6 +40,7 @@ final class MediaReadAheadGate: @unchecked Sendable {
         condition.lock()
         self.generation = generation
         self.position = position.isFinite ? max(0, position) : 0
+        earliestWaitingTimestamp = nil
         condition.broadcast()
         condition.unlock()
     }
@@ -39,20 +48,35 @@ final class MediaReadAheadGate: @unchecked Sendable {
     @discardableResult
     func wait(until timestamp: TimeInterval?, generation: Int) -> Bool {
         condition.lock()
-        defer { condition.unlock() }
+        var registeredReader = false
+        defer {
+            if registeredReader { waitingReaders -= 1 }
+            condition.unlock()
+        }
         while !closed, self.generation == generation,
               timestamp == nil || timestamp! > position + lookahead {
-            waitingReaders += 1
-            condition.broadcast()
+            if !registeredReader {
+                registeredReader = true
+                waitingReaders += 1
+                if waitingObservers > 0 { condition.broadcast() }
+            }
+            if let timestamp {
+                earliestWaitingTimestamp = min(
+                    earliestWaitingTimestamp ?? timestamp, timestamp
+                )
+            }
             condition.wait()
-            waitingReaders -= 1
         }
         return !closed && self.generation == generation
     }
 
     func waitForBlockedReader(timeout: TimeInterval) -> Bool {
         condition.lock()
-        defer { condition.unlock() }
+        waitingObservers += 1
+        defer {
+            waitingObservers -= 1
+            condition.unlock()
+        }
         let deadline = Date().addingTimeInterval(timeout)
         while waitingReaders == 0, !closed {
             guard condition.wait(until: deadline) else { break }
@@ -63,6 +87,7 @@ final class MediaReadAheadGate: @unchecked Sendable {
     func close() {
         condition.lock()
         closed = true
+        earliestWaitingTimestamp = nil
         condition.broadcast()
         condition.unlock()
     }
