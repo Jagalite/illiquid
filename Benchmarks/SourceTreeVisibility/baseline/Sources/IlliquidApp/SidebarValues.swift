@@ -67,10 +67,17 @@ struct SourceVisibilityMatcher {
         let expression: NSRegularExpression
     }
 
+    private struct CachedAncestorEvaluation {
+        let path: String
+        let evaluation: SourceVisibilityEvaluation
+    }
+
+    private static let ancestorEvaluationCacheLimit = 1_024
     private let configuration: SourceVisibilityConfiguration
     private let rootPaths: [String]
     private let compiledRules: [CompiledRule]
     private let rootEvaluations: [String: SourceVisibilityEvaluation]
+    private var ancestorEvaluations: [String: CachedAncestorEvaluation] = [:]
 
     init(
         configuration: SourceVisibilityConfiguration,
@@ -167,7 +174,7 @@ struct SourceVisibilityMatcher {
         )
     }
 
-    func evaluateIncludingAncestors(_ url: URL) -> SourceVisibilityEvaluation {
+    mutating func evaluateIncludingAncestors(_ url: URL) -> SourceVisibilityEvaluation {
         guard let normalizedPath = SourceVisibilityPath.normalized(url) else {
             return SourceVisibilityEvaluation(
                 hiddenMatches: [],
@@ -177,7 +184,7 @@ struct SourceVisibilityMatcher {
         return evaluateIncludingAncestors(normalizedPath: normalizedPath)
     }
 
-    func evaluateIncludingAncestors(
+    mutating func evaluateIncludingAncestors(
         normalizedPath: String
     ) -> SourceVisibilityEvaluation {
         guard let rootPath = matchingRootPath(for: normalizedPath) else {
@@ -189,7 +196,7 @@ struct SourceVisibilityMatcher {
         )
     }
 
-    private func evaluateIncludingAncestors(
+    private mutating func evaluateIncludingAncestors(
         normalizedPath: String,
         rootPath: String
     ) -> SourceVisibilityEvaluation {
@@ -207,7 +214,7 @@ struct SourceVisibilityMatcher {
                 ? rootEvaluations[rootPath] ?? evaluate(
                     normalizedPath: ancestorPath
                 )
-                : evaluate(normalizedPath: ancestorPath)
+                : evaluateAncestor(normalizedPath: ancestorPath)
             for match in ancestor.regexMatches where !regexMatches.contains(match) {
                 regexMatches.append(match)
             }
@@ -229,6 +236,32 @@ struct SourceVisibilityMatcher {
             hiddenMatches: direct.hiddenMatches,
             regexMatches: regexMatches
         )
+    }
+
+    private mutating func evaluateAncestor(
+        normalizedPath: String
+    ) -> SourceVisibilityEvaluation {
+        if !Task.isCancelled,
+           let cached = ancestorEvaluations[normalizedPath],
+           // String keys equate canonically equivalent Unicode spellings,
+           // but a regular expression can distinguish their actual text.
+           cached.path.utf8.elementsEqual(normalizedPath.utf8)
+        {
+            return cached.evaluation
+        }
+        let evaluation = evaluate(normalizedPath: normalizedPath)
+        // Siblings share these evaluations only during this visibility pass.
+        // Keep deep or very broad libraries bounded, and never retain a regex
+        // evaluation interrupted by cancellation.
+        if !Task.isCancelled,
+           ancestorEvaluations.count < Self.ancestorEvaluationCacheLimit
+        {
+            ancestorEvaluations[normalizedPath] = CachedAncestorEvaluation(
+                path: normalizedPath,
+                evaluation: evaluation
+            )
+        }
+        return evaluation
     }
 
     func relativePath(for url: URL) -> String {

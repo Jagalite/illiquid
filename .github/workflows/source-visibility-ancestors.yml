@@ -1,0 +1,55 @@
+name: Source visibility ancestor performance
+
+on:
+  push:
+    branches: [perf/source-visibility-ancestors-d74d3c22]
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/UI/SourcesSidebar.swift
+      - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
+      - Tests/IlliquidAppTests/SourceVisibilityAncestorCacheTests.swift
+      - Benchmarks/SourceVisibilityAncestors/**
+      - Scripts/test-source-browser-search.py
+      - .github/workflows/source-visibility-ancestors.yml
+      - '!Benchmarks/SourceVisibilityAncestors/README.md'
+      - '!Benchmarks/SourceVisibilityAncestors/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-visibility-ancestors-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record native host
+        run: |
+          mkdir -p "$RUNNER_TEMP/source-visibility-ancestors"
+          sw_vers > "$RUNNER_TEMP/source-visibility-ancestors/host.txt"
+          uname -a >> "$RUNNER_TEMP/source-visibility-ancestors/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/source-visibility-ancestors/host.txt"
+          swift --version >> "$RUNNER_TEMP/source-visibility-ancestors/host.txt"
+      - name: Check behavior and measure paired native passes
+        run: |
+          python3 Benchmarks/SourceVisibilityAncestors/run.py \
+            --pairs 6 --target-ms 100 \
+            --output "$RUNNER_TEMP/source-visibility-ancestors/results"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-visibility-ancestors-macos
+          path: |
+            ${{ runner.temp }}/source-visibility-ancestors/
+            !${{ runner.temp }}/source-visibility-ancestors/**/clang-cache/**
+            !${{ runner.temp }}/source-visibility-ancestors/**/swift-cache/**
+          retention-days: 14

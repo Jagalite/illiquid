@@ -89,7 +89,7 @@ actor SourceBrowserFilter {
         configuration: SourceVisibilityConfiguration, roots: [URL],
         revealsRulePreview: Bool
     ) -> SourceBrowserProjection? {
-        let matcher = SourceVisibilityMatcher(configuration: configuration, roots: roots)
+        var matcher = SourceVisibilityMatcher(configuration: configuration, roots: roots)
         let evaluatesVisibility =
             !configuration.manuallyHiddenPaths.isEmpty
             || !configuration.alwaysShownPaths.isEmpty

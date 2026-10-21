@@ -21,6 +21,18 @@ only the original visibility-cache production diff remains between them.
 The retained October 19 native measurements still identify baseline
 `33fff16155c3472960f88e04c72dfdfdefd56dcf` and have not been rewritten.
 
+The October 21 refresh updates the retained shared sidebar declarations to
+the current production ancestor-visibility memoization. New runs therefore
+hold that bounded memoization equal in both variants. The historical filter
+has one compatibility adaptation, `let matcher` to `var matcher`, for the
+shared matcher's mutating ancestor evaluation; its original tree-cache
+algorithm is preserved. The manifest retains that filter's original source
+hash and Git blob separately from the adapted snapshot hash, and records the
+shared sidebar's current production hashes and refresh provenance. The
+historical baseline revision above is unchanged; the per-file manifest
+identifies the refreshed inputs precisely. Existing timing evidence is
+unchanged and does not measure these refreshed binaries.
+
 ## Run
 
 Swift 6.1 or later and Python 3 are required. Use macOS 26 and the repository's

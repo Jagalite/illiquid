@@ -3049,7 +3049,7 @@ struct SourcesSidebarFolderModelTests {
             regexRules: []
         )
         configuration.normalize()
-        let matcher = SourceVisibilityMatcher(
+        var matcher = SourceVisibilityMatcher(
             configuration: configuration,
             roots: [root]
         )

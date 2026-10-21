@@ -2,7 +2,9 @@
 """Test actual source-browser search and projection sources on macOS or Linux.
 
 The disposable package uses complete Filter/Input files and verbatim portable
-declarations from AppModel/SourcesSidebar, with source and slice hashes. It
+declarations from AppModel/SourcesSidebar, with source and slice hashes. Historical
+Filters receive a recorded let-to-var compatibility adaptation for the shared
+matcher's mutating ancestor evaluation; their search algorithm is unchanged. It
 requires Swift 6.1+ with its bundled Testing module and has no network packages.
 This component harness does not build SwiftUI or the native playback targets.
 """
@@ -76,6 +78,8 @@ def prepare_package(
     Benchmarks can reuse this function and add their own executable target.
     source_ref overrides only SourceBrowserFilter via git show; shared support
     declarations and the new regression tests always come from the working tree.
+    A historical Filter's matcher binding is adapted to the shared mutating API;
+    its original and compiled hashes are recorded separately.
     filter_source alternatively supplies an exact Filter file, for local probes.
     """
     if source_ref is not None and filter_source is not None:
@@ -92,14 +96,21 @@ def prepare_package(
     (output / "Package.swift").write_text(manifest, encoding="utf-8")
     inputs: list[dict] = []
 
-    def copy_source(path: str, target: str, data: bytes | None = None, origin: str = "working-tree") -> None:
+    def copy_source(
+        path: str, target: str, data: bytes | None = None, origin: str = "working-tree", *,
+        compiled_data: bytes | None = None, adaptations: list[dict] | None = None,
+    ) -> None:
         original = (ROOT / path).read_bytes() if data is None else data
+        compiled = original if compiled_data is None else compiled_data
         destination = output / target / Path(path).name
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes(original)
-        inputs.append({"path": path, "origin": origin, "source_sha256": digest(original),
-                       "compiled_path": str(destination.relative_to(output)),
-                       "compiled_sha256": digest(original)})
+        destination.write_bytes(compiled)
+        record = {"path": path, "origin": origin, "source_sha256": digest(original),
+                  "compiled_path": str(destination.relative_to(output)),
+                  "compiled_sha256": digest(compiled)}
+        if adaptations:
+            record["adaptations"] = adaptations
+        inputs.append(record)
 
     for path in ["Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
                  "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift"]:
@@ -110,7 +121,21 @@ def prepare_package(
             ["git", "-C", str(ROOT), "rev-parse", "--verify", source_ref + "^{commit}"], text=True
         ).strip()
         original = subprocess.check_output(["git", "-C", str(ROOT), "show", resolved_ref + ":" + FILTER_PATH])
-        copy_source(FILTER_PATH, "Sources/IlliquidApp", original, resolved_ref)
+        before = b"        let matcher = SourceVisibilityMatcher(configuration: configuration, roots: roots)\n"
+        after = b"        var matcher = SourceVisibilityMatcher(configuration: configuration, roots: roots)\n"
+        adaptations = []
+        if original.count(before) == 1 and original.count(after) == 0:
+            compiled = original.replace(before, after, 1)
+            adaptations.append({
+                "before": before.decode().strip(), "after": after.decode().strip(),
+                "reason": "Compatibility with mutating ancestor evaluation in the shared current matcher; historical search behavior is unchanged.",
+            })
+        elif original.count(before) == 0 and original.count(after) == 1:
+            compiled = original
+        else:
+            raise ValueError("Historical Filter matcher binding changed; review compatibility adaptation")
+        copy_source(FILTER_PATH, "Sources/IlliquidApp", original, resolved_ref,
+                    compiled_data=compiled, adaptations=adaptations)
     elif filter_source is not None:
         resolved_ref = None
         copy_source(FILTER_PATH, "Sources/IlliquidApp", Path(filter_source).read_bytes(), str(Path(filter_source).resolve()))

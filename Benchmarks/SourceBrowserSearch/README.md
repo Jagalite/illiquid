@@ -97,6 +97,15 @@ algorithms. A separate executable target calls the production module, preserving
 the normal compilation boundary. Only the Filter file differs between variants;
 the runner verifies the compiled source, harness, oracle, and manifest hashes.
 
+For new runs after the ancestor-visibility cache change, a historical Filter's
+`let matcher` binding is changed to `var matcher` so it can call the shared
+matcher's mutating API. The preparation helper requires exactly one recognized
+binding and records the adaptation, original source hash, and compiled hash in
+its receipt. The historical search method remains unchanged, shared dependencies
+remain identical across variants, and the gate requiring only the Filter file
+to differ is preserved. Retained historical measurements are unchanged and do
+not qualify these newly prepared binaries.
+
 The output retains environment and toolchain details, commands and build logs,
 source and executable hashes, the exact staged source files, calibration data,
 every timing/allocation record, and summaries. `completion.json` distinguishes a
