@@ -54,13 +54,22 @@ jobs:
           python3 Benchmarks/AudioFormatMetadata/run.py \
             --pairs 6 --target-ms 80 \
             --output "$RUNNER_TEMP/audio-format-metadata/benchmark"
-      - name: Generate the real multichannel playback fixture
+      - name: Generate native playback fixtures
         run: |
           mkdir -p "$RUNNER_TEMP/audio-format-metadata/fixtures"
           ffmpeg -hide_banner -loglevel error -y \
             -f lavfi -i 'anullsrc=r=48000:cl=7.1' -t 2 -c:a flac \
             "$RUNNER_TEMP/audio-format-metadata/fixtures/audio-7.1.flac"
           test -s "$RUNNER_TEMP/audio-format-metadata/fixtures/audio-7.1.flac"
+          # AudioDelayTests also loads the standard H.264/AAC fixture.
+          # Match its definition in Scripts/generate-native-fixtures.sh.
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'testsrc2=size=640x360:rate=30' \
+            -f lavfi -i 'sine=frequency=440:sample_rate=48000' \
+            -t 3 -shortest \
+            -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac \
+            "$RUNNER_TEMP/audio-format-metadata/fixtures/h264-aac.mp4"
+          test -s "$RUNNER_TEMP/audio-format-metadata/fixtures/h264-aac.mp4"
       - name: Build the app graph and qualify audio output and draining
         run: |
           export ILLIQUID_NATIVE_FIXTURE_DIR="$RUNNER_TEMP/audio-format-metadata/fixtures"
