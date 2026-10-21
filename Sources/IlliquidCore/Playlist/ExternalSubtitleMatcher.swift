@@ -67,15 +67,9 @@ public enum ExternalSubtitleMatcher {
             }
         }
 
-        // Value-only mutation preserves indices. A standalone cursor avoids
-        // retaining the dictionary through an indices view while sorting.
-        var resultIndex = result.startIndex
-        while resultIndex != result.endIndex {
+        for mediaURL in Array(result.keys) {
             guard !isCancelled() else { return [:] }
-            if result.values[resultIndex].count > 1 {
-                result.values[resultIndex] = NaturalFilenameOrdering.sort(result.values[resultIndex])
-            }
-            result.formIndex(after: &resultIndex)
+            result[mediaURL] = NaturalFilenameOrdering.sort(result[mediaURL, default: []])
         }
 
         guard !isCancelled() else { return [:] }
@@ -173,8 +167,7 @@ public enum ExternalSubtitleMatcher {
             return nil
         }
 
-        let sharedTokens = Array(mediaTokens.prefix(sharedCount))
-        let sharedWeight = tokenWeight(sharedTokens)
+        let sharedWeight = mediaTokens.prefix(sharedCount).reduce(0) { $0 + $1.count }
         guard sharedWeight >= 4 else {
             return nil
         }

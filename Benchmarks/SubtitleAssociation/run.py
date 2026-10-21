@@ -117,6 +117,7 @@ def main() -> None:
         platform=platform.platform(), machine=platform.machine(),
         compiler=command([compiler, "--version"]).strip(),
         swift=command([swift, "--version"]).strip(),
+        compiler_path=str(Path(compiler).resolve()),
         compiler_sha256=sha256(Path(compiler).resolve()),
         candidate_matcher_override=str(args.candidate_matcher) if args.candidate_matcher else None,
         revision=command(["git", "rev-parse", "HEAD"], cwd=ROOT).strip(),
@@ -135,6 +136,9 @@ def main() -> None:
         github={name: os.environ[name] for name in ("GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT") if name in os.environ},
     )
     if platform.system() == "Darwin":
+        selected_compiler = Path(command(["xcrun", "--find", "swiftc"]).strip()).resolve()
+        manifest["xcrun_compiler_path"] = str(selected_compiler)
+        manifest["xcrun_compiler_sha256"] = sha256(selected_compiler)
         manifest["hardware"] = command(["sysctl", "-n", "machdep.cpu.brand_string"]).strip()
         manifest["os_version"] = command(["sw_vers"]).strip()
     else:
@@ -254,7 +258,7 @@ def main() -> None:
                     with (output / "measurements.jsonl").open("a") as stream:
                         stream.write(json.dumps(row, ensure_ascii=False) + "\n")
                     print("MEASUREMENT " + json.dumps(row), flush=True)
-                for field in ("checksum", "expectedChecksum", "count", "preflightChecksum", "verifiedQueries"):
+                for field in ("checksum", "expectedChecksum", "count", "preflightChecksum", "verifiedQueries", "localeIdentifier"):
                     if results["baseline"][field] != results["candidate"][field]:
                         raise RuntimeError(f"Paired outputs disagree for {case}: {field}")
                 paired.append(results)
