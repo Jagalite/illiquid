@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import statistics
 import subprocess
@@ -176,7 +177,7 @@ def main() -> None:
                         result = run([executable, "--testing-library", "swift-testing", "--filter",
                                       "cancellationRacingWithHandoffNeitherDuplicatesWorkNorLeaksCapacity"],
                                      stress_log, timeout=30)
-                        if "1 test passed" not in result:
+                        if not re.search(r"Test run with 1 test(?: in 1 suite)? passed", stress_log.read_text()):
                             raise RuntimeError(f"Stress filter did not execute exactly one test: {stress_log}")
                         stress_rows.append({"process": repetition + 1, "handoffs": 32, "passed": True})
                     write_json(folder / f"stress-{configuration}.json", stress_rows)
