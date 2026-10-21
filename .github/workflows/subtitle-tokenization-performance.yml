@@ -37,7 +37,9 @@ jobs:
       - name: Test both implementations and measure paired release associations
         run: |
           python3 Benchmarks/SubtitleTokenization/run.py \
-            --output "$RUNNER_TEMP/subtitle-tokenization" --pairs 6
+            --output "$RUNNER_TEMP/subtitle-tokenization" --mode benchmark --pairs 12 --target-ms 500 \
+            --case ascii_256 --case empty_256 --case unicode_16 \
+            --case unicode_256 --case late_unicode_256
       - name: Package complete evidence for review
         if: always()
         run: |

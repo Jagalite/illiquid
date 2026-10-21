@@ -56,6 +56,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--mode", choices=("all", "tests", "benchmark"), default="all")
+    parser.add_argument("--case", action="append", dest="selected_cases", help="Time only the named case (repeatable); full output verification still runs")
     parser.add_argument("--pairs", type=positive_int, default=6)
     parser.add_argument("--target-ms", type=positive_int, default=150)
     parser.add_argument("--max-iterations", type=positive_int, default=2_000_000)
@@ -208,6 +209,11 @@ def main() -> None:
         candidate_cases = json.loads(command([str(executables["candidate"]), "--list-cases"], env=environment))
         if cases != candidate_cases or not isinstance(cases, list) or not all(isinstance(x, str) for x in cases):
             raise RuntimeError("Case lists differ or have an invalid shape")
+        if args.selected_cases:
+            unknown = set(args.selected_cases) - set(cases)
+            if unknown:
+                raise RuntimeError(f"Unknown selected cases: {sorted(unknown)}")
+            cases = [case for case in cases if case in args.selected_cases]
         write_json(output / "cases.json", cases)
         summaries, pilots = [], []
 
