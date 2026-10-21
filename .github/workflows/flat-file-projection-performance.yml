@@ -1,8 +1,6 @@
 name: Flat file projection performance
 
 on:
-  push:
-    branches: [perf/flat-file-projection-20261021]
   pull_request:
     paths:
       - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
@@ -32,18 +30,17 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Confirm short-batch controls with longer paired observations
+      - name: Validate exact production sources and complete output parity
+        if: github.event_name == 'pull_request'
         run: |
           python3 Benchmarks/FlatFileProjection/run.py \
-            --mode benchmark --pairs 10 --target-ms 1000 \
-            --sizes 100 --cases mixed-files mixed-media explicit-files \
-            --output "$RUNNER_TEMP/flat-file-projection/controls-small"
-      - name: Confirm large explicit-media control
+            --mode verify --output "$RUNNER_TEMP/flat-file-projection"
+      - name: Run the full paired native performance study
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python3 Benchmarks/FlatFileProjection/run.py \
-            --mode benchmark --pairs 10 --target-ms 1000 \
-            --sizes 10000 --cases explicit-media \
-            --output "$RUNNER_TEMP/flat-file-projection/control-large"
+            --pairs 10 --target-ms 1000 \
+            --output "$RUNNER_TEMP/flat-file-projection"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

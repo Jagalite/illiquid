@@ -39,6 +39,9 @@ python3 Benchmarks/FlatFileProjection/run.py \
 Output directories must be new or empty. `--swift` accepts a compiler path.
 `--sizes`, `--cases`, and `--pairs` select workloads; the default study has six
 balanced pairs for each of six scenarios at 100, 1,000, and 10,000 entries.
+PR CI runs the tests and complete output comparisons in `verify` mode. Manual
+workflow dispatch runs the full study with ten pairs and a 1,000 ms target per
+observation. Timing results are research evidence, not a noisy pass/fail gate.
 
 ## Method
 
@@ -83,5 +86,34 @@ production source staging needs none.
 
 ## Results
 
-Native qualification is pending. No timing claim is made until the native
-tests, exact-output comparisons, and paired study complete.
+The native study on Apple M1 (Virtual), macOS 26.6.2 and Apple Swift 6.3.3
+measured lower median paired wall and CPU time in all six folder-only cells.
+Both metrics improved in 32 of 36 target pairs.
+
+| Files | Files Only wall reduction | Media wall reduction | Files Only CPU reduction | Media CPU reduction |
+| ---: | ---: | ---: | ---: | ---: |
+| 100 | 22.54% | 23.54% | 22.38% | 19.05% |
+| 1,000 | 25.33% | 22.16% | 24.32% | 18.21% |
+| 10,000 | 15.16% | 13.26% | 16.61% | 13.30% |
+
+These percentages are medians of paired changes for complete `rows()` calls.
+They are component results from one synthetic-workload host, not whole-player
+or interactive-latency measurements.
+
+The first short-batch cohort also showed substantial slowdowns in four control
+cells. A targeted confirmation kept the sources and harness unchanged, increased
+to ten pairs, and targeted 1,000 ms per observation. Those four median changes
+were -3.76% to +1.67% wall and -3.51% to -0.16% CPU. The large initial control
+slowdowns did not reproduce; individual observations remained variable. Both
+cohorts, all controls and all samples are retained. This does not establish
+exact equivalence, tight tail latency or a universal absence of regressions.
+
+Correctness qualification passed all four baseline/candidate debug/release
+runs (20 tests reported per run) and all 18 full-row comparisons. The confirmation
+repeated four complete-output comparisons and retained 80 additional timed
+observations alongside the initial 216. Independent audits reproduced the
+source receipts, output comparisons, checksums, execution order and statistics.
+
+See the [complete results and raw evidence](evidence/README.md), the
+[initial native run](https://github.com/Jagalite/illiquid/actions/runs/39666994530),
+and the [targeted confirmation](https://github.com/Jagalite/illiquid/actions/runs/39669135880).
