@@ -4,6 +4,22 @@ This experiment measures `PlaybackState.applyAuthorityProjection` through the
 production `PlaybackViewSnapshot` and `PlaybackViewStore.publish` callback.
 The baseline is `a2de305c8dbcaa81aac1477df7c9a0017c14eae3`.
 
+## Measured outcome
+
+The [research report](../../Documentation/TRACK_SELECTION_PROJECTION_PERFORMANCE.md)
+records the macOS qualification at candidate `d2b04d8`, the small mutation-path
+tradeoffs, and the practical limits. Connected last-selection medians fell
+5.710 → 3.105 µs at 2 audio/8 subtitle tracks, 10.341 → 3.054 µs at 8/32,
+and 26.524 → 3.097 µs at 16/128. These are synchronous state-to-view component
+costs, not whole-player measurements. The 2/8 switching control rose 5.7%.
+
+Complete [macOS evidence](Results/2026-10-21-macos/) and separate
+[Linux corroboration](Results/2026-10-21-linux/) include all 448 observations
+per platform. `summary.json` reports ratios of variant medians;
+`paired-summary.json` separately reports medians of within-round ratios.
+
+## Run
+
 ```sh
 python3 Benchmarks/TrackSelectionProjection/run.py \
   --pairs 8 --output /tmp/illiquid-track-selection-projection
