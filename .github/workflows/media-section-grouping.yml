@@ -1,0 +1,53 @@
+name: Media section grouping
+
+on:
+  push:
+    branches: ['perf/media-section-grouping-329e']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaGroupingTests.swift'
+      - 'Benchmarks/MediaSectionGrouping/**'
+      - '.github/workflows/media-section-grouping.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowser*Tests.swift'
+      - 'Tests/IlliquidAppTests/SourceMedia*Tests.swift'
+      - 'Benchmarks/MediaSectionGrouping/**'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - '.github/workflows/media-section-grouping.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-section-grouping-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test, compare complete outputs, and measure native projection
+        run: >-
+          python3 Benchmarks/MediaSectionGrouping/run.py
+          --pairs 6 --target-ms 60 --output "$RUNNER_TEMP/media-section-grouping"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-section-grouping-macos
+          path: |
+            ${{ runner.temp }}/media-section-grouping/
+            !${{ runner.temp }}/media-section-grouping/build/**
+            !${{ runner.temp }}/media-section-grouping/cache/**
+          retention-days: 14
