@@ -3,6 +3,7 @@ import CoreMedia
 
 /// Serialized, on-demand timestamp discovery. Keeps one decoder and two scalar
 /// timestamps for a request, with no persistent frame history or decoder.
+/// Codec and deinterlacing output is timed without conversion to display pixels.
 actor NativeFrameStepReader {
     func target(url: URL, position: Double, direction: Int) throws -> Double? {
         let interrupt = FFmpegInterruptState()
@@ -31,8 +32,8 @@ actor NativeFrameStepReader {
             var next: Double?
             var reachedCurrent = false
             var eof = false
-            func receive(_ frame: NativeDecodedVideoFrame) {
-                let pts = frame.presentationTime.seconds
+            func receive(_ time: CMTime) {
+                let pts = time.seconds
                 guard pts.isFinite else { return }
                 if pts < position - 0.000001 { previous = pts }
                 else { reachedCurrent = true }
@@ -44,12 +45,12 @@ actor NativeFrameStepReader {
             for _ in 0..<50_000 {
                 guard keepDecoding() else { throw CancellationError() }
                 guard let packet = try demuxer.readPacket(generation: 1) else {
-                    try decoder.drain(generation: 1, while: keepDecoding, emit: receive)
+                    try decoder.drainPresentationTimes(generation: 1, while: keepDecoding, emit: receive)
                     eof = true
                     break
                 }
                 if packet.streamIndex == stream.index {
-                    try decoder.decode(packet, while: keepDecoding, emit: receive)
+                    try decoder.decodePresentationTimes(packet, while: keepDecoding, emit: receive)
                 }
                 if direction > 0 ? next != nil : reachedCurrent { break }
             }
