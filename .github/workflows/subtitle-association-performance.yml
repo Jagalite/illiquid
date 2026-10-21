@@ -42,8 +42,8 @@ jobs:
           persist-credentials: false
       - name: Qualify production change against frozen baseline
         run: |
-          echo 'CAMPAIGN final_slice'
-          python3 Benchmarks/SubtitleAssociation/run.py --output "$RUNNER_TEMP/subtitle-association/final-slice" --pairs 12 --target-ms 250
+          echo 'CAMPAIGN focused_repeat'
+          python3 Benchmarks/SubtitleAssociation/run.py --output "$RUNNER_TEMP/subtitle-association/focused-repeat" --mode benchmark --pairs 20 --target-ms 300 --cases broad_prefix_256,broad_prefix_1024,one_to_one_16,multilingual_256,sparse_1024,empty_16,empty_1024
       - name: Compare isolated alternatives
         if: github.event_name == 'workflow_dispatch'
         run: python3 Benchmarks/SubtitleAssociation/explore.py --output "$RUNNER_TEMP/subtitle-association/exploration" --pairs 4 --target-ms 75
