@@ -5,6 +5,19 @@ This study compares complete cached source-browser projections against main
 case folding within one `organizeMedia` call. It retains the first encountered
 spelling as the canonical title and all existing section/member ordering.
 
+The cache is local to one projection. It cannot retain a title chosen by an
+earlier search or visibility state, and its extra storage grows with distinct
+section spellings rather than reserving space for every media row.
+
+A cache hit requires identical UTF-8 bytes, in addition to the dictionary lookup.
+Swift `String` equality treats canonical Unicode spellings as equal, while
+Foundation case folding can distinguish their original combining-mark order.
+The new regression suite exercises a three-title Greek example against the
+original grouping algorithm. Removing only the UTF-8 guard makes that test fail
+on the qualified Linux toolchain. Canonically equivalent but byte-distinct titles
+may replace the same cache slot and be folded again; that preserves existing
+behavior rather than promising one fold per Unicode-equivalent title.
+
 ## Reproduce
 
 With Swift 6.1 or newer and Python 3:
@@ -19,6 +32,14 @@ for every workload at 100, 1,000 and 10,000 files. Each output directory must be
 new or empty. `--swift /path/to/swift` selects a toolchain; `--mode tests`,
 `--mode verify` and `--mode benchmark` select individual stages. For a short
 exploratory run use `--cases movies seasons --sizes 100 --pairs 2 --target-ms 10`.
+
+This is a historical research harness. For the recorded comparison, use candidate
+checkout `cf27b1e73cd2b1ecd5bfd8b9e5bb0fd273b42536`; the manual Actions workflow also
+checks out that revision explicitly. It intentionally rejects unrelated changes
+to production dependencies and requires baseline-equivalent output. Studying a
+future implementation requires deliberate baseline/dependency review and new
+evidence. The normal app test target includes the grouping regressions and is
+covered by the repository's existing native release test workflow on pull requests.
 
 ## Sources and correctness
 
