@@ -166,17 +166,14 @@ def main() -> None:
                     line for line in result.splitlines() if "tests passed" in line or "Test run with" in line
                 ][-2:]
                 if args.stress_repetitions:
-                    bin_path = Path(run([args.swift, "build", "--package-path", package,
-                                         "--configuration", configuration, "--show-bin-path"]).strip())
-                    executable = bin_path / "SourcePreparationContractPackageTests.xctest"
-                    if sys.platform == "darwin":
-                        executable /= "Contents/MacOS/SourcePreparationContractPackageTests"
+                    # Darwin XCTest products are bundles, not executables.
+                    # SwiftPM selects the proper host on each platform.
+                    stress_command = [*command, "--skip-build", "--filter",
+                                      "cancellationRacingWithHandoffNeitherDuplicatesWorkNorLeaksCapacity"]
                     stress_log = folder / f"stress-{configuration}.log"
                     stress_rows = []
                     for repetition in range(args.stress_repetitions):
-                        result = run([executable, "--testing-library", "swift-testing", "--filter",
-                                      "cancellationRacingWithHandoffNeitherDuplicatesWorkNorLeaksCapacity"],
-                                     stress_log, timeout=30)
+                        run(stress_command, stress_log, timeout=30)
                         if not re.search(r"Test run with 1 test(?: in 1 suite)? passed", stress_log.read_text()):
                             raise RuntimeError(f"Stress filter did not execute exactly one test: {stress_log}")
                         stress_rows.append({"process": repetition + 1, "handoffs": 32, "passed": True})
