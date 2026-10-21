@@ -12,12 +12,12 @@ public final class SourcePreparationExecutor: @unchecked Sendable {
     private let timeout: TimeInterval
     private var running = 0
     private var backgroundRunning = 0
-    private var backgroundRequests: Set<UUID> = []
+    private var backgroundRequests: Set<ObjectIdentifier> = []
     private var pendingBackground: [BackgroundWork] = []
     private let maximumWaiters = 64
 
     private struct BackgroundWork: Sendable {
-        let id: UUID
+        let id: ObjectIdentifier
         let start: @Sendable () -> Void
     }
 
@@ -70,14 +70,14 @@ public final class SourcePreparationExecutor: @unchecked Sendable {
         background: Bool = false
     ) async throws -> Value {
         let deadline = DispatchTime.now() + timeout
-        let backgroundID = background ? UUID() : nil
-        let onFinish: (@Sendable () -> Void)?
-        if let backgroundID {
-            onFinish = { [weak self] in self?.retireBackgroundRequest(backgroundID) }
+        let onFinish: (@Sendable (ObjectIdentifier) -> Void)?
+        if background {
+            onFinish = { [weak self] id in self?.retireBackgroundRequest(id) }
         } else {
             onFinish = nil
         }
         let request = Request<Value>(onFinish: onFinish)
+        let backgroundID = background ? ObjectIdentifier(request) : nil
         return try await withTaskCancellationHandler {
             try Task.checkCancellation()
             return try await withCheckedThrowingContinuation { continuation in
@@ -158,7 +158,7 @@ public final class SourcePreparationExecutor: @unchecked Sendable {
         return next
     }
 
-    private func retireBackgroundRequest(_ id: UUID) {
+    private func retireBackgroundRequest(_ id: ObjectIdentifier) {
         let retired = lock.withLock { () -> BackgroundWork? in
             guard backgroundRequests.remove(id) != nil else { return nil }
             guard let index = pendingBackground.firstIndex(where: { $0.id == id }) else { return nil }
@@ -171,12 +171,12 @@ public final class SourcePreparationExecutor: @unchecked Sendable {
 
     private final class Request<Value: Sendable>: @unchecked Sendable {
         private let lock = NSLock()
-        private let onFinish: (@Sendable () -> Void)?
+        private let onFinish: (@Sendable (ObjectIdentifier) -> Void)?
         private var continuation: CheckedContinuation<Value, Error>?
         private var result: Result<Value, Error>?
         private var timer: DispatchSourceTimer?
 
-        init(onFinish: (@Sendable () -> Void)? = nil) {
+        init(onFinish: (@Sendable (ObjectIdentifier) -> Void)? = nil) {
             self.onFinish = onFinish
         }
 
@@ -216,7 +216,7 @@ public final class SourcePreparationExecutor: @unchecked Sendable {
                 return (true, continuation)
             }
             guard completion.0 else { return }
-            onFinish?()
+            onFinish?(ObjectIdentifier(self))
             completion.1?.resume(with: result)
         }
     }
