@@ -212,7 +212,8 @@ final class AudioDecoder {
     private let stream: FFmpegStreamInfo
     private let timelineOriginSeconds: Double
     private let outputCapacity: NativeAudioOutputCapacity
-    private var sourceFormatSignature: String?
+    private var sourceFormatSignature: AudioSourceFormat?
+    private var channelLayoutNameCache = AudioChannelLayoutNameCache()
     private var sourceFormatRevision: UInt64 = 0
     private var resampledTimeline = ResampledAudioTimeline()
     private var resamplerFrameMetadata: NativeDecodedAudioFrame?
@@ -328,15 +329,7 @@ final class AudioDecoder {
         var output: [NativeDecodedAudioFrame] = []
         let sourceRate = illiquid_audio_frame_sample_rate(frame)
         let sourceChannels = illiquid_audio_frame_channel_count(frame)
-        var channelLayoutBuffer = [CChar](repeating: 0, count: 128)
-        let channelLayoutResult = illiquid_audio_frame_channel_layout_name(
-            frame,
-            &channelLayoutBuffer,
-            channelLayoutBuffer.count
-        )
-        let sourceChannelLayout = channelLayoutResult >= 0
-            ? stringFromCStringBuffer(channelLayoutBuffer)
-            : "unknown"
+        let sourceChannelLayout = channelLayoutNameCache.name(for: frame)
         let inputSamples = illiquid_audio_frame_sample_count(frame)
         guard sourceRate > 0, sourceChannels > 0, inputSamples > 0 else {
             throw FFmpegError(operation: "Decode audio format", code: -22)
@@ -344,7 +337,13 @@ final class AudioDecoder {
 
         let sampleFormat = illiquid_frame_sample_format(frame)
         let outputChannels = outputCapacity.outputChannels(forSourceChannels: Int(sourceChannels))
-        let signature = "\(sourceRate)|\(sourceChannels)|\(sourceChannelLayout)|\(sampleFormat)|out=\(outputChannels)"
+        let signature = AudioSourceFormat(
+            sampleRate: sourceRate,
+            channelCount: sourceChannels,
+            channelLayout: sourceChannelLayout,
+            sampleFormat: sampleFormat,
+            outputChannelCount: outputChannels
+        )
         if sourceFormatSignature != signature {
             // Preserve the old format's buffered output before replacing it.
             // Seek flushes intentionally discard this output instead.
