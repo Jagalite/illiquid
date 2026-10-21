@@ -18,6 +18,9 @@ actor NativeThumbnailDiskCache {
         var used: Date
         var background: Bool
     }
+    // A full 2048x2048 BGRA thumbnail is 16 MiB before JPEG compression.
+    // Bound encoded storage independently of the total disk-cache allowance.
+    static let maximumEncodedImageBytes = 16 * 1024 * 1024
     private let directory: URL?
     private var preferences = ThumbnailPreferences()
     // Key by physical filename, not digest: b- and f- aliases can coexist.
@@ -69,14 +72,38 @@ actor NativeThumbnailDiskCache {
         return nil
     }
 
-    private nonisolated static func readImage(at url: URL, key: Key) -> CGImage? {
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+    nonisolated static func readImage(at url: URL, key: Key) -> CGImage? {
+        // ImageIO can retain the URL for deferred JPEG reads even with immediate
+        // caching requested. Promotion renames this file before the caller draws
+        // the image; eviction may remove it later. Own the encoded bytes so the
+        // returned CGImage never depends on that pathname remaining available.
+        guard let data = readEncodedImage(at: url),
+              let source = CGImageSourceCreateWithData(data as CFData, nil),
               let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
               let width = properties[kCGImagePropertyPixelWidth] as? Int,
               let height = properties[kCGImagePropertyPixelHeight] as? Int,
               width <= key.width, height <= key.height else { return nil }
         return CGImageSourceCreateImageAtIndex(source, 0,
             [kCGImageSourceShouldCacheImmediately: true] as CFDictionary)
+    }
+
+    private nonisolated static func readEncodedImage(at url: URL) -> Data? {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return nil }
+        defer { try? handle.close() }
+        do {
+            // Reject existing oversized files before allocating their contents.
+            guard try handle.seekToEnd() <= UInt64(maximumEncodedImageBytes) else { return nil }
+            try handle.seek(toOffset: 0)
+            var data = Data()
+            // Bound the read itself as well: the file may grow after the size
+            // check. Small chunks avoid reserving 16 MiB for every tiny JPEG.
+            while data.count <= maximumEncodedImageBytes {
+                let count = min(64 * 1024, maximumEncodedImageBytes + 1 - data.count)
+                guard let chunk = try handle.read(upToCount: count), !chunk.isEmpty else { return data }
+                data.append(chunk)
+            }
+            return nil
+        } catch { return nil }
     }
 
     private static func filenames(for digest: String) -> [String] {
@@ -97,7 +124,7 @@ actor NativeThumbnailDiskCache {
         // proceed while the single utility writer compresses its current image.
         encoding = (digest, epoch, false)
         defer { encoding = nil }
-        guard let data = await encode(image), epoch == generation,
+        guard let data = await encode(image), data.count <= Self.maximumEncodedImageBytes, epoch == generation,
               !Task.isCancelled, preferences.diskMiB > 0 else { return }
         let background = background && encoding?.promoted != true
             && !promotions.protects(digest, epoch: epoch)
