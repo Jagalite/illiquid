@@ -112,4 +112,10 @@ percentages are medians of paired changes, rather than differences between the
 independent variant medians. The unique-section and non-media controls must be
 reported alongside repeated-section results.
 
-Native measurements and conclusions will be added after qualification completes.
+## Results
+
+[The complete research report](RESULTS.md) includes all initial native and
+exploratory Linux cases, the longer native confirmation, adverse observations,
+and retained raw receipts. The confirmation supports a scoped improvement for
+repeated season groups and broad searches. It does not establish a uniform
+speedup across views, queries, inventory shapes, or platforms.

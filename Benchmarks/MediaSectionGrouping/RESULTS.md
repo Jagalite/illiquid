@@ -1,6 +1,6 @@
 # Media section grouping performance research
 
-2026-10-21. **Initial cohorts complete; confirmatory result pending.**
+2026-10-21. **Qualified improvement for repeated-section workloads; propose the scoped cache change.**
 
 ## Question and scope
 
@@ -52,7 +52,7 @@ not a substitute for macOS Foundation behavior or native timing.
 
 ## Method and correctness
 
-Each cohort covers eight cases at 100, 1,000, and 10,000 files: six alternating
+Each initial cohort covers eight cases at 100, 1,000, and 10,000 files: six alternating
 AB/BA pairs per case, with every observation in a fresh process. The 288 final
 observations and 48 separate calibration observations are retained. Calibration
 chooses a shared iteration count targeting 60 ms for the faster variant, capped
@@ -88,8 +88,9 @@ replace a cache slot and fold again; preserving baseline behavior takes priority
 ## Reading the tables
 
 Times are **independent medians per projection**, in milliseconds. Paired Δ is the
-median of `100 × (candidate / baseline − 1)` for the six matched batches; negative
-means faster. It is not the ratio of the two independent medians. For example,
+median of `100 × (candidate / baseline − 1)` for six matched batches in each initial
+cohort, twelve in confirmation; negative means faster. It is not the ratio of the
+two independent medians. For example,
 10,000 native movies have lower candidate median wall time but a **+0.65%** paired
 change. Faster-pair counts show consistency, not statistical significance. No
 final observations were discarded.
@@ -166,7 +167,7 @@ are retained.
 | `tree_control` | 1,000 | 0.0427 → 0.0367 | -16.26% | 5/6 | 0.0293 → 0.0262 | -13.84% | 5/6 |
 | `tree_control` | 10,000 | 0.0354 → 0.0455 | +29.97% | 1/6 | 0.0258 → 0.0272 | +7.00% | 2/6 |
 
-## Interpretation and confirmatory cohort — pending
+## Interpretation and native confirmation
 
 The initial native cohort suggests benefits in several repeated-section cases:
 10,000 seasons and Unicode groups show paired wall changes of −11.11% and −16.11%,
@@ -191,9 +192,65 @@ of the assessment. The workflow-only revision is
 `1a981a0cb89b650f19f678448e39eda2a855df16`; production, tests, and measurement driver
 are unchanged from the measured candidate.
 
-**Confirmation results and final decision: PENDING.** Add its environment, raw
-receipts, paired wall/CPU table, control interpretation, and decision here after
-verification. No confirmatory outcome is assumed above.
+The confirmation completed successfully with **192 observations, 16 calibrations,
+and eight complete projection comparisons**. Its recorded host class and toolchain
+match the initial native cohort: Apple M1 virtual runner, three CPUs, macOS 26.6.2,
+and Apple Swift 6.3.3. It rebuilt both release binaries and checked outputs; it did
+not rerun the test suites already qualified on the identical source/test/driver
+bytes. Later commits add evidence, documentation, and a manual historical workflow
+without changing those measured inputs.
+
+[Confirmation environment](results/macos-confirmation/environment.json),
+[all observations](results/macos-confirmation/measurements.jsonl),
+[calibration](results/macos-confirmation/calibration.jsonl),
+[unrounded summary and pair ranges](results/macos-confirmation/summary.json), and
+[artifact/source provenance](results/macos-confirmation/provenance.json) are retained.
+The two native cohorts remain separate; the follow-up does not replace the first.
+
+| Case (1,000 files) | Wall ms, baseline → candidate | Paired wall Δ | Faster pairs | CPU ms, baseline → candidate | Paired CPU Δ | Faster pairs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `movies` | 12.149 → 11.068 | -20.19% | 9/12 | 11.812 → 10.601 | -15.80% | 9/12 |
+| `seasons` | 32.933 → 28.693 | -16.34% | 11/12 | 32.844 → 28.134 | -16.52% | 11/12 |
+| `unicode_groups` | 70.373 → 64.083 | -11.20% | 9/12 | 70.109 → 63.318 | -11.12% | 9/12 |
+| `unique_sections` | 84.898 → 84.078 | -0.97% | 7/12 | 81.274 → 80.195 | -0.13% | 6/12 |
+| `broad_search` | 41.391 → 36.453 | -21.08% | 11/12 | 35.968 → 33.010 | -14.82% | 12/12 |
+| `narrow_search` | 14.264 → 14.363 | -14.03% | 8/12 | 14.033 → 13.642 | -5.09% | 9/12 |
+| `files_control` | 0.0210 → 0.0238 | +8.28% | 4/12 | 0.0218 → 0.0250 | +9.76% | 5/12 |
+| `tree_control` | 0.0204 → 0.0232 | +5.41% | 5/12 | 0.0211 → 0.0221 | -0.04% | 6/12 |
+
+The strongest confirmation is for repeated season groups: paired wall time is
+**16.34% lower** and process CPU time **16.52% lower**, with both metrics favoring
+the candidate in **11 of 12 pairs**. Broad search also improves consistently:
+**21.08% lower paired wall time** in 11/12 pairs and **14.82% lower CPU time** in
+12/12. Movies and repeated Unicode groups favor the candidate in 9/12 pairs for
+both metrics, providing less consistent supporting evidence.
+
+The all-unique-section case is approximately neutral at this size: −0.97% paired
+wall and −0.13% CPU, with split directions across pairs. This does not establish
+zero overhead at every size or eliminate the transient-memory tradeoff. The
+narrow-search result is not evidence of repeated-title reuse: its ten retained
+files have ten different section titles. Its independent wall median increases
+slightly despite a negative paired median, so no narrow-search improvement is
+attributed to this change.
+
+Noise remains visible. Broad search has one wall-time pair at +85.7%, despite all
+12 CPU pairs favoring the candidate. Files/tree controls, which bypass the changed
+code, have +8.28%/+5.41% paired wall changes and independent median increases of
+about 2.8 microseconds. These controls are not subtracted from media timings or
+used to explain every outlier. The report makes no universal or statistically
+significant speedup claim.
+
+### Decision
+
+**Proceed with a PR for repeated-section grouping.** The confirmation supports a
+workload-specific reduction in complete warm-cache projection work, especially
+season groups and broad searches, with baseline-equivalent output and no material
+all-unique-section regression in that confirmation. The first native matrix and
+all exploratory Linux regressions remain visible above. This is a bounded local
+cache proposal, not a promise about cold loading, real-library UI latency,
+playback, energy, or memory use. No further performance variants were selected or
+benchmarked after inspecting the confirmation.
+
 
 ## Reproduce and inspect
 
