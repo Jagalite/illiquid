@@ -83,3 +83,11 @@ These measurements cover in-memory subtitle association after URL preparation.
 They do not establish total folder-open latency, filesystem I/O, playback CPU,
 frame rate, memory use, or battery life. The macOS workflow supplies target-platform
 component evidence; the separate complete-app CI suite supplies integration checks.
+
+## Native research record
+
+The [research report](../../Documentation/SUBTITLE_ASSOCIATION_PERFORMANCE.md)
+records the candidates, all native campaigns, the fixed acceptance criteria, and
+the final decision. Versioned raw measurements and receipts are under results/.
+Use the measured revision cited in the report when reproducing a historical
+campaign; later documentation and workflow commits do not change that campaign.

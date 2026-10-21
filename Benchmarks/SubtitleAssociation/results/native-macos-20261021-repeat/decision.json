@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "decision": "inconclusive; no production PR",
+  "plan_commit": "bd3dece1a978502ed42d757ab749cc80beb03afb",
+  "plan_url": "https://github.com/Jagalite/illiquid/blob/bd3dece1a978502ed42d757ab749cc80beb03afb/Documentation/SUBTITLE_ASSOCIATION_PERFORMANCE.md",
+  "repeat_run": 39668955054,
+  "targets": [
+    {
+      "case": "broad_prefix_256",
+      "pass": true,
+      "faster_cpu_pairs": 16,
+      "faster_wall_pairs": 16,
+      "required_faster_pairs": 15,
+      "paired_cpu_reduction_percent": 7.1269363738579505,
+      "paired_wall_reduction_percent": 6.922701250277319,
+      "orders": {
+        "AB": {
+          "cpu": 6.211785460785713,
+          "wall": 6.1369603351632,
+          "winsCPU": 8,
+          "winsWall": 8
+        },
+        "BA": {
+          "cpu": 7.9495194832400085,
+          "wall": 7.9378086420622385,
+          "winsCPU": 8,
+          "winsWall": 8
+        }
+      }
+    },
+    {
+      "case": "broad_prefix_1024",
+      "pass": false,
+      "faster_cpu_pairs": 13,
+      "faster_wall_pairs": 13,
+      "required_faster_pairs": 15,
+      "paired_cpu_reduction_percent": 9.18106256501179,
+      "paired_wall_reduction_percent": 9.329666990203245,
+      "orders": {
+        "AB": {
+          "cpu": 11.358079331117853,
+          "wall": 11.300255726020003,
+          "winsCPU": 7,
+          "winsWall": 7
+        },
+        "BA": {
+          "cpu": 5.605323093228121,
+          "wall": 4.300507582956037,
+          "winsCPU": 6,
+          "winsWall": 6
+        }
+      }
+    }
+  ],
+  "reason": "broad_prefix_1024 failed the fixed minimum 15/20 faster CPU and wall pairs. Its 13/20 wins and wide paired ranges do not satisfy the planned cross-workload repeatability requirement. Controls were variable; no claim of no regressions or player-wide speedup is made.",
+  "additional_sampling": false,
+  "audit": {
+    "checks": 238,
+    "errors": [],
+    "measurementCount": 280
+  },
+  "inputs": {
+    "sameSource": true,
+    "sameDriver": true,
+    "sameRunner": true,
+    "sameFullOutputDigest": true
+  },
+  "performance_accepted": false
+}

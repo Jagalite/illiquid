@@ -2,10 +2,17 @@
 
 ## Decision status
 
-A fixed independent repeat is pending. No production PR has been opened.
-Correctness qualification passed, but the first full selected-source campaign
-did not establish an unambiguous performance win. This note records the decision
-criteria before inspecting the repeat's measurements.
+**Outcome: no production PR.** The candidate passed all completed correctness
+checks, but the fixed independent repeat did not meet the cross-workload
+performance criterion. Broad-prefix256 passed its per-case repeat criterion;
+broad-prefix1024 produced only 13/20 faster pairs against the required 15/20.
+
+The acceptance rule was recorded before the repeat's results in
+[commit bd3dece1](https://github.com/Jagalite/illiquid/commit/bd3dece1a978502ed42d757ab749cc80beb03afb).
+It was not relaxed after observing the results. All **1,152 native timing
+observations** remain available across separate campaigns. The candidate stays
+on this experimental branch for reproduction; it is not proposed for production.
+No additional sampling is planned.
 
 ## Candidate and scope
 
@@ -84,8 +91,8 @@ Timed count checksums supplement those full comparisons.
 
 See the [qualification run](https://github.com/Jagalite/illiquid/actions/runs/39667662212)
 and [retained test receipts](../Benchmarks/SubtitleAssociation/results/native-macos-20261021-qualification/test-receipts.txt).
-The full application/native integration suite has not been run for a PR at this
-stage.
+The full application/native integration suite was not started for this study:
+the performance candidate did not qualify for a production PR.
 
 ## Discovery and rejected alternatives
 
@@ -151,14 +158,14 @@ justify a claim of no regressions or a clean 1024-episode performance result.
 ## Fixed independent repeat
 
 The [repeat run](https://github.com/Jagalite/illiquid/actions/runs/39668955054)
-uses unchanged selected production and driver bytes, twenty pairs, and a 300 ms
-target. Its seven cases were fixed before inspecting results:
+completed successfully using unchanged selected production, test, driver, and
+runner bytes, twenty pairs, and a 300 ms target. Its seven cases were fixed before inspecting results:
 
 - broad_prefix_256 and broad_prefix_1024;
 - one_to_one_16, multilingual_256, and sparse_1024;
 - empty_16 and empty_1024.
 
-The practical decision rule is:
+The practical decision rule recorded before the repeat was:
 
 1. Both broad-prefix targets must have positive median paired CPU and wall
    reductions, at least 15/20 faster pairs on both clocks, and positive median
@@ -166,10 +173,59 @@ The practical decision rule is:
 2. Exact and empty controls must not show sustained material slowdowns.
 3. Keep the campaigns separate and retain all earlier data.
 4. If this repeat remains mixed, conclude that the performance evidence is
-   inconclusive and do not open a production PR. No additional sampling is planned.
+   inconclusive and do not open a production PR. Do not collect further samples.
 
 This is a practical engineering acceptance rule, not a claim of a formal
 statistical confidence level.
+
+## Final repeat results and decision
+
+The repeat contains **280 observations** and passed the same 52 complete output
+comparisons. It ran in benchmark-only mode because the exact selected production
+and test bytes had already passed all four native debug/release configurations.
+All seven workloads alternated AB/BA with ten pairs starting in each order.
+
+[Raw repeat evidence and machine-readable decision](../Benchmarks/SubtitleAssociation/results/native-macos-20261021-repeat)
+include every observation, calibration, source/build receipt, summary, order
+breakdown, and the acceptance evaluation. A positive percentage means less
+candidate time. Paired reductions are 100 × (1 − the median of the within-pair
+candidate/baseline ratios). The last column contains separate marginal medians
+and need not imply the same percentage.
+
+| Workload | Median paired CPU reduction | Median paired wall reduction | Faster CPU / wall pairs | Baseline → candidate CPU medians (ms) |
+| --- | ---: | ---: | ---: | ---: |
+| broad_prefix_256 | +7.13% | +6.92% | 16/20 · 16/20 | 3.807 → 3.619 |
+| broad_prefix_1024 | +9.18% | +9.33% | 13/20 · 13/20 | 13.571 → 13.622 |
+| one_to_one_16 | -0.15% | -0.18% | 10/20 · 10/20 | 0.287 → 0.289 |
+| multilingual_256 | -1.51% | +1.73% | 8/20 · 10/20 | 28.185 → 28.745 |
+| sparse_1024 | +2.91% | +2.65% | 11/20 · 12/20 | 16.116 → 17.018 |
+| empty_16 | -2.93% | -2.48% | 9/20 · 9/20 | 0.010 → 0.011 |
+| empty_1024 | +1.32% | +3.57% | 11/20 · 11/20 | 1.490 → 1.427 |
+
+Broad-prefix256 met the planned per-case condition: 16/20 wins on both clocks,
+with positive median reductions in both orders. AB pairs showed 6.21% CPU and
+6.14% wall reductions; BA pairs showed 7.95% CPU and 7.94% wall reductions.
+The median within-pair CPU saving was 0.334 ms per association.
+
+Broad-prefix1024 did not meet the planned minimum: only 13/20 wins on either
+clock. Its positive paired estimates were accompanied by CPU ratios ranging
+from 0.681 to 1.364 and nearly unchanged marginal CPU medians
+(13.571 ms → 13.622 ms, a 0.37% slowdown). The two order groups had positive
+medians, but that does not repair the failed repeatability requirement.
+
+The controls continued to vary. None had 15/20 consistent losses on both
+clocks, but their wide ranges and order-dependent effects do not establish
+absence of regression. In particular, sparse1024's paired CPU estimate was
++2.91% while its marginal medians regressed 5.60%; both are retained.
+
+The result supports a narrow positive signal in the 256-episode fixture. It
+does not satisfy the fixed criteria for proposing the production change.
+The experiment ends with **no PR**. No measurements were pooled, removed, or
+reclassified as controls after the repeat.
+
+A separately opened [ASCII subtitle tokenization PR](https://github.com/Jagalite/illiquid/pull/69)
+changes filename tokenization, while this study changes fuzzy shared-prefix
+weighting. This study did not modify that PR or measure the combined changes.
 
 ## Evidence retention
 
