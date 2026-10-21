@@ -1,8 +1,6 @@
 name: Frame step timestamp discovery
 
 on:
-  push:
-    branches: ['perf/frame-step-timestamps']
   pull_request:
     paths:
       - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
@@ -13,6 +11,12 @@ on:
       - 'Benchmarks/FrameStepTimestamps/**'
       - '.github/workflows/frame-step-timestamps.yml'
   workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: Baseline commit for the matched native performance comparison
+        required: true
+        type: string
+        default: a2de305c8dbcaa81aac1477df7c9a0017c14eae3
 
 permissions:
   contents: read
@@ -54,11 +58,14 @@ jobs:
             --filter 'VideoTimestampDiscoveryTests|NativePlaybackFoundationTests|VideoDeinterlacerTests|SeekPrerollDecodeTests' \
             2>&1 | tee "$RUNNER_TEMP/frame-step-qualification/tests.log"
       - name: Measure baseline and candidate on the same native runner
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          FRAME_STEP_BASELINE: ${{ inputs.baseline_ref }}
         run: |
           python3 Benchmarks/FrameStepTimestamps/run.py \
             --output "$RUNNER_TEMP/frame-step-results" \
             --fixtures "$RUNNER_TEMP/frame-step-fixtures" \
-            --pairs 6 --iterations 3
+            --baseline "$FRAME_STEP_BASELINE" --pairs 6 --iterations 3
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
