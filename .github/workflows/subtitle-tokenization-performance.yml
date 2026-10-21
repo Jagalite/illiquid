@@ -1,13 +1,5 @@
 name: Subtitle filename tokenization performance
 on:
-  push:
-    branches: [perf/subtitle-contiguous-ascii-20261021]
-    paths:
-      - Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift
-      - Tests/IlliquidCoreTests/ExternalSubtitleTokenizationTests.swift
-      - Benchmarks/SubtitleTokenization/Driver.swift
-      - Benchmarks/SubtitleTokenization/run.py
-      - .github/workflows/subtitle-tokenization-performance.yml
   pull_request:
     paths:
       - Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift

@@ -2,9 +2,9 @@
 
 This experiment measures complete `ExternalSubtitleMatcher.associate` calls
 over prepared folder inventories. The optimization handles ASCII filename stems
-with byte-level case conversion and token splitting. Any non-ASCII filename
-retains the existing Foundation normalization path. The trie, matching scores,
-ambiguity handling, cancellation, and natural subtitle ordering are unchanged.
+with contiguous UTF-8 storage using byte-level case conversion and token splitting. Non-ASCII filenames and
+strings without contiguous UTF-8 storage retain the existing Foundation
+normalization path. The trie, matching scores, ambiguity handling, cancellation, and natural subtitle ordering are unchanged.
 
 ## Reproduce
 
@@ -18,8 +18,9 @@ python3 Benchmarks/SubtitleTokenization/run.py \
 
 The output directory must be empty. `--mode tests` runs only correctness tests;
 `--mode benchmark` runs full association parity checks and paired measurements.
-The isolated package has no downloaded dependencies. The macOS workflow follows
-the repository's macOS 26 / Xcode 26.6 component qualification setup.
+`--case NAME` can be repeated to time selected workloads; full association
+verification still runs for all fixtures. The isolated package has no downloaded
+dependencies. The macOS workflow follows the repository's macOS 26 / Xcode 26.6 component qualification setup.
 
 ## Method
 
@@ -33,9 +34,10 @@ Each timed iteration performs a complete association call, consumes its media
 key count and total subtitle count, and releases the result. Fixture creation,
 full output serialization, correctness checks, warmup, and JSON output are
 outside the timer. No overhead is subtracted. Each pair uses identical iteration
-counts, calibrated from baseline process CPU time toward 150 ms. Six serial
-AB/BA pairs use fresh processes. All observations are retained, including
-unfavorable samples. Both wall and process CPU measurements are reported.
+counts, calibrated from baseline process CPU time toward a requested batch
+duration. Defaults are 150 ms and six serial AB/BA pairs using fresh processes.
+The native qualification workflow uses longer 500 ms targets and twelve pairs.
+All observations are retained, including unfavorable samples. Both wall and process CPU measurements are reported.
 
 The workload matrix includes small movie/season inventories, large folders,
 three subtitle languages per media file, longer release names, unrelated and
@@ -47,8 +49,10 @@ guard against dropped work; they are not the full correctness oracle.
 
 ## Correctness and retained evidence
 
-The runner executes the existing matcher/empty-inventory suites plus the new
-tokenization regressions against both implementations in debug and release.
+In the default `--mode all` and in `--mode tests`, the runner executes the
+existing matcher/empty-inventory suites plus the new tokenization regressions
+against both implementations in debug and release. `--mode benchmark` performs
+association verification and timing without those test configurations.
 The new regressions compare normalization behavior with Foundation and check
 Unicode fallback and association semantics. Existing tests cover cancellation
 at every observed checkpoint, exact/prefix matches, language suffixes, release
@@ -71,3 +75,6 @@ five of six pairs faster, and no repeatable regression above 5% in the Unicode
 or empty-input controls. An apparent control regression warrants a focused
 confirmation; it is not a reason to discard individual unfavorable samples.
 The native macOS run determines the platform-specific performance claim.
+For the twelve-pair refinement qualification, the direction check scales the
+original five-of-six fraction to at least ten faster pairs. See [RESULTS.md](RESULTS.md) for the measured cohorts,
+source revisions, full results, limitations, and retained evidence.
