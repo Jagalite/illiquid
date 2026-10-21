@@ -32,18 +32,26 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Test exact production sources and measure paired native runs
+      - name: Confirm short-batch controls with longer paired observations
         run: |
           python3 Benchmarks/FlatFileProjection/run.py \
-            --output "$RUNNER_TEMP/flat-file-projection"
+            --mode benchmark --pairs 10 --target-ms 1000 \
+            --sizes 100 --cases mixed-files mixed-media explicit-files \
+            --output "$RUNNER_TEMP/flat-file-projection/controls-small"
+      - name: Confirm large explicit-media control
+        run: |
+          python3 Benchmarks/FlatFileProjection/run.py \
+            --mode benchmark --pairs 10 --target-ms 1000 \
+            --sizes 10000 --cases explicit-media \
+            --output "$RUNNER_TEMP/flat-file-projection/control-large"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: flat-file-projection-macos
           path: |
             ${{ runner.temp }}/flat-file-projection/
-            !${{ runner.temp }}/flat-file-projection/build/**
-            !${{ runner.temp }}/flat-file-projection/swiftpm-cache/**
+            !${{ runner.temp }}/flat-file-projection/**/build/**
+            !${{ runner.temp }}/flat-file-projection/**/swiftpm-cache/**
             !${{ runner.temp }}/flat-file-projection/**/.build/**
             !${{ runner.temp }}/flat-file-projection/**/module-cache/**
             !${{ runner.temp }}/flat-file-projection/**/cache/**
