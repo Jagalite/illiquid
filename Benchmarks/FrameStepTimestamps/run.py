@@ -120,6 +120,7 @@ def main():
     roots = {"baseline": baseline_tree, "candidate": ROOT}
     base_environment = os.environ.copy()
     base_environment.update(ILLIQUID_FRAME_STEP_BENCHMARK="1",
+                            ILLIQUID_FRAME_STEP_PARITY="0",
                             ILLIQUID_FRAME_STEP_FIXTURE_DIR=str(fixtures),
                             TERM="dumb", NO_COLOR="1")
 
@@ -152,6 +153,51 @@ def main():
     for variant in ["baseline", "candidate"]:
         print(f"Building and qualifying {variant}", flush=True)
         measure(variant, cases[0], build=True)
+
+    # Compare the real old/new readers on every correctness fixture outside the
+    # timed measurements. Program-stream seeks need not reproduce a sequential
+    # open's first GOP, so preserve existing container behavior as well as PTS.
+    manifest_path = fixtures / "fixture-manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    expected_requests = []
+    for fixture in sorted(manifest["fixtures"], key=lambda item: item["filename"]):
+        times = fixture["normalizedPTS"]
+        first, last = times[0], times[-1]
+        middle = times[len(times) // 2]
+        between = (times[0] + times[1]) / 2 if len(times) > 1 else first + 0.01
+        for position in sorted({0, first, middle, between, last, last + 0.125}):
+            for direction in [-1, 1]:
+                expected_requests.append({"filename": fixture["filename"],
+                                          "position": position, "direction": direction})
+    if manifest["schemaVersion"] != 1 or not expected_requests:
+        raise RuntimeError("Reader parity requires a nonempty version-1 correctness fixture manifest")
+    parity = {}
+    for variant in ["baseline", "candidate"]:
+        print(f"Qualifying {variant} reader across all correctness fixtures", flush=True)
+        env = base_environment.copy()
+        env.update(ILLIQUID_FRAME_STEP_BENCHMARK="0", ILLIQUID_FRAME_STEP_PARITY="1")
+        raw = run(["swift", "test", "--package-path", roots[variant],
+                   "--scratch-path", output / f"{variant}-build",
+                   "--force-resolved-versions", "-c", "release", "--jobs", "2",
+                   "--no-parallel", "--filter", "FrameStepPerformanceTests", "--skip-build"],
+                  env=env, timeout=300)
+        matches = re.findall(r"^FRAME_STEP_READER_PARITY (\{.*\})$", raw, re.MULTILINE)
+        if len(matches) != 1:
+            raise RuntimeError("Expected exactly one native reader-parity record")
+        parity[variant] = json.loads(matches[0])["records"]
+        actual_requests = [{key: row[key] for key in ["filename", "position", "direction"]}
+                           for row in parity[variant]]
+        if actual_requests != expected_requests:
+            raise RuntimeError(f"{variant} reader parity did not cover every requested boundary/direction")
+    reader_parity_equal = parity["baseline"] == parity["candidate"]
+    save(output / "reader-parity.json", {
+        "baseline_commit": baseline, "candidate_commit": environment["candidate_commit"],
+        "fixture_manifest_sha256": digest(manifest_path),
+        "requests": len(expected_requests), "outputs_equal": reader_parity_equal, **parity,
+    })
+    if not reader_parity_equal:
+        raise RuntimeError("Baseline/candidate reader boundary outputs differ; see reader-parity.json")
+
     rows = []
     for case in cases:
         print(f"Measuring {case['name']}", flush=True)
@@ -185,6 +231,7 @@ def main():
         summary.append(record)
     save(output / "summary.json", summary)
     save(output / "verification.json", {"rows": len(rows), "outputs_equal": True,
+         "reader_parity_requests": len(expected_requests), "reader_parity_outputs_equal": True,
          "expected_adjacent_timestamps_verified": True,
          "full_decode_frame_counts_verified": True, "alternating_order": True})
     print(json.dumps(summary, indent=2), flush=True)

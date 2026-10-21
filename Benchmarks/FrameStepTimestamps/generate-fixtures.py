@@ -59,14 +59,17 @@ def main() -> None:
     ]
     for field, top in [("tff", 1), ("bff", 0)]:
         mode = "interleave_top" if top else "interleave_bottom"
-        specs.append((
-            f"timestamp-{field}.mpg",
-            ["-f", "lavfi", "-i", "testsrc2=size=320x180:rate=50:duration=2",
-             "-vf", f"tinterlace={mode},setfield={field}", "-r", "25",
-             "-an", "-c:v", "mpeg2video", "-threads", "2", "-g", "12", "-bf", "2",
-             "-q:v", "2", "-flags", "+ildct+ilme", "-top", str(top)],
-            50, field, True,
-        ))
+        # MPEG program streams exercise the real demuxer's coarse seek behavior;
+        # indexed Matroska equivalents support absolute reader-boundary checks.
+        for extension in ["mpg", "mkv"]:
+            specs.append((
+                f"timestamp-{field}.{extension}",
+                ["-f", "lavfi", "-i", "testsrc2=size=320x180:rate=50:duration=2",
+                 "-vf", f"tinterlace={mode},setfield={field}", "-r", "25",
+                 "-an", "-c:v", "mpeg2video", "-threads", "2", "-g", "12", "-bf", "2",
+                 "-q:v", "2", "-flags", "+ildct+ilme", "-top", str(top)],
+                50, field, True,
+            ))
 
     def oracle(name: str, *, deinterlace: bool) -> dict:
         path = output / name

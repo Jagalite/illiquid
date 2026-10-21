@@ -7,7 +7,8 @@ import Testing
 /// Opt-in native measurements. The runner builds this identical harness against
 /// the baseline and candidate and alternates fresh processes on one macOS host.
 @Suite("Frame step performance", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["ILLIQUID_FRAME_STEP_BENCHMARK"] == "1"))
+       .enabled(if: ProcessInfo.processInfo.environment["ILLIQUID_FRAME_STEP_BENCHMARK"] == "1"
+                || ProcessInfo.processInfo.environment["ILLIQUID_FRAME_STEP_PARITY"] == "1"))
 struct FrameStepPerformanceTests {
     private struct Workload: Decodable {
         let name: String
@@ -18,7 +19,57 @@ struct FrameStepPerformanceTests {
         let fullDecode: Bool
     }
 
-    @Test func measureNativeRequest() async throws {
+    private struct FixtureManifest: Decodable {
+        struct Fixture: Decodable {
+            let filename: String
+            let normalizedPTS: [Double]
+        }
+        let schemaVersion: Int
+        let fixtures: [Fixture]
+    }
+
+    /// The runner compares records from the real reader in both revisions.
+    /// Some containers expose a different packet sequence after seeking than
+    /// after opening sequentially; equivalence must include that existing
+    /// demuxer behavior instead of assuming every container has an exact index.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ILLIQUID_FRAME_STEP_PARITY"] == "1"))
+    func recordReaderParity() async throws {
+        let environment = ProcessInfo.processInfo.environment
+        let path = try #require(environment["ILLIQUID_FRAME_STEP_FIXTURE_DIR"])
+        let directory = URL(fileURLWithPath: path, isDirectory: true)
+        let manifest = try JSONDecoder().decode(FixtureManifest.self, from: Data(contentsOf:
+            directory.appendingPathComponent("fixture-manifest.json")))
+        try #require(manifest.schemaVersion == 1)
+        try #require(!manifest.fixtures.isEmpty)
+        let reader = NativeFrameStepReader()
+        var records: [[String: Any]] = []
+        for fixture in manifest.fixtures.sorted(by: { $0.filename < $1.filename }) {
+            let times = fixture.normalizedPTS
+            let first = try #require(times.first)
+            let last = try #require(times.last)
+            let middle = times[times.count / 2]
+            let between = times.count > 1 ? (times[0] + times[1]) / 2 : first + 0.01
+            let positions = Set([0, first, middle, between, last, last + 0.125]).sorted()
+            let url = directory.appendingPathComponent(fixture.filename)
+            try #require(FileManager.default.fileExists(atPath: url.path))
+            for position in positions {
+                for direction in [-1, 1] {
+                    let target = try await reader.target(url: url, position: position, direction: direction)
+                    records.append([
+                        "filename": fixture.filename,
+                        "position": position,
+                        "direction": direction,
+                        "target": target.map { $0 as Any } ?? NSNull(),
+                    ])
+                }
+            }
+        }
+        let data = try JSONSerialization.data(withJSONObject: ["records": records], options: [.sortedKeys])
+        print("FRAME_STEP_READER_PARITY " + String(decoding: data, as: UTF8.self))
+    }
+
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ILLIQUID_FRAME_STEP_BENCHMARK"] == "1"))
+    func measureNativeRequest() async throws {
         let environment = ProcessInfo.processInfo.environment
         let directory = try #require(environment["ILLIQUID_FRAME_STEP_FIXTURE_DIR"])
         let specification = try #require(environment["ILLIQUID_FRAME_STEP_WORKLOAD"])
