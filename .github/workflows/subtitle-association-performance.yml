@@ -1,0 +1,57 @@
+name: Subtitle Association Performance
+
+on:
+  push:
+    branches: [perf/subtitle-association-indexed-8956e8]
+    paths:
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitleMatcher*.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitleAssociationTests.swift'
+      - 'Benchmarks/SubtitleAssociation/**'
+      - '.github/workflows/subtitle-association-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitleMatcher*.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitleAssociationTests.swift'
+      - 'Benchmarks/SubtitleAssociation/**'
+      - '.github/workflows/subtitle-association-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-association-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-association:
+    name: Native subtitle association qualification
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Qualify production change against frozen baseline
+        run: |
+          echo 'CAMPAIGN indexed'
+          python3 Benchmarks/SubtitleAssociation/run.py --output "$RUNNER_TEMP/subtitle-association/indexed" --pairs 8 --target-ms 100
+      - name: Compare isolated alternatives
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: python3 Benchmarks/SubtitleAssociation/explore.py --output "$RUNNER_TEMP/subtitle-association/exploration" --pairs 4 --target-ms 75
+      - name: Upload complete native evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: subtitle-association-${{ github.sha }}
+          path: ${{ runner.temp }}/subtitle-association
+          if-no-files-found: error
+          retention-days: 14
