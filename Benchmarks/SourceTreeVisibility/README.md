@@ -22,8 +22,9 @@ The retained October 19 native measurements still identify baseline
 `33fff16155c3472960f88e04c72dfdfdefd56dcf` and have not been rewritten.
 
 The October 21 refresh updates the retained shared sidebar declarations to
-the current production ancestor-visibility memoization. New runs therefore
-hold that bounded memoization equal in both variants. The historical filter
+the current production ancestor-visibility memoization, including literal
+UTF-8 path keys. New runs therefore hold that bounded memoization equal in
+both variants. The historical filter
 has one compatibility adaptation, `let matcher` to `var matcher`, for the
 shared matcher's mutating ancestor evaluation; its original tree-cache
 algorithm is preserved. The manifest retains that filter's original source

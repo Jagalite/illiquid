@@ -2117,9 +2117,18 @@ struct SourceVisibilityMatcher {
         let expression: NSRegularExpression
     }
 
-    private struct CachedAncestorEvaluation {
+    private struct LiteralAncestorPath: Hashable {
         let path: String
-        let evaluation: SourceVisibilityEvaluation
+
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.path.utf8.elementsEqual(rhs.path.utf8)
+        }
+
+        func hash(into hasher: inout Hasher) {
+            // Canonical-equivalent spellings may collide; byte equality still
+            // distinguishes them, and byte-equal paths always hash equally.
+            hasher.combine(path)
+        }
     }
 
     private static let ancestorEvaluationCacheLimit = 1_024
@@ -2127,7 +2136,7 @@ struct SourceVisibilityMatcher {
     private let rootPaths: [String]
     private let compiledRules: [CompiledRule]
     private let rootEvaluations: [String: SourceVisibilityEvaluation]
-    private var ancestorEvaluations: [String: CachedAncestorEvaluation] = [:]
+    private var ancestorEvaluations: [LiteralAncestorPath: SourceVisibilityEvaluation] = [:]
 
     init(
         configuration: SourceVisibilityConfiguration,
@@ -2291,13 +2300,9 @@ struct SourceVisibilityMatcher {
     private mutating func evaluateAncestor(
         normalizedPath: String
     ) -> SourceVisibilityEvaluation {
-        if !Task.isCancelled,
-           let cached = ancestorEvaluations[normalizedPath],
-           // String keys equate canonically equivalent Unicode spellings,
-           // but a regular expression can distinguish their actual text.
-           cached.path.utf8.elementsEqual(normalizedPath.utf8)
-        {
-            return cached.evaluation
+        let path = LiteralAncestorPath(path: normalizedPath)
+        if !Task.isCancelled, let cached = ancestorEvaluations[path] {
+            return cached
         }
         let evaluation = evaluate(normalizedPath: normalizedPath)
         // Siblings share these evaluations only during this visibility pass.
@@ -2306,10 +2311,7 @@ struct SourceVisibilityMatcher {
         if !Task.isCancelled,
            ancestorEvaluations.count < Self.ancestorEvaluationCacheLimit
         {
-            ancestorEvaluations[normalizedPath] = CachedAncestorEvaluation(
-                path: normalizedPath,
-                evaluation: evaluation
-            )
+            ancestorEvaluations[path] = evaluation
         }
         return evaluation
     }

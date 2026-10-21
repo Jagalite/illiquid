@@ -7,9 +7,10 @@ for one visibility pass, with a maximum of 1,024 entries. It preserves the exist
 upward walk, nearest hidden ancestor precedence, ordered regex matches, and root
 boundaries. Leaf evaluations and the existing root evaluation cache are unchanged.
 
-The cache checks exact UTF-8 spelling before accepting a dictionary hit. Swift
-String equality treats canonically equivalent Unicode spellings as equal, while
-regular expressions can distinguish them. Cancelled evaluations are neither
+The cache uses an exact UTF-8 path key. Swift String equality treats canonically
+equivalent Unicode spellings as equal, while regular expressions can distinguish
+them. The key uses byte equality and String hashing, so different spellings can
+share a hash but remain distinct cached entries. Cancelled evaluations are neither
 reused nor inserted.
 
 ## Reproduce
@@ -71,6 +72,12 @@ rules only; no rules; nonrecursive Tree mode; and Unicode paths. No-rules projec
 and Tree mode are controls. The standalone matcher still evaluates ancestry for
 the no-rules fixture; the real projection skips that unnecessary work.
 
+The Unicode fixture is adversarial: each block alternates composed/decomposed
+spellings of canonically equivalent parent keys. On platforms that preserve both
+ancestor spellings, the cache must retain them as distinct keys. Foundation's
+native ancestor normalization can make the same fixture use one spelling on
+macOS. Results for this fixture are platform-specific.
+
 Before timing, complete baseline and candidate outputs must match for every
 workload and both operations, including a 1,300-parent capacity case. Each timing
 sample also must match the full output receipt from every other sample of the
@@ -91,3 +98,23 @@ playback throughput, energy use, or a user's full filesystem scan.
 shared matcher snapshot is refreshed to keep this optimization equal in both of
 that benchmark's variants; its historical algorithm, comparison gate, and past
 evidence are retained.
+
+## Research history
+
+The first cache used a String-keyed dictionary and checked exact UTF-8 spelling
+before reusing its value. The initial six-pair Linux run showed strong gains on
+shared and deep paths but consistent slowdowns on deliberately alternating
+Unicode spellings: 32.7% for matching and 26.8% for projection. That implementation
+preserved correctness but repeatedly replaced the canonical String key. Its
+[complete results, including adverse and noisy controls](evidence/2026-10-21-linux/)
+remain retained rather than being attributed to the final implementation.
+
+A focused, isolated comparison of exact UTF-8 keys against that first candidate
+used three alternating process pairs on Linux. Unicode matching improved by
+42.8% and projection by 39.0%; shared-parent eight-rule timing was effectively
+unchanged (median paired differences within 0.3%). Both versions passed all 16
+release tests, and their full 20-cell differential output matched each other and
+the retained original-main output. This supported adopting the literal key for
+full qualification; the probe is not a measurement against original main.
+[Probe records and source receipts](evidence/2026-10-21-literal-key-probe/) identify
+both exact inputs.
