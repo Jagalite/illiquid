@@ -66,7 +66,7 @@ struct SourceVisibilityAncestorCacheTests {
         }
     }
 
-    @Test func canonicallyEquivalentAncestorSpellingsKeepDistinctRegexResults() {
+    @Test func canonicallyEquivalentAncestorSpellingsMatchFreshEvaluation() {
         let composed = "Caf\u{00e9}"
         let decomposed = "Cafe\u{0301}"
         #expect(composed == decomposed)
@@ -77,12 +77,16 @@ struct SourceVisibilityAncestorCacheTests {
         )
         var matcher = SourceVisibilityMatcher(configuration: configuration, roots: [root])
 
-        for (parent, id) in [(composed, "composed"), (decomposed, "decomposed"),
-                             (composed, "composed"), (decomposed, "decomposed")] {
+        // Foundation may normalize ancestor spellings differently by platform.
+        // Cache reuse must preserve that platform's fresh evaluation exactly.
+        for parent in [composed, decomposed, composed, decomposed] {
             let path = "/media/\(parent)/Episode.mkv"
+            var fresh = SourceVisibilityMatcher(configuration: configuration, roots: [root])
+            let expected = fresh.evaluateIncludingAncestors(normalizedPath: path)
+            #expect(expected.regexMatches.count == 1)
+            #expect(expected.hiddenMatches == expected.regexMatches.map(SourceVisibilityHideMatch.regex))
             let result = matcher.evaluateIncludingAncestors(normalizedPath: path)
-            #expect(result.hiddenMatches == [.regex(match(id))])
-            #expect(result.regexMatches == [match(id)])
+            #expect(result == expected)
         }
     }
 

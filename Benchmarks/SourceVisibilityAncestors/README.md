@@ -57,6 +57,13 @@ measurement consumes all output counts and retains the final complete output for
 validation. This measures visibility rebuilds, not the existing cross-request
 projection cache hit.
 
+The projection fixtures use Files Only mode with **Show Hidden enabled**, except
+for the nonrecursive Tree control. This retains every annotated row and permits
+complete output comparison, including hidden-row metadata and counts. It does
+not time the ordinary hidden-row pruning path or Media-mode section grouping;
+the behavior tests separately verify hidden-row exclusion. Ancestor evaluation
+occurs before pruning in production.
+
 The workloads include a 100-file small library; 5,000 files sharing ancestors with
 one or eight regex rules; 2,500 files with ten directory levels; an immediately
 hidden parent; 2,000 files with unique parents exceeding cache capacity; manual
