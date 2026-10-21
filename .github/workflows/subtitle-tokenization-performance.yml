@@ -1,7 +1,7 @@
 name: Subtitle filename tokenization performance
 on:
   push:
-    branches: [perf/subtitle-ascii-tokenization-20261021]
+    branches: [perf/subtitle-contiguous-ascii-20261021]
     paths:
       - Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift
       - Tests/IlliquidCoreTests/ExternalSubtitleTokenizationTests.swift
@@ -37,9 +37,7 @@ jobs:
       - name: Test both implementations and measure paired release associations
         run: |
           python3 Benchmarks/SubtitleTokenization/run.py \
-            --output "$RUNNER_TEMP/subtitle-tokenization" --mode benchmark --pairs 12 --target-ms 500 \
-            --case ascii_256 --case empty_256 --case unicode_16 \
-            --case unicode_256 --case late_unicode_256
+            --output "$RUNNER_TEMP/subtitle-tokenization" --mode all --pairs 12 --target-ms 500
       - name: Package complete evidence for review
         if: always()
         run: |
@@ -47,6 +45,8 @@ jobs:
           import hashlib, os, pathlib, zipfile
           root = pathlib.Path(os.environ['RUNNER_TEMP'])
           source = root / 'subtitle-tokenization'
+          if not source.is_dir():
+              raise SystemExit('Qualification did not create an evidence directory')
           archive = root / 'subtitle-tokenization-evidence.zip'
           with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as output:
               for path in sorted(source.rglob('*')):
