@@ -1,0 +1,58 @@
+name: Source preparation admission performance
+
+on:
+  push:
+    branches:
+      - 'perf/source-preparation-admission-*'
+    paths:
+      - 'Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift'
+      - 'Tests/IlliquidCoreTests/SourcePreparationExecutorTests.swift'
+      - 'Benchmarks/SourcePreparationAdmission/**'
+      - '.github/workflows/source-preparation-admission.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift'
+      - 'Tests/IlliquidCoreTests/SourcePreparationExecutorTests.swift'
+      - 'Benchmarks/SourcePreparationAdmission/**'
+      - '.github/workflows/source-preparation-admission.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-preparation-admission-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test both implementations and compare native optimized timings
+        run: |
+          python3 Benchmarks/SourcePreparationAdmission/run.py \
+            --mode all --pairs 8 --stress-repetitions 100 \
+            --output "$RUNNER_TEMP/source-preparation-admission"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-preparation-admission-native
+          path: |
+            ${{ runner.temp }}/source-preparation-admission/receipt.json
+            ${{ runner.temp }}/source-preparation-admission/summary.json
+            ${{ runner.temp }}/source-preparation-admission/measurements.jsonl
+            ${{ runner.temp }}/source-preparation-admission/commands.jsonl
+            ${{ runner.temp }}/source-preparation-admission/baseline/*.log
+            ${{ runner.temp }}/source-preparation-admission/baseline/stress-*.json
+            ${{ runner.temp }}/source-preparation-admission/baseline/SourcePreparationExecutor.swift
+            ${{ runner.temp }}/source-preparation-admission/candidate/*.log
+            ${{ runner.temp }}/source-preparation-admission/candidate/stress-*.json
+            ${{ runner.temp }}/source-preparation-admission/candidate/SourcePreparationExecutor.swift
+          retention-days: 14
