@@ -66,3 +66,11 @@ This is a component experiment. It does not decode compressed audio, perform
 resampling, measure renderer submission, or measure whole-player CPU, battery
 use, or playback latency. Native decoder and resampler regression tests remain
 a separate required validation step.
+
+## Results
+
+The [research report](../../Documentation/AUDIO_FORMAT_METADATA_PERFORMANCE.md)
+contains the native measurements, implementation rationale, regression coverage,
+and interpretation. [Retained evidence](evidence/) includes both native cohorts,
+the supplementary Linux cohort, raw timings, source hashes, test logs, and the
+complete metadata parity trace.

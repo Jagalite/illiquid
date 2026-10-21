@@ -1,0 +1,56 @@
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/19] Write swift-version-33E6E653F810AB97.txt
+[1/19] Emitting module for IlliquidNativePlayback
+[2/19] Compiling IlliquidNativePlayback AudioSourceFormat.swift
+[3/19] Compiling IlliquidNativePlayback CStringBuffer.swift
+[4/19] Emitting module for IlliquidNativePlaybackTests
+[5/19] Wrapping AST for IlliquidNativePlaybackTests for debugging
+[6/19] Wrapping AST for IlliquidNativePlayback for debugging
+[7/19] Compiling IlliquidNativePlaybackTests AudioSourceFormatTests.swift
+[8/19] /workspace/scratch/86896e846d92/audio-metadata-published-tests/build-debug/x86_64-unknown-linux-gnu/debug/AudioSourceFormatQualificationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[9/19] Emitting module for AudioSourceFormatQualificationPackageDiscoveredTests
+[10/19] Compiling AudioSourceFormatQualificationPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+[11/19] /workspace/scratch/86896e846d92/audio-metadata-published-tests/build-debug/x86_64-unknown-linux-gnu/debug/AudioSourceFormatQualificationPackageTests.derived/runner.swift
+[12/19] Wrapping AST for AudioSourceFormatQualificationPackageDiscoveredTests for debugging
+[13/19] Compiling AudioSourceFormatQualificationPackageDiscoveredTests all-discovered-tests.swift
+[14/19] Emitting module for AudioSourceFormatQualificationPackageTests
+[15/19] Wrapping AST for AudioSourceFormatQualificationPackageTests for debugging
+[16/19] Compiling AudioSourceFormatQualificationPackageTests runner.swift
+[17/19] Write Objects.LinkFileList
+[18/19] Linking AudioSourceFormatQualificationPackageTests.xctest
+Build complete! (18.57s)
+Test Suite 'Selected tests' started at 2026-10-21 15:13:16.270
+Test Suite 'Selected tests' passed at 2026-10-21 15:13:16.273
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Audio source format metadata" started.
+◇ Test equivalentNativeAndCustomDescriptionsKeepTheSameFormatIdentity() started.
+◇ Test repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test ambisonicAndInvalidOrdersKeepTheFallbackBehavior() started.
+◇ Test customNamesAndIDsCanChangeAtTheSameAddress() started.
+◇ Test cachedStringsOutliveTheirFrames() started.
+◇ Test customDescriptionsRetainTheExisting128ByteLimit() started.
+◇ Test unspecifiedOrderUsesChannelCountAndIgnoresTheUnion() started.
+◇ Test everyFormerSignatureFieldStillDistinguishesFormats() started.
+◇ Test case passing 1 argument layout → "mono" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "5.1(side)" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "stereo" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "5.1" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test equalChannelCountsWithDifferentMasksInvalidateTheName() started.
+◇ Test case passing 1 argument layout → "7.1" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test changingNativeChannelCountAlsoInvalidatesTheName() started.
+✔ Test cachedStringsOutliveTheirFrames() passed after 0.001 seconds.
+✔ Test equivalentNativeAndCustomDescriptionsKeepTheSameFormatIdentity() passed after 0.001 seconds.
+✔ Test unspecifiedOrderUsesChannelCountAndIgnoresTheUnion() passed after 0.001 seconds.
+✔ Test everyFormerSignatureFieldStillDistinguishesFormats() passed after 0.001 seconds.
+✔ Test equalChannelCountsWithDifferentMasksInvalidateTheName() passed after 0.001 seconds.
+✔ Test changingNativeChannelCountAlsoInvalidatesTheName() passed after 0.001 seconds.
+✔ Test customNamesAndIDsCanChangeAtTheSameAddress() passed after 0.001 seconds.
+✔ Test ambisonicAndInvalidOrdersKeepTheFallbackBehavior() passed after 0.001 seconds.
+✔ Test customDescriptionsRetainTheExisting128ByteLimit() passed after 0.001 seconds.
+✔ Test repeatedNativeLayoutsMatchFFmpeg(layout:) with 5 test cases passed after 0.002 seconds.
+✔ Suite "Audio source format metadata" passed after 0.002 seconds.
+✔ Test run with 10 tests in 1 suite passed after 0.003 seconds.
