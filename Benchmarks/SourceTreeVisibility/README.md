@@ -101,8 +101,13 @@ the measurement.
 `baseline/manifest.json` records the current baseline revision, source Git blob IDs,
 SHA-256 hashes, and extraction boundaries. The retained baseline consists of
 complete small production files and guarded verbatim Foundation declarations
-from `AppModel.swift` and `SourcesSidebar.swift`. The candidate stages the same
-current declarations; all shared dependencies must match the baseline.
+from `AppModel.swift` and `SourcesSidebar.swift`. The candidate reads current
+declarations. Current integrated runs stage the current checkout's
+`MediaSidecarReader.swift` identically in both variants; every other shared
+dependency must still match the retained baseline. Output manifests record both
+historical and current reader hashes in `shared_dependencies`. This deliberate
+substitution leaves the retained snapshot and published historical campaigns
+unchanged; reproduce those campaigns from their recorded checkouts.
 
 The benchmark executes the production actor, tree builder, matcher, sorter,
 and model types. It does not substitute a simplified implementation. Linux

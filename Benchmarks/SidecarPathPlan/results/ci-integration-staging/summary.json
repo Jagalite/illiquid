@@ -1,0 +1,100 @@
+{
+  "current_reader_sha256": "45ce16f1a81bdeeb0a8573438ed023bf76f698b976abf29fa12f3b808a39403c",
+  "negative_controls": [
+    {
+      "kind": "unrelated source differs",
+      "message": "Unrelated staged production dependency changed: Sources/IlliquidCore/PlexMatchHints.swift",
+      "rejected": true,
+      "runner": "SourceTreeVisibility"
+    },
+    {
+      "kind": "unrelated source differs",
+      "message": "Unrelated production dependency changed: Sources/IlliquidCore/PlexMatchHints.swift",
+      "rejected": true,
+      "runner": "MediaSectionGrouping"
+    },
+    {
+      "kind": "unrelated source differs",
+      "message": "Unrelated staged production source changed: Sources/IlliquidCore/PlexMatchHints.swift",
+      "rejected": true,
+      "runner": "FlatFileProjection"
+    },
+    {
+      "kind": "hash",
+      "message": "Shared dependency source hash changed: Sources/IlliquidCore/MediaSidecarReader.swift",
+      "rejected": true,
+      "side": "historical"
+    },
+    {
+      "kind": "source boundary",
+      "message": "Shared dependency source boundary changed: Sources/IlliquidCore/MediaSidecarReader.swift",
+      "rejected": true,
+      "side": "historical"
+    },
+    {
+      "kind": "hash",
+      "message": "Shared dependency source hash changed: Sources/IlliquidCore/MediaSidecarReader.swift",
+      "rejected": true,
+      "side": "current"
+    },
+    {
+      "kind": "source boundary",
+      "message": "Shared dependency source boundary changed: Sources/IlliquidCore/MediaSidecarReader.swift",
+      "rejected": true,
+      "side": "current"
+    }
+  ],
+  "retained_baseline_files_unchanged": 13,
+  "retained_baseline_tree_sha256": "07490eb2ce904586842328373f3de6c96f8f3b4c7bc02d46966864d61724b480",
+  "runner_sha256": {
+    "FlatFileProjection": "97048b5e0937f96ba75666b1ff9b19ed657faf910ba16cadda68ce650c8436fa",
+    "MediaSectionGrouping": "9fa2aeccdec40fc4bed9268453b8ab8fbcc3e29cbee8076a0de74efe5ec4585e",
+    "SourceTreeVisibility": "9518c40cf874b605af28744cd6c57814fce364db35aeba96d270f1bbb2884f4b"
+  },
+  "runners": {
+    "FlatFileProjection": {
+      "all_staged_hashes_verified": true,
+      "baseline_revision": "070c7a4c84a4f00b2ac3e17587a7b5f3857952fd",
+      "baseline_targets_match_pinned_sources": true,
+      "compiled_reader_sha256": "1afb8689591b9e8fc424c9994acaf411b152ed6f46b81e80ad9f94a8438ac19f",
+      "current_reader_sha256": "45ce16f1a81bdeeb0a8573438ed023bf76f698b976abf29fa12f3b808a39403c",
+      "historical_reader_sha256": "5c53358426ed6d5abffefd84a6e1c99d5a7a1a801c226486b671e276969c16ba",
+      "identical_reader_in_both_variants": true,
+      "prepare_succeeded": true,
+      "production_files_per_variant": 12,
+      "target_only_differences": [
+        "Sources/IlliquidApp/SourceTreeProjectionInput.swift"
+      ]
+    },
+    "MediaSectionGrouping": {
+      "all_staged_hashes_verified": true,
+      "baseline_revision": "6dc482129373da1c611b6e8cc7ea7906c381912c",
+      "baseline_targets_match_pinned_sources": true,
+      "compiled_reader_sha256": "1afb8689591b9e8fc424c9994acaf411b152ed6f46b81e80ad9f94a8438ac19f",
+      "current_reader_sha256": "45ce16f1a81bdeeb0a8573438ed023bf76f698b976abf29fa12f3b808a39403c",
+      "historical_reader_sha256": "5c53358426ed6d5abffefd84a6e1c99d5a7a1a801c226486b671e276969c16ba",
+      "identical_reader_in_both_variants": true,
+      "prepare_succeeded": true,
+      "production_files_per_variant": 12,
+      "target_only_differences": [
+        "Sources/IlliquidApp/SourceBrowserFilter.swift"
+      ]
+    },
+    "SourceTreeVisibility": {
+      "all_staged_hashes_verified": true,
+      "baseline_revision": "2c25829e108d6eee065f2a2bc3b2d58f8fa7e122",
+      "baseline_targets_match_pinned_sources": true,
+      "compiled_reader_sha256": "1afb8689591b9e8fc424c9994acaf411b152ed6f46b81e80ad9f94a8438ac19f",
+      "current_reader_sha256": "45ce16f1a81bdeeb0a8573438ed023bf76f698b976abf29fa12f3b808a39403c",
+      "historical_reader_sha256": "5c53358426ed6d5abffefd84a6e1c99d5a7a1a801c226486b671e276969c16ba",
+      "identical_reader_in_both_variants": true,
+      "prepare_succeeded": true,
+      "production_files_per_variant": 12,
+      "target_only_differences": [
+        "Sources/IlliquidApp/SourceBrowserFilter.swift",
+        "Sources/IlliquidApp/SourceTreeProjectionInput.swift"
+      ]
+    }
+  },
+  "scope": "prepare only; no Swift builds, tests, or timing runs"
+}

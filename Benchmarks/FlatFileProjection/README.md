@@ -52,9 +52,12 @@ observation. Timing results are research evidence, not a noisy pass/fail gate.
 
 The runner uses the existing source-tree benchmark's guarded staging definitions.
 It compiles the complete production projection input and supporting Foundation
-declarations, with a separate executable driver. Baseline files come directly
+declarations, with a separate executable driver. Baseline projection files come
 from the pinned Git revision; candidate files come from the current checkout.
-The runner rejects any staged production difference outside
+Current integrated runs stage the current checkout's `MediaSidecarReader.swift`
+identically in both variants and record historical and current reader hashes in
+`shared_dependencies`. All other shared dependencies still match the pinned
+revision. The runner rejects any staged production difference outside
 `SourceTreeProjectionInput.swift`. There is no replacement projection or sorter.
 
 Both variants run `SourceBrowserFilterTests`, `SourceMediaOrganizationTests`, and

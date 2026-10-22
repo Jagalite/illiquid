@@ -24,6 +24,13 @@ import time
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASELINE = "2c25829e108d6eee065f2a2bc3b2d58f8fa7e122"
+# This reader is a shared dependency, not one of the projection changes under
+# comparison. Keep the historical snapshot intact, but qualify both variants
+# with the same current reader and record both source generations explicitly.
+CURRENT_SHARED_SOURCES = {
+    "Sources/IlliquidCore/MediaSidecarReader.swift":
+        "Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift",
+}
 CORE = [
     "Utilities/NormalizedFileURL.swift", "Utilities/MediaFileSupport.swift",
     "Utilities/SourcePreparationExecutor.swift", "MediaLibrary/MediaNameRecognition.swift",
@@ -107,6 +114,31 @@ def snapshot(read_source) -> tuple[dict[str, bytes], dict]:
     return files, records
 
 
+def share_current_dependencies(baseline_files, baseline_records, candidate_files, candidate_records):
+    """Align only explicitly shared files, retaining their original provenance.
+
+    Callers still enforce their own target-only source differences afterwards.
+    The retained baseline files and manifests on disk are never rewritten.
+    """
+    shared = {}
+    for staged, repository_path in CURRENT_SHARED_SOURCES.items():
+        previous, current = baseline_records[staged], candidate_records[staged]
+        for record, raw in [(previous, baseline_files[staged]),
+                            (current, candidate_files[staged])]:
+            if record["repository_path"] != repository_path or record["excerpts"]:
+                raise ValueError(f"Shared dependency source boundary changed: {staged}")
+            if digest(raw) != record["snapshot_sha256"]:
+                raise ValueError(f"Shared dependency source hash changed: {staged}")
+        shared[staged] = {
+            "policy": "identical current worktree source in both variants",
+            "historical_baseline": dict(previous),
+            "current_shared_source": dict(current),
+        }
+        baseline_files[staged] = candidate_files[staged]
+        baseline_records[staged] = dict(current)
+    return shared
+
+
 class Runner:
     def __init__(self, args):
         self.args = args
@@ -150,15 +182,18 @@ class Runner:
                 raise ValueError(f"Retained baseline changed: {relative}")
             baseline_files[relative] = raw
         candidate_files, candidate_records = snapshot(lambda name: (ROOT / name).read_bytes())
+        baseline_records = dict(baseline["files"])
+        shared_dependencies = share_current_dependencies(
+            baseline_files, baseline_records, candidate_files, candidate_records)
         for relative, raw in candidate_files.items():
             if Path(relative).name not in {"SourceBrowserFilter.swift", "SourceTreeProjectionInput.swift"}:
                 if raw != baseline_files[relative]:
                     raise ValueError(f"Unrelated staged production dependency changed: {relative}")
-        for variant, files, records in [("baseline", baseline_files, baseline["files"]),
+        for variant, files, records in [("baseline", baseline_files, baseline_records),
                                         ("candidate", candidate_files, candidate_records)]:
             package = self.output / "packages" / variant
             manifest = {"variant": variant, "baseline_revision": BASELINE, "production": records,
-                        "staged": {}, "adaptations": []}
+                        "shared_dependencies": shared_dependencies, "staged": {}, "adaptations": []}
             staging = dict(files)
             staging["Sources/SourceTreeBenchmark/Harness.swift"] = (HERE / "Harness.swift").read_bytes()
             for name in TESTS:

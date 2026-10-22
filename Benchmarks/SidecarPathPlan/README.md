@@ -79,8 +79,9 @@ four test logs, [test counts](results/native-macos/tests.json), complete gzip
 output snapshots, host/compiler details, command receipts, binary hashes,
 calibrations, every observation, completion and audit provenance. The
 [verification digest](results/native-macos/verification.json) matches the Linux
-canonical-output digest below. **Full-app PR CI remains pending**; these
-component suites do not build the app graph.
+canonical-output digest below. These component suites do not build the app
+graph; the separate integration status is tracked in
+[PR #77's checks](https://github.com/Jagalite/illiquid/pull/77/checks).
 
 ## Linux exploratory results
 
@@ -177,6 +178,19 @@ ASCII keys remain distinct. A separate control switches to decoded `.path`
 keys and canonical String equality: it fails with **two parity assertions**.
 Both exact mutations and their hashes are recorded, including the passing
 control. This focused Linux check is separate from the subsequent successful native qualification.
+
+## Integration with existing projection benchmarks
+
+The first PR integration run stopped in the source-tree visibility benchmark
+before tests because its historical dependency guard rejected the updated
+reader. Media grouping and flat-file projection use the same dependency.
+Their runners now stage the identical current reader in both comparison
+variants, explicitly recording the historical and current source hashes.
+Historical benchmark targets and retained snapshots remain unchanged, and all
+other source-isolation guards remain active. This shared-dependency update does
+not change the sidecar benchmark or any measurements reported above.
+A [prepare-only audit](results/ci-integration-staging/summary.json) verified all
+three source cohorts and rejected seven deliberately invalid source/hash cases.
 
 ## Reproduce
 

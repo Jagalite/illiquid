@@ -104,6 +104,8 @@ class Runner:
         baseline_files, baseline_records = staging.snapshot(lambda name: subprocess.check_output(
             ["git", "show", f"{self.args.baseline}:{name}"], cwd=ROOT))
         candidate_files, candidate_records = staging.snapshot(lambda name: (ROOT / name).read_bytes())
+        shared_dependencies = staging.share_current_dependencies(
+            baseline_files, baseline_records, candidate_files, candidate_records)
         for name in baseline_files:
             if not name.endswith("/SourceTreeProjectionInput.swift") and baseline_files[name] != candidate_files[name]:
                 raise ValueError(f"Unrelated staged production source changed: {name}")
@@ -113,7 +115,7 @@ class Runner:
             files["Sources/FlatFileProjectionBenchmark/Harness.swift"] = (HERE / "Harness.swift").read_bytes()
             for name in TESTS:
                 files["Tests/IlliquidAppTests/" + name] = (ROOT / "Tests/IlliquidAppTests" / name).read_bytes()
-            manifest = {"production": records, "staged": {}}
+            manifest = {"production": records, "shared_dependencies": shared_dependencies, "staged": {}}
             for name, raw in files.items():
                 compiled, adaptations = adapt(name, raw)
                 path = self.output / variant / name
