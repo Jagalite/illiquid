@@ -1,0 +1,165 @@
+Fetching https://github.com/swiftlang/swift-syntax.git
+Fetching https://github.com/swiftlang/swift-testing.git
+[1/45023] Fetching swift-testing
+[36920/125995] Fetching swift-testing, swift-syntax
+Fetched https://github.com/swiftlang/swift-testing.git from cache (5.36s)
+Fetched https://github.com/swiftlang/swift-syntax.git from cache (5.37s)
+Fetching https://github.com/sparkle-project/Sparkle.git
+[1/44207] Fetching sparkle
+Fetched https://github.com/sparkle-project/Sparkle.git from cache (3.06s)
+Creating working copy for https://github.com/sparkle-project/Sparkle.git
+Creating working copy for https://github.com/swiftlang/swift-syntax.git
+Creating working copy for https://github.com/swiftlang/swift-testing.git
+Working copy of https://github.com/swiftlang/swift-testing.git resolved at swift-6.3.2-RELEASE (70eff26)
+Working copy of https://github.com/swiftlang/swift-syntax.git resolved at 603.0.2
+Working copy of https://github.com/sparkle-project/Sparkle.git resolved at 2.10.0
+Downloading binary artifact https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+[16375/10193895] Downloading https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+Downloaded https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip (1.07s)
+Downloading package prebuilt https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip
+Downloaded https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip (0.20s)
+Building for production...
+[0/49] /Users/runner/work/illiquid/illiquid/.build/arm64-apple-macosx/release/IlliquidPackageTests.derived/runner.swift
+[1/49] Write swift-version-7974D3F7F03D5E95.txt
+[2/49] Compiling _TestingInternals WillThrow.cpp
+[3/49] Compiling _TestingInternals ExecutablePath.cpp
+[4/49] Compiling _TestingInternals Discovery.cpp
+[5/49] Write sources
+[8/50] Compiling _TestingInternals Versions.cpp
+[9/50] Copying Sparkle.framework
+[11/51] Compiling _TestDiscovery WinSDKAdditions.swift
+[11/51] Copying NativePlaybackShaders.metal
+[12/51] Copying Resources
+[13/51] Write sources
+[32/52] Compiling TestingMacros ConditionMacro.swift
+[32/52] Write sources
+[33/52] Write Objects.LinkFileList
+[34/52] Write sources
+[35/52] Linking TestingMacros-tool
+[36/52] Compiling CNativeAudio AudioOutputDevice.m
+[38/53] Compiling IlliquidCore MediaMetadataHints.swift
+[39/54] Compiling IlliquidPlaybackCore EventsAndEffects.swift
+[40/55] Compiling Testing ABI.Record+Streaming.swift
+[41/56] Compiling IlliquidPlaybackStateSpace PlaybackPartialOrderReducer.swift
+[42/57] Compiling IlliquidPlayback Module.swift
+[43/58] Compiling IlliquidStateSpaceExplorer main.swift
+[44/59] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+[45/60] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+[46/61] Compiling IlliquidPlaybackCoreTests PlaybackCoreTests.swift
+[47/62] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+/Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1150 |             self.workQueue.async {
+1151 |                 _ = resources.retainedCVTextures
+1152 |                 guard commandBuffer.status != .error else {
+     |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1153 |                     completion(.failure(
+1154 |                         commandBuffer.error
+
+/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+243 |  */
+244 | API_AVAILABLE(macos(10.11), ios(8.0))
+245 | @protocol MTLCommandBuffer <NSObject>
+    |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+246 | 
+247 | /*!
+
+/Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   4 | import CoreVideo
+   5 | import Foundation
+   6 | import Metal
+     | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   7 | import OSLog
+   8 | import QuartzCore
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[47/62] Write Objects.LinkFileList
+[49/63] Compiling IlliquidRenderProfile main.swift
+[49/63] Linking IlliquidStateSpaceExplorer
+[51/64] Compiling IlliquidCoreTests AspectFitWindowSizingTests.swift
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 97 |             nil,
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+101 |         ]
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+101 |         ]
+102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+[52/65] Compiling IlliquidPlayer ArchitectureValidation.swift
+[53/66] Compiling IlliquidDifferentialHarness main.swift
+[54/67] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+[55/68] Compiling IlliquidPlaybackStress main.swift
+[56/69] Compiling IlliquidArchitectureCheck main.swift
+[57/70] Compiling IlliquidApp AppDelegate.swift
+[57/70] Write Objects.LinkFileList
+[59/70] Linking IlliquidRenderProfile
+[60/70] Linking IlliquidPlaybackStress
+[61/70] Write Objects.LinkFileList
+[63/70] Linking IlliquidDifferentialHarness
+[64/70] Linking IlliquidArchitectureCheck
+[65/70] Write Objects.LinkFileList
+[66/70] Linking Illiquid
+[68/71] Compiling IlliquidNativePlaybackTests AudioDelayTests.swift
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift:127:18: warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+125 |         let queue = BoundedQueue<Payload>(capacity: 1)
+126 |         var value: Payload? = Payload()
+127 |         weak var retained = value
+    |                  `- warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+128 |         #expect(queue.push(value!)); value = nil
+129 |         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift:99:13: warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+ 97 |         let checkoutID = try #require(token).checkoutID
+ 98 |         var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
+ 99 |             ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+    |             `- warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+100 |         )
+101 |         token?.transition(to: .queued)
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+167 |         var first: Value? = Value()
+168 |         weak var released = first
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+169 |         ring.append(first!)
+170 |         first = nil
+
+[#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+[69/71] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+[70/72] Compiling IlliquidPackageTests runner.swift
+[70/72] Write Objects.LinkFileList
+[71/72] Linking IlliquidPackageTests
+Build complete! (555.40s)
+Test Suite 'Selected tests' started at 2026-10-22 20:07:23.119.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-10-22 20:07:23.129.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-10-22 20:07:23.129.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-22 20:07:23.129.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.010) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Native playback parity tools" started.
+◇ Test screenshotIncludesSubtitleMaskAtTheExpectedPixels() started.
+✔ Test screenshotIncludesSubtitleMaskAtTheExpectedPixels() passed after 0.649 seconds.
+✔ Suite "Native playback parity tools" passed after 0.650 seconds.
+◇ Suite "Screenshot context reuse" started.
+◇ Test repeatedCapturesReadCurrentBytesFromTheSamePixelBuffer() started.
+✔ Test repeatedCapturesReadCurrentBytesFromTheSamePixelBuffer() passed after 0.016 seconds.
+◇ Test reusedBufferMatrixAttachmentsDoNotReusePreviousColors() started.
+✔ Test reusedBufferMatrixAttachmentsDoNotReusePreviousColors() passed after 0.036 seconds.
+◇ Test changesToGeometryDoNotCarryAcrossCaptures() started.
+✔ Test changesToGeometryDoNotCarryAcrossCaptures() passed after 0.031 seconds.
+◇ Test paddedTextAndBitmapSubtitleRegionsRemainIndependentOfImageReuse() started.
+✔ Test paddedTextAndBitmapSubtitleRegionsRemainIndependentOfImageReuse() passed after 0.016 seconds.
+◇ Test concurrentImmutableCapturesMatchSerialPixels() started.
+✔ Test concurrentImmutableCapturesMatchSerialPixels() passed after 0.100 seconds.
+◇ Test invalidOutputDimensionsKeepTheExistingFailureContract() started.
+✔ Test invalidOutputDimensionsKeepTheExistingFailureContract() passed after 0.001 seconds.
+✔ Suite "Screenshot context reuse" passed after 0.204 seconds.
+✔ Test run with 7 tests in 2 suites passed after 0.855 seconds.
