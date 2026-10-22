@@ -124,7 +124,8 @@ public final class AtomicPlaybackSessionStore: PlaybackSessionStoring, @unchecke
                 attributes: nil
             )
             let encoder = JSONEncoder()
-            encoder.outputFormatting = [.sortedKeys]
+            // Restoration reads keyed values; sorting every playlist item's
+            // JSON keys adds checkpoint work without changing the saved state.
             let data = try encoder.encode(session)
             try data.write(to: fileURL, options: [.atomic])
         }
