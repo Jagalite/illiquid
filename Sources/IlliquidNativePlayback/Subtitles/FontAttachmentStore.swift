@@ -6,6 +6,10 @@ struct FontAttachment: Equatable, Sendable {
     let data: Data
 
     var isSupportedFont: Bool {
+        Self.isSupportedFont(filename: filename, mimeType: mimeType)
+    }
+
+    static func isSupportedFont(filename: String, mimeType: String?) -> Bool {
         let extensionName = URL(fileURLWithPath: filename).pathExtension.lowercased()
         if ["ttf", "otf", "ttc"].contains(extensionName) { return true }
         guard let mimeType = mimeType?.lowercased() else { return false }
