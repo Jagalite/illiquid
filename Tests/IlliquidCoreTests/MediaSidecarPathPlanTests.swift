@@ -69,20 +69,27 @@ struct MediaSidecarPathPlanTests {
 
     @Test func unicodeEquivalentStringsKeepTheirExactURLBoundaries() throws {
         try withFixture { fixture in
-            let composed = fixture.appendingPathComponent("Caf\u{00e9}", isDirectory: true)
-            let decomposed = fixture.appendingPathComponent("Cafe\u{0301}", isDirectory: true)
+            // File-path constructors can normalize both spellings on macOS.
+            // Explicit URL strings retain distinct inputs; production URL
+            // standardization is still free to apply the platform's rules.
+            let composed = try #require(URL(string: fixture.absoluteString + "Caf%C3%A9/"))
+            let decomposed = try #require(URL(string: fixture.absoluteString + "Cafe%CC%81/"))
+            let original = try #require(URL(string: composed.absoluteString + "clip.mkv"))
+            let alternate = try #require(URL(string: decomposed.absoluteString + "clip.mkv"))
             try FileManager.default.createDirectory(at: composed, withIntermediateDirectories: true)
             try write("title: Exact Root\nep: 5: clip.mkv", at: composed, name: ".plexmatch")
             #expect(composed.path == decomposed.path)
             #expect(!composed.absoluteString.utf8.elementsEqual(decomposed.absoluteString.utf8))
+            #expect(!original.absoluteString.utf8.elementsEqual(alternate.absoluteString.utf8))
             let reader = MediaSidecarReader()
-            let original = composed.appendingPathComponent("clip.mkv")
-            #expect(try reader.recognize(original, within: composed).title == "Exact Root")
+            // Warm a valid boundary using the reader's own parent transform;
+            // root and child URL transforms need not normalize identically.
+            let warmRoot = original.deletingLastPathComponent().standardizedFileURL
+            #expect(try reader.recognize(original, within: warmRoot).title == "Exact Root")
             // Either URL can be a filesystem alias on macOS; the root walk's
             // original URL equality, rather than String equality, is the oracle.
             for (file, root) in [
-                (decomposed.appendingPathComponent("clip.mkv"), composed),
-                (original, decomposed), (original, composed),
+                (alternate, composed), (original, decomposed), (original, composed),
             ] {
                 #expect(try reader.recognize(file, within: root)
                         == MediaSidecarReader().recognize(file, within: root))
