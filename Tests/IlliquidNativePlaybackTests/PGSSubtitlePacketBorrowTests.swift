@@ -102,7 +102,8 @@ struct PGSSubtitlePacketBorrowTests {
     }
 
     private func parseThenOverwrite(_ packet: FFmpegPacket) throws -> PGSSubtitlePresentation {
-        let result = try #require(PGSSubtitlePresentation.update(in: packet))
+        let parsed = try PGSSubtitlePresentation.update(in: packet)
+        let result = try #require(parsed)
         let pointer = try #require(packet.pointer)
         let bytes = try #require(pointer.pointee.data)
         bytes.update(repeating: 0, count: Int(pointer.pointee.size))
