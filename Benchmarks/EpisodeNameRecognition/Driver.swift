@@ -137,7 +137,11 @@ private func differentialPaths() -> [String] {
                       "Arrival {imdb-tt2543164}.mkv", "Show {tvdb-1234}.mkv", "Movie (2020)-trailer.mp4",
                       "2001 A Space Odyssey (1968).mkv", "七人の侍 (1954).mkv", "2024.mp4", ".mkv", ""]
     for parent in parents + ["Arrival (2016)", "Arrival (2016) {imdb-tt2543164}"] {
-        paths += movieFiles.map { (parent.isEmpty ? "" : parent + "/") + $0 }
+        // Swift 6.2.4/Linux Foundation traps when the frozen baseline decomposes
+        // a truly empty path. Keep .mkv and every nonempty directory-only fixture.
+        for file in movieFiles where !parent.isEmpty || !file.isEmpty {
+            paths.append((parent.isEmpty ? "" : parent + "/") + file)
+        }
     }
     paths += ["\u{200B}/S01E01.mkv", "\u{00AD}/S01E01.mkv", "\u{FEFF}/S01E01.mkv", "\u{200D}/S01E01.mkv",
               "\u{034F}/S01E01.mkv", "\u{FE0F}/S01E01.mkv", " (\u{200B}) /S01E01.mkv", "Season 01/S01E01.mkv",
@@ -145,6 +149,10 @@ private func differentialPaths() -> [String] {
               "Show (2005)/Season 1000/S01E01.mkv", "TV/Café (2005)/Season 01/Cafe\u{301}.S01E01.mkv",
               "TV/ΟΣ (2005)/Season 01/ος.S01E01.mkv", "TV/Show/Season 01/show.S01E01.mkv",
               "TV/Show (2005)/Season 01/show.(2000).S01E01.mkv"]
+    // Fail with a diagnostic before invoking either recognizer if corpus edits
+    // reintroduce the unsafe input or remove the legitimate empty-basename case.
+    guard !paths.contains("") else { fail("Differential corpus contains an empty path") }
+    guard paths.contains(".mkv") else { fail("Differential corpus is missing the .mkv fixture") }
     return paths
 }
 

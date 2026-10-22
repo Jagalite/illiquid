@@ -122,13 +122,19 @@ def benchmark(args: argparse.Namespace, metadata: dict) -> None:
         metadata["compiled_baseline_sha256"] = sha256(baseline_source)
         metadata["baseline_adaptation"] = "Rename the two top-level types only"
         executable = build / "recognition"
-        flags = ["-O", "-whole-module-optimization", "-swift-version", "6", "-parse-as-library"]
+        flags = ["-O", "-whole-module-optimization", "-swift-version", "6", "-parse-as-library", "-j", "2"]
         metadata["compiler_flags"] = flags
         run([metadata["swiftc"], *flags, str(SOURCE), str(baseline_source),
              str(HERE / "Driver.swift"), "-o", str(executable)], args.output, "compile")
         differential = json.loads(run([str(executable), "--differential"], args.output, "differential"))
         if differential.get("ok") is not True:
             raise RuntimeError("Differential comparison did not pass")
+        if args.command == "differential":
+            write_json(args.output / "results.json", {
+                "environment": metadata, "differential": differential,
+            })
+            print(json.dumps(differential, indent=2), flush=True)
+            return
         observations = []
         for scenario in args.scenarios:
             for repeat in range(args.repeats):
@@ -184,13 +190,14 @@ def main() -> None:
     tests = subparsers.add_parser("test")
     tests.add_argument("--configuration", choices=["debug", "release"], default="debug")
     tests.add_argument("--implementation", choices=["baseline", "candidate"], default="candidate")
+    differential = subparsers.add_parser("differential", help="Compare the full corpus without running timings")
     bench = subparsers.add_parser("benchmark")
     bench.add_argument("--repeats", type=positive, default=12)
     bench.add_argument("--iterations", type=positive, default=128,
                        help="Complete scans of the 64-path corpus per timed round")
     bench.add_argument("--rounds", type=positive, default=3)
     bench.add_argument("--scenarios", nargs="+", choices=SCENARIOS, default=SCENARIOS)
-    for command in [tests, bench]:
+    for command in [tests, differential, bench]:
         command.add_argument("--output", type=Path, required=True)
         command.add_argument("--reference", choices=["main", "folder-reuse"], default="main")
     args = parser.parse_args()

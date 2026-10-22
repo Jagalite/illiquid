@@ -34,6 +34,8 @@ python3 Benchmarks/EpisodeNameRecognition/run.py test --implementation baseline 
 python3 Benchmarks/EpisodeNameRecognition/run.py test --implementation baseline --configuration release --output /tmp/episode-baseline-release
 python3 Benchmarks/EpisodeNameRecognition/run.py test --configuration debug --output /tmp/episode-candidate-debug
 python3 Benchmarks/EpisodeNameRecognition/run.py test --configuration release --output /tmp/episode-candidate-release
+python3 Benchmarks/EpisodeNameRecognition/run.py differential --output /tmp/episode-differential
+python3 Benchmarks/EpisodeNameRecognition/run.py differential --reference folder-reuse --output /tmp/episode-folder-reuse-differential
 python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --output /tmp/episode-benchmark
 python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --reference folder-reuse --scenarios named-episode-with-year named-episode-no-year bare-season-episode movie-controls --output /tmp/episode-folder-reuse-comparison
 ```
@@ -49,6 +51,19 @@ The differential corpus compares all result fields plus `seriesTitle`,
 `displayName`, and `section`. It includes episode numbers and ranges, folder/year
 precedence, Unicode/case/canonical-equivalence cases, invalid dates, tags, catalog
 IDs, editions, extras, movies, and unclassified paths.
+
+The live corpus now contains **16,299 paths**, excluding only the truly empty
+relative path from the original 16,300. The frozen baseline's Foundation path
+decomposition was reported to trap on that input with Swift 6.2.4/Linux in
+[PR #49's review](https://github.com/Jagalite/illiquid/pull/49#discussion_r4304671619).
+The `.mkv` empty-basename fixture, its parent-prefixed variants, and all other
+nonempty fixtures (including directory-only paths) remain. The driver checks
+that no empty path exists and that `.mkv` is present before invoking either
+recognizer. These invariants also run before every benchmark's differential.
+The `differential` command compiles the same driver and compares the full corpus
+without running timings; use it for correctness-only Linux qualification.
+The archived 16,300-path macOS receipts and their source hashes below remain
+unchanged and describe the original corpus, not the revised live driver.
 
 The default timing run uses seven 64-path corpora, 12 fresh process pairs per
 corpus, and 3 timed rounds of 128 complete scans per process. Baseline/candidate
