@@ -52,6 +52,39 @@ URL bytes, visibility paths, date bit patterns, row kinds, and recognized media
 fields. Each workload retains a complete receipt for both variants, raw timing
 samples, source and binary hashes, environment details, and command/test logs.
 
+## Linux results
+
+The completed local cohort used Swift 6.3.3 on Linux x86_64 (AMD EPYC 9V74).
+It measured the production bytes published in commit
+`a8ed1e86a82ce8000044ff424f9a140e21d4a51f`; the original working-tree manifests and
+post-run hash verification are retained in the
+[Linux evidence](PerformanceEvidence/RecursiveMediaScan/linux/).
+
+| Fixture | Baseline CPU median | Candidate CPU median | Median paired CPU reduction |
+| --- | ---: | ---: | ---: |
+| 1,000 supported ASCII files | 99.584 ms | 99.082 ms | −0.2% (effectively flat) |
+| 1,000 supported Unicode files | 120.966 ms | 120.516 ms | −0.5% (effectively flat) |
+| 2,000 files, 90% unrelated | 176.568 ms | 131.289 ms | 24.4% |
+| 1,230 directories, 120 media files | 155.136 ms | 132.183 ms | 13.2% |
+| Symlink and nonregular controls | 22.193 ms | 15.756 ms | 27.7% |
+| Explicit files and overlapping roots | 8.574 ms | 7.817 ms | 9.1% |
+| Sidecar metadata enabled | 19.652 ms | 17.191 ms | 6.7% |
+
+The main fixtures saved 45.279 ms and 22.954 ms between their CPU medians.
+Median paired wall-time reductions were 24.5% and 13.1%, respectively. The
+supported-file controls show no systematic improvement or regression in this
+cohort. The smaller semantic controls should not be treated as precise
+predictions of application latency.
+
+The percentage column is the median of paired reductions, not a ratio of the
+two independently calculated medians. Raw samples and ranges are retained;
+individual measurements varied with the shared host.
+
+All 336 timed scans, their process warmups, and 14 diagnostic scans passed the
+complete-result checks. Both variants passed 15 tests in two suites in debug
+and release, for four successful test runs. Nineteen recorded production,
+test, and harness hashes matched the checkout after measurement.
+
 ## Correctness coverage
 
 The dedicated regression suite covers nested media, uppercase and Unicode

@@ -3,7 +3,10 @@ name: Recursive media scan performance
 on:
   pull_request:
     paths:
+      - 'Sources/IlliquidApp/App/AppModel.swift'
       - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
       - 'Sources/IlliquidCore/Utilities/**'
       - 'Sources/IlliquidCore/MediaLibrary/**'
       - 'Tests/IlliquidAppTests/SourceRecursiveMediaLoaderTests.swift'
@@ -11,8 +14,6 @@ on:
       - 'Benchmarks/RecursiveMediaScan/**'
       - 'Benchmarks/SourceTreeVisibility/run.py'
       - '.github/workflows/recursive-media-scan-performance.yml'
-  push:
-    branches: [perf/recursive-media-scan]
   workflow_dispatch:
 
 permissions:

@@ -114,3 +114,7 @@ compact summaries; one full receipt per fixture/variant; fixture specifications;
 the runner, driver, extractor and baseline; and compressed staged source packages.
 Compiler caches, built binaries and filesystem fixture trees are excluded.
 The output directory retains those larger intermediates for local inspection.
+
+The [research report](../../Documentation/RECURSIVE_MEDIA_SCAN_PERFORMANCE.md)
+records findings and qualification, with retained
+[evidence](../../Documentation/PerformanceEvidence/RecursiveMediaScan/).
