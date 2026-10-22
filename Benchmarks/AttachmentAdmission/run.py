@@ -88,7 +88,12 @@ class Runner:
         self.exes = {}
         self.env = os.environ.copy()
         self.prefix = args.ffmpeg_prefix.resolve(strict=True)
-        self.swiftc = Path(args.swiftc or shutil.which("swiftc") or "swiftc").resolve(strict=True)
+        # Keep the swiftc executable name: resolving its swift-driver symlink
+        # changes argv[0], which the Swift driver uses to select compiler mode.
+        compiler = args.swiftc or self.command(["xcrun", "--find", "swiftc"]).strip()
+        self.swiftc = Path(compiler).absolute()
+        if not self.swiftc.is_file():
+            raise ValueError(f"Missing Swift compiler: {self.swiftc}")
         self.fixtures = self.load_fixtures(args.fixtures.resolve(strict=True))
         self.record = {
             "started_utc": datetime.now(timezone.utc).isoformat(),
