@@ -119,3 +119,11 @@ exploratory Linux cases, the longer native confirmation, adverse observations,
 and retained raw receipts. The confirmation supports a scoped improvement for
 repeated season groups and broad searches. It does not establish a uniform
 speedup across views, queries, inventory shapes, or platforms.
+
+## Integrated dependency baseline
+
+Current-checkout runs use `4d69d7d4fdf677a7793ed7ceeff4835ee5958c88`, which adds the
+flat-file and source-preparation changes to the original baseline. This keeps
+the media-grouping change as the only staged production difference and retains
+the shared-source guards. Existing evidence and the manually dispatched
+historical workflow retain their original revisions.

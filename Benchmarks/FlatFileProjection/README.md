@@ -20,7 +20,11 @@ component experiment.
 
 ## Reproduce
 
-The frozen baseline is `a2de305c8dbcaa81aac1477df7c9a0017c14eae3`.
+The current baseline is `a3bb949d79e824793fc4e6f7fb1258dddae0c7ec`. It adds the
+source-preparation and media-grouping changes to the original
+`a2de305c8dbcaa81aac1477df7c9a0017c14eae3` baseline, preserving the strict
+shared-source checks. The retained October 21 measurements keep their original
+baseline and source manifests; they have not been rewritten.
 Use the repository's macOS 26 / Xcode 26.6 environment for native qualification.
 The isolated Swift package has no remote package dependencies.
 
