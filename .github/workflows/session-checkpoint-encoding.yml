@@ -36,7 +36,7 @@ jobs:
           fetch-depth: 0
       - name: Verify compatibility and measure paired production saves
         run: >-
-          python3 Benchmarks/SessionCheckpointEncoding/run.py --pairs 8 --target-ms 80
+          python3 Benchmarks/SessionCheckpointEncoding/run.py --pairs 12 --target-ms 500
           --output "$RUNNER_TEMP/session-checkpoint-encoding"
       - name: Print environment and compact measurements
         if: always()

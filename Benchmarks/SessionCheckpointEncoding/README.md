@@ -26,7 +26,7 @@ From a checkout containing the baseline commit (use a full clone in CI):
 
 ```sh
 python3 Benchmarks/SessionCheckpointEncoding/run.py \
-  --pairs 8 --target-ms 80 --output /tmp/session-checkpoint-results
+  --pairs 12 --target-ms 500 --output /tmp/session-checkpoint-results
 ```
 
 The output directory must be new or empty. Swift 6.1 or later is needed.
@@ -85,10 +85,39 @@ performance claims; Linux results are retained separately.
 
 The runner writes `manifest.json`, `tests.json`, `observations.jsonl`,
 `summary.json`, command/test logs, and representative payloads. The workflow
-uploads these as `session-checkpoint-encoding-native`. Final measured results
-and their exact commit/run references are recorded here after qualification.
+uploads these as `session-checkpoint-encoding-native`.
+
+### Initial native sample
+
+[Run 39844623385](https://github.com/Jagalite/illiquid/actions/runs/39844623385)
+tested commit `224fc23b0dff728378d77591a5f229be36295892` on a virtual Apple M1,
+macOS 26.6.2, Apple Swift 6.3.3. All seven tests passed in both debug and release
+for both variants. All 128 complete-payload comparisons passed (256 timing
+observations plus 16 calibration observations).
+
+This sample used eight pairs targeting 80 ms per observation. Production-save
+medians are below; positive reductions mean faster. Full results, including
+all paired differences and encode-only observations, are in
+[`evidence/native-initial`](evidence/native-initial).
+
+| Playlist | Baseline save, ms | Candidate save, ms | Wall reduction | CPU reduction |
+| --- | ---: | ---: | ---: | ---: |
+| Empty / remote | 0.582 | 0.544 | 6.6% | -0.3% |
+| 1 plain item | 0.525 | 0.540 | -2.9% | 6.6% |
+| 24 plain items | 0.503 | 0.613 | -21.9% | -14.2% |
+| 1,000 plain items | 3.176 | 2.908 | 8.4% | 8.9% |
+| 10,000 plain items | 33.141 | 25.755 | 22.3% | 18.9% |
+| 24 rich items | 0.835 | 0.760 | 9.0% | 14.1% |
+| 1,000 rich items | 8.450 | 7.541 | 10.8% | 11.4% |
+| 10,000 rich items | 113.679 | 105.181 | 7.5% | -6.7% |
+
+The small-playlist apparent slowdown and mixed rich-playlist CPU results
+require a longer independent confirmation. The workflow now uses twelve
+pairs targeting 500 ms. No production code or fixtures changed for that
+confirmation, and the initial observations remain retained.
 
 The initial Linux run passed all seven tests for both variants in debug and
 release. It stopped during encode-only measurements because the shared disk
 filled; no production-save measurements completed. Those partial, noisy
-timings are inconclusive and do not justify a performance claim.
+timings are inconclusive and do not justify a performance claim. Receipts are
+in [`evidence/linux-incomplete`](evidence/linux-incomplete).
