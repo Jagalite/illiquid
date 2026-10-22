@@ -1,0 +1,63 @@
+name: Filesystem invalidation planning performance
+
+on:
+  push:
+    branches: ['perf/filesystem-event-planning-*']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystem*Tests.swift'
+      - 'Benchmarks/FilesystemInvalidation/Harness.swift'
+      - 'Benchmarks/FilesystemInvalidation/run.py'
+      - '.github/workflows/filesystem-invalidation-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystem*Tests.swift'
+      - 'Benchmarks/FilesystemInvalidation/Harness.swift'
+      - 'Benchmarks/FilesystemInvalidation/run.py'
+      - '.github/workflows/filesystem-invalidation-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: filesystem-invalidation-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-planner:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact plans and measure paired production implementations
+        run: >-
+          python3 Benchmarks/FilesystemInvalidation/run.py
+          --output "$RUNNER_TEMP/filesystem-invalidation"
+          --pairs 8 --target-ms 100
+      - name: Print result receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'filesystem-invalidation/evidence'
+          for name in ['environment.json', 'manifest.json', 'validation.json', 'summary.json', 'completion.json']:
+              path = root / name
+              if path.is_file():
+                  print(f'::group::{name}')
+                  print(path.read_text())
+                  print('::endgroup::')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: filesystem-invalidation-native
+          path: ${{ runner.temp }}/filesystem-invalidation/evidence/
+          retention-days: 14

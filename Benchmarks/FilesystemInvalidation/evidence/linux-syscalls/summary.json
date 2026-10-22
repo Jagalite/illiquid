@@ -1,0 +1,72 @@
+[
+  {
+    "variant": "baseline",
+    "command": [
+      "strace",
+      "-f",
+      "-e",
+      "trace=%file",
+      "-o",
+      "/workspace/scratch/24271c317bcb/filesystem-planning-linux-exploratory/syscalls/baseline.trace",
+      "/workspace/scratch/24271c317bcb/filesystem-planning-linux-exploratory/baseline/planner-release",
+      "bench",
+      "existing_content_256",
+      "10"
+    ],
+    "fixture_path_syscalls": {
+      "newfstatat": 3328
+    },
+    "fixture_path_calls": 3328,
+    "planner_calls": 13,
+    "events_per_call": 256,
+    "benchmark_output": {
+      "case": "existing_content_256",
+      "checksum": 0,
+      "cpu_ns": 54116868,
+      "elapsed_ns": 141918762,
+      "event_count": 256,
+      "final_plan": {
+        "directories_to_reload": [],
+        "roots_to_rescan": [],
+        "trees_to_invalidate": []
+      },
+      "iterations": 10,
+      "root_count": 1
+    },
+    "note": "Timing under strace is not performance evidence."
+  },
+  {
+    "variant": "candidate",
+    "command": [
+      "strace",
+      "-f",
+      "-e",
+      "trace=%file",
+      "-o",
+      "/workspace/scratch/24271c317bcb/filesystem-planning-linux-exploratory/syscalls/candidate.trace",
+      "/workspace/scratch/24271c317bcb/filesystem-planning-linux-exploratory/candidate/planner-release",
+      "bench",
+      "existing_content_256",
+      "10"
+    ],
+    "fixture_path_syscalls": {},
+    "fixture_path_calls": 0,
+    "planner_calls": 13,
+    "events_per_call": 256,
+    "benchmark_output": {
+      "case": "existing_content_256",
+      "checksum": 0,
+      "cpu_ns": 10707543,
+      "elapsed_ns": 10873938,
+      "event_count": 256,
+      "final_plan": {
+        "directories_to_reload": [],
+        "roots_to_rescan": [],
+        "trees_to_invalidate": []
+      },
+      "iterations": 10,
+      "root_count": 1
+    },
+    "note": "Timing under strace is not performance evidence."
+  }
+]
