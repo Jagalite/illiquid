@@ -26,10 +26,7 @@ struct SourcesSidebar: View {
     let layout: SourcesSidebarLayoutState
 
     @State private var mediaPresenceScanner = SourceMediaPresenceScanner()
-    @State private var directoryContents: [String: [SourceTreeEntry]] = [:]
-    @State private var directoryErrors: [String: String] = [:]
-    @State private var loadingFolderIDs: Set<String> = []
-    @State private var directoryLoadTasks: [String: Task<Void, Never>] = [:]
+    @State private var directories = SourceTreeDirectoryState(load: SourceDirectoryLoader.load)
     @State private var recursiveMediaEntries: [SourceTreeEntry] = []
     @State private var recursiveMediaLoadTask: Task<Void, Never>?
     @State private var recursiveMediaLoadKey: String?
@@ -244,8 +241,7 @@ struct SourcesSidebar: View {
         filterTask = nil
         resizeState.clear()
         layout.clear()
-        directoryLoadTasks.values.forEach { $0.cancel() }
-        directoryLoadTasks.removeAll()
+        directories.cancelAllLoads()
         recursiveMediaLoadTask?.cancel()
         recursiveMediaLoadTask = nil
         filesystemDebounceTask?.cancel()
@@ -253,7 +249,6 @@ struct SourcesSidebar: View {
         pendingFilesystemEvents.removeAll()
         filesystemMonitor?.stop()
         filesystemMonitor = nil
-        loadingFolderIDs.removeAll()
         model.setChromePin(.pointerOverSidebar, active: false)
         model.setChromePin(.sidebarResize, active: false)
         model.setPlaybackFocus(false, owner: "source-search")
@@ -269,8 +264,8 @@ struct SourcesSidebar: View {
                 depth: row.depth,
                 isRoot: isRoot,
                 isExpanded: expandedFolderIDs.contains(row.folderID),
-                isLoading: loadingFolderIDs.contains(row.folderID),
-                hasError: directoryErrors[row.folderID] != nil,
+                isLoading: directories.loadingFolderIDs.contains(row.folderID),
+                hasError: directories.directoryErrors[row.folderID] != nil,
                 visibility: row.visibility,
                 onToggleVisibility: {
                     toggleVisibility(of: row)
@@ -738,7 +733,7 @@ struct SourcesSidebar: View {
 
     private var isActiveTabLoading: Bool {
         !model.areSourceRootsReady || isRecursiveMediaLoading || model.activeSourceFolders.contains { folder in
-            loadingFolderIDs.contains(SourceTreeIdentity.folderID(for: folder))
+            directories.loadingFolderIDs.contains(SourceTreeIdentity.folderID(for: folder))
         }
     }
 
@@ -759,8 +754,8 @@ struct SourcesSidebar: View {
         guard model.areSourceRootsReady else { return }
         let input = SourceTreeProjectionInput(
             items: model.activeSourceItems, visibility: model.activeSourceVisibility,
-            roots: model.activeSourceFolders, directoryContents: directoryContents,
-            directoryErrors: directoryErrors, recursiveMediaEntries: recursiveMediaEntries,
+            roots: model.activeSourceFolders, directoryContents: directories.directoryContents,
+            directoryErrors: directories.directoryErrors, recursiveMediaEntries: recursiveMediaEntries,
             expandedFolderIDs: expandedFolderIDs, sortConfiguration: sortConfiguration,
             mediaPresence: mediaPresenceScanner.results
         )
@@ -894,7 +889,7 @@ struct SourcesSidebar: View {
         let folderID = SourceTreeIdentity.folderID(for: folderURL)
         if expandedFolderIDs.contains(folderID) {
             expandedFolderIDs.remove(folderID)
-            cancelLoads(beneath: folderURL)
+            directories.cancelLoads(beneath: folderURL)
         } else {
             expandedFolderIDs.insert(folderID)
             loadFolderIfNeeded(folderURL)
@@ -914,11 +909,7 @@ struct SourcesSidebar: View {
 
     private func refreshFolder(_ folderURL: URL) {
         let folderID = SourceTreeIdentity.folderID(for: folderURL)
-        directoryLoadTasks[folderID]?.cancel()
-        directoryLoadTasks[folderID] = nil
-        directoryContents[folderID] = nil
-        directoryErrors[folderID] = nil
-        loadingFolderIDs.remove(folderID)
+        directories.invalidateCachedDirectory(folderURL)
         refreshVisibleRows(rebuildProjection: true)
         if expandedFolderIDs.contains(folderID) {
             loadFolderIfNeeded(folderURL)
@@ -965,29 +956,12 @@ struct SourcesSidebar: View {
         )
         guard !plan.isEmpty else { return }
 
-        for path in plan.rootsToRescan {
-            invalidateCachedTree(
-                beneath: URL(fileURLWithPath: path, isDirectory: true),
-                preserveExpansion: true
-            )
-        }
-        for path in plan.treesToInvalidate {
-            invalidateCachedTree(
-                beneath: URL(fileURLWithPath: path, isDirectory: true),
-                preserveExpansion: false
-            )
-        }
+        directories.invalidate(plan, expandedFolderIDs: &expandedFolderIDs)
         if !plan.treesToInvalidate.isEmpty {
             persistExpansionState()
         }
         mediaPresenceScanner.invalidate(paths: plan.directoriesToReload,
             trees: plan.treesToInvalidate, fullRoots: plan.rootsToRescan)
-        for path in plan.directoriesToReload {
-            invalidateCachedDirectory(
-                URL(fileURLWithPath: path, isDirectory: true)
-            )
-        }
-
         let activeRoots = model.activeSourceFolders
         if plan.affectsAny(model.activeSourceWatchRoots),
            model.activeSourceVisibility.viewMode.scansRecursively
@@ -995,111 +969,37 @@ struct SourcesSidebar: View {
             synchronizeRecursiveMediaScan(force: true)
         }
 
-        let activeRootPaths = Set(activeRoots.map {
-            SourceTreeIdentity.folderID(for: $0)
-        })
-        let reloadPaths = plan.directoriesToReload.union(plan.rootsToRescan)
-        for path in reloadPaths where isInsideActiveSource(path) {
-            if activeRootPaths.contains(path) || expandedFolderIDs.contains(path) {
-                loadFolderIfNeeded(URL(fileURLWithPath: path, isDirectory: true))
-            }
+        let reloadPaths = SourceTreeDirectoryState.reloadPaths(
+            for: plan, activeRoots: activeRoots, expandedFolderIDs: expandedFolderIDs
+        )
+        for path in reloadPaths {
+            loadFolderIfNeeded(URL(fileURLWithPath: path, isDirectory: true))
         }
         refreshVisibleRows(rebuildProjection: true)
     }
 
-    private func isInsideActiveSource(_ folderPath: String) -> Bool {
-        model.activeSourceFolders.contains { root in
-            SourceTreeIdentity.isFolderID(folderPath, inside: root)
-        }
-    }
-
     private func loadFolderIfNeeded(_ folderURL: URL) {
-        let folderID = SourceTreeIdentity.folderID(for: folderURL)
-        guard directoryContents[folderID] == nil,
-              directoryErrors[folderID] == nil,
-              directoryLoadTasks[folderID] == nil
-        else {
-            loadExpandedChildren(of: folderID)
-            return
-        }
-
-        loadingFolderIDs.insert(folderID)
-        let task = Task { @MainActor in
-            let listing = await SourceDirectoryLoader.load(folderURL)
-            guard !Task.isCancelled else { return }
-
-            loadingFolderIDs.remove(folderID)
-            directoryLoadTasks[folderID] = nil
-            directoryContents[folderID] = listing.entries
-            directoryErrors[folderID] = listing.errorMessage
-            LifecyclePerformance.mark(listing.errorMessage == nil ? "source-directory-ready" : "source-directory-unavailable")
-            loadExpandedChildren(of: folderID)
-            refreshVisibleRows(rebuildProjection: true)
-        }
-        directoryLoadTasks[folderID] = task
-    }
-
-    private func loadExpandedChildren(of folderID: String) {
-        guard let entries = directoryContents[folderID] else { return }
-        for entry in entries where entry.kind == .folder {
-            let childID = SourceTreeIdentity.folderID(for: entry.url)
-            if expandedFolderIDs.contains(childID) {
-                loadFolderIfNeeded(entry.url)
+        directories.loadFolderIfNeeded(
+            folderURL, expandedFolderIDs: { expandedFolderIDs },
+            didLoad: { listing in
+                LifecyclePerformance.mark(listing.errorMessage == nil ? "source-directory-ready" : "source-directory-unavailable")
+            },
+            didChange: {
+                refreshVisibleRows(rebuildProjection: true)
             }
-        }
-    }
-
-    private func cancelLoads(beneath folderURL: URL) {
-        let folderPath = folderURL.absoluteURL.standardized.path
-        let descendantIDs = directoryLoadTasks.keys.filter {
-            let candidatePath = SourceTreeIdentity.path(fromFolderID: $0)
-            return candidatePath == folderPath
-                || candidatePath.hasPrefix(folderPath + "/")
-        }
-        for id in descendantIDs {
-            directoryLoadTasks[id]?.cancel()
-            directoryLoadTasks[id] = nil
-            loadingFolderIDs.remove(id)
-        }
+        )
     }
 
     private func discardCachedTree(beneath folderURL: URL) {
         invalidateCachedTree(beneath: folderURL, preserveExpansion: false)
     }
 
-    private func invalidateCachedDirectory(_ folderURL: URL) {
-        let folderID = SourceTreeIdentity.folderID(for: folderURL)
-        directoryLoadTasks[folderID]?.cancel()
-        directoryLoadTasks[folderID] = nil
-        loadingFolderIDs.remove(folderID)
-        directoryContents[folderID] = nil
-        directoryErrors[folderID] = nil
-    }
-
     private func invalidateCachedTree(
         beneath folderURL: URL,
         preserveExpansion: Bool
     ) {
-        cancelLoads(beneath: folderURL)
-        let folderPath = folderURL.absoluteURL.standardized.path
-        let cachedIDs = Set(directoryContents.keys)
-            .union(directoryErrors.keys)
-            .filter {
-                let candidatePath = SourceTreeIdentity.path(fromFolderID: $0)
-                return candidatePath == folderPath
-                    || candidatePath.hasPrefix(folderPath + "/")
-            }
-        if !preserveExpansion {
-            expandedFolderIDs = Set(expandedFolderIDs.filter { id in
-                let candidatePath = SourceTreeIdentity.path(fromFolderID: id)
-                return candidatePath != folderPath
-                    && !candidatePath.hasPrefix(folderPath + "/")
-            })
-        }
-        for id in cachedIDs {
-            directoryContents[id] = nil
-            directoryErrors[id] = nil
-        }
+        directories.invalidateCachedTree(beneath: folderURL,
+            preserveExpansion: preserveExpansion, expandedFolderIDs: &expandedFolderIDs)
     }
 
     private func isCurrentFile(_ url: URL) -> Bool {
@@ -2250,8 +2150,7 @@ struct SourceVisibilityMatcher {
             .deletingLastPathComponent()
             .path
         while ancestorPath.count >= rootPath.count,
-              ancestorPath == rootPath
-                || ancestorPath.hasPrefix(rootPath + "/")
+              SourceTreeIdentity.contains(ancestorPath, within: rootPath)
         {
             let ancestor = ancestorPath == rootPath
                 ? rootEvaluations[rootPath] ?? evaluate(
@@ -2298,14 +2197,13 @@ struct SourceVisibilityMatcher {
         guard normalizedPath != matchingRoot else {
             return URL(fileURLWithPath: matchingRoot, isDirectory: false).lastPathComponent
         }
-        return String(normalizedPath.dropFirst(matchingRoot.count + 1))
+        return String(normalizedPath.dropFirst(matchingRoot == "/" ? 1 : matchingRoot.count + 1))
     }
 
     private func matchingRootPath(for normalizedPath: String) -> String? {
         rootPaths
             .filter { rootPath in
-                normalizedPath == rootPath
-                    || normalizedPath.hasPrefix(rootPath + "/")
+                SourceTreeIdentity.contains(normalizedPath, within: rootPath)
             }
             .max { $0.count < $1.count }
     }
@@ -2653,7 +2551,9 @@ enum SourceRecursiveMediaLoader {
             for index in entries.indices {
                 guard (try? checkCancellation()) != nil else { return [] }
                 let file = entries[index].url
-                let root = metadataRoots.first { file.path.hasPrefix($0.path + "/") }
+                let root = metadataRoots.first {
+                    file.path != $0.path && SourceTreeIdentity.contains(file.path, within: $0.path)
+                }
                     ?? file.deletingLastPathComponent()
                 do {
                     entries[index].recognizedMedia = try reader.recognize(file, within: root, checkCancellation: checkCancellation)
@@ -2711,8 +2611,11 @@ enum SourceTreeIdentity {
     }
 
     static func isFolderID(_ id: String, inside root: URL) -> Bool {
-        let rootPath = normalizedPath(for: root)
-        return id == rootPath || id.hasPrefix(rootPath + "/")
+        contains(id, within: normalizedPath(for: root))
+    }
+
+    static func contains(_ path: String, within rootPath: String) -> Bool {
+        path == rootPath || path.hasPrefix(rootPath == "/" ? "/" : rootPath + "/")
     }
 
     private static func normalizedPath(for url: URL) -> String {
