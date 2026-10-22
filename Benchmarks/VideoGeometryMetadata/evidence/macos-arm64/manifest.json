@@ -1,0 +1,2963 @@
+{
+  "baseline_commit": "7f9ba073394b77a908e0589447c6edc8d10b832c",
+  "candidate_head": "9b0e52193bbc41e42e7c0cd821f05e557bb32975",
+  "candidate_source": "Sources/IlliquidNativePlayback/Media/VideoGeometryMetadataCache.swift",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/git-head.log",
+      "log_sha256": "e6d8ab0e77216c34b06ba7f34c31e16d881d0c32b3100c828c401125d01e40e0"
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/git-status.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "swift",
+        "--version"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/swift-version.log",
+      "log_sha256": "5fa4b669e41b23b9ad0760253d062493487f93cf5d8ad8c44f0d4fd635137499"
+    },
+    {
+      "argv": [
+        "sysctl",
+        "-n",
+        "machdep.cpu.brand_string"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/cpu.log",
+      "log_sha256": "ff76851c55aca2697f22e6534c9378088cae0334bbb5d13675e90a9097fc2713"
+    },
+    {
+      "argv": [
+        "sw_vers"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/macos.log",
+      "log_sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+    },
+    {
+      "argv": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--show-sdk-path"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/sdk.log",
+      "log_sha256": "0f808f2e6b513e3677dcb3492d4b0577b7f2680ca95d988f4ea653b04edc4a89"
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "7f9ba073394b77a908e0589447c6edc8d10b832c:Sources/IlliquidNativePlayback/Media/VideoDecoder.swift"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-decoder.log",
+      "log_sha256": "26a53e0abd16a26bf3a4997bc0a61a4d2d4acb6053d9d579e5c613534b42d457"
+    },
+    {
+      "argv": [
+        "swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/video-geometry-metadata/packages/baseline",
+        "-c",
+        "debug",
+        "--jobs",
+        "2",
+        "--no-parallel",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-debug-tests.log",
+      "log_sha256": "e23816433dfa4210f09687a9d410392ad743bc2a33b4e42234aa7d40a78b36c5"
+    },
+    {
+      "argv": [
+        "swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/video-geometry-metadata/packages/baseline",
+        "-c",
+        "release",
+        "--jobs",
+        "2",
+        "--no-parallel",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-release-tests.log",
+      "log_sha256": "596a37795989176e56fce2ecb790332ba8190038b9c6d118f3d2c01b372aecb5"
+    },
+    {
+      "argv": [
+        "swiftc",
+        "-swift-version",
+        "6",
+        "-O",
+        "-whole-module-optimization",
+        "-warnings-as-errors",
+        "-target",
+        "arm64-apple-macosx26.0",
+        "-sdk",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-name",
+        "IlliquidNativePlayback",
+        "-emit-library",
+        "-emit-module",
+        "-emit-module-path",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/IlliquidNativePlayback.swiftmodule",
+        "/Users/runner/work/_temp/video-geometry-metadata/sources/baseline-VideoGeometryMetadataCache.swift",
+        "-o",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/libIlliquidNativePlayback.dylib"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-library.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "swiftc",
+        "-swift-version",
+        "6",
+        "-O",
+        "-whole-module-optimization",
+        "-warnings-as-errors",
+        "-target",
+        "arm64-apple-macosx26.0",
+        "-sdk",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-parse-as-library",
+        "/Users/runner/work/_temp/video-geometry-metadata/sources/Harness.swift",
+        "-I",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline",
+        "-L",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline",
+        "-lIlliquidNativePlayback",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline",
+        "-o",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-harness.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/video-geometry-metadata/packages/candidate",
+        "-c",
+        "debug",
+        "--jobs",
+        "2",
+        "--no-parallel",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-debug-tests.log",
+      "log_sha256": "0c921f3a741773f461452f1e62f410c274d9503e3c85847dc3bed8296a026a7e"
+    },
+    {
+      "argv": [
+        "swift",
+        "test",
+        "--package-path",
+        "/Users/runner/work/_temp/video-geometry-metadata/packages/candidate",
+        "-c",
+        "release",
+        "--jobs",
+        "2",
+        "--no-parallel",
+        "-Xswiftc",
+        "-warnings-as-errors"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-release-tests.log",
+      "log_sha256": "661d936e43a765dd8a4231b72cdf9ce7992a0934914348ddf13041428ab2d74c"
+    },
+    {
+      "argv": [
+        "swiftc",
+        "-swift-version",
+        "6",
+        "-O",
+        "-whole-module-optimization",
+        "-warnings-as-errors",
+        "-target",
+        "arm64-apple-macosx26.0",
+        "-sdk",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-parse-as-library",
+        "-enable-testing",
+        "-module-name",
+        "IlliquidNativePlayback",
+        "-emit-library",
+        "-emit-module",
+        "-emit-module-path",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/IlliquidNativePlayback.swiftmodule",
+        "/Users/runner/work/_temp/video-geometry-metadata/sources/candidate-VideoGeometryMetadataCache.swift",
+        "-o",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/libIlliquidNativePlayback.dylib"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-library.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "swiftc",
+        "-swift-version",
+        "6",
+        "-O",
+        "-whole-module-optimization",
+        "-warnings-as-errors",
+        "-target",
+        "arm64-apple-macosx26.0",
+        "-sdk",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-parse-as-library",
+        "/Users/runner/work/_temp/video-geometry-metadata/sources/Harness.swift",
+        "-I",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate",
+        "-L",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate",
+        "-lIlliquidNativePlayback",
+        "-Xlinker",
+        "-rpath",
+        "-Xlinker",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate",
+        "-o",
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-harness.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "outputs"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-outputs.log",
+      "log_sha256": "d240edf25804a6dddcd607396a2a8d69c4cd38a98fb3648e756fca0442856a42"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "outputs"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-outputs.log",
+      "log_sha256": "d240edf25804a6dddcd607396a2a8d69c4cd38a98fb3648e756fca0442856a42"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "list"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/workload-list.log",
+      "log_sha256": "1be398a45547c2fdf0347ad4887524e5d9e1e1cc16ae167a8407940a6c25a6fa"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-stable-square.log",
+      "log_sha256": "261e4f6121833bee9f59f7f93fcb5ef0ecbb66c3f955bdc295eedf50d66a6ca4"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-stable-square.log",
+      "log_sha256": "7a82e98c3d089ffd444515d4c96f0cfa58f9be2c0919a2ef380d2aca952aeb6e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-0-baseline.log",
+      "log_sha256": "b75c042d27bf53de6ec2d46de205a6eea7cfa4533f984d2fba6d69c01bbd50dd"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-0-candidate.log",
+      "log_sha256": "b744710e9a57f7f2adf02c91eab6a4d87b0275e600600ead2a396c529a12d337"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-1-candidate.log",
+      "log_sha256": "744666146c70df652a61390bc8a44b8202bed62aeb735ff329a133e4ab50eb34"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-1-baseline.log",
+      "log_sha256": "787d3347de710a499521486acb76f238c017b7fcf8de3d12ef0e69d39366d0cf"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-2-baseline.log",
+      "log_sha256": "45f757c07cb5efb8ec3aa99daa8c1fff34ff412bf95c4cc73e72e95939c4ce5d"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-2-candidate.log",
+      "log_sha256": "c03908886a075a35a7c0ae8e25d41cba8922b470ecf5d3493be7db3231cbcde8"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-3-candidate.log",
+      "log_sha256": "3cd3f9ae505ada4d719e2ef290a24b85757888d50f7b731364f4893d6155b07e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-3-baseline.log",
+      "log_sha256": "6fbdb9a4255f0b69934043a64c42400af9b946f96b661a326055b82cb259080a"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-4-baseline.log",
+      "log_sha256": "bc6781e782c5305fde6a469faffd4b2a94d0bfb05e2807bde961a8d39881e9a9"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-4-candidate.log",
+      "log_sha256": "ef2f673b99ab3c98e4961894e2d88f8e9d62152805291c772df624a39235994d"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-5-candidate.log",
+      "log_sha256": "14fe9a14763496169e116c933637a084ceb5e406e3516add401d8b62bb728fca"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-5-baseline.log",
+      "log_sha256": "04ee766ea289be9606372b99d2bcfb6e2fa5cb0da49e0713fd5dcb1f339991c9"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-6-baseline.log",
+      "log_sha256": "db3348ca6a0dbbcbf252fb2f9bcf66b766c2c934157ed2ecacde2671fbe60f14"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-6-candidate.log",
+      "log_sha256": "9b6c7eb109b72382ab544c967d74ee1d28fc4f997c525332c156734a94bec1c1"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-7-candidate.log",
+      "log_sha256": "1759707a4fa26eadd0364188c307a087f8cab5200ba039adb9612e77d1713300"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-square",
+        "316714"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-square-pair-7-baseline.log",
+      "log_sha256": "ee3a0a4940b1cfb1cc7e3628ea3f9c22e717758d2c46c8fc4067d4da17e0068c"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-stable-anamorphic.log",
+      "log_sha256": "b4a386710f7c04643827127aff0c79045b2b6b67b838f59c64a3d2f0695fe3d8"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-stable-anamorphic.log",
+      "log_sha256": "973ed9cd3534d0dcfc8373e7392fd4180f2dd58f81843075e0f1483ae0fbb57f"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-0-baseline.log",
+      "log_sha256": "d4bb58cf15da98ba69a9df96e003ed352c5e20fb0f5bdf27623decd9431174bd"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-0-candidate.log",
+      "log_sha256": "7b4f1de7a58d92f1f6a307ebe6b2c91802af691f85a58b88da55e2ae46df73f2"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-1-candidate.log",
+      "log_sha256": "5b03a1c9e142811ede3b315c328980d3bb362ae9de4f8598204dbecaedadd931"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-1-baseline.log",
+      "log_sha256": "3ab4a34401d9b8fa7e04bb09824d83c8c03d9a57e7d31f51dc6fff3b435f37cd"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-2-baseline.log",
+      "log_sha256": "23b57e0f92d9705e8199410500f37475d171c9874ccda99889f56cdafc54ab44"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-2-candidate.log",
+      "log_sha256": "c8d280e3e052a470acfda38ddc4210c401f4bdf60c86d0f73d23cbde243d377e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-3-candidate.log",
+      "log_sha256": "8213c25686a1fd266531d0c53a67aca601b0e5990e2ad7a74d7ea095dc7f09e4"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-3-baseline.log",
+      "log_sha256": "42fea220421f54353d78a0f7129eed3553eb033f0ba9253d894774dd0022364e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-4-baseline.log",
+      "log_sha256": "fabc009106f59a05a705b31f5ba8b3dddce4b9f0781bd7b7d8e66564bc4d2926"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-4-candidate.log",
+      "log_sha256": "42beee8e99a1b939ac2618e0770862a28ae006902e2f4fad12d07342a0c424e0"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-5-candidate.log",
+      "log_sha256": "88da786b26342514d08ea816f83f27cdefdc27bcfe4eee8feb22d41ddfca8a58"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-5-baseline.log",
+      "log_sha256": "bf8dfc6a5f5505d3f8af58d37a01d0fbb82027815d7e7265a503ed80e66cfac7"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-6-baseline.log",
+      "log_sha256": "dd37c98404fb3d845c508336ab840dbb2a9e2fafe564426209e6c9cce8947990"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-6-candidate.log",
+      "log_sha256": "5ebc323b08d8e6c48e1b461663ca7d37f886b774f377f45367bd92b432adca05"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-7-candidate.log",
+      "log_sha256": "1aff940be36e92ac1df0caa7003016e513d7b5542df158fad2b63ff3157ac8b9"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-anamorphic",
+        "323269"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-anamorphic-pair-7-baseline.log",
+      "log_sha256": "40c0e510ca40e2f54b37773ac7239f2e47f1d55e594ad5f6c874621ea0267ad2"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-stable-cropped.log",
+      "log_sha256": "5db80b823ad2eaf5c7a6e7e68f3536752b51d8842272c45014e9b34f5eeed69e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-stable-cropped.log",
+      "log_sha256": "38a6d493d1222a83d373f175acc6cc9747861ffec75c0dde3b1670d92c5c7662"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-0-baseline.log",
+      "log_sha256": "4314a1daaba81e95920de0a1f946c32f3ba8ffc0bb20ad46c194643d27fc60f5"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-0-candidate.log",
+      "log_sha256": "7a0e1dd6888c35a756c5232d680e6c71e30866c1c003550fee5f547df4f0630e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-1-candidate.log",
+      "log_sha256": "29d61d71667b3154c8cfe057548d55902d163c34a6b7cffe6dcf8259fc89ec2d"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-1-baseline.log",
+      "log_sha256": "90c18514f40841ff40db72ff232f36383e557dff2a89ab903670304e5873b3e0"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-2-baseline.log",
+      "log_sha256": "0d1f50205188d61f4cc7e4e44e6ac84f71bb836ef824f46ca78381f6c495dccf"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-2-candidate.log",
+      "log_sha256": "47acec4c88c470c6bc433856ca4ef2b3059f7a689dab0881b620d3e8404f9e9e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-3-candidate.log",
+      "log_sha256": "2f48cefaaabda150c84c0a9d167c8c0e43e37753a21fc8d3a4f7f305a4c7d78c"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-3-baseline.log",
+      "log_sha256": "5097d47c7cd37f46997f653898530e0f3cdd9e60ba91e12cab6c0c399cd8c437"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-4-baseline.log",
+      "log_sha256": "6860c0122ce5ce8dd82bf0d979c8d5d262ad9ec9c32fbc79c678df6aea276040"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-4-candidate.log",
+      "log_sha256": "f8af900455d75697a974251c9167f8baec92dc9cfc3e898a5906c47f99b772e0"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-5-candidate.log",
+      "log_sha256": "1833538fa5157de832dfa06392e50d288b19f76a2a9ed3a3500cdeca2bad59b0"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-5-baseline.log",
+      "log_sha256": "c4dd332e2f5de11f9429473bc34304e0550c12e20fbbf4eb38ae22eb96da5987"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-6-baseline.log",
+      "log_sha256": "beffd752732d18f2ca00492487a5a7c004154d68238d491e46310414783b9c29"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-6-candidate.log",
+      "log_sha256": "1174b1d3e9d6bc81bffbfc1a9c7b8fa0cb0b6429244b385034ab5549d9d2620f"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-7-candidate.log",
+      "log_sha256": "716346337027b1fa31ab96c89dffe7c62095f945aa602d04eca28b642b21bc81"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-cropped",
+        "352698"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-cropped-pair-7-baseline.log",
+      "log_sha256": "b4670aea043d4363bbd7d404fb20f1e0f067a78c43d221c6849354ff553948d2"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-stable-4k.log",
+      "log_sha256": "977f59ebd4ceb2d4ca1788e36b9086c3ea8d31b397dc7f69d05a2342dc31b5cc"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-stable-4k.log",
+      "log_sha256": "e4b45d263feca009e1d1d1f6c42d682a0d4a1dfe0141f2751f16c629b7144076"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-0-baseline.log",
+      "log_sha256": "44f74fbe24db35d4e2531faaf8230e81f43a42c891caf37d512a51ee80d5dc51"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-0-candidate.log",
+      "log_sha256": "7f28ee2d65fb1e905612867f300eed4d1609fedc2936e0842a69a927936d0d09"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-1-candidate.log",
+      "log_sha256": "8dbc3d15767229913b1646be8195febb1603b383cbc3b5253143fe291be4c6c4"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-1-baseline.log",
+      "log_sha256": "3b9ab2cf6819effb31f2d2a0068f2f80c5d77f6913a6eebb32302d4faee45045"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-2-baseline.log",
+      "log_sha256": "d84d9fd284e851a33d212f8973507ca7f5541bef9f13adc8a3af5f4ab0dd4cf7"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-2-candidate.log",
+      "log_sha256": "16cbdfb967eb1aca0f033e5c9bb0a271477bc3bf3816300bce04d669afceb6aa"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-3-candidate.log",
+      "log_sha256": "616ecddaa8c4c8e8543a54a56cfe359712f97e8c9c0cfdb6419742a2931f6d5e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-3-baseline.log",
+      "log_sha256": "c420d77b5e9cbaca5b141e3b5432e120ef9e6d5e3755ad8f429e8b7b87d63942"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-4-baseline.log",
+      "log_sha256": "df008556df6b8cfa10f18e776a7291fa4fc4c9192f4958c4317eda7d8d4e2628"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-4-candidate.log",
+      "log_sha256": "1c595185734c2e4671c3b5ae850be050955f518fe1c0140a25db3efec01e6e1f"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-5-candidate.log",
+      "log_sha256": "85cbfd4ceedc71f7414dc9f94e3f22d4d17bd7ffb1663563fd98a3a761a7fa05"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-5-baseline.log",
+      "log_sha256": "c94557806c07e7e4db44971c847188cbcd6b916411aa062de55a23c311445cd2"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-6-baseline.log",
+      "log_sha256": "eaa4a30368f3bd729923e625348f0a05235e555d654fefc241539602f5387083"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-6-candidate.log",
+      "log_sha256": "a0fa71886b7f5d9df9754433c43e8d41be2abb01a8b10cf5afa7dbf3f3ec511f"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-7-candidate.log",
+      "log_sha256": "7ba99aec2a4b2de6ab475af4e8a0cc50224eb76db2edccedf2d971db38679bf7"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "stable-4k",
+        "309612"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/stable-4k-pair-7-baseline.log",
+      "log_sha256": "3433445cf728aacf51aa3173f94c206951f09ecffe81cf0bc28999d3a92dea91"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-rotating-square.log",
+      "log_sha256": "e64af1b3ab82c198d46785939c7820945911d2c88ffa7dbe44ac38af0bb3d9a6"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-rotating-square.log",
+      "log_sha256": "d96b014ba402080a8dd0cad3dcc020617cb12c65f45909930ed7a82605f26e40"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-0-baseline.log",
+      "log_sha256": "cabb4e2d3061c9f2dff9cee4b1cf8d417ca01ea9c3504cb9b180de33bd14d6bc"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-0-candidate.log",
+      "log_sha256": "d00f6f5aa8052d50d3ac5f5f0dcdeace692239cf80471554a65c8952b5dc45d4"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-1-candidate.log",
+      "log_sha256": "1494ab92b5670fdd052a980b6d686b24626ec747a26009675ad333f53585b73e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-1-baseline.log",
+      "log_sha256": "6690c1e96a5f3c6b8188955b092251d620b016ae9729c4cc0a36b7452246fa54"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-2-baseline.log",
+      "log_sha256": "c92fd8ff90885c71935f9b68fdff0a31a5ba3e24be502f7527b3af29d3d6c1d9"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-2-candidate.log",
+      "log_sha256": "fc02ff0f6fae6d23412bb6adf9b99b4cfc0695352fdfb9756b4cfe959e6a4b78"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-3-candidate.log",
+      "log_sha256": "19ec094be442d3f89c834ff03aee39bc305f0017a5d6eb065d157afdeb930406"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-3-baseline.log",
+      "log_sha256": "fa78d0baafc82f53fdb181db2086b9a3a94654b06b0859705a650330195e1828"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-4-baseline.log",
+      "log_sha256": "182df6599bcee96b4bfac898589da8f7a2f877b498efdbf84a7d9a29dea483ae"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-4-candidate.log",
+      "log_sha256": "fbe5c0822b7fdce7add3f008adb23024fecfc3404faa9531fc03fb4887a56e51"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-5-candidate.log",
+      "log_sha256": "adbfebd19c9ac6c88f9bc30eb7fa3105401bf319f0d14dd8458108cf0ecc34a9"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-5-baseline.log",
+      "log_sha256": "3cc0e6261ccf478f1478ac710f93496f37522534e61d86d2bf95444035e85b53"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-6-baseline.log",
+      "log_sha256": "e0298ad45577be38cd031034f988a898a412774ee8aee3935f29a814eb73a89c"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-6-candidate.log",
+      "log_sha256": "c50c215d1b16ab3b132c635b322e0109cdd282a4462844d9c2dffc528b0a1ad2"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-7-candidate.log",
+      "log_sha256": "8d42e339d6b4d02a5a8e7140f42de9fb86e22c6f2c61bf1962341984e645e75e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-square",
+        "357660"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-square-pair-7-baseline.log",
+      "log_sha256": "b6972bb1b49a3c0e0982048153158142785f468916242024444583a03ee6946a"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-rotating-anamorphic.log",
+      "log_sha256": "29a27bd5165b9584520e130ac0ceac3ee1d056e203a2d4a5d5a5e1fa5424e1c0"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-rotating-anamorphic.log",
+      "log_sha256": "cc23e354f86daeae346ead8943f3f10d42557ea1d88810f2651d0ba538ea1728"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-0-baseline.log",
+      "log_sha256": "1ced387fecb02f992080874de6b718ef085a76e9624df6ea3a1542fd7af960e3"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-0-candidate.log",
+      "log_sha256": "34155fbd8309062f837127886f2e6ae050deeedb6df2e0e4baafb848365a1912"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-1-candidate.log",
+      "log_sha256": "829275d1d9fe6a983222d7161feb20a3a06b9889e6342fe97bd609be8a0204cb"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-1-baseline.log",
+      "log_sha256": "414c92804dab9e3c370c5f2bee6b3b192eaba5ed00a9647dc7cbfcaf72532d76"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-2-baseline.log",
+      "log_sha256": "015dd4099e16bff43a5507a5ed2499d3a68c6ecbaa3bfad237a585476466fb06"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-2-candidate.log",
+      "log_sha256": "1fdbb369c1a40618c068ce8dc49218369c3edb018cc8328589b5293979985c29"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-3-candidate.log",
+      "log_sha256": "093280ed9136332c7b6efa3a3e8d03e8cbe52442fd2ad60e7b9a835060259740"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-3-baseline.log",
+      "log_sha256": "03e9e71885a5dc3a4b06208df74742b2bb5fb42c2c0e4376e03dccf54920f393"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-4-baseline.log",
+      "log_sha256": "b4289ccbb6684a5e1a65ff6d0a90b7f08c8cdf1036c50824863c6c097624d079"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-4-candidate.log",
+      "log_sha256": "6a58cbad8bfb696af7befd885531f587d4ee8040ceaa74b6cc868d29ec3288d9"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-5-candidate.log",
+      "log_sha256": "4643c7152be5ef6ee8e5d19f5b30df0bc1f2d24af5dfcdf004e81650504a8b35"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-5-baseline.log",
+      "log_sha256": "b48300e19380aaf89955482e766544f9438671b35cb86afe0d943ec1c47cf144"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-6-baseline.log",
+      "log_sha256": "3c2aa73537353a342c5a9b14455e82eaaf43215101f1bf1e2f64566fecb726a3"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-6-candidate.log",
+      "log_sha256": "d11ee724b7fa87f58ecef9a17d81eab6451838b0d8cc51a0d1de0022d25c820f"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-7-candidate.log",
+      "log_sha256": "7106c5313172ed2be47b5956aa704e40054067c3ad4c1dc1cf629fb96045b1f7"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-anamorphic",
+        "333384"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-anamorphic-pair-7-baseline.log",
+      "log_sha256": "bd9e176eb2aa15cc3b12a2d79f44e685c204f1e06f722262a4aeab3d4dda84bf"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-rotating-cleared.log",
+      "log_sha256": "457ca32d18d46799efffc50fce3d502a890ccc57fc6c6c3de9106cdc5791efb6"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-rotating-cleared.log",
+      "log_sha256": "4e7352da150add0f10ae6ac6bc14fa68adaecc012775451289951fbfa8ca9913"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-0-baseline.log",
+      "log_sha256": "8871b11282c0c5bc8be3fd759caf33a6a6c57816ebb0b1636a59a4ac950410c2"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-0-candidate.log",
+      "log_sha256": "9fac10f234431dda10a176bcf48b2d551389815b35ade74c49bcf3fec6f43026"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-1-candidate.log",
+      "log_sha256": "782494324eddf47a79fb72b5e6cd83490ae80beeb7a3bcbedc1a63c8eca3f417"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-1-baseline.log",
+      "log_sha256": "dd95589ec3b7ba501e1570101a4af2c1882affa572b43fa1fda46a65c150fba9"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-2-baseline.log",
+      "log_sha256": "4b1bbd0004e5dedcfd868fb6a040f10e53c83c5154e40a690745aa2b9333e13a"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-2-candidate.log",
+      "log_sha256": "bf4b887792aa7d120c5aa024bf5083a842b441970723f645422162e1343aebdd"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-3-candidate.log",
+      "log_sha256": "664095fb1c87bb1fbb0ff82f5b22e45bb4cfff5340e743850e57caf004c89679"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-3-baseline.log",
+      "log_sha256": "5b5a1d94053f84335d01415295efeb1628bbf15dc32a492fa6418b6381868088"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-4-baseline.log",
+      "log_sha256": "d6dd279247bcf497c6b5f7be952a825c87508ecf60a6b61f84e88baf693e1a05"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-4-candidate.log",
+      "log_sha256": "a6e01ff936de35f6eb6520da0014703c90a3001d11c67d71347d97b4cc31efea"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-5-candidate.log",
+      "log_sha256": "e00f0a0f728f284d571b051847b89d50b5befbd0692bb55ce0a61dc14db383be"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-5-baseline.log",
+      "log_sha256": "d45f3b7cf1a39dacfb0e4bac9f8f4db000c14c4dea6fa6b2e614bc1eed8d6a0a"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-6-baseline.log",
+      "log_sha256": "24782acbf8b91100a0f3ff01c5939b6d9fc414d35544dd9fc44cdc8208c28209"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-6-candidate.log",
+      "log_sha256": "1711a07c281df2c680f1f008246294dfd356ecb6d95aecfca91db8cf0371f0c8"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-7-candidate.log",
+      "log_sha256": "4f1fe9a75a385e864fd28e7f472a0945b9ba41936b2f4f1026bf36651e403b53"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rotating-cleared",
+        "219154"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rotating-cleared-pair-7-baseline.log",
+      "log_sha256": "14ce8773aa8d059a9e83669d4fcf8eb5306be9477540facabe40c8603a186924"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-alternating-aspect.log",
+      "log_sha256": "198d9cc418444ce0921de099095bf0fe8ad696d27323e7b5562b33a3c16cffbd"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-alternating-aspect.log",
+      "log_sha256": "a19a701c5972d2e40938ac2b622295a8b9325ce0c8f6d238a3a5438c7b1dac0c"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-0-baseline.log",
+      "log_sha256": "0f2d40b43fd9c6672b8ef80425af1485fab8f9c4eeeee96de2aa7724e01b72cf"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-0-candidate.log",
+      "log_sha256": "d550d672edec1e2940c603e13a26ba0c24d68ee0918e3720dba1b2ef31cba848"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-1-candidate.log",
+      "log_sha256": "e2def387c13cd83f6aa11d741b555329708dc6767c93bd8c71ac4df898e7417a"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-1-baseline.log",
+      "log_sha256": "3e8e70c32535c674cd20da82fd81270c1e0e1f5bb497d6247afed074fb358ac7"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-2-baseline.log",
+      "log_sha256": "246d893b458efc2e8b71a57734af61f7f98377211f131cdf22947a5311b340fc"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-2-candidate.log",
+      "log_sha256": "26a52d1f4cc8c07fef2508ffe70ef16823965a0b7ee37f098befcbdfb4e4ad2b"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-3-candidate.log",
+      "log_sha256": "200671c3fbccb8e471ebf888ed339693601a62b73912c72674d950845fef9a53"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-3-baseline.log",
+      "log_sha256": "09a5ea7f50edb3e17ec1f2e0c7001151173a9106350162e3bcd460bd3370f38a"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-4-baseline.log",
+      "log_sha256": "d8551c1735a6d58c33eeb1928cb5f960d77edac72536cf6a06ae5fe82c7bea62"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-4-candidate.log",
+      "log_sha256": "585da0383c7d2ea90d55d05573adbc2e13ca858fed8b5c6e8904daa85c4cea9e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-5-candidate.log",
+      "log_sha256": "547cca5cbfbe7fbb0dced82dc7e011caa107b5f45f6dce518c838fc46b948460"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-5-baseline.log",
+      "log_sha256": "23130108d697788d4bc25b7fbfa60a1c94f773d082566f37a98f3bcb1e71abf4"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-6-baseline.log",
+      "log_sha256": "b1169f142d72572837defd104cfaf52d5acec3b37a0f325df3b3b110ef72e466"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-6-candidate.log",
+      "log_sha256": "f17ab18df0df6cb92be7c0d2db00a614088dba61408d6b71a85169798a48d46f"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-7-candidate.log",
+      "log_sha256": "12cfc5cf00c0e3ba537cfc1ff27112915c93947e61b515a1f3726eb83aa0bff3"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aspect",
+        "178968"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aspect-pair-7-baseline.log",
+      "log_sha256": "eab8648ccbfbb0f510548f624068251dfb2e95b0bd7f59dd109d190ac188c0d5"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-alternating-aperture.log",
+      "log_sha256": "730b8cba13431e554409a26603bbc4eaaf1f962434ff98e0f5dcc343a4ad0073"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-alternating-aperture.log",
+      "log_sha256": "dd83980f11879f9c06338e670bc461103df7f2252059e458b946759f7d61a8f3"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-0-baseline.log",
+      "log_sha256": "e78769a3519f0ac64e833e0385fdd6e4d6a90006b2586b811a85672660ea8565"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-0-candidate.log",
+      "log_sha256": "79ac6b5e8d5c69be42efded76098de8bce5670c19299bd488feebc4fcf9d4d14"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-1-candidate.log",
+      "log_sha256": "4d50f3f1a00ef12dcafcfdfbd0c4397c161e34232e09f69de962886dd6f2ba9e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-1-baseline.log",
+      "log_sha256": "c98441884a62cc5010057aa6c44b0466b2f355726f1cac166494c01f6a3d7f52"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-2-baseline.log",
+      "log_sha256": "b8a9b98a33212c7b39a1d48248bfe2347e17ee98281c342a06e2aef7b7521920"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-2-candidate.log",
+      "log_sha256": "bdec010d24cf8f8c0a188ebdc54dce22cc0bbceab350654bc8ce54cea06cc7e6"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-3-candidate.log",
+      "log_sha256": "c5da81d26deeaf7cd204c4d6226eba354a20cf5fe95872c3ffc9c05e3fb03ebb"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-3-baseline.log",
+      "log_sha256": "7c0c9937df4acbc9e181a8f0fc3c99437aaaca3ce2d09cdd875e715586ffe793"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-4-baseline.log",
+      "log_sha256": "72d546eaf89552a9611206f9b0c325c5df14c7d8be519a13086cb73fdb3c1084"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-4-candidate.log",
+      "log_sha256": "a7f68d290e48cbe82a8699c15de0a5b47261056234b8c6534369bcaadc880382"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-5-candidate.log",
+      "log_sha256": "efc8be80c2499a4d9332b8624ce986005ab7bf6f8ed21421f374f0ec4f4cbe1c"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-5-baseline.log",
+      "log_sha256": "aa2a77973f57ed08f5db2f3efbfefe7322baf79bb6cdaf83cbf2846c873e6eed"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-6-baseline.log",
+      "log_sha256": "b610c958d23b7a4554b79d369296fe41d1cda82677b0d0716747f2b6de66885b"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-6-candidate.log",
+      "log_sha256": "a692f0c3c545b30a32947cc0f4c99641debe64012a359d26f6499e4c29f1ba3c"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-7-candidate.log",
+      "log_sha256": "6b867ffcff7b3657997a691977c43499f4cdf359a792e69d272219a056a0e977"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-aperture",
+        "158200"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-aperture-pair-7-baseline.log",
+      "log_sha256": "2fb94a03c73ba69f85c350417d3cb55a192a27ae69e7fe3f69f8946b5975a735"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-alternating-both.log",
+      "log_sha256": "aae728c5a194e81f69b16c15f35080fd59fc51d5165d8268cd612a6aa929492f"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-alternating-both.log",
+      "log_sha256": "4f7ab78f5295d1b576f968bedebb439d18d3ce79a629d67ef18da328840755d2"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-0-baseline.log",
+      "log_sha256": "a29e5e72812fab36fd6dfd1c4ddd74f3e3f009e1357aa618479532ca799d8c0c"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-0-candidate.log",
+      "log_sha256": "fd99af1d56a283caffaeb532bea56ed4f181ad311534a352a02cf01f9672257f"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-1-candidate.log",
+      "log_sha256": "bf049c0b6ce128d507dc14c330dbe2fbac6347c216dff8c83e84a65854eda9fc"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-1-baseline.log",
+      "log_sha256": "cf2ff4f24a77164f8e8feaf000b2eb182c9f64d9b72907e651247bf88b6adff9"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-2-baseline.log",
+      "log_sha256": "7cc664e088d40835c153ef7d62bcbe7aab2a3ff7d7dd37623dec537f5a882073"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-2-candidate.log",
+      "log_sha256": "39fd5d0b8526339451aba1e1d4bbb9b173b548a3dab2518e92d1592fb917fd7a"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-3-candidate.log",
+      "log_sha256": "c15291c0f3415e0f5ebb7fee5101d8320857049566563b0770592f5700438df6"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-3-baseline.log",
+      "log_sha256": "e4721fa31bafd7d651ed91a5a85210fe34076cb511b714ad96f84a407197dc96"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-4-baseline.log",
+      "log_sha256": "b56c71c1355eb4f27efd108cf474e23691b28f3ee105b06a472ccb4f94bd4e22"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-4-candidate.log",
+      "log_sha256": "60a17597a2d513d158ceb552254307e750d15d52ddbb2b436c8edba9c143292f"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-5-candidate.log",
+      "log_sha256": "f6ea8ced8648d7430a17b39be2f62acad1254eaba7e765239c450c7af8c4de18"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-5-baseline.log",
+      "log_sha256": "d9d117962aa1680faa8e0cf0897a6fa218a0b544e550ba66cb97b9847a95e288"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-6-baseline.log",
+      "log_sha256": "fdb1b6a626dbc324a0cc75414cc3220f425ffc060778cee25f2d5385b913e650"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-6-candidate.log",
+      "log_sha256": "f3da395829b233596c081bc25834e0884828234513683743a43ac78d9923a9cb"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-7-candidate.log",
+      "log_sha256": "f5ab91b822912c93fc9459707dc45265f49c2ef1d1fa5ab1f8992ee9979691c7"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "alternating-both",
+        "109349"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/alternating-both-pair-7-baseline.log",
+      "log_sha256": "9b8b27fa421f96ef8d9dc4b18fd7b88a3f15bc7b40a65e65b1a35afd6688d464"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-invalid-aspect.log",
+      "log_sha256": "37da37e8e4502b1d18c3b79606145cab6b4b00758a0032a3c68b37e2485e90b6"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-invalid-aspect.log",
+      "log_sha256": "9d035839397ef7c45756992548db25ef834a78e7e5c0faff94899f2795cc905b"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-0-baseline.log",
+      "log_sha256": "9870a21151158072d437ef8cca628ecfb03e17bede794a10d0e325f6b84f20ca"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-0-candidate.log",
+      "log_sha256": "dae38965f34f7f38f40f95b42a1133604ed8ee124e155ad157d3fc463cacb1a3"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-1-candidate.log",
+      "log_sha256": "56c6c466dc02a08c7b6b22df1e3673e1c1aaa4e7f08bec86186a62cfe2128b9b"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-1-baseline.log",
+      "log_sha256": "07f873bd477c5fb585a31158d851b1a693a7081f3cb97a318d3b2fa55c822b10"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-2-baseline.log",
+      "log_sha256": "60016bcd0523fb87601ab3271c7062434d8ab462c6ddf0d23cf1a342b95d95aa"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-2-candidate.log",
+      "log_sha256": "b6f46f57b2f85239442b836981ab79f6d6582369f7198dbff7ac00ecd82ff2aa"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-3-candidate.log",
+      "log_sha256": "f807d50e09fb9d4c2b79fd3e6d5578868cea5d3a4fda51d3191ae5b64b94ea43"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-3-baseline.log",
+      "log_sha256": "8ab706348aec7e0fe5e0deb88942bd92e6094dd2257a0f5eeeb6230c6816e1ab"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-4-baseline.log",
+      "log_sha256": "7765a38a6a0ab204c624dcbbcadf539918127332c734dead325a0b9d85ebbe80"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-4-candidate.log",
+      "log_sha256": "ccaacf70615a1fc0149d602a1b0f0d7a365781c2c4bea6405b130dc608e5b636"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-5-candidate.log",
+      "log_sha256": "7241c22d18c430e07319f332bd2a137f12a5ba75a1e563038ce5969771eaebb1"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-5-baseline.log",
+      "log_sha256": "257adcea1c4d0a2282b695cc57c793a18704e61b7e93672144bd3b96b5e06412"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-6-baseline.log",
+      "log_sha256": "659f8ae7c55cca18e8b1783f41b4705b59f5c9739ef07e0b3def4a45174be04c"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-6-candidate.log",
+      "log_sha256": "1eafa2ba462cb074e04ec48babb1b43ef68f5ddbada9a354660b25f9a4983060"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-7-candidate.log",
+      "log_sha256": "ef85674ac4caf37dc8327827c60a8dae2db34e13378d7d025a20d1b1f6b00220"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "invalid-aspect",
+        "508118"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/invalid-aspect-pair-7-baseline.log",
+      "log_sha256": "9a0e19ca2596f707bdb387cdf0867e119fb08a692a88ca05e5788d7d2faf065d"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/baseline-calibrate-rounding-and-signed-zero.log",
+      "log_sha256": "35547e515d54eb49a27501ea6d3f25ad75ace58bb2bd437d8184e735d8c02a8a"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "2048"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/candidate-calibrate-rounding-and-signed-zero.log",
+      "log_sha256": "bc7f285662a21cb5bf3914435e368711c2a9cd7005570c93050b1c20c05c2d50"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-0-baseline.log",
+      "log_sha256": "aa990e48a2dafa0ce6b54b030cf0b2a4bb0a7fb933d21d431ba02d3fe29376d4"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-0-candidate.log",
+      "log_sha256": "92e9ad90369a29ded3fe60332f794e5db9495a5bd6d35d376797c2edf8e38ffa"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-1-candidate.log",
+      "log_sha256": "85e0d6a43fd6787eb4fc34ce0d62b3d2a7c99e1ca6cb685fff2a7c84e2373346"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-1-baseline.log",
+      "log_sha256": "2e679fb3231c673e56450670d1f2c0869e20680b5f061f91b8ffac4db9939992"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-2-baseline.log",
+      "log_sha256": "94761b0f5a9317181d11b4a82c373e522b6eeb28010db5640f47b7405000cf13"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-2-candidate.log",
+      "log_sha256": "4c011d9f969eab390a7b1cc9e62b6af9699933a328a1aac46ebb7115495e39d5"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-3-candidate.log",
+      "log_sha256": "584f4a669815381bfcc9b49b771fbe717dc859690c6d2b98d4958e6c98092142"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-3-baseline.log",
+      "log_sha256": "c1e36d5a39bb28f204c7711e974b6b14526dd57b118e482bd6c5344d6634f197"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-4-baseline.log",
+      "log_sha256": "2e623b285530c7964940c552f8a4528b92cea03b48f74de9212b2e246f4ce25c"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-4-candidate.log",
+      "log_sha256": "a65fd21ef11a5b0e59f9761ec70c3a2db90ba908913450b2c8744bc58c5f60bb"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-5-candidate.log",
+      "log_sha256": "738570aeba5211c5fb924f3b798a64d54e3cdd6c49885049812a752cf3e8ee2d"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-5-baseline.log",
+      "log_sha256": "1794073512181270b1974ca45ecd7252b06f49e5dd14986ea32bcde794ef9fef"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-6-baseline.log",
+      "log_sha256": "acbf728460fc516e515217769a6c0dcac574e357509918bf01f1d2397b639c68"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-6-candidate.log",
+      "log_sha256": "0fe5ba47a490466a26315250c2a8e6350baede1feaae9cd23cc140dd7e8481db"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/candidate/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-7-candidate.log",
+      "log_sha256": "67eb8e68f2110c4ef6d00894c7f8362855c9fa6eb0be29627cd6e013597cab5e"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/_temp/video-geometry-metadata/build/baseline/geometry-benchmark",
+        "bench",
+        "rounding-and-signed-zero",
+        "124485"
+      ],
+      "cwd": "/Users/runner/work/illiquid/illiquid",
+      "exit_code": 0,
+      "log": "logs/rounding-and-signed-zero-pair-7-baseline.log",
+      "log_sha256": "017b90cf6a1806203ad3c35ccd98d29f690b94b61f8a19c600e1d83ed350f9b6"
+    }
+  ],
+  "cpu": "Apple M1 (Virtual)",
+  "files": {
+    "build/baseline/geometry-benchmark": "73e71a9adc40fba13d44bc4509aeef9c899c7688c7b1928b494b6f9d732c557d",
+    "build/baseline/libIlliquidNativePlayback.dylib": "f3f1e7d74cbeb0dca35205a62fc948a49e2811a7f6d0b4231b1e3960d3b00430",
+    "build/candidate/geometry-benchmark": "14656a15a5f1482ddd7b0d36decb8f8d602e2c93e0c85bf89f321a5c9dd67844",
+    "build/candidate/libIlliquidNativePlayback.dylib": "5fe2a33e56d5295d18d452647fc28565a5c3f9cea81dd163dd63bae098165d60",
+    "sources/Harness.swift": "7108593f1567f9e92c24cf4c45e66ed3be6275e3e0d42237357cfb6b46bc3bf3",
+    "sources/VideoGeometryMetadataCacheTests.swift": "b2e7ef1a04cedd2157e5790b4f279dde7accf6dd3e73e04908d9b379ed0834e3",
+    "sources/baseline-VideoDecoder.swift": "26a53e0abd16a26bf3a4997bc0a61a4d2d4acb6053d9d579e5c613534b42d457",
+    "sources/baseline-VideoGeometryMetadataCache.swift": "fd0bf22bbd6866ab305627f0067e4081de69d2d4da1001e97b887bd22bc0dcbe",
+    "sources/candidate-VideoDecoder.swift": "7dc4823df8daa2e8dc4ec4d5644fcb45183dbdf611632f576dfa18e25677861d",
+    "sources/candidate-VideoGeometryMetadataCache.swift": "be7cfc8164c1209952015804e52b13b4a723a0656eb2b6a6d45959d7ace03cc0",
+    "sources/run.py": "a7ef559bc7c7366ff1032965d84805d3521b901f8416a76887c8e57c90f837e3"
+  },
+  "finished_utc": "2026-10-22T21:41:05Z",
+  "host": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+  "output_parity": {
+    "matched": true,
+    "steps_per_workload": 32,
+    "workloads": 12
+  },
+  "protocol": {
+    "excluded": [
+      "buffer setup",
+      "warmup",
+      "output snapshot/checksum"
+    ],
+    "fresh_process_per_observation": true,
+    "max_estimated_sample_ms": 1500,
+    "pairs": 8,
+    "target_ms": 150.0,
+    "tests_only": false,
+    "timed_operation": "one aspect and one aperture application"
+  },
+  "schema_version": 1,
+  "started_utc": "2026-10-22T21:39:00Z",
+  "status": "passed",
+  "swift_version": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "tests": [
+    {
+      "configuration": "debug",
+      "passed": 13,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "passed": 13,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "passed": 13,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "passed": 13,
+      "variant": "candidate"
+    }
+  ],
+  "worktree_status": ""
+}
