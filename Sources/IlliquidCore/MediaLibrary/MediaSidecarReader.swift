@@ -22,7 +22,7 @@ public final class MediaSidecarReader {
         guard recognized.kind != .extra else { return recognized }
         let root = root.standardizedFileURL
         let parent = file.deletingLastPathComponent().standardizedFileURL
-        guard parent.path == root.path || parent.path.hasPrefix(root.path + "/") else { return recognized }
+        guard Self.relativePath(parent.path, within: root.path) != nil else { return recognized }
         var folders: [URL] = []
         var cursor = parent
         while folders.count < 64 {
@@ -43,8 +43,8 @@ public final class MediaSidecarReader {
                 hints = nfo.overriding(hints)
             }
             if case let .plex(plex) = read(folder.appendingPathComponent(".plexmatch")) {
-                let relative = String(file.path.dropFirst(folder.path.count + 1))
-                if let mapping = plex.episodeHint(for: relative, inheritsDescendantMappings: !foundSeriesPlex) {
+                if let relative = Self.relativePath(file.path, within: folder.path),
+                   let mapping = plex.episodeHint(for: relative, inheritsDescendantMappings: !foundSeriesPlex) {
                     mappedEpisode = mapping
                 }
                 hints = plex.metadata.overriding(hints)
@@ -80,6 +80,15 @@ public final class MediaSidecarReader {
         }
         recognized = recognized.applying(hints)
         return recognized
+    }
+
+    /// Use the same component boundary for containment and PlexMatch mapping keys.
+    /// The filesystem root already includes its descendant separator.
+    static func relativePath(_ path: String, within root: String) -> String? {
+        if path == root { return "" }
+        let prefix = root == "/" ? "/" : root + "/"
+        guard path.hasPrefix(prefix) else { return nil }
+        return String(path.dropFirst(prefix.count))
     }
 
     private func read(_ url: URL) -> Sidecar {
