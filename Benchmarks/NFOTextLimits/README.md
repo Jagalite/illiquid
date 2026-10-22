@@ -10,6 +10,8 @@ The early DOCTYPE rejection control remained slower: +7.14% by independent media
 
 These are complete warmed, in-memory NFO parse measurements on fixed synthetic fixtures. Whole-library loading, file I/O, playback, and energy were outside the experiment.
 
+The timing results below qualify the recorded historical source cohort only. Current integration is checked separately without timing; these historical numbers do not qualify the current integrated pipeline's performance.
+
 ## Final native cohort
 
 [Run 39075451501](https://github.com/Jagalite/illiquid/actions/runs/39075451501), completed October 17, 2026, used protocol `3-longer-ordinary-controls`.
@@ -80,24 +82,50 @@ Keeping the exact expression matters when a combining mark, regional indicator, 
 
 The change preserves the document-size and nesting limits, captured-field selection, XML validation, declaration rejection, and metadata interpretation.
 
-## Reproduce
+## Current qualification (no timing)
 
 Run on macOS with Python 3.10+ and Swift 6.1+. The runner uses the actual five MediaLibrary sources, including the Darwin-based sidecar reader.
 
 ```sh
 git fetch --no-tags --depth=1 origin 68274d1b09dcc866296321a5a8858efc297c4f19
 python3 Benchmarks/NFOTextLimits/run.py \
-  --output /tmp/illiquid-nfo-text-limits \
+  --mode qualify --jobs 2 \
+  --output .build/nfo-current-qualification
+```
+
+`qualify` is the default and the [automatic workflow](../../.github/workflows/nfo-text-limits.yml) uses it explicitly. Both variants receive a snapshot of the **current** four shared production dependencies, the same five current test files, and the current driver. Only the baseline NFO parser comes from `68274d1b09dcc866296321a5a8858efc297c4f19`; this is a composite input, not a claim to test that entire old tree. In particular, both versions retain the current filesystem-root reader repair and its regressions.
+
+Before compiling, the runner requires byte-identical shared dependencies and exactly one differing source, `NFOMetadataHints.swift`. It also requires the reviewed baseline/candidate parser blobs `55e84590829c678f6ac5cb1328e64dead63651b6` / `051c475fd33bcd16ec33f6b4b93ee98fffdb21d3`. Any new parser change requires a separately reviewed comparison. The manifest records both source sets' Git blob and SHA-256 hashes, test/driver/runner identities, checkout state, toolchain, commands, and test counts.
+
+Qualification runs all current regressions in debug and release with each parser, then compares all **136 complete** release differential outputs, preserving explicit nulls, strings, and array order. Missing cases, duplicate cases, missing receipt fields, differing test counts, or any output difference fail the run. It never invokes the driver's timing path, and it rejects `--skip-tests` and `--rounds`. Passing results set `completed: true` in `manifest.json`; four test logs, two compiler logs, and `differential.json` supply the evidence. Use a fresh output directory. Swift builds are sequential with at most two compiler jobs.
+
+The fast Python controls exercise the original old-sidecar staging error, unexpected parser changes, incomplete corpora, exact output mismatches, and the no-timing path. They also verify historical source/test/driver hashes against the archived manifest without executing historical timings:
+
+```sh
+git fetch --no-tags --depth=1 origin 91dab495865210bbaced94ef39a2eb613209c3c7
+python3 -m unittest discover -s Benchmarks/NFOTextLimits -p test_harness.py -v
+```
+
+## Reproduce historical protocol 3 (explicit timing)
+
+Historical reproduction loads **all** baseline production sources from `68274d1b09dcc866296321a5a8858efc297c4f19` and candidate sources, tests, and driver from `91dab495865210bbaced94ef39a2eb613209c3c7`. Those blobs match the recorded merge checkout in the final native cohort. Current shared code and root regressions are qualified by the separate path above.
+
+```sh
+git fetch --no-tags --depth=1 origin 68274d1b09dcc866296321a5a8858efc297c4f19
+git fetch --no-tags --depth=1 origin 91dab495865210bbaced94ef39a2eb613209c3c7
+python3 Benchmarks/NFOTextLimits/run.py \
+  --mode historical-timing --jobs 2 \
+  --output .build/nfo-historical-protocol-3 \
   --rounds 12
 ```
 
-Use a fresh output directory and a quiet host. The [workflow](../../.github/workflows/nfo-text-limits.yml) pins its macOS toolchain and executes this command. The manifest records the candidate commit and working-tree state, source/test/driver/runner Git blob hashes, environment, compiler flags, test counts, and acceptance criteria.
+Use a fresh output directory and a quiet host. This opt-in mode preserves protocol 3's workload counts, warmups, AB/BA order, receipts, and statistics; automatic CI does not run it. The current runner adds isolation checks and records its own hash. For the exact original runner, use `Benchmarks/NFOTextLimits/run.py` at the pinned candidate commit (blob `f77ca6bf077428a964d4bcefc8f51658d8b6c679`) in an isolated checkout of that commit. Archived evidence remains unchanged. New executions are separate cohorts and must not be pooled with the historical results.
 
-`--skip-tests` is available for an explicitly limited follow-up measurement; such a run alone does not satisfy the correctness criterion.
+`--skip-tests` is available only with `--mode historical-timing` for an explicitly limited follow-up measurement; such a run alone does not satisfy the correctness criterion.
 
 ## Method and acceptance criteria
 
-[`run.py`](run.py) reads baseline source bytes directly from pinned Git objects and builds separate baseline/candidate executables with `-swift-version 6 -O -parse-as-library`. It applies the same current five regression-test files to both implementations in debug and release. Those tests include the existing real sidecar reader, NFO field selection and episode scope, media-name recognition, and the new text-limit suite.
+The historical protocol reads source bytes directly from pinned Git objects and builds separate baseline/candidate executables with `-swift-version 6 -O -parse-as-library`. It applies the same five regression-test files from that cohort to both implementations in debug and release. Those tests include the real sidecar reader, NFO field selection and episode scope, media-name recognition, and the text-limit suite.
 
 Each timing observation uses a fresh process. [`Driver.swift`](Driver.swift) constructs fixed XML `Data` before timing and performs three untimed warmup parses. One additional pair per workload is retained as round -1 and excluded. Twelve measured pairs alternate AB/BA order. The complete production parser runs once per timed iteration, and the driver consumes cheap result scalars and collection counts. Parser/result release occurs inside the timed call.
 
@@ -138,7 +166,7 @@ A full expanded campaign has 13 workloads, 312 measured process observations, 26
 
 ## Historical investigations
 
-The source and protocol changed during the research. Each cohort remains separate; medians and observations from different cohorts are not pooled. The final cohort above is the evidence for the current production implementation.
+The source and protocol changed during the research. Each cohort remains separate; medians and observations from different cohorts are not pooled. The final cohort above is evidence for the refined parser in its recorded historical dependency set.
 
 The first three campaigns tested the original byte guard, source blob `a5a698d2d19c721ce1252384993307ceaf4fe67c`. Its fragmented-field gains were approximately 95–98%. The expanded campaign added a repeated Unicode fallback control and increased the differential corpus from 135 to 136 cases. Every campaign passed the four 52-test runs and exact output comparisons.
 
