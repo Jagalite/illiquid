@@ -1,5 +1,19 @@
 # Reusing decoded video HDR metadata
 
+## Outcome
+
+The fixed confirmation supports this small production change. Relative to the
+pinned baseline, median process CPU time in the isolated metadata-preparation
+component fell **11.2% for HDR10 BGRA** and **15.3% for HDR10 P010**. Each primary
+case won 18 of 20 CPU pairs and improved in both execution orders. Median paired
+savings were **0.278 µs** and **0.404 µs** per operation, respectively.
+
+All ten measured workloads had lower CPU medians. The cleared-buffer
+P010 control improved by 14.2% and also won 18 of 20 CPU pairs. Exact component
+parity and selected native integration tests passed. The absolute benefit is
+modest and confined to metadata preparation; whole-player CPU, throughput,
+allocation counts, memory use, and energy use were not measured.
+
 ## Finding and change
 
 At baseline `7f9ba073394b77a908e0589447c6edc8d10b832c`,
@@ -21,6 +35,56 @@ The frame's `hasMasteringDisplayMetadata` and `hasContentLightMetadata` flags
 continue to inspect the actual output buffer, including inherited hardware
 attachments.
 
+## Confirmation results
+
+[Run 39847419512](https://github.com/Jagalite/illiquid/actions/runs/39847419512)
+used candidate `133dc35f3a4bfcec5b9bbb9c8dd6204d5e4c6880`, twenty balanced AB/BA
+pairs per workload, and a 300 ms calibration target. The platform configuration
+was arm64 macOS 26.6.2, Apple Swift 6.3.3, and SDK 26.5. Times below are CPU
+medians in microseconds per metadata-preparation operation. Percentage changes
+compare the two variant medians; they are not the median of paired ratios.
+
+| Workload | Baseline CPU µs | Candidate CPU µs | CPU change | Wall change | CPU pair wins |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `sdr_bgra` | 1.356 | 1.196 | -11.8% | -11.7% | 17/20 |
+| `sdr_nv12` | 1.697 | 1.431 | -15.7% | -17.0% | 20/20 |
+| `hdr10_bgra` | 2.783 | 2.470 | -11.2% | -16.1% | 18/20 |
+| `hdr10_p010` | 3.009 | 2.548 | -15.3% | -12.5% | 18/20 |
+| `mastering_only` | 2.076 | 1.804 | -13.1% | -8.6% | 19/20 |
+| `light_only` | 2.081 | 1.869 | -10.2% | -8.7% | 18/20 |
+| `metadata_changes` | 2.533 | 2.126 | -16.1% | -13.5% | 20/20 |
+| `preexisting_attachments` | 0.645 | 0.441 | -31.6% | -30.7% | 20/20 |
+| `hdr10_p010_cleared` | 2.499 | 2.144 | -14.2% | -14.3% | 18/20 |
+| `sdr_nv12_cleared` | 1.185 | 1.015 | -14.4% | -14.3% | 20/20 |
+
+The primary cases also pass each paired acceptance check:
+
+| Primary case | Median paired CPU ratio | Median paired saving µs | Baseline-first ratio | Candidate-first ratio | Result |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `hdr10_bgra` | 0.8982 | 0.278 | 0.9037 | 0.8782 | All criteria pass |
+| `hdr10_p010` | 0.8727 | 0.404 | 0.8727 | 0.8777 | All criteria pass |
+
+An independent audit recomputed all 400 raw measurements, matched iteration
+counts and checksums, balanced execution orders, summary statistics, and exact
+103-record traces. All CPU order-subgroup medians improved, including controls.
+Both compiled executable hashes, generated processors, the harness, production
+source, compiler flags, and recorded native toolchain/library configuration
+match the initial run. The runner update adds fail-closed call-site validation;
+it does not change the timed code. Matching configurations do not imply the
+two runs used the same physical host.
+
+The 300 ms duration is a calibration target; the shortest observation was about
+203 ms. Shared-runner scheduling noise remains, with a wall/process-CPU ratio
+reaching approximately 1.64. All observations are retained. CPU results and
+execution-order consistency provide the primary evidence; the wall results are
+supporting measurements.
+
+[Preserved confirmation evidence](PerformanceEvidence/VideoHDRMetadata/confirmation-macos/)
+contains all 400 original timing records, full traces, source/toolchain receipts,
+calibration data, provenance, and the computed acceptance assessment. Native
+integration qualification comes from the initial run of the unchanged production
+code; this confirmation did not repeat the native test build.
+
 ## Confirmation protocol
 
 The initial study below was exploratory. Before any confirmation measurements
@@ -32,10 +96,12 @@ at least 100 ns, at least 16 of 20 CPU-pair wins, improvement in both execution
 order groups, and a lower overall wall-time median. The controls must not show
 a repeatable CPU regression above 5%.
 
-These are practical acceptance criteria for this narrow change on a shared CI
-host. All samples and scheduling outliers are retained. The two runs are
-reported separately; the confirmation is not pooled with the initial study,
-and the production code is not tuned or rerun until a favorable timing appears.
+The criteria were committed in [289b32d](https://github.com/Jagalite/illiquid/commit/289b32dbdcb50318ad1516be6abe3ac070c36d77)
+before confirmation execution began. These are practical acceptance criteria for
+this narrow change on a shared CI host. All samples and scheduling outliers are
+retained. The two runs are reported separately; the confirmation is not pooled
+with the initial study. Production code and timed executable hashes were
+unchanged, and exactly one confirmation run was used for this decision.
 
 ## Initial native results
 
@@ -63,11 +129,12 @@ microseconds per metadata preparation. Negative changes mean lower cost.
 | `hdr10_p010_cleared` | 2.911 | 2.547 | -12.5% | -12.5% | 7/10 |
 | `sdr_nv12_cleared` | 1.758 | 1.472 | -16.3% | -14.4% | 9/10 |
 
-Every median improved, but some individual process pairs varied substantially.
-These first-run percentages are preliminary estimates; a predefined second
-run uses twenty pairs and a 300 ms target, with production code, the harness,
-compiler flags, fixtures, and default scheduling policy unchanged. That run checks whether the
-result survives longer samples rather than selecting the fastest observation.
+Every median improved, but some individual process pairs varied substantially,
+including order sensitivity in HDR BGRA. This exploratory run motivated the
+fixed confirmation above. Production code, the harness, compiler flags,
+fixtures, and default scheduling policy remained unchanged. The confirmation,
+rather than the stronger first-run percentages, supplies the numerical claim.
+The two runs are kept separate and no samples are discarded.
 
 [Preserved initial evidence](PerformanceEvidence/VideoHDRMetadata/initial-macos/)
 contains every timing sample, exact parity traces, source/compiler/library
@@ -142,11 +209,13 @@ application dependency graph in release configuration.
 Prepare the pinned native SDK as documented in the benchmark README, then run:
 
 ```sh
-python3 Benchmarks/VideoHDRMetadata/run.py --pairs 10 --target-ms 100 \
+python3 Benchmarks/VideoHDRMetadata/run.py --pairs 20 --target-ms 300 \
   --output /tmp/illiquid-video-hdr-metadata
 ```
 
-The workflow `.github/workflows/video-hdr-metadata.yml` generates the required
-native fixtures and runs the release integration tests. Source extraction can
-be inspected without Apple frameworks using `--prepare-only`; Linux extraction
-is not native performance or decoder qualification.
+On pull requests and manual dispatch, the workflow
+`.github/workflows/video-hdr-metadata.yml` generates the required native fixtures
+and runs the release integration tests. Research-branch pushes run the component
+study only. Source extraction can be inspected without Apple frameworks using
+`--prepare-only`; Linux extraction is not native performance or decoder
+qualification.
