@@ -7,6 +7,8 @@ on:
       - 'Tests/IlliquidCoreTests/EpisodeNameRecognitionRegressionTests.swift'
       - 'Benchmarks/EpisodeNameRecognition/Driver.swift'
       - 'Benchmarks/EpisodeNameRecognition/run.py'
+      - 'Benchmarks/EpisodeNameRecognition/FoundationBoundary.swift'
+      - 'Benchmarks/EpisodeNameRecognition/test_harness.py'
       - 'Benchmarks/EpisodeNameRecognition/baseline/**'
       - 'Benchmarks/EpisodeNameRecognition/folder-reuse/**'
       - '.github/workflows/episode-name-recognition-performance.yml'
@@ -28,14 +30,14 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - name: Compare the complete corpus on the originally affected Linux toolchain
+      - name: Harness transformation and timing-isolation checks
+        run: python3 Benchmarks/EpisodeNameRecognition/test_harness.py
+      - name: Compare all 16300 paths at the adapted Foundation boundary (Swift 6.2.4 Linux)
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           swiftc --version
-          ILLIQUID_EPISODE_TRACE_PATH="$RUNNER_TEMP/episode-linux/main/cases.jsonl" \
           python3 Benchmarks/EpisodeNameRecognition/run.py differential \
             --output "$RUNNER_TEMP/episode-linux/main"
-          ILLIQUID_EPISODE_TRACE_PATH="$RUNNER_TEMP/episode-linux/folder-reuse/cases.jsonl" \
           python3 Benchmarks/EpisodeNameRecognition/run.py differential --reference folder-reuse \
             --output "$RUNNER_TEMP/episode-linux/folder-reuse"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -62,6 +64,13 @@ jobs:
                 --implementation "$implementation" --configuration "$configuration" \
                 --output "$RUNNER_TEMP/episode-name-recognition/$implementation-$configuration"
             done
+          done
+      - name: Prove the Foundation adapter against native paths and complete recognition snapshots (no timings)
+        run: |
+          python3 Benchmarks/EpisodeNameRecognition/test_harness.py
+          for reference in main folder-reuse; do
+            python3 Benchmarks/EpisodeNameRecognition/run.py foundation-proof --reference "$reference" \
+              --output "$RUNNER_TEMP/episode-name-recognition/foundation-proof-$reference"
           done
       - name: Differential corpus and balanced paired native benchmarks
         run: |

@@ -36,6 +36,10 @@ python3 Benchmarks/EpisodeNameRecognition/run.py test --configuration debug --ou
 python3 Benchmarks/EpisodeNameRecognition/run.py test --configuration release --output /tmp/episode-candidate-release
 python3 Benchmarks/EpisodeNameRecognition/run.py differential --output /tmp/episode-differential
 python3 Benchmarks/EpisodeNameRecognition/run.py differential --reference folder-reuse --output /tmp/episode-folder-reuse-differential
+# macOS only, correctness proofs with no timing runs:
+python3 Benchmarks/EpisodeNameRecognition/run.py foundation-proof --output /tmp/episode-foundation-proof-main
+python3 Benchmarks/EpisodeNameRecognition/run.py foundation-proof --reference folder-reuse --output /tmp/episode-foundation-proof-folder-reuse
+python3 Benchmarks/EpisodeNameRecognition/test_harness.py
 python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --output /tmp/episode-benchmark
 python3 Benchmarks/EpisodeNameRecognition/run.py benchmark --reference folder-reuse --scenarios named-episode-with-year named-episode-no-year bare-season-episode movie-controls --output /tmp/episode-folder-reuse-comparison
 ```
@@ -44,26 +48,80 @@ The test runner copies the exact source and existing/new Swift Testing suites to
 a temporary standalone package without changing the app package or fetching
 dependencies. The baseline file is retained verbatim from commit
 `68274d1b09dcc866296321a5a8858efc297c4f19`; its receipt includes SHA-256 and Git blob
-hashes. The benchmark compiles the candidate in place and renames only the two
-top-level types in a disposable copy of the baseline so they can run together.
+hashes. The timing binary compiles the candidate in place and renames only the
+two top-level types in a disposable copy of the baseline so they can run together.
 
 The differential corpus compares all result fields plus `seriesTitle`,
 `displayName`, and `section`. It includes episode numbers and ranges, folder/year
 precedence, Unicode/case/canonical-equivalence cases, invalid dates, tags, catalog
 IDs, editions, extras, movies, and unclassified paths.
 
-The live corpus now contains **16,299 paths**, excluding only the truly empty
-relative path from the original 16,300. The frozen baseline's Foundation path
-decomposition was reported to trap on that input with Swift 6.2.4/Linux in
-[PR #49's review](https://github.com/Jagalite/illiquid/pull/49#discussion_r4304671619).
-The `.mkv` empty-basename fixture, its parent-prefixed variants, and all other
-nonempty fixtures (including directory-only paths) remain. The driver checks
-that no empty path exists and that `.mkv` is present before invoking either
-recognizer. These invariants also run before every benchmark's differential.
-The `differential` command compiles the same driver and compares the full corpus
-without running timings; use it for correctness-only Linux qualification.
-The archived 16,300-path macOS receipts and their source hashes below remain
-unchanged and describe the original corpus, not the revised live driver.
+The live corpus is the original **16,300 paths**, including the empty input,
+`.mkv`, all **27 directory-only fixtures**, and the original order and duplicates.
+Its generating source is pinned byte for byte to original Driver blob
+`b4716d684dfe61aee3dcd22d88abd439e77673b3` (commit `2a07d79`). Each run also retains
+the complete ordered path array and its SHA-256 receipt. Corpus edits fail closed.
+
+The earlier attribution of the Linux crash to empty input was incorrect.
+[Swift 6.2.4 corelibs Foundation](https://github.com/swiftlang/swift-corelibs-foundation/blob/swift-6.2.4-RELEASE/Sources/Foundation/NSPathUtilities.swift#L189-L208)
+handles empty/root paths before entering `_startOfLastPathComponent`. That helper
+requires UTF-16 length greater than one after trailing-slash removal. Relative
+paths containing exactly one non-slash BMP scalar, optionally followed by
+slashes, encounter this boundary: for example `a`, `a/`, or `\u{200B}/`.
+There are six such directory-only fixtures in the original corpus, at zero-based
+indices 16143, 16157, 16171, 16185, 16199, and 16213. The same Foundation expression
+occurs in the candidate and both frozen references. Removing the empty fixture
+did not address this pre-existing platform boundary.
+
+The [hosted diagnostic run](https://github.com/Jagalite/illiquid/actions/runs/39730226702/job/119663329388)
+for PR head `9aa79a46a92d611f1cb7d351d65ac6314330fdb3` (CI merge checkout
+`cd6c25edab88ec04b142da8f21eace4d2f6e7f74`) confirmed the exact failing input.
+Its 32,285-record trace completed both recognizers at index 16141 (`\u{200B}/.mkv`)
+and ended immediately before the baseline call at index 16142 (`\u{200B}/`, UTF-8
+`[226, 128, 139, 47]`), followed by SIGILL in `_startOfLastPathComponent` /
+`NSString.deletingLastPathComponent`. Those indices refer to the then-reduced
+16,299-path corpus; the restored empty fixture shifts them by one. The small
+[diagnostic receipt](linux-foundation-boundary-diagnostic.json) retains artifact
+12404631785, full trace/log SHA-256 hashes, terminal records, the stack excerpt,
+and original compiler/source receipts. Temporary per-call tracing was removed
+after retaining this evidence.
+
+On Linux, `differential` replaces exactly one `path.deletingLastPathComponent`
+expression in each **generated** reference/candidate copy with
+`benchmarkParentPath(path)`. The adapter returns the native macOS empty parent
+only for the one-BMP-scalar boundary; every other input, including empty, root,
+ordinary Unicode, and supplementary scalars, delegates to Foundation unchanged.
+Missing or ambiguous source expressions stop generation. No input is filtered
+or rewritten, and every stored/computed field and stored-field fingerprint is
+still compared. Originals and frozen hashes are unchanged. Linux results are
+explicitly scoped to an **adapted Foundation boundary**, not raw production Linux
+behavior or an upstream Foundation repair.
+
+The macOS-only `foundation-proof` command compiles originals and adapted copies
+together. It compares native/helper parent paths and complete original/adapted
+recognition snapshots for both implementations over all 16,300 paths, plus
+focused empty, BMP, repeated-slash, root, Unicode, supplementary-scalar, and
+ordinary episode cases. Run it against both references. Explicit expected parent
+paths and guard decisions supplement the native oracle. Deliberately incorrect
+root handling and dummy-component path shifting must be detected by the parent
+comparison. No proof or adapted binary accepts timing invocations.
+
+Linux `benchmark` first passes the full adapted differential, then compiles a
+**separate, unadapted timing binary** from the exact candidate and the rename-only
+reference. Native macOS differential/timing code keeps its original Foundation
+calls. The adapter and proof flags are absent from timed compilation. The Python
+harness tests check this separation and reject timing after a failed/incomplete
+differential; they do not execute benchmarks.
+
+`environment.json`, `commands.jsonl`, and `results.json` retain exact compiler
+commands, original/generated/helper/driver hashes, source replacement and rename
+counts, binary hashes, and qualification scope. Generated source copies remain
+under each output's `sources/`; executables are temporary. `corpus.json` retains
+the ordered path hash and fixture counts, and `corpus.log` retains the path array.
+Proof receipts also record the six guarded indices, full comparison counts, and
+negative-control detections.
+The archived macOS measurements below remain unchanged; they do not constitute
+new measurements or qualify the Linux adapter.
 
 The default timing run uses seven 64-path corpora, 12 fresh process pairs per
 corpus, and 3 timed rounds of 128 complete scans per process. Baseline/candidate
@@ -80,7 +138,9 @@ samples. There is no CI timing threshold.
 
 The workflow runs the full experiment on this research branch and via manual
 dispatch. Pull-request runs repeat correctness checks with a small timing smoke;
-those two-pair results are not performance evidence.
+those two-pair results are not performance evidence. Linux full-corpus correctness
+remains pinned to the Swift 6.2.4 container digest. Native macOS runs additionally
+prove the adapter against both references, without adding any timing runs.
 
 ## Native results
 
