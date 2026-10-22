@@ -58,7 +58,7 @@ swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
 ```
 
 The new five-test suite checks explicit expected strings, invalid and signed-zero
-inputs, all 3,600 minute/second combinations at nine hour widths, adjacent
+inputs, all 3,600 minute/second combinations at nine hour counts, adjacent
 floating-point values at boundaries, and large representable intervals. The
 reference in those differential tests retains the original Foundation call.
 
@@ -74,11 +74,97 @@ baseline/candidate process order across ten pairs. Calibration targets at least
 250 ms per sample. Raw wall-time and process-CPU observations accompany the
 summary so that variation can be inspected.
 
+Each workload cycles through 4,096 runtime inputs:
+
+| Workload | Input pattern |
+| --- | --- |
+| `continuous_short` | A position advancing from 0 to 819 seconds in 200 ms steps |
+| `long_movie` | The same progression beginning at two hours |
+| `scrubbing` | Deterministic millisecond positions spread across a 24-hour interval |
+| `repeated_display` | Fractional positions from 42 to 42.9 seconds, all displaying `00:42` |
+
+Each process warms 8,192 calls before measurement. Calibration uses the faster
+variant with a 1.5x duration margin, then gives both variants the same iteration
+count. The recorded measurements include ten alternating process pairs for each
+workload, totaling 80 timed observations. The results below describe this one
+native CI host; other hardware and OS/compiler versions were not measured.
+
 The GitHub workflow `.github/workflows/timecode-formatting.yml` runs the isolated
 native measurement and the native app tests as separate jobs. Test failures
 propagate through the log-capture pipeline.
 
-## Results
+## Native app validation
 
-Native results and their evidence will be recorded here after the experiment
-completes. This document does not claim a speedup before that measurement.
+The candidate commit `c3e68c2fa78e042e9d72050922cf66e9af6cd4c3` passed the
+native release app build and all **12 selected tests in two suites**: five new
+formatter tests and seven existing UX verification probes. The release build
+took 493.56 seconds; Swift Testing reported 0.542 seconds for the selected tests.
+These are targeted tests, not a claim that the entire repository suite ran.
+
+- [Native app job](https://github.com/Jagalite/illiquid/actions/runs/39847090191/job/120063112723)
+- [Test summary](evidence/macos-arm64/app-test-summary.log)
+- [Test receipt](evidence/macos-arm64/app-test-receipt.json), including the full
+  job-log hash and artifact identifier
+
+## Timing results
+
+The native run on **2026-10-22** completed successfully on an **Apple M1
+(Virtual), arm64**, with three logical CPUs, macOS **26.6.2**, Apple Swift
+**6.3.3**, and macOS SDK **26.5**. The working tree was clean. The measured
+candidate was `c3e68c2fa78e042e9d72050922cf66e9af6cd4c3`; subsequent result-documentation
+changes do not alter the production source, harness, or runner.
+
+The optimized formatter workload improved across all four input patterns:
+
+| Workload | Baseline wall ns/op | Candidate wall ns/op | Wall reduction | Baseline CPU ns/op | Candidate CPU ns/op | CPU reduction |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Short playback | 1,803.7 | 36.8 | 97.96% | 1,768.7 | 36.4 | 97.94% |
+| Two-hour movie | 2,017.0 | 59.4 | 97.05% | 2,005.7 | 59.4 | 97.04% |
+| Scrubbing over 24 hours | 2,175.3 | 66.5 | 96.94% | 2,171.0 | 66.4 | 96.94% |
+| Repeated displayed second | 1,585.4 | 34.7 | 97.81% | 1,572.1 | 34.6 | 97.80% |
+
+Values are medians of ten observations per variant, per workload. Reductions
+use the ratio of those medians. All **40 paired comparisons** improved in both
+metrics: paired wall-time reductions ranged from **96.26% to 98.45%**, and
+paired CPU-time reductions ranged from **96.26% to 98.27%**. Every one of the
+**80 timed observations** exceeded the 250 ms target; the shortest was
+**291.0 ms**. No observations were discarded. Individual samples, ranges,
+and paired reductions are retained below.
+
+Correctness checks also passed:
+
+- Exact output agreement for **87,860 input rows per binary** across baseline
+  and candidate in both debug and optimized configurations, including every
+  whole second from zero through 24 hours, fractional boundaries, invalid inputs,
+  signed zero, and large representable intervals.
+- **21 independent golden cases per binary** in addition to differential parity.
+- Matching output checksums, warmup checksums, final strings, and iteration counts
+  for every timed old/new pair.
+- The native release app build and **12 selected regression tests** described above.
+
+The change saves roughly **1.6–2.1 microseconds per operation** in these warmed
+workloads. This is sufficient evidence for the small formatter change, while
+its absolute impact on ordinary timeline refreshes is modest. These results do
+not establish a whole-player CPU, frame-rate, energy, or visible UI-latency gain.
+Initial table construction and allocation counts were not measured.
+
+## Retained evidence
+
+- [Successful native run](https://github.com/Jagalite/illiquid/actions/runs/39847090191)
+  and [component job](https://github.com/Jagalite/illiquid/actions/runs/39847090191/job/120063113270)
+- [Run receipt](evidence/macos-arm64/run-receipt.json): artifact identity and hash,
+  log hash, and hashes for the compact evidence files
+- [Environment](evidence/macos-arm64/environment.json) and
+  [source/binary receipts](evidence/macos-arm64/source-receipts.json)
+- [Exact-output parity](evidence/macos-arm64/parity.json) and
+  [completion status](evidence/macos-arm64/completion.json)
+- [Raw observations](evidence/macos-arm64/measurements.jsonl),
+  [calibration](evidence/macos-arm64/calibration.json), and
+  [statistical summary](evidence/macos-arm64/summary.json)
+- [Executed commands](evidence/macos-arm64/commands.json)
+
+The run's `timecode-formatting-macos` artifact also contains all four complete
+verification traces, extracted source snapshots, and compiled binaries. That
+artifact expires after 14 days; the compact evidence above remains in Git and
+the committed runner regenerates the full output. The app test summary and
+receipt are linked in the native validation section.
