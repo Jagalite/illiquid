@@ -1,6 +1,6 @@
 # Media section grouping
 
-This study compares complete cached source-browser projections against main
+The recorded study compares complete cached source-browser projections against main
 `a2de305c8dbcaa81aac1477df7c9a0017c14eae3`. The proposed change caches section-title
 case folding within one `organizeMedia` call. It retains the first encountered
 spelling as the canonical title and all existing section/member ordering.
@@ -47,9 +47,13 @@ The staging helper in `Benchmarks/SourceTreeVisibility/run.py` supplies complete
 production Filter/Projection and core source files, together with guarded,
 verbatim model and loader declarations from AppModel/SourcesSidebar. There is no
 replacement actor, grouping algorithm, row model, metadata model, or comparator.
-The runner reads baseline files from the exact Git revision above, requires all
-staged production dependencies other than `SourceBrowserFilter.swift` to match,
-and records original and compiled source hashes.
+The current runner reads baseline files from the integrated revision below,
+then stages the current checkout's `MediaSidecarReader.swift` identically in
+both variants. Manifests retain historical and current reader hashes in
+`shared_dependencies`. Every other staged production dependency except
+`SourceBrowserFilter.swift` must match; original and compiled source hashes are
+recorded. Published historical campaigns retain their original source policy,
+measurements and manifests.
 
 Both variants run the complete existing `SourceBrowserFilterTests`,
 `SourceBrowserSearchTests`, `SourceMediaOrganizationTests`, and new

@@ -90,6 +90,8 @@ class Runner:
         baseline_files, baseline_records = helper.snapshot(
             lambda path: subprocess.check_output(["git", "show", f"{BASELINE}:{path}"], cwd=ROOT))
         candidate_files, candidate_records = helper.snapshot(lambda path: (ROOT / path).read_bytes())
+        shared_dependencies = helper.share_current_dependencies(
+            baseline_files, baseline_records, candidate_files, candidate_records)
         for name in baseline_files:
             if name != "Sources/IlliquidApp/SourceBrowserFilter.swift" and baseline_files[name] != candidate_files[name]:
                 raise ValueError(f"Unrelated production dependency changed: {name}")
@@ -104,7 +106,8 @@ class Runner:
             for name in TESTS:
                 staged[f"Tests/IlliquidAppTests/{name}"] = (ROOT / "Tests/IlliquidAppTests" / name).read_bytes()
             manifest = {"variant": variant, "baseline_revision": BASELINE,
-                        "production": records, "staged": {}, "adaptations": []}
+                        "production": records, "shared_dependencies": shared_dependencies,
+                        "staged": {}, "adaptations": []}
             for relative, raw in staged.items():
                 compiled = raw
                 if platform.system() == "Linux":
