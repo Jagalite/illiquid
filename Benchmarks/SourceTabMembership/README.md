@@ -72,3 +72,36 @@ These are in-memory component measurements. They do not measure source-folder
 scans, UI latency, decoding, playback CPU, memory usage, battery life, or energy.
 Linux results are preliminary; the macOS workflow measures native Foundation
 with the same source and harness.
+
+## Fixed-count short-path diagnostic
+
+The native workflow also runs this bounded check using the release binaries
+already produced above:
+
+```sh
+python3 -B Benchmarks/SourceTabMembership/controls.py \
+  --evidence /tmp/illiquid-membership-results --pairs 8 --iterations 2048
+```
+
+Six singleton/first-hit workloads each receive eight fresh-process paired
+comparisons of baseline against candidate and eight independent comparisons of
+the baseline binary against itself. All labels perform exactly 2,048 batches
+(32,768 lookups) per sample, without calibration. The default eight pairs balance
+label order and comparison position; workload order rotates. All 192 samples
+are retained under `control-check/`.
+
+The script verifies staged-source and executable hashes, passing parent test
+receipts, and fresh exact fixture/output receipts before timing. It does not
+rebuild or substitute the production code. The same-binary comparison diagnoses
+runner variability; its percentages are not subtracted from the candidate
+results or treated as proof of common-path neutrality. Smaller local runs are
+execution checks, not native timing evidence.
+
+## Recorded research
+
+See the [research report](../../Documentation/SOURCE_TAB_MEMBERSHIP_PERFORMANCE.md)
+for native results, the first-item refinement, and limits on interpretation.
+[Retained evidence](evidence/README.md) includes favorable and unfavorable
+observations from both native candidates. Generated build directories are not
+checked in; immutable commits, extraction boundaries, and source/build hashes
+identify the measured inputs.
