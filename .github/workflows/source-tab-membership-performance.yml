@@ -1,0 +1,91 @@
+name: Source tab membership performance
+
+on:
+  push:
+    branches:
+      - perf/source-tab-membership-20261022
+    paths:
+      - Sources/IlliquidApp/App/AppModel.swift
+      - Sources/IlliquidCore/Utilities/NormalizedFileURL.swift
+      - Tests/IlliquidAppTests/SourceTabMembershipTests.swift
+      - Benchmarks/SourceTabMembership/**
+      - .github/workflows/source-tab-membership-performance.yml
+      - '!Benchmarks/SourceTabMembership/README.md'
+      - '!Benchmarks/SourceTabMembership/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/App/AppModel.swift
+      - Sources/IlliquidCore/Utilities/NormalizedFileURL.swift
+      - Tests/IlliquidAppTests/SourceTabMembershipTests.swift
+      - Benchmarks/SourceTabMembership/**
+      - .github/workflows/source-tab-membership-performance.yml
+      - '!Benchmarks/SourceTabMembership/README.md'
+      - '!Benchmarks/SourceTabMembership/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-tab-membership-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test both implementations and measure paired native lookups
+        run: |
+          python3 Benchmarks/SourceTabMembership/run.py \
+            --output "$RUNNER_TEMP/source-tab-membership" --pairs 8 --target-ms 60
+      - name: Publish compact evidence in the run log and summary
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-tab-membership'
+          evidence = {name: json.loads((root / f'{name}.json').read_text())
+                      for name in ('manifest', 'source-receipts', 'build-receipts',
+                                   'tests', 'verification', 'calibration', 'summary')}
+          evidence['measurements'] = [json.loads(line) for line in
+                                      (root / 'measurements.jsonl').read_text().splitlines()]
+          evidence['github_run'] = {
+              'id': os.environ['GITHUB_RUN_ID'], 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'sha': os.environ['GITHUB_SHA'], 'event': os.environ['GITHUB_EVENT_NAME'],
+              'url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          }
+          serialized = json.dumps(evidence, separators=(',', ':'), sort_keys=True).encode()
+          (root / 'evidence.json').write_bytes(serialized + b'\n')
+          encoded = base64.b64encode(gzip.compress(serialized, mtime=0)).decode()
+          print('SOURCE_TAB_EVIDENCE_GZIP_BASE64=' + encoded)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+              out.write('## Source-tab membership\n\n')
+              out.write('Both implementations passed debug/release regression tests and exact receipt comparison.\n\n')
+              out.write('| Workload | Baseline µs/lookup | Candidate µs/lookup | Paired wall reduction | Paired CPU reduction |\n')
+              out.write('|---|---:|---:|---:|---:|\n')
+              for row in evidence['summary']['results']:
+                  wall, cpu = row['wall'], row['cpu']
+                  out.write(f"| {row['workload']} | {wall['baseline_median_ns_per_lookup']/1000:.3f} | "
+                            f"{wall['candidate_median_ns_per_lookup']/1000:.3f} | "
+                            f"{wall['paired_median_reduction_percent']:.1f}% | "
+                            f"{cpu['paired_median_reduction_percent']:.1f}% |\n")
+              out.write('\nIn-memory membership component measurements; no playback-wide performance claim.\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-tab-membership-native
+          path: |
+            ${{ runner.temp }}/source-tab-membership/
+            !${{ runner.temp }}/source-tab-membership/packages/**/.build/**
+            !${{ runner.temp }}/source-tab-membership/module-cache/**
+            !${{ runner.temp }}/source-tab-membership/package-cache/**
+            !${{ runner.temp }}/source-tab-membership/package-config/**
+            !${{ runner.temp }}/source-tab-membership/package-security/**
+          retention-days: 14
