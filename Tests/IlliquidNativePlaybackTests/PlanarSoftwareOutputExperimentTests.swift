@@ -541,6 +541,19 @@ struct PlanarSoftwareOutputExperimentTests {
             guard packet.streamIndex == stream.index else { continue }
             for frame in try decoder.decode(packet) {
                 observedSizes.insert("\(Int(frame.codedSize.width))x\(Int(frame.codedSize.height))")
+                // Geometry dictionaries are reused across steady frames, but
+                // a resolution change must update every output attachment.
+                var mode = CVAttachmentMode.shouldNotPropagate
+                let aperture = try #require(CVBufferCopyAttachment(
+                    frame.pixelBuffer, kCVImageBufferCleanApertureKey, &mode
+                ) as? [CFString: Any])
+                #expect(mode == .shouldPropagate)
+                #expect(aperture[kCVImageBufferCleanApertureWidthKey] as? Int
+                    == Int(frame.codedSize.width))
+                #expect(aperture[kCVImageBufferCleanApertureHeightKey] as? Int
+                    == Int(frame.codedSize.height))
+                #expect(aperture[kCVImageBufferCleanApertureHorizontalOffsetKey] as? Double == 0)
+                #expect(aperture[kCVImageBufferCleanApertureVerticalOffsetKey] as? Double == 0)
             }
         }
         #expect(observedSizes.contains("640x360"))

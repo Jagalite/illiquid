@@ -9,6 +9,8 @@ on:
       - 'Tests/IlliquidNativePlaybackTests/VideoGeometryMetadataCacheTests.swift'
       - 'Benchmarks/VideoGeometryMetadata/**'
       - '.github/workflows/video-geometry-metadata.yml'
+      - '!Benchmarks/VideoGeometryMetadata/*.md'
+      - '!Benchmarks/VideoGeometryMetadata/evidence/**'
   pull_request:
     paths:
       - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
@@ -18,6 +20,8 @@ on:
       - 'Tests/IlliquidNativePlaybackTests/VideoTimestampDiscoveryTests.swift'
       - 'Benchmarks/VideoGeometryMetadata/**'
       - '.github/workflows/video-geometry-metadata.yml'
+      - '!Benchmarks/VideoGeometryMetadata/*.md'
+      - '!Benchmarks/VideoGeometryMetadata/evidence/**'
   workflow_dispatch:
 
 permissions:
@@ -40,9 +44,13 @@ jobs:
           fetch-depth: 0
       - name: Compare exact output and measure paired native implementations
         run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
           python3 Benchmarks/VideoGeometryMetadata/run.py \
             --output "$RUNNER_TEMP/video-geometry-metadata" \
-            --pairs 8 --target-ms 150
+            --pairs 8 --target-ms 150 "${mode[@]}"
       - name: Emit compact receipts and complete component evidence
         if: always()
         run: |

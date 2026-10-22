@@ -545,6 +545,7 @@ final class VideoDecoder {
     private var conversionContext: UnsafeMutablePointer<SwsContext>?
     private var softwarePixelBufferPool: SoftwareBGRAOutputPool?
     private var softwarePlanarPixelBufferPool: SoftwarePlanarOutputPool?
+    private let geometryMetadata = VideoGeometryMetadataCache()
     private var retiredPlanarDiagnostics = SoftwarePlanarPoolDiagnostics()
     private var planarFallbackGeneration: Int?
     private let softwareOutputMode: SoftwareVideoOutputMode
@@ -1746,20 +1747,9 @@ final class VideoDecoder {
         pixelBuffer: CVPixelBuffer,
         pixelAspect: CGSize
     ) {
-        guard pixelAspect.width.isFinite, pixelAspect.height.isFinite,
-              pixelAspect.width > 0, pixelAspect.height > 0
-        else {
-            return
-        }
-        let value: [CFString: Any] = [
-            kCVImageBufferPixelAspectRatioHorizontalSpacingKey: Int(pixelAspect.width.rounded()),
-            kCVImageBufferPixelAspectRatioVerticalSpacingKey: Int(pixelAspect.height.rounded()),
-        ]
-        CVBufferSetAttachment(
-            pixelBuffer,
-            kCVImageBufferPixelAspectRatioKey,
-            value as CFDictionary,
-            .shouldPropagate
+        geometryMetadata.applyPixelAspectMetadata(
+            pixelBuffer: pixelBuffer,
+            pixelAspect: pixelAspect
         )
     }
 
@@ -1782,17 +1772,12 @@ final class VideoDecoder {
         horizontalOffset: Double,
         verticalOffset: Double
     ) {
-        let aperture: [CFString: Any] = [
-            kCVImageBufferCleanApertureWidthKey: width,
-            kCVImageBufferCleanApertureHeightKey: height,
-            kCVImageBufferCleanApertureHorizontalOffsetKey: horizontalOffset,
-            kCVImageBufferCleanApertureVerticalOffsetKey: verticalOffset,
-        ]
-        CVBufferSetAttachment(
-            pixelBuffer,
-            kCVImageBufferCleanApertureKey,
-            aperture as CFDictionary,
-            .shouldPropagate
+        geometryMetadata.applyCleanApertureMetadata(
+            pixelBuffer: pixelBuffer,
+            width: width,
+            height: height,
+            horizontalOffset: horizontalOffset,
+            verticalOffset: verticalOffset
         )
     }
 

@@ -17,6 +17,7 @@ private struct Workload: Sendable {
     let codedHeight: Int
     let bufferCount: Int
     let geometry: [Geometry]
+    var clearsBeforeApply = false
 }
 
 private let workloads: [Workload] = {
@@ -31,6 +32,8 @@ private let workloads: [Workload] = {
         Workload(name: "stable-4k", codedWidth: 3_840, codedHeight: 2_160, bufferCount: 1, geometry: [uhd]),
         Workload(name: "rotating-square", codedWidth: 1_920, codedHeight: 1_080, bufferCount: 8, geometry: [square]),
         Workload(name: "rotating-anamorphic", codedWidth: 720, codedHeight: 576, bufferCount: 8, geometry: [anamorphic]),
+        Workload(name: "rotating-cleared", codedWidth: 1_920, codedHeight: 1_080, bufferCount: 8,
+                 geometry: [square], clearsBeforeApply: true),
         Workload(name: "alternating-aspect", codedWidth: 1_920, codedHeight: 1_080, bufferCount: 3,
                  geometry: [square, Geometry(aspect: CGSize(width: 4, height: 3))]),
         Workload(name: "alternating-aperture", codedWidth: 1_920, codedHeight: 1_080, bufferCount: 3,
@@ -102,6 +105,11 @@ private final class Session {
     func apply(_ index: Int) {
         let geometry = workload.geometry[index % workload.geometry.count]
         let buffer = buffers[index % buffers.count]
+        if workload.clearsBeforeApply {
+            // Planar pool checkout clears these before each frame's metadata is applied.
+            CVBufferRemoveAttachment(buffer, kCVImageBufferPixelAspectRatioKey)
+            CVBufferRemoveAttachment(buffer, kCVImageBufferCleanApertureKey)
+        }
         cache.applyPixelAspectMetadata(pixelBuffer: buffer, pixelAspect: geometry.aspect)
         cache.applyCleanApertureMetadata(pixelBuffer: buffer, width: geometry.width, height: geometry.height,
                                         horizontalOffset: geometry.horizontal, verticalOffset: geometry.vertical)
@@ -128,6 +136,7 @@ private final class Session {
         }
         return ["workload": workload.name, "buffer_count": buffers.count,
                 "coded_width": workload.codedWidth, "coded_height": workload.codedHeight,
+                "clears_before_apply": workload.clearsBeforeApply,
                 "steps": steps, "final_buffers": try buffers.map { try snapshot($0) }]
     }
 }
@@ -162,6 +171,7 @@ private enum Main {
             output = ["workload": workload.name, "iterations": iterations,
                       "elapsed_ns": elapsed, "cpu_ns": cpu,
                       "checksum": try session.checksum(), "warmup_operations": 256,
+                      "clears_before_apply": workload.clearsBeforeApply,
                       "buffer_count": workload.bufferCount] as [String: Any]
         } else {
             throw NSError(domain: "GeometryBenchmark", code: 2,
