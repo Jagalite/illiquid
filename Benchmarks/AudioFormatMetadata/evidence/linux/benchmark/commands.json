@@ -1,0 +1,2654 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.0055759749993740115,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "26d1f7a76f83e752532286dde06d5952da3987bdb32fc2d3379cb5557eeed0bc"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-perf-swift/usr/bin/swiftc",
+      "--version"
+    ],
+    "elapsed_seconds": 4.206400301998656,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1d762e32f31ac0d0550e913ae47faf3b2ca9c548411ab9ec48a84588438d92cf"
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "a2de305c8dbcaa81aac1477df7c9a0017c14eae3:Sources/CFFmpeg/include/ffmpeg_shim.h"
+    ],
+    "elapsed_seconds": 0.12351274899992859,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96"
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "a2de305c8dbcaa81aac1477df7c9a0017c14eae3:Sources/IlliquidNativePlayback/Media/FFmpegStreamInfo.swift"
+    ],
+    "elapsed_seconds": 0.007441196001309436,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fe482e6b8cc4a04e55de7a06e839f8fefe1745e28da8b149a02fd1ebdbc84721"
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "a2de305c8dbcaa81aac1477df7c9a0017c14eae3:Sources/IlliquidNativePlayback/Media/FFmpegError.swift"
+    ],
+    "elapsed_seconds": 0.005268046999844955,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341"
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "a2de305c8dbcaa81aac1477df7c9a0017c14eae3:Sources/IlliquidNativePlayback/Media/AudioDecoder.swift"
+    ],
+    "elapsed_seconds": 0.004990833998817834,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e8825bfd1dab808470f237f011d74f9d711cf39f8b492760f9f55185d526b918"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-perf-swift/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-I",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/CFFmpeg",
+      "-Xcc",
+      "-I/tmp/illiquid-perf-ffmpeg/include",
+      "-L",
+      "/tmp/illiquid-perf-ffmpeg/lib",
+      "-lavutil",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/illiquid-perf-ffmpeg/lib",
+      "-module-cache-path",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/module-cache",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/Tracker.swift",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/FFmpegError.swift",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/Harness.swift",
+      "-o",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark"
+    ],
+    "elapsed_seconds": 5.493290123000406,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-perf-swift/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-I",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/CFFmpeg",
+      "-Xcc",
+      "-I/tmp/illiquid-perf-ffmpeg/include",
+      "-L",
+      "/tmp/illiquid-perf-ffmpeg/lib",
+      "-lavutil",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/illiquid-perf-ffmpeg/lib",
+      "-module-cache-path",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/module-cache",
+      "-lm",
+      "-lpthread",
+      "-ldl",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/Tracker.swift",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/FFmpegError.swift",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/Harness.swift",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/AudioSourceFormat.swift",
+      "-o",
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark"
+    ],
+    "elapsed_seconds": 3.7995510829987325,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "verify"
+    ],
+    "elapsed_seconds": 0.28444467700137466,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "83fcded91ddec2682f6f4de62739ef5eb35852280c8da35306ef77f7ee919233"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "verify"
+    ],
+    "elapsed_seconds": 0.0953909649997513,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "83fcded91ddec2682f6f4de62739ef5eb35852280c8da35306ef77f7ee919233"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "10000"
+    ],
+    "elapsed_seconds": 0.08253487299953122,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "038b805b88a3d2118fbafd67d87d0c177474676881a999826cdde3bf755e8d19"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "10000"
+    ],
+    "elapsed_seconds": 0.0835874389995297,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "00c6b48395f668a2ade4be764181c31592c4194e5ba6e7c9d12a1bb09d88f633"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "100000"
+    ],
+    "elapsed_seconds": 0.017465397000705707,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bcba65e5bd4cb8773ba58e3324cbcb106879843c7389c66d9d68b4421e95cd79"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "100000"
+    ],
+    "elapsed_seconds": 0.01621676499962632,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "870aabe3d2f390f21dbd66fa5440aa47f7c7e10b0806cf2421776f0c29d265d4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 1.5725874439995096,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "011c98256139b1d6c839466810ffc7eef6c024d5a0053de65920ed3f585c449e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 0.017870932000732864,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "aa01d133b136661e9b23b535412b15cebc4ca39574389b8ecb591ed8b8a25cc8"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 0.01979586600100447,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d0c230c4b414cbb95023f5d614c7d94467cc7d29fb584397e6c0342a15f6132b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 0.8472722779988544,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "51d4402996b05fcc5575cb44ee37bc7464611116f44aa8379024b246e76aed4a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 1.72324414600007,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fe3f5c078c698600189907d4cbd3d6121a3288b5abe1d0a7e50814633283ecd5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 0.027316097999573685,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "210576ab6f371a41905faa7537f386ee87ab848687b3b0a3537eab800fbfe7ab"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 0.020854090000284486,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "247c12b2091966dac7f936e43ff5c595c3b126b72d2e43d9477806d3990da46d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 1.5602589350000926,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6a4b0727a1685db719be56bee6245a412a2fbb25b6d53adfa3f59aa639284e95"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 2.022417020998546,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6cc60bfc7c45fc5b594fc4bdfa3721aa2b9809a3a18ed99c28706a4311207b4a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 0.04396745300073235,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3141fdace514272a602dedeaffedc9f19327b8f0e05989b65d1a5579d539e9f0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 0.024006637000638875,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c4765e9527e72703a69a3f86224ca0b06e713d181a8a775cf4c56f221310871b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "277311"
+    ],
+    "elapsed_seconds": 2.6704019789995073,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8654328aa987c7a92a91a794c318228865c38eb18af456d8b570473cc7a43ae5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "10000"
+    ],
+    "elapsed_seconds": 0.04739628399875073,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6be52426b244d995a093ed804fc58286112248d9941671e33358d8c88f6bf2ad"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "10000"
+    ],
+    "elapsed_seconds": 0.10025640499952715,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "91871167e09995aeb22948817ff296b58037cdbe12b45c0d0123e4c27021ffe0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "100000"
+    ],
+    "elapsed_seconds": 0.01818408500002988,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9982b484fe7bd5e7259a438b2cabf27f8c0068188a482e225c400eba8372bf3b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "100000"
+    ],
+    "elapsed_seconds": 0.022394563000489143,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "45db5dcca0fa6b29eff6a86ca4e524df9ba45511ac8e4b567af08b4901b2b9eb"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 2.016718366998248,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4315d784e44ede4fe0b1969793eb5d16d62ecaecb7af31ee023744dbc5631acb"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 0.029850850000002538,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "302c7c7376ff3e18c76460ecae1e5fbb4eb2b4c737c89bec5945eb82266d1ba9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 0.02516338199893653,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c43a2ccbe4c252f0e99904856f7be6cb68d60872486cd3a387fdb0cfd3f86dcb"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 1.3434187229995587,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "db81cbb821d01da058d86558b002b8a574dbc278024276a59d58ccb887827ae7"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 2.2149850920013705,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ccc4ac9911e1a8eaf882f7c30185939c6f30313c9a8bf3a9bb129e76d9d9f2ba"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 0.028198862999488483,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2f42801f564d2cff86e75e100895f3b3603110d124c36a7409c6635fdfe46d83"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 0.020643199000915047,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7666eeb6dc518a3055a885aa0f90016dfc9f34c101868b1a6bd5f6a1dd6b394e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 1.9674211509991437,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "be4ff4823ecb776c83bc483d3ba79f8a5a752332c622c0a15d9987caad24955c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 2.3391434450004454,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c7e46005f58ec78c3bbeba08e74b4be9686260b47e4c156c613072433491d24d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 0.031336615998952766,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a71bfd28d46d7e1a79cf907b330ae42b884fd61a94c7156f01041435bbb05bfb"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 0.02498567499969795,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "65385f46d0844c5b3665744853013a31a22e12720d45854ee8faa09ecce0cfae"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "348234"
+    ],
+    "elapsed_seconds": 2.3429116839997732,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2364cafb9fdba286a2aff93e07770a91d470d96f736c69bca98f2518324ddf97"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "10000"
+    ],
+    "elapsed_seconds": 0.11782508999931451,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "16fdd5ce8eab471fe1ea4b9c781c2e5a5f5ce9156c0a340cce002bf45b06b6b1"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "10000"
+    ],
+    "elapsed_seconds": 0.121759755000312,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "347f75605e68b0fbbe1fdb3dd5155df4cc039a9a717ef048eafc93b365afe8dc"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "100000"
+    ],
+    "elapsed_seconds": 0.026002966000305605,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d7e6aecefaf3b3729f14a3eb8ff40285926a689ee92f939f0b50dea06c298382"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "100000"
+    ],
+    "elapsed_seconds": 0.024161752000509296,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "28df2d9aa7d83a68d836dc4482e4a97b8032dfc91a111614cf0859a35f428127"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 1.540973370001666,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3e445dfeef33f4da695b043614f206a9e3086f491405d2bdc203275d5c8e316a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 0.029206574999989243,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "eb5caee1ce409d3bae23399b672e0eb7451a0333232ebf7c1f8003d9cebccc37"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 0.03273055200043018,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "22f7348f243ed22f84e24d13c73a8fb4351086247c9ab0a1d4e7483ea12b1aae"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 1.6034367399988696,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "65a8f314329b3fa110a0a2b93fff4b6a4087e034061e759fe0a119aa07d8cb8a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 0.7688458119991992,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cd257c055dd75ec228018234bed95c01523abf76a3121600de632d778968b099"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 0.027254893000645097,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6cb29d1a3295d4c7ce2de444885dba7d1fbbd7687f15886d958852f3c2bbdc46"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 0.02410196100026951,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "09131cb8b06cafae64db1ec963c553afedcedb8b803ba4e443fd2170c0b10804"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 1.303126495999095,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2cdaa779a9d78947a39a9400e44aa5e7ccdb2bbd6f8e339645e0019b4a12af87"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 1.3931871300010243,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "043d5b4f20f6768c3cad6d13c7351e9fff0f073901486089a6a9d035ab719561"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 0.0365521309995529,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a685a172205d513fe909395d7d1a29ae36cd7de32f6e95ac4a85268aebd20fc1"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 0.024745447000896093,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "22ca36f2dd117b171c4d0fe06c8fcf4966375644351b3fa8c4e465d895e65774"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "254786"
+    ],
+    "elapsed_seconds": 1.5243410590010171,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c758e6d697cf8ec343f45c7b5a8644b0b4ac82ed95fec8da54b7d877584ec2a2"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "10000"
+    ],
+    "elapsed_seconds": 0.15770609200080798,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7a40408b01074a0dc4d222d40d2f33deb98a1b40bc967b969aabcf7778ae721a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "10000"
+    ],
+    "elapsed_seconds": 0.13984574000096472,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "028fcb7f795d6951526e729f2ccac73c905058ff983e3026e4c29137dcf76813"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "100000"
+    ],
+    "elapsed_seconds": 0.02352543399865681,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c296a8119150c57b85d14f3e835eb2a42c0ba71e0808711d2b1b825e39b21536"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "100000"
+    ],
+    "elapsed_seconds": 0.11968965200139792,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d5ea16ab5704f07e98c8e9b5768b740b40e443956cb3e8dfe5dcebf27460eece"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 1.0921469230015646,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2bca66f4fd22e4616177300a3289e70e7af72eeb2bd30927b848d2e1b78e9942"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 0.03451570899960643,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d0393a299675b333e13ac49ecc84c435c8f4d2c99bff6e87a21c704e905c1794"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 0.01921342000059667,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "de75c43710815886f221a641883a35970b0e458f3b3c1497bab229aeab440f20"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 1.0679974920003588,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f9eb781494fbaa3d9099b566d63c23710c727a45043f2a3c3ea3e60c81e0bfec"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 1.0452785400011635,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6c7f4fcbdbb79a37ba3792e1aec40b0ab16b2d6b7b3dfca5d18daa58f7ec4bb3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 0.017898252999657416,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2c1292eadc20b7522a29eb97c08e10c38a6a828309688e9bea087e9b19464c18"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 0.024427569998806575,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0356c37894791b2839b13318d34d45e687819116091fa941de69769f55d4e499"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 1.0047321479996754,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0db41ddb431f964be319f4af480c2ac31051983523cbff851acf5b1e7fa9f2e1"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 1.1246250119984325,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0c57b064d4d3202d6eb79f712974496c914e75c21f980ba7fad077010dd1bfbd"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 0.025166077000903897,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0eed2b8c5dd310d8d3a1e4658d96d06a37b1642c0bbe17af3347b48573022146"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 0.016029787999286782,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "31d833e2424e9804b40fdf6970584495fd44bef93e4f6afaffec460e0063374b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "178392"
+    ],
+    "elapsed_seconds": 1.0316624869992665,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cb04a12073ee45c9b71cbe76e6e2c3024fa413fc6cfb0046b58d9ea8ea04fbae"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "10000"
+    ],
+    "elapsed_seconds": 0.09498414500012586,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0fa238036bd8399c9c19ff5869902f48977ae6101bdf95968145bc5a01da79a3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "10000"
+    ],
+    "elapsed_seconds": 0.08289359999980661,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "99fea0c673c3db23515ce9d9e22666d45c79757c4f2e3dcbd0f650655cf9197d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "100000"
+    ],
+    "elapsed_seconds": 0.01799202499933017,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "26211ab607c9b794a76d79c6f850e1465e8c0c0f846fdd427477c8b2f2b5eff6"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "100000"
+    ],
+    "elapsed_seconds": 0.017851115999292233,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "30f4a13e2fc7edc9dbdd47b5c3c92cfddfd88720881fc63d683baf8b1787f8fe"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 1.610620736999408,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c0ead77c9ba416d4c0a85d2ace953b72d52215a9bfb0b785874324fa39761349"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 0.019847363999360823,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bd42668d881c0326c184ecd78b292bb52e4e7ec6a5b70462c3ecbb16f3553cd2"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 0.022718999000062468,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "efbcd214aa4d892ba0cd18497077877edb32420c56adb3150c004de1c227c658"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 1.2789575920014613,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3426034a645977a85a6cc17af14278724383d1908f5eebe8e1dbba4ca47c9d3f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 1.7283684200010612,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8cbf8de769f673514406383871bbff51907ab9716d9fd5c0678fa51101549332"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 0.047936822000338,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cf035edcd1fb72f9d806816b203ec5ab8c48586bfc6ab01dadb1f37a4b08b65a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 0.06928220599911583,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b5f41911da6f2223fdb395554cee0b0c9cc626935553c795bd7625db682eac0d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 3.970521576000465,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "38e905565ccea408ba71dae0556dde83f6638595fd5c295d0105bcd4b2c758a1"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 2.0331963210010144,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "510e9c1aa3bd4e732eaa0948141d184d52956678ea4ec9ea1da70b1754b6c940"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 0.033309418000499136,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "caea069b5b37f76257a403d466c3275e303bbd0b2020910cd976cc1656dc6b60"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 0.026192581000941573,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "49c7055deb607aeb1dd4e43a480e85f489163a457e83aa4a8c407d9509523328"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "279101"
+    ],
+    "elapsed_seconds": 1.728055999001299,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f5960898d87e3b52eea6e17087842c5480e1b3179b16dad9d2403514964c1434"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.2282108409999637,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a7b3f52a899b1b6b9c4751680567f0981e2123965a786e33736f3af69fa97c63"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.1310942359996261,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "49d3778baa49129b0b6ad760bec10e45a61bc073dd587376b52dd15b432268d4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "100000"
+    ],
+    "elapsed_seconds": 0.27715863100092974,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "45320634bdfd46ce6f39466855a619f3a34c58ac3478c97c315abb3325d757dd"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "100000"
+    ],
+    "elapsed_seconds": 0.17486460200052534,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7b635e7a88ba9d78f1ce5cb41547d97447055dfd26f8b738b1bb5e72a4393bb5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.10530611099966336,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8d2678af37a88d61403353f976dceaa91809cb957862e3a69c79486f52e68dfd"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.04512303400042583,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1e78f3e6b373c92bbed81f0d8bbc01d98a6523a5151a43215576bd85877b7d31"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.02766689599957317,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "02ef1fa6cb083d984ed100efa0a4a882737be4f53c07d7cc39492116bd65020c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.13867957199909142,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "aad3cfe1df118975bb027019e5cb3d271338bd48bce7118eae02722bdfe4a373"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.06782712400126911,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f42d1db6502e3aec833fd9aa97c16d4b11640296cf2c88258d476ec3dd5c88be"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.05014689800009364,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "95975737ceebbc9cea48a9777f3480bdeb15a90e828b51099ab50d4b2d8f557d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.04243755700008478,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5ddb13333a3a81243d372095ed28e02d6fdbee95ef22b0a70d5476dd799983a3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.1670900890003395,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "092a164f973a46481e363979221b3a6f55b07ef0efb78d126c61e4c7e050471c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.0759362949993374,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b31a7962143059e1cc0eeaedbeb38141a032e5893b80dbae1147a45ba0eaeb2c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.017353998999169562,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e76c90a9502ce62c83eb8812427ffa10d0cc14435216928f842a8626f55b3d73"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.02732671600097092,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "be630308cbfdaa9dd28073009512c03acafffa8f3db3994699a101296467c006"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.10030937000010454,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fe104a153140f92b768322da81099572f40b38a09b7471e76b825929357774e0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "10000"
+    ],
+    "elapsed_seconds": 0.08979096000075515,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ff922b0c4098d547335675fd0576d4824e6c5115bafeea865fdc21acab049099"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "10000"
+    ],
+    "elapsed_seconds": 0.10078866399999242,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4e6b4e1fbf914fba2327aa6e6b4aa9cab5a3f35effad2d85f3f913b0c6647afb"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "100000"
+    ],
+    "elapsed_seconds": 0.0993529959996522,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9cbd0f2acd7fb1e23432a3beae7395e467266c15d97693afa5221afa46aa491b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "100000"
+    ],
+    "elapsed_seconds": 0.10280014399904758,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d6394499db92216bf8ce89cc29d7d7194ac0cb2c49b7a21ea4e2481774c38da6"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.1119389150007919,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6db16979ed1650054010ac0bd12f14dac40a33890371807c95a2182549cd0d4d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.023783365000781487,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c44642eece0f5561bd97c8a983b2633029184cdee9743d3c9152428063afc6ab"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.025843252000413486,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c52c9241c2321d7329830843fba0168a41da9d5eb88796b16ac445e9aae79ebe"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.10400920899883204,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3b2531a8df17ee7a9dcef1361c6b2822c62919adecb15531cda5f695c188050a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.09672154300096736,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c2817affabbb530cc32a657e7b35d93677b0c2d7b55aa8fcdc6b03925bebbc59"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.021385410000220872,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f28e5d6082ff8e65cdb8b6ca9785d4f6b82cd70d10b5f282a4ca857742f912b5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.02064510400123254,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0e44f64530f466851ef6dba3307c9df72664851adb5e520e877cefb32326ec76"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.10930811599973822,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d539ea6ca62c4207577276a992ab0ab1d5b5df37de46bea794b881f2d98ae6e4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.11008804599987343,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9a03226ead6f14005d204c1f78ac532940a2f9d76c81d8a088f24c69321619a9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.03187645599973621,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5fb47ef3fd1d896e0ed9ecced3752e99f55cb2b19911452004c839e0099bedbe"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.026817080999535392,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "452bb0d003f7463d0a251283eec210ef165002edc23c659aeeff49c7d71282f1"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "12752"
+    ],
+    "elapsed_seconds": 0.1056472179989214,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f446e3b27e41220c8c184aa27b8edfd15d17732bff15ac3842f2d97e04f47367"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.10205576500084135,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b165b545082733d0a72381e3dd7b0304ba6c4a88fb99b53b5e8852a5e7f0a80c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.19259124800009886,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6c8ae65c78d81544842b8b244774cc682259dfd0c619532349bbee6ff81f907b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.024701737000214052,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "01ea5b2939e69299baf19055247bdd15efc33675bc5b6c890229ffe809edf5d9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.017449296999984654,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0c644f927c565fad3f3c77940ff823583ca2ddc1b431eabb4cffc317e068ed90"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 1.5589900489994761,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2dd41a3e1d451b6c93481b0c0c90942baedb0b1a9135c2295fb4f413e4b60be7"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 0.01917702500031737,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "56de34b794f920a486fa8ae3fde4ac28c9d9391e807b702ecf31795588387d60"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 0.03323293200082844,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2787656519b4d6182b6bdcc16b7e60d1aa58cbf8078b6ae255410c95d534feea"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 1.487458505000177,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "118254ca0908c80df47c872ddcf5d14900a067892f4d8527b3a307e8d06321b1"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 1.5504896180009382,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5a0e5c146b3d123a080d0505953c59f068d13c280493e85908473bb7b1f79a0f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 0.02561066199996276,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "31418d32af9957be600f2c48caec94da555c0108d8e5797d2a20487fb33cfb80"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 0.03179570099928242,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "27fa04be4fda2e6a3a78a0df08ce597cfcdb9323f2eb7a00ac2d0d281b756c27"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 1.809102138999151,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cdb2e1058ed1fd71b140981cbd6b97c95061085a6f59cef4d9677fea306e71d8"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 1.5758006779997231,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "564f2fbd9d200e3bc0da902089e7666058fca137f5448ea8c1ca909ea0fe470a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 0.027370326999516692,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e1324968085624c6d024abbb9e4186a40f5f1df2259de50063d51e794ffe4f26"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 0.034492311999201775,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b815e2b68d52849117ca884803a735fcb1e2529b821d9f85f927d24783b8097c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "259241"
+    ],
+    "elapsed_seconds": 1.1441530669999338,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8f41128f90ec7e25478284c417f138217eaac855f478c7a1ade77253dbd6349e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.09369474400045874,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ebe94474cc015f22b40d94495ec4ef0ff027ce822cc6a116cda8f10b5c79ebbe"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.09120023399918864,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a1e640dfe67bd396cc69578f3fee186b0dbc8d38ffc07d4790cf33629eb3300f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.020226063999871258,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ac54ef0f66de20ddc50c8be4a998808c9eb5e16c95d4e05157730c57265fb8da"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.021767796000858652,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "11c7929d81cfeb3005560cfe60f05decc162964e5d72cd02f3e257755bdc2735"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 1.477593479999996,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "222899b77b7af7fd03cca521751eafc026894b59bfc89e9865a51b6fa18d7afe"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 0.02735770599974785,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5a732d920d144d608d281c5fffd9a638b045be3d832d36de6e82c9466602f075"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 0.03198299599898746,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1abbfba502135d8a6a1df6cbcd0d3fc1298f4f42da27697bb51e306c8905020b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 1.4202567689990246,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f44803d70da3d1e3504a94d0032c50495b67873c962d403e30ba9c1388b70e6e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 1.5253711709992785,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3df00c37bb5c7b554fb1671a096231fe0034ef9a75519cd50eeee15521ca4a32"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 0.028862685001513455,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "581e78f25ad1cd64fed5a3265855dbf7bbff87d70db6766ecc70dd9da59495e4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 0.02887170999929367,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f058bc3e919b011f90454c7cafa6c0b84aadca5bed68f4b6bd3d1e251a6e26f4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 1.8559768159993837,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b0c0aeb231e65d0c8c8df88e3fc8f9042e243f355be3c91168190003088c16f3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 5.9668100439994305,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8b8d9d7c1482b3ce992a9bb2fa707f0f792d923aa0d76f4b731736ed1ea0bcc0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 0.45453526599885663,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "76ab45a8054f599014fa74122601c3a2937521d03a5cfecf90b74498317807cc"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 0.5901593260005029,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fac78b8692eb5167f22e2c970f2932733c80286953f03a140f46e8feff20af49"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "228162"
+    ],
+    "elapsed_seconds": 2.330665127001339,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "63960fc15115d7f9a2e821b0bef45fc277a74126850cea58dc51c2e7219940a4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.2344466279992048,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1b47602e372973d52adabef5e030af33af3597e097dd9de930cdbc11492d2f2f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 1.2593246790002013,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "823f868ec81843a7d59d8edcfd355de23a8269e72fb0a238a07c220332ecc6c9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.19260962400039716,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1656228c68655236b1759563f33f3be7a875cfae164f2c8d9b18ffa004dbe690"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.3574535139996442,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fe62bb598cd08f730e768b2328f570fe878d48cc5f52b02db8c26add66647173"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 2.111095418998957,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "871d0a881fa626cf13d5f5d642d5aac85fbfa64712d908260ca78aa5089c873f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 0.03182978000040748,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "19378a6f48f081122608bc0f8765d36da95b0c6b4b5ce07c6abb5151ee6391ad"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 0.01957710599890561,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "096bc6eb526522ade202f92560893dd8d2a5080d6a9ebe8cd5d3d896c4f062dc"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 1.885280241998771,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "67f6457af057a220fdf03aa9d65c949f4a0ef16206570775ec06ea769fc9e4b6"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 1.6241049020009086,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fb1e533e8bc13f61b641537befc30d717fb287adf5ae15c33bb861a77f420199"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 0.0237649059999967,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6401db8fc61e7743ef4d625970987ac045dba1f0895b664bb9d45c97c36bf68f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 0.017841412998677697,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "795b70e85ce9e84f64de168922e40be0f50c9dd8c537ef4035a704a41349940a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 1.6934785630000988,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "da15b10b62f8ccf2041f02b336379f173ab422bd3bedf0c102121ecd33aa5ff3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 1.562629840000227,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "be27da75e6fa163b076fea4efcb44775a46786be561b75ce77ebc825a7a9ef2e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 0.03410818700103846,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d86cc6dabbd185256d75bcba405e8aca31e4f345caa77ee2cffdf8fcc49cd74a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 0.020977823000066564,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fdd874fbff4f30e6794df4910cefd6822e6f1cb16d86cfd72bbea248696a5596"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "370469"
+    ],
+    "elapsed_seconds": 1.4448622199997772,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d9e1f446ae74b9328bd6a6959d1990f36f2225aa5b7439949d9a51d6e7512657"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.07215808200089668,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0e0fe1e7eaee0f85934b45bf894b64f8b190a17010a818151f5dad6bd1b552b0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.05866041599983873,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5005c5c8c18b8c46b4990a30df228c7e0c763ca96ef0fd39a8744ec42116754a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.01696876400092151,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d6136c18b2c1ffe08152030f4e4dc3d29edfcb9f1913c4cd2591f52bc732c41e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.01802090599994699,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b76d6eba2f5e0cc6e516f9643c0200e1ce2cbca14b85db130dccacd44892fb5a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 1.581612131998554,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "53bcb858bac7ebc032adc86daa5eff77419e87dc2513f0c6381b19074f4ffafb"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 0.027670698998917942,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b7974dbf339bc2ecf11879d971524583cc97c3134528191117b5b807df00a8f9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 0.021303901999999653,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ec79c2764f92aabb857d028865d3a252d4c525c47523fb6dfcb6f97ad2092880"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 1.6504089579993888,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "53c179d75d73d33393ccbdd7a53e8f1a72733a856df91ce506b8ccf862f1b5c9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 1.002107326999976,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "548bf90f4d704296ece1253da3b4a44d8787610e590bacd081907f15a1f1cb8c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 0.018803658000251744,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "861ea03ec942cee212c7fd475289c667de6d5ec01355e7bb35187aef306fd314"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 0.017267814999286202,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b44efa86ae46b5930a3c97ed6668645ebebcdc76e31078d2c43e3fffeafdb94f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 1.2057908839997253,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "84dc9672e0875330754bdb6321f3b2d8d17b62efb17d20a74395587b318222b7"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 1.188176765001117,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "db3042458513bbe91e84aa2271acbe1ed0037a271213087efba26753008e93a0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 0.0272651000013866,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ab83e0d4da808be694c6c3896d54eef9f46c14fab82f4af8c65980df1a62bc07"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 0.03259086900106922,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d495a52965643fa492c76d5f10f93ed0bef258bff5c7feb55e2fad210ed908e5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "291139"
+    ],
+    "elapsed_seconds": 1.9053117780003959,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0002d72eaedbd136d9655226e90c6f865ba4ce4f3d13d7010b01b6ff22a5e7a0"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "10000"
+    ],
+    "elapsed_seconds": 0.11086975499893015,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "dd874f967f1bfe856d8dcd9f7b30c25930b3bc02e2b602597a388312676c4c1d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "10000"
+    ],
+    "elapsed_seconds": 0.08938659799969173,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "16d0918a026b2f89967274cb7aa6e9c3dd293304bd7eda51b508bd5bef534d65"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "100000"
+    ],
+    "elapsed_seconds": 0.07283809799992014,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c113ad2da171c6a9c1b1c0f6801af85e8e5713bee596c11a717b0b542c63f6d4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "100000"
+    ],
+    "elapsed_seconds": 0.04209648399955768,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7a04c125b06de06bab3b471090db6156a0abd4c69d0432578fd3ac4dc2d4a11e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.1364117230004922,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1e0471a2493c06740b0eb3f75c85aa1ecc384fe0ddd1724e27293480e55489e4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.03771955599950161,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ce4a4aad8fe12d6aeaffa59e8cea10108c2607f46a7734fc4c40e1b314e18c19"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.03262710200033325,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d82af0f4bc77014b359052db6a562f09d858b5ab396875d5234a274b967ac65d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.23210000600010972,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0e0cfbba0820156c6a0a3fc5f834f1efd82691ccdcc8038f57f5667c16d71434"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.21215476999896055,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5725b35264aef4bc68cf62488f6925f0f1f6107f69d1b4fc5171745ec2689742"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.02219715900173469,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a98edb1ed2ebea43a265543c1690784749c98a5def62b3610ea4582631f0c3bc"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.027117795001686318,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a2c6674790f302d2bd9dd38fa2e39379b3a0eacfc5422ee5fcacb3e3c3066e29"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.1268652100006875,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d8dd7590ae724f48c0f4ee7800e6eb606e0fc277eac8d0a4645e7496d8f6103b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.1278559590009536,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3c66d674db66221b7b51953379fa55f380a1afd848276586b01fd2e09d3cf930"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.07435442600035458,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8bdf02069b1a821ab0f2ae688fe036953e5e0b6086c8405278fedb6f0cc17904"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.0323501570001099,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3c4698912f0ac9cb14aea2c359787a1196257b49df2e6bf167dbaf329b7c4cc5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "34055"
+    ],
+    "elapsed_seconds": 0.3789098979996197,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ec5069a9b0b325ae827be6222da86a2f62cc8cd65ae463c573251e28e1a35757"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "10000"
+    ],
+    "elapsed_seconds": 0.1080538139995042,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fc1d281519d66cb7a5e5d4a9fed15c3983c530da2bfcd676c5055c18af716701"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "10000"
+    ],
+    "elapsed_seconds": 0.15999348500008637,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c39450c59577930940533ec188e9fcf2fc63ac1c0a36b4cb2a5e23b4ccd5dc77"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "100000"
+    ],
+    "elapsed_seconds": 0.20514176500000758,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b1248fdc7043628b3821e0a4804c8084f9a52dad9c21dc588bbb9effa0523fb5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "100000"
+    ],
+    "elapsed_seconds": 0.14636455199979537,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "155975ce8f81c027a16dcb32d5e34ad4b5b60ef8f8783a78397f42b4fa9ce05c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.114556132000871,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d4670a06efbe83b6c95f59004deacd6af89ad70676c91d2930bf4c7c3f0a1472"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.045269422998899245,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cd42ef9864229af33ee789626b3f843fe08d7119d9b459cd028a13c2c216d688"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.0310118750003312,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "48a6b3e48520ff6c44bd272c36e557c880e5d55dd5d728dc2e13a36307e6ee07"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.10300625200034119,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "22498c7a2c321965afc0c61116af5ad617dff265639776b9e4cda17eb0d2eb56"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.07046961800006102,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1b45969bb71419b0d5ade25e4dfb73a21eacf3c5b07cfa027a2a845f85765df1"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.029683406000913237,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "03f8d23d623844d72e36d4bd703591400cf31698d2e416cb5ec52d6682117284"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.04309696499876736,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8c041f5a558c769ec9001a1cfafa86b7ef411934047fd89f52896d17a3145ef5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.1142311259991402,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bed272e551905a20df4f780c9ecc11a399f02eb1958b31c7a46325a322f70e08"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.11783619400011958,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "087857824b77fa127acb4f0cb6a6420481117c67e0718b56e96d21e2b6df907e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.04316383300101734,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ea2ee3eb67d0cda662e72160068c5e7313487477b78149cb43af84a2a8f3e452"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.02596864400038612,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e98bf80d3b89c7c9a6daa409071ce4ec2c3d3dcf1cedbdc9fd16828ee3fc19cf"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/86896e846d92/audio-metadata-published-qualified/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "11189"
+    ],
+    "elapsed_seconds": 0.09127142000033928,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a90d90cd810b8db28ba9daea416e67c8757766b93536a9126651875b579c567f"
+  }
+]

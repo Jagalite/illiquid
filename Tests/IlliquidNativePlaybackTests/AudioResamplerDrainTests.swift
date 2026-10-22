@@ -34,7 +34,7 @@ struct AudioResamplerDrainTests {
 
     @Test func seekFlushDiscardsOldTailAndRestartsGeneration() throws {
         let decoder = try decoder(rate: 44_100)
-        _ = try decoder.decode(packet(rate: 44_100, samples: 441))
+        let beforeSeek = try #require(decoder.decode(packet(rate: 44_100, samples: 441)).first)
         decoder.flush()
         #expect(try decoder.drain(generation: 2).isEmpty)
         decoder.flush()
@@ -42,6 +42,8 @@ struct AudioResamplerDrainTests {
         frames += try decoder.drain(generation: 2)
         #expect(frames.reduce(0) { $0 + $1.sampleCount } == 48_000)
         #expect(frames.allSatisfy { $0.generation == 2 })
+        #expect(frames.allSatisfy { $0.formatRevision == beforeSeek.formatRevision })
+        #expect(frames.allSatisfy { $0.sourceChannelLayout == beforeSeek.sourceChannelLayout })
         #expect(frames.first?.presentationTime.seconds == 2)
         assertContinuous(frames)
     }
