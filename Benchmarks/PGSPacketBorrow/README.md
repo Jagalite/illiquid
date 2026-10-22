@@ -6,6 +6,11 @@ Foundation `Data`, then inspected segment headers and composition references. Th
 candidate passes the owning `FFmpegPacket` to the parser, which borrows its bytes
 for the synchronous parse.
 
+See the [performance report](../../Documentation/PGS_PACKET_BORROW_PERFORMANCE.md)
+for native results, integration coverage, retained evidence, and limitations.
+The component benchmark qualifies; native integration is pending after a
+test-only compilation fix, so the PR is a draft.
+
 ## Reproduce
 
 After installing the repository's pinned native dependencies:
