@@ -44,6 +44,10 @@ jobs:
         run: |
           python3 Benchmarks/SourceTabMembership/run.py \
             --output "$RUNNER_TEMP/source-tab-membership" --pairs 8 --target-ms 60
+      - name: Check short paths with equal work and same-binary controls
+        run: |
+          python3 Benchmarks/SourceTabMembership/controls.py \
+            --evidence "$RUNNER_TEMP/source-tab-membership" --pairs 8 --iterations 2048
       - name: Publish compact evidence in the run log and summary
         run: |
           python3 - <<'PY'
@@ -55,6 +59,13 @@ jobs:
                                    'tests', 'verification', 'calibration', 'summary')}
           evidence['measurements'] = [json.loads(line) for line in
                                       (root / 'measurements.jsonl').read_text().splitlines()]
+          control_root = root / 'control-check'
+          evidence['controls'] = {
+              name: json.loads((control_root / f'{name}.json').read_text())
+              for name in ('manifest', 'summary')
+          }
+          evidence['controls']['measurements'] = [json.loads(line) for line in
+              (control_root / 'measurements.jsonl').read_text().splitlines()]
           evidence['github_run'] = {
               'id': os.environ['GITHUB_RUN_ID'], 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
               'sha': os.environ['GITHUB_SHA'], 'event': os.environ['GITHUB_EVENT_NAME'],
