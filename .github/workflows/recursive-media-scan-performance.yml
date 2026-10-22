@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: recursive-media-scan-${{ github.head_ref || github.ref_name }}
+  group: recursive-media-scan-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
