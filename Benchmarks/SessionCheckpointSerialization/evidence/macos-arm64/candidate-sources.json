@@ -1,0 +1,28 @@
+{
+  "binary_sha256": "84d28b2197e36c125d11412602a33477a6e31374761322a48c12c0bd512c89e7",
+  "compiled_sha256": {
+    "Persistence/LegacyPreferencesMigration.swift": "29188a77e687c7852bd096f04cd3dba7a2e1536e1ecbd145f84f78a9406374e9",
+    "Persistence/PlaybackSessionStore.swift": "792d22dbace2e360c2006a9b5416ce32ab2de2a671aea88898eff362c9e02cdf",
+    "Player/MediaSource.swift": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254",
+    "Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "Playlist/PlaylistMutation.swift": "30fed7b3888f5b249c3b9770b980b25eb576cdc8d39044c73c021f52381eb6e1",
+    "Utilities/LifecyclePerformance.swift": "eac6f08a13b62f429fd693168b6019b6ce671ec9ad4641c7f851600f202886df",
+    "Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+  },
+  "encoder_probe": "import Foundation\nimport IlliquidCore\n@inline(never)\nfunc encodeSession(_ session: PlaybackSessionRecord) throws -> Data {\nlet encoder = JSONEncoder()\n            // Restoration reads keyed values; sorting every playlist item's\n            // JSON keys adds checkpoint work without changing the saved state.\n            let data = try encoder.encode(session)\nreturn data\n}\n",
+  "encoder_probe_sha256": "fcd7bf4050f70b3a292935f9ba9ec7f2ee4142a170154ad605fb90770836ff95",
+  "harness_sha256": "48a7228729cb346823096e5a8294d89006a7c598741e141dfc7aa34fb1d40772",
+  "linux_disabled_lifecycle_shim": false,
+  "production_sha256": {
+    "Persistence/LegacyPreferencesMigration.swift": "29188a77e687c7852bd096f04cd3dba7a2e1536e1ecbd145f84f78a9406374e9",
+    "Persistence/PlaybackSessionStore.swift": "792d22dbace2e360c2006a9b5416ce32ab2de2a671aea88898eff362c9e02cdf",
+    "Player/MediaSource.swift": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254",
+    "Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "Playlist/PlaylistMutation.swift": "30fed7b3888f5b249c3b9770b980b25eb576cdc8d39044c73c021f52381eb6e1",
+    "Utilities/LifecyclePerformance.swift": "eac6f08a13b62f429fd693168b6019b6ce671ec9ad4641c7f851600f202886df",
+    "Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+  },
+  "tests_sha256": "671951e7c0b9b6b8c1c653c4742cf45a00d85f39442a58e8b04f2b6485a5e73c"
+}

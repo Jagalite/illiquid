@@ -1,0 +1,28 @@
+{
+  "binary_sha256": "5d0bbc9bc94f441e1e60327bf18d86c0bc74eb3d9667cdc6919fda70ff71d2f7",
+  "compiled_sha256": {
+    "Persistence/LegacyPreferencesMigration.swift": "29188a77e687c7852bd096f04cd3dba7a2e1536e1ecbd145f84f78a9406374e9",
+    "Persistence/PlaybackSessionStore.swift": "4318a57a49833f22c3b1181c53694fc31e3a74535ee1644d82bce3134c54228f",
+    "Player/MediaSource.swift": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254",
+    "Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "Playlist/PlaylistMutation.swift": "30fed7b3888f5b249c3b9770b980b25eb576cdc8d39044c73c021f52381eb6e1",
+    "Utilities/LifecyclePerformance.swift": "eac6f08a13b62f429fd693168b6019b6ce671ec9ad4641c7f851600f202886df",
+    "Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+  },
+  "encoder_probe": "import Foundation\nimport IlliquidCore\n@inline(never)\nfunc encodeSession(_ session: PlaybackSessionRecord) throws -> Data {\nlet encoder = JSONEncoder()\n            encoder.outputFormatting = [.sortedKeys]\n            let data = try encoder.encode(session)\nreturn data\n}\n",
+  "encoder_probe_sha256": "a422ca3a821aa613187edf47c1b4eeead60b1d5d83a5e40cd5a393fd40469731",
+  "harness_sha256": "48a7228729cb346823096e5a8294d89006a7c598741e141dfc7aa34fb1d40772",
+  "linux_disabled_lifecycle_shim": false,
+  "production_sha256": {
+    "Persistence/LegacyPreferencesMigration.swift": "29188a77e687c7852bd096f04cd3dba7a2e1536e1ecbd145f84f78a9406374e9",
+    "Persistence/PlaybackSessionStore.swift": "4318a57a49833f22c3b1181c53694fc31e3a74535ee1644d82bce3134c54228f",
+    "Player/MediaSource.swift": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254",
+    "Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "Playlist/PlaylistMutation.swift": "30fed7b3888f5b249c3b9770b980b25eb576cdc8d39044c73c021f52381eb6e1",
+    "Utilities/LifecyclePerformance.swift": "eac6f08a13b62f429fd693168b6019b6ce671ec9ad4641c7f851600f202886df",
+    "Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+  },
+  "tests_sha256": "671951e7c0b9b6b8c1c653c4742cf45a00d85f39442a58e8b04f2b6485a5e73c"
+}
