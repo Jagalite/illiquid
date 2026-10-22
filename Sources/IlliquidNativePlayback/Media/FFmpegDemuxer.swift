@@ -413,11 +413,18 @@ final class FFmpegDemuxer {
                let data = parameters.pointee.extradata,
                parameters.pointee.extradata_size > 0
             {
+                let filename = metadataValue(stream.pointee.metadata, key: "filename")
+                    ?? title
+                    ?? "attachment-\(index)"
+                let mimeType = metadataValue(stream.pointee.metadata, key: "mimetype")
+                // The stream metadata remains available even when its attachment
+                // is not a font. Reject its payload before making a Swift copy.
+                guard FontAttachment.isSupportedFont(filename: filename, mimeType: mimeType) else {
+                    continue
+                }
                 attachments.append(FontAttachment(
-                    filename: metadataValue(stream.pointee.metadata, key: "filename")
-                        ?? title
-                        ?? "attachment-\(index)",
-                    mimeType: metadataValue(stream.pointee.metadata, key: "mimetype"),
+                    filename: filename,
+                    mimeType: mimeType,
                     data: Data(bytes: data, count: Int(parameters.pointee.extradata_size))
                 ))
             }
@@ -467,7 +474,7 @@ final class FFmpegDemuxer {
             startTimeStatus: startStatus,
             streams: streams,
             chapters: chapters,
-            attachments: attachments.filter(\.isSupportedFont),
+            attachments: attachments,
             selectedVideoIndex: bestStream(
                 context,
                 type: AVMEDIA_TYPE_VIDEO

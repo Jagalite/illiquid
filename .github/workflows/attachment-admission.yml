@@ -1,0 +1,104 @@
+name: Attachment admission performance
+
+on:
+  push:
+    branches: ['perf/attachment-copy-admission-*']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift'
+      - 'Tests/IlliquidNativePlaybackTests/FontAttachmentAdmissionTests.swift'
+      - 'Benchmarks/AttachmentAdmission/**'
+      - '.github/workflows/attachment-admission.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: attachment-admission-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-benchmark:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate controlled Matroska attachments
+        run: python3 Benchmarks/AttachmentAdmission/generate-fixtures.py --output "$RUNNER_TEMP/attachment-fixtures"
+      - name: Compare exact production outputs and paired release measurements
+        run: |
+          python3 Benchmarks/AttachmentAdmission/run.py \
+            --fixtures "$RUNNER_TEMP/attachment-fixtures" \
+            --output "$RUNNER_TEMP/attachment-results" \
+            --pairs 12 --target-ms 250 --max-iterations 1000000
+      - name: Print evidence summaries
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "attachment-results"
+          for path in sorted(root.glob("*.json")):
+              if path.name not in {"commands.json", "source-receipt.json"}:
+                  print(f"::group::{path.name}")
+                  print(path.read_text())
+                  print("::endgroup::")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: attachment-admission-native-benchmark
+          path: |
+            ${{ runner.temp }}/attachment-results/
+            ${{ runner.temp }}/attachment-fixtures/manifest.json
+            ${{ runner.temp }}/attachment-fixtures/fixture-commands.json
+            !${{ runner.temp }}/attachment-results/**/module-cache/**
+          retention-days: 14
+
+  native-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate required native attachment fixture
+        run: python3 Benchmarks/AttachmentAdmission/generate-fixtures.py --output "$RUNNER_TEMP/attachment-fixtures"
+      - name: Build the application graph and qualify attachment handling
+        run: |
+          mkdir -p "$RUNNER_TEMP/attachment-tests"
+          sw_vers > "$RUNNER_TEMP/attachment-tests/host.txt"
+          swift --version >> "$RUNNER_TEMP/attachment-tests/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/attachment-tests/host.txt"
+          export ILLIQUID_ATTACHMENT_ADMISSION_FIXTURE="$RUNNER_TEMP/attachment-fixtures/attachment-admission.mkv"
+          test -s "$ILLIQUID_ATTACHMENT_ADMISSION_FIXTURE"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+            'FontAttachmentAdmissionTests|NativePlaybackFoundationTests' \
+            2>&1 | tee "$RUNNER_TEMP/attachment-tests/native-tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: attachment-admission-native-tests
+          path: ${{ runner.temp }}/attachment-tests/
+          retention-days: 14
