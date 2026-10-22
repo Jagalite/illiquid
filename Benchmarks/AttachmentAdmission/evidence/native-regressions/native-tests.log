@@ -1,0 +1,337 @@
+Fetching https://github.com/sparkle-project/Sparkle.git
+Fetching https://github.com/swiftlang/swift-syntax.git
+[1/44207] Fetching sparkle
+[6190/125179] Fetching sparkle, swift-syntax
+Fetched https://github.com/sparkle-project/Sparkle.git from cache (4.38s)
+Fetching https://github.com/swiftlang/swift-testing.git
+[25102/80972] Fetching swift-syntax
+[32390/125995] Fetching swift-syntax, swift-testing
+Fetched https://github.com/swiftlang/swift-testing.git from cache (2.06s)
+[47774/80972] Fetching swift-syntax
+Fetched https://github.com/swiftlang/swift-syntax.git from cache (11.89s)
+Creating working copy for https://github.com/swiftlang/swift-testing.git
+Creating working copy for https://github.com/swiftlang/swift-syntax.git
+Creating working copy for https://github.com/sparkle-project/Sparkle.git
+Working copy of https://github.com/swiftlang/swift-testing.git resolved at swift-6.3.2-RELEASE (70eff26)
+Working copy of https://github.com/swiftlang/swift-syntax.git resolved at 603.0.2
+Working copy of https://github.com/sparkle-project/Sparkle.git resolved at 2.10.0
+Downloading binary artifact https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+[16375/10193895] Downloading https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+Downloaded https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip (1.35s)
+Downloading package prebuilt https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip
+Downloaded https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip (0.71s)
+Building for production...
+[0/49] /Users/runner/work/illiquid/illiquid/.build/arm64-apple-macosx/release/IlliquidPackageTests.derived/runner.swift
+[1/49] Write swift-version-7974D3F7F03D5E95.txt
+[2/49] Compiling _TestingInternals WillThrow.cpp
+[3/49] Compiling _TestingInternals ExecutablePath.cpp
+[4/49] Compiling _TestingInternals Discovery.cpp
+[5/49] Write sources
+[8/50] Compiling _TestingInternals Versions.cpp
+[9/50] Copying Sparkle.framework
+[11/51] Compiling _TestDiscovery WinSDKAdditions.swift
+[11/51] Copying NativePlaybackShaders.metal
+[12/51] Copying Resources
+[13/51] Write sources
+[32/52] Compiling TestingMacros ConditionMacro.swift
+[32/52] Write sources
+[33/52] Write Objects.LinkFileList
+[34/52] Write sources
+[35/52] Linking TestingMacros-tool
+[36/52] Compiling CNativeAudio AudioOutputDevice.m
+[38/53] Compiling IlliquidCore MediaMetadataHints.swift
+[39/54] Compiling IlliquidPlaybackCore EventsAndEffects.swift
+[40/55] Compiling Testing ABI.Record+Streaming.swift
+[41/56] Compiling IlliquidPlaybackStateSpace PlaybackPartialOrderReducer.swift
+[42/57] Compiling IlliquidPlayback Module.swift
+[43/58] Compiling IlliquidStateSpaceExplorer main.swift
+[44/59] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+[45/60] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+[46/61] Compiling IlliquidPlaybackCoreTests PlaybackCoreTests.swift
+[47/62] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+/Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1150 |             self.workQueue.async {
+1151 |                 _ = resources.retainedCVTextures
+1152 |                 guard commandBuffer.status != .error else {
+     |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1153 |                     completion(.failure(
+1154 |                         commandBuffer.error
+
+/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+243 |  */
+244 | API_AVAILABLE(macos(10.11), ios(8.0))
+245 | @protocol MTLCommandBuffer <NSObject>
+    |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+246 | 
+247 | /*!
+
+/Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   4 | import CoreVideo
+   5 | import Foundation
+   6 | import Metal
+     | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   7 | import OSLog
+   8 | import QuartzCore
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[47/62] Write Objects.LinkFileList
+[49/63] Compiling IlliquidRenderProfile main.swift
+[49/63] Linking IlliquidStateSpaceExplorer
+[51/64] Compiling IlliquidCoreTests AspectFitWindowSizingTests.swift
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 97 |             nil,
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+101 |         ]
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+101 |         ]
+102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+[52/65] Compiling IlliquidPlayer ArchitectureValidation.swift
+[53/66] Compiling IlliquidDifferentialHarness main.swift
+[54/67] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+[55/68] Compiling IlliquidPlaybackStress main.swift
+[56/69] Compiling IlliquidArchitectureCheck main.swift
+[57/70] Compiling IlliquidApp AppDelegate.swift
+[57/70] Write Objects.LinkFileList
+[59/70] Linking IlliquidRenderProfile
+[60/70] Linking IlliquidPlaybackStress
+[61/70] Write Objects.LinkFileList
+[63/70] Linking IlliquidDifferentialHarness
+[64/70] Linking IlliquidArchitectureCheck
+[65/70] Write Objects.LinkFileList
+[66/70] Linking Illiquid
+[68/71] Compiling IlliquidNativePlaybackTests AudioDelayTests.swift
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift:127:18: warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+125 |         let queue = BoundedQueue<Payload>(capacity: 1)
+126 |         var value: Payload? = Payload()
+127 |         weak var retained = value
+    |                  `- warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+128 |         #expect(queue.push(value!)); value = nil
+129 |         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift:99:13: warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+ 97 |         let checkoutID = try #require(token).checkoutID
+ 98 |         var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
+ 99 |             ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+    |             `- warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+100 |         )
+101 |         token?.transition(to: .queued)
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+167 |         var first: Value? = Value()
+168 |         weak var released = first
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+169 |         ring.append(first!)
+170 |         first = nil
+
+[#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+[69/71] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+[70/72] Compiling IlliquidPackageTests runner.swift
+[70/72] Write Objects.LinkFileList
+[71/72] Linking IlliquidPackageTests
+Build complete! (484.70s)
+Test Suite 'Selected tests' started at 2026-10-22 20:16:26.669.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-10-22 20:16:26.682.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-10-22 20:16:26.682.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-22 20:16:26.682.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.013) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Font attachment admission" started.
+◇ Test supportedMetadataIsAdmitted(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "Title Font.ttf", mimeType → nil to supportedMetadataIsAdmitted(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "嵌入字体.OTF", mimeType → nil to supportedMetadataIsAdmitted(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "collection.TtC", mimeType → "application/octet-stream" to supportedMetadataIsAdmitted(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "nested/path/font.ttf", mimeType → "image/jpeg" to supportedMetadataIsAdmitted(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "font.bin", mimeType → "application/x-truetype-font" to supportedMetadataIsAdmitted(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "font.bin", mimeType → "APPLICATION/VND.MS-OPENTYPE" to supportedMetadataIsAdmitted(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "font.bin", mimeType → "font/woff2" to supportedMetadataIsAdmitted(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "", mimeType → "application/x-font-opentype" to supportedMetadataIsAdmitted(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "unknown.bin", mimeType → "application/not-a-font-format" to supportedMetadataIsAdmitted(filename:mimeType:) started.
+✔ Test supportedMetadataIsAdmitted(filename:mimeType:) with 9 test cases passed after 0.003 seconds.
+◇ Test unsupportedMetadataIsRejected(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "report.pdf", mimeType → "application/pdf" to unsupportedMetadataIsRejected(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "metadata.xml", mimeType → "application/xml" to unsupportedMetadataIsRejected(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "cover.jpg", mimeType → "image/jpeg" to unsupportedMetadataIsRejected(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "cover.png", mimeType → "application/octet-stream" to unsupportedMetadataIsRejected(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "font.ttf.bin", mimeType → nil to unsupportedMetadataIsRejected(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "font.woff", mimeType → nil to unsupportedMetadataIsRejected(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "", mimeType → nil to unsupportedMetadataIsRejected(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "unknown", mimeType → "" to unsupportedMetadataIsRejected(filename:mimeType:) started.
+◇ Test case passing 2 arguments filename → "attachment-4", mimeType → "application/octet-stream" to unsupportedMetadataIsRejected(filename:mimeType:) started.
+✔ Test unsupportedMetadataIsRejected(filename:mimeType:) with 9 test cases passed after 0.001 seconds.
+◇ Test demuxingPreservesStreamsAndCopiesOnlySupportedFontPayloads() started.
+[matroska,webm @ 0xb6afa0000] Could not find codec parameters for stream 1 (Attachment: none): unknown codec
+Consider increasing the value for the 'analyzeduration' (0) and 'probesize' (5000000) options
+[matroska,webm @ 0xb6afa0000] Could not find codec parameters for stream 3 (Attachment: none): unknown codec
+Consider increasing the value for the 'analyzeduration' (0) and 'probesize' (5000000) options
+✔ Test demuxingPreservesStreamsAndCopiesOnlySupportedFontPayloads() passed after 0.037 seconds.
+✔ Suite "Font attachment admission" passed after 0.043 seconds.
+◇ Suite "Native Picture in Picture geometry" started.
+◇ Test matchesSourceLayerBoundsToPictureInPictureViewport() started.
+✔ Test matchesSourceLayerBoundsToPictureInPictureViewport() passed after 0.001 seconds.
+◇ Test preservesQuarterTurnTransformGeometry() started.
+✔ Test preservesQuarterTurnTransformGeometry() passed after 0.001 seconds.
+◇ Test inactivePictureInPictureUsesThePlayerViewport() started.
+✔ Test inactivePictureInPictureUsesThePlayerViewport() passed after 0.001 seconds.
+◇ Test composedPictureInPictureSuppressesAndRestoresTheMainSurface() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test composedPictureInPictureSuppressesAndRestoresTheMainSurface() passed after 1.587 seconds.
+◇ Test mouseMovementOnNativeSurfaceDefersToWindowRevealPolicy() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test mouseMovementOnNativeSurfaceDefersToWindowRevealPolicy() passed after 0.017 seconds.
+✔ Suite "Native Picture in Picture geometry" passed after 1.606 seconds.
+◇ Suite "Native damaged-stream hardening policies" started.
+◇ Test demuxRetryBudgetSeparatesCorruptionFromOtherErrors() started.
+✔ Test demuxRetryBudgetSeparatesCorruptionFromOtherErrors() passed after 0.001 seconds.
+◇ Test demuxRetryBudgetNeverRetriesInterruptionOrExpiredProgress() started.
+✔ Test demuxRetryBudgetNeverRetriesInterruptionOrExpiredProgress() passed after 0.001 seconds.
+◇ Test audioSanitizationZerosInvalidSamplesOnly() started.
+✔ Test audioSanitizationZerosInvalidSamplesOnly() passed after 0.001 seconds.
+◇ Test softwareDecodeProgressResetsOnSuccessfulFrame() started.
+✔ Test softwareDecodeProgressResetsOnSuccessfulFrame() passed after 0.001 seconds.
+◇ Test timestampValidatorDropsSmallBackwardPTSAndSegmentsLargeJumps() started.
+✔ Test timestampValidatorDropsSmallBackwardPTSAndSegmentsLargeJumps() passed after 0.001 seconds.
+◇ Test h264DecoderAdvertisesVideoToolboxConfiguration() started.
+✔ Test h264DecoderAdvertisesVideoToolboxConfiguration() passed after 0.001 seconds.
+◇ Test unknownDecoderDoesNotAdvertiseVideoToolboxConfiguration() started.
+✔ Test unknownDecoderDoesNotAdvertiseVideoToolboxConfiguration() passed after 0.001 seconds.
+◇ Test audioPresentationRecoveryFlushesThenReplacesRenderer() started.
+✔ Test audioPresentationRecoveryFlushesThenReplacesRenderer() passed after 0.416 seconds.
+✔ Suite "Native damaged-stream hardening policies" passed after 0.419 seconds.
+◇ Suite "Native player click routing" started.
+◇ Test singleClickWaitsForDoubleClickInterval() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test singleClickWaitsForDoubleClickInterval() passed after 0.634 seconds.
+◇ Test doubleClickCancelsSingleClick(x:) started.
+◇ Test case passing 1 argument x → 20.0 to doubleClickCancelsSingleClick(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+◇ Test case passing 1 argument x → 200.0 to doubleClickCancelsSingleClick(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+◇ Test case passing 1 argument x → 380.0 to doubleClickCancelsSingleClick(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test doubleClickCancelsSingleClick(x:) with 3 test cases passed after 2.016 seconds.
+◇ Test continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) started.
+◇ Test case passing 1 argument x → 20.0 to continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+◇ Test case passing 1 argument x → 200.0 to continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+◇ Test case passing 1 argument x → 380.0 to continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) with 3 test cases passed after 0.026 seconds.
+◇ Test rejectedPressesDoNotSeek() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test rejectedPressesDoNotSeek() passed after 0.004 seconds.
+◇ Test detachingSurfaceCancelsPendingSingleClick() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test detachingSurfaceCancelsPendingSingleClick() passed after 0.614 seconds.
+✔ Suite "Native player click routing" passed after 3.299 seconds.
+◇ Suite "Native subtitle render policy" started.
+◇ Test rendersOnlyForAnEnabledActiveSubtitleSource() started.
+✔ Test rendersOnlyForAnEnabledActiveSubtitleSource() passed after 0.001 seconds.
+◇ Test subtitlePacketArrivalInvalidatesTheCurrentPresentationTime() started.
+✔ Test subtitlePacketArrivalInvalidatesTheCurrentPresentationTime() passed after 0.001 seconds.
+✔ Suite "Native subtitle render policy" passed after 0.001 seconds.
+◇ Suite "Native playback foundations" started.
+◇ Test packagedMetalLibraryContainsEveryProductionShader() started.
+✔ Test packagedMetalLibraryContainsEveryProductionShader() passed after 0.002 seconds.
+◇ Test headlessSubtitleOverlayDoesNotInitializeMetal() started.
+✔ Test headlessSubtitleOverlayDoesNotInitializeMetal() passed after 0.001 seconds.
+◇ Test surfaceCreationLeavesPictureInPictureSubtitleInfrastructureDeferred() started.
+[ass-compositor] selected=metal-r8 activation=success
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1792700192.441363 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+✔ Test surfaceCreationLeavesPictureInPictureSubtitleInfrastructureDeferred() passed after 0.051 seconds.
+◇ Test cancellationBeforeOpenAdmissionRemainsVisibleToNativeInput() started.
+✔ Test cancellationBeforeOpenAdmissionRemainsVisibleToNativeInput() passed after 0.002 seconds.
+◇ Test formatCompletionRequiresTheExactRevisionAndShutdownCancelsWaiters() started.
+✔ Test formatCompletionRequiresTheExactRevisionAndShutdownCancelsWaiters() passed after 0.001 seconds.
+◇ Test rendererClockAdvanceIsGenerationScopedAndRequiresMovement() started.
+✔ Test rendererClockAdvanceIsGenerationScopedAndRequiresMovement() passed after 0.001 seconds.
+◇ Test softwareBGRAOutputPoolBoundsAndReusesAllocations() started.
+✔ Test softwareBGRAOutputPoolBoundsAndReusesAllocations() passed after 0.014 seconds.
+◇ Test softwareBGRAOutputPoolCheckoutHonorsCancellation() started.
+✔ Test softwareBGRAOutputPoolCheckoutHonorsCancellation() passed after 0.001 seconds.
+◇ Test videoFrameCapacityGateReservesBeforeSurfaceCheckout() started.
+✔ Test videoFrameCapacityGateReservesBeforeSurfaceCheckout() passed after 0.001 seconds.
+◇ Test videoFrameCapacityGateCloseCancelsBlockedAcquisition() started.
+✔ Test videoFrameCapacityGateCloseCancelsBlockedAcquisition() passed after 0.001 seconds.
+◇ Test rationalToCMTimePreservesTimestamp() started.
+✔ Test rationalToCMTimePreservesTimestamp() passed after 0.001 seconds.
+◇ Test timestampRoundTripUsesRequestedTimeBase() started.
+✔ Test timestampRoundTripUsesRequestedTimeBase() passed after 0.001 seconds.
+◇ Test boundedQueueAppliesFIFOAndBounds() started.
+✔ Test boundedQueueAppliesFIFOAndBounds() passed after 0.001 seconds.
+◇ Test boundedQueueBackpressuresProducerUntilCapacityIsAvailable() started.
+✔ Test boundedQueueBackpressuresProducerUntilCapacityIsAvailable() passed after 0.038 seconds.
+◇ Test boundedQueueAppliesByteAndDurationGrants() started.
+✔ Test boundedQueueAppliesByteAndDurationGrants() passed after 0.153 seconds.
+◇ Test queueInvalidationPreemptsAProducerBlockedOnDataCapacity() started.
+✔ Test queueInvalidationPreemptsAProducerBlockedOnDataCapacity() passed after 0.001 seconds.
+◇ Test nonblockingQueuePushReportsCapacityWithoutSleeping() started.
+✔ Test nonblockingQueuePushReportsCapacityWithoutSleeping() passed after 0.001 seconds.
+◇ Test interleavingRouterFeedsAudioAroundFullVideoWithoutReordering() started.
+✔ Test interleavingRouterFeedsAudioAroundFullVideoWithoutReordering() passed after 0.001 seconds.
+◇ Test inputCancellationTargetsOnlyTheActiveEffect() started.
+✔ Test inputCancellationTargetsOnlyTheActiveEffect() passed after 0.001 seconds.
+◇ Test inputCancellationRemainsStickyUntilTheNextReadBegins() started.
+✔ Test inputCancellationRemainsStickyUntilTheNextReadBegins() passed after 0.001 seconds.
+◇ Test acceptedSeekClearsDeferredReadCancellation() started.
+✔ Test acceptedSeekClearsDeferredReadCancellation() passed after 0.001 seconds.
+◇ Test inputQuarantineIsStrictlyBoundedByWorkersAndBytes() started.
+✔ Test inputQuarantineIsStrictlyBoundedByWorkersAndBytes() passed after 0.001 seconds.
+◇ Test blockingInputWaitIsBoundedAndRequestsExactCancellation() started.
+✔ Test blockingInputWaitIsBoundedAndRequestsExactCancellation() passed after 0.166 seconds.
+◇ Test exactSeekTrimsAudioAtTheFirstSampleOnOrAfterTarget() started.
+✔ Test exactSeekTrimsAudioAtTheFirstSampleOnOrAfterTarget() passed after 0.001 seconds.
+◇ Test resampledAudioBuffersUseAContinuousOutputClock() started.
+✔ Test resampledAudioBuffersUseAContinuousOutputClock() passed after 0.001 seconds.
+◇ Test resampledAudioClockPreservesRealGapsAndResets() started.
+✔ Test resampledAudioClockPreservesRealGapsAndResets() passed after 0.001 seconds.
+◇ Test queuedHorizonsNeverProducePresentationDriftCorrection() started.
+✔ Test queuedHorizonsNeverProducePresentationDriftCorrection() passed after 0.002 seconds.
+◇ Test pixelBufferExhaustionIsNotClassifiedAsDecoderFallback() started.
+✔ Test pixelBufferExhaustionIsNotClassifiedAsDecoderFallback() passed after 0.001 seconds.
+◇ Test hardwareDecodeFailureCarriesConsecutiveCount() started.
+✔ Test hardwareDecodeFailureCarriesConsecutiveCount() passed after 0.001 seconds.
+◇ Test observationMetricsSeparateSourcesCoalescingAndUrgentDelay() started.
+✔ Test observationMetricsSeparateSourcesCoalescingAndUrgentDelay() passed after 0.001 seconds.
+◇ Test periodicMetricsExposeObservationSourceCounts() started.
+✔ Test periodicMetricsExposeObservationSourceCounts() passed after 0.001 seconds.
+◇ Test generationRejectsStaleOutput() started.
+✔ Test generationRejectsStaleOutput() passed after 0.001 seconds.
+◇ Test synchronizationMetricsTrackWorstDifferenceAndDrift() started.
+✔ Test synchronizationMetricsTrackWorstDifferenceAndDrift() passed after 0.001 seconds.
+◇ Test synchronizationMetricsExcludePrerollAndFinalDrainFromSteadyDrift() started.
+✔ Test synchronizationMetricsExcludePrerollAndFinalDrainFromSteadyDrift() passed after 0.001 seconds.
+◇ Test displayCapabilitiesIdentifySDRAndEDRDisplays() started.
+✔ Test displayCapabilitiesIdentifySDRAndEDRDisplays() passed after 0.001 seconds.
+◇ Test latestSeekReplacesPendingSeek() started.
+✔ Test latestSeekReplacesPendingSeek() passed after 0.001 seconds.
+◇ Test completedOlderSeekCannotOverwriteNewPendingPhase() started.
+✔ Test completedOlderSeekCannotOverwriteNewPendingPhase() passed after 0.001 seconds.
+◇ Test viewportAspectFitsLetterboxAndPillarbox() started.
+✔ Test viewportAspectFitsLetterboxAndPillarbox() passed after 0.001 seconds.
+◇ Test subtitleCoordinatesMapIntoViewport() started.
+✔ Test subtitleCoordinatesMapIntoViewport() passed after 0.001 seconds.
+◇ Test externalSubtitleReaderStopsAtItsConfiguredByteLimit() started.
+✔ Test externalSubtitleReaderStopsAtItsConfiguredByteLimit() passed after 0.004 seconds.
+◇ Test fontAttachmentDetectionUsesExtensionAndMime() started.
+✔ Test fontAttachmentDetectionUsesExtensionAndMime() passed after 0.001 seconds.
+◇ Test fontAttachmentValidationRejectsAggregateBytesBeforeRegistration() started.
+✔ Test fontAttachmentValidationRejectsAggregateBytesBeforeRegistration() passed after 0.001 seconds.
+✔ Suite "Native playback foundations" passed after 0.452 seconds.
+✔ Test run with 65 tests in 6 suites passed after 5.824 seconds.
