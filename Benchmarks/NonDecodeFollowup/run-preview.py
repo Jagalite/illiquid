@@ -24,8 +24,12 @@ def main():
   cache=cp.read_text();disk=dp.read_text()
   for name in ['CoreGraphics','CryptoKit','IlliquidCore','ImageIO','UniformTypeIdentifiers']:
    cache=cache.replace('import '+name+'\n','');disk=disk.replace('import '+name+'\n','')
-  if '    private nonisolated static func readImage(' in disk:
-   begin=disk.index('    private nonisolated static func readImage(')
+  read_image_markers = ['    private nonisolated static func readImage(',
+                        '    nonisolated static func readImage(']
+  read_image_marker = next((marker for marker in read_image_markers if marker in disk), None)
+  if read_image_marker is not None:
+   if disk.count(read_image_marker) != 1: raise ValueError('Ambiguous thumbnail decoder boundary')
+   begin=disk.index(read_image_marker)
    end=disk.index('    private static func filenames',begin)
    disk=disk[:begin]+'''    // CODEC ADAPTER ONLY; production lookup and inventory flow retained.
     private nonisolated static func readImage(at url: URL, key: Key) -> CGImage? {
