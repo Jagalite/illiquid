@@ -113,12 +113,14 @@ struct SourceMediaGroupingTests {
         #expect(files(searched) == [rows[1]])
         let searchedTitle = try #require(rows[1].recognizedMedia?.section) + " (1)"
         #expect(headers(searched).map { Array($0.displayName.utf8) } == [Array(searchedTitle.utf8)])
+        #expect(headers(searched).first?.url == rows[1].url)
         let restored = try await project(rows, filter: filter)
         // Native collation may tie distinct section names, so compare each
         // section's bytes and ordered members independently of section order.
         for group in actual {
             let header = try #require(headers(restored).first { $0.id == group.header.id })
             #expect(Array(header.displayName.utf8) == Array(group.header.displayName.utf8))
+            #expect(header.url == group.header.url)
             let memberIDs = Set(group.members.map(\.id))
             #expect(files(restored).filter { memberIDs.contains($0.id) } == group.members)
         }
@@ -156,6 +158,7 @@ struct SourceMediaGroupingTests {
         #expect(headers(all).map(\.displayName) == ["TV Shows · AuThOrItAtIvE · Season 1 (2)"])
         #expect(headers(all).first?.url == raw)
         #expect(files(all).map(\.url) == [secondURL, raw])
+        #expect(Set(files(all).map(\.id)).count == files(all).count)
         #expect(files(all).last?.recognizedMedia == first.recognizedMedia)
         #expect(files(all).last?.kind == .media(dateAdded: first.dateAdded))
         #expect(all.thumbnailCandidates == [secondURL, raw])
