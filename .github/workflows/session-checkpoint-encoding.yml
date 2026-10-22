@@ -1,0 +1,65 @@
+name: Session checkpoint encoding performance
+
+on:
+  push:
+    branches: ['perf/session-checkpoint-json-*']
+    paths:
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Tests/IlliquidCoreTests/PlaybackSessionStoreTests.swift'
+      - 'Benchmarks/SessionCheckpointEncoding/**'
+      - '.github/workflows/session-checkpoint-encoding.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Tests/IlliquidCoreTests/PlaybackSessionStoreTests.swift'
+      - 'Benchmarks/SessionCheckpointEncoding/**'
+      - '.github/workflows/session-checkpoint-encoding.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: session-checkpoint-encoding-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify compatibility and measure paired production saves
+        run: >-
+          python3 Benchmarks/SessionCheckpointEncoding/run.py --pairs 8 --target-ms 80
+          --output "$RUNNER_TEMP/session-checkpoint-encoding"
+      - name: Print environment and compact measurements
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "session-checkpoint-encoding"
+          for name in ("manifest.json", "tests.json", "summary.json"):
+              path = root / name
+              if path.is_file():
+                  print(f"::group::{name}")
+                  print(path.read_text())
+                  print("::endgroup::")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: session-checkpoint-encoding-native
+          path: |
+            ${{ runner.temp }}/session-checkpoint-encoding/*.json
+            ${{ runner.temp }}/session-checkpoint-encoding/*.jsonl
+            ${{ runner.temp }}/session-checkpoint-encoding/logs/**
+            ${{ runner.temp }}/session-checkpoint-encoding/samples/**/payload.json
+            ${{ runner.temp }}/session-checkpoint-encoding/build/*/Sources/**
+          retention-days: 14
