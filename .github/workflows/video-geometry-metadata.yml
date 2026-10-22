@@ -1,0 +1,183 @@
+name: Video geometry metadata performance
+
+on:
+  push:
+    branches: ['perf/video-geometry-metadata-20261022']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
+      - 'Sources/IlliquidNativePlayback/Media/VideoGeometryMetadataCache.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoGeometryMetadataCacheTests.swift'
+      - 'Benchmarks/VideoGeometryMetadata/**'
+      - '.github/workflows/video-geometry-metadata.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
+      - 'Sources/IlliquidNativePlayback/Media/VideoGeometryMetadataCache.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoGeometryMetadataCacheTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlanarSoftwareOutputExperimentTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoTimestampDiscoveryTests.swift'
+      - 'Benchmarks/VideoGeometryMetadata/**'
+      - '.github/workflows/video-geometry-metadata.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-geometry-metadata-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compare exact output and measure paired native implementations
+        run: |
+          python3 Benchmarks/VideoGeometryMetadata/run.py \
+            --output "$RUNNER_TEMP/video-geometry-metadata" \
+            --pairs 8 --target-ms 150
+      - name: Emit compact receipts and complete component evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "video-geometry-metadata"
+          paths = set(root.glob("*.json")) | set(root.glob("*.jsonl"))
+          paths |= set((root / "logs").glob("*.log"))
+          paths |= set((root / "sources").glob("*.swift"))
+          paths |= set((root / "sources").glob("*.py"))
+          files = {str(path.relative_to(root)): path.read_text()
+                   for path in sorted(paths) if path.is_file()}
+          for name in ["manifest.json", "summary.json"]:
+              if name in files:
+                  print(f"::group::{name}")
+                  print(files[name])
+                  print("::endgroup::")
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(),
+                                 compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit("Component evidence exceeds the log-bundle limit; use the uploaded artifact")
+          print("GEOMETRY_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          print("GEOMETRY_BUNDLE_BASE64 " + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-geometry-metadata-component
+          path: |
+            ${{ runner.temp }}/video-geometry-metadata/*.json
+            ${{ runner.temp }}/video-geometry-metadata/*.jsonl
+            ${{ runner.temp }}/video-geometry-metadata/logs/*.log
+            ${{ runner.temp }}/video-geometry-metadata/sources/*.swift
+            ${{ runner.temp }}/video-geometry-metadata/sources/*.py
+          retention-days: 14
+
+  native-app:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Detect production integration
+        id: integration
+        run: |
+          if test -f Sources/IlliquidNativePlayback/Media/VideoGeometryMetadataCache.swift; then
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+            echo 'Prototype-only experiment: app integration qualification has not run.'
+          fi
+      - name: Prepare pinned native dependencies
+        if: steps.integration.outputs.enabled == 'true'
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate required geometry and timestamp fixtures
+        if: steps.integration.outputs.enabled == 'true'
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "video-geometry-native"
+          fixtures = root / "fixtures"
+          fixtures.mkdir(parents=True)
+          commands = []
+          def run(name, arguments):
+              command = ["ffmpeg", "-hide_banner", "-nostdin", "-loglevel", "error", "-y", *arguments]
+              result = subprocess.run(command, capture_output=True, text=True, timeout=120)
+              (fixtures / (name + ".log")).write_text(result.stdout + result.stderr)
+              commands.append({"name": name, "argv": command, "exit_code": result.returncode})
+              (fixtures / "commands.json").write_text(json.dumps(commands, indent=2) + "\n")
+              result.check_returncode()
+          def source(size, duration=2):
+              return ["-f", "lavfi", "-i", f"testsrc2=size={size}:rate=24:duration={duration}", "-an"]
+          h264 = ["-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p"]
+          run("anamorphic-sar", source("720x480") + ["-vf", "setsar=40/33", *h264,
+              str(fixtures / "anamorphic-sar.mkv")])
+          run("full-range-anamorphic", source("640x360") + ["-c:v", "ffv1",
+              "-vf", "scale=in_range=tv:out_range=pc,setsar=4/3", "-pix_fmt", "yuv420p",
+              "-color_range", "pc", "-chroma_sample_location", "center",
+              str(fixtures / "full-range-anamorphic.mkv")])
+          run("rotation-source", source("640x360") + [*h264, str(fixtures / "rotation-source.mp4")])
+          run("rotated-90", ["-display_rotation:v:0", "90", "-i", str(fixtures / "rotation-source.mp4"),
+              "-map", "0", "-c", "copy", str(fixtures / "rotated-90.mp4")])
+          parts = []
+          for index, size in enumerate(["640x360", "960x540"]):
+              part = fixtures / f"resolution-{index}.ts"
+              run(f"resolution-{index}", source(size) + [*h264, "-output_ts_offset", str(index * 2), str(part)])
+              parts.append(part.read_bytes())
+          (fixtures / "resolution-transition.ts").write_bytes(b"".join(parts))
+          names = ["anamorphic-sar.mkv", "full-range-anamorphic.mkv", "rotated-90.mp4", "resolution-transition.ts"]
+          records = []
+          for name in names:
+              data = (fixtures / name).read_bytes()
+              if not data:
+                  raise SystemExit("Missing required fixture: " + name)
+              records.append({"name": name, "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()})
+          (fixtures / "manifest.json").write_text(json.dumps(records, indent=2) + "\n")
+          PY
+          python3 Benchmarks/FrameStepTimestamps/generate-fixtures.py \
+            --output "$RUNNER_TEMP/video-geometry-native/timestamps"
+      - name: Build the app graph and qualify decoded geometry
+        if: steps.integration.outputs.enabled == 'true'
+        env:
+          ILLIQUID_NATIVE_FIXTURE_DIR: ${{ runner.temp }}/video-geometry-native/fixtures
+          ILLIQUID_PLANAR_EXPERIMENT_FIXTURE_DIR: ${{ runner.temp }}/video-geometry-native/fixtures
+          ILLIQUID_FRAME_STEP_FIXTURE_DIR: ${{ runner.temp }}/video-geometry-native/timestamps
+          ILLIQUID_FRAME_STEP_REQUIRE_FIXTURES: '1'
+        run: |
+          sw_vers > "$RUNNER_TEMP/video-geometry-native/host.txt"
+          uname -a >> "$RUNNER_TEMP/video-geometry-native/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/video-geometry-native/host.txt"
+          swift --version >> "$RUNNER_TEMP/video-geometry-native/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/video-geometry-native/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'VideoGeometryMetadataCacheTests|PiPVideoMappingTests|VideoTimestampDiscoveryTests|fullRangeAnamorphicMetadataAndOutputAreExact|rotationMetadataDoesNotChangePlanarBytesOrTiming|midstreamResolutionChangeRecreatesThePlanarPool|anamorphicFixtureUsesDisplayAspectInsteadOfCodedAspect' \
+            2>&1 | tee "$RUNNER_TEMP/video-geometry-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && steps.integration.outputs.enabled == 'true'
+        with:
+          name: video-geometry-metadata-native-app
+          path: |
+            ${{ runner.temp }}/video-geometry-native/*.txt
+            ${{ runner.temp }}/video-geometry-native/*.log
+            ${{ runner.temp }}/video-geometry-native/fixtures/*.json
+            ${{ runner.temp }}/video-geometry-native/fixtures/*.log
+            ${{ runner.temp }}/video-geometry-native/timestamps/*.json
+            ${{ runner.temp }}/video-geometry-native/timestamps/*.log
+          retention-days: 14
