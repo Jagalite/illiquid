@@ -8,6 +8,11 @@ experiment measures the complete existing PNG path, including image conversion,
 geometry, subtitle composition and PNG encoding, to determine whether avoiding
 repeated context setup has a meaningful benefit.
 
+Apple recommends [reusing Core Image contexts](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/CoreImaging/ci_performance/ci_performance.html)
+and documents that [a context can render concurrently](https://developer.apple.com/documentation/coreimage/cicontext).
+The candidate follows the existing thumbnail renderer's ownership pattern while
+keeping the screenshot context lazy and `.cacheIntermediates` disabled.
+
 Before measurement, the acceptance criteria are:
 
 - Exact equality of decoded canonical RGBA pixels across the verification corpus.
@@ -20,7 +25,7 @@ Before measurement, the acceptance criteria are:
 
 These are review criteria. CI does not fail on a timing percentage; it fails on
 build errors, incorrect output, malformed evidence or failing regression tests.
-No native performance results have yet been recorded in this directory.
+The native qualification and its limitations are recorded in [RESULTS.md](RESULTS.md).
 
 ## Reproduce
 
@@ -52,8 +57,9 @@ regression tests run separately in native CI.
 ## Workloads and protocol
 
 Five predeclared workloads cover BGRA 1080p, NV12 1080p, 10-bit P010 1080p, BGRA 4K,
-and 1080p with subtitles. The fixed verification corpus exercises the same pixel
-formats and additional geometry/subtitle cases. Each variant decodes its generated
+and 1080p with subtitles. The 19-case verification corpus exercises the same pixel
+formats at small and actual benchmark resolutions, plus geometry/subtitle cases.
+Each variant decodes its generated
 PNGs into a specified canonical RGBA representation. The runner compares every
 output byte, decoded dimensions and color metadata, and records the output sizes
 and SHA-256 values. This avoids treating
@@ -77,9 +83,10 @@ match between variants; decoded image equality is established independently
 before measurements. Summaries report normalized wall/CPU time per capture,
 paired wall/CPU reductions, median/min/max values and memory observations.
 
-RSS fields describe the current/peak process metrics explicitly emitted by the
-harness. They include runtime and fixture costs and are not complete accounting
-of GPU/device memory. Short-lived fresh processes cannot establish the long-term
+The `maxrss_*` fields are Darwin peak resident-set size in bytes, sampled before
+warmup, before timing and after timing. They include runtime and fixture costs;
+they do not measure current post-capture residency or all GPU/device allocations.
+Short-lived fresh processes cannot establish the long-term
 memory residence of a shared Core Image context in a running player. Reusing that
 context is a memory-lifetime tradeoff even if the observed RSS controls are flat.
 

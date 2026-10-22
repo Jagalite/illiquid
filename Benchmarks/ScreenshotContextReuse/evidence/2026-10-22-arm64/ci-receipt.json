@@ -1,0 +1,143 @@
+{
+  "run_id": 39844570938,
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/39844570938",
+  "head_sha": "8ebc569187ec03355e09885eeebab21b391eb91e",
+  "conclusion": "success",
+  "run_attempt": 1,
+  "updated_at": "2026-10-22T20:07:33Z",
+  "jobs": [
+    {
+      "id": 120054337226,
+      "name": "native-app",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Prepare pinned native dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Build the app graph and verify screenshot behavior",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 120054337647,
+      "name": "native-component",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Compare decoded output and measure first and repeated captures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Print result receipts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 12454234815,
+      "name": "screenshot-context-reuse-app",
+      "digest": "sha256:ee5d665b311aa23b304ee0d650b5772c31be2cef14904d7c226d77f0ac8cec48",
+      "size_in_bytes": 3303,
+      "expires_at": "2026-11-05T20:07:25Z",
+      "archive_download_url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12454234815/zip"
+    },
+    {
+      "id": 12453509886,
+      "name": "screenshot-context-reuse-component",
+      "digest": "sha256:14865f18b0d9fbb77b488c7423905ebcb3e617eab5fb5afdbe81825142bff2e1",
+      "size_in_bytes": 58524185,
+      "expires_at": "2026-11-05T19:59:04Z",
+      "archive_download_url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12453509886/zip"
+    }
+  ],
+  "native_tests": {
+    "configuration": "release",
+    "app_graph_built": true,
+    "passed": 7,
+    "skipped": 0,
+    "log": "native-tests.log",
+    "filter": "ScreenshotContextReuseTests|screenshotIncludesSubtitleMaskAtTheExpectedPixels"
+  },
+  "independent_review": {
+    "all_120_observations_and_paired_summaries_recomputed": true,
+    "source_and_driver_hashes_verified": true,
+    "downloaded_component_zip_digest_verified": true,
+    "exact_decoded_RGBA_pairs_rechecked": 19,
+    "downloaded_app_zip_digest_verified": true
+  }
+}
