@@ -1,0 +1,1149 @@
+[
+  {
+    "argv": [
+      "xcrun",
+      "--find",
+      "swiftc"
+    ],
+    "label": "selected-swiftc",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/selected-swiftc.log"
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "--version"
+    ],
+    "label": "swift-version",
+    "returncode": 0,
+    "stderr": "swift-driver version: 1.148.6 ",
+    "stdout_log": "logs/swift-version.log"
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "label": "head",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/head.log"
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "label": "worktree",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/worktree.log"
+  },
+  {
+    "argv": [
+      "sysctl",
+      "-n",
+      "machdep.cpu.brand_string"
+    ],
+    "label": "cpu-model",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/cpu-model.log"
+  },
+  {
+    "argv": [
+      "sw_vers"
+    ],
+    "label": "macos-version",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/macos-version.log"
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "build",
+      "--package-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/baseline",
+      "--scratch-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline",
+      "--cache-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-cache",
+      "--config-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-config",
+      "--security-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-security",
+      "--jobs",
+      "2",
+      "--configuration",
+      "release",
+      "--product",
+      "FlatFileProjectionBenchmark"
+    ],
+    "label": "build-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/build-baseline.log"
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "build",
+      "--package-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/baseline",
+      "--scratch-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline",
+      "--cache-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-cache",
+      "--config-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-config",
+      "--security-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-security",
+      "--jobs",
+      "2",
+      "--configuration",
+      "release",
+      "--product",
+      "FlatFileProjectionBenchmark"
+    ],
+    "label": "release-product-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/release-product-baseline.log"
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "build",
+      "--package-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/baseline",
+      "--scratch-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline",
+      "--cache-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-cache",
+      "--config-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-config",
+      "--security-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-security",
+      "--jobs",
+      "2",
+      "--configuration",
+      "release",
+      "--show-bin-path"
+    ],
+    "label": "bin-path-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/bin-path-baseline.log"
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "build",
+      "--package-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/candidate",
+      "--scratch-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate",
+      "--cache-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-cache",
+      "--config-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-config",
+      "--security-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-security",
+      "--jobs",
+      "2",
+      "--configuration",
+      "release",
+      "--product",
+      "FlatFileProjectionBenchmark"
+    ],
+    "label": "build-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/build-candidate.log"
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "build",
+      "--package-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/candidate",
+      "--scratch-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate",
+      "--cache-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-cache",
+      "--config-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-config",
+      "--security-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-security",
+      "--jobs",
+      "2",
+      "--configuration",
+      "release",
+      "--product",
+      "FlatFileProjectionBenchmark"
+    ],
+    "label": "release-product-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/release-product-candidate.log"
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "build",
+      "--package-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/candidate",
+      "--scratch-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate",
+      "--cache-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-cache",
+      "--config-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-config",
+      "--security-path",
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/swiftpm-security",
+      "--jobs",
+      "2",
+      "--configuration",
+      "release",
+      "--show-bin-path"
+    ],
+    "label": "bin-path-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/bin-path-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "verify",
+      "mixed-files",
+      "100"
+    ],
+    "label": "verify-mixed-files-100-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "traces/verify-mixed-files-100-baseline.json"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "verify",
+      "mixed-files",
+      "100"
+    ],
+    "label": "verify-mixed-files-100-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "traces/verify-mixed-files-100-candidate.json"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "verify",
+      "mixed-media",
+      "100"
+    ],
+    "label": "verify-mixed-media-100-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "traces/verify-mixed-media-100-baseline.json"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "verify",
+      "mixed-media",
+      "100"
+    ],
+    "label": "verify-mixed-media-100-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "traces/verify-mixed-media-100-candidate.json"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "verify",
+      "explicit-files",
+      "100"
+    ],
+    "label": "verify-explicit-files-100-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "traces/verify-explicit-files-100-baseline.json"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "verify",
+      "explicit-files",
+      "100"
+    ],
+    "label": "verify-explicit-files-100-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "traces/verify-explicit-files-100-candidate.json"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "1"
+    ],
+    "label": "calibrate-mixed-files-100-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/calibrate-mixed-files-100-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "1"
+    ],
+    "label": "calibrate-mixed-files-100-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/calibrate-mixed-files-100-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-0-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-0-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-0-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-0-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-1-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-1-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-1-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-1-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-2-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-2-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-2-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-2-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-3-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-3-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-3-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-3-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-4-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-4-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-4-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-4-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-5-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-5-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-5-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-5-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-6-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-6-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-6-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-6-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-7-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-7-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-7-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-7-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-8-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-8-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-8-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-8-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-9-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-9-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-files",
+      "100",
+      "204"
+    ],
+    "label": "measure-mixed-files-100-9-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-files-100-9-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "1"
+    ],
+    "label": "calibrate-mixed-media-100-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/calibrate-mixed-media-100-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "1"
+    ],
+    "label": "calibrate-mixed-media-100-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/calibrate-mixed-media-100-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-0-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-0-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-0-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-0-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-1-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-1-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-1-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-1-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-2-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-2-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-2-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-2-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-3-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-3-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-3-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-3-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-4-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-4-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-4-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-4-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-5-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-5-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-5-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-5-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-6-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-6-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-6-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-6-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-7-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-7-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-7-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-7-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-8-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-8-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-8-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-8-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-9-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-9-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "mixed-media",
+      "100",
+      "159"
+    ],
+    "label": "measure-mixed-media-100-9-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-mixed-media-100-9-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "1"
+    ],
+    "label": "calibrate-explicit-files-100-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/calibrate-explicit-files-100-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "1"
+    ],
+    "label": "calibrate-explicit-files-100-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/calibrate-explicit-files-100-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-0-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-0-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-0-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-0-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-1-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-1-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-1-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-1-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-2-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-2-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-2-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-2-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-3-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-3-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-3-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-3-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-4-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-4-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-4-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-4-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-5-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-5-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-5-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-5-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-6-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-6-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-6-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-6-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-7-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-7-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-7-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-7-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-8-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-8-baseline.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-8-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-8-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/candidate/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-9-candidate",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-9-candidate.log"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/flat-file-projection/controls-small/build/baseline/arm64-apple-macosx/release/FlatFileProjectionBenchmark",
+      "measure",
+      "explicit-files",
+      "100",
+      "157"
+    ],
+    "label": "measure-explicit-files-100-9-baseline",
+    "returncode": 0,
+    "stderr": "",
+    "stdout_log": "logs/measure-explicit-files-100-9-baseline.log"
+  }
+]

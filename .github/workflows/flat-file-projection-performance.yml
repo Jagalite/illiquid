@@ -1,0 +1,55 @@
+name: Flat file projection performance
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Tests/IlliquidAppTests/FlatFileProjectionTests.swift'
+      - 'Benchmarks/FlatFileProjection/**'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - '.github/workflows/flat-file-projection-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flat-file-projection-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Validate exact production sources and complete output parity
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 Benchmarks/FlatFileProjection/run.py \
+            --mode verify --output "$RUNNER_TEMP/flat-file-projection"
+      - name: Run the full paired native performance study
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/FlatFileProjection/run.py \
+            --pairs 10 --target-ms 1000 \
+            --output "$RUNNER_TEMP/flat-file-projection"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: flat-file-projection-macos
+          path: |
+            ${{ runner.temp }}/flat-file-projection/
+            !${{ runner.temp }}/flat-file-projection/**/build/**
+            !${{ runner.temp }}/flat-file-projection/**/swiftpm-cache/**
+            !${{ runner.temp }}/flat-file-projection/**/.build/**
+            !${{ runner.temp }}/flat-file-projection/**/module-cache/**
+            !${{ runner.temp }}/flat-file-projection/**/cache/**
+          retention-days: 14
