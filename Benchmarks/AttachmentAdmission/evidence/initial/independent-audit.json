@@ -1,0 +1,751 @@
+{
+  "baseline_revision": "7f9ba073394b77a908e0589447c6edc8d10b832c",
+  "calibrations_below_target": [
+    {
+      "case": "cover-png",
+      "mode": "setup"
+    }
+  ],
+  "candidate_revision": "50c1265a5ca53f5d1a7e092369090f42c221dec8",
+  "compiled_source_hashes_reconstructed": 20,
+  "measured_observations": 168,
+  "observations": 252,
+  "observations_below_5ms": 0,
+  "omitted_content_not_independently_rehashed": [
+    "optional source snapshot: baseline:Sources/CFFmpeg/include/ffmpeg_shim.h",
+    "optional source snapshot: baseline:Sources/CFFmpeg/module.modulemap",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Media/FFmpegError.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Media/FFmpegStreamInfo.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Media/MediaTime.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift",
+    "optional source snapshot: baseline:Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift",
+    "optional source snapshot: candidate:Sources/CFFmpeg/include/ffmpeg_shim.h",
+    "optional source snapshot: candidate:Sources/CFFmpeg/module.modulemap",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Media/FFmpegError.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Media/FFmpegStreamInfo.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Media/MediaTime.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift",
+    "optional source snapshot: candidate:Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift",
+    "optional compiled source: baseline/ExtractedDeclarations.swift",
+    "optional compiled source: baseline/FFmpegDemuxer.swift",
+    "optional compiled source: baseline/FFmpegError.swift",
+    "optional compiled source: baseline/FFmpegInputExecutor.swift",
+    "optional compiled source: baseline/FFmpegPacket.swift",
+    "optional compiled source: baseline/FFmpegStreamInfo.swift",
+    "optional compiled source: baseline/FixedRingBuffer.swift",
+    "optional compiled source: baseline/FontAttachmentStore.swift",
+    "optional compiled source: baseline/MediaTime.swift",
+    "optional compiled source: baseline/PacketQueue.swift",
+    "optional compiled source: candidate/ExtractedDeclarations.swift",
+    "optional compiled source: candidate/FFmpegDemuxer.swift",
+    "optional compiled source: candidate/FFmpegError.swift",
+    "optional compiled source: candidate/FFmpegInputExecutor.swift",
+    "optional compiled source: candidate/FFmpegPacket.swift",
+    "optional compiled source: candidate/FFmpegStreamInfo.swift",
+    "optional compiled source: candidate/FixedRingBuffer.swift",
+    "optional compiled source: candidate/FontAttachmentStore.swift",
+    "optional compiled source: candidate/MediaTime.swift",
+    "optional compiled source: candidate/PacketQueue.swift",
+    "optional run.py snapshot",
+    "optional Harness.swift snapshot",
+    "native binary: baseline/libAttachmentProjection.dylib",
+    "native binary: baseline/attachment-benchmark",
+    "native binary: candidate/libAttachmentProjection.dylib",
+    "native binary: candidate/attachment-benchmark",
+    "native compiler executable",
+    "native FFmpeg library: avcodec",
+    "native FFmpeg library: avfilter",
+    "native FFmpeg library: avformat",
+    "native FFmpeg library: avutil",
+    "native FFmpeg library: swresample",
+    "native FFmpeg library: swscale",
+    "native FFmpeg header contents: 141/141",
+    "native fixture bytes: none",
+    "native fixture bytes: fonts-2mib",
+    "native fixture bytes: unsupported-1mib",
+    "native fixture bytes: unsupported-16mib",
+    "native fixture bytes: unsupported-64mib",
+    "native fixture bytes: mixed-16mib",
+    "native fixture bytes: cover-png"
+  ],
+  "pairs": 6,
+  "production_source_hashes_reconstructed": 26,
+  "results": [
+    {
+      "case": "none",
+      "cpu_seconds": {
+        "baseline": 8.084712274635712e-07,
+        "candidate": 8.097472626986088e-07,
+        "candidate_lower_pairs": 2,
+        "paired_median_percent_change": 4.325829780746215,
+        "paired_percent_changes": [
+          10.795269610502277,
+          6.563232503627692,
+          -2.946500402252561,
+          2.088427057864739,
+          34.53435114503818,
+          -18.49911265106051
+        ]
+      },
+      "iterations": 12147,
+      "mode": "projection",
+      "process_max_rss_bytes": {
+        "baseline": 13869056.0,
+        "candidate": 13836288.0,
+        "candidate_lower_pairs": 3,
+        "paired_median_percent_change": -0.17667844522968323,
+        "paired_percent_changes": [
+          -0.5889281507656108,
+          0.23696682464455776,
+          -0.4711425206124886,
+          -0.35335689045936647,
+          0.0,
+          0.0
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 8.080767267638101e-07,
+        "candidate": 8.093064954309707e-07,
+        "candidate_lower_pairs": 2,
+        "paired_median_percent_change": 4.312992569322994,
+        "paired_percent_changes": [
+          10.802513633390976,
+          6.5502303363220715,
+          -2.9272428090718616,
+          2.0757548023239147,
+          34.76512743556122,
+          -18.509241939063447
+        ]
+      }
+    },
+    {
+      "case": "none",
+      "cpu_seconds": {
+        "baseline": 0.0001405673076923077,
+        "candidate": 0.00010556249999999998,
+        "candidate_lower_pairs": 4,
+        "paired_median_percent_change": -32.710401696712836,
+        "paired_percent_changes": [
+          62.922224146890635,
+          13.868142000922123,
+          -52.143569292123594,
+          -43.52809752780611,
+          -31.571277159512455,
+          -33.84952623391321
+        ]
+      },
+      "iterations": 104,
+      "mode": "setup",
+      "process_max_rss_bytes": {
+        "baseline": 13991936.0,
+        "candidate": 13959168.0,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -0.29274245802080046,
+        "paired_percent_changes": [
+          -0.3512880562060894,
+          -0.11709601873536313,
+          -0.2350176263219761,
+          -0.3504672897196248,
+          -0.11709601873536313,
+          -0.5847953216374324
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.0001513517644230769,
+        "candidate": 0.00010552544230769232,
+        "candidate_lower_pairs": 4,
+        "paired_median_percent_change": -37.15929295015934,
+        "paired_percent_changes": [
+          63.022978709835954,
+          13.849469896182786,
+          -52.0755358423838,
+          -46.55302810498346,
+          -40.472060370172414,
+          -33.846525530146266
+        ]
+      }
+    },
+    {
+      "case": "fonts-2mib",
+      "cpu_seconds": {
+        "baseline": 0.00021072881355932202,
+        "candidate": 0.0002312881355932203,
+        "candidate_lower_pairs": 1,
+        "paired_median_percent_change": 11.55139877723028,
+        "paired_percent_changes": [
+          -2.5002604437962317,
+          15.29314918137754,
+          2.9354769252852853,
+          11.193715808668813,
+          20.599739243806958,
+          11.909081745791749
+        ]
+      },
+      "iterations": 59,
+      "mode": "projection",
+      "process_max_rss_bytes": {
+        "baseline": 24797184.0,
+        "candidate": 24797184.0,
+        "candidate_lower_pairs": 3,
+        "paired_median_percent_change": -0.033046926635821317,
+        "paired_percent_changes": [
+          0.0,
+          -0.26350461133070047,
+          -0.06609385327164263,
+          0.0,
+          -0.46113306982872304,
+          0.06609385327165374
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.0002107627118644068,
+        "candidate": 0.00023120868644067795,
+        "candidate_lower_pairs": 1,
+        "paired_median_percent_change": 10.903872519124214,
+        "paired_percent_changes": [
+          -2.4976222427787853,
+          15.994291567532692,
+          2.827741372667858,
+          11.185042292265624,
+          20.325101909808474,
+          10.622702745982803
+        ]
+      }
+    },
+    {
+      "case": "fonts-2mib",
+      "cpu_seconds": {
+        "baseline": 0.001815857142857143,
+        "candidate": 0.0016784999999999999,
+        "candidate_lower_pairs": 3,
+        "paired_median_percent_change": -8.421527534939848,
+        "paired_percent_changes": [
+          1.6326955074875027,
+          7.569887969846034,
+          -31.92090395480226,
+          36.64188137644826,
+          -26.319285110493908,
+          -18.4757505773672
+        ]
+      },
+      "iterations": 7,
+      "mode": "setup",
+      "process_max_rss_bytes": {
+        "baseline": 24895488.0,
+        "candidate": 24838144.0,
+        "candidate_lower_pairs": 5,
+        "paired_median_percent_change": -0.23032812445861195,
+        "paired_percent_changes": [
+          -0.39473684210525883,
+          -0.1315789473684159,
+          -0.19749835418038098,
+          0.13201320132012473,
+          -0.3295978905734964,
+          -0.2631578947368429
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.001815092285714286,
+        "candidate": 0.001678,
+        "candidate_lower_pairs": 3,
+        "paired_median_percent_change": -8.407100014742065,
+        "paired_percent_changes": [
+          1.6309824549027185,
+          7.582911377751023,
+          -31.490476382872966,
+          36.66740133374944,
+          -26.517915289232164,
+          -18.445182484386848
+        ]
+      }
+    },
+    {
+      "case": "unsupported-1mib",
+      "cpu_seconds": {
+        "baseline": 0.0002339057142857143,
+        "candidate": 2.2192857142857153e-05,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -90.6141122341032,
+        "paired_percent_changes": [
+          -90.99742329477735,
+          -92.75218888541046,
+          -92.82052250431958,
+          -86.22530775837389,
+          -86.45504184459986,
+          -90.23080117342907
+        ]
+      },
+      "iterations": 350,
+      "mode": "projection",
+      "process_max_rss_bytes": {
+        "baseline": 18366464.0,
+        "candidate": 18358272.0,
+        "candidate_lower_pairs": 4,
+        "paired_median_percent_change": -0.0892060660124927,
+        "paired_percent_changes": [
+          -0.4440497335701621,
+          0.08928571428572507,
+          -0.0892060660124927,
+          -0.0892060660124927,
+          -0.4444444444444473,
+          0.17857142857142794
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.00023550666714285714,
+        "candidate": 2.2179762857142858e-05,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -90.66402509450545,
+        "paired_percent_changes": [
+          -91.09443592465888,
+          -92.78803024023519,
+          -92.86936378880962,
+          -86.27491643806786,
+          -86.18398606748315,
+          -90.23361426435201
+        ]
+      }
+    },
+    {
+      "case": "unsupported-1mib",
+      "cpu_seconds": {
+        "baseline": 0.0009247857142857144,
+        "candidate": 0.0006006428571428571,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -32.668953268699156,
+        "paired_percent_changes": [
+          -23.236386138613852,
+          -31.914246616998632,
+          -29.993782061246666,
+          -49.21574023115025,
+          -41.73222273638747,
+          -33.423659920399686
+        ]
+      },
+      "iterations": 14,
+      "mode": "setup",
+      "process_max_rss_bytes": {
+        "baseline": 18464768.0,
+        "candidate": 18423808.0,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -0.2658800393313676,
+        "paired_percent_changes": [
+          -0.17730496453900457,
+          -0.5323868677905907,
+          -0.1777777777777767,
+          -0.6211180124223614,
+          -0.3539823008849585,
+          -0.08873114463177068
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.0009337038928571428,
+        "candidate": 0.0006007440357142858,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -32.721277816108454,
+        "paired_percent_changes": [
+          -26.92183745062473,
+          -32.0119089383409,
+          -29.70910009718174,
+          -51.52120553438504,
+          -41.729572710086025,
+          -33.43064669387601
+        ]
+      }
+    },
+    {
+      "case": "unsupported-16mib",
+      "cpu_seconds": {
+        "baseline": 3.0398148148148147e-05,
+        "candidate": 2.272592592592592e-05,
+        "candidate_lower_pairs": 4,
+        "paired_median_percent_change": -23.49217279819051,
+        "paired_percent_changes": [
+          -24.501968959925836,
+          -22.482376636455182,
+          -40.57372211073073,
+          9.073095927756047,
+          5.36837570012918,
+          -51.043024771838375
+        ]
+      },
+      "iterations": 540,
+      "mode": "projection",
+      "process_max_rss_bytes": {
+        "baseline": 79101952.0,
+        "candidate": 81313792.0,
+        "candidate_lower_pairs": 0,
+        "paired_median_percent_change": 2.7855540843624182,
+        "paired_percent_changes": [
+          2.733485193621865,
+          2.753623188405796,
+          2.8174849803190405,
+          2.733485193621865,
+          2.838201781644911,
+          2.838201781644911
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 3.0553664814814816e-05,
+        "candidate": 2.2713001851851854e-05,
+        "candidate_lower_pairs": 4,
+        "paired_median_percent_change": -25.496241326685247,
+        "paired_percent_changes": [
+          -27.62909514580962,
+          -23.363387507560873,
+          -40.58949391119246,
+          9.084032897259986,
+          5.3554181230215825,
+          -51.144226366858405
+        ]
+      }
+    },
+    {
+      "case": "unsupported-16mib",
+      "cpu_seconds": {
+        "baseline": 0.01561325,
+        "candidate": 0.008933500000000002,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -44.61776577290035,
+        "paired_percent_changes": [
+          -44.879156528791555,
+          -51.59456496800675,
+          -53.798891053499176,
+          -36.55537968859276,
+          -44.35637501700914,
+          -35.31996964714808
+        ]
+      },
+      "iterations": 2,
+      "mode": "setup",
+      "process_max_rss_bytes": {
+        "baseline": 81379328.0,
+        "candidate": 81330176.0,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -0.040269808119819395,
+        "paired_percent_changes": [
+          -0.020132876988121495,
+          -0.04026575397624299,
+          -0.14090177133655457,
+          -0.0402738622633958,
+          -0.02014098690835686,
+          -0.12079726192872897
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.0156104585,
+        "candidate": 0.008934646000000001,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -44.62559988120631,
+        "paired_percent_changes": [
+          -44.86284161427703,
+          -51.974268427151436,
+          -53.999604772557795,
+          -36.55583423456591,
+          -44.38835814813559,
+          -35.31768754748905
+        ]
+      }
+    },
+    {
+      "case": "unsupported-64mib",
+      "cpu_seconds": {
+        "baseline": 5.2273972602739726e-05,
+        "candidate": 3.3894324853228963e-05,
+        "candidate_lower_pairs": 5,
+        "paired_median_percent_change": -29.272946825465233,
+        "paired_percent_changes": [
+          -34.821865242090176,
+          47.097463284379224,
+          -23.72402840884029,
+          -44.19376671930899,
+          -17.885482248630925,
+          -66.11419979719574
+        ]
+      },
+      "iterations": 511,
+      "mode": "projection",
+      "process_max_rss_bytes": {
+        "baseline": 280444928.0,
+        "candidate": 282648576.0,
+        "candidate_lower_pairs": 0,
+        "paired_median_percent_change": 0.7945083739223868,
+        "paired_percent_changes": [
+          0.777005316352164,
+          0.8122954651706316,
+          0.7828474615878989,
+          0.7886896068236338,
+          0.8003271410211399,
+          0.8003738972950813
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 5.243203718199609e-05,
+        "candidate": 3.388262426614481e-05,
+        "candidate_lower_pairs": 5,
+        "paired_median_percent_change": -29.32346803458799,
+        "paired_percent_changes": [
+          -34.918965096146,
+          64.42523451782168,
+          -23.727970973029976,
+          -44.28673731302452,
+          -11.564159776488403,
+          -66.42066817159294
+        ]
+      }
+    },
+    {
+      "case": "unsupported-64mib",
+      "cpu_seconds": {
+        "baseline": 0.07292000000000001,
+        "candidate": 0.03766649999999999,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -49.8782576028772,
+        "paired_percent_changes": [
+          -49.297186174996796,
+          -32.28873190568054,
+          -57.16183067478012,
+          -50.54399020346647,
+          -50.4593290307576,
+          -46.322594161042694
+        ]
+      },
+      "iterations": 1,
+      "mode": "setup",
+      "process_max_rss_bytes": {
+        "baseline": 282566656.0,
+        "candidate": 282615808.0,
+        "candidate_lower_pairs": 1,
+        "paired_median_percent_change": 0.017394833749007077,
+        "paired_percent_changes": [
+          0.01739432944860564,
+          0.028995592669911474,
+          -0.028980467165129475,
+          0.005796093433030336,
+          0.034790676098794826,
+          0.017395338049408515
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.0734876455,
+        "candidate": 0.0379560205,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -49.650922740467664,
+        "paired_percent_changes": [
+          -48.85015048860769,
+          -32.487447076054956,
+          -57.12932997172019,
+          -50.548037200196475,
+          -50.451694992327646,
+          -46.25189324259465
+        ]
+      }
+    },
+    {
+      "case": "mixed-16mib",
+      "cpu_seconds": {
+        "baseline": 0.00012105309734513275,
+        "candidate": 9.173451327433623e-05,
+        "candidate_lower_pairs": 4,
+        "paired_median_percent_change": -26.051324156569354,
+        "paired_percent_changes": [
+          -58.728617660656504,
+          18.19618467095605,
+          -58.28013823947962,
+          -16.478894396875532,
+          -35.623753916263176,
+          120.47726969737371
+        ]
+      },
+      "iterations": 113,
+      "mode": "projection",
+      "process_max_rss_bytes": {
+        "baseline": 79699968.0,
+        "candidate": 82214912.0,
+        "candidate_lower_pairs": 0,
+        "paired_median_percent_change": 3.1555242497704694,
+        "paired_percent_changes": [
+          3.229123817359114,
+          3.1873329220645674,
+          3.1237155774763714,
+          3.040887610437637,
+          3.1237155774763714,
+          3.207896360271434
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.00012102488938053097,
+        "candidate": 9.169303539823009e-05,
+        "candidate_lower_pairs": 4,
+        "paired_median_percent_change": -26.00691164221829,
+        "paired_percent_changes": [
+          -58.998927843908824,
+          18.196151945907026,
+          -59.9415078254443,
+          -16.37748943761149,
+          -35.636333846825096,
+          120.4824700331761
+        ]
+      }
+    },
+    {
+      "case": "mixed-16mib",
+      "cpu_seconds": {
+        "baseline": 0.01468975,
+        "candidate": 0.009455749999999999,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -37.362983326512165,
+        "paired_percent_changes": [
+          -42.84893933252264,
+          -32.275767449837076,
+          -12.662509679259948,
+          -29.3993595251113,
+          -42.450199203187246,
+          -50.83259494637782
+        ]
+      },
+      "iterations": 2,
+      "mode": "setup",
+      "process_max_rss_bytes": {
+        "baseline": 82223104.0,
+        "candidate": 82214912.0,
+        "candidate_lower_pairs": 4,
+        "paired_median_percent_change": -0.019930245926724766,
+        "paired_percent_changes": [
+          -0.15926737009754888,
+          -0.01993620414673103,
+          -0.07964954201513663,
+          0.0,
+          -0.019924287706718502,
+          0.09966115208290827
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.014722510500000001,
+        "candidate": 0.00946579175,
+        "candidate_lower_pairs": 6,
+        "paired_median_percent_change": -37.45680406420198,
+        "paired_percent_changes": [
+          -43.027017464048335,
+          -32.43077684756407,
+          -12.664896896448052,
+          -29.20488779966941,
+          -42.482831280839896,
+          -50.83347817634303
+        ]
+      }
+    },
+    {
+      "case": "cover-png",
+      "cpu_seconds": {
+        "baseline": 1.4176957721923583e-06,
+        "candidate": 1.4293912538137439e-06,
+        "candidate_lower_pairs": 2,
+        "paired_median_percent_change": 9.940973625598758,
+        "paired_percent_changes": [
+          15.320388349514591,
+          36.6282146258863,
+          -53.97547835779305,
+          -6.91367835502138,
+          16.886069889899513,
+          4.561558901682927
+        ]
+      },
+      "iterations": 6883,
+      "mode": "projection",
+      "process_max_rss_bytes": {
+        "baseline": 14213120.0,
+        "candidate": 14188544.0,
+        "candidate_lower_pairs": 3,
+        "paired_median_percent_change": 0.0,
+        "paired_percent_changes": [
+          -0.11520737327188613,
+          0.34762456546928444,
+          0.11520737327188613,
+          -0.11534025374856371,
+          -0.45977011494252595,
+          0.34802784222738303
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 1.4170904402150225e-06,
+        "candidate": 1.4288645939270667e-06,
+        "candidate_lower_pairs": 2,
+        "paired_median_percent_change": 9.989404352599362,
+        "paired_percent_changes": [
+          15.387861924838697,
+          36.59524987090257,
+          -53.96487430043,
+          -6.966347849849697,
+          16.882422138078624,
+          4.590946780360028
+        ]
+      }
+    },
+    {
+      "case": "cover-png",
+      "cpu_seconds": {
+        "baseline": 0.00013299350649350648,
+        "candidate": 0.0001556753246753247,
+        "candidate_lower_pairs": 2,
+        "paired_median_percent_change": 29.893862285836104,
+        "paired_percent_changes": [
+          34.36559557324534,
+          25.422128998426864,
+          38.43760801935705,
+          -6.881329524798785,
+          39.18467583497052,
+          -7.804501110789175
+        ]
+      },
+      "iterations": 77,
+      "mode": "setup",
+      "process_max_rss_bytes": {
+        "baseline": 14336000.0,
+        "candidate": 14311424.0,
+        "candidate_lower_pairs": 3,
+        "paired_median_percent_change": -0.05714285714285561,
+        "paired_percent_changes": [
+          -0.34285714285714475,
+          -0.11428571428571122,
+          0.0,
+          0.5747126436781658,
+          -0.45610034207526073,
+          0.0
+        ]
+      },
+      "wall_seconds": {
+        "baseline": 0.0001329304675324675,
+        "candidate": 0.0001556222987012987,
+        "candidate_lower_pairs": 2,
+        "paired_median_percent_change": 29.756254800408087,
+        "paired_percent_changes": [
+          34.388762626262626,
+          25.12374697455355,
+          38.46312577655395,
+          -6.901603484088781,
+          38.96980057181649,
+          -7.837032923251519
+        ]
+      }
+    }
+  ],
+  "shortest_measured_sample_ms": 7.172334,
+  "status": "pass",
+  "verified_available_files": [
+    "FFmpeg header hash manifest",
+    "command exit-code receipts"
+  ]
+}

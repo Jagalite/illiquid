@@ -1,0 +1,65 @@
+[
+  {
+    "name": "none",
+    "filename": "none.mkv",
+    "description": "No attachments; normal-open control",
+    "rejected_payload_bytes": 0,
+    "accepted_payload_bytes": 0,
+    "sha256": "a95a58bb3dec5029eb26c8c7d88273a6e0232a458353111d88757c5c861b31e0",
+    "size_bytes": 657
+  },
+  {
+    "name": "fonts-2mib",
+    "filename": "fonts-2mib.mkv",
+    "description": "2 MiB font-labeled payload; supported-copy control",
+    "rejected_payload_bytes": 0,
+    "accepted_payload_bytes": 2097152,
+    "sha256": "4bbfe7031a617808a707a2593eee3a5adca80b70f6909a4efd078036d09a0cae",
+    "size_bytes": 2097891
+  },
+  {
+    "name": "unsupported-1mib",
+    "filename": "unsupported-1mib.mkv",
+    "description": "1 MiB generic embedded extra",
+    "rejected_payload_bytes": 1048576,
+    "accepted_payload_bytes": 0,
+    "sha256": "402edc623cc0a81b16cf23374670da75861accbac9fd392cb77d3b65054e804c",
+    "size_bytes": 1049308
+  },
+  {
+    "name": "unsupported-16mib",
+    "filename": "unsupported-16mib.mkv",
+    "description": "16 MiB generic embedded extra",
+    "rejected_payload_bytes": 16777216,
+    "accepted_payload_bytes": 0,
+    "sha256": "452fb0efffe03f3fc76bd0c7e9920b70f05cdf502f4b75e6b6b84bb803841578",
+    "size_bytes": 16777952
+  },
+  {
+    "name": "unsupported-64mib",
+    "filename": "unsupported-64mib.mkv",
+    "description": "64 MiB generic embedded extra; stress case",
+    "rejected_payload_bytes": 67108864,
+    "accepted_payload_bytes": 0,
+    "sha256": "c0deb5ce87359e90d15973a22467a303153a4725bb6e56578cd0fb974dc9292f",
+    "size_bytes": 67109600
+  },
+  {
+    "name": "mixed-16mib",
+    "filename": "mixed-16mib.mkv",
+    "description": "16 MiB PDF-labeled extra plus 128 KiB font-labeled payload",
+    "rejected_payload_bytes": 16777216,
+    "accepted_payload_bytes": 131072,
+    "sha256": "d5e6b9611184343c491375371b7ff2fd14bb45c9e3e0abe7324977eef672d3ab",
+    "size_bytes": 16909082
+  },
+  {
+    "name": "cover-png",
+    "filename": "cover-png.mkv",
+    "description": "Real PNG cover promoted by FFmpeg to an attached-picture stream",
+    "rejected_payload_bytes": 0,
+    "accepted_payload_bytes": 0,
+    "sha256": "1421f4295324c573b68c01afdef902cd7cd8d7d73804be8dcc15ae4407abd566",
+    "size_bytes": 831
+  }
+]
