@@ -1,0 +1,52 @@
+Building for debugging...
+[0/7] /Users/runner/work/_temp/audio-format-metadata/tests/build-debug/arm64-apple-macosx/debug/AudioSourceFormatQualificationPackageTests.derived/runner.swift
+[1/7] Write sources
+[4/7] Write swift-version-7974D3F7F03D5E95.txt
+[6/9] Emitting module IlliquidNativePlayback
+[7/9] Compiling IlliquidNativePlayback AudioSourceFormat.swift
+[8/10] Compiling IlliquidNativePlayback CStringBuffer.swift
+[9/12] Emitting module IlliquidNativePlaybackTests
+[10/12] Compiling IlliquidNativePlaybackTests AudioSourceFormatTests.swift
+[11/14] Emitting module AudioSourceFormatQualificationPackageTests
+[12/14] Compiling AudioSourceFormatQualificationPackageTests runner.swift
+[12/14] Write Objects.LinkFileList
+ld: warning: building for macOS-14.0, but linking with dylib '/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/libavutil.60.dylib' which was built for newer version 26.0
+[13/14] Linking AudioSourceFormatQualificationPackageTests
+Build complete! (10.56s)
+Test Suite 'Selected tests' started at 2026-10-21 20:12:21.171.
+Test Suite 'AudioSourceFormatQualificationPackageTests.xctest' started at 2026-10-21 20:12:21.175.
+Test Suite 'AudioSourceFormatQualificationPackageTests.xctest' passed at 2026-10-21 20:12:21.175.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-21 20:12:21.175.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Audio source format metadata" started.
+◇ Test customNamesAndIDsCanChangeAtTheSameAddress() started.
+◇ Test customDescriptionsRetainTheExisting128ByteLimit() started.
+◇ Test everyFormerSignatureFieldStillDistinguishesFormats() started.
+◇ Test repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test cachedStringsOutliveTheirFrames() started.
+◇ Test equivalentNativeAndCustomDescriptionsKeepTheSameFormatIdentity() started.
+◇ Test changingNativeChannelCountAlsoInvalidatesTheName() started.
+◇ Test ambisonicAndInvalidOrdersKeepTheFallbackBehavior() started.
+◇ Test equalChannelCountsWithDifferentMasksInvalidateTheName() started.
+◇ Test unspecifiedOrderUsesChannelCountAndIgnoresTheUnion() started.
+◇ Test case passing 1 argument layout → "mono" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "5.1" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "5.1(side)" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "7.1" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "stereo" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+✔ Test everyFormerSignatureFieldStillDistinguishesFormats() passed after 0.001 seconds.
+✔ Test customNamesAndIDsCanChangeAtTheSameAddress() passed after 0.001 seconds.
+✔ Test cachedStringsOutliveTheirFrames() passed after 0.001 seconds.
+✔ Test customDescriptionsRetainTheExisting128ByteLimit() passed after 0.001 seconds.
+✔ Test equivalentNativeAndCustomDescriptionsKeepTheSameFormatIdentity() passed after 0.001 seconds.
+✔ Test repeatedNativeLayoutsMatchFFmpeg(layout:) with 5 test cases passed after 0.001 seconds.
+✔ Test equalChannelCountsWithDifferentMasksInvalidateTheName() passed after 0.001 seconds.
+✔ Test changingNativeChannelCountAlsoInvalidatesTheName() passed after 0.001 seconds.
+✔ Test unspecifiedOrderUsesChannelCountAndIgnoresTheUnion() passed after 0.001 seconds.
+✔ Test ambisonicAndInvalidOrdersKeepTheFallbackBehavior() passed after 0.001 seconds.
+✔ Suite "Audio source format metadata" passed after 0.001 seconds.
+✔ Test run with 10 tests in 1 suite passed after 0.001 seconds.

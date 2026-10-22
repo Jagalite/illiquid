@@ -7,6 +7,8 @@ on:
       - 'Tests/IlliquidCoreTests/EpisodeNameRecognitionRegressionTests.swift'
       - 'Benchmarks/EpisodeNameRecognition/Driver.swift'
       - 'Benchmarks/EpisodeNameRecognition/run.py'
+      - 'Benchmarks/EpisodeNameRecognition/FoundationBoundary.swift'
+      - 'Benchmarks/EpisodeNameRecognition/test_harness.py'
       - 'Benchmarks/EpisodeNameRecognition/baseline/**'
       - 'Benchmarks/EpisodeNameRecognition/folder-reuse/**'
       - '.github/workflows/episode-name-recognition-performance.yml'
@@ -17,6 +19,34 @@ concurrency:
   group: episode-name-recognition-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  linux-differential:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    container:
+      image: swift:6.2.4-noble@sha256:d6f8f6112e9a63da0a4a151d6b93acd16699d35c0b82531ac1a245f5af210197
+    steps:
+      - name: Install the Python runner dependency
+        run: apt-get update && apt-get install -y --no-install-recommends python3
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Harness transformation and timing-isolation checks
+        run: python3 Benchmarks/EpisodeNameRecognition/test_harness.py
+      - name: Compare all 16300 paths at the adapted Foundation boundary (Swift 6.2.4 Linux)
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          swiftc --version
+          python3 Benchmarks/EpisodeNameRecognition/run.py differential \
+            --output "$RUNNER_TEMP/episode-linux/main"
+          python3 Benchmarks/EpisodeNameRecognition/run.py differential --reference folder-reuse \
+            --output "$RUNNER_TEMP/episode-linux/folder-reuse"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: episode-name-recognition-linux-6.2.4
+          path: ${{ runner.temp }}/episode-linux/
+          retention-days: 14
+
   native-component:
     runs-on: macos-26
     timeout-minutes: 15
@@ -34,6 +64,13 @@ jobs:
                 --implementation "$implementation" --configuration "$configuration" \
                 --output "$RUNNER_TEMP/episode-name-recognition/$implementation-$configuration"
             done
+          done
+      - name: Prove the Foundation adapter against native paths and complete recognition snapshots (no timings)
+        run: |
+          python3 Benchmarks/EpisodeNameRecognition/test_harness.py
+          for reference in main folder-reuse; do
+            python3 Benchmarks/EpisodeNameRecognition/run.py foundation-proof --reference "$reference" \
+              --output "$RUNNER_TEMP/episode-name-recognition/foundation-proof-$reference"
           done
       - name: Differential corpus and balanced paired native benchmarks
         run: |

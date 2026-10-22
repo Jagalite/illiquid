@@ -1,0 +1,271 @@
+Fetching https://github.com/sparkle-project/Sparkle.git
+Fetching https://github.com/swiftlang/swift-syntax.git
+[1/44195] Fetching sparkle
+[34474/125186] Fetching sparkle, swift-syntax
+Fetched https://github.com/swiftlang/swift-syntax.git from cache (4.11s)
+Fetched https://github.com/sparkle-project/Sparkle.git from cache (4.11s)
+Fetching https://github.com/swiftlang/swift-testing.git
+[1/44975] Fetching swift-testing
+Fetched https://github.com/swiftlang/swift-testing.git from cache (2.16s)
+Creating working copy for https://github.com/sparkle-project/Sparkle.git
+Creating working copy for https://github.com/swiftlang/swift-testing.git
+Creating working copy for https://github.com/swiftlang/swift-syntax.git
+Working copy of https://github.com/swiftlang/swift-testing.git resolved at swift-6.3.2-RELEASE (70eff26)
+Working copy of https://github.com/swiftlang/swift-syntax.git resolved at 603.0.2
+Working copy of https://github.com/sparkle-project/Sparkle.git resolved at 2.10.0
+Downloading binary artifact https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+[16375/10193895] Downloading https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+Downloaded https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip (0.94s)
+Downloading package prebuilt https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip
+Downloaded https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip (1.00s)
+Building for production...
+[0/49] /Users/runner/work/illiquid/illiquid/.build/arm64-apple-macosx/release/IlliquidPackageTests.derived/runner.swift
+[1/49] Write swift-version-7974D3F7F03D5E95.txt
+[2/49] Compiling _TestingInternals WillThrow.cpp
+[3/49] Compiling _TestingInternals ExecutablePath.cpp
+[4/49] Compiling _TestingInternals Discovery.cpp
+[5/49] Write sources
+[8/50] Compiling _TestingInternals Versions.cpp
+[9/50] Copying Sparkle.framework
+[11/51] Compiling _TestDiscovery WinSDKAdditions.swift
+[11/51] Copying NativePlaybackShaders.metal
+[12/51] Copying Resources
+[13/51] Write sources
+[32/52] Compiling TestingMacros ConditionMacro.swift
+[32/52] Write sources
+[33/52] Write Objects.LinkFileList
+[34/52] Write sources
+[35/52] Linking TestingMacros-tool
+[36/52] Compiling CNativeAudio AudioOutputDevice.m
+[38/53] Compiling IlliquidCore MediaMetadataHints.swift
+[39/54] Compiling IlliquidPlaybackCore EventsAndEffects.swift
+[40/55] Compiling Testing ABI.Record+Streaming.swift
+[41/56] Compiling IlliquidPlayback Module.swift
+[42/57] Compiling IlliquidPlaybackStateSpace PlaybackPartialOrderReducer.swift
+[43/58] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+[44/59] Compiling IlliquidStateSpaceExplorer main.swift
+[45/60] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+[46/61] Compiling IlliquidPlaybackCoreTests PlaybackCoreTests.swift
+[47/62] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+/Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1150 |             self.workQueue.async {
+1151 |                 _ = resources.retainedCVTextures
+1152 |                 guard commandBuffer.status != .error else {
+     |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1153 |                     completion(.failure(
+1154 |                         commandBuffer.error
+
+/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+243 |  */
+244 | API_AVAILABLE(macos(10.11), ios(8.0))
+245 | @protocol MTLCommandBuffer <NSObject>
+    |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+246 | 
+247 | /*!
+
+/Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   4 | import CoreVideo
+   5 | import Foundation
+   6 | import Metal
+     | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   7 | import OSLog
+   8 | import QuartzCore
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[47/62] Write Objects.LinkFileList
+[49/63] Compiling IlliquidRenderProfile main.swift
+[50/63] Compiling IlliquidCoreTests AspectFitWindowSizingTests.swift
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 97 |             nil,
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+101 |         ]
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+101 |         ]
+102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+[50/64] Linking IlliquidStateSpaceExplorer
+[52/65] Compiling IlliquidPlayer ArchitectureValidation.swift
+[53/66] Compiling IlliquidDifferentialHarness main.swift
+[54/67] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+[55/68] Compiling IlliquidPlaybackStress main.swift
+[56/69] Compiling IlliquidArchitectureCheck main.swift
+[57/70] Compiling IlliquidApp AppDelegate.swift
+[57/70] Write Objects.LinkFileList
+[59/70] Linking IlliquidRenderProfile
+[60/70] Linking IlliquidPlaybackStress
+[61/70] Write Objects.LinkFileList
+[63/70] Linking IlliquidDifferentialHarness
+[64/70] Linking IlliquidArchitectureCheck
+[65/70] Write Objects.LinkFileList
+[66/70] Linking Illiquid
+[68/71] Compiling IlliquidNativePlaybackTests AudioDelayTests.swift
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift:127:18: warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+125 |         let queue = BoundedQueue<Payload>(capacity: 1)
+126 |         var value: Payload? = Payload()
+127 |         weak var retained = value
+    |                  `- warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+128 |         #expect(queue.push(value!)); value = nil
+129 |         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift:99:13: warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+ 97 |         let checkoutID = try #require(token).checkoutID
+ 98 |         var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
+ 99 |             ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+    |             `- warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+100 |         )
+101 |         token?.transition(to: .queued)
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+167 |         var first: Value? = Value()
+168 |         weak var released = first
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+169 |         ring.append(first!)
+170 |         first = nil
+
+[#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+[69/71] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+[70/72] Compiling IlliquidPackageTests runner.swift
+[70/72] Write Objects.LinkFileList
+[71/72] Linking IlliquidPackageTests
+Build complete! (283.97s)
+Test Suite 'Selected tests' started at 2026-10-21 20:18:38.728.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-10-21 20:18:38.730.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-10-21 20:18:38.730.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-21 20:18:38.730.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Signed audio delay" started.
+◇ Test positiveDelayAddsBoundedSilenceWithoutChangingSamples() started.
+✔ Test positiveDelayAddsBoundedSilenceWithoutChangingSamples() passed after 0.001 seconds.
+◇ Test negativeDelayTrimsAtSampleBoundaryAndPadsExhaustedTail() started.
+✔ Test negativeDelayTrimsAtSampleBoundaryAndPadsExhaustedTail() passed after 0.001 seconds.
+◇ Test seekUsesMappedSourceSamplesAndCancelsLargeSilence() started.
+✔ Test seekUsesMappedSourceSamplesAndCancelsLargeSilence() passed after 0.001 seconds.
+◇ Test extremeOffsetsPrepareSeekAndReleaseWithoutVideoBackpressure() started.
+✔ Test extremeOffsetsPrepareSeekAndReleaseWithoutVideoBackpressure() passed after 0.001 seconds.
+◇ Test runtimeDelayReplacementPublishesCommittedValueAndStopWins() started.
+[ass-compositor] selected=metal-r8 activation=success
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+✘ Test runtimeDelayReplacementPublishesCommittedValueAndStopWins() recorded an issue at AudioDelayTests.swift:103:9: Expectation failed: await waitUntil { backend.sessionSnapshotForDiagnostics?.isPrerolled == true }
+✘ Test runtimeDelayReplacementPublishesCommittedValueAndStopWins() recorded an issue at AudioDelayTests.swift:105:9: Expectation failed: await waitUntil { observed.last == -0.25 }
+✘ Test runtimeDelayReplacementPublishesCommittedValueAndStopWins() recorded an issue at AudioDelayTests.swift:108:9: Expectation failed: await waitUntil { observed.last == 0 }
+[ass-compositor] failure reason=invalid-backing-geometry revision=1 media=unknown
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=1 last-failure=invalid-backing-geometry drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1792613934.966695 selected=metal-r8 failure-count=1 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+✘ Test runtimeDelayReplacementPublishesCommittedValueAndStopWins() failed after 15.962 seconds with 3 issues.
+✘ Suite "Signed audio delay" failed after 15.966 seconds with 3 issues.
+◇ Suite "Audio resampler completion" started.
+◇ Test eofPreservesAFullSecond(rate:) started.
+◇ Test case passing 1 argument rate → 32000 to eofPreservesAFullSecond(rate:) started.
+◇ Test case passing 1 argument rate → 44100 to eofPreservesAFullSecond(rate:) started.
+◇ Test case passing 1 argument rate → 48000 to eofPreservesAFullSecond(rate:) started.
+◇ Test case passing 1 argument rate → 96000 to eofPreservesAFullSecond(rate:) started.
+✔ Test eofPreservesAFullSecond(rate:) with 4 test cases passed after 0.020 seconds.
+◇ Test outputFormatChangePreservesBothTailsAndRevisions() started.
+✔ Test outputFormatChangePreservesBothTailsAndRevisions() passed after 0.010 seconds.
+◇ Test seekFlushDiscardsOldTailAndRestartsGeneration() started.
+✔ Test seekFlushDiscardsOldTailAndRestartsGeneration() passed after 0.001 seconds.
+✔ Suite "Audio resampler completion" passed after 0.033 seconds.
+◇ Suite "Audio sample sanitization" started.
+◇ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() started.
+✔ Test ieeeBoundaryClassesHaveExactCountsAndPreserveAcceptedBits() passed after 0.001 seconds.
+◇ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() started.
+✔ Test nanPayloadFamiliesAndSignsAreReplacedWithoutChangingNeighbors() passed after 0.001 seconds.
+◇ Test everyDirtyLaneAndShortTailMatchesScalarClassification() started.
+✔ Test everyDirtyLaneAndShortTailMatchesScalarClassification() passed after 0.008 seconds.
+◇ Test incompleteTrailingBytesRemainUntouched() started.
+✔ Test incompleteTrailingBytesRemainUntouched() passed after 0.001 seconds.
+◇ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() started.
+✔ Test slicedDataPreservesItsIndicesAndRetainedBackingStorage() passed after 0.001 seconds.
+◇ Test unalignedExternalStorageAndPartialTailMatchReference() started.
+✔ Test unalignedExternalStorageAndPartialTailMatchReference() passed after 0.001 seconds.
+◇ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() started.
+✔ Test retainedSnapshotsStayUnchangedAndSanitizationIsIdempotent() passed after 0.001 seconds.
+◇ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() started.
+✔ Test allExponentClassesAndDeterministicWideBitCorpusMatchReference() passed after 0.002 seconds.
+✔ Suite "Audio sample sanitization" passed after 0.012 seconds.
+◇ Suite "Audio source format metadata" started.
+◇ Test repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "mono" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "stereo" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "5.1" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "5.1(side)" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+◇ Test case passing 1 argument layout → "7.1" to repeatedNativeLayoutsMatchFFmpeg(layout:) started.
+✔ Test repeatedNativeLayoutsMatchFFmpeg(layout:) with 5 test cases passed after 0.001 seconds.
+◇ Test equalChannelCountsWithDifferentMasksInvalidateTheName() started.
+✔ Test equalChannelCountsWithDifferentMasksInvalidateTheName() passed after 0.001 seconds.
+◇ Test unspecifiedOrderUsesChannelCountAndIgnoresTheUnion() started.
+✔ Test unspecifiedOrderUsesChannelCountAndIgnoresTheUnion() passed after 0.001 seconds.
+◇ Test changingNativeChannelCountAlsoInvalidatesTheName() started.
+✔ Test changingNativeChannelCountAlsoInvalidatesTheName() passed after 0.001 seconds.
+◇ Test customNamesAndIDsCanChangeAtTheSameAddress() started.
+✔ Test customNamesAndIDsCanChangeAtTheSameAddress() passed after 0.001 seconds.
+◇ Test equivalentNativeAndCustomDescriptionsKeepTheSameFormatIdentity() started.
+✔ Test equivalentNativeAndCustomDescriptionsKeepTheSameFormatIdentity() passed after 0.001 seconds.
+◇ Test customDescriptionsRetainTheExisting128ByteLimit() started.
+✔ Test customDescriptionsRetainTheExisting128ByteLimit() passed after 0.001 seconds.
+◇ Test ambisonicAndInvalidOrdersKeepTheFallbackBehavior() started.
+✔ Test ambisonicAndInvalidOrdersKeepTheFallbackBehavior() passed after 0.001 seconds.
+◇ Test cachedStringsOutliveTheirFrames() started.
+✔ Test cachedStringsOutliveTheirFrames() passed after 0.001 seconds.
+◇ Test everyFormerSignatureFieldStillDistinguishesFormats() started.
+✔ Test everyFormerSignatureFieldStillDistinguishesFormats() passed after 0.001 seconds.
+✔ Suite "Audio source format metadata" passed after 0.002 seconds.
+◇ Suite "Negotiated multichannel PCM" started.
+◇ Test pausedMutedSessionSubmitsNegotiatedPCMAndShutsDown() started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+✔ Test pausedMutedSessionSubmitsNegotiatedPCMAndShutsDown() passed after 0.112 seconds.
+◇ Test discoveryRequiresBothStreamCapacityAndPreferredSpeakerLayout() started.
+✔ Test discoveryRequiresBothStreamCapacityAndPreferredSpeakerLayout() passed after 0.001 seconds.
+◇ Test speakerPositionsDistinguishSurroundFromArbitraryChannelCounts() started.
+✔ Test speakerPositionsDistinguishSurroundFromArbitraryChannelCounts() passed after 0.001 seconds.
+◇ Test surroundOutputNeverUpmixesAndUnknownRoutesKeepStereo() started.
+✔ Test surroundOutputNeverUpmixesAndUnknownRoutesKeepStereo() passed after 0.001 seconds.
+◇ Test decoderAndSampleBufferPreserveEachCanonicalChannel(channels:) started.
+◇ Test case passing 1 argument channels → 6 to decoderAndSampleBufferPreserveEachCanonicalChannel(channels:) started.
+◇ Test case passing 1 argument channels → 8 to decoderAndSampleBufferPreserveEachCanonicalChannel(channels:) started.
+✔ Test decoderAndSampleBufferPreserveEachCanonicalChannel(channels:) with 2 test cases passed after 0.001 seconds.
+◇ Test routeCapacityChangeRevisesFormatAndRetainsTheMediaTimeFloor() started.
+✔ Test routeCapacityChangeRevisesFormatAndRetainsTheMediaTimeFloor() passed after 0.001 seconds.
+✔ Suite "Negotiated multichannel PCM" passed after 0.115 seconds.
+◇ Suite "Native damaged-stream hardening policies" started.
+◇ Test audioSanitizationZerosInvalidSamplesOnly() started.
+✔ Test audioSanitizationZerosInvalidSamplesOnly() passed after 0.001 seconds.
+✔ Suite "Native damaged-stream hardening policies" passed after 0.001 seconds.
+◇ Suite "Native playback foundations" started.
+◇ Test exactSeekTrimsAudioAtTheFirstSampleOnOrAfterTarget() started.
+✔ Test exactSeekTrimsAudioAtTheFirstSampleOnOrAfterTarget() passed after 0.001 seconds.
+◇ Test resampledAudioBuffersUseAContinuousOutputClock() started.
+✔ Test resampledAudioBuffersUseAContinuousOutputClock() passed after 0.001 seconds.
+◇ Test resampledAudioClockPreservesRealGapsAndResets() started.
+✔ Test resampledAudioClockPreservesRealGapsAndResets() passed after 0.001 seconds.
+✔ Suite "Native playback foundations" passed after 0.001 seconds.
+✘ Test run with 36 tests in 7 suites failed after 16.132 seconds with 3 issues.

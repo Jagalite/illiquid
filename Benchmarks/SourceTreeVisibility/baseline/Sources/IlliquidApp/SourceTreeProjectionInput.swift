@@ -60,17 +60,21 @@ struct SourceTreeProjectionInput: Equatable, Sendable {
             roots: roots
         )
         var entries = recursiveMediaEntries
-        let loadedPaths = Set(entries.map { SourceTreeIdentity.fileID(for: $0.url) })
-        entries.append(contentsOf: items.compactMap { item in
-            guard item.kind == .file, !loadedPaths.contains(SourceTreeIdentity.fileID(for: item.url)) else { return nil }
-            return SourceTreeEntry(
-                url: item.url,
-                kind: .media,
-                dateAdded: nil,
-                creationDate: nil,
-                visibilityPath: SourceVisibilityPath.normalized(item.url)
-            )
-        })
+        // Folder-only tabs already have all entries from recursive discovery.
+        // Build the identity set only when explicit files need to be merged.
+        if items.contains(where: { $0.kind == .file }) {
+            let loadedPaths = Set(entries.map { SourceTreeIdentity.fileID(for: $0.url) })
+            entries.append(contentsOf: items.compactMap { item in
+                guard item.kind == .file, !loadedPaths.contains(SourceTreeIdentity.fileID(for: item.url)) else { return nil }
+                return SourceTreeEntry(
+                    url: item.url,
+                    kind: .media,
+                    dateAdded: nil,
+                    creationDate: nil,
+                    visibilityPath: SourceVisibilityPath.normalized(item.url)
+                )
+            })
+        }
 
         var seenPaths: Set<String> = []
         return SourceTreeSorting.sorted(entries, using: sortConfiguration)

@@ -3,10 +3,12 @@
 Measure the real background browser projection when visibility settings change
 without changing the underlying source tree. The current baseline for native
 qualification is integration ancestor
-`ad647a61f995541789f2f77014894614ed2d0b4a`, which combines PRs #55 and #57
-before adding the visibility-cache change from #58. Both variants therefore
-use the reviewed search-ID construction and source-tree sorting. The strict
-shared-source equality checks remain enabled.
+`2c25829e108d6eee065f2a2bc3b2d58f8fa7e122`, which extends the pre-visibility-cache
+baseline with the production changes from PRs #67, #70 and #72 and the
+filesystem-root sidebar and sidecar repairs. Both variants use the same flat-file fast path,
+source-preparation admission, media-section grouping and sidebar declarations.
+Only the original visibility-cache production diff remains between them, and
+the strict shared-source equality checks remain enabled.
 
 The original Linux measurements used
 `68274d1b09dcc866296321a5a8858efc297c4f19` and remain historical evidence with
@@ -18,6 +20,10 @@ are unchanged between the two revisions; new native measurements identify the
 refreshed baseline independently of the original Linux cohort. The October 20
 integration refresh adds the search and sorting changes to both variants;
 only the original visibility-cache production diff remains between them.
+The October 22 refresh preserves that comparison while adding the three new
+independent optimizations and the filesystem-root sidebar and sidecar repairs to both variants.
+Its baseline commit is retained as an integration ancestor. Historical
+measurements and manifests are unchanged.
 The retained October 19 native measurements still identify baseline
 `33fff16155c3472960f88e04c72dfdfdefd56dcf` and have not been rewritten.
 

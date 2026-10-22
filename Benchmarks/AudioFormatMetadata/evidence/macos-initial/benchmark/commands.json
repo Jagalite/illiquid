@@ -1,0 +1,2648 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.03904162500001007,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "26d1f7a76f83e752532286dde06d5952da3987bdb32fc2d3379cb5557eeed0bc"
+  },
+  {
+    "argv": [
+      "/usr/bin/swiftc",
+      "--version"
+    ],
+    "elapsed_seconds": 1.012412249999997,
+    "returncode": 0,
+    "stderr_sha256": "542ca724f46d8a3dffb85c3cd4b6e0d2fdf6c1bd4c484e6978dd9ed2f22cd639",
+    "stdout_sha256": "b674f79b747370a1c05ae7cec551fffe557816c6c807f35f39f933ecbcca80d7"
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "a2de305c8dbcaa81aac1477df7c9a0017c14eae3:Sources/CFFmpeg/include/ffmpeg_shim.h"
+    ],
+    "elapsed_seconds": 0.02212425000000451,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96"
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "a2de305c8dbcaa81aac1477df7c9a0017c14eae3:Sources/IlliquidNativePlayback/Media/FFmpegStreamInfo.swift"
+    ],
+    "elapsed_seconds": 0.009282624999997324,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fe482e6b8cc4a04e55de7a06e839f8fefe1745e28da8b149a02fd1ebdbc84721"
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "a2de305c8dbcaa81aac1477df7c9a0017c14eae3:Sources/IlliquidNativePlayback/Media/FFmpegError.swift"
+    ],
+    "elapsed_seconds": 0.0076233340000015914,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341"
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "a2de305c8dbcaa81aac1477df7c9a0017c14eae3:Sources/IlliquidNativePlayback/Media/AudioDecoder.swift"
+    ],
+    "elapsed_seconds": 0.008502667000001907,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e8825bfd1dab808470f237f011d74f9d711cf39f8b492760f9f55185d526b918"
+  },
+  {
+    "argv": [
+      "/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-I",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/CFFmpeg",
+      "-Xcc",
+      "-I/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/include",
+      "-L",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-lavutil",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-module-cache-path",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/module-cache",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/Tracker.swift",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/FFmpegError.swift",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/Harness.swift",
+      "-o",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark"
+    ],
+    "elapsed_seconds": 3.426993500000009,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-I",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/CFFmpeg",
+      "-Xcc",
+      "-I/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/include",
+      "-L",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-lavutil",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-module-cache-path",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/module-cache",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/Tracker.swift",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/FFmpegError.swift",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/Harness.swift",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/AudioSourceFormat.swift",
+      "-o",
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark"
+    ],
+    "elapsed_seconds": 1.5864470839999996,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "verify"
+    ],
+    "elapsed_seconds": 0.08162433399999713,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "83fcded91ddec2682f6f4de62739ef5eb35852280c8da35306ef77f7ee919233"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "verify"
+    ],
+    "elapsed_seconds": 0.065590708000002,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "83fcded91ddec2682f6f4de62739ef5eb35852280c8da35306ef77f7ee919233"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "10000"
+    ],
+    "elapsed_seconds": 0.05926474999999698,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "40c3a8905ceccc817598b9e56bd5dd94dda29e83990860ea41878e0978dae1ee"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "10000"
+    ],
+    "elapsed_seconds": 0.054010290999997324,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a2cbeef503e16eab4609d1a5a30efc47721febbda22f789df290b9a1356b8012"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "100000"
+    ],
+    "elapsed_seconds": 0.02944745799999282,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "dffd38ba2e002d7c29dedee46c841fdf809c44e482cf0b70398b65ac72dff114"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "100000"
+    ],
+    "elapsed_seconds": 0.02203604100000689,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5caae8d498ba9b9f0ea7be4a805bb5caab6303132c75ed9f6bba17782242c064"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 1.0403929999999946,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "10d4aef829f93f1e0e4d2a7497fa26ac3e89da4c16029201a6d60ca92bc37272"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 0.01516591700000447,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "878fe49f3b64d159f2edcb302b7e933eb2a72a434f198e7d286d854a90682dfe"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 0.015687916999993945,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7355aa91dd4751f0a8f02b837c80f80108bf1c14fe1b45a0453be29959ccc073"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 1.0050402090000006,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f10102d59c90d7075d4adb07e905943151fb48f47c54306b7847d3f7de673bb8"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 1.0381897910000077,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "038b0212d058dbe8cb4b6d1c9f7207a48d73a33c61c373427a875136d6664e24"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 0.014874332999994522,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4f1f354ad2db1e1378ff3ffe1ff1fcb4e8d947ab857d715d49be0b030722130c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 0.014848250000000007,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "733259583012a3ebeeb4e76ecaeaec48bc12a3e556f4a12f4158beee60082170"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 0.9874757909999943,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8911a793e90f4f33b1666376727463b51f524e4f577c5ccc29d60ba7d2fedce6"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 1.0624549169999966,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ce4162a811124a97263530bc8e557f939ad597c3a264f00ec6a854c992e85214"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 0.01953575000000285,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7e0a29ed9442fd50963039af9b6aafd4620240cfdd7f6a3e95f6aea2a2c58e83"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 0.017055667000008157,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a0c939dfcd33538086678cc18099885d3279afc7fc36a383a8f00c0558aab2b2"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_mono",
+      "403613"
+    ],
+    "elapsed_seconds": 1.027503166999992,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d4332297bf76996ab826bc4086874b52cce53b839eb2afbca01c4b0fb21280f9"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "10000"
+    ],
+    "elapsed_seconds": 0.03876629100000173,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "05fd509ff708b5bf3dec4fe52dc97466d39f8882750c120c1251ab2e88e5cc45"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "10000"
+    ],
+    "elapsed_seconds": 0.038492916000009814,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "78c7ab523fbc3e5982f6dcdf0f09d731b8dda69aad850a08ca91dd98f9158390"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "100000"
+    ],
+    "elapsed_seconds": 0.008755457999995997,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "19a2b854ee16f12c30b1f851e051400604e96eb428662b242c7a92b06ed67b87"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "100000"
+    ],
+    "elapsed_seconds": 0.008631124999993744,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0005b8b2bb1b503db4ff32337fa38772b31f42c9a754a2153fe839d5bbe7ff03"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 1.301634582999995,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1a63aa8b7c978d6e852fb6ccb819d6fade5c6f2e2899e6d90942911b21b4f4ac"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 0.015426165999997465,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "899f3724fe6fd86fc4cc2858f0f748e3f43446dda8444fd824cf2435207e17eb"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 0.014949999999998909,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "56cd1364b3f07eaf0baacd51ea016751a80b010ee8d23d4a1f38a4b739b2b618"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 1.3801452499999982,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "abc39efcf15886f7841c4422e07dd69f6550fd75f6e8c4393e222273b06edc30"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 1.3377496250000007,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7cdd2da4022d4fa6d996da1956887b2798de6e2dabc079da7d5206fc558b4eb8"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 0.018132374999993317,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "074524d5d83cf45183dc8e8d6ec9ab672a60838e2969d0d6af763a7969e8ecab"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 0.0179449590000047,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d75716e457a5ebc1e7d0139b064baf8810e682a814b9a399ccc43852bbf33510"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 1.3795888340000033,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2aecd456ce3971683e3c5859a42b00ddf3eb7eb85c7307ecde9de0ed83516e30"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 1.4277486669999746,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6d9f8e701cb72e484e3546df221a99118250a4f84064e0f305859be855ab964c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 0.019344749999987698,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4a2ae36f42031c1f6a8681a0fa7cc95c5de82a907c76732eac98db681c6d58f4"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 0.03235100000000557,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b000c5ddb277078e4e941822280bad7301f0efcbf3d4523a352ce37393486774"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_stereo",
+      "554978"
+    ],
+    "elapsed_seconds": 1.406152082999995,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "76ade499669a3ba805feacf63c92dd53505203cfc2300ff0d08bbb003d8d3517"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "10000"
+    ],
+    "elapsed_seconds": 0.04188320800000156,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "547dcc2b2d0dfbea9440d9ded211247eb744a004773c9ee4cf1edae51e79bece"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "10000"
+    ],
+    "elapsed_seconds": 0.042191374999987374,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "47a8cbefab6d85ba24939aebcff8c3e7a3b7b2d42147b5d72dabf3e0359d7803"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "100000"
+    ],
+    "elapsed_seconds": 0.010032958000010694,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c7911d526c8550b19827c05d848843e9b146f0b9a5f5d22d2e3f2814e0eccdca"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "100000"
+    ],
+    "elapsed_seconds": 0.010142666999996663,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1e54d63d24e4ba88280061faf6033a01e3ed75e7d0df39b9acde88bc787a65d1"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 1.3271681249999858,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "48604fb331829896793dbfcd32b30125c7ccccf98fafa724fcaedb703d5ffe57"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 0.019223291000002973,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7008879f25b5d7e5a5f184b879e59ffda0d4b82c5f736b63d365edf6cc4db87d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 0.019340791000018953,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "eedec87aef607c521817e7a406605690176a7946fe475a9f0cc877696ead4489"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 1.2901075000000048,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e18cec5ca69469e21d9f7557287a97df1f316ba6d9dc981eba3eea38f0844198"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 1.2869497079999803,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2680758b4f62d9819ee61429d32b00e53fa0a685da61bd0e62b24468eeebe914"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 0.01832533300000705,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f05068b3dc88da2c806c1fbbba35be344298fcea25a223e9f80da5ea2a63f9c4"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 0.01743824999999788,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c93c652b2067da04a17ee31589af8128b8dc849b5b4a4e1f5681b4d1b064b02d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 1.2664432920000195,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7366486604ca217c31582517b50e46feb7933bfbc964e425f6ce246c34f671fd"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 1.3027194169999916,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9741f841a721d7295690e5b9104aea31382dd0b15070520626ce02df9dbeea42"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 0.017933583000001363,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "10e72b0687267a5d6848c1108a51bae6d9d897b788362d3c4c3c7ab0e060186c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 0.0171802909999883,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f409e4eed6ae3621009723b1756128b194fb5f0ba20e11da7706108156397d5b"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_5_1",
+      "538600"
+    ],
+    "elapsed_seconds": 1.3096011250000004,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ec7f006a4abdb8c8af37b7d90bc5a4219c08fed56f2a80b08ab8fb470bec61d9"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "10000"
+    ],
+    "elapsed_seconds": 0.03936770900000397,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9685f19a1bdc55619531c8103ef706b1eef0b7ffc139d7ad58a3fe8e6472bf87"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "10000"
+    ],
+    "elapsed_seconds": 0.03895937499999036,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1eccad69b603c75bb5c150bb56a58dbefb2aa7ed1623b26e71edcc0d686bad20"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "100000"
+    ],
+    "elapsed_seconds": 0.009708125000003065,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "032b270b2716f9944c90560274f1684a1433b13d0eb257378f2cf9dda2544a68"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "100000"
+    ],
+    "elapsed_seconds": 0.009548999999992702,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "811f0c25befde888b5345ce97b4bbc6938257e531ab933fab5eef47e02d8b9ea"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 1.2696292089999872,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "590cf04e8c04e1e70cfe67133e78f4d196eeebe73c1c0884e2ffa1e33e98d61c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 0.019851749999986623,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4488115eddc3bbeef6b0f1a525713ea38b8f7aaf0e6d5276303b7c40cfdd2af0"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 0.020345500000019,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "09bcf598c7934739076d61b347459a6a5d7cbc508826d6a34807532ec15e494f"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 1.282168583000015,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5bfe129b51b59d10a1c78bd71c681bb1941adfd714182188b5c56a9499bf21ea"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 1.255111792000008,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f48011db1cc8ecca06a58b50f1ae5a5a6ed7e7fa47a2517873b4505628aa0f03"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 0.016475541999994903,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "23a0efacd5b49c32aaab5fb6c82c984fc06da5b7621cefdd889d71cd83b16f54"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 0.016297584000000143,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "95f8aa38cd090009825286fc9f1d2abe844f7544c06f4b5daec816116cc71215"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 1.2646694999999966,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c05dc70f3048ad67e20cdbd2543af76b1ba9c6d8656efc5c6892371ce95e21ab"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 1.2636383329999887,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d22c3cdcb169233e07b9b3f1398ba2b45788f1be6a4fa6fb3aaa74056407bbac"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 0.01838787500000194,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cefe1cb5f31895538c1e27bf465564aecf5d841d4b8af50fad9f2f805ec20f20"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 0.016836082999986957,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ab580d61a5b4020f1e9e618c6249ef100befb143e85f9681b4a7e8821a28ae05"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_7_1",
+      "534331"
+    ],
+    "elapsed_seconds": 1.2443930829999772,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9fa3d5079e2eeb3d9e92fac5b5fa190d13700e99474fed6c142213d0b791488f"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "10000"
+    ],
+    "elapsed_seconds": 0.03955700000000206,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "538bdf75f22e83797940b87e1372f8b01662f681e677d8b0fd4a3e79f307308d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "10000"
+    ],
+    "elapsed_seconds": 0.039327374999999165,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "313447e08e30f1686e20d48c4e13099e72a51d1b1ef7f30b8fd85a0eb5867edb"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "100000"
+    ],
+    "elapsed_seconds": 0.00924783400000706,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "88efd3a964dbd7d6c8acac1924e86c327032cf444d16f41a0a79a3f0a8d6fc55"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "100000"
+    ],
+    "elapsed_seconds": 0.008999958000003971,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0cb4b560d2f06d4d86bcd2ebc1944f0c431c93a9760cf7e5f4dff1da22b2a07f"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 1.349389040999995,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "229b48d377b40e41e67299c95587808f2e21389e6b9fe029f3ce9b11c252c5fe"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 0.017049458999991884,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fb57f771443ecffda3b130db491cf48b720a58e343719e1dee8349d78e087481"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 0.016634667000005265,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a3cf018fcd6e3294c31857a95d5664add3d740e372102a2c3a32cac6b25aed3a"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 1.3536320409999973,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fc9f6ec4286f47549a44e4316cacf936619d2d4b20f56485a0c82e4478a8fdf6"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 1.3061576249999973,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4c3806a15f26bb23cc341f0a8efe6df58f31ae672828a19ceb89aa9b8a805159"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 0.017783374999993384,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f7b42e5e34216e89784c0da165b3000c5a9b84e77215904fc81206b13fb48260"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 0.017511874999996735,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "81fd89871d16560e02f36549501c568e1156959bbc8f95797b2ae4d5cabff59c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 1.3701882089999913,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "256b1bd1711b0abc930effb6c4b03be14ea1b50266237ae43d040b7e8cbf30ba"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 1.3063106670000195,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "53640c1beadb5bc5585bd1b163c81c9b26e5d999198afa451790dca6c7681055"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 0.017480041999988316,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "75ee042bd225226e8237bb83ba2522bd23c95517becaa60a0e3eed839604b1e4"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 0.016237832999991042,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bea6daae39ee6df5a70f78d2819a579f6689194617f0bf585658a3e3b92fe222"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_unspecified",
+      "554478"
+    ],
+    "elapsed_seconds": 1.305333499999989,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "51db95830fc902b1b1acc99349ffbf2b45d7d707185f4f6a7e3616fe47249b51"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.05441341700000635,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "327e5a721bb8c5500f0429fa7429997b7874efab7cf7078e6eb5d08790de5789"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.050358791999997266,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f5fe083746f85862dd2bf7e37c6ada2f78b10f1435a6330b48ef030b24bc29d4"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "100000"
+    ],
+    "elapsed_seconds": 0.08692483299998344,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b99fb7e8531d850da1702a2de28bef5fbd8b0ce078d4f168e9bf32b3d975b193"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "100000"
+    ],
+    "elapsed_seconds": 0.08352745799999184,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d8935b2215252301e455e2e538be793a37858d1e50fe6eb24d7a899b0be9e24e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.0970267920000083,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "afa3f3013a255353a69ecca3f45a1bd07f29abb94c663018cdc1d56ad9d6b731"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.028620250000017222,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1f2edc72b65c880c04fc2873fe872ee4653bb61a271321cffd76e7223673da6c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.02563579099998492,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "352d155fdf5d52d9ff67e8c73446119fc4230eeb2a8d14b98abf74fe5ce961da"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.10798370899999554,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "12eb662744922cbf4918fcd6252c15f1143caff540224dc087d4ef9f525307ad"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.09267420800000536,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7422a32771b54a71a065e60bb47ff08f16d23de3ce432de38a5200e87c5896f2"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.02699641600000291,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "630370a1e963a91335a2352e85a3751e311d8a8bd5096126c9ffb4767fc0686a"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.02525837499999284,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e775185db847396a1b56f851aa680f569223186504970f939a6aa6f119b904f4"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.0845753749999858,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bbc953569ad50d82f74c06bbccb0f8a76aae0c93a3cbe45c0bf949578fc1ad8c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.08590004100000215,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4a5c560c8e9b34682bda07b031635a7888053d3d263e9fa1cc243b3f0a0bd05d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.024053624999993417,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ca8e2be4be5690e517be2e39c949b7a2f480f934695c70c0d3c64ae0d26038e6"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.022833916999985604,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cfd0b62709e66ba21841a8816f34f28dc6ccc53ab528870a9d2213faebe5224c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_custom",
+      "23877"
+    ],
+    "elapsed_seconds": 0.08098958400000811,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0f164726b5f1d1e5573f4cbc0122dc564cb721bd4a716e7f8706120d3b0e901b"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "10000"
+    ],
+    "elapsed_seconds": 0.04105545799998822,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9fb6bf1351801690bd8560e5d9b96dfabe976df084e31c110427719b8e114c73"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "10000"
+    ],
+    "elapsed_seconds": 0.04204212499999471,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b770b8dfc6dc26f27866655550e2f36193fb6026e19c115cac34037e1703865d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "100000"
+    ],
+    "elapsed_seconds": 0.04447154199999659,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5a9348a150b75fee6b36d51cbe39857e2c5a38c304e12d8947bed34a196ff4a7"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "100000"
+    ],
+    "elapsed_seconds": 0.044492832999992515,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "97f24c2d3745b46a8c975c73cbb998a6de1aa908fc30a31fc7c701820ef8343c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.09115820799999597,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1791c5cdd74957dacb10341ac700019b12f223abaf24ca55312149dc0787aa29"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.01967899999999645,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "eb2bdcfe6c594527dd75eaa7fd6bc979a68b68adb52b17001381b6ab24c5a58f"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.01932454199999256,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1ec2347b58fd8a3782e38f02798694dc7f6ea8c61fac6bec451b8107d8a515d7"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.09096212499997591,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bac26365819f8c4b8ed6060106d0e8f71638e21d758508538abfc94f25db3753"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.08858429099998943,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4fa3ae79346bde634602fe63e9a61e6d1bb2bc2d4835600dbc4e2d006e19ff9c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.022144499999996015,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "aaa7296ce3404c29c4dcc01fbc60ffa85598f5e2cb25268c5ffc332f106d0b9b"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.023463915999997198,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2a9fc42cb783ba0b790181a719a79bcad9d5aecc0bf502b1b673a465461ca262"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.08936458299999117,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f50dda3bf7fed49904c2806671fac5b827611d3afd6b262e814623e5435d7421"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.09033362499999953,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d9b5c0aa4056decf3fefc4f0cfb6c50efe40859020c17df59d2d4702904a3520"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.02080870899999354,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6074ac5846082c53dcf5583e1bf30ae0bc161c13837eeeb2d280c1f7ec8392fe"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.019207625000007056,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "601c0c5c4bc6c6cf3c11ec78cbb73df63bf175d498f09163f4b2bafeec7c11c8"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "stable_ambisonic",
+      "30088"
+    ],
+    "elapsed_seconds": 0.09319329199999515,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "58551275ad16b9822397bb7e9f5c89a42a786ad96b2f81c579af3124ef098a1c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.038043874999999616,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ca9b494fea2cf1ccc65afcc0cb16b3ecc3afb7dd97acc030bdd7acc0a97a7c64"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.03882433299997956,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fd05fcbcd4154babd1f0b1cf320dd08775af71ef4296b7be2f38bf24ff7e028f"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.008590249999997468,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6dabc08d2341df64cd761f288f465ad37a02c43be66ba5525b66adc2d90c8ecb"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.008296000000001413,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "912d6a8e42694995de911f940bad33fdfd0c73f41fe6998d162cb6577444f71e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 1.363766499999997,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "93be3c32db7bda98e48c737a6feeed36ed968d879481a610641111da14eed2dd"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 0.018886417000004485,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0071017c094c397d11a4494eb47a1d90b77d6523ef77c594ddc981cbc6f5a2ae"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 0.02079208300000346,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "668374db9f1d4de41d880e4dd4ea21d2cd08c8a53da06ce86ab5f2ce39d073aa"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 1.4583348339999986,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "217de36aa69b3996f455f4b4d61049ff094c507e0f9a61e7d668e2285c49f41c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 1.4659120420000136,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3a42267be86241b621ecd20d24eccdd456a6687b09ca8f395ba9cca03a418a6"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 0.019514291999996658,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5fed6a212bab848d8b39fba0c578f18d84828e4cb8a30b17203d9460a9e1c8f4"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 0.02029208299998686,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "10c5e816ba8892b71789366d8068653b0452cfd879fed357e725a5c9f91a97f2"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 1.4413902499999836,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b1d7fefe802b9e68006c5efa980f1f9ac78c0564cb98ebdcd7838931bfa1a88b"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 1.344961834000003,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "851510b5569a5e876830b2494309f349b17c9bf5a6921f09a87abb33a394d26a"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 0.02067758399999775,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4ea76a03e6386cac60b884eb598af27e7beb9c669c646d7bda82ae7ae05430fc"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 0.018201916000009533,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c95675ab0717034bcb1c53609310c72ceb827e4c43f98600f7b2753f8823edf9"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "rate_changes",
+      "584198"
+    ],
+    "elapsed_seconds": 1.3777782079999952,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "27cdf40cf3060a834cb4cdb6bf946ba0413bfb79e35eb248b6f35fd110520482"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.04352049999999963,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a2e4769cb63cd2e0bcf9da4aec129be1d290d75fee8fb9e800b5b6bc2485cc2e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.04098716699999727,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "21e27f331a6d6fb3ba837beaaf3ac684f4b29018f47622b7ade16bfa96d71689"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.009803874999988693,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cb410fb8b9e96bf9f2c3bfa32138d85478251a60add0d3164157c62316e42991"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.009701250000006212,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7686831761e20ba31d4cbb91685ac5197598c7ea568c50606f69d8c74ba4865e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 1.2629670420000139,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7e8e8d9ee2ac0e198af22ee1daac6ba4a8266b5fbcf3a07ea816be209db80291"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 0.01854212499998198,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0e290c53322f9ee959c487463ca0442bcaca5035a19b57feadfdea65c20cea61"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 0.017413583999996263,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "79e0623bd961e11643f41d07097ca8c2d69a9f6a5865d904f57595a9d158480a"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 1.2854283750000093,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c5050e8f09873aafa3c95a1279432f897454935a732b3451c7704dd8b9045cde"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 1.230377333000007,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bcda3279d3d0b448194e626a643af47ad7d4bdc2f2fce036292210fc064e6db3"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 0.017459166999998388,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "49c3f778005f552d290bc11f953993c29f990a0d3da02fa72291880c662a6616"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 0.01704079199998887,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "afefbe30b9af74b9cc6ca381ba7443cbf175ff5e57ffe310d5e9b131ebe968f7"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 1.3051943330000029,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "556fd22b15094c004c4325d45890a06f90d5ab05e0f528c3bc54c5335a4d101c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 1.3706300829999805,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "454ea50a5eff86123d3c05210d4c944c4039469fc0dde697b07c8b8235ac0be0"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 0.016041625000013937,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3c24be2698b9977a2026bef547bff4ee7eaab338439295279614d2605f00d4e2"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 0.015400999999997111,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "eefa4cd525ddd1faaa5557976ca363745646a1212d77ae10301a4a35d7910fe1"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "sample_format_changes",
+      "553710"
+    ],
+    "elapsed_seconds": 1.1671124579999912,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8d2a20414d52a297c7ec3c977bfbabfe4538a07ae8037e837f5a18de15d6be05"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.036174875000000384,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a6cdb3793542fc5b143c17dde7e471096475bcc89255b2e5315a509655af0aa6"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.03468679200000224,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fb365b266579e9d2136cdea64581d0c4f2cb55f4d23b5451a25babad2ba8dfc9"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.007913165999980265,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "92c15ea362b44c626ac9c367d2b59627be8d6fad58fa5f75615546f111296f9d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.007811207999992575,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "dfbcff5ae3c75e4f37e72eef396c647ecbf780e2f06c093182e5f6cca98c9f07"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 1.289583792000002,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e4df9354f58f4deba57f2bbdfa449ae38d0147483b4b97deb9192a7472a92f92"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 0.01739558299999544,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1416b49974cea4958ad77a90e007f807ee40848188f0dc62dd58554125ed4dd7"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 0.01663704200001348,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "afcdebcc9b62f06b2e524b8607800f39309684eaae4b352f94d21dcc7bf020d7"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 1.342163792000008,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "aad47702e622a06771fa131ae7bb0dc2397c41d0632e813e69039bc658c42006"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 1.269426917000004,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "05fd85ed160405c54a263e1a43b327ff39a3e87290137599a3732a346d43c2ea"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 0.01677720899999713,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "68934c260c8ccdce27b14d3a3023871c7f745f6957f7cf4f9dc6e89bdf4c3222"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 0.01600591700000109,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "80846e8e981ee309bfb7b3f96cd814252ca7360a38a2ef3e0da151fe67778e26"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 1.281493542000021,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5eb636ec4d0e7c71d974cce5cde1b0769a0dfdd85cf7e79759f03cabfe2d70fe"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 1.27314312499999,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ead78f95bdc7ec4bbe7ce54f424e35ffd9be6a2575456aba869b5f73ce39558e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 0.016531334000006837,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "32394751a45f6efe99758795e5cac411ee793227b57cd8699434db92306eb36c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 0.015933875000001763,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "33846ee884a3f025d2babdb2f74a20783bcd25985a38ff612cd14ac916213e80"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "output_changes",
+      "613968"
+    ],
+    "elapsed_seconds": 1.2808307920000175,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "40d0232c692aa7657f3e19443594cfd9714bcded4a5b6b892e54ee8064d84248"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.035149875000001884,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cfd76c2dd2b5e5a34c791fbbb551a98d818ec53484b5cc4f067c1df6c644ef10"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "10000"
+    ],
+    "elapsed_seconds": 0.03545987500001502,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "28bfb4803ec4eba75804c08a77448469169ba7c540c9b2e13157b406c6641c8f"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.007878000000005159,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "649f9c48ce9b5ebbe2d97938273553ead8033942978ec60f02e7d8073c50def1"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "100000"
+    ],
+    "elapsed_seconds": 0.007352499999996098,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3815efcf72440b37508bdadd4eaf842f0b3d0222867923ad9edf5c60b166bbd"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 1.2102248330000123,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "38c38ec91eb97e4626d9b0d9d45407a276565a81d48ef76c614838a640953b88"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 0.01639687499999809,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2fb53745ad552cb5f655b17c4d5e486bc767185ab9c76f46934b13dd567a21c5"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 0.015834249999983285,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3cc4a2f30f9118188f6f13402225e8eb974e3e90d4b9c8eba18b45085d24fba1"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 1.2012618750000001,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "95f650311fd2e0ccb6f734620b0018e7109a949e10685851df621b35783b777c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 1.2197031249999952,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d0c66d5d3e1717c0e07ac168620d3ba2d5aafb3d2e652ecc5a3caf4ac4e244bd"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 0.016448749999995016,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2c736c9ff87a3249c40a6a4a882addae38ef4ecb962105ddd62a45e298951356"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 0.01586404200000402,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8bfd43da06c7c08689be773492194df1c6334014fb7577e9f16ffe21fe36c2a8"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 1.261376624999997,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "54575df22a5dfd4b6818d3f28aef0b81470a92980bc66cc5ca4ff394b3e6e2b6"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 1.1965002080000033,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b27102274b20607afea92178fca846494fd5d267e8a1670a7f817ebf6ed6a815"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 0.016377500000004375,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d23c185c1383189a1a238ef88971db9a6fede1a1b61281f37f5c2a1d779e1b7a"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 0.01588804200000027,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e52591cecb74dd752590f612f243aa1fdcdce427909af03db84be899cefeed33"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "same_count_layout_changes",
+      "576162"
+    ],
+    "elapsed_seconds": 1.4081385000000068,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "500ec56ddd1d4c30006e6aac88bbbd7ae4a6757cc3c9dc560b7ce429920523da"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "10000"
+    ],
+    "elapsed_seconds": 0.03545837499999038,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "775a4193f9c1623cd4e10bb796b2fc4fa914afb369ca843c909aade5bcaaf428"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "10000"
+    ],
+    "elapsed_seconds": 0.03456691699997805,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3abe83db1c4a4700314004a825997718f93cf3010cad5be47d581f00d1627fa3"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "100000"
+    ],
+    "elapsed_seconds": 0.029809292000010146,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "75ad6ea136bb6777306228fec4ac32f3406b48513b4eb584384820fde18f398d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "100000"
+    ],
+    "elapsed_seconds": 0.02925904200000673,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6c7ba8e1913950e62959b6ca6c5eb4555df39c443d0515071fc9196c263b5c27"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.11159100000000421,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0b6cc3e3c98abdd85b832b46a77b412825e035173142f8019dd44bdb092838de"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.018299250000012535,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "56900102353ac2226f56a2ef04a1dc9c3be3cd5b9092a35cbb7d9cddb5b66653"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.01815337499999714,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cae7661e41302ed5120a989994f1bf614dbf2ff2a06eb08caa031c7c7a62bccb"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.10882616600000006,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "17d4e6920aa0cace50f519f357a011922836177c482661e4198f750bd91ebc92"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.11330662500000699,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "205860da6a61631411638a9b642334f72e951f1707a2224a049403ac9a45c4aa"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.01894058400000631,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4f4307f42d61befaf85de6c910a32ba04ea855e0c8c1cec66b62c23cd0486095"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.01729079200001138,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6f028c9c9d9478d7ee468e58ed53586a2d73cddfbb86b6105efa5c1eaf26ca79"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.10684220799998911,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b00bffd43174be79f00f239beaa1076142a469cb6050be9476c3548836cc4a70"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.10691045800001575,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1a481f2006b50f2b6262f441582f18bbcee9099477827a2ce0974ec1dc462361"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.017813999999987118,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c60ca67628d22ce09ea3932fd9b057f87cb968807146f4f23b5f41fbe3118aac"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.016795333999994,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c7858f985e6fe23bf994d62cdcadb5976ca6343a0b08339b1ba75898481f2a17"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "native_changes_every_frame",
+      "44297"
+    ],
+    "elapsed_seconds": 0.10776020800000197,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2fe649db176b6fd5e4bdc98b98a6840dba193b65ddf73a8605a92ad9377a984d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "10000"
+    ],
+    "elapsed_seconds": 0.041005000000012615,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e050f2f52797f3a0befa561263800f3b07cb5c529f213165f9584cc12ec04314"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "10000"
+    ],
+    "elapsed_seconds": 0.04084008300000619,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1f8add50c6b34f493cb6631a2d07750fe06ba0f1c21b5226b80e6ca7cfee16db"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "100000"
+    ],
+    "elapsed_seconds": 0.06419879099999548,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2a18a74155c029da94aaae86cb18ab5ec89b0314f5df71c522a17a64c8c2a9ea"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "100000"
+    ],
+    "elapsed_seconds": 0.06419920900000875,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "55fd3fffe7a2eca82e1ad0509b074931d9c929b49f40ab3bd068bf1188ea82cd"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.08710175000001641,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0f46c73ebca9978ffa091ab5b209facb643430fea73e2eb4013a3e0560d62460"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.02428454200000374,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d94bf3437c6e788a7c2ba46eb4376b93cb5d234530db03d93e174d808719310a"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.02365612500000225,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "80abf190c37df9515cd2381f83484c7e608cff622825df9c16dc2aa59d028707"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.08627345799999375,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d5d51eb45bbb864c204cb50ed6a9ab8a4ed04bc90204bb0d6ec3942b2fb3b34d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.08665970800001332,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "16574e35f64f223595c950a557b7a2812bc206363df994f147b141bf79b7f55f"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.023800958000009587,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9621553d1b1272066413aabb47086f350db9aebe4912855f3d63f80dca2e384c"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.0238024580000058,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "91da6e883c568ed88e0906c63bfd17298342375964594dc8c3856555a64d9960"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.08732279099999118,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4b14d3fa06905d3d275195a4e434049f59e0e0f3535d648725e41d913afb7ea4"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.08709174999998481,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6c83c18bb0c9699b4cb80d67a7ae7c6f99d7839ba675bf5a97860eabf25692b0"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.025671041999999034,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2cf625e79b7d7e1945a7f668970224e1da26ce070dd95685d7febff9fa2e729d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/candidate/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.025118875000003982,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3e998c3c54c7073d21a136048f67bc002b00313492578cc4f53636c023cee56b"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/audio-format-metadata/benchmark/baseline/benchmark",
+      "measure",
+      "custom_changes_every_frame",
+      "27921"
+    ],
+    "elapsed_seconds": 0.08808054200000015,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b1a5d43de73c4ccf53fab8d18993c2b2d17276d7dd83deb87027b069729238a2"
+  }
+]

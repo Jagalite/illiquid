@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-import IlliquidCore
+@testable import IlliquidCore
 
 @Suite("Local media sidecars")
 struct MediaSidecarTests {
@@ -158,5 +158,140 @@ struct MediaSidecarTests {
         #expect(throws: CancellationError.self) {
             try MediaSidecarReader().recognize(file, within: root) { throw CancellationError() }
         }
+    }
+
+    @Test(arguments: [false, true])
+    func movieSidecarsPreservePrecedenceWithinFilesystemRoot(_ filesystemRoot: Bool) throws {
+        let fixture = try temporarySidecarDirectory()
+        defer { try? FileManager.default.removeItem(at: fixture) }
+        let folder = fixture.appendingPathComponent("Movies/Film", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let file = folder.appendingPathComponent("Film.mkv")
+        let fallback = folder.appendingPathComponent("Other.mkv")
+        try Data().write(to: file)
+        try Data().write(to: fallback)
+        try Data("<movie><title>Folder Film</title><year>2001</year></movie>".utf8)
+            .write(to: folder.appendingPathComponent("movie.nfo"))
+        try Data("<movie><title>Per-file Film</title></movie>".utf8)
+            .write(to: folder.appendingPathComponent("Film.nfo"))
+        let root = filesystemRoot ? URL(fileURLWithPath: "/", isDirectory: true) : fixture
+        let reader = MediaSidecarReader()
+        let own = try reader.recognize(file, within: root)
+        #expect(own.kind == .movie)
+        #expect(own.title == "Per-file Film")
+        #expect(own.year == 2001)
+        #expect(own.metadataSources == ["NFO"])
+        let shared = try reader.recognize(fallback, within: root)
+        #expect(shared.kind == .movie)
+        #expect(shared.title == "Folder Film")
+        #expect(shared.year == 2001)
+        #expect(shared.metadataSources == ["NFO"])
+        let reads = reader.filesRead
+        #expect(reads == 2)
+        #expect(try reader.recognize(file, within: root) == own)
+        #expect(try reader.recognize(fallback, within: root) == shared)
+        #expect(reader.filesRead == reads)
+        #expect(throws: CancellationError.self) {
+            try reader.recognize(file, within: root) { throw CancellationError() }
+        }
+    }
+
+    @Test(arguments: [false, true])
+    func nestedPlexMappingsPreserveEntirePathWithinFilesystemRoot(_ filesystemRoot: Bool) throws {
+        let fixture = try temporarySidecarDirectory()
+        defer { try? FileManager.default.removeItem(at: fixture) }
+        let nestedPath = "Épisodes 🦊/Season 2"
+        let folder = fixture.appendingPathComponent(nestedPath, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let mappedFile = folder.appendingPathComponent("opaque.mkv")
+        let overriddenFile = folder.appendingPathComponent("overridden.mkv")
+        try Data().write(to: mappedFile)
+        try Data().write(to: overriddenFile)
+        try Data("<tvshow><title>NFO Series</title><year>2010</year></tvshow>".utf8)
+            .write(to: fixture.appendingPathComponent("tvshow.nfo"))
+        try Data("""
+            title: Plex Series
+            ep: S04E06-E08: \(nestedPath)/opaque.mkv
+            ep: S04E09: \(nestedPath)/overridden.mkv
+            ep: S09E99: opaque.mkv
+            ep: S09E98: pisodes 🦊/Season 2/opaque.mkv
+            """.utf8).write(to: fixture.appendingPathComponent(".plexmatch"))
+        try Data("season: 7".utf8).write(to: folder.appendingPathComponent(".plexmatch"))
+        try Data("""
+            <episodedetails><showtitle>Per-file Series</showtitle><title>Finale</title>
+            <season>2</season><episode>10</episode></episodedetails>
+            """.utf8).write(to: folder.appendingPathComponent("overridden.nfo"))
+        let root = filesystemRoot ? URL(fileURLWithPath: "/", isDirectory: true) : fixture
+        let reader = MediaSidecarReader()
+        let mapped = try reader.recognize(mappedFile, within: root)
+        #expect(mapped.kind == .episode)
+        #expect(mapped.title == "Plex Series")
+        #expect(mapped.year == 2010)
+        #expect(mapped.season == 4)
+        #expect(mapped.episode == 6)
+        #expect(mapped.lastEpisode == 8)
+        #expect(mapped.metadataSources == [".plexmatch", "NFO"])
+        let overridden = try reader.recognize(overriddenFile, within: root)
+        #expect(overridden.title == "Per-file Series")
+        #expect(overridden.season == 2)
+        #expect(overridden.episode == 10)
+        #expect(overridden.lastEpisode == nil)
+        #expect(overridden.episodeTitle == "Finale")
+        #expect(overridden.metadataSources == [".plexmatch", "NFO"])
+        #expect(reader.filesRead == 4)
+        #expect(try reader.recognize(mappedFile, within: root) == mapped)
+        #expect(reader.filesRead == 4)
+    }
+
+    @Test func siblingPrefixDoesNotReadSidecars() throws {
+        let fixture = try temporarySidecarDirectory()
+        defer { try? FileManager.default.removeItem(at: fixture) }
+        let root = fixture.appendingPathComponent("Library", isDirectory: true)
+        let sibling = fixture.appendingPathComponent("Library-other", isDirectory: true)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: sibling, withIntermediateDirectories: true)
+        let file = sibling.appendingPathComponent("Film.mkv")
+        try Data().write(to: file)
+        try Data("title: Wrong Series\nep: 7: Film.mkv".utf8)
+            .write(to: sibling.appendingPathComponent(".plexmatch"))
+        try Data("<movie><title>Wrong Folder Film</title></movie>".utf8)
+            .write(to: sibling.appendingPathComponent("movie.nfo"))
+        try Data("<movie><title>Wrong Per-file Film</title></movie>".utf8)
+            .write(to: sibling.appendingPathComponent("Film.nfo"))
+        let reader = MediaSidecarReader()
+        #expect(try reader.recognize(file, within: root) == MediaNameRecognition.recognize(relativePath: file.path))
+        #expect(reader.filesRead == 0)
+    }
+
+    @Test func filesystemRootMappingKeyKeepsItsFirstComponent() throws {
+        let fixture = try temporarySidecarDirectory()
+        defer { try? FileManager.default.removeItem(at: fixture) }
+        let folder = fixture.appendingPathComponent("Épisodes 🦊/Season 2", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let file = folder.appendingPathComponent("opaque.mkv")
+        try Data().write(to: file)
+        let expected = file.pathComponents.dropFirst().joined(separator: "/")
+        let sidecar = fixture.appendingPathComponent(".plexmatch")
+        // Store a root-relative mapping in the fixture instead of writing /.plexmatch.
+        try Data("""
+            title: Root Series
+            ep: S03E05: \(expected)
+            ep: S09E99: \(expected.dropFirst())
+            """.utf8).write(to: sidecar)
+        let relative = try #require(MediaSidecarReader.relativePath(file.path, within: "/"))
+        #expect(relative == expected)
+        let plex = try #require(PlexMatchHints.parse(String(contentsOf: sidecar, encoding: .utf8)))
+        let hints = plex.hints(for: relative)
+        #expect(hints.season == 3)
+        #expect(hints.episode == 5)
+        #expect(MediaSidecarReader.relativePath("/", within: "/") == "")
+        #expect(MediaSidecarReader.relativePath("/Library-other/Film.mkv", within: "/Library") == nil)
+    }
+
+    private func temporarySidecarDirectory() throws -> URL {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("sidecar-" + UUID().uuidString, isDirectory: true).standardizedFileURL
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        return root
     }
 }

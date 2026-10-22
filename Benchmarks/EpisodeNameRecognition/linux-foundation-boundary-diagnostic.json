@@ -1,0 +1,157 @@
+{
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/swiftc",
+        "--version"
+      ],
+      "label": "toolchain"
+    },
+    {
+      "command": [
+        "/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-j",
+        "2",
+        "/__w/illiquid/illiquid/Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+        "/tmp/episode-recognition-benchmark-1_08pyzz/Baseline.swift",
+        "/__w/illiquid/illiquid/Benchmarks/EpisodeNameRecognition/Driver.swift",
+        "-o",
+        "/tmp/episode-recognition-benchmark-1_08pyzz/recognition"
+      ],
+      "label": "compile"
+    },
+    {
+      "command": [
+        "/tmp/episode-recognition-benchmark-1_08pyzz/recognition",
+        "--differential"
+      ],
+      "label": "differential"
+    }
+  ],
+  "conclusion": "Baseline entered recognize with U+200B followed by slash and trapped in Foundation deletingLastPathComponent. The preceding U+200B slash .mkv completed both recognizers. Empty-input exclusion was not a repair; all inputs are restored and only disposable Linux correctness sources adapt the single-BMP-scalar parent-path boundary.",
+  "corpus_at_failure": {
+    "cases": 16299,
+    "empty_path_excluded": true,
+    "failing_zero_based_index": 16142
+  },
+  "environment": {
+    "baseline": {
+      "commit": "68274d1b09dcc866296321a5a8858efc297c4f19",
+      "git_blob_sha": "ec326ee65e9f9081d223d58d7c098b6c66459233",
+      "path": "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift",
+      "sha256": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb"
+    },
+    "cpu_count": 4,
+    "machine": "x86_64",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "reference_name": "main",
+    "reference_source": "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift",
+    "revision": "cd6c25edab88ec04b142da8f21eace4d2f6e7f74",
+    "source_sha256": {
+      "Benchmarks/EpisodeNameRecognition/Driver.swift": "57502d2a397e8afbd1caebef4476d9f27343a026670290ba3bc65b660c328043",
+      "Benchmarks/EpisodeNameRecognition/baseline/MediaNameRecognition.swift": "b9e75457eccae3c30e09817ce3520750429935b2af646532ac290b18e4aee8fb",
+      "Benchmarks/EpisodeNameRecognition/run.py": "168b4cae01ac77b8f1c84ffa22c55a5e9d325dffe37c4f6203e5cd8ccfee673b",
+      "Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift": "546229819194a5844bc052e3837a21296921f4b11e6191ebdc82c0c7c5e64910"
+    },
+    "swift": "/usr/bin/swift",
+    "swiftc": "/usr/bin/swiftc",
+    "timestamp_utc": "2026-10-22T05:50:15.250631+00:00",
+    "toolchain": "Swift version 6.2.4 (swift-6.2.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+  },
+  "foundation_source": "https://github.com/swiftlang/swift-corelibs-foundation/blob/swift-6.2.4-RELEASE/Sources/Foundation/NSPathUtilities.swift#L189-L208",
+  "github": {
+    "artifact_id": 12404631785,
+    "artifact_url": "https://github.com/Jagalite/illiquid/actions/runs/39730226702/artifacts/12404631785",
+    "checkout_log": "2026-10-22T05:50:14.9808859Z HEAD is now at cd6c25e Merge 9aa79a46a92d611f1cb7d351d65ac6314330fdb3 into a2de305c8dbcaa81aac1477df7c9a0017c14eae3",
+    "checkout_sha": "cd6c25edab88ec04b142da8f21eace4d2f6e7f74",
+    "head_sha": "9aa79a46a92d611f1cb7d351d65ac6314330fdb3",
+    "head_source_hashes_match_checkout_receipt": true,
+    "job_id": 119663329388,
+    "job_url": "https://github.com/Jagalite/illiquid/actions/runs/39730226702/job/119663329388",
+    "repository": "Jagalite/illiquid",
+    "run_id": 39730226702
+  },
+  "log": {
+    "bytes": 36610,
+    "crash_excerpt": [
+      "2026-10-22T05:50:29.2968189Z *** Signal 4: Backtracing from 0x7fb1c742450b... done ***",
+      "2026-10-22T05:50:29.2968655Z ",
+      "2026-10-22T05:50:29.2968944Z *** Program crashed: Illegal instruction at 0x00007fb1c742450b ***",
+      "2026-10-22T05:50:29.2969739Z ",
+      "2026-10-22T05:50:29.2969937Z Platform: x86_64 Linux (Ubuntu 24.04.5 LTS)",
+      "2026-10-22T05:50:29.2970280Z ",
+      "2026-10-22T05:50:29.2970444Z Thread 0 \"recognition\" crashed:",
+      "2026-10-22T05:50:29.2970706Z ",
+      "2026-10-22T05:50:29.2971148Z   0      0x00007fb1c742450b String._startOfLastPathComponent.getter + 331 in libFoundation.so",
+      "2026-10-22T05:50:29.2972746Z   1 [ra] 0x00007fb1c7426f76 NSString.deletingLastPathComponent.getter + 181 in libFoundation.so",
+      "2026-10-22T05:50:29.2974818Z   2 [ra] 0x000055a95b1ad196 specialized static BaselineMediaNameRecognition.recognize(relativePath:) + 101 in recognition",
+      "2026-10-22T05:50:29.2975871Z   3 [ra] 0x000055a95b1b4266 main + 5 in recognition"
+    ],
+    "original_local_path": "/tmp/illiquid-pr74-linux-differential-9aa79a4.log",
+    "sha256": "af437b1b5ef4551e66fc0e425d180e277606741a45c8c868ae36cd151cd05414"
+  },
+  "restored_corpus": {
+    "cases": 16300,
+    "empty_path_included": true,
+    "same_failing_path_zero_based_index": 16143
+  },
+  "retention": "Terminal input records, complete crash excerpt, compiler/source receipts, and hashes of the full original trace/log are retained here; the full trace/log remain in the linked CI artifact and original local paths. Temporary tracing code has been removed.",
+  "scope": "Historical unadapted Linux crash diagnosis; not a repaired-harness qualification or timing result",
+  "trace": {
+    "artifact_path": "main/cases.jsonl",
+    "bytes": 10154393,
+    "complete_baseline_candidate_pairs": 16142,
+    "original_local_path": "/tmp/illiquid-linux-crash-trace-9aa79a4/main/cases.jsonl",
+    "records": 32285,
+    "sha256": "0930eacab66190735edd160e223cb3762fd747f1b8035b7a2969ac5412ab4637",
+    "terminal_records": [
+      {
+        "implementation": "baseline",
+        "index": 16141,
+        "path": "\u200b/.mkv",
+        "utf8": [
+          226,
+          128,
+          139,
+          47,
+          46,
+          109,
+          107,
+          118
+        ]
+      },
+      {
+        "implementation": "candidate",
+        "index": 16141,
+        "path": "\u200b/.mkv",
+        "utf8": [
+          226,
+          128,
+          139,
+          47,
+          46,
+          109,
+          107,
+          118
+        ]
+      },
+      {
+        "implementation": "baseline",
+        "index": 16142,
+        "path": "\u200b/",
+        "utf8": [
+          226,
+          128,
+          139,
+          47
+        ]
+      }
+    ]
+  }
+}

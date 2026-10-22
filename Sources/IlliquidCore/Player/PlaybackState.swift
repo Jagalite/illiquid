@@ -56,10 +56,18 @@ public final class PlaybackState {
     public internal(set) var volume: Double { didSet { notifyMutation() } }
     public internal(set) var isMuted: Bool { didSet { notifyMutation() } }
     public internal(set) var playbackSpeed: Double { didSet { notifyMutation() } }
-    public internal(set) var audioTracks: [MediaTrack] = [] { didSet { notifyMutation() } }
-    public internal(set) var subtitleTracks: [MediaTrack] = [] { didSet { notifyMutation() } }
-    public internal(set) var selectedAudioTrack: MediaTrack? { didSet { notifyMutation() } }
-    public internal(set) var selectedSubtitleTrack: MediaTrack? { didSet { notifyMutation() } }
+    public internal(set) var audioTracks: [MediaTrack] = [] {
+        didSet { audioSelectionNeedsResolution = true; notifyMutation() }
+    }
+    public internal(set) var subtitleTracks: [MediaTrack] = [] {
+        didSet { subtitleSelectionNeedsResolution = true; notifyMutation() }
+    }
+    public internal(set) var selectedAudioTrack: MediaTrack? {
+        didSet { audioSelectionNeedsResolution = true; notifyMutation() }
+    }
+    public internal(set) var selectedSubtitleTrack: MediaTrack? {
+        didSet { subtitleSelectionNeedsResolution = true; notifyMutation() }
+    }
     public internal(set) var chapters: [Chapter] = [] { didSet { notifyMutation() } }
     public internal(set) var currentChapterID: Int64? { didSet { notifyMutation() } }
     public internal(set) var audioDelay: TimeInterval = 0 { didSet { notifyMutation() } }
@@ -86,6 +94,13 @@ public final class PlaybackState {
 
     @ObservationIgnored private var mutationBatchDepth = 0
     @ObservationIgnored private var hasPendingMutation = false
+    // Position and other authority updates normally retain their track IDs.
+    // Remember resolved requests (including misses) until the catalogue or
+    // selected value changes, without retaining a second track collection.
+    @ObservationIgnored private var projectedAudioID: Int64?
+    @ObservationIgnored private var projectedSubtitleID: Int64?
+    @ObservationIgnored private var audioSelectionNeedsResolution = true
+    @ObservationIgnored private var subtitleSelectionNeedsResolution = true
 
     private func notifyMutation() {
         guard mutationBatchDepth == 0 else {
@@ -237,10 +252,26 @@ public final class PlaybackState {
             if bufferStatus.isBuffering != projection.isBuffering {
                 bufferStatus.isBuffering = projection.isBuffering
             }
-            let audioTrack = audioTracks.first { $0.id == projection.selectedAudioID }
-            if selectedAudioTrack != audioTrack { selectedAudioTrack = audioTrack }
-            let subtitleTrack = subtitleTracks.first { $0.id == projection.selectedSubtitleID }
-            if selectedSubtitleTrack != subtitleTrack { selectedSubtitleTrack = subtitleTrack }
+            // Clear before assignment: a synchronous Observation callback can
+            // mutate the catalogue while the selected value is being set.
+            // Its invalidation must survive into the next projection. A real
+            // selection change therefore gets one additional resolution.
+            if audioSelectionNeedsResolution || projectedAudioID != projection.selectedAudioID {
+                audioSelectionNeedsResolution = false
+                projectedAudioID = projection.selectedAudioID
+                let audioTrack = projection.selectedAudioID.flatMap { id in
+                    audioTracks.first { $0.id == id }
+                }
+                if selectedAudioTrack != audioTrack { selectedAudioTrack = audioTrack }
+            }
+            if subtitleSelectionNeedsResolution || projectedSubtitleID != projection.selectedSubtitleID {
+                subtitleSelectionNeedsResolution = false
+                projectedSubtitleID = projection.selectedSubtitleID
+                let subtitleTrack = projection.selectedSubtitleID.flatMap { id in
+                    subtitleTracks.first { $0.id == id }
+                }
+                if selectedSubtitleTrack != subtitleTrack { selectedSubtitleTrack = subtitleTrack }
+            }
             let delay = projection.subtitleDelay.isFinite ? projection.subtitleDelay : 0
             if subtitleDelay != delay { subtitleDelay = delay }
             if coreFailureCode != projection.failureCode {

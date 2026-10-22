@@ -4,10 +4,22 @@ on:
     paths:
       - '.github/workflows/source-volume-regressions.yml'
       - 'Scripts/test-source-volume-regressions.sh'
+      - 'Scripts/test-source-tree-directory-state.py'
+      - 'Scripts/test-source-browser-search.py'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
       - 'Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift'
       - 'Sources/IlliquidApp/UI/SourceFilesystem*.swift'
       - 'Sources/IlliquidCore/Utilities/LifecyclePerformance.swift'
       - 'Tests/IlliquidAppTests/SourceVolumeChangePolicyTests.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystemLifecycleTests.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeDirectoryStateTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,6 +27,26 @@ concurrency:
   group: source-volume-regressions-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  directory-consumers:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test sidebar directory consumers in debug and release
+        run: |
+          python3 Scripts/test-source-tree-directory-state.py --configuration debug --output "$RUNNER_TEMP/directory-consumers/debug"
+          python3 Scripts/test-source-tree-directory-state.py --configuration release --output "$RUNNER_TEMP/directory-consumers/release"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: sidebar-directory-consumers
+          path: ${{ runner.temp }}/directory-consumers/
+          retention-days: 14
+
   volume-routing:
     runs-on: macos-26
     timeout-minutes: 10

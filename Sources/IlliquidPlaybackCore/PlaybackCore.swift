@@ -1714,7 +1714,11 @@ public struct PlaybackCore: Sendable {
     }
   }
 
-  private func authorityIsCurrent(_ authority: PlaybackAuthority) -> Bool {
+  /// Whether ordinary playback work still has authority to affect a session.
+  /// Dispatchers must share this result-admission rule when retiring work that
+  /// never reached an executor; subtitle/overlay-only invalidation is orthogonal.
+  /// Cleanup and effect-specific revision checks remain the reducer's concern.
+  public func authorityIsCurrent(_ authority: PlaybackAuthority) -> Bool {
     switch authority {
     case .application(let epoch):
       return epoch == state.applicationEpoch

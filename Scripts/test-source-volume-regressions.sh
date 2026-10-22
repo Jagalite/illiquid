@@ -10,6 +10,7 @@ cp "$root/Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift" "$work/Sources/
 if [[ "$(uname -s)" == "Darwin" ]]; then
     mkdir -p "$work/Sources/IlliquidCore"
     cp "$root/Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift" "$work/Sources/IlliquidApp/"
+    cp "$root/Tests/IlliquidAppTests/SourceFilesystemLifecycleTests.swift" "$work/Tests/IlliquidAppTests/"
     cp "$root/Sources/IlliquidCore/Utilities/LifecyclePerformance.swift" "$work/Sources/IlliquidCore/"
     # Support the separate planner extraction when it is present after merging.
     if [[ -f "$root/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift" ]]; then
