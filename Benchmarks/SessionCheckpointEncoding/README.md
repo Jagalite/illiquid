@@ -1,5 +1,25 @@
 # Session checkpoint JSON encoding
 
+## Decision: do not promote this candidate
+
+The longer native confirmation did not reproduce a sufficiently consistent
+production-save improvement. No PR was opened, and this experiment did not
+change `main`. The candidate implementation remains in this research branch
+to make the comparison reproducible; it is not a merge recommendation.
+
+The decision criteria were recorded before retrieving confirmation output in
+[`evidence/confirmation-plan.json`](evidence/confirmation-plan.json). In the
+large plain workloads, median paired CPU reductions were only **1.43%** and
+**1.34%**, with **8/12** and **9/12** winning pairs. Neither reached the practical
+gate of at least 5% with at least 10/12 winning pairs. These thresholds are
+consistency rules for this experiment, not statistical-significance claims.
+
+Compatibility passed. The rejection concerns the performance evidence, not a
+reproduced data-loss or restoration defect. A small benefit on some workloads
+remains possible, but the initial larger gains are not justified as a stable
+improvement in the production save path. No further repetitions were used to
+search for a favorable result.
+
 ## Question and change
 
 `AtomicPlaybackSessionStore.save` encodes the complete playlist on each session
@@ -111,10 +131,54 @@ all paired differences and encode-only observations, are in
 | 1,000 rich items | 8.450 | 7.541 | 10.8% | 11.4% |
 | 10,000 rich items | 113.679 | 105.181 | 7.5% | -6.7% |
 
-The small-playlist apparent slowdown and mixed rich-playlist CPU results
-require a longer independent confirmation. The workflow now uses twelve
-pairs targeting 500 ms. No production code or fixtures changed for that
-confirmation, and the initial observations remain retained.
+The small-playlist apparent slowdown and mixed rich-playlist CPU results led
+to one longer independent confirmation using twelve pairs targeting 500 ms.
+No production code or fixtures changed for that confirmation, and the initial
+observations remain retained.
+
+### Longer native confirmation
+
+[Run 39845750523](https://github.com/Jagalite/illiquid/actions/runs/39845750523)
+tested `c98e29f874e6d6295f1940886849b35f11b3b28d` with the same virtual Apple M1,
+macOS 26.6.2, and Apple Swift 6.3.3 configuration. The original and candidate
+source hashes match those in the first native run. All seven compatibility
+tests again passed in debug and release for both variants. All **192** complete
+JSON comparisons passed, with equal payload sizes and full record round trips.
+The run contains **384 timing observations plus 16 calibrations**.
+
+The table reports marginal wall-time medians and the primary paired CPU
+comparison. These are distinct summaries: the median of paired percentage
+changes need not equal the ratio of two separate medians.
+
+| Playlist | Baseline save, ms | Candidate save, ms | Median paired CPU reduction | Faster CPU pairs |
+| --- | ---: | ---: | ---: | ---: |
+| Empty / remote | 0.426 | 0.416 | 1.51% | 7/12 |
+| 1 plain item | 0.388 | 0.367 | 3.94% | 10/12 |
+| 24 plain items | 0.511 | 0.562 | 5.94% | 9/12 |
+| 1,000 plain items | 2.997 | 2.983 | 1.43% | 8/12 |
+| 10,000 plain items | 25.855 | 25.861 | 1.34% | 9/12 |
+| 24 rich items | 0.517 | 0.531 | -1.34% | 5/12 |
+| 1,000 rich items | 7.418 | 6.957 | 1.60% | 8/12 |
+| 10,000 rich items | 73.005 | 72.315 | 0.97% | 7/12 |
+
+Full medians, ranges, paired observations, execution-order splits, environment,
+and hashes are retained in
+[`evidence/native-confirmation`](evidence/native-confirmation). The archive
+digest in `run.json` was verified after downloading the CI artifact.
+
+The apparent 22.3% initial wall-time saving for 10,000 plain items became
+effectively flat in confirmation (25.855 versus 25.861 ms). Rich 10,000-item
+CPU medians still differed by execution order: -0.14% with baseline first
+versus +4.11% with candidate first. Small controls remain variable; no claim
+of zero overhead or universally faster small saves is warranted.
+
+Across both native runs, **640 timing observations and 320 complete JSON
+comparisons** were collected, plus 32 calibrations. They are reported
+separately rather than pooled. The complete app build and native playback
+suite were not run for this rejected candidate; passing these component
+tests is not full application qualification.
+
+### Portable preliminary run
 
 The initial Linux run passed all seven tests for both variants in debug and
 release. It stopped during encode-only measurements because the shared disk

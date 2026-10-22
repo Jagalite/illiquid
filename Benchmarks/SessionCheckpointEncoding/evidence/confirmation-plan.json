@@ -1,0 +1,10 @@
+{
+  "set_before_confirmation_output_was_retrieved": true,
+  "confirmation_run_id": 39845750523,
+  "code_and_fixtures_unchanged": true,
+  "primary_endpoint": "paired median process CPU reduction in actual production save()",
+  "success_gate": "At least one large plain workload: >=5% paired CPU reduction, >=10/12 faster pairs, positive CPU medians in both execution orders, no wall regression. Remaining large-rich workloads: nonnegative paired CPU medians and no clear wall regression.",
+  "ordinary_playlist_gate": "Reject a repeated >=5% CPU or wall slowdown in 24-item saves, especially if both execution-order strata are negative.",
+  "interpretation": "Report wall and marginal medians too. No improvement is required in rich fixtures dominated by unchanged string/URL encoding, but any regression must be resolved. No pooling of exploratory and confirmation samples; no further repetition to chase favorable results.",
+  "small_controls": "0/1-item timings may remain storage-noise-dominated; do not claim zero overhead or a small-playlist speedup without support."
+}
