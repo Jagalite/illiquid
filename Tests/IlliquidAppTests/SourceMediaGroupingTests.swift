@@ -88,7 +88,8 @@ struct SourceMediaGroupingTests {
                 expected.append((canonical, [member]))
             }
         }
-        let result = try await project(rows)
+        let filter = SourceBrowserFilter()
+        let result = try await project(rows, filter: filter)
         #expect(headers(result).count == expected.count)
         // Compare membership independently of section order: a native locale
         // may collate two distinct section titles equally, with no tie-break.
@@ -108,6 +109,64 @@ struct SourceMediaGroupingTests {
             #expect(found.header.url == group.members.first?.url)
             #expect(found.members == group.members)
         }
+        let searched = try await project(rows, filter: filter, query: "combining-1")
+        #expect(files(searched) == [rows[1]])
+        let searchedTitle = try #require(rows[1].recognizedMedia?.section) + " (1)"
+        #expect(headers(searched).map { Array($0.displayName.utf8) } == [Array(searchedTitle.utf8)])
+        let restored = try await project(rows, filter: filter)
+        // Native collation may tie distinct section names, so compare each
+        // section's bytes and ordered members independently of section order.
+        for group in actual {
+            let header = try #require(headers(restored).first { $0.id == group.header.id })
+            #expect(Array(header.displayName.utf8) == Array(group.header.displayName.utf8))
+        }
+        #expect(Set(files(restored).map(\.id)) == Set(rows.map(\.id)))
+        #expect(await filter.visibilityBuildCount == 1)
+    }
+
+    @Test func flatProjectionAliasesPreserveLoadedMetadataThroughGroupingAndSearch() async throws {
+        let root = URL(fileURLWithPath: "/tmp/source-media-grouping", isDirectory: true)
+        let raw = try #require(URL(string:
+            "file:///tmp/source-media-grouping/Unused/../Cafe%CC%81/first.mkv"))
+        let alias = root.appendingPathComponent("Café/first.mkv")
+        let secondURL = root.appendingPathComponent("second.mkv")
+        func entry(_ url: URL, title: String, episode: Int, added: TimeInterval) -> SourceTreeEntry {
+            var value = SourceTreeEntry(url: url, kind: .media,
+                dateAdded: Date(timeIntervalSince1970: added), creationDate: nil)
+            var recognition = MediaNameRecognition.recognize(relativePath: "\(title).S01E0\(episode).mkv")
+            recognition.metadataSources = ["NFO"]
+            value.recognizedMedia = recognition
+            return value
+        }
+        let first = entry(raw, title: "AuThOrItAtIvE", episode: 2, added: 123)
+        let duplicate = entry(alias, title: "Wrong Metadata", episode: 9, added: 456)
+        let second = entry(secondURL, title: "authoritative", episode: 1, added: 789)
+        var configuration = SourceVisibilityConfiguration.default
+        configuration.viewMode = .media
+        let input = SourceTreeProjectionInput(
+            items: [.init(kind: .folder, url: root), .init(kind: .file, url: alias),
+                    .init(kind: .file, url: alias)],
+            visibility: configuration, roots: [root], directoryContents: [:], directoryErrors: [:],
+            recursiveMediaEntries: [first, duplicate, second], expandedFolderIDs: [],
+            sortConfiguration: .init(name: .off, dateCreated: .off, type: .off))
+        let filter = SourceBrowserFilter()
+        let all = try #require(await filter.project(input: input, revealsRulePreview: false, query: ""))
+        #expect(headers(all).map(\.displayName) == ["TV Shows · AuThOrItAtIvE · Season 1 (2)"])
+        #expect(headers(all).first?.url == raw)
+        #expect(files(all).map(\.url) == [secondURL, raw])
+        #expect(files(all).last?.recognizedMedia == first.recognizedMedia)
+        #expect(files(all).last?.kind == .media(dateAdded: first.dateAdded))
+        #expect(all.thumbnailCandidates == [secondURL, raw])
+
+        let searched = try #require(await filter.project(input: input, revealsRulePreview: false, query: "second.mkv"))
+        #expect(headers(searched).map(\.displayName) == ["TV Shows · authoritative · Season 1 (1)"])
+        #expect(files(searched).map(\.url) == [secondURL])
+        let restored = try #require(await filter.project(input: input, revealsRulePreview: false, query: ""))
+        #expect(restored.rows == all.rows)
+        #expect(restored.mediaPaths == all.mediaPaths)
+        #expect(restored.thumbnailCandidates == all.thumbnailCandidates)
+        #expect(await filter.treeBuildCount == 1)
+        #expect(await filter.visibilityBuildCount == 1)
     }
 
     @Test func caseFoldingDoesNotEraseAccentsOrWidthDifferences() async throws {
