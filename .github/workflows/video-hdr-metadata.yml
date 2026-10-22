@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: video-hdr-metadata-${{ github.head_ref || github.ref }}
+  group: video-hdr-metadata-refs/heads/${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:

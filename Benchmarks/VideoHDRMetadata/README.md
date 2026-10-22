@@ -26,6 +26,8 @@ shims, payload serialization, or color mapping helpers that would broaden this
 comparison.
 
 The measured operation includes color attachments and the returned HDR payloads.
+The two `*_cleared` controls additionally include clearing attachments before
+each preparation.
 It excludes decoding, pixel conversion, frame and pixel buffer allocation,
 geometry attachments, and presentation. Results establish component cost, not
 whole-player CPU consumption or frame-rate improvements.
@@ -49,8 +51,20 @@ be new or empty.
 
 ## Workloads and method
 
-Workloads cover SDR BGRA/NV12, HDR10 BGRA/P010, mastering-only metadata,
-content-light-only metadata, changing metadata, and preexisting attachments.
+The eight original workloads cover SDR BGRA/NV12, HDR10 BGRA/P010,
+mastering-only metadata, content-light-only metadata, changing metadata, and
+preexisting attachments. They use a warm 32-buffer ring: repeated preparations
+replace or preserve attachments already present after warmup.
+
+Two additional controls, `hdr10_p010_cleared` and `sdr_nv12_cleared`, call
+`CVBufferRemoveAllAttachments` before every preparation, inside the measured
+interval. They measure **clearing plus fresh attachment insertion and payload
+preparation**, without allocating a new buffer per iteration. These controls
+cover the empty-attachment condition of the software planar path, which clears
+metadata before preparing each output. Their clearing operation is a benchmark
+fixture mechanism; it does not reproduce production's individual key removals.
+Keep their results separate from the eight warm-buffer workloads when reporting
+absolute cost or percentage changes.
 
 Before timing, `--verify` traces from both executables must match exactly as
 decoded JSON. Each timed process must also report matching output checksums.

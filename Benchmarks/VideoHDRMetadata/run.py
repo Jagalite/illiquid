@@ -37,6 +37,7 @@ METHODS = (
 CASES = (
     "sdr_bgra", "sdr_nv12", "hdr10_bgra", "hdr10_p010", "mastering_only",
     "light_only", "metadata_changes", "preexisting_attachments",
+    "hdr10_p010_cleared", "sdr_nv12_cleared",
 )
 PACKAGES = ("libavformat", "libavfilter", "libavcodec", "libavutil", "libswresample", "libswscale")
 FLAGS = ("-O", "-whole-module-optimization", "-swift-version", "6", "-parse-as-library")
@@ -124,7 +125,7 @@ class Runner:
             "candidate_revision": self.command(["git", "rev-parse", "HEAD"]).strip(),
             "platform": platform.platform(), "machine": platform.machine(),
             "processor": platform.processor(), "files": {}, "binaries": {},
-            "scope": "Color attachments and both returned HDR payloads for an existing AVFrame/CVPixelBuffer; excludes decode, pixel conversion, allocation of the frame/pixel buffer, geometry attachments and presentation.",
+            "scope": "Color attachments and both returned HDR payloads for an existing AVFrame/CVPixelBuffer. The *_cleared controls also time clearing all attachments before preparation; other cases use a warm 32-buffer ring. Excludes decode, pixel conversion, allocation of the frame/pixel buffer, geometry attachments and presentation.",
         }
 
     def command(self, argv, *, log: Path | None = None):
@@ -244,11 +245,14 @@ class Runner:
             traces[variant] = self.invoke(variant, "--verify")
             write_json(self.output / f"{variant}-trace.json", traces[variant])
         equal = traces["baseline"] == traces["candidate"]
-        write_json(self.output / "parity.json", {
+        parity = {
             "equal": equal, "comparison": "Complete decoded JSON traces",
             "trace_sha256": {variant: sha(json.dumps(trace, sort_keys=True))
                              for variant, trace in traces.items()},
-        })
+        }
+        if all(isinstance(trace, list) for trace in traces.values()):
+            parity["trace_count"] = len(traces["candidate"])
+        write_json(self.output / "parity.json", parity)
         if not equal:
             raise ValueError("HDR payload/attachment traces differ; inspect saved traces. Timing was not run.")
         print("Exact HDR payload/attachment trace parity passed", flush=True)

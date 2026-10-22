@@ -292,9 +292,9 @@ private func fixtures(_ name: String) -> [Fixture] {
     let specification: [(MetadataKind, OSType, Bool)]
     switch name {
     case "sdr_bgra": specification = [(.none, bgra, false)]
-    case "sdr_nv12": specification = [(.none, nv12, false)]
+    case "sdr_nv12", "sdr_nv12_cleared": specification = [(.none, nv12, false)]
     case "hdr10_bgra": specification = [(.hdr, bgra, false)]
-    case "hdr10_p010": specification = [(.hdr, p010, false)]
+    case "hdr10_p010", "hdr10_p010_cleared": specification = [(.hdr, p010, false)]
     case "mastering_only": specification = [(.masteringOnly, p010, false)]
     case "light_only": specification = [(.lightOnly, p010, false)]
     case "metadata_changes": specification = [(.hdr, p010, false), (.alternate, bgra, false),
@@ -327,10 +327,16 @@ private struct Timing: Codable {
 private func benchmark(_ name: String, iterations: Int) -> Timing {
     let values = fixtures(name)
     let processor = MetadataProcessor()
+    let clearsAttachments = name.hasSuffix("_cleared")
     @inline(never) func loop(_ count: Int) -> UInt64 {
         var checksum: UInt64 = 0
         for index in 0..<count {
             let fixture = values[index & 31]
+            if clearsAttachments {
+                // This control includes clearing and new attachment insertion.
+                // It does not measure pixel-buffer allocation or pixel writes.
+                CVBufferRemoveAllAttachments(fixture.buffer)
+            }
             let result = processor.metadata(frame: fixture.frame, pixelBuffer: fixture.buffer)
             checksum &+= UInt64(result.masteringMetadata?.count ?? 0)
             checksum &+= UInt64(result.contentLightMetadata?.count ?? 0)
@@ -342,8 +348,8 @@ private func benchmark(_ name: String, iterations: Int) -> Timing {
     _ = autoreleasepool { loop(min(iterations, 10_000)) }
     let wallStart = DispatchTime.now().uptimeNanoseconds
     let cpuStart = cpuNanoseconds()
-    // The pool is drained inside the measured interval. No per-iteration pool
-    // creation and no deferred CF/Foundation cleanup escaping the measurement.
+    // Temporary autorelease cleanup is included, without per-iteration pools.
+    // The fixture ring and its final attachment values stay alive after timing.
     let checksum = autoreleasepool { loop(iterations) }
     let cpuElapsed = cpuNanoseconds() - cpuStart
     let wallElapsed = DispatchTime.now().uptimeNanoseconds - wallStart
