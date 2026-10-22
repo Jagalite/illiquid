@@ -498,6 +498,22 @@ final class SoftwarePlanarOutputPool: @unchecked Sendable {
 }
 
 final class VideoDecoder {
+    private enum OutputMode {
+        case frames
+        case presentationTimes
+    }
+
+    private enum DecodedOutput {
+        case frame(NativeDecodedVideoFrame)
+        case presentationTime(CMTime)
+    }
+
+    private struct FrameTiming {
+        let presentationTime: CMTime
+        let duration: CMTime
+        let beginsTimelineDiscontinuity: Bool
+    }
+
     private final class SeekPrerollFallback {
         var frame: UnsafeMutablePointer<AVFrame>?
         let generation: Int
@@ -799,12 +815,44 @@ final class VideoDecoder {
         reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)? = nil,
         emit: (NativeDecodedVideoFrame) throws -> Void
     ) throws {
+        try decodeOutput(packet, while: shouldContinue,
+                         reserveSoftwareOutput: reserveSoftwareOutput, mode: .frames) { output in
+            guard case let .frame(frame) = output else {
+                preconditionFailure("Frame decoding produced timestamp-only output")
+            }
+            try emit(frame)
+        }
+    }
+
+    /// Discovers the same accepted presentation times as full frame decoding,
+    /// including temporal filtering, without preparing pixel buffers for display.
+    func decodePresentationTimes(
+        _ packet: FFmpegPacket,
+        while shouldContinue: () -> Bool,
+        emit: (CMTime) throws -> Void
+    ) throws {
+        try decodeOutput(packet, while: shouldContinue,
+                         reserveSoftwareOutput: nil, mode: .presentationTimes) { output in
+            guard case let .presentationTime(time) = output else {
+                preconditionFailure("Timestamp discovery produced a display frame")
+            }
+            try emit(time)
+        }
+    }
+
+    private func decodeOutput(
+        _ packet: FFmpegPacket,
+        while shouldContinue: () -> Bool,
+        reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)?,
+        mode: OutputMode,
+        emit: (DecodedOutput) throws -> Void
+    ) throws {
         guard shouldContinue() else {
             retiredPlanarDiagnostics.cancellations += 1
             throw SoftwarePixelBufferPoolError.cancelled
         }
         try prepareSeekDecoder(for: packet, while: shouldContinue,
-            reserveSoftwareOutput: reserveSoftwareOutput, emit: emit)
+            reserveSoftwareOutput: reserveSoftwareOutput, mode: mode, emit: emit)
         guard let context, let packetPointer = packet.pointer else { return }
         let floor = seekOutputFloor.flatMap { $0.generation == packet.generation ? $0.seconds : nil }
         let skipsNonReference = seekPrerollDecodePolicy.shouldSkipNonReference(
@@ -825,6 +873,7 @@ final class VideoDecoder {
                 generation: packet.generation,
                 while: shouldContinue,
                 reserveSoftwareOutput: reserveSoftwareOutput,
+                mode: mode,
                 emit: emit
             )
             if observedInterlacedFrame { context.pointee.skip_frame = AVDISCARD_DEFAULT }
@@ -847,6 +896,7 @@ final class VideoDecoder {
             generation: packet.generation,
             while: shouldContinue,
             reserveSoftwareOutput: reserveSoftwareOutput,
+            mode: mode,
             emit: emit
         )
     }
@@ -862,6 +912,36 @@ final class VideoDecoder {
         while shouldContinue: () -> Bool,
         reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)? = nil,
         emit: (NativeDecodedVideoFrame) throws -> Void
+    ) throws {
+        try drainOutput(generation: generation, while: shouldContinue,
+                        reserveSoftwareOutput: reserveSoftwareOutput, mode: .frames) { output in
+            guard case let .frame(frame) = output else {
+                preconditionFailure("Frame draining produced timestamp-only output")
+            }
+            try emit(frame)
+        }
+    }
+
+    func drainPresentationTimes(
+        generation: Int,
+        while shouldContinue: () -> Bool,
+        emit: (CMTime) throws -> Void
+    ) throws {
+        try drainOutput(generation: generation, while: shouldContinue,
+                        reserveSoftwareOutput: nil, mode: .presentationTimes) { output in
+            guard case let .presentationTime(time) = output else {
+                preconditionFailure("Timestamp draining produced a display frame")
+            }
+            try emit(time)
+        }
+    }
+
+    private func drainOutput(
+        generation: Int,
+        while shouldContinue: () -> Bool,
+        reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)?,
+        mode: OutputMode,
+        emit: (DecodedOutput) throws -> Void
     ) throws {
         guard let context else { return }
         let result = avcodec_send_packet(context, nil)
@@ -881,12 +961,13 @@ final class VideoDecoder {
             generation: generation,
             while: shouldContinue,
             reserveSoftwareOutput: reserveSoftwareOutput,
+            mode: mode,
             emit: emit
         )
         if let deinterlacer, deinterlacingFailure == nil {
             try deinterlacer.drain(while: shouldContinue) { output in
                 try deliver(output, generation: generation, while: shouldContinue,
-                            reserveSoftwareOutput: reserveSoftwareOutput, emit: emit)
+                            reserveSoftwareOutput: reserveSoftwareOutput, mode: mode, emit: emit)
             }
         }
     }
@@ -915,7 +996,8 @@ final class VideoDecoder {
     private func prepareSeekDecoder(
         for packet: FFmpegPacket, while shouldContinue: () -> Bool,
         reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)?,
-        emit: (NativeDecodedVideoFrame) throws -> Void
+        mode: OutputMode,
+        emit: (DecodedOutput) throws -> Void
     ) throws {
         guard let parameters, let pointer = packet.pointer else { return }
         let firstPacket = seekAccelerationNeedsDecision
@@ -958,8 +1040,8 @@ final class VideoDecoder {
         if restoreHardware && !firstPacket {
             // Frame threading and B pictures can retain output preceding IDR.
             // Deliver it before changing contexts, preserving PTS continuity.
-            try drain(generation: packet.generation, while: shouldContinue,
-                      reserveSoftwareOutput: reserveSoftwareOutput, emit: emit)
+            try drainOutput(generation: packet.generation, while: shouldContinue,
+                            reserveSoftwareOutput: reserveSoftwareOutput, mode: mode, emit: emit)
         }
         guard shouldContinue() else { throw SoftwarePixelBufferPoolError.cancelled }
         if let frame { av_frame_unref(frame) }
@@ -996,6 +1078,10 @@ final class VideoDecoder {
 
     var currentPlanarOutputDiagnostics: SoftwarePlanarPoolDiagnostics? {
         softwarePlanarPixelBufferPool?.diagnostics
+    }
+
+    var hasSoftwareOutputPoolForDiagnostics: Bool {
+        softwarePixelBufferPool != nil || softwarePlanarPixelBufferPool != nil
     }
 
     var planarOutputDiagnostics: SoftwarePlanarPoolDiagnostics? {
@@ -1041,7 +1127,8 @@ final class VideoDecoder {
         generation: Int,
         while shouldContinue: () -> Bool,
         reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)?,
-        emit: (NativeDecodedVideoFrame) throws -> Void
+        mode: OutputMode,
+        emit: (DecodedOutput) throws -> Void
     ) throws {
         guard let context, let frame else { return }
 
@@ -1082,7 +1169,7 @@ final class VideoDecoder {
                     try deinterlacer.process(frame, while: shouldContinue) { output in
                         do {
                             try deliver(output, generation: generation, while: shouldContinue,
-                                        reserveSoftwareOutput: reserveSoftwareOutput, emit: emit)
+                                        reserveSoftwareOutput: reserveSoftwareOutput, mode: mode, emit: emit)
                             delivered = true
                         } catch { throw OutputDeliveryError(underlying: error) }
                     }
@@ -1101,18 +1188,26 @@ final class VideoDecoder {
                 }
             }
             try deliver(.init(frame: frame, timeBase: stream.timeBase, filtered: false, copiedHardware: false),
-                        generation: generation, while: shouldContinue, reserveSoftwareOutput: reserveSoftwareOutput, emit: emit)
+                        generation: generation, while: shouldContinue,
+                        reserveSoftwareOutput: reserveSoftwareOutput, mode: mode, emit: emit)
         }
     }
 
     private func deliver(_ output: VideoDeinterlacer.Output, generation: Int,
                          while shouldContinue: () -> Bool,
                          reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)?,
-                         emit: (NativeDecodedVideoFrame) throws -> Void) throws {
-        let decoded: NativeDecodedVideoFrame
+                         mode: OutputMode,
+                         emit: (DecodedOutput) throws -> Void) throws {
+        let decoded: DecodedOutput
         do {
-            decoded = try makeFrame(output.frame, generation: generation, while: shouldContinue,
-                                    reserveSoftwareOutput: reserveSoftwareOutput, filteredOutput: output)
+            switch mode {
+            case .frames:
+                decoded = .frame(try makeFrame(output.frame, generation: generation, while: shouldContinue,
+                                              reserveSoftwareOutput: reserveSoftwareOutput, filteredOutput: output))
+            case .presentationTimes:
+                let timing = try frameTiming(output.frame, generation: generation, filteredOutput: output)
+                decoded = .presentationTime(timing.presentationTime)
+            }
         } catch VideoTimestampValidationError.dropFrame { return }
         softwareDecodeProgress.recordFrame()
         try emit(decoded)
@@ -1127,25 +1222,21 @@ final class VideoDecoder {
         }
     }
 
-    private func makeFrame(
+    /// Shared by display output and timestamp discovery so VFR, missing PTS,
+    /// deinterlacing and seek-preroll acceptance cannot diverge between them.
+    private func frameTiming(
         _ frame: UnsafeMutablePointer<AVFrame>,
         generation: Int,
-        while shouldContinue: () -> Bool,
-        reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)?,
         filteredOutput: VideoDeinterlacer.Output,
         validatedTimestamp: CMTime? = nil,
         validatedDiscontinuity: Bool = false
-    ) throws -> NativeDecodedVideoFrame {
+    ) throws -> FrameTiming {
         let width = illiquid_frame_width(frame)
         let height = illiquid_frame_height(frame)
         guard width > 0, height > 0 else {
             throw FFmpegError(operation: "Decode video dimensions", code: -22)
         }
 
-        let pixelFormat = illiquid_frame_pixel_format(frame)
-        let pixelFormatName = illiquid_frame_pixel_format_name(frame)
-            .map(String.init(cString:)) ?? "unknown"
-        let isHardware = pixelFormat == AV_PIX_FMT_VIDEOTOOLBOX
         let rawDuration = illiquid_frame_duration(frame)
         let duration: CMTime
         if rawDuration > 0 {
@@ -1193,6 +1284,32 @@ final class VideoDecoder {
             throw VideoTimestampValidationError.dropFrame
         }
         seekPrerollFallback = nil
+
+        return FrameTiming(presentationTime: pts, duration: duration,
+                           beginsTimelineDiscontinuity: beginsTimelineDiscontinuity)
+    }
+
+    private func makeFrame(
+        _ frame: UnsafeMutablePointer<AVFrame>,
+        generation: Int,
+        while shouldContinue: () -> Bool,
+        reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)?,
+        filteredOutput: VideoDeinterlacer.Output,
+        validatedTimestamp: CMTime? = nil,
+        validatedDiscontinuity: Bool = false
+    ) throws -> NativeDecodedVideoFrame {
+        let timing = try frameTiming(frame, generation: generation, filteredOutput: filteredOutput,
+                                     validatedTimestamp: validatedTimestamp,
+                                     validatedDiscontinuity: validatedDiscontinuity)
+        let pts = timing.presentationTime
+        let duration = timing.duration
+        let beginsTimelineDiscontinuity = timing.beginsTimelineDiscontinuity
+        let width = illiquid_frame_width(frame)
+        let height = illiquid_frame_height(frame)
+        let pixelFormat = illiquid_frame_pixel_format(frame)
+        let pixelFormatName = illiquid_frame_pixel_format_name(frame)
+            .map(String.init(cString:)) ?? "unknown"
+        let isHardware = pixelFormat == AV_PIX_FMT_VIDEOTOOLBOX
 
         let pixelAspect = effectivePixelAspectRatio(frame)
         let cropLeft = min(Int(illiquid_frame_crop_left(frame)), Int(width))
