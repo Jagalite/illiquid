@@ -2508,17 +2508,34 @@ enum SourceRecursiveMediaLoader {
 
             while let originalURL = enumerator.nextObject() as? URL {
                 guard (try? checkCancellation()) != nil else { return [] }
-                let url = NormalizedFileURL.resolveFilesystemIdentity(originalURL) ?? originalURL
-                guard (try? checkCancellation()) != nil else { return [] }
                 let values = try? originalURL.resourceValues(forKeys: Set(keys))
+                guard (try? checkCancellation()) != nil else { return [] }
                 if values?.isDirectory == true {
                     if values?.isSymbolicLink == true || values?.isPackage == true {
                         enumerator.skipDescendants()
                     }
                     continue
                 }
-                guard values?.isRegularFile == true,
-                      MediaFileSupport.isSupportedMediaFile(url),
+                guard values?.isRegularFile == true else { continue }
+
+                // Use the enumerator's original-entry metadata to discard work
+                // before resolving filesystem identity. Links and unknown link
+                // status still need the resolved target's extension check.
+                let hasSupportedOriginalExtension: Bool
+                if values?.isSymbolicLink == false {
+                    guard MediaFileSupport.isSupportedMediaFile(originalURL) else { continue }
+                    hasSupportedOriginalExtension = true
+                } else {
+                    hasSupportedOriginalExtension = false
+                }
+
+                let url = NormalizedFileURL.resolveFilesystemIdentity(originalURL) ?? originalURL
+                guard (try? checkCancellation()) != nil else { return [] }
+                // Avoid repeating extension classification only when resolution
+                // preserved the exact URL bytes, including Unicode spelling.
+                guard (hasSupportedOriginalExtension
+                       && url.absoluteString.utf8.elementsEqual(originalURL.absoluteString.utf8))
+                      || MediaFileSupport.isSupportedMediaFile(url),
                       let path = SourceVisibilityPath.normalized(url),
                       seenPaths.insert(path).inserted
                 else {

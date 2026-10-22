@@ -44,16 +44,47 @@ python3 Benchmarks/FlatFileProjection/run.py \
 Output directories must be new or empty. `--swift` accepts a compiler path.
 `--sizes`, `--cases`, and `--pairs` select workloads; the default study has six
 balanced pairs for each of six scenarios at 100, 1,000, and 10,000 entries.
-PR CI runs the tests and complete output comparisons in `verify` mode. Manual
+PR CI runs the tests and complete output comparisons in `verify` mode with
+`--current-support`, as described below. Manual
 workflow dispatch runs the full study with ten pairs and a 1,000 ms target per
 observation. Timing results are research evidence, not a noisy pass/fail gate.
+
+### Current integration context
+
+Use this explicit mode when supporting production code has changed since the
+pinned baseline:
+
+```sh
+python3 Benchmarks/FlatFileProjection/run.py --current-support \
+  --mode verify --output /tmp/flat-projection-current-support
+```
+
+Only the baseline `SourceTreeProjectionInput.swift` comes from the pinned
+revision. Both variants compile the same current snapshot of every supporting
+file and declaration, including the recursive scanner used by the filesystem
+regression tests. The existing equality gate still rejects any difference in
+compiled support; the projection optimization remains the focal difference.
+
+`sources.json` and `environment.json` identify the comparison mode and focal
+baseline. Every production source records its own origin, revision, role, and
+original/snapshot hashes. A working-tree source has `revision: null` and a
+separate `worktree_head`; hashes identify its exact bytes without attributing
+current support to the old baseline revision. Timings collected with current
+support are a new integration-context experiment, not a reproduction of the
+retained historical measurements.
+
+The default CLI and the manual historical study remain strict: without
+`--current-support`, changed shared dependencies are rejected. Run the historical
+study from its recorded checkout. Existing evidence and retained baselines are
+unchanged.
 
 ## Method
 
 The runner uses the existing source-tree benchmark's guarded staging definitions.
 It compiles the complete production projection input and supporting Foundation
-declarations, with a separate executable driver. Baseline files come directly
-from the pinned Git revision; candidate files come from the current checkout.
+declarations, with a separate executable driver. In the default strict mode,
+baseline files come directly from the pinned Git revision; candidate files come
+from the current checkout.
 The runner rejects any staged production difference outside
 `SourceTreeProjectionInput.swift`. There is no replacement projection or sorter.
 

@@ -37,9 +37,9 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Test integrated sources in debug and release
-        run: python3 Benchmarks/MediaSectionGrouping/run.py --mode tests --output "$RUNNER_TEMP/media-grouping-tests"
+        run: python3 Benchmarks/MediaSectionGrouping/run.py --current-support --mode tests --output "$RUNNER_TEMP/media-grouping-tests"
       - name: Compare complete projection outputs
-        run: python3 Benchmarks/MediaSectionGrouping/run.py --mode verify --output "$RUNNER_TEMP/media-grouping-parity"
+        run: python3 Benchmarks/MediaSectionGrouping/run.py --current-support --mode verify --output "$RUNNER_TEMP/media-grouping-parity"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
