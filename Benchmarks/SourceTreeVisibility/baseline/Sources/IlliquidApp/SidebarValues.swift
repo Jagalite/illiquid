@@ -200,8 +200,7 @@ struct SourceVisibilityMatcher {
             .deletingLastPathComponent()
             .path
         while ancestorPath.count >= rootPath.count,
-              ancestorPath == rootPath
-                || ancestorPath.hasPrefix(rootPath + "/")
+              SourceTreeIdentity.contains(ancestorPath, within: rootPath)
         {
             let ancestor = ancestorPath == rootPath
                 ? rootEvaluations[rootPath] ?? evaluate(
@@ -248,14 +247,13 @@ struct SourceVisibilityMatcher {
         guard normalizedPath != matchingRoot else {
             return URL(fileURLWithPath: matchingRoot, isDirectory: false).lastPathComponent
         }
-        return String(normalizedPath.dropFirst(matchingRoot.count + 1))
+        return String(normalizedPath.dropFirst(matchingRoot == "/" ? 1 : matchingRoot.count + 1))
     }
 
     private func matchingRootPath(for normalizedPath: String) -> String? {
         rootPaths
             .filter { rootPath in
-                normalizedPath == rootPath
-                    || normalizedPath.hasPrefix(rootPath + "/")
+                SourceTreeIdentity.contains(normalizedPath, within: rootPath)
             }
             .max { $0.count < $1.count }
     }
@@ -513,7 +511,9 @@ enum SourceRecursiveMediaLoader {
             for index in entries.indices {
                 guard (try? checkCancellation()) != nil else { return [] }
                 let file = entries[index].url
-                let root = metadataRoots.first { file.path.hasPrefix($0.path + "/") }
+                let root = metadataRoots.first {
+                    file.path != $0.path && SourceTreeIdentity.contains(file.path, within: $0.path)
+                }
                     ?? file.deletingLastPathComponent()
                 do {
                     entries[index].recognizedMedia = try reader.recognize(file, within: root, checkCancellation: checkCancellation)
@@ -572,8 +572,11 @@ enum SourceTreeIdentity {
     }
 
     static func isFolderID(_ id: String, inside root: URL) -> Bool {
-        let rootPath = normalizedPath(for: root)
-        return id == rootPath || id.hasPrefix(rootPath + "/")
+        contains(id, within: normalizedPath(for: root))
+    }
+
+    static func contains(_ path: String, within rootPath: String) -> Bool {
+        path == rootPath || path.hasPrefix(rootPath == "/" ? "/" : rootPath + "/")
     }
 
     private static func normalizedPath(for url: URL) -> String {

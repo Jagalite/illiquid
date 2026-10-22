@@ -19,7 +19,7 @@ import time
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-BASELINE = "4d69d7d4fdf677a7793ed7ceeff4835ee5958c88"
+BASELINE = "46325de29e3a6d97af5520b827e564e0e24eb52d"
 SNAPSHOT_HELPER = ROOT / "Benchmarks/SourceTreeVisibility/run.py"
 CASES = ["movies", "seasons", "unicode_groups", "unique_sections",
          "broad_search", "narrow_search", "files_control", "tree_control"]

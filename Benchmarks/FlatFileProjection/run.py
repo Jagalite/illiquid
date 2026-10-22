@@ -19,7 +19,7 @@ import time
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-BASELINE = "a3bb949d79e824793fc4e6f7fb1258dddae0c7ec"
+BASELINE = "b95e09e8bc06ebfe77ce725e9dfe3b65cfe4cf1c"
 CASES = ["folders-files", "folders-media", "mixed-files", "mixed-media", "explicit-files", "explicit-media"]
 TESTS = ["SourceBrowserFilterTests.swift", "SourceMediaOrganizationTests.swift", "FlatFileProjectionTests.swift"]
 HELPER = ROOT / "Benchmarks/SourceTreeVisibility/run.py"

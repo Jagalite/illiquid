@@ -20,8 +20,9 @@ component experiment.
 
 ## Reproduce
 
-The current baseline is `a3bb949d79e824793fc4e6f7fb1258dddae0c7ec`. It adds the
-source-preparation and media-grouping changes to the original
+The current baseline is `b95e09e8bc06ebfe77ce725e9dfe3b65cfe4cf1c`. It adds the
+source-preparation, media-grouping and filesystem-root sidebar changes to the
+original
 `a2de305c8dbcaa81aac1477df7c9a0017c14eae3` baseline, preserving the strict
 shared-source checks. The retained October 21 measurements keep their original
 baseline and source manifests; they have not been rewritten.
