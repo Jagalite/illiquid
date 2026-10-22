@@ -170,11 +170,22 @@ actor SourceBrowserFilter {
     private static func organizeMedia(_ rows: [SourceTreeDisplayRow]) -> [SourceTreeDisplayRow] {
         // Case variations in release names should not split a season.
         var canonicalTitles: [String: String] = [:]
+        // Most rows share a section. Reuse folding for repeated spellings,
+        // retaining this projection's first encountered spelling as the title.
+        var canonicalByTitle: [String: (raw: String, canonical: String)] = [:]
+        let locale = Locale(identifier: "en_US_POSIX")
         let sections = Dictionary(grouping: rows) { row in
             let title = row.recognizedMedia?.section ?? "Other Videos"
-            let key = title.folding(options: .caseInsensitive, locale: Locale(identifier: "en_US_POSIX"))
+            // String keys equate canonical Unicode spellings. Reuse folding
+            // only for identical bytes, preserving Foundation's original input.
+            if let cached = canonicalByTitle[title],
+               cached.raw.utf8.elementsEqual(title.utf8) {
+                return cached.canonical
+            }
+            let key = title.folding(options: .caseInsensitive, locale: locale)
             let canonical = canonicalTitles[key] ?? title
             canonicalTitles[key] = canonical
+            canonicalByTitle[title] = (title, canonical)
             return canonical
         }
         func rank(_ title: String) -> Int {

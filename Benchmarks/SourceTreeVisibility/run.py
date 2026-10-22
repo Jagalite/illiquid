@@ -23,7 +23,7 @@ import time
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-BASELINE = "ad647a61f995541789f2f77014894614ed2d0b4a"
+BASELINE = "f9a1cf493aa7236c741898b19137dfc17145af74"
 CORE = [
     "Utilities/NormalizedFileURL.swift", "Utilities/MediaFileSupport.swift",
     "Utilities/SourcePreparationExecutor.swift", "MediaLibrary/MediaNameRecognition.swift",
