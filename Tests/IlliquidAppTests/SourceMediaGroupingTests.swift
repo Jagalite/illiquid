@@ -119,6 +119,8 @@ struct SourceMediaGroupingTests {
         for group in actual {
             let header = try #require(headers(restored).first { $0.id == group.header.id })
             #expect(Array(header.displayName.utf8) == Array(group.header.displayName.utf8))
+            let memberIDs = Set(group.members.map(\.id))
+            #expect(files(restored).filter { memberIDs.contains($0.id) } == group.members)
         }
         #expect(Set(files(restored).map(\.id)) == Set(rows.map(\.id)))
         #expect(await filter.visibilityBuildCount == 1)
