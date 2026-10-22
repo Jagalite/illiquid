@@ -193,12 +193,42 @@ public enum ExternalSubtitleMatcher {
 
     private static func filenameTokens(_ url: URL) -> [String] {
         let stem = url.deletingPathExtension().lastPathComponent
-            .lowercased(with: Locale(identifier: "en_US_POSIX"))
+        if let tokens = asciiFilenameTokens(stem) { return tokens }
+
+        let normalized = stem.lowercased(with: Locale(identifier: "en_US_POSIX"))
             .folding(options: [.diacriticInsensitive, .widthInsensitive], locale: .current)
 
-        return stem
+        return normalized
             .components(separatedBy: CharacterSet.alphanumerics.inverted)
             .filter { !$0.isEmpty }
+    }
+
+    private static func asciiFilenameTokens(_ stem: String) -> [String]? {
+        // Noncontiguous strings keep Foundation's normalization path without
+        // a preliminary UTF-8 traversal of bridged UTF-16 storage.
+        return stem.utf8.withContiguousStorageIfAvailable { bytes -> [String]? in
+            // POSIX lowercasing and diacritic/width folding reduce to ASCII case
+            // conversion here. Check the whole stem before allocating tokens so
+            // names needing Foundation's Unicode normalization use the original path.
+            guard bytes.allSatisfy({ $0 < 128 }) else { return nil }
+
+            var tokens: [String] = []
+            var token: [UInt8] = []
+            token.reserveCapacity(bytes.count)
+            for byte in bytes {
+                switch byte {
+                case 65...90: token.append(byte + 32)
+                case 48...57, 97...122: token.append(byte)
+                default:
+                    if !token.isEmpty {
+                        tokens.append(String(decoding: token, as: UTF8.self))
+                        token.removeAll(keepingCapacity: true)
+                    }
+                }
+            }
+            if !token.isEmpty { tokens.append(String(decoding: token, as: UTF8.self)) }
+            return tokens
+        } ?? nil
     }
 
     private static func removingTrailingSubtitleQualifiers(from tokens: [String]) -> [String] {
