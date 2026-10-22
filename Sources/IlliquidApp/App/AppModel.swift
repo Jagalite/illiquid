@@ -2896,16 +2896,25 @@ enum SourceTabs {
     }
 
     static func contains(_ candidate: URL, in tab: SourceTab) -> Bool {
-        guard !tab.items.isEmpty else { return false }
+        guard let first = tab.items.first else { return false }
+        // Single-source tabs and first-item hits have no repeated query work.
+        // Keep their original predicate before preparing a longer scan.
+        switch first.kind {
+        case .file:
+            if NormalizedFileURL.representsSameFile(candidate, first.url) { return true }
+        case .folder:
+            if contains(candidate, inside: first.url) { return true }
+        }
+        guard tab.items.count > 1 else { return false }
 
         // The playing indicator compares one URL with every source in a tab.
-        // Reuse only this call's query identity; decoded item paths still need
+        // Reuse this call's query identity for the remaining items. Their paths need
         // their existing normalization, and no cache survives a tab change.
         let normalizedCandidate = NormalizedFileURL.normalize(candidate)
         var candidateKey: String?
         var candidateComponents: [String]?
 
-        for item in tab.items {
+        for item in tab.items.dropFirst() {
             switch item.kind {
             case .file:
                 guard let normalizedCandidate else { continue }
@@ -2933,6 +2942,17 @@ enum SourceTabs {
             }
         }
         return false
+    }
+
+    private static func contains(_ candidate: URL, inside folder: URL) -> Bool {
+        guard candidate.isFileURL, folder.isFileURL else { return false }
+        let candidateComponents = (
+            NormalizedFileURL.normalize(candidate) ?? candidate.absoluteURL.standardized
+        ).pathComponents
+        let folderComponents = (
+            NormalizedFileURL.normalize(folder) ?? folder.absoluteURL.standardized
+        ).pathComponents
+        return candidateComponents.starts(with: folderComponents)
     }
 }
 
