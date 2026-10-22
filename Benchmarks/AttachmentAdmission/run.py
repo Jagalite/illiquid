@@ -94,6 +94,9 @@ class Runner:
         self.swiftc = Path(compiler).absolute()
         if not self.swiftc.is_file():
             raise ValueError(f"Missing Swift compiler: {self.swiftc}")
+        self.sdk = self.command(["xcrun", "--sdk", "macosx", "--show-sdk-path"]).strip()
+        if not Path(self.sdk).is_dir():
+            raise ValueError(f"Missing macOS SDK: {self.sdk}")
         self.fixtures = self.load_fixtures(args.fixtures.resolve(strict=True))
         self.record = {
             "started_utc": datetime.now(timezone.utc).isoformat(),
@@ -103,6 +106,8 @@ class Runner:
             "platform": platform.platform(), "machine": platform.machine(),
             "compiler": self.command([self.swiftc, "--version"]).strip(),
             "compiler_path": str(self.swiftc), "compiler_sha256": file_sha(self.swiftc),
+            "sdk_path": self.sdk,
+            "sdk_version": self.command(["xcrun", "--sdk", "macosx", "--show-sdk-version"]).strip(),
             "ffmpeg_prefix": str(self.prefix),
             "protocol": vars(args) | {"baseline": BASELINE},
             "sources": self.sources, "binaries": {}, "native_libraries": {},
@@ -201,6 +206,7 @@ class Runner:
         write_json(self.output / "ffmpeg-headers.json", header_manifest)
         self.record["ffmpeg_headers_manifest_sha256"] = file_sha(self.output / "ffmpeg-headers.json")
         flags = ["-O", "-whole-module-optimization", "-swift-version", "6", "-parse-as-library",
+                 "-sdk", self.sdk,
                  "-I", str(module), "-Xcc", "-I" + str(self.prefix / "include"),
                  "-L", str(self.prefix / "lib"), "-Xlinker", "-rpath", "-Xlinker", str(self.prefix / "lib"),
                  "-module-cache-path", str(self.output / "module-cache"),

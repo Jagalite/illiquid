@@ -45,7 +45,8 @@ struct FontAttachmentAdmissionTests {
         #expect(FileManager.default.fileExists(atPath: path))
         let info = try {
             let demuxer = try FFmpegDemuxer(url: URL(fileURLWithPath: path))
-            let packet = try #require(demuxer.readPacket(generation: 1))
+            let readPacket = try demuxer.readPacket(generation: 1)
+            let packet = try #require(readPacket)
             #expect(packet.streamIndex == demuxer.mediaInfo.selectedAudioIndex)
             return demuxer.mediaInfo
         }()
