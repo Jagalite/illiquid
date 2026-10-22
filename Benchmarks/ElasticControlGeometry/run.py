@@ -157,7 +157,10 @@ def run(output: Path, tests_only: bool, rounds: int, iterations: int) -> None:
                  output / "candidate.swift", output / "baseline-renamed.swift",
                  HERE / "PathSupport.swift", HERE / "Differential.swift", "-o", binary], output)
         print(f"Differential {configuration}", flush=True)
-        result = json.loads(command([binary], output))
+        # The exhaustive unoptimized sweep can exceed four minutes on hosted
+        # macOS runners. Keep every comparison and allow that sweep ten minutes.
+        result = json.loads(command([binary], output,
+                                    timeout=600 if configuration == "debug" else 240))
         (output / f"differential-{configuration}.json").write_text(json.dumps(result, indent=2) + "\n")
     binaries = {}
     if not tests_only:
