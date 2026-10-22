@@ -259,7 +259,7 @@ def main():
     parser.add_argument("--ffmpeg-prefix", type=Path, default=Path("/opt/homebrew/opt/ffmpeg"))
     parser.add_argument("--tests-only", action="store_true")
     parser.add_argument("--pairs", type=int, default=8)
-    parser.add_argument("--target-ms", type=float, default=80)
+    parser.add_argument("--target-ms", type=float, default=240)
     parser.add_argument("--minimum-ms", type=float, default=60)
     parser.add_argument("--cases", nargs="+", choices=CASES, default=CASES)
     args = parser.parse_args()

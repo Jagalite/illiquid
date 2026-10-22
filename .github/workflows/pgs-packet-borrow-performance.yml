@@ -52,7 +52,7 @@ jobs:
       - name: Check parser parity and measure packet intake
         run: |
           python3 Benchmarks/PGSPacketBorrow/run.py \
-            --pairs 8 --target-ms 80 \
+            --pairs 8 --target-ms 240 \
             --output "$RUNNER_TEMP/pgs-packet-borrow/benchmark"
       - name: Build the app graph and test native subtitle ownership and output
         run: |

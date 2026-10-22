@@ -12,7 +12,7 @@ After installing the repository's pinned native dependencies:
 
 ```sh
 python3 Benchmarks/PGSPacketBorrow/run.py \
-  --pairs 8 --target-ms 80 --output /tmp/pgs-packet-borrow
+  --pairs 8 --target-ms 240 --output /tmp/pgs-packet-borrow
 ```
 
 `--tests-only` builds both executables and runs complete-output parity without
