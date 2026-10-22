@@ -1393,7 +1393,16 @@ final class VideoDecoder {
             )
         }
 
-        applyColorMetadata(frame: frame, pixelBuffer: pixelBuffer)
+        // Share the serialized HDR payloads between the output attachments and
+        // decoded-frame metadata; both describe this same source frame.
+        let masteringMetadata = masteringDisplayPayload(frame)
+        let contentLightMetadata = contentLightPayload(frame)
+        applyColorMetadata(
+            frame: frame,
+            pixelBuffer: pixelBuffer,
+            masteringMetadata: masteringMetadata,
+            contentLightMetadata: contentLightMetadata
+        )
         applyPixelAspectMetadata(pixelBuffer: pixelBuffer, pixelAspect: pixelAspect)
         applyCleanApertureMetadata(
             pixelBuffer: pixelBuffer,
@@ -1404,9 +1413,6 @@ final class VideoDecoder {
         )
 
         let codedSize = CGSize(width: Int(width), height: Int(height))
-        let masteringMetadata = masteringDisplayPayload(frame)
-        let contentLightMetadata = contentLightPayload(frame)
-
         var decodedFrame = NativeDecodedVideoFrame(
             pixelBuffer: pixelBuffer,
             planarOwnershipToken: planarOwnershipToken,
@@ -1624,7 +1630,9 @@ final class VideoDecoder {
 
     private func applyColorMetadata(
         frame: UnsafeMutablePointer<AVFrame>,
-        pixelBuffer: CVPixelBuffer
+        pixelBuffer: CVPixelBuffer,
+        masteringMetadata: Data?,
+        contentLightMetadata: Data?
     ) {
         let primaries = illiquid_frame_color_primaries(frame)
         let transfer = illiquid_frame_color_transfer(frame)
@@ -1659,32 +1667,20 @@ final class VideoDecoder {
             )
         }
 
-        var masteringPayload = [UInt8](repeating: 0, count: 24)
-        let masteringSize = illiquid_frame_mastering_display_payload(
-            frame,
-            &masteringPayload,
-            masteringPayload.count
-        )
-        if masteringSize == masteringPayload.count {
+        if let masteringMetadata, masteringMetadata.count == 24 {
             CVBufferSetAttachment(
                 pixelBuffer,
                 kCVImageBufferMasteringDisplayColorVolumeKey,
-                Data(masteringPayload) as CFData,
+                masteringMetadata as CFData,
                 .shouldPropagate
             )
         }
 
-        var contentLightPayload = [UInt8](repeating: 0, count: 4)
-        let contentLightSize = illiquid_frame_content_light_payload(
-            frame,
-            &contentLightPayload,
-            contentLightPayload.count
-        )
-        if contentLightSize == contentLightPayload.count {
+        if let contentLightMetadata, contentLightMetadata.count == 4 {
             CVBufferSetAttachment(
                 pixelBuffer,
                 kCVImageBufferContentLightLevelInfoKey,
-                Data(contentLightPayload) as CFData,
+                contentLightMetadata as CFData,
                 .shouldPropagate
             )
         }
