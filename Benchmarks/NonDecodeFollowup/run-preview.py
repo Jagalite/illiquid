@@ -2,8 +2,9 @@
 """Compile actual cache/disk actor logic with explicitly labeled pixel/JPEG adapters.
 Tests controlled actor blockage, NOT real disk latency, decoding, or input-to-photon.
 """
-import argparse,hashlib,json,pathlib,platform,subprocess,time
+import argparse,hashlib,json,pathlib,platform,runpy,subprocess,time
 H=pathlib.Path(__file__).resolve().parent;R=H.parent.parent
+adapt_disk_codecs=runpy.run_path(str(R/'Benchmarks/NonDecodeFourthPass/build.py'))['adapt_disk_codecs']
 
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=pathlib.Path,required=True);p.add_argument('--repeats',type=int,default=7);p.add_argument('--tests-only',action='store_true');a=p.parse_args()
@@ -21,40 +22,9 @@ def main():
   src=R/'Sources/IlliquidNativePlayback/Media'
   cp=H/'fixtures/PreviewCacheV1.swift' if variant=='baseline' else src/'NativeThumbnailCache.swift'
   dp=H/'fixtures/NativeThumbnailDiskCache.swift' if variant=='baseline' else src/'NativeThumbnailDiskCache.swift'
-  cache=cp.read_text();disk=dp.read_text()
+  cache=cp.read_text();disk=adapt_disk_codecs(dp.read_text(),dp)
   for name in ['CoreGraphics','CryptoKit','IlliquidCore','ImageIO','UniformTypeIdentifiers']:
    cache=cache.replace('import '+name+'\n','');disk=disk.replace('import '+name+'\n','')
-  read_image_markers = ['    private nonisolated static func readImage(',
-                        '    nonisolated static func readImage(']
-  read_image_marker = next((marker for marker in read_image_markers if marker in disk), None)
-  if read_image_marker is not None:
-   if disk.count(read_image_marker) != 1: raise ValueError('Ambiguous thumbnail decoder boundary')
-   begin=disk.index(read_image_marker)
-   end=disk.index('    private static func filenames',begin)
-   disk=disk[:begin]+'''    // CODEC ADAPTER ONLY; production lookup and inventory flow retained.
-    private nonisolated static func readImage(at url: URL, key: Key) -> CGImage? {
-        guard let data = try? Data(contentsOf: url), let image = CGImage.decode(data),
-              image.width <= key.width, image.height <= key.height else { return nil }
-        return image
-    }
-'''+disk[end:]
-  else:
-   begin=disk.index('    func image(for key:');end=disk.index('    func insert(',begin)
-   disk=disk[:begin]+'''    // TEST ADAPTER ONLY: the filesystem cache state remains production code.
-     func image(for key: Key, background: Bool) -> CGImage? {
-         guard preferences.diskMiB > 0 else { return nil }
-         loadDisk()
-         guard let entry = files[key.digest], let data = try? Data(contentsOf: entry.url),
-               let image = CGImage.decode(data), image.width <= key.width, image.height <= key.height else { return nil }
-         if !background { promoteDisk(key.digest) }
-         return image
-     }
-
- '''+disk[end:]
-  begin=disk.index('    private nonisolated static func encode');end=disk.index('    private func promoteDisk',begin)
-  disk=disk[:begin]+'''    private nonisolated static func encode(_ image: CGImage) -> Data? { image.encoded() }
-
-'''+disk[end:]
   cache+='''\nextension NativeThumbnailCache { func testDisk() -> NativeThumbnailDiskCache { disk } }\n'''
   disk+='''\nextension NativeThumbnailDiskCache {
     func testBlock(started: DispatchSemaphore, release: DispatchSemaphore) {

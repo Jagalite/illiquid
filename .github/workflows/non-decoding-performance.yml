@@ -62,6 +62,7 @@ jobs:
         run: |
           evidence="$RUNNER_TEMP/non-decoding-regressions"
           mkdir -p "$evidence"
+          python3 Benchmarks/NonDecodeFourthPass/test-codec-adapters.py
           python3 Benchmarks/NonDecodePerformance/run.py --tests-only --output "$evidence/policy-cache"
           python3 Benchmarks/NonDecodeFollowup/test-core.py --output "$evidence/deferred-persistence.txt"
           python3 Benchmarks/NonDecodeThirdPass/test-core.py --output "$evidence/persistence.txt"
