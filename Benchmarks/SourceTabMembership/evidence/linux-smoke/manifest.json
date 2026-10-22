@@ -1,0 +1,63 @@
+{
+  "baseline": {
+    "extraction": {
+      "end_exclusive": "\nprivate struct PlaybackLifecycleObservation:",
+      "excerpt_sha256": "9c1f6450b9dfec94a3e6368493a1050379f6b9c0d318b149804926b048bd0135",
+      "path": "Sources/IlliquidApp/App/AppModel.swift",
+      "prelude": "import Foundation\nimport IlliquidCore\n\n",
+      "source_sha256": "91f93b79f623ed35671afe07844cbd415acefab7185383cf77cf671f97db32cc",
+      "start": "struct SourceTabItem:"
+    },
+    "files": {
+      "NormalizedFileURL.swift": {
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+        "source_path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift"
+      },
+      "SourceTabs.swift": {
+        "sha256": "c03aed104403cb5bde16216c07e548f8bcfcaab665d3b9274807566f6e0aed97"
+      }
+    },
+    "revision": "7f9ba073394b77a908e0589447c6edc8d10b832c"
+  },
+  "candidate_relevant_status": "M Sources/IlliquidApp/App/AppModel.swift\n?? Benchmarks/SourceTabMembership/\n?? Tests/IlliquidAppTests/SourceTabMembershipTests.swift",
+  "candidate_revision": "7f9ba073394b77a908e0589447c6edc8d10b832c",
+  "created_utc": "2026-10-22T19:51:54.931240+00:00",
+  "environment": {
+    "cpu_count": 9,
+    "machine": "x86_64",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+    "swift_command": "/tmp/illiquid-swift-6.3.2/usr/bin/swift",
+    "variables": {
+      "DEVELOPER_DIR": null,
+      "LANG": "C.UTF-8",
+      "LC_ALL": "C.UTF-8",
+      "LC_COLLATE": null,
+      "SWIFT_DETERMINISTIC_HASHING": null
+    }
+  },
+  "inputs": {
+    "Driver.swift": "a0fc18ba148d7ec9536cba287a689485debac3c7a03033489016cb4ebfb7bf6f",
+    "Package.swift": "376262172416173388d7266a19ff9077f171c9ae6633e451bc97338314a100aa",
+    "Sources/IlliquidApp/App/AppModel.swift": "d534079ade87b2213ab27f49b8334879d0cd14b14d152d6e4e70537636930ffb",
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "Tests/IlliquidAppTests/SourceTabMembershipTests.swift": "deaacbd1c3f838ced262d0cc826890f3e1ae861eb5d91a38a1319735e1f6ebc4",
+    "run.py": "9c8eac801f1af4017c417b0137277bc4240549bb9f539faae07d4b70c5ec5856"
+  },
+  "method": {
+    "calibration": "each variant independently targets requested duration; normalized per lookup; minimum one batch",
+    "configuration": "SwiftPM release, Swift 6 mode; IlliquidApp -enable-testing for internal benchmark access",
+    "exclusions": "all tab/query construction, Codable decoding, oracle, warmup, final checks, and JSON encoding are untimed",
+    "modules": "unaltered production excerpt plus imports, separate IlliquidCore and IlliquidApp modules; no cross-module optimization",
+    "observability": "preallocated exact boolean outputs plus weighted checksum from every timed batch",
+    "pairs": 2,
+    "sampling": "fresh processes, rotated workload order, balanced baseline/candidate then candidate/baseline pairs",
+    "scope": "in-memory source-tab membership; no filesystem scan, UI, decode, playback, or energy measurement",
+    "seed": 1729,
+    "target_ms": 20.0,
+    "timers": "DispatchTime monotonic wall time and CLOCK_PROCESS_CPUTIME_ID around repeated 16-query batches; includes loop, Boolean stores, checksum updates and timer overhead; no empty-loop subtraction",
+    "unit": "one SourceTabs.contains(candidate, in: tab) lookup"
+  },
+  "schema_version": 1
+}
