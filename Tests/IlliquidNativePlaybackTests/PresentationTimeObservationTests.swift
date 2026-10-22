@@ -18,16 +18,20 @@ struct PresentationTimeObservationTests {
         defer { presentation.terminate() }
         let recorder = Recorder()
         presentation.setPresentationTimeHandler { recorder.append($0) }
-        #expect(presentation.setRate(0, at: CMTime(seconds: 3, preferredTimescale: 600), fence: presentation.currentFence))
-        for _ in 0..<100 where !recorder.values.contains(where: { abs($0 - 3) < 0.01 }) {
-            try await Task.sleep(for: .milliseconds(10))
-        }
-        #expect(recorder.values.contains(where: { abs($0 - 3) < 0.01 }))
+        // Measure the initial paused timeline before requesting any jumps.
+        // setRate updates the timebase asynchronously; seeing a target once
+        // does not drain all of the native callbacks caused by that change.
+        try #require(presentation.rate == 0)
         let baseline = recorder.count
         try await Task.sleep(for: .milliseconds(300))
         let pausedCallbacks = recorder.count - baseline
         print("[presentation-observation] paused-callbacks-in-300ms=\(pausedCallbacks)")
         #expect(pausedCallbacks == 0)
+        #expect(presentation.setRate(0, at: CMTime(seconds: 3, preferredTimescale: 600), fence: presentation.currentFence))
+        for _ in 0..<100 where !recorder.values.contains(where: { abs($0 - 3) < 0.01 }) {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(recorder.values.contains(where: { abs($0 - 3) < 0.01 }))
         #expect(presentation.setRate(0, at: CMTime(seconds: 6, preferredTimescale: 600), fence: presentation.currentFence))
         for _ in 0..<100 where !recorder.values.contains(where: { abs($0 - 6) < 0.01 }) {
             try await Task.sleep(for: .milliseconds(10))
