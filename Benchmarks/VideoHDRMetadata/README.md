@@ -21,7 +21,8 @@ The runner extracts these production methods verbatim, removing only their
 A small wrapper preserves each revision's call order and returns both HDR
 payloads. Both executables use the same full repository CFFmpeg shim and module
 map, real FFmpeg frames, real CoreVideo pixel buffers, the same fixtures, and
-identical optimized Swift compiler flags. The runner rejects changes to shared
+identical optimized Swift compiler flags and the same default scheduling policy.
+The runner rejects changes to shared
 shims, payload serialization, or color mapping helpers that would broaden this
 comparison.
 
@@ -81,5 +82,9 @@ No performance threshold is imposed by the runner; all workloads, including the
 SDR controls, must be examined before deciding whether the production change is
 worth keeping.
 
-Native decoder/application tests qualify the integration separately from this
-component benchmark.
+The CI confirmation protocol uses twenty pairs and a 300 ms target to reduce
+short-process scheduling variation. Research-branch pushes run the component
+study; pull requests and manual workflow runs also generate native fixtures,
+build the complete app graph, and run the native decoder/application tests.
+The initial research run additionally completed that native qualification before
+this component-only push convention was introduced.

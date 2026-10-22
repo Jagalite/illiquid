@@ -71,6 +71,77 @@ def extract_method(source: str, name: str) -> str:
     return block.replace("    private func ", "    func ", 1)
 
 
+def validate_call_topology(source: str, variant: str) -> dict[str, str]:
+    """Reject production call-site drift that the small wrapper cannot model.
+
+    The production method and each relevant call must be unique. Require the
+    exact variables, argument order and unconditional method-body indentation;
+    moving preparation into a branch or changing either consumer needs review.
+    Returned snippets are saved and hashed with the extracted helper methods.
+    """
+    if variant not in ("baseline", "candidate"):
+        raise ValueError(f"Unknown topology variant: {variant}")
+    # extract_method checks declaration uniqueness and the class-member closing
+    # boundary. Restore its sole modifier removal for the call-site snapshot.
+    frame = extract_method(source, "makeFrame").replace(
+        "    func makeFrame(", "    private func makeFrame(", 1
+    )
+    for name in ("masteringDisplayPayload", "contentLightPayload", "applyColorMetadata", "NativeDecodedVideoFrame"):
+        if len(re.findall(r"\b" + re.escape(name) + r"\s*\(", frame)) != 1:
+            raise ValueError(f"Review {variant} makeFrame: expected one {name} call")
+
+    def unique(pattern: str, label: str):
+        matches = list(re.finditer(pattern, frame, re.MULTILINE))
+        if len(matches) != 1:
+            raise ValueError(f"Review {variant} makeFrame {label}: expected exact call-site variables and arguments")
+        return matches[0]
+
+    mastering = unique(
+        r"^        let masteringMetadata = masteringDisplayPayload\(frame\)[ \t]*$",
+        "mastering extraction",
+    )
+    light = unique(
+        r"^        let contentLightMetadata = contentLightPayload\(frame\)[ \t]*$",
+        "content-light extraction",
+    )
+    arguments = r"frame:\s*frame,\s*pixelBuffer:\s*pixelBuffer"
+    if variant == "candidate":
+        arguments += r",\s*masteringMetadata:\s*masteringMetadata,\s*contentLightMetadata:\s*contentLightMetadata"
+    apply = unique(
+        r"^        applyColorMetadata\(\s*" + arguments + r"\s*\)[ \t]*$",
+        "color attachment call",
+    )
+    construction_start = unique(
+        r"^        var decodedFrame = NativeDecodedVideoFrame\([ \t]*$",
+        "decoded-frame construction",
+    )
+    construction_end = re.search(r"(?m)^        \)[ \t]*$", frame[construction_start.end():])
+    if construction_end is None:
+        raise ValueError(f"Review {variant} makeFrame: missing decoded-frame constructor boundary")
+    construction = frame[construction_start.start():construction_start.end() + construction_end.end()]
+    for label, value in (("pixelBuffer", "pixelBuffer"),
+                         ("masteringDisplayMetadata", "masteringMetadata"),
+                         ("contentLightMetadata", "contentLightMetadata")):
+        if len(re.findall(r"\b" + label + r"\s*:", construction)) != 1 or not re.search(
+            r"(?m)^            " + label + r": " + value + r",[ \t]*$", construction
+        ):
+            raise ValueError(f"Review {variant} makeFrame: decoded frame must consume {label}: {value}")
+
+    if frame[mastering.end():light.start()].strip():
+        raise ValueError(f"Review {variant} makeFrame: payload extraction statements must be adjacent")
+    if variant == "baseline":
+        valid_order = apply.end() < mastering.start() < light.start() < construction_start.start()
+    else:
+        valid_order = mastering.start() < light.start() < apply.start() < construction_start.start()
+        if frame[light.end():apply.start()].strip():
+            raise ValueError("Review candidate makeFrame: attachment call must immediately consume the extracted payloads")
+    if not valid_order:
+        raise ValueError(f"Review {variant} makeFrame: HDR preparation order no longer matches the benchmark wrapper")
+    return {"makeFrame": frame, "masteringExtraction": mastering.group(),
+            "contentLightExtraction": light.group(), "applyColorMetadataCall": apply.group(),
+            "decodedFrameConstruction": construction}
+
+
 def processor(methods: dict[str, str], variant: str) -> str:
     if variant == "baseline":
         body = """        applyColorMetadata(frame: frame, pixelBuffer: pixelBuffer)
@@ -172,6 +243,7 @@ class Runner:
         baseline_methods = None
         for variant in ("baseline", "candidate"):
             source = self.source(variant, DECODER)
+            topology = validate_call_topology(source, variant)
             methods = {name: extract_method(source, name) for name in METHODS}
             if baseline_methods is None:
                 baseline_methods = methods
@@ -179,6 +251,11 @@ class Runner:
                 raise ValueError("Payload serialization or color mapping changed; review benchmark scope")
             directory = self.output / variant
             directory.mkdir()
+            (directory / "makeFrame.call-site.swift").write_text(topology["makeFrame"])
+            self.receipt["call_site_topology_" + variant] = {
+                "verified": True,
+                "snippet_sha256": {name: sha(value) for name, value in topology.items()},
+            }
             generated = processor(methods, variant)
             (directory / "MetadataProcessor.swift").write_text(generated)
             self.receipt["files"][variant + ":processor"] = sha(generated)

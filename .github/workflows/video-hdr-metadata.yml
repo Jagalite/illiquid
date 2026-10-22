@@ -40,9 +40,10 @@ jobs:
       - name: Verify exact payloads and measure paired production code
         run: |
           python3 Benchmarks/VideoHDRMetadata/run.py \
-            --pairs 10 --target-ms 100 \
+            --pairs 20 --target-ms 300 \
             --output "$RUNNER_TEMP/video-hdr-metadata/component"
       - name: Generate required native video fixtures
+        if: github.event_name != 'push'
         run: |
           fixtures="$RUNNER_TEMP/video-hdr-metadata/fixtures"
           mkdir -p "$fixtures"
@@ -69,6 +70,7 @@ jobs:
             test -s "$fixtures/$file"
           done
       - name: Build app graph and verify hardware and software decoder integration
+        if: github.event_name != 'push'
         run: |
           export ILLIQUID_NATIVE_FIXTURE_DIR="$RUNNER_TEMP/video-hdr-metadata/fixtures"
           export ILLIQUID_NATIVE_REQUIRE_FIXTURES=1
