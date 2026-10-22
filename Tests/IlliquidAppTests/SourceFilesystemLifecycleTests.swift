@@ -44,8 +44,8 @@ struct SourceFilesystemLifecycleTests {
             }
             return state.second
         }
-        var deliveries = 0
-        let monitor = SourceFilesystemMonitor(worker: worker) { _ in deliveries += 1 }
+        var received: [SourceFilesystemEvent] = []
+        let monitor = SourceFilesystemMonitor(worker: worker) { received.append(contentsOf: $0) }
         monitor.start(watching: [URL(fileURLWithPath: "/old")])
         let started = await Task.detached { state.waitUntilStarted() }.value
         #expect(started)
@@ -62,7 +62,10 @@ struct SourceFilesystemLifecycleTests {
         state.emit(1)
         // The accepted callback is queued before this main-actor barrier.
         await Task { @MainActor in }.value
-        #expect(deliveries == 1)
+        #expect(received == [
+            .init(path: "/new", flags: [.mustScanSubdirectories]),
+            .init(path: "/watched/file", flags: [.created]),
+        ])
         monitor.stop()
         await drain(queue)
         #expect(state.second.stopCount == 1)
@@ -79,11 +82,88 @@ struct SourceFilesystemLifecycleTests {
         let monitor = SourceFilesystemMonitor(worker: worker) { _ in deliveries += 1 }
         monitor.start(watching: [URL(fileURLWithPath: "/old")])
         await drain(queue)
+        await Task { @MainActor in }.value
+        #expect(deliveries == 1) // Startup reconciliation has been delivered.
+        deliveries = 0
         state.emit(0)
         monitor.stop() // Invalidate before the main-actor delivery task executes.
         await drain(queue)
         await Task { @MainActor in }.value
         #expect(deliveries == 0)
+        #expect(state.first.stopCount == 1)
+    }
+
+    @Test @MainActor func startupReconcilesChangesAfterInitialSnapshotForEveryRoot() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let roots = ["first", "second"].map { directory.appendingPathComponent($0) }
+        for root in roots {
+            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        }
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let state = State()
+        let queue = DispatchQueue(label: "test.watcher.startup-reconciliation")
+        let worker = SourceFilesystemStreamWorker(queue: queue) { _, _, _, _ in
+            state.started.signal()
+            #expect(state.release.wait(timeout: .now() + 5) == .success)
+            return state.first
+        }
+        var snapshots: [String: [String]] = [:]
+        var rescannedRoots: Set<String> = []
+        let monitor = SourceFilesystemMonitor(worker: worker) { events in
+            let plan = SourceFilesystemInvalidationPlanner.plan(events: events, roots: roots)
+            rescannedRoots.formUnion(plan.rootsToRescan)
+            for path in plan.rootsToRescan {
+                snapshots[path] = try? FileManager.default.contentsOfDirectory(atPath: path).sorted()
+            }
+        }
+        monitor.start(watching: roots)
+        let started = await Task.detached { state.waitUntilStarted() }.value
+        #expect(started)
+        // The sidebar's initial snapshots complete while native creation is held.
+        for root in roots {
+            snapshots[root.path] = try FileManager.default.contentsOfDirectory(atPath: root.path)
+            #expect(snapshots[root.path] == [])
+            try Data("new".utf8).write(to: root.appendingPathComponent("new.txt"))
+        }
+        state.release.signal()
+        await drain(queue)
+        await Task { @MainActor in }.value
+        // The fake stream emits nothing: readiness alone must repair both snapshots.
+        #expect(rescannedRoots == Set(roots.map(\.path)))
+        for root in roots { #expect(snapshots[root.path] == ["new.txt"]) }
+        monitor.stop()
+        await drain(queue)
+        #expect(state.first.stopCount == 1)
+    }
+
+    @Test @MainActor func failedCreationDoesNotReportReadiness() async {
+        let queue = DispatchQueue(label: "test.watcher.failed-startup")
+        let worker = SourceFilesystemStreamWorker(queue: queue) { _, _, _, _ in nil }
+        var received: [SourceFilesystemEvent] = []
+        let monitor = SourceFilesystemMonitor(worker: worker) { received.append(contentsOf: $0) }
+        monitor.start(watching: [URL(fileURLWithPath: "/unavailable")])
+        await drain(queue)
+        await Task { @MainActor in }.value
+        #expect(received.isEmpty)
+        monitor.stop()
+        await drain(queue)
+    }
+
+    @Test @MainActor func stopRejectsAlreadyQueuedReadiness() async {
+        let state = State()
+        let queue = DispatchQueue(label: "test.watcher.queued-readiness")
+        let worker = SourceFilesystemStreamWorker(queue: queue) { _, _, _, _ in state.first }
+        var received: [SourceFilesystemEvent] = []
+        let monitor = SourceFilesystemMonitor(worker: worker) { received.append(contentsOf: $0) }
+        monitor.start(watching: [URL(fileURLWithPath: "/old")])
+        // Hold the main actor until the worker has queued readiness, then invalidate
+        // the request before allowing its delivery task to run.
+        queue.async { state.started.signal() }
+        #expect(state.waitUntilStarted())
+        monitor.stop()
+        await drain(queue)
+        await Task { @MainActor in }.value
+        #expect(received.isEmpty)
         #expect(state.first.stopCount == 1)
     }
 

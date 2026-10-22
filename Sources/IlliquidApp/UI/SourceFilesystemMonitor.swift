@@ -98,13 +98,20 @@ final class SourceFilesystemStreamWorker: @unchecked Sendable {
             stream?.stop()
             stream = nil
             guard isCurrent(revision) else { return }
-            let created = factory(paths, latency, queue) { [weak self] events in
+            let receiveCurrent: Receive = { [weak self] events in
                 guard self?.isCurrent(revision) == true else { return }
                 receive(events)
             }
+            let created = factory(paths, latency, queue, receiveCurrent)
             // Stop/restart may have arrived while FSEvents was blocked in open.
             guard isCurrent(revision) else { created?.stop(); return }
             stream = created
+            // The initial scan can finish before asynchronous native startup.
+            // Reconcile every root once monitoring is active so changes in that
+            // gap are recovered even if no further filesystem event arrives.
+            if created != nil {
+                receiveCurrent(paths.map { .init(path: $0, flags: [.mustScanSubdirectories]) })
+            }
         }
     }
 
