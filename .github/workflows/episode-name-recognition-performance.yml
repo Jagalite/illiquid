@@ -30,6 +30,7 @@ jobs:
           persist-credentials: false
       - name: Compare the complete corpus on the originally affected Linux toolchain
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           swiftc --version
           python3 Benchmarks/EpisodeNameRecognition/run.py differential \
             --output "$RUNNER_TEMP/episode-linux/main"
