@@ -173,9 +173,32 @@ private func fail(_ message: String) -> Never {
         let arguments = Array(CommandLine.arguments.dropFirst())
         if arguments == ["--differential"] {
             let paths = differentialPaths()
+            // Optional crash receipt: write each input before entering a recognizer.
+            // Keep diagnostics separate from the machine-readable result on stdout.
+            let trace: FileHandle?
+            if let destination = ProcessInfo.processInfo.environment["ILLIQUID_EPISODE_TRACE_PATH"] {
+                guard FileManager.default.createFile(atPath: destination, contents: nil),
+                      let handle = try? FileHandle(forWritingTo: URL(fileURLWithPath: destination))
+                else { fail("Cannot create differential input trace") }
+                trace = handle
+            } else {
+                trace = nil
+            }
+            defer { try? trace?.close() }
+            func record(_ implementation: String, _ index: Int, _ path: String) {
+                guard let trace else { return }
+                let data = try! JSONSerialization.data(withJSONObject: [
+                    "implementation": implementation, "index": index, "path": path,
+                    "utf8": Array(path.utf8),
+                ], options: [.sortedKeys])
+                trace.write(data)
+                trace.write(Data([0x0a]))
+            }
             var checksum: UInt64 = 0
             for (index, path) in paths.enumerated() {
+                record("baseline", index, path)
                 let baseline = BaselineMediaNameRecognition.recognize(relativePath: path)
+                record("candidate", index, path)
                 let candidate = MediaNameRecognition.recognize(relativePath: path)
                 let before = Snapshot(baseline), after = Snapshot(candidate)
                 guard before == after, fingerprint(baseline) == fingerprint(candidate) else {

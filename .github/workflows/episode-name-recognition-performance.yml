@@ -32,8 +32,10 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           swiftc --version
+          ILLIQUID_EPISODE_TRACE_PATH="$RUNNER_TEMP/episode-linux/main/cases.jsonl" \
           python3 Benchmarks/EpisodeNameRecognition/run.py differential \
             --output "$RUNNER_TEMP/episode-linux/main"
+          ILLIQUID_EPISODE_TRACE_PATH="$RUNNER_TEMP/episode-linux/folder-reuse/cases.jsonl" \
           python3 Benchmarks/EpisodeNameRecognition/run.py differential --reference folder-reuse \
             --output "$RUNNER_TEMP/episode-linux/folder-reuse"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
