@@ -1,0 +1,35 @@
+{
+  "command": [
+    "swift",
+    "test",
+    "--package-path",
+    "/workspace/scratch/55fd7b122f8f/sidecar-local-study/build/candidate",
+    "--no-parallel",
+    "--jobs",
+    "2",
+    "--filter",
+    "unicodeEquivalentStringsKeepTheirExactURLBoundaries"
+  ],
+  "returncode": 1,
+  "changes": [
+    [
+      "let rootKey = root.absoluteString",
+      "let rootKey = root.path"
+    ],
+    [
+      "let parentKey = parent.absoluteString",
+      "let parentKey = parent.path"
+    ],
+    [
+      "plan.root.utf8.elementsEqual(rootKey.utf8)",
+      "plan.root == rootKey"
+    ],
+    [
+      "plan.parent.utf8.elementsEqual(parentKey.utf8)",
+      "plan.parent == parentKey"
+    ]
+  ],
+  "production_sha256": "1afb8689591b9e8fc424c9994acaf411b152ed6f46b81e80ad9f94a8438ac19f",
+  "mutant_sha256": "ed3d19edeb03e6f520cde5ce77ff8635b4b40d9b54d9cb9e7d39894f34c02ceb",
+  "test_sha256": "4d750d076cea2d70fec3cce50e5fd3ebfc82db7acadf4a4aa7e899bd5c0a9e5d"
+}
