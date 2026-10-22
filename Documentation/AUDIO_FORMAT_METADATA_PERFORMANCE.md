@@ -92,4 +92,3 @@ See [the benchmark instructions](../Benchmarks/AudioFormatMetadata/README.md) fo
 [Retained evidence](../Benchmarks/AudioFormatMetadata/evidence/) includes raw observations, calibration, source/binary/library hashes, compiler flags, commands, host receipts, and test logs for both native runs and the supplementary Linux run. The full baseline and candidate metadata traces are byte-identical across all three cohorts and are retained once as [`metadata-trace.json.gz`](../Benchmarks/AudioFormatMetadata/evidence/metadata-trace.json.gz), with an uncompressed SHA-256 in [`trace-receipt.json`](../Benchmarks/AudioFormatMetadata/evidence/trace-receipt.json).
 
 The Actions artifacts additionally contain source snapshots, compiled harnesses, and generated media; those artifacts expire after 14 days. The committed evidence and pinned source revisions remain sufficient to inspect the measurements and reproduce the experiment.
-
