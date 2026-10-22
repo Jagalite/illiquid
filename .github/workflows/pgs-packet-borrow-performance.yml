@@ -1,0 +1,94 @@
+name: PGS packet borrowing performance
+
+on:
+  push:
+    branches: ['perf/pgs-packet-borrow-20261022']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/SubtitleDecoder.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/PGSSubtitlePresentation.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PGSSubtitle*Tests.swift'
+      - 'Benchmarks/PGSPacketBorrow/**'
+      - '.github/workflows/pgs-packet-borrow-performance.yml'
+      - '!Benchmarks/PGSPacketBorrow/README.md'
+      - '!Benchmarks/PGSPacketBorrow/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/SubtitleDecoder.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/PGSSubtitlePresentation.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PGSSubtitle*Tests.swift'
+      - 'Benchmarks/PGSPacketBorrow/**'
+      - '.github/workflows/pgs-packet-borrow-performance.yml'
+      - '!Benchmarks/PGSPacketBorrow/README.md'
+      - '!Benchmarks/PGSPacketBorrow/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pgs-packet-borrow-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-pgs:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Check parser parity and measure packet intake
+        run: |
+          python3 Benchmarks/PGSPacketBorrow/run.py \
+            --pairs 8 --target-ms 80 \
+            --output "$RUNNER_TEMP/pgs-packet-borrow/benchmark"
+      - name: Build the app graph and test native subtitle ownership and output
+        run: |
+          mkdir -p "$RUNNER_TEMP/pgs-packet-borrow"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+            'PGSSubtitlePacketBorrowTests|PGSSubtitleCropTests|BitmapSubtitleTests|ExternalVobSubTests|PacketOwnershipTests' \
+            2>&1 | tee "$RUNNER_TEMP/pgs-packet-borrow/native-tests.log"
+      - name: Emit reviewable measurement receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'pgs-packet-borrow'
+          files = {}
+          for path in sorted(root.rglob('*')):
+              if (path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}
+                      and not any(part in {'build', 'module-cache', 'cache', '.build'} for part in path.relative_to(root).parts)):
+                  files[str(path.relative_to(root))] = path.read_text()
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print('PGS_REVIEW_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('PGS_REVIEW_BASE64 ' + base64.b64encode(packed).decode())
+          for name, value in files.items():
+              if name.endswith(('summary.json', 'parity.json', 'completion.json')):
+                  print(name + '\n' + value)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pgs-packet-borrow-native
+          path: |
+            ${{ runner.temp }}/pgs-packet-borrow/**/*.json
+            ${{ runner.temp }}/pgs-packet-borrow/**/*.jsonl
+            ${{ runner.temp }}/pgs-packet-borrow/**/*.log
+            ${{ runner.temp }}/pgs-packet-borrow/**/*.txt
+            ${{ runner.temp }}/pgs-packet-borrow/**/*.swift
+            ${{ runner.temp }}/pgs-packet-borrow/**/*.py
+          retention-days: 14

@@ -61,7 +61,7 @@ final class SubtitleDecoder {
             return []
         }
         if stream.codecID == Int32(AV_CODEC_ID_HDMV_PGS_SUBTITLE.rawValue),
-           let data = packet.data, let presentation = try PGSSubtitlePresentation.update(in: data) {
+           let presentation = try PGSSubtitlePresentation.update(in: packet) {
             pgsPresentation = presentation
         }
         try checkFFmpeg(
