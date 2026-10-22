@@ -81,20 +81,26 @@ enum SourceFilesystemInvalidationPlanner {
 
         var plan = SourceFilesystemInvalidationPlan()
         for event in events {
-            let eventPath = normalizedPath(event.path)
+            let eventURL = URL(fileURLWithPath: event.path, isDirectory: false)
+                .absoluteURL.standardized
+            let eventPath = eventURL.path
+            let requiresFullRescan = event.flags.requiresFullRescan
             let matchingRoots = rootPaths.filter {
                 contains(eventPath, within: $0)
-                    || (event.flags.requiresFullRescan && contains($0, within: eventPath))
+                    || (requiresFullRescan && contains($0, within: eventPath))
             }
             guard !matchingRoots.isEmpty else { continue }
 
-            if event.flags.requiresFullRescan {
+            if requiresFullRescan {
                 plan.rootsToRescan.formUnion(matchingRoots)
                 continue
             }
-            let eventURL = URL(fileURLWithPath: eventPath)
-            let isMetadata = eventURL.lastPathComponent == ".plexmatch" || eventURL.pathExtension.lowercased() == "nfo"
-            guard event.flags.changesDirectoryListing || isMetadata else { continue }
+            // Structural changes already require a reload. Only content-only
+            // events need metadata classification, using the normalized URL.
+            guard event.flags.changesDirectoryListing
+                || eventURL.lastPathComponent == ".plexmatch"
+                || eventURL.pathExtension.lowercased() == "nfo"
+            else { continue }
 
             let parentPath = URL(fileURLWithPath: eventPath, isDirectory: false)
                 .deletingLastPathComponent()
@@ -138,10 +144,6 @@ enum SourceFilesystemInvalidationPlanner {
                 })
         }
         return plan
-    }
-
-    private static func normalizedPath(_ path: String) -> String {
-        URL(fileURLWithPath: path, isDirectory: false).absoluteURL.standardized.path
     }
 
     private static func normalizedPath(_ url: URL) -> String {
