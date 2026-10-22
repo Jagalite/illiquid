@@ -11,7 +11,7 @@ def segment(kind, data):
     return bytes([kind]) + struct.pack(">H", len(data)) + bytes(data)
 
 
-def generate(output):
+def generate(output, *, include_vobsub=True):
     output.mkdir(parents=True, exist_ok=True)
     result = bytearray()
     # A 2x2 white/half-transparent-grey checker at (10,20), then a clear.
@@ -38,6 +38,9 @@ def generate(output):
             "-i", str(source), "-map", "0:v", "-map", "1:s", "-c:v", "mpeg4",
             "-q:v", "10", "-c:s", codec, "-y", str(output / name),
         ], check=True, timeout=60)
+
+    if not include_vobsub:
+        return
 
     # Two language tracks in an original VobSub pair. IDX owns cue timestamps;
     # the MPEG private-stream payload is produced from our authored DVD packets.
@@ -66,4 +69,7 @@ def generate(output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
-    generate(parser.parse_args().output)
+    parser.add_argument("--skip-vobsub", action="store_true",
+                        help="Generate PGS/DVD/DVB containers only; omit the ffprobe-dependent VobSub pair")
+    args = parser.parse_args()
+    generate(args.output, include_vobsub=not args.skip_vobsub)
