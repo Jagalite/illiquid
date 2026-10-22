@@ -34,7 +34,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           python3 Benchmarks/FlatFileProjection/run.py \
-            --mode verify --output "$RUNNER_TEMP/flat-file-projection"
+            --current-support --mode verify --output "$RUNNER_TEMP/flat-file-projection"
       - name: Run the full paired native performance study
         if: github.event_name == 'workflow_dispatch'
         run: |

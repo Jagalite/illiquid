@@ -59,6 +59,36 @@ driver. An exploratory smoke can use `--smoke --samples 1 --sizes 100`;
 one-pair output is not the formal performance result. `--case` narrows the
 workloads, and `--sizes 100000` enables a larger stress fixture.
 
+### Verify the comparison with current supporting code
+
+PR CI passes `--current-support` to test the visibility-cache optimization in
+the current integration context:
+
+```sh
+python3 Benchmarks/SourceTreeVisibility/run.py --current-support \
+  --output /tmp/source-tree-current-support
+```
+
+This mode retains the frozen baseline `SourceBrowserFilter.swift` and
+`SourceTreeProjectionInput.swift` implementations. All supporting files and
+declarations come from one current snapshot and are compiled identically in
+both variants. In particular, both variants' filesystem/sidecar regression tests
+exercise the current recursive scanner. The shared-source equality gate remains
+enabled; unequal supporting code is never accepted as part of the comparison.
+
+Receipts identify the mode and the focal baseline revision. Each production
+source also records its own origin, revision, role, and original/snapshot hashes.
+Working-tree sources have a null `revision` and a separate `worktree_head`;
+their hashes identify the exact staged bytes, including uncommitted changes.
+The global baseline revision therefore does not label current support as
+historical source. Any timings from this mode are a new integration-context
+experiment and must not be combined with the retained historical cohorts.
+
+Without this flag, the strict historical baseline comparison is unchanged and
+still rejects changed shared dependencies. Reproduce historical measurements
+from their recorded source revisions; existing baseline files and evidence are
+not rewritten by either mode.
+
 ## Workloads and timing boundary
 
 | Case | Operation |
@@ -101,13 +131,8 @@ the measurement.
 `baseline/manifest.json` records the current baseline revision, source Git blob IDs,
 SHA-256 hashes, and extraction boundaries. The retained baseline consists of
 complete small production files and guarded verbatim Foundation declarations
-from `AppModel.swift` and `SourcesSidebar.swift`. The candidate reads current
-declarations. Current integrated runs stage the current checkout's
-`MediaSidecarReader.swift` identically in both variants; every other shared
-dependency must still match the retained baseline. Output manifests record both
-historical and current reader hashes in `shared_dependencies`. This deliberate
-substitution leaves the retained snapshot and published historical campaigns
-unchanged; reproduce those campaigns from their recorded checkouts.
+from `AppModel.swift` and `SourcesSidebar.swift`. The candidate stages the same
+current declarations; all shared dependencies must match the baseline.
 
 The benchmark executes the production actor, tree builder, matcher, sorter,
 and model types. It does not substitute a simplified implementation. Linux

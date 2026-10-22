@@ -1,6 +1,6 @@
 # Media section grouping
 
-The recorded study compares complete cached source-browser projections against main
+This study compares complete cached source-browser projections against main
 `a2de305c8dbcaa81aac1477df7c9a0017c14eae3`. The proposed change caches section-title
 case folding within one `organizeMedia` call. It retains the first encountered
 spelling as the canonical title and all existing section/member ordering.
@@ -41,19 +41,47 @@ future implementation requires deliberate baseline/dependency review and new
 evidence. The normal app test target includes the grouping regressions and is
 covered by the repository's existing native release test workflow on pull requests.
 
+### Current-support regression mode
+
+The PR regression workflow explicitly rebases the comparison onto current
+supporting code:
+
+```sh
+python3 Benchmarks/MediaSectionGrouping/run.py --current-support \
+  --mode tests --output /tmp/media-sections-current-tests
+python3 Benchmarks/MediaSectionGrouping/run.py --current-support \
+  --mode verify --output /tmp/media-sections-current-parity
+```
+
+The baseline keeps `SourceBrowserFilter.swift` from its pinned revision. Every
+supporting file and declaration comes from one current snapshot and is compiled
+identically in both variants, retaining the shared-source equality gate. The
+filesystem/sidecar regression tests therefore exercise the current recursive
+scanner in both variants without making its changes part of the grouping
+comparison. The timed driver still prepares synthetic entries without scanning
+the filesystem.
+
+Source and environment receipts identify this mode and its focal baseline.
+Each production source records its own origin, revision, role, and
+original/snapshot hashes. Working-tree sources use `revision: null` and record
+`worktree_head` separately; their hashes identify exact staged bytes. Current
+support is not attributed to the historical baseline revision. Any timings from
+this mode describe a new integration-context experiment and must be reported
+separately from the retained results.
+
+Without `--current-support`, the historical strict comparison remains unchanged.
+The historical manual workflow continues to use its recorded checkout, and no
+existing evidence or frozen baseline is rewritten.
+
 ## Sources and correctness
 
 The staging helper in `Benchmarks/SourceTreeVisibility/run.py` supplies complete
 production Filter/Projection and core source files, together with guarded,
 verbatim model and loader declarations from AppModel/SourcesSidebar. There is no
 replacement actor, grouping algorithm, row model, metadata model, or comparator.
-The current runner reads baseline files from the integrated revision below,
-then stages the current checkout's `MediaSidecarReader.swift` identically in
-both variants. Manifests retain historical and current reader hashes in
-`shared_dependencies`. Every other staged production dependency except
-`SourceBrowserFilter.swift` must match; original and compiled source hashes are
-recorded. Published historical campaigns retain their original source policy,
-measurements and manifests.
+The runner reads baseline files from the exact Git revision above, requires all
+staged production dependencies other than `SourceBrowserFilter.swift` to match,
+and records original and compiled source hashes.
 
 Both variants run the complete existing `SourceBrowserFilterTests`,
 `SourceBrowserSearchTests`, `SourceMediaOrganizationTests`, and new

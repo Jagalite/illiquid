@@ -104,8 +104,13 @@ class Runner:
         baseline_files, baseline_records = staging.snapshot(lambda name: subprocess.check_output(
             ["git", "show", f"{self.args.baseline}:{name}"], cwd=ROOT))
         candidate_files, candidate_records = staging.snapshot(lambda name: (ROOT / name).read_bytes())
-        shared_dependencies = staging.share_current_dependencies(
-            baseline_files, baseline_records, candidate_files, candidate_records)
+        head = self.command(["git", "rev-parse", "HEAD"], "head").strip()
+        baseline_files, baseline_records, candidate_records, comparison = staging.comparison_sources(
+            baseline_files, baseline_records, candidate_files, candidate_records,
+            focal_sources={"Sources/IlliquidApp/SourceTreeProjectionInput.swift"},
+            baseline_revision=self.args.baseline, worktree_head=head,
+            current_support=self.args.current_support,
+        )
         for name in baseline_files:
             if not name.endswith("/SourceTreeProjectionInput.swift") and baseline_files[name] != candidate_files[name]:
                 raise ValueError(f"Unrelated staged production source changed: {name}")
@@ -115,7 +120,7 @@ class Runner:
             files["Sources/FlatFileProjectionBenchmark/Harness.swift"] = (HERE / "Harness.swift").read_bytes()
             for name in TESTS:
                 files["Tests/IlliquidAppTests/" + name] = (ROOT / "Tests/IlliquidAppTests" / name).read_bytes()
-            manifest = {"production": records, "shared_dependencies": shared_dependencies, "staged": {}}
+            manifest = {"comparison": comparison, "production": records, "staged": {}}
             for name, raw in files.items():
                 compiled, adaptations = adapt(name, raw)
                 path = self.output / variant / name
@@ -136,7 +141,7 @@ class Runner:
             "platform": platform.platform(), "architecture": platform.machine(), "python": sys.version,
             "swift": self.command([self.swift, "--version"], "swift-version").strip(),
             "compiler_sha256": {str(path): file_digest(path) for path in compiler_paths if path.is_file()},
-            "baseline": self.args.baseline, "head": self.command(["git", "rev-parse", "HEAD"], "head").strip(),
+            "baseline": self.args.baseline, "head": head, "comparison": comparison,
             "worktree": self.command(["git", "status", "--short"], "worktree"),
             "driver_sha256": {name: file_digest(self.output / name) for name in ["runner.py", "staging-helper.py", "Harness.swift"]},
             "arguments": {key: str(value) if isinstance(value, Path) else value for key, value in vars(self.args).items()},
@@ -250,6 +255,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--swift", default=shutil.which("swift") or "swift")
     parser.add_argument("--baseline", default=BASELINE)
+    parser.add_argument("--current-support", action="store_true",
+                        help="Keep the historical projection Input; use identical current supporting sources in both variants")
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--sizes", type=int, nargs="+", default=[100, 1000, 10000])
     parser.add_argument("--cases", nargs="+", choices=CASES, default=CASES)
