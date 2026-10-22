@@ -122,8 +122,8 @@ speedup across views, queries, inventory shapes, or platforms.
 
 ## Integrated dependency baseline
 
-Current-checkout runs use `46325de29e3a6d97af5520b827e564e0e24eb52d`, which adds the
-flat-file, source-preparation and filesystem-root sidebar changes to the original
+Current-checkout runs use `6dc482129373da1c611b6e8cc7ea7906c381912c`, which adds the
+flat-file, source-preparation and filesystem-root sidebar and sidecar changes to the original
 baseline. This keeps the media-grouping change as the only staged production
 difference and retains
 the shared-source guards. Existing evidence and the manually dispatched
