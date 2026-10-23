@@ -1,0 +1,113 @@
+name: Audio PCM allocation capacity
+
+on:
+  push:
+    branches: ['perf/audio-pcm-capacity-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/AudioDecoder.swift'
+      - 'Benchmarks/AudioPCMCapacity/**'
+      - '.github/workflows/audio-pcm-capacity.yml'
+      - '!Benchmarks/AudioPCMCapacity/README.md'
+      - '!Benchmarks/AudioPCMCapacity/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/AudioDecoder.swift'
+      - 'Benchmarks/AudioPCMCapacity/**'
+      - '.github/workflows/audio-pcm-capacity.yml'
+      - '!Benchmarks/AudioPCMCapacity/README.md'
+      - '!Benchmarks/AudioPCMCapacity/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audio-pcm-capacity-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-memory:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify bytes and measure paired native allocations
+        run: |
+          python3 Benchmarks/AudioPCMCapacity/run.py \
+            --output "$RUNNER_TEMP/audio-pcm-capacity" \
+            --pairs 6 --target-ms 120
+      - name: Emit reviewable measurement receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'audio-pcm-capacity'
+          files = {str(p.relative_to(root)): p.read_text()
+                   for p in sorted(root.glob('*'))
+                   if p.is_file() and p.suffix in {'.json', '.jsonl', '.txt'}}
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print('AUDIO_CAPACITY_REVIEW_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('AUDIO_CAPACITY_REVIEW_BASE64 ' + base64.b64encode(packed).decode())
+          for name in ('parity.json', 'summary.json'):
+              if name in files:
+                  print(name + '\n' + files[name])
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: audio-pcm-capacity-measurements
+          path: |
+            ${{ runner.temp }}/audio-pcm-capacity/
+            !${{ runner.temp }}/audio-pcm-capacity/build/**
+            !${{ runner.temp }}/audio-pcm-capacity/module-cache/**
+          retention-days: 14
+
+  native-audio:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate real audio playback fixtures
+        run: |
+          fixture_dir="$RUNNER_TEMP/audio-pcm-capacity/fixtures"
+          mkdir -p "$fixture_dir"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'anullsrc=r=48000:cl=7.1' -t 2 -c:a flac \
+            "$fixture_dir/audio-7.1.flac"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'testsrc2=size=640x360:rate=30' \
+            -f lavfi -i 'sine=frequency=440:sample_rate=48000' \
+            -t 3 -shortest -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac \
+            "$fixture_dir/h264-aac.mp4"
+          test -s "$fixture_dir/audio-7.1.flac"
+          test -s "$fixture_dir/h264-aac.mp4"
+      - name: Build app graph and qualify audio conversion and drain
+        run: |
+          export ILLIQUID_NATIVE_FIXTURE_DIR="$RUNNER_TEMP/audio-pcm-capacity/fixtures"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+            'MultichannelAudioTests|AudioResamplerDrainTests|AudioSampleSanitizationTests|AudioDelayTests|AudioSourceFormatTests|audioSanitizationZerosInvalidSamplesOnly|resampledAudioBuffersUseAContinuousOutputClock|resampledAudioClockPreservesRealGapsAndResets|exactSeekTrimsAudioAtTheFirstSampleOnOrAfterTarget' \
+            2>&1 | tee "$RUNNER_TEMP/audio-pcm-capacity/native-tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: audio-pcm-capacity-native-audio
+          path: ${{ runner.temp }}/audio-pcm-capacity/native-tests.log
+          retention-days: 14

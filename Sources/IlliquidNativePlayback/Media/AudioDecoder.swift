@@ -377,11 +377,10 @@ final class AudioDecoder {
         }
 
         let bytesPerSample = MemoryLayout<Float>.size
-        var data = Data(
-            count: Int(capacity)
-                * outputChannels
-                * bytesPerSample
-        )
+        let byteCapacity = Int(capacity) * outputChannels * bytesPerSample
+        // Reserving first avoids the growth headroom of Data(count:).
+        var data = Data(capacity: byteCapacity)
+        data.count = byteCapacity
         let convertedSamples: Int32 = data.withUnsafeMutableBytes { bytes in
             guard let address = bytes.bindMemory(to: UInt8.self).baseAddress else {
                 return -22
@@ -458,7 +457,10 @@ final class AudioDecoder {
             let capacity = illiquid_audio_resampler_output_capacity(resampler, 0)
             try checkFFmpeg(capacity, operation: "Calculate audio drain capacity")
             guard capacity > 0 else { break }
-            var data = Data(count: Int(capacity) * metadata.channelCount * MemoryLayout<Float>.size)
+            let byteCapacity = Int(capacity) * metadata.channelCount * MemoryLayout<Float>.size
+            // Reserving first avoids the growth headroom of Data(count:).
+            var data = Data(capacity: byteCapacity)
+            data.count = byteCapacity
             let count = data.withUnsafeMutableBytes { bytes in
                 illiquid_drain_audio_resampler(resampler,
                     bytes.bindMemory(to: UInt8.self).baseAddress!, capacity)
