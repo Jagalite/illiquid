@@ -44,6 +44,10 @@ final class PiPSubtitleUploadCache {
         invalidate()
     }
 
+    var retainedResourceBytesForTesting: (texture: Int, vertices: Int) {
+        (subtitleTexture?.allocatedSize ?? 0, subtitleVertexBuffer?.allocatedSize ?? 0)
+    }
+
     /// Only nonempty, validated packer output reaches this method. A cache hit
     /// reuses GPU resources, while the caller still encodes the caption draw
     /// into each new video frame with its current viewport and color pipeline.

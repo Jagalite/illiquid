@@ -1,0 +1,73 @@
+name: PiP idle resource retirement
+
+on:
+  push:
+    branches: ['perf/pip-idle-resources-*']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleUploadCache.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPIdleResourceRetirementTests.swift'
+      - 'Benchmarks/PiPIdleResources/**'
+      - '.github/workflows/pip-idle-resources.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pip-idle-resources-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-memory-and-regressions:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compare native baseline and candidate idle resources
+        run: |
+          python3 Benchmarks/PiPIdleResources/run.py \
+            --output "$RUNNER_TEMP/pip-idle-resources" --repetitions 3
+      - name: Verify candidate PiP output and lifecycle regressions
+        run: |
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --scratch-path .build/pip-idle-resources \
+            --filter 'PiPIdleResourceRetirementTests|PiPSubtitleUploadReuseTests|PiPSubtitlePipelineTests|PiPVideoMappingTests|PiPSubtitleCompositionPolicyTests|MetalASSSubtitleCompositorTests' \
+            2>&1 | tee "$RUNNER_TEMP/pip-idle-native-tests.log"
+      - name: Print compact evidence receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'pip-idle-resources'
+          for name in ['environment.json', 'summary.json', 'restoration.json', 'completion.json']:
+              path = root / name
+              if path.is_file():
+                  print(f'::group::{name}')
+                  print(path.read_text())
+                  print('::endgroup::')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pip-idle-resources-native
+          path: |
+            ${{ runner.temp }}/pip-idle-resources/
+            ${{ runner.temp }}/pip-idle-native-tests.log
+          retention-days: 14

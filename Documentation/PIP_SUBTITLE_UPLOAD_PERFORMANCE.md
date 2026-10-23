@@ -50,8 +50,10 @@ each GPU completion because that direct seam bypasses production scheduling.
 
 Texture dimensions still determine normalized UV coordinates. Growth, pixel
 format changes, and any new prepared caption rebuild the vertices. Smaller
-captions use the actual retained texture dimensions, as before. An unchanged
-caption may reuse uploads across stop/start while its resources remain valid.
+captions use the actual retained texture dimensions, as before. Unchanged
+captions reuse uploads within an active session. The later
+[idle-resource retirement change](PIP_IDLE_RESOURCE_MEMORY.md) releases those
+optional resources when PiP stops and rebuilds them on re-entry.
 
 The new native regression suite checks tightly packed output BGRA bytes, excluding
 Core Video row padding, together with successful upload counters:

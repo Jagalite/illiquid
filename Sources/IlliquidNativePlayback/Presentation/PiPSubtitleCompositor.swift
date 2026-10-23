@@ -184,6 +184,23 @@ final class PiPSubtitleDisplayLayerHost {
     }
 }
 
+/// A read-only ownership snapshot, captured on the compositor's work queue.
+/// Prepared pixels may share staging storage; these fields are not additive.
+/// Device allocation includes framework resources and is diagnostic only.
+struct PiPSubtitleResourceSnapshot: Codable, Equatable, Sendable {
+    let isActive: Bool
+    let workerActive: Bool
+    let hasOutputPool: Bool
+    let hasOutputPoolObserver: Bool
+    let outputBufferIdentityCount: Int
+    let hdrTextureAllocatedBytes: Int
+    let subtitleTextureAllocatedBytes: Int
+    let subtitleVertexAllocatedBytes: Int
+    let stagingBytes: Int
+    let preparedPixelBytes: Int
+    let deviceAllocatedBytes: Int
+}
+
 struct PiPSubtitleCompositionMetrics: Equatable, Sendable {
     var receivedFrames = 0
     var composedFrames = 0
@@ -625,9 +642,35 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         }
         workQueue.async { [weak self] in
             guard let self else { return }
-            presenter.flush(removeDisplayedImage: true)
+            retireResourcesIfInactive()
             emitMetrics()
         }
+    }
+
+    /// Work-queue confined. Keep the latest decoded frame and bound subtitle
+    /// pipeline for paused re-entry, but release the optional PiP working set.
+    private func retireResourcesIfInactive() {
+        // A stop can be queued before another caller starts PiP again. Do not
+        // flush that session or discard resources it has already recreated.
+        guard !stateLock.withLock({ active }) else { return }
+        presenter.flush(removeDisplayedImage: true)
+        if let outputPoolObserver {
+            NotificationCenter.default.removeObserver(outputPoolObserver)
+        }
+        outputPoolObserver = nil
+        outputPool = nil
+        outputPoolSize = .zero
+        outputPoolPixelFormat = kCVPixelFormatType_32BGRA
+        stateLock.withLock { observedOutputBuffers.removeAll() }
+        hdrLinearTexture = nil
+        preparedSubtitleFrame = nil
+        preparedSubtitlePipelineRevision = nil
+        subtitleUploadCache.retireSource()
+        subtitlePacker.retireSource()
+        // Ordinary Metal command buffers retain encoded GPU resources, and
+        // MetalFrameResources keeps their CV wrappers until GPU completion.
+        // Drop our idle references without blocking the caller or the GPU.
+        CVMetalTextureCacheFlush(textureCache, 0)
     }
 
     func invalidatePendingFrames() {
@@ -664,6 +707,30 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
 
     func metricsSnapshot() -> PiPSubtitleCompositionMetrics {
         stateLock.withLock { metrics }
+    }
+
+    func resourceSnapshotForTesting() async -> PiPSubtitleResourceSnapshot {
+        await withCheckedContinuation { continuation in
+            workQueue.async { [self] in
+                let state = stateLock.withLock {
+                    (active, workerActive, observedOutputBuffers.count)
+                }
+                let upload = subtitleUploadCache.retainedResourceBytesForTesting
+                continuation.resume(returning: PiPSubtitleResourceSnapshot(
+                    isActive: state.0,
+                    workerActive: state.1,
+                    hasOutputPool: outputPool != nil,
+                    hasOutputPoolObserver: outputPoolObserver != nil,
+                    outputBufferIdentityCount: state.2,
+                    hdrTextureAllocatedBytes: hdrLinearTexture?.allocatedSize ?? 0,
+                    subtitleTextureAllocatedBytes: upload.texture,
+                    subtitleVertexAllocatedBytes: upload.vertices,
+                    stagingBytes: subtitlePacker.retainedStorageByteCountForTesting,
+                    preparedPixelBytes: preparedSubtitleFrame?.pixels.count ?? 0,
+                    deviceAllocatedBytes: device.currentAllocatedSize
+                ))
+            }
+        }
     }
 
     func composedPixelBufferForTesting(
@@ -711,7 +778,14 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             }
             return frame.map { ($0, displayImmediately, compositionFence.revision) }
         }
-        guard let work else { return }
+        guard let work else {
+            // A stop may have flushed while the GPU still retained CV texture
+            // wrappers. After stale work drains, flush those now-unused cache
+            // entries as well. Never reset workerActive in stop itself: its
+            // completion remains responsible for resuming a rapid re-entry.
+            retireResourcesIfInactive()
+            return
+        }
 
         do {
             try compose(work.frame) { [weak self] result in
