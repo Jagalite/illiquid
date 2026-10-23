@@ -23,6 +23,7 @@ struct OpenVideoTabBar: View {
                                         .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
+                                .accessibilityIdentifier("illiquid.videos.tab.\(tab.id)")
                                 .accessibilityAddTraits(tab.id == model.openVideoTabs.selectedID ? .isSelected : [])
                                 .help(tab.source.url.isFileURL ? tab.source.url.path : tab.source.url.absoluteString)
                                 Button { model.closeOpenVideoTab(tab.id) } label: {
@@ -33,6 +34,7 @@ struct OpenVideoTabBar: View {
                                 }
                                 .buttonStyle(.plain)
                                 .accessibilityLabel("Close \(tab.title)")
+                                .accessibilityIdentifier("illiquid.videos.close-tab.\(tab.id)")
                                 .help("Close video tab")
                             }
                             .foregroundStyle(tab.id == model.openVideoTabs.selectedID ? theme.primaryColor : theme.secondaryColor)
@@ -63,6 +65,7 @@ struct OpenVideoTabBar: View {
                     .fixedSize()
                     .help("All Open Videos (\(model.openVideoTabs.items.count))")
                     .accessibilityLabel("All Open Videos")
+                    .accessibilityIdentifier("illiquid.videos.all-tabs")
                 }
             }
             .frame(height: 28)

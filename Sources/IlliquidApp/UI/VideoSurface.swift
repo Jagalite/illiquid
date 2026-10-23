@@ -72,6 +72,7 @@ final class VideoSurfaceUnavailableView: NSView {
         setAccessibilityElement(true)
         setAccessibilityRole(.group)
         setAccessibilityLabel("Video unavailable")
+        setAccessibilityIdentifier("illiquid.video.unavailable")
         setAccessibilityHelp(message)
     }
 

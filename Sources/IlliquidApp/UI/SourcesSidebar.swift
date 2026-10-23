@@ -125,6 +125,7 @@ struct SourcesSidebar: View {
                             LazyVStack(spacing: 2) {
                                 ForEach(visibleRows) { row in
                                     sourceRow(row)
+                                        .accessibilityIdentifier("illiquid.sources.row.\(row.id)")
                                         .dynamicPlayerTextStyle()
                                         .padding(.horizontal, 7)
                                         .onScrollVisibilityChange(threshold: 0.1) { visible in
@@ -141,11 +142,13 @@ struct SourcesSidebar: View {
                                     .frame(width: 0, height: 0)
                             }
                         }
+                        .accessibilityIdentifier("illiquid.sources.results")
                         .modifier(SourceScrollRestoration(rowID: $scrollRowID, isEnabled: restoresScrollPosition))
                     }
                 }
             }
         }
+        .accessibilityIdentifier("illiquid.sources.sidebar")
         .frame(maxHeight: .infinity, alignment: .top)
         .dynamicPlayerTextStyle(
             contrastRegion: .leading,
@@ -460,6 +463,7 @@ struct SourcesSidebar: View {
             .disabled(model.activeSourceFolders.isEmpty)
             .help("Rescan Folders")
             .accessibilityLabel("Rescan Folders")
+            .accessibilityIdentifier("illiquid.sources.rescan")
             .accessibilityValue(mediaPresenceScanner.isScanning ? "Scanning" : "Idle")
 
             Button(action: model.addSourceFilesPanel) {
@@ -473,6 +477,7 @@ struct SourcesSidebar: View {
             .buttonStyle(.borderless)
             .help("Add Files to Tab…")
             .accessibilityLabel("Add Files to Tab")
+            .accessibilityIdentifier("illiquid.sources.add-files")
 
             Button(action: model.addSourceFoldersPanel) {
                 Image(systemName: "folder.badge.plus")
@@ -485,6 +490,7 @@ struct SourcesSidebar: View {
             .buttonStyle(.borderless)
             .help("Add Folder…")
             .accessibilityLabel("Add Folder")
+            .accessibilityIdentifier("illiquid.sources.add-folder")
         }
     }
 
@@ -524,6 +530,7 @@ struct SourcesSidebar: View {
             .buttonStyle(.plain)
             .help(visibilityHelp)
             .accessibilityLabel("Source view and visibility")
+            .accessibilityIdentifier("illiquid.sources.visibility")
             .accessibilityValue(visibilityHelp)
             .popover(isPresented: $isVisibilityPresented, arrowEdge: .top) {
                 SourceVisibilityPopover(
@@ -616,6 +623,7 @@ struct SourcesSidebar: View {
             "\(criterion.title): \(direction.title). "
                 + "Click for \(direction.next.title.lowercased())."
         )
+        .accessibilityIdentifier("illiquid.sources.sort.\(criterion.rawValue)")
         .accessibilityLabel("Sort by \(criterion.title)")
         .accessibilityValue(direction.title)
     }
@@ -1256,6 +1264,7 @@ private struct SourcesSidebarResizeHandle: View {
         .help("Drag to resize sources")
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Resize Sources")
+        .accessibilityIdentifier("illiquid.sources.resize")
         .accessibilityValue("\(Int(liveWidth)) points wide")
         .accessibilityHint("Drag, or use accessibility increment and decrement actions")
         .accessibilityAdjustableAction { direction in

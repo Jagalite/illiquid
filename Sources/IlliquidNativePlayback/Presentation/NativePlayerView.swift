@@ -69,6 +69,7 @@ final class NativePlayerNSView: NSView {
         setAccessibilityElement(true)
         setAccessibilityRole(.group)
         setAccessibilityLabel("Video")
+        setAccessibilityIdentifier("illiquid.video.surface")
         setAccessibilityHelp("Double-click the left or right third to seek backward or forward 5 seconds. Double-click the center to toggle fullscreen. Show the menu for more playback actions.")
     }
 

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "name": "timeline-grip-pending",
+  "description": "PENDING, deliberately capability-gated; not a drag test. Source now publishes illiquid.timeline.grip in swiftui-player-root-top-left-points; the grip remains accessibility-hidden. Native input needs Quartz global logical points. Fresh geometry transformation, source revision checks, press/move/release and outcome assertions are not implemented here. Missing synthetic requirement timeline-grip-global-input must fail; never remove the gate and count inspection as drag coverage.",
+  "requires": [
+    "timeline-grip-global-input"
+  ],
+  "steps": [
+    {
+      "id": "diagnostic-state-only",
+      "command": "hook",
+      "args": {
+        "action": "agent-state"
+      },
+      "expect": {
+        "path": "data.state.data.targets",
+        "op": "exists"
+      }
+    }
+  ],
+  "metrics": {
+    "required": []
+  }
+}

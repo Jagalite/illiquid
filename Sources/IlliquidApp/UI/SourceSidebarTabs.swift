@@ -32,6 +32,7 @@ struct SourceSidebarTabs: View {
             .buttonStyle(.plain)
             .help("New Folder Tab")
             .accessibilityLabel("New Source Tab")
+            .accessibilityIdentifier("illiquid.sources.new-tab")
         }
         .frame(height: 28)
         .padding(.horizontal, 10)
@@ -83,6 +84,7 @@ private struct SourceSidebarTab: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("illiquid.sources.tab.\(tab.id)")
 
             Button {
                 model.closeSourceTab(tab.id)
@@ -96,6 +98,7 @@ private struct SourceSidebarTab: View {
             .opacity(showsCloseButton ? 0.72 : 0)
             .allowsHitTesting(showsCloseButton)
             .accessibilityLabel("Close \(tab.displayName) Tab")
+            .accessibilityIdentifier("illiquid.sources.close-tab.\(tab.id)")
         }
         .padding(.leading, 8)
         .padding(.trailing, 3)

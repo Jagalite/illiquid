@@ -20,6 +20,7 @@ struct PlayerRootView: View {
                 }
             chrome.scaledPlayerInterface()
         }
+        .coordinateSpace(name: AgentUITargetGeometry.coordinateSpace)
     }
 
     private var chrome: some View {
@@ -329,6 +330,7 @@ private struct CenterTransportControls: View {
             HStack(spacing: 24) {
                 transportButton(
                     "Seek Backward 10 Seconds",
+                    identifier: "illiquid.transport.seek-backward",
                     systemImage: "gobackward.10",
                     diameter: 74,
                     symbolSize: 34,
@@ -339,6 +341,7 @@ private struct CenterTransportControls: View {
 
                 transportButton(
                     model.state.isPauseDesired ? "Play" : "Pause",
+                    identifier: "illiquid.transport.play-pause",
                     systemImage: model.state.isPauseDesired ? "play.fill" : "pause.fill",
                     diameter: 100,
                     symbolSize: model.state.isPauseDesired ? 46 : 40,
@@ -349,6 +352,7 @@ private struct CenterTransportControls: View {
 
                 transportButton(
                     "Seek Forward 10 Seconds",
+                    identifier: "illiquid.transport.seek-forward",
                     systemImage: "goforward.10",
                     diameter: 74,
                     symbolSize: 34,
@@ -366,6 +370,7 @@ private struct CenterTransportControls: View {
 
     private func transportButton(
         _ title: String,
+        identifier: String,
         systemImage: String,
         diameter: CGFloat,
         symbolSize: CGFloat,
@@ -399,6 +404,7 @@ private struct CenterTransportControls: View {
         .disabled(!isEnabled)
         .help(title)
         .accessibilityLabel(title)
+        .accessibilityIdentifier(identifier)
     }
 }
 
@@ -619,9 +625,11 @@ private struct EmptyPlayerView: View {
         Button(action: model.openFilePanel) {
             Text("Open File…").playerProminentButtonTextStyle()
         }
+        .accessibilityIdentifier("illiquid.empty.open-file")
         .keyboardShortcut(.defaultAction)
         .buttonStyle(.borderedProminent)
         Button("Add Folder…", action: model.addSourceFoldersPanel)
+            .accessibilityIdentifier("illiquid.empty.add-folder")
             .buttonStyle(.bordered)
     }
 }

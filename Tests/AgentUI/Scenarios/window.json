@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "name": "window",
+  "description": "SETUP: single visible focused player window, normal windowed mode, no modal/popup/Settings or PiP, usable macOS GUI. No media fixture needed. Command-F is the actual Toggle Fullscreen menu shortcut. State tracks fullscreen request/completion but does not establish compositor presentation, resize hit targets, minimize/restore or multi-display behavior.",
+  "requires": [],
+  "steps": [
+    {
+      "id": "player-focused",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.window.key",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "initially-windowed",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.window.fullscreen",
+          "op": "eq",
+          "value": false
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "enter-fullscreen-shortcut",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": "f",
+        "modifiers": [
+          "command"
+        ]
+      }
+    },
+    {
+      "id": "fullscreen-state-arrives",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.window.fullscreen",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "leave-fullscreen-shortcut",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": "f",
+        "modifiers": [
+          "command"
+        ]
+      }
+    },
+    {
+      "id": "windowed-state-returns",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.window.fullscreen",
+          "op": "eq",
+          "value": false
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "final-window-tree",
+      "command": "inspect",
+      "args": {}
+    },
+    {
+      "id": "owned-window-remains",
+      "command": "assert",
+      "args": {
+        "path": "data.windows.0",
+        "op": "exists"
+      }
+    }
+  ],
+  "metrics": {
+    "required": []
+  }
+}

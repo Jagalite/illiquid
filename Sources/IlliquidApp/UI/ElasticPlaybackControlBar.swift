@@ -1073,6 +1073,7 @@ private struct ElasticPlaybackTimelineAccessibilityContent: View {
                 Text("Playback position")
             }
             .accessibilityValue("\(TimecodeFormatter.string(from: model.state.position)) of \(TimecodeFormatter.string(from: model.state.duration))")
+            .accessibilityIdentifier("illiquid.timeline.position")
             .disabled(model.state.duration <= 0)
         }
     }
@@ -1242,7 +1243,7 @@ enum TimelineThumbnailHoverPolicy {
     }
 }
 
-enum ElasticPlaybackUtility: Hashable {
+enum ElasticPlaybackUtility: String, Hashable {
     case volume
     case audio
     case subtitles
@@ -1362,6 +1363,7 @@ struct ElasticPlaybackControlBar: View {
                     .foregroundStyle(theme.secondaryColor)
                     .frame(width: 24, height: 40)
                     .contentShape(Rectangle())
+                    .agentUITarget(AgentUITargetGeometry.timelineGrip, model: model)
                     .rotationEffect(.radians(geometry.tangentAngle(at: geometry.dragHandleS)))
                     .position(geometry.point(at: geometry.dragHandleS))
                     .gesture(barDragGesture(geometry: geometry, size: size, utilityCount: utilities.count))
@@ -2010,6 +2012,7 @@ private struct ElasticPlaybackUtilityControl: View {
 
     var body: some View {
         utilityControl(utility, popoverEdge: popoverEdge)
+            .accessibilityIdentifier("illiquid.utility.\(utility.rawValue)")
     }
 
     @ViewBuilder

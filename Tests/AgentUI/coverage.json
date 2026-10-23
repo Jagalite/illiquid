@@ -1,0 +1,2042 @@
+{
+  "schema_version": 1,
+  "name": "Illiquid macOS app-wide interaction inventory",
+  "source_baseline": "2cf381767023c5e7f748e3e45a214e002a8b87ae",
+  "qualification": {
+    "level": "initial-native-smoke",
+    "live_ui": "inspection and playback-shortcuts passed; broader coverage pending",
+    "build": "optimized product and benchmark packaging passed locally",
+    "traces": "readiness timed out; cleanup confirmed; no valid measurement",
+    "note": "Retained live smoke receipts qualify only the named scenarios. Per-run preference isolation, custom grip global coordinates, wider scenarios and presentation metrics remain pending.",
+    "ci": "Component-only workflow exists; no workflow run result is claimed by this inventory.",
+    "receipts": {
+      "inspection": "/tmp/illiquid-agent-ui-live-20261023-inspection-4",
+      "playback_shortcuts": "/tmp/illiquid-agent-ui-live-20261023-playback-6",
+      "component_tests_kyoto": "b868f79e3f5249c4b5aced4c1cdb805b"
+    },
+    "current_source_validation": "Pending parent-coordinated aggregate validation after the latest activation run-loop changes; 117-test receipt predates those changes.",
+    "live_qualified_scope": "Entry live_qualified means the complete named family is qualified for current source. Historical smoke evidence covers only the recorded steps and source, and is retained separately.",
+    "preference_isolation": "NOT established: shared benchmark bundle preferences were inherited; per-run CFFIXED_USER_HOME is insufficient."
+  },
+  "status_definitions": {
+    "automated": "Executable interaction and outcome assertions have retained qualifying evidence for the named scope. No entries claim this state yet.",
+    "partial": "A smoke example covers a subset; live evidence, missing behaviors and unqualified family scope remain explicit.",
+    "pending": "No qualifying executable interaction/outcome pair; source inventory or a deliberately gated probe only.",
+    "environment-dependent": "Requires named hardware, backend, permissions, controlled service or session; no qualifying live evidence yet."
+  },
+  "existing_identifiers": [
+    {
+      "identifier": "elastic-playback-control-bar",
+      "source_path": "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+      "scope": "Container only; not grip, video or scrub target."
+    },
+    {
+      "identifier": "source-sidebar-tabs",
+      "source_path": "Sources/IlliquidApp/UI/SourceSidebarTabs.swift",
+      "scope": "Container only; not stable tab row identity."
+    },
+    {
+      "identifier": "open-video-tabs",
+      "source_path": "Sources/IlliquidApp/UI/OpenVideoTabBar.swift",
+      "scope": "Container only; not stable video row identity."
+    },
+    {
+      "identifier": "thumbnail-cache-usage",
+      "source_path": "Sources/IlliquidApp/UI/ThumbnailSettingsCard.swift",
+      "scope": "Cache usage readout only."
+    },
+    {
+      "identifier": "illiquid.player.window",
+      "source_path": "Sources/IlliquidApp/App/AppModel.swift",
+      "scope": "Player window; no assumption about other windows."
+    },
+    {
+      "identifier": "illiquid.video.surface",
+      "source_path": "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift",
+      "scope": "Native video surface; inspect live availability."
+    },
+    {
+      "identifier": "illiquid.transport.seek-backward",
+      "source_path": "Sources/IlliquidApp/UI/PlayerRootView.swift",
+      "scope": "Transport seek-backward button."
+    },
+    {
+      "identifier": "illiquid.transport.play-pause",
+      "source_path": "Sources/IlliquidApp/UI/PlayerRootView.swift",
+      "scope": "Transport play/pause button."
+    },
+    {
+      "identifier": "illiquid.transport.seek-forward",
+      "source_path": "Sources/IlliquidApp/UI/PlayerRootView.swift",
+      "scope": "Transport seek-forward button."
+    },
+    {
+      "identifier": "illiquid.empty.open-file",
+      "source_path": "Sources/IlliquidApp/UI/PlayerRootView.swift",
+      "scope": "Empty-state open-file button."
+    },
+    {
+      "identifier": "illiquid.empty.add-folder",
+      "source_path": "Sources/IlliquidApp/UI/PlayerRootView.swift",
+      "scope": "Empty-state add-folder button."
+    },
+    {
+      "identifier": "illiquid.timeline.position",
+      "source_path": "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+      "scope": "Semantic Playback position slider; not drag grip."
+    },
+    {
+      "identifier": "illiquid.settings",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.always-on-top",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.always-show-controls",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.ask-default-player",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.aspect-lock",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.audio-output",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.auto-hide-step",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.auto-hide-timeout",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.clear-cancel",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.clear-confirm",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.hardware-decoding",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.interface-scale",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.keep-running",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.lock-controls",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.make-default-player",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.muted",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.navigation",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.playback-speed",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.rainbow-palette",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.remember-history",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.repeat",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.reset-controls",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.reset-unreadable-history",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.restore-paused",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.shuffle",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.sidebar-visible",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.sidebar-width",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.source-show-hidden",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.source-view-mode",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.subtitle-encoding",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.text-appearance",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.theme",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.settings.volume",
+      "source_path": "Sources/IlliquidApp/UI/SettingsView.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.sources.add-files",
+      "source_path": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.sources.add-folder",
+      "source_path": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.sources.new-tab",
+      "source_path": "Sources/IlliquidApp/UI/SourceSidebarTabs.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.sources.rescan",
+      "source_path": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.sources.resize",
+      "source_path": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.sources.results",
+      "source_path": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.sources.sidebar",
+      "source_path": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.sources.visibility",
+      "source_path": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.utility.audio",
+      "source_path": "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.utility.more",
+      "source_path": "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.utility.pictureInPicture",
+      "source_path": "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.utility.settings",
+      "source_path": "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.utility.sidebar",
+      "source_path": "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.utility.subtitles",
+      "source_path": "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.utility.volume",
+      "source_path": "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.video.unavailable",
+      "source_path": "Sources/IlliquidApp/UI/VideoSurface.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.videos.all-tabs",
+      "source_path": "Sources/IlliquidApp/UI/OpenVideoTabBar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "illiquid.volume.level",
+      "source_path": "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    },
+    {
+      "identifier": "source-search",
+      "source_path": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "scope": "Source-observed literal; live presence, uniqueness and input semantics unqualified."
+    }
+  ],
+  "matrix_dimensions": {
+    "playback": [
+      "empty",
+      "loading",
+      "playing",
+      "paused",
+      "failed"
+    ],
+    "sidebar": [
+      "open",
+      "closed"
+    ],
+    "appearance": [
+      "each supported theme",
+      "conditional text and rainbow modes"
+    ],
+    "ui_scale": [
+      "default",
+      "minimum",
+      "maximum"
+    ],
+    "window": [
+      "minimum",
+      "standard",
+      "fullscreen"
+    ],
+    "motion": [
+      "normal",
+      "reduced-motion"
+    ],
+    "fixture": [
+      "audio-only",
+      "seekable SDR video",
+      "playlist",
+      "subtitles",
+      "multi-track",
+      "HDR",
+      "remote",
+      "missing/corrupt media"
+    ],
+    "environment": [
+      "single/multiple displays",
+      "refresh rate",
+      "backing scale",
+      "VoiceOver",
+      "power mode"
+    ]
+  },
+  "matrix_policy": "Use representative smoke combinations and a broader serial cohort; neither this inventory nor one happy path claims the Cartesian product.",
+  "entries": [
+    {
+      "id": "inspection",
+      "area": "inspection",
+      "actions": [
+        "discover owned windows",
+        "bounded AX tree",
+        "roles labels values bounds and focus"
+      ],
+      "status": "partial",
+      "live_qualified": false,
+      "scenarios": [
+        "Scenarios/inspection.json"
+      ],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [],
+      "gap": "Three-step inspection/window-existence/capture smoke passed; per-control AX exposure, selector uniqueness and current-source revalidation remain pending.",
+      "evidence": [
+        {
+          "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-inspection-4",
+          "scope": "historical smoke only; current-source aggregate validation pending"
+        }
+      ]
+    },
+    {
+      "id": "launch-empty",
+      "area": "lifecycle",
+      "actions": [
+        "launch exact benchmark executable",
+        "empty player readiness",
+        "owned close"
+      ],
+      "status": "partial",
+      "live_qualified": false,
+      "scenarios": [
+        "Scenarios/inspection.json"
+      ],
+      "source_paths": [
+        "Scripts/agent-ui/IMPLEMENTATION_CONTRACT.md"
+      ],
+      "requires": [],
+      "gap": "Exact benchmark launch and graceful close were observed as external setup; startup timing, preference isolation and current-source revalidation remain pending.",
+      "evidence": [
+        {
+          "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-inspection-4",
+          "scope": "historical smoke only; current-source aggregate validation pending"
+        }
+      ]
+    },
+    {
+      "id": "restore-session",
+      "area": "lifecycle",
+      "actions": [
+        "restore paused session",
+        "restore unavailable media",
+        "protect unreadable history"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "fixture-owned session and preferences"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "open-file-folder",
+      "area": "lifecycle",
+      "actions": [
+        "Open File",
+        "New Video Tab",
+        "Add Files to Sources",
+        "Add Folder to Sources"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "generated playlist and folder fixtures",
+        "file-panel selectors"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "open-location",
+      "area": "lifecycle",
+      "actions": [
+        "Open Location",
+        "URL validation",
+        "Open Anyway warning",
+        "TLS failure",
+        "remote session not reconnected"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "controlled local network fixture",
+        "backend remote-playback capability"
+      ],
+      "gap": "Network and backend dependent; no remote UI scenario or controlled endpoint provided.",
+      "evidence": []
+    },
+    {
+      "id": "drop-media",
+      "area": "lifecycle",
+      "actions": [
+        "drop file",
+        "drop folder",
+        "drop URL",
+        "reject unsupported drop"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/PlayerRootView.swift"
+      ],
+      "requires": [
+        "owned drag source",
+        "drop adapter and fixture"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "window-close-reopen",
+      "area": "lifecycle",
+      "actions": [
+        "close last window",
+        "keep-running preference",
+        "reopen from Dock",
+        "quit while loading"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "isolated preferences",
+        "loading fixture"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "second-window",
+      "area": "lifecycle",
+      "actions": [
+        "repeated player open",
+        "settings and player ownership",
+        "second player behavior"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/IlliquidApp.swift"
+      ],
+      "requires": [],
+      "gap": "Single player Window scene in source; determine supported behavior live before assuming multiple independent players.",
+      "evidence": []
+    },
+    {
+      "id": "play-pause-shortcut",
+      "area": "playback",
+      "actions": [
+        "Space play",
+        "Space pause"
+      ],
+      "status": "partial",
+      "live_qualified": false,
+      "scenarios": [
+        "Scenarios/playback-shortcuts.json"
+      ],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerShortcutBindings.swift"
+      ],
+      "requires": [
+        "loaded seekable fixture",
+        "default shortcuts",
+        "player keyboard focus",
+        "VoiceOver off"
+      ],
+      "gap": "Real Space play/pause intent transitions passed in the retained 19-step playback run; decoded audio/video presentation and current-source revalidation remain pending.",
+      "evidence": [
+        {
+          "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-playback-6",
+          "scope": "historical smoke only; current-source aggregate validation pending"
+        }
+      ]
+    },
+    {
+      "id": "seek-shortcuts",
+      "area": "playback",
+      "actions": [
+        "Left and Right relative seeks",
+        "Shift+Left and Shift+Right one-second seeks",
+        "large seeks",
+        "undo seek"
+      ],
+      "status": "partial",
+      "live_qualified": false,
+      "scenarios": [
+        "Scenarios/playback-shortcuts.json"
+      ],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerShortcutBindings.swift"
+      ],
+      "requires": [
+        "loaded seekable fixture",
+        "default shortcuts"
+      ],
+      "gap": "Real Right/Left relative seek position checks passed in the retained playback run; Shift variants, boundaries, large seek, undo and presentation remain pending.",
+      "evidence": [
+        {
+          "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-playback-6",
+          "scope": "historical smoke only; current-source aggregate validation pending"
+        }
+      ]
+    },
+    {
+      "id": "transport-menus",
+      "area": "playback",
+      "actions": [
+        "Play and Pause menu",
+        "Stop",
+        "Previous File",
+        "Next File"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "playlist with at least two entries"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "transport-buttons",
+      "area": "playback",
+      "actions": [
+        "play/pause button",
+        "previous/next buttons",
+        "repeat",
+        "shuffle"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+      ],
+      "requires": [
+        "playlist fixture",
+        "fresh discovered button selectors"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "speed",
+      "area": "playback",
+      "actions": [
+        "Playback Speed choices",
+        "remembered speed",
+        "disabled capability"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "backend speed capability",
+        "media fixture"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "frame-chapter",
+      "area": "playback",
+      "actions": [
+        "Step One Frame Forward",
+        "Step One Frame Backward",
+        "chapter forward/backward"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "step-frame capability",
+        "chapter fixture"
+      ],
+      "gap": "Conditional backend actions and chapter metadata; no interaction scenario or presentation assertion.",
+      "evidence": []
+    },
+    {
+      "id": "go-to-time-loop",
+      "area": "playback",
+      "actions": [
+        "Go to Time validation",
+        "A\u2013B loop start/end/clear",
+        "invalid loop boundaries"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/UI/GoToTimeView.swift"
+      ],
+      "requires": [
+        "seekable fixture"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "timeline-scrub",
+      "area": "timeline",
+      "actions": [
+        "click seek",
+        "press/move/release scrub",
+        "seek preview",
+        "cancel scrub",
+        "curved track routing"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+      ],
+      "requires": [
+        "seekable video fixture",
+        "current custom track geometry"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "timeline-grip",
+      "area": "timeline",
+      "actions": [
+        "grip press/move/release",
+        "bend",
+        "rotate",
+        "release outside window",
+        "cancel move"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [
+        "Scenarios/timeline-grip-pending.json"
+      ],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+      ],
+      "requires": [
+        "fresh visible grip target and coordinate mapping",
+        "real drag adapter"
+      ],
+      "gap": "Source now publishes illiquid.timeline.grip as a diagnostic target in SwiftUI player-root points; it remains AX-hidden. Global input coordinate conversion and drag outcome assertions are pending. Container ID elastic-playback-control-bar is not the grip.",
+      "evidence": []
+    },
+    {
+      "id": "timeline-position-policy",
+      "area": "timeline",
+      "actions": [
+        "Lock Controls Position",
+        "Reset Controls Position",
+        "edge constraints",
+        "sidebar displacement",
+        "UI scale changes"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+      ],
+      "requires": [
+        "grip target",
+        "layout matrix"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "timeline-duration",
+      "area": "timeline",
+      "actions": [
+        "toggle total and remaining time",
+        "Playback position AX slider",
+        "keyboard adjustment"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+      ],
+      "requires": [
+        "seekable fixture"
+      ],
+      "gap": "Playback duration and Playback position labels exist; illiquid.timeline.position identifies the semantic slider, not the grip. AX adjustment does not prove pointer scrubbing.",
+      "evidence": []
+    },
+    {
+      "id": "chrome-keyboard",
+      "area": "chrome",
+      "actions": [
+        "Space play hides chrome",
+        "Space pause reveals chrome"
+      ],
+      "status": "partial",
+      "live_qualified": false,
+      "scenarios": [
+        "Scenarios/chrome.json"
+      ],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "loaded fixture",
+        "benchmark chrome pin disabled",
+        "no active focus pin"
+      ],
+      "gap": "Keyboard/state routing smoke only; pointer zones, Escape behavior, timeout policy and actual presentation need live qualification.",
+      "evidence": []
+    },
+    {
+      "id": "chrome-pointer",
+      "area": "chrome",
+      "actions": [
+        "video single-click",
+        "double-click zones",
+        "pointer exit/reentry",
+        "hover reveal",
+        "paused timeout",
+        "focus pin",
+        "popover/menu pin",
+        "interruption"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift"
+      ],
+      "requires": [
+        "current video hit bounds",
+        "real pointer input",
+        "playing and paused fixtures"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "chrome-always-visible",
+      "area": "chrome",
+      "actions": [
+        "Always Show Controls",
+        "auto-hide timeout minimum/maximum",
+        "reset controls"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "isolated preferences"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "audio-volume-mute",
+      "area": "audio",
+      "actions": [
+        "volume button and popover",
+        "slider",
+        "Up/Down shortcuts",
+        "Mute and Unmute",
+        "remembered volume"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "audio fixture",
+        "default shortcuts"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "audio-tracks",
+      "area": "audio",
+      "actions": [
+        "Audio Track menu",
+        "no tracks",
+        "select alternate track",
+        "restore remembered track"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+      ],
+      "requires": [
+        "multi-audio fixture"
+      ],
+      "gap": "No multi-track fixture or outcome assertion is supplied by the small generated smoke fixture.",
+      "evidence": []
+    },
+    {
+      "id": "audio-output-sync",
+      "area": "audio",
+      "actions": [
+        "preferred audio output",
+        "audio delay decrement/increment",
+        "device removal"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+      ],
+      "requires": [
+        "audio output hardware",
+        "audio sync fixture"
+      ],
+      "gap": "Hardware and audible synchronization need dedicated receipts; model state alone does not prove output.",
+      "evidence": []
+    },
+    {
+      "id": "subtitle-tracks",
+      "area": "subtitles",
+      "actions": [
+        "Subtitles menu",
+        "visibility",
+        "track selection",
+        "unavailable tracks",
+        "popover dismissal"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+      ],
+      "requires": [
+        "embedded subtitle fixture"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "subtitle-external",
+      "area": "subtitles",
+      "actions": [
+        "Load External Subtitle",
+        "SRT fallback encoding",
+        "subtitle delay validation",
+        "reset delay"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "captions.srt fixture",
+        "non-UTF8 SRT fixture",
+        "file-panel selectors"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "track-preferences",
+      "area": "subtitles",
+      "actions": [
+        "audio languages",
+        "subtitle languages",
+        "Save Languages validation",
+        "automatic subtitle selection",
+        "prefer accessible tracks"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/TrackSelectionSettings.swift"
+      ],
+      "requires": [
+        "multi-language and flagged-track fixtures"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "sources-management",
+      "area": "sources",
+      "actions": [
+        "Add Files to Tab",
+        "Add Folder",
+        "remove source",
+        "Rescan Folders",
+        "Reveal in Finder"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+      ],
+      "requires": [
+        "owned source tree",
+        "external Finder outcome scope"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "sources-tree",
+      "area": "sources",
+      "actions": [
+        "expand/collapse folders",
+        "open file",
+        "missing media",
+        "selection",
+        "scroll",
+        "scroll restoration",
+        "resize sidebar"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+      ],
+      "requires": [
+        "nested source fixture",
+        "stable row identity"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "sources-search-sort",
+      "area": "sources",
+      "actions": [
+        "search query",
+        "clear search",
+        "filter",
+        "Name sort",
+        "Date Created sort",
+        "Type sort"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+      ],
+      "requires": [
+        "large named source fixture",
+        "metadata-controlled dates"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "sources-visibility",
+      "area": "sources",
+      "actions": [
+        "Source view and visibility",
+        "view modes",
+        "hidden items",
+        "always-show paths",
+        "regex rules",
+        "Reset Current Tab"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "hidden-file and visibility-rule fixtures"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "source-tabs",
+      "area": "sources",
+      "actions": [
+        "New Source Tab",
+        "select tab",
+        "Previous/Next Source Tab",
+        "close tab",
+        "tab context menu"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourceSidebarTabs.swift",
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "at least two source tabs"
+      ],
+      "gap": "Container and data-derived tab/close identifiers now exist in source; scenario selection and live outcomes remain pending.",
+      "evidence": []
+    },
+    {
+      "id": "video-tabs",
+      "area": "sources",
+      "actions": [
+        "open video tabs",
+        "select tab",
+        "Previous/Next Video Tab",
+        "Close Video Tab",
+        "close button"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/OpenVideoTabBar.swift",
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "at least two video fixtures"
+      ],
+      "gap": "Container and data-derived tab/close identifiers now exist in source; keyboard/menu equivalence and live outcomes remain pending.",
+      "evidence": []
+    },
+    {
+      "id": "sources-monitoring",
+      "area": "sources",
+      "actions": [
+        "filesystem change",
+        "unreadable folder",
+        "missing mounted source",
+        "restore source"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+      ],
+      "requires": [
+        "owned mutable filesystem fixture",
+        "optional removable volume"
+      ],
+      "gap": "File event and mount behavior is not covered by hook-injected source-query benchmarks.",
+      "evidence": []
+    },
+    {
+      "id": "settings-open",
+      "area": "settings",
+      "actions": [
+        "open Settings with Command-comma",
+        "inspect settings window",
+        "close Settings"
+      ],
+      "status": "partial",
+      "live_qualified": false,
+      "scenarios": [
+        "Scenarios/settings-menu.json"
+      ],
+      "source_paths": [
+        "Sources/IlliquidApp/App/IlliquidApp.swift"
+      ],
+      "requires": [],
+      "gap": "Native shortcut/window-count smoke only; second-window ordering does not identify Settings content. Current-source live validation, content identity, direct menu traversal, individual controls and preference persistence remain pending.",
+      "evidence": []
+    },
+    {
+      "id": "settings-playback",
+      "area": "settings",
+      "actions": [
+        "Always show playback controls",
+        "auto-hide timeout text and stepper",
+        "Lock controls position",
+        "Reset Controls Position",
+        "Remembered volume",
+        "Muted",
+        "Default playback speed",
+        "Repeat",
+        "Shuffle"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "isolated preference seed"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "settings-behavior",
+      "area": "settings",
+      "actions": [
+        "default-player launch reminder",
+        "keep running after last window",
+        "restore previous session paused"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "isolated preference seed"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "settings-default-player",
+      "area": "settings",
+      "actions": [
+        "Make Default",
+        "Changing Defaults",
+        "success/failure result",
+        "launch reminder alert"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "dedicated account",
+        "explicit system default-association qualification"
+      ],
+      "gap": "System associations affect the account beyond the benchmark bundle; no example changes them.",
+      "evidence": []
+    },
+    {
+      "id": "settings-thumbnails",
+      "area": "settings",
+      "actions": [
+        "Apply Preset Economical/Balanced/Extensive",
+        "Clear Thumbnail Cache",
+        "prepare current video",
+        "generate while idle",
+        "generate with window closed",
+        "Prioritize",
+        "Exclude Folder",
+        "remove exclusion"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ThumbnailSettingsCard.swift"
+      ],
+      "requires": [
+        "owned cache",
+        "folder fixture"
+      ],
+      "gap": "thumbnail-cache-usage is an existing readout ID, not an automation claim for cache mutations.",
+      "evidence": []
+    },
+    {
+      "id": "settings-audio",
+      "area": "settings",
+      "actions": [
+        "Preferred audio output",
+        "SRT fallback encoding",
+        "track-selection preferences",
+        "forget remembered media choices"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "audio and subtitle fixtures",
+        "isolated history"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "settings-video",
+      "area": "settings",
+      "actions": [
+        "Hardware decoding Automatic/Compatibility/Off",
+        "Active decoder",
+        "Hardware decoded",
+        "HDR",
+        "Video format",
+        "Open Playback Inspector"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "hardware/codec fixture matrix"
+      ],
+      "gap": "Output readouts and requested decoder policy must be verified separately from actual decoder and display output.",
+      "evidence": []
+    },
+    {
+      "id": "settings-appearance",
+      "area": "settings",
+      "actions": [
+        "UI Scale",
+        "Interface theme",
+        "Text appearance",
+        "Rainbow palette",
+        "Lock window to video aspect ratio",
+        "Always on Top"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "isolated preferences",
+        "conditional theme controls"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "settings-sources",
+      "area": "settings",
+      "actions": [
+        "Show sources sidebar",
+        "Sidebar width",
+        "View",
+        "Show hidden items",
+        "Reset Current Tab",
+        "sort directions",
+        "Restore Sidebar Defaults"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "source tab fixture",
+        "isolated preferences"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "settings-data",
+      "area": "settings",
+      "actions": [
+        "Remember playback history",
+        "Clear Progress",
+        "Clear Choices",
+        "Reset Unreadable History",
+        "confirm/cancel"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "owned seeded history",
+        "unreadable-history fixture"
+      ],
+      "gap": "Destructive preference/history controls require fixture-owned state; never reset production defaults.",
+      "evidence": []
+    },
+    {
+      "id": "settings-updates",
+      "area": "settings",
+      "actions": [
+        "Automatically check for updates",
+        "Include prerelease updates",
+        "Check for Updates",
+        "disabled updater state"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/UpdateSettingsView.swift"
+      ],
+      "requires": [
+        "controlled update feed",
+        "supported signing and updater configuration"
+      ],
+      "gap": "Network, signing and Sparkle state affect availability; no production updater interaction.",
+      "evidence": []
+    },
+    {
+      "id": "help-shortcuts",
+      "area": "dialogs",
+      "actions": [
+        "Keyboard Shortcuts",
+        "Customize Playback Shortcuts",
+        "Action picker",
+        "Save Shortcut",
+        "conflict validation",
+        "Reset All",
+        "Done"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ShortcutSettingsView.swift",
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "isolated default shortcut overrides"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "inspector-messages",
+      "area": "dialogs",
+      "actions": [
+        "Playback Inspector",
+        "Playback Message History",
+        "dismiss",
+        "focus return"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "loaded fixture",
+        "message-producing fixture"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "file-panels",
+      "area": "dialogs",
+      "actions": [
+        "file/folder open",
+        "subtitle open",
+        "save screenshot",
+        "cancel",
+        "Escape",
+        "focus return"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "fixture paths",
+        "fresh native panel selectors"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "screenshot",
+      "area": "dialogs",
+      "actions": [
+        "Save Screenshot",
+        "Include subtitles",
+        "save destination",
+        "cancel",
+        "output image"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "backend screenshot capability",
+        "video/subtitle fixture",
+        "owned destination"
+      ],
+      "gap": "App screenshot export differs from runner window capture; neither is displayed-FPS evidence.",
+      "evidence": []
+    },
+    {
+      "id": "recovery",
+      "area": "dialogs",
+      "actions": [
+        "Retry",
+        "Locate",
+        "Forget Session",
+        "Skip",
+        "Stop",
+        "Copy Details",
+        "Dismiss"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/PlaybackRecoveryView.swift"
+      ],
+      "requires": [
+        "failed-source fixture",
+        "unavailable-session fixture",
+        "owned clipboard policy"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "video-geometry",
+      "area": "video",
+      "actions": [
+        "Sizing Fit/Fill",
+        "Aspect Ratio",
+        "Crop",
+        "Reset Video Sizing",
+        "disabled in PiP"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "video geometry capability",
+        "aspect-ratio fixture"
+      ],
+      "gap": "Capability gated controls need input and actual presentation assertions.",
+      "evidence": []
+    },
+    {
+      "id": "video-context-menu",
+      "area": "video",
+      "actions": [
+        "secondary-click",
+        "available Playback context actions",
+        "disabled actions",
+        "dismiss",
+        "focus and chrome return"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "loaded local/remote fixtures",
+        "current video bounds",
+        "real secondary-click"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "window-fullscreen",
+      "area": "window",
+      "actions": [
+        "Command-F fullscreen enter",
+        "Command-F fullscreen exit"
+      ],
+      "status": "partial",
+      "live_qualified": false,
+      "scenarios": [
+        "Scenarios/window.json"
+      ],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "one visible player window",
+        "no modal panel"
+      ],
+      "gap": "Shortcut scenario supplies a transition smoke; fullscreen completion and layout require live qualification.",
+      "evidence": []
+    },
+    {
+      "id": "window-resize",
+      "area": "window",
+      "actions": [
+        "resize edges",
+        "minimum size",
+        "aspect lock",
+        "Fit Window to Video",
+        "desktop fill",
+        "titlebar double-click"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/PlayerWindowControls.swift",
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "fresh window bounds",
+        "video fixture",
+        "real window edge input"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "window-minimize",
+      "area": "window",
+      "actions": [
+        "minimize",
+        "restore",
+        "focus",
+        "Always on Top",
+        "traffic-light close"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "owned window selectors"
+      ],
+      "gap": "AX window actions and real titlebar hits must be qualified as different delivery modes.",
+      "evidence": []
+    },
+    {
+      "id": "window-multiple-displays",
+      "area": "window",
+      "actions": [
+        "move between displays",
+        "backing scale change",
+        "fullscreen on each display",
+        "offscreen restoration"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "multiple physical displays"
+      ],
+      "gap": "Single-display/offline checks cannot qualify multi-display geometry.",
+      "evidence": []
+    },
+    {
+      "id": "window-pip",
+      "area": "window",
+      "actions": [
+        "Start/Stop Picture in Picture",
+        "player close while PiP active",
+        "disabled video sizing",
+        "restore player"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift"
+      ],
+      "requires": [
+        "pictureInPicture capability",
+        "supported video fixture",
+        "usable GUI session"
+      ],
+      "gap": "PiP may use additional system windows; ownership and visible output remain unqualified.",
+      "evidence": []
+    },
+    {
+      "id": "a11y-focus",
+      "area": "accessibility",
+      "actions": [
+        "Tab/Shift-Tab",
+        "arrow focus",
+        "Return/Space activation",
+        "Escape",
+        "focus return after dialog",
+        "menu tracking"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "Full Keyboard Access configuration",
+        "fresh focus tree"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "a11y-voiceover",
+      "area": "accessibility",
+      "actions": [
+        "VoiceOver labels and values",
+        "navigation",
+        "playback shortcut deferral",
+        "slider adjustments",
+        "custom geometry semantics"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "VoiceOver enabled",
+        "dedicated accessibility qualification"
+      ],
+      "gap": "AX snapshots and semantic actions are not VoiceOver qualification.",
+      "evidence": []
+    },
+    {
+      "id": "input-isolation",
+      "area": "input",
+      "actions": [
+        "shortcut conflicts",
+        "typing in search/text fields",
+        "held modifiers",
+        "repeat behavior",
+        "focus loss",
+        "cancel drag"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/App/PlayerShortcutBindings.swift"
+      ],
+      "requires": [
+        "focused text controls",
+        "input-contamination detection"
+      ],
+      "gap": "No executable interaction and outcome assertion for this family yet.",
+      "evidence": []
+    },
+    {
+      "id": "capture",
+      "area": "evidence",
+      "actions": [
+        "owned-window screenshot",
+        "UI tree capture",
+        "scoped artifact identity"
+      ],
+      "status": "partial",
+      "live_qualified": false,
+      "scenarios": [
+        "Scenarios/inspection.json"
+      ],
+      "source_paths": [
+        "Scripts/agent-ui/IMPLEMENTATION_CONTRACT.md"
+      ],
+      "requires": [
+        "Screen Recording permission"
+      ],
+      "gap": "Owned-window screenshot passed in the retained inspection run; this does not qualify arbitrary windows, per-control selectors or compositor performance.",
+      "evidence": [
+        {
+          "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-inspection-4",
+          "scope": "historical smoke only; current-source aggregate validation pending"
+        }
+      ]
+    },
+    {
+      "id": "performance-trace",
+      "area": "performance",
+      "actions": [
+        "recorder readiness",
+        "bounded Time Profiler",
+        "export table discovery",
+        "hitch/SwiftUI availability",
+        "matched comparison"
+      ],
+      "status": "environment-dependent",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Scripts/agent-ui/IMPLEMENTATION_CONTRACT.md"
+      ],
+      "requires": [
+        "full Xcode",
+        "usable trace template",
+        "nonempty required export tables",
+        "controlled slow and smooth fixtures"
+      ],
+      "gap": "Live Time Profiler readiness FAILED; SIGINT cleanup was confirmed and measurement_valid was false. No valid metric export, performance threshold or displayed FPS is established.",
+      "evidence": [
+        {
+          "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-playback-6/trace/7aabdf4d197649bb938adccf922e297d",
+          "status": "failed",
+          "cleanup_confirmed": true,
+          "measurement_valid": false
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "automated": 0,
+    "partial": 8,
+    "pending": 41,
+    "environment-dependent": 14
+  },
+  "diagnostic_targets": [
+    {
+      "identifier": "illiquid.timeline.grip",
+      "source_path": "Sources/IlliquidApp/UI/AgentUITargetGeometry.swift",
+      "coordinate_space": "swiftui-player-root-top-left-points",
+      "accessibility_hidden": true,
+      "input_qualified": false,
+      "gap": "No global input mapping or executable grip drag yet."
+    }
+  ],
+  "example_definitions": {
+    "runnable-after-prerequisites": "Uses implemented scenario schema and source-observed commands after documented setup. Historical smoke results, where present, are separate from current-source qualification.",
+    "pending-capability-gated": "A schema-valid descriptor intentionally fails a missing capability before interaction; not a runnable drag test."
+  },
+  "scenario_examples": [
+    {
+      "path": "Scenarios/chrome.json",
+      "state": "runnable-after-prerequisites",
+      "schema_validation": "passed",
+      "live_qualified": false,
+      "requires_fixture": true,
+      "setup": "SETUP: loaded generated video fixture; player focused, VoiceOver off, default shortcuts; controls-always-visible false and benchmark chrome pin disabled. No menu, popover or focus pins; pointer stationary. A real Space play transition hides controls, and a real Space pause transition reveals them. Hooks only establish setup/read state; no pointer, timeout, or presented-frame qualification."
+    },
+    {
+      "path": "Scenarios/inspection.json",
+      "state": "runnable-after-prerequisites",
+      "schema_validation": "passed",
+      "live_qualified": false,
+      "requires_fixture": false,
+      "setup": "SETUP: launch one isolated benchmark player; no media fixture needed. Requires Accessibility and Screen Recording for capture. Bounded inspection/window existence and capture smoke only; does not qualify every control or display output.",
+      "historical_smoke": {
+        "status": "passed",
+        "steps": 3,
+        "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-inspection-4",
+        "scope": "named input/state/capture steps only; current-source revalidation pending"
+      }
+    },
+    {
+      "path": "Scenarios/playback-shortcuts.json",
+      "state": "runnable-after-prerequisites",
+      "schema_validation": "passed",
+      "live_qualified": false,
+      "requires_fixture": true,
+      "setup": "SETUP: open generated fixtures/video.mp4 (12 seconds) in the isolated benchmark build before running; default shortcut overrides, VoiceOver off, player focused, no text field/modal/popover. Hooks establish pause/seek setup and read state; Space/Right/Left are real input. Main-actor state assertions are not visible frame or audio-output proof.",
+      "historical_smoke": {
+        "status": "passed",
+        "steps": 19,
+        "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-playback-6",
+        "scope": "named input/state/capture steps only; current-source revalidation pending"
+      }
+    },
+    {
+      "path": "Scenarios/settings-menu.json",
+      "state": "runnable-after-prerequisites",
+      "schema_validation": "passed",
+      "live_qualified": false,
+      "requires_fixture": false,
+      "setup": "SETUP: one visible focused player and no other app windows or modals; shared benchmark preference domain; verify effective preferences before use. No media fixture. Command-comma and Command-W are real native menu shortcuts. This requests Settings, observes a second owned window, inspects, sends close, and checks player focus return. It does not identify Settings content; per-control settings changes and menu traversal remain pending."
+    },
+    {
+      "path": "Scenarios/timeline-grip-pending.json",
+      "state": "pending-capability-gated",
+      "schema_validation": "passed",
+      "live_qualified": false,
+      "requires_fixture": true,
+      "setup": "PENDING, deliberately capability-gated; not a drag test. Source now publishes illiquid.timeline.grip in swiftui-player-root-top-left-points; the grip remains accessibility-hidden. Native input needs Quartz global logical points. Fresh geometry transformation, source revision checks, press/move/release and outcome assertions are not implemented here. Missing synthetic requirement timeline-grip-global-input must fail; never remove the gate and count inspection as drag coverage."
+    },
+    {
+      "path": "Scenarios/window.json",
+      "state": "runnable-after-prerequisites",
+      "schema_validation": "passed",
+      "live_qualified": false,
+      "requires_fixture": false,
+      "setup": "SETUP: single visible focused player window, normal windowed mode, no modal/popup/Settings or PiP, usable macOS GUI. No media fixture needed. Command-F is the actual Toggle Fullscreen menu shortcut. State tracks fullscreen request/completion but does not establish compositor presentation, resize hit targets, minimize/restore or multi-display behavior."
+    }
+  ],
+  "example_counts": {
+    "runnable_after_prerequisites": 5,
+    "pending_capability_gated": 1,
+    "live_qualified": 0,
+    "historical_smoke_passed": 2
+  },
+  "identifier_patterns": [
+    {
+      "source_pattern": "illiquid.settings.\\(identifier)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    },
+    {
+      "source_pattern": "illiquid.settings.destination.\\(destination.rawValue)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    },
+    {
+      "source_pattern": "illiquid.settings.sort.\\(identifier)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    },
+    {
+      "source_pattern": "illiquid.sources.close-tab.\\(tab.id)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourceSidebarTabs.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    },
+    {
+      "source_pattern": "illiquid.sources.row.\\(row.id)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    },
+    {
+      "source_pattern": "illiquid.sources.sort.\\(criterion.rawValue)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    },
+    {
+      "source_pattern": "illiquid.sources.tab.\\(tab.id)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourceSidebarTabs.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    },
+    {
+      "source_pattern": "illiquid.utility.\\(utility.rawValue)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    },
+    {
+      "source_pattern": "illiquid.videos.close-tab.\\(tab.id)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/OpenVideoTabBar.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    },
+    {
+      "source_pattern": "illiquid.videos.tab.\\(tab.id)",
+      "source_paths": [
+        "Sources/IlliquidApp/UI/OpenVideoTabBar.swift"
+      ],
+      "live_qualified": false,
+      "note": "Resolve actual data identity from the current tree; do not substitute a list index."
+    }
+  ]
+}

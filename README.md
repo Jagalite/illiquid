@@ -40,6 +40,12 @@ See [DISTRIBUTING.md](DISTRIBUTING.md) for release packaging
 and [Documentation/MANUAL_PLAYBACK_CHECKLIST.md](Documentation/MANUAL_PLAYBACK_CHECKLIST.md)
 for physical-device playback QA.
 
+For agent-driven macOS UI inspection, input, screenshots, and Instruments capture,
+see the [automation runbook](Documentation/MACOS_AGENT_UI_AUTOMATION_RUNBOOK.md).
+It documents the benchmark runner, required Kyoto build coordination, and retained
+inspection/playback smoke receipts. Preference isolation, broader interactions,
+and rendering performance remain unqualified.
+
 The [living findings register](Documentation/ROBUSTNESS_REVIEW_MPV_IINA.md)
 tracks structural, robustness, and user-experience research against mpv and IINA.
 

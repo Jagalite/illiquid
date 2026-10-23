@@ -61,6 +61,7 @@ struct PlaybackControlBar: View {
             .buttonStyle(.borderless)
             .help("Volume")
             .accessibilityLabel("Volume")
+            .accessibilityIdentifier("illiquid.utility.volume")
             .popover(isPresented: $isVolumePopoverPresented, arrowEdge: .bottom) {
                 VolumePopover(model: model)
                     .background(PopoverDismissalBoundary { isVolumePopoverPresented = false })
@@ -84,6 +85,7 @@ struct PlaybackControlBar: View {
             .buttonStyle(.borderless)
             .help("Audio Track")
             .accessibilityLabel("Audio Track")
+            .accessibilityIdentifier("illiquid.utility.audio")
 
             Menu {
                 Button {
@@ -122,6 +124,7 @@ struct PlaybackControlBar: View {
             .buttonStyle(.borderless)
             .help("Subtitles")
             .accessibilityLabel("Subtitles")
+            .accessibilityIdentifier("illiquid.utility.subtitles")
             .accessibilityValue(SubtitleControlVisualState(
                 selectedTrack: model.state.selectedSubtitleTrack
             ).accessibilityValue)
@@ -134,6 +137,7 @@ struct PlaybackControlBar: View {
             ) {
                 model.toggleSidebar()
             }
+            .accessibilityIdentifier("illiquid.utility.sidebar")
             .disabled(!model.isSidebarAvailable)
             .help(model.isSidebarAvailable ? "Sources" : "Widen the window to show Sources")
 
@@ -148,6 +152,7 @@ struct PlaybackControlBar: View {
                 ) {
                     model.togglePictureInPicture()
                 }
+                .accessibilityIdentifier("illiquid.utility.pictureInPicture")
             }
 
             SettingsLink {
@@ -166,6 +171,7 @@ struct PlaybackControlBar: View {
             .buttonStyle(.borderless)
             .help("Settings")
             .accessibilityLabel("Settings")
+            .accessibilityIdentifier("illiquid.utility.settings")
 
             Menu {
                 if !model.state.chapters.isEmpty {
@@ -246,6 +252,7 @@ struct PlaybackControlBar: View {
             .buttonStyle(.borderless)
             .help("More Playback Controls")
             .accessibilityLabel("More Playback Controls")
+            .accessibilityIdentifier("illiquid.utility.more")
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
@@ -523,6 +530,7 @@ private final class PlaybackTimelineNativeView: NSView {
         slider.isContinuous = true
         slider.controlSize = .regular
         slider.setAccessibilityLabel("Playback position")
+        slider.setAccessibilityIdentifier("illiquid.timeline.position")
         slider.onEditingChanged = { [weak self] editing in
             self?.handleEditingChanged(editing)
         }
@@ -1727,6 +1735,7 @@ struct VolumePopover: View {
                 )
                 .tint(theme.accentColor)
                 .accessibilityLabel("Volume")
+                .accessibilityIdentifier("illiquid.volume.level")
             }
         }
         .padding(14)

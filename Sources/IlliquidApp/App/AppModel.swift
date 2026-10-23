@@ -325,6 +325,7 @@ final class AppModel {
     @ObservationIgnored private var globalPointerEventMonitor: Any?
     @ObservationIgnored private var keyboardEventMonitor: Any?
     @ObservationIgnored private var benchmarkPlaybackControl: BenchmarkPlaybackControl?
+    @ObservationIgnored private var agentUITargetObservations: [String: AgentUITargetGeometry.Observation] = [:]
     @ObservationIgnored private var windowObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var didRestorePlaybackSession = false
     @ObservationIgnored private var pointerRevealGate = PointerRevealGate()
@@ -419,6 +420,8 @@ final class AppModel {
         benchmarkPlaybackControl?.applicationCommand = { [weak self] command in
             guard let self else { return false }
             switch command.action {
+            case "capabilities", "agent-state":
+                return self.writeAgentUIState(command)
             case "ping": break
             case "hover-preview":
                 guard let target = command.targetSeconds, target.isFinite else { return false }
@@ -475,6 +478,123 @@ final class AppModel {
             }
             restorePlayerWindowForPictureInPicture(completion: completion)
         }
+    }
+
+    var isAgentUIDiagnosticsEnabled: Bool { benchmarkPlaybackControl != nil }
+
+    func publishAgentUITarget(_ identifier: String, observation: AgentUITargetGeometry.Observation?) {
+        guard isAgentUIDiagnosticsEnabled else { return }
+        if let observation {
+            agentUITargetObservations[identifier] = observation
+        } else {
+            agentUITargetObservations.removeValue(forKey: identifier)
+        }
+    }
+
+    private func writeAgentUIState(_ command: BenchmarkPlaybackControlCommand) -> Bool {
+        guard isAgentUIDiagnosticsEnabled, command.isAgentUIAction else { return false }
+        let data: [String: Any]
+        if command.action == "capabilities" {
+            data = [
+                "commands": ["capabilities", "agent-state"],
+                "mode": "app-hook",
+                "completion": "main-actor-snapshot",
+                "state_sections": ["playback", "source", "chrome", "window", "readiness", "targets"],
+                "target_coordinate_space": AgentUITargetGeometry.coordinateSpace,
+                "target_coordinate_space_description": AgentUITargetGeometry.coordinateSpaceDescription,
+                "observes_presentation": false,
+            ]
+        } else {
+            data = agentUIStateSnapshot()
+        }
+        do {
+            FileHandle.standardError.write(try AgentUIStateDiagnostic.line(command: command, data: data))
+            return true
+        } catch {
+            // The existing channel acknowledgement reports accepted=no.
+            return false
+        }
+    }
+
+    /// Sampled synchronously; no layout flush or renderer query is performed.
+    func agentUIStateSnapshot() -> [String: Any] {
+        func rect(_ value: CGRect) -> [String: Any] {
+            ["x": AgentUIStateDiagnostic.finite(value.minX), "y": AgentUIStateDiagnostic.finite(value.minY),
+             "width": AgentUIStateDiagnostic.finite(value.width), "height": AgentUIStateDiagnostic.finite(value.height)]
+        }
+        let window: Any
+        if let playerWindow {
+            window = [
+                "id": playerWindow.windowNumber,
+                "identifier": "illiquid.player.window",
+                "visible": playerWindow.isVisible,
+                "key": playerWindow.isKeyWindow,
+                "miniaturized": playerWindow.isMiniaturized,
+                "fullscreen": state.isFullscreen,
+                "frame": rect(playerWindow.frame),
+                "coordinate_space": "appkit-screen-bottom-left-points",
+                "coordinate_space_description": "AppKit global screen points; origin at the primary screen's bottom-left, x right, y up. Not backing pixels or AX top-left screen coordinates.",
+                "backing_scale": AgentUIStateDiagnostic.finite(playerWindow.backingScaleFactor),
+                "interface_scale": AgentUIStateDiagnostic.finite(PlayerInterfaceScaleStore.shared.factor),
+                "sidebar_presented": isSidebarPresented,
+                "focused_identifier": (playerWindow.firstResponder as? NSView)?.accessibilityIdentifier() as Any? ?? NSNull(),
+            ] as [String: Any]
+        } else {
+            window = NSNull()
+        }
+        let targets: [[String: Any]] = agentUITargetObservations.keys.sorted().compactMap { identifier in
+            guard isPlaybackChromeVisible, state.currentSource != nil,
+                  !state.pictureInPicture.isActive, playerWindow?.isVisible == true,
+                  playerWindow?.isMiniaturized == false,
+                  let observation = agentUITargetObservations[identifier],
+                  observation.isCurrent(for: player.interactionSourceRevision) else { return nil }
+            return ["identifier": identifier, "bounds": rect(observation.bounds),
+                    "coordinate_space": AgentUITargetGeometry.coordinateSpace,
+                    "coordinate_space_description": AgentUITargetGeometry.coordinateSpaceDescription,
+                    "geometry_observation": "last-published-layout-bounds; animation-settling-unverified",
+                    "accessibility_hidden": true,
+                    "enabled": !isControlsPositionLocked,
+                    "source_revision": observation.sourceRevision]
+        }
+        return [
+            "playback": [
+                "phase": state.phase.rawValue,
+                "position_seconds": AgentUIStateDiagnostic.finite(state.position),
+                "duration_seconds": AgentUIStateDiagnostic.finite(state.duration),
+                "pause_desired": state.isPauseDesired,
+                "loading": state.isLoading,
+                "buffering": state.bufferStatus.isBuffering,
+                "last_error": state.lastError as Any? ?? NSNull(),
+            ],
+            "source": ["url": state.currentSource?.url.absoluteString as Any? ?? NSNull(),
+                       "revision": player.interactionSourceRevision],
+            "chrome": [
+                "phase": String(describing: chromePhase),
+                "visible": isPlaybackChromeVisible,
+                "mounted": isPlaybackChromeMounted,
+                "pins": chromeMachine.pinReasons.map { String(describing: $0) }.sorted(),
+                "interaction_pins": chromeMachine.pinReasons.filter {
+                    [.scrubbing, .chromeDrag, .sidebarResize, .manipulation].contains($0)
+                }.map { String(describing: $0) }.sorted(),
+                "surface_click_pending": chromeMachine.isVideoSurfaceClickPending,
+                "transient_owners": transientOwners.sorted(),
+                "interaction_cancellation_revision": interactionCancellationRevision,
+                "controls_position_revision": controlsPositionRevision,
+            ],
+            "window": window,
+            "readiness": [
+                "model_initialized": true,
+                "window_attached": playerWindow != nil,
+                "source_roots_ready": areSourceRootsReady,
+                "playback_loading": state.isLoading,
+                "pending_operation": state.isLoading || state.bufferStatus.isBuffering
+                    ? player.pendingOperationLabel as Any : NSNull(),
+                "layout_settled": NSNull(),
+                "draw_submitted": NSNull(),
+                "presentation_observed": NSNull(),
+            ],
+            "targets": targets,
+        ]
     }
 
     static func benchmarkPinsPlaybackChrome(
@@ -1483,6 +1603,7 @@ final class AppModel {
             return
         }
         playerWindow = window
+        window.setAccessibilityIdentifier("illiquid.player.window")
         updateThumbnailScheduling()
         PlayerWindowControls.configure(window)
         window.minSize = NSSize(width: 720, height: 440)
