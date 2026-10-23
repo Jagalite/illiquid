@@ -3,6 +3,8 @@
 This research measures the actual native `PiPSubtitleCompositor` while its owner
 remains alive after PiP stops. It compares the pinned baseline
 `af1c1add701e49b355448cf8983eaed1e7623108` with the working candidate.
+An optional historical retirement-only control can distinguish releasing owned
+references from draining temporary autoreleased native objects.
 
 ## Reproduce
 
@@ -33,6 +35,17 @@ new frame. All active output bytes and color tags must match across restart,
 baseline, candidate, and repetitions. Padding bytes are excluded from the fixed
 FNV-1a checksum.
 
+After these two sessions, the same live compositor runs **eight additional
+production-only start/stop cycles without companion readbacks**. Each cycle
+records first-sample callback latency and the populated active resources, checks
+that one frame is composed and immediately displayed with a caption, and samples
+the stopped state after worker drainage, 150 ms, and one second. The second
+original stop also has a 150 ms sample. After the last production-only cycle,
+four more seconds of idle time produce a final sample at approximately five
+seconds after drainage. Queue/observation overhead can make these intervals
+slightly longer. The compositor, subtitle pipeline, and cached source stay alive
+throughout; destruction cannot hide continuing retention.
+
 ## What is measured
 
 Snapshots run on the compositor's serial work queue. The report records native
@@ -44,8 +57,11 @@ while the compositor stays alive, then reconstruct them on reentry.
 
 These fields are **not additive**. Prepared pixels can share backing storage with
 the packer. Device allocation can include CoreVideo/IOSurface storage and driver
-caches. `device.currentAllocatedSize`, sampled again after 150 ms, is a secondary
-diagnostic; it is not an assertion or whole-player RSS/physical-footprint result.
+caches. `device.currentAllocatedSize` is preserved for every active, stopped, and
+settled sample so repeated-cycle growth or stabilization can be evaluated from
+the actual trajectory. No arbitrary device-allocation threshold is asserted, and
+this is not a whole-player RSS/physical-footprint measurement. Owned-resource
+and staging-budget assertions still apply after every stop and settling period.
 The pool flag demonstrates retired ownership, not an assumed byte total for free
 CoreVideo buffers. The cached decoded input frame and shader pipelines remain
 alive in both variants.
@@ -54,10 +70,28 @@ First-sample latency records the actual callback timestamp before and after
 reentry. The baseline-then-candidate order and small sample count make these
 **descriptive reentry-cost observations**, not a rendering-speed claim. The main
 acceptance criterion is deterministic idle ownership reduction plus exact output
-parity and native lifecycle regressions.
+parity and native lifecycle regressions. Pixel checksum parity covers the first
+two sessions; the eight later production-only cycles check submitted-frame and
+caption metrics without adding readback allocations.
 
 Artifacts include source/instrumentation hashes, native toolchain identity,
-command logs, each process's measurements, output digests, summary, and a source
+command logs, each process's complete per-cycle measurements, output digests,
+summary, completion counts, and a source
 restoration receipt. The workflow prepares the existing checksum-verified native
 SDK, runs this comparison, then runs the regular PiP/subtitle suites on restored
 candidate sources.
+
+## Optional historical control
+
+Pass `--retirement-only-control <commit>` to include a third arm between baseline
+and candidate. The runner loads that commit's complete compositor and requires
+its snapshot declarations and upload-cache source to match the common candidate
+instrumentation exactly. The full native graph uses the same remaining support
+sources. Its original source and SHA are preserved in the evidence receipt.
+
+The `retirement-only` arm has the same zero-owned-resource assertions as the
+candidate. All variants share the same first-two-session pixel checks and eight
+production-only cycles, and output parity includes every arm. Three repetitions
+of each workload produce 18 fresh processes with the control or 12 without it.
+Each process allows 120 seconds; the fixed settling periods total approximately
+12.3 seconds, leaving ample room for native initialization and composition.

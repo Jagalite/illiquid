@@ -358,7 +358,10 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
     private let subtitleUploadCache: PiPSubtitleUploadCache
     private let workQueue = DispatchQueue(
         label: "com.illiquid.pip-subtitles",
-        qos: .userInteractive
+        qos: .userInteractive,
+        // Bound Objective-C temporaries from Metal/Core Video to a work item.
+        // Explicit completion ownership still protects GPU work in flight.
+        autoreleaseFrequency: .workItem
     )
     private let stateLock = NSLock()
 

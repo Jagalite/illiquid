@@ -25,6 +25,15 @@ struct PiPIdleResourcesMemoryProbeTests {
         let budgetStagingBytes: Int
     }
 
+    private struct ProductionCycle: Codable, Sendable {
+        let cycle: Int
+        let firstSampleNanoseconds: UInt64
+        let active: Stage
+        let stopped: Stage
+        let stoppedAfter150Milliseconds: Stage
+        let stoppedAfterOneSecond: Stage
+    }
+
     private struct Measurement: Codable, Sendable {
         let variant: String
         let workload: String
@@ -34,6 +43,9 @@ struct PiPIdleResourcesMemoryProbeTests {
         let stoppedAfterSettling: Stage
         let reentered: Stage
         let stoppedAgain: Stage
+        let stoppedAgainAfterSettling: Stage
+        let productionCycles: [ProductionCycle]
+        let finalIdleAfterFiveSeconds: Stage
         let firstOutput: OutputDigest
         let reenteredOutput: OutputDigest
         let firstSampleNanoseconds: UInt64
@@ -72,7 +84,7 @@ struct PiPIdleResourcesMemoryProbeTests {
         let variant = try #require(environment["ILLIQUID_PIP_IDLE_VARIANT"])
         let workload = try #require(environment["ILLIQUID_PIP_IDLE_WORKLOAD"])
         let report = try #require(environment["ILLIQUID_PIP_IDLE_REPORT"])
-        #expect(variant == "baseline" || variant == "candidate")
+        #expect(["baseline", "retirement-only", "candidate"].contains(variant))
         #expect(workload == "sdr-1080p" || workload == "hdr-pq-4k")
         let hdr = workload == "hdr-pq-4k"
         let size = hdr ? CGSize(width: 3840, height: 2160)
@@ -127,10 +139,50 @@ struct PiPIdleResourcesMemoryProbeTests {
         compositor.stop()
         let stoppedAgain = try await stoppedStage(compositor, budget: budget)
         try requireStopped(stoppedAgain, variant: variant, hdr: hdr)
+        try await Task.sleep(for: .milliseconds(150))
+        let stoppedAgainSettled = await stage(compositor, budget: budget)
+        try requireStopped(stoppedAgainSettled, variant: variant, hdr: hdr)
+
+        // Separate continued production lifecycle behavior from the two
+        // companion readbacks above. These cycles never call the test compose
+        // seam and keep the compositor, pipeline, and cached source alive.
+        var productionCycles: [ProductionCycle] = []
+        for cycle in 1...8 {
+            let latency = try await startAndWait(compositor)
+            let activeStage = await stage(compositor, budget: budget)
+            try requirePopulated(activeStage, hdr: hdr)
+            #expect(activeStage.resources.isActive && !activeStage.resources.workerActive)
+            let metrics = compositor.metricsSnapshot()
+            #expect(metrics.composedFrames == 1)
+            #expect(metrics.immediatelyDisplayedFrames == 1)
+            #expect(metrics.subtitleVisibleFrames > 0)
+
+            compositor.stop()
+            let cycleStopped = try await stoppedStage(compositor, budget: budget)
+            try requireStopped(cycleStopped, variant: variant, hdr: hdr)
+            try await Task.sleep(for: .milliseconds(150))
+            let after150Milliseconds = await stage(compositor, budget: budget)
+            try requireStopped(after150Milliseconds, variant: variant, hdr: hdr)
+            try await Task.sleep(for: .milliseconds(850))
+            let afterOneSecond = await stage(compositor, budget: budget)
+            try requireStopped(afterOneSecond, variant: variant, hdr: hdr)
+            productionCycles.append(ProductionCycle(
+                cycle: cycle, firstSampleNanoseconds: latency, active: activeStage,
+                stopped: cycleStopped, stoppedAfter150Milliseconds: after150Milliseconds,
+                stoppedAfterOneSecond: afterOneSecond
+            ))
+        }
+        // The last cycle already waited one second. Keep the owner alive for
+        // four more seconds before the final diagnostic and ownership check.
+        try await Task.sleep(for: .seconds(4))
+        let finalIdle = await stage(compositor, budget: budget)
+        try requireStopped(finalIdle, variant: variant, hdr: hdr)
         let measurement = Measurement(
             variant: variant, workload: workload, constructed: constructed,
             composed: composed, stopped: stopped, stoppedAfterSettling: settled,
             reentered: reentered, stoppedAgain: stoppedAgain,
+            stoppedAgainAfterSettling: stoppedAgainSettled,
+            productionCycles: productionCycles, finalIdleAfterFiveSeconds: finalIdle,
             firstOutput: firstOutput, reenteredOutput: reenteredOutput,
             firstSampleNanoseconds: firstLatency,
             reentryFirstSampleNanoseconds: reentryLatency

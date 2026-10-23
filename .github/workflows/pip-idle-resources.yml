@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: pip-idle-resources-${{ github.head_ref || github.ref }}
+  group: pip-idle-resources-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -41,7 +41,8 @@ jobs:
       - name: Compare native baseline and candidate idle resources
         run: |
           python3 Benchmarks/PiPIdleResources/run.py \
-            --output "$RUNNER_TEMP/pip-idle-resources" --repetitions 3
+            --output "$RUNNER_TEMP/pip-idle-resources" --repetitions 3 \
+            --retirement-only-control d79da1b6e9b0fd2a6598b378f4ec0353e063fbcd
       - name: Verify candidate PiP output and lifecycle regressions
         run: |
           set -o pipefail

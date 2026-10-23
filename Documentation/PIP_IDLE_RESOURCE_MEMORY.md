@@ -31,6 +31,15 @@ serial work queue:
 - Retire the subtitle packer's backing storage and release its budget reservation.
 - Flush unused Core Video texture-cache resources.
 
+The follow-up candidate also gives the work queue a per-item autorelease pool.
+Apple documents [`.workItem`](https://developer.apple.com/documentation/dispatch/dispatchqueue/autoreleasefrequency/workitem)
+as draining that pool after each block, and documents command buffers and
+encoders as autoreleased temporary objects in its
+[Metal programming guide](https://developer.apple.com/library/archive/documentation/Miscellaneous/Conceptual/MetalProgrammingGuide/Cmd-Submiss/Cmd-Submiss.html).
+Explicit command-buffer and `MetalFrameResources` ownership still protects
+resources through GPU completion. This queue change is being qualified against
+the initial retirement-only candidate as a separate control.
+
 The latest decoded input frame, bound subtitle pipeline, source geometry, and
 compiled Metal pipelines remain available for paused re-entry. The first
 composition of a new session rebuilds its optional working resources; subsequent
@@ -97,10 +106,44 @@ does not measure live occupancy, so this report does not multiply observed outpu
 identities by frame size. Device allocation may overlap other reported resources
 and does not measure process RSS or physical footprint.
 
-## Qualification status
+## Initial native result and follow-up
 
-Native measurement and regression qualification are pending. No measured memory
-reduction or target-platform test success is claimed at this stage.
+[Native run 40009592397](https://github.com/Jagalite/illiquid/actions/runs/40009592397)
+qualified the initial retirement-only implementation at
+`d79da1b6e9b0fd2a6598b378f4ec0353e063fbcd`: all 12 measurement processes and
+66 focused tests in six suites passed, including seven new retirement tests,
+without skips. It ran on an Apple M1 virtual arm64 runner with macOS 26.6.2,
+Xcode 26.6, and Swift 6.3.3. The evidence is retained under
+[`preliminary-macos-arm64-20261023`](../Benchmarks/PiPIdleResources/evidence/preliminary-macos-arm64-20261023/).
+
+The directly owned resources became zero after each stop. The baseline retained
+4,194,304 bytes of subtitle texture, 16,384 bytes of vertices, and 4,194,304 bytes
+of CPU staging in both workloads; HDR additionally retained 66,355,200 bytes of
+working texture. Pool and observer ownership also ended in the candidate.
+Output checksums and color tags matched across all variants/repetitions and
+after reentry.
+
+However, the broader device counter exposed a concern that ownership probes
+alone missed. Every second candidate session added 16,588,928 device bytes in
+SDR or 99,567,616 bytes in HDR, still present at the second stopped snapshot.
+The increments match the newly allocated output buffers' Metal views. The
+initial trace had no second-stop settling measurement, so this does not yet
+establish the retaining owner or unbounded growth. It prevents treating that
+first result as a demonstrated net memory improvement across repeated sessions.
+
+The initial reentry first-sample callback median also rose from 2.758 to
+20.954 ms for SDR and from 5.151 to 74.218 ms for HDR. These are descriptive
+measurements from three fresh processes per variant/workload, with baseline
+measured first; they are not end-to-end AVKit window timings.
+
+The follow-up compares three arms in the same native run: original baseline,
+the historical retirement-only candidate, and retirement with per-work-item
+autorelease pools. It preserves the original readback checks and adds eight
+production-only start/stop cycles without companion readbacks, with immediate,
+150 ms, 1 second, and final 5 second idle observations. Native qualification of
+this follow-up is pending. Device allocations remain diagnostic rather than an
+RSS estimate, but sustained cycle growth is a reason to reject or revise a
+memory-management change.
 
 The focused native suite covers resource retirement while keeping the compositor
 alive, same-frame subtitle reconstruction, HDR storage, retained output lifetime,
