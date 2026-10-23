@@ -12,6 +12,7 @@ On macOS 26 with the repository's pinned Xcode/native SDK environment:
 python3 Benchmarks/PiPIdleResources/run.py \
   --output /tmp/illiquid-pip-idle-results --repetitions 3
 swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+  -Xswiftc -enable-testing \
   --scratch-path .build/pip-idle-resources \
   --filter 'PiPIdleResourceRetirementTests|PiPSubtitleUploadReuseTests|PiPSubtitlePipelineTests|PiPVideoMappingTests|PiPSubtitleCompositionPolicyTests|MetalASSSubtitleCompositorTests'
 ```

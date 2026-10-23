@@ -183,7 +183,10 @@ def main() -> None:
         "hardware": runner.command(["sysctl", "-n", "machdep.cpu.brand_string"]).strip(),
     })
     rows = []
+    # `swift build --build-tests` does not enable @testable imports in release.
+    # Apply the same testing visibility to both measured variants and test runs.
     swift_options = ["--force-resolved-versions", "--configuration", "release",
+                     "-Xswiftc", "-enable-testing",
                      "--jobs", str(args.jobs), "--scratch-path", str(args.scratch_path.resolve())]
     try:
         probe_path.write_bytes((HERE / "MemoryProbeTests.swift").read_bytes())
