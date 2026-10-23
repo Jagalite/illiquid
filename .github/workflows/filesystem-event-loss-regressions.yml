@@ -3,10 +3,14 @@ on:
   pull_request:
     paths:
       - 'Sources/IlliquidApp/UI/SourceFilesystem*.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
       - 'Tests/IlliquidAppTests/SourceFilesystemMonitorTests.swift'
       - 'Tests/IlliquidAppTests/SourceFilesystemEventLossTests.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystemEventBufferTests.swift'
       - 'Scripts/test-filesystem-event-loss-regressions.sh'
       - 'Validation/SourceFilesystemEventLoss/**'
+      - 'Benchmarks/FilesystemEventBuffer/**'
+      - 'Benchmarks/RuntimeLeaseHistory/CLeaseHeap/**'
       - '.github/workflows/filesystem-event-loss-regressions.yml'
   workflow_dispatch:
 permissions:
@@ -17,7 +21,7 @@ concurrency:
 jobs:
   focused-event-loss:
     runs-on: macos-26
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
@@ -32,3 +36,11 @@ jobs:
         run: bash Scripts/test-filesystem-event-loss-regressions.sh --jobs 2 --configuration release -Xswiftc -warnings-as-errors
       - name: Baseline parity and event-loss invariants
         run: bash Validation/SourceFilesystemEventLoss/run.sh
+      - name: Measure bounded debounce event retention
+        run: python3 Benchmarks/FilesystemEventBuffer/run.py --output "$RUNNER_TEMP/filesystem-event-buffer" --pairs 4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: filesystem-event-buffer-memory
+          path: ${{ runner.temp }}/filesystem-event-buffer/evidence/
+          retention-days: 14

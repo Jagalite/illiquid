@@ -1,0 +1,148 @@
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/19] Write swift-version-79F5DDD9F357E4C6.txt
+[1/19] Emitting module for IlliquidApp
+[2/19] Emitting module for IlliquidAppTests
+[3/19] Compiling IlliquidApp Planner.swift
+[4/19] Compiling IlliquidAppTests SourceFilesystemMonitorTests.swift
+[5/19] Wrapping AST for IlliquidAppTests for debugging
+[6/19] Wrapping AST for IlliquidApp for debugging
+[7/19] Compiling IlliquidAppTests SourceFilesystemEventBufferTests.swift
+[8/19] /tmp/illiquid-filesystem-loss.CWS2v3/.build/x86_64-unknown-linux-gnu/debug/IlliquidFilesystemEventLossRegressionsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[9/19] Emitting module for IlliquidFilesystemEventLossRegressionsPackageDiscoveredTests
+[10/19] Compiling IlliquidFilesystemEventLossRegressionsPackageDiscoveredTests IlliquidAppTests.swift
+[11/19] /tmp/illiquid-filesystem-loss.CWS2v3/.build/x86_64-unknown-linux-gnu/debug/IlliquidFilesystemEventLossRegressionsPackageTests.derived/runner.swift
+[12/19] Compiling IlliquidFilesystemEventLossRegressionsPackageDiscoveredTests all-discovered-tests.swift
+[13/19] Wrapping AST for IlliquidFilesystemEventLossRegressionsPackageDiscoveredTests for debugging
+[14/19] Emitting module for IlliquidFilesystemEventLossRegressionsPackageTests
+[15/19] Wrapping AST for IlliquidFilesystemEventLossRegressionsPackageTests for debugging
+[16/19] Compiling IlliquidFilesystemEventLossRegressionsPackageTests runner.swift
+[17/19] Write Objects.LinkFileList
+[18/19] Linking IlliquidFilesystemEventLossRegressionsPackageTests.xctest
+Build complete! (7.83s)
+Test Suite 'All tests' started at 2026-10-23 13:59:04.386
+Test Suite 'debug.xctest' started at 2026-10-23 13:59:04.388
+Test Suite 'debug.xctest' passed at 2026-10-23 13:59:04.388
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-23 13:59:04.388
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Source filesystem event-loss recovery" started.
+◇ Suite "Bounded source filesystem event retention" started.
+◇ Suite "Source filesystem synchronization" started.
+◇ Test createdDirectoryReloadsItsParent() started.
+◇ Test eventLossWithNoWatchedRootsProducesNoWork() started.
+◇ Test overflowUsesCurrentNormalizedRootsAndNoRootsMeansNoWork() started.
+◇ Test eventLossDeduplicatesNormalizedRoots() started.
+◇ Test activeRootImpactIncludesAncestorRescans() started.
+◇ Test changesOutsideSourceRootsAreIgnored() started.
+◇ Test createdFileReloadsItsContainingDirectory() started.
+◇ Test removedDirectoryDropsItsSubtreeAndReloadsItsParent() started.
+◇ Test eventLossSupersedesTargetedWorkRegardlessOfOrder(_:) started.
+◇ Test removedRootIsReloadedSoUnavailableStateCanAppear() started.
+◇ Test similarPathPrefixesAreNotDescendants(_:) started.
+◇ Test pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) started.
+◇ Test maximumIntegerLimitDoesNotOverflowOrAllocateUpFront() started.
+◇ Test droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test fileContentAndMetadataChangesDoNotReloadTheListing() started.
+◇ Test sidecarContentWritesReloadTheirDirectory(_:) started.
+◇ Test ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+◇ Test volumeChangeInvalidatesNestedRootsButNotSiblingVolumes() started.
+◇ Test droppedEventRescansEveryMatchingRoot() started.
+◇ Test reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 1 argument lossFirst → false to eventLossSupersedesTargetedWorkRegardlessOfOrder(_:) started.
+◇ Test case passing 1 argument lossFirst → true to eventLossSupersedesTargetedWorkRegardlessOfOrder(_:) started.
+◇ Test generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+◇ Test defaultCapacityPreservesExactly4096EventsInArrivalOrder() started.
+◇ Test nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+◇ Test generatedOverflowNeverLosesRecoveryAndStaysWithinItsBound(_:) started.
+◇ Test overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 128) to similarPathPrefixesAreNotDescendants(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 16) to pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 2) to similarPathPrefixesAreNotDescendants(_:) started.
+◇ Test emptyInputAndRepeatedDrainsProduceNoWork() started.
+◇ Test firstEventBeyondDefaultCapacityRequestsRecovery() started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 64) to pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) started.
+◇ Test takenBatchAndCopiedBufferRemainIndependentOfLaterMutation() started.
+◇ Test clearingForWatcherRestartOrDisappearanceRestoresOrdinaryAdmission(_:) started.
+◇ Test case passing 2 arguments path → "/media/movies/Movie.mkv", flags → Flags(rawValue: 32) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test sustainedOverflowStaysCollapsedUntilTaken() started.
+◇ Test case passing 2 arguments path → "/media", flags → Flags(rawValue: 32) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/media", flags → Flags(rawValue: 48) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/outside/watched/roots", flags → Flags(rawValue: 32) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/movies/Movie.mkv", flags → Flags(rawValue: 48) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/outside/watched/roots", flags → Flags(rawValue: 48) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 2) to ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+◇ Test case passing 2 arguments path → "/", flags → Flags(rawValue: 32) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/", flags → Flags(rawValue: 48) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 128) to pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 4) to ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 8) to ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 9) to ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 16) to similarPathPrefixesAreNotDescendants(_:) started.
+◇ Test case passing 1 argument name → ".plexmatch" to sidecarContentWritesReloadTheirDirectory(_:) started.
+◇ Test case passing 1 argument name → "tvshow.nfo" to sidecarContentWritesReloadTheirDirectory(_:) started.
+◇ Test case passing 1 argument name → "movie.nfo" to sidecarContentWritesReloadTheirDirectory(_:) started.
+◇ Test case passing 1 argument name → "Episode.NFO" to sidecarContentWritesReloadTheirDirectory(_:) started.
+✔ Test activeRootImpactIncludesAncestorRescans() passed after 0.001 seconds.
+✔ Test createdDirectoryReloadsItsParent() passed after 0.001 seconds.
+✔ Test eventLossWithNoWatchedRootsProducesNoWork() passed after 0.001 seconds.
+✔ Test overflowUsesCurrentNormalizedRootsAndNoRootsMeansNoWork() passed after 0.001 seconds.
+✔ Test eventLossDeduplicatesNormalizedRoots() passed after 0.001 seconds.
+✔ Test maximumIntegerLimitDoesNotOverflowOrAllocateUpFront() passed after 0.001 seconds.
+✔ Test createdFileReloadsItsContainingDirectory() passed after 0.001 seconds.
+✔ Test removedRootIsReloadedSoUnavailableStateCanAppear() passed after 0.001 seconds.
+✔ Test changesOutsideSourceRootsAreIgnored() passed after 0.001 seconds.
+◇ Test case passing 2 arguments markerIndex → 0, flags → Flags(rawValue: 49) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 0, flags → Flags(rawValue: 32) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+✔ Test removedDirectoryDropsItsSubtreeAndReloadsItsParent() passed after 0.001 seconds.
+◇ Test case passing 2 arguments markerIndex → 1, flags → Flags(rawValue: 49) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 3, flags → Flags(rawValue: 49) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 3, flags → Flags(rawValue: 32) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 1, flags → Flags(rawValue: 32) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+✔ Test eventLossSupersedesTargetedWorkRegardlessOfOrder(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test case passing 1 argument seed → 1311768467463790320 to generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+◇ Test case passing 1 argument seed → 3735928559 to generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+◇ Test case passing 1 argument seed → 1 to generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+◇ Test case passing 1 argument requestedCapacity → -9223372036854775808 to nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+◇ Test case passing 1 argument requestedCapacity → 0 to nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+◇ Test case passing 1 argument requestedCapacity → -1 to nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+◇ Test case passing 1 argument requestedCapacity → 1 to nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+◇ Test case passing 1 argument seed → 7 to generatedOverflowNeverLosesRecoveryAndStaysWithinItsBound(_:) started.
+◇ Test case passing 1 argument seed → 4277009102 to generatedOverflowNeverLosesRecoveryAndStaysWithinItsBound(_:) started.
+◇ Test case passing 2 arguments capacity → 1, singleCallback → false to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 1, singleCallback → true to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 2, singleCallback → false to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 2, singleCallback → true to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 7, singleCallback → false to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 7, singleCallback → true to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+✔ Test similarPathPrefixesAreNotDescendants(_:) with 3 test cases passed after 0.002 seconds.
+◇ Test case passing 2 arguments capacity → 31, singleCallback → false to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+✔ Test pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) with 3 test cases passed after 0.003 seconds.
+◇ Test case passing 2 arguments capacity → 31, singleCallback → true to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 1 argument overflowed → false to clearingForWatcherRestartOrDisappearanceRestoresOrdinaryAdmission(_:) started.
+◇ Test case passing 1 argument overflowed → true to clearingForWatcherRestartOrDisappearanceRestoresOrdinaryAdmission(_:) started.
+✔ Test fileContentAndMetadataChangesDoNotReloadTheListing() passed after 0.003 seconds.
+◇ Test case passing 1 argument seed → 42 to generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+✔ Test droppedEventsRescanEveryWatchedRoot(_:_:) with 8 test cases passed after 0.008 seconds.
+✔ Test ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) with 4 test cases passed after 0.008 seconds.
+✔ Test sidecarContentWritesReloadTheirDirectory(_:) with 4 test cases passed after 0.008 seconds.
+✔ Test droppedEventRescansEveryMatchingRoot() passed after 0.008 seconds.
+✔ Test volumeChangeInvalidatesNestedRootsButNotSiblingVolumes() passed after 0.008 seconds.
+✔ Test reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) with 6 test cases passed after 0.007 seconds.
+✔ Test nonpositiveLimitsAreSafelyClampedToOne(_:) with 4 test cases passed after 0.007 seconds.
+✔ Test emptyInputAndRepeatedDrainsProduceNoWork() passed after 0.007 seconds.
+✔ Test overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) with 8 test cases passed after 0.007 seconds.
+✔ Test takenBatchAndCopiedBufferRemainIndependentOfLaterMutation() passed after 0.007 seconds.
+✔ Test clearingForWatcherRestartOrDisappearanceRestoresOrdinaryAdmission(_:) with 2 test cases passed after 0.007 seconds.
+✔ Test defaultCapacityPreservesExactly4096EventsInArrivalOrder() passed after 0.007 seconds.
+✔ Suite "Source filesystem event-loss recovery" passed after 0.009 seconds.
+✔ Suite "Source filesystem synchronization" passed after 0.009 seconds.
+✔ Test firstEventBeyondDefaultCapacityRequestsRecovery() passed after 0.009 seconds.
+✔ Test sustainedOverflowStaysCollapsedUntilTaken() passed after 0.012 seconds.
+✔ Test generatedOverflowNeverLosesRecoveryAndStaysWithinItsBound(_:) with 2 test cases passed after 0.035 seconds.
+✔ Test generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) with 4 test cases passed after 0.092 seconds.
+✔ Suite "Bounded source filesystem event retention" passed after 0.093 seconds.
+✔ Test run with 30 tests in 3 suites passed after 0.094 seconds.
