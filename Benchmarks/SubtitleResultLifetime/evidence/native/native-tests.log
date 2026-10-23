@@ -1,0 +1,375 @@
+Fetching https://github.com/swiftlang/swift-testing.git
+Fetching https://github.com/sparkle-project/Sparkle.git
+[1/44215] Fetching sparkle
+[11055/89270] Fetching sparkle, swift-testing
+Fetched https://github.com/swiftlang/swift-testing.git from cache (2.74s)
+Fetched https://github.com/sparkle-project/Sparkle.git from cache (2.74s)
+Fetching https://github.com/swiftlang/swift-syntax.git
+[1/81056] Fetching swift-syntax
+Fetched https://github.com/swiftlang/swift-syntax.git from cache (4.08s)
+Creating working copy for https://github.com/swiftlang/swift-testing.git
+Creating working copy for https://github.com/sparkle-project/Sparkle.git
+Creating working copy for https://github.com/swiftlang/swift-syntax.git
+Working copy of https://github.com/swiftlang/swift-testing.git resolved at swift-6.3.2-RELEASE (70eff26)
+Working copy of https://github.com/swiftlang/swift-syntax.git resolved at 603.0.2
+Working copy of https://github.com/sparkle-project/Sparkle.git resolved at 2.10.0
+Downloading binary artifact https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+[16375/10193895] Downloading https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+Downloaded https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip (0.85s)
+Downloading package prebuilt https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip
+Downloaded https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip (0.16s)
+Building for production...
+[0/49] /Users/runner/work/illiquid/illiquid/.build/arm64-apple-macosx/release/IlliquidPackageTests.derived/runner.swift
+[1/49] Write swift-version-7974D3F7F03D5E95.txt
+[2/49] Compiling _TestingInternals WillThrow.cpp
+[3/49] Compiling _TestingInternals ExecutablePath.cpp
+[4/49] Compiling _TestingInternals Discovery.cpp
+[5/49] Write sources
+[8/49] Copying Sparkle.framework
+[9/50] Compiling _TestingInternals Versions.cpp
+[10/50] Copying NativePlaybackShaders.metal
+[10/50] Copying Resources
+[10/50] Write sources
+[32/50] Compiling CNativeAudio AudioOutputDevice.m
+[34/51] Compiling _TestDiscovery WinSDKAdditions.swift
+[35/52] Compiling TestingMacros ConditionMacro.swift
+[35/52] Write Objects.LinkFileList
+[36/52] Linking TestingMacros-tool
+[38/53] Compiling IlliquidCore MediaMetadataHints.swift
+[39/54] Compiling IlliquidPlaybackCore EventsAndEffects.swift
+[40/55] Compiling Testing ABI.Record+Streaming.swift
+[41/56] Compiling IlliquidPlayback Module.swift
+[42/57] Compiling IlliquidPlaybackStateSpace PlaybackPartialOrderReducer.swift
+[43/58] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+[44/59] Compiling IlliquidStateSpaceExplorer main.swift
+[45/60] Compiling IlliquidPlaybackCoreTests PlaybackCoreTests.swift
+[46/61] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+[47/62] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+/Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1150 |             self.workQueue.async {
+1151 |                 _ = resources.retainedCVTextures
+1152 |                 guard commandBuffer.status != .error else {
+     |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1153 |                     completion(.failure(
+1154 |                         commandBuffer.error
+
+/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+243 |  */
+244 | API_AVAILABLE(macos(10.11), ios(8.0))
+245 | @protocol MTLCommandBuffer <NSObject>
+    |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+246 | 
+247 | /*!
+
+/Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   4 | import CoreVideo
+   5 | import Foundation
+   6 | import Metal
+     | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   7 | import OSLog
+   8 | import QuartzCore
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[47/62] Write Objects.LinkFileList
+[48/62] Linking IlliquidStateSpaceExplorer
+[50/63] Compiling IlliquidRenderProfile main.swift
+[51/64] Compiling IlliquidCoreTests AspectFitWindowSizingTests.swift
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 97 |             nil,
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+101 |         ]
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+101 |         ]
+102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+[52/65] Compiling IlliquidPlayer ArchitectureValidation.swift
+[53/66] Compiling IlliquidDifferentialHarness main.swift
+[54/67] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+[55/68] Compiling IlliquidPlaybackStress main.swift
+[56/69] Compiling IlliquidArchitectureCheck main.swift
+[57/70] Compiling IlliquidApp AppDelegate.swift
+[57/70] Write Objects.LinkFileList
+[60/70] Linking IlliquidRenderProfile
+[61/70] Linking IlliquidPlaybackStress
+[62/70] Linking IlliquidDifferentialHarness
+[63/70] Write Objects.LinkFileList
+[65/70] Linking IlliquidArchitectureCheck
+[66/70] Linking Illiquid
+[68/71] Compiling IlliquidNativePlaybackTests AudioDelayTests.swift
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PGSSubtitlePacketBorrowTests.swift:77:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 75 |             reference(x: 30, y: 40),
+ 76 |         ]))
+ 77 |         weak var released = owner
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 78 |         let metadata = try parseThenOverwrite(try #require(owner))
+ 79 |         owner = nil
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift:127:18: warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+125 |         let queue = BoundedQueue<Payload>(capacity: 1)
+126 |         var value: Payload? = Payload()
+127 |         weak var retained = value
+    |                  `- warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+128 |         #expect(queue.push(value!)); value = nil
+129 |         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift:99:13: warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+ 97 |         let checkoutID = try #require(token).checkoutID
+ 98 |         var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
+ 99 |             ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+    |             `- warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+100 |         )
+101 |         token?.transition(to: .queued)
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+167 |         var first: Value? = Value()
+168 |         weak var released = first
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+169 |         ring.append(first!)
+170 |         first = nil
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:11:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+  9 |     @Test func bitmapEventsOutliveNativeOutputUpdatesFlushAndDecoderDestruction() throws {
+ 10 |         var decoder: SubtitleDecoder? = try makeDecoder()
+ 11 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 12 |         let first = try #require(try decoder?.decode(packet(fullPGS, at: 2)).first)
+ 13 |         let bitmap = try #require(first.bitmapComposition)
+
+/Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:66:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 64 |     @Test func textEventsOwnTheirBytesAcrossNativeOutputReuseFlushAndDestruction() throws {
+ 65 |         var decoder: SubtitleDecoder? = try makeDecoder(codec: AV_CODEC_ID_SUBRIP, name: "subrip")
+ 66 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 67 |         let first = try #require(try decoder?.decode(packet(Array("First caption".utf8), at: 2)).first)
+ 68 |         #expect(decoder?.hasRetainedDecodedOutput == false)
+
+[#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+[69/71] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+[70/72] Compiling IlliquidPackageTests runner.swift
+[70/72] Write Objects.LinkFileList
+[71/72] Linking IlliquidPackageTests
+Build complete! (480.29s)
+Test Suite 'Selected tests' started at 2026-10-23 18:47:05.789.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-10-23 18:47:05.802.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-10-23 18:47:05.802.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-23 18:47:05.802.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.014) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Bitmap subtitle data and lifetime" started.
+◇ Test indefiniteFiniteAndClearSetsDoNotResurrectOldCaptions() started.
+✔ Test indefiniteFiniteAndClearSetsDoNotResurrectOldCaptions() passed after 0.001 seconds.
+◇ Test pruningRetainsSpanningDisplayAndSeekRejectsLateGeneration() started.
+✔ Test pruningRetainsSpanningDisplayAndSeekRejectsLateGeneration() passed after 0.001 seconds.
+◇ Test boundedTimelineAcceptsReplacementButRejectsGrowth() started.
+✔ Test boundedTimelineAcceptsReplacementButRejectsGrowth() passed after 0.001 seconds.
+◇ Test paletteConversionPremultipliesAlphaAndHonorsRowStride() started.
+✔ Test paletteConversionPremultipliesAlphaAndHonorsRowStride() passed after 0.001 seconds.
+◇ Test generatedPGSDecodesPalettePlacementForcedFlagAndClear() started.
+✔ Test generatedPGSDecodesPalettePlacementForcedFlagAndClear() passed after 0.010 seconds.
+◇ Test bitmapAtlasScalesSourcePixelsWithoutTreatingThemAsGlyphMasks() started.
+✔ Test bitmapAtlasScalesSourcePixelsWithoutTreatingThemAsGlyphMasks() passed after 0.809 seconds.
+◇ Test bitmapPipelineExpiryAndGenerationChangesDoNotCallLibass() started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+✔ Test bitmapPipelineExpiryAndGenerationChangesDoNotCallLibass() passed after 0.032 seconds.
+◇ Test generatedContainersRestoreSpanningCaptionsAndClearAtSeekTargets(name:) started.
+◇ Test case passing 1 argument name → "generated-pgs.mkv" to generatedContainersRestoreSpanningCaptionsAndClearAtSeekTargets(name:) started.
+◇ Test case passing 1 argument name → "generated-dvd.mkv" to generatedContainersRestoreSpanningCaptionsAndClearAtSeekTargets(name:) started.
+◇ Test case passing 1 argument name → "generated-dvb.mkv" to generatedContainersRestoreSpanningCaptionsAndClearAtSeekTargets(name:) started.
+✔ Test generatedContainersRestoreSpanningCaptionsAndClearAtSeekTargets(name:) with 3 test cases passed after 0.034 seconds.
+◇ Test forcedBitmapFilterChangesCachedPresentationAtTheSameTime() started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+✔ Test forcedBitmapFilterChangesCachedPresentationAtTheSameTime() passed after 0.003 seconds.
+◇ Test bitmapForcedPolicyDistinguishesAutomaticAndExplicitSelection(explicit:) started.
+◇ Test case passing 1 argument explicit → false to bitmapForcedPolicyDistinguishesAutomaticAndExplicitSelection(explicit:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+◇ Test case passing 1 argument explicit → true to bitmapForcedPolicyDistinguishesAutomaticAndExplicitSelection(explicit:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+✔ Test bitmapForcedPolicyDistinguishesAutomaticAndExplicitSelection(explicit:) with 2 test cases passed after 0.586 seconds.
+◇ Test acquisitionParsingRejectsTruncatedSegmentsAndRecognizesEpochs() started.
+✔ Test acquisitionParsingRejectsTruncatedSegmentsAndRecognizesEpochs() passed after 0.001 seconds.
+◇ Test nativeSessionDeliversBitmapCaptionsAcrossPausedSeeks(name:) started.
+◇ Test case passing 1 argument name → "generated-pgs.mkv" to nativeSessionDeliversBitmapCaptionsAcrossPausedSeeks(name:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+◇ Test case passing 1 argument name → "generated-dvd.mkv" to nativeSessionDeliversBitmapCaptionsAcrossPausedSeeks(name:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+◇ Test case passing 1 argument name → "generated-dvb.mkv" to nativeSessionDeliversBitmapCaptionsAcrossPausedSeeks(name:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+✔ Test nativeSessionDeliversBitmapCaptionsAcrossPausedSeeks(name:) with 3 test cases passed after 0.403 seconds.
+◇ Test authoredDVBPagePreservesPalettePlacementTimeoutAndClear(transparency:) started.
+◇ Test case passing 1 argument transparency → 0 to authoredDVBPagePreservesPalettePlacementTimeoutAndClear(transparency:) started.
+◇ Test case passing 1 argument transparency → 128 to authoredDVBPagePreservesPalettePlacementTimeoutAndClear(transparency:) started.
+✔ Test authoredDVBPagePreservesPalettePlacementTimeoutAndClear(transparency:) with 2 test cases passed after 0.001 seconds.
+◇ Test dvbAcquisitionRequiresCompleteMatchingPageAndValidState() started.
+✔ Test dvbAcquisitionRequiresCompleteMatchingPageAndValidState() passed after 0.001 seconds.
+✔ Suite "Bitmap subtitle data and lifetime" passed after 1.884 seconds.
+◇ Suite "PGS composition cropping" started.
+◇ Test cropsPixelsWithoutMovingTheCompositionAndRestoresFullObjects() started.
+✔ Test cropsPixelsWithoutMovingTheCompositionAndRestoresFullObjects() passed after 0.001 seconds.
+◇ Test separatePresentationPacketsAndResetKeepTheRightCrop() started.
+✔ Test separatePresentationPacketsAndResetKeepTheRightCrop() passed after 0.001 seconds.
+◇ Test rejectsOutOfBoundsAndTruncatedCropsBeforeCopyingPixels() started.
+✔ Test rejectsOutOfBoundsAndTruncatedCropsBeforeCopyingPixels() passed after 0.010 seconds.
+◇ Test twoReferencesToOneObjectKeepIndependentCropsPositionsAndFlags() started.
+✔ Test twoReferencesToOneObjectKeepIndependentCropsPositionsAndFlags() passed after 0.001 seconds.
+✔ Suite "PGS composition cropping" passed after 0.012 seconds.
+◇ Suite "PGS packet metadata borrowing" started.
+◇ Test packetParsingMatchesDataAcrossSegmentAndCompositionChanges() started.
+✔ Test packetParsingMatchesDataAcrossSegmentAndCompositionChanges() passed after 0.001 seconds.
+◇ Test everyTruncatedCompositionHasTheSameErrorAsTheDataParser() started.
+✔ Test everyTruncatedCompositionHasTheSameErrorAsTheDataParser() passed after 0.001 seconds.
+◇ Test invalidGeometryAndObjectCountsKeepTheirExistingRejections() started.
+✔ Test invalidGeometryAndObjectCountsKeepTheirExistingRejections() passed after 0.001 seconds.
+◇ Test returnedMetadataSurvivesPacketMutationAndRelease() started.
+✔ Test returnedMetadataSurvivesPacketMutationAndRelease() passed after 0.001 seconds.
+◇ Test missingEmptyAndNegativePayloadsAreIgnoredLikePacketData() started.
+✔ Test missingEmptyAndNegativePayloadsAreIgnoredLikePacketData() passed after 0.001 seconds.
+✔ Suite "PGS packet metadata borrowing" passed after 0.001 seconds.
+◇ Suite "Subtitle memory budget accounting" started.
+◇ Test zeroByteReservationsKeepTheirOwnerUntilTheLastLeaseIsReleased() started.
+✔ Test zeroByteReservationsKeepTheirOwnerUntilTheLastLeaseIsReleased() passed after 0.001 seconds.
+◇ Test rejectedGrowthPreservesBothTheLeaseAndOtherReservations() started.
+✔ Test rejectedGrowthPreservesBothTheLeaseAndOtherReservations() passed after 0.001 seconds.
+◇ Test preflightCombinesDuplicateOwnersAndDoesNotReserveOrReject() started.
+✔ Test preflightCombinesDuplicateOwnersAndDoesNotReserveOrReject() passed after 0.001 seconds.
+◇ Test nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test case passing 1 argument limit → 0 to nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test case passing 1 argument limit → -7 to nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+◇ Test case passing 1 argument limit → -9223372036854775808 to nonpositiveGlobalLimitsStillAllowOneByte(limit:) started.
+✔ Test nonpositiveGlobalLimitsStillAllowOneByte(limit:) with 3 test cases passed after 0.001 seconds.
+◇ Test accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) started.
+◇ Test case passing 1 argument withOwnerLimit → false to accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) started.
+◇ Test case passing 1 argument withOwnerLimit → true to accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) started.
+✔ Test accountingHandlesTheFullIntegerCapacity(withOwnerLimit:) with 2 test cases passed after 0.001 seconds.
+◇ Test previouslyReturnedSnapshotsDoNotChangeAfterUpdates() started.
+✔ Test previouslyReturnedSnapshotsDoNotChangeAfterUpdates() passed after 0.001 seconds.
+◇ Test aliasesReleaseAReservationOnlyWhenTheFinalReferenceIsDropped() started.
+✔ Test aliasesReleaseAReservationOnlyWhenTheFinalReferenceIsDropped() passed after 0.001 seconds.
+◇ Test leasesDoNotKeepAnOrphanedBudgetAlive() started.
+✔ Test leasesDoNotKeepAnOrphanedBudgetAlive() passed after 0.001 seconds.
+◇ Test mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 1 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 42 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 1311768467463790320 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+◇ Test case passing 1 argument seed → 3735928559 to mixedOperationsMatchAnIndependentScanOracle(seed:) started.
+✔ Test mixedOperationsMatchAnIndependentScanOracle(seed:) with 4 test cases passed after 0.137 seconds.
+◇ Test concurrentReservationsRespectLimitsAndReturnToKnownBaseline() started.
+✔ Test concurrentReservationsRespectLimitsAndReturnToKnownBaseline() passed after 0.150 seconds.
+◇ Test concurrentResizesOfSharedLeasesKeepZeroByteOwnersAndReleaseExactlyOnce() started.
+✔ Test concurrentResizesOfSharedLeasesKeepZeroByteOwnersAndReleaseExactlyOnce() passed after 0.050 seconds.
+✔ Suite "Subtitle memory budget accounting" passed after 0.344 seconds.
+◇ Suite "Subtitle decoder scratch-output lifetime" started.
+◇ Test bitmapEventsOutliveNativeOutputUpdatesFlushAndDecoderDestruction() started.
+✔ Test bitmapEventsOutliveNativeOutputUpdatesFlushAndDecoderDestruction() passed after 0.001 seconds.
+◇ Test incompleteDisplaySetsKeepCodecHistoryWithoutRetainingOutput() started.
+✔ Test incompleteDisplaySetsKeepCodecHistoryWithoutRetainingOutput() passed after 0.001 seconds.
+◇ Test textEventsOwnTheirBytesAcrossNativeOutputReuseFlushAndDestruction() started.
+✔ Test textEventsOwnTheirBytesAcrossNativeOutputReuseFlushAndDestruction() passed after 0.001 seconds.
+◇ Test bitmapBudgetRejectionReleasesNativeOutputAndAllowsRecovery() started.
+✔ Test bitmapBudgetRejectionReleasesNativeOutputAndAllowsRecovery() passed after 0.001 seconds.
+◇ Test cropConversionRejectionReleasesNativeOutputAndAllowsRecovery() started.
+✔ Test cropConversionRejectionReleasesNativeOutputAndAllowsRecovery() passed after 0.001 seconds.
+◇ Test metadataParsingFailureLeavesNoNativeOutputAndPreservesEarlierEvents() started.
+✔ Test metadataParsingFailureLeavesNoNativeOutputAndPreservesEarlierEvents() passed after 0.001 seconds.
+◇ Test dvbOutputAndNativeDecodeFailureLeaveOwnedEventsIntact() started.
+✔ Test dvbOutputAndNativeDecodeFailureLeaveOwnedEventsIntact() passed after 0.001 seconds.
+✔ Suite "Subtitle decoder scratch-output lifetime" passed after 0.003 seconds.
+✔ Test run with 41 tests in 5 suites passed after 2.246 seconds.

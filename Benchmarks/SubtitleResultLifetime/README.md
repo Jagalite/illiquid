@@ -17,6 +17,67 @@ The candidate resets that result when the synchronous decode method exits. The
 experiment establishes ownership lifetime independently from application-event
 lifetime and codec-private state.
 
+## Measured result
+
+[Native qualification run 40004809868](https://github.com/Jagalite/illiquid/actions/runs/40004809868)
+passed on **2026-10-23**, measuring candidate
+`a27c73f17736ccfffc0cb0d1de8628464dc2ec85`. The host was an Apple M1 virtual
+runner with macOS 26.6.2, Apple Swift 6.3.3, and the repository's pinned FFmpeg
+8.1.2 SDK. Debug and optimized builds produced the same allocation counts:
+
+| Workload | Original result-owned malloc bytes after return | Candidate bytes after return |
+|---|---:|---:|
+| SubRip text | 192 | 0 |
+| 2 × 2 PGS | 1,152 | 0 |
+| 1920 × 1080 PGS | 2,081,904 | 0 |
+| 4096 × 1024 PGS cropped to 1 × 1 | 4,195,440 | 0 |
+| PGS rejected by display-byte limit | 4,211,824 | 0 |
+| PGS rejected by event memory budget | 2,081,904 | 0 |
+| Malformed PGS before native decode (control) | 0 | 0 |
+| 2 × 2 DVB | 1,152 | 0 |
+
+The cropped case returns only four bytes of BGRA pixels while the original
+implementation retains approximately four MiB of redundant native output.
+Caller-owned event data and its memory reservations are unchanged. Allocation
+sizes include allocator rounding and are specific to these authored packets and
+this native allocator; they are not a prediction for every media file.
+
+Qualification passed all **32 process observations, 16 complete output
+comparisons, 14 expected original-lifetime assertion failures, and 128 empty
+candidate lifecycle snapshots**. A separate parser audited all 160 retained
+event batches, including 165,890,080 bytes of text and pixel payload, and verified
+every byte and metadata field between variants. The complete application/test
+graph built in release mode, and **41 tests in five suites passed** (53
+invocations including parameter cases, no skips). Those suites include all seven
+new ownership tests, existing PGS crop/packet-borrow and memory-accounting tests,
+and PGS, DVD, and DVB integration fixtures.
+
+The downloaded native artifact's SHA-256 was verified, and every file duplicated
+in the job's compact evidence bundle was checked byte-for-byte against the
+artifact. The unmodified native evidence is retained under [`evidence/native/`](evidence/native/),
+with a [qualification receipt](evidence/qualification.json) and
+[independent audit receipt](evidence/independent-audit.json). The source and
+measurement harness have not changed since the measured commit; subsequent
+changes retain and document the results.
+
+## Why the earlier release is safe
+
+The existing decoder creates text with `Data(String(cString: ass).utf8)` and
+allocates separate BGRA `Data` before copying each bitmap. Returned events do not
+borrow the native rectangle, palette, index-plane, or ASS-string allocations.
+The added `defer` therefore resets the temporary result after copying is complete,
+including when conversion or memory admission throws. It does not flush or
+replace the codec context.
+
+The ownership review used the repository's pinned FFmpeg 8.1.2 source archive:
+`avcodec_decode_subtitle2` transfers successful subtitle output to its caller,
+and `avsubtitle_free` frees that output. PGS, DVB, and DVD subtitle output
+allocations are separate from persistent decoder caches. The repository's
+existing `illiquid_subtitle_result_reset` already performs this cleanup before
+the next decode and on explicit flush/destruction; this change also invokes it
+at the end of the current call. Partial display sets and palette-only updates
+are covered by the new native lifecycle tests.
+
 ## Run
 
 Use the repository's macOS/Xcode configuration and install its verified native
@@ -128,5 +189,7 @@ dropped.
 - `sources/`: the actual staged input files and observer used to build the binaries.
 
 The runner rehashes all inputs and executables after measurement. Results are
-valid only when `completion.json` reports `complete: true`. This README describes
-the protocol; native results must be read from a completed retained evidence set.
+valid only when `completion.json` reports `complete: true`. The retained
+[`completion.json`](evidence/native/component/completion.json) records a fully
+successful run; [`summary.json`](evidence/native/component/summary.json) contains
+the individual native measurements and output hashes.
