@@ -41,7 +41,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Qualify source-tree reuse for visibility edits
-        run: python3 Benchmarks/SourceTreeVisibility/run.py --output "$RUNNER_TEMP/source-tree-visibility"
+        run: python3 Benchmarks/SourceTreeVisibility/run.py --current-support --output "$RUNNER_TEMP/source-tree-visibility"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

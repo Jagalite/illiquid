@@ -1737,6 +1737,10 @@ struct VolumePopover: View {
 }
 
 enum TimecodeFormatter {
+    private static let twoDigitComponents = (0..<60).map { value in
+        value < 10 ? "0\(value)" : String(value)
+    }
+
     static func string(from interval: TimeInterval) -> String {
         guard interval.isFinite, interval >= 0 else { return "0:00" }
         let totalSeconds = Int(interval.rounded(.down))
@@ -1744,8 +1748,13 @@ enum TimecodeFormatter {
         let minutes = (totalSeconds / 60) % 60
         let hours = totalSeconds / 3_600
         if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+            // Preserve the existing C-format behavior for unusually large
+            // intervals whose hour count does not fit its signed %d field.
+            if hours > Int(Int32.max) {
+                return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+            }
+            return "\(hours):\(twoDigitComponents[minutes]):\(twoDigitComponents[seconds])"
         }
-        return String(format: "%02d:%02d", minutes, seconds)
+        return "\(twoDigitComponents[minutes]):\(twoDigitComponents[seconds])"
     }
 }

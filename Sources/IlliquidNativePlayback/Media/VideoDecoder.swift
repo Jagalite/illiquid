@@ -545,6 +545,7 @@ final class VideoDecoder {
     private var conversionContext: UnsafeMutablePointer<SwsContext>?
     private var softwarePixelBufferPool: SoftwareBGRAOutputPool?
     private var softwarePlanarPixelBufferPool: SoftwarePlanarOutputPool?
+    private let geometryMetadata = VideoGeometryMetadataCache()
     private var retiredPlanarDiagnostics = SoftwarePlanarPoolDiagnostics()
     private var planarFallbackGeneration: Int?
     private let softwareOutputMode: SoftwareVideoOutputMode
@@ -1393,7 +1394,16 @@ final class VideoDecoder {
             )
         }
 
-        applyColorMetadata(frame: frame, pixelBuffer: pixelBuffer)
+        // Share the serialized HDR payloads between the output attachments and
+        // decoded-frame metadata; both describe this same source frame.
+        let masteringMetadata = masteringDisplayPayload(frame)
+        let contentLightMetadata = contentLightPayload(frame)
+        applyColorMetadata(
+            frame: frame,
+            pixelBuffer: pixelBuffer,
+            masteringMetadata: masteringMetadata,
+            contentLightMetadata: contentLightMetadata
+        )
         applyPixelAspectMetadata(pixelBuffer: pixelBuffer, pixelAspect: pixelAspect)
         applyCleanApertureMetadata(
             pixelBuffer: pixelBuffer,
@@ -1404,9 +1414,6 @@ final class VideoDecoder {
         )
 
         let codedSize = CGSize(width: Int(width), height: Int(height))
-        let masteringMetadata = masteringDisplayPayload(frame)
-        let contentLightMetadata = contentLightPayload(frame)
-
         var decodedFrame = NativeDecodedVideoFrame(
             pixelBuffer: pixelBuffer,
             planarOwnershipToken: planarOwnershipToken,
@@ -1624,7 +1631,9 @@ final class VideoDecoder {
 
     private func applyColorMetadata(
         frame: UnsafeMutablePointer<AVFrame>,
-        pixelBuffer: CVPixelBuffer
+        pixelBuffer: CVPixelBuffer,
+        masteringMetadata: Data?,
+        contentLightMetadata: Data?
     ) {
         let primaries = illiquid_frame_color_primaries(frame)
         let transfer = illiquid_frame_color_transfer(frame)
@@ -1659,32 +1668,20 @@ final class VideoDecoder {
             )
         }
 
-        var masteringPayload = [UInt8](repeating: 0, count: 24)
-        let masteringSize = illiquid_frame_mastering_display_payload(
-            frame,
-            &masteringPayload,
-            masteringPayload.count
-        )
-        if masteringSize == masteringPayload.count {
+        if let masteringMetadata, masteringMetadata.count == 24 {
             CVBufferSetAttachment(
                 pixelBuffer,
                 kCVImageBufferMasteringDisplayColorVolumeKey,
-                Data(masteringPayload) as CFData,
+                masteringMetadata as CFData,
                 .shouldPropagate
             )
         }
 
-        var contentLightPayload = [UInt8](repeating: 0, count: 4)
-        let contentLightSize = illiquid_frame_content_light_payload(
-            frame,
-            &contentLightPayload,
-            contentLightPayload.count
-        )
-        if contentLightSize == contentLightPayload.count {
+        if let contentLightMetadata, contentLightMetadata.count == 4 {
             CVBufferSetAttachment(
                 pixelBuffer,
                 kCVImageBufferContentLightLevelInfoKey,
-                Data(contentLightPayload) as CFData,
+                contentLightMetadata as CFData,
                 .shouldPropagate
             )
         }
@@ -1746,20 +1743,9 @@ final class VideoDecoder {
         pixelBuffer: CVPixelBuffer,
         pixelAspect: CGSize
     ) {
-        guard pixelAspect.width.isFinite, pixelAspect.height.isFinite,
-              pixelAspect.width > 0, pixelAspect.height > 0
-        else {
-            return
-        }
-        let value: [CFString: Any] = [
-            kCVImageBufferPixelAspectRatioHorizontalSpacingKey: Int(pixelAspect.width.rounded()),
-            kCVImageBufferPixelAspectRatioVerticalSpacingKey: Int(pixelAspect.height.rounded()),
-        ]
-        CVBufferSetAttachment(
-            pixelBuffer,
-            kCVImageBufferPixelAspectRatioKey,
-            value as CFDictionary,
-            .shouldPropagate
+        geometryMetadata.applyPixelAspectMetadata(
+            pixelBuffer: pixelBuffer,
+            pixelAspect: pixelAspect
         )
     }
 
@@ -1782,17 +1768,12 @@ final class VideoDecoder {
         horizontalOffset: Double,
         verticalOffset: Double
     ) {
-        let aperture: [CFString: Any] = [
-            kCVImageBufferCleanApertureWidthKey: width,
-            kCVImageBufferCleanApertureHeightKey: height,
-            kCVImageBufferCleanApertureHorizontalOffsetKey: horizontalOffset,
-            kCVImageBufferCleanApertureVerticalOffsetKey: verticalOffset,
-        ]
-        CVBufferSetAttachment(
-            pixelBuffer,
-            kCVImageBufferCleanApertureKey,
-            aperture as CFDictionary,
-            .shouldPropagate
+        geometryMetadata.applyCleanApertureMetadata(
+            pixelBuffer: pixelBuffer,
+            width: width,
+            height: height,
+            horizontalOffset: horizontalOffset,
+            verticalOffset: verticalOffset
         )
     }
 

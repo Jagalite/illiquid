@@ -1,0 +1,34 @@
+{
+  "reason": "First 10-pair run has substantial per-process timing variance despite lower medians in all cases.",
+  "unchanged": [
+    "production code",
+    "Harness.swift",
+    "fixtures",
+    "Swift optimization flags",
+    "default scheduling policy"
+  ],
+  "confirmation": {
+    "pairs": 20,
+    "target_ms": 300,
+    "all_cases": 10
+  },
+  "primary_cases": [
+    "hdr10_bgra",
+    "hdr10_p010"
+  ],
+  "assessment": "Inspect both wall and process CPU medians, paired uncertainty, and cleared-buffer/SDR controls; preserve all samples. No whole-player performance claim.",
+  "assessment_recorded_utc": "2026-10-22T20:24:38Z",
+  "pre_result_acceptance": {
+    "applies_to_each_primary_case": {
+      "median_paired_cpu_ratio_at_most": 0.95,
+      "median_paired_cpu_saving_ns_at_least": 100,
+      "cpu_pair_wins_at_least": 16,
+      "pairs": 20,
+      "cpu_median_ratio_below_one_in_both_orders": true,
+      "overall_median_wall_time_improves": true
+    },
+    "controls": "Disclose every result, including cleared-buffer and SDR controls. Do not accept a repeatable CPU regression greater than 5%; qualify inconsistent or small gains rather than extending the primary claim.",
+    "interpretation": "Use the fixed confirmation separately from the initial exploratory run. Preserve outliers. Do not rerun or tune the production code to obtain a passing timing result.",
+    "status_when_recorded": "Confirmation job 120064257666 was queued with no steps or measurement output available."
+  }
+}

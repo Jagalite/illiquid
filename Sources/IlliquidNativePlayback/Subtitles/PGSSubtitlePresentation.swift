@@ -18,47 +18,61 @@ struct PGSSubtitlePresentation {
     }
     let objects: [Object]
 
+    /// Inspect packet-owned bytes synchronously. Metadata contains only copied
+    /// coordinates; no packet pointer or payload storage escapes this call.
+    static func update(in packet: FFmpegPacket) throws -> Self? {
+        guard let pointer = packet.pointer,
+              let bytes = pointer.pointee.data,
+              pointer.pointee.size > 0 else { return nil }
+        return try withExtendedLifetime(packet) {
+            try update(in: UnsafeBufferPointer(start: bytes, count: Int(pointer.pointee.size)))
+        }
+    }
+
     static func update(in data: Data) throws -> Self? {
         try data.withUnsafeBytes { raw in
-            let bytes = raw.bindMemory(to: UInt8.self)
-            func word(_ offset: Int) -> Int32 { Int32(bytes[offset]) * 256 + Int32(bytes[offset + 1]) }
-            var offset = 0
-            var latest: Self?
-            while offset < bytes.count {
-                guard bytes.count - offset >= 3 else { throw invalid() }
-                let kind = bytes[offset]
-                let length = Int(word(offset + 1))
-                offset += 3
-                guard length <= bytes.count - offset else { throw invalid() }
-                let end = offset + length
-                if kind == 0x16 {
-                    guard length >= 11 else { throw invalid() }
-                    let width = word(offset), height = word(offset + 2)
-                    guard width > 0, height > 0, width <= 8_192, height <= 8_192 else { throw invalid() }
-                    let count = Int(bytes[offset + 10])
-                    guard count <= 2 else { throw invalid() } // PGS / pinned decoder object-reference limit.
-                    var cursor = offset + 11
-                    var objects: [Object] = []
-                    for _ in 0..<count {
-                        guard end - cursor >= 8 else { throw invalid() }
-                        let cropped = bytes[cursor + 3] & 0x80 != 0
-                        let x = word(cursor + 4), y = word(cursor + 6)
-                        guard x <= width, y <= height else { throw invalid() }
-                        cursor += 8
-                        var crop: Crop?
-                        if cropped {
-                            guard end - cursor >= 8 else { throw invalid() }
-                            crop = Crop(x: word(cursor), y: word(cursor + 2), width: word(cursor + 4), height: word(cursor + 6))
-                            cursor += 8
-                        }
-                        objects.append(Object(x: x, y: y, crop: crop))
-                    }
-                    latest = Self(objects: objects)
-                }
-                offset = end
-            }
-            return latest
+            try update(in: raw.bindMemory(to: UInt8.self))
         }
+    }
+
+    private static func update(in bytes: UnsafeBufferPointer<UInt8>) throws -> Self? {
+        func word(_ offset: Int) -> Int32 { Int32(bytes[offset]) * 256 + Int32(bytes[offset + 1]) }
+        var offset = 0
+        var latest: Self?
+        while offset < bytes.count {
+            guard bytes.count - offset >= 3 else { throw invalid() }
+            let kind = bytes[offset]
+            let length = Int(word(offset + 1))
+            offset += 3
+            guard length <= bytes.count - offset else { throw invalid() }
+            let end = offset + length
+            if kind == 0x16 {
+                guard length >= 11 else { throw invalid() }
+                let width = word(offset), height = word(offset + 2)
+                guard width > 0, height > 0, width <= 8_192, height <= 8_192 else { throw invalid() }
+                let count = Int(bytes[offset + 10])
+                guard count <= 2 else { throw invalid() } // PGS / pinned decoder object-reference limit.
+                var cursor = offset + 11
+                var objects: [Object] = []
+                for _ in 0..<count {
+                    guard end - cursor >= 8 else { throw invalid() }
+                    let cropped = bytes[cursor + 3] & 0x80 != 0
+                    let x = word(cursor + 4), y = word(cursor + 6)
+                    guard x <= width, y <= height else { throw invalid() }
+                    cursor += 8
+                    var crop: Crop?
+                    if cropped {
+                        guard end - cursor >= 8 else { throw invalid() }
+                        crop = Crop(x: word(cursor), y: word(cursor + 2), width: word(cursor + 4), height: word(cursor + 6))
+                        cursor += 8
+                    }
+                    objects.append(Object(x: x, y: y, crop: crop))
+                }
+                latest = Self(objects: objects)
+            }
+            offset = end
+        }
+        return latest
     }
 
     /// Returns a borrowed palette rectangle. Its backing storage remains owned

@@ -1,0 +1,390 @@
+Test Suite 'All tests' started at 2026-10-22 20:11:18.770.
+Test Suite 'All tests' passed at 2026-10-22 20:11:18.773.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Sidecar ancestor path planning" started.
+◇ Test siblingsRetainTheirOwnMappingsAndOverrides() started.
+✔ Test siblingsRetainTheirOwnMappingsAndOverrides() passed after 0.016 seconds.
+◇ Test alternatingParentsAndSourceRootsDoNotSharePlans() started.
+✔ Test alternatingParentsAndSourceRootsDoNotSharePlans() passed after 0.005 seconds.
+◇ Test unicodeEquivalentStringsKeepTheirExactURLBoundaries() started.
+✔ Test unicodeEquivalentStringsKeepTheirExactURLBoundaries() passed after 0.002 seconds.
+◇ Test filesystemRootAndDirectoryURLSpellingMatchFreshReaders() started.
+✔ Test filesystemRootAndDirectoryURLSpellingMatchFreshReaders() passed after 0.007 seconds.
+◇ Test ancestorLimitRemainsInclusiveOfTheSourceRoot() started.
+✔ Test ancestorLimitRemainsInclusiveOfTheSourceRoot() passed after 0.038 seconds.
+◇ Test cancellationPreservesCheckpointAndReadOrderOnColdAndWarmCalls() started.
+✔ Test cancellationPreservesCheckpointAndReadOrderOnColdAndWarmCalls() passed after 0.019 seconds.
+◇ Test negativeSidecarCacheStillAppliesToSiblingFiles() started.
+✔ Test negativeSidecarCacheStillAppliesToSiblingFiles() passed after 0.002 seconds.
+◇ Test exhaustedByteBudgetStillUsesPreviouslyReadAncestorMetadata() started.
+✔ Test exhaustedByteBudgetStillUsesPreviouslyReadAncestorMetadata() passed after 0.725 seconds.
+✔ Suite "Sidecar ancestor path planning" passed after 0.817 seconds.
+◇ Suite "Local media sidecars" started.
+◇ Test sidecarIdentifiersMergeWithoutErasingOtherProviders() started.
+✔ Test sidecarIdentifiersMergeWithoutErasingOtherProviders() passed after 0.001 seconds.
+◇ Test plexMappingsAndPrecedence() started.
+✔ Test plexMappingsAndPrecedence() passed after 0.001 seconds.
+◇ Test nfoMovieAndEpisodeFieldsAreScoped() started.
+✔ Test nfoMovieAndEpisodeFieldsAreScoped() passed after 0.001 seconds.
+◇ Test malformedNFOIsIgnored(_:) started.
+◇ Test case passing 1 argument text → "<movie><title>Broken" to malformedNFOIsIgnored(_:) started.
+◇ Test case passing 1 argument text → "<unexpected><title>Wrong root</title></unexpected>" to malformedNFOIsIgnored(_:) started.
+◇ Test case passing 1 argument text → "<!DOCTYPE movie [<!ENTITY x SYSTEM 'file:///etc/passwd'>]><movie><title>&x;</title></movie>" to malformedNFOIsIgnored(_:) started.
+◇ Test case passing 1 argument text → "<movie><year>-1</year><uniqueid type='imdb'>bad</uniqueid></movie>" to malformedNFOIsIgnored(_:) started.
+✔ Test malformedNFOIsIgnored(_:) with 4 test cases passed after 0.001 seconds.
+◇ Test readersBoundSizeAndCacheSharedMetadata() started.
+✔ Test readersBoundSizeAndCacheSharedMetadata() passed after 0.002 seconds.
+◇ Test filenameNFOOverridesSeriesHintsAndNewScanSeesEdits() started.
+✔ Test filenameNFOOverridesSeriesHintsAndNewScanSeesEdits() passed after 0.005 seconds.
+◇ Test hintsIdentifyNumberedFilesWithOpaqueFolderNames() started.
+✔ Test hintsIdentifyNumberedFilesWithOpaqueFolderNames() passed after 0.001 seconds.
+◇ Test explicitMappedSeasonWinsOverGeneralChildHint() started.
+✔ Test explicitMappedSeasonWinsOverGeneralChildHint() passed after 0.002 seconds.
+◇ Test readerDoesNotFollowSidecarLinksOrReadAboveSourceBoundary() started.
+✔ Test readerDoesNotFollowSidecarLinksOrReadAboveSourceBoundary() passed after 0.001 seconds.
+◇ Test movieSidecarsPreservePrecedenceWithinFilesystemRoot(_:) started.
+◇ Test case passing 1 argument filesystemRoot → false to movieSidecarsPreservePrecedenceWithinFilesystemRoot(_:) started.
+◇ Test case passing 1 argument filesystemRoot → true to movieSidecarsPreservePrecedenceWithinFilesystemRoot(_:) started.
+✔ Test movieSidecarsPreservePrecedenceWithinFilesystemRoot(_:) with 2 test cases passed after 0.006 seconds.
+◇ Test nestedPlexMappingsPreserveEntirePathWithinFilesystemRoot(_:) started.
+◇ Test case passing 1 argument filesystemRoot → false to nestedPlexMappingsPreserveEntirePathWithinFilesystemRoot(_:) started.
+◇ Test case passing 1 argument filesystemRoot → true to nestedPlexMappingsPreserveEntirePathWithinFilesystemRoot(_:) started.
+✔ Test nestedPlexMappingsPreserveEntirePathWithinFilesystemRoot(_:) with 2 test cases passed after 0.010 seconds.
+◇ Test siblingPrefixDoesNotReadSidecars() started.
+✔ Test siblingPrefixDoesNotReadSidecars() passed after 0.002 seconds.
+◇ Test filesystemRootMappingKeyKeepsItsFirstComponent() started.
+✔ Test filesystemRootMappingKeyKeepsItsFirstComponent() passed after 0.001 seconds.
+✔ Suite "Local media sidecars" passed after 0.037 seconds.
+◇ Suite "NFO episode field scope" started.
+◇ Test nonEpisodeNumbersAreNotIdentity(_:_:) started.
+◇ Test case passing 2 arguments root → "tvshow", count → 0 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+◇ Test case passing 2 arguments root → "tvshow", count → 1 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+◇ Test case passing 2 arguments root → "tvshow", count → 5 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+◇ Test case passing 2 arguments root → "tvshow", count → 999 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+◇ Test case passing 2 arguments root → "movie", count → 0 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+◇ Test case passing 2 arguments root → "movie", count → 1 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+◇ Test case passing 2 arguments root → "movie", count → 5 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+◇ Test case passing 2 arguments root → "movie", count → 999 to nonEpisodeNumbersAreNotIdentity(_:_:) started.
+✔ Test nonEpisodeNumbersAreNotIdentity(_:_:) with 8 test cases passed after 0.001 seconds.
+◇ Test ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+◇ Test case passing 2 arguments root → "tvshow", fields → "<season>5</season>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+◇ Test case passing 2 arguments root → "tvshow", fields → "<episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+◇ Test case passing 2 arguments root → "tvshow", fields → "<season>5</season><episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+◇ Test case passing 2 arguments root → "movie", fields → "<season>5</season>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+◇ Test case passing 2 arguments root → "movie", fields → "<episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+◇ Test case passing 2 arguments root → "movie", fields → "<season>5</season><episode>62</episode>" to ignoredNumbersAloneDoNotProduceHints(_:_:) started.
+✔ Test ignoredNumbersAloneDoNotProduceHints(_:_:) with 6 test cases passed after 0.001 seconds.
+◇ Test explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 0, episode → 0 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 0, episode → 1 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 0, episode → 62 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 0, episode → 9999 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 1, episode → 0 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 1, episode → 1 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 1, episode → 62 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 1, episode → 9999 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 999, episode → 0 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 999, episode → 1 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 999, episode → 62 to explicitEpisodeNumbersStillWork(_:_:) started.
+◇ Test case passing 2 arguments season → 999, episode → 9999 to explicitEpisodeNumbersStillWork(_:_:) started.
+✔ Test explicitEpisodeNumbersStillWork(_:_:) with 12 test cases passed after 0.001 seconds.
+◇ Test caseCDATAAndNestedFieldsRespectScope() started.
+✔ Test caseCDATAAndNestedFieldsRespectScope() passed after 0.001 seconds.
+◇ Test invalidEpisodeNumbersStayIgnored(_:) started.
+◇ Test case passing 1 argument fields → "<season>-1</season><episode>-2</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+◇ Test case passing 1 argument fields → "<season>1000</season><episode>10000</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+◇ Test case passing 1 argument fields → "<season>５</season><episode>٦٢</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+◇ Test case passing 1 argument fields → "<season>1x</season><episode>2.5</episode>" to invalidEpisodeNumbersStayIgnored(_:) started.
+✔ Test invalidEpisodeNumbersStayIgnored(_:) with 4 test cases passed after 0.001 seconds.
+◇ Test showTotalsPreserveFilenameIdentityAndClassification() started.
+✔ Test showTotalsPreserveFilenameIdentityAndClassification() passed after 0.008 seconds.
+◇ Test implicitPlexMappingsUseDirectoryOrDefaultSeasonNotTotals() started.
+✔ Test implicitPlexMappingsUseDirectoryOrDefaultSeasonNotTotals() passed after 0.005 seconds.
+◇ Test childShowTotalsDoNotOverrideExplicitPlexSeasonOrRange() started.
+✔ Test childShowTotalsDoNotOverrideExplicitPlexSeasonOrRange() passed after 0.002 seconds.
+◇ Test titleOnlyEpisodeSidecarPreservesRangeAndDate() started.
+✔ Test titleOnlyEpisodeSidecarPreservesRangeAndDate() passed after 0.004 seconds.
+◇ Test explicitEpisodeSidecarStillOverridesFilenameRangeAndDate() started.
+✔ Test explicitEpisodeSidecarStillOverridesFilenameRangeAndDate() passed after 0.004 seconds.
+◇ Test malformedFileCannotReplaceFilename(_:) started.
+◇ Test case passing 1 argument rootName → "tvshow" to malformedFileCannotReplaceFilename(_:) started.
+◇ Test case passing 1 argument rootName → "movie" to malformedFileCannotReplaceFilename(_:) started.
+◇ Test case passing 1 argument rootName → "episodedetails" to malformedFileCannotReplaceFilename(_:) started.
+✔ Test malformedFileCannotReplaceFilename(_:) with 3 test cases passed after 0.005 seconds.
+◇ Test everyIncompleteDocumentPrefixIsRejected(_:) started.
+◇ Test case passing 1 argument rootName → "tvshow" to everyIncompleteDocumentPrefixIsRejected(_:) started.
+◇ Test case passing 1 argument rootName → "movie" to everyIncompleteDocumentPrefixIsRejected(_:) started.
+◇ Test case passing 1 argument rootName → "episodedetails" to everyIncompleteDocumentPrefixIsRejected(_:) started.
+✔ Test everyIncompleteDocumentPrefixIsRejected(_:) with 3 test cases passed after 0.008 seconds.
+◇ Test validDocumentsAtTheLimitsStillParse() started.
+✔ Test validDocumentsAtTheLimitsStillParse() passed after 0.003 seconds.
+◇ Test parserLimitsAndMalformedInputRemainRejected() started.
+✔ Test parserLimitsAndMalformedInputRemainRejected() passed after 0.002 seconds.
+✔ Suite "NFO episode field scope" passed after 0.050 seconds.
+◇ Suite "NFO metadata field selection" started.
+◇ Test ignoredShowTotalsDoNotConsumeEpisodeFieldBudget() started.
+✔ Test ignoredShowTotalsDoNotConsumeEpisodeFieldBudget() passed after 0.001 seconds.
+◇ Test longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "plot", root → "movie" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "plot", root → "tvshow" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "plot", root → "episodedetails" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "outline", root → "movie" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "outline", root → "tvshow" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "outline", root → "episodedetails" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "tagline", root → "movie" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "tagline", root → "tvshow" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "tagline", root → "episodedetails" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "CUSTOM", root → "movie" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "CUSTOM", root → "tvshow" to longIgnoredFieldsPreserveHints(_:_:) started.
+◇ Test case passing 2 arguments field → "CUSTOM", root → "episodedetails" to longIgnoredFieldsPreserveHints(_:_:) started.
+✔ Test longIgnoredFieldsPreserveHints(_:_:) with 12 test cases passed after 0.067 seconds.
+◇ Test ignoredFieldsDoNotResetAdjacentValues(_:) started.
+◇ Test case passing 1 argument position → 0 to ignoredFieldsDoNotResetAdjacentValues(_:) started.
+◇ Test case passing 1 argument position → 1 to ignoredFieldsDoNotResetAdjacentValues(_:) started.
+◇ Test case passing 1 argument position → 2 to ignoredFieldsDoNotResetAdjacentValues(_:) started.
+✔ Test ignoredFieldsDoNotResetAdjacentValues(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test contextuallyUnusedFieldsDoNotInvalidateHints() started.
+✔ Test contextuallyUnusedFieldsDoNotInvalidateHints() passed after 0.001 seconds.
+◇ Test consumedFieldsKeepTheirTextLimit(_:) started.
+◇ Test case passing 1 argument field → "title" to consumedFieldsKeepTheirTextLimit(_:) started.
+◇ Test case passing 1 argument field → "showtitle" to consumedFieldsKeepTheirTextLimit(_:) started.
+◇ Test case passing 1 argument field → "year" to consumedFieldsKeepTheirTextLimit(_:) started.
+◇ Test case passing 1 argument field → "season" to consumedFieldsKeepTheirTextLimit(_:) started.
+◇ Test case passing 1 argument field → "episode" to consumedFieldsKeepTheirTextLimit(_:) started.
+◇ Test case passing 1 argument field → "uniqueid" to consumedFieldsKeepTheirTextLimit(_:) started.
+✔ Test consumedFieldsKeepTheirTextLimit(_:) with 6 test cases passed after 0.001 seconds.
+◇ Test unicodeAndEntityTextKeepTheirExistingLimit() started.
+✔ Test unicodeAndEntityTextKeepTheirExistingLimit() passed after 0.007 seconds.
+◇ Test wholeDocumentSizeLimitStillAppliesToIgnoredFields() started.
+✔ Test wholeDocumentSizeLimitStillAppliesToIgnoredFields() passed after 0.004 seconds.
+◇ Test nestingLimitStillAppliesToIgnoredFields() started.
+✔ Test nestingLimitStillAppliesToIgnoredFields() passed after 0.001 seconds.
+◇ Test ignoredFieldsDoNotSupplyIdentificationOrNestedValues() started.
+✔ Test ignoredFieldsDoNotSupplyIdentificationOrNestedValues() passed after 0.001 seconds.
+◇ Test ignoredFieldsDoNotBypassXMLValidation() started.
+✔ Test ignoredFieldsDoNotBypassXMLValidation() passed after 0.001 seconds.
+◇ Test deterministicIgnoredFieldCorpusPreservesIdentity() started.
+✔ Test deterministicIgnoredFieldCorpusPreservesIdentity() passed after 0.133 seconds.
+◇ Test fileSidecarLoadsAndCachesMetadataWithLongPlot() started.
+✔ Test fileSidecarLoadsAndCachesMetadataWithLongPlot() passed after 0.003 seconds.
+◇ Test seriesAndEpisodeSidecarsRetainPrecedenceWithLongPlots() started.
+✔ Test seriesAndEpisodeSidecarsRetainPrecedenceWithLongPlots() passed after 0.003 seconds.
+✔ Suite "NFO metadata field selection" passed after 0.226 seconds.
+◇ Suite "PlexMatch episode mapping validation" started.
+◇ Test documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "01", season: 7, episode: 1, lastEpisode: nil) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "E02", season: 7, episode: 2, lastEpisode: nil) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "SP04", season: 0, episode: 4, lastEpisode: nil) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "S03E04", season: 3, episode: 4, lastEpisode: nil) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "01-02", season: 7, episode: 1, lastEpisode: Optional(2)) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "E01-E02", season: 7, episode: 1, lastEpisode: Optional(2)) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "S01E01-E02", season: 1, episode: 1, lastEpisode: Optional(2)) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "S03E12-S03E13", season: 3, episode: 12, lastEpisode: Optional(13)) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "SP01-E02", season: 0, episode: 1, lastEpisode: Optional(2)) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "SP01-S00E02", season: 0, episode: 1, lastEpisode: Optional(2)) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "s03e04-e05", season: 3, episode: 4, lastEpisode: Optional(5)) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "sp01", season: 0, episode: 1, lastEpisode: nil) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "S000E0000", season: 0, episode: 0, lastEpisode: nil) to documentedFormatsAndBoundsRemainSupported(_:) started.
+◇ Test case passing 1 argument example → ValidExample(token: "S999E9998-S999E9999", season: 999, episode: 9998, lastEpisode: Optional(9999)) to documentedFormatsAndBoundsRemainSupported(_:) started.
+✔ Test documentedFormatsAndBoundsRemainSupported(_:) with 14 test cases passed after 0.001 seconds.
+◇ Test invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "０２" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "E０２" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "SP０１" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S０２E03" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E０３" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E０５" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S０４E05" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S04E０５" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S0２E03" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E0３" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E0５" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S0４E05" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "E٠٢" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "SP٠١" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S٠٢E03" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E٠٣" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E٠٥" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S٠٤E05" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "E०२" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S०२E03" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E०५" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S०४E05" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "E𝟎𝟐" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S𝟎𝟐E03" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E𝟎𝟓" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S𝟎𝟒E05" to invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) started.
+✔ Test invalidOnlyFileIsNotAcceptedAsSeriesMetadata(_:) with 26 test cases passed after 0.002 seconds.
+◇ Test invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "０２" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "E０２" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "SP０１" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S０２E03" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E０３" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E０５" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S０４E05" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S04E０５" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S0２E03" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E0３" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E0５" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S0４E05" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "E٠٢" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "SP٠١" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S٠٢E03" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E٠٣" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E٠٥" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S٠٤E05" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "E०२" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S०२E03" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E०५" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S०४E05" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "E𝟎𝟐" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S𝟎𝟐E03" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E𝟎𝟓" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S𝟎𝟒E05" to invalidMappingDoesNotOverrideFilenameEvidence(_:) started.
+✔ Test invalidMappingDoesNotOverrideFilenameEvidence(_:) with 26 test cases passed after 0.004 seconds.
+◇ Test invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "０２" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "E０２" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "SP０１" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S０２E03" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E０３" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E０５" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S０４E05" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S04E０５" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S0２E03" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E0３" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E0５" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S0４E05" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "E٠٢" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "SP٠١" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S٠٢E03" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E٠٣" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E٠٥" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S٠٤E05" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "E०२" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S०२E03" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E०५" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S०४E05" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "E𝟎𝟐" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S𝟎𝟐E03" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E𝟎𝟓" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S𝟎𝟒E05" to invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) started.
+✔ Test invalidLaterMappingDoesNotEraseValidEarlierMapping(_:) with 26 test cases passed after 0.005 seconds.
+◇ Test invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S1000E01" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S01E10000" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S01E01-E10000" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S01E01-S1000E02" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S01E02-E01" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S01E02-E02" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S01E02-S02E03" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "SP01-S01E02" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "-1" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "+1" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S-1E02" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "E1.5" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "E" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S01E" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S01E02suffix" to invalidASCIIMappingsRemainRejected(_:) started.
+◇ Test case passing 1 argument token → "S01E02 " to invalidASCIIMappingsRemainRejected(_:) started.
+✔ Test invalidASCIIMappingsRemainRejected(_:) with 16 test cases passed after 0.002 seconds.
+◇ Test laterValidMappingStillReplacesAnEarlierMapping() started.
+✔ Test laterValidMappingStillReplacesAnEarlierMapping() passed after 0.001 seconds.
+◇ Test inheritedSeasonDefaultsAndExplicitSpecialsAreUnchanged() started.
+✔ Test inheritedSeasonDefaultsAndExplicitSpecialsAreUnchanged() passed after 0.001 seconds.
+◇ Test unicodeTitlesAndPathsAreNotRestricted() started.
+✔ Test unicodeTitlesAndPathsAreNotRestricted() passed after 0.001 seconds.
+◇ Test descendantMappingRestrictionsAreUnchanged() started.
+✔ Test descendantMappingRestrictionsAreUnchanged() passed after 0.001 seconds.
+◇ Test fileAndDirectiveSizeLimitsAreUnchanged() started.
+✔ Test fileAndDirectiveSizeLimitsAreUnchanged() passed after 0.002 seconds.
+◇ Test generatedNumericFieldMutationsAreRejectedAtomically() started.
+✔ Test generatedNumericFieldMutationsAreRejectedAtomically() passed after 0.001 seconds.
+✔ Suite "PlexMatch episode mapping validation" passed after 0.022 seconds.
+◇ Suite "PlexMatch filesystem mapping regressions" started.
+◇ Test malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "０２" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "E０２" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "SP０１" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S０２E03" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E０３" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E０５" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S０４E05" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S04E０５" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S0２E03" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E0３" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E0５" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S0４E05" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "E٠٢" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "SP٠١" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S٠٢E03" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E٠٣" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E٠٥" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S٠٤E05" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "E०२" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S०२E03" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E०५" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S०४E05" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "E𝟎𝟐" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S𝟎𝟐E03" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E𝟎𝟓" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S𝟎𝟒E05" to malformedMappingDoesNotChangeRecognizedFilename(_:) started.
+✔ Test malformedMappingDoesNotChangeRecognizedFilename(_:) with 26 test cases passed after 0.026 seconds.
+◇ Test malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "０２" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "E０２" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "SP０１" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S０２E03" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E０３" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E０５" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S０４E05" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S04E０５" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S0２E03" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E0３" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E0５" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S0４E05" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "E٠٢" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "SP٠١" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S٠٢E03" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E٠٣" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E٠٥" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S٠٤E05" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "E०२" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S०२E03" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E०५" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S०४E05" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "E𝟎𝟐" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S𝟎𝟐E03" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-E𝟎𝟓" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+◇ Test case passing 1 argument token → "S02E03-S𝟎𝟒E05" to malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) started.
+✔ Test malformedChildMappingDoesNotReplaceValidAncestorMapping(_:) with 26 test cases passed after 0.051 seconds.
+◇ Test invalidOnlyAncestorDoesNotCreateASeriesMappingBoundary() started.
+✔ Test invalidOnlyAncestorDoesNotCreateASeriesMappingBoundary() passed after 0.002 seconds.
+✔ Suite "PlexMatch filesystem mapping regressions" passed after 0.080 seconds.
+✔ Test run with 62 tests in 6 suites passed after 1.235 seconds.
+Building for debugging...
+[0/7] /Users/runner/work/_temp/sidecar-path-plan/results/build/candidate/.build/arm64-apple-macosx/debug/SidecarPathPlanQualificationPackageTests.derived/runner.swift
+[1/7] Write sources
+[4/7] Write swift-version-7974D3F7F03D5E95.txt
+[6/11] Compiling IlliquidCore MediaMetadataHints.swift
+[7/11] Compiling IlliquidCore MediaNameRecognition.swift
+[8/11] Compiling IlliquidCore MediaSidecarReader.swift
+[9/11] Emitting module IlliquidCore
+[10/13] Compiling IlliquidCore NFOMetadataHints.swift
+[11/13] Compiling IlliquidCore PlexMatchHints.swift
+[12/17] Compiling IlliquidCoreTests MediaSidecarPathPlanTests.swift
+[13/17] Compiling IlliquidCoreTests MediaSidecarTests.swift
+[14/17] Compiling IlliquidCoreTests NFOEpisodeScopeRegressionTests.swift
+[15/17] Emitting module IlliquidCoreTests
+[16/20] Compiling IlliquidCoreTests NFOMetadataFieldSelectionTests.swift
+[17/20] Compiling IlliquidCoreTests PlexMatchHintsRegressionTests.swift
+[18/20] Compiling IlliquidCoreTests PlexMatchReaderRegressionTests.swift
+[19/22] Emitting module SidecarPathPlanQualificationPackageTests
+[20/22] Compiling SidecarPathPlanQualificationPackageTests runner.swift
+[20/22] Write Objects.LinkFileList
+[21/22] Linking SidecarPathPlanQualificationPackageTests
+Build complete! (22.64s)

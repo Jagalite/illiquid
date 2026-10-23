@@ -7,7 +7,7 @@ work="$(mktemp -d "${TMPDIR:-/tmp}/illiquid-source-filesystem.XXXXXX")"
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/Sources/IlliquidApp" "$work/Tests/IlliquidAppTests"
 cp "$root/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift" "$work/Sources/IlliquidApp/"
-for file in SourceFilesystemMonitorTests SourceFilesystemRootRegressionTests; do
+for file in SourceFilesystemMonitorTests SourceFilesystemRootRegressionTests SourceFilesystemPlanningTests; do
     cp "$root/Tests/IlliquidAppTests/$file.swift" "$work/Tests/IlliquidAppTests/"
 done
 cat > "$work/Package.swift" <<'SWIFT'

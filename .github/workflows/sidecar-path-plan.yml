@@ -1,0 +1,80 @@
+name: Sidecar ancestor path plan
+
+on:
+  push:
+    branches: ['perf/sidecar-path-plan-55fd7']
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/MediaSidecarPathPlanTests.swift'
+      - 'Benchmarks/SidecarPathPlan/Harness.swift'
+      - 'Benchmarks/SidecarPathPlan/runner.py'
+      - '.github/workflows/sidecar-path-plan.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/MediaSidecarPathPlanTests.swift'
+      - 'Benchmarks/SidecarPathPlan/Harness.swift'
+      - 'Benchmarks/SidecarPathPlan/runner.py'
+      - '.github/workflows/sidecar-path-plan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sidecar-path-plan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record native host
+        run: |
+          mkdir -p "$RUNNER_TEMP/sidecar-path-plan"
+          sw_vers > "$RUNNER_TEMP/sidecar-path-plan/host.txt"
+          uname -a >> "$RUNNER_TEMP/sidecar-path-plan/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/sidecar-path-plan/host.txt"
+          swift --version >> "$RUNNER_TEMP/sidecar-path-plan/host.txt"
+      - name: Qualify both readers and measure complete native scans
+        run: >-
+          python3 Benchmarks/SidecarPathPlan/runner.py
+          --pairs 8 --target-ms 100
+          --output "$RUNNER_TEMP/sidecar-path-plan/results"
+      - name: Preserve compact evidence in the job log
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "sidecar-path-plan"
+          paths = [root / "host.txt", *sorted((root / "results/evidence").glob("*"))]
+          files = {str(path.relative_to(root)): base64.b64encode(path.read_bytes()).decode()
+                   for path in paths if path.is_file()}
+          if not files:
+              raise SystemExit("No research evidence was produced")
+          payload = gzip.compress(json.dumps({"files": files}, sort_keys=True).encode(), mtime=0)
+          encoded = base64.b64encode(payload).decode()
+          print("SIDECAR_EVIDENCE_BEGIN " + hashlib.sha256(payload).hexdigest())
+          for offset in range(0, len(encoded), 4000):
+              print(encoded[offset:offset + 4000])
+          print("SIDECAR_EVIDENCE_END")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        # The complete evidence is already retained in the job log. An optional
+        # artifact-service outage must not mask the qualification step's result.
+        continue-on-error: true
+        with:
+          name: sidecar-path-plan-native
+          path: |
+            ${{ runner.temp }}/sidecar-path-plan/host.txt
+            ${{ runner.temp }}/sidecar-path-plan/results/evidence/
+          retention-days: 14

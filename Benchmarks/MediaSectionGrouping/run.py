@@ -90,6 +90,13 @@ class Runner:
         baseline_files, baseline_records = helper.snapshot(
             lambda path: subprocess.check_output(["git", "show", f"{BASELINE}:{path}"], cwd=ROOT))
         candidate_files, candidate_records = helper.snapshot(lambda path: (ROOT / path).read_bytes())
+        head = self.execute(["git", "rev-parse", "HEAD"], "head")[0].stdout.strip()
+        baseline_files, baseline_records, candidate_records, comparison = helper.comparison_sources(
+            baseline_files, baseline_records, candidate_files, candidate_records,
+            focal_sources={"Sources/IlliquidApp/SourceBrowserFilter.swift"},
+            baseline_revision=BASELINE, worktree_head=head,
+            current_support=self.args.current_support,
+        )
         for name in baseline_files:
             if name != "Sources/IlliquidApp/SourceBrowserFilter.swift" and baseline_files[name] != candidate_files[name]:
                 raise ValueError(f"Unrelated production dependency changed: {name}")
@@ -104,7 +111,7 @@ class Runner:
             for name in TESTS:
                 staged[f"Tests/IlliquidAppTests/{name}"] = (ROOT / "Tests/IlliquidAppTests" / name).read_bytes()
             manifest = {"variant": variant, "baseline_revision": BASELINE,
-                        "production": records, "staged": {}, "adaptations": []}
+                        "comparison": comparison, "production": records, "staged": {}, "adaptations": []}
             for relative, raw in staged.items():
                 compiled = raw
                 if platform.system() == "Linux":
@@ -137,7 +144,7 @@ class Runner:
                        "platform": platform.platform(), "machine": platform.machine(),
                        "python": sys.version, "cpu_count": os.cpu_count(),
                        "swift": self.execute([self.swift, "--version"], "swift-version")[0].stdout.strip(),
-                       "head": self.execute(["git", "rev-parse", "HEAD"], "head")[0].stdout.strip(),
+                       "head": head, "comparison": comparison,
                        "worktree": self.execute(["git", "status", "--short"], "worktree")[0].stdout,
                        "baseline": BASELINE, "driver_hashes": driver_hashes,
                        "cases": self.args.cases, "sizes": self.args.sizes,
@@ -268,6 +275,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--swift")
+    parser.add_argument("--current-support", action="store_true",
+                        help="Keep the historical grouping Filter; use identical current supporting sources in both variants")
     parser.add_argument("--jobs", type=int, default=2)
     parser.add_argument("--mode", choices=["all", "tests", "benchmark", "verify", "prepare"], default="all")
     parser.add_argument("--cases", nargs="+", choices=CASES, default=CASES)

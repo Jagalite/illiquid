@@ -6,6 +6,21 @@ import IlliquidCore
 import UniformTypeIdentifiers
 
 struct NativeScreenshot: @unchecked Sendable {
+    private final class ImageRenderer: @unchecked Sendable {
+        // CIContext supports concurrent rendering. Keep its setup and compiled
+        // kernels across captures without caching intermediate image contents.
+        private let context = CIContext(options: [.cacheIntermediates: false])
+
+        func makeImage(from image: CIImage, colorSpace: CGColorSpace) -> CGImage? {
+            context.createCGImage(
+                image, from: image.extent, format: .RGBA8, colorSpace: colorSpace
+            )
+        }
+    }
+
+    // Lazy initialization keeps screenshot-only work out of startup/playback.
+    private static let imageRenderer = ImageRenderer()
+
     let buffer: CVPixelBuffer
     let displaySize: CGSize
     let rotation: Double
@@ -39,9 +54,8 @@ struct NativeScreenshot: @unchecked Sendable {
         var transform = CGAffineTransform(rotationAngle: rotation * .pi / 180)
         if mirrored { transform = transform.scaledBy(x: -1, y: 1) }
         image = image.transformed(by: transform)
-        let renderer = CIContext(options: [.cacheIntermediates: false])
-        guard let cgImage = renderer.createCGImage(image, from: image.extent,
-            format: .RGBA8, colorSpace: space) else { throw PresentationError("Could not read the displayed video image.") }
+        guard let cgImage = Self.imageRenderer.makeImage(from: image,
+            colorSpace: space) else { throw PresentationError("Could not read the displayed video image.") }
         context.clip(to: geometry.clipRect)
         context.draw(cgImage, in: geometry.imageRect)
         for region in regions {

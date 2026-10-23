@@ -1,0 +1,12 @@
+{
+  "workflow_run_url": "https://github.com/Jagalite/illiquid/actions/runs/39844636106",
+  "job_id": 120054565633,
+  "head_commit": "0df1acd5da213dfa70262ae3ce5d183a905d3e90",
+  "conclusion": "failure",
+  "failure_stage": "baseline debug test suite, before performance measurements",
+  "failure": "New test incorrectly required Foundation to preserve the input Unicode path UTF-8 representation. The unchanged baseline failed this assertion on macOS; semantic plan equality passed.",
+  "correction_commit": "4e78049dc225fa2dea86fc5b3fa6cef24c132655",
+  "correction": "Remove raw-input byte-preservation assertion; retain semantic expected plan and exact baseline/candidate differential trace comparisons. No production change.",
+  "artifact_id": 12453759243,
+  "artifact_zip_sha256": "57b99b136078a01da3244c946754d5df7f2b265a037f7e40db928f15102d1d8c"
+}

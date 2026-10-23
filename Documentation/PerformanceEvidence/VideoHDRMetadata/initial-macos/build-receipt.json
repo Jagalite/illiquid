@@ -1,0 +1,113 @@
+{
+  "baseline_revision": "7f9ba073394b77a908e0589447c6edc8d10b832c",
+  "binaries": {
+    "baseline": {
+      "path": "/Users/runner/work/_temp/video-hdr-metadata/component/baseline/benchmark",
+      "sha256": "a8230c41ed3ead73cd0bc1753c229e049a1f9e002a108db750d78abe3f8ed92d"
+    },
+    "candidate": {
+      "path": "/Users/runner/work/_temp/video-hdr-metadata/component/candidate/benchmark",
+      "sha256": "f58e11df778f4171d6fb9e4aa569e7773c51eeb8017f0634d1da05e42c1dc2c2"
+    }
+  },
+  "candidate_revision": "5e77f6602f3e9abf7b484252e8183352a1baf24d",
+  "candidate_working_tree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "extracted_methods_baseline": {
+    "applyColorMetadata": "471d2fbdd3530e8ec4e6446eae9cd28cc23a0d950dabe51b4f826935ed98c014",
+    "colorPrimariesAttachment": "e3613c2c5e25465f909a0c2b5c83194efe5578e096618466f55daf580c018d53",
+    "contentLightPayload": "41598f42ea553f42bec75a5d5493d580981c290151f4da8efb4f4da9c3bacbf6",
+    "masteringDisplayPayload": "4698f4f0d2994d68b203d7884a801e83eeda3441d17914fcb467eea7899e78c0",
+    "matrixAttachment": "632ce18ab0aa09b40bd78db583a25b79608ebfe94be0239b26931590ed8a21d4",
+    "transferAttachment": "2c11d780103d2ca9f0e4b93f05ef3916fb02a81820ffff322570214d030715c8"
+  },
+  "extracted_methods_candidate": {
+    "applyColorMetadata": "ff418823be3a4ed502ea6e96fef6963dbba9abb750f102f8e3896a1a38e74405",
+    "colorPrimariesAttachment": "e3613c2c5e25465f909a0c2b5c83194efe5578e096618466f55daf580c018d53",
+    "contentLightPayload": "41598f42ea553f42bec75a5d5493d580981c290151f4da8efb4f4da9c3bacbf6",
+    "masteringDisplayPayload": "4698f4f0d2994d68b203d7884a801e83eeda3441d17914fcb467eea7899e78c0",
+    "matrixAttachment": "632ce18ab0aa09b40bd78db583a25b79608ebfe94be0239b26931590ed8a21d4",
+    "transferAttachment": "2c11d780103d2ca9f0e4b93f05ef3916fb02a81820ffff322570214d030715c8"
+  },
+  "files": {
+    "baseline:Sources/CFFmpeg/include/ffmpeg_shim.h": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+    "baseline:Sources/CFFmpeg/module.modulemap": "9a2151e77447bcdb17a6a39f4a08c035461a5cedf030b7e8ef40146c84309bbf",
+    "baseline:Sources/IlliquidNativePlayback/Media/VideoDecoder.swift": "26a53e0abd16a26bf3a4997bc0a61a4d2d4acb6053d9d579e5c613534b42d457",
+    "baseline:processor": "9ce767ae75b18ce027980003eb50e36cd25e73d1a1122f40c5aa4df504d785e9",
+    "candidate:Sources/CFFmpeg/include/ffmpeg_shim.h": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+    "candidate:Sources/CFFmpeg/module.modulemap": "9a2151e77447bcdb17a6a39f4a08c035461a5cedf030b7e8ef40146c84309bbf",
+    "candidate:Sources/IlliquidNativePlayback/Media/VideoDecoder.swift": "c7ea0afd0486bf080d578947b47cbf8ceb1689381797adbeb274e78a7eb76706",
+    "candidate:processor": "179b694668b78f7ee222edfc3b5a5a6e3b024575ff48e6cfc1a21e893e35f018"
+  },
+  "flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-parse-as-library",
+    "-I",
+    "/Users/runner/work/_temp/video-hdr-metadata/component/CFFmpeg",
+    "-module-cache-path",
+    "/Users/runner/work/_temp/video-hdr-metadata/component/module-cache",
+    "-Xcc",
+    "-I/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/include",
+    "-Xlinker",
+    "-L/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+    "-Xlinker",
+    "-lavfilter",
+    "-Xlinker",
+    "-lavformat",
+    "-Xlinker",
+    "-lavcodec",
+    "-Xlinker",
+    "-lswresample",
+    "-Xlinker",
+    "-lswscale",
+    "-Xlinker",
+    "-lavutil",
+    "-framework",
+    "CoreVideo",
+    "-framework",
+    "CoreMedia",
+    "-framework",
+    "VideoToolbox",
+    "-framework",
+    "Foundation",
+    "-Xlinker",
+    "-rpath",
+    "-Xlinker",
+    "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib"
+  ],
+  "harness_sha256": "6b8c9dd51fe919e239b2429b0dc5ce4ce4a91dc7505f1be7b3f4752cabe3865d",
+  "libavutil_files": {
+    "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/libavutil.60.26.102.dylib": "475c71ddcf2a5141e12c8abfedb1c97681cded54f7f92a38eeaf17ba02703462"
+  },
+  "machine": "arm64",
+  "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+  "package_versions": {
+    "libavcodec": "62.28.102",
+    "libavfilter": "11.14.102",
+    "libavformat": "62.12.102",
+    "libavutil": "60.26.102",
+    "libswresample": "6.3.102",
+    "libswscale": "9.5.102"
+  },
+  "pkg_config_cflags": [
+    "-I/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/include"
+  ],
+  "pkg_config_libs": [
+    "-L/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+    "-lavfilter",
+    "-lavformat",
+    "-lavcodec",
+    "-lswresample",
+    "-lswscale",
+    "-lavutil"
+  ],
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "processor": "arm",
+  "runner_sha256": "0d26de35e0fe6722114d4f2d6b5c148f9d64c6ec046eb66f27f63c0226725264",
+  "scope": "Color attachments and both returned HDR payloads for an existing AVFrame/CVPixelBuffer. The *_cleared controls also time clearing all attachments before preparation; other cases use a warm 32-buffer ring. Excludes decode, pixel conversion, allocation of the frame/pixel buffer, geometry attachments and presentation.",
+  "sdk_version": "26.5",
+  "started_utc": "2026-10-22T20:03:28.099693+00:00"
+}

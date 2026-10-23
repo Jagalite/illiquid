@@ -1,0 +1,57 @@
+name: Recursive media scan performance
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidCore/Utilities/**'
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidAppTests/SourceRecursiveMediaLoaderTests.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaOrganizationTests.swift'
+      - 'Benchmarks/RecursiveMediaScan/**'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - '.github/workflows/recursive-media-scan-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: recursive-media-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify behavior and measure complete recursive scans
+        run: |
+          python3 Benchmarks/RecursiveMediaScan/run.py \
+            --pairs 8 --jobs 2 --output "$RUNNER_TEMP/recursive-media-scan"
+      - name: Record native host
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/recursive-media-scan/evidence"
+          {
+            sw_vers
+            uname -a
+            sysctl -n machdep.cpu.brand_string
+            xcodebuild -version
+            swift --version
+            printf 'ImageOS=%s\nImageVersion=%s\n' "$ImageOS" "$ImageVersion"
+          } > "$RUNNER_TEMP/recursive-media-scan/evidence/host.txt"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: recursive-media-scan-macos
+          path: ${{ runner.temp }}/recursive-media-scan/evidence/
+          retention-days: 14

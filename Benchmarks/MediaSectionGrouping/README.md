@@ -41,6 +41,38 @@ future implementation requires deliberate baseline/dependency review and new
 evidence. The normal app test target includes the grouping regressions and is
 covered by the repository's existing native release test workflow on pull requests.
 
+### Current-support regression mode
+
+The PR regression workflow explicitly rebases the comparison onto current
+supporting code:
+
+```sh
+python3 Benchmarks/MediaSectionGrouping/run.py --current-support \
+  --mode tests --output /tmp/media-sections-current-tests
+python3 Benchmarks/MediaSectionGrouping/run.py --current-support \
+  --mode verify --output /tmp/media-sections-current-parity
+```
+
+The baseline keeps `SourceBrowserFilter.swift` from its pinned revision. Every
+supporting file and declaration comes from one current snapshot and is compiled
+identically in both variants, retaining the shared-source equality gate. The
+filesystem/sidecar regression tests therefore exercise the current recursive
+scanner in both variants without making its changes part of the grouping
+comparison. The timed driver still prepares synthetic entries without scanning
+the filesystem.
+
+Source and environment receipts identify this mode and its focal baseline.
+Each production source records its own origin, revision, role, and
+original/snapshot hashes. Working-tree sources use `revision: null` and record
+`worktree_head` separately; their hashes identify exact staged bytes. Current
+support is not attributed to the historical baseline revision. Any timings from
+this mode describe a new integration-context experiment and must be reported
+separately from the retained results.
+
+Without `--current-support`, the historical strict comparison remains unchanged.
+The historical manual workflow continues to use its recorded checkout, and no
+existing evidence or frozen baseline is rewritten.
+
 ## Sources and correctness
 
 The staging helper in `Benchmarks/SourceTreeVisibility/run.py` supplies complete
