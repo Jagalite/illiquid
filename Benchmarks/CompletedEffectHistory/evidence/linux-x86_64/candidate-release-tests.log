@@ -1,0 +1,332 @@
+Test Suite 'All tests' started at 2026-10-23 14:11:23.867
+Test Suite 'release.xctest' started at 2026-10-23 14:11:23.868
+Test Suite 'release.xctest' passed at 2026-10-23 14:11:23.868
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-23 14:11:23.868
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Compact completed-effect history" started.
+◇ Test consecutiveHistoryUsesOnlyAPrefixWithoutForgettingOldIDs() started.
+✔ Test consecutiveHistoryUsesOnlyAPrefixWithoutForgettingOldIDs() passed after 0.013 seconds.
+◇ Test outOfOrderCompletionsFillHolesAndDuplicatesDoNotChangeHistory() started.
+✔ Test outOfOrderCompletionsFillHolesAndDuplicatesDoNotChangeHistory() passed after 0.001 seconds.
+◇ Test closingManyCompletionGapsReleasesTheirPeakStorage() started.
+✔ Test closingManyCompletionGapsReleasesTheirPeakStorage() passed after 0.001 seconds.
+◇ Test anEarlyGapKeepsLaterIDsInASetUntilItActuallyCompletes() started.
+✔ Test anEarlyGapKeepsLaterIDsInASetUntilItActuallyCompletes() passed after 0.002 seconds.
+◇ Test zeroAndMaximumIDsDoNotOverflowOrBridgeMissingHistory() started.
+✔ Test zeroAndMaximumIDsDoNotOverflowOrBridgeMissingHistory() passed after 0.001 seconds.
+◇ Test randomizedHistoryMatchesSetIncludingSparseAndRepeatedIDs() started.
+✔ Test randomizedHistoryMatchesSetIncludingSparseAndRepeatedIDs() passed after 0.055 seconds.
+◇ Test shuffledCompleteHistoriesDrainToTheSameCanonicalPrefix() started.
+✔ Test shuffledCompleteHistoriesDrainToTheSameCanonicalPrefix() passed after 0.113 seconds.
+◇ Test publicSetMutationsAndValueCopiesKeepTheirOriginalSemantics() started.
+✔ Test publicSetMutationsAndValueCopiesKeepTheirOriginalSemantics() passed after 0.001 seconds.
+◇ Test stateCodablePreservesLegacySetFieldAndCanonicalReplay() started.
+✔ Test stateCodablePreservesLegacySetFieldAndCanonicalReplay() passed after 0.002 seconds.
+◇ Test productionCoreRetainsDuplicateClassificationAfterLongHistory() started.
+✔ Test productionCoreRetainsDuplicateClassificationAfterLongHistory() passed after 0.049 seconds.
+◇ Test outstandingHolesRemainLiveUntilTheirOwnResultsArrive() started.
+✔ Test outstandingHolesRemainLiveUntilTheirOwnResultsArrive() passed after 0.001 seconds.
+◇ Test arbitraryInitialIDsDoNotTurnUnknownIDsIntoDuplicates() started.
+✔ Test arbitraryInitialIDsDoNotTurnUnknownIDsIntoDuplicates() passed after 0.001 seconds.
+✔ Suite "Compact completed-effect history" passed after 0.242 seconds.
+◇ Suite "Deterministic playback core" started.
+◇ Test loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() started.
+✔ Test loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() passed after 0.003 seconds.
+◇ Test pausedLoadDoesNotRequestNonzeroRate() started.
+✔ Test pausedLoadDoesNotRequestNonzeroRate() passed after 0.001 seconds.
+◇ Test replacementKeepsCommittedSourceUntilCandidatePrerollCommits() started.
+✔ Test replacementKeepsCommittedSourceUntilCandidatePrerollCommits() passed after 0.001 seconds.
+◇ Test failedReplacementDiscardsPendingSourceWithoutMutatingCommittedAuthority() started.
+✔ Test failedReplacementDiscardsPendingSourceWithoutMutatingCommittedAuthority() passed after 0.001 seconds.
+◇ Test staleGenerationResultCannotResumeAfterSeek() started.
+✔ Test staleGenerationResultCannotResumeAfterSeek() passed after 0.001 seconds.
+◇ Test duplicateCompletionIsIdempotent() started.
+✔ Test duplicateCompletionIsIdempotent() passed after 0.001 seconds.
+◇ Test directEffectResultRetiresPendingRuntimeEffect() started.
+✔ Test directEffectResultRetiresPendingRuntimeEffect() passed after 0.001 seconds.
+◇ Test shutdownRequiresCleanupAcknowledgmentAndThenEmitsNothing() started.
+✔ Test shutdownRequiresCleanupAcknowledgmentAndThenEmitsNothing() passed after 0.001 seconds.
+◇ Test invalidTimeAndInvalidSeekAreRejectedWithoutEffects() started.
+✔ Test invalidTimeAndInvalidSeekAreRejectedWithoutEffects() passed after 0.001 seconds.
+◇ Test checkpointAndDiagnosticEventsCarryDeterministicIdentity() started.
+✔ Test checkpointAndDiagnosticEventsCarryDeterministicIdentity() passed after 0.001 seconds.
+◇ Test subtitleInvalidationOwnsRevisionsClearAndFinalCommitFence() started.
+✔ Test subtitleInvalidationOwnsRevisionsClearAndFinalCommitFence() passed after 0.002 seconds.
+◇ Test aggregateSeekAcknowledgmentRestoresRateOnlyAfterNativePreroll() started.
+✔ Test aggregateSeekAcknowledgmentRestoresRateOnlyAfterNativePreroll() passed after 0.001 seconds.
+◇ Test relativeSeekResolvesFromAcceptedClockAndAccumulatesPendingIntent() started.
+✔ Test relativeSeekResolvesFromAcceptedClockAndAccumulatesPendingIntent() passed after 0.001 seconds.
+◇ Test catalogDefaultsAndDrainFinalizationAreDeterministicAndExactlyOnce() started.
+✔ Test catalogDefaultsAndDrainFinalizationAreDeterministicAndExactlyOnce() passed after 0.002 seconds.
+◇ Test duplicateEOFInSameGenerationPreservesObservedDrainProgress() started.
+✔ Test duplicateEOFInSameGenerationPreservesObservedDrainProgress() passed after 0.001 seconds.
+◇ Test failedEOFCheckpointCannotAdvanceAndLateSuccessCannotReplaceNewMedia() started.
+✔ Test failedEOFCheckpointCannotAdvanceAndLateSuccessCannotReplaceNewMedia() passed after 0.002 seconds.
+◇ Test aggregateDuplicateEOFCannotSkipExistingDrainObligations() started.
+✔ Test aggregateDuplicateEOFCannotSkipExistingDrainObligations() passed after 0.001 seconds.
+◇ Test acceptedNewSeekGenerationRearmsFinalizedEOFCycle() started.
+✔ Test acceptedNewSeekGenerationRearmsFinalizedEOFCycle() passed after 0.001 seconds.
+◇ Test shutdownCleanupFailuresBecomeExplicitExternalWaits() started.
+✔ Test shutdownCleanupFailuresBecomeExplicitExternalWaits() passed after 0.001 seconds.
+◇ Test shutdownRejectsLateRawFactsBeforeTheyCanEmitPlaybackWork() started.
+✔ Test shutdownRejectsLateRawFactsBeforeTheyCanEmitPlaybackWork() passed after 0.001 seconds.
+◇ Test failedTrackReplacementRestoresPrerollAuthorityWithPriorPlayback() started.
+✔ Test failedTrackReplacementRestoresPrerollAuthorityWithPriorPlayback() passed after 0.001 seconds.
+◇ Test subtitleInvalidationDoesNotStrandInFlightSubtitleSelection() started.
+✔ Test subtitleInvalidationDoesNotStrandInFlightSubtitleSelection() passed after 0.002 seconds.
+◇ Test subtitleInvalidationDoesNotStrandTrackResumeRate() started.
+✔ Test subtitleInvalidationDoesNotStrandTrackResumeRate() passed after 0.002 seconds.
+◇ Test aggregatePrerollIsTheOnlyStartupRateAuthority() started.
+✔ Test aggregatePrerollIsTheOnlyStartupRateAuthority() passed after 0.001 seconds.
+◇ Test lateCatalogMetadataDoesNotRearmSatisfiedStartupPreroll() started.
+✔ Test lateCatalogMetadataDoesNotRearmSatisfiedStartupPreroll() passed after 0.001 seconds.
+◇ Test invariantRejectsPlaybackBeforeCurrentPrerollObligation() started.
+✔ Test invariantRejectsPlaybackBeforeCurrentPrerollObligation() passed after 0.001 seconds.
+◇ Test recoveryBudgetIsScopedToMediaSessionAndSelectedVideoLineage() started.
+✔ Test recoveryBudgetIsScopedToMediaSessionAndSelectedVideoLineage() passed after 0.001 seconds.
+◇ Test retryableVideoDecodeFailureDoesNotReachUserFacingSnapshot() started.
+✔ Test retryableVideoDecodeFailureDoesNotReachUserFacingSnapshot() passed after 0.002 seconds.
+◇ Test presentationRecoveryIsScopedThenRebuildsOnceBeforeTerminalFailure() started.
+✔ Test presentationRecoveryIsScopedThenRebuildsOnceBeforeTerminalFailure() passed after 0.001 seconds.
+◇ Test presentationRecoveryBudgetSurvivesRevisionAdvances() started.
+✔ Test presentationRecoveryBudgetSurvivesRevisionAdvances() passed after 0.001 seconds.
+◇ Test synchronizationOwnsPrerollBufferingDriftAndRateAcknowledgment() started.
+✔ Test synchronizationOwnsPrerollBufferingDriftAndRateAcknowledgment() passed after 0.001 seconds.
+◇ Test lifecycleReducerRemembersExactlyOneResumeAfterWakeDecision() started.
+✔ Test lifecycleReducerRemembersExactlyOneResumeAfterWakeDecision() passed after 0.001 seconds.
+◇ Test trackIntentsAreDistinctAndRollbackKeepsOldEffectiveSelection() started.
+✔ Test trackIntentsAreDistinctAndRollbackKeepsOldEffectiveSelection() passed after 0.001 seconds.
+◇ Test controlReducerOwnsRequestedAndAppliedSubtitleDelay() started.
+✔ Test controlReducerOwnsRequestedAndAppliedSubtitleDelay() passed after 0.001 seconds.
+✔ Suite "Deterministic playback core" passed after 0.039 seconds.
+◇ Suite "Optional track recovery" started.
+◇ Test audioDecodeFailureDisablesAudioWhenVideoCanContinue() started.
+✔ Test audioDecodeFailureDisablesAudioWhenVideoCanContinue() passed after 0.001 seconds.
+◇ Test subtitleReadFailureDisablesOnlyTheSubtitleTrack() started.
+✔ Test subtitleReadFailureDisablesOnlyTheSubtitleTrack() passed after 0.001 seconds.
+◇ Test audioPresentationFlushesThenRebuildsThenDisables() started.
+✔ Test audioPresentationFlushesThenRebuildsThenDisables() passed after 0.001 seconds.
+◇ Test audioOnlyDecodeFailureRemainsTerminal() started.
+✔ Test audioOnlyDecodeFailureRemainsTerminal() passed after 0.001 seconds.
+◇ Test recoveryStateDecodesDocumentsFromBeforeOptionalTrackBudgets() started.
+✔ Test recoveryStateDecodesDocumentsFromBeforeOptionalTrackBudgets() passed after 0.001 seconds.
+✔ Suite "Optional track recovery" passed after 0.001 seconds.
+◇ Suite "Playback core replay" started.
+◇ Test canonicalEncodingIgnoresSetAndDictionaryInsertionHistory() started.
+✔ Test canonicalEncodingIgnoresSetAndDictionaryInsertionHistory() passed after 0.001 seconds.
+◇ Test replayJSONRoundTripsWithStableBytes() started.
+✔ Test replayJSONRoundTripsWithStableBytes() passed after 0.001 seconds.
+◇ Test shrinkerProducesDeterministicNonemptyDeletionCandidates() started.
+✔ Test shrinkerProducesDeterministicNonemptyDeletionCandidates() passed after 0.001 seconds.
+✔ Suite "Playback core replay" passed after 0.002 seconds.
+◇ Suite "Playback core model runtime" started.
+◇ Test productionModeSkipsReplayEncodingAndRetention() started.
+✔ Test productionModeSkipsReplayEncodingAndRetention() passed after 0.001 seconds.
+◇ Test seededSequencesRemainDeterministicAndInvariantSafe() started.
+✔ Test seededSequencesRemainDeterministicAndInvariantSafe() passed after 0.013 seconds.
+✔ Suite "Playback core model runtime" passed after 0.014 seconds.
+◇ Suite "Playback parity transport policies" started.
+◇ Test speedSurvivesPauseSeekWakeAndSourceReplacement() started.
+✔ Test speedSurvivesPauseSeekWakeAndSourceReplacement() passed after 0.006 seconds.
+◇ Test loopUsesOneExactSeekAndDoesNotLeakToAnotherFile() started.
+✔ Test loopUsesOneExactSeekAndDoesNotLeakToAnotherFile() passed after 0.004 seconds.
+✔ Suite "Playback parity transport policies" passed after 0.010 seconds.
+◇ Suite "Renderer recovery regression coverage" started.
+◇ Test actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → true, stage → .enqueue to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → true, stage → .flush to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → true, stage → .render to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → false, stage → .enqueue to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → false, stage → .flush to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → false, stage → .render to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+✔ Test actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) with 6 test cases passed after 0.001 seconds.
+◇ Test lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoFlush, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoFlush, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoFlush, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .transientVideo, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .transientVideo, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .transientVideo, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioFlush, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioFlush, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioFlush, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableAudio, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableAudio, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableAudio, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableSubtitle, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableSubtitle, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableSubtitle, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+✔ Test lateRecoveryResultPreservesTerminalFailure(route:token:) with 27 test cases passed after 0.004 seconds.
+◇ Test recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .videoFlush to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .videoRebuild to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .hardwareFallback to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .softwareRestart to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .transientVideo to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .audioFlush to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .audioRebuild to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .disableAudio to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .disableSubtitle to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+✔ Test recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) with 9 test cases passed after 0.001 seconds.
+◇ Test recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .videoFlush, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .videoFlush, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .audioFlush, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .audioFlush, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+✔ Test recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) with 12 test cases passed after 0.002 seconds.
+◇ Test furtherFailureObservationsDoNotRestartATerminalSession() started.
+✔ Test furtherFailureObservationsDoNotRestartATerminalSession() passed after 0.001 seconds.
+◇ Test terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .enqueue, recoverability → .fatal to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .enqueue, recoverability → .cancelled to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .flush, recoverability → .fatal to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .flush, recoverability → .cancelled to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .render, recoverability → .fatal to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .render, recoverability → .cancelled to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+✔ Test terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) with 6 test cases passed after 0.001 seconds.
+◇ Test pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .videoFlush to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .videoRebuild to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .hardwareFallback to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .softwareRestart to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .audioFlush to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .audioRebuild to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+✔ Test pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) with 6 test cases passed after 0.001 seconds.
+◇ Test seekingDoesNotRefundTheRendererBudget() started.
+✔ Test seekingDoesNotRefundTheRendererBudget() passed after 0.001 seconds.
+◇ Test aNewLoadRestoresTheBudgetAfterTerminalFailure() started.
+✔ Test aNewLoadRestoresTheBudgetAfterTerminalFailure() passed after 0.001 seconds.
+◇ Test overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) started.
+◇ Test case passing 1 argument flushFirst → true to overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) started.
+◇ Test case passing 1 argument flushFirst → false to overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) started.
+✔ Test overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) with 2 test cases passed after 0.001 seconds.
+◇ Test persistenceAndTeardownStillCompleteAfterTerminalFailure() started.
+✔ Test persistenceAndTeardownStillCompleteAfterTerminalFailure() passed after 0.001 seconds.
+◇ Test failureOfARecoveryEffectIsNotErasedByAnOlderOptionalTrackCompletion() started.
+✔ Test failureOfARecoveryEffectIsNotErasedByAnOlderOptionalTrackCompletion() passed after 0.001 seconds.
+◇ Test automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.supplyObserved(starved: true, cacheMicroseconds: 0)) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackCore.SynchronizedStream.video, revision: IlliquidPlaybackCore.MediaFormatRevisionID(rawValue: 1))) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemWillSleep) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemDidWake) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .demuxEndOfFile(requiredDrain: Set([])) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+✔ Test automaticObservationsCannotReopenATerminalRecovery(event:) with 5 test cases passed after 0.002 seconds.
+◇ Test otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.seek(target: IlliquidPlaybackCore.MediaTimestamp.valid(IlliquidPlaybackCore.ValidMediaTime(value: 12, timescale: 1)), mode: IlliquidPlaybackCore.SeekMode.exact)), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.seek(target: IlliquidPlaybackCore.MediaTimestamp.valid(IlliquidPlaybackCore.ValidMediaTime(value: 12, timescale: 1)), mode: IlliquidPlaybackCore.SeekMode.exact)), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.seek(target: IlliquidPlaybackCore.MediaTimestamp.valid(IlliquidPlaybackCore.ValidMediaTime(value: 12, timescale: 1)), mode: IlliquidPlaybackCore.SeekMode.exact)), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackCore.SynchronizedStream.video, revision: IlliquidPlaybackCore.MediaFormatRevisionID(rawValue: 1))), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackCore.SynchronizedStream.video, revision: IlliquidPlaybackCore.MediaFormatRevisionID(rawValue: 1))), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackCore.SynchronizedStream.video, revision: IlliquidPlaybackCore.MediaFormatRevisionID(rawValue: 1))), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemDidWake), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemDidWake), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemDidWake), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.setSubtitleDelay(microseconds: 250000)), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.setSubtitleDelay(microseconds: 250000)), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.setSubtitleDelay(microseconds: 250000)), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+✔ Test otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) with 12 test cases passed after 0.003 seconds.
+◇ Test aLateDeadlineDoesNotReplaceTheFirstTerminalError() started.
+✔ Test aLateDeadlineDoesNotReplaceTheFirstTerminalError() passed after 0.001 seconds.
+◇ Test transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) started.
+◇ Test case passing 1 argument command → .play to transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) started.
+◇ Test case passing 1 argument command → .pause to transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) started.
+✔ Test transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) with 2 test cases passed after 0.001 seconds.
+◇ Test spentBudgetSurvivesCodableRoundTripAndLegacyDocuments() started.
+✔ Test spentBudgetSurvivesCodableRoundTripAndLegacyDocuments() passed after 0.001 seconds.
+◇ Test exhaustedRevisionCountersFailWithoutOverflow() started.
+✔ Test exhaustedRevisionCountersFailWithoutOverflow() passed after 0.001 seconds.
+✔ Suite "Renderer recovery regression coverage" passed after 0.020 seconds.
+◇ Suite "Playback bounded state-space explorer" started.
+◇ Test exposesAllSixIndependentModels() started.
+✔ Test exposesAllSixIndependentModels() passed after 0.001 seconds.
+◇ Test everyModelPublishesACompleteScenarioInventory() started.
+✔ Test everyModelPublishesACompleteScenarioInventory() passed after 0.001 seconds.
+◇ Test modelVersionsRecordPendingSourceAndRecoveryDependencySemantics() started.
+✔ Test modelVersionsRecordPendingSourceAndRecoveryDependencySemantics() passed after 0.001 seconds.
+◇ Test approvedProfilesFreezeConservativeBounds() started.
+✔ Test approvedProfilesFreezeConservativeBounds() passed after 0.001 seconds.
+◇ Test trendPolicyFlagsCountAndNormalizationDrift() started.
+✔ Test trendPolicyFlagsCountAndNormalizationDrift() passed after 0.001 seconds.
+◇ Test canonicalizationIsIdempotentAndAlphaRenamingInvariant() started.
+✔ Test canonicalizationIsIdempotentAndAlphaRenamingInvariant() passed after 0.001 seconds.
+◇ Test canonicalizationPreservesBehaviorallyDistinctPendingEffects() started.
+✔ Test canonicalizationPreservesBehaviorallyDistinctPendingEffects() passed after 0.001 seconds.
+◇ Test equalKeysExposeEqualNormalizedEnabledActions() started.
+✔ Test equalKeysExposeEqualNormalizedEnabledActions() passed after 0.001 seconds.
+◇ Test aggregateRecoveryAndReplacementSuccessWaitForExecutorPrerequisites() started.
+✔ Test aggregateRecoveryAndReplacementSuccessWaitForExecutorPrerequisites() passed after 0.001 seconds.
+◇ Test recoveryExecutorPrerequisitesAdvanceAbstractMechanismLifecycle() started.
+✔ Test recoveryExecutorPrerequisitesAdvanceAbstractMechanismLifecycle() passed after 0.001 seconds.
+◇ Test recoveryPrerequisitesExposeOnlyDependencyReadyActions() started.
+✔ Test recoveryPrerequisitesExposeOnlyDependencyReadyActions() passed after 0.001 seconds.
+◇ Test explorerTerminatesAtConfiguredWallClockBudget() started.
+✔ Test explorerTerminatesAtConfiguredWallClockBudget() passed after 0.001 seconds.
+◇ Test recoveryMechanismLifecycleParticipatesInStableCanonicalDigest() started.
+✔ Test recoveryMechanismLifecycleParticipatesInStableCanonicalDigest() passed after 0.001 seconds.
+◇ Test actionCardinalityBudgetsControlFailureAndDuplicateClasses() started.
+✔ Test actionCardinalityBudgetsControlFailureAndDuplicateClasses() passed after 0.001 seconds.
+◇ Test layeredBFSIsDeterministicAndUsesProductionTransitions() started.
+✔ Test layeredBFSIsDeterministicAndUsesProductionTransitions() passed after 0.115 seconds.
+◇ Test everyAdvertisedSeedCanBeConstructed() started.
+✔ Test everyAdvertisedSeedCanBeConstructed() passed after 0.001 seconds.
+◇ Test allSixModelsCompleteAtValidationBounds() started.
+✔ Test allSixModelsCompleteAtValidationBounds() passed after 0.031 seconds.
+◇ Test syntheticFailureProducesStableReplayableArtifact() started.
+✔ Test syntheticFailureProducesStableReplayableArtifact() passed after 0.006 seconds.
+◇ Test causalMinimizerReplaysProductionCoreForEveryAcceptedCandidate() started.
+✔ Test causalMinimizerReplaysProductionCoreForEveryAcceptedCandidate() passed after 0.001 seconds.
+◇ Test progressAnalysisSeparatesNamedWaitsCutoffsAndStuckSCCs() started.
+✔ Test progressAnalysisSeparatesNamedWaitsCutoffsAndStuckSCCs() passed after 0.001 seconds.
+◇ Test externalSubtitleSeedHasNoStuckProgressStates() started.
+✔ Test externalSubtitleSeedHasNoStuckProgressStates() passed after 2.434 seconds.
+◇ Test conservativePORMatchesUnreducedReachabilityAndFailures() started.
+✔ Test conservativePORMatchesUnreducedReachabilityAndFailures() passed after 0.011 seconds.
+◇ Test porValidationReportsEveryNonCommutingCandidatePair() started.
+✔ Test porValidationReportsEveryNonCommutingCandidatePair() passed after 0.001 seconds.
+◇ Test eligibleArtifactPromotesToRuntimeScheduleWithoutInventingMechanisms() started.
+✔ Test eligibleArtifactPromotesToRuntimeScheduleWithoutInventingMechanisms() passed after 0.001 seconds.
+✔ Suite "Playback bounded state-space explorer" passed after 2.610 seconds.
+✔ Test run with 100 tests in 8 suites passed after 2.944 seconds.
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for production...
+[0/16] Compiling CEffectHistoryHeap heap.c
+[1/16] Write swift-version-17CA9076A828B430.txt
+[2/16] Compiling IlliquidCore MediaTrack.swift
+[3/16] Compiling IlliquidPlaybackCore CompletedPlaybackEffectHistory.swift
+[4/16] Compiling IlliquidPlaybackStateSpace PlaybackPartialOrderReducer.swift
+[5/16] Compiling EffectHistoryBenchmark Harness.swift
+[6/16] Compiling IlliquidPlaybackCoreTests CompletedEffectHistoryTests.swift
+[7/16] Write Objects.LinkFileList
+[8/16] Linking EffectHistoryBenchmark
+[9/16] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+[10/16] /tmp/illiquid-effect-history-16dfe/linux-final/candidate/.build/tests/x86_64-unknown-linux-gnu/release/CompletedEffectHistoryPackageDiscoveredTests.derived/all-discovered-tests.swift
+[11/16] Compiling CompletedEffectHistoryPackageDiscoveredTests IlliquidPlaybackCoreTests.swift
+[12/16] /tmp/illiquid-effect-history-16dfe/linux-final/candidate/.build/tests/x86_64-unknown-linux-gnu/release/CompletedEffectHistoryPackageTests.derived/runner.swift
+[13/16] Compiling CompletedEffectHistoryPackageTests runner.swift
+[14/16] Write Objects.LinkFileList
+[15/16] Linking CompletedEffectHistoryPackageTests.xctest
+Build complete! (37.70s)

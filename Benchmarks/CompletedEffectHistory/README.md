@@ -82,7 +82,7 @@ controls are particularly susceptible to timer and scheduling noise.
 ## Correctness gates
 
 The runner executes existing baseline core/state-space tests in release mode and
-candidate tests in debug and release mode. A byte-equivalent deterministic replay
+candidate tests in debug and release mode. An identical deterministic replay and semantic-output
 comparison covers duplicate callbacks, unknown IDs, out-of-order completions,
 stale contexts and source replacement. Every timed pair must agree on command and
 completion counts, effect-ID checksum, final canonical state digest, Codable
@@ -103,9 +103,96 @@ approach was rejected. Keeping a verified prefix plus a Set for the remainder
 avoids that shifting behavior and retains the existing data structure for
 unusual sparse histories.
 
+## Native macOS results
+
+macOS 26.6.2 on arm64, Apple Swift 6.3.3, optimized builds. Baseline
+`af1c1add701e49b355448cf8983eaed1e7623108` and candidate
+`386c1160c934472c83ac1045aed4f50945e0150c` used identical benchmark sources.
+The [native workflow](https://github.com/Jagalite/illiquid/actions/runs/40004876258)
+passed both component and app integration jobs. There are six alternating pairs
+per workload and size, 144 fresh-process observations in total.
+
+| Workload at 32,768 cycles | Completed effects | Baseline retained bytes | Candidate retained bytes | Reduction |
+| --- | ---: | ---: | ---: | ---: |
+| Transport | 65,538 | 1,118,272 | 36,928 | 96.70% |
+| Source replacement | 65,538 | 1,118,272 | 36,928 | 96.70% |
+| Out-of-order checkpoint burst | 32,770 | 611,264 | 70,592 | 88.45% |
+| Unclosed-gap control | 65,538 | 1,118,272 | 1,118,272 | 0.00% |
+
+These allocator deltas include other model/runtime allocations. In particular,
+the candidate's aggregate macOS fixture total varies across workload sizes;
+the result does not establish constant memory for the whole fixture. The
+verified consecutive completed-ID prefix itself occupies one counter, while
+sparse completed IDs continue to occupy a Set.
+
+Median component wall-time changes for these longest workloads were -6.34%,
+-3.50%, -0.52%, and +0.24%, respectively. The short gap control increased by
+4.71%, and timing ranges overlap. This study supports a retained-memory
+improvement without a demonstrated large timing regression, not a statistically
+established speedup or whole-player playback claim. All sizes, raw observations,
+CPU timings, ranges, source hashes and test logs are in
+[`evidence/macos-arm64/`](evidence/macos-arm64/).
+
+Native qualification passed:
+
+- 88 baseline core/state-space tests in release mode.
+- 100 candidate core/state-space tests in both debug and release mode.
+- Identical deterministic replay/semantic output and all measured-pair checks.
+- A complete native app graph build using the repository's pinned SDK, followed
+  by 186 selected release tests across core, state-space, coordinator, renderer
+  recovery and relative-seek lifetime suites. See
+  [`native-integration-job.log`](evidence/macos-arm64/native-integration-job.log).
+
+## Portable results
+
+Linux x86_64, glibc 2.39, Swift 6.3.2, optimized builds. These are medians
+from six alternating baseline/candidate pairs per workload and size; all 144
+observations and their ranges are included in
+[`evidence/linux-x86_64/`](evidence/linux-x86_64/).
+
+| Workload at 32,768 cycles | Completed effects | Baseline retained bytes | Candidate retained bytes | Reduction |
+| --- | ---: | ---: | ---: | ---: |
+| Transport | 65,538 | 1,072,256 | 2,608 | 99.76% |
+| Source replacement | 65,538 | 1,072,256 | 2,608 | 99.76% |
+| Out-of-order checkpoint burst | 32,770 | 571,944 | 35,504 | 93.79% |
+| Unclosed-gap control | 65,538 | 1,072,256 | 1,072,256 | 0.00% |
+
+The transport and replacement candidate retained delta was 2,608 bytes at all
+three tested sizes: 32, 4,096 and 32,768 cycles. The gap control deliberately
+demonstrates the remaining linear-storage case. The checkpoint workload also
+retains model and diagnostic allocations unrelated to the completed-ID Set;
+the table reports the entire fixture rather than attributing every byte to
+one field.
+
+For the longest workloads, median component wall time changed by -8.46%
+(transport), -7.64% (replacement), -6.81% (checkpoint burst), and -0.62% (gap
+control). Smaller controls included changes of +1.83% and +1.87%. These timings
+are observations from one environment, not a player throughput or frame-rate
+claim; the retained-memory result is the purpose of the change.
+
+The baseline passed all 88 existing core/state-space tests in release mode.
+The candidate passed all 100 tests, including 12 new history regressions, in
+both debug and release. The deterministic replay/semantic output was identical
+between implementations, and every measured pair passed its semantic checks.
+The run began from an uncommitted candidate worktree above the baseline HEAD;
+[`receipts.json`](evidence/linux-x86_64/receipts.json) subsequently verifies every
+candidate bundle and harness hash against published source commit
+`386c1160c934472c83ac1045aed4f50945e0150c`.
+
 ## Evidence
 
 Final native and portable results, source receipts, and test summaries are stored
 under `evidence/`. See those receipts for the measured candidate source hashes and
 exact scope; benchmark counts are synthetic stress workloads, not inferred user
 session durations.
+
+Verbose observations, replay output and command transcripts are stored as
+deterministic gzip files to keep the review focused on source changes. Their
+compressed and original SHA-256 hashes are in each platform's `receipts.json`.
+For example, `gzip -dc evidence/macos-arm64/observations.json.gz` prints every
+native observation. The runner itself writes ordinary uncompressed JSON.
+
+The native workflow runs the full paired experiment on this research branch and
+on manual dispatch. Subsequent pull requests run the exact-source correctness
+gates with `--tests-only` plus native integration; they do not treat noisy timing
+percentages as a pass/fail performance threshold.
