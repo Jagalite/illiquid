@@ -1,0 +1,106 @@
+name: Audio PCM block buffer memory
+
+on:
+  push:
+    branches: ['perf/audio-pcm-block-buffer-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/AudioPCMBlockBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/SampleBufferAudioPresenter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AudioPCMBlockBufferTests.swift'
+      - 'Benchmarks/AudioPCMBlockBuffer/**'
+      - '.github/workflows/audio-pcm-block-buffer.yml'
+      - '!Benchmarks/AudioPCMBlockBuffer/README.md'
+      - '!Benchmarks/AudioPCMBlockBuffer/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/AudioPCMBlockBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/SampleBufferAudioPresenter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AudioPCMBlockBufferTests.swift'
+      - 'Benchmarks/AudioPCMBlockBuffer/**'
+      - '.github/workflows/audio-pcm-block-buffer.yml'
+      - '!Benchmarks/AudioPCMBlockBuffer/README.md'
+      - '!Benchmarks/AudioPCMBlockBuffer/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audio-pcm-block-buffer-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-audio-memory:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Measure native PCM ownership and paired memory costs
+        run: |
+          python3 Benchmarks/AudioPCMBlockBuffer/run.py \
+            --pairs 8 --target-ms 120 \
+            --output "$RUNNER_TEMP/audio-pcm-block-buffer/benchmark"
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate real audio playback fixtures
+        run: |
+          fixture_dir="$RUNNER_TEMP/audio-pcm-block-buffer/fixtures"
+          mkdir -p "$fixture_dir"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'anullsrc=r=48000:cl=7.1' -t 2 -c:a flac \
+            "$fixture_dir/audio-7.1.flac"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'testsrc2=size=640x360:rate=30' \
+            -f lavfi -i 'sine=frequency=440:sample_rate=48000' \
+            -t 3 -shortest -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac \
+            "$fixture_dir/h264-aac.mp4"
+          test -s "$fixture_dir/audio-7.1.flac"
+          test -s "$fixture_dir/h264-aac.mp4"
+      - name: Build app graph and qualify PCM lifetimes and audio playback
+        run: |
+          export ILLIQUID_NATIVE_FIXTURE_DIR="$RUNNER_TEMP/audio-pcm-block-buffer/fixtures"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+            'AudioPCMBlockBufferTests|MultichannelAudioTests|AudioResamplerDrainTests|AudioSampleSanitizationTests|AudioDelayTests|AudioSourceFormatTests|audioSanitizationZerosInvalidSamplesOnly|resampledAudioBuffersUseAContinuousOutputClock|resampledAudioClockPreservesRealGapsAndResets|exactSeekTrimsAudioAtTheFirstSampleOnOrAfterTarget' \
+            2>&1 | tee "$RUNNER_TEMP/audio-pcm-block-buffer/native-tests.log"
+      - name: Emit reviewable result receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'audio-pcm-block-buffer'
+          files = {}
+          for path in sorted(root.rglob('*')):
+              if (path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}
+                      and not any(part in {'build', 'module-cache', 'cache', '.build'} for part in path.relative_to(root).parts)):
+                  files[str(path.relative_to(root))] = path.read_text()
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print('AUDIO_PCM_REVIEW_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('AUDIO_PCM_REVIEW_BASE64 ' + base64.b64encode(packed).decode())
+          for name, value in files.items():
+              if name.endswith(('summary.json', 'parity.json', 'completion.json')):
+                  print(name + '\n' + value)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: audio-pcm-block-buffer-native
+          path: |
+            ${{ runner.temp }}/audio-pcm-block-buffer/**/*.json
+            ${{ runner.temp }}/audio-pcm-block-buffer/**/*.jsonl
+            ${{ runner.temp }}/audio-pcm-block-buffer/**/*.log
+            ${{ runner.temp }}/audio-pcm-block-buffer/**/*.txt
+            ${{ runner.temp }}/audio-pcm-block-buffer/**/*.swift
+            ${{ runner.temp }}/audio-pcm-block-buffer/**/*.py
+          retention-days: 14

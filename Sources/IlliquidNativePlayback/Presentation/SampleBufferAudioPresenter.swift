@@ -124,33 +124,7 @@ final class SampleBufferAudioPresenter: @unchecked Sendable {
         guard !overflow, frame.interleavedFloatPCM.count == bytes else {
             throw PresentationError("PCM sample count does not match its backing bytes")
         }
-        var blockBuffer: CMBlockBuffer?
-        try checkOSStatus(
-            CMBlockBufferCreateWithMemoryBlock(
-                allocator: kCFAllocatorDefault,
-                memoryBlock: nil,
-                blockLength: frame.interleavedFloatPCM.count,
-                blockAllocator: kCFAllocatorDefault,
-                customBlockSource: nil,
-                offsetToData: 0,
-                dataLength: frame.interleavedFloatPCM.count,
-                flags: 0,
-                blockBufferOut: &blockBuffer
-            ),
-            operation: "Create audio block buffer"
-        )
-        guard let blockBuffer else {
-            throw PresentationError("Audio block buffer was not created")
-        }
-        let copyStatus = frame.interleavedFloatPCM.withUnsafeBytes { bytes in
-            CMBlockBufferReplaceDataBytes(
-                with: bytes.baseAddress!,
-                blockBuffer: blockBuffer,
-                offsetIntoDestination: 0,
-                dataLength: bytes.count
-            )
-        }
-        try checkOSStatus(copyStatus, operation: "Copy decoded audio")
+        let blockBuffer = try AudioPCMBlockBuffer.make(frame.interleavedFloatPCM)
 
         var timing = CMSampleTimingInfo(
             duration: CMTime(value: 1, timescale: Int32(frame.sampleRate)),
