@@ -1,0 +1,112 @@
+name: Completed effect history memory
+
+on:
+  push:
+    branches: ['perf/completed-effect-history-20261023-16dfe']
+    paths:
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Tests/IlliquidPlaybackCoreTests/**'
+      - 'Benchmarks/CompletedEffectHistory/**'
+      - '.github/workflows/completed-effect-history.yml'
+      - '!Benchmarks/CompletedEffectHistory/*.md'
+      - '!Benchmarks/CompletedEffectHistory/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Tests/IlliquidPlaybackCoreTests/**'
+      - 'Tests/IlliquidPlayerTests/RelativeSeekEffectLifetimeTests.swift'
+      - 'Benchmarks/CompletedEffectHistory/**'
+      - '.github/workflows/completed-effect-history.yml'
+      - '!Benchmarks/CompletedEffectHistory/*.md'
+      - '!Benchmarks/CompletedEffectHistory/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: completed-effect-history-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test state, replay and exact legacy checkpoint compatibility
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/CompletedEffectHistory/run.py \
+            --output "$RUNNER_TEMP/completed-effect-history" \
+            --pairs 6 --cycles 32,4096,32768 "${mode[@]}"
+      - name: Emit native results and reproducibility receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'completed-effect-history'
+          paths = set(root.glob('*.json')) | set(root.glob('*.jsonl')) | set(root.glob('*.log'))
+          files = {p.name: p.read_text() for p in sorted(paths) if p.is_file()}
+          for name in ['summary.json']:
+              if name in files:
+                  print(f'::group::{name}')
+                  print(files[name])
+                  print('::endgroup::')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log bundle limit; use the artifact')
+          print('EFFECT_HISTORY_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('EFFECT_HISTORY_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: completed-effect-history-component
+          path: |
+            ${{ runner.temp }}/completed-effect-history/*.json
+            ${{ runner.temp }}/completed-effect-history/*.jsonl
+            ${{ runner.temp }}/completed-effect-history/*.log
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and qualify core and driver behavior
+        run: |
+          mkdir -p "$RUNNER_TEMP/effect-history-integration"
+          sw_vers > "$RUNNER_TEMP/effect-history-integration/host.txt"
+          swift --version >> "$RUNNER_TEMP/effect-history-integration/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/effect-history-integration/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'CompletedEffectHistoryTests|PlaybackCoreTests|PlaybackParityCoreTests|RendererRecoveryRegressionTests|PlaybackStateSpaceTests|RelativeSeekEffectLifetimeTests|PlaybackCoordinatorTests' \
+            2>&1 | tee "$RUNNER_TEMP/effect-history-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: completed-effect-history-integration
+          path: ${{ runner.temp }}/effect-history-integration/
+          retention-days: 14

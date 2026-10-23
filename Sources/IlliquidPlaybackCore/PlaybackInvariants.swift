@@ -96,7 +96,7 @@ public enum PlaybackInvariantChecker {
             details: "Outstanding effect key and effect context disagree."
           ))
       }
-      if state.completedEffectIDs.contains(effectID) {
+      if state.containsCompletedEffect(effectID) {
         violations.append(
           .init(
             name: "completedEffectIsNotOutstanding",

@@ -240,7 +240,7 @@ public struct PlaybackCoreState: Codable, Equatable, Sendable {
   public var pendingSession: PendingPlaybackSession?
   public var lastLoadFailure: PlaybackFailure?
   public var outstandingEffects: [PlaybackEffectID: OutstandingEffectRecord]
-  public var completedEffectIDs: Set<PlaybackEffectID>
+  @CompletedPlaybackEffectHistory public var completedEffectIDs: Set<PlaybackEffectID>
   public var resourceLeases: [ResourceLeaseKey: ResourceLeaseRecord]
   public var allocator: PlaybackIDAllocator
   public var snapshotRevision: UInt64
@@ -288,6 +288,22 @@ public struct PlaybackCoreState: Codable, Equatable, Sendable {
     self.lastPersistenceFailureCode = lastPersistenceFailureCode
     self.externalWaitReason = externalWaitReason
   }
+
+  func containsCompletedEffect(_ id: PlaybackEffectID) -> Bool {
+    _completedEffectIDs.contains(id)
+  }
+
+  mutating func recordCompletedEffect(_ id: PlaybackEffectID) {
+    _completedEffectIDs.insert(id)
+  }
+
+  var completedEffectHistoryPrefixCount: UInt64 { _completedEffectIDs.prefixCount }
+
+  var completedEffectHistorySparseCount: Int { _completedEffectIDs.sparseCount }
+
+  var completedEffectHistorySparseCapacity: Int { _completedEffectIDs.sparseCapacity }
+
+  var sortedCompletedEffectIDs: [PlaybackEffectID] { _completedEffectIDs.sortedIDs }
 }
 
 public struct PlaybackUISnapshot: Codable, Equatable, Sendable {
