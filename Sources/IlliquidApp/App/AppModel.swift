@@ -354,6 +354,18 @@ final class AppModel {
             setChromePin(.alwaysVisible, active: areControlsAlwaysVisible)
         }
     }
+    private var storedControlsAutoHideTimeout = PlaybackChromePreferences.load()
+    var controlsAutoHideTimeout: TimeInterval {
+        get { storedControlsAutoHideTimeout }
+        set {
+            let interval = PlaybackChromePreferences.resolve(newValue)
+            guard interval != storedControlsAutoHideTimeout else { return }
+            storedControlsAutoHideTimeout = interval
+            UserDefaults.standard.set(interval, forKey: PlaybackChromePreferences.storageKey)
+            chromeMachine.setAutoHideInterval(interval, now: Self.currentTime())
+            synchronizeChrome()
+        }
+    }
     var isControlsPositionLocked = UserDefaults.standard.bool(forKey: "Illiquid.controls-position-locked") {
         didSet {
             cancelActiveInteraction()
@@ -394,6 +406,7 @@ final class AppModel {
             ?? true
         isAlwaysOnTop = defaults.bool(forKey: Self.alwaysOnTopKey)
         let now = Self.currentTime()
+        chromeMachine.setAutoHideInterval(controlsAutoHideTimeout, now: now)
         chromeMachine.setPin(.alwaysVisible, active: areControlsAlwaysVisible, now: now)
         chromeMachine.setPin(.noMedia, active: true, now: now)
         chromeMachine.setPin(
@@ -1201,6 +1214,16 @@ final class AppModel {
         case let .doubleClickSeek(seconds):
             guard !hasTransientPresentation, playerWindow?.attachedSheet == nil else { return }
             performRelativeSeek(seconds)
+        case let .primaryClickPending(isPending):
+            chromeMachine.setVideoSurfaceClickPending(isPending, now: Self.currentTime())
+            if isPending, !hasTransientPresentation, playerWindow?.attachedSheet == nil {
+                playbackFocusOwners.removeAll()
+                chromeMachine.handleVideoSurfacePress(
+                    reducedMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
+                    now: Self.currentTime()
+                )
+            }
+            synchronizeChrome()
         case .primaryClick:
             guard !hasTransientPresentation, playerWindow?.attachedSheet == nil else { return }
             // The native surface now owns first responder. Do not let stale
@@ -2268,6 +2291,7 @@ final class AppModel {
 
     private func updatePlaybackChromePins() {
         let now = Self.currentTime()
+        chromeMachine.setPlaybackPaused(state.isPauseDesired, now: now)
         chromeMachine.setPin(
             .windowResize,
             active: playerWindow?.inLiveResize == true && state.phase == .paused,

@@ -11,14 +11,14 @@ struct PlayerInterfaceScaleTests {
         let defaults = UserDefaults(suiteName: name)!
         defer { defaults.removePersistentDomain(forName: name) }
         let store = PlayerInterfaceScaleStore(defaults: defaults)
-        #expect(store.percentage == 100)
+        #expect(store.percentage == 90)
         store.increase()
-        #expect(PlayerInterfaceScaleStore(defaults: defaults).percentage == 110)
-        store.decrease()
-        store.decrease()
-        #expect(PlayerInterfaceScaleStore(defaults: defaults).percentage == 90)
-        store.reset()
         #expect(PlayerInterfaceScaleStore(defaults: defaults).percentage == 100)
+        store.decrease()
+        store.decrease()
+        #expect(PlayerInterfaceScaleStore(defaults: defaults).percentage == 80)
+        store.reset()
+        #expect(PlayerInterfaceScaleStore(defaults: defaults).percentage == 90)
     }
 
     @Test func repeatedShortcutsStopAtBoundsAndInvalidPreferencesRecover() {
@@ -27,7 +27,7 @@ struct PlayerInterfaceScaleTests {
         defer { defaults.removePersistentDomain(forName: name) }
         defaults.set(999, forKey: PlayerInterfaceScaleStore.storageKey)
         let store = PlayerInterfaceScaleStore(defaults: defaults)
-        #expect(store.percentage == 100)
+        #expect(store.percentage == 90)
         for _ in 0..<20 { store.increase() }
         #expect(store.percentage == 150)
         #expect(!store.canIncrease && store.canDecrease)
@@ -38,7 +38,7 @@ struct PlayerInterfaceScaleTests {
         #expect(store.percentage == 80)
     }
 
-    @Test(arguments: [0.8, 1.0, 1.5])
+    @Test(arguments: [0.8, 0.9, 1.0, 1.5])
     func sidebarEdgeTracksPhysicalPointerTravel(factor: Double) {
         let start: CGFloat = 420
         for distance: CGFloat in [-72, 96] {
@@ -58,7 +58,7 @@ struct PlayerInterfaceScaleTests {
         #expect(abs((end - visibleStart) * factor + 60) < 0.01)
     }
 
-    @Test(arguments: [0.8, 1.0, 1.5])
+    @Test(arguments: [0.8, 0.9, 1.0, 1.5])
     func scaledContentReservesItsVisibleFootprint(factor: Double) {
         let view = NSHostingView(rootView:
             PlayerInterfaceScaleLayout(factor: factor) {
@@ -70,7 +70,7 @@ struct PlayerInterfaceScaleTests {
         #expect(abs(view.fittingSize.height - 80 * factor) < 0.01)
     }
 
-    @Test(arguments: [0.8, 1.0, 1.5])
+    @Test(arguments: [0.8, 0.9, 1.0, 1.5])
     func chromeUsesLogicalViewportWhileVideoKeepsPhysicalViewport(factor: Double) {
         let sizes = ViewportSizes()
         let view = NSHostingView(rootView: ZStack {

@@ -10,9 +10,25 @@ enum SourcesSidebarPreferences {
     static let typeSortKey = "Illiquid.sources-sidebar-sort-type.v2"
 
     static let defaultWidth = Double(SourcesSidebarSizing.defaultWidth)
-    static let defaultNameSort = SourceTreeSortDirection.ascending.rawValue
-    static let defaultDateCreatedSort = SourceTreeSortDirection.off.rawValue
+    static let defaultNameSort = SourceTreeSortDirection.off.rawValue
+    static let defaultDateCreatedSort = SourceTreeSortDirection.descending.rawValue
     static let defaultTypeSort = SourceTreeSortDirection.off.rawValue
+
+    static func initializeSortPreferences(defaults: UserDefaults = .standard) {
+        let keys = [nameSortKey, dateCreatedSortKey, typeSortKey]
+        let hasSavedSort = keys.contains { defaults.object(forKey: $0) != nil }
+        // A partially saved choice used the old defaults for its missing keys.
+        // Fill the whole configuration once so the new date default cannot
+        // override a saved name or type preference on this or a later launch.
+        let initialValues = [
+            (nameSortKey, hasSavedSort ? SourceTreeSortDirection.ascending.rawValue : defaultNameSort),
+            (dateCreatedSortKey, hasSavedSort ? SourceTreeSortDirection.off.rawValue : defaultDateCreatedSort),
+            (typeSortKey, defaultTypeSort),
+        ]
+        for (key, value) in initialValues where defaults.object(forKey: key) == nil {
+            defaults.set(value, forKey: key)
+        }
+    }
 }
 
 struct SourcesSidebar: View {

@@ -239,12 +239,8 @@ private struct PlayerPane: View {
                 }
             }
         }
-        .contentShape(Rectangle())
-        .onHover { isHovering in
-            if !isHovering {
-                model.pointerExitedWindow()
-            }
-        }
+        // Empty chrome space must pass clicks through to the native video.
+        // Window exit is tracked by the native surface and AppModel monitors.
     }
 }
 

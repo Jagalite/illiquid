@@ -19,6 +19,7 @@ struct IlliquidApp: App {
                 destinationDomain: LegacyPreferencesMigration.bundleIdentifier
             )
         }
+        SourcesSidebarPreferences.initializeSortPreferences()
         _themeStore = State(initialValue: PlayerThemeStore.shared)
         _interfaceScale = State(initialValue: PlayerInterfaceScaleStore.shared)
     }

@@ -236,8 +236,7 @@ final class NativePlayerNSView: NSView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        pendingSurfaceClick?.cancel()
-        pendingSurfaceClick = nil
+        cancelPendingSurfaceClick()
         surfacePressOrigin = nil
         updateDisplayConfiguration()
         DispatchQueue.main.async { [weak self] in
@@ -283,17 +282,33 @@ final class NativePlayerNSView: NSView {
 
     private var surfacePressOrigin: NSPoint?
     private var pendingSurfaceClick: Task<Void, Never>?
-    override func mouseDown(with event: NSEvent) {
+    private var isSurfaceClickPending = false
+
+    private func setSurfaceClickPending(_ isPending: Bool) {
+        guard isSurfaceClickPending != isPending else { return }
+        isSurfaceClickPending = isPending
+        onInteraction?(.primaryClickPending(isPending))
+    }
+
+    private func cancelPendingSurfaceClick() {
         pendingSurfaceClick?.cancel()
         pendingSurfaceClick = nil
+        surfacePressOrigin = nil
+        setSurfaceClickPending(false)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        cancelPendingSurfaceClick()
         window?.makeFirstResponder(self)
         surfacePressOrigin = event.locationInWindow
+        setSurfaceClickPending(event.clickCount == 1)
     }
 
     override func mouseDragged(with event: NSEvent) {
         if let origin = surfacePressOrigin,
            hypot(event.locationInWindow.x - origin.x, event.locationInWindow.y - origin.y) > 4 {
             surfacePressOrigin = nil
+            cancelPendingSurfaceClick()
         }
     }
 
@@ -301,9 +316,13 @@ final class NativePlayerNSView: NSView {
         defer { surfacePressOrigin = nil }
         guard let origin = surfacePressOrigin,
               hypot(event.locationInWindow.x - origin.x, event.locationInWindow.y - origin.y) <= 4,
-              bounds.contains(convert(event.locationInWindow, from: nil)), window?.isKeyWindow == true else { return }
+              bounds.contains(convert(event.locationInWindow, from: nil)), window?.isKeyWindow == true else {
+            cancelPendingSurfaceClick()
+            return
+        }
         let location = convert(event.locationInWindow, from: nil)
         if event.clickCount >= 2 {
+            cancelPendingSurfaceClick()
             let fraction = (location.x - bounds.minX) / bounds.width
             if fraction < 1.0 / 3.0 {
                 onInteraction?(.doubleClickSeek(-5))
@@ -321,19 +340,22 @@ final class NativePlayerNSView: NSView {
                 } catch {
                     return
                 }
-                guard let self, let clickWindow,
+                guard let self else { return }
+                defer {
+                    self.pendingSurfaceClick = nil
+                    self.setSurfaceClickPending(false)
+                }
+                guard let clickWindow,
                       self.window === clickWindow, clickWindow.isKeyWindow,
                       clickWindow.firstResponder === self,
                       clickWindow.attachedSheet == nil else { return }
-                self.pendingSurfaceClick = nil
                 self.onInteraction?(.primaryClick)
             }
         }
     }
 
     override func keyDown(with event: NSEvent) {
-        pendingSurfaceClick?.cancel()
-        pendingSurfaceClick = nil
+        cancelPendingSurfaceClick()
         guard !isVoiceOverEnabled() else {
             super.keyDown(with: event)
             return
@@ -364,8 +386,7 @@ final class NativePlayerNSView: NSView {
     }
 
     override func rightMouseDown(with event: NSEvent) {
-        pendingSurfaceClick?.cancel()
-        pendingSurfaceClick = nil
+        cancelPendingSurfaceClick()
         onUserActivity?()
         super.rightMouseDown(with: event)
     }
@@ -375,15 +396,13 @@ final class NativePlayerNSView: NSView {
     }
 
     override func otherMouseDown(with event: NSEvent) {
-        pendingSurfaceClick?.cancel()
-        pendingSurfaceClick = nil
+        cancelPendingSurfaceClick()
         onUserActivity?()
         onInteraction?(.auxiliaryButton(event.buttonNumber))
     }
 
     override func scrollWheel(with event: NSEvent) {
-        pendingSurfaceClick?.cancel()
-        pendingSurfaceClick = nil
+        cancelPendingSurfaceClick()
         onUserActivity?()
         onInteraction?(.scroll(PlaybackSurfaceScroll(
             deltaX: event.scrollingDeltaX,

@@ -215,7 +215,40 @@ struct SettingsView: View {
             SettingsSectionLabel("Controls")
             SettingsCard {
                 Toggle("Always show playback controls", isOn: $model.areControlsAlwaysVisible)
-                Text("Automatic hiding waits 2.5 seconds after activity. Focus and active interactions keep controls visible.")
+                SettingsRow(
+                    title: "Auto-hide timeout",
+                    detail: "Seconds of inactivity while playing (0.5–60). Focus and active interactions keep controls visible."
+                ) {
+                    HStack(spacing: 8) {
+                        TextField(
+                            "Auto-hide timeout in seconds",
+                            value: $model.controlsAutoHideTimeout,
+                            format: .number
+                        )
+                        .labelsHidden()
+                        .textFieldStyle(.roundedBorder)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 72)
+                        .accessibilityLabel("Auto-hide timeout in seconds")
+                        .accessibilityHint("Enter a delay from 0.5 to 60 seconds.")
+
+                        Text("seconds")
+                            .foregroundStyle(.secondary)
+
+                        Stepper(
+                            "Adjust auto-hide timeout",
+                            value: $model.controlsAutoHideTimeout,
+                            in: PlaybackChromePreferences.allowedRange,
+                            step: 0.5
+                        )
+                        .labelsHidden()
+                        .fixedSize()
+                        .accessibilityLabel("Adjust auto-hide timeout in seconds")
+                        .accessibilityValue(Text("\(model.controlsAutoHideTimeout, format: .number) seconds"))
+                    }
+                    .disabled(model.areControlsAlwaysVisible)
+                }
+                Text("Paused controls stay visible until manually hidden. Click the video to hide controls while playing or paused.")
                     .font(.caption).foregroundStyle(.secondary)
                 Toggle("Lock controls position", isOn: $model.isControlsPositionLocked)
                 Button("Reset Controls Position", action: model.resetControlsPosition)

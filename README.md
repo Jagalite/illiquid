@@ -20,13 +20,21 @@ current Homebrew versions may differ. See the pinned CI inputs in
 
 ```sh
 brew install ffmpeg libass pkg-config
-swift run Illiquid
+./Scripts/run-app.sh
 # Validate the architecture separately:
 swift run IlliquidArchitectureCheck
 swift test --no-parallel
 ./Scripts/build-local-dmg.sh
 open dist/Illiquid.app
 ```
+
+`run-app.sh` builds and runs the optimized release executable directly, without
+packaging an `.app` or running a signing step. Use `--configuration debug` for a
+development build. When the pinned native SDK is installed, the launcher selects
+its FFmpeg and runtime library directories, including the matching x265 library,
+so moved Homebrew `opt` links do not break source launches. An explicit
+`PKG_CONFIG_PATH` keeps your selected toolchain; use `ILLIQUID_NATIVE_LIBRARY_PATH`
+for any runtime library directory overrides it needs.
 
 See [DISTRIBUTING.md](DISTRIBUTING.md) for release packaging
 and [Documentation/MANUAL_PLAYBACK_CHECKLIST.md](Documentation/MANUAL_PLAYBACK_CHECKLIST.md)
@@ -35,9 +43,13 @@ for physical-device playback QA.
 The [living findings register](Documentation/ROBUSTNESS_REVIEW_MPV_IINA.md)
 tracks structural, robustness, and user-experience research against mpv and IINA.
 
-Use **⌘+** and **⌘−** to resize the interface, and **⌘0** to reset it to 100%.
-The scale is remembered across launches and can also be selected in
+Use **⌘+** and **⌘−** to resize the interface, and **⌘0** to reset it to the
+90% default. The scale is remembered across launches and can also be selected in
 **Settings → Appearance → UI Scale** (80–150%, in 10% steps).
+
+The UI hide timer runs only while playing. Single-click the video outside the
+controls to hide or show them while playing or paused. Adjust the delay in
+**Settings → Playback → Controls → Auto-hide timeout** (0.5–60 seconds).
 
 Double-click or double-tap the video’s left third to seek backward 5 seconds,
 or the right third to seek forward 5 seconds. Double-click the center third to
