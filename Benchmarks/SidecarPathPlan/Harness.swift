@@ -164,11 +164,13 @@ private struct Measurement: Encodable {
 private func consume(_ values: [RecognizedMediaName]) -> UInt64 {
     var checksum: UInt64 = 0
     for value in values {
-        checksum &+= UInt64(value.title.utf8.count + value.kind.rawValue.utf8.count
-            + (value.year ?? 0) + (value.season ?? 0) + (value.episode ?? 0)
-            + (value.lastEpisode ?? 0) + (value.episodeTitle?.utf8.count ?? 0)
-            + (value.airDate?.utf8.count ?? 0) + (value.edition?.utf8.count ?? 0)
-            + (value.variant?.utf8.count ?? 0) + value.catalogIDs.count + value.metadataSources.count)
+        var contribution: Int = value.title.utf8.count + value.kind.rawValue.utf8.count
+        contribution += (value.year ?? 0) + (value.season ?? 0)
+        contribution += (value.episode ?? 0) + (value.lastEpisode ?? 0)
+        contribution += (value.episodeTitle?.utf8.count ?? 0) + (value.airDate?.utf8.count ?? 0)
+        contribution += (value.edition?.utf8.count ?? 0) + (value.variant?.utf8.count ?? 0)
+        contribution += value.catalogIDs.count + value.metadataSources.count
+        checksum &+= UInt64(contribution)
     }
     return checksum
 }

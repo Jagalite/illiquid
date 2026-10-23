@@ -1,5 +1,8 @@
 # PGS composition metadata: avoid a temporary packet copy
 
+> Integration review update (2026-10-22): the previously pending [native rerun](https://github.com/Jagalite/illiquid/actions/runs/39851029701) completed successfully at `18ff51664de46c55b3b9aae1c195efd2b09259d0`. Its app/test graph build and 29 tests in four suites passed. Pending statements below describe the original publication snapshot. Combined-branch validation is reported separately by the integration PR checks.
+
+
 ## Question and scope
 
 Can the bitmap-subtitle adapter inspect PGS composition metadata without copying

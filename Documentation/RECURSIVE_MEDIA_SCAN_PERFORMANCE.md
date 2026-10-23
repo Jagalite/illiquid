@@ -1,5 +1,8 @@
 # Recursive media scan performance
 
+> Integration review update (2026-10-22): the previously queued [native qualification](https://github.com/Jagalite/illiquid/actions/runs/39853427231) completed successfully at `a8ed1e86a82ce8000044ff424f9a140e21d4a51f`. This updates the execution status; the Linux measurements below remain Linux measurements. Combined-branch validation is reported separately by the integration PR checks.
+
+
 ## Problem and change
 
 `SourceRecursiveMediaLoader.read` discovers media for recursive source-browser
