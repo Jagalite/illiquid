@@ -7,6 +7,11 @@ resident process memory:** the large-font fixtures had approximately 16 MiB
 higher current RSS with the candidate, while peak RSS was essentially unchanged.
 That adverse result is retained alongside the allocation and timing results.
 
+**Review status:** the native component experiment and independent evidence audit
+are complete. Application runtime qualification remains pending: the first test
+build failed on new test assertions, those assertions are corrected, and the
+native rerun is queued. The proposal is a draft until that gate is resolved.
+
 ## Problem and change
 
 The primary playback input supplies embedded fonts to both the main and Picture
@@ -220,5 +225,25 @@ in the complete raw evidence.
 
 ### Corrected native qualification
 
-The corrected test run and its full evidence will be recorded here before this
-study is submitted for review.
+[Run 40102141590](https://github.com/Jagalite/illiquid/actions/runs/40102141590)
+targets corrected commit `a95e1f09b379a31892181b20f6d9de0a042179c0`.
+It was still queued when this draft was prepared on 2026-10-24; it has not
+produced a second measurement cohort or an application-test pass. The report
+and committed evidence above describe only the completed first component run.
+
+The queued workflow will rebuild the exact native component comparison and run
+the release application test graph with these suites:
+
+- `AuxiliaryFontAttachmentTests`: default/explicit font loading, metadata and
+  native codec parity, owned codec lifetime, complete packet reads, and seeking.
+- `AuxiliaryFontPlaybackTests`: real-font main/PiP rendering after constructing
+  a session with independent subtitle and delayed-audio readers.
+- Existing `FontAttachmentAdmissionTests`, `NativePlaybackFoundationTests`, and
+  `InputReadFailureTests`.
+
+These are pending checks, not recorded passes. The component measurements and
+48 parity traces already executed successfully; a completed corrected native
+application run is still required before treating the change as fully qualified.
+No live GUI interaction, continuous playback, or whole-player memory test is
+claimed. Commits after `a95e1f0` change only research documentation and retained evidence;
+production code, tests, and benchmark drivers are unchanged.

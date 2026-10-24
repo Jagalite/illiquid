@@ -99,7 +99,8 @@ The measured interval includes normal open/probe, metadata construction, small
 inventory/checksum consumption, and teardown. It excludes main-input setup,
 hashing, packet tracing, and encoding.
 
-Both cohorts use six balanced AB/BA pairs for each of sixteen fixture/policy/count
+The memory and timing cohorts use six balanced AB/BA pairs for each of sixteen
+fixture/policy/count
 combinations: 192 memory processes and 192 timing processes, plus 32 calibration
 and 8 verification processes. All observations, including adverse controls, are
 retained. Percent reductions are medians of within-pair changes, not ratios of

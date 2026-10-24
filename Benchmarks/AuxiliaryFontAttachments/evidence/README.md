@@ -7,6 +7,7 @@ explains the performance boundary and the adverse resident-memory result.
 | Run | Measured candidate | Component result | Application qualification |
 | --- | --- | --- | --- |
 | [40101084730](https://github.com/Jagalite/illiquid/actions/runs/40101084730) | `4e64b3d2b6098536c61710dca2354442c718961c` | Complete; 384 final observations, 32 calibration observations, 48 verification traces | Failed during compilation of new test assertions; no test execution claimed |
+| [40102141590](https://github.com/Jagalite/illiquid/actions/runs/40102141590) | `a95e1f09b379a31892181b20f6d9de0a042179c0` | Queued when the draft was prepared; no second cohort retained | Pending |
 
 The subsequent `a95e1f09b379a31892181b20f6d9de0a042179c0` commit corrects the
 throwing assertions. It does not change production or benchmark code. The first
