@@ -26,13 +26,14 @@ HERE = Path(__file__).resolve().parent
 BASELINE = "7f9ba073394b77a908e0589447c6edc8d10b832c"
 DEMUXER = "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift"
 FONT = "Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift"
+INPUT_EXECUTOR = "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"
 FULL_SOURCES = [
     DEMUXER, FONT,
     "Sources/IlliquidNativePlayback/Media/FFmpegStreamInfo.swift",
     "Sources/IlliquidNativePlayback/Media/MediaTime.swift",
     "Sources/IlliquidNativePlayback/Media/FFmpegError.swift",
     "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
-    "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift",
+    INPUT_EXECUTOR,
     "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
     "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
 ]
@@ -71,6 +72,28 @@ def extract(source: str, start: str, end: str) -> str:
     if result.count("{") != result.count("}"):
         raise ValueError("Extracted declarations have unbalanced braces")
     return result
+
+
+def executor_without_attachment_policy(source: str) -> str:
+    # Comparison only: this benchmark uses the unchanged default-copy policy.
+    # Permit exactly its optional argument and forwarding; compile the original
+    # sources below and keep full returned-output parity checks unchanged.
+    additions = [
+        ("        cancellationSignal: FFmpegInputCancellationSignal? = nil,\n"
+         "        attachmentPayloadPolicy: FFmpegAttachmentPayloadPolicy = .copyFonts\n",
+         "        cancellationSignal: FFmpegInputCancellationSignal? = nil\n"),
+        ("                    try FFmpegDemuxer(\n"
+         "                        url: url,\n"
+         "                        interruptState: openingInterruptState,\n"
+         "                        attachmentPayloadPolicy: attachmentPayloadPolicy\n"
+         "                    ),\n",
+         "                    try FFmpegDemuxer(url: url, interruptState: openingInterruptState),\n"),
+    ]
+    for added, previous in additions:
+        if source.count(added) != 1:
+            raise ValueError("Unexpected executor attachment-policy forwarding change")
+        source = source.replace(added, previous, 1)
+    return source
 
 
 class Runner:
@@ -180,7 +203,10 @@ class Runner:
                               for path in FULL_SOURCES + [PRESENTATION, BITMAP] + C_SOURCES}
                     for variant in VARIANTS}
         for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT}:
-            if original["baseline"][path] != original["candidate"][path]:
+            candidate = original["candidate"][path]
+            if path == INPUT_EXECUTOR and candidate != original["baseline"][path]:
+                candidate = executor_without_attachment_policy(candidate)
+            if original["baseline"][path] != candidate:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
         error = {v: extract(original[v][PRESENTATION], "struct PresentationError:", "\nfunc checkOSStatus(")
                  for v in VARIANTS}

@@ -41,6 +41,13 @@ struct FFmpegDemuxReadRetryPolicy {
     }
 }
 
+/// Controls additional Swift-owned attachment payloads. FFmpeg still owns the
+/// container's attachment bytes, and every stream remains in the metadata.
+enum FFmpegAttachmentPayloadPolicy: Sendable {
+    case copyFonts
+    case omit
+}
+
 final class FFmpegDemuxer {
     private var terminalPacketWasCorrupt = false
     private var context: UnsafeMutablePointer<AVFormatContext>?
@@ -49,7 +56,11 @@ final class FFmpegDemuxer {
     var bytesRead: Int64 { context?.pointee.pb?.pointee.bytes_read ?? 0 }
     let mediaInfo: FFmpegMediaInfo
 
-    init(url: URL, interruptState: AnyObject? = nil) throws {
+    init(
+        url: URL,
+        interruptState: AnyObject? = nil,
+        attachmentPayloadPolicy: FFmpegAttachmentPayloadPolicy = .copyFonts
+    ) throws {
         guard url.isFileURL else {
             throw CocoaError(.fileReadUnsupportedScheme)
         }
@@ -82,7 +93,11 @@ final class FFmpegDemuxer {
                 operation: "Read stream metadata"
             )
             context = openedContext
-            mediaInfo = Self.makeMediaInfo(url: url, context: openedContext)
+            mediaInfo = Self.makeMediaInfo(
+                url: url,
+                context: openedContext,
+                attachmentPayloadPolicy: attachmentPayloadPolicy
+            )
         } catch {
             var temporary: UnsafeMutablePointer<AVFormatContext>? = openedContext
             avformat_close_input(&temporary)
@@ -326,7 +341,8 @@ final class FFmpegDemuxer {
 
     private static func makeMediaInfo(
         url: URL,
-        context: UnsafeMutablePointer<AVFormatContext>
+        context: UnsafeMutablePointer<AVFormatContext>,
+        attachmentPayloadPolicy: FFmpegAttachmentPayloadPolicy = .copyFonts
     ) -> FFmpegMediaInfo {
         var streams: [FFmpegStreamInfo] = []
         var attachments: [FontAttachment] = []
@@ -409,7 +425,8 @@ final class FFmpegDemuxer {
             )
             streams.append(info)
 
-            if kind == .attachment,
+            if case .copyFonts = attachmentPayloadPolicy,
+               kind == .attachment,
                let data = parameters.pointee.extradata,
                parameters.pointee.extradata_size > 0
             {

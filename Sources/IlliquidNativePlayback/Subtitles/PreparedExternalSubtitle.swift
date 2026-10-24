@@ -42,7 +42,7 @@ struct PreparedExternalSubtitle {
             throw PresentationError("Open a VobSub .idx file with its matching .sub file in the same folder (index limit: 8 MiB).")
         }
         let versions = [url, companion].map(NativeFileContentVersion.read)
-        let input = try FFmpegInputExecutor(url: url)
+        let input = try FFmpegInputExecutor(url: url, attachmentPayloadPolicy: .omit)
         let streams = input.mediaInfo.subtitleStreams
         guard !streams.isEmpty, streams.count <= 32,
               streams.allSatisfy({ $0.codecName == "dvd_subtitle" || $0.codecName == "dvdsub" }) else {

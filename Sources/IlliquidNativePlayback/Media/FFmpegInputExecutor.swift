@@ -312,7 +312,8 @@ final class FFmpegInputExecutor: @unchecked Sendable {
         url: URL,
         openTimeout: TimeInterval = 12,
         cancellationGrace: TimeInterval = 1,
-        cancellationSignal: FFmpegInputCancellationSignal? = nil
+        cancellationSignal: FFmpegInputCancellationSignal? = nil,
+        attachmentPayloadPolicy: FFmpegAttachmentPayloadPolicy = .copyFonts
     ) throws {
         try cancellationSignal?.checkCancellation()
         guard let workerID = FFmpegInputOpenAdmission.shared.reserve() else {
@@ -343,7 +344,11 @@ final class FFmpegInputExecutor: @unchecked Sendable {
                 )
                 defer { openingInterruptState.end(token) }
                 return (
-                    try FFmpegDemuxer(url: url, interruptState: openingInterruptState),
+                    try FFmpegDemuxer(
+                        url: url,
+                        interruptState: openingInterruptState,
+                        attachmentPayloadPolicy: attachmentPayloadPolicy
+                    ),
                     Thread.isMainThread
                 )
             })

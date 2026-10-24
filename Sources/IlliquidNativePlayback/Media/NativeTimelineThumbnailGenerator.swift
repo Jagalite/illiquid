@@ -137,7 +137,11 @@ public actor NativeTimelineThumbnailGenerator {
             packetWindow = packetWindowBytes > 0 ? ThumbnailPacketWindow(maximumBytes: packetWindowBytes) : nil
             self.url = url
             self.interrupt = interrupt
-            let opened = try FFmpegDemuxer(url: url, interruptState: interrupt)
+            let opened = try FFmpegDemuxer(
+                url: url,
+                interruptState: interrupt,
+                attachmentPayloadPolicy: .omit
+            )
             demuxer = opened
             guard let stream = opened.mediaInfo.videoStreams.first(where: {
                 $0.index == opened.mediaInfo.selectedVideoIndex
