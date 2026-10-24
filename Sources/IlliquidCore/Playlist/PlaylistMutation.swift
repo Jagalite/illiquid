@@ -60,8 +60,33 @@ public enum PlaylistMutation {
     }
 
     public static func deduplicated(_ items: [FolderPlaylistItem]) -> [FolderPlaylistItem] {
+        guard !items.isEmpty else { return [] }
+        guard items.count > 1 else { return uniqueResult(items) }
         var seen: Set<FolderPlaylistItem.ID> = []
-        return items.filter { seen.insert($0.id).inserted }
+        for index in items.indices {
+            if !seen.insert(items[index].id).inserted {
+                // Defer the duplicate-result allocation until the first repeat,
+                // preserving each first item's complete metadata and order.
+                var result = Array(items[..<index])
+                for item in items[(index + 1)...] where seen.insert(item.id).inserted {
+                    result.append(item)
+                }
+                return result
+            }
+        }
+        return uniqueResult(items)
+    }
+
+    private static func uniqueResult(_ items: [FolderPlaylistItem]) -> [FolderPlaylistItem] {
+        let capacity = items.capacity
+        // Ordinary geometric growth and small buffers are worth sharing. A
+        // heavily reduced playlist should not keep its former large allocation
+        // alive after its caller releases the input.
+        guard capacity > 64, items.count < capacity / 2 else { return items }
+        var compact: [FolderPlaylistItem] = []
+        compact.reserveCapacity(items.count)
+        compact.append(contentsOf: items)
+        return compact
     }
 
     public static func sorted(
