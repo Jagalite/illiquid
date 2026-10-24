@@ -1,0 +1,147 @@
+name: Auxiliary input font memory
+
+on:
+  push:
+    branches: ['perf/auxiliary-font-attachments-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/**'
+      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryFontAttachmentTests.swift'
+      - 'Benchmarks/AuxiliaryFontAttachments/**'
+      - '.github/workflows/auxiliary-font-attachments.yml'
+      - '!Benchmarks/AuxiliaryFontAttachments/*.md'
+      - '!Benchmarks/AuxiliaryFontAttachments/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeFrameStepReader.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailMetadataReader.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeTimelineThumbnailGenerator.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/PreparedExternalSubtitle.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryFontAttachmentTests.swift'
+      - 'Benchmarks/AuxiliaryFontAttachments/**'
+      - '.github/workflows/auxiliary-font-attachments.yml'
+      - '!Benchmarks/AuxiliaryFontAttachments/*.md'
+      - '!Benchmarks/AuxiliaryFontAttachments/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auxiliary-font-attachments-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  retained-memory:
+    if: github.event_name != 'pull_request'
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate deterministic Matroska fixtures
+        run: |
+          python3 Benchmarks/AuxiliaryFontAttachments/generate-fixtures.py \
+            --output "$RUNNER_TEMP/auxiliary-font-fixtures"
+      - name: Measure complete live executor groups and verify output parity
+        run: |
+          python3 Benchmarks/AuxiliaryFontAttachments/run.py \
+            --fixtures "$RUNNER_TEMP/auxiliary-font-fixtures" \
+            --output "$RUNNER_TEMP/auxiliary-font-results" --pairs 6
+      - name: Emit measurement receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "auxiliary-font-results"
+          fixtures = Path(os.environ["RUNNER_TEMP"]) / "auxiliary-font-fixtures"
+          paths = set(root.glob("*.json")) | set(root.glob("*.jsonl")) | set(root.glob("*.log"))
+          files = {str(p.relative_to(root)): p.read_text() for p in sorted(paths) if p.is_file()}
+          for p in sorted(fixtures.glob("*.json")):
+              files["fixtures/" + p.name] = p.read_text()
+          for name in ["failure.json", "summary.json"]:
+              if name in files:
+                  print(f"::group::{name}")
+                  print(files[name])
+                  print("::endgroup::")
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit("Evidence exceeds log bundle limit; use uploaded artifact")
+          print("AUXILIARY_FONT_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          print("AUXILIARY_FONT_BUNDLE_BASE64 " + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: auxiliary-font-memory-evidence
+          path: |
+            ${{ runner.temp }}/auxiliary-font-results/
+            ${{ runner.temp }}/auxiliary-font-fixtures/*.json
+            !${{ runner.temp }}/auxiliary-font-results/module-cache/**
+          retention-days: 14
+
+  native-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate required integration fixture
+        run: |
+          python3 Benchmarks/AuxiliaryFontAttachments/generate-fixtures.py \
+            --only-integration --output "$RUNNER_TEMP/auxiliary-font-fixtures"
+      - name: Build application graph and verify auxiliary inputs and primary font registration
+        run: |
+          mkdir -p "$RUNNER_TEMP/auxiliary-font-tests"
+          sw_vers > "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
+          swift --version >> "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
+          export ILLIQUID_AUXILIARY_FONT_FIXTURE="$RUNNER_TEMP/auxiliary-font-fixtures/auxiliary-font-attachments.mkv"
+          test -s "$ILLIQUID_AUXILIARY_FONT_FIXTURE"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'AuxiliaryFontAttachmentTests|FontAttachmentAdmissionTests|NativePlaybackFoundationTests' \
+            2>&1 | tee "$RUNNER_TEMP/auxiliary-font-tests/native-tests.log"
+      - name: Emit native test receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "auxiliary-font-tests"
+          files = {p.name: p.read_text() for p in sorted(root.glob("*")) if p.is_file()}
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit("Native test evidence exceeds log bundle limit; use artifact")
+          print("AUXILIARY_TEST_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          print("AUXILIARY_TEST_BUNDLE_BASE64 " + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: auxiliary-font-native-tests
+          path: |
+            ${{ runner.temp }}/auxiliary-font-tests/
+            ${{ runner.temp }}/auxiliary-font-fixtures/*.json
+          retention-days: 14

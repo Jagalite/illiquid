@@ -180,7 +180,27 @@ class Runner:
                               for path in FULL_SOURCES + [PRESENTATION, BITMAP] + C_SOURCES}
                     for variant in VARIANTS}
         for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT}:
-            if original["baseline"][path] != original["candidate"][path]:
+            candidate = original["candidate"][path]
+            if path == "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift":
+                # Permit only this default-preserving forwarding change. This
+                # historical benchmark still exercises the default demuxer
+                # path and rejects every unrelated executor difference.
+                replacements = [
+                    ("        cancellationSignal: FFmpegInputCancellationSignal? = nil,\n"
+                     "        includeFontAttachments: Bool = true\n",
+                     "        cancellationSignal: FFmpegInputCancellationSignal? = nil\n"),
+                    ("                    try FFmpegDemuxer(\n"
+                     "                        url: url,\n"
+                     "                        interruptState: openingInterruptState,\n"
+                     "                        includeFontAttachments: includeFontAttachments\n"
+                     "                    ),",
+                     "                    try FFmpegDemuxer(url: url, interruptState: openingInterruptState),"),
+                ]
+                for new, old in replacements:
+                    if candidate.count(new) != 1:
+                        raise ValueError("Expected exact optional attachment forwarding in executor")
+                    candidate = candidate.replace(new, old, 1)
+            if original["baseline"][path] != candidate:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
         error = {v: extract(original[v][PRESENTATION], "struct PresentationError:", "\nfunc checkOSStatus(")
                  for v in VARIANTS}
