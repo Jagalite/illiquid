@@ -1,0 +1,237 @@
+[
+  {
+    "delay": 0.0,
+    "fallback": {
+      "channels": 2,
+      "conversion": true,
+      "downmix": false,
+      "generation": 4,
+      "layout": "stereo",
+      "rate": 48000,
+      "revision": 7,
+      "samples": 0,
+      "seed": 1,
+      "source_channels": 2,
+      "source_rate": 44100,
+      "time": 0.0
+    },
+    "name": "zero-stereo",
+    "operations": [
+      {
+        "frame": {
+          "channels": 2,
+          "conversion": true,
+          "downmix": false,
+          "generation": 4,
+          "layout": "stereo",
+          "rate": 48000,
+          "revision": 7,
+          "samples": 480,
+          "seed": 1,
+          "source_channels": 2,
+          "source_rate": 44100,
+          "time": 0.0
+        },
+        "kind": "consume"
+      },
+      {
+        "duration": null,
+        "kind": "finish"
+      }
+    ],
+    "target": 0.0
+  },
+  {
+    "delay": 0.1,
+    "fallback": {
+      "channels": 2,
+      "conversion": true,
+      "downmix": false,
+      "generation": 4,
+      "layout": "stereo",
+      "rate": 48000,
+      "revision": 7,
+      "samples": 0,
+      "seed": 1,
+      "source_channels": 2,
+      "source_rate": 44100,
+      "time": 0.0
+    },
+    "name": "positive-100ms-stereo",
+    "operations": [
+      {
+        "frame": {
+          "channels": 2,
+          "conversion": true,
+          "downmix": false,
+          "generation": 4,
+          "layout": "stereo",
+          "rate": 48000,
+          "revision": 7,
+          "samples": 480,
+          "seed": 1,
+          "source_channels": 2,
+          "source_rate": 44100,
+          "time": 0.0
+        },
+        "kind": "consume"
+      },
+      {
+        "duration": null,
+        "kind": "finish"
+      }
+    ],
+    "target": 0.0
+  },
+  {
+    "delay": 10.0,
+    "fallback": {
+      "channels": 2,
+      "conversion": true,
+      "downmix": false,
+      "generation": 4,
+      "layout": "stereo",
+      "rate": 48000,
+      "revision": 7,
+      "samples": 0,
+      "seed": 1,
+      "source_channels": 2,
+      "source_rate": 44100,
+      "time": 0.0
+    },
+    "name": "positive-10s-stereo",
+    "operations": [
+      {
+        "frame": {
+          "channels": 2,
+          "conversion": true,
+          "downmix": false,
+          "generation": 4,
+          "layout": "stereo",
+          "rate": 48000,
+          "revision": 7,
+          "samples": 480,
+          "seed": 1,
+          "source_channels": 2,
+          "source_rate": 44100,
+          "time": 0.0
+        },
+        "kind": "consume"
+      },
+      {
+        "duration": null,
+        "kind": "finish"
+      }
+    ],
+    "target": 0.0
+  },
+  {
+    "delay": 10.0,
+    "fallback": {
+      "channels": 8,
+      "conversion": true,
+      "downmix": false,
+      "generation": 4,
+      "layout": "7.1",
+      "rate": 48000,
+      "revision": 7,
+      "samples": 0,
+      "seed": 1,
+      "source_channels": 8,
+      "source_rate": 44100,
+      "time": 0.0
+    },
+    "name": "positive-10s-8ch",
+    "operations": [
+      {
+        "frame": {
+          "channels": 8,
+          "conversion": true,
+          "downmix": false,
+          "generation": 4,
+          "layout": "7.1",
+          "rate": 48000,
+          "revision": 7,
+          "samples": 480,
+          "seed": 1,
+          "source_channels": 8,
+          "source_rate": 96000,
+          "time": 0.0
+        },
+        "kind": "consume"
+      },
+      {
+        "duration": null,
+        "kind": "finish"
+      }
+    ],
+    "target": 0.0
+  },
+  {
+    "delay": -10.0,
+    "fallback": {
+      "channels": 8,
+      "conversion": true,
+      "downmix": false,
+      "generation": 4,
+      "layout": "7.1",
+      "rate": 48000,
+      "revision": 7,
+      "samples": 0,
+      "seed": 1,
+      "source_channels": 8,
+      "source_rate": 44100,
+      "time": 0.0
+    },
+    "name": "negative-tail-10s-8ch",
+    "operations": [
+      {
+        "frame": {
+          "channels": 8,
+          "conversion": true,
+          "downmix": false,
+          "generation": 4,
+          "layout": "7.1",
+          "rate": 48000,
+          "revision": 7,
+          "samples": 480,
+          "seed": 1,
+          "source_channels": 8,
+          "source_rate": 96000,
+          "time": 0.0
+        },
+        "kind": "consume"
+      },
+      {
+        "duration": 10.0,
+        "kind": "finish"
+      }
+    ],
+    "target": 0.0
+  },
+  {
+    "delay": 0.0,
+    "fallback": {
+      "channels": 2,
+      "conversion": true,
+      "downmix": false,
+      "generation": 4,
+      "layout": "stereo",
+      "rate": 48000,
+      "revision": 7,
+      "samples": 0,
+      "seed": 1,
+      "source_channels": 2,
+      "source_rate": 44100,
+      "time": 0.0
+    },
+    "name": "one-sample-fallback",
+    "operations": [
+      {
+        "duration": null,
+        "kind": "finish"
+      }
+    ],
+    "target": 0.0
+  }
+]

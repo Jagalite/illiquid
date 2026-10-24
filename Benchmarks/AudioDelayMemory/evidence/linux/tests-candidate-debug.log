@@ -1,0 +1,66 @@
+Test Suite 'All tests' started at 2026-10-23 23:13:07.588
+Test Suite 'debug.xctest' started at 2026-10-23 23:13:07.589
+Test Suite 'debug.xctest' passed at 2026-10-23 23:13:07.589
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-23 23:13:07.589
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Audio delay PCM ownership" started.
+◇ Suite "Signed audio delay" started.
+◇ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+◇ Test tailPaddingUsesTheLatestFormatAfterAFormatChange() started.
+◇ Test rejectedSilenceDoesNotAdvancePastAcceptedChunks(acceptedChunks:) started.
+◇ Test completedInputStorageIsReleasedWhileTailFormatRemainsAvailable() started.
+◇ Test mutatingOneSilenceCopyDoesNotChangeOtherOwners() started.
+◇ Test case passing 1 argument channels → 6 to retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+◇ Test case passing 1 argument channels → 2 to retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+◇ Test case passing 1 argument channels → 8 to retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+◇ Test case passing 1 argument acceptedChunks → 2 to rejectedSilenceDoesNotAdvancePastAcceptedChunks(acceptedChunks:) started.
+◇ Test case passing 1 argument acceptedChunks → 3 to rejectedSilenceDoesNotAdvancePastAcceptedChunks(acceptedChunks:) started.
+◇ Test case passing 1 argument acceptedChunks → 0 to rejectedSilenceDoesNotAdvancePastAcceptedChunks(acceptedChunks:) started.
+◇ Test case passing 1 argument channels → 1 to retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+◇ Test shortPrefixesPreserveExactSampleAndByteCounts(silenceSamples:) started.
+◇ Test positiveDelayAddsBoundedSilenceWithoutChangingSamples() started.
+◇ Test case passing 1 argument silenceSamples → 0 to shortPrefixesPreserveExactSampleAndByteCounts(silenceSamples:) started.
+◇ Test case passing 1 argument silenceSamples → 128 to shortPrefixesPreserveExactSampleAndByteCounts(silenceSamples:) started.
+◇ Test case passing 1 argument silenceSamples → 1024 to shortPrefixesPreserveExactSampleAndByteCounts(silenceSamples:) started.
+◇ Test case passing 1 argument silenceSamples → 1028 to shortPrefixesPreserveExactSampleAndByteCounts(silenceSamples:) started.
+✔ Test completedInputStorageIsReleasedWhileTailFormatRemainsAvailable() passed after 0.001 seconds.
+✔ Test shortPrefixesPreserveExactSampleAndByteCounts(silenceSamples:) with 4 test cases passed after 0.001 seconds.
+✔ Test rejectedSilenceDoesNotAdvancePastAcceptedChunks(acceptedChunks:) with 3 test cases passed after 0.001 seconds.
+✔ Test tailPaddingUsesTheLatestFormatAfterAFormatChange() passed after 0.001 seconds.
+✔ Test positiveDelayAddsBoundedSilenceWithoutChangingSamples() passed after 0.001 seconds.
+◇ Test negativeDelayTrimsAtSampleBoundaryAndPadsExhaustedTail() started.
+✔ Test negativeDelayTrimsAtSampleBoundaryAndPadsExhaustedTail() passed after 0.001 seconds.
+◇ Test seekUsesMappedSourceSamplesAndCancelsLargeSilence() started.
+✔ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) with 4 test cases passed after 0.002 seconds.
+✔ Test seekUsesMappedSourceSamplesAndCancelsLargeSilence() passed after 0.001 seconds.
+✔ Suite "Signed audio delay" passed after 0.003 seconds.
+✔ Test mutatingOneSilenceCopyDoesNotChangeOtherOwners() passed after 0.004 seconds.
+✔ Suite "Audio delay PCM ownership" passed after 0.004 seconds.
+✔ Test run with 9 tests in 2 suites passed after 0.004 seconds.
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/20] Write swift-version-79F5DDD9F357E4C6.txt
+[1/20] Emitting module for IlliquidNativePlayback
+[2/20] Compiling IlliquidNativePlayback Platform.swift
+[3/20] Compiling IlliquidNativePlayback AudioDelayTimeline.swift
+[4/20] Emitting module for IlliquidNativePlaybackTests
+[5/20] Compiling IlliquidNativePlaybackTests AudioDelayMemoryTests.swift
+[6/20] Wrapping AST for IlliquidNativePlaybackTests for debugging
+[7/20] Wrapping AST for IlliquidNativePlayback for debugging
+[8/20] Compiling IlliquidNativePlaybackTests AudioDelayTests.swift
+[9/20] /workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-candidate/.build/x86_64-unknown-linux-gnu/debug/AudioDelayOwnershipQualificationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[10/20] Emitting module for AudioDelayOwnershipQualificationPackageDiscoveredTests
+[11/20] Compiling AudioDelayOwnershipQualificationPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+[12/20] /workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-candidate/.build/x86_64-unknown-linux-gnu/debug/AudioDelayOwnershipQualificationPackageTests.derived/runner.swift
+[13/20] Wrapping AST for AudioDelayOwnershipQualificationPackageDiscoveredTests for debugging
+[14/20] Compiling AudioDelayOwnershipQualificationPackageDiscoveredTests all-discovered-tests.swift
+[15/20] Emitting module for AudioDelayOwnershipQualificationPackageTests
+[16/20] Wrapping AST for AudioDelayOwnershipQualificationPackageTests for debugging
+[17/20] Compiling AudioDelayOwnershipQualificationPackageTests runner.swift
+[18/20] Write Objects.LinkFileList
+[19/20] Linking AudioDelayOwnershipQualificationPackageTests.xctest
+Build complete! (11.62s)
