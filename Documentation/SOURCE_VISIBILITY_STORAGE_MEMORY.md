@@ -14,9 +14,11 @@ three sizes. The source-level storage-sharing mechanism and output parity passed
 the checks below. Timing results are mixed and include substantial unfavorable
 samples.
 
-The native macOS workflow remains pending. This is a successful portable memory
-experiment proposed as a **draft pending native qualification**. Whole-player
-memory, visible sidebar latency and playback performance remain unmeasured.
+Native macOS app integration passed 38 tests in six suites. The separate native
+allocation and timing cohort remains pending. This is a successful portable
+memory experiment proposed as a **draft pending native performance qualification**.
+Whole-player memory, visible sidebar latency and playback performance remain
+unmeasured.
 
 ## Allocation mechanism
 
@@ -348,11 +350,20 @@ dependency graph and runs six adjacent suites, adding
 `SourceEmptyFolderVisibilityTests` to the five portable suites.
 
 [Run 40102200273](https://github.com/Jagalite/illiquid/actions/runs/40102200273)
-targets published commit `08c6da0cc4aca611adf1ec08da171b23dcbdf207`. The completed evidence in this report is from Linux. Native component
-measurements and app integration are tracked in that live workflow; this draft
-does not claim completed macOS qualification. The draft should stay unmerged until those results are
-available and reviewed. This workflow does not itself provide a visible-playback
-or Instruments whole-app memory study.
+targets published commit `08c6da0cc4aca611adf1ec08da171b23dcbdf207`.
+Its [native integration job](https://github.com/Jagalite/illiquid/actions/runs/40102200273/job/120896476117)
+completed successfully on macOS 26.6.2 arm64 with Apple Swift 6.3.3. It built the
+app dependency graph in release configuration and passed **38 test functions in
+six suites**. The [qualification receipt](../Benchmarks/SourceVisibilityStorage/evidence/macos-integration/qualification.json)
+records the tested commit and source hash. The [original CI evidence bundle](../Benchmarks/SourceVisibilityStorage/evidence/macos-integration/run-evidence.json.gz)
+retains the complete build/test log and host information, with its SHA-256 checked
+against the digest emitted by the workflow.
+
+The separate native component allocation/timing job remains queued. All numerical
+allocation and timing results in this report are therefore from Linux. The draft
+should stay unmerged until the native cohort completes and its memory behavior
+and latency tradeoffs are reviewed. This workflow does not itself provide a
+visible-playback or Instruments whole-app memory study.
 
 During review, a concurrently published
 [`perf/source-browser-row-storage-20261024` branch](https://github.com/Jagalite/illiquid/tree/perf/source-browser-row-storage-20261024)
@@ -387,6 +398,7 @@ The committed evidence includes:
 - [Test results](../Benchmarks/SourceVisibilityStorage/evidence/linux-x86_64/tests.json) and [36 complete-byte verification results](../Benchmarks/SourceVisibilityStorage/evidence/linux-x86_64/verification.json).
 - [Independent numeric/source audit](../Benchmarks/SourceVisibilityStorage/evidence/linux-x86_64/independent-audit.json) and [publication/source mapping](../Benchmarks/SourceVisibilityStorage/evidence/linux-x86_64/publication.json).
 - [Deterministic raw evidence archive](../Benchmarks/SourceVisibilityStorage/evidence/linux-x86_64/raw-evidence.tar.gz): every command and observation, compiler/test logs, all 72 compressed verification snapshots, both staged source packages, the runner and extraction helper, review receipts, and a Git bundle of the exact measured local commit.
+- [Native integration qualification](../Benchmarks/SourceVisibilityStorage/evidence/macos-integration/qualification.json) and its [original CI evidence bundle](../Benchmarks/SourceVisibilityStorage/evidence/macos-integration/run-evidence.json.gz), covering the release app build and 38 passing tests.
 
 The archive contains a SHA-256 inventory for each included file. Its own digest
 is recorded in `publication.json`. Extract it with
