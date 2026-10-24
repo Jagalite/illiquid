@@ -1,0 +1,362 @@
+{
+  "audit_script_sha256": "d8f1f6ab9a57fb36374df1b2d2a4aaa07f6313ebbf05327c35695555353eafbe",
+  "audited_at_utc": "2026-10-24T14:25:52.132755+00:00",
+  "audited_file_sha256": {
+    "commands.jsonl": "30b03f004639614787ff0b4d7120d8fa4bb2c9db60ab074b22190597045ba6ef",
+    "completion.json": "ab11edef84c6cb5753e17cec467fc4d91505ba3717ae2d54757220a8c8e42043",
+    "fixture-manifest.json": "463838b8ca5bc2d20e9f6f89f71c4c0b92d9a6e74a82ef73b7a7048189ab78c8",
+    "manifest.json": "b61786af026a16b30cc779b786f892fdf4fdf1b2d0a6c02f98d9459b234d50b2",
+    "observations.jsonl": "2c20ff5f31dba650a0bdeb45d3cabcf5587172c453abc6e25da9b658d8fe7cde",
+    "pairs.json": "7d7e6bd0697aecf5ca40fda16538370f7eac7ef435f9e0644aadb1ef13238b7d",
+    "summary.json": "296535154f3c99ad9ba1dabfa051e40110b3ad55ffb7c02abe447431d75dc21a"
+  },
+  "auditor": "/root/attachment_review",
+  "checks": {
+    "balanced_pairs": {
+      "failed": 0,
+      "passed": 235
+    },
+    "binary_hashes": {
+      "failed": 0,
+      "passed": 4
+    },
+    "build_provenance": {
+      "failed": 0,
+      "passed": 23
+    },
+    "c_shim": {
+      "failed": 0,
+      "passed": 12
+    },
+    "cohort_design": {
+      "failed": 0,
+      "passed": 2
+    },
+    "command_receipts": {
+      "failed": 0,
+      "passed": 676
+    },
+    "complete_cohort": {
+      "failed": 0,
+      "passed": 3
+    },
+    "driver_hashes": {
+      "failed": 0,
+      "passed": 3
+    },
+    "exact_source_adaptation": {
+      "failed": 0,
+      "passed": 14
+    },
+    "fixtures": {
+      "failed": 0,
+      "passed": 23
+    },
+    "native_header_sha256": {
+      "failed": 0,
+      "passed": 130
+    },
+    "native_library_sha256": {
+      "failed": 0,
+      "passed": 3
+    },
+    "numeric_measurements": {
+      "failed": 0,
+      "passed": 864
+    },
+    "observed_memory_effect": {
+      "failed": 0,
+      "passed": 2
+    },
+    "payload_ownership": {
+      "failed": 0,
+      "passed": 216
+    },
+    "production_source_hashes": {
+      "failed": 0,
+      "passed": 19
+    },
+    "raw_observation_receipts": {
+      "failed": 0,
+      "passed": 648
+    },
+    "scope": {
+      "failed": 0,
+      "passed": 216
+    },
+    "staged_source_hashes": {
+      "failed": 0,
+      "passed": 10
+    },
+    "summary_arithmetic": {
+      "failed": 0,
+      "passed": 2
+    },
+    "validation_groups": {
+      "failed": 0,
+      "passed": 139
+    },
+    "validation_receipts": {
+      "failed": 0,
+      "passed": 216
+    }
+  },
+  "counts": {
+    "AB_pairs": 54,
+    "BA_pairs": 54,
+    "commands": 225,
+    "groups": 18,
+    "observations": 216,
+    "pairs": 108,
+    "pairs_per_group": 6,
+    "raw_stdout_receipts": 216,
+    "unique_observation_identities": 216
+  },
+  "evidence_directory": "/tmp/illiquid-auxiliary-linux-final-aa79",
+  "failed_check_count": 0,
+  "failures": [],
+  "ffmpeg_prefix": "/tmp/illiquid-auxiliary-native/prefix",
+  "fixture_directory": "/tmp/illiquid-auxiliary-fixtures-aa79",
+  "independent_script": "/tmp/audit_illiquid_auxiliary_aa79.py",
+  "key_results": [
+    {
+      "auxiliary_count": 0,
+      "case": "none",
+      "live_allocator_improved_pairs": 0,
+      "live_allocator_reduction_bytes": 0.0,
+      "live_allocator_reduction_percent": 0.0,
+      "opening_wall_reduction_seconds": 5.60850000000001e-05,
+      "release_allocator_baseline_median": 24816.0,
+      "release_allocator_candidate_median": 24816.0,
+      "retained_payload_reduction_bytes": 0.0
+    },
+    {
+      "auxiliary_count": 1,
+      "case": "none",
+      "live_allocator_improved_pairs": 0,
+      "live_allocator_reduction_bytes": 0.0,
+      "live_allocator_reduction_percent": 0.0,
+      "opening_wall_reduction_seconds": -0.0024111460000000003,
+      "release_allocator_baseline_median": 29232.0,
+      "release_allocator_candidate_median": 29232.0,
+      "retained_payload_reduction_bytes": 0.0
+    },
+    {
+      "auxiliary_count": 2,
+      "case": "none",
+      "live_allocator_improved_pairs": 0,
+      "live_allocator_reduction_bytes": 0.0,
+      "live_allocator_reduction_percent": 0.0,
+      "opening_wall_reduction_seconds": -0.0004068559999999995,
+      "release_allocator_baseline_median": 33296.0,
+      "release_allocator_candidate_median": 33296.0,
+      "retained_payload_reduction_bytes": 0.0
+    },
+    {
+      "auxiliary_count": 0,
+      "case": "fonts-128kib",
+      "live_allocator_improved_pairs": 0,
+      "live_allocator_reduction_bytes": 0.0,
+      "live_allocator_reduction_percent": 0.0,
+      "opening_wall_reduction_seconds": -0.00036117600000000016,
+      "release_allocator_baseline_median": 25984.0,
+      "release_allocator_candidate_median": 25984.0,
+      "retained_payload_reduction_bytes": 0.0
+    },
+    {
+      "auxiliary_count": 1,
+      "case": "fonts-128kib",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 131088.0,
+      "live_allocator_reduction_percent": 8.652170698995702,
+      "opening_wall_reduction_seconds": -9.649900000000032e-05,
+      "release_allocator_baseline_median": 30672.0,
+      "release_allocator_candidate_median": 30672.0,
+      "retained_payload_reduction_bytes": 131072.0
+    },
+    {
+      "auxiliary_count": 2,
+      "case": "fonts-128kib",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 262896.0,
+      "live_allocator_reduction_percent": 11.81015769877665,
+      "opening_wall_reduction_seconds": -0.0010090280000000008,
+      "release_allocator_baseline_median": 34464.0,
+      "release_allocator_candidate_median": 34480.0,
+      "retained_payload_reduction_bytes": 262144.0
+    },
+    {
+      "auxiliary_count": 0,
+      "case": "fonts-2mib",
+      "live_allocator_improved_pairs": 0,
+      "live_allocator_reduction_bytes": 0.0,
+      "live_allocator_reduction_percent": 0.0,
+      "opening_wall_reduction_seconds": -0.000549744999999999,
+      "release_allocator_baseline_median": 25984.0,
+      "release_allocator_candidate_median": 25984.0,
+      "retained_payload_reduction_bytes": 0.0
+    },
+    {
+      "auxiliary_count": 1,
+      "case": "fonts-2mib",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 2097168.0,
+      "live_allocator_reduction_percent": 12.159029452063054,
+      "opening_wall_reduction_seconds": 0.006748898,
+      "release_allocator_baseline_median": 30672.0,
+      "release_allocator_candidate_median": 30672.0,
+      "retained_payload_reduction_bytes": 2097152.0
+    },
+    {
+      "auxiliary_count": 2,
+      "case": "fonts-2mib",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 4195088.0,
+      "live_allocator_reduction_percent": 16.24550324608939,
+      "opening_wall_reduction_seconds": -0.015229986000000004,
+      "release_allocator_baseline_median": 34304.0,
+      "release_allocator_candidate_median": 34464.0,
+      "retained_payload_reduction_bytes": 4194304.0
+    },
+    {
+      "auxiliary_count": 0,
+      "case": "fonts-16mib",
+      "live_allocator_improved_pairs": 0,
+      "live_allocator_reduction_bytes": 0.0,
+      "live_allocator_reduction_percent": 0.0,
+      "opening_wall_reduction_seconds": -0.041190158500000004,
+      "release_allocator_baseline_median": 25984.0,
+      "release_allocator_candidate_median": 25984.0,
+      "retained_payload_reduction_bytes": 0.0
+    },
+    {
+      "auxiliary_count": 1,
+      "case": "fonts-16mib",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 16777232.0,
+      "live_allocator_reduction_percent": 12.456336233896304,
+      "opening_wall_reduction_seconds": 0.0790360115,
+      "release_allocator_baseline_median": 30672.0,
+      "release_allocator_candidate_median": 30672.0,
+      "retained_payload_reduction_bytes": 16777216.0
+    },
+    {
+      "auxiliary_count": 2,
+      "case": "fonts-16mib",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 33555216.0,
+      "live_allocator_reduction_percent": 16.612822095074538,
+      "opening_wall_reduction_seconds": 0.08705327499999996,
+      "release_allocator_baseline_median": 34304.0,
+      "release_allocator_candidate_median": 34464.0,
+      "retained_payload_reduction_bytes": 33554432.0
+    },
+    {
+      "auxiliary_count": 0,
+      "case": "fonts-64mib",
+      "live_allocator_improved_pairs": 0,
+      "live_allocator_reduction_bytes": 0.0,
+      "live_allocator_reduction_percent": 0.0,
+      "opening_wall_reduction_seconds": 0.006138684499999991,
+      "release_allocator_baseline_median": 26448.0,
+      "release_allocator_candidate_median": 26448.0,
+      "retained_payload_reduction_bytes": 0.0
+    },
+    {
+      "auxiliary_count": 1,
+      "case": "fonts-64mib",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 67110544.0,
+      "live_allocator_reduction_percent": 12.488569264828767,
+      "opening_wall_reduction_seconds": 1.0094909060000001,
+      "release_allocator_baseline_median": 32128.0,
+      "release_allocator_candidate_median": 31632.0,
+      "retained_payload_reduction_bytes": 67108864.0
+    },
+    {
+      "auxiliary_count": 2,
+      "case": "fonts-64mib",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 134220672.0,
+      "live_allocator_reduction_percent": 16.65251230885215,
+      "opening_wall_reduction_seconds": -0.21508253550000023,
+      "release_allocator_baseline_median": 34832.0,
+      "release_allocator_candidate_median": 33600.0,
+      "retained_payload_reduction_bytes": 134217728.0
+    },
+    {
+      "auxiliary_count": 0,
+      "case": "mixed",
+      "live_allocator_improved_pairs": 0,
+      "live_allocator_reduction_bytes": 0.0,
+      "live_allocator_reduction_percent": 0.0,
+      "opening_wall_reduction_seconds": 0.0003103880000000017,
+      "release_allocator_baseline_median": 26992.0,
+      "release_allocator_candidate_median": 26992.0,
+      "retained_payload_reduction_bytes": 0.0
+    },
+    {
+      "auxiliary_count": 1,
+      "case": "mixed",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 2097872.0,
+      "live_allocator_reduction_percent": 7.080260083472517,
+      "opening_wall_reduction_seconds": -0.002393808499999997,
+      "release_allocator_baseline_median": 31200.0,
+      "release_allocator_candidate_median": 31200.0,
+      "retained_payload_reduction_bytes": 2097152.0
+    },
+    {
+      "auxiliary_count": 2,
+      "case": "mixed",
+      "live_allocator_improved_pairs": 6,
+      "live_allocator_reduction_bytes": 4195056.0,
+      "live_allocator_reduction_percent": 9.449969129762046,
+      "opening_wall_reduction_seconds": 0.004303441500000001,
+      "release_allocator_baseline_median": 33632.0,
+      "release_allocator_candidate_median": 33632.0,
+      "retained_payload_reduction_bytes": 4194304.0
+    }
+  ],
+  "limitations": [
+    "Linux component evidence: actual FFmpeg open/probe and extracted production media-info projection, not the complete macOS demuxer/executor/player lifecycle.",
+    "Native macOS compilation, packet/seek regression execution and real-font rendering execution remain pending; this audit does not qualify them.",
+    "Benchmark payloads have supported-font labels but synthetic bytes; the separate actual Noto font fixture is reserved for native rendering regression.",
+    "mallinfo2 live bytes are allocator ownership counters, not whole-player resident memory; FFmpeg-owned attachment extradata remains present.",
+    "ru_maxrss is a high-water mark and includes a substantial pre-open floor; small-fixture RSS equality cannot establish absence of resident-memory savings.",
+    "Six balanced pairs per group support component observations, not universal timing or macOS end-to-end performance claims.",
+    "Packet validation exposes complete trace hashes and per-stream counts, not each packet record; this audit verifies every raw receipt and the real-C hashing implementation, without independently re-demuxing fixtures."
+  ],
+  "live_allocator_effect_counts": {
+    "font_bearing_auxiliary_pairs": {
+      "improved": 60,
+      "pairs": 60,
+      "tied": 0,
+      "worse": 0
+    },
+    "zero_auxiliary_or_no_font_control_pairs": {
+      "improved": 0,
+      "pairs": 48,
+      "tied": 48,
+      "worse": 0
+    }
+  },
+  "method": "Direct original/staged/fixture/binary hashes and byte comparisons, raw stdout receipts, independently reconstructed identities/pairs/medians; benchmark Python not imported.",
+  "mode": "full_completed_cohort",
+  "passed": true,
+  "passed_check_count": 3460,
+  "provenance_counts": {
+    "compiled_harness_binaries": 2,
+    "compiled_projection_libraries": 2,
+    "complete_matroska_fixtures": 6,
+    "drivers": 3,
+    "native_headers": 130,
+    "native_libraries": 3,
+    "production_original_files": 12,
+    "staged_sources": 10
+  },
+  "rss_pre_open_range_bytes": [
+    81420288,
+    81420288
+  ]
+}
