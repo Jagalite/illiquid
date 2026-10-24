@@ -15,8 +15,8 @@ publishing the shared instance, with no intervening suspension.
 
 ## Reproduce
 
-Requires Swift 6.1 or newer and Python 3.10 or newer. The recorded local cohort
-uses Swift 6.3.2. No Swift package download or native codec SDK is needed for
+Requires Swift 6.1 or newer and Python 3.10 or newer. The retained native cohort
+uses Apple Swift 6.3.3. No Swift package download or native codec SDK is needed for
 this component experiment.
 
 ```sh
@@ -101,3 +101,34 @@ copy in its job log so the experiment can be audited independently.
 
 The fix changes resource ownership only. It does not change source selection,
 source persistence format, startup read coalescing, or playback buffering.
+
+## Audit the retained native cohort
+
+The full gzip bundle is a JSON object mapping original relative filenames to
+unmodified text. Unpack it into a scratch directory, then run the independent
+semantic/statistical audit against the repository sources:
+
+```sh
+python3 - <<'PY_AUDIT'
+import gzip, hashlib, json
+from pathlib import Path
+source = Path("Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64")
+packed = (source / "native-component-bundle.json.gz").read_bytes()
+assert hashlib.sha256(packed).hexdigest() == (source / "native-component-bundle.sha256").read_text().strip()
+output = Path("/tmp/startup-snapshot-audit")
+output.mkdir(parents=True, exist_ok=True)
+for name, text in json.loads(gzip.decompress(packed)).items():
+    relative = Path(name)
+    assert not relative.is_absolute() and ".." not in relative.parts
+    path = output / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
+PY_AUDIT
+python3 Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64/audit.py \
+  /tmp/startup-snapshot-audit "$PWD"
+```
+
+The audit independently reconstructs each deterministic fixture and its final
+state, checks all 300 raw observations and 150 pairs, recomputes summary
+statistics, and compares the source hashes with the qualified checkout. A source
+change that affects the measurement requires fresh evidence.

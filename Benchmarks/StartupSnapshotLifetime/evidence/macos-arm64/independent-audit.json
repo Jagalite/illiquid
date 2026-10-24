@@ -1,0 +1,379 @@
+{
+  "balanced_order_per_workload": "three AB, three BA; rotated workload order",
+  "binary_receipt_note": "Both release binary SHA-256 receipts are present. CI runner verifies unchanged binaries at experiment completion; binary files are not in the uploaded evidence, so this audit does not independently rehash them.",
+  "github_run": {
+    "attempt": "1",
+    "event": "push",
+    "id": "40101057617",
+    "sha": "160b6f4c0ba77fbbabf2c40b08dfa02cba1bdd1d",
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40101057617"
+  },
+  "native_environment": {
+    "DEVELOPER_DIR": "/Applications/Xcode_26.6.app/Contents/Developer",
+    "SWIFT_DETERMINISTIC_HASHING": null,
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.15.0",
+    "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+    "swift_command": "/usr/bin/swift"
+  },
+  "observations": 300,
+  "paired_states": 150,
+  "primary_results": [
+    {
+      "baseline_median": 752.0,
+      "candidate_median": 752.0,
+      "count": 1,
+      "paired_median_reduction_percent": 0.0,
+      "paired_median_saved": 0.0,
+      "paired_saved_range": [
+        0,
+        0
+      ],
+      "pairs_lower": 0,
+      "scenario": "unchanged"
+    },
+    {
+      "baseline_median": 1008.0,
+      "candidate_median": 848.0,
+      "count": 1,
+      "paired_median_reduction_percent": 15.873015873015873,
+      "paired_median_saved": 160.0,
+      "paired_saved_range": [
+        160,
+        160
+      ],
+      "pairs_lower": 6,
+      "scenario": "append-item"
+    },
+    {
+      "baseline_median": 848.0,
+      "candidate_median": 256.0,
+      "count": 1,
+      "paired_median_reduction_percent": 69.81132075471699,
+      "paired_median_saved": 592.0,
+      "paired_saved_range": [
+        -4800,
+        592
+      ],
+      "pairs_lower": 5,
+      "scenario": "remove-half"
+    },
+    {
+      "baseline_median": 752.0,
+      "candidate_median": 160.0,
+      "count": 1,
+      "paired_median_reduction_percent": 78.72340425531915,
+      "paired_median_saved": 592.0,
+      "paired_saved_range": [
+        592,
+        592
+      ],
+      "pairs_lower": 6,
+      "scenario": "remove-all"
+    },
+    {
+      "baseline_median": 848.0,
+      "candidate_median": 416.0,
+      "count": 1,
+      "paired_median_reduction_percent": 50.943396226415096,
+      "paired_median_saved": 432.0,
+      "paired_saved_range": [
+        432,
+        5824
+      ],
+      "pairs_lower": 6,
+      "scenario": "replace-visibility"
+    },
+    {
+      "baseline_median": 6496.0,
+      "candidate_median": 6496.0,
+      "count": 32,
+      "paired_median_reduction_percent": 0.0,
+      "paired_median_saved": 0.0,
+      "paired_saved_range": [
+        0,
+        0
+      ],
+      "pairs_lower": 0,
+      "scenario": "unchanged"
+    },
+    {
+      "baseline_median": 7280.0,
+      "candidate_median": 6800.0,
+      "count": 32,
+      "paired_median_reduction_percent": 6.593406593406593,
+      "paired_median_saved": 480.0,
+      "paired_saved_range": [
+        -4912,
+        480
+      ],
+      "pairs_lower": 5,
+      "scenario": "append-item"
+    },
+    {
+      "baseline_median": 6752.0,
+      "candidate_median": 3456.0,
+      "count": 32,
+      "paired_median_reduction_percent": 48.81516587677725,
+      "paired_median_saved": 3296.0,
+      "paired_saved_range": [
+        3296,
+        8688
+      ],
+      "pairs_lower": 6,
+      "scenario": "remove-half"
+    },
+    {
+      "baseline_median": 6496.0,
+      "candidate_median": 160.0,
+      "count": 32,
+      "paired_median_reduction_percent": 97.53694581280789,
+      "paired_median_saved": 6336.0,
+      "paired_saved_range": [
+        6336,
+        6336
+      ],
+      "pairs_lower": 6,
+      "scenario": "remove-all"
+    },
+    {
+      "baseline_median": 6752.0,
+      "candidate_median": 4384.0,
+      "count": 32,
+      "paired_median_reduction_percent": 35.07109004739336,
+      "paired_median_saved": 2368.0,
+      "paired_saved_range": [
+        2368,
+        2368
+      ],
+      "pairs_lower": 6,
+      "scenario": "replace-visibility"
+    },
+    {
+      "baseline_median": 161856.0,
+      "candidate_median": 158304.0,
+      "count": 1000,
+      "paired_median_reduction_percent": 2.1945432977461445,
+      "paired_median_saved": 3552.0,
+      "paired_saved_range": [
+        3552,
+        3552
+      ],
+      "pairs_lower": 6,
+      "scenario": "unchanged"
+    },
+    {
+      "baseline_median": 168336.0,
+      "candidate_median": 158384.0,
+      "count": 1000,
+      "paired_median_reduction_percent": 5.911985552704116,
+      "paired_median_saved": 9952.0,
+      "paired_saved_range": [
+        2832,
+        9952
+      ],
+      "pairs_lower": 6,
+      "scenario": "append-item"
+    },
+    {
+      "baseline_median": 162112.0,
+      "candidate_median": 80704.0,
+      "count": 1000,
+      "paired_median_reduction_percent": 50.21713383339913,
+      "paired_median_saved": 81408.0,
+      "paired_saved_range": [
+        81408,
+        88624
+      ],
+      "pairs_lower": 6,
+      "scenario": "remove-half"
+    },
+    {
+      "baseline_median": 161856.0,
+      "candidate_median": 2656.0,
+      "count": 1000,
+      "paired_median_reduction_percent": 98.3590351917754,
+      "paired_median_saved": 159200.0,
+      "paired_saved_range": [
+        152080,
+        159200
+      ],
+      "pairs_lower": 6,
+      "scenario": "remove-all"
+    },
+    {
+      "baseline_median": 162112.0,
+      "candidate_median": 123488.0,
+      "count": 1000,
+      "paired_median_reduction_percent": 23.825503355704697,
+      "paired_median_saved": 38624.0,
+      "paired_saved_range": [
+        31504,
+        38624
+      ],
+      "pairs_lower": 6,
+      "scenario": "replace-visibility"
+    },
+    {
+      "baseline_median": 1709312.0,
+      "candidate_median": 1705696.0,
+      "count": 10000,
+      "paired_median_reduction_percent": 0.21154710199191254,
+      "paired_median_saved": 3616.0,
+      "paired_saved_range": [
+        -3504,
+        3616
+      ],
+      "pairs_lower": 5,
+      "scenario": "unchanged"
+    },
+    {
+      "baseline_median": 1775184.0,
+      "candidate_median": 1705776.0,
+      "count": 10000,
+      "paired_median_reduction_percent": 3.909904550739529,
+      "paired_median_saved": 69408.0,
+      "paired_saved_range": [
+        69408,
+        69408
+      ],
+      "pairs_lower": 6,
+      "scenario": "append-item"
+    },
+    {
+      "baseline_median": 1709568.0,
+      "candidate_median": 933376.0,
+      "count": 10000,
+      "paired_median_reduction_percent": 45.40281521413597,
+      "paired_median_saved": 776192.0,
+      "paired_saved_range": [
+        769072,
+        776192
+      ],
+      "pairs_lower": 6,
+      "scenario": "remove-half"
+    },
+    {
+      "baseline_median": 1709312.0,
+      "candidate_median": 160800.0,
+      "count": 10000,
+      "paired_median_reduction_percent": 90.5927063052269,
+      "paired_median_saved": 1548512.0,
+      "paired_saved_range": [
+        1541392,
+        1555728
+      ],
+      "pairs_lower": 6,
+      "scenario": "remove-all"
+    },
+    {
+      "baseline_median": 1709568.0,
+      "candidate_median": 1383200.0,
+      "count": 10000,
+      "paired_median_reduction_percent": 19.090670859538783,
+      "paired_median_saved": 326368.0,
+      "paired_saved_range": [
+        326368,
+        333584
+      ],
+      "pairs_lower": 6,
+      "scenario": "replace-visibility"
+    },
+    {
+      "baseline_median": 15820080.0,
+      "candidate_median": 15816464.0,
+      "count": 100000,
+      "paired_median_reduction_percent": 0.022857027271669928,
+      "paired_median_saved": 3616.0,
+      "paired_saved_range": [
+        3616,
+        3616
+      ],
+      "pairs_lower": 6,
+      "scenario": "unchanged"
+    },
+    {
+      "baseline_median": 16426624.0,
+      "candidate_median": 15816544.0,
+      "count": 100000,
+      "paired_median_reduction_percent": 3.7139706856381447,
+      "paired_median_saved": 610080.0,
+      "paired_saved_range": [
+        610080,
+        619280
+      ],
+      "pairs_lower": 6,
+      "scenario": "append-item"
+    },
+    {
+      "baseline_median": 15820336.0,
+      "candidate_median": 8013936.0,
+      "count": 100000,
+      "paired_median_reduction_percent": 49.34408472740402,
+      "paired_median_saved": 7806400.0,
+      "paired_saved_range": [
+        7806400,
+        7815600
+      ],
+      "pairs_lower": 6,
+      "scenario": "remove-half"
+    },
+    {
+      "baseline_median": 15820080.0,
+      "candidate_median": 211152.0,
+      "count": 100000,
+      "paired_median_reduction_percent": 98.66529119953881,
+      "paired_median_saved": 15608928.0,
+      "paired_saved_range": [
+        15608928,
+        15608928
+      ],
+      "pairs_lower": 6,
+      "scenario": "remove-all"
+    },
+    {
+      "baseline_median": 15820336.0,
+      "candidate_median": 12236240.0,
+      "count": 100000,
+      "paired_median_reduction_percent": 22.65499291544756,
+      "paired_median_saved": 3584096.0,
+      "paired_saved_range": [
+        3584096,
+        3591312
+      ],
+      "pairs_lower": 6,
+      "scenario": "replace-visibility"
+    }
+  ],
+  "raw_probe_logs_and_executable_variants_verified": 300,
+  "semantic_state_workloads_reconstructed": 25,
+  "source_hash_count": 13,
+  "staged_source_count": 20,
+  "staged_source_receipts_checked": true,
+  "state_parity_note": "All recorded full-state comparisons, lengths and checksums agree with an independently reconstructed Python state for every scenario/count. Temporary model JSON files were deleted by the runner after byte equality.",
+  "status": "passed",
+  "summary_recalculated_independently": true,
+  "tests": {
+    "baseline": {
+      "debug": {
+        "passed": true,
+        "tests": 5
+      },
+      "release": {
+        "passed": true,
+        "tests": 5
+      }
+    },
+    "candidate": {
+      "debug": {
+        "passed": true,
+        "tests": 10
+      },
+      "release": {
+        "passed": true,
+        "tests": 10
+      }
+    }
+  }
+}

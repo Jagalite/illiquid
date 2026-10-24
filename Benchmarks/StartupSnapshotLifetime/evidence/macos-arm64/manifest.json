@@ -1,0 +1,75 @@
+{
+  "baseline": {
+    "app_path": "Sources/IlliquidApp/App/AppModel.swift",
+    "app_sha256": "78dd10a831b77f02b67a0f256c001d5b71e053fe595576b03b6d5fb7ad77d7d1",
+    "baseline_behavior": "AppModel publishes sharedInstance without finishing the startup loader; cached startup resources remain until shutdown.",
+    "path": "Sources/IlliquidApp/App/ReadOnlyStartupLoader.swift",
+    "revision": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+    "shared_sources": {
+      "Sources/IlliquidApp/App/SourceStartupSnapshot.swift": "286e225f478ff368ec121291adcb81608d2349a7fcf185f60b89f0a94c4beac6",
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "source_sha256": "680f54f667dd893b699e9e71137ccbfa197725e8d1d93252c38673aac9efacad",
+    "support_extraction": {
+      "end_exclusive": "\nprivate struct PlaybackLifecycleObservation:",
+      "prelude": "import Foundation\nimport IlliquidCore\n\n",
+      "sha256": "0483e173859aa6ba6e802e28caec64d72c1fe9901b2e49cb05cf839b584463e0",
+      "start": "enum SourceFolderLibrary {"
+    },
+    "test_path": "Tests/IlliquidAppTests/ReadOnlyStartupLoaderTests.swift",
+    "test_sha256": "9b5a999f14d3293e3d99d755c943a6b3fbb2b6df43909c119cc9f100512e9eaf"
+  },
+  "candidate_head": "160b6f4c0ba77fbbabf2c40b08dfa02cba1bdd1d",
+  "candidate_status": "",
+  "created_utc": "2026-10-24T14:07:10.276789+00:00",
+  "environment": {
+    "DEVELOPER_DIR": "/Applications/Xcode_26.6.app/Contents/Developer",
+    "SWIFT_DETERMINISTIC_HASHING": null,
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.15.0",
+    "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+    "swift_command": "/usr/bin/swift"
+  },
+  "inputs": {
+    "Benchmarks/StartupSnapshotLifetime/CStartupHeap/heap.c": "1208ffe980f0c665b39f2d8c6b2a15519cf7baf7ad37c7efca606d30039997e4",
+    "Benchmarks/StartupSnapshotLifetime/CStartupHeap/include/heap.h": "8b6c1f262ae31500d5dacc7a9e497f65f50b65ce6b681237af7ce699d7e51c99",
+    "Benchmarks/StartupSnapshotLifetime/Driver.swift": "da0a203bfb570130560490623ce7a18b1a15bcac296fb91b5b97499e4046cdd1",
+    "Benchmarks/StartupSnapshotLifetime/baseline/ReadOnlyStartupLoader.swift": "680f54f667dd893b699e9e71137ccbfa197725e8d1d93252c38673aac9efacad",
+    "Benchmarks/StartupSnapshotLifetime/baseline/ReadOnlyStartupLoaderTests.swift": "9b5a999f14d3293e3d99d755c943a6b3fbb2b6df43909c119cc9f100512e9eaf",
+    "Benchmarks/StartupSnapshotLifetime/baseline/manifest.json": "af8092c707e28b7411b9873647b1501defd226b2ba958e6138257ca238ac95a5",
+    "Benchmarks/StartupSnapshotLifetime/run.py": "5832c6bc78c653036b4b22abe69d562852a05eb4bf809229b6e5fc680b4a0e06",
+    "Sources/IlliquidApp/App/AppModel.swift": "e1de8eb5cdb4ec2f1cea32ea7725fec218928bd56548a461d04bb09b86114648",
+    "Sources/IlliquidApp/App/ReadOnlyStartupLoader.swift": "53f6caa3069c1e2e84709626e42813a36f4dc90781a1d47e110ef9d006ba599a",
+    "Sources/IlliquidApp/App/SourceStartupSnapshot.swift": "286e225f478ff368ec121291adcb81608d2349a7fcf185f60b89f0a94c4beac6",
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "Tests/IlliquidAppTests/ReadOnlyStartupLoaderTests.swift": "7936d07da01f3cd3dc54d1933b0b67e75b830162173271c0e36e1c2762790d27",
+    "Tests/IlliquidAppTests/SourceStartupSnapshotTests.swift": "3a5bb899fb5daca5d5a6ed812d666c48eafabba8dd84a9ab8f233f47cf60f97e"
+  },
+  "method": {
+    "cleanup_metric": "diagnostic only: sampled after canonical state serialization, which may populate runtime caches",
+    "extraction": "exact unchanged production source models plus imports; real loader/snapshot/normalizer; fixture model represents adoption without native player graph",
+    "pairs": 6,
+    "parity": "canonical actual measured model JSON is compared byte-for-byte after primary memory sampling; payload SHA256/length are retained",
+    "primary_metric": "allocator_after_mutation_bytes minus allocator_before_load_bytes",
+    "sampling": "separate fresh process per variant; balanced AB/BA; rotated workload order",
+    "scenarios": [
+      "unchanged",
+      "append-item",
+      "remove-half",
+      "remove-all",
+      "replace-visibility"
+    ],
+    "scope": "live allocator bytes for a saved explicit-source snapshot and adopted value model; no native player, recursive scan index, RSS, GPU, or playback-FPS measurement",
+    "sizes": [
+      1,
+      32,
+      1000,
+      10000,
+      100000
+    ],
+    "tests_only": false,
+    "timing": "one mutation per process; includes object destruction when it occurs; descriptive, not a timing acceptance gate"
+  },
+  "schema_version": 1
+}

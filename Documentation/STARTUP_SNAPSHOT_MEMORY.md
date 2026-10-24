@@ -75,13 +75,94 @@ sample to the post-mutation sample. macOS uses
 after primary sampling and compared byte-for-byte within every pair. Build,
 source, binary, command, and full observation receipts are preserved.
 
-## Qualification status
+## Native macOS results
 
-The production loader's seven ownership/coalescing/shutdown tests passed locally
-in debug and release. The initial 80-process smoke comparison also passed all
-baseline and candidate source-snapshot tests and all 40 full-state byte
-comparisons. Full platform measurements and native app integration results are
-being collected on the research branch before opening a PR.
+Measured on macOS 26.6.2, Apple Silicon arm64, Apple Swift 6.3.3, using
+[workflow run 40101057617](https://github.com/Jagalite/illiquid/actions/runs/40101057617)
+at source commit `160b6f4c0ba77fbbabf2c40b08dfa02cba1bdd1d`.
+
+The table shows live allocator deltas relative to the warmed pre-load sample
+**after closing all restored source tabs**. These are component allocations,
+not total player memory.
+
+| Saved explicit items | Baseline delta (bytes) | Updated delta (bytes) | Paired median reduction |
+| ---: | ---: | ---: | ---: |
+| 1 | 752 | 160 | 78.7% |
+| 32 | 6,496 | 160 | 97.5% |
+| 1,000 | 161,856 | 2,656 | 98.4% |
+| 10,000 | 1,709,312 | 160,800 | 90.6% |
+| 100,000 | 15,820,080 | 211,152 | 98.7% |
+
+At 100,000 saved items, this is **15.087 MiB → 0.201 MiB**, a saving of
+**14.886 MiB**. All six pairs saved exactly 15,608,928 bytes in that workload.
+Other mutations in the same stress fixture also reduce obsolete retention:
+
+| Mutation, 100,000 saved items | Median paired bytes saved | Reduction |
+| --- | ---: | ---: |
+| Append one item to the first tab | 610,080 | 3.7% |
+| Close the trailing half of tabs | 7,806,400 | 49.3% |
+| Clear custom visibility settings | 3,584,096 | 22.7% |
+
+The unchanged 1-item and 32-item controls are exactly neutral. At 100,000 items,
+the unchanged median difference is only 3,616 bytes (0.023%), consistent with
+retaining the same live source values rather than reclaiming a large duplicate
+at startup. No broad launch-memory improvement is claimed.
+
+Small outliers remain in the evidence: one 1-item close-half pair retained 4,800
+more bytes, and one 32-item append pair retained 4,912 more bytes. A 10,000-item
+unchanged pair was also 3,504 bytes higher. These were retained, not discarded.
+The larger changed-state workloads improve in all six pairs.
+
+### Reclamation cost
+
+Closing tabs now destroys obsolete objects during the mutation instead of
+leaving them reachable until shutdown. Median single-operation wall times:
+
+| Operation | Baseline | Updated |
+| --- | ---: | ---: |
+| Close all, 32 items | 1.67 µs | 4.94 µs |
+| Close all, 1,000 items | 4.04 µs | 35.23 µs |
+| Close all, 10,000 items | 4.33 µs | 280.42 µs |
+| Close all, 100,000 items | 5.54 µs | 3.094 ms |
+| Close half, 100,000 items | 7.46 µs | 1.536 ms |
+| Clear visibility, 100,000 items | 8.25 µs | 0.727 ms |
+
+The 100,000-item append observation fell from 0.238 ms to 0.072 ms, but this is
+not a calibrated timing experiment. Memory ownership and state correctness are
+the acceptance criteria; the timings expose the moved destruction cost.
+
+## Validation and evidence
+
+- Native component job passed: five baseline tests and ten candidate tests in
+  both debug and release, with warnings treated as errors. The candidate includes
+  seven real-loader ownership/coalescing/shutdown tests and three production
+  source-startup restoration tests.
+- All 300 measurement processes succeeded, with 150 complete model-state
+  byte comparisons. Every workload has three AB and three BA pairs.
+- An independent Python audit reconstructed all 25 expected states, including
+  path sets, selection, checksums, JSON byte lengths, and SHA-256 hashes. Every
+  result matches the native probe receipts.
+- The audit recomputed every summary statistic, checked all 13 source-input
+  hashes and staged-source receipts, and connected every observation to its raw
+  process log and executable variant.
+- The CI runner rehashed measured binaries and source files after the experiment.
+  Binary hash receipts are preserved; executable files themselves are not in the
+  evidence bundle, so the independent audit does not rehash those binaries.
+- Full native app startup/source integration is still running on the research
+  branch; its result will be recorded before opening the PR.
+
+The complete immutable component evidence is in
+[`Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64`](../Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64):
+[summary](../Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64/summary.json),
+[source/environment manifest](../Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64/manifest.json),
+[independent audit](../Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64/independent-audit.json),
+and [compressed full receipt/log bundle](../Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64/native-component-bundle.json.gz).
+The bundle's SHA-256 is
+`47d98874f0ec736883d5cb68d138a8f51104d1d8d9c19d0b4eaf2de84493eb9a`.
+
+Earlier Linux development runs passed their ownership tests and a 300-process
+comparison. Their raw cohort was lost in a workspace restart; no Linux numeric
+results are used for qualification or the tables above.
 
 ## Interpretation and limits
 
