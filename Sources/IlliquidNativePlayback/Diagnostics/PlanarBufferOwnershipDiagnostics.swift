@@ -247,7 +247,7 @@ final class PlanarBufferOwnershipLedger: @unchecked Sendable {
     private func snapshotLocked(activeGeneration: Int) -> PlanarBufferOwnershipSnapshot {
         var snapshot = PlanarBufferOwnershipSnapshot(
             totalCheckouts: totalCheckouts,
-                distinctBufferIdentitiesSeen: lastCheckoutByBuffer.count,
+            distinctBufferIdentitiesSeen: lastCheckoutByBuffer.count,
             reuseCheckouts: reuseCheckouts,
             reuseWhileKnownOwned: reuseWhileKnownOwned,
             peakApplicationFrames: peakApplicationFrames,
