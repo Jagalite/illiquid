@@ -73,7 +73,11 @@ class CodecAdapterTests(unittest.TestCase):
                           function_text(generated, 'readImage'))
             self.assertNotIn('Data(contentsOf:', function_text(generated, 'readImage'))
             self.assertIn('static let maximumEncodedImageBytes = 16 * 1024 * 1024', generated)
-            self.assertIn('guard try handle.seekToEnd() <= UInt64(maximumEncodedImageBytes)', generated)
+            self.assertIn('let initialByteCount = try handle.seekToEnd()', generated)
+            self.assertIn('guard initialByteCount <= UInt64(maximumEncodedImageBytes)', generated)
+            self.assertIn('var data = Data()', generated)
+            self.assertIn('if initialByteCount > 64 * 1024 {', generated)
+            self.assertIn('data.reserveCapacity(Int(initialByteCount))', generated)
             self.assertIn('while data.count <= maximumEncodedImageBytes', generated)
             self.assertIn('min(64 * 1024, maximumEncodedImageBytes + 1 - data.count)', generated)
         else:

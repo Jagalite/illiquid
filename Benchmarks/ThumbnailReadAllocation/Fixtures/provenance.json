@@ -1,0 +1,21 @@
+{
+  "description": "Deterministic synthetic RGB noise, encoded as JPEG. No external source images. High-detail size controls, not recordings of user media.",
+  "generator": "Pillow Image.frombytes RGB with random.Random(20261024).randrange(256) per channel, JPEG quality=82; independent random generator reset for each image",
+  "pillow_version": "12.3.0",
+  "fixtures": [
+    {
+      "path": "noise-320x180.jpg",
+      "bytes": 41904,
+      "sha256": "cade4b216205c532471918ecaa01291737090da0ac707f11d89fbfd2bca065ab",
+      "width": 320,
+      "height": 180
+    },
+    {
+      "path": "noise-640x360.jpg",
+      "bytes": 162337,
+      "sha256": "28d2c467b73d179b2395c27c96b470992b77c1604f547f8481b0d042aa04c5b1",
+      "width": 640,
+      "height": 360
+    }
+  ]
+}

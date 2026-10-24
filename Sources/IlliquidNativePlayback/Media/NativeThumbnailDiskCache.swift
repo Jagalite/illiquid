@@ -95,10 +95,13 @@ actor NativeThumbnailDiskCache {
             let initialByteCount = try handle.seekToEnd()
             guard initialByteCount <= UInt64(maximumEncodedImageBytes) else { return nil }
             try handle.seek(toOffset: 0)
-            // Reserve the validated size so multi-chunk reads do not repeatedly
-            // grow and copy their backing storage. The read bound below still
-            // applies if the file changes after this size probe.
-            var data = Data(capacity: Int(initialByteCount))
+            var data = Data()
+            // Multi-chunk reads can reserve their validated size rather than
+            // repeatedly grow and copy storage. Keep one-chunk reads on the
+            // existing path; reserving can round their capacity up needlessly.
+            if initialByteCount > 64 * 1024 {
+                data.reserveCapacity(Int(initialByteCount))
+            }
             // Bound the read itself as well: the file may grow after the size
             // check. Small chunks avoid reserving 16 MiB for every tiny JPEG.
             while data.count <= maximumEncodedImageBytes {
