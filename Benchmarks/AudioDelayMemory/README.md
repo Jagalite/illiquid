@@ -1,5 +1,10 @@
 # Audio-delay PCM ownership
 
+**Status:** The production improvement is tracked in [PR #95](https://github.com/Jagalite/illiquid/pull/95).
+A parallel run opened that equivalent fix seconds before this branch's
+[PR #97](https://github.com/Jagalite/illiquid/pull/97), which was closed as a duplicate.
+This branch preserves independent reproduction and validation evidence.
+
 This experiment investigates memory retained by signed audio-delay padding in
 `AudioDelayTimeline`. It compares the complete production timeline at
 `6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635` against the current working tree.
@@ -132,8 +137,9 @@ generates the required H.264/AAC and 7.1 FLAC fixtures and runs
 `AudioDelayMemoryTests`, `AudioDelayTests`, `AudioResamplerDrainTests`, and
 `MultichannelAudioTests` in the full application graph. This covers extreme
 offsets, prepare/seek/stop, delay replacement, resampler draining, and negotiated
-multichannel sample-buffer output. Native run results are recorded here once
-qualification completes.
+multichannel sample-buffer output. Native qualification was still queued when
+this duplicate was closed. Follow [PR #95](https://github.com/Jagalite/illiquid/pull/95)
+for the active implementation's native results; no native pass is claimed here.
 
 No CPU-speedup, ordinary-playback RAM, or real-device synchronization claim
 follows from this component experiment.
