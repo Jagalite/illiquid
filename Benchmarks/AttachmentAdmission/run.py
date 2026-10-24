@@ -179,7 +179,12 @@ class Runner:
         original = {variant: {path: self.source(variant, path)
                               for path in FULL_SOURCES + [PRESENTATION, BITMAP] + C_SOURCES}
                     for variant in VARIANTS}
-        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT}:
+        # Executor policy forwarding is also part of attachment handling. This
+        # original admission study still uses the default include policy; its
+        # complete output comparisons guard that default across revisions.
+        attachment_sources = {DEMUXER, FONT,
+                              "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"}
+        for path in set(FULL_SOURCES + C_SOURCES) - attachment_sources:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
         error = {v: extract(original[v][PRESENTATION], "struct PresentationError:", "\nfunc checkOSStatus(")

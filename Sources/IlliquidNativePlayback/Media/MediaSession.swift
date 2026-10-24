@@ -438,7 +438,10 @@ final class MediaSession: @unchecked Sendable {
         let audioStream = openedMediaInfo.audioStreams.first { $0.index == audioIndex }
         self.audioDelay = audioStream == nil ? 0 : AudioDelayTimeline.bounded(audioDelay)
         delayedAudioInput = self.audioDelay == 0 ? nil : try FFmpegInputExecutor(
-            url: url, cancellationSignal: constructionCancellation)
+            url: url,
+            cancellationSignal: constructionCancellation,
+            fontAttachmentLoading: .omit
+        )
         let requestedSubtitleSource = subtitleSource
             ?? selectedSubtitleIndex.map(NativeSubtitleSource.embedded)
             ?? .automaticEmbedded
@@ -453,7 +456,11 @@ final class MediaSession: @unchecked Sendable {
         let subtitleStream: FFmpegStreamInfo?
         let openedSubtitleInput: FFmpegInputExecutor?
         if case let .externalBitmap(subtitleURL, index) = resolvedSubtitleSource {
-            let external = try FFmpegInputExecutor(url: subtitleURL, cancellationSignal: constructionCancellation)
+            let external = try FFmpegInputExecutor(
+                url: subtitleURL,
+                cancellationSignal: constructionCancellation,
+                fontAttachmentLoading: .omit
+            )
             guard let stream = external.mediaInfo.subtitleStreams.first(where: { $0.index == index && $0.subtitleCapability == .bitmap }) else {
                 throw PresentationError("The selected external bitmap subtitle track is unavailable.")
             }
@@ -462,7 +469,13 @@ final class MediaSession: @unchecked Sendable {
             subtitleTimelineOrigin = 0
         } else {
             subtitleStream = resolvedSubtitleSource.resolve(in: openedMediaInfo)
-            openedSubtitleInput = subtitleStream == nil ? nil : try FFmpegInputExecutor(url: url, cancellationSignal: constructionCancellation)
+            // Both subtitle pipelines use fonts from the primary input's
+            // mediaInfo; this input only supplies packets and codec parameters.
+            openedSubtitleInput = subtitleStream == nil ? nil : try FFmpegInputExecutor(
+                url: url,
+                cancellationSignal: constructionCancellation,
+                fontAttachmentLoading: .omit
+            )
             subtitleTimelineOrigin = openedMediaInfo.startTime
         }
         try constructionCancellation?.checkCancellation()

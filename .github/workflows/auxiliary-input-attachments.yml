@@ -1,0 +1,131 @@
+name: Auxiliary input attachment memory
+
+on:
+  push:
+    branches: ['perf/auxiliary-font-memory-1d89f']
+    paths:
+      - 'Sources/IlliquidNativePlayback/**'
+      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryInput*Tests.swift'
+      - 'Benchmarks/AuxiliaryInputAttachments/**'
+      - 'Benchmarks/AttachmentAdmission/run.py'
+      - '.github/workflows/auxiliary-input-attachments.yml'
+      - '!Benchmarks/AuxiliaryInputAttachments/*.md'
+      - '!Benchmarks/AuxiliaryInputAttachments/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryInput*Tests.swift'
+      - 'Benchmarks/AuxiliaryInputAttachments/**'
+      - '.github/workflows/auxiliary-input-attachments.yml'
+      - '!Benchmarks/AuxiliaryInputAttachments/*.md'
+      - '!Benchmarks/AuxiliaryInputAttachments/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auxiliary-font-memory-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-memory:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native SDK
+        run: |
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate real and stress font fixtures
+        run: python3 Benchmarks/AuxiliaryInputAttachments/generate-fixtures.py --output "$RUNNER_TEMP/auxiliary-font-fixtures"
+      - name: Measure retained inputs and verify complete output parity
+        run: |
+          python3 Benchmarks/AuxiliaryInputAttachments/run.py \
+            --fixtures "$RUNNER_TEMP/auxiliary-font-fixtures" \
+            --output "$RUNNER_TEMP/auxiliary-font-memory" --pairs 6
+      - name: Emit portable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'auxiliary-font-memory'
+          files = {}
+          for pattern in ['*.json', '*.jsonl', '*.log', 'outputs/*.json']:
+              for path in sorted(root.glob(pattern)):
+                  files[str(path.relative_to(root))] = path.read_text()
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log bundle limit; use artifact')
+          print('AUXILIARY_MEMORY_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('AUXILIARY_MEMORY_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: auxiliary-font-memory
+          path: |
+            ${{ runner.temp }}/auxiliary-font-memory/*.json
+            ${{ runner.temp }}/auxiliary-font-memory/*.jsonl
+            ${{ runner.temp }}/auxiliary-font-memory/*.log
+            ${{ runner.temp }}/auxiliary-font-memory/*.swift
+            ${{ runner.temp }}/auxiliary-font-memory/*.py
+            ${{ runner.temp }}/auxiliary-font-memory/*.c
+            ${{ runner.temp }}/auxiliary-font-memory/*.h
+            ${{ runner.temp }}/auxiliary-font-memory/outputs/
+            ${{ runner.temp }}/auxiliary-font-memory/sources/
+            ${{ runner.temp }}/auxiliary-font-fixtures/manifest.json
+            ${{ runner.temp }}/auxiliary-font-fixtures/commands.json
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native SDK and Metal
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate required ownership and font rendering fixtures
+        run: |
+          python3 Benchmarks/AttachmentAdmission/generate-fixtures.py --output "$RUNNER_TEMP/attachment-fixtures"
+          python3 Benchmarks/AuxiliaryInputAttachments/generate-fixtures.py --output "$RUNNER_TEMP/auxiliary-font-fixtures"
+      - name: Build app graph and test input ownership and font rendering
+        run: |
+          mkdir -p "$RUNNER_TEMP/auxiliary-font-tests"
+          sw_vers > "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
+          swift --version >> "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
+          export ILLIQUID_ATTACHMENT_ADMISSION_FIXTURE="$RUNNER_TEMP/attachment-fixtures/attachment-admission.mkv"
+          export ILLIQUID_AUXILIARY_FONT_RENDER_FIXTURE="$RUNNER_TEMP/auxiliary-font-fixtures/real-font.mkv"
+          test -s "$ILLIQUID_ATTACHMENT_ADMISSION_FIXTURE"
+          test -s "$ILLIQUID_AUXILIARY_FONT_RENDER_FIXTURE"
+          set -o pipefail
+          for configuration in debug release; do
+            swift test --force-resolved-versions -c "$configuration" --jobs 2 --no-parallel \
+              --filter 'AuxiliaryInputAttachmentTests|AuxiliaryInputFontRenderingTests|FontAttachmentAdmissionTests|NativePlaybackFoundationTests|InputReadFailureTests' \
+              2>&1 | tee "$RUNNER_TEMP/auxiliary-font-tests/$configuration.log"
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: auxiliary-font-integration
+          path: ${{ runner.temp }}/auxiliary-font-tests/
+          retention-days: 14

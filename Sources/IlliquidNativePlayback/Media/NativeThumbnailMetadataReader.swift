@@ -13,7 +13,11 @@ public final class NativeThumbnailMetadataReader: Sendable {
             await worker.read {
                 interrupt.begin(token)
                 defer { interrupt.end(token) }
-                guard let input = try? FFmpegDemuxer(url: url, interruptState: interrupt),
+                guard let input = try? FFmpegDemuxer(
+                    url: url,
+                    interruptState: interrupt,
+                    fontAttachmentLoading: .omit
+                ),
                       !interrupt.shouldInterrupt(), !input.mediaInfo.videoStreams.isEmpty,
                       input.mediaInfo.duration.isFinite, input.mediaInfo.duration > 0 else { return nil }
                 return input.mediaInfo.duration

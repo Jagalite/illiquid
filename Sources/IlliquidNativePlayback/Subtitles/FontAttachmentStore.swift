@@ -1,5 +1,13 @@
 import Foundation
 
+/// Controls the Swift-owned font payload copies in `FFmpegMediaInfo`.
+/// Auxiliary inputs can omit them while preserving FFmpeg's codec parameters
+/// and the metadata for every stream, including attachments.
+enum FontAttachmentLoading: Equatable, Sendable {
+    case include
+    case omit
+}
+
 struct FontAttachment: Equatable, Sendable {
     let filename: String
     let mimeType: String?
