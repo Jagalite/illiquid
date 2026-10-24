@@ -1,0 +1,2033 @@
+{
+  "method": "Fresh processes, balanced alternating AB/BA order. Inputs prebuilt; small reader warms runtime. Live allocator samples after autorelease pools drain, before reader release and after release. Two scans per reader: filling and cached.",
+  "metric": "mallinfo2.uordblks + mallinfo2.hblkhd",
+  "observations": 108,
+  "scope": "Additional live allocator-accounted bytes while one scan-local reader is alive. Excludes input URL arrays and output retention. Not process RSS, peak footprint, whole-player RAM, or a leak claim.",
+  "timing_scope": "One complete scan including actual sidecar probes/parsing, recognize calls, small result consumer and autorelease drain; excludes fixture/input preparation, full-output verification and JSON. Warm filesystem caches; short controls can be noisy.",
+  "workloads": {
+    "extras-8192": {
+      "baseline": {
+        "cachedDeltaBytes": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "firstCPUNS": {
+          "max": 1001910281,
+          "median": 240870556.0,
+          "min": 200998723
+        },
+        "firstWallNS": {
+          "max": 1465033501,
+          "median": 375723513.0,
+          "min": 221092444
+        },
+        "releasedDeltaBytes": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "retainedDeltaBytes": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "secondCPUNS": {
+          "max": 495377110,
+          "median": 233725410.5,
+          "min": 211445219
+        },
+        "secondWallNS": {
+          "max": 1187232850,
+          "median": 289798255.5,
+          "min": 231784216
+        }
+      },
+      "candidate": {
+        "cachedDeltaBytes": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "firstCPUNS": {
+          "max": 393076235,
+          "median": 313030692.5,
+          "min": 246549710
+        },
+        "firstWallNS": {
+          "max": 699963779,
+          "median": 485180338.5,
+          "min": 323585290
+        },
+        "releasedDeltaBytes": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "retainedDeltaBytes": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "secondCPUNS": {
+          "max": 287887128,
+          "median": 237004178.0,
+          "min": 206330207
+        },
+        "secondWallNS": {
+          "max": 361279492,
+          "median": 292929491.0,
+          "min": 224158299
+        }
+      },
+      "count": 8192,
+      "paired": {
+        "cachedDeltaBytes": {
+          "candidate_minus_baseline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "change_percent": [],
+          "lower_pairs": 0,
+          "median_change_percent": null,
+          "median_difference": 0.0
+        },
+        "firstCPUNS": {
+          "candidate_minus_baseline": [
+            -694440125,
+            133639236,
+            104386164,
+            48248534,
+            -1250851,
+            36197166
+          ],
+          "change_percent": [
+            -69.31160785244003,
+            66.4876045008505,
+            48.73188409433735,
+            13.99207020203983,
+            -0.5047813430898551,
+            15.472805311123672
+          ],
+          "lower_pairs": 2,
+          "median_change_percent": 14.732437756581751,
+          "median_difference": 42222850.0
+        },
+        "firstWallNS": {
+          "candidate_minus_baseline": [
+            -765069722,
+            140042292,
+            437474655,
+            101721412,
+            -109321685,
+            117192239
+          ],
+          "change_percent": [
+            -52.221995024535616,
+            63.3410574628231,
+            185.04711183265195,
+            23.894182169685287,
+            -25.252927606444775,
+            35.978249879561595
+          ],
+          "lower_pairs": 2,
+          "median_change_percent": 29.93621602462344,
+          "median_difference": 109456825.5
+        },
+        "releasedDeltaBytes": {
+          "candidate_minus_baseline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "change_percent": [],
+          "lower_pairs": 0,
+          "median_change_percent": null,
+          "median_difference": 0.0
+        },
+        "retainedDeltaBytes": {
+          "candidate_minus_baseline": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "change_percent": [],
+          "lower_pairs": 0,
+          "median_change_percent": null,
+          "median_difference": 0.0
+        },
+        "secondCPUNS": {
+          "candidate_minus_baseline": [
+            -289046903,
+            36430777,
+            62115113,
+            -68707644,
+            -19229290,
+            7483327
+          ],
+          "change_percent": [
+            -58.348861335155355,
+            16.921188253047937,
+            27.512317237368865,
+            -21.453273268519723,
+            -7.956547915086931,
+            3.539132752866836
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": -2.2087075811100476,
+          "median_difference": -5872981.5
+        },
+        "secondWallNS": {
+          "candidate_minus_baseline": [
+            -963074551,
+            45263489,
+            93761708,
+            -57276579,
+            40951978,
+            21954303
+          ],
+          "change_percent": [
+            -81.11926409381277,
+            19.528287896877327,
+            36.16387191870842,
+            -15.645582900734079,
+            12.784408522584801,
+            8.776421259624057
+          ],
+          "lower_pairs": 2,
+          "median_change_percent": 10.780414891104428,
+          "median_difference": 31453140.5
+        }
+      },
+      "pairs": 6,
+      "style": "extras"
+    },
+    "malformed-8192": {
+      "baseline": {
+        "cachedDeltaBytes": {
+          "max": 3686608,
+          "median": 3686400.0,
+          "min": 3685584
+        },
+        "firstCPUNS": {
+          "max": 4914610691,
+          "median": 3204292321.0,
+          "min": 2346515698
+        },
+        "firstWallNS": {
+          "max": 7955562267,
+          "median": 5925444859.0,
+          "min": 4005262820
+        },
+        "releasedDeltaBytes": {
+          "max": 3120,
+          "median": 2888.0,
+          "min": 1936
+        },
+        "retainedDeltaBytes": {
+          "max": 3686448,
+          "median": 3686240.0,
+          "min": 3685424
+        },
+        "secondCPUNS": {
+          "max": 3333945641,
+          "median": 1556420326.5,
+          "min": 1343126646
+        },
+        "secondWallNS": {
+          "max": 7055125246,
+          "median": 3871164879.0,
+          "min": 1760391951
+        }
+      },
+      "candidate": {
+        "cachedDeltaBytes": {
+          "max": 1593328,
+          "median": 1592912.0,
+          "min": 1592672
+        },
+        "firstCPUNS": {
+          "max": 3874272806,
+          "median": 2431532143.5,
+          "min": 2210893711
+        },
+        "firstWallNS": {
+          "max": 5013988033,
+          "median": 4044084634.5,
+          "min": 3300948100
+        },
+        "releasedDeltaBytes": {
+          "max": 6160,
+          "median": 6016.0,
+          "min": 5808
+        },
+        "retainedDeltaBytes": {
+          "max": 1593328,
+          "median": 1592912.0,
+          "min": 1592672
+        },
+        "secondCPUNS": {
+          "max": 3348687768,
+          "median": 1391705962.5,
+          "min": 841038164
+        },
+        "secondWallNS": {
+          "max": 5664158395,
+          "median": 2060854762.0,
+          "min": 1080667211
+        }
+      },
+      "count": 8192,
+      "paired": {
+        "cachedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -2092848,
+            -2093696,
+            -2092256,
+            -2093712,
+            -2093680,
+            -2093472
+          ],
+          "change_percent": [
+            -56.78223989512022,
+            -56.794892383279596,
+            -56.76864236441226,
+            -56.79581942629959,
+            -56.79150047957364,
+            -56.788076595892434
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -56.78978853773304,
+          "median_difference": -2093576.0
+        },
+        "firstCPUNS": {
+          "candidate_minus_baseline": [
+            -1354038990,
+            -1040337885,
+            -694341653,
+            -548703718,
+            -135621987,
+            -883779687
+          ],
+          "change_percent": [
+            -34.793961002945984,
+            -21.168266428613435,
+            -21.738586997945376,
+            -18.842470809964496,
+            -5.779717864900469,
+            -27.493251241720806
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -21.453426713279406,
+          "median_difference": -789060670.0
+        },
+        "firstWallNS": {
+          "candidate_minus_baseline": [
+            -3360059379,
+            -2941574234,
+            -2575116344,
+            -105676076,
+            -1270233595,
+            -420177467
+          ],
+          "change_percent": [
+            -50.443711249284426,
+            -36.97506392730745,
+            -38.185868483692396,
+            -2.6384305037940092,
+            -24.475191083425273,
+            -9.107321268564661
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -30.725127505366363,
+          "median_difference": -1922674969.5
+        },
+        "releasedDeltaBytes": {
+          "candidate_minus_baseline": [
+            4032,
+            3024,
+            4160,
+            2912,
+            3040,
+            2944
+          ],
+          "change_percent": [
+            189.47368421052633,
+            104.99999999999999,
+            214.87603305785123,
+            100.55248618784529,
+            97.43589743589745,
+            98.39572192513369
+          ],
+          "lower_pairs": 0,
+          "median_change_percent": 102.77624309392263,
+          "median_difference": 3032.0
+        },
+        "retainedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -2092688,
+            -2093536,
+            -2092096,
+            -2093552,
+            -2093520,
+            -2093312
+          ],
+          "change_percent": [
+            -56.780363708980715,
+            -56.793017088341124,
+            -56.766765506492604,
+            -56.793944155319906,
+            -56.78962513508938,
+            -56.786201029540706
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -56.78791308231504,
+          "median_difference": -2093416.0
+        },
+        "secondCPUNS": {
+          "candidate_minus_baseline": [
+            -1934726154,
+            1509598945,
+            1439008526,
+            -47420573,
+            -49790786,
+            -840189478
+          ],
+          "change_percent": [
+            -58.03112474922323,
+            112.39438585302253,
+            75.35341508414429,
+            -3.3123876798853757,
+            -3.4986469865673553,
+            -49.974759932004496
+          ],
+          "lower_pairs": 4,
+          "median_change_percent": -3.4055173332263653,
+          "median_difference": -48605679.5
+        },
+        "secondWallNS": {
+          "candidate_minus_baseline": [
+            -5150327223,
+            1733695916,
+            -651750826,
+            -1858772127,
+            408222421,
+            -1095550674
+          ],
+          "change_percent": [
+            -73.00121604389729,
+            44.10920916464498,
+            -14.478077061592609,
+            -48.762771391338354,
+            23.18929149659581,
+            -50.34195709681892
+          ],
+          "lower_pairs": 4,
+          "median_change_percent": -31.62042422646548,
+          "median_difference": -873650750.0
+        }
+      },
+      "pairs": 6,
+      "style": "malformed"
+    },
+    "missing-512": {
+      "baseline": {
+        "cachedDeltaBytes": {
+          "max": 233120,
+          "median": 232944.0,
+          "min": 232944
+        },
+        "firstCPUNS": {
+          "max": 106686828,
+          "median": 86322232.5,
+          "min": 39268084
+        },
+        "firstWallNS": {
+          "max": 178993548,
+          "median": 101966035.0,
+          "min": 42443158
+        },
+        "releasedDeltaBytes": {
+          "max": 384,
+          "median": 208.0,
+          "min": 208
+        },
+        "retainedDeltaBytes": {
+          "max": 232960,
+          "median": 232784.0,
+          "min": 232784
+        },
+        "secondCPUNS": {
+          "max": 357450103,
+          "median": 68950057.0,
+          "min": 38597101
+        },
+        "secondWallNS": {
+          "max": 436912315,
+          "median": 90447725.5,
+          "min": 38977083
+        }
+      },
+      "candidate": {
+        "cachedDeltaBytes": {
+          "max": 97936,
+          "median": 97760.0,
+          "min": 97760
+        },
+        "firstCPUNS": {
+          "max": 123392548,
+          "median": 69107172.0,
+          "min": 33473925
+        },
+        "firstWallNS": {
+          "max": 155489564,
+          "median": 71177204.0,
+          "min": 33766006
+        },
+        "releasedDeltaBytes": {
+          "max": 176,
+          "median": 0.0,
+          "min": 0
+        },
+        "retainedDeltaBytes": {
+          "max": 97936,
+          "median": 97760.0,
+          "min": 97760
+        },
+        "secondCPUNS": {
+          "max": 95046300,
+          "median": 70362661.5,
+          "min": 33140353
+        },
+        "secondWallNS": {
+          "max": 175879163,
+          "median": 71493189.5,
+          "min": 33451054
+        }
+      },
+      "count": 512,
+      "paired": {
+        "cachedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -135184,
+            -135008,
+            -135360,
+            -135008,
+            -135184,
+            -135184
+          ],
+          "change_percent": [
+            -58.03283192526959,
+            -57.95727728552785,
+            -58.06451612903225,
+            -57.95727728552785,
+            -58.03283192526959,
+            -58.03283192526959
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -58.03283192526959,
+          "median_difference": -135184.0
+        },
+        "firstCPUNS": {
+          "candidate_minus_baseline": [
+            -7967044,
+            27853728,
+            -38445965,
+            -23305752,
+            -8767216,
+            11416716
+          ],
+          "change_percent": [
+            -19.225042734883925,
+            29.154356312962637,
+            -36.03628087996018,
+            -24.818761266321065,
+            -11.13428802897185,
+            29.073779102642238
+          ],
+          "lower_pairs": 4,
+          "median_change_percent": -15.179665381927887,
+          "median_difference": -8367130.0
+        },
+        "firstWallNS": {
+          "candidate_minus_baseline": [
+            -8677152,
+            40924151,
+            -38350589,
+            -54967032,
+            -23503984,
+            19927249
+          ],
+          "change_percent": [
+            -20.444171472820194,
+            42.08170249000105,
+            -35.94824203798037,
+            -42.866371450606145,
+            -13.131190628167221,
+            40.53104627756983
+          ],
+          "lower_pairs": 4,
+          "median_change_percent": -16.78768105049371,
+          "median_difference": -16090568.0
+        },
+        "releasedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -208,
+            -32,
+            -384,
+            -32,
+            -208,
+            -208
+          ],
+          "change_percent": [
+            -100.0,
+            -15.384615384615385,
+            -100.0,
+            -15.384615384615385,
+            -100.0,
+            -100.0
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -100.0,
+          "median_difference": -208.0
+        },
+        "retainedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -135024,
+            -134848,
+            -135200,
+            -134848,
+            -135024,
+            -135024
+          ],
+          "change_percent": [
+            -58.00398652828373,
+            -57.92837995738539,
+            -58.03571428571428,
+            -57.92837995738539,
+            -58.00398652828373,
+            -58.00398652828373
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -58.00398652828373,
+          "median_difference": -135024.0
+        },
+        "secondCPUNS": {
+          "candidate_minus_baseline": [
+            -5456748,
+            -262403803,
+            -28261571,
+            1942344,
+            3790344,
+            -19477315
+          ],
+          "change_percent": [
+            -14.137714643387334,
+            -73.40991114499693,
+            -27.98699202063515,
+            2.940118708596162,
+            5.276336696003647,
+            -32.770200418914065
+          ],
+          "lower_pairs": 4,
+          "median_change_percent": -21.06235333201124,
+          "median_difference": -12467031.5
+        },
+        "secondWallNS": {
+          "candidate_minus_baseline": [
+            -5526029,
+            -336344915,
+            -26490046,
+            -11419026,
+            21609543,
+            -13776450
+          ],
+          "change_percent": [
+            -14.177636125309833,
+            -76.98224642626519,
+            -26.23356099878609,
+            -14.288472299765488,
+            14.007646482826619,
+            -23.080096022527684
+          ],
+          "lower_pairs": 5,
+          "median_change_percent": -18.684284161146586,
+          "median_difference": -12597738.0
+        }
+      },
+      "pairs": 6,
+      "style": "missing"
+    },
+    "missing-8192": {
+      "baseline": {
+        "cachedDeltaBytes": {
+          "max": 3674192,
+          "median": 3674192.0,
+          "min": 3674192
+        },
+        "firstCPUNS": {
+          "max": 2320569936,
+          "median": 2078043947.0,
+          "min": 793985463
+        },
+        "firstWallNS": {
+          "max": 2921928301,
+          "median": 2130132000.5,
+          "min": 798848811
+        },
+        "releasedDeltaBytes": {
+          "max": 384,
+          "median": 384.0,
+          "min": 384
+        },
+        "retainedDeltaBytes": {
+          "max": 3673872,
+          "median": 3673872.0,
+          "min": 3673872
+        },
+        "secondCPUNS": {
+          "max": 2213376106,
+          "median": 1558890898.5,
+          "min": 695881602
+        },
+        "secondWallNS": {
+          "max": 2230398566,
+          "median": 1635862153.0,
+          "min": 697974017
+        }
+      },
+      "candidate": {
+        "cachedDeltaBytes": {
+          "max": 1576976,
+          "median": 1576976.0,
+          "min": 1576976
+        },
+        "firstCPUNS": {
+          "max": 2304267703,
+          "median": 2062087807.0,
+          "min": 1576041352
+        },
+        "firstWallNS": {
+          "max": 2520319499,
+          "median": 2202104770.5,
+          "min": 1715657224
+        },
+        "releasedDeltaBytes": {
+          "max": 176,
+          "median": 176.0,
+          "min": 176
+        },
+        "retainedDeltaBytes": {
+          "max": 1576816,
+          "median": 1576816.0,
+          "min": 1576816
+        },
+        "secondCPUNS": {
+          "max": 2069087273,
+          "median": 1726168829.5,
+          "min": 1105365341
+        },
+        "secondWallNS": {
+          "max": 2180390460,
+          "median": 1976319524.0,
+          "min": 1671452433
+        }
+      },
+      "count": 8192,
+      "paired": {
+        "cachedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -2097216,
+            -2097216,
+            -2097216,
+            -2097216,
+            -2097216,
+            -2097216
+          ],
+          "change_percent": [
+            -57.07965179827292,
+            -57.07965179827292,
+            -57.07965179827292,
+            -57.07965179827292,
+            -57.07965179827292,
+            -57.07965179827292
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -57.07965179827292,
+          "median_difference": -2097216.0
+        },
+        "firstCPUNS": {
+          "candidate_minus_baseline": [
+            -744528584,
+            1510282240,
+            -568630560,
+            1086898858,
+            67438806,
+            -99351086
+          ],
+          "change_percent": [
+            -32.08386752106919,
+            190.21535158761463,
+            -24.935524916563356,
+            92.70364219132938,
+            3.2873472239991264,
+            -4.720614171808101
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": -0.7166334739044875,
+          "median_difference": -15956140.0
+        },
+        "firstWallNS": {
+          "candidate_minus_baseline": [
+            -1206271077,
+            1621847097,
+            -653294431,
+            1088356030,
+            38229280,
+            362215193
+          ],
+          "change_percent": [
+            -41.28339071794356,
+            203.02303448005006,
+            -27.29359698191257,
+            92.58943989102195,
+            1.8185716380600736,
+            16.783952100598796
+          ],
+          "lower_pairs": 2,
+          "median_change_percent": 9.301261869329435,
+          "median_difference": 200222236.5
+        },
+        "releasedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -208,
+            -208,
+            -208,
+            -208,
+            -208,
+            -208
+          ],
+          "change_percent": [
+            -54.16666666666667,
+            -54.16666666666667,
+            -54.16666666666667,
+            -54.16666666666667,
+            -54.16666666666667,
+            -54.16666666666667
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -54.16666666666667,
+          "median_difference": -208.0
+        },
+        "retainedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -2097056,
+            -2097056,
+            -2097056,
+            -2097056,
+            -2097056,
+            -2097056
+          ],
+          "change_percent": [
+            -57.080268447022654,
+            -57.080268447022654,
+            -57.080268447022654,
+            -57.080268447022654,
+            -57.080268447022654,
+            -57.080268447022654
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -57.080268447022654,
+          "median_difference": -2097056.0
+        },
+        "secondCPUNS": {
+          "candidate_minus_baseline": [
+            -76231335,
+            1090081043,
+            240029052,
+            377651438,
+            -623160830,
+            -33969993
+          ],
+          "change_percent": [
+            -6.451552932432247,
+            156.64748713962982,
+            16.82824913413259,
+            22.327269541383465,
+            -28.154312695015605,
+            -1.8584157053834427
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": 7.484916714374574,
+          "median_difference": 103029529.5
+        },
+        "secondWallNS": {
+          "candidate_minus_baseline": [
+            668348934,
+            1150313188,
+            228384178,
+            351734409,
+            -114228279,
+            116778239
+          ],
+          "change_percent": [
+            55.41014385699255,
+            164.80745127794637,
+            15.826290766821693,
+            19.23458535615017,
+            -5.12142900113396,
+            5.954043163003631
+          ],
+          "lower_pairs": 1,
+          "median_change_percent": 17.53043806148593,
+          "median_difference": 290059293.5
+        }
+      },
+      "pairs": 6,
+      "style": "missing"
+    },
+    "missing-cap": {
+      "baseline": {
+        "cachedDeltaBytes": {
+          "max": 26894176,
+          "median": 26894176.0,
+          "min": 26894176
+        },
+        "firstCPUNS": {
+          "max": 18938088056,
+          "median": 13071575719.5,
+          "min": 9889910961
+        },
+        "firstWallNS": {
+          "max": 35633739171,
+          "median": 14497742719.0,
+          "min": 10946808335
+        },
+        "releasedDeltaBytes": {
+          "max": 384,
+          "median": 384.0,
+          "min": 384
+        },
+        "retainedDeltaBytes": {
+          "max": 26894016,
+          "median": 26894016.0,
+          "min": 26894016
+        },
+        "secondCPUNS": {
+          "max": 17041582423,
+          "median": 12235937282.0,
+          "min": 9258599406
+        },
+        "secondWallNS": {
+          "max": 28685323785,
+          "median": 16739690412.0,
+          "min": 10441744132
+        }
+      },
+      "candidate": {
+        "cachedDeltaBytes": {
+          "max": 10116752,
+          "median": 10116752.0,
+          "min": 10116752
+        },
+        "firstCPUNS": {
+          "max": 11431168273,
+          "median": 9616769173.5,
+          "min": 8419340221
+        },
+        "firstWallNS": {
+          "max": 15907838809,
+          "median": 9833906212.5,
+          "min": 9409355380
+        },
+        "releasedDeltaBytes": {
+          "max": 176,
+          "median": 176.0,
+          "min": 176
+        },
+        "retainedDeltaBytes": {
+          "max": 10116592,
+          "median": 10116592.0,
+          "min": 10116592
+        },
+        "secondCPUNS": {
+          "max": 13724672325,
+          "median": 8785345192.0,
+          "min": 7426800255
+        },
+        "secondWallNS": {
+          "max": 23793074747,
+          "median": 9297433612.5,
+          "min": 7507998503
+        }
+      },
+      "count": 50010,
+      "paired": {
+        "cachedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -16777424,
+            -16777424,
+            -16777424,
+            -16777424,
+            -16777424,
+            -16777424
+          ],
+          "change_percent": [
+            -62.38311223961649,
+            -62.38311223961649,
+            -62.38311223961649,
+            -62.38311223961649,
+            -62.38311223961649,
+            -62.38311223961649
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -62.38311223961649,
+          "median_difference": -16777424.0
+        },
+        "firstCPUNS": {
+          "candidate_minus_baseline": [
+            -881943196,
+            -2550346401,
+            -3090193928,
+            -9547479590,
+            -5986525055,
+            -1470570740
+          ],
+          "change_percent": [
+            -8.223343900370894,
+            -18.240844861698857,
+            -25.409358852858322,
+            -50.41416832453237,
+            -37.73765652667266,
+            -14.869403231222877
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -21.82510185727859,
+          "median_difference": -2820270164.5
+        },
+        "firstWallNS": {
+          "candidate_minus_baseline": [
+            -988261257,
+            -2156958773,
+            -4778162472,
+            -26224383791,
+            -6071614192,
+            -2094800073
+          ],
+          "change_percent": [
+            -9.027848362341862,
+            -14.867316009106624,
+            -32.981441092900745,
+            -73.59425196764737,
+            -27.624045929276587,
+            -17.85821468337574
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -22.741130306326163,
+          "median_difference": -3467560622.5
+        },
+        "releasedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -208,
+            -208,
+            -208,
+            -208,
+            -208,
+            -208
+          ],
+          "change_percent": [
+            -54.16666666666667,
+            -54.16666666666667,
+            -54.16666666666667,
+            -54.16666666666667,
+            -54.16666666666667,
+            -54.16666666666667
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -54.16666666666667,
+          "median_difference": -208.0
+        },
+        "retainedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -16777424,
+            -16777424,
+            -16777424,
+            -16777424,
+            -16777424,
+            -16777424
+          ],
+          "change_percent": [
+            -62.383483374145385,
+            -62.383483374145385,
+            -62.383483374145385,
+            -62.383483374145385,
+            -62.383483374145385,
+            -62.383483374145385
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -62.383483374145385,
+          "median_difference": -16777424.0
+        },
+        "secondCPUNS": {
+          "candidate_minus_baseline": [
+            -2584664861,
+            -2582680916,
+            -1831799151,
+            -7407054575,
+            2520411346,
+            -5916252471
+          ],
+          "change_percent": [
+            -24.567125411990066,
+            -19.46605468612613,
+            -19.784840780700698,
+            -43.464593786802,
+            22.49511458831577,
+            -43.83569996397431
+          ],
+          "lower_pairs": 5,
+          "median_change_percent": -22.175983096345384,
+          "median_difference": -2583672888.5
+        },
+        "secondWallNS": {
+          "candidate_minus_baseline": [
+            -3091210018,
+            -3257897124,
+            -2933745629,
+            -10755690813,
+            -4892249038,
+            -10575681941
+          ],
+          "change_percent": [
+            -28.005471717640873,
+            -23.227293132525016,
+            -28.096317932261705,
+            -52.5359309543656,
+            -17.05488519030848,
+            -54.36468144994129
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -28.05089482495129,
+          "median_difference": -4075073081.0
+        }
+      },
+      "pairs": 6,
+      "style": "missing"
+    },
+    "mixed-8192": {
+      "baseline": {
+        "cachedDeltaBytes": {
+          "max": 3757440,
+          "median": 3756976.0,
+          "min": 3756592
+        },
+        "firstCPUNS": {
+          "max": 3392812371,
+          "median": 2487195398.5,
+          "min": 1313482683
+        },
+        "firstWallNS": {
+          "max": 7001572315,
+          "median": 3380094428.5,
+          "min": 1952556463
+        },
+        "releasedDeltaBytes": {
+          "max": 1776,
+          "median": 1288.0,
+          "min": 912
+        },
+        "retainedDeltaBytes": {
+          "max": 3757120,
+          "median": 3756672.0,
+          "min": 3756288
+        },
+        "secondCPUNS": {
+          "max": 3499739701,
+          "median": 2433438633.5,
+          "min": 982782690
+        },
+        "secondWallNS": {
+          "max": 9563115018,
+          "median": 4303384382.0,
+          "min": 2152000808
+        }
+      },
+      "candidate": {
+        "cachedDeltaBytes": {
+          "max": 1813904,
+          "median": 1813504.0,
+          "min": 1813472
+        },
+        "firstCPUNS": {
+          "max": 3781329498,
+          "median": 2240750653.5,
+          "min": 1923668777
+        },
+        "firstWallNS": {
+          "max": 11519234618,
+          "median": 3205962616.0,
+          "min": 2586563081
+        },
+        "releasedDeltaBytes": {
+          "max": 3616,
+          "median": 3200.0,
+          "min": 3184
+        },
+        "retainedDeltaBytes": {
+          "max": 1813744,
+          "median": 1813344.0,
+          "min": 1813312
+        },
+        "secondCPUNS": {
+          "max": 1915885611,
+          "median": 1584618275.0,
+          "min": 1040242161
+        },
+        "secondWallNS": {
+          "max": 3169661199,
+          "median": 2069081251.0,
+          "min": 1651994723
+        }
+      },
+      "count": 8192,
+      "paired": {
+        "cachedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -1943888,
+            -1943104,
+            -1943216,
+            -1942688,
+            -1943760,
+            -1943936
+          ],
+          "change_percent": [
+            -51.7350332358189,
+            -51.724960389798454,
+            -51.72639962520497,
+            -51.71410682874264,
+            -51.73382958518399,
+            -51.735649804121955
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -51.73011460519448,
+          "median_difference": -1943488.0
+        },
+        "firstCPUNS": {
+          "candidate_minus_baseline": [
+            2467846815,
+            89973366,
+            209919042,
+            -562073358,
+            -842536312,
+            -1035484789
+          ],
+          "change_percent": [
+            187.88575189765177,
+            3.6153502651391944,
+            12.195334059000086,
+            -22.611893248532798,
+            -24.832976889661307,
+            -34.90808562665547
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": -9.498271491696801,
+          "median_difference": -236049996.0
+        },
+        "firstWallNS": {
+          "candidate_minus_baseline": [
+            8368401015,
+            781882265,
+            634006618,
+            -1343607239,
+            -3320622521,
+            -829615154
+          ],
+          "change_percent": [
+            265.59323878710074,
+            27.43155031180762,
+            32.47059073650973,
+            -33.76040749912966,
+            -47.426811744641675,
+            -22.985134341669323
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": 2.2232079850691484,
+          "median_difference": -97804268.0
+        },
+        "releasedDeltaBytes": {
+          "candidate_minus_baseline": [
+            1536,
+            2288,
+            2208,
+            2528,
+            1696,
+            1424
+          ],
+          "change_percent": [
+            92.3076923076923,
+            250.8771929824561,
+            222.5806451612903,
+            232.3529411764706,
+            113.9784946236559,
+            80.18018018018019
+          ],
+          "lower_pairs": 0,
+          "median_change_percent": 168.2795698924731,
+          "median_difference": 1952.0
+        },
+        "retainedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -1943728,
+            -1942944,
+            -1943056,
+            -1942688,
+            -1943600,
+            -1943776
+          ],
+          "change_percent": [
+            -51.73518101329972,
+            -51.725107340012265,
+            -51.72654669364285,
+            -51.716309519245925,
+            -51.733977266435836,
+            -51.735797632228945
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -51.730261980039344,
+          "median_difference": -1943328.0
+        },
+        "secondCPUNS": {
+          "candidate_minus_baseline": [
+            57459471,
+            -541803657,
+            -843143907,
+            -299059344,
+            -971211180,
+            -1972104446
+          ],
+          "change_percent": [
+            5.846609996763363,
+            -22.744484445701797,
+            -33.93281155433336,
+            -16.523632596951508,
+            -33.639716653337516,
+            -56.3500321305753
+          ],
+          "lower_pairs": 5,
+          "median_change_percent": -28.192100549519658,
+          "median_difference": -692473782.0
+        },
+        "secondWallNS": {
+          "candidate_minus_baseline": [
+            -140269504,
+            -551844993,
+            -7570837726,
+            -1920748805,
+            -2614325054,
+            -2794927886
+          ],
+          "change_percent": [
+            -6.518097180937488,
+            -20.604484140000334,
+            -79.16706754807328,
+            -46.1735538630755,
+            -45.19936493009503,
+            -62.850832626217176
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -45.68645939658526,
+          "median_difference": -2267536929.5
+        }
+      },
+      "pairs": 6,
+      "style": "mixed"
+    },
+    "positive-8192": {
+      "baseline": {
+        "cachedDeltaBytes": {
+          "max": 4985632,
+          "median": 4985328.0,
+          "min": 4985264
+        },
+        "firstCPUNS": {
+          "max": 7053638450,
+          "median": 3515641670.5,
+          "min": 2576911914
+        },
+        "firstWallNS": {
+          "max": 8718097731,
+          "median": 5820562667.0,
+          "min": 4008220499
+        },
+        "releasedDeltaBytes": {
+          "max": 384,
+          "median": 96.0,
+          "min": 96
+        },
+        "retainedDeltaBytes": {
+          "max": 4985632,
+          "median": 4985328.0,
+          "min": 4985264
+        },
+        "secondCPUNS": {
+          "max": 1886075501,
+          "median": 1392186987.0,
+          "min": 742240738
+        },
+        "secondWallNS": {
+          "max": 2670230776,
+          "median": 2120366845.5,
+          "min": 805820668
+        }
+      },
+      "candidate": {
+        "cachedDeltaBytes": {
+          "max": 4985728,
+          "median": 4985448.0,
+          "min": 4985424
+        },
+        "firstCPUNS": {
+          "max": 5410910735,
+          "median": 3534088514.5,
+          "min": 2920845130
+        },
+        "firstWallNS": {
+          "max": 7761287077,
+          "median": 5166381461.5,
+          "min": 4292257793
+        },
+        "releasedDeltaBytes": {
+          "max": 480,
+          "median": 192.0,
+          "min": 96
+        },
+        "retainedDeltaBytes": {
+          "max": 4985728,
+          "median": 4985448.0,
+          "min": 4985424
+        },
+        "secondCPUNS": {
+          "max": 2582339335,
+          "median": 2079718697.5,
+          "min": 1168127666
+        },
+        "secondWallNS": {
+          "max": 3644787416,
+          "median": 2641011311.0,
+          "min": 1891320863
+        }
+      },
+      "count": 8192,
+      "paired": {
+        "cachedDeltaBytes": {
+          "candidate_minus_baseline": [
+            96,
+            160,
+            112,
+            -176,
+            384,
+            112
+          ],
+          "change_percent": [
+            0.0019255332122325441,
+            0.0032094589173192745,
+            0.0022465924007342153,
+            -0.003530144222441134,
+            0.0077026025168347445,
+            0.0022465924007342153
+          ],
+          "lower_pairs": 1,
+          "median_change_percent": 0.0022465924007342153,
+          "median_difference": 112.0
+        },
+        "firstCPUNS": {
+          "candidate_minus_baseline": [
+            -2835811748,
+            -15449675,
+            1953543957,
+            343933216,
+            311325652,
+            -1286568552
+          ],
+          "change_percent": [
+            -40.203531384572166,
+            -0.4322897506882861,
+            56.50381005078311,
+            13.346719929829941,
+            9.73384072711465,
+            -27.27315920498068
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": 4.650775488213182,
+          "median_difference": 147937988.5
+        },
+        "firstWallNS": {
+          "candidate_minus_baseline": [
+            -3488665215,
+            230119693,
+            3753066578,
+            789092928,
+            -1347790928,
+            -3169757910
+          ],
+          "change_percent": [
+            -40.01635818551252,
+            5.664989405456211,
+            93.6342344174015,
+            15.204090943899873,
+            -20.892351236484686,
+            -39.87753975576671
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": -7.613680915514237,
+          "median_difference": -558835617.5
+        },
+        "releasedDeltaBytes": {
+          "candidate_minus_baseline": [
+            96,
+            0,
+            96,
+            -192,
+            288,
+            96
+          ],
+          "change_percent": [
+            25.0,
+            0.0,
+            100.0,
+            -50.0,
+            300.0,
+            100.0
+          ],
+          "lower_pairs": 1,
+          "median_change_percent": 62.5,
+          "median_difference": 96.0
+        },
+        "retainedDeltaBytes": {
+          "candidate_minus_baseline": [
+            96,
+            160,
+            112,
+            -176,
+            384,
+            112
+          ],
+          "change_percent": [
+            0.0019255332122325441,
+            0.0032094589173192745,
+            0.0022465924007342153,
+            -0.003530144222441134,
+            0.0077026025168347445,
+            0.0022465924007342153
+          ],
+          "lower_pairs": 1,
+          "median_change_percent": 0.0022465924007342153,
+          "median_difference": 112.0
+        },
+        "secondCPUNS": {
+          "candidate_minus_baseline": [
+            1728667314,
+            398698483,
+            1296073840,
+            -95876842,
+            376554932,
+            14225222
+          ],
+          "change_percent": [
+            232.8984688522984,
+            21.139052110512523,
+            100.76254436103022,
+            -7.585166144043532,
+            25.135358171883084,
+            0.8002349446380563
+          ],
+          "lower_pairs": 1,
+          "median_change_percent": 23.137205141197803,
+          "median_difference": 387626707.5
+        },
+        "secondWallNS": {
+          "candidate_minus_baseline": [
+            2838966748,
+            631977480,
+            1341081760,
+            -163492415,
+            -331098133,
+            24292347
+          ],
+          "change_percent": [
+            352.30751217217477,
+            28.911275828778304,
+            74.50034094105116,
+            -7.956558230883692,
+            -12.39960740382089,
+            0.9956563893166681
+          ],
+          "lower_pairs": 2,
+          "median_change_percent": 14.953466109047486,
+          "median_difference": 328134913.5
+        }
+      },
+      "pairs": 6,
+      "style": "positive"
+    },
+    "unicode-1024": {
+      "baseline": {
+        "cachedDeltaBytes": {
+          "max": 479872,
+          "median": 479872.0,
+          "min": 479872
+        },
+        "firstCPUNS": {
+          "max": 599532843,
+          "median": 341272185.0,
+          "min": 250402489
+        },
+        "firstWallNS": {
+          "max": 945073790,
+          "median": 443262562.0,
+          "min": 280322574
+        },
+        "releasedDeltaBytes": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0
+        },
+        "retainedDeltaBytes": {
+          "max": 479696,
+          "median": 479696.0,
+          "min": 479696
+        },
+        "secondCPUNS": {
+          "max": 370235434,
+          "median": 270348196.5,
+          "min": 223547676
+        },
+        "secondWallNS": {
+          "max": 848362675,
+          "median": 335331133.0,
+          "min": 260691739
+        }
+      },
+      "candidate": {
+        "cachedDeltaBytes": {
+          "max": 214144,
+          "median": 214144.0,
+          "min": 214144
+        },
+        "firstCPUNS": {
+          "max": 443474762,
+          "median": 319070317.0,
+          "min": 213602842
+        },
+        "firstWallNS": {
+          "max": 968065667,
+          "median": 464795970.5,
+          "min": 240418524
+        },
+        "releasedDeltaBytes": {
+          "max": 192,
+          "median": 192.0,
+          "min": 192
+        },
+        "retainedDeltaBytes": {
+          "max": 213968,
+          "median": 213968.0,
+          "min": 213968
+        },
+        "secondCPUNS": {
+          "max": 360520113,
+          "median": 297890964.5,
+          "min": 208276521
+        },
+        "secondWallNS": {
+          "max": 1127397394,
+          "median": 335562630.5,
+          "min": 235974221
+        }
+      },
+      "count": 1024,
+      "paired": {
+        "cachedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -265728,
+            -265728,
+            -265728,
+            -265728,
+            -265728,
+            -265728
+          ],
+          "change_percent": [
+            -55.37476660442785,
+            -55.37476660442785,
+            -55.37476660442785,
+            -55.37476660442785,
+            -55.37476660442785,
+            -55.37476660442785
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -55.37476660442785,
+          "median_difference": -265728.0
+        },
+        "firstCPUNS": {
+          "candidate_minus_baseline": [
+            -156058081,
+            -51922678,
+            -98678460,
+            49661009,
+            -2053726,
+            -36799647
+          ],
+          "change_percent": [
+            -26.0299469532147,
+            -12.813464329573476,
+            -24.077701663865913,
+            17.907171333484428,
+            -0.8131027024714022,
+            -14.696198566939966
+          ],
+          "lower_pairs": 5,
+          "median_change_percent": -13.75483144825672,
+          "median_difference": -44361162.5
+        },
+        "firstWallNS": {
+          "candidate_minus_baseline": [
+            13722449,
+            51785707,
+            -198812875,
+            268906865,
+            -63679851,
+            -39904050
+          ],
+          "change_percent": [
+            1.451997626555701,
+            5.651734105371031,
+            -36.862191973383695,
+            83.9921711674644,
+            -18.341803898513454,
+            -14.235046942741047
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": -6.391524658092672,
+          "median_difference": -13090800.5
+        },
+        "releasedDeltaBytes": {
+          "candidate_minus_baseline": [
+            192,
+            192,
+            192,
+            192,
+            192,
+            192
+          ],
+          "change_percent": [],
+          "lower_pairs": 0,
+          "median_change_percent": null,
+          "median_difference": 192.0
+        },
+        "retainedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -265728,
+            -265728,
+            -265728,
+            -265728,
+            -265728,
+            -265728
+          ],
+          "change_percent": [
+            -55.395083552916844,
+            -55.395083552916844,
+            -55.395083552916844,
+            -55.395083552916844,
+            -55.395083552916844,
+            -55.395083552916844
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -55.395083552916844,
+          "median_difference": -265728.0
+        },
+        "secondCPUNS": {
+          "candidate_minus_baseline": [
+            7309840,
+            -28749031,
+            -57710063,
+            117791368,
+            22834175,
+            -28705547
+          ],
+          "change_percent": [
+            2.0695434302954174,
+            -7.765067403029824,
+            -19.001429385986324,
+            52.691832949316805,
+            9.858944855743989,
+            -12.11296164400084
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": -2.8477619863672032,
+          "median_difference": -10697853.5
+        },
+        "secondWallNS": {
+          "candidate_minus_baseline": [
+            174913994,
+            279034719,
+            -57909879,
+            125828949,
+            -52026020,
+            -24717518
+          ],
+          "change_percent": [
+            24.775738404715277,
+            32.890970716032506,
+            -17.154925065599215,
+            47.62098242290429,
+            -15.619101343614172,
+            -9.481511801952426
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": 7.647113301381426,
+          "median_difference": 50555715.5
+        }
+      },
+      "pairs": 6,
+      "style": "unicode"
+    },
+    "unique-parents-4096": {
+      "baseline": {
+        "cachedDeltaBytes": {
+          "max": 6761328,
+          "median": 6761192.0,
+          "min": 6761040
+        },
+        "firstCPUNS": {
+          "max": 1540035768,
+          "median": 1353266463.0,
+          "min": 1111775216
+        },
+        "firstWallNS": {
+          "max": 4478202484,
+          "median": 1720688690.0,
+          "min": 1473863939
+        },
+        "releasedDeltaBytes": {
+          "max": 720,
+          "median": 440.0,
+          "min": 272
+        },
+        "retainedDeltaBytes": {
+          "max": 6760992,
+          "median": 6760856.0,
+          "min": 6760704
+        },
+        "secondCPUNS": {
+          "max": 1641815112,
+          "median": 1247189262.0,
+          "min": 1061701898
+        },
+        "secondWallNS": {
+          "max": 2071048923,
+          "median": 1827152452.5,
+          "min": 1449997910
+        }
+      },
+      "candidate": {
+        "cachedDeltaBytes": {
+          "max": 2567088,
+          "median": 2566880.0,
+          "min": 2566720
+        },
+        "firstCPUNS": {
+          "max": 2603959456,
+          "median": 2180694368.5,
+          "min": 1055483035
+        },
+        "firstWallNS": {
+          "max": 6102953332,
+          "median": 2977507728.5,
+          "min": 1362063924
+        },
+        "releasedDeltaBytes": {
+          "max": 464,
+          "median": 272.0,
+          "min": 272
+        },
+        "retainedDeltaBytes": {
+          "max": 2566912,
+          "median": 2566704.0,
+          "min": 2566544
+        },
+        "secondCPUNS": {
+          "max": 2364591469,
+          "median": 1329472055.0,
+          "min": 1073597493
+        },
+        "secondWallNS": {
+          "max": 3590817297,
+          "median": 2145329195.5,
+          "min": 1293919304
+        }
+      },
+      "count": 4096,
+      "paired": {
+        "cachedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -4194528,
+            -4194448,
+            -4193952,
+            -4194304,
+            -4194272,
+            -4194320
+          ],
+          "change_percent": [
+            -62.03777764105089,
+            -62.035860410854205,
+            -62.031166802740415,
+            -62.03505184890694,
+            -62.035018967226804,
+            -62.03514169082411
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -62.035096769865525,
+          "median_difference": -4194312.0
+        },
+        "firstCPUNS": {
+          "candidate_minus_baseline": [
+            415166744,
+            1104305165,
+            809863974,
+            1280510059,
+            786343550,
+            -56292181
+          ],
+          "change_percent": [
+            30.017474382055198,
+            76.29920077800472,
+            52.58734834787291,
+            96.7554983139261,
+            64.18368963531509,
+            -5.063270001874187
+          ],
+          "lower_pairs": 1,
+          "median_change_percent": 58.385518991594,
+          "median_difference": 798103762.0
+        },
+        "firstWallNS": {
+          "candidate_minus_baseline": [
+            1214312725,
+            1624750848,
+            1299325352,
+            1883686075,
+            111518097,
+            -111800015
+          ],
+          "change_percent": [
+            72.73758361673559,
+            36.281317198251095,
+            73.32808683263039,
+            123.86361982152457,
+            5.073374433954125,
+            -7.5855044717258675
+          ],
+          "lower_pairs": 1,
+          "median_change_percent": 54.50945040749335,
+          "median_difference": 1256819038.5
+        },
+        "releasedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -272,
+            -448,
+            192,
+            -80,
+            -256,
+            -80
+          ],
+          "change_percent": [
+            -50.0,
+            -62.22222222222222,
+            70.58823529411764,
+            -22.72727272727273,
+            -48.484848484848484,
+            -22.72727272727273
+          ],
+          "lower_pairs": 5,
+          "median_change_percent": -35.60606060606061,
+          "median_difference": -168.0
+        },
+        "retainedDeltaBytes": {
+          "candidate_minus_baseline": [
+            -4194368,
+            -4194288,
+            -4193792,
+            -4194144,
+            -4194112,
+            -4194160
+          ],
+          "change_percent": [
+            -62.03849421498164,
+            -62.03657688102575,
+            -62.03188307016547,
+            -62.03576829415481,
+            -62.03573541592711,
+            -62.03585813884143
+          ],
+          "lower_pairs": 6,
+          "median_change_percent": -62.03581321649812,
+          "median_difference": -4194152.0
+        },
+        "secondCPUNS": {
+          "candidate_minus_baseline": [
+            -65067563,
+            1302889571,
+            1115379800,
+            154583420,
+            -568217619,
+            -39684724
+          ],
+          "change_percent": [
+            -4.86484978878019,
+            122.71708032681694,
+            100.3519122068937,
+            12.548127534878972,
+            -34.609111272451244,
+            -3.14345820743287
+          ],
+          "lower_pairs": 3,
+          "median_change_percent": 4.702334663723051,
+          "median_difference": 57449348.0
+        },
+        "secondWallNS": {
+          "candidate_minus_baseline": [
+            626141457,
+            1660282082,
+            1887983557,
+            263047859,
+            -777129619,
+            -537889641
+          ],
+          "change_percent": [
+            32.0856115237552,
+            102.6173314634498,
+            110.87304136926485,
+            18.14125780360607,
+            -37.523479545538486,
+            -25.995872521180395
+          ],
+          "lower_pairs": 2,
+          "median_change_percent": 25.113434663680636,
+          "median_difference": 444594658.0
+        }
+      },
+      "pairs": 6,
+      "style": "unique"
+    }
+  }
+}

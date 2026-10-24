@@ -1,0 +1,73 @@
+{
+  "all_observation_delta_arithmetic_verified": true,
+  "all_recorded_commands_succeeded": true,
+  "all_summary_medians_ranges_paired_differences_ratios_and_lower_pair_counts_recomputed": true,
+  "balanced_ab_ba_order_and_no_omissions_verified": true,
+  "baseline_candidate_parity_process_output_hashes_equal": true,
+  "baseline_reader_commit": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "command_records_verified": 145,
+  "complete_output_snapshots_verified": {
+    "compressed_files": 10,
+    "existing_outputs": 1421,
+    "existing_scenarios": 15,
+    "memory_outputs": 193204,
+    "memory_scenarios": 9
+  },
+  "completion_inventory_and_every_evidence_hash_verified": true,
+  "each_measurement_row_matches_its_recorded_process_output_hash": true,
+  "findings": [],
+  "implementation_commit": "47c6b816fd57c2eb7083d1daf8c3440dbed9ea68",
+  "interpretation": [
+    "Allocator live-byte deltas describe one scan-local reader fixture; not RSS, peak footprint, whole-player RAM, or an accumulating leak.",
+    "Timing non-regression is unproven. Unique-parent first-scan CPU has a +58.39% median paired change and positive-only cached CPU +23.14%, each adverse in five of six pairs. Wide timing ranges and noisy unchanged controls prevent a broad causal conclusion; these adverse cohorts require native follow-up.",
+    "Median paired percentages differ from percentages calculated from independent baseline/candidate medians.",
+    "Percentages omit pairs with nonpositive baseline metrics; interpret tiny or zero controls and release deltas in bytes.",
+    "The malformed-8192 fixture contains well-formed XML with an unsupported root.",
+    "This audit does not establish native macOS application qualification."
+  ],
+  "linux_import_adaptations_reconstructed": true,
+  "observations_verified": 108,
+  "only_differing_production_source": "Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift",
+  "pairs": 54,
+  "platform": "Linux x86_64, glibc 2.39, Swift 6.3.2",
+  "receipt_checksums_recomputed": true,
+  "receipt_sha256": {
+    "completion.json": "a88fe971a7ffa4f5533c00b3d8ecbc481f706c4b819eed9afa307c72f4618679",
+    "manifest.json": "50c8102fb9248f2867f03290530a13535f39ac586b297c4d8fb312c420f7d2b5",
+    "measurements.jsonl": "9b5e81f70cf1262633fb3a24e7c902b0e1fe8f83cc0774bd8727414ce8c29ef4",
+    "summary.json": "39983d5e2167c7260af2bcf1a34736c4d579ec7f6dc96ccd6f90b1a3ca1c162e",
+    "tests.json": "24cdb692ed4b52ff95e5181e36a811efc3e8ea7f52b9c991c9dadb7bb3745f88",
+    "verification.json": "e24b4aa81115b9476053ea5b4f9ef182456d022ad0f8927e94bfae1bf7dd376a"
+  },
+  "scope": "Independent read-only audit of saved Linux component evidence; no builds, tests, or measurements rerun.",
+  "source_files_matched_to_commits": 18,
+  "staged_source_and_binary_hashes_verified": true,
+  "status": "passed",
+  "tests_verified_from_all_four_logs": {
+    "baseline-debug": 63,
+    "baseline-release": 63,
+    "candidate-debug": 63,
+    "candidate-release": 63
+  },
+  "unresolved_timing_observations": {
+    "positive-8192_secondCPUNS": {
+      "adverse_pairs": 5,
+      "median_paired_percent": 23.137205141197803,
+      "paired_percent_range": [
+        -7.585166144043532,
+        232.8984688522984
+      ],
+      "pairs": 6
+    },
+    "unique-parents-4096_firstCPUNS": {
+      "adverse_pairs": 5,
+      "median_paired_percent": 58.385518991594,
+      "paired_percent_range": [
+        -5.063270001874187,
+        96.7554983139261
+      ],
+      "pairs": 6
+    }
+  },
+  "workloads": 9
+}
