@@ -31,6 +31,47 @@ struct SourceFilesystemEvent: Equatable, Sendable {
     let flags: Flags
 }
 
+/// Bounds event retention while the sidebar waits for its debounce deadline.
+/// A sustained stream can keep postponing that deadline. Once detail exceeds
+/// the budget, use the planner's existing event-loss recovery for every root.
+/// Native callback arrays and tasks awaiting main-actor delivery are separate.
+struct SourceFilesystemEventBuffer {
+    private let maximumCount: Int
+    private var events: [SourceFilesystemEvent] = []
+    private var requiresFullRescan = false
+
+    init(maximumCount: Int = 4096) {
+        self.maximumCount = max(1, maximumCount)
+    }
+
+    var count: Int { events.count }
+
+    mutating func append(contentsOf incoming: [SourceFilesystemEvent]) {
+        guard !requiresFullRescan else { return }
+        if incoming.count > maximumCount - events.count
+            || incoming.contains(where: { $0.flags.contains(.eventsDropped) })
+        {
+            // Drop this buffer's references to accumulated paths and storage.
+            // The marker path is ignored by event-loss recovery.
+            events = [.init(path: "/", flags: [.eventsDropped])]
+            requiresFullRescan = true
+        } else {
+            events.append(contentsOf: incoming)
+        }
+    }
+
+    mutating func take() -> [SourceFilesystemEvent] {
+        let result = events
+        removeAll()
+        return result
+    }
+
+    mutating func removeAll() {
+        events = []
+        requiresFullRescan = false
+    }
+}
+
 struct SourceFilesystemInvalidationPlan: Equatable, Sendable {
     var directoriesToReload: Set<String> = []
     var treesToInvalidate: Set<String> = []
