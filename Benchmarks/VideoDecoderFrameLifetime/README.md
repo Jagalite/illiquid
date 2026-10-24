@@ -37,7 +37,8 @@ both lifetimes without weakening ordinary test expectations.
 
 The affected cases are cancellation after delivery, a throwing frame
 consumer, rejected output-capacity reservation, and a throwing timestamp
-consumer. Normal completion and cancellation before decoding are controls.
+consumer. Normal frame delivery, normal timestamp delivery, and cancellation
+before decoding are controls.
 The ledger is inspected after packet release, a short idle interval, flush,
 recovery decoding, and decoder destruction. Pixel content and frame metadata
 are checked independently of the allocation counts.
@@ -69,15 +70,70 @@ dependency graph; Linux parsing alone cannot qualify CoreVideo ownership.
 
 ## Evidence
 
-Native qualification results and source receipts are recorded with the PR
-after the experiment completes. No result is inferred solely from the code
-change or from the calculated size of a video frame.
+The [native qualification run](https://github.com/Jagalite/illiquid/actions/runs/40101023090)
+passed on an Apple M1 virtual machine running arm64 macOS 26.6.2 and Apple
+Swift 6.3.3. Both decoder variants were built in release configuration against
+the repository's pinned native SDK. The measured candidate source is commit
+`45ff51c0d2f630f33c6c88b1838aee961005fd40`; the subsequent evidence commit
+does not change the production fix, tests, or measurement runner.
+
+The experiment produced **21 matched comparisons**: seven scenarios at each
+of three frame sizes, with 42 individual allocation receipts. All four
+interrupted-output scenarios showed the following result after the caller's
+packet was released, while the decoder and any delivered output stayed alive:
+
+| Raw BGRA frame | Original live allocation | Revised live allocation | Allocation released earlier |
+| --- | ---: | ---: | ---: |
+| 64 x 48 | 12,352 bytes | 0 bytes | 12.06 KiB |
+| 1920 x 1080 | 8,294,464 bytes | 0 bytes | 7.91 MiB |
+| 3840 x 2160 | 33,177,664 bytes | 0 bytes | 31.64 MiB |
+
+These are observed allocation lifetimes from the custom FFmpeg free callback.
+Each count includes 64 bytes of FFmpeg packet padding and excludes allocator
+overhead, delivered CoreVideo buffers, and unrelated codec allocations.
+The original decoder still held that allocation after a 25 ms idle interval
+and after `flush()`. The recovery decode then released it.
+The revised decoder released it before either idle or flush, with exactly
+one free callback. The three control scenarios retained zero bytes in both
+variants at every size.
+
+All 21 comparisons matched full delivered pixel bytes and their SHA-256
+hashes, captured frame metadata, timestamp output, and errors. Recovery
+output also matched, and retained display pixels still matched the fixture
+after flush, recovery, and decoder destruction.
 
 The workflow also generates the existing eight-file timestamp corpus and
 runs `VideoTimestampDiscoveryTests` and `VideoDeinterlacerTests` against the
 candidate. These cover delayed B-frame output, temporal filtering, seek and
 drain behavior, and throwing or cancelled consumers. The runner checks the
-fixture hashes and required aliases before invoking the tests.
+fixture hashes and required aliases before invoking the tests. All required
+suites passed without skips:
+
+| Candidate suite | Test declarations | Parameterized invocations |
+| --- | ---: | ---: |
+| Scratch-frame lifetime regression | 4 | 11 |
+| Timestamp discovery | 7 | 25 |
+| Decoder-owned BWDIF deinterlacing | 7 | 9 |
+| Measurement probe | 1 | 1, containing 21 scenario/size cases |
+
+Swift Testing reports **19 passed test declarations** for the candidate and
+one for the baseline measurement probe. The regression suites account for
+45 invocations, in addition to the measurement probe. These counts are not
+additional independent repetitions of the 21 allocation comparisons.
+
+The committed [summary](evidence/native/summary.json),
+[run manifest](evidence/native/manifest.json),
+[allocation receipts](evidence/native/receipts),
+[native logs](evidence/native/logs), and
+[measured source snapshots](evidence/native/sources) preserve the complete
+results. The [bundle receipt](evidence/native/bundle-receipt.json) records the
+workflow and job URLs and SHA-256 checksums of the verbatim evidence files.
+
+The confirmed improvement is earlier release of one scratch-frame reference
+and, in this controlled raw-video fixture, its underlying allocation. No
+whole-player RSS, hardware-surface residency, throughput, or frame-rate
+improvement is claimed. The temporal tests qualify output behavior; they do
+not measure allocation savings for compressed or hardware decoding.
 
 ## Reference contracts
 

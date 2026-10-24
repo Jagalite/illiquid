@@ -1,0 +1,100 @@
+[
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "--version"
+    ],
+    "elapsed_seconds": 2.6661849159999917,
+    "log": "logs/swift-version.log",
+    "log_sha256": "5fa4b669e41b23b9ad0760253d062493487f93cf5d8ad8c44f0d4fd635137499",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "sw_vers"
+    ],
+    "elapsed_seconds": 0.011212292000010393,
+    "log": "logs/macos.log",
+    "log_sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "sysctl",
+      "-n",
+      "machdep.cpu.brand_string"
+    ],
+    "elapsed_seconds": 0.005241166000004682,
+    "log": "logs/hardware.log",
+    "log_sha256": "ff76851c55aca2697f22e6534c9378088cae0334bbb5d13675e90a9097fc2713",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "xcrun",
+      "--sdk",
+      "macosx",
+      "--show-sdk-version"
+    ],
+    "elapsed_seconds": 0.505437999999998,
+    "log": "logs/sdk-version.log",
+    "log_sha256": "25205f2e2f02dc71036ee827e19c49b893b231a3d1af240e35a3ac55aa8cdcb6",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "test",
+      "--package-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/packages/baseline",
+      "--scratch-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/build/baseline",
+      "--cache-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/cache/packages",
+      "--config-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/cache/config",
+      "--security-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/cache/security",
+      "--force-resolved-versions",
+      "--configuration",
+      "release",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "--filter",
+      "VideoDecoderFrameLifetimeProbeTests"
+    ],
+    "elapsed_seconds": 317.322708125,
+    "log": "logs/baseline-native-tests.log",
+    "log_sha256": "65b6758106f9d3921e92c6ed3e57a2b992764e9aef1ba131f13dda8b64993a3d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/bin/swift",
+      "test",
+      "--package-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/packages/candidate",
+      "--scratch-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/build/candidate",
+      "--cache-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/cache/packages",
+      "--config-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/cache/config",
+      "--security-path",
+      "/Users/runner/work/_temp/video-frame-lifetime/cache/security",
+      "--force-resolved-versions",
+      "--configuration",
+      "release",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "--filter",
+      "VideoDecoderFrameLifetimeProbeTests|VideoDecoderFrameLifetimeTests|VideoTimestampDiscoveryTests|VideoDeinterlacerTests"
+    ],
+    "elapsed_seconds": 300.10654645799997,
+    "log": "logs/candidate-native-tests.log",
+    "log_sha256": "52e3e7575bb8ee78f83a70908b09593da22433631ae9494b885c85b3c30bf13e",
+    "returncode": 0
+  }
+]

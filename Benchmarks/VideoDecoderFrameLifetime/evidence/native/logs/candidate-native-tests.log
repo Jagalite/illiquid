@@ -1,0 +1,279 @@
+Fetching https://github.com/swiftlang/swift-testing.git from cache
+Fetching https://github.com/swiftlang/swift-syntax.git from cache
+Fetched https://github.com/swiftlang/swift-testing.git from cache (0.02s)
+Fetched https://github.com/swiftlang/swift-syntax.git from cache (0.02s)
+Fetching https://github.com/sparkle-project/Sparkle.git from cache
+Fetched https://github.com/sparkle-project/Sparkle.git from cache (0.02s)
+Creating working copy for https://github.com/swiftlang/swift-testing.git
+Creating working copy for https://github.com/sparkle-project/Sparkle.git
+Creating working copy for https://github.com/swiftlang/swift-syntax.git
+Working copy of https://github.com/swiftlang/swift-testing.git resolved at swift-6.3.2-RELEASE (70eff26)
+Working copy of https://github.com/swiftlang/swift-syntax.git resolved at 603.0.2
+Working copy of https://github.com/sparkle-project/Sparkle.git resolved at 2.10.0
+Fetching binary artifact https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip from cache
+Fetched https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip from cache (0.54s)
+Building for production...
+[0/49] /Users/runner/work/_temp/video-frame-lifetime/build/candidate/arm64-apple-macosx/release/IlliquidPackageTests.derived/runner.swift
+[1/49] Write swift-version-7974D3F7F03D5E95.txt
+[2/49] Compiling _TestingInternals WillThrow.cpp
+[3/49] Compiling _TestingInternals ExecutablePath.cpp
+[4/49] Compiling _TestingInternals Discovery.cpp
+[5/49] Write sources
+[8/50] Compiling _TestingInternals Versions.cpp
+[9/50] Copying Sparkle.framework
+[9/50] Copying NativePlaybackShaders.metal
+[9/50] Copying Resources
+[9/50] Write sources
+[32/50] Compiling CNativeAudio AudioOutputDevice.m
+[34/51] Compiling _TestDiscovery WinSDKAdditions.swift
+[35/52] Compiling TestingMacros ConditionMacro.swift
+[35/52] Write Objects.LinkFileList
+[36/52] Linking TestingMacros-tool
+[38/53] Compiling IlliquidCore MediaMetadataHints.swift
+[39/54] Compiling IlliquidPlaybackCore CompletedPlaybackEffectHistory.swift
+[40/55] Compiling Testing ABI.Record+Streaming.swift
+[41/56] Compiling IlliquidPlayback Module.swift
+[42/57] Compiling IlliquidPlaybackStateSpace PlaybackPartialOrderReducer.swift
+[43/58] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+[44/59] Compiling IlliquidStateSpaceExplorer main.swift
+[45/60] Compiling IlliquidPlaybackCoreTests CompletedEffectHistoryTests.swift
+[46/61] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+[47/62] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1150 |             self.workQueue.async {
+1151 |                 _ = resources.retainedCVTextures
+1152 |                 guard commandBuffer.status != .error else {
+     |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1153 |                     completion(.failure(
+1154 |                         commandBuffer.error
+
+/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+243 |  */
+244 | API_AVAILABLE(macos(10.11), ios(8.0))
+245 | @protocol MTLCommandBuffer <NSObject>
+    |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+246 | 
+247 | /*!
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   4 | import CoreVideo
+   5 | import Foundation
+   6 | import Metal
+     | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   7 | import OSLog
+   8 | import QuartzCore
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[47/62] Write Objects.LinkFileList
+[49/63] Compiling IlliquidRenderProfile main.swift
+[49/63] Linking IlliquidStateSpaceExplorer
+[51/64] Compiling IlliquidCoreTests AspectFitWindowSizingTests.swift
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 97 |             nil,
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+101 |         ]
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+101 |         ]
+102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+[52/65] Compiling IlliquidPlayer ArchitectureValidation.swift
+[53/66] Compiling IlliquidDifferentialHarness main.swift
+[54/67] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+[55/68] Compiling IlliquidPlaybackStress main.swift
+[56/69] Compiling IlliquidArchitectureCheck main.swift
+[57/70] Compiling IlliquidApp AppDelegate.swift
+[57/70] Write Objects.LinkFileList
+[59/70] Linking IlliquidRenderProfile
+[60/70] Linking IlliquidPlaybackStress
+[61/70] Write Objects.LinkFileList
+[63/70] Linking IlliquidDifferentialHarness
+[64/70] Linking IlliquidArchitectureCheck
+[65/70] Write Objects.LinkFileList
+[66/70] Linking Illiquid
+[68/71] Compiling IlliquidNativePlaybackTests ASSBitmapCopyTests.swift
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidNativePlaybackTests/PGSSubtitlePacketBorrowTests.swift:77:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 75 |             reference(x: 30, y: 40),
+ 76 |         ]))
+ 77 |         weak var released = owner
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 78 |         let metadata = try parseThenOverwrite(try #require(owner))
+ 79 |         owner = nil
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift:127:18: warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+125 |         let queue = BoundedQueue<Payload>(capacity: 1)
+126 |         var value: Payload? = Payload()
+127 |         weak var retained = value
+    |                  `- warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+128 |         #expect(queue.push(value!)); value = nil
+129 |         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift:99:13: warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+ 97 |         let checkoutID = try #require(token).checkoutID
+ 98 |         var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
+ 99 |             ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+    |             `- warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+100 |         )
+101 |         token?.transition(to: .queued)
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+167 |         var first: Value? = Value()
+168 |         weak var released = first
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+169 |         ring.append(first!)
+170 |         first = nil
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:11:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+  9 |     @Test func bitmapEventsOutliveNativeOutputUpdatesFlushAndDecoderDestruction() throws {
+ 10 |         var decoder: SubtitleDecoder? = try makeDecoder()
+ 11 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 12 |         let first = try #require(try decoder?.decode(packet(fullPGS, at: 2)).first)
+ 13 |         let bitmap = try #require(first.bitmapComposition)
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:66:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 64 |     @Test func textEventsOwnTheirBytesAcrossNativeOutputReuseFlushAndDestruction() throws {
+ 65 |         var decoder: SubtitleDecoder? = try makeDecoder(codec: AV_CODEC_ID_SUBRIP, name: "subrip")
+ 66 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 67 |         let first = try #require(try decoder?.decode(packet(Array("First caption".utf8), at: 2)).first)
+ 68 |         #expect(decoder?.hasRetainedDecodedOutput == false)
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidNativePlaybackTests/VideoDecoderFrameLifetimeProbeTests.swift:101:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 99 |         let fixture = VideoFrameLifetimeFixture(width: width, height: height)
+100 |         var decoder: VideoDecoder? = try fixture.makeDecoder()
+101 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+102 |         let attempt = try decode(try #require(decoder), fixture: fixture, scenario: scenario)
+103 |         var snapshots = ["after_packet_release": Snapshot(attempt.probe)]
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidNativePlaybackTests/VideoDecoderFrameLifetimeTests.swift:22:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 20 |         let fixture = VideoFrameLifetimeFixture()
+ 21 |         var decoder: VideoDecoder? = try fixture.makeDecoder(deinterlacingEnabled: deinterlacing)
+ 22 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 23 |         let result = try deliver(fixture, through: decoder!, at: 3)
+ 24 |         let frame = try #require(result.frame)
+
+/Users/runner/work/_temp/video-frame-lifetime/packages/candidate/Tests/IlliquidNativePlaybackTests/VideoDecoderFrameLifetimeTests.swift:44:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 42 |         let fixture = VideoFrameLifetimeFixture()
+ 43 |         var decoder: VideoDecoder? = try fixture.makeDecoder(deinterlacingEnabled: deinterlacing)
+ 44 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 45 |         let interrupted = try deliver(fixture, through: decoder!, interruption: interruption)
+ 46 |         // The packet has left scope, but the decoder and any emitted pixel
+
+[#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+[69/71] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+[70/72] Compiling IlliquidPackageTests runner.swift
+[70/72] Write Objects.LinkFileList
+[71/72] Linking IlliquidPackageTests
+Build complete! (294.64s)
+Test Suite 'Selected tests' started at 2026-10-24 14:17:08.015.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-10-24 14:17:08.017.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-10-24 14:17:08.017.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-24 14:17:08.017.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Video decoder frame lifetime measurements" started.
+◇ Test recordsActualNativeAllocationLifetimes() started.
+✔ Test recordsActualNativeAllocationLifetimes() passed after 2.491 seconds.
+✔ Suite "Video decoder frame lifetime measurements" passed after 2.491 seconds.
+◇ Suite "Video decoder scratch-frame lifetime" started.
+◇ Test normalDeliveryReleasesInputStorageWhileOutputOutlivesDecoder(deinterlacing:) started.
+◇ Test case passing 1 argument deinterlacing → false to normalDeliveryReleasesInputStorageWhileOutputOutlivesDecoder(deinterlacing:) started.
+◇ Test case passing 1 argument deinterlacing → true to normalDeliveryReleasesInputStorageWhileOutputOutlivesDecoder(deinterlacing:) started.
+✔ Test normalDeliveryReleasesInputStorageWhileOutputOutlivesDecoder(deinterlacing:) with 2 test cases passed after 0.001 seconds.
+◇ Test interruptedDeliveryReleasesInputStorageBeforeReuseOrFlush(interruption:deinterlacing:) started.
+◇ Test case passing 2 arguments interruption → .cancelledAfterDelivery, deinterlacing → false to interruptedDeliveryReleasesInputStorageBeforeReuseOrFlush(interruption:deinterlacing:) started.
+◇ Test case passing 2 arguments interruption → .cancelledAfterDelivery, deinterlacing → true to interruptedDeliveryReleasesInputStorageBeforeReuseOrFlush(interruption:deinterlacing:) started.
+◇ Test case passing 2 arguments interruption → .throwingConsumer, deinterlacing → false to interruptedDeliveryReleasesInputStorageBeforeReuseOrFlush(interruption:deinterlacing:) started.
+◇ Test case passing 2 arguments interruption → .throwingConsumer, deinterlacing → true to interruptedDeliveryReleasesInputStorageBeforeReuseOrFlush(interruption:deinterlacing:) started.
+◇ Test case passing 2 arguments interruption → .outputCapacityRejected, deinterlacing → false to interruptedDeliveryReleasesInputStorageBeforeReuseOrFlush(interruption:deinterlacing:) started.
+◇ Test case passing 2 arguments interruption → .outputCapacityRejected, deinterlacing → true to interruptedDeliveryReleasesInputStorageBeforeReuseOrFlush(interruption:deinterlacing:) started.
+✔ Test interruptedDeliveryReleasesInputStorageBeforeReuseOrFlush(interruption:deinterlacing:) with 6 test cases passed after 0.004 seconds.
+◇ Test interruptedTimestampDiscoveryReleasesInputWithoutAllocatingDisplayBuffers(throwingConsumer:) started.
+◇ Test case passing 1 argument throwingConsumer → false to interruptedTimestampDiscoveryReleasesInputWithoutAllocatingDisplayBuffers(throwingConsumer:) started.
+◇ Test case passing 1 argument throwingConsumer → true to interruptedTimestampDiscoveryReleasesInputWithoutAllocatingDisplayBuffers(throwingConsumer:) started.
+✔ Test interruptedTimestampDiscoveryReleasesInputWithoutAllocatingDisplayBuffers(throwingConsumer:) with 2 test cases passed after 0.002 seconds.
+◇ Test cancellationBeforeSubmissionDoesNotRetainInput() started.
+✔ Test cancellationBeforeSubmissionDoesNotRetainInput() passed after 0.001 seconds.
+✔ Suite "Video decoder scratch-frame lifetime" passed after 0.008 seconds.
+◇ Suite "Decoder-owned BWDIF deinterlacing" started.
+◇ Test generatedContainerDoublesCadenceWithoutChangingDuration(name:) started.
+◇ Test case passing 1 argument name → "interlaced-tff.mpg" to generatedContainerDoublesCadenceWithoutChangingDuration(name:) started.
+◇ Test case passing 1 argument name → "interlaced-bff.mpg" to generatedContainerDoublesCadenceWithoutChangingDuration(name:) started.
+✔ Test generatedContainerDoublesCadenceWithoutChangingDuration(name:) with 2 test cases passed after 0.082 seconds.
+◇ Test pausedNativeSeeksDiscardOldFieldsAndRespectExactVideoFloor() started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+✔ Test pausedNativeSeeksDiscardOldFieldsAndRespectExactVideoFloor() passed after 0.328 seconds.
+◇ Test rejectsOversizedTemporalInputBeforeAllocatingItsPixelStorage() started.
+✔ Test rejectsOversizedTemporalInputBeforeAllocatingItsPixelStorage() passed after 0.001 seconds.
+◇ Test reconstructsFieldOrderAndDrainsEveryHalfFrame(topFirst:) started.
+◇ Test case passing 1 argument topFirst → true to reconstructsFieldOrderAndDrainsEveryHalfFrame(topFirst:) started.
+◇ Test case passing 1 argument topFirst → false to reconstructsFieldOrderAndDrainsEveryHalfFrame(topFirst:) started.
+✔ Test reconstructsFieldOrderAndDrainsEveryHalfFrame(topFirst:) with 2 test cases passed after 0.001 seconds.
+◇ Test progressiveFramesKeepTheirFullDurationAcrossAnInterlacedTransition() started.
+✔ Test progressiveFramesKeepTheirFullDurationAcrossAnInterlacedTransition() passed after 0.001 seconds.
+◇ Test resetDropsBufferedOldFieldsAndCancellationPropagates() started.
+✔ Test resetDropsBufferedOldFieldsAndCancellationPropagates() passed after 0.001 seconds.
+◇ Test formatChangesDrainOldFieldsAndPreserveColorMetadata() started.
+✔ Test formatChangesDrainOldFieldsAndPreserveColorMetadata() passed after 0.001 seconds.
+✔ Suite "Decoder-owned BWDIF deinterlacing" passed after 0.413 seconds.
+◇ Suite "Timestamp discovery without presentation buffers" started.
+◇ Test acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-cfr-bframes.mkv" to acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-vfr.mkv" to acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-nonzero.mkv" to acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-single.mp4" to acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-tff.mpg" to acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-bff.mpg" to acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-tff.mkv" to acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-bff.mkv" to acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) started.
+✔ Test acceptedTimesMatchFullFramesAndIndependentFFmpeg(filename:) with 8 test cases passed after 0.227 seconds.
+◇ Test flushDropsOldDecoderAndFilterStateBeforeRepeatedSeeks(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-cfr-bframes.mkv" to flushDropsOldDecoderAndFilterStateBeforeRepeatedSeeks(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-vfr.mkv" to flushDropsOldDecoderAndFilterStateBeforeRepeatedSeeks(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-tff.mpg" to flushDropsOldDecoderAndFilterStateBeforeRepeatedSeeks(filename:) started.
+✔ Test flushDropsOldDecoderAndFilterStateBeforeRepeatedSeeks(filename:) with 3 test cases passed after 0.125 seconds.
+◇ Test seekFloorPreservesFullDecoderAdmissionAndGenerationFence(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-cfr-bframes.mkv" to seekFloorPreservesFullDecoderAdmissionAndGenerationFence(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-vfr.mkv" to seekFloorPreservesFullDecoderAdmissionAndGenerationFence(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-bff.mpg" to seekFloorPreservesFullDecoderAdmissionAndGenerationFence(filename:) started.
+✔ Test seekFloorPreservesFullDecoderAdmissionAndGenerationFence(filename:) with 3 test cases passed after 0.112 seconds.
+◇ Test cancellationStopsBeforeAndDuringOutputAndFlushAllowsReuse(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-cfr-bframes.mkv" to cancellationStopsBeforeAndDuringOutputAndFlushAllowsReuse(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-tff.mpg" to cancellationStopsBeforeAndDuringOutputAndFlushAllowsReuse(filename:) started.
+✔ Test cancellationStopsBeforeAndDuringOutputAndFlushAllowsReuse(filename:) with 2 test cases passed after 0.040 seconds.
+◇ Test consumerErrorPropagatesWithoutBecomingDeinterlacingFallback(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-cfr-bframes.mkv" to consumerErrorPropagatesWithoutBecomingDeinterlacingFallback(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-bff.mpg" to consumerErrorPropagatesWithoutBecomingDeinterlacingFallback(filename:) started.
+✔ Test consumerErrorPropagatesWithoutBecomingDeinterlacingFallback(filename:) with 2 test cases passed after 0.026 seconds.
+◇ Test timestampDiscoveryAlsoBypassesPlanarOutputStorage() started.
+✔ Test timestampDiscoveryAlsoBypassesPlanarOutputStorage() passed after 0.006 seconds.
+◇ Test frameStepReaderChoosesAdjacentDisplayedTimeAtBoundariesAndBetweenFrames(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-cfr-bframes.mkv" to frameStepReaderChoosesAdjacentDisplayedTimeAtBoundariesAndBetweenFrames(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-vfr.mkv" to frameStepReaderChoosesAdjacentDisplayedTimeAtBoundariesAndBetweenFrames(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-nonzero.mkv" to frameStepReaderChoosesAdjacentDisplayedTimeAtBoundariesAndBetweenFrames(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-single.mp4" to frameStepReaderChoosesAdjacentDisplayedTimeAtBoundariesAndBetweenFrames(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-tff.mkv" to frameStepReaderChoosesAdjacentDisplayedTimeAtBoundariesAndBetweenFrames(filename:) started.
+◇ Test case passing 1 argument filename → "timestamp-bff.mkv" to frameStepReaderChoosesAdjacentDisplayedTimeAtBoundariesAndBetweenFrames(filename:) started.
+✔ Test frameStepReaderChoosesAdjacentDisplayedTimeAtBoundariesAndBetweenFrames(filename:) with 6 test cases passed after 0.187 seconds.
+✔ Suite "Timestamp discovery without presentation buffers" passed after 0.727 seconds.
+✔ Test run with 19 tests in 4 suites passed after 3.641 seconds.
