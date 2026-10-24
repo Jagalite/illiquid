@@ -1,0 +1,72 @@
+name: Foundation Data copy residency
+
+on:
+  push:
+    branches: ['research/font-copy-residency-20261024']
+    paths:
+      - 'Benchmarks/FontCopyResidency/**'
+      - '.github/workflows/font-copy-residency.yml'
+      - '!Benchmarks/FontCopyResidency/evidence/**'
+  pull_request:
+    paths:
+      - 'Benchmarks/FontCopyResidency/**'
+      - '.github/workflows/font-copy-residency.yml'
+      - '!Benchmarks/FontCopyResidency/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: font-copy-residency-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-probe:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Compile standalone debug and release probes and run paired controls
+        run: |
+          python3 Benchmarks/FontCopyResidency/run.py \
+            --output "$RUNNER_TEMP/font-copy-residency"
+      - name: Emit transferable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'font-copy-residency'
+          if not root.is_dir():
+              raise SystemExit('The probe did not create an evidence directory')
+          files = {str(p.relative_to(root)): p.read_text()
+                   for p in sorted(root.rglob('*'))
+                   if p.is_file() and p.suffix in {'.json', '.jsonl', '.log', '.txt', '.md', '.swift', '.c', '.h', '.py', '.yml', '.modulemap'}
+                   and not any(part in {'build', 'module-cache'} for part in p.relative_to(root).parts)}
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          (root / 'evidence.json.gz').write_bytes(packed)
+          digest = hashlib.sha256(packed).hexdigest()
+          (root / 'evidence.sha256').write_text(digest + '  evidence.json.gz\n')
+          print('FONT_COPY_RESIDENCY_SHA256 ' + digest)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log bundle limit; retrieve the uploaded artifact')
+          print('FONT_COPY_RESIDENCY_BASE64 ' + base64.b64encode(packed).decode())
+          if 'summary.md' in files:
+              print(files['summary.md'])
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+                  summary.write(files['summary.md'])
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: font-copy-residency
+          path: |
+            ${{ runner.temp }}/font-copy-residency/
+            !${{ runner.temp }}/font-copy-residency/build/**
+            !${{ runner.temp }}/font-copy-residency/module-cache/**
+          retention-days: 14
