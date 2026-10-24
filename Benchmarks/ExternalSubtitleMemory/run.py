@@ -112,7 +112,11 @@ def build(args: argparse.Namespace, output: Path) -> dict[str, Path]:
     flags = ["-O", "-whole-module-optimization", "-swift-version", "6", "-warnings-as-errors",
              "-module-cache-path", str(output / "module-cache")]
     if platform.system() == "Darwin":
-        flags += ["-target", f"{platform.machine()}-apple-macosx26.0"]
+        # Direct swiftc invocations do not inherit SwiftPM's SDK selection.
+        # Use the SDK belonging to the selected Xcode (DEVELOPER_DIR).
+        sdk = run(["xcrun", "--sdk", "macosx", "--show-sdk-path"],
+                  output, output / "sdk.log").strip()
+        flags += ["-sdk", sdk, "-target", f"{platform.machine()}-apple-macosx26.0"]
     manifest = {"created_utc": datetime.now(timezone.utc).isoformat(), "platform": platform.platform(),
                 "machine": platform.machine(), "compiler": version, "compiler_path": compiler,
                 "compiler_sha256": file_sha(Path(compiler)), "flags": flags,
