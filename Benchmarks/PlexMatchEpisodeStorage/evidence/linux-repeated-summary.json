@@ -1,0 +1,856 @@
+{
+  "baselineRevision": "4abf4b44f13386ccd04f1ce4ad0e756255ca4d14",
+  "freshProcessCount": 72,
+  "inputHashesUnchanged": true,
+  "largeCaseMemoryReductionObserved": true,
+  "limitations": [
+    "Component allocator storage, not RSS or whole-player memory.",
+    "Dictionary capacity and allocator size classes govern storage; no per-entry heap allocation claim.",
+    "Timing includes an autorelease pool and scalar consumer per operation; parse also includes one lookup.",
+    "Each process calibrates its own iteration count; timing checksums are sinks, not parity checks.",
+    "Timing ratios are descriptive, not a statistical no-regression guarantee.",
+    "Adapted Linux Foundation imports, no-op autoreleasepool shim, and glibc heap probe; not native macOS.",
+    "Shared-host wall-clock timing is descriptive and is not a performance guarantee.",
+    "Functional qualification is the pure PlexMatch regression suite only; native reader/sidecar test suites remain separate."
+  ],
+  "memoryMetric": "Linux glibc mallinfo2().uordblks + hblkhd: held minus after explicit payload release; allocator caches may remain counted",
+  "nativeMacOSQualification": "Not performed by this study; separate queued CI must qualify the native platform",
+  "pairs": 6,
+  "priorEvidenceArchive": {
+    "commitPrefix": "814b0990",
+    "contents": "Pure-source tests plus original adapted Linux smoke and complete semantic output",
+    "repositoryPath": "Benchmarks/PlexMatchEpisodeStorage/evidence/linux-validation.tar.gz",
+    "sha256": "84c2f05cae5f345778b0473befe3d4157527aa7719012a0ff95d9e9e54485585"
+  },
+  "qualification": "Repeated adapted Linux component study; native macOS qualification is separate",
+  "scenarios": [
+    {
+      "baselineMedianReleasedBytes": 0.0,
+      "candidateMedianReleasedBytes": 0.0,
+      "inputBytes": 78,
+      "mappings": 0,
+      "medianReductionBytes": 0.0,
+      "pairedReductionBytes": {
+        "median": 0.0,
+        "positivePairs": 0,
+        "range": [
+          0,
+          0
+        ],
+        "values": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "reductionPercent": null,
+      "releasedBytesRanges": {
+        "baseline": [
+          0,
+          0
+        ],
+        "candidate": [
+          0,
+          0
+        ]
+      },
+      "scenario": "mappings-0",
+      "sidecarCount": 1,
+      "timings": {
+        "parseLookupAndRelease": {
+          "baselineMedianNanoseconds": 99481.4517321623,
+          "candidateMedianNanoseconds": 46452.52626952334,
+          "candidateOverBaseline": 0.4669466062335846,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 5,
+            "median": 0.6973500811098051,
+            "range": [
+              0.0028380920362201917,
+              6.103736902823025
+            ],
+            "ratios": [
+              0.34717484920562713,
+              0.9959561177369406,
+              0.4055035722422547,
+              0.9891965899773556,
+              6.103736902823025,
+              0.0028380920362201917
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              45296.13866778383,
+              17093491.75
+            ],
+            "candidate": [
+              45112.9664160401,
+              512930.6682926829
+            ]
+          }
+        },
+        "rawMissingLookup": {
+          "baselineMedianNanoseconds": 68.049192,
+          "candidateMedianNanoseconds": 36.2705505,
+          "candidateOverBaseline": 0.5330048665383124,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 6,
+            "median": 0.5370367095224045,
+            "range": [
+              0.20748855351657472,
+              0.9711884128862328
+            ],
+            "ratios": [
+              0.46482820626936644,
+              0.8305381664968617,
+              0.5574300563151581,
+              0.9711884128862328,
+              0.5166433627296508,
+              0.20748855351657472
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              35.800874,
+              359.44765206346995
+            ],
+            "candidate": [
+              31.765403,
+              185.70624368734863
+            ]
+          }
+        }
+      }
+    },
+    {
+      "baselineMedianReleasedBytes": 0.0,
+      "candidateMedianReleasedBytes": 0.0,
+      "inputBytes": 107,
+      "mappings": 1,
+      "medianReductionBytes": 0.0,
+      "pairedReductionBytes": {
+        "median": 0.0,
+        "positivePairs": 0,
+        "range": [
+          0,
+          0
+        ],
+        "values": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "reductionPercent": null,
+      "releasedBytesRanges": {
+        "baseline": [
+          0,
+          0
+        ],
+        "candidate": [
+          0,
+          0
+        ]
+      },
+      "scenario": "mappings-1",
+      "sidecarCount": 1,
+      "timings": {
+        "mergedSuccessfulLookup": {
+          "baselineMedianNanoseconds": 2195.3898396914865,
+          "candidateMedianNanoseconds": 2136.9432775313385,
+          "candidateOverBaseline": 0.9733775928523194,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 3,
+            "median": 0.9998342319819318,
+            "range": [
+              0.7159926597922975,
+              1.0450945605283355
+            ],
+            "ratios": [
+              0.9832265957203078,
+              1.0164418682435559,
+              0.9616163143591031,
+              1.0450945605283355,
+              1.024125924679383,
+              0.7159926597922975
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              1983.6509198160368,
+              5371.592162203056
+            ],
+            "candidate": [
+              2073.1027862867695,
+              3846.020559535225
+            ]
+          }
+        },
+        "parseLookupAndRelease": {
+          "baselineMedianNanoseconds": 64052.03629495199,
+          "candidateMedianNanoseconds": 68844.07742824843,
+          "candidateOverBaseline": 1.0748148132438704,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 2,
+            "median": 1.069282267248148,
+            "range": [
+              0.9783321061456791,
+              20.49443353984193
+            ],
+            "ratios": [
+              0.9783321061456791,
+              1.1304296461384287,
+              1.0081348883578674,
+              0.9975593157076904,
+              1.168254860312015,
+              20.49443353984193
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              59361.28008088979,
+              80587.9392971246
+            ],
+            "candidate": [
+              59216.39793702497,
+              1651604.1660377358
+            ]
+          }
+        },
+        "rawMissingLookup": {
+          "baselineMedianNanoseconds": 91.23769100000001,
+          "candidateMedianNanoseconds": 94.4544635,
+          "candidateOverBaseline": 1.0352570573054067,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 4,
+            "median": 0.9703849559585197,
+            "range": [
+              0.7055532289551318,
+              1.1355972486737524
+            ],
+            "ratios": [
+              1.1355972486737524,
+              0.9509662392667432,
+              0.9632808404402409,
+              1.0541948682121003,
+              0.9774890714767985,
+              0.7055532289551318
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              85.773761,
+              339.2851951857811
+            ],
+            "candidate": [
+              83.789545,
+              239.383765
+            ]
+          }
+        },
+        "rawSuccessfulLookup": {
+          "baselineMedianNanoseconds": 140.32922536181653,
+          "candidateMedianNanoseconds": 125.84060244988588,
+          "candidateOverBaseline": 0.8967526338538958,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 6,
+            "median": 0.9053153711001656,
+            "range": [
+              0.7925242509204806,
+              0.9718893972995718
+            ],
+            "ratios": [
+              0.904456582706476,
+              0.9061741594938552,
+              0.7925242509204806,
+              0.9610205142175681,
+              0.9718893972995718,
+              0.8323032930593269
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              130.14559424009988,
+              164.34239082584963
+            ],
+            "candidate": [
+              114.843844,
+              136.78271307359756
+            ]
+          }
+        }
+      }
+    },
+    {
+      "baselineMedianReleasedBytes": 6128.0,
+      "candidateMedianReleasedBytes": 3552.0,
+      "inputBytes": 888,
+      "mappings": 24,
+      "medianReductionBytes": 2576.0,
+      "pairedReductionBytes": {
+        "median": 2576.0,
+        "positivePairs": 6,
+        "range": [
+          2576,
+          2576
+        ],
+        "values": [
+          2576,
+          2576,
+          2576,
+          2576,
+          2576,
+          2576
+        ]
+      },
+      "reductionPercent": 42.03655352480418,
+      "releasedBytesRanges": {
+        "baseline": [
+          6128,
+          6128
+        ],
+        "candidate": [
+          3552,
+          3552
+        ]
+      },
+      "scenario": "mappings-24",
+      "sidecarCount": 1,
+      "timings": {
+        "mergedSuccessfulLookup": {
+          "baselineMedianNanoseconds": 2091.984235237785,
+          "candidateMedianNanoseconds": 2735.9462211048276,
+          "candidateOverBaseline": 1.307823536630928,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 1,
+            "median": 1.4064659356962128,
+            "range": [
+              0.4945587940320959,
+              2.1439903855988702
+            ],
+            "ratios": [
+              0.4945587940320959,
+              1.1947835120579013,
+              1.618148359334524,
+              1.0268408149189938,
+              2.1439903855988702,
+              1.8707116339739591
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              1701.5322443890275,
+              4414.097545853784
+            ],
+            "candidate": [
+              2005.141766772193,
+              6159.93064985451
+            ]
+          }
+        },
+        "parseLookupAndRelease": {
+          "baselineMedianNanoseconds": 548210.1826803139,
+          "candidateMedianNanoseconds": 597181.3296377322,
+          "candidateOverBaseline": 1.0893291451063316,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 2,
+            "median": 1.0842799279569302,
+            "range": [
+              0.3450915148258823,
+              2.27352417768702
+            ],
+            "ratios": [
+              0.3450915148258823,
+              1.0725664324188982,
+              1.8453226695489717,
+              0.9820004767599758,
+              2.27352417768702,
+              1.0959934234949622
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              455926.43842364533,
+              1288918.6153846155
+            ],
+            "candidate": [
+              444794.8774703557,
+              1237049.0857142857
+            ]
+          }
+        },
+        "rawMissingLookup": {
+          "baselineMedianNanoseconds": 165.8631661021675,
+          "candidateMedianNanoseconds": 202.58385829771714,
+          "candidateOverBaseline": 1.221391482259121,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 2,
+            "median": 1.0591172466629446,
+            "range": [
+              0.43933884975831594,
+              3.4227191488913604
+            ],
+            "ratios": [
+              0.43933884975831594,
+              1.0369407230144183,
+              1.081293770311471,
+              0.990879068082113,
+              3.4227191488913604,
+              3.261056818369247
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              132.11254972603768,
+              365.2865936892949
+            ],
+            "candidate": [
+              150.87055267890028,
+              570.4144714869043
+            ]
+          }
+        },
+        "rawSuccessfulLookup": {
+          "baselineMedianNanoseconds": 163.07614650693455,
+          "candidateMedianNanoseconds": 166.30156516020875,
+          "candidateOverBaseline": 1.0197786047951352,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 3,
+            "median": 0.9907577063423971,
+            "range": [
+              0.37851815542018463,
+              3.920689738061056
+            ],
+            "ratios": [
+              0.37851815542018463,
+              0.846394737338058,
+              1.1351206753467362,
+              0.8089188270569242,
+              2.0228100228427364,
+              3.920689738061056
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              139.66004824091814,
+              384.2862759618431
+            ],
+            "candidate": [
+              121.53966187465751,
+              547.5637179552798
+            ]
+          }
+        }
+      }
+    },
+    {
+      "baselineMedianReleasedBytes": 360560.0,
+      "candidateMedianReleasedBytes": 196704.0,
+      "inputBytes": 34938,
+      "mappings": 1024,
+      "medianReductionBytes": 163856.0,
+      "pairedReductionBytes": {
+        "median": 163856.0,
+        "positivePairs": 6,
+        "range": [
+          163856,
+          163856
+        ],
+        "values": [
+          163856,
+          163856,
+          163856,
+          163856,
+          163856,
+          163856
+        ]
+      },
+      "reductionPercent": 45.44486354559574,
+      "releasedBytesRanges": {
+        "baseline": [
+          360560,
+          360560
+        ],
+        "candidate": [
+          196704,
+          196704
+        ]
+      },
+      "scenario": "mappings-1024",
+      "sidecarCount": 1,
+      "timings": {
+        "mergedSuccessfulLookup": {
+          "baselineMedianNanoseconds": 2273.159180536036,
+          "candidateMedianNanoseconds": 2772.258904567403,
+          "candidateOverBaseline": 1.21956215310609,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 2,
+            "median": 1.1078541775638633,
+            "range": [
+              0.949661146488048,
+              1.6255198782816216
+            ],
+            "ratios": [
+              0.949661146488048,
+              1.490370965395986,
+              1.173456054873663,
+              1.0422523002540638,
+              0.9643975832502597,
+              1.6255198782816216
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              1919.0522180957435,
+              2957.045174639145
+            ],
+            "candidate": [
+              2000.136588617952,
+              3890.9302248310996
+            ]
+          }
+        },
+        "parseLookupAndRelease": {
+          "baselineMedianNanoseconds": 19178190.21666667,
+          "candidateMedianNanoseconds": 27448147.666666664,
+          "candidateOverBaseline": 1.431216780966801,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 2,
+            "median": 1.11231920476595,
+            "range": [
+              0.6079208521806365,
+              1.955255043881764
+            ],
+            "ratios": [
+              1.3250053192843483,
+              1.955255043881764,
+              1.207559212573774,
+              0.9880337949842735,
+              1.017079196958126,
+              0.6079208521806365
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              18108639,
+              54533774.5
+            ],
+            "candidate": [
+              18368364.2,
+              35572210.5
+            ]
+          }
+        },
+        "rawMissingLookup": {
+          "baselineMedianNanoseconds": 97.5170825,
+          "candidateMedianNanoseconds": 118.32464390002964,
+          "candidateOverBaseline": 1.2133735020223728,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 1,
+            "median": 1.1189167847874228,
+            "range": [
+              0.8990289234883244,
+              1.5783572500192256
+            ],
+            "ratios": [
+              0.8990289234883244,
+              1.5783572500192256,
+              1.0166730549549106,
+              1.1973548319260874,
+              1.0404787376487583,
+              1.5760032819973926
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              89.333227,
+              127.55891991827288
+            ],
+            "candidate": [
+              90.743755,
+              168.96518467126475
+            ]
+          }
+        },
+        "rawSuccessfulLookup": {
+          "baselineMedianNanoseconds": 178.64129116164955,
+          "candidateMedianNanoseconds": 161.99397298795594,
+          "candidateOverBaseline": 0.9068114764204782,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 4,
+            "median": 0.8955793551547959,
+            "range": [
+              0.8207095093286543,
+              1.1504664170802843
+            ],
+            "ratios": [
+              0.8818707325112247,
+              1.060788776778852,
+              0.8284717323792823,
+              0.909287977798367,
+              0.8207095093286543,
+              1.1504664170802843
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              148.122421904656,
+              225.85868321442055
+            ],
+            "candidate": [
+              133.7840211367094,
+              229.720234964432
+            ]
+          }
+        }
+      }
+    },
+    {
+      "baselineMedianReleasedBytes": 1422816.0,
+      "candidateMedianReleasedBytes": 767456.0,
+      "inputBytes": 131059,
+      "mappings": 3847,
+      "medianReductionBytes": 655360.0,
+      "pairedReductionBytes": {
+        "median": 655360.0,
+        "positivePairs": 6,
+        "range": [
+          655360,
+          655360
+        ],
+        "values": [
+          655360,
+          655360,
+          655360,
+          655360,
+          655360,
+          655360
+        ]
+      },
+      "reductionPercent": 46.06076962868003,
+      "releasedBytesRanges": {
+        "baseline": [
+          1422816,
+          1422816
+        ],
+        "candidate": [
+          767456,
+          767456
+        ]
+      },
+      "scenario": "near-128kib",
+      "sidecarCount": 1,
+      "timings": {
+        "mergedSuccessfulLookup": {
+          "baselineMedianNanoseconds": 2611.0866484687194,
+          "candidateMedianNanoseconds": 2180.588715895188,
+          "candidateOverBaseline": 0.8351269067129586,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 6,
+            "median": 0.8874963761256941,
+            "range": [
+              0.8072508558690766,
+              0.9544350161326093
+            ],
+            "ratios": [
+              0.8176956340075668,
+              0.9242167792475334,
+              0.8072508558690766,
+              0.9544350161326093,
+              0.9098501781645927,
+              0.8651425740867955
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              2075.663540624048,
+              6587.227916666667
+            ],
+            "candidate": [
+              1981.085964881382,
+              5993.390493589945
+            ]
+          }
+        },
+        "parseLookupAndRelease": {
+          "baselineMedianNanoseconds": 88890759.0,
+          "candidateMedianNanoseconds": 79070675.0,
+          "candidateOverBaseline": 0.889526379226889,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 5,
+            "median": 0.848728984333837,
+            "range": [
+              0.7282078633286508,
+              2.174645905262351
+            ],
+            "ratios": [
+              2.174645905262351,
+              0.9376459399899657,
+              0.7715366341457675,
+              0.8945745701172246,
+              0.8028833985504493,
+              0.7282078633286508
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              74561897,
+              254668575
+            ],
+            "candidate": [
+              67429205,
+              204469171
+            ]
+          }
+        },
+        "rawMissingLookup": {
+          "baselineMedianNanoseconds": 97.88797752262124,
+          "candidateMedianNanoseconds": 95.36955286562913,
+          "candidateOverBaseline": 0.9742723803195329,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 2,
+            "median": 1.0466862807517225,
+            "range": [
+              0.6872069601598328,
+              1.117804987838581
+            ],
+            "ratios": [
+              1.117804987838581,
+              1.1129036037140736,
+              0.6872069601598328,
+              1.0042262501231465,
+              1.0891463113802986,
+              0.9044723903779588
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              78.412775,
+              332.51931761964795
+            ],
+            "candidate": [
+              78.744167,
+              362.16218824813353
+            ]
+          }
+        },
+        "rawSuccessfulLookup": {
+          "baselineMedianNanoseconds": 239.24624242898506,
+          "candidateMedianNanoseconds": 170.20757757352447,
+          "candidateOverBaseline": 0.7114326053586686,
+          "pairedCandidateOverBaseline": {
+            "candidateFasterPairs": 5,
+            "median": 0.7650418055020506,
+            "range": [
+              0.5929603982854789,
+              1.0119440766827446
+            ],
+            "ratios": [
+              0.7941679682610396,
+              0.9013123212746964,
+              0.5929603982854789,
+              0.7161307219849282,
+              1.0119440766827446,
+              0.7359156427430615
+            ]
+          },
+          "rangesNanoseconds": {
+            "baseline": [
+              183.89272717477925,
+              631.7129614341313
+            ],
+            "candidate": [
+              144.09549695118355,
+              639.2581894869842
+            ]
+          }
+        }
+      }
+    },
+    {
+      "baselineMedianReleasedBytes": 45592624.0,
+      "candidateMedianReleasedBytes": 24621472.0,
+      "inputBytes": 4193792,
+      "mappings": null,
+      "medianReductionBytes": 20971152.0,
+      "pairedReductionBytes": {
+        "median": 20971152.0,
+        "positivePairs": 6,
+        "range": [
+          20971152,
+          20971152
+        ],
+        "values": [
+          20971152,
+          20971152,
+          20971152,
+          20971152,
+          20971152,
+          20971152
+        ]
+      },
+      "reductionPercent": 45.996808606585134,
+      "releasedBytesRanges": {
+        "baseline": [
+          45592624,
+          45592624
+        ],
+        "candidate": [
+          24621472,
+          24621472
+        ]
+      },
+      "scenario": "reader-cache-32",
+      "sidecarCount": 32,
+      "timings": {}
+    }
+  ],
+  "schemaVersion": 1,
+  "semanticParity": true,
+  "semanticParityEvidence": {
+    "sha256": {
+      "baseline": "4c5148fea2cf7b086ca51c85f0d86c70a135bf406e4ca6e9a8be32d013681ab9",
+      "candidate": "4c5148fea2cf7b086ca51c85f0d86c70a135bf406e4ca6e9a8be32d013681ab9"
+    },
+    "unchangedBinariesAndFixtures": true
+  },
+  "status": "passed",
+  "targetMilliseconds": 100,
+  "tests": {
+    "manifestSHA256": "e70f4ca6bad701042702c775a059278c34fd15fa6500478b846338883c2a0531",
+    "reportedTestsPerRun": 14,
+    "runs": [
+      {
+        "configuration": "debug",
+        "logLabel": "tests-baseline-debug",
+        "passedTests": 14,
+        "variant": "baseline"
+      },
+      {
+        "configuration": "release",
+        "logLabel": "tests-baseline-release",
+        "passedTests": 14,
+        "variant": "baseline"
+      },
+      {
+        "configuration": "debug",
+        "logLabel": "tests-candidate-debug",
+        "passedTests": 14,
+        "variant": "candidate"
+      },
+      {
+        "configuration": "release",
+        "logLabel": "tests-candidate-release",
+        "passedTests": 14,
+        "variant": "candidate"
+      }
+    ],
+    "scope": "Pure PlexMatch functional and compiler validation on Linux; no native macOS memory claims",
+    "testsSHA256": "5502db9531acbb0233cc7bcee11c4e74117ca915bb90eb86204ed77934a64ed6"
+  }
+}
