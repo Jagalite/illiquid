@@ -1,0 +1,2081 @@
+{
+  "baseline": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "mode": "all",
+  "status": "passed",
+  "tests": [
+    {
+      "configuration": "debug",
+      "passed": true,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "passed": true,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "passed": true,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "passed": true,
+      "variant": "candidate"
+    }
+  ],
+  "workloads": [
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 0,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 64.76388,
+        "median_loop_ns": 2246045.5,
+        "median_ns": 22.460455,
+        "min_ns": 21.3302,
+        "output_capacities": [
+          0
+        ],
+        "output_count": 0,
+        "shared_results": 6
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 0,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 28.63149,
+        "median_loop_ns": 1927311.0,
+        "median_ns": 19.273110000000003,
+        "min_ns": 18.30755,
+        "output_capacities": [
+          0
+        ],
+        "output_count": 0,
+        "shared_results": 6
+      },
+      "count": 0,
+      "id": "deduplicate/unique/0",
+      "iterations": 100000,
+      "median_time_change_percent": -14.190919106491817,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 1,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 4388.054067775099,
+        "median_loop_ns": 33495425.0,
+        "median_ns": 4251.2279477091,
+        "min_ns": 4186.795405508313,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 1,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 28.977408300545754,
+        "median_loop_ns": 180016.0,
+        "median_ns": 22.84756948851377,
+        "min_ns": 19.407285188475694,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 6
+      },
+      "count": 1,
+      "id": "deduplicate/unique/1",
+      "iterations": 7879,
+      "median_time_change_percent": -99.46256541005228,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          1280
+        ],
+        "element_stride": 40,
+        "input_capacity": 32,
+        "live_allocator_delta_bytes": [
+          1328,
+          1328,
+          1328,
+          1328,
+          1328,
+          1328
+        ],
+        "max_ns": 464300.43333333335,
+        "median_loop_ns": 42711962.5,
+        "median_ns": 142373.2083333333,
+        "min_ns": 136486.43,
+        "output_capacities": [
+          32
+        ],
+        "output_count": 32,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 32,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 239478.48,
+        "median_loop_ns": 49196917.5,
+        "median_ns": 163989.725,
+        "min_ns": 134472.4,
+        "output_capacities": [
+          32
+        ],
+        "output_count": 32,
+        "shared_results": 6
+      },
+      "count": 32,
+      "id": "deduplicate/unique/32",
+      "iterations": 300,
+      "median_time_change_percent": 15.182994693816765,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          41200,
+          41104,
+          41296,
+          41008,
+          41200,
+          41296
+        ],
+        "max_ns": 4780252.8,
+        "median_loop_ns": 43740490.5,
+        "median_ns": 4374049.05,
+        "min_ns": 4298978.5,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 1000,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          192,
+          0
+        ],
+        "max_ns": 5119354.3,
+        "median_loop_ns": 43493338.0,
+        "median_ns": 4349333.8,
+        "min_ns": 4281166.7,
+        "output_capacities": [
+          1000
+        ],
+        "output_count": 1000,
+        "shared_results": 6
+      },
+      "count": 1000,
+      "id": "deduplicate/unique/1000",
+      "iterations": 10,
+      "median_time_change_percent": -0.5650428177068623,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          655360
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          655696,
+          655696,
+          655504,
+          655696,
+          655504,
+          655504
+        ],
+        "max_ns": 72966514.0,
+        "median_loop_ns": 48395176.0,
+        "median_ns": 48395176.0,
+        "min_ns": 45249767.0,
+        "output_capacities": [
+          16384
+        ],
+        "output_count": 10000,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          96,
+          96,
+          192,
+          192,
+          96,
+          192
+        ],
+        "max_ns": 59980814.0,
+        "median_loop_ns": 46809214.0,
+        "median_ns": 46809214.0,
+        "min_ns": 45833295.0,
+        "output_capacities": [
+          10034
+        ],
+        "output_count": 10000,
+        "shared_results": 6
+      },
+      "count": 10000,
+      "id": "deduplicate/unique/10000",
+      "iterations": 1,
+      "median_time_change_percent": -3.2771076191560944,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          2621440
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          2621776,
+          2621680,
+          2621680,
+          2621776,
+          2621776,
+          2621776
+        ],
+        "max_ns": 301463735.0,
+        "median_loop_ns": 250367073.5,
+        "median_ns": 250367073.5,
+        "min_ns": 242351451.0,
+        "output_capacities": [
+          65536
+        ],
+        "output_count": 50000,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          288,
+          288,
+          192,
+          192,
+          288,
+          192
+        ],
+        "max_ns": 299215494.0,
+        "median_loop_ns": 275373964.5,
+        "median_ns": 275373964.5,
+        "min_ns": 248734798.0,
+        "output_capacities": [
+          50072
+        ],
+        "output_count": 50000,
+        "shared_results": 6
+      },
+      "count": 50000,
+      "id": "deduplicate/unique/50000",
+      "iterations": 1,
+      "median_time_change_percent": 9.988090945992534,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 23.93122,
+        "median_loop_ns": 2229741.5,
+        "median_ns": 22.297415,
+        "min_ns": 21.22425,
+        "output_capacities": [
+          0
+        ],
+        "output_count": 0,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 138.61553,
+        "median_loop_ns": 1904796.5,
+        "median_ns": 19.047964999999998,
+        "min_ns": 17.95853,
+        "output_capacities": [
+          0
+        ],
+        "output_count": 0,
+        "shared_results": 0
+      },
+      "count": 0,
+      "id": "deduplicate/sparse/0",
+      "iterations": 100000,
+      "median_time_change_percent": -14.573213980185606,
+      "pairs": 6,
+      "pattern": "sparse",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 6780.864821844007,
+        "median_loop_ns": 37086264.5,
+        "median_ns": 4540.989898371496,
+        "min_ns": 4155.754132484389,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 84.20044079833477,
+        "median_loop_ns": 654529.5,
+        "median_ns": 80.14319823680665,
+        "min_ns": 69.28884535325089,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "count": 1,
+      "id": "deduplicate/sparse/1",
+      "iterations": 8167,
+      "median_time_change_percent": -98.23511613039378,
+      "pairs": 6,
+      "pattern": "sparse",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          1280
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          1328,
+          1328,
+          1328,
+          1328,
+          1328,
+          1328
+        ],
+        "max_ns": 258494.36144578314,
+        "median_loop_ns": 27966533.0,
+        "median_ns": 168473.0903614458,
+        "min_ns": 136005.9096385542,
+        "output_capacities": [
+          32
+        ],
+        "output_count": 32,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          1280
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          1328,
+          1328,
+          1328,
+          1328,
+          1328,
+          1328
+        ],
+        "max_ns": 254835.06024096385,
+        "median_loop_ns": 26054440.5,
+        "median_ns": 156954.4608433735,
+        "min_ns": 136864.72891566265,
+        "output_capacities": [
+          32
+        ],
+        "output_count": 32,
+        "shared_results": 0
+      },
+      "count": 32,
+      "id": "deduplicate/sparse/32",
+      "iterations": 166,
+      "median_time_change_percent": -6.837073798171556,
+      "pairs": 6,
+      "pattern": "sparse",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          41200,
+          41104,
+          41104,
+          41008,
+          41104,
+          41104
+        ],
+        "max_ns": 4673303.9,
+        "median_loop_ns": 43924942.5,
+        "median_ns": 4392494.25,
+        "min_ns": 4260887.1,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 1000,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40000
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          40336,
+          40240,
+          40336,
+          40336,
+          40336,
+          40240
+        ],
+        "max_ns": 4550873.6,
+        "median_loop_ns": 43282255.0,
+        "median_ns": 4328225.5,
+        "min_ns": 4260858.2,
+        "output_capacities": [
+          1000
+        ],
+        "output_count": 1000,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "deduplicate/sparse/1000",
+      "iterations": 10,
+      "median_time_change_percent": -1.4631493256934802,
+      "pairs": 6,
+      "pattern": "sparse",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          41200,
+          41008,
+          41200,
+          41104,
+          41104,
+          41104
+        ],
+        "max_ns": 4532764.3,
+        "median_loop_ns": 43461074.0,
+        "median_ns": 4346107.4,
+        "min_ns": 4252071.9,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 999,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          41200,
+          41104,
+          41104,
+          41104,
+          41104,
+          41488
+        ],
+        "max_ns": 4630267.1,
+        "median_loop_ns": 43552657.5,
+        "median_ns": 4355265.75,
+        "min_ns": 4341533.5,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 999,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "deduplicate/early/1000",
+      "iterations": 10,
+      "median_time_change_percent": 0.21072534930912656,
+      "pairs": 6,
+      "pattern": "early",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          41008,
+          41104,
+          41104,
+          41008,
+          41200,
+          41008
+        ],
+        "max_ns": 6522864.7,
+        "median_loop_ns": 43858940.5,
+        "median_ns": 4385894.050000001,
+        "min_ns": 4272998.4,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 999,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          39960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          40288,
+          40288,
+          40096,
+          40192,
+          40096,
+          40096
+        ],
+        "max_ns": 4502870.9,
+        "median_loop_ns": 42731140.5,
+        "median_ns": 4273114.05,
+        "min_ns": 4243177.5,
+        "output_capacities": [
+          999
+        ],
+        "output_count": 999,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "deduplicate/late/1000",
+      "iterations": 10,
+      "median_time_change_percent": -2.5714255454939883,
+      "pairs": 6,
+      "pattern": "late",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          10240
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          10624,
+          10720,
+          10624,
+          10816,
+          10720,
+          10816
+        ],
+        "max_ns": 7559499.666666667,
+        "median_loop_ns": 26253004.0,
+        "median_ns": 4375500.666666667,
+        "min_ns": 4264987.666666667,
+        "output_capacities": [
+          256
+        ],
+        "output_count": 250,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          10000
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          10144,
+          10048,
+          10048,
+          10048,
+          10144,
+          10144
+        ],
+        "max_ns": 4586902.166666667,
+        "median_loop_ns": 25503030.5,
+        "median_ns": 4250505.083333334,
+        "min_ns": 4154596.3333333335,
+        "output_capacities": [
+          250
+        ],
+        "output_count": 250,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "deduplicate/fourfold/1000",
+      "iterations": 6,
+      "median_time_change_percent": -2.856714987740061,
+      "pairs": 6,
+      "pattern": "fourfold",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 7463622.0,
+        "median_loop_ns": 25134515.5,
+        "median_ns": 4189085.9166666665,
+        "min_ns": 4008730.3333333335,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 7362079.166666667,
+        "median_loop_ns": 23960483.5,
+        "median_ns": 3993413.916666667,
+        "min_ns": 3977625.1666666665,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "deduplicate/all/1000",
+      "iterations": 6,
+      "median_time_change_percent": -4.670995150075585,
+      "pairs": 6,
+      "pattern": "all",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          655360
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          655504,
+          655504,
+          655696,
+          655600,
+          655696,
+          655504
+        ],
+        "max_ns": 86792022.0,
+        "median_loop_ns": 46444064.0,
+        "median_ns": 46444064.0,
+        "min_ns": 45334724.0,
+        "output_capacities": [
+          16384
+        ],
+        "output_count": 9999,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          655360
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          655504,
+          655504,
+          655504,
+          655504,
+          655504,
+          655696
+        ],
+        "max_ns": 64280941.0,
+        "median_loop_ns": 48291299.5,
+        "median_ns": 48291299.5,
+        "min_ns": 45044548.0,
+        "output_capacities": [
+          16384
+        ],
+        "output_count": 9999,
+        "shared_results": 0
+      },
+      "count": 10000,
+      "id": "deduplicate/early/10000",
+      "iterations": 1,
+      "median_time_change_percent": 3.9773338956728743,
+      "pairs": 6,
+      "pattern": "early",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          655360
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          655504,
+          655696,
+          655600,
+          655504,
+          655696,
+          655600
+        ],
+        "max_ns": 56913572.0,
+        "median_loop_ns": 46805508.0,
+        "median_ns": 46805508.0,
+        "min_ns": 44722463.0,
+        "output_capacities": [
+          16384
+        ],
+        "output_count": 9999,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          399960
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          400096,
+          400288,
+          400192,
+          400096,
+          400096,
+          400192
+        ],
+        "max_ns": 49194905.0,
+        "median_loop_ns": 46756709.5,
+        "median_ns": 46756709.5,
+        "min_ns": 44728422.0,
+        "output_capacities": [
+          9999
+        ],
+        "output_count": 9999,
+        "shared_results": 0
+      },
+      "count": 10000,
+      "id": "deduplicate/late/10000",
+      "iterations": 1,
+      "median_time_change_percent": -0.10425802877729318,
+      "pairs": 6,
+      "pattern": "late",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          163840
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          164176,
+          164176,
+          164176,
+          164176,
+          164080,
+          164176
+        ],
+        "max_ns": 95035640.0,
+        "median_loop_ns": 44418851.5,
+        "median_ns": 44418851.5,
+        "min_ns": 43352000.0,
+        "output_capacities": [
+          4096
+        ],
+        "output_count": 2500,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          100000
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          100240,
+          100336,
+          100240,
+          100240,
+          100144,
+          100240
+        ],
+        "max_ns": 45461255.0,
+        "median_loop_ns": 44613514.5,
+        "median_ns": 44613514.5,
+        "min_ns": 43527995.0,
+        "output_capacities": [
+          2500
+        ],
+        "output_count": 2500,
+        "shared_results": 0
+      },
+      "count": 10000,
+      "id": "deduplicate/fourfold/10000",
+      "iterations": 1,
+      "median_time_change_percent": 0.438244109035546,
+      "pairs": 6,
+      "pattern": "fourfold",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 49347129.0,
+        "median_loop_ns": 45712428.0,
+        "median_ns": 45712428.0,
+        "min_ns": 44033887.0,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 67473966.0,
+        "median_loop_ns": 47822378.5,
+        "median_ns": 47822378.5,
+        "min_ns": 43151378.0,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "count": 10000,
+      "id": "deduplicate/all/10000",
+      "iterations": 1,
+      "median_time_change_percent": 4.6157042894330536,
+      "pairs": 6,
+      "pattern": "all",
+      "scope": "deduplicate"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 0,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 126.3723,
+        "median_loop_ns": 10838803.5,
+        "median_ns": 108.388035,
+        "min_ns": 96.37445,
+        "output_capacities": [
+          0
+        ],
+        "output_count": 0,
+        "shared_results": 6
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 0,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 112.13177,
+        "median_loop_ns": 9513223.0,
+        "median_ns": 95.13222999999999,
+        "min_ns": 91.43773,
+        "output_capacities": [
+          0
+        ],
+        "output_count": 0,
+        "shared_results": 6
+      },
+      "count": 0,
+      "id": "session/unique/0",
+      "iterations": 100000,
+      "median_time_change_percent": -12.22995231899906,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 1,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 7684.45855702501,
+        "median_loop_ns": 44176018.5,
+        "median_ns": 5784.472764174414,
+        "min_ns": 4273.63545894985,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 1,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 112.14207149404216,
+        "median_loop_ns": 701626.0,
+        "median_ns": 91.87193924315831,
+        "min_ns": 79.01257038103968,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 6
+      },
+      "count": 1,
+      "id": "session/unique/1",
+      "iterations": 7637,
+      "median_time_change_percent": -98.41174912582945,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          1280
+        ],
+        "element_stride": 40,
+        "input_capacity": 32,
+        "live_allocator_delta_bytes": [
+          1328,
+          1328,
+          1328,
+          1344,
+          1328,
+          1328
+        ],
+        "max_ns": 147212.17333333334,
+        "median_loop_ns": 42317693.0,
+        "median_ns": 141058.97666666668,
+        "min_ns": 132605.65333333332,
+        "output_capacities": [
+          32
+        ],
+        "output_count": 32,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 32,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 147480.51,
+        "median_loop_ns": 42305165.0,
+        "median_ns": 141017.21666666667,
+        "min_ns": 134941.87,
+        "output_capacities": [
+          32
+        ],
+        "output_count": 32,
+        "shared_results": 6
+      },
+      "count": 32,
+      "id": "session/unique/32",
+      "iterations": 300,
+      "median_time_change_percent": -0.029604638419211682,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          41008,
+          41008,
+          41104,
+          41200,
+          41104,
+          41008
+        ],
+        "max_ns": 4947004.111111111,
+        "median_loop_ns": 40491223.5,
+        "median_ns": 4499024.833333333,
+        "min_ns": 4318011.333333333,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 1000,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          0,
+          96,
+          0,
+          96,
+          0,
+          0
+        ],
+        "max_ns": 5623094.0,
+        "median_loop_ns": 40080471.5,
+        "median_ns": 4453385.722222222,
+        "min_ns": 4242296.222222222,
+        "output_capacities": [
+          1000
+        ],
+        "output_count": 1000,
+        "shared_results": 6
+      },
+      "count": 1000,
+      "id": "session/unique/1000",
+      "iterations": 9,
+      "median_time_change_percent": -1.0144222982049422,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          655360
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          655504,
+          655600,
+          655600,
+          655696,
+          655600,
+          655504
+        ],
+        "max_ns": 56686991.0,
+        "median_loop_ns": 46019740.0,
+        "median_ns": 46019740.0,
+        "min_ns": 44490293.0,
+        "output_capacities": [
+          16384
+        ],
+        "output_count": 10000,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          0,
+          192,
+          192,
+          96,
+          192,
+          288
+        ],
+        "max_ns": 53774447.0,
+        "median_loop_ns": 48867741.5,
+        "median_ns": 48867741.5,
+        "min_ns": 44774251.0,
+        "output_capacities": [
+          10034
+        ],
+        "output_count": 10000,
+        "shared_results": 6
+      },
+      "count": 10000,
+      "id": "session/unique/10000",
+      "iterations": 1,
+      "median_time_change_percent": 6.1886518698280435,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          2621440
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          2621584,
+          2621488,
+          2621488,
+          2621680,
+          2621776,
+          2621680
+        ],
+        "max_ns": 276704610.0,
+        "median_loop_ns": 251788009.0,
+        "median_ns": 251788009.0,
+        "min_ns": 236190511.0,
+        "output_capacities": [
+          65536
+        ],
+        "output_count": 50000,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          192,
+          192,
+          288,
+          288,
+          288,
+          192
+        ],
+        "max_ns": 304710639.0,
+        "median_loop_ns": 254098544.5,
+        "median_ns": 254098544.5,
+        "min_ns": 241256975.0,
+        "output_capacities": [
+          50072
+        ],
+        "output_count": 50000,
+        "shared_results": 6
+      },
+      "count": 50000,
+      "id": "session/unique/50000",
+      "iterations": 1,
+      "median_time_change_percent": 0.917651126110619,
+      "pairs": 6,
+      "pattern": "unique",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 94.32628,
+        "median_loop_ns": 9304235.0,
+        "median_ns": 93.04235,
+        "min_ns": 91.35641,
+        "output_capacities": [
+          0
+        ],
+        "output_count": 0,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          0
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 94.64966,
+        "median_loop_ns": 9003892.5,
+        "median_ns": 90.038925,
+        "min_ns": 89.25383,
+        "output_capacities": [
+          0
+        ],
+        "output_count": 0,
+        "shared_results": 0
+      },
+      "count": 0,
+      "id": "session/sparse/0",
+      "iterations": 100000,
+      "median_time_change_percent": -3.2280192836917743,
+      "pairs": 6,
+      "pattern": "sparse",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 4966.440647012783,
+        "median_loop_ns": 33234868.0,
+        "median_ns": 4335.359770414818,
+        "min_ns": 4267.393555961388,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 138.41990607878947,
+        "median_loop_ns": 988417.5,
+        "median_ns": 128.93523349856508,
+        "min_ns": 127.45903991651448,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "count": 1,
+      "id": "session/sparse/1",
+      "iterations": 7666,
+      "median_time_change_percent": -97.02596231163007,
+      "pairs": 6,
+      "pattern": "sparse",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          1280
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          1328,
+          1328,
+          1328,
+          1328,
+          1328,
+          1328
+        ],
+        "max_ns": 195494.07457627117,
+        "median_loop_ns": 41325656.0,
+        "median_ns": 140086.96949152544,
+        "min_ns": 137816.14576271185,
+        "output_capacities": [
+          32
+        ],
+        "output_count": 32,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          1280
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          1328,
+          1328,
+          1328,
+          1328,
+          1328,
+          1328
+        ],
+        "max_ns": 168044.22033898305,
+        "median_loop_ns": 40370353.5,
+        "median_ns": 136848.6559322034,
+        "min_ns": 135842.66440677966,
+        "output_capacities": [
+          32
+        ],
+        "output_count": 32,
+        "shared_results": 0
+      },
+      "count": 32,
+      "id": "session/sparse/32",
+      "iterations": 295,
+      "median_time_change_percent": -2.3116450952406,
+      "pairs": 6,
+      "pattern": "sparse",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          41104,
+          41200,
+          41008,
+          41200,
+          41104,
+          41008
+        ],
+        "max_ns": 5313291.8,
+        "median_loop_ns": 45592717.0,
+        "median_ns": 4559271.7,
+        "min_ns": 4352748.5,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 1000,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40000
+        ],
+        "element_stride": 40,
+        "input_capacity": 50072,
+        "live_allocator_delta_bytes": [
+          40336,
+          40240,
+          40240,
+          40240,
+          40240,
+          40336
+        ],
+        "max_ns": 5844537.8,
+        "median_loop_ns": 46901758.0,
+        "median_ns": 4690175.800000001,
+        "min_ns": 4583312.4,
+        "output_capacities": [
+          1000
+        ],
+        "output_count": 1000,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "session/sparse/1000",
+      "iterations": 10,
+      "median_time_change_percent": 2.871162514837633,
+      "pairs": 6,
+      "pattern": "sparse",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          41104,
+          41104,
+          41200,
+          41008,
+          41104,
+          41008
+        ],
+        "max_ns": 4661912.7,
+        "median_loop_ns": 44271424.5,
+        "median_ns": 4427142.45,
+        "min_ns": 4228767.8,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 999,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          41104,
+          41104,
+          41008,
+          41104,
+          41200,
+          41104
+        ],
+        "max_ns": 5936552.3,
+        "median_loop_ns": 43963020.0,
+        "median_ns": 4396302.0,
+        "min_ns": 4274332.4,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 999,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "session/early/1000",
+      "iterations": 10,
+      "median_time_change_percent": -0.6966220388955446,
+      "pairs": 6,
+      "pattern": "early",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          41104,
+          41104,
+          41008,
+          41008,
+          41008,
+          41104
+        ],
+        "max_ns": 4877175.8,
+        "median_loop_ns": 45180276.5,
+        "median_ns": 4518027.65,
+        "min_ns": 4259829.6,
+        "output_capacities": [
+          1024
+        ],
+        "output_count": 999,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          39960
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          40192,
+          40192,
+          40192,
+          40192,
+          40096,
+          40096
+        ],
+        "max_ns": 7458988.2,
+        "median_loop_ns": 46298791.0,
+        "median_ns": 4629879.1,
+        "min_ns": 4203742.1,
+        "output_capacities": [
+          999
+        ],
+        "output_count": 999,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "session/late/1000",
+      "iterations": 10,
+      "median_time_change_percent": 2.4756698866152282,
+      "pairs": 6,
+      "pattern": "late",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          10240
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          10624,
+          10816,
+          10624,
+          10624,
+          10720,
+          10720
+        ],
+        "max_ns": 4817032.3,
+        "median_loop_ns": 44726239.0,
+        "median_ns": 4472623.9,
+        "min_ns": 4185897.3,
+        "output_capacities": [
+          256
+        ],
+        "output_count": 250,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          10000
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          10048,
+          10048,
+          10144,
+          10048,
+          10048,
+          10144
+        ],
+        "max_ns": 6231645.4,
+        "median_loop_ns": 43034016.5,
+        "median_ns": 4303401.65,
+        "min_ns": 4204781.7,
+        "output_capacities": [
+          250
+        ],
+        "output_count": 250,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "session/fourfold/1000",
+      "iterations": 10,
+      "median_time_change_percent": -3.7835117323412826,
+      "pairs": 6,
+      "pattern": "fourfold",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 5881778.333333333,
+        "median_loop_ns": 38947390.5,
+        "median_ns": 4327487.833333333,
+        "min_ns": 4024775.5555555555,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 1000,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 4249556.111111111,
+        "median_loop_ns": 37352906.0,
+        "median_ns": 4150322.888888889,
+        "min_ns": 3975767.3333333335,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "count": 1000,
+      "id": "session/all/1000",
+      "iterations": 9,
+      "median_time_change_percent": -4.09394436836531,
+      "pairs": 6,
+      "pattern": "all",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          655360
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          655504,
+          655504,
+          655504,
+          655504,
+          655408,
+          655504
+        ],
+        "max_ns": 47712204.0,
+        "median_loop_ns": 45976438.5,
+        "median_ns": 45976438.5,
+        "min_ns": 44469459.0,
+        "output_capacities": [
+          16384
+        ],
+        "output_count": 9999,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          655360
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          655600,
+          655504,
+          655504,
+          655696,
+          655696,
+          655504
+        ],
+        "max_ns": 50469733.0,
+        "median_loop_ns": 45698400.0,
+        "median_ns": 45698400.0,
+        "min_ns": 44569601.0,
+        "output_capacities": [
+          16384
+        ],
+        "output_count": 9999,
+        "shared_results": 0
+      },
+      "count": 10000,
+      "id": "session/early/10000",
+      "iterations": 1,
+      "median_time_change_percent": -0.6047412741637226,
+      "pairs": 6,
+      "pattern": "early",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          655360
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          655600,
+          655696,
+          655600,
+          655504,
+          655600,
+          655408
+        ],
+        "max_ns": 52716215.0,
+        "median_loop_ns": 45638620.5,
+        "median_ns": 45638620.5,
+        "min_ns": 44833401.0,
+        "output_capacities": [
+          16384
+        ],
+        "output_count": 9999,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          399960
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          400096,
+          400192,
+          400192,
+          400288,
+          400096,
+          400192
+        ],
+        "max_ns": 72798127.0,
+        "median_loop_ns": 45470837.0,
+        "median_ns": 45470837.0,
+        "min_ns": 45220281.0,
+        "output_capacities": [
+          9999
+        ],
+        "output_count": 9999,
+        "shared_results": 0
+      },
+      "count": 10000,
+      "id": "session/late/10000",
+      "iterations": 1,
+      "median_time_change_percent": -0.36763490693151324,
+      "pairs": 6,
+      "pattern": "late",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          163840
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          164176,
+          164080,
+          164080,
+          164176,
+          164176,
+          164080
+        ],
+        "max_ns": 44890335.0,
+        "median_loop_ns": 44249476.0,
+        "median_ns": 44249476.0,
+        "min_ns": 43901968.0,
+        "output_capacities": [
+          4096
+        ],
+        "output_count": 2500,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          100000
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          100240,
+          100144,
+          100240,
+          100144,
+          100240,
+          100240
+        ],
+        "max_ns": 44775163.0,
+        "median_loop_ns": 44364058.0,
+        "median_ns": 44364058.0,
+        "min_ns": 43235284.0,
+        "output_capacities": [
+          2500
+        ],
+        "output_count": 2500,
+        "shared_results": 0
+      },
+      "count": 10000,
+      "id": "session/fourfold/10000",
+      "iterations": 1,
+      "median_time_change_percent": 0.25894543926350266,
+      "pairs": 6,
+      "pattern": "fourfold",
+      "scope": "session"
+    },
+    {
+      "baseline": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 43266441.0,
+        "median_loop_ns": 42794040.0,
+        "median_ns": 42794040.0,
+        "min_ns": 41589417.0,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "candidate": {
+        "additional_element_capacity_bytes": [
+          40
+        ],
+        "element_stride": 40,
+        "input_capacity": 10034,
+        "live_allocator_delta_bytes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "max_ns": 43926314.0,
+        "median_loop_ns": 42915453.5,
+        "median_ns": 42915453.5,
+        "min_ns": 41252260.0,
+        "output_capacities": [
+          1
+        ],
+        "output_count": 1,
+        "shared_results": 0
+      },
+      "count": 10000,
+      "id": "session/all/10000",
+      "iterations": 1,
+      "median_time_change_percent": 0.28371590997251506,
+      "pairs": 6,
+      "pattern": "all",
+      "scope": "session"
+    }
+  ]
+}
