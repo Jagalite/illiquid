@@ -96,6 +96,90 @@ struct PlexMatchHintsRegressionTests {
         #expect(explicit.hints(for: "file.mkv", defaultSeason: 4).season == 7)
     }
 
+    @Test(arguments: [
+        ("E02", nil, 2, nil),
+        ("01-02", nil, 1, 2),
+        ("SP04", 0, 4, nil),
+        ("SP01-S00E02", 0, 1, 2),
+        ("s03e04-e05", 3, 4, 5),
+        ("S000E0000", 0, 0, nil),
+        ("S999E9998-S999E9999", 999, 9998, 9999),
+    ] as [(String, Int?, Int, Int?)])
+    func rawMappingsContainOnlyExplicitEpisodeIdentity(
+        _ example: (String, Int?, Int, Int?)
+    ) throws {
+        let (token, season, episode, lastEpisode) = example
+        let plex = try #require(PlexMatchHints.parse("""
+            title: Show
+            year: 2019
+            season: 7
+            tvdbid: 42
+            guid: imdb://tt123
+            ep: \(token): file.mkv
+            """))
+        var expected = MediaMetadataHints()
+        expected.content = .episode
+        expected.season = season
+        expected.episode = episode
+        expected.lastEpisode = lastEpisode
+        // A raw mapping must not carry inherited series fields or attribution.
+        // In particular, an omitted season is distinct from an explicit zero.
+        #expect(plex.episodeHint(for: "file.mkv", inheritsDescendantMappings: true) == expected)
+
+        expected.title = "Show"
+        expected.year = 2019
+        expected.season = season ?? 7
+        expected.catalogIDs = ["tvdb-42", "imdb-tt123"]
+        expected.sources = [".plexmatch"]
+        #expect(plex.hints(for: "file.mkv", defaultSeason: 4) == expected)
+    }
+
+    @Test func implicitReplacementClearsEarlierExplicitSeasonAndRange() throws {
+        let plex = try #require(PlexMatchHints.parse("""
+            season: 7
+            ep: S03E04-E08: file.mkv
+            ep: E06: file.mkv
+            """))
+        var expected = MediaMetadataHints()
+        expected.content = .episode
+        expected.episode = 6
+        #expect(plex.episodeHint(for: "file.mkv", inheritsDescendantMappings: true) == expected)
+        #expect(plex.hints(for: "file.mkv", defaultSeason: 4).season == 7)
+        #expect(plex.hints(for: "file.mkv").lastEpisode == nil)
+    }
+
+    @Test func returnedHintsDoNotMutateTheIndexOrItsCopies() throws {
+        let plex = try #require(PlexMatchHints.parse("""
+            title: Show
+            tvdbid: 42
+            ep: E02: regular.mkv
+            ep: SP03-E05: special.mkv
+            """))
+        let copied = plex
+        let expectedMetadata = plex.metadata
+        let expectedRaw = try #require(plex.episodeHint(for: "regular.mkv", inheritsDescendantMappings: true))
+        let expectedMerged = plex.hints(for: "regular.mkv", defaultSeason: 4)
+        let expectedOther = plex.hints(for: "special.mkv")
+
+        var raw = expectedRaw
+        raw.title = "Changed"
+        raw.season = 99
+        raw.catalogIDs.append("tmdb-1")
+        raw.sources.append("caller")
+        var merged = expectedMerged
+        merged.episode = 100
+        merged.catalogIDs.removeAll()
+        merged.sources.append("caller")
+        #expect(raw != expectedRaw && merged != expectedMerged)
+
+        for index in [plex, copied] {
+            #expect(index.metadata == expectedMetadata)
+            #expect(index.episodeHint(for: "regular.mkv", inheritsDescendantMappings: true) == expectedRaw)
+            #expect(index.hints(for: "regular.mkv", defaultSeason: 4) == expectedMerged)
+            #expect(index.hints(for: "special.mkv") == expectedOther)
+        }
+    }
+
     @Test func unicodeTitlesAndPathsAreNotRestricted() throws {
         let title = "番組 À"
         let path = "季節０２/第０３話 – café 🎬: 前編.mkv"
