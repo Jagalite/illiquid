@@ -117,7 +117,7 @@ presented as production post-close savings or as a clean teardown comparison.
 
 Native debug and release builds both succeeded. Each selected test run reports
 83 test functions across 10 suites: **73 passed and 10 explicitly skipped**.
-The new five-function auxiliary-font suite ran all 20 parameterized cases in
+The new five-function auxiliary-font suite ran all 20 cases in
 both configurations. It checks default font ownership after demuxer destruction;
 full non-font metadata, packet bytes/flags/side data, codec configuration,
 seek/subtitle reconstruction through both input APIs; duration/frame-step

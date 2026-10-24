@@ -18,7 +18,7 @@ Baseline: `6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635`.
 | `native-evidence.json.xz` | Exact lossless bundle: raw observations, parity, fixtures, commands, manifest and summary. |
 | `archive-receipt.json` | Original gzip, decoded-content and XZ checksums. |
 | `native-test-summary.json` | Separate debug/release results and explicit skipped test names. |
-| `tests-debug.log.gz`, `tests-release.log.gz` | Native build/test log sections, including every assertion outcome. |
+| `tests-debug.log.gz`, `tests-release.log.gz` | Native build/test log sections, including recorded test results and explicit skips. |
 
 The original CI gzip bundle checksum was verified before its exact decompressed
 JSON bytes were repacked with XZ. This reduces archive size without selecting,
