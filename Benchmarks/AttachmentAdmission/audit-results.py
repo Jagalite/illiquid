@@ -32,6 +32,8 @@ RECEIPT_KEYS = ("snapshot", "input_attachments", "accepted_payload_bytes",
                 "avcodec_version", "avutil_version")
 BENCHMARK = "Benchmarks/AttachmentAdmission/"
 DEMUXER = "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift"
+INPUT_EXECUTOR = "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"
+EXECUTOR_CLASS_MARKER = "/// Sole owner of AVFormatContext and every open/probe/read/seek/close C-call."
 PRESENTATION = "Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift"
 BITMAP = "Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift"
 
@@ -99,6 +101,28 @@ class Audit:
             self.sources[key] = data
             self.optional_file(self.root / "sources" / variant / path, receipt["sha256"],
                                f"optional source snapshot: {key}")
+        executor_support = {}
+        if "input_executor_support" in m:
+            boundary = m["input_executor_support"]
+            require(boundary["format"] == "verbatim-prefix-v1"
+                    and boundary["path"] == INPUT_EXECUTOR
+                    and boundary["end_marker"] == EXECUTOR_CLASS_MARKER
+                    and set(boundary["variants"]) == set(VARIANTS),
+                    "Unrecognized input executor support boundary")
+            for variant in VARIANTS:
+                source = self.sources[f"{variant}:{INPUT_EXECUTOR}"]
+                marker = EXECUTOR_CLASS_MARKER.encode()
+                require(source.count(marker) == 1, "Input executor class boundary changed")
+                prefix = source[:source.index(marker)]
+                require(prefix and prefix.count(b"{") == prefix.count(b"}"),
+                        "Input executor support prefix is incomplete")
+                receipt = boundary["variants"][variant]
+                require(receipt == {"full_source_sha256": digest(source),
+                                    "prefix_sha256": digest(prefix), "prefix_bytes": len(prefix)},
+                        "Input executor support source receipt mismatch")
+                executor_support[variant] = prefix
+            require(executor_support["baseline"] == executor_support["candidate"],
+                    "Shared input executor support declarations differ")
         require(set(m["compiled_sources"]) == set(VARIANTS), "Missing compiled-source variant")
         for variant, files in m["compiled_sources"].items():
             for relative, receipt in files.items():
@@ -120,6 +144,8 @@ class Audit:
                         marker = b"    private static func makeMediaInfo("
                         require(expected.count(marker) == 1, "Projection access marker changed")
                         expected = expected.replace(marker, b"    static func makeMediaInfo(", 1)
+                    elif name == "FFmpegInputExecutor.swift" and executor_support:
+                        expected = executor_support[variant]
                 require(digest(expected) == receipt, f"Reconstructed compiled-source mismatch: {relative}")
                 self.optional_file(self.root / relative, receipt, f"optional compiled source: {relative}")
         for filename, receipt_key, snapshot in [

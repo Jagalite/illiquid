@@ -26,13 +26,15 @@ HERE = Path(__file__).resolve().parent
 BASELINE = "7f9ba073394b77a908e0589447c6edc8d10b832c"
 DEMUXER = "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift"
 FONT = "Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift"
+INPUT_EXECUTOR = "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"
+EXECUTOR_CLASS_MARKER = "/// Sole owner of AVFormatContext and every open/probe/read/seek/close C-call."
 FULL_SOURCES = [
     DEMUXER, FONT,
     "Sources/IlliquidNativePlayback/Media/FFmpegStreamInfo.swift",
     "Sources/IlliquidNativePlayback/Media/MediaTime.swift",
     "Sources/IlliquidNativePlayback/Media/FFmpegError.swift",
     "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
-    "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift",
+    INPUT_EXECUTOR,
     "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
     "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
 ]
@@ -71,6 +73,15 @@ def extract(source: str, start: str, end: str) -> str:
     if result.count("{") != result.count("}"):
         raise ValueError("Extracted declarations have unbalanced braces")
     return result
+
+
+def executor_support_prefix(source: str) -> str:
+    if source.count(EXECUTOR_CLASS_MARKER) != 1:
+        raise ValueError("Input executor class boundary changed")
+    prefix = source[:source.index(EXECUTOR_CLASS_MARKER)]
+    if not prefix or prefix.count("{") != prefix.count("}"):
+        raise ValueError("Input executor support prefix is incomplete")
+    return prefix
 
 
 class Runner:
@@ -179,9 +190,24 @@ class Runner:
         original = {variant: {path: self.source(variant, path)
                               for path in FULL_SOURCES + [PRESENTATION, BITMAP] + C_SOURCES}
                     for variant in VARIANTS}
-        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT}:
+        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT, INPUT_EXECUTOR}:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
+        # This harness constructs demuxers directly. Compile their unchanged
+        # interrupt/owned-parameter support, without the unused executor class.
+        executor_support = {v: executor_support_prefix(original[v][INPUT_EXECUTOR])
+                            for v in VARIANTS}
+        if executor_support["baseline"] != executor_support["candidate"]:
+            raise ValueError("Shared input executor support declarations differ")
+        self.record["input_executor_support"] = {
+            "format": "verbatim-prefix-v1", "path": INPUT_EXECUTOR,
+            "end_marker": EXECUTOR_CLASS_MARKER,
+            "variants": {v: {
+                "full_source_sha256": sha(original[v][INPUT_EXECUTOR]),
+                "prefix_sha256": sha(executor_support[v]),
+                "prefix_bytes": len(executor_support[v].encode()),
+            } for v in VARIANTS},
+        }
         error = {v: extract(original[v][PRESENTATION], "struct PresentationError:", "\nfunc checkOSStatus(")
                  for v in VARIANTS}
         packets = {v: extract(original[v][BITMAP], "enum PGSSubtitlePacket {", "\nstruct NativeBitmapSubtitleRegion:")
@@ -218,7 +244,9 @@ class Runner:
             inputs = []
             for path in FULL_SOURCES:
                 source = original[variant][path]
-                if path == DEMUXER:
+                if path == INPUT_EXECUTOR:
+                    source = executor_support[variant]
+                elif path == DEMUXER:
                     marker = "    private static func makeMediaInfo("
                     replacement = "    static func makeMediaInfo("
                     if source.count(marker) != 1:

@@ -438,7 +438,8 @@ final class MediaSession: @unchecked Sendable {
         let audioStream = openedMediaInfo.audioStreams.first { $0.index == audioIndex }
         self.audioDelay = audioStream == nil ? 0 : AudioDelayTimeline.bounded(audioDelay)
         delayedAudioInput = self.audioDelay == 0 ? nil : try FFmpegInputExecutor(
-            url: url, cancellationSignal: constructionCancellation)
+            url: url, cancellationSignal: constructionCancellation,
+            includeFontAttachments: false)
         let requestedSubtitleSource = subtitleSource
             ?? selectedSubtitleIndex.map(NativeSubtitleSource.embedded)
             ?? .automaticEmbedded
@@ -462,7 +463,11 @@ final class MediaSession: @unchecked Sendable {
             subtitleTimelineOrigin = 0
         } else {
             subtitleStream = resolvedSubtitleSource.resolve(in: openedMediaInfo)
-            openedSubtitleInput = subtitleStream == nil ? nil : try FFmpegInputExecutor(url: url, cancellationSignal: constructionCancellation)
+            // Both subtitle pipelines register fonts from openedMediaInfo.
+            // This independent input only supplies packets and codec metadata.
+            openedSubtitleInput = subtitleStream == nil ? nil : try FFmpegInputExecutor(
+                url: url, cancellationSignal: constructionCancellation,
+                includeFontAttachments: false)
             subtitleTimelineOrigin = openedMediaInfo.startTime
         }
         try constructionCancellation?.checkCancellation()

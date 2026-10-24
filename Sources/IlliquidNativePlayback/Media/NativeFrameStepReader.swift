@@ -12,7 +12,8 @@ actor NativeFrameStepReader {
         let deadline = DispatchWorkItem { _ = interrupt.cancel(token) }
         DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 8, execute: deadline)
         defer { deadline.cancel(); interrupt.end(token) }
-        let demuxer = try FFmpegDemuxer(url: url, interruptState: interrupt)
+        let demuxer = try FFmpegDemuxer(
+            url: url, interruptState: interrupt, includeFontAttachments: false)
         guard let stream = demuxer.mediaInfo.videoStreams.first(where: { $0.index == demuxer.mediaInfo.selectedVideoIndex }),
               let parameters = demuxer.codecParameters(streamIndex: stream.index) else {
             throw PresentationError("This file has no video frames.")

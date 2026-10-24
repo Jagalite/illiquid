@@ -136,6 +136,27 @@ memory. The sources prove that an owning `Data` construction is avoided for
 each rejected payload; they do not establish an equal reduction in physical
 memory use.
 
+### Maintained harness boundary
+
+The recorded October 22 studies above compiled the complete
+`FFmpegInputExecutor.swift` file as a dependency, although the harness creates
+`FFmpegDemuxer` directly and never constructs an input executor. Subsequent
+runs compile the exact prefix before the unique `Sole owner of AVFormatContext`
+class comment, which contains the interrupt and owned-codec-parameter support
+declarations. The unused executor class is omitted in both variants. The
+runner requires the compiled prefixes to be byte-identical between the pinned
+baseline and current source; all other shared dependency checks remain in
+place. The complete production demuxers are still measured with their default
+font-attachment behavior.
+
+New manifests identify this boundary as `input_executor_support` with format
+`verbatim-prefix-v1` and retain both full-source and compiled-prefix hashes.
+The auditor reconstructs and validates this exact boundary for new receipts;
+historical receipts without the field continue to require the complete input
+executor file. This maintenance change does not revise the archived source
+receipts, measurements, or historical results above, and this benchmark does
+not qualify input-executor routing or the auxiliary-reader opt-out policy.
+
 ## Reproduce on Apple Silicon macOS
 
 Use the repository's pinned FFmpeg SDK and the compiler selected by
