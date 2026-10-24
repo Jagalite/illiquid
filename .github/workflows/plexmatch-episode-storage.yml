@@ -1,0 +1,91 @@
+name: PlexMatch episode storage
+
+on:
+  push:
+    branches: ['perf/plexmatch-episode-storage-c018']
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Benchmarks/PlexMatchEpisodeStorage/*.swift'
+      - 'Benchmarks/PlexMatchEpisodeStorage/*.c'
+      - 'Benchmarks/PlexMatchEpisodeStorage/*.py'
+      - '.github/workflows/plexmatch-episode-storage.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Benchmarks/PlexMatchEpisodeStorage/*.swift'
+      - 'Benchmarks/PlexMatchEpisodeStorage/*.c'
+      - 'Benchmarks/PlexMatchEpisodeStorage/*.py'
+      - '.github/workflows/plexmatch-episode-storage.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plexmatch-episode-storage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record native host and revision
+        run: |
+          mkdir -p "$RUNNER_TEMP/plexmatch-episode-storage"
+          {
+            git rev-parse HEAD
+            sw_vers
+            uname -a
+            sysctl -n machdep.cpu.brand_string
+            swift --version
+          } > "$RUNNER_TEMP/plexmatch-episode-storage/host.txt"
+      - name: Test both representations and measure native allocations
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; building directly in isolated packages.'
+          python3 Benchmarks/PlexMatchEpisodeStorage/runner.py \
+            --pairs 6 --target-ms 100 \
+            --output "$RUNNER_TEMP/plexmatch-episode-storage/results"
+      - name: Preserve evidence in the job log
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'plexmatch-episode-storage'
+          paths = [root / 'host.txt', *sorted((root / 'results/evidence').rglob('*'))]
+          files = {str(path.relative_to(root)): base64.b64encode(path.read_bytes()).decode()
+                   for path in paths if path.is_file()}
+          if not files:
+              raise SystemExit('No research evidence was produced')
+          payload = gzip.compress(json.dumps({'files': files}, sort_keys=True).encode(), mtime=0)
+          if len(payload) > 2_000_000:
+              raise SystemExit('Evidence exceeds the log bundle size limit; use the uploaded artifact')
+          encoded = base64.b64encode(payload).decode()
+          print('PLEXMATCH_STORAGE_EVIDENCE_BEGIN ' + hashlib.sha256(payload).hexdigest())
+          for offset in range(0, len(encoded), 4000):
+              print(encoded[offset:offset + 4000])
+          print('PLEXMATCH_STORAGE_EVIDENCE_END')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: plexmatch-episode-storage-native
+          path: |
+            ${{ runner.temp }}/plexmatch-episode-storage/host.txt
+            ${{ runner.temp }}/plexmatch-episode-storage/results/evidence/
+          retention-days: 30
