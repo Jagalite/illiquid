@@ -70,7 +70,8 @@ class Runner:
             "driver_sha256": sha((HERE / "Main.swift").read_bytes()),
             "extractor_sha256": sha(EXTRACTOR.read_bytes()),
             "protocol": {"pairs": args.pairs, "fresh_process_per_observation": True,
-                         "order": "alternating AB/BA by pair", "warmup_sequences": 0},
+                         "order": "alternating AB/BA by pair", "warmup_sequences": 0,
+                         "held_count": args.held_count},
             "variants": {},
         }
         if platform.system() == "Darwin":
@@ -145,9 +146,12 @@ class Runner:
             for pair in range(self.args.pairs):
                 order = VARIANTS if pair % 2 == 0 else VARIANTS[::-1]
                 for order_index, variant in enumerate(order):
-                    value = json.loads(self.command([self.binaries[variant], "measure", case]))
+                    value = json.loads(self.command([self.binaries[variant], "measure", case, self.args.held_count]))
                     if value["case"] != case or value["mode"] != "measure":
                         raise ValueError("Measurement command receipt mismatch")
+                    if (value["retained_snapshot_limit"] != self.args.held_count
+                            or value["retained_snapshot_count"] != self.args.held_count):
+                        raise ValueError("Snapshot retention does not match requested workload")
                     if not value["frames"]:
                         raise ValueError("Missing frame measurements")
                     verified = self.parity[case][variant]["parity"]
@@ -182,7 +186,7 @@ class Runner:
                     with (self.output / "observations.jsonl").open("a") as stream:
                         stream.write(json.dumps(value, sort_keys=True, allow_nan=False) + "\n")
             print(f"Completed {case}: {self.args.pairs} paired fresh processes", flush=True)
-        return summarize(self.rows, self.cases, self.args.pairs)
+        return summarize(self.rows, self.cases, self.args.pairs, self.args.held_count)
 
     def verify_sources(self):
         for path, expected in self.manifest["variants"]["candidate"]["source_sha256"].items():
@@ -194,7 +198,7 @@ class Runner:
                 raise ValueError("Measurement source changed during run")
 
 
-def summarize(rows, cases, pairs):
+def summarize(rows, cases, pairs, held_count):
     results = []
     def metric(row, key):
         if key == "retained_bytes":
@@ -246,8 +250,8 @@ def summarize(rows, cases, pairs):
         results.append(result)
     if len(rows) != len(cases) * pairs * 2:
         raise ValueError("Unexpected observations outside case matrix")
-    return {"status": "complete", "processes": len(rows), "results": results,
-            "memory_scope": "reusable slot Data lengths and whole harness process memory with latest frame alive",
+    return {"status": "complete", "processes": len(rows), "held_count": held_count, "results": results,
+            "memory_scope": "reusable slot Data lengths and whole harness process memory with requested frame snapshots alive",
             "timing_scope": "cold frame-preparation samples; small intervals are exploratory, not playback latency"}
 
 
@@ -256,6 +260,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--swift", default=shutil.which("swift"))
     parser.add_argument("--pairs", type=int, default=6)
+    parser.add_argument("--held-count", type=int, choices=(1, 3), default=1)
     parser.add_argument("--build-only", action="store_true")
     args = parser.parse_args()
     if not args.swift or args.pairs < 2 or args.pairs % 2:

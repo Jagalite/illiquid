@@ -7,8 +7,9 @@ import Glibc
 
 // Compiled with complete production packer/region/budget declarations by
 // run.py. Verification and measurement use separate processes: verification
-// deliberately retains three immutable snapshots and independent byte copies,
-// while measurement retains only the latest prepared frame.
+// deliberately retains three immutable snapshots and independent byte copies.
+// Measurement defaults to the latest frame; optional held3 retains frame values
+// without independent byte copies to exercise Data copy-on-write ownership.
 private struct HarnessError: Error, CustomStringConvertible {
     let description: String
     init(_ description: String) { self.description = description }
@@ -352,10 +353,12 @@ private func memoryCheckpoint() throws -> [String: Any] {
     #endif
 }
 
-private func measure(_ workload: Workload) throws -> [String: Any] {
+private func measure(_ workload: Workload, heldCount: Int = 1) throws -> [String: Any] {
     let budget = SubtitleMemoryBudget()
     let packer = ASSSubtitleFramePacker(memoryBudget: budget)
     var latest: ASSPreparedSubtitleFrame?
+    var held: [ASSPreparedSubtitleFrame] = []
+    if heldCount == 3 { held.reserveCapacity(3) }
     var observations: [FrameObservation] = []
     observations.reserveCapacity(workload.isLarge.count)
     let before = try memoryCheckpoint()
@@ -373,15 +376,24 @@ private func measure(_ workload: Workload) throws -> [String: Any] {
             cpuNanoseconds: usageAfter.cpuNanoseconds - usageBefore.cpuNanoseconds,
             minorFaults: usageAfter.minorFaults - usageBefore.minorFaults
         ))
+        if heldCount == 3 {
+            // Keep three prior frame values alive during the next preparation,
+            // exceeding the two reusable slots and exercising real Data COW.
+            // Queue updates are untimed; no oracle arrays or byte copies exist.
+            if held.count == 3 { held.removeFirst() }
+            held.append(frame)
+        }
     }
     // No byte hashing, fresh oracle, independent byte copies, or JSON encoding
     // happens before this checkpoint. Keep both inputs and current owners alive.
-    let after = try withExtendedLifetime((workload, packer, budget, latest)) {
+    let after = try withExtendedLifetime((workload, packer, budget, latest, held)) {
         try memoryCheckpoint()
     }
     guard let final = latest else { throw HarnessError("No measured output") }
     return ["schema": 1, "mode": "measure", "case": workload.name,
             "frame_count": observations.count, "maximum_latest_snapshots": 1,
+            "retained_snapshot_limit": heldCount,
+            "retained_snapshot_count": heldCount == 3 ? held.count : 1,
             "input_payload_bytes": workload.inputPayloadBytes,
             "memory_before": before, "memory": after,
             "total_wall_ns": observations.reduce(UInt64(0)) { $0 + $1.wallNanoseconds },
@@ -406,8 +418,13 @@ private enum SubtitleSlotCapacityBenchmark {
             result = try verify(Workload(arguments[1]))
         case "measure" where arguments.count == 2:
             result = try measure(Workload(arguments[1]))
+        case "measure" where arguments.count == 3:
+            guard let heldCount = Int(arguments[2]), heldCount == 1 || heldCount == 3 else {
+                throw HarnessError("HOLD_COUNT must be 1 or 3")
+            }
+            result = try measure(Workload(arguments[1]), heldCount: heldCount)
         default:
-            throw HarnessError("Usage: binary list | verify [CASE] | measure CASE")
+            throw HarnessError("Usage: binary list | verify [CASE] | measure CASE [1|3]")
         }
         let data = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys])
         guard let text = String(data: data, encoding: .utf8) else { throw HarnessError("JSON encoding failed") }

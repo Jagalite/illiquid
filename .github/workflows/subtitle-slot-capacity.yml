@@ -42,6 +42,8 @@ jobs:
         run: |
           python3 Benchmarks/SubtitleSlotCapacity/run.py \
             --output "$RUNNER_TEMP/subtitle-slot/memory" --pairs 6
+          python3 Benchmarks/SubtitleSlotCapacity/run.py \
+            --output "$RUNNER_TEMP/subtitle-slot/memory-held3" --pairs 6 --held-count 3
       - name: Prepare pinned native dependencies
         run: |
           if ! xcrun -sdk macosx metal --version; then
@@ -67,11 +69,11 @@ jobs:
           from pathlib import Path
           root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-slot"
           paths = []
-          for directory in ("debug", "release", "memory", "native"):
+          for directory in ("debug", "release", "memory", "memory-held3", "native"):
               for extension in ("*.json", "*.jsonl", "*.log", "*.txt"):
                   paths.extend((root / directory).glob(extension))
           files = {str(p.relative_to(root)): p.read_text() for p in sorted(set(paths)) if p.is_file()}
-          for name in ("memory/failure.json", "memory/summary.json"):
+          for name in ("memory/failure.json", "memory/summary.json", "memory-held3/failure.json", "memory-held3/summary.json"):
               if name in files:
                   print(f"::group::{name}")
                   print(files[name])
