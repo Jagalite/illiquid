@@ -1,32 +1,13 @@
 name: Video scratch frame memory lifetime
 
 on:
-  push:
-    branches: ['perf/video-scratch-frame-lifetime-20261023']
-    paths:
-      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
-      - 'Sources/CFFmpeg/include/ffmpeg_shim.h'
-      - 'Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeTests.swift'
-      - 'Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeMeasurements.swift'
-      - 'Tests/IlliquidNativePlaybackTests/VideoTimestampDiscoveryTests.swift'
-      - 'Benchmarks/VideoScratchFrameLifetime/**'
-      - 'Benchmarks/FrameStepTimestamps/generate-fixtures.py'
-      - '.github/workflows/video-scratch-frame-lifetime.yml'
-      - '!Benchmarks/VideoScratchFrameLifetime/*.md'
-      - '!Benchmarks/VideoScratchFrameLifetime/evidence/**'
-  pull_request:
-    paths:
-      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
-      - 'Sources/CFFmpeg/include/ffmpeg_shim.h'
-      - 'Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeTests.swift'
-      - 'Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeMeasurements.swift'
-      - 'Tests/IlliquidNativePlaybackTests/VideoTimestampDiscoveryTests.swift'
-      - 'Benchmarks/VideoScratchFrameLifetime/**'
-      - 'Benchmarks/FrameStepTimestamps/generate-fixtures.py'
-      - '.github/workflows/video-scratch-frame-lifetime.yml'
-      - '!Benchmarks/VideoScratchFrameLifetime/*.md'
-      - '!Benchmarks/VideoScratchFrameLifetime/evidence/**'
   workflow_dispatch:
+    inputs:
+      candidate_ref:
+        description: Candidate commit for the frozen native ownership comparison
+        required: true
+        type: string
+        default: 40b8cae2651e643491f82af34f1c4b608e1cbc62
 
 permissions:
   contents: read
@@ -37,9 +18,6 @@ concurrency:
 
 jobs:
   native-memory:
-    # This pinned differential qualifies one research branch. General decoder
-    # regressions remain in the frame-step workflow as main evolves.
-    if: github.head_ref == 'perf/video-scratch-frame-lifetime-20261023' || github.ref_name == 'perf/video-scratch-frame-lifetime-20261023'
     runs-on: macos-26
     timeout-minutes: 90
     env:
@@ -47,6 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
+          ref: ${{ inputs.candidate_ref }}
           persist-credentials: false
           fetch-depth: 0
       - name: Prepare pinned native dependencies

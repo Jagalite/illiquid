@@ -88,8 +88,18 @@ Regression coverage includes output kept across error/reuse/flush/destruction,
 repeated cancellation, retained thumbnail fallback clones, delayed H.264 output,
 throwing EOF drain, B-frame timing, BWDIF interlacing, and decoder reuse.
 
-The pinned paired experiment runs only for the research branch. General native
-regression coverage remains in the frame-step timestamp workflow.
+Initial qualification runs on the research branch
+`perf/video-scratch-frame-lifetime-20261023`. Once the dedicated workflow is on
+the default branch, subsequent reproductions use its manual `workflow_dispatch`
+trigger and required
+`candidate_ref` input, which checks out the explicitly selected candidate commit
+(currently `40b8cae2651e643491f82af34f1c4b608e1cbc62`). This frozen differential
+rejects unrelated production-source changes; it does not rerun automatically
+for documentation updates or PR merge commits containing newer main changes.
+The frame-step timestamp workflow provides automatic native regression coverage
+on relevant PRs, including the scratch-lifetime suite and real timestamp and
+deinterlacing fixtures. A selected candidate commit is not qualified until the
+native evidence satisfies the success requirements below.
 
 ## Evidence
 
@@ -100,5 +110,16 @@ The workflow uploads these and emits a SHA-256-identified compressed evidence
 bundle in its logs. A result is qualified only when `completion.json` reports
 success and both native regression suites ran with nonzero test counts.
 
-See `Documentation/VIDEO_SCRATCH_FRAME_LIFETIME.md` for the observed results,
-their scope, and the qualified commit and workflow run.
+The [native run](https://github.com/Jagalite/illiquid/actions/runs/40101088087)
+qualified commit `40b8cae2651e643491f82af34f1c4b608e1cbc62`: 112 observations,
+56 paired output comparisons, and both regression suites passed. The four
+interrupted paths released the tracked allocation promptly in the candidate;
+both normal controls retained zero tracked source bytes in both revisions.
+
+See the [research report](../../Documentation/VIDEO_SCRATCH_FRAME_LIFETIME.md)
+for the exact byte counts, timing results, limits, and overlap with PR #100.
+[Committed native receipts](evidence/native/) include the raw observations,
+source and environment hashes, regression logs, and the unchanged full evidence
+bundle. `full-evidence.json.gz` is a gzip-compressed JSON object mapping relative
+paths to their original text; `provenance.json` records its SHA-256 and workflow.
+The checked-in evidence remains available after the temporary CI artifact expires.
