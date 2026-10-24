@@ -1,0 +1,1089 @@
+{
+  "limits": "Allocator deltas include Swift runtime/task scheduler allocations; completed Task handles do not establish retained media payload. Synthetic scheduling times are not player throughput. Native renderer/resource behavior requires native tests.",
+  "observations": 144,
+  "pairs": 6,
+  "qualification_scenarios_per_variant": 6,
+  "results": [
+    {
+      "cycles": 32,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 31.0,
+          "baseline_range": [
+            31,
+            31
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": -31.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 1125130.5,
+          "baseline_range": [
+            343438,
+            2062310
+          ],
+          "candidate_lower_pairs": 4,
+          "candidate_median": 619006.5,
+          "candidate_range": [
+            383068,
+            991800
+          ],
+          "paired_change_median": -598733.5
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 8358997.5,
+          "baseline_range": [
+            5387853,
+            21036890
+          ],
+          "candidate_lower_pairs": 3,
+          "candidate_median": 8197810.0,
+          "candidate_range": [
+            5408855,
+            26470637
+          ],
+          "paired_change_median": 489419.0
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 34704.0,
+          "baseline_range": [
+            34704,
+            34704
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": -34704.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 21736.0,
+          "baseline_range": [
+            18560,
+            22592
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 17424.0,
+          "candidate_range": [
+            17008,
+            21024
+          ],
+          "paired_change_median": -1512.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 56440.0,
+          "baseline_range": [
+            53264,
+            57296
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 17424.0,
+          "candidate_range": [
+            17008,
+            21024
+          ],
+          "paired_change_median": -36216.0
+        }
+      },
+      "scenario": "supersede"
+    },
+    {
+      "cycles": 4096,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 4095.0,
+          "baseline_range": [
+            4095,
+            4095
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": -4095.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 146450101.5,
+          "baseline_range": [
+            37152544,
+            457211800
+          ],
+          "candidate_lower_pairs": 5,
+          "candidate_median": 58860604.0,
+          "candidate_range": [
+            44098272,
+            113035124
+          ],
+          "paired_change_median": -77339504.5
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 341744603.0,
+          "baseline_range": [
+            87721699,
+            810635755
+          ],
+          "candidate_lower_pairs": 5,
+          "candidate_median": 145256372.5,
+          "candidate_range": [
+            97817080,
+            275385333
+          ],
+          "paired_change_median": -170693012.0
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 5630784.0,
+          "baseline_range": [
+            5630784,
+            5630784
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            -2912,
+            0
+          ],
+          "paired_change_median": -5630784.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 99992.0,
+          "baseline_range": [
+            97776,
+            101440
+          ],
+          "candidate_lower_pairs": 3,
+          "candidate_median": 100304.0,
+          "candidate_range": [
+            96768,
+            103216
+          ],
+          "paired_change_median": 512.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 5730776.0,
+          "baseline_range": [
+            5728560,
+            5732224
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 100304.0,
+          "candidate_range": [
+            96768,
+            100688
+          ],
+          "paired_change_median": -5631728.0
+        }
+      },
+      "scenario": "supersede"
+    },
+    {
+      "cycles": 32768,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 32767.0,
+          "baseline_range": [
+            32767,
+            32767
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": -32767.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 579391071.0,
+          "baseline_range": [
+            369856388,
+            1084459206
+          ],
+          "candidate_lower_pairs": 3,
+          "candidate_median": 636766808.5,
+          "candidate_range": [
+            430360255,
+            1171067053
+          ],
+          "paired_change_median": 100190280.0
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 992705077.5,
+          "baseline_range": [
+            468523077,
+            2378343279
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 1092812742.5,
+          "candidate_range": [
+            539664864,
+            2633788325
+          ],
+          "paired_change_median": 145463610.0
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 45091648.0,
+          "baseline_range": [
+            45088736,
+            45091648
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": -45091648.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 101360.0,
+          "baseline_range": [
+            98544,
+            101920
+          ],
+          "candidate_lower_pairs": 5,
+          "candidate_median": 100528.0,
+          "candidate_range": [
+            97664,
+            104512
+          ],
+          "paired_change_median": -800.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 45193008.0,
+          "baseline_range": [
+            45189648,
+            45193568
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 100528.0,
+          "candidate_range": [
+            97664,
+            104512
+          ],
+          "paired_change_median": -45092448.0
+        }
+      },
+      "scenario": "supersede"
+    },
+    {
+      "cycles": 32,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 3549472.0,
+          "baseline_range": [
+            1643498,
+            15295203
+          ],
+          "candidate_lower_pairs": 5,
+          "candidate_median": 2115788.0,
+          "candidate_range": [
+            1281596,
+            16217470
+          ],
+          "paired_change_median": -1503771.5
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 18980497.5,
+          "baseline_range": [
+            7137392,
+            334111689
+          ],
+          "candidate_lower_pairs": 5,
+          "candidate_median": 9705590.0,
+          "candidate_range": [
+            7207241,
+            41742594
+          ],
+          "paired_change_median": -4864101.5
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 9560.0,
+          "baseline_range": [
+            6384,
+            16256
+          ],
+          "candidate_lower_pairs": 5,
+          "candidate_median": 7360.0,
+          "candidate_range": [
+            5904,
+            11200
+          ],
+          "paired_change_median": -2200.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 9560.0,
+          "baseline_range": [
+            6384,
+            16256
+          ],
+          "candidate_lower_pairs": 5,
+          "candidate_median": 7360.0,
+          "candidate_range": [
+            5904,
+            11200
+          ],
+          "paired_change_median": -2200.0
+        }
+      },
+      "scenario": "complete"
+    },
+    {
+      "cycles": 4096,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 882875607.5,
+          "baseline_range": [
+            577054378,
+            1254478664
+          ],
+          "candidate_lower_pairs": 5,
+          "candidate_median": 626962391.0,
+          "candidate_range": [
+            307937044,
+            860384345
+          ],
+          "paired_change_median": -337730227.0
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 2295752257.5,
+          "baseline_range": [
+            1657370369,
+            6148763209
+          ],
+          "candidate_lower_pairs": 5,
+          "candidate_median": 1688832527.5,
+          "candidate_range": [
+            379565242,
+            3323159706
+          ],
+          "paired_change_median": -1322630799.5
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 351264.0,
+          "baseline_range": [
+            340960,
+            360256
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 357544.0,
+          "candidate_range": [
+            346608,
+            359344
+          ],
+          "paired_change_median": 4608.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 351264.0,
+          "baseline_range": [
+            340960,
+            360256
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 357544.0,
+          "candidate_range": [
+            346608,
+            359344
+          ],
+          "paired_change_median": 4608.0
+        }
+      },
+      "scenario": "complete"
+    },
+    {
+      "cycles": 32768,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 4511886574.0,
+          "baseline_range": [
+            3067922689,
+            7305746694
+          ],
+          "candidate_lower_pairs": 4,
+          "candidate_median": 4134987047.5,
+          "candidate_range": [
+            3781770037,
+            4735515678
+          ],
+          "paired_change_median": -69179671.5
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 14122587158.5,
+          "baseline_range": [
+            5730732930,
+            26523469882
+          ],
+          "candidate_lower_pairs": 3,
+          "candidate_median": 10753120680.0,
+          "candidate_range": [
+            8817326018,
+            13100557784
+          ],
+          "paired_change_median": -1466984091.0
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            80
+          ],
+          "paired_change_median": 0.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 774768.0,
+          "baseline_range": [
+            601824,
+            785744
+          ],
+          "candidate_lower_pairs": 3,
+          "candidate_median": 770024.0,
+          "candidate_range": [
+            736080,
+            777584
+          ],
+          "paired_change_median": -3272.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 774768.0,
+          "baseline_range": [
+            601824,
+            785744
+          ],
+          "candidate_lower_pairs": 3,
+          "candidate_median": 770024.0,
+          "candidate_range": [
+            736160,
+            777584
+          ],
+          "paired_change_median": -3272.0
+        }
+      },
+      "scenario": "complete"
+    },
+    {
+      "cycles": 32,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 1151389.0,
+          "baseline_range": [
+            447511,
+            5843929
+          ],
+          "candidate_lower_pairs": 4,
+          "candidate_median": 709952.5,
+          "candidate_range": [
+            505582,
+            2741406
+          ],
+          "paired_change_median": -418180.0
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 7028481.0,
+          "baseline_range": [
+            5387526,
+            23944546
+          ],
+          "candidate_lower_pairs": 4,
+          "candidate_median": 6386636.0,
+          "candidate_range": [
+            5417484,
+            33397173
+          ],
+          "paired_change_median": -354085.0
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 1,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            -2912,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 19464.0,
+          "baseline_range": [
+            17296,
+            24256
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 20648.0,
+          "candidate_range": [
+            18128,
+            21872
+          ],
+          "paired_change_median": 344.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 19464.0,
+          "baseline_range": [
+            17296,
+            24256
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 19720.0,
+          "candidate_range": [
+            17360,
+            21872
+          ],
+          "paired_change_median": 344.0
+        }
+      },
+      "scenario": "cancel"
+    },
+    {
+      "cycles": 4096,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 68445704.0,
+          "baseline_range": [
+            22441673,
+            390589594
+          ],
+          "candidate_lower_pairs": 3,
+          "candidate_median": 51689517.0,
+          "candidate_range": [
+            24457800,
+            84876820
+          ],
+          "paired_change_median": -14613085.5
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 133976687.0,
+          "baseline_range": [
+            61762320,
+            923827273
+          ],
+          "candidate_lower_pairs": 4,
+          "candidate_median": 87016011.5,
+          "candidate_range": [
+            55942956,
+            178616635
+          ],
+          "paired_change_median": -44973664.0
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 99616.0,
+          "baseline_range": [
+            97248,
+            100720
+          ],
+          "candidate_lower_pairs": 4,
+          "candidate_median": 100264.0,
+          "candidate_range": [
+            96768,
+            100304
+          ],
+          "paired_change_median": -328.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 99616.0,
+          "baseline_range": [
+            97248,
+            100720
+          ],
+          "candidate_lower_pairs": 4,
+          "candidate_median": 100264.0,
+          "candidate_range": [
+            96768,
+            100304
+          ],
+          "paired_change_median": -328.0
+        }
+      },
+      "scenario": "cancel"
+    },
+    {
+      "cycles": 32768,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 358969825.5,
+          "baseline_range": [
+            167487379,
+            498718934
+          ],
+          "candidate_lower_pairs": 1,
+          "candidate_median": 756546098.0,
+          "candidate_range": [
+            205068846,
+            1057431714
+          ],
+          "paired_change_median": 349488792.0
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 613159422.5,
+          "baseline_range": [
+            227917779,
+            1104793639
+          ],
+          "candidate_lower_pairs": 1,
+          "candidate_median": 1341584732.5,
+          "candidate_range": [
+            265061918,
+            2297180882
+          ],
+          "paired_change_median": 581558217.5
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 0.0,
+          "baseline_range": [
+            0,
+            0
+          ],
+          "candidate_lower_pairs": 0,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": 0.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 100464.0,
+          "baseline_range": [
+            97472,
+            101616
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 99568.0,
+          "candidate_range": [
+            97664,
+            104112
+          ],
+          "paired_change_median": 712.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 100464.0,
+          "baseline_range": [
+            97472,
+            101616
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 99568.0,
+          "candidate_range": [
+            97664,
+            104112
+          ],
+          "paired_change_median": 712.0
+        }
+      },
+      "scenario": "cancel"
+    },
+    {
+      "cycles": 32,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 31.0,
+          "baseline_range": [
+            31,
+            31
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": -31.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 1320423.0,
+          "baseline_range": [
+            385063,
+            10435201
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 1880830.0,
+          "candidate_range": [
+            729084,
+            4369520
+          ],
+          "paired_change_median": 528023.5
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 7976558.5,
+          "baseline_range": [
+            5361226,
+            86648370
+          ],
+          "candidate_lower_pairs": 3,
+          "candidate_median": 6846354.0,
+          "candidate_range": [
+            5655294,
+            107531720
+          ],
+          "paired_change_median": -1868664.5
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 34704.0,
+          "baseline_range": [
+            31792,
+            34704
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 1104.0,
+          "candidate_range": [
+            1104,
+            1104
+          ],
+          "paired_change_median": -33600.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 24520.0,
+          "baseline_range": [
+            24128,
+            27872
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 22120.0,
+          "candidate_range": [
+            20608,
+            24720
+          ],
+          "paired_change_median": -2824.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 59224.0,
+          "baseline_range": [
+            58832,
+            62544
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 23224.0,
+          "candidate_range": [
+            21712,
+            25824
+          ],
+          "paired_change_median": -36424.0
+        }
+      },
+      "scenario": "physicalStop"
+    },
+    {
+      "cycles": 4096,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 4095.0,
+          "baseline_range": [
+            4095,
+            4095
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": -4095.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 66993766.5,
+          "baseline_range": [
+            44115481,
+            77298834
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 69395254.5,
+          "candidate_range": [
+            59909338,
+            85917971
+          ],
+          "paired_change_median": 18203560.0
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 70554840.5,
+          "baseline_range": [
+            51671050,
+            160431801
+          ],
+          "candidate_lower_pairs": 1,
+          "candidate_median": 123752348.0,
+          "candidate_range": [
+            70601824,
+            171927866
+          ],
+          "paired_change_median": 32759445.0
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 5630784.0,
+          "baseline_range": [
+            5630784,
+            5630784
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 135168.0,
+          "candidate_range": [
+            135168,
+            135168
+          ],
+          "paired_change_median": -5495616.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 149488.0,
+          "baseline_range": [
+            137600,
+            164432
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 162192.0,
+          "candidate_range": [
+            107840,
+            189168
+          ],
+          "paired_change_median": 11208.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 5780272.0,
+          "baseline_range": [
+            5768384,
+            5795216
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 297360.0,
+          "candidate_range": [
+            243008,
+            324336
+          ],
+          "paired_change_median": -5484408.0
+        }
+      },
+      "scenario": "physicalStop"
+    },
+    {
+      "cycles": 32768,
+      "metrics": {
+        "completed_handles_retained": {
+          "baseline_median": 32767.0,
+          "baseline_range": [
+            32767,
+            32767
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 0.0,
+          "candidate_range": [
+            0,
+            0
+          ],
+          "paired_change_median": -32767.0
+        },
+        "loop_cpu_nanoseconds": {
+          "baseline_median": 571167239.5,
+          "baseline_range": [
+            284855622,
+            686392335
+          ],
+          "candidate_lower_pairs": 3,
+          "candidate_median": 624511150.0,
+          "candidate_range": [
+            526657552,
+            885716751
+          ],
+          "paired_change_median": 86360342.5
+        },
+        "loop_wall_nanoseconds": {
+          "baseline_median": 1011550465.5,
+          "baseline_range": [
+            493143323,
+            1602602413
+          ],
+          "candidate_lower_pairs": 2,
+          "candidate_median": 950893491.5,
+          "candidate_range": [
+            696024351,
+            1648940232
+          ],
+          "paired_change_median": 226134916.0
+        },
+        "reclaimed_registry_bytes": {
+          "baseline_median": 45091648.0,
+          "baseline_range": [
+            45091648,
+            45091648
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 1060864.0,
+          "candidate_range": [
+            1057952,
+            1060864
+          ],
+          "paired_change_median": -44030784.0
+        },
+        "released_allocator_delta_bytes": {
+          "baseline_median": 317256.0,
+          "baseline_range": [
+            238976,
+            413520
+          ],
+          "candidate_lower_pairs": 1,
+          "candidate_median": 367496.0,
+          "candidate_range": [
+            220304,
+            599776
+          ],
+          "paired_change_median": 59272.0
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 45408904.0,
+          "baseline_range": [
+            45330624,
+            45505168
+          ],
+          "candidate_lower_pairs": 6,
+          "candidate_median": 1426904.0,
+          "candidate_range": [
+            1281168,
+            1660640
+          ],
+          "paired_change_median": -43971512.0
+        }
+      },
+      "scenario": "physicalStop"
+    }
+  ],
+  "status": "complete"
+}

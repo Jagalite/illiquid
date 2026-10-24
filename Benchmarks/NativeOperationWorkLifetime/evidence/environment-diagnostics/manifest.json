@@ -1,0 +1,277 @@
+{
+  "baseline_commit": "4abf4b44f13386ccd04f1ce4ad0e756255ca4d14",
+  "binaries": {
+    "baseline": "c18f6ec4672f4b9c3b7dc3d7da9ea6fe4652927bfcd113157eb49de4856cc7d9"
+  },
+  "build_commands": {
+    "baseline": [
+      "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "build",
+      "--package-path",
+      "/tmp/operation-work-lifetime-linux-final-810bd/baseline",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "--cache-path",
+      "/tmp/operation-work-lifetime-linux-final-810bd/cache",
+      "--config-path",
+      "/tmp/operation-work-lifetime-linux-final-810bd/config",
+      "--security-path",
+      "/tmp/operation-work-lifetime-linux-final-810bd/security",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "--use-integrated-swift-driver",
+      "--product",
+      "OperationWorkBenchmark"
+    ],
+    "candidate": [
+      "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "build",
+      "--package-path",
+      "/tmp/operation-work-lifetime-linux-final-810bd/candidate",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "--cache-path",
+      "/tmp/operation-work-lifetime-linux-final-810bd/cache",
+      "--config-path",
+      "/tmp/operation-work-lifetime-linux-final-810bd/config",
+      "--security-path",
+      "/tmp/operation-work-lifetime-linux-final-810bd/security",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "--use-integrated-swift-driver",
+      "--product",
+      "OperationWorkBenchmark"
+    ]
+  },
+  "candidate_head": "4abf4b44f13386ccd04f1ce4ad0e756255ca4d14",
+  "compiled_inputs": {
+    "baseline": {
+      "Package.swift": "43be54187e166df81b0a5ff5d031cf72bfc06e3d3e9e31870674381d1ce304b1",
+      "Sources/CWorkHeap/heap.c": "87476c1df75ffa014a4f224ce368d5f45f6a9515f805ecaf1c98a44be43d93c8",
+      "Sources/CWorkHeap/include/CWorkHeap.h": "e85f2ca8575f415fc01de62bb88b3f7186ad5ad145d9a26875f0baeaf4e45ba0",
+      "Sources/IlliquidCore/Player/MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+      "Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift": "bdcf2f3a283de51150cf03f1b982dd9b3f7861acdb90a470947f84d6f8cda339",
+      "Sources/IlliquidPlaybackCore/EventsAndEffects.swift": "f17fb90da6f1c907aa2bfc0e87c3a12606385abd07a96608452fa2c7b027218b",
+      "Sources/IlliquidPlaybackCore/IdentityAndTime.swift": "c1c1ee83d7cfbfb909e30fccba6d239ddc412a9f1138015b431b7cda3df723bb",
+      "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift": "da35a412ca1a6919c9aa73a1c2eb06e7296ffa4643e27a9506b9294976ffffc4",
+      "Sources/IlliquidPlaybackCore/PlaybackCore.swift": "59faf4ba801d6d1e2d937302a19b45aa7c15eec263aebef987521a879d930fa0",
+      "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift": "4832bd64d67568c5ebdc641dc67c64d1f681ba07a7902887fa8ee81e04d1b59f",
+      "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift": "d25bb7de8f1871781bc8ee035a4b58dc00446f2dfe7491799a8315822a3c173e",
+      "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift": "54a12cac94e739f0ca681b262283c125b3df291be0e3f1a7d1e0eb1b496d2ffb",
+      "Sources/IlliquidPlaybackCore/PlaybackReplay.swift": "a5a94109b548bf12148b3e49b93570fbf2b63efffd97ef56d8deb6ee997279e3",
+      "Sources/IlliquidPlaybackCore/RecoveryCore.swift": "569ceffa207ba7dfdbd10f07d7f6ffc4d44fef37eefef2315959dcbb56b80f9a",
+      "Sources/IlliquidPlaybackCore/SeekCore.swift": "08e138ead38382839cb27a2a923247ec2716a2ea8b036bc8045df38feb78eb4b",
+      "Sources/IlliquidPlaybackCore/SubtitleCore.swift": "87e13ceedada39f64dd80c40b98040b9102db55bbe59784ec01b2111db12311b",
+      "Sources/IlliquidPlaybackCore/SynchronizationCore.swift": "9337d8cc2936e9155a61d8fdd0dd4d2e2c9312ede2f9047c2d9bd83629459e20",
+      "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift": "18f1e2274b9d6eb9e78a8916913f2bd538896363437089e16a3f81f49cf92f8d",
+      "Sources/OperationWorkBenchmark/Harness.swift": "41e97d46be4e6d36afbe8f9842cd3f6e17387425de01258f87de78a618cb3366",
+      "Sources/OperationWorkBenchmark/NativeOperationTransaction.swift": "acd85af0b9afd20eee68aac12c84defe081775c78ef69ce6ae36d34c4a6120b8",
+      "Sources/OperationWorkBenchmark/RuntimeShell.swift": "79bc71596a95a1b08763709e5812eb6ed74b7c9841dc84d08299e3c6d991c1c9"
+    },
+    "candidate": {
+      "Package.swift": "e3e336a1733f31faf477e71e1d4055e2cba4462937e7e8f02dc9ea009368ee85",
+      "Sources/CWorkHeap/heap.c": "87476c1df75ffa014a4f224ce368d5f45f6a9515f805ecaf1c98a44be43d93c8",
+      "Sources/CWorkHeap/include/CWorkHeap.h": "e85f2ca8575f415fc01de62bb88b3f7186ad5ad145d9a26875f0baeaf4e45ba0",
+      "Sources/IlliquidCore/Player/MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+      "Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift": "bdcf2f3a283de51150cf03f1b982dd9b3f7861acdb90a470947f84d6f8cda339",
+      "Sources/IlliquidPlaybackCore/EventsAndEffects.swift": "f17fb90da6f1c907aa2bfc0e87c3a12606385abd07a96608452fa2c7b027218b",
+      "Sources/IlliquidPlaybackCore/IdentityAndTime.swift": "c1c1ee83d7cfbfb909e30fccba6d239ddc412a9f1138015b431b7cda3df723bb",
+      "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift": "da35a412ca1a6919c9aa73a1c2eb06e7296ffa4643e27a9506b9294976ffffc4",
+      "Sources/IlliquidPlaybackCore/PlaybackCore.swift": "59faf4ba801d6d1e2d937302a19b45aa7c15eec263aebef987521a879d930fa0",
+      "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift": "4832bd64d67568c5ebdc641dc67c64d1f681ba07a7902887fa8ee81e04d1b59f",
+      "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift": "d25bb7de8f1871781bc8ee035a4b58dc00446f2dfe7491799a8315822a3c173e",
+      "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift": "54a12cac94e739f0ca681b262283c125b3df291be0e3f1a7d1e0eb1b496d2ffb",
+      "Sources/IlliquidPlaybackCore/PlaybackReplay.swift": "a5a94109b548bf12148b3e49b93570fbf2b63efffd97ef56d8deb6ee997279e3",
+      "Sources/IlliquidPlaybackCore/RecoveryCore.swift": "569ceffa207ba7dfdbd10f07d7f6ffc4d44fef37eefef2315959dcbb56b80f9a",
+      "Sources/IlliquidPlaybackCore/SeekCore.swift": "08e138ead38382839cb27a2a923247ec2716a2ea8b036bc8045df38feb78eb4b",
+      "Sources/IlliquidPlaybackCore/SubtitleCore.swift": "87e13ceedada39f64dd80c40b98040b9102db55bbe59784ec01b2111db12311b",
+      "Sources/IlliquidPlaybackCore/SynchronizationCore.swift": "9337d8cc2936e9155a61d8fdd0dd4d2e2c9312ede2f9047c2d9bd83629459e20",
+      "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift": "18f1e2274b9d6eb9e78a8916913f2bd538896363437089e16a3f81f49cf92f8d",
+      "Sources/OperationWorkBenchmark/Harness.swift": "41e97d46be4e6d36afbe8f9842cd3f6e17387425de01258f87de78a618cb3366",
+      "Sources/OperationWorkBenchmark/NativeOperationTransaction.swift": "acd85af0b9afd20eee68aac12c84defe081775c78ef69ce6ae36d34c4a6120b8",
+      "Sources/OperationWorkBenchmark/RuntimeShell.swift": "36bc7382b8c48fac90d826f5156295d96f75d95b79d36f1fb0348b0840ae5b41"
+    }
+  },
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "cycles": [
+    32,
+    4096,
+    32768
+  ],
+  "environment": {
+    "CLANG_MODULE_CACHE_PATH": "/tmp/operation-work-lifetime-linux-final-810bd/module-cache",
+    "DEVELOPER_DIR": null,
+    "DYLD_LIBRARY_PATH": null,
+    "GLIBC_TUNABLES": null,
+    "LD_LIBRARY_PATH": "/tmp/illiquid-presence-toolchain/runtime-libs/usr/lib/x86_64-linux-gnu",
+    "MALLOC_ARENA_MAX": null,
+    "MALLOC_MMAP_THRESHOLD_": null,
+    "MallocNanoZone": null,
+    "MallocScribble": null,
+    "MallocStackLogging": null,
+    "SDKROOT": null,
+    "SWIFTPM_MODULECACHE_OVERRIDE": "/tmp/operation-work-lifetime-linux-final-810bd/module-cache",
+    "SWIFT_BACKTRACE": null,
+    "SWIFT_DETERMINISTIC_HASHING": null,
+    "SWIFT_STDLIB_SINGLE_THREADED_CONCURRENCY": null
+  },
+  "fragments": {
+    "baseline": {
+      "deadline_admission_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "fence_sha256": "ba7f42b6780031e626f1d9fed3b60442232d59d923b18439c40bdb1ebd128984",
+      "generated_shell_sha256": "79bc71596a95a1b08763709e5812eb6ed74b7c9841dc84d08299e3c6d991c1c9",
+      "methods": {
+        "    private func beginOperation(": "ed5f2cfbff909e221825404944f12aea4488696c875a7b60dd4a2e2d11e02276",
+        "    private func cancelOperation(kind:": "dbee12d3470592823d86de5098821b5864236ae78a2087204ff3532a6fabf955",
+        "    private func cancelOperationWork(": "694c50a9ed14d9cd1804b8d4cedae44b226c6e587b1e539d2393fb0ba69739e2",
+        "    private func correlateOperation(": "8b0b2bd1fae7efaa2cafbd8ec601084b61cff157007d81b65c0830c23c7923ec",
+        "    private func finishOperation(\n        effectID:": "c4fe92424e905f044d55d053ec6f52e57d967bcd5d495c4efc9463e280743843",
+        "    private func finishWhenPresentationFlushCompletes(": "743d61bbe25006034e0b545e63d4348cf53a35bec4a7e80bb4c38640c30b7793"
+      }
+    },
+    "candidate": {
+      "deadline_admission_sha256": "29cca0cb955b81100fc9669fd18fa99bd53c3d2b0cf4921ef7bea8db80976b78",
+      "fence_sha256": "ba7f42b6780031e626f1d9fed3b60442232d59d923b18439c40bdb1ebd128984",
+      "generated_shell_sha256": "36bc7382b8c48fac90d826f5156295d96f75d95b79d36f1fb0348b0840ae5b41",
+      "methods": {
+        "    private func beginOperation(": "97c1ab5827ed15f5eefd94ca4d9043e629e65513b47af4d412e6be6c9e7637ae",
+        "    private func cancelOperation(kind:": "dbee12d3470592823d86de5098821b5864236ae78a2087204ff3532a6fabf955",
+        "    private func cancelOperationWork(": "694c50a9ed14d9cd1804b8d4cedae44b226c6e587b1e539d2393fb0ba69739e2",
+        "    private func correlateOperation(": "8b0b2bd1fae7efaa2cafbd8ec601084b61cff157007d81b65c0830c23c7923ec",
+        "    private func finishOperation(\n        effectID:": "9e11e41f948b6c99ca8951a31f3329f57fef4d7de8da7b7267f9dad04eba18ef",
+        "    private func finishWhenPresentationFlushCompletes(": "c40e4f0b4dc12573ad770e24d65e9c3fdfda5eddcce171a0e23bf38981545a94"
+      }
+    }
+  },
+  "harness": {
+    "CWorkHeap/heap.c": "87476c1df75ffa014a4f224ce368d5f45f6a9515f805ecaf1c98a44be43d93c8",
+    "CWorkHeap/include/CWorkHeap.h": "e85f2ca8575f415fc01de62bb88b3f7186ad5ad145d9a26875f0baeaf4e45ba0",
+    "Harness.swift": "41e97d46be4e6d36afbe8f9842cd3f6e17387425de01258f87de78a618cb3366",
+    "RuntimeShell.swift.template": "61bd7013f9971caf7eb1c2d9fc021e535f3b66f51e70a7913b4aac9257dca4e1",
+    "run.py": "2211c42caa0d29a506d61d40fb99583406a049f5320c1bfb664fb8c44d1c0912"
+  },
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "libc": [
+      "glibc",
+      "2.39"
+    ],
+    "logical_cpu_count": 9
+  },
+  "machine": "x86_64",
+  "ownership": "No external Task collection. Await all callback-capture probes' deinitialization then 5ms quiet period; sample live heap with runtime registry alive, then clear research registry and sample again.",
+  "pairs": 6,
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "scenarios": [
+    "supersede",
+    "complete",
+    "cancel",
+    "physicalStop"
+  ],
+  "scope": "Exact begin/correlate/finish(effectID)/cancel(kind)/cancelWork/flush-poller bodies and complete ledger/core types. Explicit adapters: presentation Boolean, bounded terminal receipts, physical-stop latch and timer registration using exact admission prefix. No native renderer/session, app footprint or throughput claim.",
+  "sources": {
+    "baseline:Sources/IlliquidCore/Player/MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+    "baseline:Sources/IlliquidNativePlayback/Presentation/NativePresentationCoordinator.swift": "678f42ef79769f30989a81d4df6468c6d92f8865a164d2a513d9a55adfc408db",
+    "baseline:Sources/IlliquidNativePlayback/Production/NativeOperationTransaction.swift": "acd85af0b9afd20eee68aac12c84defe081775c78ef69ce6ae36d34c4a6120b8",
+    "baseline:Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift": "ea63bd635e54ec6360a9054ad32c3f3e9c079c20ec67827e031cf8525c8d75e2",
+    "baseline:Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift": "bdcf2f3a283de51150cf03f1b982dd9b3f7861acdb90a470947f84d6f8cda339",
+    "baseline:Sources/IlliquidPlaybackCore/EventsAndEffects.swift": "f17fb90da6f1c907aa2bfc0e87c3a12606385abd07a96608452fa2c7b027218b",
+    "baseline:Sources/IlliquidPlaybackCore/IdentityAndTime.swift": "c1c1ee83d7cfbfb909e30fccba6d239ddc412a9f1138015b431b7cda3df723bb",
+    "baseline:Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift": "da35a412ca1a6919c9aa73a1c2eb06e7296ffa4643e27a9506b9294976ffffc4",
+    "baseline:Sources/IlliquidPlaybackCore/PlaybackCore.swift": "59faf4ba801d6d1e2d937302a19b45aa7c15eec263aebef987521a879d930fa0",
+    "baseline:Sources/IlliquidPlaybackCore/PlaybackCoreState.swift": "4832bd64d67568c5ebdc641dc67c64d1f681ba07a7902887fa8ee81e04d1b59f",
+    "baseline:Sources/IlliquidPlaybackCore/PlaybackInvariants.swift": "d25bb7de8f1871781bc8ee035a4b58dc00446f2dfe7491799a8315822a3c173e",
+    "baseline:Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift": "54a12cac94e739f0ca681b262283c125b3df291be0e3f1a7d1e0eb1b496d2ffb",
+    "baseline:Sources/IlliquidPlaybackCore/PlaybackReplay.swift": "a5a94109b548bf12148b3e49b93570fbf2b63efffd97ef56d8deb6ee997279e3",
+    "baseline:Sources/IlliquidPlaybackCore/RecoveryCore.swift": "569ceffa207ba7dfdbd10f07d7f6ffc4d44fef37eefef2315959dcbb56b80f9a",
+    "baseline:Sources/IlliquidPlaybackCore/SeekCore.swift": "08e138ead38382839cb27a2a923247ec2716a2ea8b036bc8045df38feb78eb4b",
+    "baseline:Sources/IlliquidPlaybackCore/SubtitleCore.swift": "87e13ceedada39f64dd80c40b98040b9102db55bbe59784ec01b2111db12311b",
+    "baseline:Sources/IlliquidPlaybackCore/SynchronizationCore.swift": "9337d8cc2936e9155a61d8fdd0dd4d2e2c9312ede2f9047c2d9bd83629459e20",
+    "baseline:Sources/IlliquidPlaybackCore/TrackSelectionCore.swift": "18f1e2274b9d6eb9e78a8916913f2bd538896363437089e16a3f81f49cf92f8d",
+    "candidate:Sources/IlliquidCore/Player/MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+    "candidate:Sources/IlliquidNativePlayback/Presentation/NativePresentationCoordinator.swift": "678f42ef79769f30989a81d4df6468c6d92f8865a164d2a513d9a55adfc408db",
+    "candidate:Sources/IlliquidNativePlayback/Production/NativeOperationTransaction.swift": "acd85af0b9afd20eee68aac12c84defe081775c78ef69ce6ae36d34c4a6120b8",
+    "candidate:Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift": "7477ad521faedf4830f858f65b741832effc7f2513e72c67013a4d228e1b5eca",
+    "candidate:Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift": "bdcf2f3a283de51150cf03f1b982dd9b3f7861acdb90a470947f84d6f8cda339",
+    "candidate:Sources/IlliquidPlaybackCore/EventsAndEffects.swift": "f17fb90da6f1c907aa2bfc0e87c3a12606385abd07a96608452fa2c7b027218b",
+    "candidate:Sources/IlliquidPlaybackCore/IdentityAndTime.swift": "c1c1ee83d7cfbfb909e30fccba6d239ddc412a9f1138015b431b7cda3df723bb",
+    "candidate:Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift": "da35a412ca1a6919c9aa73a1c2eb06e7296ffa4643e27a9506b9294976ffffc4",
+    "candidate:Sources/IlliquidPlaybackCore/PlaybackCore.swift": "59faf4ba801d6d1e2d937302a19b45aa7c15eec263aebef987521a879d930fa0",
+    "candidate:Sources/IlliquidPlaybackCore/PlaybackCoreState.swift": "4832bd64d67568c5ebdc641dc67c64d1f681ba07a7902887fa8ee81e04d1b59f",
+    "candidate:Sources/IlliquidPlaybackCore/PlaybackInvariants.swift": "d25bb7de8f1871781bc8ee035a4b58dc00446f2dfe7491799a8315822a3c173e",
+    "candidate:Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift": "54a12cac94e739f0ca681b262283c125b3df291be0e3f1a7d1e0eb1b496d2ffb",
+    "candidate:Sources/IlliquidPlaybackCore/PlaybackReplay.swift": "a5a94109b548bf12148b3e49b93570fbf2b63efffd97ef56d8deb6ee997279e3",
+    "candidate:Sources/IlliquidPlaybackCore/RecoveryCore.swift": "569ceffa207ba7dfdbd10f07d7f6ffc4d44fef37eefef2315959dcbb56b80f9a",
+    "candidate:Sources/IlliquidPlaybackCore/SeekCore.swift": "08e138ead38382839cb27a2a923247ec2716a2ea8b036bc8045df38feb78eb4b",
+    "candidate:Sources/IlliquidPlaybackCore/SubtitleCore.swift": "87e13ceedada39f64dd80c40b98040b9102db55bbe59784ec01b2111db12311b",
+    "candidate:Sources/IlliquidPlaybackCore/SynchronizationCore.swift": "9337d8cc2936e9155a61d8fdd0dd4d2e2c9312ede2f9047c2d9bd83629459e20",
+    "candidate:Sources/IlliquidPlaybackCore/TrackSelectionCore.swift": "18f1e2274b9d6eb9e78a8916913f2bd538896363437089e16a3f81f49cf92f8d"
+  },
+  "tests_only": false,
+  "toolchain": {
+    "executables": {
+      "clang": {
+        "path": "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/clang",
+        "resolved_path": "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/clang-21",
+        "sha256": "2dcad253dc4f4cd1cb80cff9f809baf4a83cbf96239ba6c8fe1f1218aabeed8e"
+      },
+      "swift": {
+        "path": "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+        "resolved_path": "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift-driver",
+        "sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de"
+      },
+      "swift-frontend": {
+        "path": "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift-frontend",
+        "resolved_path": "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift-frontend",
+        "sha256": "81a8f92138bb9b2544abb5446eeb554fc37c5b5bf9bef2569f70232578ec15b6"
+      },
+      "swiftc": {
+        "path": "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+        "resolved_path": "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift-driver",
+        "sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de"
+      }
+    },
+    "target_info": {
+      "compilerVersion": "Swift version 6.3.2 (swift-6.3.2-RELEASE)",
+      "paths": {
+        "runtimeLibraryImportPaths": [
+          "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/linux",
+          "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/linux/x86_64"
+        ],
+        "runtimeLibraryPaths": [
+          "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift/linux"
+        ],
+        "runtimeResourcePath": "/tmp/illiquid-presence-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/lib/swift"
+      },
+      "swiftCompilerTag": "swift-6.3.2-RELEASE",
+      "target": {
+        "arch": "x86_64",
+        "compatibilityLibraries": [],
+        "librariesRequireRPath": false,
+        "moduleTriple": "x86_64-unknown-linux-gnu",
+        "openbsdBTCFIEnabled": false,
+        "platform": "linux",
+        "pointerWidthInBits": 64,
+        "pointerWidthInBytes": 8,
+        "triple": "x86_64-unknown-linux-gnu",
+        "unversionedTriple": "x86_64-unknown-linux-gnu"
+      }
+    }
+  },
+  "worktree_status": " M Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift\n M Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift\n?? .github/workflows/native-operation-work-lifetime.yml\n?? Benchmarks/NativeOperationWorkLifetime/\n?? DependencySources/archives/.openssl-3-3.6.3-build-source.tar.xz.GkofNl\n?? Tests/IlliquidAppTests/SourceMediaPresenceSnapshotTests.swift\n?? Tests/IlliquidNativePlaybackTests/NativeOperationWorkLifetimeTests.swift\n"
+}

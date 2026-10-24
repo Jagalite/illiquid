@@ -32,6 +32,11 @@ MARKERS = [
 ]
 
 def digest(data): return hashlib.sha256(data).hexdigest()
+def file_digest(path):
+    value = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""): value.update(block)
+    return value.hexdigest()
 def save(path, value): path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 def declaration(source, marker):
     if source.count(marker) != 1: raise ValueError(f"Nonunique declaration: {marker}")
@@ -78,11 +83,43 @@ def main():
         "compiler": command([args.swift, "--version"]).strip(), "platform": platform.platform(),
         "machine": platform.machine(), "pairs": args.pairs, "cycles": cycles,
         "scenarios": list(SCENARIOS), "tests_only": args.tests_only,
-        "sources": {}, "fragments": {}, "binaries": {},
+        "sources": {}, "fragments": {}, "binaries": {}, "compiled_inputs": {}, "build_commands": {},
         "scope": "Exact begin/correlate/finish(effectID)/cancel(kind)/cancelWork/flush-poller bodies and complete ledger/core types. Explicit adapters: presentation Boolean, bounded terminal receipts, physical-stop latch and timer registration using exact admission prefix. No native renderer/session, app footprint or throughput claim.",
         "ownership": "No external Task collection. Await all callback-capture probes' deinitialization then 5ms quiet period; sample live heap with runtime registry alive, then clear research registry and sample again.",
         "harness": {str(p.relative_to(HERE)): digest(p.read_bytes()) for p in HERE.rglob("*")
                     if p.is_file() and p.suffix in (".py", ".swift", ".template", ".c", ".h")}}
+    compiler = Path(shutil.which(args.swift) or args.swift).absolute()
+    tool_hashes, compiler_tools = {}, {}
+    for name, path in [("swift", compiler), ("swiftc", compiler.with_name("swiftc")),
+                       ("swift-frontend", compiler.with_name("swift-frontend")),
+                       ("clang", compiler.with_name("clang"))]:
+        if not path.is_file(): continue
+        resolved = path.resolve()
+        if resolved not in tool_hashes: tool_hashes[resolved] = file_digest(resolved)
+        compiler_tools[name] = {"path": str(path), "resolved_path": str(resolved),
+                                "sha256": tool_hashes[resolved]}
+    manifest["toolchain"] = {"executables": compiler_tools,
+        "target_info": json.loads(command([args.swift, "-print-target-info"]))}
+    manifest["environment"] = {key: env.get(key) for key in (
+        "LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "DEVELOPER_DIR", "SDKROOT",
+        "SWIFT_DETERMINISTIC_HASHING", "SWIFT_BACKTRACE", "SWIFT_STDLIB_SINGLE_THREADED_CONCURRENCY",
+        "MALLOC_ARENA_MAX", "MALLOC_MMAP_THRESHOLD_", "GLIBC_TUNABLES", "MallocNanoZone",
+        "MallocScribble", "MallocStackLogging", "SWIFTPM_MODULECACHE_OVERRIDE", "CLANG_MODULE_CACHE_PATH")}
+    host = {"logical_cpu_count": os.cpu_count(), "libc": platform.libc_ver()}
+    if hasattr(os, "sched_getaffinity"): host["cpu_affinity"] = sorted(os.sched_getaffinity(0))
+    if platform.system() == "Darwin":
+        host.update(os_version=command(["sw_vers"]).strip(),
+                    cpu=command(["sysctl", "-n", "machdep.cpu.brand_string"]).strip(),
+                    sdk_path=command(["xcrun", "--sdk", "macosx", "--show-sdk-path"]).strip(),
+                    sdk_version=command(["xcrun", "--sdk", "macosx", "--show-sdk-version"]).strip())
+    elif Path("/proc/cpuinfo").is_file():
+        host["cpu"] = next((line.partition(":")[2].strip() for line in Path("/proc/cpuinfo").read_text().splitlines()
+                            if line.startswith("model name")), "unknown")
+    manifest["host"] = host
+    harness_inputs = {relative: (HERE / relative).read_bytes() for relative in manifest["harness"]}
+    for relative, data in harness_inputs.items():
+        target = output / "harness" / relative
+        target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(data)
     def source(variant, relative):
         data = command(["git", "show", f"{BASELINE}:{relative}"]).encode() if variant == "baseline" else (ROOT / relative).read_bytes()
         target = output / "sources" / variant / relative
@@ -103,11 +140,11 @@ def main():
         deadline = declaration(original, "    private func scheduleOperationDeadline(")
         admission = deadline[deadline.index("{") + 1:deadline.index("        cancelOperationDeadline(effectID:")]
         fence = declaration(source(variant, PRESENTATION).decode(), "struct PresentationFence:")
-        shell = (HERE / "RuntimeShell.swift.template").read_text().replace("%%PRODUCTION_METHODS%%", "\n\n".join(methods))
+        shell = harness_inputs["RuntimeShell.swift.template"].decode().replace("%%PRODUCTION_METHODS%%", "\n\n".join(methods))
         shell = shell.replace("%%DEADLINE_ADMISSION%%", admission).replace("%%PRESENTATION_FENCE%%", fence)
         (executable / "RuntimeShell.swift").write_text(shell)
-        (executable / "Harness.swift").write_bytes((HERE / "Harness.swift").read_bytes())
-        shutil.copytree(HERE / "CWorkHeap", package / "Sources/CWorkHeap")
+        (executable / "Harness.swift").write_bytes(harness_inputs["Harness.swift"])
+        shutil.copytree(output / "harness/CWorkHeap", package / "Sources/CWorkHeap")
         manifest["fragments"][variant] = {
             "methods": {marker: digest(body.encode()) for marker, body in zip(MARKERS, methods)},
             "deadline_admission_sha256": digest(admission.encode()), "fence_sha256": digest(fence.encode()),
@@ -124,6 +161,10 @@ def main():
                  "--cache-path", output / "cache", "--config-path", output / "config",
                  "--security-path", output / "security", "-Xswiftc", "-warnings-as-errors"]
         if platform.system() == "Linux": build.append("--use-integrated-swift-driver")
+        manifest["compiled_inputs"][variant] = {
+            str(path.relative_to(package)): file_digest(path) for path in package.rglob("*")
+            if path.is_file() and path.suffix in (".swift", ".c", ".h")}
+        manifest["build_commands"][variant] = [str(arg) for arg in [*build, "--product", "OperationWorkBenchmark"]]
         save(output / "manifest.json", manifest)
         print(f"Build {variant}", flush=True)
         command([*build, "--product", "OperationWorkBenchmark"], log=f"{variant}-build.log")
@@ -132,6 +173,8 @@ def main():
     for relative in ["Sources/IlliquidCore/Player/MediaTrack.swift", *core_paths, LEDGER]:
         if manifest["sources"][f"baseline:{relative}"] != manifest["sources"][f"candidate:{relative}"]:
             raise ValueError(f"Unrelated support changed: {relative}")
+    if manifest["fragments"]["baseline"]["fence_sha256"] != manifest["fragments"]["candidate"]["fence_sha256"]:
+        raise ValueError("Unrelated PresentationFence declaration changed")
     checks = {variant: json.loads(command([binary, "verify"], log=f"{variant}-qualification.log")) for variant, binary in binaries.items()}
     save(output / "qualification.json", checks)
     observations = []
@@ -168,6 +211,9 @@ def main():
         variant, relative = key.split(":", 1)
         if variant == "candidate" and digest((ROOT / relative).read_bytes()) != expected:
             raise ValueError(f"Measured source changed: {relative}")
+    for relative, expected in manifest["harness"].items():
+        if digest((HERE / relative).read_bytes()) != expected:
+            raise ValueError(f"Benchmark input changed: {relative}")
     summary = {"status": "complete", "observations": len(observations), "pairs": args.pairs,
         "qualification_scenarios_per_variant": len(checks["candidate"]), "results": summaries,
         "limits": "Allocator deltas include Swift runtime/task scheduler allocations; completed Task handles do not establish retained media payload. Synthetic scheduling times are not player throughput. Native renderer/resource behavior requires native tests."}
