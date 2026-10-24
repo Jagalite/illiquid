@@ -1,0 +1,98 @@
+name: State-space key storage memory
+
+on:
+  push:
+    branches: ['perf/state-space-key-storage-0fa33058']
+    paths:
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Sources/IlliquidPlaybackStateSpace/**'
+      - 'Tests/IlliquidPlaybackCoreTests/**'
+      - 'Tests/IlliquidPlaybackStateSpaceTests/**'
+      - 'Scripts/test-state-space-key-storage.py'
+      - 'Benchmarks/StateSpaceKeyStorage/**'
+      - '.github/workflows/state-space-key-storage.yml'
+      - '!Benchmarks/StateSpaceKeyStorage/*.md'
+      - '!Benchmarks/StateSpaceKeyStorage/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlaybackStateSpace/**'
+      - 'Tests/IlliquidPlaybackStateSpaceTests/**'
+      - 'Scripts/test-state-space-key-storage.py'
+      - 'Benchmarks/StateSpaceKeyStorage/**'
+      - '.github/workflows/state-space-key-storage.yml'
+      - '!Benchmarks/StateSpaceKeyStorage/*.md'
+      - '!Benchmarks/StateSpaceKeyStorage/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: state-space-key-storage-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-qualification:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Explain isolated build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Unexpected shared queue on the hosted runner; use Kyoto before building.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this isolated hosted runner; builds run serially in separate scratch paths.'
+      - name: Test production core and explorer in debug and release
+        run: |
+          python3 Scripts/test-state-space-key-storage.py \
+            --output "$RUNNER_TEMP/state-space-key-tests-debug" --configuration debug
+          python3 Scripts/test-state-space-key-storage.py \
+            --output "$RUNNER_TEMP/state-space-key-tests-release" --configuration release
+      - name: Compare exact production searches in fresh processes
+        run: |
+          python3 Benchmarks/StateSpaceKeyStorage/run.py \
+            --output "$RUNNER_TEMP/state-space-key-memory" --pairs 6
+      - name: Emit evidence and provenance
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP'])
+          files = {}
+          for directory in ('state-space-key-tests-debug', 'state-space-key-tests-release', 'state-space-key-memory'):
+              path = root / directory
+              for source in sorted(path.glob('*')):
+                  if source.is_file() and source.suffix in ('.json', '.jsonl', '.log'):
+                      files[str(source.relative_to(root))] = source.read_text()
+          for name, contents in files.items():
+              if name.endswith('/summary.json'):
+                  print(f'::group::{name}')
+                  print(contents)
+                  print('::endgroup::')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log bundle limit; use the artifact')
+          print('STATE_SPACE_KEY_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('STATE_SPACE_KEY_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: state-space-key-storage-native
+          path: |
+            ${{ runner.temp }}/state-space-key-tests-*/*.json
+            ${{ runner.temp }}/state-space-key-tests-*/*.log
+            ${{ runner.temp }}/state-space-key-memory/*.json
+            ${{ runner.temp }}/state-space-key-memory/*.jsonl
+            ${{ runner.temp }}/state-space-key-memory/*.log
+            ${{ runner.temp }}/state-space-key-memory/control-receipts/*.gz
+          retention-days: 14

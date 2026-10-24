@@ -23,9 +23,9 @@ public struct PlaybackStateSpaceExplorer: Sendable {
     let definition = PlaybackSearchModelDefinition(model: model)
     let seed = try definition.makeSeed(profile: seedProfile)
     var nodes = [seed]
-    var keys = [PlaybackSearchCanonicalizer.key(for: seed)]
+    let seedKey = PlaybackSearchCanonicalizer.key(for: seed)
     var predecessors: [PlaybackSearchPredecessor?] = [nil]
-    var visited: [PlaybackSearchStateKey: Int] = [keys[0]: 0]
+    var visited: [PlaybackSearchStateKey: Int] = [seedKey: 0]
     var graph = PlaybackSearchGraph()
     var failures: [PlaybackSearchFailure] = []
     var currentFrontier = [0]
@@ -101,7 +101,6 @@ public struct PlaybackStateSpaceExplorer: Sendable {
             successorIndex = nodes.count
             visited[successorKey] = successorIndex
             nodes.append(applied.node)
-            keys.append(successorKey)
             predecessors.append(PlaybackSearchPredecessor(nodeIndex: nodeIndex, action: action))
             nextFrontier.append(successorIndex)
           }
@@ -132,7 +131,9 @@ public struct PlaybackStateSpaceExplorer: Sendable {
       )
     }
 
-    let canonicalDigest = digest(keys: keys)
+    // The visited table already owns each unique key. Digest that collection
+    // directly instead of retaining a second, large value copy for every state.
+    let canonicalDigest = digest(keys: visited.keys)
     let summary = PlaybackSearchSummary(
       model: model, modelVersion: definition.modelVersion,
       seedProfile: seedProfile, configuration: configuration,
@@ -577,7 +578,7 @@ func synchronizeEnvironment(node: inout PlaybackSearchNode, transition: Playback
   }
 }
 
-func digest(keys: [PlaybackSearchStateKey]) -> String {
+func digest<Keys: Sequence>(keys: Keys) -> String where Keys.Element == PlaybackSearchStateKey {
   var hash: UInt64 = 14_695_981_039_346_656_037
   for digest in keys.map(PlaybackSearchCanonicalizer.digest).sorted() {
     for byte in digest.utf8 {

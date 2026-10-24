@@ -108,6 +108,30 @@ struct PlaybackStateSpaceTests {
   }
 
   @Test
+  func aggregateDigestIsIndependentOfKeyCollectionAndEnumerationOrder() throws {
+    let keys = try PlaybackSearchModel.allCases.map { model in
+      let definition = PlaybackSearchModelDefinition(model: model)
+      let profile = try #require(definition.inventory.seedProfiles.first)
+      return PlaybackSearchCanonicalizer.key(for: try definition.makeSeed(profile: profile))
+    }
+    #expect(Set(keys).count == keys.count)
+    let expected = digest(keys: keys)
+
+    for offset in keys.indices {
+      let reordered = Array(keys[offset...]) + Array(keys[..<offset])
+      let visited = Dictionary(
+        uniqueKeysWithValues: reordered.enumerated().map { ($0.element, $0.offset) }
+      )
+      #expect(digest(keys: reordered) == expected)
+      #expect(digest(keys: reordered.reversed()) == expected)
+      #expect(digest(keys: visited.keys) == expected)
+    }
+
+    // Generalizing traversal must not deduplicate repeated digest values.
+    #expect(digest(keys: keys + [keys[0]]) != expected)
+  }
+
+  @Test
   func equalKeysExposeEqualNormalizedEnabledActions() {
     let first = makeNode(session: 4, operation: 9, effect: 12)
     let renamed = makeNode(session: 44, operation: 90, effect: 120)
@@ -249,6 +273,74 @@ struct PlaybackStateSpaceTests {
   }
 
   @Test
+  func canonicalDigestIncludesSeedWhenExplorationEndsBeforeAdmittingASuccessor() throws {
+    let seed = try PlaybackSearchModelDefinition(model: .seek).makeSeed(profile: "ready-playing")
+    let seedKey = PlaybackSearchCanonicalizer.key(for: seed)
+    let expectedDigest = digest(keys: [seedKey])
+    #expect(expectedDigest == "fnv1a64:8b10594aca4bd4b9")
+    let cases: [
+      (depth: Int, stateCap: Int, edgeCap: Int, seconds: Double?, termination: PlaybackSearchTermination)
+    ] = [
+      (0, 100, 100, nil, .completeWithinBounds),
+      (3, 1, 100, nil, .stateCapReached),
+      (3, 100, 0, nil, .edgeCapReached),
+      (3, 100, 100, 0, .timeBudgetReached),
+    ]
+
+    for boundary in cases {
+      let configuration = PlaybackSearchConfiguration(
+        profile: "seed-digest", depthLimit: boundary.depth, generationLimit: 1,
+        pendingEffectLimit: 3, lateResultLimit: 1, failureLimit: 1,
+        duplicateLimit: 1, interruptLimit: 1, stateLimit: boundary.stateCap,
+        edgeLimit: boundary.edgeCap, porMode: .disabled, timeLimitSeconds: boundary.seconds
+      )
+      let result = try PlaybackStateSpaceExplorer().run(
+        model: .seek, seedProfile: "ready-playing", configuration: configuration
+      )
+
+      #expect(result.summary.termination == boundary.termination)
+      #expect(result.summary.stateCount == 1)
+      #expect(result.nodes.map { PlaybackSearchCanonicalizer.key(for: $0) } == [seedKey])
+      #expect(result.summary.canonicalDigest == expectedDigest)
+    }
+  }
+
+  @Test
+  func canonicalDigestPreservesBaselineForCompletedAndCappedSearches() throws {
+    // Seek model 10 snapshots from the array-backed explorer at 4abf4b4.
+    // Storage changes must preserve the persisted digest, including partial searches.
+    let cases: [
+      (depth: Int, stateCap: Int, edgeCap: Int, termination: PlaybackSearchTermination,
+       states: Int, edges: Int, digest: String)
+    ] = [
+      (3, 17, 1_000, .stateCapReached, 17, 23, "fnv1a64:6f12ac590d116976"),
+      (3, 100, 24, .edgeCapReached, 18, 24, "fnv1a64:ff9cdc2cfb1301b8"),
+      (2, 10_000, 100_000, .completeWithinBounds, 45, 70, "fnv1a64:95dfaf7860c2ba16"),
+    ]
+
+    for fixture in cases {
+      let configuration = PlaybackSearchConfiguration(
+        profile: "digest-baseline", depthLimit: fixture.depth, generationLimit: 1,
+        pendingEffectLimit: 3, lateResultLimit: 1, failureLimit: 1,
+        duplicateLimit: 1, interruptLimit: 1, stateLimit: fixture.stateCap,
+        edgeLimit: fixture.edgeCap, porMode: .disabled
+      )
+      let result = try PlaybackStateSpaceExplorer().run(
+        model: .seek, seedProfile: "ready-playing", configuration: configuration
+      )
+      let keys = result.nodes.map { PlaybackSearchCanonicalizer.key(for: $0) }
+
+      #expect(result.summary.modelVersion == 10)
+      #expect(result.summary.termination == fixture.termination)
+      #expect(result.summary.stateCount == fixture.states)
+      #expect(result.summary.edgeCount == fixture.edges)
+      #expect(Set(keys).count == fixture.states)
+      #expect(result.summary.canonicalDigest == fixture.digest)
+      #expect(result.summary.canonicalDigest == digest(keys: keys))
+    }
+  }
+
+  @Test
   func recoveryMechanismLifecycleParticipatesInStableCanonicalDigest() throws {
     let definition = PlaybackSearchModelDefinition(model: .recovery)
     let hardware = try definition.makeSeed(profile: "playing-hardware")
@@ -352,6 +444,10 @@ struct PlaybackStateSpaceTests {
       )
       #expect(result.summary.termination == .completeWithinBounds)
       #expect(result.failures.isEmpty, Comment(rawValue: model.rawValue))
+      let keys = result.nodes.map { PlaybackSearchCanonicalizer.key(for: $0) }
+      #expect(Set(keys).count == keys.count)
+      #expect(keys.count == result.summary.stateCount)
+      #expect(result.summary.canonicalDigest == digest(keys: keys))
     }
   }
 
