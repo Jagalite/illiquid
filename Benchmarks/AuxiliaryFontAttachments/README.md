@@ -1,5 +1,17 @@
 # Font copies in auxiliary media inputs
 
+## Qualification outcome
+
+The native experiment reduces live malloc ownership but increases retained
+resident memory and physical footprint in all 36 paired comparisons involving
+16/64 MiB font fixtures. Opening-time results are mixed. Debug and release
+regression checks pass. This candidate is retained for research; a production
+memory-performance PR is withheld. See the
+[complete findings](../../Documentation/AUXILIARY_FONT_ATTACHMENT_MEMORY.md)
+and [archived evidence](evidence/native-20261024).
+
+## Candidate
+
 Illiquid's primary input supplies embedded fonts to the main and Picture in
 Picture subtitle pipelines. Before this change, every additional demuxer also
 copied supported font attachments into Swift `Data`, even when the reader used
@@ -39,6 +51,9 @@ ILLIQUID_AUXILIARY_FONT_FIXTURES=/tmp/auxiliary-font-fixtures \
 Use new or empty fixture and results directories. The benchmark accepts
 `--ffmpeg-prefix` and `--swiftc` for explicit native toolchain selection. It
 requires macOS; syntax checks on Linux are not native execution evidence.
+When the repository's shared Kyoto queue is available, submit the benchmark
+and Swift test commands through that queue as described in `AGENTS.md`. The
+hosted workflow uses an isolated runner and executes its builds sequentially.
 
 ## Workloads and controls
 
@@ -47,7 +62,9 @@ inventories: no attachments, 2 MiB of fonts, 16 MiB of fonts, 64 MiB of fonts,
 unsupported attachments only, and mixed font/non-font attachments. Large font
 payloads are dense deterministic bytes labeled as supported fonts. They test
 copying and ownership, not font parsing or visual subtitle quality. The 64 MiB
-case is an upper-bound stress case, split into individually admitted font sizes.
+stress case matches the aggregate font budget for successful subtitle-pipeline
+configuration, split into individually admitted font sizes. That budget does
+not bound raw demuxer allocations before subtitle validation.
 
 Nineteen scenarios exercise the complete production demuxer and executor:
 
@@ -91,9 +108,11 @@ serialization, payload hashing and packet validation. Metrics are:
   it is not the metric used to claim live retained-memory savings.
 - **Open wall and process CPU time:** opening/probing the designated inputs.
 
-The after-release observation supports lifetime inspection. Small JSON receipts
-remain alive at that point, and allocators may retain freed pages, so it is not
-expected to equal the pre-open sample or prove immediate RSS reclamation.
+The after-release observation supports lifetime inspection. It follows
+variant-dependent attachment hashing and receipt construction; baseline inputs
+have more font payloads to hash. Small JSON receipts remain alive, and allocators
+may retain freed pages. This is not an isolated production teardown comparison
+and must not be used to claim post-close memory savings.
 
 Summary values are medians per variant and medians of paired reductions
 `baseline - candidate` (or `100 * (1 - candidate / baseline)`). A median paired
