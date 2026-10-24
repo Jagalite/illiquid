@@ -6,6 +6,9 @@ retains exactly the same historical keys; its values also identify the latest
 checkout. The candidate derives distinct identity count and reuse detection
 from that one dictionary without changing release or flush semantics.
 
+See the [research report](../../Documentation/PLANAR_HISTORY_MEMORY_PERFORMANCE.md)
+for production scope, the representation invariant, and measured results.
+
 ## Reproduce
 
 Run from a checkout containing the candidate and the pinned baseline commit:
@@ -49,7 +52,9 @@ statistics. Those statistics include glibc thread-cache residue, so small Linux
 deltas may not isolate live storage. Inspect the destruction checkpoint; native
 results qualify the memory claim. Peak RSS includes fixtures and is auxiliary.
 
-Uninstrumented lifecycle timing uses the existing `PlanarOwnership` harness
+Lifecycle timing uses the existing `PlanarOwnership` harness without its
+allocation meter or per-step trace recording; production signposts remain.
+It runs
 with pipeline and mixed-ownership workloads at 1, 16, and 32 live owners.
 Summary percentages are medians of paired changes, with all pairs and ranges
 retained. These measurements do not establish whole-player RAM, frame-rate,
