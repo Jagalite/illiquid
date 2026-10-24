@@ -4,6 +4,8 @@
 Requires macOS, Swift 6.1+, and an installed FFmpeg prefix. No dependencies or
 fixtures are downloaded. Every timed observation is a new process; no samples
 are removed. The output directory retains source, commands, receipts, and data.
+The historical baseline remains the default; pass --baseline for a later
+comparison whose unrelated production dependencies match the candidate.
 """
 from __future__ import annotations
 
@@ -26,13 +28,14 @@ HERE = Path(__file__).resolve().parent
 BASELINE = "7f9ba073394b77a908e0589447c6edc8d10b832c"
 DEMUXER = "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift"
 FONT = "Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift"
+INPUT_EXECUTOR = "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"
 FULL_SOURCES = [
     DEMUXER, FONT,
     "Sources/IlliquidNativePlayback/Media/FFmpegStreamInfo.swift",
     "Sources/IlliquidNativePlayback/Media/MediaTime.swift",
     "Sources/IlliquidNativePlayback/Media/FFmpegError.swift",
     "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
-    "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift",
+    INPUT_EXECUTOR,
     "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
     "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
 ]
@@ -87,6 +90,10 @@ class Runner:
         self.measurements = []
         self.exes = {}
         self.env = os.environ.copy()
+        self.baseline = self.command([
+            "git", "rev-parse", "--verify", "--end-of-options",
+            f"{args.baseline}^{{commit}}",
+        ]).strip()
         self.prefix = args.ffmpeg_prefix.resolve(strict=True)
         # Keep the swiftc executable name: resolving its swift-driver symlink
         # changes argv[0], which the Swift driver uses to select compiler mode.
@@ -100,7 +107,7 @@ class Runner:
         self.fixtures = self.load_fixtures(args.fixtures.resolve(strict=True))
         self.record = {
             "started_utc": datetime.now(timezone.utc).isoformat(),
-            "baseline_revision": BASELINE,
+            "baseline_revision": self.baseline,
             "candidate_revision": self.command(["git", "rev-parse", "HEAD"]).strip(),
             "candidate_worktree_status": self.command(["git", "status", "--porcelain=v1"]),
             "platform": platform.platform(), "machine": platform.machine(),
@@ -109,7 +116,7 @@ class Runner:
             "sdk_path": self.sdk,
             "sdk_version": self.command(["xcrun", "--sdk", "macosx", "--show-sdk-version"]).strip(),
             "ffmpeg_prefix": str(self.prefix),
-            "protocol": vars(args) | {"baseline": BASELINE},
+            "protocol": vars(args) | {"baseline": self.baseline},
             "sources": self.sources, "binaries": {}, "native_libraries": {},
             "runner_sha256": file_sha(Path(__file__)),
             "harness_sha256": file_sha(HERE / "Harness.swift"),
@@ -168,7 +175,7 @@ class Runner:
 
     def source(self, variant: str, path: str) -> str:
         text = ((ROOT / path).read_text() if variant == "candidate" else
-                self.command(["git", "show", f"{BASELINE}:{path}"]))
+                self.command(["git", "show", f"{self.baseline}:{path}"]))
         destination = self.output / "sources" / variant / path
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(text)
@@ -179,7 +186,10 @@ class Runner:
         original = {variant: {path: self.source(variant, path)
                               for path in FULL_SOURCES + [PRESENTATION, BITMAP] + C_SOURCES}
                     for variant in VARIANTS}
-        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT}:
+        # Keep each executor paired with its revision's demuxer initializer.
+        # The harness still uses the default font policy and compares complete
+        # output receipts; unrelated shared Swift/C dependencies must match.
+        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT, INPUT_EXECUTOR}:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
         error = {v: extract(original[v][PRESENTATION], "struct PresentationError:", "\nfunc checkOSStatus(")
@@ -376,6 +386,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fixtures", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--baseline", default=BASELINE,
+                        help="Baseline commit or ref (default: original attachment admission experiment)")
     parser.add_argument("--ffmpeg-prefix", type=Path, default=Path("/opt/homebrew/opt/ffmpeg"))
     parser.add_argument("--swiftc")
     parser.add_argument("--pairs", type=int, default=6)

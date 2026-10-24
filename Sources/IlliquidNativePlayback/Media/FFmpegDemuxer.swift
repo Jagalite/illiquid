@@ -1,6 +1,14 @@
 import CFFmpeg
 import Foundation
 
+/// Controls Swift-owned font payload copies in the projected media information.
+/// Stream metadata and FFmpeg's original codec extradata remain available under
+/// either policy, including for independent packet and metadata readers.
+enum FFmpegAttachmentPolicy: Equatable, Sendable {
+    case supportedFonts
+    case none
+}
+
 enum FFmpegDemuxReadRetryDecision: Equatable {
     case retry
     case fail
@@ -49,7 +57,11 @@ final class FFmpegDemuxer {
     var bytesRead: Int64 { context?.pointee.pb?.pointee.bytes_read ?? 0 }
     let mediaInfo: FFmpegMediaInfo
 
-    init(url: URL, interruptState: AnyObject? = nil) throws {
+    init(
+        url: URL,
+        interruptState: AnyObject? = nil,
+        attachmentPolicy: FFmpegAttachmentPolicy = .supportedFonts
+    ) throws {
         guard url.isFileURL else {
             throw CocoaError(.fileReadUnsupportedScheme)
         }
@@ -82,7 +94,11 @@ final class FFmpegDemuxer {
                 operation: "Read stream metadata"
             )
             context = openedContext
-            mediaInfo = Self.makeMediaInfo(url: url, context: openedContext)
+            mediaInfo = Self.makeMediaInfo(
+                url: url,
+                context: openedContext,
+                attachmentPolicy: attachmentPolicy
+            )
         } catch {
             var temporary: UnsafeMutablePointer<AVFormatContext>? = openedContext
             avformat_close_input(&temporary)
@@ -326,7 +342,8 @@ final class FFmpegDemuxer {
 
     private static func makeMediaInfo(
         url: URL,
-        context: UnsafeMutablePointer<AVFormatContext>
+        context: UnsafeMutablePointer<AVFormatContext>,
+        attachmentPolicy: FFmpegAttachmentPolicy = .supportedFonts
     ) -> FFmpegMediaInfo {
         var streams: [FFmpegStreamInfo] = []
         var attachments: [FontAttachment] = []
@@ -409,7 +426,8 @@ final class FFmpegDemuxer {
             )
             streams.append(info)
 
-            if kind == .attachment,
+            if attachmentPolicy == .supportedFonts,
+               kind == .attachment,
                let data = parameters.pointee.extradata,
                parameters.pointee.extradata_size > 0
             {

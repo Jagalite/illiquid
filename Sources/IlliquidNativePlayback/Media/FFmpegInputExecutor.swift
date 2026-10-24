@@ -310,6 +310,7 @@ final class FFmpegInputExecutor: @unchecked Sendable {
 
     init(
         url: URL,
+        attachmentPolicy: FFmpegAttachmentPolicy = .supportedFonts,
         openTimeout: TimeInterval = 12,
         cancellationGrace: TimeInterval = 1,
         cancellationSignal: FFmpegInputCancellationSignal? = nil
@@ -343,7 +344,11 @@ final class FFmpegInputExecutor: @unchecked Sendable {
                 )
                 defer { openingInterruptState.end(token) }
                 return (
-                    try FFmpegDemuxer(url: url, interruptState: openingInterruptState),
+                    try FFmpegDemuxer(
+                        url: url,
+                        interruptState: openingInterruptState,
+                        attachmentPolicy: attachmentPolicy
+                    ),
                     Thread.isMainThread
                 )
             })

@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift'
       - 'Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift'
       - 'Tests/IlliquidNativePlaybackTests/FontAttachmentAdmissionTests.swift'
       - 'Benchmarks/AttachmentAdmission/**'
@@ -37,11 +38,17 @@ jobs:
       - name: Generate controlled Matroska attachments
         run: python3 Benchmarks/AttachmentAdmission/generate-fixtures.py --output "$RUNNER_TEMP/attachment-fixtures"
       - name: Compare exact production outputs and paired release measurements
+        env:
+          ATTACHMENT_BASELINE: ${{ github.event.pull_request.base.sha || github.sha }}
+          ATTACHMENT_PAIRS: ${{ github.event_name == 'pull_request' && '2' || '12' }}
+          ATTACHMENT_TARGET_MS: ${{ github.event_name == 'pull_request' && '20' || '250' }}
         run: |
           python3 Benchmarks/AttachmentAdmission/run.py \
+            --baseline "$ATTACHMENT_BASELINE" \
             --fixtures "$RUNNER_TEMP/attachment-fixtures" \
             --output "$RUNNER_TEMP/attachment-results" \
-            --pairs 12 --target-ms 250 --max-iterations 1000000
+            --pairs "$ATTACHMENT_PAIRS" --target-ms "$ATTACHMENT_TARGET_MS" \
+            --max-iterations 1000000
       - name: Print evidence summaries
         if: always()
         run: |
@@ -93,7 +100,7 @@ jobs:
           export ILLIQUID_ATTACHMENT_ADMISSION_FIXTURE="$RUNNER_TEMP/attachment-fixtures/attachment-admission.mkv"
           test -s "$ILLIQUID_ATTACHMENT_ADMISSION_FIXTURE"
           set -o pipefail
-          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+          TMPDIR="$RUNNER_TEMP/attachment-tests" bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 --filter \
             'FontAttachmentAdmissionTests|NativePlaybackFoundationTests' \
             2>&1 | tee "$RUNNER_TEMP/attachment-tests/native-tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
