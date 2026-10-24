@@ -10,8 +10,9 @@ copy that destination repeatedly despite already knowing the initial file size.
 The candidate starts with an empty `Data()` and calls `reserveCapacity` for the
 **validated initial length** only when that length exceeds the existing 64 KiB
 read chunk. Files that fit in one chunk keep the original destination behavior.
-Both paths start with zero contents. The 16 MiB admission limit, chunk size, extra-byte growth check,
-read-error handling, and independently owned image backing remain unchanged.
+Both paths start with zero contents. The 16 MiB admission limit, chunk size,
+extra-byte growth check, read-error handling, and independently owned image
+backing remain unchanged.
 The hypothesis is lower allocation traffic for multi-chunk reads, without
 changing returned bytes or rejection decisions.
 
