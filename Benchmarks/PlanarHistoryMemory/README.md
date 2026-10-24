@@ -7,7 +7,7 @@ checkout. The candidate derives distinct identity count and reuse detection
 from that one dictionary without changing release or flush semantics.
 
 See the [research report](../../Documentation/PLANAR_HISTORY_MEMORY_PERFORMANCE.md)
-for production scope, the representation invariant, and measured results.
+for production scope, the representation invariant, and qualification status.
 
 ## Reproduce
 

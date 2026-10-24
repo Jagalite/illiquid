@@ -154,12 +154,25 @@ flushes and generation changes, keeping buffers alive to prevent address
 recycling from weakening their assertions. Actual execution counts and
 outcomes must come from `native-tests.json` and its accompanying logs.
 
-## Results
+## Qualification status
 
-Native qualification and measured outcomes are pending for the candidate
-identified above. No performance improvement or successful test execution is
-claimed by this draft. This section must be completed from the native evidence
-and its completion receipt before publication.
+The [native qualification run](https://github.com/Jagalite/illiquid/actions/runs/40101428154)
+is queued for the candidate identified above. It had not been assigned a runner
+when this draft PR was prepared, after more than 30 minutes in the repository's
+CI backlog. The PR remains a draft pending native qualification.
+
+An exploratory Linux run completed 20,010 matching normalized baseline/candidate
+snapshot comparisons across the five seeds in debug and release. That run used
+the documented framework stubs, so it does not qualify CoreVideo/CoreMedia
+behavior or native memory and timing performance. Its temporary receipts were
+lost when the executor reset; no quantitative performance conclusion is based
+on that run.
+
+Native test execution and native memory/timing outcomes remain unverified. No
+native performance improvement, whole-player saving, or completed native test
+result is claimed here. The queued workflow will publish its full receipts and
+completion status when it runs. Those results must be audited and this section
+completed before the PR is marked ready for review.
 
 ## Reproduction
 
