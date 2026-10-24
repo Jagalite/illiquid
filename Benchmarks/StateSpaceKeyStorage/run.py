@@ -249,7 +249,7 @@ def main() -> None:
         controls += [
             {"name": "seed-only", "model": "seek", "seed": "ready-playing", "cap": 1,
              "depth": 0, "oracle": "production", "performance": False},
-            {"name": "failure-replay", "model": "seek", "seed": "ready-playing", "cap": 10_000,
+            {"name": "failure-replay", "model": "stop-shutdown", "seed": "playing", "cap": 10_000,
              "depth": 2, "oracle": "stop", "performance": False},
         ]
         for index, cohort in enumerate(controls):
