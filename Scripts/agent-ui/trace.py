@@ -82,6 +82,19 @@ def load(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def stream_diagnostic(path):
+    """Bound the error summary without discarding the complete raw stream."""
+    path = Path(path)
+    try:
+        with path.open("rb") as stream:
+            size = stream.seek(0, os.SEEK_END)
+            stream.seek(max(0, size - 4096))
+            tail = stream.read(4096).decode("utf-8", errors="replace")
+        return {"path": str(path), "bytes": size, "tail": tail}
+    except OSError as exc:
+        return {"path": str(path), "error": str(exc)}
+
+
 def process_identity(pid):
     """Kernel start identity and executable, never process-name matching.
 
@@ -435,7 +448,9 @@ def start(root, pid, template, seconds):
             if (capture / "outcome.json").exists():
                 outcome = load(capture / "outcome.json")
                 raise TraceError(outcome["status"] if outcome["status"] != "ok" else "assertion-failed",
-                                 "Recorder ended before start could return readiness", outcome=outcome)
+                                 outcome.get("error") or "Recorder ended before start could return readiness",
+                                 outcome=outcome, capture_dir=str(capture),
+                                 cleanup_confirmed=outcome["data"].get("cleanup_confirmed", False))
             if (capture / "ready.json").exists():
                 ready = load(capture / "ready.json")
                 if not same_process(target):
@@ -479,6 +494,7 @@ def record_worker(capture):
     result = envelope("error", data, "Recording did not finish")
     interrupted = []
     old_handlers = {}
+    phase = "recorder-launch"
     try:
         for sig in (signal.SIGINT, signal.SIGTERM):
             old_handlers[sig] = signal.signal(sig, lambda number, frame: interrupted.append(number))
@@ -498,6 +514,7 @@ def record_worker(capture):
             save(capture / "recorder.json", {"process": identity, "command": command, "started": stamp()})
             if identity is None:
                 raise TraceError("error", "Recorder exited or could not be identified at launch")
+            phase = "tracing-readiness"
             ready = False
             start_deadline = time.monotonic() + START_TIMEOUT
             end_deadline = None
@@ -527,6 +544,7 @@ def record_worker(capture):
                 if stop and not stopping:
                     signal_child(child, identity, signal.SIGINT)
                     stopping = True
+                    phase = "recorder-finalization"
                     end_deadline = now + FINALIZE_TIMEOUT
                 if not stopping and not same_process(request["target"]):
                     raise TraceError("target-lost", "Target exited or changed identity during recording")
@@ -534,6 +552,7 @@ def record_worker(capture):
                     raise TraceError("timed-out", "Tracing readiness notification did not arrive")
                 if not ready and not stopping and notification.fired():
                     ready = True
+                    phase = "recording"
                     end_deadline = now + request["seconds"] + FINALIZE_TIMEOUT
                     save(capture / "ready.json", {"confirmed": stamp(), "source": "darwin-notification",
                                                  "recorder": identity})
@@ -562,6 +581,11 @@ def record_worker(capture):
                 notification.close()
             except Exception as exc:
                 result = envelope("error", data, "Notification cleanup failed: " + str(exc))
+        if result["status"] != "ok":
+            data.update(failure_phase=phase, diagnostics={
+                "stdout": stream_diagnostic(capture / "record.stdout"),
+                "stderr": stream_diagnostic(capture / "record.stderr"),
+                "readiness_received": (capture / "ready.json").exists()})
         data["finished"] = stamp()
         save(capture / "outcome.json", result)
         for sig, handler in old_handlers.items():
@@ -621,16 +645,20 @@ def time_profile_metric(path):
     schema = node.find("schema")
     if schema is None or schema.get("name") != "time-profile":
         raise TraceError("unsupported", "Export schema does not match time-profile")
-    columns = schema.findall("./col/mnemonic")
-    if not columns or columns[0].text != "sample-time":
+    columns = schema.findall("col")
+    # Instruments' Sampling.instrdst declares mnemonic="time" with
+    # engineeringType="sample-time". The mnemonic and the XML value tag are
+    # different: requiring a "sample-time" mnemonic rejects the installed schema.
+    if (not columns or columns[0].findtext("mnemonic") != "time"
+            or columns[0].findtext("engineering-type") != "sample-time"):
         raise TraceError("unsupported", "Unknown time-profile column layout")
     rows = node.findall("row")
     if not rows:
         raise TraceError("assertion-failed", "time-profile contains no sample rows")
     values = {}
     for row in rows:
-        sample = row.find("sample-time")
-        if sample is None:
+        sample = row[0] if len(row) else None
+        if sample is None or sample.tag != "sample-time":
             raise TraceError("unsupported", "Sample row lacks sample-time")
         if sample.get("ref"):
             value = values.get(sample.get("ref"))
@@ -642,6 +670,7 @@ def time_profile_metric(path):
         if value is None:
             raise TraceError("unsupported", "Unrecognized sample-time encoding/reference")
     return {"name": METRIC, "value": len(rows), "unit": "samples", "sample_count": len(rows),
+            "diagnostic": True,
             "schema": "time-profile", "scope": "exported table; no interaction or target-row attribution",
             "definition": "Count of rows with valid sample timestamps; not FPS or CPU utilization",
             "artifact": str(path)}

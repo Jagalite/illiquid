@@ -465,6 +465,14 @@ struct Action {
     let windowAction: String?
     let windowFrame: CGRect?
     let fullscreen: Bool?
+    // A window-only constraint scopes explicit pointer coordinates; it does not
+    // select an AX control. Control selectors and semantic actions need discovery.
+    var usesCoordinateWindow: Bool {
+        mode == "input" && selector?.identifier == nil && selector?.id == nil &&
+        ((name == "drag" && from != nil && to != nil) ||
+         (["click", "double-click", "right-click", "move", "hover", "scroll"].contains(name) && point != nil))
+    }
+    var requiresAXTree: Bool { mode == "accessibility" || (selector != nil && !usesCoordinateWindow) }
     init(_ request: Object) throws {
         name = try string(request, "action", required: true)!
         mode = try string(request, "mode", required: true)!
@@ -533,8 +541,12 @@ func unicodeChunks(_ text: String, limit: Int = 20) -> [[UniChar]] {
 
 func validatePoint(_ point: CGPoint, windows: [WindowInfo], windowID: Int?, displays: [CGRect]) throws {
     guard displays.contains(where: { $0.contains(point) }) else { throw Failure("assertion-failed", "point is outside active displays") }
-    let owned = windows.filter { $0.onScreen && $0.layer == 0 && (windowID == nil || $0.id == windowID) && $0.bounds.contains(point) }
-    guard !owned.isEmpty else { throw Failure("assertion-failed", "point is outside a visible target-owned window") }
+    // CG window lists are front-to-back. A different window of the same process
+    // must not satisfy a pinned window constraint merely by overlapping it.
+    guard let owned = windows.first(where: { $0.onScreen && $0.bounds.contains(point) }),
+          owned.layer == 0, windowID == nil || owned.id == windowID else {
+        throw Failure("assertion-failed", "point is outside or occluded within the visible target-owned window")
+    }
 }
 
 // A drag may move its target after mouse-down. Its initial press has the same
@@ -670,7 +682,7 @@ func ensureFocus(_ identity: Identity, budget: Budget) throws {
     } else { throw Failure("unsupported", "no interactive WindowServer session") }
 }
 
-func input(_ action: Action, identity: Identity, tree: Tree?, budget: Budget) throws -> Object {
+func requireInputAccess() throws {
     guard CGPreflightPostEventAccess() else { throw Failure("permission-required", "post-event access is required; helper never prompts") }
     try requireAX()
     // Refuse to disturb physical input already held by the user/another client.
@@ -679,25 +691,58 @@ func input(_ action: Action, identity: Identity, tree: Tree?, budget: Budget) th
     guard !heldButtons, flags.intersection([.maskShift, .maskControl, .maskAlternate, .maskCommand, .maskSecondaryFn]).isEmpty else {
         throw Failure("assertion-failed", "existing held mouse button or modifier would contaminate input")
     }
-    try ensureFocus(identity, budget: budget)
-    let node = try action.selector.map { selector -> Node in
+}
+
+func pointerHit(_ point: CGPoint, pid: pid_t, budget: Budget) throws -> AXUIElement {
+    try budget.check()
+    var hit: AXUIElement?
+    let code = AXUIElementCopyElementAtPosition(AXUIElementCreateSystemWide(), Float(point.x), Float(point.y), &hit)
+    try budget.check()
+    guard code == .success, let hit else { throw Failure("assertion-failed", "cannot validate pointer hit target (AX \(code.rawValue))") }
+    var hitPID: pid_t = 0
+    guard AXUIElementGetPid(hit, &hitPID) == .success, hitPID == pid else {
+        throw Failure("assertion-failed", "point is occluded by another process")
+    }
+    return hit
+}
+
+// Injection is confined to native fixtures; production uses these exact defaults.
+struct InputEnvironment {
+    var requireAccess: () throws -> Void = requireInputAccess
+    var validateFocus: (Identity, Budget) throws -> Void = { try ensureFocus($0, budget: $1) }
+    var ownedWindows: (pid_t) -> [WindowInfo] = windows
+    var displays: () -> [CGRect] = displayBounds
+    var hit: (CGPoint, pid_t, Budget) throws -> AXUIElement = { try pointerHit($0, pid: $1, budget: $2) }
+    var session: () throws -> InputSession = { try InputSession() }
+}
+
+// Both the real executor and fixtures use this lazy dispatch, so a coordinate
+// test can fail if discovery is ever added back before the input path.
+func performAction<Snapshot>(_ action: Action, buildTree: () throws -> Snapshot,
+                             semantic: (Snapshot) throws -> Object,
+                             pointer: (Snapshot?) throws -> Object) throws -> Object {
+    let tree = action.requiresAXTree ? try buildTree() : nil
+    if action.mode == "accessibility" { return try semantic(tree!) }
+    return try pointer(tree)
+}
+
+func input(_ action: Action, identity: Identity, tree: Tree?, budget: Budget,
+           environment: InputEnvironment = InputEnvironment()) throws -> Object {
+    try environment.requireAccess()
+    try environment.validateFocus(identity, budget)
+    let node = try (action.usesCoordinateWindow ? nil : action.selector).map { selector -> Node in
         guard let tree else { throw Failure("missing AX snapshot") }
         return try tree.resolve(selector)
     }
     if node?.enabled == false || node?.visible == false { throw Failure("assertion-failed", "target is disabled or not visible") }
-    let activeDisplays = displayBounds()
-    func validate() throws { try ensureFocus(identity, budget: budget) }
+    let windowID = node?.windowID ?? (action.usesCoordinateWindow ? action.selector?.windowID : nil)
+    let activeDisplays = environment.displays()
+    func validate() throws { try environment.validateFocus(identity, budget) }
     func validateLocation(_ p: CGPoint, dragging: Bool = false) throws {
         try validate()
-        try validatePoint(p, windows: windows(identity.pid), windowID: node?.windowID, displays: activeDisplays)
+        try validatePoint(p, windows: environment.ownedWindows(identity.pid), windowID: windowID, displays: activeDisplays)
         // AX hit testing catches overlays owned by other apps and target mismatch.
-        var hit: AXUIElement?
-        let code = AXUIElementCopyElementAtPosition(AXUIElementCreateSystemWide(), Float(p.x), Float(p.y), &hit)
-        guard code == .success, let hit else { throw Failure("assertion-failed", "cannot validate pointer hit target (AX \(code.rawValue))") }
-        var hitPID: pid_t = 0
-        guard AXUIElementGetPid(hit, &hitPID) == .success, hitPID == identity.pid else {
-            throw Failure("assertion-failed", "point is occluded by another process")
-        }
+        let hit = try environment.hit(p, identity.pid, budget)
         if let node, let target = node.ax {
             try validatePointerSelection(node, at: p, dragging: dragging,
                                          currentBounds: { try axRect(target, budget) }, hitMatches: {
@@ -718,11 +763,15 @@ func input(_ action: Action, identity: Identity, tree: Tree?, budget: Budget) th
     if let p = action.point, let bounds = node?.bounds, !bounds.contains(p) {
         throw Failure("assertion-failed", "point is outside selected target bounds")
     }
-    let session = try InputSession()
+    let session = try environment.session()
     defer { session.releaseAll() }
     var result: Object = ["mode": "input", "action": action.name, "completion": "input-dispatched",
                           "identity": identity.json, "coordinate_space": "quartz-global-logical-points"]
     if let node, let tree { result["target"] = node.json(tree.fingerprint) }
+    if action.usesCoordinateWindow {
+        result["target_validation"] = "coordinate-owned-window-and-ax-hit"
+        if let windowID { result["window_id"] = windowID }
+    }
     do {
         switch action.name {
         case "move", "hover":
@@ -750,10 +799,10 @@ func input(_ action: Action, identity: Identity, tree: Tree?, budget: Budget) th
             try validateLocation(from)
             let points = dragPoints(from: from, to: to, duration: action.duration)
             // Validate the entire route before pressing. No cross-app drops.
-            let routeWindows = windows(identity.pid)
+            let routeWindows = environment.ownedWindows(identity.pid)
             for p in points {
                 try budget.check()
-                try validatePoint(p, windows: routeWindows, windowID: node?.windowID, displays: activeDisplays)
+                try validatePoint(p, windows: routeWindows, windowID: windowID, displays: activeDisplays)
             }
             try validateLocation(from)
             let release = try session.mouse(.leftMouseUp, at: from)
@@ -1118,10 +1167,10 @@ func execute(_ request: Object) throws -> Object {
     case "capture": return try capture(request, identity: identity, budget: budget)
     case "act":
         let action = action!
-        let tree = action.selector != nil || action.mode == "accessibility"
-            ? try Tree(identity: identity, request: request, budget: budget) : nil
-        if action.mode == "accessibility" { return try accessibility(action, identity: identity, tree: tree!, budget: budget) }
-        return try input(action, identity: identity, tree: tree, budget: budget)
+        return try performAction(action,
+            buildTree: { try Tree(identity: identity, request: request, budget: budget) },
+            semantic: { try accessibility(action, identity: identity, tree: $0, budget: budget) },
+            pointer: { try input(action, identity: identity, tree: $0, budget: budget) })
     default: throw Failure("unsupported", "unsupported operation")
     }
 }

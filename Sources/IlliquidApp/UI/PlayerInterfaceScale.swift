@@ -15,7 +15,7 @@ final class PlayerInterfaceScaleStore {
     var canIncrease: Bool { percentage < 150 }
     var canDecrease: Bool { percentage > 80 }
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = AppPreferences.defaults) {
         self.defaults = defaults
         let saved = defaults.object(forKey: Self.storageKey) as? Int
         percentage = saved.flatMap { Self.percentages.contains($0) ? $0 : nil } ?? Self.defaultPercentage

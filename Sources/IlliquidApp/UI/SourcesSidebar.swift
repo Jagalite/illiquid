@@ -14,7 +14,7 @@ enum SourcesSidebarPreferences {
     static let defaultDateCreatedSort = SourceTreeSortDirection.descending.rawValue
     static let defaultTypeSort = SourceTreeSortDirection.off.rawValue
 
-    static func initializeSortPreferences(defaults: UserDefaults = .standard) {
+    static func initializeSortPreferences(defaults: UserDefaults = AppPreferences.defaults) {
         let keys = [nameSortKey, dateCreatedSortKey, typeSortKey]
         let hasSavedSort = keys.contains { defaults.object(forKey: $0) != nil }
         // A partially saved choice used the old defaults for its missing keys.
@@ -2774,7 +2774,7 @@ enum SourcesSidebarExpansionStore {
 
     static func persist(
         _ snapshot: SourcesSidebarExpansionSnapshot,
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = AppPreferences.defaults
     ) {
         let payload = Payload(
             version: 1,

@@ -1,5 +1,6 @@
 """Runner contract tests. No UI input, application launch, Swift or product build."""
 import importlib.util
+import hashlib
 import io
 import json
 import os
@@ -18,6 +19,24 @@ SCRIPT = Path(__file__).resolve().parents[1] / "agent_ui.py"
 SPEC = importlib.util.spec_from_file_location("agent_ui_runner", SCRIPT)
 runner = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(runner)
+
+
+class SyntheticClock:
+    """Advance runner deadlines on sleeps, independently of host scheduling/I/O."""
+    strftime = staticmethod(time.strftime)
+    time = staticmethod(time.time)
+
+    def __init__(self):
+        self.now = 10.0
+
+    def monotonic(self):
+        return self.now
+
+    def monotonic_ns(self):
+        return round(self.now * 1e9)
+
+    def sleep(self, seconds):
+        self.now += seconds
 
 
 class FakeChild:
@@ -57,6 +76,9 @@ class FakeAdapter:
         self.quit_exits = True
         self.trace_failure = None
         self.trace_data = {}
+        self.emit_preferences = True
+        self.preference_transform = None
+        self.preference_bytes = None
 
     def identity(self, pid, timeout=10):
         assert pid == self.live["pid"], "wrong PID selected"
@@ -81,6 +103,30 @@ class FakeAdapter:
     def spawn(self, executable, environment, log):
         assert str(executable) == self.live["executable_path"]
         self.environments.append(environment)
+        receipt_path = Path(environment["ILLIQUID_BENCHMARK_PREFERENCES_RECEIPT"])
+        assert receipt_path.is_absolute() and receipt_path.parent.is_dir()
+        assert not receipt_path.exists(), "runner must supply an absent receipt path"
+        if self.emit_preferences:
+            seed_path = environment.get("ILLIQUID_BENCHMARK_PREFERENCES_SEED_FILE")
+            seed = Path(seed_path).read_bytes() if seed_path else None
+            values = json.loads(seed) if seed is not None else {}
+            effective = dict(values, **{"Illiquid.agent-ui-preference-suite.v1":
+                                      environment["ILLIQUID_BENCHMARK_PREFERENCES_SUITE"]})
+            canonical = json.dumps(effective, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            receipt = {"schema_version": 1, "pid": self.child.pid,
+                       "session": environment["ILLIQUID_BENCHMARK_CONTROL_SESSION"],
+                       "suite": environment["ILLIQUID_BENCHMARK_PREFERENCES_SUITE"],
+                       "isolation_mode": "session-suite-only", "fallback_domains": [],
+                       "seed_path": seed_path,
+                       "seed_sha256": hashlib.sha256(seed).hexdigest() if seed is not None else None,
+                       "seed_values": values, "effective_initial_values": effective,
+                       "effective_initial_canonical_json": canonical,
+                       "effective_initial_sha256": hashlib.sha256(canonical.encode()).hexdigest(),
+                       "session_file": environment["ILLIQUID_BENCHMARK_SESSION_FILE"]}
+            if self.preference_transform:
+                self.preference_transform(receipt)
+            receipt_path.write_bytes(self.preference_bytes if self.preference_bytes is not None
+                                     else json.dumps(receipt).encode())
         if self.ready:
             log.write(("[benchmark-control-channel] session=" +
                        environment["ILLIQUID_BENCHMARK_CONTROL_SESSION"] + " phase=ready\n").encode())
@@ -102,6 +148,11 @@ class FakeAdapter:
 
 class RunnerTests(unittest.TestCase):
     def setUp(self):
+        self.clock = SyntheticClock()
+        # Scope the clock to this runner module; subprocess tests keep real time.
+        clock = patch.object(runner, "time", self.clock)
+        clock.start()
+        self.addCleanup(clock.stop)
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name).resolve()
@@ -147,8 +198,154 @@ class RunnerTests(unittest.TestCase):
                              f'phase=completed accepted={accepted}\n')
         self.adapter.on_signal = respond
 
+    def grip_state(self, *, x=200, y=300, locked=False):
+        return {"source": {"url": "file:///fixture/video.mp4", "revision": 7},
+                "window": {"id": 9, "visible": True, "key": True, "miniaturized": False,
+                           "frame": {"x": 0, "y": 0, "width": 900, "height": 600},
+                           "interface_scale": .9, "sidebar_presented": False},
+                "chrome": {"controls_position_locked": locked, "interaction_cancellation_revision": 1,
+                           "controls_position_revision": 0, "interaction_pins": []},
+                "playback": {"pause_desired": True, "position_seconds": 3.0, "loading": False, "buffering": False},
+                "targets": [{"identifier": runner.GRIP_IDENTIFIER, "enabled": not locked,
+                             "source_revision": 7, "sampled_monotonic_ns": self.clock.monotonic_ns(),
+                             "bounds": {"x": 9999, "y": 9999, "width": 24, "height": 40},
+                             "screen_geometry": {"coordinate_space": "quartz-global-logical-points",
+                                                 "window_id": 9,
+                                                 "bounds": {"x": x, "y": y, "width": 24, "height": 40},
+                                                 "root_screen_appkit": {"x": 0, "y": 0, "width": 900, "height": 600}}}]}
+
+    def grip_request(self, expected="moved"):
+        return {"action": "drag", "mode": "input", "diagnostic_target": {"identifier": runner.GRIP_IDENTIFIER},
+                "delta": {"x": 0, "y": -80}, "duration": .01, "expected_outcome": expected, "timeout": 1.1}
+
+    def grip_observations(self, states):
+        self.launch()
+        retained = list(states)
+        def observe(args):
+            state = retained.pop(0) if len(retained) > 1 else retained[0]
+            return {"state": {"data": state}}
+        hook = patch.object(self.run, "hook", side_effect=observe)
+        hook.start()
+        self.addCleanup(hook.stop)
+
+    def drag_calls(self):
+        return [r for r in self.adapter.native_calls if r.get("action") == "drag"]
+
+    def test_diagnostic_grip_uses_screen_center_not_local_or_ax_guess(self):
+        before, after = self.grip_state(), self.grip_state(y=220)
+        self.grip_observations([before, before, after, after])
+        result = self.run.execute("act", self.grip_request())
+        self.assertEqual(result["status"], "ok", result)
+        self.assertEqual(result["data"]["movement_points"], 80)
+        self.assertTrue(result["data"]["no_seek"])
+        self.assertEqual(len(self.drag_calls()), 1)
+        request = self.drag_calls()[0]
+        self.assertEqual(request["from"], {"x": 212, "y": 320})
+        self.assertEqual(request["to"], {"x": 212, "y": 240})
+        self.assertEqual(request["target"], {"window_id": 9})
+        self.assertEqual(request["expected_identity"]["process_start_identity"], "12345:678")
+        self.assertNotIn("diagnostic_target", request)
+
+    def test_locked_grip_delivers_real_drag_and_requires_unchanged_geometry(self):
+        state = self.grip_state(locked=True)
+        self.grip_observations([state])
+        result = self.run.execute("act", self.grip_request("locked"))
+        self.assertEqual(result["status"], "ok", result)
+        self.assertEqual(result["data"]["outcome"], "locked")
+        self.assertEqual(result["data"]["movement_points"], 0)
+        self.assertEqual(len(self.drag_calls()), 1)
+
+    def test_grip_refuses_stale_source_window_space_and_sample_before_input(self):
+        import copy
+        cases = []
+        for mutate in [
+            lambda s: s["targets"][0].update(source_revision=6),
+            lambda s: s["targets"][0]["screen_geometry"].update(window_id=8),
+            lambda s: s["targets"][0]["screen_geometry"].update(coordinate_space="swiftui-player-root-top-left-points"),
+            lambda s: s["targets"][0].update(sampled_monotonic_ns=1),
+            lambda s: s["window"].update(key=False),
+            lambda s: s["targets"].append(copy.deepcopy(s["targets"][0])),
+            lambda s: s["targets"][0]["screen_geometry"]["bounds"].update(x=float("nan")),
+        ]:
+            state = self.grip_state()
+            mutate(state)
+            cases.append(state)
+        self.launch()
+        for state in cases:
+            with self.subTest(state=state), patch.object(self.run, "hook", return_value={"state": {"data": state}}):
+                result = self.run.execute("act", self.grip_request())
+                self.assertNotEqual(result["status"], "ok", result)
+                self.assertEqual(self.drag_calls(), [])
+
+    def test_grip_reconfirms_geometry_before_press_and_refuses_drift(self):
+        self.grip_observations([self.grip_state(), self.grip_state(y=295)])
+        result = self.run.execute("act", self.grip_request())
+        self.assertEqual(result["status"], "assertion-failed", result)
+        self.assertIn("changed before input", result["error"])
+        self.assertEqual(self.drag_calls(), [])
+
+    def test_grip_checks_lock_and_paused_prerequisites_before_input(self):
+        self.launch()
+        for change in ("locked", "playing", "loading", "interaction"):
+            state = self.grip_state(locked=change == "locked")
+            if change == "playing": state["playback"]["pause_desired"] = False
+            if change == "loading": state["playback"]["loading"] = True
+            if change == "interaction": state["chrome"]["interaction_pins"] = ["scrubbing"]
+            with self.subTest(change=change), patch.object(self.run, "hook", return_value={"state": {"data": state}}):
+                result = self.run.execute("act", self.grip_request())
+                self.assertEqual(result["status"], "assertion-failed", result)
+                self.assertEqual(self.drag_calls(), [])
+
+    def test_grip_fails_changed_source_cancellation_seek_or_window_after_input(self):
+        self.launch()
+        for change in ("source", "cancellation", "seek", "window"):
+            before, after = self.grip_state(), self.grip_state(y=220)
+            if change == "source":
+                after["source"]["revision"] = 8
+                after["targets"][0]["source_revision"] = 8
+            if change == "cancellation": after["chrome"]["interaction_cancellation_revision"] += 1
+            if change == "seek": after["playback"]["position_seconds"] = 6.0
+            if change == "window": after["window"]["frame"]["width"] = 850
+            with self.subTest(change=change), patch.object(self.run, "hook", side_effect=[
+                    {"state": {"data": before}}, {"state": {"data": before}}, {"state": {"data": after}}]):
+                count = len(self.drag_calls())
+                result = self.run.execute("act", self.grip_request())
+                self.assertEqual(result["status"], "assertion-failed", result)
+                self.assertEqual(len(self.drag_calls()), count + 1)
+                self.assertIn("native", result["data"])
+
+    def test_dispatched_grip_without_movement_fails_and_never_retries_input(self):
+        self.grip_observations([self.grip_state()])
+        # Refresh only the sample timestamp; the observed position stays fixed.
+        with patch.object(self.run, "hook", side_effect=lambda args: {"state": {"data": self.grip_state()}}):
+            result = self.run.execute("act", self.grip_request())
+        self.assertEqual(result["status"], "assertion-failed", result)
+        self.assertEqual(len(self.drag_calls()), 1)
+        self.assertIn("outcome was not observed", result["error"])
+
+    def test_grip_native_failure_preserves_cleanup_and_does_not_retry(self):
+        before = self.grip_state()
+        self.grip_observations([before])
+        self.adapter.fail_native = runner.Failure("assertion-failed", "focus lost during drag", {
+            "held_inputs_released": True, "focus_lost": True})
+        result = self.run.execute("act", self.grip_request())
+        self.assertEqual(result["status"], "assertion-failed", result)
+        self.assertTrue(result["data"]["input_attempted"])
+        self.assertTrue(result["data"]["native_failure"]["held_inputs_released"])
+        self.assertEqual(len(self.drag_calls()), 1)
+
+    def test_canceled_grip_and_raw_point_overrides_are_refused_without_input(self):
+        self.launch()
+        for request in (self.grip_request("canceled"), dict(self.grip_request(), to={"x": 1, "y": 2})):
+            result = self.run.execute("act", request)
+            self.assertNotEqual(result["status"], "ok", result)
+            self.assertEqual(self.drag_calls(), [])
+
     def test_launch_exact_bundle_isolated_environment_and_manifest(self):
-        with patch.dict(os.environ, {"HOME": "/do-not-repurpose", "ILLIQUID_BENCHMARK_FAKE": "stale"}):
+        with patch.dict(os.environ, {"HOME": "/do-not-repurpose", "ILLIQUID_BENCHMARK_FAKE": "stale",
+                                    "ILLIQUID_BENCHMARK_PREFERENCES_SUITE": "shared",
+                                    "ILLIQUID_BENCHMARK_PREFERENCES_SEED_FILE": "/inherited-seed",
+                                    "ILLIQUID_BENCHMARK_PREFERENCES_RECEIPT": "/inherited-receipt"}):
             response = self.launch()
         env = self.adapter.environments[0]
         self.assertEqual(env["HOME"], "/do-not-repurpose")
@@ -161,6 +358,136 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(self.run.manifest["executable_sha256"], runner.digest(self.executable))
         self.assertTrue((self.run.directory / "artifacts/source.patch").is_file())
         self.assertEqual(self.adapter.native_calls[0]["pid"], FakeChild.pid)
+        preferences = self.run.manifest["preferences"]
+        self.assertEqual(env["ILLIQUID_ENABLE_BENCHMARK_OVERRIDES"], "1")
+        self.assertEqual(env["ILLIQUID_BENCHMARK_PREFERENCES_SUITE"],
+                         runner.DOMAIN + ".AgentUI." + self.run.manifest["session_token"])
+        self.assertEqual(env["ILLIQUID_BENCHMARK_PREFERENCES_RECEIPT"], preferences["receipt_file"])
+        self.assertNotIn("ILLIQUID_BENCHMARK_PREFERENCES_SEED_FILE", env)
+        self.assertEqual(preferences["status"], "validated")
+        self.assertEqual(preferences["isolation_mode"], "session-suite-only")
+        self.assertIsNone(preferences["seed_sha256"])
+        self.assertEqual(preferences["receipt_sha256"], runner.digest(preferences["receipt_file"]))
+        self.assertEqual(runner.read_json(self.run.directory / "manifest.json")["preferences"], preferences)
+
+    def test_preference_seed_is_copied_exactly_and_receipt_hash_is_bound(self):
+        source = self.root / "reviewed-seed.json"
+        seed = b'{ "Illiquid.fixture": {"unicode": "caf\\u00e9", "url": "file:///fixture/", "float": 1.0} }\n'
+        source.write_bytes(seed)
+        def foundation_encoding(receipt):
+            canonical = receipt["effective_initial_canonical_json"].replace("/", "\\/").replace('"float":1.0', '"float":1')
+            receipt.update(effective_initial_canonical_json=canonical,
+                           effective_initial_sha256=hashlib.sha256(canonical.encode()).hexdigest())
+        self.adapter.preference_transform = foundation_encoding
+        result = self.run.execute("launch", {"app": str(self.app), "timeout": .2,
+                                             "preferences_seed_file": str(source)})
+        self.assertEqual(result["status"], "ok", result)
+        preferences = self.run.manifest["preferences"]
+        retained = Path(preferences["seed_path"])
+        self.assertEqual(retained, self.run.directory / "state/preferences-seed.json")
+        self.assertEqual(retained.read_bytes(), seed)
+        self.assertEqual(source.read_bytes(), seed)
+        self.assertEqual(preferences["seed_sha256"], hashlib.sha256(seed).hexdigest())
+        self.assertEqual(self.adapter.environments[0]["ILLIQUID_BENCHMARK_PREFERENCES_SEED_FILE"], str(retained))
+        receipt = runner.read_json(preferences["receipt_file"])
+        self.assertEqual(preferences["effective_initial_sha256"],
+                         hashlib.sha256(receipt["effective_initial_canonical_json"].encode()).hexdigest())
+        self.assertNotEqual(runner.json_hash(receipt["effective_initial_values"]),
+                            preferences["effective_initial_sha256"])
+
+    def test_invalid_preference_seeds_refused_before_spawn(self):
+        source = self.root / "invalid-seed.json"
+        for data in (b'[]', b'{broken', b'{"Illiquid.x":null}', b'{"Illiquid.x":[null]}',
+                     b'{"Shared.key":1}', b'{"Illiquid.agent-ui-preference-suite.v1":"forged"}',
+                     b'{"Illiquid.x":NaN}', b'{"Illiquid.x":1,"Illiquid.x":2}', b'\xff',
+                     b' ' * (1024 * 1024 + 1)):
+            source.write_bytes(data)
+            with self.subTest(data=data[:80]):
+                result = self.run.execute("launch", {"app": str(self.app), "preferences_seed_file": str(source)})
+                self.assertEqual(result["status"], "error", result)
+                self.assertEqual(self.adapter.environments, [])
+                self.assertFalse(self.run.directory.exists())
+        result = self.run.execute("launch", {"app": str(self.app), "preferences_seed_file": str(source) + ".absent"})
+        self.assertEqual(result["status"], "error", result)
+        self.assertEqual(self.adapter.environments, [])
+
+    def test_missing_preference_receipt_never_qualifies_or_dispatches_input(self):
+        self.adapter.emit_preferences = False
+        result = self.run.execute("launch", {"app": str(self.app), "timeout": .01})
+        self.assertEqual(result["status"], "timed-out", result)
+        self.assertIn("preference receipt", result["error"])
+        self.assertEqual(self.adapter.native_calls, [])
+        self.assertEqual(result["data"]["launch_failure_cleanup"]["status"], "ok")
+        preferences = runner.read_json(self.run.directory / "manifest.json")["preferences"]
+        self.assertEqual(preferences["status"], "failed")
+        self.assertIsNone(preferences["isolation_mode"])
+        self.assertFalse(Path(preferences["receipt_file"]).exists())
+
+    def test_app_preference_refusal_retains_log_and_exit_without_isolation_claim(self):
+        self.adapter.emit_preferences = False
+        self.adapter.ready = False
+        original = self.adapter.spawn
+        def refuse(executable, environment, log):
+            child = original(executable, environment, log)
+            log.write(b"[agent-ui-preferences] refused: invalid preference configuration\n")
+            child.returncode = 78
+            return child
+        with patch.object(self.adapter, "spawn", side_effect=refuse):
+            result = self.run.execute("launch", {"app": str(self.app), "timeout": .1})
+        self.assertEqual(result["status"], "target-lost", result)
+        self.assertEqual(result["data"]["launch_failure_cleanup"]["returncode"], 78)
+        self.assertIn("[agent-ui-preferences] refused", (self.run.directory / "app.log").read_text())
+        preferences = runner.read_json(self.run.directory / "manifest.json")["preferences"]
+        self.assertEqual(preferences["status"], "failed")
+        self.assertIsNone(preferences["isolation_mode"])
+        self.assertEqual(self.adapter.native_calls, [])
+
+    def test_malformed_preference_receipt_retained_and_launch_fails_closed(self):
+        for index, data in enumerate((b'{broken', b'[]', b'null', b'\xff', b'{"schema_version":NaN}',
+                                      b'{"schema_version":1,"schema_version":2}')):
+            self.adapter = FakeAdapter(self.executable)
+            self.run = runner.Runner(self.root / f"malformed-{index}", self.adapter)
+            self.adapter.preference_bytes = data
+            with self.subTest(data=data):
+                result = self.run.execute("launch", {"app": str(self.app), "timeout": .1})
+                self.assertEqual(result["status"], "assertion-failed", result)
+                self.assertEqual(self.run.manifest["preferences"]["status"], "failed")
+                self.assertEqual(Path(self.run.manifest["preferences"]["receipt_file"]).read_bytes(), data)
+                self.assertNotEqual(self.run.manifest["lifecycle"], "ready")
+                self.assertEqual(self.adapter.native_calls, [])
+
+    def test_mismatched_preference_receipt_fields_refuse_launch_before_activation(self):
+        cases = {"schema_version": True, "session": "wrong", "suite": runner.DOMAIN,
+                 "pid": FakeChild.pid + 1, "isolation_mode": "shared", "fallback_domains": [runner.DOMAIN],
+                 "seed_path": "/unrequested", "seed_sha256": "0" * 64, "seed_values": {"Illiquid.x": True},
+                 "session_file": "/wrong-session", "effective_initial_sha256": "0" * 64,
+                 "effective_initial_canonical_json": "{}", "effective_initial_values": []}
+        for index, (key, value) in enumerate(cases.items()):
+            self.adapter = FakeAdapter(self.executable)
+            self.run = runner.Runner(self.root / f"mismatch-{index}", self.adapter)
+            self.adapter.preference_transform = lambda r, k=key, v=value: r.update({k: v})
+            with self.subTest(field=key):
+                result = self.run.execute("launch", {"app": str(self.app), "timeout": .1})
+                self.assertEqual(result["status"], "assertion-failed", result)
+                self.assertEqual(self.run.manifest["preferences"]["status"], "failed")
+                self.assertIsNone(self.run.manifest["preferences"]["isolation_mode"])
+                self.assertEqual(self.adapter.native_calls, [])
+
+    def test_receipt_missing_required_fields_is_not_a_default_value(self):
+        for index, key in enumerate(("seed_path", "seed_sha256", "seed_values", "fallback_domains",
+                                     "effective_initial_canonical_json", "session", "suite")):
+            self.adapter = FakeAdapter(self.executable)
+            self.run = runner.Runner(self.root / f"missing-{index}", self.adapter)
+            self.adapter.preference_transform = lambda r, k=key: r.pop(k)
+            with self.subTest(field=key):
+                result = self.run.execute("launch", {"app": str(self.app), "timeout": .1})
+                self.assertEqual(result["status"], "assertion-failed", result)
+                self.assertEqual(self.adapter.native_calls, [])
+
+    def test_attach_never_claims_preference_isolation(self):
+        self.attach()
+        self.assertEqual(self.run.manifest["preferences"], {"status": "unverified", "isolation_mode": None})
+        self.assertEqual(self.adapter.environments, [])
 
     def test_launch_refuses_production_bundle_without_creating_run_or_spawn(self):
         self.info.write_bytes(plistlib.dumps({"CFBundleIdentifier": "com.example.Illiquid", "CFBundleExecutable": "Illiquid"}))
@@ -235,15 +562,20 @@ class RunnerTests(unittest.TestCase):
 
     def test_launch_waits_for_appkit_registration_with_pinned_kernel_identity(self):
         initial = dict(self.adapter.live, bundle_id=None)
-        with patch.object(self.adapter, "identity", side_effect=[initial, dict(self.adapter.live),
-                                                               dict(self.adapter.live)]):
+        original = self.adapter.identity
+        def identify(pid, timeout=10):
+            live = original(pid, timeout)
+            return initial if identity.call_count == 1 else live
+        with patch.object(self.adapter, "identity", side_effect=identify) as identity:
             self.launch()
+        self.assertGreaterEqual(identity.call_count, 3)
         self.assertEqual(self.run.manifest["process_start_identity"], initial["process_start_identity"])
 
     def test_launch_refuses_pid_reuse_during_appkit_registration(self):
         initial = dict(self.adapter.live, bundle_id=None)
         replacement = dict(self.adapter.live, process_start_identity="reused")
-        with patch.object(self.adapter, "identity", side_effect=[initial, replacement, replacement]):
+        with patch.object(self.adapter, "identity", side_effect=lambda pid, timeout=10:
+                          initial if identity.call_count == 1 else dict(replacement)) as identity:
             result = self.run.execute("launch", {"app": str(self.app), "timeout": .2})
         self.assertEqual(result["status"], "target-lost")
         self.assertEqual(self.adapter.native_calls, [])
@@ -717,6 +1049,31 @@ class ComparisonTests(unittest.TestCase):
         self.assertEqual(result["performance_gate"], "not-established")
         self.assertNotIn("p99", row)
         self.assertEqual(result["run_count_per_build"], 1)
+
+    def test_isolated_preferences_compare_semantics_instead_of_run_paths(self):
+        for index, directory in enumerate(self.paths):
+            path = directory / "manifest.json"
+            manifest = runner.read_json(path)
+            manifest["preferences"] = {"status": "validated", "fallback_domains": [],
+                "isolation_mode": "suite-only", "seed_sha256": None,
+                "effective_initial_sha256": str(index) * 64,
+                "effective_initial_values": {"Illiquid.agent-ui-preference-suite.v1": "suite." + str(index),
+                                             "Illiquid.test": True}}
+            manifest["environment"]["launch_overrides"] = {
+                "ILLIQUID_BENCHMARK_PREFERENCES_SUITE": "suite." + str(index),
+                "ILLIQUID_BENCHMARK_PREFERENCES_RECEIPT": str(directory / "receipt.json")}
+            runner.atomic_json(path, manifest)
+        self.assertIn("latency", runner.compare_runs(*self.paths)["metrics"])
+        path = self.paths[1] / "manifest.json"
+        manifest = runner.read_json(path)
+        manifest["preferences"]["effective_initial_values"]["Illiquid.test"] = False
+        runner.atomic_json(path, manifest)
+        with self.assertRaises(runner.Failure):
+            runner.compare_runs(*self.paths)
+        manifest["preferences"]["status"] = "pending"
+        runner.atomic_json(path, manifest)
+        with self.assertRaises(runner.Failure):
+            runner.compare_runs(*self.paths)
 
     def test_missing_metric_or_failed_correctness_cannot_pass(self):
         runner.atomic_json(self.paths[1] / "metrics.json", {"schema_version": 1, "metrics": {}})

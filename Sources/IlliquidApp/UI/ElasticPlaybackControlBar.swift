@@ -101,7 +101,7 @@ struct ElasticPlaybackControlBarPlacement: Codable, Equatable {
 enum ElasticPlaybackControlBarPlacementStore {
     static let defaultsKey = "elasticPlaybackControlBarPlacement.v1"
 
-    static func restored(defaults: UserDefaults = .standard) -> ElasticPlaybackControlBarPlacement {
+    static func restored(defaults: UserDefaults = AppPreferences.defaults) -> ElasticPlaybackControlBarPlacement {
         guard let data = defaults.data(forKey: defaultsKey),
               let placement = try? JSONDecoder().decode(
                   ElasticPlaybackControlBarPlacement.self,
@@ -114,7 +114,7 @@ enum ElasticPlaybackControlBarPlacementStore {
 
     static func persist(
         _ placement: ElasticPlaybackControlBarPlacement,
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = AppPreferences.defaults
     ) {
         guard placement.isValid,
               let data = try? JSONEncoder().encode(placement)
@@ -1308,7 +1308,7 @@ struct ElasticPlaybackControlBar: View {
     init(
         model: AppModel,
         sidebarOccupiedWidth: CGFloat = 0,
-        placementDefaults: UserDefaults = .standard
+        placementDefaults: UserDefaults = AppPreferences.defaults
     ) {
         self.model = model
         self.sidebarOccupiedWidth = sidebarOccupiedWidth

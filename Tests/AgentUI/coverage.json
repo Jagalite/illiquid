@@ -1,22 +1,53 @@
 {
   "schema_version": 1,
   "name": "Illiquid macOS app-wide interaction inventory",
-  "source_baseline": "2cf381767023c5e7f748e3e45a214e002a8b87ae",
+  "source_baseline": "b5ceab959c97b36be8a32d71da870538567db20c",
   "qualification": {
-    "level": "initial-native-smoke",
-    "live_ui": "inspection and playback-shortcuts passed; broader coverage pending",
-    "build": "optimized product and benchmark packaging passed locally",
-    "traces": "readiness timed out; cleanup confirmed; no valid measurement",
-    "note": "Retained live smoke receipts qualify only the named scenarios. Per-run preference isolation, custom grip global coordinates, wider scenarios and presentation metrics remain pending.",
+    "level": "source-audit-with-scoped-development-evidence",
+    "live_ui": "Historical inspection and playback-shortcuts smoke receipts are retained for their recorded versions. Newer live launch validated session-suite-only preference initialization; actual grip scenario failed at native AXChildren inspection before mouse-down. Every feature family remains unqualified.",
+    "build": "Kyoto 21a6ad7fbd0647d1999f5fb4ceb0441b passed product compilation and 6/6 AgentUIProtocolTests; /tmp/illiquid-agent-ui-app-20261023-r2/Illiquid.app passed 32 arm64 Mach-O image/signature audit; executable SHA-256 70b30f19f97924c61091ef93c050d662e925a5c510b528fedd5a6f588a261779. Helpers prepared through Kyoto. Applies only to recorded source/helper versions.",
+    "traces": "Historical readiness timeout retained. New actual readiness confirmed by Darwin notification; stop exceeded bounded 10-second recording/finalization deadline, cleanup confirmed/reaped, export failed Document Missing Template Error; measurement_valid false, no qualified metrics.",
+    "note": "Feature audit describes supported routes, states and expected outcomes. Historical smoke receipts cover only recorded steps and versions. Inventory structure and synthetic Python contracts are not executable UI correctness or presentation evidence.",
     "ci": "Component-only workflow exists; no workflow run result is claimed by this inventory.",
     "receipts": {
       "inspection": "/tmp/illiquid-agent-ui-live-20261023-inspection-4",
       "playback_shortcuts": "/tmp/illiquid-agent-ui-live-20261023-playback-6",
-      "component_tests_kyoto": "b868f79e3f5249c4b5aced4c1cdb805b"
+      "component_tests_kyoto": "b868f79e3f5249c4b5aced4c1cdb805b",
+      "product_package_kyoto": "21a6ad7fbd0647d1999f5fb4ceb0441b",
+      "preference_controls_kyoto": "ea21da702ec543c58fe3e953b2b43cfe",
+      "subtitle_delay_focused_kyoto": "c2ad910c28514ed9b80a53e23f1b546e",
+      "live_run": "/tmp/illiquid-agent-ui-live-20261024-grip-r1",
+      "preferences": "/tmp/illiquid-agent-ui-live-20261024-grip-r1/artifacts/preferences.json",
+      "grip_launch": "/tmp/illiquid-agent-ui-live-20261024-grip-launch-r1.json",
+      "grip_scenario": "/tmp/illiquid-agent-ui-live-20261024-grip-scenario-r1.json",
+      "trace_start": "/tmp/illiquid-agent-ui-live-20261024-trace-start-r1.json",
+      "trace_stop": "/tmp/illiquid-agent-ui-live-20261024-trace-stop-r1.json",
+      "trace_export": "/tmp/illiquid-agent-ui-live-20261024-trace-export-r1.json",
+      "close": "/tmp/illiquid-agent-ui-live-20261024-close-r1.json"
     },
-    "current_source_validation": "Pending parent-coordinated aggregate validation after the latest activation run-loop changes; 117-test receipt predates those changes.",
+    "current_source_validation": "Recorded component checks: runner 76 passed; trace 71 passed; inventory 10 passed. Preference standalone Kyoto ea21da702ec543c58fe3e953b2b43cfe passed 71 controls. These checks and the packaged protocol tests do not qualify subsequent source/helper changes or establish a full app suite/live UI pass. Focused subtitle-delay job c2ad910c28514ed9b80a53e23f1b546e failed in test-fixture compilation.",
     "live_qualified_scope": "Entry live_qualified means the complete named family is qualified for current source. Historical smoke evidence covers only the recorded steps and source, and is retained separately.",
-    "preference_isolation": "NOT established: shared benchmark bundle preferences were inherited; per-run CFFIXED_USER_HOME is insufficient."
+    "preference_isolation": "Established for initialization in /tmp/illiquid-agent-ui-live-20261024-grip-r1: validated session-bound session-suite-only receipt, fallback_domains []. Owned launch requires the preference suite/seed/receipt contract. Does not qualify all Settings controls, scene updates, persistence or system/framework preferences; CFFIXED_USER_HOME alone and attach remain insufficient.",
+    "preference_contract": "Scripts/agent-ui/PREFERENCE_ISOLATION_CONTRACT.md; optional launch --preferences-seed-file copies reviewed seed bytes into run state and retains seed identity. A missing/invalid/mismatched initialization receipt fails closed without fallback.",
+    "preference_comparison": "Validate exact app canonical JSON bytes/hash and effective values first. Raw effective_initial_sha256 includes the unique Illiquid.agent-ui-preference-suite.v1 reservation and normally differs per run. Compare validated effective values with only that reservation removed, matching isolation mode and seed hash; retain complete raw receipts. This does not materialize unpersisted code defaults.",
+    "cleanup": "Actual app close: terminated true, forced false; outer close remains timed-out and propagates retained trace failure despite confirmed/reaped recorder cleanup.",
+    "latest_component_followup": {
+      "native_tests": {
+        "kyoto_job": "6e2123aecedf422a87972fbf938771b7",
+        "passed": 9
+      },
+      "helper_preparation": {
+        "kyoto_job": "4714f7f5876748889029ba5ff5dd41fb",
+        "status": "passed"
+      },
+      "subtitle_delay_help": {
+        "kyoto_job": "df8285adb8cb4924a6254969229c47fc",
+        "passed_controls": 60,
+        "scope": "production callbacks with fake UI; live dialogs unqualified"
+      },
+      "live_grip": "fresh updated-helper run pending",
+      "performance_metrics": "unqualified; finalization/export failed"
+    }
   },
   "status_definitions": {
     "automated": "Executable interaction and outcome assertions have retained qualifying evidence for the named scope. No entries claim this state yet.",
@@ -452,19 +483,61 @@
       "actions": [
         "restore paused session",
         "restore unavailable media",
-        "protect unreadable history"
+        "protect unreadable history",
+        "relaunch with restore-paused on/off",
+        "relaunch then Retry / Locate / Forget",
+        "relaunch and compare state classes"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/AppModel.swift"
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift",
+        "Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift",
+        "Sources/IlliquidCore/Persistence/PlaybackRestoreTarget.swift",
+        "Sources/IlliquidApp/UI/PlaybackRecoveryView.swift",
+        "Sources/IlliquidApp/App/SourceStartupSnapshot.swift"
       ],
       "requires": [
-        "fixture-owned session and preferences"
+        "fixture-owned session and preferences",
+        "saved local file/folder and position",
+        "checkpoint within 5 seconds of end",
+        "missing/unreadable history",
+        "remote source",
+        "failed Locate replacement"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "launch local file/folder session",
+        "recovery Retry / Locate / Forget Session",
+        "Settings > Behavior > Restore paused",
+        "Settings > Data > Remember history"
+      ],
+      "state_variants": [
+        {
+          "state": "valid local file/folder",
+          "action": "relaunch with restore-paused on/off",
+          "expected_outcomes": [
+            "Restore local target, queue identity and normalized position; paused preference or saved paused state controls pause. Near-end saved checkpoint restarts at zero; explicit launch opens supersede restore; remote streams never auto-restore."
+          ]
+        },
+        {
+          "state": "history disabled / unreadable / missing target",
+          "action": "relaunch then Retry / Locate / Forget",
+          "expected_outcomes": [
+            "History off retains old data but stops writes/restoration; unreadable history is preserved pending explicit reset. Missing target offers Retry, type-specific Locate and Forget Session; unsuccessful Locate preserves old target, successful replacement commits after open; Forget keeps playback history."
+          ]
+        },
+        {
+          "state": "persistent sources versus session video tabs",
+          "action": "relaunch and compare state classes",
+          "expected_outcomes": [
+            "Source membership, selection, visibility and expansion have separate persisted migration paths; open-video strip and per-tab playback state are session-only. Do not infer video-tab restoration from source-tab restoration."
+          ]
+        }
+      ]
     },
     {
       "id": "open-file-folder",
@@ -473,20 +546,53 @@
         "Open File",
         "New Video Tab",
         "Add Files to Sources",
-        "Add Folder to Sources"
+        "Add Folder to Sources",
+        "open single/multiple files or add folders",
+        "deliver open events before/after ready"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/App/AppDelegate.swift",
+        "Sources/IlliquidApp/App/LaunchOpenQueue.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift"
       ],
       "requires": [
         "generated playlist and folder fixtures",
-        "file-panel selectors"
+        "file-panel selectors",
+        "multiple local media files",
+        "folders and unsupported/duplicate items",
+        "Finder events before and after first player readiness"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "File > Open File (Command-O)",
+        "File > New Video Tab (Command-T)",
+        "empty player Open File / Return",
+        "File > Add Folder to Sources (Command-Shift-O)",
+        "Finder Launch Services open events"
+      ],
+      "state_variants": [
+        {
+          "state": "file selection, folder selection, cancel",
+          "action": "open single/multiple files or add folders",
+          "expected_outcomes": [
+            "Open File selects files only and allows multiple selection; one event becomes one playlist; folders create source tabs rather than a recursively playing folder queue; cancel preserves current media."
+          ]
+        },
+        {
+          "state": "startup not ready and repeated Finder events",
+          "action": "deliver open events before/after ready",
+          "expected_outcomes": [
+            "Queue events in order until ready, retain one event as one request, drain once; pending launch opens suppress automatic session restoration. Explicitly opened files play automatically."
+          ]
+        }
+      ]
     },
     {
       "id": "open-location",
@@ -515,23 +621,77 @@
       "id": "drop-media",
       "area": "lifecycle",
       "actions": [
-        "drop file",
-        "drop folder",
-        "drop URL",
-        "reject unsupported drop"
+        "drop local file/folder URLs",
+        "normal drop replaces playlist",
+        "Option-drop appends playlist",
+        "reject non-file pasteboard payload",
+        "drop same mixed file URLs onto each target"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/PlayerRootView.swift"
+        "Sources/IlliquidApp/UI/PlayerRootView.swift",
+        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift",
+        "Sources/IlliquidApp/App/LaunchOpenQueue.swift",
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
       ],
       "requires": [
         "owned drag source",
-        "drop adapter and fixture"
+        "drop adapter and fixture",
+        "seeded playlist",
+        "normal and Option modifier input",
+        "file-URL and non-file pasteboard fixtures",
+        "mixed file/folder/subtitle/unsupported drops",
+        "duplicate URLs",
+        "no active source tab",
+        "close destination tab while async classification is pending"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "native surface with file URLs",
+          "action": "drop without Option",
+          "expected_outcomes": [
+            "Read NSURL objects with urlReadingFileURLsOnly; route accepted file/folder URLs to replace mode and inspect resulting media/playlist."
+          ]
+        },
+        {
+          "state": "native surface with existing playlist",
+          "action": "hold Option at drop",
+          "expected_outcomes": [
+            "Route file URLs to append mode; existing playlist retained and new media added; Adding media OSD may appear."
+          ]
+        },
+        {
+          "state": "remote URL text or unsupported payload",
+          "action": "drag over and release",
+          "expected_outcomes": [
+            "No remote URL drop support is claimed: registration is fileURL only and an empty extracted file-URL list rejects the operation."
+          ]
+        },
+        {
+          "state": "local files with no supported media",
+          "action": "drop extracted file URLs",
+          "expected_outcomes": [
+            "Native acceptance is distinct from coordinator validation; inspect unsupported-media error rather than treating accepted drag as playback success."
+          ]
+        },
+        {
+          "state": "sidebar versus surface",
+          "action": "drop same mixed file URLs onto each target",
+          "expected_outcomes": [
+            "Surface ordinary drop replaces playlist and Option-drop appends (existing surface variants apply); sidebar classifies folders/supported media, deduplicates and adds to captured source tab, creating one when absent. Unsupported-only selection reports error; closing captured tab before completion discards result without retargeting."
+          ]
+        }
+      ],
+      "routes": [
+        "native video-surface drop; Option modifier selects append",
+        "sidebar panel file-URL drop adds to active source tab"
+      ]
     },
     {
       "id": "window-close-reopen",
@@ -617,17 +777,44 @@
         "Scenarios/playback-shortcuts.json"
       ],
       "source_paths": [
-        "Sources/IlliquidApp/App/PlayerShortcutBindings.swift"
+        "Sources/IlliquidApp/App/PlayerShortcutBindings.swift",
+        "Sources/IlliquidApp/App/PlayerInteractionModel.swift",
+        "Sources/IlliquidApp/App/AppModel.swift"
       ],
       "requires": [
         "loaded seekable fixture",
-        "default shortcuts"
+        "default shortcuts",
+        "fixture longer than 10 minutes",
+        "source boundaries"
       ],
-      "gap": "Real Right/Left relative seek position checks passed in the retained playback run; Shift variants, boundaries, large seek, undo and presentation remain pending.",
+      "gap": "Real Right/Left relative seek position checks passed in the retained playback run; Shift variants, boundaries, large seek, undo and presentation remain pending. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
       "evidence": [
         {
           "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-playback-6",
           "scope": "historical smoke only; current-source aggregate validation pending"
+        }
+      ],
+      "state_variants": [
+        {
+          "state": "default seek chords",
+          "action": "Left/Right; Shift+Left/Right; Shift+PageUp/PageDown",
+          "expected_outcomes": [
+            "Request \u2212/+5 seconds, \u2212/+1 second and \u2212/+600 seconds respectively; verify boundaries and actual position."
+          ]
+        },
+        {
+          "state": "relative sequence within 0.75 seconds",
+          "action": "repeat seek then Shift+Delete",
+          "expected_outcomes": [
+            "OSD target accumulator preserves sequence origin; undo returns once to that origin and resets sequence; absent origin leaves event unhandled."
+          ]
+        },
+        {
+          "state": "hidden chrome",
+          "action": "seek repeatedly",
+          "expected_outcomes": [
+            "Hidden-chrome keyboard seek does not register reveal activity; visible chrome seek registers activity; historical Left/Right smoke does not qualify these variants."
+          ]
         }
       ]
     },
@@ -644,35 +831,87 @@
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/AppModel.swift"
       ],
       "requires": [
-        "playlist with at least two entries"
+        "playlist with at least two entries",
+        "loaded seekable fixture",
+        "empty-source and playlist-boundary states"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; live input, visible/audible output and persistence are unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "source loaded/empty",
+          "action": "Playback menu Play/Pause, Stop and Seek Backward/Forward 5 Seconds",
+          "expected_outcomes": [
+            "Loaded source enables actions; Play/Pause toggles intent, Stop stops session and seek actions request \u00b15 seconds. Empty source disables these entries."
+          ]
+        },
+        {
+          "state": "playlist previous/next availability",
+          "action": "Previous/Next File or Command+Left/Right",
+          "expected_outcomes": [
+            "Menu enabled states follow hasPreviousItem/hasNextItem; action changes source through playlist navigation. These native menu commands remain separate from configurable playback chords."
+          ]
+        }
+      ]
     },
     {
       "id": "transport-buttons",
       "area": "playback",
       "actions": [
+        "seek backward 10 seconds",
         "play/pause button",
-        "previous/next buttons",
-        "repeat",
-        "shuffle"
+        "seek forward 10 seconds"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+        "Sources/IlliquidApp/UI/PlayerRootView.swift",
+        "Sources/IlliquidApp/App/AppModel.swift"
       ],
       "requires": [
         "playlist fixture",
-        "fresh discovered button selectors"
+        "fresh discovered button selectors",
+        "loaded seekable fixture",
+        "visible center transport controls",
+        "seekRelative capability"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "source loaded and seekRelative supported",
+          "action": "activate CenterTransportControls backward/forward",
+          "expected_outcomes": [
+            "Request relative seek \u221210/+10 seconds; observe resulting position including start/end boundaries and seek OSD."
+          ]
+        },
+        {
+          "state": "playing or paused source",
+          "action": "activate play/pause",
+          "expected_outcomes": [
+            "Toggle pause intent; label and symbol change between Play/play.fill and Pause/pause.fill; playing activation hides chrome and pause activation reveals it."
+          ]
+        },
+        {
+          "state": "empty source or unsupported seeking",
+          "action": "inspect enabled state",
+          "expected_outcomes": [
+            "Play/pause disabled without source; seek buttons disabled without source or seekRelative capability."
+          ]
+        },
+        {
+          "state": "sidebar open and compact width",
+          "action": "discover and activate each center control",
+          "expected_outcomes": [
+            "Group compensates for sidebar while keeping controls reachable; fresh bounds and identifiers resolve to the three center buttons."
+          ]
+        }
+      ]
     },
     {
       "id": "speed",
@@ -687,89 +926,234 @@
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/App/PlayerCommands.swift",
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift"
       ],
       "requires": [
         "backend speed capability",
-        "media fixture"
+        "media fixture",
+        "known initial speed and isolated preferences"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; live input, visible/audible output and persistence are unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "changePlaybackSpeed supported",
+          "action": "choose 0.5, 0.75, 1, 1.25, 1.5 or 2\u00d7 via Playback menu, More or Settings",
+          "expected_outcomes": [
+            "Update requested/effective speed and current selection/checkmark; verify remembered default and playback rate separately."
+          ]
+        },
+        {
+          "state": "unsupported capability",
+          "action": "inspect menus and Settings speed picker",
+          "expected_outcomes": [
+            "Playback menu/More speed actions omitted; Settings picker disabled; no change from unavailable UI."
+          ]
+        }
+      ]
     },
     {
       "id": "frame-chapter",
       "area": "playback",
       "actions": [
-        "Step One Frame Forward",
-        "Step One Frame Backward",
-        "chapter forward/backward"
+        "frame forward/backward",
+        "chapter forward/backward",
+        "direct chapter selection",
+        "current chapter checkmarks and fallback titles"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift"
       ],
       "requires": [
         "step-frame capability",
-        "chapter fixture"
+        "chapter fixture",
+        "chapter titles including nil",
+        "first/last/current/unknown chapter states"
       ],
-      "gap": "Conditional backend actions and chapter metadata; no interaction scenario or presentation assertion.",
-      "evidence": []
+      "gap": "Conditional backend actions and chapter metadata; no interaction scenario or presentation assertion. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "stepFrame supported with source",
+          "action": "Option+Left/Right or frame menu actions",
+          "expected_outcomes": [
+            "Request adjacent frame and observe paused frame presentation; unsupported capability prevents shortcut action and omits menu actions."
+          ]
+        },
+        {
+          "state": "chapter catalog present",
+          "action": "PageUp/PageDown",
+          "expected_outcomes": [
+            "Select adjacent chapter with index clamped to first/last; missing current index starts from first/last according to direction; show chapter status OSD."
+          ]
+        },
+        {
+          "state": "More chapter section in elastic or legacy bar",
+          "action": "select specific chapter",
+          "expected_outcomes": [
+            "Seek selected chapter, update currentChapterID checkmark; nil title uses Chapter id+1; absent chapter catalog omits section."
+          ]
+        }
+      ]
     },
     {
       "id": "go-to-time-loop",
       "area": "playback",
       "actions": [
-        "Go to Time validation",
-        "A\u2013B loop start/end/clear",
-        "invalid loop boundaries"
+        "Go to Time formats and validation",
+        "Go/Return and Cancel/Escape",
+        "source-change guard",
+        "A\u2013B start/end/set again/clear",
+        "loop markers and source clearing"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/App/PlayerCommands.swift",
-        "Sources/IlliquidApp/UI/GoToTimeView.swift"
+        "Sources/IlliquidApp/UI/GoToTimeView.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift",
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidCore/Utilities/PlaybackTimeInput.swift"
       ],
       "requires": [
-        "seekable fixture"
+        "seekable fixture",
+        "positive finite duration",
+        "source replacement while sheet is open",
+        "loop-capable runtime",
+        "positions before/equal/after A"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "Go to Time sheet",
+          "action": "enter seconds, minutes:seconds or hours:minutes:seconds",
+          "expected_outcomes": [
+            "Trim outer whitespace; allow fractional seconds in last field and target 0 through duration inclusive; Go/Return seeks and dismisses; Cancel/Escape dismisses without seek."
+          ]
+        },
+        {
+          "state": "invalid time",
+          "action": "enter empty, signs, exponents, empty colon fields, >3 fields, non-ASCII digits, nonfinal fractions, later field >=60 or beyond duration",
+          "expected_outcomes": [
+            "Reject target and disable Go; nonempty invalid text shows validation; nonpositive/nonfinite duration invalidates target."
+          ]
+        },
+        {
+          "state": "source changed while sheet open",
+          "action": "submit previously valid target",
+          "expected_outcomes": [
+            "Captured source mismatch disables Go and submit refuses; no seek into replacement source."
+          ]
+        },
+        {
+          "state": "source loaded",
+          "action": "set A, then B, then set A again",
+          "expected_outcomes": [
+            "A records position, clears B and disables backend loop; B requires position > A and backend acceptance; Set Again updates labels and elastic A/B markers."
+          ]
+        },
+        {
+          "state": "B before/equal A or missing A",
+          "action": "attempt B",
+          "expected_outcomes": [
+            "Menu disabled or handler refuses; no new valid loop."
+          ]
+        },
+        {
+          "state": "loop set or source changes/stops",
+          "action": "Clear Loop / Shift+B / currentSource change",
+          "expected_outcomes": [
+            "Clear A/B and backend loop; PlayerRootView currentSource observer clears loop on source change including nil. Same-URL reload behavior requires explicit qualification, not an assumed source-value change."
+          ]
+        }
+      ]
     },
     {
       "id": "timeline-scrub",
       "area": "timeline",
       "actions": [
-        "click seek",
+        "stationary timeline click seek",
         "press/move/release scrub",
-        "seek preview",
-        "cancel scrub",
+        "6-point recognition threshold",
+        "source-revision transaction",
+        "Escape/focus cancellation and origin restore",
         "curved track routing"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/App/PlayerUXPolicy.swift",
+        "Sources/IlliquidApp/App/AppModel.swift"
       ],
       "requires": [
         "seekable video fixture",
-        "current custom track geometry"
+        "current custom track geometry",
+        "same URL reload and replacement source fixtures",
+        "active drag interruption input"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "press on track within hit tolerance",
+          "action": "release without moving 6 points",
+          "expected_outcomes": [
+            "Capture source revision/origin/duration at press; pending timeline commits a stationary click at release, only on original revision."
+          ]
+        },
+        {
+          "state": "track press and movement >=6 points",
+          "action": "drag along or across track",
+          "expected_outcomes": [
+            "Pending timeline becomes scrub; preview/commit clamp target to 0...duration; track press never becomes grip movement merely from direction."
+          ]
+        },
+        {
+          "state": "same-source active scrub",
+          "action": "Escape, focus loss or gesture disappearance",
+          "expected_outcomes": [
+            "Cancel preview, seek origin only if transaction had a target and revision still matches; clear scrubbing/chromeDrag pins and reject remaining held drag."
+          ]
+        },
+        {
+          "state": "source revision changes including same URL reload",
+          "action": "release or cancel old gesture",
+          "expected_outcomes": [
+            "Cancel without restoring old origin and do not commit into replacement source; stationary press has the same revision guard."
+          ]
+        },
+        {
+          "state": "utility or volume control press",
+          "action": "drag off child control",
+          "expected_outcomes": [
+            "Child controls own entire press; parent bar gesture refuses takeover; semantic AX position slider is separate from pointer scrub."
+          ]
+        }
+      ]
     },
     {
       "id": "timeline-grip",
       "area": "timeline",
       "actions": [
         "grip press/move/release",
-        "bend",
-        "rotate",
+        "bend and orientation deformation",
         "release outside window",
-        "cancel move"
+        "Escape/cancel restores placement",
+        "source/focus interruption",
+        "position lock and persisted placement"
       ],
       "status": "pending",
       "live_qualified": false,
@@ -777,14 +1161,64 @@
         "Scenarios/timeline-grip-pending.json"
       ],
       "source_paths": [
-        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/App/PlayerUXPolicy.swift"
       ],
       "requires": [
         "fresh visible grip target and coordinate mapping",
-        "real drag adapter"
+        "real drag adapter",
+        "isolated placement preferences",
+        "unlocked and locked controls",
+        "source revision/focus changes during drag"
       ],
-      "gap": "Source now publishes illiquid.timeline.grip as a diagnostic target in SwiftUI player-root points; it remains AX-hidden. Global input coordinate conversion and drag outcome assertions are pending. Container ID elastic-playback-control-bar is not the grip.",
-      "evidence": []
+      "gap": "Fresh NSView/window-to-Quartz conversion and target-driven drag/outcome checks are implemented; packaged app compilation passed for the recorded version. Actual scenario failed at native full-tree AXChildren inspection (-25204) before mouse-down. Coordinate-input fix ongoing separately; no live drag, presentation, cancellation or persistence qualification. AX container identity is not grip identity.",
+      "evidence": [
+        {
+          "receipt": "/tmp/illiquid-agent-ui-live-20261024-grip-scenario-r1.json",
+          "status": "timed-out",
+          "error": "AX count AXChildren failed: -25204",
+          "mouse_down_delivered": false,
+          "scope": "Failure before mouse-down; runner input_attempted true does not prove event delivery. No live drag pass."
+        }
+      ],
+      "state_variants": [
+        {
+          "state": "unlocked explicit grip hit",
+          "action": "move around edges/corners then release",
+          "expected_outcomes": [
+            "Move/deform bar using captured grab point; grip rotation describes bar deformation, not a video-rotation control; persist normalized placement/orientation after committed move."
+          ]
+        },
+        {
+          "state": "nontrack, nongrip or utility hit",
+          "action": "press/drag",
+          "expected_outcomes": [
+            "Reject parent move; only grip owns movement and child controls retain their presses."
+          ]
+        },
+        {
+          "state": "active move with Escape/focus loss/source revision change",
+          "action": "cancel or release outside",
+          "expected_outcomes": [
+            "Restore gesture-start placement and clear pins; stale revision prevents seek commit/restore. Outside-window release and cancellation delivery require actual input qualification."
+          ]
+        },
+        {
+          "state": "locked controls",
+          "action": "attempt grip move then scrub track",
+          "expected_outcomes": [
+            "Grip move rejected while lock is active; track seeking remains available; lock activation cancels active interaction through AppModel."
+          ]
+        },
+        {
+          "state": "committed placement and reset/reopen",
+          "action": "reload UI or Reset Controls Position",
+          "expected_outcomes": [
+            "Restore valid stored placement; invalid stored data falls back to default; reset cancels gesture, persists default and increments position revision."
+          ]
+        }
+      ]
     },
     {
       "id": "timeline-position-policy",
@@ -801,14 +1235,33 @@
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/App/PlayerCommands.swift",
-        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/App/PlaybackChromePreferences.swift"
       ],
       "requires": [
         "grip target",
-        "layout matrix"
+        "layout matrix",
+        "isolated placement and lock preferences"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "lock/reset from View menu, More or Settings",
+          "action": "toggle Lock Controls Position or reset",
+          "expected_outcomes": [
+            "Lock changes cancel active interaction; reset writes default placement and updates bar revision; verify equivalent entry points."
+          ]
+        },
+        {
+          "state": "sidebar/window/UI scale changes",
+          "action": "resize and reposition bar",
+          "expected_outcomes": [
+            "Constrain visible geometry and restore placement in current container; verify utility reachability and fresh global coordinates for each layout."
+          ]
+        }
+      ]
     },
     {
       "id": "timeline-duration",
@@ -822,13 +1275,39 @@
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift"
       ],
       "requires": [
-        "seekable fixture"
+        "seekable fixture",
+        "known position/duration",
+        "focus on semantic timeline target"
       ],
-      "gap": "Playback duration and Playback position labels exist; illiquid.timeline.position identifies the semantic slider, not the grip. AX adjustment does not prove pointer scrubbing.",
-      "evidence": []
+      "gap": "Playback duration and Playback position labels exist; illiquid.timeline.position identifies the semantic slider, not the grip. AX adjustment does not prove pointer scrubbing. Expanded outcomes are source-derived inventory only; live input, visible/audible output and persistence are unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "elastic bar with duration label visible",
+          "action": "activate Playback duration",
+          "expected_outcomes": [
+            "Toggle total and remaining-time display; compact More-only tier may omit duration label."
+          ]
+        },
+        {
+          "state": "positive duration and Playback position semantic slider",
+          "action": "focus then Left/Right or AX adjust",
+          "expected_outcomes": [
+            "Semantic slider uses one-second steps and formatted current-of-duration value; focused Left/Right requests clamped \u00b11-second absolute seek; AX setter registers activity; illiquid.timeline.position is not the grip."
+          ]
+        },
+        {
+          "state": "nonpositive duration",
+          "action": "inspect semantic slider",
+          "expected_outcomes": [
+            "Disabled at duration <=0; semantic adjustment does not qualify custom pointer scrubbing."
+          ]
+        }
+      ]
     },
     {
       "id": "chrome-keyboard",
@@ -857,13 +1336,14 @@
       "id": "chrome-pointer",
       "area": "chrome",
       "actions": [
-        "video single-click",
-        "double-click zones",
+        "single-click chrome hide/reveal",
+        "delayed single-click recognition",
+        "left/right thirds double-click seek",
+        "middle third double-click fullscreen",
         "pointer exit/reentry",
         "hover reveal",
         "paused timeout",
-        "focus pin",
-        "popover/menu pin",
+        "focus/popover/menu pins",
         "interruption"
       ],
       "status": "pending",
@@ -871,15 +1351,64 @@
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/App/AppModel.swift",
-        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift"
+        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift",
+        "Sources/IlliquidApp/App/PlaybackChromeController.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift"
       ],
       "requires": [
         "current video hit bounds",
         "real pointer input",
-        "playing and paused fixtures"
+        "playing and paused fixtures",
+        "macOS doubleClickInterval",
+        "fresh full native surface bounds",
+        "modal and first-responder transitions"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "opaque visible chrome",
+          "action": "single press/release on video",
+          "expected_outcomes": [
+            "Press removes playback-focus pin and initiates chrome hide; delayed recognized single click does not reveal it again; playback pause intent is unchanged."
+          ]
+        },
+        {
+          "state": "hidden or hiding chrome",
+          "action": "single press/release on video",
+          "expected_outcomes": [
+            "After macOS double-click interval, valid single click registers pointer activity and reveals chrome; no playback toggle."
+          ]
+        },
+        {
+          "state": "multi-click at x fraction < 1/3 or > 2/3",
+          "action": "double-click left/right third",
+          "expected_outcomes": [
+            "Cancel pending single click and request \u22125/+5-second seek; outer thirds also route clickCount >= 2, without a fullscreen request."
+          ]
+        },
+        {
+          "state": "x fraction in inclusive middle third",
+          "action": "double-click exactly twice",
+          "expected_outcomes": [
+            "Request fullscreen toggle; a higher click count in the center has no doubleClick action."
+          ]
+        },
+        {
+          "state": "movement > 4 points, outside release, key/responder/window change or sheet",
+          "action": "interrupt single click",
+          "expected_outcomes": [
+            "Cancel or reject pending single click; double-click dispatch also respects sheet/transient guards. Verify any press-time chrome change separately."
+          ]
+        },
+        {
+          "state": "pointer exits/reenters, paused/playing, active focus/popover/menu pins",
+          "action": "move pointer and wait for effective timeout",
+          "expected_outcomes": [
+            "Assert chrome state and cursor/pin lifecycle for each condition; passive space passes input to native surface, interactive controls retain input."
+          ]
+        }
+      ]
     },
     {
       "id": "chrome-always-visible",
@@ -917,35 +1446,85 @@
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+        "Sources/IlliquidApp/App/AppModel.swift"
       ],
       "requires": [
         "audio fixture",
-        "default shortcuts"
+        "default shortcuts",
+        "isolated volume/mute preferences",
+        "minimum/maximum volume"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; live input, visible/audible output and persistence are unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "volume utility popover",
+          "action": "move slider through 0...100 and toggle mute",
+          "expected_outcomes": [
+            "Volume readout rounds to percent; slider requests clamped 0...100 value and volume OSD; mute changes icon/help without changing remembered volume."
+          ]
+        },
+        {
+          "state": "default shortcuts or More volume menu",
+          "action": "Up/Down and Option+Up/Down; More Increase/Decrease Volume",
+          "expected_outcomes": [
+            "Change by \u00b15 or \u00b11 percentage points for keys, \u00b15 for More; clamp boundaries; mute/unmute remains available through Playback menu and M."
+          ]
+        },
+        {
+          "state": "popover presented",
+          "action": "Escape/outside click then reopen",
+          "expected_outcomes": [
+            "Dismissal consumed with no underlying action; reopen shows effective volume/mute; verify stored volume across fixture-owned relaunch separately from audible output."
+          ]
+        }
+      ]
     },
     {
       "id": "audio-tracks",
       "area": "audio",
       "actions": [
         "Audio Track menu",
-        "no tracks",
-        "select alternate track",
-        "restore remembered track"
+        "empty catalog",
+        "select alternate audio/checkmark",
+        "track display-name fallback",
+        "remembered track precedence"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift",
+        "Sources/IlliquidCore/Player/MediaTrack.swift"
       ],
       "requires": [
-        "multi-audio fixture"
+        "multi-audio fixture",
+        "commentary/audio-description and language fixture",
+        "isolated per-file choices"
       ],
-      "gap": "No multi-track fixture or outcome assertion is supplied by the small generated smoke fixture.",
-      "evidence": []
+      "gap": "No multi-track fixture or outcome assertion is supplied by the small generated smoke fixture. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "empty/multiple audio catalog",
+          "action": "open audio menu and select track",
+          "expected_outcomes": [
+            "Empty menu reports No audio tracks; selected track ID has checkmark; displayName uses title, otherwise localized language, otherwise Audio id. Selecting alternate requests track and shows audio-track OSD."
+          ]
+        },
+        {
+          "state": "remembered per-file audio versus defaults",
+          "action": "reopen media with conflicting global language/commentary preference",
+          "expected_outcomes": [
+            "Matching remembered audio applies after catalog acknowledgement; verify chosen track, flags and audible output separately."
+          ]
+        }
+      ]
     },
     {
       "id": "audio-output-sync",
@@ -953,43 +1532,98 @@
       "actions": [
         "preferred audio output",
         "audio delay decrement/increment",
-        "device removal"
+        "device removal",
+        "reset audio delay",
+        "audio delay capability gate"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/UI/SettingsView.swift",
-        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift"
       ],
       "requires": [
         "audio output hardware",
-        "audio sync fixture"
+        "audio sync fixture",
+        "nonzero audio delay state"
       ],
-      "gap": "Hardware and audible synchronization need dedicated receipts; model state alone does not prove output.",
-      "evidence": []
+      "gap": "Hardware and audible synchronization need dedicated receipts; model state alone does not prove output. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "changeAudioDelay capability",
+          "action": "More Audio \u22120.1 s / +0.1 s / Reset",
+          "expected_outcomes": [
+            "Request 0.1-second steps or zero; reset disabled within abs(delay)<0.001; audio timing/readout and audible synchronization require separate checks."
+          ]
+        },
+        {
+          "state": "preferred device disappears",
+          "action": "disconnect owned output fixture",
+          "expected_outcomes": [
+            "Coordinator falls back to System Default and records diagnostic; validate actual audible output on selected device separately."
+          ]
+        }
+      ]
     },
     {
       "id": "subtitle-tracks",
       "area": "subtitles",
       "actions": [
-        "Subtitles menu",
-        "visibility",
-        "track selection",
+        "Subtitles menu and Off",
+        "selected checkmarks/accessibility value",
+        "remembered Off and track precedence",
         "unavailable tracks",
-        "popover dismissal"
+        "dismissal consumes input"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift"
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift"
       ],
       "requires": [
-        "embedded subtitle fixture"
+        "embedded subtitle fixture",
+        "isolated history with remembered Off and explicit track",
+        "forced/accessibility subtitle catalog"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "Off versus selected subtitle",
+          "action": "select Off or embedded/external track",
+          "expected_outcomes": [
+            "Off checkmark follows nil selection; selected track ID checkmarked; subtitle control tint/accessibility value reflect selection; show subtitle OSD and verify actual overlay separately."
+          ]
+        },
+        {
+          "state": "remembered Off conflicts with Always/default languages",
+          "action": "reopen media",
+          "expected_outcomes": [
+            "Per-file areSubtitlesVisible false restores nil selection after defaults; remembered explicit embedded/external track restoration has priority when available."
+          ]
+        },
+        {
+          "state": "no matching or unavailable remembered track",
+          "action": "open menu/reopen fixture",
+          "expected_outcomes": [
+            "Inspect actual fallback/catalog instead of claiming absent track selection; external restore waits for external catalog."
+          ]
+        },
+        {
+          "state": "menu/popover active",
+          "action": "Escape or click outside",
+          "expected_outcomes": [
+            "Dismissal retains focus/chrome lifecycle and consumes boundary event; no transport action leaks through."
+          ]
+        }
+      ]
     },
     {
       "id": "subtitle-external",
@@ -998,44 +1632,142 @@
         "Load External Subtitle",
         "SRT fallback encoding",
         "subtitle delay validation",
-        "reset delay"
+        "reset delay",
+        "whole-millisecond delay limits and invalid-input retry",
+        "delay cancel and per-video persistence",
+        "drop external subtitles"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/App/AppModel.swift",
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift",
+        "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift"
       ],
       "requires": [
         "captions.srt fixture",
         "non-UTF8 SRT fixture",
-        "file-panel selectors"
+        "file-panel selectors",
+        "delay boundary/invalid text fixtures",
+        "owned per-file settings/history",
+        "loaded and empty player",
+        "multiple subtitle sidecars",
+        "matching/mismatching media names"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "subtitle delay sheet",
+          "action": "submit whole milliseconds \u221210000, 0, +10000 or trimmed signed integer",
+          "expected_outcomes": [
+            "Convert milliseconds to seconds; accept inclusive limits; update current signed-ms readout and per-video delay through coordinator."
+          ]
+        },
+        {
+          "state": "fractional, empty, noninteger or out-of-range delay text",
+          "action": "Set Delay",
+          "expected_outcomes": [
+            "Reject and reopen validation sheet with submitted text retained; delay unchanged; Cancel closes without applying."
+          ]
+        },
+        {
+          "state": "nonzero versus near-zero delay",
+          "action": "Reset Subtitle Delay",
+          "expected_outcomes": [
+            "Set to zero; reset disabled when abs(delay) <0.001; inspect menu readout and OSD; verify overlay timing and remembered per-video setting separately."
+          ]
+        },
+        {
+          "state": "external subtitle file panel",
+          "action": "select supported SRT/ASS/SSA/WebVTT/IDX or cancel",
+          "expected_outcomes": [
+            "Supported external subtitle loads through capability-gated panel; SRT fallback encoding applies; verify selected track and rendered text separately."
+          ]
+        },
+        {
+          "state": "subtitle-only no current media / multiple subtitles",
+          "action": "drop external subtitles",
+          "expected_outcomes": [
+            "Require current media for subtitle-only load; use first of multiple subtitles with warning. Mixed media associates matching subtitle with selected media; verify association and mismatch rather than counting accepted drop as a subtitle pass."
+          ]
+        }
+      ],
+      "routes": [
+        "Load External Subtitle native panel",
+        "subtitle-only surface drop",
+        "media and subtitle file-URL drop"
+      ]
     },
     {
       "id": "track-preferences",
       "area": "subtitles",
       "actions": [
-        "audio languages",
-        "subtitle languages",
-        "Save Languages validation",
-        "automatic subtitle selection",
-        "prefer accessible tracks"
+        "ordered audio/subtitle languages",
+        "Save Languages validation/normalization",
+        "Automatic/Forced only/Always when available/Off",
+        "Avoid commentary tracks",
+        "Prefer audio description and accessible subtitles",
+        "remembered-choice precedence"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/TrackSelectionSettings.swift"
+        "Sources/IlliquidApp/UI/TrackSelectionSettings.swift",
+        "Sources/IlliquidCore/Player/TrackSelectionPreferences.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift"
       ],
       "requires": [
-        "multi-language and flagged-track fixtures"
+        "multi-language and flagged-track fixtures",
+        "language aliases/regions/duplicates/invalid codes",
+        "32 and 33 comma-separated fields",
+        "flagged/default/forced/commentary/accessibility tracks",
+        "isolated choices/history"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "language edit and Save Languages/Return",
+          "action": "save whitespace/case/region/alias/duplicate inputs",
+          "expected_outcomes": [
+            "Normalize recognized ISO languages to alpha2 else alpha3; trim/lowercase, de-duplicate preserving order; empty entries removed; successful save refreshes fields from effective preference."
+          ]
+        },
+        {
+          "state": "invalid or oversized lists",
+          "action": "save unknown/nonlanguage identifiers or >32 comma-separated fields in either list",
+          "expected_outcomes": [
+            "Show error and preserve preferences; UI counts raw split fields before normalization; valid input clears error. Language token length >35 is invalid."
+          ]
+        },
+        {
+          "state": "fresh media without remembered choice",
+          "action": "choose Automatic, Forced only, Always when available or Off",
+          "expected_outcomes": [
+            "Automatic without subtitle languages/accessibility retains demux fallback; Off selects none; Forced only filters forced-capable candidates by preferred subtitles or selected-audio language if list empty; Always ranks available candidates."
+          ]
+        },
+        {
+          "state": "multiple eligible tracks",
+          "action": "change ordered languages/commentary/accessibility preferences then open media",
+          "expected_outcomes": [
+            "Ranking prioritizes language, commentary avoidance, accessibility match, forced/default flags and fallback with deterministic ID tie-break; commentary avoidance is a preference, not removal of every commentary track."
+          ]
+        },
+        {
+          "state": "remembered per-file audio/subtitle/Off",
+          "action": "change global policy and reopen",
+          "expected_outcomes": [
+            "Remembered explicit choice takes precedence after catalog; history disabled/unreadable and missing matches require separate fallback assertions."
+          ]
+        }
+      ]
     },
     {
       "id": "sources-management",
@@ -1045,20 +1777,56 @@
         "Add Folder",
         "remove source",
         "Rescan Folders",
-        "Reveal in Finder"
+        "Reveal in Finder",
+        "hide/show folder, open in new tab, reveal, refresh, remove root",
+        "hide/always show, play or resume, reveal, remove explicit file",
+        "add supported/mixed/duplicate items then switch or close target"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/App/LaunchOpenQueue.swift"
       ],
       "requires": [
         "owned source tree",
-        "external Finder outcome scope"
+        "external Finder outcome scope",
+        "folder root and nested folder",
+        "explicit file and descendant file",
+        "visible/direct-hidden/inherited-hidden rows"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "File > New Source Tab / Add Files to Sources / Add Folder to Sources",
+        "sidebar New Tab / Add Files / Add Folder",
+        "folder and file row context menus"
+      ],
+      "state_variants": [
+        {
+          "state": "folder context menu",
+          "action": "hide/show folder, open in new tab, reveal, refresh, remove root",
+          "expected_outcomes": [
+            "Hide/Show updates current-tab overrides; Open in New Tab opens folder source tab; Reveal targets Finder; Refresh Folder reloads folder. Remove Folder exists only for explicit roots."
+          ]
+        },
+        {
+          "state": "file context menu",
+          "action": "hide/always show, play or resume, reveal, remove explicit file",
+          "expected_outcomes": [
+            "Visible files offer Play/Resume using containing-folder playlist; hidden files omit Play/Resume until made visible. Reveal targets Finder; Remove from Tab exists only for explicitly added file. Inherited-hidden descendants expose no independent visibility toggle; change ancestor rules to show them."
+          ]
+        },
+        {
+          "state": "async source preparation and tab switch",
+          "action": "add supported/mixed/duplicate items then switch or close target",
+          "expected_outcomes": [
+            "Capture target tab before await; merge normalized identity without duplicates; closed target rejects completion. Membership edits persist and do not modify source files."
+          ]
+        }
+      ]
     },
     {
       "id": "sources-tree",
@@ -1070,20 +1838,49 @@
         "selection",
         "scroll",
         "scroll restoration",
-        "resize sidebar"
+        "resize sidebar",
+        "switch all four view modes",
+        "inspect movies/show seasons/extras/other ordering"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "Sources/IlliquidApp/UI/SourceBrowserFilter.swift",
+        "Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift"
       ],
       "requires": [
         "nested source fixture",
-        "stable row identity"
+        "stable row identity",
+        "nested/overlapping roots",
+        "standalone files",
+        "movies, shows/seasons, extras, other files",
+        "folders with/without supported media"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "sidebar View & Visibility > View",
+        "Settings > Sources > Current Tab > View",
+        "row disclosure buttons"
+      ],
+      "state_variants": [
+        {
+          "state": "Tree / Folders Only / Files / Media",
+          "action": "switch all four view modes",
+          "expected_outcomes": [
+            "Tree lazily exposes expanded descendants; Folders Only filters file rows; Files and Media scan recursively. Flatten single roots and deduplicate overlapping root/file identities; no-media folders auto-hide unless overridden."
+          ]
+        },
+        {
+          "state": "recursive Media projection",
+          "action": "inspect movies/show seasons/extras/other ordering",
+          "expected_outcomes": [
+            "Organize recognized movies and shows with season groups, extras and other sections; metadata/catalog context and recognized titles differ from raw filenames. Verify row order and root flattening with deterministic fixtures."
+          ]
+        }
+      ]
     },
     {
       "id": "sources-search-sort",
@@ -1094,20 +1891,49 @@
         "filter",
         "Name sort",
         "Date Created sort",
-        "Type sort"
+        "Type sort",
+        "type trimmed mixed-case query, clear, use no-match query",
+        "cycle each off/ascending/descending and combine"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "Sources/IlliquidApp/UI/SourceBrowserFilter.swift",
+        "Sources/IlliquidApp/UI/SourceNavigationState.swift"
       ],
       "requires": [
         "large named source fixture",
-        "metadata-controlled dates"
+        "metadata-controlled dates",
+        "case/whitespace/natural numeric names",
+        "unopened nested folders",
+        "missing/tied creation dates",
+        "rapid search then tab change"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "sidebar search field",
+        "sidebar Type / Date Created / Name buttons",
+        "Settings > Sources > Sorting"
+      ],
+      "state_variants": [
+        {
+          "state": "projected Tree / Files / Media rows",
+          "action": "type trimmed mixed-case query, clear, use no-match query",
+          "expected_outcomes": [
+            "Case-insensitive search retains matching ancestors; Media searches filename, section/catalog/context as projected. Tree search does not recursively discover unopened folders. Clearing restores projection; no-match state and rapid query/tab changes must not publish stale results."
+          ]
+        },
+        {
+          "state": "three independent sort directions",
+          "action": "cycle each off/ascending/descending and combine",
+          "expected_outcomes": [
+            "Priority is Type then Date Created then Name; known dates precede missing dates in either date direction, full ties retain input order; names use natural comparison with path tie-break. All off preserves input order."
+          ]
+        }
+      ]
     },
     {
       "id": "sources-visibility",
@@ -1118,20 +1944,58 @@
         "hidden items",
         "always-show paths",
         "regex rules",
-        "Reset Current Tab"
+        "Reset Current Tab",
+        "Add or Return, disable/enable/remove rule; hover rule then exit",
+        "submit invalid pattern",
+        "show hidden, remove override, reset"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/UI/SourcesSidebar.swift",
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/UI/SourceBrowserFilter.swift",
+        "Sources/IlliquidApp/App/AppModel.swift"
       ],
       "requires": [
-        "hidden-file and visibility-rule fixtures"
+        "hidden-file and visibility-rule fixtures",
+        "overlapping regex rules",
+        "manual hide and always-show overrides",
+        "inherited hidden descendants",
+        "filesystem-hidden files",
+        "512-character pattern boundary"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "sidebar View & Visibility popover",
+        "row eye/context actions",
+        "Settings > Sources > Show Hidden / Reset Current Tab"
+      ],
+      "state_variants": [
+        {
+          "state": "valid regex",
+          "action": "Add or Return, disable/enable/remove rule; hover rule then exit",
+          "expected_outcomes": [
+            "Add assigns rule color; toggles change application; remove deletes rule. Hover previews matched rows and counts, exit removes preview; counts/match dots handle overlapping rules and inheritance."
+          ]
+        },
+        {
+          "state": "empty / duplicate / invalid / >512-character regex",
+          "action": "submit invalid pattern",
+          "expected_outcomes": [
+            "Reject without adding rule; preserve explanatory validation. Valid boundary pattern can be added; duplicate check uses trimmed pattern."
+          ]
+        },
+        {
+          "state": "manual hide / always-show / inherited / no-media",
+          "action": "show hidden, remove override, reset",
+          "expected_outcomes": [
+            "Show Hidden reveals app-hidden rows with visibility styling, not filesystem-hidden files excluded by scanning. Always-show overrides direct rules/no-media policy; ancestor inheritance remains explicit. Remove individual manual/always-show overrides; Reset clears this tab view/rules/paths/hidden toggle and does not affect other tabs."
+          ]
+        }
+      ]
     },
     {
       "id": "source-tabs",
@@ -1141,20 +2005,50 @@
         "select tab",
         "Previous/Next Source Tab",
         "close tab",
-        "tab context menu"
+        "tab context menu",
+        "close tabs; previous/next across ends",
+        "search/scroll, switch tabs, hide/show sidebar, close tab"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/UI/SourceSidebarTabs.swift",
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/UI/SourceNavigationState.swift",
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "Sources/IlliquidApp/App/AppModel.swift"
       ],
       "requires": [
-        "at least two source tabs"
+        "at least two source tabs",
+        "selected and background tabs",
+        "overflowing strip",
+        "last source tab",
+        "distinct per-tab search/scroll/visibility/expansion"
       ],
-      "gap": "Container and data-derived tab/close identifiers now exist in source; scenario selection and live outcomes remain pending.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "source tab strip select/hover close",
+        "source tab context menu Close / single-item Reveal in Finder",
+        "View > Previous / Next Source Tab"
+      ],
+      "state_variants": [
+        {
+          "state": "selected/background close and navigation",
+          "action": "close tabs; previous/next across ends",
+          "expected_outcomes": [
+            "Close control appears on selected/hovered tabs; closing background keeps active selection, active chooses neighbor, last closes to no-tabs state; previous/next wraps; selection auto-scrolls; single-item tab alone offers Reveal."
+          ]
+        },
+        {
+          "state": "per-tab browser state",
+          "action": "search/scroll, switch tabs, hide/show sidebar, close tab",
+          "expected_outcomes": [
+            "Search and scroll retained during session switching/sidebar hiding; closed-tab session state discarded. Source membership, active selection, visibility and expansion persist with migration; distinguish these from session-only open video strip."
+          ]
+        }
+      ]
     },
     {
       "id": "video-tabs",
@@ -1164,20 +2058,51 @@
         "select tab",
         "Previous/Next Video Tab",
         "Close Video Tab",
-        "close button"
+        "close button",
+        "open/select via strip and All Open Videos",
+        "close each tab kind and cycle forwards/backwards"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/UI/OpenVideoTabBar.swift",
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/OpenVideoTabStore.swift",
+        "Sources/IlliquidCore/Player/OpenVideoTabs.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift"
       ],
       "requires": [
-        "at least two video fixtures"
+        "at least two video fixtures",
+        "two sources including same-resource aliases",
+        "failed/loading source",
+        "distinct position, pause and playlist states"
       ],
-      "gap": "Container and data-derived tab/close identifiers now exist in source; keyboard/menu equivalence and live outcomes remain pending.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "open video strip select / close",
+        "All Open Videos dropdown when count >1",
+        "Control-Tab / Control-Shift-Tab",
+        "View > Close Video Tab (Command-Shift-W)"
+      ],
+      "state_variants": [
+        {
+          "state": "many open videos and duplicate source",
+          "action": "open/select via strip and All Open Videos",
+          "expected_outcomes": [
+            "Dropdown exists only with >1 item and checks selected item; selection scrolls into view. Same-resource opens deduplicate; switching restores per-tab position/pause/queue in this app session; failed current tab can be reselected."
+          ]
+        },
+        {
+          "state": "background / active / last / loading close",
+          "action": "close each tab kind and cycle forwards/backwards",
+          "expected_outcomes": [
+            "Background close leaves playback; active close activates neighbor; final close clears media; close while loading cancels load and prevents late reopen. Control-Tab variants wrap; session tab strip is not restored after relaunch."
+          ]
+        }
+      ]
     },
     {
       "id": "sources-monitoring",
@@ -1207,7 +2132,8 @@
       "actions": [
         "open Settings with Command-comma",
         "inspect settings window",
-        "close Settings"
+        "close Settings",
+        "select each destination and scroll full page"
       ],
       "status": "partial",
       "live_qualified": false,
@@ -1215,11 +2141,28 @@
         "Scenarios/settings-menu.json"
       ],
       "source_paths": [
-        "Sources/IlliquidApp/App/IlliquidApp.swift"
+        "Sources/IlliquidApp/App/IlliquidApp.swift",
+        "Sources/IlliquidApp/UI/SettingsView.swift"
       ],
-      "requires": [],
-      "gap": "Native shortcut/window-count smoke only; second-window ordering does not identify Settings content. Current-source live validation, content identity, direct menu traversal, individual controls and preference persistence remain pending.",
-      "evidence": []
+      "requires": [
+        "all eight destinations",
+        "scaled/small Settings window with scrollable content"
+      ],
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "application Settings (Command-comma)",
+        "timeline Settings utility or compact More"
+      ],
+      "state_variants": [
+        {
+          "state": "Playback / Behavior / Audio & Subtitles / Video / Appearance / Sources / Data & Privacy / Updates",
+          "action": "select each destination and scroll full page",
+          "expected_outcomes": [
+            "Assert destination-specific content_anchors and dependent controls, navigation selection, scroll reachability and close/player focus return. Existing settings-menu example only observes second-window existence; it does not identify Settings content."
+          ]
+        }
+      ]
     },
     {
       "id": "settings-playback",
@@ -1233,19 +2176,50 @@
         "Muted",
         "Default playback speed",
         "Repeat",
-        "Shuffle"
+        "Shuffle",
+        "edit timeout via text and 0.5-second stepper",
+        "lock/reset controls; set volume/mute; select each speed, repeat and shuffle"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/App/PlaybackChromePreferences.swift"
       ],
       "requires": [
-        "isolated preference seed"
+        "isolated preference seed",
+        "persisted preference isolation",
+        "capable and speed-incapable backends",
+        "valid/invalid timeout text"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "settings_destination": "playback",
+      "content_anchors": [
+        "Controls",
+        "Playback Preferences",
+        "Playlist"
+      ],
+      "routes": [
+        "Settings > Playback > Controls / Playback Preferences / Playlist"
+      ],
+      "state_variants": [
+        {
+          "state": "always visible on/off",
+          "action": "edit timeout via text and 0.5-second stepper",
+          "expected_outcomes": [
+            "Allowed timeout is 0.5..60; invalid finite/out-of-range/nonfinite model input falls back to 2.5 rather than clamping. Always visible disables timeout controls. Assert focus loss/commit behavior separately from stepper changes."
+          ]
+        },
+        {
+          "state": "controls / playback / playlist defaults",
+          "action": "lock/reset controls; set volume/mute; select each speed, repeat and shuffle",
+          "expected_outcomes": [
+            "Volume spans 0..100 with mute; six speeds 0.5/0.75/1/1.25/1.5/2 require capability; Repeat Off/All/One and shuffle update state while preserving playing identity. Lock/reset outcome and preference reload require assertions."
+          ]
+        }
+      ]
     },
     {
       "id": "settings-behavior",
@@ -1253,19 +2227,43 @@
       "actions": [
         "default-player launch reminder",
         "keep running after last window",
-        "restore previous session paused"
+        "restore previous session paused",
+        "toggle keep-running and restore-paused"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/App/WindowCloseBehavior.swift"
       ],
       "requires": [
-        "isolated preference seed"
+        "isolated preference seed",
+        "PiP active/inactive",
+        "keep-running on/off",
+        "paused restoration on/off"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "settings_destination": "behavior",
+      "content_anchors": [
+        "Default Video Player",
+        "Window Closing",
+        "Thumbnail Previews",
+        "Session Restoration"
+      ],
+      "routes": [
+        "Settings > Behavior > Window Closing / Session Restoration"
+      ],
+      "state_variants": [
+        {
+          "state": "last window close and explicit open",
+          "action": "toggle keep-running and restore-paused",
+          "expected_outcomes": [
+            "Close stops playback unless PiP is active; keep-running controls process continuation, Dock reopens player; Command-Q exits. Explicit opens play automatically regardless of restore-paused preference. Thumbnail/default-player details are owned by linked inventory families."
+          ]
+        }
+      ]
     },
     {
       "id": "settings-default-player",
@@ -1274,20 +2272,48 @@
         "Make Default",
         "Changing Defaults",
         "success/failure result",
-        "launch reminder alert"
+        "launch reminder alert",
+        "Make Default from Settings; select result text",
+        "accept Make Default / Not Now, dismiss result OK, reopen player"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/App/DefaultVideoPlayer.swift",
+        "Sources/IlliquidApp/App/IlliquidApp.swift"
       ],
       "requires": [
         "dedicated account",
-        "explicit system default-association qualification"
+        "explicit system default-association qualification",
+        "installed Applications bundle and declared formats",
+        "incomplete versus complete defaults",
+        "controlled cancel/failure of system association changes",
+        "benchmark suppression"
       ],
-      "gap": "System associations affect the account beyond the benchmark bundle; no example changes them.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "Settings > Behavior > Make Default / launch reminder",
+        "launch Make Default / Not Now / result OK"
+      ],
+      "state_variants": [
+        {
+          "state": "installed / not installed / no declared formats",
+          "action": "Make Default from Settings; select result text",
+          "expected_outcomes": [
+            "Noninstalled copy gives Applications guidance; no formats gives reason; changing state disables Make Default; success/partial failure displays selectable result. Dedupe content types and leave already-completed changes on cancellation."
+          ]
+        },
+        {
+          "state": "launch eligibility and reminder",
+          "action": "accept Make Default / Not Now, dismiss result OK, reopen player",
+          "expected_outcomes": [
+            "Offer only installed, nonempty formats, reminder enabled and incomplete defaults; evaluate once per app launch. Benchmark environment suppresses offer. System permission/association UI is environment-dependent and must be observed without invented dialog details."
+          ]
+        }
+      ]
     },
     {
       "id": "settings-thumbnails",
@@ -1300,20 +2326,54 @@
         "generate with window closed",
         "Prioritize",
         "Exclude Folder",
-        "remove exclusion"
+        "remove exclusion",
+        "apply Economical/Balanced/Extensive and adjust boundaries",
+        "toggle both generators, closed-window option and three priorities",
+        "add/remove exclusions, clear cache, wait usage refresh"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/ThumbnailSettingsCard.swift"
+        "Sources/IlliquidApp/UI/ThumbnailSettingsCard.swift",
+        "Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift",
+        "Sources/IlliquidCore/Player/ThumbnailPolicy.swift"
       ],
       "requires": [
         "owned cache",
-        "folder fixture"
+        "folder fixture",
+        "cache data and usage snapshots",
+        "background off/on",
+        "excluded folders / duplicates / 128 cap"
       ],
-      "gap": "thumbnail-cache-usage is an existing readout ID, not an automation claim for cache mutations.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "Settings > Behavior > Thumbnail Previews"
+      ],
+      "state_variants": [
+        {
+          "state": "resource budgets and presets",
+          "action": "apply Economical/Balanced/Extensive and adjust boundaries",
+          "expected_outcomes": [
+            "Memory 8..128 MiB step 8, disk 0..2048 MiB step 64 (zero disables disk); videos/pass and previews/video 1..64, idle 1..30 seconds, work 1..120 seconds, recent 1..30 days. Applying preset changes budgets without enabling background generation."
+          ]
+        },
+        {
+          "state": "background off/on and current-video preparation",
+          "action": "toggle both generators, closed-window option and three priorities",
+          "expected_outcomes": [
+            "Background-dependent controls disabled when off; priorities Balanced/Nearby files/Recent activity; closed-window generation needs keep-running; current-video generation has independent switch. Verify visible scheduler status and yielding prerequisites, not decoder success from toggles."
+          ]
+        },
+        {
+          "state": "exclude panel cancel / multi-select / duplicate / capacity",
+          "action": "add/remove exclusions, clear cache, wait usage refresh",
+          "expected_outcomes": [
+            "Cancel preserves list; normalized multi-folder exclusions deduplicate and cap 128; full list disables add; exclusions include descendants but keep hover preview available. Clear cache and 2-second usage refresh/status need measured outcomes."
+          ]
+        }
+      ]
     },
     {
       "id": "settings-audio",
@@ -1322,20 +2382,77 @@
         "Preferred audio output",
         "SRT fallback encoding",
         "track-selection preferences",
-        "forget remembered media choices"
+        "forget remembered media choices",
+        "Save Languages or Return; choose four subtitle policies and accessibility/commentary preferences",
+        "change preferred device or disconnect it",
+        "select Unicode only, Windows-1252, Windows-1251, Shift JIS or ISO-8859-1"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/UI/TrackSelectionSettings.swift",
+        "Sources/IlliquidCore/Player/TrackSelectionPreferences.swift",
+        "Sources/IlliquidCore/Player/SubtitleFallbackEncoding.swift"
       ],
       "requires": [
         "audio and subtitle fixtures",
-        "isolated history"
+        "isolated history",
+        "devices available/unavailable and unsupported selection",
+        "remembered track/off versus global defaults",
+        "SRT fixtures for five encodings"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "settings_destination": "audio",
+      "content_anchors": [
+        "Output",
+        "External Subtitles",
+        "Default tracks",
+        "Remembered Per Media"
+      ],
+      "routes": [
+        "Settings > Audio & Subtitles > Output / External Subtitles / Default tracks / Remembered Per Media"
+      ],
+      "state_variants": [
+        {
+          "state": "default track preferences",
+          "action": "Save Languages or Return; choose four subtitle policies and accessibility/commentary preferences",
+          "expected_outcomes": [
+            "Normalize ordered language lists with maximum 32 codes per list; invalid input preserves preferences with error. Four subtitle policies plus Avoid commentary and accessibility toggle apply on next open; remembered per-file choices take precedence. Track selection variants remain in track-preferences."
+          ]
+        },
+        {
+          "state": "System Default / selected available / unavailable / unsupported output",
+          "action": "change preferred device or disconnect it",
+          "expected_outcomes": [
+            "System Default is auto; absent saved device displays Unavailable Device and follows system output; unsupported backend disables selection with explanation; verify actual output separately from preference readout."
+          ]
+        },
+        {
+          "state": "SRT fallback encoding",
+          "action": "select Unicode only, Windows-1252, Windows-1251, Shift JIS or ISO-8859-1",
+          "expected_outcomes": [
+            "Selection affects next external SRT load, not already loaded subtitles; assert decoded content using matching fixtures. Clear remembered choices routes through separate confirmation, not immediate data deletion."
+          ]
+        }
+      ],
+      "choice_sets": {
+        "subtitles": [
+          "Automatic",
+          "Forced only",
+          "Always when available",
+          "Off"
+        ],
+        "srt_fallback": [
+          "Unicode only",
+          "Western (Windows-1252)",
+          "Cyrillic (Windows-1251)",
+          "Japanese (Shift JIS)",
+          "Western (ISO-8859-1)"
+        ]
+      }
     },
     {
       "id": "settings-video",
@@ -1346,7 +2463,9 @@
         "Hardware decoded",
         "HDR",
         "Video format",
-        "Open Playback Inspector"
+        "Open Playback Inspector",
+        "choose hardware policy and inspect current output",
+        "open inspector"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
@@ -1355,10 +2474,35 @@
         "Sources/IlliquidApp/UI/SettingsView.swift"
       ],
       "requires": [
-        "hardware/codec fixture matrix"
+        "hardware/codec fixture matrix",
+        "no source, unreported decoder, software/fallback and hardware HDR fixtures"
       ],
-      "gap": "Output readouts and requested decoder policy must be verified separately from actual decoder and display output.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "settings_destination": "video",
+      "content_anchors": [
+        "Decoding",
+        "Current Output"
+      ],
+      "routes": [
+        "Settings > Video > Hardware decoding / Current Output / Open Playback Inspector"
+      ],
+      "state_variants": [
+        {
+          "state": "Automatic / Compatibility / Off",
+          "action": "choose hardware policy and inspect current output",
+          "expected_outcomes": [
+            "Requested policy is distinct from active decoder: No video loaded / Not reported by current engine / Software / Software fallback / backend decoder. Read hardware-decoded Yes/No, HDR Active/Inactive and codec/dimensions; a policy selection alone does not prove hardware/HDR output."
+          ]
+        },
+        {
+          "state": "no source / loaded source",
+          "action": "open inspector",
+          "expected_outcomes": [
+            "Inspector button disabled without source; loaded media allows inspector and selectable runtime fields."
+          ]
+        }
+      ]
     },
     {
       "id": "settings-appearance",
@@ -1369,20 +2513,85 @@
         "Text appearance",
         "Rainbow palette",
         "Lock window to video aspect ratio",
-        "Always on Top"
+        "Always on Top",
+        "select each option and reload preferences",
+        "toggle aspect lock and Always on Top"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/UI/PlayerTheme.swift",
+        "Sources/IlliquidApp/UI/PlayerInterfaceScale.swift"
       ],
       "requires": [
         "isolated preferences",
-        "conditional theme controls"
+        "conditional theme controls",
+        "all five themes",
+        "three text modes and six palettes",
+        "80..150% scale and small window"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "settings_destination": "appearance",
+      "content_anchors": [
+        "Interface Size",
+        "Theme",
+        "Window"
+      ],
+      "routes": [
+        "Settings > Appearance > UI Scale / Theme / Overlay Text / Window",
+        "View > Increase / Decrease / Reset UI Size"
+      ],
+      "state_variants": [
+        {
+          "state": "scale/theme/text/palette matrix",
+          "action": "select each option and reload preferences",
+          "expected_outcomes": [
+            "Scale 80..150 by 10; five themes; Liquid Glass alone shows three text modes; Dynamic Rainbow alone shows six palettes. Switching away hides dependent controls while retaining selection. Assert content scaling and reachability rather than changing picker alone."
+          ]
+        },
+        {
+          "state": "window settings",
+          "action": "toggle aspect lock and Always on Top",
+          "expected_outcomes": [
+            "Aspect lock affects resize; top preference updates window and synchronizes menu/context/Settings state; assert persistence and fullscreen/PiP interactions separately."
+          ]
+        }
+      ],
+      "choice_sets": {
+        "ui_scale_percent": [
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150
+        ],
+        "themes": [
+          "Liquid Glass",
+          "Graphite",
+          "Midnight",
+          "Nord",
+          "Classic macOS"
+        ],
+        "text_appearance": [
+          "Dynamic Rainbow",
+          "Dynamic Black / White / Grey",
+          "Static"
+        ],
+        "rainbow_palettes": [
+          "Soft Spectrum",
+          "Balanced",
+          "Analogous",
+          "Complementary",
+          "Warm",
+          "Cool"
+        ]
+      }
     },
     {
       "id": "settings-sources",
@@ -1394,20 +2603,51 @@
         "Show hidden items",
         "Reset Current Tab",
         "sort directions",
-        "Restore Sidebar Defaults"
+        "Restore Sidebar Defaults",
+        "edit width, view, Show Hidden and reset",
+        "set each off/ascending/descending, Restore Sidebar Defaults"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
       ],
       "requires": [
         "source tab fixture",
-        "isolated preferences"
+        "isolated preferences",
+        "no active tab and two isolated tabs",
+        "nondefault visibility",
+        "all sort directions"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "settings_destination": "sources",
+      "content_anchors": [
+        "Sidebar",
+        "Current Tab",
+        "Sorting"
+      ],
+      "routes": [
+        "Settings > Sources > Sidebar / Current Tab / Sorting"
+      ],
+      "state_variants": [
+        {
+          "state": "sidebar and active tab state",
+          "action": "edit width, view, Show Hidden and reset",
+          "expected_outcomes": [
+            "Width slider 300..720; four view modes; current-tab view/hidden controls disabled without tab. Reset Current Tab visible only for nondefault visibility, isolates other tabs; Show Hidden concerns app rules."
+          ]
+        },
+        {
+          "state": "sort versus visibility defaults",
+          "action": "set each off/ascending/descending, Restore Sidebar Defaults",
+          "expected_outcomes": [
+            "Sort combines Type > Date Created > Name; Restore Sidebar Defaults resets width and sort only, preserving current-tab visibility, membership and view configuration."
+          ]
+        }
+      ]
     },
     {
       "id": "settings-data",
@@ -1417,20 +2657,51 @@
         "Clear Progress",
         "Clear Choices",
         "Reset Unreadable History",
-        "confirm/cancel"
+        "confirm/cancel",
+        "open confirmation, cancel then confirm each",
+        "toggle then open/seek/relaunch"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/SettingsView.swift"
+        "Sources/IlliquidApp/UI/SettingsView.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift"
       ],
       "requires": [
         "owned seeded history",
-        "unreadable-history fixture"
+        "unreadable-history fixture",
+        "separate history progress and media-choice records",
+        "unreadable history",
+        "confirm and cancel for each action"
       ],
-      "gap": "Destructive preference/history controls require fixture-owned state; never reset production defaults.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "settings_destination": "data",
+      "content_anchors": [
+        "On This Mac",
+        "Playback Data"
+      ],
+      "routes": [
+        "Settings > Data & Privacy > Remember history / Clear progress / Clear media choices / Reset unreadable history",
+        "Audio & Subtitles > Clear remembered choices"
+      ],
+      "state_variants": [
+        {
+          "state": "clear progress / choices / unreadable history",
+          "action": "open confirmation, cancel then confirm each",
+          "expected_outcomes": [
+            "Separate titles/messages and destructive outcomes: progress clears resumes/completed/last-local/folder memories while preserving preferences/sources; media choices clears audio/subtitle/visibility/delay preserving progress; unreadable reset replaces unreadable data removing both classes while preserving media files/preferences/sources."
+          ]
+        },
+        {
+          "state": "Remember playback history off/on",
+          "action": "toggle then open/seek/relaunch",
+          "expected_outcomes": [
+            "Off retains stored data but stops writes and session restoration. Cancellation makes no data changes. Assert actual records and unaffected data after confirmation; readout/panel alone is insufficient."
+          ]
+        }
+      ]
     },
     {
       "id": "settings-updates",
@@ -1439,20 +2710,54 @@
         "Automatically check for updates",
         "Include prerelease updates",
         "Check for Updates",
-        "disabled updater state"
+        "disabled updater state",
+        "inspect reason and attempt menu/Settings check",
+        "toggle automatic and prerelease, reopen app, request controlled update"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/UpdateSettingsView.swift"
+        "Sources/IlliquidApp/UI/UpdateSettingsView.swift",
+        "Sources/IlliquidApp/App/AppUpdateController.swift",
+        "Sources/IlliquidApp/App/AppDelegate.swift",
+        "Sources/IlliquidApp/App/IlliquidApp.swift"
       ],
       "requires": [
         "controlled update feed",
-        "supported signing and updater configuration"
+        "supported signing and updater configuration",
+        "installed signed configured app",
+        "controlled HTTPS signed feed",
+        "benchmark/unconfigured/startup failure/busy states"
       ],
-      "gap": "Network, signing and Sparkle state affect availability; no production updater interaction.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "settings_destination": "updates",
+      "content_anchors": [
+        "Automatically check for updates",
+        "Include prerelease updates",
+        "Check for Updates\u2026"
+      ],
+      "routes": [
+        "application Check for Updates menu",
+        "Settings > Updates > automatic / prerelease / Check for Updates"
+      ],
+      "state_variants": [
+        {
+          "state": "uninstalled / benchmark / invalid config / start failure / busy",
+          "action": "inspect reason and attempt menu/Settings check",
+          "expected_outcomes": [
+            "Unavailable reasons disable automatic check; manual check enabled only when canCheckForUpdates. Benchmark overrides explicitly disable updates; startup errors surface reason; busy state follows Sparkle readiness."
+          ]
+        },
+        {
+          "state": "stable / beta preferences",
+          "action": "toggle automatic and prerelease, reopen app, request controlled update",
+          "expected_outcomes": [
+            "Prerelease persists, stable channels empty / beta enabled, changing preference resets update cycle; automatic follows updater preference. Sparkle owns consent/download verification/install UI; exact dialogs and outcomes require controlled signed feed/system receipts, not invented details."
+          ]
+        }
+      ]
     },
     {
       "id": "help-shortcuts",
@@ -1464,28 +2769,186 @@
         "Save Shortcut",
         "conflict validation",
         "Reset All",
-        "Done"
+        "Done",
+        "select every Action, save new chord then send old/new bindings",
+        "compare Command-T help with actual menu route"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/UI/ShortcutSettingsView.swift",
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/PlayerShortcutBindings.swift",
+        "Sources/IlliquidApp/App/PlaybackOSD.swift"
       ],
       "requires": [
-        "isolated default shortcut overrides"
+        "isolated default shortcut overrides",
+        "all 25 editable definitions",
+        "frame-step capability on/off",
+        "isolated persisted overrides",
+        "invalid/reserved/duplicate chords"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Historical Command-T help discrepancy is source-corrected: ShortcutHelpView now says New Video Tab, matching PlayerCommands. Executable help/menu input and content assertions, shortcut persistence and current-source live receipts remain pending.",
+      "evidence": [],
+      "routes": [
+        "Help > Keyboard Shortcuts / Customize Playback Shortcuts",
+        "default ? help binding",
+        "customization Action / Shortcut / Save Shortcut / Reset All / Done"
+      ],
+      "state_variants": [
+        {
+          "state": "all editable actions",
+          "action": "select every Action, save new chord then send old/new bindings",
+          "expected_outcomes": [
+            "Enumerate editable_actions from PlayerShortcutDefinition.all; frame actions conditionally shown. Malformed/reserved Command/Control/Tab/Escape or duplicate chord reports error and preserves binding; successful override disables old fallback, updates menu/help shortcut labels where dynamic, persists; Reset All restores defaults. Repeat/routing matrix lives in playback-shortcut-routing."
+          ]
+        },
+        {
+          "state": "help content discrepancy",
+          "action": "compare Command-T help with actual menu route",
+          "expected_outcomes": [
+            "Regression target for the historical discrepancy: ShortcutHelpView now labels Command-T New Video Tab, matching PlayerCommands. Verify live help content and actual menu route; source correction alone is not UI qualification."
+          ]
+        }
+      ],
+      "editable_actions": [
+        {
+          "id": "time",
+          "title": "Go to Time",
+          "default_key": "G"
+        },
+        {
+          "id": "loop-a",
+          "title": "Set loop start (A)",
+          "default_key": "A"
+        },
+        {
+          "id": "loop-b",
+          "title": "Set loop end (B)",
+          "default_key": "B"
+        },
+        {
+          "id": "loop-clear",
+          "title": "Clear A\u2013B loop",
+          "default_key": "Shift+B"
+        },
+        {
+          "id": "screenshot",
+          "title": "Save screenshot",
+          "default_key": "S"
+        },
+        {
+          "id": "play",
+          "title": "Play or pause",
+          "default_key": "Space"
+        },
+        {
+          "id": "back",
+          "title": "Seek backward 5 seconds",
+          "default_key": "Left"
+        },
+        {
+          "id": "forward",
+          "title": "Seek forward 5 seconds",
+          "default_key": "Right"
+        },
+        {
+          "id": "back-small",
+          "title": "Seek backward 1 second",
+          "default_key": "Shift+Left"
+        },
+        {
+          "id": "forward-small",
+          "title": "Seek forward 1 second",
+          "default_key": "Shift+Right"
+        },
+        {
+          "id": "back-large",
+          "title": "Seek backward 10 minutes",
+          "default_key": "Shift+PageUp"
+        },
+        {
+          "id": "forward-large",
+          "title": "Seek forward 10 minutes",
+          "default_key": "Shift+PageDown"
+        },
+        {
+          "id": "quieter",
+          "title": "Volume down 5%",
+          "default_key": "Down"
+        },
+        {
+          "id": "louder",
+          "title": "Volume up 5%",
+          "default_key": "Up"
+        },
+        {
+          "id": "quieter-small",
+          "title": "Volume down 1%",
+          "default_key": "Option+Down"
+        },
+        {
+          "id": "louder-small",
+          "title": "Volume up 1%",
+          "default_key": "Option+Up"
+        },
+        {
+          "id": "frame-back",
+          "title": "Previous frame",
+          "default_key": "Option+Left"
+        },
+        {
+          "id": "frame-forward",
+          "title": "Next frame",
+          "default_key": "Option+Right"
+        },
+        {
+          "id": "chapter-back",
+          "title": "Previous chapter",
+          "default_key": "PageUp"
+        },
+        {
+          "id": "chapter-forward",
+          "title": "Next chapter",
+          "default_key": "PageDown"
+        },
+        {
+          "id": "undo-seek",
+          "title": "Undo seek",
+          "default_key": "Shift+Delete"
+        },
+        {
+          "id": "fullscreen",
+          "title": "Toggle fullscreen",
+          "default_key": "F"
+        },
+        {
+          "id": "mute",
+          "title": "Mute or unmute",
+          "default_key": "M"
+        },
+        {
+          "id": "inspector",
+          "title": "Playback Inspector",
+          "default_key": "I"
+        },
+        {
+          "id": "help",
+          "title": "Keyboard Shortcuts",
+          "default_key": "?"
+        }
+      ]
     },
     {
       "id": "inspector-messages",
       "area": "dialogs",
       "actions": [
-        "Playback Inspector",
-        "Playback Message History",
-        "dismiss",
+        "Playback Inspector selectable fields",
+        "Copy Diagnostics",
+        "OSD click opens history",
+        "Playback Message History Clear/Done/empty",
+        "reverse order and seek coalescing",
         "focus return"
       ],
       "status": "pending",
@@ -1493,14 +2956,58 @@
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/App/PlayerCommands.swift",
-        "Sources/IlliquidApp/App/AppModel.swift"
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+        "Sources/IlliquidApp/App/PlaybackOSD.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift"
       ],
       "requires": [
         "loaded fixture",
-        "message-producing fixture"
+        "message-producing fixture",
+        "owned clipboard readback",
+        "known source/video/display/buffer/diagnostic state",
+        "more than 50 generated messages",
+        "seek bursts within and beyond lifetime"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "inspector shown",
+          "action": "select/copy field text and Copy Diagnostics",
+          "expected_outcomes": [
+            "All labeled values and recent diagnostics selectable; report copies session source/origin/phase/time, video format/decoder/HDR/filters, display refresh ceiling/color/EDR, buffer/read speed, audio output/selected tracks, subtitle delay, chapters and recent diagnostics; empty/unknown fields use explicit placeholders."
+          ]
+        },
+        {
+          "state": "OSD item present in titlebar or fullscreen overlay",
+          "action": "click message",
+          "expected_outcomes": [
+            "Open Playback Messages; item text is accessible label with history hint; Done dismisses and focus returns through presentation owner."
+          ]
+        },
+        {
+          "state": "history populated or empty",
+          "action": "Clear then inspect empty state",
+          "expected_outcomes": [
+            "Clear removes history; No Playback Messages placeholder replaces list, Clear disappears and View history command disabled when empty; clearing history does not itself invalidate current OSD."
+          ]
+        },
+        {
+          "state": "successive messages and seek bursts",
+          "action": "generate actions, inspect order and retention",
+          "expected_outcomes": [
+            "Newest messages first with timestamps; retain latest 50; seeks during current one-second OSD lifetime add signed delta and latest target, replacing last history item; after expiration a new row is appended."
+          ]
+        },
+        {
+          "state": "source/system transition or OSD deadline",
+          "action": "wait or transition",
+          "expected_outcomes": [
+            "OSD invalidates/expires while historical messages remain; no displayed FPS claim from inspector Refresh ceiling or capture."
+          ]
+        }
+      ]
     },
     {
       "id": "file-panels",
@@ -1511,20 +3018,49 @@
         "save screenshot",
         "cancel",
         "Escape",
-        "focus return"
+        "focus return",
+        "Open or Cancel location prompt and HTTP warning",
+        "submit valid/invalid values then replace source while dialog open"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/AppModel.swift"
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/UI/GoToTimeView.swift",
+        "Sources/IlliquidCore/Utilities/PlaybackTimeInput.swift"
       ],
       "requires": [
         "fixture paths",
-        "fresh native panel selectors"
+        "fresh native panel selectors",
+        "cancel and stale-source replacement",
+        "valid/invalid time and subtitle delay",
+        "HTTP warning cancellation"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable native panel/content/outcome qualification. Go to Time retains its source guard; subtitle-delay completion now captures/checks source identity and shutdown before applying or re-presenting input. Focused Kyoto job c2ad910c28514ed9b80a53e23f1b546e failed test-fixture compilation (NSTextField(frame:) stub mismatch); no passing focused or live stale-source qualification.",
+      "evidence": [],
+      "routes": [
+        "open/add source/subtitle panels",
+        "Open Location alert",
+        "Go to Time sheet",
+        "Subtitle Delay alert"
+      ],
+      "state_variants": [
+        {
+          "state": "location malformed / unsupported scheme / HTTPS / HTTP",
+          "action": "Open or Cancel location prompt and HTTP warning",
+          "expected_outcomes": [
+            "Malformed/non-HTTP(S) URL no-ops; HTTPS opens directly; HTTP requires Open Anyway, cancel preserves current source; no media-open pass from dialog dismissal."
+          ]
+        },
+        {
+          "state": "Go to Time and subtitle delay",
+          "action": "submit valid/invalid values then replace source while dialog open",
+          "expected_outcomes": [
+            "Go to Time accepts seconds, mm:ss and hh:mm:ss with range/source validation (go-to-time-loop variants apply). Subtitle delay accepts integer milliseconds \u00b110000, retains invalid input/error on re-presentation; Cancel leaves delay unchanged. Subtitle-delay completion now captures/checks source identity and shutdown before applying or re-presenting input. Require stale-source replacement and shutdown regression controls plus live outcomes; the focused fixture-compilation failure is not a passing control. Verify file-type filters and panel cancellation separately."
+          ]
+        }
+      ]
     },
     {
       "id": "screenshot",
@@ -1534,21 +3070,40 @@
         "Include subtitles",
         "save destination",
         "cancel",
-        "output image"
+        "output image",
+        "save PNG with subtitles checked/unchecked"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/AppModel.swift"
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidNativePlayback/Presentation/NativeScreenshot.swift"
       ],
       "requires": [
         "backend screenshot capability",
         "video/subtitle fixture",
-        "owned destination"
+        "owned destination",
+        "writable/unwritable destinations",
+        "subtitle on/off content",
+        "supported backend and loaded media"
       ],
-      "gap": "App screenshot export differs from runner window capture; neither is displayed-FPS evidence.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "Playback > Save Screenshot / S binding",
+        "context menu / More when supported",
+        "PNG save panel Include subtitles toggle"
+      ],
+      "state_variants": [
+        {
+          "state": "save success / failure / cancel",
+          "action": "save PNG with subtitles checked/unchecked",
+          "expected_outcomes": [
+            "Default timestamped media name and PNG filter; cancel preserves filesystem. Success emits Screenshot saved; capture failure reports error. Inspect resulting pixels and subtitle inclusion; save-panel success alone does not qualify renderer output."
+          ]
+        }
+      ]
     },
     {
       "id": "recovery",
@@ -1560,31 +3115,49 @@
         "Skip",
         "Stop",
         "Copy Details",
-        "Dismiss"
+        "Dismiss",
+        "exercise each available recovery action"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/UI/PlaybackRecoveryView.swift"
+        "Sources/IlliquidApp/UI/PlaybackRecoveryView.swift",
+        "Sources/IlliquidCore/Player/PlaybackRecoveryIssue.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift"
       ],
       "requires": [
         "failed-source fixture",
         "unavailable-session fixture",
-        "owned clipboard policy"
+        "owned clipboard policy",
+        "message-only, unavailable file/folder and failed-source cases",
+        "canSkip true/false",
+        "clipboard verification"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "playback recovery overlay Retry / Locate / Forget / Skip / Stop / Copy Details / Dismiss"
+      ],
+      "state_variants": [
+        {
+          "state": "recovery kind variants",
+          "action": "exercise each available recovery action",
+          "expected_outcomes": [
+            "Message-only has Copy Details/Dismiss; unavailable restore has Retry/type-specific single file or folder Locate/Forget; failed source has Retry, conditional Skip, Stop. Copy Details writes diagnostic text; Dismiss removes overlay. Cancel/failed Locate preserves restore target; Forget preserves history; wrapping narrow action layout remains reachable."
+          ]
+        }
+      ]
     },
     {
       "id": "video-geometry",
       "area": "video",
       "actions": [
-        "Sizing Fit/Fill",
-        "Aspect Ratio",
-        "Crop",
+        "Sizing Fit/Fill including PiP",
+        "Aspect Ratio Automatic/4:3/16:9/16:10/2.35:1",
+        "Crop None/1:1/4:3/16:9/2.35:1",
         "Reset Video Sizing",
-        "disabled in PiP"
+        "PiP per-control availability"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
@@ -1594,10 +3167,54 @@
       ],
       "requires": [
         "video geometry capability",
-        "aspect-ratio fixture"
+        "aspect-ratio fixture",
+        "active PiP and windowed video comparison"
       ],
-      "gap": "Capability gated controls need input and actual presentation assertions.",
-      "evidence": []
+      "gap": "Capability gated controls need input and actual presentation assertions. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "changeVideoGeometry supported",
+          "action": "choose Fit or Fill",
+          "expected_outcomes": [
+            "Fit shows entire image; Fill crops to window; Sizing picker remains enabled during PiP."
+          ]
+        },
+        {
+          "state": "PiP inactive",
+          "action": "choose aspect/crop or reset",
+          "expected_outcomes": [
+            "Apply selected aspect/crop; Reset restores default video sizing; assert actual geometry separately from requested settings."
+          ]
+        },
+        {
+          "state": "PiP active",
+          "action": "inspect aspect/crop/reset",
+          "expected_outcomes": [
+            "Aspect Ratio, Crop and Reset Video Sizing are disabled, with PiP guidance; Fit/Fill remains available."
+          ]
+        }
+      ],
+      "choice_sets": {
+        "sizing": [
+          "Fit",
+          "Fill"
+        ],
+        "aspect": [
+          "Automatic",
+          "4:3",
+          "16:9",
+          "16:10",
+          "2.35:1"
+        ],
+        "crop": [
+          "None",
+          "1:1",
+          "4:3",
+          "16:9",
+          "2.35:1"
+        ]
+      }
     },
     {
       "id": "video-context-menu",
@@ -1607,28 +3224,60 @@
         "available Playback context actions",
         "disabled actions",
         "dismiss",
-        "focus and chrome return"
+        "focus and chrome return",
+        "invoke context menu and traverse action outcomes",
+        "choose each action then dismiss"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/AppModel.swift"
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/App/PlayerUXPolicy.swift",
+        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift",
+        "Sources/IlliquidApp/App/PlayerInteractionModel.swift"
       ],
       "requires": [
         "loaded local/remote fixtures",
         "current video bounds",
-        "real secondary-click"
+        "real secondary-click",
+        "local / remote / empty source",
+        "no tracks and audio/subtitle tracks",
+        "previous/next boundaries",
+        "capability present/absent"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "native video right click",
+        "AXShowMenu on invoking native video view"
+      ],
+      "state_variants": [
+        {
+          "state": "local / remote / empty / capabilities",
+          "action": "invoke context menu and traverse action outcomes",
+          "expected_outcomes": [
+            "Verify play/pause, \u00b15-second seek, previous/next, audio and subtitle selection/Off/no-tracks, PiP/fullscreen/top, screenshot, Finder, copy file path or remote URL, inspector. Use source availability model to distinguish omitted actions from disabled items/checkmarks; Finder only local, empty source yields no menu."
+          ]
+        },
+        {
+          "state": "menu dismissed or activated",
+          "action": "choose each action then dismiss",
+          "expected_outcomes": [
+            "Assert actual transport/track/window/clipboard/Finder/inspector outcome, focus return and released transient pin, not menu presence alone."
+          ]
+        }
+      ]
     },
     {
       "id": "window-fullscreen",
       "area": "window",
       "actions": [
-        "Command-F fullscreen enter",
-        "Command-F fullscreen exit"
+        "Command-F and F fullscreen",
+        "Window menu and context-menu fullscreen",
+        "middle-third double-click fullscreen",
+        "native green-button fullscreen",
+        "Escape exit and transition lifecycle"
       ],
       "status": "partial",
       "live_qualified": false,
@@ -1636,14 +3285,44 @@
         "Scenarios/window.json"
       ],
       "source_paths": [
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift",
+        "Sources/IlliquidApp/UI/PlayerWindowControls.swift",
+        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift"
       ],
       "requires": [
         "one visible player window",
-        "no modal panel"
+        "no modal panel",
+        "default F binding",
+        "native traffic-light and video bounds",
+        "fullscreen transition notifications"
       ],
-      "gap": "Shortcut scenario supplies a transition smoke; fullscreen completion and layout require live qualification.",
-      "evidence": []
+      "gap": "Shortcut scenario supplies a transition smoke; fullscreen completion and layout require live qualification. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "windowed or fullscreen",
+          "action": "Command-F / F / Window menu / video context fullscreen / center double-click",
+          "expected_outcomes": [
+            "Request toggle and observe AppKit completion, isFullscreen, layout and focus; OSD invalidated before app-owned system transition."
+          ]
+        },
+        {
+          "state": "native green button path",
+          "action": "use native fullscreen control",
+          "expected_outcomes": [
+            "Window configured fullScreenPrimary; qualify native entry/exit separately from app shortcut request."
+          ]
+        },
+        {
+          "state": "fullscreen Escape",
+          "action": "dismiss with visible/hidden chrome and sidebar/dialog states",
+          "expected_outcomes": [
+            "Honor interaction/dialog/sidebar priority where app handles event; hidden chrome defers native fullscreen exit; attached sheets retain native cancellation."
+          ]
+        }
+      ]
     },
     {
       "id": "window-resize",
@@ -1654,22 +3333,51 @@
         "aspect lock",
         "Fit Window to Video",
         "desktop fill",
-        "titlebar double-click"
+        "titlebar double-click",
+        "passive titlebar desktop fill/restore exclusions"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
         "Sources/IlliquidApp/UI/PlayerWindowControls.swift",
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift"
       ],
       "requires": [
         "fresh window bounds",
         "video fixture",
-        "real window edge input"
+        "real window edge input",
+        "known original frame",
+        "aspect-lock enabled/disabled",
+        "native titlebar interactive-region bounds"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "No executable interaction and outcome assertion for this family yet. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "windowed passive titlebar double-click",
+          "action": "double-click hosted passive text/padding",
+          "expected_outcomes": [
+            "Fill screen visibleFrame with largest permitted frame; obey content aspect ratio; subsequent double-click restores remembered frame; reduced motion disables frame animation."
+          ]
+        },
+        {
+          "state": "traffic lights, tabs, clickable OSD/interactive regions or fullscreen",
+          "action": "double-click",
+          "expected_outcomes": [
+            "Do not consume as passive titlebar fill; native traffic-light and hosted control actions retain ownership; fullscreen excluded."
+          ]
+        },
+        {
+          "state": "Fit Window to Video or edge resize",
+          "action": "resize with aspect lock on/off",
+          "expected_outcomes": [
+            "Verify minimum frame and aspect constraints; Fit Window is enabled with an owned player window, windowed state and known video aspect ratio. There is no explicit PiP exclusion in canFitWindowToVideo; qualify each presentation state separately from desktop fill."
+          ]
+        }
+      ]
     },
     {
       "id": "window-minimize",
@@ -1718,24 +3426,69 @@
       "id": "window-pip",
       "area": "window",
       "actions": [
-        "Start/Stop Picture in Picture",
-        "player close while PiP active",
-        "disabled video sizing",
-        "restore player"
+        "menu/Command-Shift-M/utility/context PiP",
+        "system play/pause/skip controls",
+        "system close and restore",
+        "player close while active",
+        "unsupported/start-failure/restore-failure",
+        "Fit/Fill versus disabled aspect/crop/reset"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/PlayerCommands.swift"
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidNativePlayback/Presentation/NativePictureInPictureController.swift",
+        "Sources/IlliquidCore/Player/PictureInPictureState.swift"
       ],
       "requires": [
         "pictureInPicture capability",
         "supported video fixture",
-        "usable GUI session"
+        "usable GUI session",
+        "system PiP controls and windows",
+        "controlled failure/restore fixtures",
+        "known source and duration"
       ],
-      "gap": "PiP may use additional system windows; ownership and visible output remain unqualified.",
-      "evidence": []
+      "gap": "PiP may use additional system windows; ownership and visible output remain unqualified. Expanded outcomes are source-derived inventory only; input delivery, visible results and persistence remain unqualified.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "supported source and pictureInPicture.canToggle",
+          "action": "start/stop via app entry points",
+          "expected_outcomes": [
+            "Capability/source/state gate toggle; start hides chrome and clears OSD; inspect starting/active/stopping/completed state and actual system video window."
+          ]
+        },
+        {
+          "state": "PiP system controls",
+          "action": "play/pause and skip",
+          "expected_outcomes": [
+            "System setPlaying forwards requested play state; finite nonzero skip interval forwards relative skip with completion; paused/time-range snapshot reflects playback; verify visible/audible output separately."
+          ]
+        },
+        {
+          "state": "player closed/minimized while PiP active",
+          "action": "use system restore/close",
+          "expected_outcomes": [
+            "Restore reopens/unminimizes player and completes callback with actual outcome; if PiP ends with no player/restore pending, stop playback. Restore failure reports false; no inferred successful restoration."
+          ]
+        },
+        {
+          "state": "unavailable or start failure",
+          "action": "request PiP",
+          "expected_outcomes": [
+            "Unavailable toggle beeps/refuses; failed start clears desired/active transition, publishes state, records diagnostic and ends session; stale controller callbacks cannot act on replacement."
+          ]
+        },
+        {
+          "state": "PiP active",
+          "action": "inspect sizing controls",
+          "expected_outcomes": [
+            "Fit/Fill remains enabled; aspect/crop/reset disabled; source changes and stop/start races require system-owned lifecycle qualification."
+          ]
+        }
+      ]
     },
     {
       "id": "a11y-focus",
@@ -1746,20 +3499,41 @@
         "Return/Space activation",
         "Escape",
         "focus return after dialog",
-        "menu tracking"
+        "menu tracking",
+        "Tab through controls, adjust timeline, invoke AXShowMenu"
       ],
       "status": "pending",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/AppModel.swift"
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift"
       ],
       "requires": [
         "Full Keyboard Access configuration",
-        "fresh focus tree"
+        "fresh focus tree",
+        "focused native controls/text and modal sheets",
+        "known/unknown duration",
+        "hidden chrome"
       ],
-      "gap": "No executable interaction and outcome assertion for this family yet.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "keyboard focus across player chrome, text fields, sliders, sheets and menus",
+        "AXShowMenu on native video surface",
+        "Playback position adjustable action"
+      ],
+      "state_variants": [
+        {
+          "state": "focus / timeline / context menu",
+          "action": "Tab through controls, adjust timeline, invoke AXShowMenu",
+          "expected_outcomes": [
+            "Text fields and native controls defer playback bindings; timeline AX increments/decrements by one second, unknown duration disables; hidden chrome excluded from AX tree. AXShowMenu uses invoking video view/window focus; success does not establish pointer right-click delivery."
+          ]
+        }
+      ]
     },
     {
       "id": "a11y-voiceover",
@@ -1769,20 +3543,50 @@
         "navigation",
         "playback shortcut deferral",
         "slider adjustments",
-        "custom geometry semantics"
+        "custom geometry semantics",
+        "focus chrome and send keyboard commands",
+        "toggle system preferences and inspect controls/transitions"
       ],
       "status": "environment-dependent",
       "live_qualified": false,
       "scenarios": [],
       "source_paths": [
-        "Sources/IlliquidApp/App/AppModel.swift"
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift",
+        "Sources/IlliquidApp/UI/PlayerOverlayMaterial.swift",
+        "Sources/IlliquidApp/UI/IlliquidMotion.swift"
       ],
       "requires": [
         "VoiceOver enabled",
-        "dedicated accessibility qualification"
+        "dedicated accessibility qualification",
+        "VoiceOver active session",
+        "all five themes",
+        "system Reduce Motion/Transparency combinations"
       ],
-      "gap": "AX snapshots and semantic actions are not VoiceOver qualification.",
-      "evidence": []
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "macOS VoiceOver enabled / disabled",
+        "Reduce Motion / Reduce Transparency settings",
+        "all theme/control layouts"
+      ],
+      "state_variants": [
+        {
+          "state": "VoiceOver on/off",
+          "action": "focus chrome and send keyboard commands",
+          "expected_outcomes": [
+            "VoiceOver pins chrome visible and defers app playback keyboard shortcuts/dynamic equivalents; native menu accelerators retain platform semantics. Verify spoken names, order and focus separately from AX tree presence."
+          ]
+        },
+        {
+          "state": "motion/transparency matrix",
+          "action": "toggle system preferences and inspect controls/transitions",
+          "expected_outcomes": [
+            "Reduce Motion suppresses scale/animation where source observes it; Reduce Transparency adjusts highlights/material fallback where applicable. Qualify per-theme visual contrast and system-owned glass fallback with captures, without inferring appearance from preference alone."
+          ]
+        }
+      ]
     },
     {
       "id": "input-isolation",
@@ -1858,31 +3662,815 @@
         "nonempty required export tables",
         "controlled slow and smooth fixtures"
       ],
-      "gap": "Live Time Profiler readiness FAILED; SIGINT cleanup was confirmed and measurement_valid was false. No valid metric export, performance threshold or displayed FPS is established.",
+      "gap": "Historical readiness timeout retained. New actual Time Profiler readiness confirmed by Darwin notification; bounded 10-second recording/finalization deadline failed, recorder cleanup confirmed/reaped. Export failed Document Missing Template Error; measurement_valid false. No valid metric export, performance threshold, matched comparison or displayed FPS established.",
       "evidence": [
         {
           "receipt_directory": "/tmp/illiquid-agent-ui-live-20261023-playback-6/trace/7aabdf4d197649bb938adccf922e297d",
           "status": "failed",
           "cleanup_confirmed": true,
           "measurement_valid": false
+        },
+        {
+          "receipt_directory": "/tmp/illiquid-agent-ui-live-20261024-grip-r1/trace/0fc60030e6a0463596564a4386dce791",
+          "start_receipt": "/tmp/illiquid-agent-ui-live-20261024-trace-start-r1.json",
+          "stop_receipt": "/tmp/illiquid-agent-ui-live-20261024-trace-stop-r1.json",
+          "export_receipt": "/tmp/illiquid-agent-ui-live-20261024-trace-export-r1.json",
+          "readiness_confirmed": true,
+          "status": "timed-out",
+          "failure_phase": "recorder-finalization",
+          "cleanup_confirmed": true,
+          "reaped": true,
+          "export_error": "Document Missing Template Error",
+          "measurement_valid": false
+        }
+      ]
+    },
+    {
+      "id": "surface-scroll",
+      "area": "input",
+      "actions": [
+        "horizontal wheel/trackpad seeks in 5-second steps",
+        "vertical wheel/trackpad volume",
+        "axis acquisition and momentum",
+        "modal and ownership cancellation"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerInteractionModel.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift"
+      ],
+      "requires": [
+        "native video hit bounds",
+        "precise and discrete scroll injection",
+        "seekable duration and audio fixture",
+        "sheet/popover/focus interruption setup"
+      ],
+      "gap": "No executable surface-scroll scenario, real event delivery, visible seek or audible-volume outcome receipt.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "fresh began or discrete event",
+          "action": "scroll on video",
+          "expected_outcomes": [
+            "Acquire horizontal axis only when abs(deltaX) > abs(deltaY); equal deltas choose vertical; axis stays fixed for gesture."
+          ]
+        },
+        {
+          "state": "horizontal acquired",
+          "action": "send precise/discrete deltas including subthreshold/reversal",
+          "expected_outcomes": [
+            "Accumulate at threshold 8 precise points or 1 discrete unit; each whole step requests signed 5-second seek, retains remainder; no seek for duration <= 0."
+          ]
+        },
+        {
+          "state": "vertical acquired",
+          "action": "scroll up/down",
+          "expected_outcomes": [
+            "Volume delta is deltaY \u00d7 0.5 for precise input or \u00d7 5 for discrete input; negligible deltas below 0.01 ignored and user volume clamps to 0...100."
+          ]
+        },
+        {
+          "state": "ended then momentum",
+          "action": "continue gesture",
+          "expected_outcomes": [
+            "Finger-ended emits no action and retains axis; momentum may continue; cancelled or momentumEnded resets axis/remainder. Discrete event resets after consumption."
+          ]
+        },
+        {
+          "state": "cancelled or no acquired axis",
+          "action": "send late changed/momentum events",
+          "expected_outcomes": [
+            "Late events cannot reacquire ownership; a fresh began/discrete event is required."
+          ]
+        },
+        {
+          "state": "attached sheet or transient presentation; source/focus interruption",
+          "action": "scroll or interrupt gesture",
+          "expected_outcomes": [
+            "Modal/transient input cancels accumulator and performs no surface action; source change and interaction cancellation retire ownership."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "auxiliary-mouse-navigation",
+      "area": "input",
+      "actions": [
+        "mouse button 3 previous file",
+        "mouse button 4 next file",
+        "modal suppression and unsupported buttons"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift",
+        "Sources/IlliquidApp/App/AppModel.swift"
+      ],
+      "requires": [
+        "playlist with previous/next entries and boundaries",
+        "input adapter preserving NSEvent buttonNumber",
+        "sheet/transient presentation setup"
+      ],
+      "gap": "No auxiliary-button input or source-transition assertions; availability and boundary behavior need live qualification.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "video surface and playlist",
+          "action": "press auxiliary buttonNumber 3 or 4",
+          "expected_outcomes": [
+            "3 routes playPreviousFromUser; 4 routes playNextFromUser; observe selected source and playlist-boundary behavior, not center transport seeking."
+          ]
+        },
+        {
+          "state": "sheet or transient presentation",
+          "action": "press button 3/4",
+          "expected_outcomes": [
+            "No previous/next action; other auxiliary button numbers have no navigation mapping."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "playback-shortcut-routing",
+      "area": "input",
+      "actions": [
+        "all 25 PlayerShortcutDefinition.all default chords",
+        "custom overrides and native menu equivalents",
+        "repeat policy",
+        "focus/VoiceOver routing",
+        "Escape priority"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerShortcutBindings.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/PlayerUXPolicy.swift",
+        "Sources/IlliquidNativePlayback/Presentation/NativePlayerView.swift"
+      ],
+      "requires": [
+        "isolated default and remapped shortcut preferences",
+        "loaded long seekable chapter/video/audio fixture",
+        "stepFrame and screenshot capabilities",
+        "player window focus",
+        "text/control/slider focus matrix",
+        "VoiceOver on/off",
+        "modal/popover and fullscreen matrix"
+      ],
+      "gap": "Only historical Space/Right/Left smoke exists separately. No full shortcut/remap/routing/repeat/Escape live qualification; native menu shortcuts and backend presentation need separate assertions.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "default binding G",
+          "action": "send G",
+          "expected_outcomes": [
+            "Go to Time sheet; loaded source and positive duration; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding A",
+          "action": "send A",
+          "expected_outcomes": [
+            "Set A to current position and clear prior B/backend loop; source required; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding B",
+          "action": "send B",
+          "expected_outcomes": [
+            "Set B only after A with current position > A and accepted backend loop; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Shift+B",
+          "action": "send Shift+B",
+          "expected_outcomes": [
+            "Clear A, B and backend loop; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding S",
+          "action": "send S",
+          "expected_outcomes": [
+            "Save Screenshot panel; loaded source and saveScreenshot capability; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Space",
+          "action": "send Space",
+          "expected_outcomes": [
+            "Toggle play/pause; loaded source; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Left",
+          "action": "send Left",
+          "expected_outcomes": [
+            "Seek backward 5 seconds; loaded source and seekRelative capability; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Right",
+          "action": "send Right",
+          "expected_outcomes": [
+            "Seek forward 5 seconds; loaded source and seekRelative capability; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Shift+Left",
+          "action": "send Shift+Left",
+          "expected_outcomes": [
+            "Seek backward 1 second; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Shift+Right",
+          "action": "send Shift+Right",
+          "expected_outcomes": [
+            "Seek forward 1 second; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Shift+PageUp",
+          "action": "send Shift+PageUp",
+          "expected_outcomes": [
+            "Seek backward 600 seconds; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Shift+PageDown",
+          "action": "send Shift+PageDown",
+          "expected_outcomes": [
+            "Seek forward 600 seconds; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Down",
+          "action": "send Down",
+          "expected_outcomes": [
+            "Decrease volume 5 percentage points; loaded source; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Up",
+          "action": "send Up",
+          "expected_outcomes": [
+            "Increase volume 5 percentage points; loaded source; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Option+Down",
+          "action": "send Option+Down",
+          "expected_outcomes": [
+            "Decrease volume 1 percentage point; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Option+Up",
+          "action": "send Option+Up",
+          "expected_outcomes": [
+            "Increase volume 1 percentage point; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Option+Left",
+          "action": "send Option+Left",
+          "expected_outcomes": [
+            "Previous frame; loaded source and stepFrame capability; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Option+Right",
+          "action": "send Option+Right",
+          "expected_outcomes": [
+            "Next frame; loaded source and stepFrame capability; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding PageUp",
+          "action": "send PageUp",
+          "expected_outcomes": [
+            "Previous chapter; selectChapter capability and chapter catalog; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding PageDown",
+          "action": "send PageDown",
+          "expected_outcomes": [
+            "Next chapter; selectChapter capability and chapter catalog; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding Shift+Delete",
+          "action": "send Shift+Delete",
+          "expected_outcomes": [
+            "Undo relative seek sequence to its origin when available; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding F",
+          "action": "send F",
+          "expected_outcomes": [
+            "Toggle fullscreen; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding M",
+          "action": "send M",
+          "expected_outcomes": [
+            "Toggle mute; loaded source; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding I",
+          "action": "send I",
+          "expected_outcomes": [
+            "Present Playback Inspector; loaded source; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "default binding ?",
+          "action": "send ?",
+          "expected_outcomes": [
+            "Present Keyboard Shortcuts help; assert action-specific UI/state result and capability refusal where applicable."
+          ]
+        },
+        {
+          "state": "key repeat",
+          "action": "hold each default/remapped chord",
+          "expected_outcomes": [
+            "Compiled bindings allow repeats only for seek, volume and stepFrame; chapter, toggle and presentation actions ignore repeats."
+          ]
+        },
+        {
+          "state": "player versus other windows, sheets and focus owners",
+          "action": "send same chord in each context",
+          "expected_outcomes": [
+            "Local monitor requires owned player and no attached sheet; non-dismiss actions defer to playback focus owners; text views and non-slider NSControls defer; NSSlider retains seek/volume/frame/chapter navigation; VoiceOver defers playback shortcuts."
+          ]
+        },
+        {
+          "state": "custom bindings",
+          "action": "remap then use old/new chords and inspect menus",
+          "expected_outcomes": [
+            "Override replaces matching fallback; exact Shift/Option modifiers and layout text apply; navigation uses key codes; ? accepts typed ? with Shift/Option; Command/Control/Tab/Escape reserved, duplicate/invalid chords rejected; Reset All restores defaults."
+          ]
+        },
+        {
+          "state": "Escape with active interaction",
+          "action": "press unmodified nonrepeating Escape",
+          "expected_outcomes": [
+            "Cancel active scrub/drag/manipulation before normal routing; restore same-source scrub origin and placement where applicable."
+          ]
+        },
+        {
+          "state": "Escape after interaction cancellation",
+          "action": "dismiss successive eligible layers",
+          "expected_outcomes": [
+            "App dismissal order: message history, inspector, shortcut help, sidebar, fullscreen, else unhandled. Attached sheets/native controls and popover dismissal boundary own their cancellation; popover Escape/outside dismissal is consumed."
+          ]
+        },
+        {
+          "state": "fullscreen with chrome hidden",
+          "action": "press Escape",
+          "expected_outcomes": [
+            "Keyboard routing defers dismissal to native fullscreen handling; do not assume app sidebar dismissal or chrome reveal."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compact-playback-utilities",
+      "area": "timeline",
+      "actions": [
+        "full utility row",
+        "volume/sidebar/More tier",
+        "volume/More tier",
+        "More-only tier",
+        "overflow action reachability"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift"
+      ],
+      "requires": [
+        "window width/UI scale/sidebar geometry matrix",
+        "capability combinations and loaded chapter/track fixtures",
+        "fresh menu/button selectors"
+      ],
+      "gap": "Source-derived tier/action inventory only; no compact-layout hit testing, menu traversal or action outcome qualification.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "sufficient bar length",
+          "action": "inspect full tier",
+          "expected_outcomes": [
+            "Show volume, audio, subtitles, sidebar, conditional PiP, Settings and More; minimum timeline length and 34-point utility spacing determine fitting."
+          ]
+        },
+        {
+          "state": "progressively compact lengths",
+          "action": "resize through tiers",
+          "expected_outcomes": [
+            "Reduce to volume/sidebar/More, then volume/More, then More-only; smallest tier omits trailing time label and preserves timeline space."
+          ]
+        },
+        {
+          "state": "each compact tier",
+          "action": "open More and activate compacted actions",
+          "expected_outcomes": [
+            "Volume mute/\u00b15, sidebar, audio, subtitles, conditional PiP and Settings remain reachable; disabled sidebar retains widening help; native child press/drag-off must not move bar."
+          ]
+        },
+        {
+          "state": "More menu with capabilities/catalog",
+          "action": "traverse actions",
+          "expected_outcomes": [
+            "Reach chapter choices/checkmarks, lock/reset/help, Fit Window, conditional screenshot, inspector, speed choices/checkmarks, conditional audio \u00b10.1/reset and subtitle delay set/reset; verify command/state outcome for each, not menu presence alone."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "timeline-hover-thumbnails",
+      "area": "timeline",
+      "actions": [
+        "hover loading/image/unavailable",
+        "approximate cached preview",
+        "settled refinement",
+        "source retirement and stale completion refusal",
+        "audio-only suppression"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/ElasticPlaybackControlBar.swift",
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift"
+      ],
+      "requires": [
+        "seekable video with videoAspectRatio",
+        "cache hit/miss/nearby/storyboard fixtures",
+        "failed decode fixture",
+        "audio-only fixture",
+        "source replacement and same-URL reload",
+        "real track geometry and pointer dwell"
+      ],
+      "gap": "No real hover/capture, cache refinement timing or stale-image visual assertions; thumbnail images are not playback presentation proof.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "valid idle track hover within 16-point hit distance",
+          "action": "move pointer",
+          "expected_outcomes": [
+            "Target fraction maps to position and half-second bucket; absent image while loading shows spinner; failed request with no image shows Preview unavailable; card is AX-hidden."
+          ]
+        },
+        {
+          "state": "cached or retained image at another position",
+          "action": "move within/across buckets",
+          "expected_outcomes": [
+            "Retain same-source fallback image while refining; timestamp uses represented position and \u2248 when it differs from target by >0.5 seconds; nearby threshold is 3.5 seconds."
+          ]
+        },
+        {
+          "state": "moving hover then settled pointer",
+          "action": "wait for refinement",
+          "expected_outcomes": [
+            "Movement even within bucket postpones native work until 180 ms settled; guarded cache/decode may retry once after 150 ms; current request/source guards prevent stale image replacement."
+          ]
+        },
+        {
+          "state": "source revision change, exit, gesture or disappearance",
+          "action": "retire old hover",
+          "expected_outcomes": [
+            "Cancel request and clear preview; old-source completion cannot publish; preserve a fresh preview already owned by new revision."
+          ]
+        },
+        {
+          "state": "audio-only/no video aspect, nonpositive duration or active gesture",
+          "action": "hover track",
+          "expected_outcomes": [
+            "Suppress/clear thumbnail preview; hovering must not seek active playback."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "legacy-playback-control-bar",
+      "area": "timeline",
+      "actions": [
+        "--legacy-playback-control-bar launch variant",
+        "native NSSlider scrub and AX behavior",
+        "timeline wheel scrub",
+        "chapter hover labels/markers",
+        "legacy utility menus"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/PlaybackControlBarHost.swift",
+        "Sources/IlliquidApp/UI/PlaybackControlBar.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift"
+      ],
+      "requires": [
+        "separately launched isolated legacy benchmark variant for future live checks",
+        "seekable chapter fixture",
+        "precise/discrete wheel input",
+        "fresh native slider selectors"
+      ],
+      "gap": "Legacy launch, slider pointer/keyboard/AX semantics and wheel/chapter hover are unqualified; no build or app launch performed in this inventory update.",
+      "evidence": [],
+      "state_variants": [
+        {
+          "state": "launch argument --legacy-playback-control-bar",
+          "action": "select bar implementation",
+          "expected_outcomes": [
+            "Mount legacy PlaybackControlBar rather than default elastic; retain this variant separately from custom grip/timeline claims."
+          ]
+        },
+        {
+          "state": "native TrackingNSSlider",
+          "action": "click/drag/release or keyboard/AX adjustment",
+          "expected_outcomes": [
+            "Track passive playback position, preview scrub seeks at coalesced cadence and commit final position; keyboard/AX semantics do not prove pointer input."
+          ]
+        },
+        {
+          "state": "wheel over legacy slider",
+          "action": "scroll dominant horizontal/vertical delta",
+          "expected_outcomes": [
+            "Threshold 8 precise points or 1 discrete unit; signed whole steps preview \u00b15 seconds clamped to duration; discrete/end/cancel commits target and clears scrub state; orphan momentum is ignored."
+          ]
+        },
+        {
+          "state": "chapter metadata and hover",
+          "action": "move over timeline then exit",
+          "expected_outcomes": [
+            "Show time plus current-at-hover chapter title, emphasize chapter marker, clamp hover label to bounds; exit clears emphasis and label; this is a text chapter hover, not elastic thumbnail preview."
+          ]
+        },
+        {
+          "state": "legacy utility row/More",
+          "action": "activate audio/subtitle/volume/sidebar/PiP/Settings and More",
+          "expected_outcomes": [
+            "Verify shared action outcomes and chapter/speed selections; no elastic placement/grip capability inferred for legacy bar."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "playlist-navigation",
+      "area": "playback",
+      "actions": [
+        "play file from tree/recursive/media view",
+        "previous/next, reach EOF under Off / All / One, toggle shuffle",
+        "inspect exposed controls"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidPlayer/Player/PlaybackController.swift",
+        "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+        "Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift",
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+      ],
+      "requires": [
+        "immediate folder with nested directories",
+        "failed first/middle/last media",
+        "EOF and repeat/shuffle fixtures"
+      ],
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "Playback > Previous File / Next File (Command-Left / Command-Right)",
+        "native auxiliary buttons 3/4 (see auxiliary-mouse-navigation)",
+        "Settings > Playback > Repeat / Shuffle",
+        "source browser file selection"
+      ],
+      "state_variants": [
+        {
+          "state": "source browser item",
+          "action": "play file from tree/recursive/media view",
+          "expected_outcomes": [
+            "Discover immediate containing folder nonrecursively; playlist ordering differs from browser sort and Media sections. Selecting browser file does not imply full recursive browser becomes queue."
+          ]
+        },
+        {
+          "state": "queue boundaries and failing items",
+          "action": "previous/next, reach EOF under Off / All / One, toggle shuffle",
+          "expected_outcomes": [
+            "Previous/next reflect boundaries; failure may skip to eligible next item. EOF Off stops at end, All wraps, One repeats; shuffle preserves playing identity and restoring ordinary order preserves current item. Qualify each transition with source identity and position."
+          ]
+        },
+        {
+          "state": "playlist mutation surface audit",
+          "action": "inspect exposed controls",
+          "expected_outcomes": [
+            "No supported UI for playlist remove/reorder/clear is exposed; do not invent backend-only mutation controls."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sidebar-resize",
+      "area": "sources",
+      "actions": [
+        "resize divider then release or cancel",
+        "increment/decrement width",
+        "show/hide via utility, Command-Option-P, Settings"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "Sources/IlliquidApp/App/AppModel.swift",
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/UI/SettingsView.swift"
+      ],
+      "requires": [
+        "window widths below/at/above 900 points",
+        "UI scales 80\u2013150%",
+        "pointer cancel and relaunch preferences"
+      ],
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "sidebar Resize Sources divider pointer drag",
+        "AX increment/decrement on illiquid.sources.resize",
+        "utility / View > Show Sources (Command-Option-P)",
+        "Settings > Sources > Sidebar"
+      ],
+      "state_variants": [
+        {
+          "state": "pointer drag / cancellation",
+          "action": "resize divider then release or cancel",
+          "expected_outcomes": [
+            "Live width tracks scaled global translation within 300..720 and available-container bounds; release persists, gesture cancellation restores settled width and removes chrome pin."
+          ]
+        },
+        {
+          "state": "AX adjustment versus pointer",
+          "action": "increment/decrement width",
+          "expected_outcomes": [
+            "AX adjusts by 24 points with same clamp/persistence; semantic action does not establish pointer drag delivery."
+          ]
+        },
+        {
+          "state": "narrow container and visibility routes",
+          "action": "show/hide via utility, Command-Option-P, Settings",
+          "expected_outcomes": [
+            "Sidebar unavailable below 900 container points, utility/menu route disabled with widening help; stored visibility/width does not override layout availability. Verify state again after widening."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "native-menu-shortcuts",
+      "area": "input",
+      "actions": [
+        "Command-O / Command-T / Command-Shift-O / Command-L / Command-comma / Command-W / Command-Q",
+        "Command-Left/Right; Control-Tab / Control-Shift-Tab; Command-Shift-W; Command-Option-P",
+        "Command-F / Command-Option-T / Command-Shift-M; Command-plus / Command-minus / Command-0"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/PlayerCommands.swift",
+        "Sources/IlliquidApp/App/IlliquidApp.swift",
+        "Sources/IlliquidApp/App/AppDelegate.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift"
+      ],
+      "requires": [
+        "native player versus Settings focus",
+        "source/capability/tab count and scale boundary states"
+      ],
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "native app/menu keyboard accelerators (separate from editable playback bindings)"
+      ],
+      "state_variants": [
+        {
+          "state": "file and window routes",
+          "action": "Command-O / Command-T / Command-Shift-O / Command-L / Command-comma / Command-W / Command-Q",
+          "expected_outcomes": [
+            "Open File / New Video Tab / Add Folder / conditional Open Location / Settings / close focused window / Quit. Empty player Return opens file; native panels own Return/Escape."
+          ]
+        },
+        {
+          "state": "playback/source/video navigation",
+          "action": "Command-Left/Right; Control-Tab / Control-Shift-Tab; Command-Shift-W; Command-Option-P",
+          "expected_outcomes": [
+            "Previous/next file disabled at boundaries; adjacent video shortcuts require at least two tabs; close video needs selected tab; sidebar shortcut unavailable at narrow widths. Source tab navigation menu has no assigned native accelerator."
+          ]
+        },
+        {
+          "state": "presentation and UI size",
+          "action": "Command-F / Command-Option-T / Command-Shift-M; Command-plus / Command-minus / Command-0",
+          "expected_outcomes": [
+            "Fullscreen / Always on Top / conditional PiP; UI size changes by 10 across 80..150 and disables at boundaries, reset disabled at default 100. Test actual keyboard delivery separately from choosing menu item, with native Command-H/Option-Command-H hide and Command-M minimize supplied by macOS."
+          ]
+        }
+      ],
+      "source_anchors": [
+        ".keyboardShortcut(\"t\", modifiers: .command)",
+        ".keyboardShortcut(\"o\", modifiers: .command)",
+        ".keyboardShortcut(\"o\", modifiers: [.command, .shift])",
+        ".keyboardShortcut(\"l\", modifiers: .command)",
+        ".keyboardShortcut(.leftArrow, modifiers: .command)",
+        ".keyboardShortcut(.rightArrow, modifiers: .command)",
+        ".keyboardShortcut(.tab, modifiers: [.control, .shift])",
+        ".keyboardShortcut(.tab, modifiers: .control)",
+        ".keyboardShortcut(\"w\", modifiers: [.command, .shift])",
+        ".keyboardShortcut(\"+\", modifiers: .command)",
+        ".keyboardShortcut(\"-\", modifiers: .command)",
+        ".keyboardShortcut(\"0\", modifiers: .command)",
+        ".keyboardShortcut(\"p\", modifiers: [.command, .option])",
+        ".keyboardShortcut(\"f\", modifiers: .command)",
+        ".keyboardShortcut(\"t\", modifiers: [.command, .option])",
+        ".keyboardShortcut(\"m\", modifiers: [.command, .shift])"
+      ]
+    },
+    {
+      "id": "lifecycle-feedback",
+      "area": "dialogs",
+      "actions": [
+        "wait or select Quit",
+        "wait for delayed Stop then activate",
+        "observe Quitting and final error acknowledgment"
+      ],
+      "status": "pending",
+      "live_qualified": false,
+      "scenarios": [],
+      "source_paths": [
+        "Sources/IlliquidApp/App/IlliquidApp.swift",
+        "Sources/IlliquidApp/UI/PlayerRootView.swift",
+        "Sources/IlliquidApp/App/AppDelegate.swift"
+      ],
+      "requires": [
+        "controlled slow startup/load/shutdown",
+        "persistence failure fixture",
+        "loading and buffering distinct states"
+      ],
+      "gap": "Source-audited routes and expected outcomes only. Executable input, content/state assertions, persistence checks and current-source live receipts for these variants remain pending.",
+      "evidence": [],
+      "routes": [
+        "Startup Starting Illiquid / slow Quit",
+        "loading/buffering overlay delayed Stop",
+        "delayed Quitting Illiquid / final save error Quit"
+      ],
+      "state_variants": [
+        {
+          "state": "startup >3 seconds",
+          "action": "wait or select Quit",
+          "expected_outcomes": [
+            "Slow startup adds explanatory text and Quit without clearing saved history; readiness removes startup view."
+          ]
+        },
+        {
+          "state": "loading / buffering delay",
+          "action": "wait for delayed Stop then activate",
+          "expected_outcomes": [
+            "After loading/buffering stays active for 250 ms, show spinner, pending operation label and Stop; an operation ending earlier suppresses the overlay. Stop cancels the owned operation. Distinguish active loading from buffering and stale completion refusal; spinner appearance alone does not prove progress."
+          ]
+        },
+        {
+          "state": "delayed shutdown and final save failure",
+          "action": "observe Quitting and final error acknowledgment",
+          "expected_outcomes": [
+            "Shutdown feedback and save failure alert require controlled delayed/failing persistence; Quit acknowledgment must terminate with honest failure receipt. Exact timing/system presentation is unqualified."
+          ]
         }
       ]
     }
   ],
   "counts": {
-    "automated": 0,
     "partial": 8,
-    "pending": 41,
+    "pending": 51,
     "environment-dependent": 14
   },
   "diagnostic_targets": [
     {
       "identifier": "illiquid.timeline.grip",
       "source_path": "Sources/IlliquidApp/UI/AgentUITargetGeometry.swift",
-      "coordinate_space": "swiftui-player-root-top-left-points",
+      "coordinate_space": "quartz-global-logical-points (with named-root layout bounds retained)",
       "accessibility_hidden": true,
       "input_qualified": false,
-      "gap": "No global input mapping or executable grip drag yet."
+      "gap": "Fresh AppKit conversion and target-driven drag outcome checks implemented; packaged app compilation passed for the recorded version. Actual grip attempt failed native AXChildren inspection (-25204) before mouse-down; coordinate-input fix ongoing separately. Live input and presentation remain unqualified; mid-drag cancellation unsupported."
     }
   ],
   "example_definitions": {
@@ -1932,15 +4520,21 @@
       "schema_validation": "passed",
       "live_qualified": false,
       "requires_fixture": false,
-      "setup": "SETUP: one visible focused player and no other app windows or modals; shared benchmark preference domain; verify effective preferences before use. No media fixture. Command-comma and Command-W are real native menu shortcuts. This requests Settings, observes a second owned window, inspects, sends close, and checks player focus return. It does not identify Settings content; per-control settings changes and menu traversal remain pending."
+      "setup": "SETUP: one visible focused player and no other app windows or modals; shared benchmark preference domain; verify effective preferences before use. No media fixture. Command-comma and Command-W are real native menu shortcuts. This requests Settings, observes a second owned window, inspects, sends close, and checks player focus return. It does not identify Settings content; per-control settings changes and menu traversal remain pending.",
+      "current_prerequisites": "Owned launch requires a validated session-suite-only preference receipt with no fallback; retain optional seed bytes/hash and effective values. The setup field mirrors the scenario description verbatim, including its obsolete shared-domain wording, for reference consistency. Follow the current preference contract and runbook; initialization isolation does not qualify Settings controls."
     },
     {
       "path": "Scenarios/timeline-grip-pending.json",
-      "state": "pending-capability-gated",
+      "state": "runnable-after-prerequisites",
       "schema_validation": "passed",
       "live_qualified": false,
       "requires_fixture": true,
-      "setup": "PENDING, deliberately capability-gated; not a drag test. Source now publishes illiquid.timeline.grip in swiftui-player-root-top-left-points; the grip remains accessibility-hidden. Native input needs Quartz global logical points. Fresh geometry transformation, source revision checks, press/move/release and outcome assertions are not implemented here. Missing synthetic requirement timeline-grip-global-input must fail; never remove the gate and count inspection as drag coverage."
+      "setup": "Real pointer drag of the AX-hidden timeline grip using fresh app-published NSView/window-to-Quartz geometry. Requires a loaded seekable video, one focused player window, visible chrome, unlocked controls and idle physical input. Pauses via hook setup; asserts movement, released interaction pins and no accidental seek. Input and model geometry outcome only; live and presentation qualification require separate receipts. The historical filename is retained for inventory references.",
+      "latest_attempt": {
+        "receipt": "/tmp/illiquid-agent-ui-live-20261024-grip-scenario-r1.json",
+        "status": "timed-out",
+        "scope": "Native full-tree AXChildren inspection failed (-25204) before mouse-down; no live grip qualification. Separate coordinate-input fix ongoing."
+      }
     },
     {
       "path": "Scenarios/window.json",
@@ -1952,8 +4546,8 @@
     }
   ],
   "example_counts": {
-    "runnable_after_prerequisites": 5,
-    "pending_capability_gated": 1,
+    "runnable_after_prerequisites": 6,
+    "pending_capability_gated": 0,
     "live_qualified": 0,
     "historical_smoke_passed": 2
   },
@@ -2038,5 +4632,67 @@
       "live_qualified": false,
       "note": "Resolve actual data identity from the current tree; do not substitute a list index."
     }
-  ]
+  ],
+  "historical_evidence_baseline": {
+    "previous_inventory_source_baseline": "2cf381767023c5e7f748e3e45a214e002a8b87ae",
+    "scope": "Previous inventory baseline only; not a reconstructed exact source/helper pin for every receipt. Original run manifests and helper hashes remain authoritative. Historical receipts are unchanged and do not qualify the b5ceab9 source audit."
+  },
+  "source_audit": {
+    "revision": "b5ceab959c97b36be8a32d71da870538567db20c",
+    "date": "2026-10-23",
+    "method": "Read-only Swift source audit consolidated with playback audit; no app edits/builds/launches. Routes/state variants are planned assertions, not executed tests.",
+    "consolidated_entry_ids": [
+      "open-file-folder",
+      "drop-media",
+      "subtitle-external",
+      "sources-management",
+      "sources-tree",
+      "sources-search-sort",
+      "sources-visibility",
+      "source-tabs",
+      "video-tabs",
+      "playlist-navigation",
+      "sidebar-resize",
+      "video-context-menu",
+      "restore-session",
+      "settings-open",
+      "settings-playback",
+      "settings-behavior",
+      "settings-default-player",
+      "settings-thumbnails",
+      "settings-audio",
+      "settings-video",
+      "settings-appearance",
+      "settings-sources",
+      "settings-data",
+      "settings-updates",
+      "help-shortcuts",
+      "native-menu-shortcuts",
+      "file-panels",
+      "screenshot",
+      "recovery",
+      "lifecycle-feedback",
+      "a11y-focus",
+      "a11y-voiceover"
+    ],
+    "limitations": [
+      "Dynamic third-party/system UI (Sparkle, Launch Services, Finder, native panels, PiP and macOS accessibility) requires environment-specific receipts; exact dialogs are not exhaustively inventoried.",
+      "No exhaustive Cartesian-product, hardware/audio/HDR, presentation-latency, network-service or fault-injection qualification.",
+      "Existing source audit anchors detect inventory drift only; they do not test actual UI behavior."
+    ],
+    "family_count": 73,
+    "state_variant_count": 203,
+    "known_discrepancies": [
+      {
+        "entry_id": "help-shortcuts",
+        "description": "Historical source audit: ShortcutHelpView labeled Command-T New source tab while PlayerCommands opened New Video Tab. Current source corrects help to New Video Tab; live content/menu qualification pending.",
+        "status": "source-corrected-live-unqualified"
+      },
+      {
+        "entry_id": "file-panels",
+        "description": "Historical source audit: subtitle-delay completion lacked a source-identity guard. Current source captures/checks source identity and shutdown before mutation/re-presentation; Go to Time retains its distinct guard. Focused job c2ad910c28514ed9b80a53e23f1b546e failed test-fixture compilation; passing focused and live stale-source qualification remain absent.",
+        "status": "source-corrected-focused-test-failed-live-unqualified"
+      }
+    ]
+  }
 }

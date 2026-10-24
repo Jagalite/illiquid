@@ -105,7 +105,9 @@ struct AgentUIProtocolTests {
                        CGRect(x: CGFloat.nan, y: 0, width: 24, height: 40),
                        CGRect(x: 0, y: 0, width: CGFloat.infinity, height: 40),
                        CGRect(x: CGFloat.greatestFiniteMagnitude, y: 0,
-                              width: CGFloat.greatestFiniteMagnitude, height: 40)] {
+                              width: CGFloat.greatestFiniteMagnitude, height: 40),
+                       CGRect(x: 0, y: CGFloat.greatestFiniteMagnitude,
+                              width: 24, height: CGFloat.greatestFiniteMagnitude)] {
             #expect(AgentUITargetGeometry.Observation(bounds: bounds, sourceRevision: 17) == nil)
         }
     }

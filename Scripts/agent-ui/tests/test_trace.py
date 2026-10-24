@@ -27,16 +27,20 @@ TOC = '''<?xml version="1.0"?>
 <table schema="time-profile" target-pid="100"/>
 <table schema="unknown-frame-schema"/>
 </data></run></trace-toc>'''
+# First column matches the installed Instruments Sampling.instrdst schema:
+# com.apple.dt.instruments.sampling.dtac/schemas.xml declares mnemonic="time",
+# engineeringType="sample-time". Rows below remain synthetic, not live receipts.
 PROFILE = '''<?xml version="1.0"?>
 <trace-query-result><node xpath='/trace-toc/run[@number="1"]/data/table[@schema="time-profile"]'>
-<schema name="time-profile"><col><mnemonic>sample-time</mnemonic>
+<schema name="time-profile"><col><mnemonic>time</mnemonic>
 <engineering-type>sample-time</engineering-type></col></schema>
 <row><sample-time id="1" fmt="1 ms">1000000</sample-time><thread id="2"/></row>
 <row><sample-time ref="1"/><thread ref="2"/></row>
 <row><sample-time id="3" fmt="2 ms">2000000</sample-time><thread ref="2"/></row>
 </node></trace-query-result>'''
 EMPTY_PROFILE = '''<trace-query-result><node><schema name="time-profile">
-<col><mnemonic>sample-time</mnemonic></col></schema></node></trace-query-result>'''
+<col><mnemonic>time</mnemonic><engineering-type>sample-time</engineering-type>
+</col></schema></node></trace-query-result>'''
 CAPABILITIES = {"executable": "/fake/xctrace", "version": "fixture",
                 "templates": ["Time Profiler"], "record_supported": True,
                 "export_supported": True}
@@ -207,6 +211,7 @@ class XMLTests(TraceCase):
         metric = trace.time_profile_metric(self.fixture("profile.xml", PROFILE))
         self.assertEqual(3, metric["value"])
         self.assertEqual("samples", metric["unit"])
+        self.assertTrue(metric["diagnostic"])
         self.assertIn("not FPS", metric["definition"])
         self.assertIn("no interaction", metric["scope"])
 
@@ -216,7 +221,10 @@ class XMLTests(TraceCase):
 
     def test_unknown_schema_layout_encoding_or_ref_is_unsupported(self):
         cases = [PROFILE.replace('name="time-profile"', 'name="hitch"'),
-                 PROFILE.replace("<mnemonic>sample-time", "<mnemonic>duration"),
+                 PROFILE.replace("<mnemonic>time", "<mnemonic>duration"),
+                 PROFILE.replace("<engineering-type>sample-time", "<engineering-type>duration"),
+                 PROFILE.replace("<engineering-type>sample-time</engineering-type>", ""),
+                 PROFILE.replace('<row><sample-time id="1"', '<row><thread/><sample-time id="1"'),
                  PROFILE.replace('ref="1"', 'ref="missing"'),
                  PROFILE.replace(">1000000<", ">1 ms<"),
                  PROFILE.replace('<sample-time ref="1"/>', '<duration>1</duration>'),
@@ -341,8 +349,11 @@ class OwnershipTests(TraceCase):
 
 class WorkerTests(TraceCase):
     def setup_worker(self, *, fired=True, exit_at=0.3, code=0, raw=True,
-                     target_lost_at=None, stop_at=None, permission=False, ignore_signals=False):
+                     target_lost_at=None, stop_at=None, permission=False, ignore_signals=False,
+                     seconds=0.2, supervisor_signal=None):
         _, capture, request = self.capture(status=None)
+        request["seconds"] = seconds
+        trace.save(capture / "request.json", request)
         child = Process(self.clock, exit_at=exit_at, code=code)
         self.signals = []
 
@@ -388,7 +399,10 @@ class WorkerTests(TraceCase):
         def sleep(seconds):
             self.clock.sleep(seconds)
             if stop_at is not None and self.clock.now >= stop_at:
-                trace.request_stop(capture, request)
+                if supervisor_signal is None:
+                    trace.request_stop(capture, request)
+                else:
+                    trace.signal.getsignal(supervisor_signal)(supervisor_signal, None)
 
         self.patch(trace.subprocess, "Popen", popen)
         self.patch(trace, "process_identity", metadata)
@@ -425,6 +439,13 @@ class WorkerTests(TraceCase):
         self.assertEqual("timed-out", result["status"])
         self.assertFalse((capture / "ready.json").exists())
         self.assertTrue(result["data"]["cleanup_confirmed"])
+        self.assertEqual("tracing-readiness", result["data"]["failure_phase"])
+        diagnostics = result["data"]["diagnostics"]
+        self.assertFalse(diagnostics["readiness_received"])
+        for name in ("stdout", "stderr"):
+            self.assertEqual(0, diagnostics[name]["bytes"])
+            self.assertEqual("", diagnostics[name]["tail"])
+            self.assertEqual(str(capture / ("record." + name)), diagnostics[name]["path"])
         self.assertIsNotNone(child.poll())
 
     def test_notification_at_or_after_start_deadline_cannot_publish_readiness(self):
@@ -470,6 +491,7 @@ class WorkerTests(TraceCase):
         result = trace.record_worker(capture)
         self.assertEqual("permission-required", result["status"])
         self.assertIn("permission denied", (capture / "record.stderr").read_text())
+        self.assertIn("permission denied", result["data"]["diagnostics"]["stderr"]["tail"])
 
     def test_missing_raw_trace_is_incomplete(self):
         capture, _ = self.setup_worker(raw=False)
@@ -491,6 +513,69 @@ class WorkerTests(TraceCase):
         self.assertEqual(-9, child.poll())
         self.assertLess(self.clock.now, trace.STOP_TIMEOUT)
         self.assertEqual([signal.SIGINT, signal.SIGTERM, signal.SIGKILL], [sig for _, sig in self.signals])
+
+    def test_delayed_readiness_keeps_recording_and_finalization_allowance(self):
+        # An attach can take several seconds. A successful natural completion
+        # after launch + duration + grace must still fit readiness + duration
+        # + grace, without sending an interrupt to a finalizing recorder.
+        capture, _ = self.setup_worker(
+            fired=lambda: self.clock.now >= 4.35, seconds=10, exit_at=23.8)
+        result = trace.record_worker(capture)
+        self.assertEqual("ok", result["status"])
+        self.assertFalse(result["data"]["stopped"])
+        self.assertEqual([], self.signals)
+        self.assertFalse(result["data"]["cleanup"]["forced"])
+
+    def test_early_stop_allows_finalization_past_natural_time_limit(self):
+        # Approximate the retained live timing: ready at 4.35, stop at 10.2,
+        # with a 10-second capture. Finishing 9.5 seconds after stop is valid.
+        # Repeated file requests or supervisor termination signals must not
+        # interrupt finalization again or reset its deadline on every poll.
+        directory = self.directory
+        original_handler = trace.signal.getsignal(signal.SIGTERM)
+        for supervisor_signal in (None, signal.SIGTERM):
+            with self.subTest(supervisor_signal=supervisor_signal):
+                # Each worker needs its own capture directory and clock origin.
+                self.clock.now = 0
+                self.directory = directory / str(supervisor_signal)
+                self.directory.mkdir()
+                capture, _ = self.setup_worker(
+                    fired=lambda: self.clock.now >= 4.35, seconds=10,
+                    stop_at=10.2, exit_at=19.7, ignore_signals=True,
+                    supervisor_signal=supervisor_signal)
+                result = trace.record_worker(capture)
+                self.assertEqual("ok", result["status"])
+                self.assertTrue(result["data"]["stopped"])
+                self.assertEqual([(200, signal.SIGINT)], self.signals)
+                self.assertFalse(result["data"]["cleanup"]["forced"])
+                self.assertEqual(original_handler, trace.signal.getsignal(signal.SIGTERM))
+
+    def test_live_shaped_stop_timeout_escalates_once_and_retains_failure(self):
+        # Synthetic replay of the retained timing, not a live xctrace result.
+        capture, child = self.setup_worker(
+            fired=lambda: self.clock.now >= 4.35, seconds=10,
+            stop_at=10.2, exit_at=None, ignore_signals=True)
+        signals = []
+
+        def terminate(pid, sig):
+            signals.append((self.clock.now, pid, sig))
+            if sig == signal.SIGTERM:
+                child.exit_at, child.code = self.clock.now, 1
+
+        self.patch(trace.os, "killpg", terminate)
+        result = trace.record_worker(capture)
+        self.assertEqual("timed-out", result["status"])
+        self.assertEqual([signal.SIGINT, signal.SIGTERM], [s[2] for s in signals])
+        self.assertTrue(all(pid == 200 for _, pid, _ in signals))
+        self.assertGreaterEqual(signals[1][0] - signals[0][0], trace.FINALIZE_TIMEOUT)
+        self.assertLess(signals[1][0] - signals[0][0], trace.FINALIZE_TIMEOUT + 0.1)
+        self.assertEqual("recorder-finalization", result["data"]["failure_phase"])
+        self.assertEqual({"returncode": 1, "forced": True, "reaped": True},
+                         result["data"]["cleanup"])
+        self.assertTrue(result["data"]["cleanup_confirmed"])
+        self.assertFalse(result["data"]["measurement_valid"])
+        self.assertLess(self.clock.now - signals[0][0], trace.STOP_TIMEOUT)
+        self.assertEqual(result, trace.load(capture / "outcome.json"))
 
     def test_start_notification_error_still_reaps_child(self):
         capture, child = self.setup_worker(exit_at=None)
@@ -514,6 +599,16 @@ class WorkerTests(TraceCase):
 
 
 class CommandTests(TraceCase):
+    def test_failure_summary_bounds_tail_and_preserves_full_stream(self):
+        path = self.fixture("large.log", "discarded-prefix" + "x" * 4096)
+        diagnostic = trace.stream_diagnostic(path)
+        self.assertEqual(path.stat().st_size, diagnostic["bytes"])
+        self.assertEqual("x" * 4096, diagnostic["tail"])
+        self.assertTrue(path.read_text().startswith("discarded-prefix"))
+        missing = trace.stream_diagnostic(self.directory / "missing.log")
+        self.assertIn("error", missing)
+        self.assertNotIn("bytes", missing)  # Unavailable is not an empty stream.
+
     def test_discovery_uses_help_not_assumed_flags(self):
         executable = self.fixture("xctrace", "fixture")
         replies = {"find": str(executable), "version": "Xcode fixture",
@@ -717,7 +812,11 @@ class StartTests(TraceCase):
 
     def test_failed_recorder_never_returns_ready(self):
         root = self.setup_start(mode="early-exit")
-        self.assert_status("error", trace.start, root, 100, "Time Profiler", 1)
+        error = self.assert_status("error", trace.start, root, 100, "Time Profiler", 1)
+        self.assertEqual("fixture failed", str(error))
+        capture, _ = trace.current(root)
+        self.assertEqual(str(capture), error.data["capture_dir"])
+        self.assertTrue(error.data["cleanup_confirmed"])
 
     def test_start_interrupt_requests_and_waits_for_cleanup(self):
         root = self.setup_start(mode="no-ready")

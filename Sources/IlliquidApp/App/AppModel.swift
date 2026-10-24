@@ -218,10 +218,10 @@ final class AppModel {
     private static let historyStartup = ReadOnlyStartupLoader {
         await Task.detached(priority: .userInitiated) {
             let timing = LifecyclePerformance.begin("history-load")
-            let persistence = PlaybackPersistenceStore()
+            let persistence = PlaybackPersistenceStore(userDefaults: AppPreferences.defaults)
             LifecyclePerformance.end("history-load", since: timing)
             let sourceTiming = LifecyclePerformance.begin("source-settings-load")
-            let sources = SourceStartupSnapshot.load(defaults: .standard)
+            let sources = SourceStartupSnapshot.load(defaults: AppPreferences.defaults)
             LifecyclePerformance.end("source-settings-load", since: sourceTiming)
             return StartupResources(persistence: persistence, sources: sources)
         }.value
@@ -238,9 +238,12 @@ final class AppModel {
         if LifecyclePerformance.isEnabled {
             let directory = ProcessInfo.processInfo.environment["ILLIQUID_BENCHMARK_THUMBNAIL_CACHE"]
                 .flatMap { $0.hasPrefix("/") ? URL(fileURLWithPath: $0, isDirectory: true) : nil }
-            player = PlaybackController(persistence: startup.persistence, thumbnailCacheDirectory: directory)
+            player = PlaybackController(persistence: startup.persistence,
+                sessionStore: AtomicPlaybackSessionStore(fileURL: AppPreferences.sessionFileURL),
+                thumbnailCacheDirectory: directory)
         } else {
-            player = PlaybackController(persistence: startup.persistence)
+            player = PlaybackController(persistence: startup.persistence,
+                sessionStore: AtomicPlaybackSessionStore(fileURL: AppPreferences.sessionFileURL))
         }
         let model = AppModel(player: player, sources: startup.sources)
         LifecyclePerformance.end("model-init", since: timing)
@@ -325,6 +328,7 @@ final class AppModel {
     @ObservationIgnored private var globalPointerEventMonitor: Any?
     @ObservationIgnored private var keyboardEventMonitor: Any?
     @ObservationIgnored private var benchmarkPlaybackControl: BenchmarkPlaybackControl?
+    @ObservationIgnored private weak var agentUIRootGeometryView: AgentUIRootGeometryView?
     @ObservationIgnored private var agentUITargetObservations: [String: AgentUITargetGeometry.Observation] = [:]
     @ObservationIgnored private var windowObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var didRestorePlaybackSession = false
@@ -349,9 +353,9 @@ final class AppModel {
     var restoresSessionPaused: Bool {
         didSet { player.setRestoresSessionPaused(restoresSessionPaused) }
     }
-    var areControlsAlwaysVisible = UserDefaults.standard.bool(forKey: "Illiquid.controls-always-visible") {
+    var areControlsAlwaysVisible = AppPreferences.defaults.bool(forKey: "Illiquid.controls-always-visible") {
         didSet {
-            UserDefaults.standard.set(areControlsAlwaysVisible, forKey: "Illiquid.controls-always-visible")
+            AppPreferences.defaults.set(areControlsAlwaysVisible, forKey: "Illiquid.controls-always-visible")
             setChromePin(.alwaysVisible, active: areControlsAlwaysVisible)
         }
     }
@@ -362,15 +366,15 @@ final class AppModel {
             let interval = PlaybackChromePreferences.resolve(newValue)
             guard interval != storedControlsAutoHideTimeout else { return }
             storedControlsAutoHideTimeout = interval
-            UserDefaults.standard.set(interval, forKey: PlaybackChromePreferences.storageKey)
+            AppPreferences.defaults.set(interval, forKey: PlaybackChromePreferences.storageKey)
             chromeMachine.setAutoHideInterval(interval, now: Self.currentTime())
             synchronizeChrome()
         }
     }
-    var isControlsPositionLocked = UserDefaults.standard.bool(forKey: "Illiquid.controls-position-locked") {
+    var isControlsPositionLocked = AppPreferences.defaults.bool(forKey: "Illiquid.controls-position-locked") {
         didSet {
             cancelActiveInteraction()
-            UserDefaults.standard.set(isControlsPositionLocked, forKey: "Illiquid.controls-position-locked")
+            AppPreferences.defaults.set(isControlsPositionLocked, forKey: "Illiquid.controls-position-locked")
         }
     }
     @ObservationIgnored private var surfaceScrollAccumulator = SurfaceScrollAccumulator()
@@ -400,7 +404,7 @@ final class AppModel {
         systemCoordinator = PlaybackSystemCoordinator(player: player)
         nowPlayingCoordinator = NowPlayingCoordinator(player: player)
         hidesSidebarForBenchmark = Self.benchmarkHidesSidebar()
-        let defaults = UserDefaults.standard
+        let defaults = AppPreferences.defaults
         sourceTabs = sources.tabs
         activeSourceTabID = sources.selectedID
         isWindowAspectLocked = defaults.object(forKey: Self.windowAspectLockKey) as? Bool
@@ -491,17 +495,24 @@ final class AppModel {
         }
     }
 
+    func publishAgentUIRootGeometry(_ view: AgentUIRootGeometryView) {
+        guard isAgentUIDiagnosticsEnabled else { return }
+        agentUIRootGeometryView = view
+    }
+
     private func writeAgentUIState(_ command: BenchmarkPlaybackControlCommand) -> Bool {
         guard isAgentUIDiagnosticsEnabled, command.isAgentUIAction else { return false }
         let data: [String: Any]
         if command.action == "capabilities" {
             data = [
                 "commands": ["capabilities", "agent-state"],
+                "capabilities": ["capabilities", "agent-state", "timeline-grip-global-input"],
                 "mode": "app-hook",
                 "completion": "main-actor-snapshot",
                 "state_sections": ["playback", "source", "chrome", "window", "readiness", "targets"],
                 "target_coordinate_space": AgentUITargetGeometry.coordinateSpace,
                 "target_coordinate_space_description": AgentUITargetGeometry.coordinateSpaceDescription,
+                "target_input_coordinate_space": AgentUITargetGeometry.screenCoordinateSpace,
                 "observes_presentation": false,
             ]
         } else {
@@ -547,11 +558,20 @@ final class AppModel {
                   !state.pictureInPicture.isActive, playerWindow?.isVisible == true,
                   playerWindow?.isMiniaturized == false,
                   let observation = agentUITargetObservations[identifier],
-                  observation.isCurrent(for: player.interactionSourceRevision) else { return nil }
+                  observation.isCurrent(for: player.interactionSourceRevision),
+                  observation.interfaceScale == PlayerInterfaceScaleStore.shared.factor,
+                  observation.sidebarPresented == isSidebarPresented,
+                  observation.cancellationRevision == interactionCancellationRevision,
+                  observation.positionRevision == controlsPositionRevision,
+                  let playerWindow,
+                  let screenGeometry = agentUIRootGeometryView?.screenGeometry(
+                    for: observation.bounds, expectedWindow: playerWindow) else { return nil }
             return ["identifier": identifier, "bounds": rect(observation.bounds),
                     "coordinate_space": AgentUITargetGeometry.coordinateSpace,
                     "coordinate_space_description": AgentUITargetGeometry.coordinateSpaceDescription,
-                    "geometry_observation": "last-published-layout-bounds; animation-settling-unverified",
+                    "geometry_observation": "published-layout-with-current-nsview-screen-conversion; presentation-unverified",
+                    "screen_geometry": screenGeometry,
+                    "sampled_monotonic_ns": DispatchTime.now().uptimeNanoseconds,
                     "accessibility_hidden": true,
                     "enabled": !isControlsPositionLocked,
                     "source_revision": observation.sourceRevision]
@@ -580,6 +600,7 @@ final class AppModel {
                 "transient_owners": transientOwners.sorted(),
                 "interaction_cancellation_revision": interactionCancellationRevision,
                 "controls_position_revision": controlsPositionRevision,
+                "controls_position_locked": isControlsPositionLocked,
             ],
             "window": window,
             "readiness": [
@@ -1075,7 +1096,7 @@ final class AppModel {
     func setWindowAspectLocked(_ isLocked: Bool) {
         guard isWindowAspectLocked != isLocked else { return }
         isWindowAspectLocked = isLocked
-        UserDefaults.standard.set(isWindowAspectLocked, forKey: Self.windowAspectLockKey)
+        AppPreferences.defaults.set(isWindowAspectLocked, forKey: Self.windowAspectLockKey)
         if let window = playerWindow ?? NSApp.keyWindow {
             applyWindowAspectLock(to: window, resizeToVideo: true)
         }
@@ -1089,7 +1110,7 @@ final class AppModel {
     func setAlwaysOnTop(_ enabled: Bool) {
         guard isAlwaysOnTop != enabled else { return }
         isAlwaysOnTop = enabled
-        UserDefaults.standard.set(isAlwaysOnTop, forKey: Self.alwaysOnTopKey)
+        AppPreferences.defaults.set(isAlwaysOnTop, forKey: Self.alwaysOnTopKey)
         applyAlwaysOnTop()
         registerUserActivity()
     }
@@ -1627,7 +1648,7 @@ final class AppModel {
             applyOpenRequest(request)
         }
 
-        if let frameString = UserDefaults.standard.string(forKey: Self.windowFrameKey) {
+        if let frameString = AppPreferences.defaults.string(forKey: Self.windowFrameKey) {
             let frame = NSRectFromString(frameString)
             if let reachable = PlayerWindowGeometry.restoredFrame(frame, screens: NSScreen.screens.map(\.visibleFrame)) {
                 window.setFrame(reachable, display: false)
@@ -2113,7 +2134,7 @@ final class AppModel {
     }
 
     private func persistSourceTabs() {
-        let defaults = UserDefaults.standard
+        let defaults = AppPreferences.defaults
         defaults.set(SourceTabStore.encode(sourceTabs), forKey: Self.sourceTabsKey)
         if let activeSourceTabID {
             defaults.set(activeSourceTabID, forKey: Self.activeSourceTabKey)
@@ -2144,7 +2165,7 @@ final class AppModel {
 
     private func saveFrame(of window: NSWindow) {
         guard !window.styleMask.contains(.fullScreen) else { return }
-        UserDefaults.standard.set(NSStringFromRect(window.frame), forKey: Self.windowFrameKey)
+        AppPreferences.defaults.set(NSStringFromRect(window.frame), forKey: Self.windowFrameKey)
     }
 
     private func playerWindowWillClose(_ window: NSWindow) {
@@ -2510,6 +2531,7 @@ final class AppModel {
         validationMessage: String?
     ) {
         guard let playerWindow, !isShuttingDown else { return }
+        let source = state.currentSource
 
         let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
         input.placeholderString = "0"
@@ -2529,6 +2551,10 @@ final class AppModel {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 guard response == .alertFirstButtonReturn else {
+                    self.setTransientPresentation(false, owner: "subtitle-delay")
+                    return
+                }
+                guard !self.isShuttingDown, source == self.state.currentSource else {
                     self.setTransientPresentation(false, owner: "subtitle-delay")
                     return
                 }

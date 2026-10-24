@@ -13,7 +13,7 @@ enum PlaybackChromePreferences {
         return value
     }
 
-    static func load(defaults: UserDefaults = .standard) -> TimeInterval {
+    static func load(defaults: UserDefaults = AppPreferences.defaults) -> TimeInterval {
         guard let storedValue = defaults.object(forKey: storageKey) as? NSNumber,
             CFGetTypeID(storedValue) != CFBooleanGetTypeID()
         else {

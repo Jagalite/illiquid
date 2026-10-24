@@ -92,6 +92,119 @@ func runCoreTests() throws {
     try require(route.count == 30 && route.last == CGPoint(x: -10, y: 80), "drag must finish at exact endpoint")
     try require(zip(route, route.dropFirst()).allSatisfy { $0.x < $1.x && $0.y < $1.y }, "drag route must be monotonic")
 
+    // Execute the production lazy-dispatch and pointer path. Every OS-facing
+    // dependency is injected; CGEvents go only to this local array.
+    let coordinateRequest: Object = ["action": "drag", "mode": "input", "target": ["window_id": 7],
+                                     "from": ["x": -190, "y": 20], "to": ["x": -10, "y": 80], "duration": 0.01]
+    let coordinateDrag = try Action(coordinateRequest)
+    var coordinateEvents: [(CGEventType, CGPoint)] = []
+    var focusChecks = 0, windowChecks = 0, accessChecks = 0
+    var hitPoints: [CGPoint] = []
+    let fixtureHit = AXUIElementCreateApplication(identity.pid)
+    let environment = InputEnvironment(
+        requireAccess: { accessChecks += 1 },
+        validateFocus: { pinned, budget in
+            try budget.check()
+            try require(pinned.start == identity.start && pinned.executable == identity.executable,
+                        "coordinate dispatch lost exact process identity")
+            focusChecks += 1
+        },
+        ownedWindows: { pid in windowChecks += 1; return pid == identity.pid ? [owned] : [] },
+        displays: { displays },
+        hit: { p, pid, budget in
+            try budget.check()
+            try require(pid == identity.pid, "coordinate hit test lost target PID")
+            hitPoints.append(p); return fixtureHit
+        },
+        session: { try InputSession(poster: { coordinateEvents.append(($0.type, $0.location)) }, installSignalHandlers: false) })
+    func coordinateDispatch(_ action: Action, _ environment: InputEnvironment) throws -> Object {
+        try performAction(action, buildTree: { () throws -> Tree in
+            throw TestError(message: "coordinate action enumerated the full AX tree")
+        }, semantic: { _ in throw TestError(message: "coordinate action used semantic delivery") }, pointer: {
+            try input(action, identity: identity, tree: $0, budget: Budget(seconds: 1), environment: environment)
+        })
+    }
+    let coordinateResult = try coordinateDispatch(coordinateDrag, environment)
+    try require(coordinateResult["window_id"] as? Int == 7, "coordinate target lost its window constraint")
+    try require(coordinateEvents.map { $0.0 } == [.leftMouseDown, .leftMouseDragged, .leftMouseDragged, .leftMouseUp],
+                "coordinate drag did not dispatch the paired route")
+    try require(hitPoints == [CGPoint(x: -190, y: 20), CGPoint(x: -190, y: 20)] +
+                dragPoints(from: CGPoint(x: -190, y: 20), to: CGPoint(x: -10, y: 80), duration: 0.01),
+                "coordinate path skipped initial or moving AX hit checks")
+    try require(accessChecks == 1 && focusChecks > coordinateEvents.count && windowChecks == 5,
+                "coordinate path skipped access, focus/identity or current-window checks")
+
+    for name in ["click", "double-click", "right-click", "move", "hover", "scroll"] {
+        let action = try Action(["action": name, "mode": "input", "target": ["window_id": 7],
+                                 "point": ["x": -50, "y": 30]])
+        _ = try coordinateDispatch(action, environment)
+    }
+    // Element selectors (even alongside coordinates) and non-coordinate window
+    // selectors must still reach full discovery, including semantic operations.
+    let discoveryRequests: [Object] = [
+        ["action": "drag", "mode": "input", "target": ["identifier": "grip", "window_id": 7],
+         "from": ["x": -190, "y": 20], "to": ["x": -10, "y": 80]],
+        ["action": "click", "mode": "input", "target": ["id": "ax:fixture:app/w0"], "point": ["x": -50, "y": 30]],
+        ["action": "click", "mode": "input", "target": ["window_id": 7]],
+        ["action": "key", "mode": "input", "key": "space", "target": ["window_id": 7]],
+        ["action": "focus", "mode": "accessibility", "target": ["window_id": 7]]
+    ]
+    for fields in discoveryRequests {
+        try failure("unsupported") {
+            _ = try performAction(Action(fields), buildTree: { () throws -> Tree in
+                throw Failure("unsupported", "fixture full-tree marker")
+            }, semantic: { _ in throw TestError(message: "semantic action skipped discovery") },
+               pointer: { _ in throw TestError(message: "control selector skipped discovery") })
+        }
+    }
+
+    coordinateEvents.removeAll()
+    var outsideRoute = coordinateRequest
+    outsideRoute["to"] = ["x": 10, "y": 80]
+    try failure("assertion-failed") { _ = try coordinateDispatch(Action(outsideRoute), environment) }
+    try require(coordinateEvents.isEmpty, "invalid route posted mouse-down before full-route validation")
+    // Same-process occlusion along the route is rejected before pressing even
+    // when the start/end points are both inside the requested owned window.
+    var blocked = environment
+    blocked.ownedWindows = { _ in [WindowInfo(id: 8, bounds: CGRect(x: -110, y: 40, width: 20, height: 20),
+                                             title: nil, onScreen: true, layer: 0), owned] }
+    try failure("assertion-failed") { _ = try coordinateDispatch(coordinateDrag, blocked) }
+    try require(coordinateEvents.isEmpty, "route ignored a different frontmost owned window")
+    blocked.ownedWindows = { _ in [WindowInfo(id: 8, bounds: owned.bounds, title: nil, onScreen: true, layer: 0)] }
+    try failure("assertion-failed") { _ = try coordinateDispatch(coordinateDrag, blocked) }
+    try require(coordinateEvents.isEmpty, "wrong CG window ownership allowed dispatch")
+    blocked.ownedWindows = { _ in [WindowInfo(id: 8, bounds: owned.bounds, title: nil, onScreen: true, layer: 101), owned] }
+    try failure("assertion-failed") { _ = try coordinateDispatch(coordinateDrag, blocked) }
+    try require(coordinateEvents.isEmpty, "nonstandard owned overlay allowed dispatch into a pinned window")
+    blocked = environment
+    blocked.hit = { _, _, _ in throw Failure("assertion-failed", "fixture cross-process AX hit") }
+    try failure("assertion-failed") { _ = try coordinateDispatch(coordinateDrag, blocked) }
+    try require(coordinateEvents.isEmpty, "occluded coordinate action dispatched input")
+    blocked = environment
+    blocked.requireAccess = { throw Failure("permission-required", "fixture access denied") }
+    try failure("permission-required") { _ = try coordinateDispatch(coordinateDrag, blocked) }
+    try require(coordinateEvents.isEmpty, "permission denial allowed dispatch")
+    for status in ["target-lost", "assertion-failed", "timed-out"] {
+        blocked = environment
+        blocked.validateFocus = { _, _ in throw Failure(status, "fixture identity/focus/deadline refusal") }
+        try failure(status) { _ = try coordinateDispatch(coordinateDrag, blocked) }
+        try require(coordinateEvents.isEmpty, "identity/focus/deadline refusal allowed dispatch")
+    }
+    // Fresh CG bounds and AX hit ownership are required during held input too.
+    // Losing either releases the pressed button without dispatching later motion.
+    for loseWindow in [true, false] {
+        blocked = environment
+        blocked.ownedWindows = { _ in coordinateEvents.isEmpty || !loseWindow ? [owned] : [] }
+        blocked.hit = { _, _, _ in
+            if !coordinateEvents.isEmpty && !loseWindow { throw Failure("assertion-failed", "fixture moving hit occluded") }
+            return fixtureHit
+        }
+        try failure("assertion-failed") { _ = try coordinateDispatch(coordinateDrag, blocked) }
+        try require(coordinateEvents.map { $0.0 } == [.leftMouseDown, .leftMouseUp],
+                    "lost current bounds/hit did not stop motion and release input")
+        coordinateEvents.removeAll()
+    }
+
     let unicode = String(repeating: "x", count: 19) + "😀" + "e\u{301}" + "🦋"
     let chunks = unicodeChunks(unicode)
     try require(chunks.allSatisfy { $0.count <= 20 }, "Unicode event payload exceeded bound")

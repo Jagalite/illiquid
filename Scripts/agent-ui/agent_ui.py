@@ -37,7 +37,7 @@ LIMITATIONS = [
     "Input dispatch and hook acknowledgements do not establish presentation latency.",
     "CPU samples, screenshots and display-link callbacks do not establish displayed FPS.",
     "No live UI, permission or trace qualification is implied by unit tests.",
-    "Preferences use the shared benchmark bundle domain; CFFIXED_USER_HOME does not guarantee per-run preference isolation.",
+    "Preference initialization is isolated only when a session-bound app receipt is validated; attach does not establish isolation or live Settings behavior.",
 ]
 
 
@@ -80,6 +80,52 @@ def atomic_json(path, value):
 
 def read_json(path):
     return json.loads(Path(path).read_text())
+
+
+def preference_json(text):
+    """Reject ambiguous/non-finite JSON at the preference evidence boundary."""
+    def object_pairs(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("duplicate preference JSON key")
+            result[key] = value
+        return result
+    def invalid_constant(value):
+        raise ValueError("non-finite preference JSON value")
+    return json.loads(text, object_pairs_hook=object_pairs, parse_constant=invalid_constant)
+
+
+def preference_seed_values(data):
+    if len(data) > 1024 * 1024:
+        raise ValueError("preference seed exceeds 1 MiB")
+    values = preference_json(data.decode("utf-8"))
+    def plist_value(value):
+        if isinstance(value, dict):
+            return all(plist_value(v) for v in value.values())
+        if isinstance(value, list):
+            return all(plist_value(v) for v in value)
+        return (isinstance(value, (str, bool, int)) or
+                isinstance(value, float) and math.isfinite(value))
+    if (not isinstance(values, dict) or not all(k.startswith("Illiquid.") and
+            k != "Illiquid.agent-ui-preference-suite.v1" for k in values) or not plist_value(values)):
+        raise ValueError("preference seed requires Illiquid property-list values without null")
+    return values
+
+
+def preference_json_identity(value):
+    """Compare JSON structure without treating true as 1 or re-encoding numbers."""
+    if isinstance(value, dict):
+        return ("object", tuple((k, preference_json_identity(v)) for k, v in sorted(value.items())))
+    if isinstance(value, list):
+        return ("array", tuple(preference_json_identity(v) for v in value))
+    if isinstance(value, bool):
+        return ("bool", value)
+    if isinstance(value, (int, float)):
+        if isinstance(value, float) and not math.isfinite(value):
+            raise ValueError("non-finite preference JSON number")
+        return ("number", value)
+    return (type(value).__name__, value)
 
 
 def request_json(value):
@@ -365,6 +411,59 @@ def condition(value, spec):
         return False
 
 
+GRIP_IDENTIFIER = "illiquid.timeline.grip"
+
+
+def grip_snapshot(observation, max_age=.75):
+    """Validate a correlated app snapshot; never interpret local bounds as input."""
+    state = observation.get("state", {}).get("data", {})
+    source, window, chrome = (state.get(k, {}) for k in ("source", "window", "chrome"))
+    if not all(isinstance(x, dict) for x in (source, window, chrome)):
+        raise Failure("unsupported", "diagnostic source/window/chrome snapshot unavailable")
+    targets = state.get("targets", [])
+    if not isinstance(targets, list):
+        raise Failure("unsupported", "diagnostic targets unavailable")
+    matches = [t for t in targets if isinstance(t, dict) and t.get("identifier") == GRIP_IDENTIFIER]
+    if len(matches) != 1:
+        raise Failure("assertion-failed", "grip diagnostic target missing or ambiguous", {"match_count": len(matches)})
+    target = matches[0]
+    screen = target.get("screen_geometry", {})
+    if not isinstance(screen, dict) or screen.get("coordinate_space") != "quartz-global-logical-points":
+        raise Failure("unsupported", "grip has no converted Quartz screen geometry")
+    if (not isinstance(source.get("revision"), int) or isinstance(source["revision"], bool)
+            or not source.get("url") or target.get("source_revision") != source["revision"]):
+        raise Failure("assertion-failed", "grip source revision is stale or unknown")
+    if (not isinstance(window.get("id"), int) or isinstance(window["id"], bool) or window["id"] <= 0
+            or screen.get("window_id") != window["id"] or window.get("visible") is not True
+            or window.get("key") is not True or window.get("miniaturized") is not False):
+        raise Failure("assertion-failed", "grip window is stale, hidden, minimized or unfocused")
+    timestamp = target.get("sampled_monotonic_ns")
+    age = (time.monotonic_ns() - timestamp) / 1e9 if isinstance(timestamp, int) and not isinstance(timestamp, bool) else math.inf
+    if not 0 <= age <= max_age:
+        raise Failure("assertion-failed", "grip screen geometry sample expired", {"age_seconds": age if math.isfinite(age) else None})
+    bounds = screen.get("bounds", {})
+    if (not isinstance(bounds, dict) or not all(isinstance(bounds.get(k), (int, float))
+            and not isinstance(bounds[k], bool) and math.isfinite(bounds[k]) for k in ("x", "y", "width", "height"))
+            or bounds["width"] <= 0 or bounds["height"] <= 0):
+        raise Failure("error", "invalid grip screen bounds")
+    if not isinstance(target.get("enabled"), bool) or not isinstance(chrome.get("controls_position_locked"), bool):
+        raise Failure("unsupported", "grip lock state is unknown")
+    if target["enabled"] == chrome["controls_position_locked"]:
+        raise Failure("assertion-failed", "grip lock state disagrees with target enabled state")
+    for key in ("interaction_cancellation_revision", "controls_position_revision"):
+        if not isinstance(chrome.get(key), int) or isinstance(chrome[key], bool):
+            raise Failure("unsupported", "grip interaction revision unavailable")
+    # Layout-only coordinates and timestamps never enter the input selector.
+    pin = {"source": source, "window": {k: window.get(k) for k in
+           ("id", "frame", "interface_scale", "sidebar_presented", "backing_scale", "fullscreen")},
+           "screen": screen, "enabled": target["enabled"],
+           "cancellation_revision": chrome["interaction_cancellation_revision"],
+           "position_revision": chrome["controls_position_revision"]}
+    return {"state": state, "target": target, "pin": pin,
+            "point": {"x": bounds["x"] + bounds["width"] / 2,
+                      "y": bounds["y"] + bounds["height"] / 2}}
+
+
 class Runner:
     def __init__(self, directory=None, adapter=None):
         self.directory = Path(directory).resolve() if directory else None
@@ -410,6 +509,8 @@ class Runner:
                          "process_start_identity": None, "bundle_path": str(bundle) if bundle else None,
                          "bundle_id": bundle_id, "session_token": uuid.uuid4().hex if owned else None,
                          "control_file": str(self.directory / "state/control.json") if owned else None,
+                         "session_file": str(self.directory / "state/session.json") if owned else None,
+                         "preferences": {"status": "unverified", "isolation_mode": None},
                          "log_file": str(self.directory / "app.log") if owned else None,
                          "environment": {"os": platform.platform(), "machine": platform.machine()},
                          "comparison_context": context or {}, "created_wall_time": time.time(),
@@ -464,11 +565,32 @@ class Runner:
         if not executable.is_relative_to(app) or not os.access(executable, os.X_OK):
             raise Failure("error", "bundle executable must be executable and contained in the bundle")
         timeout = bounded(args.get("timeout", 30))
+        seed_bytes, seed_source, seed_values = None, None, {}
+        if args.get("preferences_seed_file") is not None:
+            try:
+                seed_source = str(Path(args["preferences_seed_file"]).resolve(strict=True))
+                with Path(seed_source).open("rb") as stream:
+                    seed_bytes = stream.read(1024 * 1024 + 1)
+                seed_values = preference_seed_values(seed_bytes)
+            except (OSError, ValueError, RecursionError) as exc:
+                raise Failure("error", f"invalid preference seed: {exc}") from exc
         # Compile/validate identity adapter before spawning a process we must own.
         if isinstance(self.adapter, Adapter):
             self.adapter.compile(HERE / "native.swift")
             self.adapter.compile(ROOT / "Scripts/performance-app-control.swift")
         self.init_run(executable, app, DOMAIN, True, args.get("context"))
+        preferences = self.manifest["preferences"]
+        receipt = self.directory / "artifacts/preferences.json"
+        if receipt.exists() or receipt.is_symlink():
+            raise Failure("error", "preference receipt must be absent before launch")
+        seed_path = self.directory / "state/preferences-seed.json" if seed_bytes is not None else None
+        if seed_path:
+            with seed_path.open("xb") as stream:
+                stream.write(seed_bytes)
+        preferences.update(status="pending", suite=DOMAIN + ".AgentUI." + self.manifest["session_token"],
+                           receipt_file=str(receipt), seed_path=str(seed_path) if seed_path else None,
+                           seed_source=seed_source, seed_values=seed_values,
+                           seed_sha256=hashlib.sha256(seed_bytes).hexdigest() if seed_bytes is not None else None)
         home = str(self.directory / "state/home")
         isolated = {
             "CFFIXED_USER_HOME": home, "TMPDIR": str(self.directory / "state/tmp") + "/",
@@ -476,11 +598,15 @@ class Runner:
             "ILLIQUID_BENCHMARK_HEARTBEAT": "0",
             "ILLIQUID_BENCHMARK_CONTROL_SESSION": self.manifest["session_token"],
             "ILLIQUID_BENCHMARK_CONTROL_FILE": self.manifest["control_file"],
-            "ILLIQUID_BENCHMARK_SESSION_FILE": str(self.directory / "state/session.json"),
+            "ILLIQUID_BENCHMARK_SESSION_FILE": self.manifest["session_file"],
+            "ILLIQUID_BENCHMARK_PREFERENCES_SUITE": preferences["suite"],
+            "ILLIQUID_BENCHMARK_PREFERENCES_RECEIPT": preferences["receipt_file"],
             "ILLIQUID_BENCHMARK_THUMBNAIL_CACHE": str(self.directory / "state/thumbnails"),
             # Match the production decoder selection rather than benchmark BGRA default.
             "ILLIQUID_BENCHMARK_SOFTWARE_OUTPUT": "planar",
         }
+        if seed_path:
+            isolated["ILLIQUID_BENCHMARK_PREFERENCES_SEED_FILE"] = str(seed_path)
         environment = {k: v for k, v in os.environ.items() if not k.startswith("ILLIQUID_")}
         environment.update(isolated)
         self.manifest["environment"]["launch_overrides"] = isolated
@@ -524,7 +650,8 @@ class Runner:
         activation = None
         while time.monotonic() < deadline:
             self.checked_identity(remaining_timeout(5))
-            if self.channel_ready():
+            isolation_ready = self.validate_preference_receipt()
+            if self.channel_ready() and isolation_ready:
                 if activation is None:
                     activation = self.adapter.native({
                         "operation": "act", "action": "focus", "mode": "accessibility",
@@ -556,12 +683,61 @@ class Runner:
                 raise Failure("target-lost", "launched app exited before hook readiness")
             time.sleep(min(.1, max(0, deadline - time.monotonic())))
         else:
-            raise Failure("timed-out", "benchmark channel/visible window never became ready; app.log retained", {
-                "last_inspection": windows})
+            raise Failure("timed-out", "benchmark channel/visible window/preference receipt never became ready; app.log retained", {
+                "last_inspection": windows, "preferences": dict(preferences)})
         self.manifest["lifecycle"] = "ready"
         self.manifest["initial_windows"] = windows["windows"]
         self.save()
         return {"manifest": self.manifest, "readiness": "channel-ready-and-window-observed"}
+
+    def validate_preference_receipt(self):
+        """Only app evidence matching this owned launch can establish isolation."""
+        preferences = self.manifest["preferences"]
+        if preferences["status"] == "validated":
+            return True
+        path = Path(preferences["receipt_file"])
+        if not path.exists() and not path.is_symlink():
+            return False
+        try:
+            if path.is_symlink() or not path.is_file():
+                raise ValueError("receipt must be a regular run-owned file")
+            data = path.read_bytes()
+            receipt = preference_json(data.decode("utf-8"))
+            if not isinstance(receipt, dict):
+                raise ValueError("receipt must be an object")
+            if type(receipt.get("schema_version")) is not int or type(receipt.get("pid")) is not int:
+                raise ValueError("receipt schema/PID must be integers")
+            expected = {"schema_version": 1, "session": self.manifest["session_token"],
+                        "suite": preferences["suite"], "pid": self.manifest["pid"],
+                        "isolation_mode": "session-suite-only", "fallback_domains": [],
+                        "seed_path": preferences["seed_path"], "seed_sha256": preferences["seed_sha256"],
+                        "seed_values": preferences["seed_values"], "session_file": self.manifest["session_file"]}
+            for key, value in expected.items():
+                if key not in receipt or preference_json_identity(receipt[key]) != preference_json_identity(value):
+                    raise ValueError(f"receipt {key} does not match owned launch")
+            canonical = receipt.get("effective_initial_canonical_json")
+            effective = receipt.get("effective_initial_values")
+            if not isinstance(canonical, str) or not isinstance(effective, dict):
+                raise ValueError("effective preference snapshot/canonical JSON is missing")
+            if preference_json_identity(preference_json(canonical)) != preference_json_identity(effective):
+                raise ValueError("canonical JSON does not match effective preference snapshot")
+            effective_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+            if receipt.get("effective_initial_sha256") != effective_hash:
+                raise ValueError("effective preference hash does not match canonical JSON")
+            if preferences["seed_path"] and digest(preferences["seed_path"]) != preferences["seed_sha256"]:
+                raise ValueError("retained preference seed bytes changed")
+            preferences.update(status="validated", isolation_mode=receipt["isolation_mode"],
+                               fallback_domains=[], receipt_sha256=hashlib.sha256(data).hexdigest(),
+                               effective_initial_sha256=effective_hash,
+                               effective_initial_values=effective,
+                               evidence_scope="preference initialization; no live UI qualification")
+            self.save()
+            return True
+        except (OSError, ValueError, RecursionError) as exc:
+            preferences.update(status="failed", isolation_mode=None, error=str(exc))
+            self.save()
+            raise Failure("assertion-failed", f"invalid preference receipt: {exc}",
+                          {"preferences": dict(preferences)}) from exc
 
     def attach(self, args):
         pid = args["pid"]
@@ -654,6 +830,114 @@ class Runner:
             time.sleep(min(.05, max(0, deadline - time.monotonic())))
         raise Failure("timed-out", "no correlated hook acknowledgement; command was not retried", {
             "command_id": identifier, "state": state})
+
+    def diagnostic_grip_drag(self, args):
+        """Fresh target resolution + one real native drag + bounded outcome checks.
+
+        Existing native input owns press/release cleanup, exact process identity,
+        focus checks, route/window bounds and AX occlusion checks. This operation
+        never retries input or substitutes an AX press/hook for the gesture.
+        """
+        allowed = {"action", "mode", "diagnostic_target", "delta", "duration", "expected_outcome", "timeout"}
+        if set(args) - allowed or args.get("action") != "drag" or args.get("mode") != "input":
+            raise Failure("error", "diagnostic target supports input drag with delta only")
+        if args.get("diagnostic_target") != {"identifier": GRIP_IDENTIFIER}:
+            raise Failure("unsupported", "unsupported diagnostic drag target")
+        expected = args.get("expected_outcome", "moved")
+        if expected not in {"moved", "locked"}:
+            raise Failure("unsupported", "diagnostic drag supports moved/locked outcomes; mid-drag cancellation requires native helper support")
+        delta = args.get("delta", {})
+        if (not isinstance(delta, dict) or set(delta) != {"x", "y"}
+                or not all(isinstance(v, (int, float)) and not isinstance(v, bool)
+                           and math.isfinite(v) and abs(v) <= 500 for v in delta.values())
+                or not 8 <= math.hypot(delta["x"], delta["y"]) <= 500):
+            raise Failure("error", "drag delta must be finite, 8..500 logical points")
+        duration = bounded(args.get("duration", .6), "duration", 5)
+        timeout = bounded(args.get("timeout", 10), maximum=30)
+        if timeout < duration + 1:
+            raise Failure("error", "drag timeout must leave at least one second for outcome observation")
+        deadline = time.monotonic() + timeout
+        def observe(label):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise Failure("timed-out", "diagnostic grip deadline expired")
+            response = self.execute("hook", {"action": "agent-state", "timeout": min(3, remaining)}, label)
+            if response["status"] != "ok":
+                raise Failure(response["status"], "diagnostic grip observation failed", response)
+            return grip_snapshot(response["data"])
+
+        before = observe("grip-resolve")
+        # Separate correlated observations must agree across an event-loop turn.
+        time.sleep(.05)
+        current = observe("grip-confirm")
+        if current["pin"] != before["pin"]:
+            raise Failure("assertion-failed", "grip geometry/source/window changed before input", {
+                "before": before["pin"], "current": current["pin"]})
+        if before["target"]["enabled"] != (expected == "moved"):
+            raise Failure("assertion-failed", "grip lock state does not match requested outcome")
+        playback = before["state"].get("playback", {})
+        position = playback.get("position_seconds")
+        if (playback.get("pause_desired") is not True or playback.get("loading") is not False
+                or playback.get("buffering") is not False or not isinstance(position, (float, int))
+                or isinstance(position, bool) or not math.isfinite(position)):
+            raise Failure("assertion-failed", "grip outcome requires paused, loaded, nonbuffering media with known position")
+        if before["state"]["chrome"].get("interaction_pins") != []:
+            raise Failure("assertion-failed", "another interaction already owns the controls")
+        origin = current["point"]
+        destination = {k: origin[k] + delta[k] for k in ("x", "y")}
+        self.checked_identity(min(3, max(.01, deadline - time.monotonic())))
+        # Recheck sample age after identity I/O, immediately before native dispatch.
+        timestamp = current["target"]["sampled_monotonic_ns"]
+        if (time.monotonic_ns() - timestamp) / 1e9 > .75:
+            raise Failure("assertion-failed", "grip geometry expired before native dispatch")
+        request = {"action": "drag", "mode": "input", "from": origin, "to": destination,
+                   "duration": duration, "target": {"window_id": before["pin"]["window"]["id"]},
+                   "operation": "act", "pid": self.manifest["pid"],
+                   "expected_identity": {k: self.manifest[k] for k in ("executable_path", "process_start_identity")}}
+        try:
+            native = self.adapter.native(request, max(.1, deadline - time.monotonic()))
+        except Failure as exc:
+            raise Failure(exc.status, str(exc), {"before": before, "input_attempted": True,
+                                                "native_failure": exc.data}) from exc
+        previous = None
+        last = None
+        while time.monotonic() < deadline:
+            try:
+                after = observe("grip-outcome")
+                last = after
+                before_context = {k: v for k, v in before["pin"].items() if k != "screen"}
+                after_context = {k: v for k, v in after["pin"].items() if k != "screen"}
+                # A movement may change target bounds, never its containing root,
+                # source, window, display conversion or lock/cancellation state.
+                before_context["screen"] = {k: v for k, v in before["pin"]["screen"].items() if k != "bounds"}
+                after_context["screen"] = {k: v for k, v in after["pin"]["screen"].items() if k != "bounds"}
+                if before_context != after_context:
+                    raise Failure("assertion-failed", "grip source/window/geometry context changed during drag")
+                observed_position = after["state"].get("playback", {}).get("position_seconds")
+                if (not isinstance(observed_position, (int, float)) or isinstance(observed_position, bool)
+                        or not math.isfinite(observed_position) or abs(observed_position - position) > .1
+                        or after["state"].get("playback", {}).get("pause_desired") is not True):
+                    raise Failure("assertion-failed", "grip drag changed playback position or pause intent")
+                released = after["state"]["chrome"].get("interaction_pins") == []
+                dx, dy = (after["point"][k] - origin[k] for k in ("x", "y"))
+                movement = math.hypot(dx, dy)
+                passed = (movement >= 5 and dx * delta["x"] + dy * delta["y"] > 0) if expected == "moved" else movement <= 1
+                if released and passed and previous == after["pin"]:
+                    return {"mode": "input", "action": "drag", "diagnostic_target": args["diagnostic_target"],
+                            "native": native, "from": origin, "to": destination,
+                            "coordinate_space": "quartz-global-logical-points", "before": before, "after": after,
+                            "outcome": expected, "outcome_verified": True, "movement_points": movement,
+                            "no_seek": True, "interaction_released": True,
+                            "endpoint": "input-dispatched-and-model-geometry-outcome; presentation-unverified"}
+                previous = after["pin"]
+            except Failure as exc:
+                # Missing post-release layout may be transient. Context/seek
+                # failures are final and must not be erased by a later snapshot.
+                if str(exc) != "grip diagnostic target missing or ambiguous":
+                    raise Failure(exc.status, str(exc), {"native": native, "before": before, "last": last, **exc.data})
+            time.sleep(min(.05, max(0, deadline - time.monotonic())))
+        raise Failure("assertion-failed", "grip drag outcome was not observed; input was not retried", {
+            "expected_outcome": expected, "native": native, "before": before, "last": last})
 
     def artifact(self, name):
         path = (self.directory / "artifacts" / name).resolve()
@@ -783,6 +1067,8 @@ class Runner:
             return self.close(args)
         if command == "run":
             return self.scenario(args)
+        if command == "act" and "diagnostic_target" in args:
+            return self.diagnostic_grip_drag(args)
         timeout = bounded(args.get("timeout", 15), maximum=300 if command.startswith("trace-") else 120)
         if command in {"inspect", "act", "capture"}:
             if set(args) & {"pid", "operation", "expected_identity"}:
@@ -847,6 +1133,10 @@ class Runner:
                         ended_monotonic=time.monotonic(),
                         timing_scope="runner wall time including helper compilation and identity checks")
         if command == "launch" and response["status"] != "ok" and self.child is not None:
+            preferences = self.manifest.get("preferences", {})
+            if preferences.get("status") == "pending":
+                preferences.update(status="failed", error="launch ended without a validated preference receipt")
+                self.save()
             response["data"]["launch_failure_cleanup"] = self.cleanup_failed_launch()
         if self.manifest:
             response["run_id"] = self.manifest["run_id"]
@@ -1086,6 +1376,31 @@ def compare_runs(baseline, candidate):
             raise Failure("assertion-failed", f"run has no passing scenario correctness receipt: {directory}")
     if not bm.get("scenario_sha256") or bm["scenario_sha256"] != cm.get("scenario_sha256"):
         raise Failure("error", "scenario hashes do not match")
+    # Run-owned suite names and paths differ; their retained initialization
+    # semantics must match before those transport fields may be ignored.
+    preference_semantics = []
+    for manifest in (bm, cm):
+        preferences = manifest.get("preferences")
+        if preferences is None:
+            preference_semantics.append(None)  # Historical manifests retain explicit context.
+            continue
+        if (preferences.get("status") != "validated"
+                or preferences.get("fallback_domains") != []
+                or not preferences.get("isolation_mode")
+                or not re.fullmatch(r"[0-9a-f]{64}", preferences.get("effective_initial_sha256", ""))):
+            raise Failure("error", "comparison requires validated isolated preference initialization")
+        values = preferences.get("effective_initial_values")
+        if not isinstance(values, dict):
+            raise Failure("error", "comparison requires retained effective preference values")
+        values = dict(values)
+        # The suite reservation identifies ownership, not a user preference.
+        # Its unique token is retained in the receipt, but differs per launch.
+        values.pop("Illiquid.agent-ui-preference-suite.v1", None)
+        preference_semantics.append({"isolation_mode": preferences["isolation_mode"],
+                                     "seed_sha256": preferences.get("seed_sha256"),
+                                     "effective_values": preference_json_identity(values)})
+    if preference_semantics[0] != preference_semantics[1]:
+        raise Failure("error", "effective preference initialization differs")
     required_context = {"fixtures", "instrumentation", "display", "cache_state", "preferences"}
     context = bm.get("comparison_context", {})
     if (not required_context <= set(context) or context != cm.get("comparison_context")
@@ -1096,7 +1411,9 @@ def compare_runs(baseline, candidate):
             overrides = dict(env.pop("launch_overrides", {}))
             return env, {k: v for k, v in overrides.items() if k not in {
                 "CFFIXED_USER_HOME", "TMPDIR", "ILLIQUID_BENCHMARK_CONTROL_SESSION",
-                "ILLIQUID_BENCHMARK_CONTROL_FILE", "ILLIQUID_BENCHMARK_SESSION_FILE", "ILLIQUID_BENCHMARK_THUMBNAIL_CACHE"}}
+                "ILLIQUID_BENCHMARK_CONTROL_FILE", "ILLIQUID_BENCHMARK_SESSION_FILE", "ILLIQUID_BENCHMARK_THUMBNAIL_CACHE",
+                "ILLIQUID_BENCHMARK_PREFERENCES_SUITE", "ILLIQUID_BENCHMARK_PREFERENCES_RECEIPT",
+                "ILLIQUID_BENCHMARK_PREFERENCES_SEED_FILE"}}
         if (not required_context <= set(context) or context != cm.get("comparison_context")
                 or semantic_environment(bm) != semantic_environment(cm)):
             raise Failure("error", "comparison requires matching fixture/instrumentation/display/cache/preferences context and environment")
@@ -1138,6 +1455,7 @@ def parser():
     launch.add_argument("--app", required=True)
     launch.add_argument("--run-dir", help="new directory; defaults to QualificationArtifacts/AgentUI/<id>")
     launch.add_argument("--context", help="JSON string/file with fixture, instrumentation, display, cache context")
+    launch.add_argument("--preferences-seed-file", help="JSON preference seed copied byte-for-byte into the new run")
     launch.add_argument("--timeout", type=float, default=30)
     attach = commands.add_parser("attach", help="attach exact PID and executable; does not acquire process ownership")
     attach.add_argument("--pid", required=True, type=int)

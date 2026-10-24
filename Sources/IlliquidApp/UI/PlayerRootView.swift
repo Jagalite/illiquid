@@ -21,6 +21,7 @@ struct PlayerRootView: View {
             chrome.scaledPlayerInterface()
         }
         .coordinateSpace(name: AgentUITargetGeometry.coordinateSpace)
+        .agentUIRootGeometry(model: model)
     }
 
     private var chrome: some View {
@@ -424,7 +425,7 @@ struct SourcesSidebarState {
     var knownSourceFolderIDs: Set<String> = []
     var hasInitializedExpansion = false
 
-    static func restored(defaults: UserDefaults = .standard) -> Self {
+    static func restored(defaults: UserDefaults = AppPreferences.defaults) -> Self {
         guard let snapshot = SourcesSidebarExpansionStore.restore(
             from: defaults.data(forKey: SourcesSidebarExpansionStore.defaultsKey)
         ) else {

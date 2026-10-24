@@ -2,6 +2,7 @@
 
 No application launch, AX action, capture, or live global input is permitted here.
 """
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,9 @@ import unittest
 
 HERE = Path(__file__).resolve().parent
 SOURCE = HERE.parent / "native.swift"
+RUNNER_SPEC = importlib.util.spec_from_file_location("native_test_runner", HERE.parent / "agent_ui.py")
+RUNNER = importlib.util.module_from_spec(RUNNER_SPEC)
+RUNNER_SPEC.loader.exec_module(RUNNER)
 
 
 @unittest.skipUnless(sys.platform == "darwin" and shutil.which("swiftc"), "requires macOS Swift SDK")
@@ -23,13 +27,15 @@ class NativeHelperTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory(prefix="illiquid-native-tests-")
         cls.addClassCleanup(cls.temporary.cleanup)
         cls.directory = Path(cls.temporary.name)
-        cls.helper = cls.directory / "native"
-        compile_result = subprocess.run(
-            ["swiftc", "-O", str(SOURCE), "-o", str(cls.helper)],
-            capture_output=True, text=True, timeout=120,
-        )
-        if compile_result.returncode:
-            raise AssertionError(compile_result.stderr)
+        # Exercise the same optimized, source/toolchain-keyed helper used by the
+        # runner. Its lock serializes concurrent preparation of identical source;
+        # private copies in overlapping native/aggregate jobs both exhausted the
+        # 120-second compiler deadline before any native test could run.
+        # A cache miss still compiles and fails the suite on any preparation error.
+        try:
+            cls.helper = RUNNER.Adapter().compile(SOURCE)
+        except RUNNER.Failure as exc:
+            raise AssertionError(f"native helper preparation failed: {exc}; {exc.data}") from exc
 
     def request(self, request=None, *, raw=None):
         result = subprocess.run(
