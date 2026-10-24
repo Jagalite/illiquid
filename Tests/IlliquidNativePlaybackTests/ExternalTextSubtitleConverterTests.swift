@@ -254,6 +254,116 @@ struct ExternalTextSubtitleConverterTests {
         }
     }
 
+    @Test(arguments: [1, 2, 3, 4, 5, 6, 7])
+    func newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count: Int) throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let first = cue(start: "00:00:01.000", end: "00:00:02.000", format: format)
+            let second = "second-id\n00:00:03.000 --> 00:00:04.000\nSecond"
+            let source = first + String(repeating: "\n", count: count) + second
+            let expected = Converter.defaultASSHeader + "\n"
+                + (count == 1
+                    ? "Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,Caption\\Nsecond-id\\N00:00:03.000 --> 00:00:04.000\\NSecond"
+                    : "Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,Caption\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Second")
+            for newline in ["\n", "\r\n", "\r"] {
+                let actual = try Converter.convert(
+                    source.replacingOccurrences(of: "\n", with: newline), format: format)
+                #expect(actual.utf8.elementsEqual(expected.utf8))
+            }
+        }
+    }
+
+    @Test(arguments: [1, 2, 3, 4, 5, 6, 7])
+    func trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count: Int) throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(start: "00:00:01.000", end: "00:00:02.000", format: format)
+                + String(repeating: "\n", count: count)
+            // One LF creates a final empty payload line. Two or more end the
+            // block; the remaining empty blocks/leading lines contain no cue.
+            let expected = Converter.defaultASSHeader
+                + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,Caption"
+                + (count == 1 ? "\\N" : "")
+            for newline in ["\n", "\r\n", "\r"] {
+                let actual = try Converter.convert(
+                    source.replacingOccurrences(of: "\n", with: newline), format: format)
+                #expect(actual.utf8.elementsEqual(expected.utf8))
+            }
+        }
+    }
+
+    @Test(arguments: [1, 2, 3, 4, 5, 6, 7])
+    func leadingEmptyBlocksDoNotHideTheNextCue(count: Int) throws {
+        let body = String(repeating: "\n", count: count)
+            + "cue-id\n00:00:01.000 --> 00:00:02.000\nCaption"
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,Caption"
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = (format == .webVTT ? "WEBVTT\n\n" : "") + body
+            #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+        }
+    }
+
+    @Test func whitespaceOnlyLinesAndUnicodeSeparatorsRemainInsideThePayload() throws {
+        let payload = "First\n \n\t\n\u{00A0}\nSecond\u{2028}Third\u{2029}Fourth\u{0085}End"
+            + "\n00:00:03.000 --> 00:00:04.000\nStill the first cue"
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,"
+            + "First\\N \\N\t\\N\u{00A0}\\NSecond\u{2028}Third\u{2029}Fourth\u{0085}End"
+            + "\\N00:00:03.000 --> 00:00:04.000\\NStill the first cue"
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                + "00:00:01.000 --> 00:00:02.000\n" + payload
+            #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+        }
+    }
+
+    @Test func webVTTDiscardsItsEntireFirstBlockEvenWhenItContainsTimings() throws {
+        let headerAndTiming = "WEBVTT - metadata\nLanguage: en\n00:01.000 --> 00:02.000\nHidden"
+        #expect(throws: Converter.ConversionError.noValidCues(.webVTT)) {
+            _ = try Converter.convert(headerAndTiming, format: .webVTT)
+        }
+        let source = headerAndTiming + "\n\n00:03.000 --> 00:04.000\nVisible"
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Visible"
+        #expect(try Converter.convert(source, format: .webVTT).utf8.elementsEqual(expected.utf8))
+    }
+
+    @Test func invalidFirstTimingDoesNotPromoteLaterTimingsInTheSameBlock() throws {
+        let badBlock = "identifier\ninvalid --> invalid\n00:00:01.000 --> 00:00:02.000\nHidden"
+        let goodBlock = "00:00:03.000 --> 00:00:04.000\nVisible"
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Visible"
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = (format == .webVTT ? "WEBVTT\n\n" : "") + badBlock + "\n\n" + goodBlock
+            #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+        }
+    }
+
+    @Test func onlySubRipMayScanPastMultipleIdentifiersForATimingLine() throws {
+        let body = "first-id\nsecond-id\n00:00:01.000 --> 00:00:02.000\nFirst"
+            + "\n\n00:00:03.000 --> 00:00:04.000\nSecond"
+        let srtExpected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,First"
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Second"
+        let vttExpected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Second"
+        #expect(try Converter.convert(body, format: .srt).utf8.elementsEqual(srtExpected.utf8))
+        #expect(try Converter.convert("WEBVTT\n\n" + body, format: .webVTT).utf8.elementsEqual(vttExpected.utf8))
+    }
+
+    @Test func blockBoundariesPreserveExactUnicodeAndControlPayloadBytes() throws {
+        let firstPayload = "Cafe\u{0301} Café\u{0000}\u{FEFF}\n\u{0301}日本語 👩\u{200D}💻"
+        let secondPayload = "\u{0308}Second\u{2028}line\u{0085}end"
+        let body = "00:00:01.000 --> 00:00:02.000\n" + firstPayload
+            + "\n\n\n00:00:03.000 --> 00:00:04.000\n" + secondPayload
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,Cafe\u{0301} Café\u{0000}\u{FEFF}\\N\u{0301}日本語 👩\u{200D}💻"
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,," + secondPayload
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = (format == .webVTT ? "\u{FEFF}WEBVTT\n\n" : "") + body
+            #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+        }
+    }
+
     private func assertRejectedTimestamp(_ timestamp: String, format: Converter.Format) {
         let separator = format == .srt ? "," : "."
         let intervals = [

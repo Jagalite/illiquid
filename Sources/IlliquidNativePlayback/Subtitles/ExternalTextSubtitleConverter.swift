@@ -58,10 +58,10 @@ enum ExternalTextSubtitleConverter {
             }
         }
 
-        let blocks = normalized.components(separatedBy: "\n\n")
-        var events: [String] = []
+        var output = defaultASSHeader
+        var hasEvents = false
         // The WebVTT header and any header metadata never contain cue payloads.
-        for block in blocks.dropFirst(format == .webVTT ? 1 : 0) {
+        for block in Blocks(normalized).dropFirst(format == .webVTT ? 1 : 0) {
             let lines = Array(block.split(separator: "\n", omittingEmptySubsequences: false)
                 .drop(while: { $0.isEmpty }))
             guard let first = lines.first else { continue }
@@ -91,12 +91,42 @@ enum ExternalTextSubtitleConverter {
             else { continue }
             let text = lines.dropFirst(timingIndex + 1).map(escapeASSPayload)
                 .joined(separator: "\\N")
-            events.append(
-                "Dialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
-            )
+            output += "\nDialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
+            hasEvents = true
         }
-        guard !events.isEmpty else { throw ConversionError.noValidCues(format) }
-        return defaultASSHeader + "\n" + events.joined(separator: "\n")
+        guard hasEvents else { throw ConversionError.noValidCues(format) }
+        return output
+    }
+
+    /// Visit one block at a time instead of retaining copies of every block
+    /// alongside every converted event. LF has no alternate Unicode spelling;
+    /// scanning its UTF-8 bytes preserves non-overlapping "\n\n" separators,
+    /// including empty blocks and a single trailing LF within the last block.
+    private struct Blocks: Sequence, IteratorProtocol {
+        private let source: String
+        private var nextStart: String.Index?
+
+        init(_ source: String) {
+            self.source = source
+            nextStart = source.startIndex
+        }
+
+        mutating func next() -> Substring? {
+            guard let start = nextStart else { return nil }
+            let bytes = source.utf8
+            var cursor = start
+            while let newline = bytes[cursor...].firstIndex(of: 0x0A) {
+                let afterNewline = bytes.index(after: newline)
+                guard afterNewline != bytes.endIndex else { break }
+                if bytes[afterNewline] == 0x0A {
+                    nextStart = bytes.index(after: afterNewline)
+                    return source[start..<newline]
+                }
+                cursor = afterNewline
+            }
+            nextStart = nil
+            return source[start...]
+        }
     }
 
     private static func escapeASSPayload(_ line: Substring) -> String {

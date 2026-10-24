@@ -6,6 +6,7 @@ on:
       - 'Tests/IlliquidNativePlaybackTests/External*Subtitle*Tests.swift'
       - 'Scripts/test-external-subtitle-regressions.sh'
       - 'Benchmarks/ExternalSubtitleConversion/**'
+      - 'Benchmarks/ExternalSubtitleMemory/**'
       - '.github/workflows/external-subtitle-conversion.yml'
   workflow_dispatch:
 permissions:
@@ -16,7 +17,7 @@ concurrency:
 jobs:
   native-component:
     runs-on: macos-26
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
@@ -32,6 +33,12 @@ jobs:
           python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark
           --rounds 10 --target-ms 100
           --output "$RUNNER_TEMP/external-subtitle-conversion"
+      - name: Compare fresh-process conversion peak memory
+        run: >-
+          python3 Benchmarks/ExternalSubtitleMemory/run.py benchmark
+          --swiftc "$(xcrun --find swiftc)"
+          --rounds 4
+          --output "$RUNNER_TEMP/external-subtitle-conversion/memory"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
