@@ -26,13 +26,14 @@ HERE = Path(__file__).resolve().parent
 BASELINE = "7f9ba073394b77a908e0589447c6edc8d10b832c"
 DEMUXER = "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift"
 FONT = "Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift"
+INPUT_EXECUTOR = "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"
 FULL_SOURCES = [
     DEMUXER, FONT,
     "Sources/IlliquidNativePlayback/Media/FFmpegStreamInfo.swift",
     "Sources/IlliquidNativePlayback/Media/MediaTime.swift",
     "Sources/IlliquidNativePlayback/Media/FFmpegError.swift",
     "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
-    "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift",
+    INPUT_EXECUTOR,
     "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
     "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
 ]
@@ -179,7 +180,10 @@ class Runner:
         original = {variant: {path: self.source(variant, path)
                               for path in FULL_SOURCES + [PRESENTATION, BITMAP] + C_SOURCES}
                     for variant in VARIANTS}
-        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT}:
+        # The executor now forwards the opt-out used by auxiliary readers.
+        # This benchmark keeps the default full projection in both variants;
+        # compile and hash each complete executor alongside its own demuxer.
+        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT, INPUT_EXECUTOR}:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
         error = {v: extract(original[v][PRESENTATION], "struct PresentationError:", "\nfunc checkOSStatus(")
