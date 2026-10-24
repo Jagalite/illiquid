@@ -1132,6 +1132,10 @@ final class VideoDecoder {
         emit: (DecodedOutput) throws -> Void
     ) throws {
         guard let context, let frame else { return }
+        // Cancellation and output errors can exit before the next iteration
+        // clears this scratch reference. Emitted buffers, filter history and
+        // the seek fallback each hold their own storage or native references.
+        defer { av_frame_unref(frame) }
 
         while true {
             guard shouldContinue() else {

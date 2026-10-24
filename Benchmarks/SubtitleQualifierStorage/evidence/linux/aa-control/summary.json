@@ -1,0 +1,92 @@
+{
+  "cases": [
+    {
+      "case": "ascii_4096",
+      "cpu_ms_per_association": {
+        "A": {
+          "max": 226.781534,
+          "median": 153.6038977,
+          "min": 125.3430292
+        },
+        "B": {
+          "max": 208.503212,
+          "median": 161.1855197,
+          "min": 97.09397779999999
+        }
+      },
+      "paired_cpu_B_minus_A_ms": {
+        "max": 83.1601828,
+        "median": -0.45154560000000865,
+        "min": -77.4032736
+      },
+      "paired_cpu_B_relative_to_A_pct": {
+        "max": 66.34607710597757,
+        "median": -0.30604241556728695,
+        "min": -44.357875541872296
+      },
+      "paired_wall_B_relative_to_A_pct": {
+        "max": 66.52483823654624,
+        "median": -5.996292056538388,
+        "min": -44.099106976499115
+      },
+      "wall_ms_per_association": {
+        "A": {
+          "max": 261.000178,
+          "median": 174.4009975,
+          "min": 126.6468694
+        },
+        "B": {
+          "max": 210.8984944,
+          "median": 173.6004103,
+          "min": 98.58510940000001
+        }
+      }
+    },
+    {
+      "case": "plain_4096",
+      "cpu_ms_per_association": {
+        "A": {
+          "max": 181.8599012,
+          "median": 123.7800258,
+          "min": 104.8197294
+        },
+        "B": {
+          "max": 229.55301419999998,
+          "median": 142.9368546,
+          "min": 91.6427356
+        }
+      },
+      "paired_cpu_B_minus_A_ms": {
+        "max": 107.6513674,
+        "median": 14.26230160000001,
+        "min": -82.81737019999998
+      },
+      "paired_cpu_B_relative_to_A_pct": {
+        "max": 95.00089423254398,
+        "median": 10.145377056469735,
+        "min": -45.53910436194606
+      },
+      "paired_wall_B_relative_to_A_pct": {
+        "max": 146.25306363032448,
+        "median": 10.13965782972589,
+        "min": -49.609698529394905
+      },
+      "wall_ms_per_association": {
+        "A": {
+          "max": 197.6387698,
+          "median": 131.63024819999998,
+          "min": 105.19798779999999
+        },
+        "B": {
+          "max": 279.04164280000003,
+          "median": 151.7491718,
+          "min": 92.1111102
+        }
+      }
+    }
+  ],
+  "control": "A/A: both labels execute the exact same qualified baseline binary",
+  "interpretation": "Label differences quantify observed run-to-run variation under this host/protocol. They measure no code change and establish neither a candidate slowdown nor a speedup.",
+  "observations": 24,
+  "pairs": 12
+}

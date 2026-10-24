@@ -1,14 +1,19 @@
 name: Thumbnail disk eviction
 
 on:
+  push:
+    branches:
+      - 'perf/thumbnail-read-allocation-*'
   pull_request:
     paths:
       - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift'
       - 'Sources/IlliquidNativePlayback/Media/ThumbnailDiskEvictionHeap.swift'
       - 'Sources/IlliquidNativePlayback/Media/ThumbnailPromotionMailbox.swift'
       - 'Tests/IlliquidNativePlaybackTests/ThumbnailDiskEvictionTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ThumbnailImageLifetimeTests.swift'
       - 'Benchmarks/ThumbnailDiskEviction/run.py'
       - 'Benchmarks/ThumbnailDiskEviction/Harness.swift'
+      - 'Benchmarks/ThumbnailReadAllocation/**'
       - '.github/workflows/thumbnail-disk-eviction.yml'
   workflow_dispatch:
 
@@ -16,7 +21,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: thumbnail-disk-eviction-${{ github.ref }}
+  group: thumbnail-disk-eviction-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -37,10 +42,50 @@ jobs:
           uname -a >> "$RUNNER_TEMP/thumbnail-disk-component/host.txt"
           sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/thumbnail-disk-component/host.txt"
           swift --version >> "$RUNNER_TEMP/thumbnail-disk-component/host.txt"
-      - name: Verify survivors and measure paired native runs
+      - name: Verify survivors and measure paired native reads
         run: |
-          python3 Benchmarks/ThumbnailDiskEviction/run.py \
-            --pairs 8 --output "$RUNNER_TEMP/thumbnail-disk-component/results"
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          commands = [
+              [sys.executable, 'Benchmarks/ThumbnailDiskEviction/run.py', '--pairs', '8',
+               '--output', os.environ['RUNNER_TEMP'] + '/thumbnail-disk-component/results'],
+              [sys.executable, 'Benchmarks/ThumbnailReadAllocation/run.py', '--pairs', '8',
+               '--output', os.environ['RUNNER_TEMP'] + '/thumbnail-read-allocation'],
+          ]
+          if not queue.is_file():
+              print('Shared Kyoto queue is unavailable on this hosted runner; '
+                    'compiling isolated components directly and serially.', flush=True)
+          for command in commands:
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = json.loads(submitted)['id']
+                  subprocess.run([*cli, 'show', job_id], check=True)
+                  result = subprocess.run([*cli, 'wait', job_id])
+                  subprocess.run([*cli, 'logs', job_id], check=True)
+                  if result.returncode:
+                      sys.exit(result.returncode)
+              else:
+                  subprocess.run(command, check=True)
+          PY
+      - name: Publish compact read-allocation results
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-read-allocation'
+          records = {str(path.relative_to(root)): path.read_text()
+                     for path in sorted(root.rglob('*'))
+                     if path.is_file() and path.suffix in ('.json', '.jsonl', '.log')
+                     and 'module-cache' not in path.parts}
+          bundle = gzip.compress(json.dumps(records, sort_keys=True).encode(), mtime=0)
+          print('THUMBNAIL_READ_BUNDLE_SHA256', hashlib.sha256(bundle).hexdigest())
+          print('THUMBNAIL_READ_BUNDLE_BASE64', base64.b64encode(bundle).decode())
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -48,6 +93,8 @@ jobs:
           path: |
             ${{ runner.temp }}/thumbnail-disk-component/
             !${{ runner.temp }}/thumbnail-disk-component/results/module-cache/**
+            ${{ runner.temp }}/thumbnail-read-allocation/
+            !${{ runner.temp }}/thumbnail-read-allocation/**/module-cache/**
           retention-days: 14
 
   native-regressions:
@@ -70,9 +117,27 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/thumbnail-disk-native"
           set -o pipefail
-          swift test --force-resolved-versions --filter \
-            'ThumbnailDiskEviction|NativeThumbnailCacheTests|ThumbnailPhysicalEntryTests|ThumbnailInventoryRegressionTests|ThumbnailPromotionMailboxTests|QueuedThumbnailPromotionTests' \
-            2>&1 | tee "$RUNNER_TEMP/thumbnail-disk-native/tests.log"
+          python3 - <<'PY' 2>&1 | tee "$RUNNER_TEMP/thumbnail-disk-native/tests.log"
+          import json, subprocess, sys
+          from pathlib import Path
+          command = ['swift', 'test', '--force-resolved-versions', '--jobs', '2', '--filter',
+              'ThumbnailDiskEviction|NativeThumbnailCacheTests|ThumbnailPhysicalEntryTests|'
+              'ThumbnailInventoryRegressionTests|ThumbnailPromotionMailboxTests|'
+              'QueuedThumbnailPromotionTests|ThumbnailImageLifetimeTests']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Shared Kyoto queue is unavailable on this hosted runner; '
+                'building the app graph and running native tests directly.', flush=True)
+          subprocess.run(command, check=True)
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

@@ -1,0 +1,64 @@
+{
+  "baseline": {
+    "binary_sha256": "6226335f7520cd1eb0980bbc1c03e2e0db2108e341bed07c8faa54339ba721ac",
+    "build_command": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/tmp/illiquid-slot-historical-gate-final/module-cache",
+      "/tmp/illiquid-slot-historical-gate-final/baseline/SubtitleFramePacker.swift",
+      "/tmp/illiquid-slot-historical-gate-final/baseline/SubtitleMemoryBudget.swift",
+      "/tmp/illiquid-slot-historical-gate-final/baseline/SubtitleRenderedRegion.swift",
+      "/tmp/illiquid-subtitle-slot-capacity/Benchmarks/SubtitleStaging/Main.swift",
+      "-o",
+      "/tmp/illiquid-slot-historical-gate-final/baseline/subtitle-staging"
+    ],
+    "driver_sha256": "ee7b7fcd120050d08957e9271002c466643979a358a2a62745166f968fd88ccc",
+    "generated_sha256": {
+      "SubtitleFramePacker.swift": "57e688ebe2f619e914888f8faa20d98be86bcae8dce8cf8f1718d4fc24a00bed",
+      "SubtitleMemoryBudget.swift": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83",
+      "SubtitleRenderedRegion.swift": "76c305231d22dd43d0e0cd759c62bacd6399f39ee3651a98b35da660461b7cb4"
+    },
+    "source_ref": "8c3cc3d4008d5d1b8d436bcf2d51d891382b6548",
+    "source_sha256": {
+      "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "089275255bd99ad57b2166489532a24373b0e218c0a6c346067c1d98b4a229f8",
+      "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "59cb70caf6282c0eb351a427275e25d7523fe17c7902e9b93881ca411a37a590",
+      "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "c0f3824176dbdf202841bcf13962e9780d11084246208b7a89c869dbd2c4af83"
+    }
+  },
+  "candidate": {
+    "binary_sha256": "4237b0a8a698b56dc08985efcd33d00d83fa569b88cfb54f95b4f6fefe6b4ed9",
+    "build_command": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/tmp/illiquid-slot-historical-gate-final/module-cache",
+      "/tmp/illiquid-slot-historical-gate-final/candidate/SubtitleFramePacker.swift",
+      "/tmp/illiquid-slot-historical-gate-final/candidate/SubtitleMemoryBudget.swift",
+      "/tmp/illiquid-slot-historical-gate-final/candidate/SubtitleRenderedRegion.swift",
+      "/tmp/illiquid-subtitle-slot-capacity/Benchmarks/SubtitleStaging/Main.swift",
+      "-o",
+      "/tmp/illiquid-slot-historical-gate-final/candidate/subtitle-staging"
+    ],
+    "driver_sha256": "ee7b7fcd120050d08957e9271002c466643979a358a2a62745166f968fd88ccc",
+    "generated_sha256": {
+      "SubtitleFramePacker.swift": "0d702d8fcf833a04ade317c969de8739bc8e26ac8f68b7df007e54bd5c883d26",
+      "SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+      "SubtitleRenderedRegion.swift": "76c305231d22dd43d0e0cd759c62bacd6399f39ee3651a98b35da660461b7cb4"
+    },
+    "source_ref": "working-tree",
+    "source_sha256": {
+      "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "71b46b0986b74f5f521dc96bbae6267f478b413f2524c2de3bc1bdb231e79fb2",
+      "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  }
+}

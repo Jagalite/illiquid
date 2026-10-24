@@ -29,14 +29,16 @@ public enum ExternalSubtitleMatcher {
         }
 
         let index = TokenIndex()
-        var media: [(url: URL, raw: [String], tokens: [String])] = []
+        // Keep one token buffer and the normalized prefix length per media.
+        // Retaining slices would enlarge every record, even without qualifiers.
+        var media: [(url: URL, raw: [String], tokenCount: Int)] = []
         for url in result.keys where MediaFileSupport.isSupportedMediaFile(url) {
             guard !isCancelled() else { return [:] }
             let raw = filenameTokens(url)
             let tokens = removingTrailingMediaQualifiers(from: raw)
             guard !tokens.isEmpty else { continue }
             index.insert(tokens, index: media.count)
-            media.append((url, raw, tokens))
+            media.append((url, raw, tokens.count))
         }
         for subtitleURL in subtitleURLs {
             guard !isCancelled() else { return [:] }
@@ -45,16 +47,12 @@ public enum ExternalSubtitleMatcher {
             let tokens = removingTrailingSubtitleQualifiers(from: raw)
             var best: (index: Int, score: Int)?
             var tied = false
-            guard let candidates = index.candidates(for: tokens, isCancelled: isCancelled) else {
-                return [:]
-            }
-            for candidate in candidates {
-                guard !isCancelled() else { return [:] }
+            let completed = index.visitCandidates(for: tokens, isCancelled: isCancelled) { candidate in
                 let item = media[candidate]
                 guard let score = matchScore(
-                    rawMediaTokens: item.raw, mediaTokens: item.tokens,
+                    rawMediaTokens: item.raw, mediaTokens: item.raw.prefix(item.tokenCount),
                     rawSubtitleTokens: raw, subtitleTokens: tokens
-                ) else { continue }
+                ) else { return }
                 if best == nil || score > best!.score {
                     best = (candidate, score)
                     tied = false
@@ -62,14 +60,18 @@ public enum ExternalSubtitleMatcher {
                     tied = true
                 }
             }
+            guard completed else { return [:] }
             if let best, !tied {
                 result[media[best.index].url, default: []].append(subtitleURL)
             }
         }
 
-        for mediaURL in Array(result.keys) {
+        // Replacing existing values preserves indices and avoids a key snapshot.
+        var resultIndex = result.startIndex
+        while resultIndex != result.endIndex {
             guard !isCancelled() else { return [:] }
-            result[mediaURL] = NaturalFilenameOrdering.sort(result[mediaURL, default: []])
+            result.values[resultIndex] = NaturalFilenameOrdering.sort(result.values[resultIndex])
+            result.formIndex(after: &resultIndex)
         }
 
         guard !isCancelled() else { return [:] }
@@ -82,7 +84,7 @@ public enum ExternalSubtitleMatcher {
         var children: [String: TokenIndex] = [:]
         var terminal: [Int] = []
 
-        func insert(_ tokens: [String], index: Int) {
+        func insert(_ tokens: ArraySlice<String>, index: Int) {
             var node = self
             for token in tokens {
                 if node.children[token] == nil { node.children[token] = TokenIndex() }
@@ -91,25 +93,33 @@ public enum ExternalSubtitleMatcher {
             node.terminal.append(index)
         }
 
-        // nil distinguishes an interrupted traversal from a completed lookup
-        // with no candidates, so the caller can discard all earlier matches.
-        func candidates(for tokens: [String], isCancelled: () -> Bool) -> [Int]? {
-            guard !tokens.isEmpty else { return [] }
-            var result: [Int] = []
+        // Visit matches as they are found instead of retaining a candidate array.
+        // false distinguishes cancellation from a completed, possibly empty
+        // traversal, so the caller can discard all earlier associations.
+        func visitCandidates(
+            for tokens: ArraySlice<String>, isCancelled: () -> Bool, _ visit: (Int) -> Void
+        ) -> Bool {
+            guard !tokens.isEmpty else { return true }
             var node = self
             for token in tokens {
-                guard !isCancelled() else { return nil }
-                result.append(contentsOf: node.terminal)
-                guard let child = node.children[token] else { return result }
+                guard !isCancelled() else { return false }
+                for candidate in node.terminal {
+                    guard !isCancelled() else { return false }
+                    visit(candidate)
+                }
+                guard let child = node.children[token] else { return true }
                 node = child
             }
             var pending = [node]
             while let current = pending.popLast() {
-                guard !isCancelled() else { return nil }
-                result.append(contentsOf: current.terminal)
+                guard !isCancelled() else { return false }
+                for candidate in current.terminal {
+                    guard !isCancelled() else { return false }
+                    visit(candidate)
+                }
                 pending.append(contentsOf: current.children.values)
             }
-            return result
+            return true
         }
     }
 
@@ -143,8 +153,8 @@ public enum ExternalSubtitleMatcher {
     }
 
     private static func matchScore(
-        rawMediaTokens: [String], mediaTokens: [String],
-        rawSubtitleTokens: [String], subtitleTokens: [String]
+        rawMediaTokens: [String], mediaTokens: ArraySlice<String>,
+        rawSubtitleTokens: [String], subtitleTokens: ArraySlice<String>
     ) -> Int? {
         guard !mediaTokens.isEmpty, !subtitleTokens.isEmpty else { return nil }
 
@@ -231,20 +241,20 @@ public enum ExternalSubtitleMatcher {
         } ?? nil
     }
 
-    private static func removingTrailingSubtitleQualifiers(from tokens: [String]) -> [String] {
-        var result = tokens
-        while result.count > 1, let last = result.last, subtitleQualifiers.contains(last) {
-            result.removeLast()
+    private static func removingTrailingSubtitleQualifiers(from tokens: [String]) -> ArraySlice<String> {
+        var count = tokens.count
+        while count > 1, subtitleQualifiers.contains(tokens[count - 1]) {
+            count -= 1
         }
-        return result
+        return tokens.prefix(count)
     }
 
-    private static func removingTrailingMediaQualifiers(from tokens: [String]) -> [String] {
-        var result = tokens
-        while result.count > 1, let last = result.last, isMediaQualifier(last) {
-            result.removeLast()
+    private static func removingTrailingMediaQualifiers(from tokens: [String]) -> ArraySlice<String> {
+        var count = tokens.count
+        while count > 1, isMediaQualifier(tokens[count - 1]) {
+            count -= 1
         }
-        return result
+        return tokens.prefix(count)
     }
 
     private static func isMediaQualifier(_ token: String) -> Bool {
@@ -260,12 +270,16 @@ public enum ExternalSubtitleMatcher {
         return false
     }
 
-    private static func hasOnlySubtitleQualifiers(after stem: [String], in tokens: [String]) -> Bool {
+    private static func hasOnlySubtitleQualifiers<Stem: Collection>(
+        after stem: Stem, in tokens: [String]
+    ) -> Bool where Stem.Element == String {
         isPrefix(stem, of: tokens)
             && tokens.dropFirst(stem.count).allSatisfy(subtitleQualifiers.contains)
     }
 
-    private static func isPrefix(_ prefix: [String], of values: [String]) -> Bool {
+    private static func isPrefix<Prefix: Collection, Values: Collection>(
+        _ prefix: Prefix, of values: Values
+    ) -> Bool where Prefix.Element == String, Values.Element == String {
         guard prefix.count <= values.count else {
             return false
         }
@@ -274,7 +288,7 @@ public enum ExternalSubtitleMatcher {
         }
     }
 
-    private static func tokenWeight(_ tokens: [String]) -> Int {
+    private static func tokenWeight<Tokens: Sequence>(_ tokens: Tokens) -> Int where Tokens.Element == String {
         tokens.reduce(0) { $0 + $1.count }
     }
 }

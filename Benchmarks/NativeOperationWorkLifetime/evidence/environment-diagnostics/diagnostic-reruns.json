@@ -1,0 +1,46 @@
+[
+  {
+    "argv": [
+      "supersede",
+      "32"
+    ],
+    "returncode": 0,
+    "stdout": "{\"allocator_after_registry_clear_bytes\":136304,\"allocator_before_bytes\":117792,\"allocator_retained_bytes\":136304,\"cancelled\":31,\"completed_closure_lifetimes\":32,\"completed_handles_retained\":0,\"cycles\":32,\"failed\":0,\"handles_before_settling\":1,\"heap_metric\":\"mallinfo2.uordblks + mallinfo2.hblkhd\",\"loop_cpu_nanoseconds\":747604,\"loop_wall_nanoseconds\":5818275,\"polls\":1,\"reclaimed_registry_bytes\":0,\"released_allocator_delta_bytes\":18512,\"result_digest\":\"4376658220738073159\",\"retained_allocator_delta_bytes\":18512,\"scenario\":\"supersede\",\"stale_success_callbacks\":0,\"success\":1,\"success_callbacks\":1}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "complete",
+      "32"
+    ],
+    "returncode": 0,
+    "stdout": "{\"allocator_after_registry_clear_bytes\":128656,\"allocator_before_bytes\":114720,\"allocator_retained_bytes\":128656,\"cancelled\":0,\"completed_closure_lifetimes\":32,\"completed_handles_retained\":0,\"cycles\":32,\"failed\":0,\"handles_before_settling\":0,\"heap_metric\":\"mallinfo2.uordblks + mallinfo2.hblkhd\",\"loop_cpu_nanoseconds\":2577211,\"loop_wall_nanoseconds\":8372795,\"polls\":32,\"reclaimed_registry_bytes\":0,\"released_allocator_delta_bytes\":13936,\"result_digest\":\"1723720688112802853\",\"retained_allocator_delta_bytes\":13936,\"scenario\":\"complete\",\"stale_success_callbacks\":0,\"success\":32,\"success_callbacks\":32}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "cancel",
+      "32"
+    ],
+    "returncode": -4,
+    "stdout": "",
+    "stderr": "swift-runtime: failed to suspend thread 48288 while processing a crash; backtraces will be missing information\nswift-runtime: failed to suspend thread 48289 while processing a crash; backtraces will be missing information\nswift-runtime: failed to suspend thread 48290 while processing a crash; backtraces will be missing information\nswift-runtime: failed to suspend thread 48291 while processing a crash; backtraces will be missing information\nswift-runtime: failed to suspend thread 48292 while processing a crash; backtraces will be missing information\nswift-runtime: failed to suspend thread 48293 while processing a crash; backtraces will be missing information\n\n*** Signal 4: Backtracing from 0x7fd4d792c2c0... done ***\n\n*** Program crashed: Illegal instruction at 0x00007fd4d792c2c0 ***\n\nPlatform: x86_64 Linux (Ubuntu 24.04.3 LTS)\n\nThread 0 crashed:\n\n  0      0x00007fd4d792c2c0\n  1 [ra] 0x00007fd4d7935048\n  2 [ra] 0x00007fd4d7940696\n  3 [ra] 0x00007fd4d7937ff6\n  4 [ra] 0x00007fd4d793afe0\n  5 [ra] 0x00007fd4d793af1d\n  6 [ra] 0x00007fd4d793e125\n  7 [ra] 0x00007fd4d67b9aa4\n...\n\n\nRegisters:\n\nrax 0x00000000ffffffff  4294967295\nrdx 0x00007fd4d36e5a70  2f 70 72 6f 63 2f 32 31 2f 73 74 61 74 00 00 00  /proc/21/stat\u00b7\u00b7\u00b7\nrcx 0x0000000000000000  0\nrbx 0x0000000000000000  0\nrsi 0x00007fd4d36e69c8  00 00 00 00 81 00 00 00 00 00 00 00 00 00 00 00  \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\nrdi 0x00007fd4d36e5a70  2f 70 72 6f 63 2f 32 31 2f 73 74 61 74 00 00 00  /proc/21/stat\u00b7\u00b7\u00b7\nrbp 0x00007fd4d36e5b50  a0 5b 6e d3 d4 7f 00 00 48 50 93 d7 d4 7f 00 00  \u00a0[n\u00d3\u00d4\u00b7\u00b7\u00b7HP\u00b7\u00d7\u00d4\u00b7\u00b7\u00b7\nrsp 0x00007fd4d36e4a68  4b 68 94 d7 d4 7f 00 00 00 00 00 00 00 00 00 00  Kh\u00b7\u00d7\u00d4\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\n r8 0x0000000000000000  0\n r9 0x0000000000000000  0\nr10 0x0000000000000000  0\nr11 0x0000000000000293  659\nr12 0x00007fd4d7966f50  c0 45 96 d7 d4 7f 00 00 00 00 00 00 09 00 00 00  \u00c0E\u00b7\u00d7\u00d4\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\nr13 0x00007fd4d7966fc8  c0 48 96 d7 d4 7f 00 00 00 00 00 00 09 00 00 00  \u00c0H\u00b7\u00d7\u00d4\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\nr14 0x00007fd4d7966fd8  17 00 00 00 00 00 00 00 90 13 00 cc d4 7f 00 00  \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00cc\u00d4\u00b7\u00b7\u00b7\nr15 0x0000000000000000  0\nrip 0x00007fd4d792c2c0  0f 0b 00 00 00 00 00 00 00 00 00 00 00 00 00 00  \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\n\nrflags 0x0000000000010246  ZF PF\n\ncs 0x0033  fs 0x0000  gs 0x0000\n\n\nImages:\n\n\n\nBacktrace took 0.00s\n\n"
+  },
+  {
+    "argv": [
+      "physicalStop",
+      "32"
+    ],
+    "returncode": 0,
+    "stdout": "{\"allocator_after_registry_clear_bytes\":141184,\"allocator_before_bytes\":114624,\"allocator_retained_bytes\":142288,\"cancelled\":31,\"completed_closure_lifetimes\":32,\"completed_handles_retained\":0,\"cycles\":32,\"failed\":0,\"handles_before_settling\":32,\"heap_metric\":\"mallinfo2.uordblks + mallinfo2.hblkhd\",\"loop_cpu_nanoseconds\":1062918,\"loop_wall_nanoseconds\":5759407,\"polls\":0,\"reclaimed_registry_bytes\":1104,\"released_allocator_delta_bytes\":26560,\"result_digest\":\"4376658220738073159\",\"retained_allocator_delta_bytes\":27664,\"scenario\":\"physicalStop\",\"stale_success_callbacks\":0,\"success\":1,\"success_callbacks\":0}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "verify"
+    ],
+    "returncode": 0,
+    "stdout": "[{\"allocator_after_registry_clear_bytes\":133264,\"allocator_before_bytes\":83120,\"allocator_retained_bytes\":133264,\"cancelled\":31,\"completed_closure_lifetimes\":32,\"completed_handles_retained\":0,\"cycles\":32,\"failed\":0,\"handles_before_settling\":1,\"heap_metric\":\"mallinfo2.uordblks + mallinfo2.hblkhd\",\"loop_cpu_nanoseconds\":2176405,\"loop_wall_nanoseconds\":6553179,\"polls\":1,\"reclaimed_registry_bytes\":0,\"released_allocator_delta_bytes\":50144,\"result_digest\":\"4376658220738073159\",\"retained_allocator_delta_bytes\":50144,\"scenario\":\"supersede\",\"stale_success_callbacks\":0,\"success\":1,\"success_callbacks\":1},{\"allocator_after_registry_clear_bytes\":140080,\"allocator_before_bytes\":135136,\"allocator_retained_bytes\":140080,\"cancelled\":0,\"completed_closure_lifetimes\":32,\"completed_handles_retained\":0,\"cycles\":32,\"failed\":0,\"handles_before_settling\":0,\"heap_metric\":\"mallinfo2.uordblks + mallinfo2.hblkhd\",\"loop_cpu_nanoseconds\":3232512,\"loop_wall_nanoseconds\":9065400,\"polls\":32,\"reclaimed_registry_bytes\":0,\"released_allocator_delta_bytes\":4944,\"result_digest\":\"1723720688112802853\",\"retained_allocator_delta_bytes\":4944,\"scenario\":\"complete\",\"stale_success_callbacks\":0,\"success\":32,\"success_callbacks\":32},{\"allocator_after_registry_clear_bytes\":146320,\"allocator_before_bytes\":141792,\"allocator_retained_bytes\":146320,\"cancelled\":32,\"completed_closure_lifetimes\":32,\"completed_handles_retained\":0,\"cycles\":32,\"failed\":0,\"handles_before_settling\":0,\"heap_metric\":\"mallinfo2.uordblks + mallinfo2.hblkhd\",\"loop_cpu_nanoseconds\":427255,\"loop_wall_nanoseconds\":5403634,\"polls\":0,\"reclaimed_registry_bytes\":0,\"released_allocator_delta_bytes\":4528,\"result_digest\":\"136594149715193989\",\"retained_allocator_delta_bytes\":4528,\"scenario\":\"cancel\",\"stale_success_callbacks\":0,\"success\":0,\"success_callbacks\":0},{\"allocator_after_registry_clear_bytes\":157616,\"allocator_before_bytes\":148048,\"allocator_retained_bytes\":158720,\"cancelled\":31,\"completed_closure_lifetimes\":32,\"completed_handles_retained\":0,\"cycles\":32,\"failed\":0,\"handles_before_settling\":32,\"heap_metric\":\"mallinfo2.uordblks + mallinfo2.hblkhd\",\"loop_cpu_nanoseconds\":826187,\"loop_wall_nanoseconds\":5794873,\"polls\":0,\"reclaimed_registry_bytes\":1104,\"released_allocator_delta_bytes\":9568,\"result_digest\":\"4376658220738073159\",\"retained_allocator_delta_bytes\":10672,\"scenario\":\"physicalStop\",\"stale_success_callbacks\":0,\"success\":1,\"success_callbacks\":0},{\"cancelled\":1,\"completed_handles_retained\":0,\"polls\":1,\"scenario\":\"cancelSleeping\"},{\"callbacks\":1,\"cancelled\":2,\"completed_handles_retained\":0,\"deadline_count\":0,\"scenario\":\"reentrant\",\"success\":1}]\n",
+    "stderr": ""
+  }
+]

@@ -19,9 +19,17 @@ component build needs no native media SDK or third-party package downloads.
 
 `run.py` extracts complete production declarations without rewriting their
 logic. It compiles independent baseline/candidate executables with the same
-`Main.swift`, checks their full-frame receipts, then runs ten alternating
+`Main.swift`, checks their active-frame receipts, then runs ten alternating
 fresh-process pairs per workload. Initial allocation and the first cleanup of
 each formerly large slot are excluded from steady-state timing.
+
+The current differential verifier compares every active pixel, geometry and
+upload field. Each variant also checks that unused tail bytes are zero and
+that complete previously returned snapshots remain unchanged. Independent
+staging-slot capacities may differ. The original checked-in study receipts
+below retain their historical whole-buffer comparison and source hashes;
+they have not been rewritten. Current timing workloads warm both slots at
+the same size, so their retained-storage equality check remains a control.
 
 Use `--case r8-large-to-small` to run one workload or `--repetitions 2` for a
 quick smoke run. The built driver also supports:

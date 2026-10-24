@@ -83,8 +83,9 @@ final class PlanarBufferOwnershipLedger: @unchecked Sendable {
     private let lock = NSLock()
     private var nextCheckoutID: UInt64 = 1
     private var checkouts: [UInt64: Checkout] = [:]
+    // Retain historical keys after release: membership counts all identities
+    // ever seen, while each value identifies only that buffer's latest checkout.
     private var lastCheckoutByBuffer: [UInt: UInt64] = [:]
-    private var seenBufferIdentities: Set<UInt> = []
     private var totalCheckouts = 0
     private var reuseCheckouts = 0
     private var reuseWhileKnownOwned = 0
@@ -107,15 +108,12 @@ final class PlanarBufferOwnershipLedger: @unchecked Sendable {
             let checkoutID = nextCheckoutID
             nextCheckoutID &+= 1
             totalCheckouts += 1
-            if seenBufferIdentities.insert(identity).inserted == false {
+            if let previous = lastCheckoutByBuffer.updateValue(checkoutID, forKey: identity) {
                 reuseCheckouts += 1
+                if checkouts[previous] != nil {
+                    reuseWhileKnownOwned += 1
+                }
             }
-            if let previous = lastCheckoutByBuffer[identity],
-               checkouts[previous] != nil
-            {
-                reuseWhileKnownOwned += 1
-            }
-            lastCheckoutByBuffer[identity] = checkoutID
             checkouts[checkoutID] = Checkout(
                 generation: generation,
                 bufferIdentity: identity,
@@ -249,7 +247,7 @@ final class PlanarBufferOwnershipLedger: @unchecked Sendable {
     private func snapshotLocked(activeGeneration: Int) -> PlanarBufferOwnershipSnapshot {
         var snapshot = PlanarBufferOwnershipSnapshot(
             totalCheckouts: totalCheckouts,
-            distinctBufferIdentitiesSeen: seenBufferIdentities.count,
+            distinctBufferIdentitiesSeen: lastCheckoutByBuffer.count,
             reuseCheckouts: reuseCheckouts,
             reuseWhileKnownOwned: reuseWhileKnownOwned,
             peakApplicationFrames: peakApplicationFrames,

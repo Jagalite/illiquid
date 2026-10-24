@@ -65,13 +65,13 @@ public enum EffectCompletionContract: Codable, Hashable, Sendable {
   )
   case bestEffortMirror
 
-  public static var standardOneShot: Self {
-    .oneShot(terminals: [
-      EffectResultToken(kind: .succeeded),
-      EffectResultToken(kind: .failed),
-      EffectResultToken(kind: .cancelled),
-    ])
-  }
+  // All default effects can share this immutable Set storage. Extracting and
+  // mutating a terminal set still makes an independent copy through Set's CoW.
+  public static let standardOneShot: Self = .oneShot(terminals: [
+    EffectResultToken(kind: .succeeded),
+    EffectResultToken(kind: .failed),
+    EffectResultToken(kind: .cancelled),
+  ])
 }
 
 public struct PlaybackFailure: Codable, Equatable, Sendable {

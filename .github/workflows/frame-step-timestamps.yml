@@ -7,6 +7,7 @@ on:
       - 'Sources/IlliquidNativePlayback/Media/NativeFrameStepReader.swift'
       - 'Sources/IlliquidNativePlayback/Media/VideoDeinterlacer.swift'
       - 'Tests/IlliquidNativePlaybackTests/VideoTimestampDiscoveryTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeTests.swift'
       - 'Tests/IlliquidNativePlaybackTests/FrameStepPerformanceTests.swift'
       - 'Benchmarks/FrameStepTimestamps/**'
       - '.github/workflows/frame-step-timestamps.yml'
@@ -55,7 +56,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/frame-step-qualification"
           set -o pipefail
           swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
-            --filter 'VideoTimestampDiscoveryTests|NativePlaybackFoundationTests|VideoDeinterlacerTests|SeekPrerollDecodeTests' \
+            --filter 'VideoTimestampDiscoveryTests|VideoScratchFrameLifetimeTests|NativePlaybackFoundationTests|VideoDeinterlacerTests|SeekPrerollDecodeTests' \
             2>&1 | tee "$RUNNER_TEMP/frame-step-qualification/tests.log"
       - name: Measure baseline and candidate on the same native runner
         if: github.event_name == 'workflow_dispatch'

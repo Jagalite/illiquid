@@ -412,6 +412,7 @@ public final class PlaybackCoordinator {
         guard case .unavailableRestore = state.recoveryIssue?.kind else { return }
         cancelFolderScans()
         pendingPlaybackRestore = nil
+        preparedRestoreSession = nil
         persistence.setLastOpenedMedia(nil)
         clearSavedPlaybackSession()
         dismissRecovery()
@@ -825,6 +826,7 @@ public final class PlaybackCoordinator {
         cancelFolderScans()
         pendingLocatedHistorySource = nil
         pendingPlaybackRestore = nil
+        preparedRestoreSession = nil
         saveCurrentProgress()
         pendingSourceTransaction = nil
         dismissRecovery()
@@ -1864,6 +1866,7 @@ public final class PlaybackCoordinator {
         for task in terminatingFolderScans {
             await task.value
         }
+        preparedRestoreSession = nil
         pendingSourceTransaction = nil
         eventGate.activate(nil)
         saveCurrentProgress()
@@ -2135,6 +2138,10 @@ public final class PlaybackCoordinator {
            snapshot.sessionID != pending.previousSessionID {
             invalidateTimelineThumbnails()
             pendingSourceTransaction = nil
+            // Locate needs the original record while an unavailable restore can
+            // still be retried. A committed session owns its playlist and pending
+            // resume values separately, so the startup snapshot can now retire.
+            preparedRestoreSession = nil
             retainsCompletedFrame = false
             dismissRecovery()
             discardFailedTraversalForPlaylistChange()

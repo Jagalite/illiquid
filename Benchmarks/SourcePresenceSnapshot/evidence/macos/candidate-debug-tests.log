@@ -1,0 +1,83 @@
+Test Suite 'All tests' started at 2026-10-24 14:08:16.396.
+Test Suite 'All tests' passed at 2026-10-24 14:08:16.399.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Source media presence recomputation" started.
+◇ Test emptyInputsAndUnwatchedChangesProduceNoWork() started.
+✔ Test emptyInputsAndUnwatchedChangesProduceNoWork() passed after 0.001 seconds.
+◇ Test duplicatesAndSharedAncestorsAreScheduledOnlyOnce() started.
+✔ Test duplicatesAndSharedAncestorsAreScheduledOnlyOnce() passed after 0.001 seconds.
+◇ Test prefixSiblingsStayOutsideTheWatchedRoot() started.
+✔ Test prefixSiblingsStayOutsideTheWatchedRoot() passed after 0.001 seconds.
+◇ Test nestedAndDisjointRootsRetainTheirBoundaries() started.
+✔ Test nestedAndDisjointRootsRetainTheirBoundaries() passed after 0.001 seconds.
+◇ Test filesystemRootIsIncludedOnceAndTerminatesTheWalk() started.
+✔ Test filesystemRootIsIncludedOnceAndTerminatesTheWalk() passed after 0.001 seconds.
+◇ Test canonicalUnicodePathsAndDictionaryKeysRemainUsable() started.
+✔ Test canonicalUnicodePathsAndDictionaryKeysRemainUsable() passed after 0.001 seconds.
+◇ Test equivalentUnicodeSpellingsDoNotPutAParentBeforeItsChild() started.
+✔ Test equivalentUnicodeSpellingsDoNotPutAParentBeforeItsChild() passed after 0.001 seconds.
+◇ Test deepAndWideBatchesHaveOneEntryPerAffectedFolder() started.
+✔ Test deepAndWideBatchesHaveOneEntryPerAffectedFolder() passed after 0.070 seconds.
+◇ Test aChangedParentSummaryIsEvaluatedEvenWhenItsChildStaysFalse() started.
+✔ Test aChangedParentSummaryIsEvaluatedEvenWhenItsChildStaysFalse() passed after 0.001 seconds.
+◇ Test incompleteUnreadableAndMissingSummariesCannotEstablishAbsence() started.
+✔ Test incompleteUnreadableAndMissingSummariesCannotEstablishAbsence() passed after 0.001 seconds.
+◇ Test positiveEvidencePropagatesThroughIncompleteUnreadableAncestors() started.
+✔ Test positiveEvidencePropagatesThroughIncompleteUnreadableAncestors() passed after 0.001 seconds.
+◇ Test missingChangedSummariesClearStaleValuesWithoutTouchingOtherTrees() started.
+✔ Test missingChangedSummariesClearStaleValuesWithoutTouchingOtherTrees() passed after 0.001 seconds.
+◇ Test seededValidTreesMatchThePreviousAncestorWalk() started.
+✔ Test seededValidTreesMatchThePreviousAncestorWalk() passed after 0.749 seconds.
+✔ Suite "Source media presence recomputation" passed after 0.824 seconds.
+◇ Suite "Source media presence cache snapshots" started.
+◇ Test rootAndDescendantsRetainBothPresenceValues() started.
+✔ Test rootAndDescendantsRetainBothPresenceValues() passed after 0.001 seconds.
+◇ Test ancestorsPrefixSiblingsAndOtherRootsAreExcluded() started.
+✔ Test ancestorsPrefixSiblingsAndOtherRootsAreExcluded() passed after 0.001 seconds.
+◇ Test filesystemRootMatchesAbsoluteDescendantsWithoutADoubleSeparator() started.
+✔ Test filesystemRootMatchesAbsoluteDescendantsWithoutADoubleSeparator() passed after 0.001 seconds.
+◇ Test missingIncompleteAndUnreadableSummariesCannotSeedReuse() started.
+✔ Test missingIncompleteAndUnreadableSummariesCannotSeedReuse() passed after 0.001 seconds.
+◇ Test canonicallyEquivalentUnicodePathsKeepTheirOriginalKeys() started.
+✔ Test canonicallyEquivalentUnicodePathsKeepTheirOriginalKeys() passed after 0.001 seconds.
+◇ Test snapshotRemainsIndependentWhenInputsChange() started.
+✔ Test snapshotRemainsIndependentWhenInputsChange() passed after 0.001 seconds.
+◇ Test scopedAndUnscopedCachesProduceEquivalentFilesystemTraversal() started.
+✔ Test scopedAndUnscopedCachesProduceEquivalentFilesystemTraversal() passed after 0.011 seconds.
+◇ Test repairingOneWatchedRootPreservesTheOtherRootsResults() started.
+✔ Test repairingOneWatchedRootPreservesTheOtherRootsResults() passed after 0.086 seconds.
+✔ Suite "Source media presence cache snapshots" passed after 0.100 seconds.
+✔ Test run with 21 tests in 2 suites passed after 0.924 seconds.
+Building for debugging...
+[0/14] /Users/runner/work/_temp/source-presence/snapshot/build/candidate/.build/arm64-apple-macosx/debug/SourcePresenceSnapshotPackageTests.derived/runner.swift
+[1/14] Write sources
+[3/14] Write PresenceSnapshotBenchmark-entitlement.plist
+[4/14] Write sources
+[7/14] Write swift-version-7974D3F7F03D5E95.txt
+[8/17] Compiling CPresenceHeap heap.c
+[10/17] Emitting module IlliquidCore
+[11/17] Compiling IlliquidCore MediaFileSupport.swift
+[12/17] Compiling IlliquidCore NormalizedFileURL.swift
+[13/18] Compiling IlliquidCore SourcePreparationExecutor.swift
+[14/22] Emitting module IlliquidApp
+[15/22] Compiling IlliquidApp BenchmarkScanner.swift
+[16/22] Compiling IlliquidApp SourceMediaPresenceRecomputation.swift
+[17/22] Compiling IlliquidApp SourceMediaPresenceScanner.swift
+[18/24] Compiling IlliquidApp SourceRootPruning.swift
+[19/24] Compiling IlliquidApp SourceTreeIdentity.swift
+[20/28] Emitting module PresenceSnapshotBenchmark
+[21/28] Compiling PresenceSnapshotBenchmark Harness.swift
+[21/28] Write Objects.LinkFileList
+[22/28] Linking PresenceSnapshotBenchmark
+[23/28] Applying PresenceSnapshotBenchmark
+[25/28] Compiling IlliquidAppTests SourceMediaPresenceRecomputationTests.swift
+[26/28] Emitting module IlliquidAppTests
+[27/29] Compiling IlliquidAppTests SourceMediaPresenceReuseTests.swift
+[28/31] Emitting module SourcePresenceSnapshotPackageTests
+[29/31] Compiling SourcePresenceSnapshotPackageTests runner.swift
+[29/31] Write Objects.LinkFileList
+[30/31] Linking SourcePresenceSnapshotPackageTests
+Build complete! (16.56s)

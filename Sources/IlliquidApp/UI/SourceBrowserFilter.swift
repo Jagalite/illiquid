@@ -103,14 +103,21 @@ actor SourceBrowserFilter {
             uniqueKeysWithValues: configuration.regexRules.map { ($0.id, 0) }
         )
         var hiddenCount = 0
-        var rows: [SourceTreeDisplayRow] = []
+        // The tree cache already retains allRows. Share that immutable storage
+        // when visibility leaves every row unannotated and included; materialize
+        // the accepted prefix only when the output first differs. A nonnil old
+        // annotation still takes the original assignment path, including when
+        // the new annotation compares equal but contains different String bytes.
+        var rows: [SourceTreeDisplayRow]?
 
-        for var row in allRows {
+        for (index, original) in allRows.enumerated() {
             guard !Task.isCancelled else { return nil }
+            var row = original
             if !SourceVisibilityProjection.includes(
                 row.kind.itemKind,
                 in: configuration.viewMode
             ) {
+                if rows == nil { rows = Array(allRows[..<index]) }
                 continue
             }
 
@@ -161,12 +168,25 @@ actor SourceBrowserFilter {
             if visibility != nil, row.kind.itemKind != nil {
                 hiddenCount += 1
             }
-            guard visibility == nil || revealsHiddenItems else { continue }
+            guard visibility == nil || revealsHiddenItems else {
+                if rows == nil { rows = Array(allRows[..<index]) }
+                continue
+            }
+            if rows == nil, row.visibility != nil || visibility != nil {
+                rows = Array(allRows[..<index])
+            }
             row.visibility = visibility
-            rows.append(row)
+            // A late changed row can fill an almost-complete copied prefix.
+            // Cap requested growth at the input size, while retaining geometric
+            // growth for small filtered results. reserveCapacity may round up.
+            if let outputCount = rows?.count, outputCount == rows?.capacity {
+                let growth = min(max(outputCount, 1), allRows.count - outputCount)
+                rows?.reserveCapacity(outputCount + growth)
+            }
+            rows?.append(row)
         }
 
-        return SourceBrowserProjection(rows: rows, hiddenCount: hiddenCount, regexCounts: counts)
+        return SourceBrowserProjection(rows: rows ?? allRows, hiddenCount: hiddenCount, regexCounts: counts)
     }
 
     private static func organizeMedia(_ rows: [SourceTreeDisplayRow]) -> [SourceTreeDisplayRow] {
@@ -176,8 +196,11 @@ actor SourceBrowserFilter {
         // retaining this projection's first encountered spelling as the title.
         var canonicalByTitle: [String: (raw: String, canonical: String)] = [:]
         let locale = Locale(identifier: "en_US_POSIX")
-        let sections = Dictionary(grouping: rows) { row in
-            let title = row.recognizedMedia?.section ?? "Other Videos"
+        // Group and sort indices so temporary section buffers do not duplicate
+        // the complete rows and their metadata. Materialize each row only once
+        // in the final projection.
+        let sections = Dictionary(grouping: rows.indices) { index in
+            let title = rows[index].recognizedMedia?.section ?? "Other Videos"
             // String keys equate canonical Unicode spellings. Reuse folding
             // only for identical bytes, preserving Foundation's original input.
             if let cached = canonicalByTitle[title],
@@ -199,26 +222,33 @@ actor SourceBrowserFilter {
             if rank($0) != rank($1) { return rank($0) < rank($1) }
             return $0.localizedStandardCompare($1) == .orderedAscending
         }
+        guard !Task.isCancelled else { return [] }
         var result: [SourceTreeDisplayRow] = []
+        result.reserveCapacity(rows.count + sections.count)
         for title in titles {
             guard !Task.isCancelled else { return [] }
-            guard let members = sections[title], let first = members.first else { continue }
+            guard let members = sections[title], let firstIndex = members.first else { continue }
+            let first = rows[firstIndex]
             result.append(SourceTreeDisplayRow(
                 id: "media-section:\(title)", folderID: "", url: first.url,
                 displayName: "\(title) (\(members.count))", depth: 0,
                 ancestorIDs: [], kind: .mediaSection))
             // Episode order has semantic meaning; retain the selected file sort
             // for movies, extras, unknown files, and alternate versions of an episode.
+            let orderedMembers: [Int]
             if first.recognizedMedia?.kind == .episode {
-                result.append(contentsOf: members.enumerated().sorted { lhs, rhs in
-                    guard let a = lhs.element.recognizedMedia, let b = rhs.element.recognizedMedia
-                    else { return lhs.offset < rhs.offset }
+                orderedMembers = members.sorted { lhs, rhs in
+                    guard let a = rows[lhs].recognizedMedia, let b = rows[rhs].recognizedMedia
+                    else { return lhs < rhs }
                     if a.episode != b.episode { return (a.episode ?? 0) < (b.episode ?? 0) }
                     if a.airDate != b.airDate { return (a.airDate ?? "") < (b.airDate ?? "") }
-                    return lhs.offset < rhs.offset
-                }.map(\.element))
+                    return lhs < rhs
+                }
             } else {
-                result.append(contentsOf: members)
+                orderedMembers = members
+            }
+            for index in orderedMembers {
+                result.append(rows[index])
             }
         }
         return result

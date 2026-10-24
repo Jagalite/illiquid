@@ -1,0 +1,48 @@
+name: Reviewed PR integration
+on:
+  push:
+    branches: ['integrate/reviewed-prs-20261024']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: reviewed-pr-integration-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  combined-native:
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Qualify combined changes with required media
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          python3 Scripts/test-reviewed-pr-integration.py --output "$RUNNER_TEMP/reviewed-integration"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: reviewed-pr-integration
+          path: |
+            ${{ runner.temp }}/reviewed-integration/**/*.json
+            ${{ runner.temp }}/reviewed-integration/**/*.jsonl
+            ${{ runner.temp }}/reviewed-integration/**/*.log
+            ${{ runner.temp }}/reviewed-integration/head.txt
+            !${{ runner.temp }}/reviewed-integration/**/.build/**
+            !${{ runner.temp }}/reviewed-integration/**/module-cache/**
+          retention-days: 14

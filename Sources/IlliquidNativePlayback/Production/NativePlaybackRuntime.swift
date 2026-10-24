@@ -1143,6 +1143,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                 nativeSessionID: activeSessionID,
                 supersessionCode: "presentationFlushSuperseded"
             )
+            guard operations.transaction(effectID: transaction.effectID) != nil else { return }
             let time = presentation.currentTime
             let fence = presentation.installFenceAndRequestFlush(
                 at: time.isNumeric ? time : .zero,
@@ -1527,6 +1528,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         _ url: URL,
         effectID: PlaybackEffectID
     ) {
+        guard operations.transaction(effectID: effectID) != nil else { return }
         guard externalSubtitleRequestRevision < UInt64.max else {
             finishOperation(
                 effectID: effectID,
@@ -1545,7 +1547,8 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                 return try PreparedExternalSubtitle.prepare(url: url, encoding: encoding)
             }
             guard let self else { return }
-            guard !self.isShutdown,
+            guard !Task.isCancelled,
+                  !self.isShutdown,
                   revision == self.externalSubtitleRequestRevision,
                   sessionID == self.activeSessionID
             else {
@@ -3400,6 +3403,14 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         deferredReplacementAdmissionCount
     }
 
+    var operationWorkTaskCountForTesting: Int {
+        operationWorkTasks.count
+    }
+
+    var operationDeadlineTaskCountForTesting: Int {
+        operationDeadlineTasks.count
+    }
+
     private func releaseLogically(_ metadata: RuntimeSessionMetadata?) {
         guard let metadata else { return }
         runtimeMetadata.leases.supersede(authority: metadata.authority)
@@ -3437,6 +3448,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     private func cancelSession(effectID: PlaybackEffectID) {
+        guard operations.transaction(effectID: effectID) != nil else { return }
         let cancelledIdentity = activeIdentity
         pendingLoad = nil
         pendingMetadataPublicationSessionID = nil
@@ -3482,10 +3494,10 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         let ledger = runtimeMetadata.leases
         operationWorkTasks[effectID] = Task { [weak self] in
             let clean = await Task.detached { oldSession.waitForShutdown() }.value
-            guard let self, !Task.isCancelled else { return }
             if clean, let oldMetadata {
                 _ = ledger.observePhysicalRelease(oldMetadata.workerLease)
             }
+            guard let self, !Task.isCancelled else { return }
             if self.activeIdentity == cancelledIdentity { self.activeIdentity = nil }
             self.emit(.stopped, identity: cancelledIdentity)
             self.finishOperation(
@@ -3552,6 +3564,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                 nativeSessionID: activeSessionID,
                 supersessionCode: "recoverySuperseded"
             )
+            guard operations.transaction(effectID: transaction.effectID) != nil else { return }
             let result = presentation.recoverVideoPresentation(rebuildGraph: false)
             session?.adoptPresentationFence(result.fence)
             session?.resumeVideoPresentationAfterRecovery()
@@ -3567,6 +3580,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                 nativeSessionID: activeSessionID,
                 supersessionCode: "recoverySuperseded"
             )
+            guard operations.transaction(effectID: transaction.effectID) != nil else { return }
             let result = presentation.recoverVideoPresentation(rebuildGraph: true)
             session?.adoptPresentationFence(result.fence)
             surfaceHost?.rebindVideoLayer(result.newDisplayLayer)
@@ -3586,6 +3600,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                 nativeSessionID: activeSessionID,
                 supersessionCode: "recoverySuperseded"
             )
+            guard operations.transaction(effectID: transaction.effectID) != nil else { return }
             do {
                 let fence = try presentation.recoverAudioPresentation(rebuildGraph: false)
                 session?.adoptPresentationFence(fence)
@@ -3609,6 +3624,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                 nativeSessionID: activeSessionID,
                 supersessionCode: "recoverySuperseded"
             )
+            guard operations.transaction(effectID: transaction.effectID) != nil else { return }
             do {
                 let fence = try presentation.recoverAudioPresentation(rebuildGraph: true)
                 session?.adoptPresentationFence(fence)
@@ -3669,6 +3685,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                 nativeSessionID: activeSessionID,
                 supersessionCode: "recoverySuperseded"
             )
+            guard operations.transaction(effectID: transaction.effectID) != nil else { return }
             let fence = presentation.installFenceAndRequestFlush(
                 at: presentation.currentTime,
                 removeDisplayedImage: false
@@ -3727,6 +3744,11 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
             supersessionCode: supersessionCode
         ) {
             cancelOperationDeadline(effectID: superseded.effectID)
+            // A stopped session's task still owns its physical shutdown wait.
+            // Keep it visible to performPhysicalShutdown until the wait ends.
+            if superseded.kind != .sessionCancellation {
+                cancelOperationWork(effectID: superseded.effectID)
+            }
             cancel(superseded.effect, code: supersessionCode)
         }
         if let nativeSessionID {
@@ -3756,9 +3778,9 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         succeeded: Bool = true,
         code: String? = nil
     ) {
-        guard let transaction = operations.take(effectID: effectID) else { return }
         cancelOperationDeadline(effectID: effectID)
         cancelOperationWork(effectID: effectID)
+        guard let transaction = operations.take(effectID: effectID) else { return }
         finish(transaction.effect, succeeded: succeeded, code: code)
     }
 
@@ -3799,6 +3821,8 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     private func scheduleOperationDeadline(
         _ transaction: NativeOperationTransaction
     ) {
+        // Emitting a superseded result can synchronously dispatch a newer effect.
+        guard operations.transaction(effectID: transaction.effectID) != nil else { return }
         cancelOperationDeadline(effectID: transaction.effectID)
         operationDeadlineTasks[transaction.effectID] = Task { [weak self] in
             do {
@@ -3894,16 +3918,22 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         fence: PresentationFence,
         onSuccess: (@MainActor () -> Void)? = nil
     ) {
+        guard operations.transaction(effectID: effectID) != nil else { return }
         operationWorkTasks[effectID]?.cancel()
         operationWorkTasks[effectID] = Task { [weak self] in
             guard let self else { return }
             for _ in 0..<300 {
+                guard !Task.isCancelled else { return }
                 if self.presentation.flushCompleted(fence) {
                     onSuccess?()
                     self.finishOperation(effectID: effectID)
                     return
                 }
-                try? await Task.sleep(for: .milliseconds(10))
+                do {
+                    try await Task.sleep(for: .milliseconds(10))
+                } catch {
+                    return
+                }
             }
             self.finishOperation(
                 effectID: effectID,

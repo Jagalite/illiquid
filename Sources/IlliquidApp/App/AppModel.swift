@@ -248,6 +248,9 @@ final class AppModel {
         let model = AppModel(player: player, sources: startup.sources)
         LifecyclePerformance.end("model-init", since: timing)
         sharedInstance = model
+        // The model owns the restored values now. Pending startup callers may
+        // still return, but the loader must not retain an obsolete source library.
+        historyStartup.finish()
         let requests = pendingStartupOpenRequests
         pendingStartupOpenRequests.removeAll()
         for urls in requests { model.handleOpenURLs(urls) }

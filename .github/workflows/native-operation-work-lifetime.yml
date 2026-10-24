@@ -1,0 +1,127 @@
+name: Native operation work lifetime
+
+on:
+  push:
+    branches: ['perf/native-operation-work-lifetime-810bd']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift'
+      - 'Sources/IlliquidNativePlayback/Production/NativeOperationTransaction.swift'
+      - 'Tests/IlliquidNativePlaybackTests/NativeOperationWorkLifetimeTests.swift'
+      - 'Benchmarks/NativeOperationWorkLifetime/**'
+      - '.github/workflows/native-operation-work-lifetime.yml'
+      - '!Benchmarks/NativeOperationWorkLifetime/*.md'
+      - '!Benchmarks/NativeOperationWorkLifetime/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift'
+      - 'Sources/IlliquidNativePlayback/Production/NativeOperationTransaction.swift'
+      - 'Tests/IlliquidNativePlaybackTests/NativeOperationWorkLifetimeTests.swift'
+      - 'Benchmarks/NativeOperationWorkLifetime/**'
+      - '.github/workflows/native-operation-work-lifetime.yml'
+      - '!Benchmarks/NativeOperationWorkLifetime/*.md'
+      - '!Benchmarks/NativeOperationWorkLifetime/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-operation-work-lifetime-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compare retained work and qualify terminal behavior
+        run: |
+          python3 Benchmarks/NativeOperationWorkLifetime/run.py \
+            --output "$RUNNER_TEMP/native-operation-work" \
+            --pairs 6 --cycles 32,4096,32768
+      - name: Emit reproducibility receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'native-operation-work'
+          paths = set(root.glob('*.json')) | set(root.glob('*.jsonl')) | set(root.glob('*.log'))
+          files = {p.name: p.read_text() for p in sorted(paths) if p.is_file()}
+          if 'summary.json' in files:
+              print('::group::summary.json')
+              print(files['summary.json'])
+              print('::endgroup::')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log bundle limit; use the artifact')
+          print('OPERATION_WORK_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('OPERATION_WORK_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-operation-work-component
+          path: |
+            ${{ runner.temp }}/native-operation-work/*.json
+            ${{ runner.temp }}/native-operation-work/*.jsonl
+            ${{ runner.temp }}/native-operation-work/*.log
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate the native replacement lifecycle fixture
+        run: |
+          mkdir -p "$RUNNER_TEMP/native-operation-integration/fixtures"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'testsrc2=size=320x180:rate=24' \
+            -f lavfi -i 'sine=frequency=440:sample_rate=48000' \
+            -f lavfi -i 'sine=frequency=660:sample_rate=48000' \
+            -f lavfi -i 'sine=frequency=880:sample_rate=48000' \
+            -t 3 -map 0:v -map 1:a -map 2:a -map 3:a \
+            -c:v libx264 -preset ultrafast -c:a aac \
+            -disposition:a:0 default -disposition:a:1 0 -disposition:a:2 comment \
+            -metadata:s:a:0 language=eng -metadata:s:a:0 title=Main \
+            -metadata:s:a:1 language=jpn -metadata:s:a:1 title=Alternate \
+            -metadata:s:a:2 language=eng -metadata:s:a:2 title=Commentary \
+            "$RUNNER_TEMP/native-operation-integration/fixtures/multiple-audio-flags.mkv"
+          ffmpeg -hide_banner -nostdin -v error -xerror -threads 2 \
+            -i "$RUNNER_TEMP/native-operation-integration/fixtures/multiple-audio-flags.mkv" \
+            -map 0:v:0 -map 0:a:0 -map 0:a:1 -map 0:a:2 -threads 2 -f null - \
+            2> "$RUNNER_TEMP/native-operation-integration/fixture-validation.log"
+      - name: Build the app graph and test operation and physical resource lifetimes
+        run: |
+          export ILLIQUID_NATIVE_FIXTURE_DIR="$RUNNER_TEMP/native-operation-integration/fixtures"
+          sw_vers > "$RUNNER_TEMP/native-operation-integration/host.txt"
+          swift --version >> "$RUNNER_TEMP/native-operation-integration/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/native-operation-integration/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'NativeOperationWorkLifetimeTests|RuntimeAuthorityFenceTests|RuntimeLeaseHistoryTests|stopDuringInFlightAudioTrackCandidateCannotResurrectSession|shutdownDuringAudioTrackCandidatePreparationReleasesEveryRuntimeLease|rapidRepeatedAudioTrackReplacementsConvergeToLatestSelectionAndReleaseLeases' \
+            2>&1 | tee "$RUNNER_TEMP/native-operation-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-operation-work-integration
+          path: ${{ runner.temp }}/native-operation-integration/
+          retention-days: 14

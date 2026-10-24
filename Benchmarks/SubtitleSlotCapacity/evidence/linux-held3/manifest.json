@@ -1,0 +1,97 @@
+{
+  "baseline_revision": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "candidate_revision": "7716424b40a3aec8c9847d4653588a1d12b444cb",
+  "candidate_worktree_status": "",
+  "cases": [
+    "r8-spike",
+    "r8-stable-small",
+    "r8-stable-large",
+    "r8-delayed-large",
+    "bitmap-spike",
+    "bitmap-stable-small",
+    "bitmap-stable-large",
+    "bitmap-delayed-large",
+    "bgra-spike",
+    "bgra-stable-small",
+    "bgra-stable-large",
+    "bgra-delayed-large"
+  ],
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "compiler_sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de",
+  "completed_utc": "2026-10-24T14:35:51.145585+00:00",
+  "driver_sha256": "666c97aeb8f0a657173337b184b58447223085e7937b9dfa192432eb9fd3e20c",
+  "extractor_sha256": "c589e8c66e197eca371b25ce71ccf6a9597b255e516157f02baab5366dce1b4e",
+  "machine": "x86_64",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "protocol": {
+    "fresh_process_per_observation": true,
+    "held_count": 3,
+    "order": "alternating AB/BA by pair",
+    "pairs": 6,
+    "warmup_sequences": 0
+  },
+  "runner_sha256": "affb09af6393b257f78f1873605697c94703fef8ab0e2f7609a59fa96307cd41",
+  "started_utc": "2026-10-24T14:32:56.672192+00:00",
+  "variants": {
+    "baseline": {
+      "binary_sha256": "6cc25c1c5ec2ab4e9efc13371b6668ebb5509e8e6d942a5f0c2ee00b7dde53f1",
+      "command": [
+        "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-module-cache-path",
+        "/tmp/illiquid-slot-memory-linux-held3-final/module-cache",
+        "/tmp/illiquid-slot-memory-linux-held3-final/baseline/SubtitleFramePacker.swift",
+        "/tmp/illiquid-slot-memory-linux-held3-final/baseline/SubtitleMemoryBudget.swift",
+        "/tmp/illiquid-slot-memory-linux-held3-final/baseline/SubtitleRenderedRegion.swift",
+        "/tmp/illiquid-slot-memory-linux-held3-final/Main.swift",
+        "-o",
+        "/tmp/illiquid-slot-memory-linux-held3-final/baseline/subtitle-slot-capacity"
+      ],
+      "generated_sha256": {
+        "SubtitleFramePacker.swift": "55ce7c18b822527bbc2c2d6c0f972452e65e60d6ed218fe0dc2b5d917f541700",
+        "SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+        "SubtitleRenderedRegion.swift": "76c305231d22dd43d0e0cd759c62bacd6399f39ee3651a98b35da660461b7cb4"
+      },
+      "source_ref": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+      "source_sha256": {
+        "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+        "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "42ec2d4371fd595d442f7a2d109ef36c10824b478dc87728fbb89ce6bee5e7f7",
+        "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+      }
+    },
+    "candidate": {
+      "binary_sha256": "88fee56078bb0ee6f6563cd54ce1cf7d5d52cdb27bb7ad52eefda383ed411674",
+      "command": [
+        "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-parse-as-library",
+        "-module-cache-path",
+        "/tmp/illiquid-slot-memory-linux-held3-final/module-cache",
+        "/tmp/illiquid-slot-memory-linux-held3-final/candidate/SubtitleFramePacker.swift",
+        "/tmp/illiquid-slot-memory-linux-held3-final/candidate/SubtitleMemoryBudget.swift",
+        "/tmp/illiquid-slot-memory-linux-held3-final/candidate/SubtitleRenderedRegion.swift",
+        "/tmp/illiquid-slot-memory-linux-held3-final/Main.swift",
+        "-o",
+        "/tmp/illiquid-slot-memory-linux-held3-final/candidate/subtitle-slot-capacity"
+      ],
+      "generated_sha256": {
+        "SubtitleFramePacker.swift": "0d702d8fcf833a04ade317c969de8739bc8e26ac8f68b7df007e54bd5c883d26",
+        "SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+        "SubtitleRenderedRegion.swift": "76c305231d22dd43d0e0cd759c62bacd6399f39ee3651a98b35da660461b7cb4"
+      },
+      "source_ref": "working-tree",
+      "source_sha256": {
+        "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+        "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "71b46b0986b74f5f521dc96bbae6267f478b413f2524c2de3bc1bdb231e79fb2",
+        "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+      }
+    }
+  }
+}

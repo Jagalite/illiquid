@@ -1,0 +1,40 @@
+Test Suite 'Selected tests' started at 2026-10-23 23:13:56.283
+Test Suite 'Selected tests' passed at 2026-10-23 23:13:56.285
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Audio delay PCM ownership" started.
+◇ Test completedInputStorageIsReleasedWhileTailFormatRemainsAvailable() started.
+◇ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+◇ Test case passing 1 argument channels → 1 to retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+✘ Test completedInputStorageIsReleasedWhileTailFormatRemainsAvailable() recorded an issue at AudioDelayMemoryTests.swift:72:9: Expectation failed: (released.count → 0) == 1
+↳ // The timeline remains alive and will need the source's format below,
+↳ // but its metadata template must not keep the source allocation alive.
+✘ Test completedInputStorageIsReleasedWhileTailFormatRemainsAvailable() recorded an issue at AudioDelayMemoryTests.swift:96:9: Expectation failed: (released.count → 0) == 1
+◇ Test case passing 1 argument channels → 6 to retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+✘ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) recorded an issue with 1 argument channels → 1 at AudioDelayMemoryTests.swift:203:17: Expectation failed: (left.baseAddress → 0x00007f729800db00) == (right.baseAddress → 0x00007f7298011050)
+✘ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) recorded an issue with 1 argument channels → 6 at AudioDelayMemoryTests.swift:203:17: Expectation failed: (left.baseAddress → 0x00007f729401dcf0) == (right.baseAddress → 0x00007f7294025d00)
+✘ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) recorded an issue with 1 argument channels → 6 at AudioDelayMemoryTests.swift:203:17: Expectation failed: (left.baseAddress → 0x00007f729401dcf0) == (right.baseAddress → 0x00007f729402dd10)
+◇ Test case passing 1 argument channels → 2 to retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+✘ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) recorded an issue with 1 argument channels → 2 at AudioDelayMemoryTests.swift:203:17: Expectation failed: (left.baseAddress → 0x00007f728c01ed70) == (right.baseAddress → 0x00007f728c021580)
+✘ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) recorded an issue with 1 argument channels → 2 at AudioDelayMemoryTests.swift:203:17: Expectation failed: (left.baseAddress → 0x00007f728c01ed70) == (right.baseAddress → 0x00007f728c023f30)
+◇ Test case passing 1 argument channels → 8 to retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) started.
+✘ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) recorded an issue with 1 argument channels → 8 at AudioDelayMemoryTests.swift:203:17: Expectation failed: (left.baseAddress → 0x00007f728c0285e0) == (right.baseAddress → 0x00007f728c0325f0)
+✘ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) recorded an issue with 1 argument channels → 8 at AudioDelayMemoryTests.swift:203:17: Expectation failed: (left.baseAddress → 0x00007f728c0285e0) == (right.baseAddress → 0x00007f728c03c600)
+✘ Test completedInputStorageIsReleasedWhileTailFormatRemainsAvailable() failed after 0.001 seconds with 2 issues.
+✘ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) recorded an issue with 1 argument channels → 1 at AudioDelayMemoryTests.swift:203:17: Expectation failed: (left.baseAddress → 0x00007f729800db00) == (right.baseAddress → 0x00007f7298012460)
+✘ Test retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels:) with 4 test cases failed after 0.002 seconds with 8 issues.
+✘ Suite "Audio delay PCM ownership" failed after 0.002 seconds with 10 issues.
+✘ Test run with 2 tests in 1 suite failed after 0.002 seconds with 10 issues.
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+[0/1] Planning build
+Building for production...
+[0/6] Write swift-version-79F5DDD9F357E4C6.txt
+[1/6] Compiling IlliquidNativePlayback AudioDelayTimeline.swift
+[2/6] Compiling IlliquidNativePlaybackTests AudioDelayMemoryTests.swift
+[3/6] /workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-baseline/.build/x86_64-unknown-linux-gnu/release/AudioDelayOwnershipQualificationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[4/6] Compiling AudioDelayOwnershipQualificationPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+[5/7] Write Objects.LinkFileList
+[6/7] Linking AudioDelayOwnershipQualificationPackageTests.xctest
+Build complete! (8.83s)

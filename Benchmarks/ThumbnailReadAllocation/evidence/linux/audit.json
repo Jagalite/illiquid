@@ -1,0 +1,195 @@
+{
+  "audit_scope": "Independent read-only validation of retained Linux component evidence; this audit does not establish native app qualification.",
+  "audited_utc": "2026-10-24T14:46:28.973909+00:00",
+  "baseline_source_sha256": "da0a647285f935bebeead0fd0cec73a9f49e0932b80daa6e0c5dd92a90f7eaa5",
+  "candidate_reservation_policy": "Empty Data; reserve validated initial length only when initialByteCount > 65536.",
+  "candidate_source_sha256": "4df8edde50b3e1a610a926b74f081f967060a8d0011f5c3413a17e3b61475706",
+  "checks": {
+    "all_104_summary_metrics_recomputed_from_raw_pairs": true,
+    "all_416_measured_loop_checksums_and_iteration_counts": true,
+    "all_commands_succeeded": true,
+    "all_eight_compiled_binary_and_object_hashes": true,
+    "all_measured_receipts_match_preflight": true,
+    "all_nine_staged_harness_and_fixture_hashes": true,
+    "all_released_heap_paired_differences_zero": true,
+    "baseline_complete_source_matches_pinned_revision": true,
+    "candidate_complete_source_matches_current_production": true,
+    "eight_pairs_and_thirteen_fixtures": true,
+    "exactly_26_preflight_receipts": true,
+    "exactly_624_observations": true,
+    "missing_fixture_is_absent": true,
+    "recorded_full_source_baseline": true,
+    "recorded_full_source_candidate": true,
+    "recorded_pair_positions": true,
+    "recorded_projection_baseline": true,
+    "recorded_projection_candidate": true,
+    "serial_balanced_ab_ba_order": true,
+    "small_jpeg_allocation_and_held_heap_unchanged_in_every_pair": true,
+    "summary_reports_matching_receipts": true,
+    "unique_complete_observation_grid": true
+  },
+  "claim_limits": [
+    "Requested allocation bytes are cumulative malloc/calloc/realloc traffic, not peak, retained heap, or RSS.",
+    "Both JPEG controls have neutral median held-allocator deltas; only the multi-chunk JPEG reduces allocation traffic.",
+    "Several multi-chunk fixtures have higher current-RSS deltas in the candidate. No RSS reduction is established.",
+    "Released-heap paired differences are zero for all fixtures; these snapshots do not establish leak freedom.",
+    "Timing has both positive and negative paired changes, including unchanged-path controls. No general speedup is established.",
+    "Synthetic large files are boundary/stress inputs, not evidence of typical thumbnail sizes.",
+    "Linux Foundation and allocator results do not establish Darwin, ImageIO, whole-cache, or whole-player performance."
+  ],
+  "counts": {
+    "ab_pairs": 156,
+    "ba_pairs": 156,
+    "commands": 663,
+    "fixtures": 13,
+    "loop_observations": 416,
+    "memory_observations": 208,
+    "observations": 624,
+    "pairs_per_fixture_mode": 8,
+    "preflight_receipts": 26,
+    "recomputed_summary_metrics": 104
+  },
+  "evidence_sha256": {
+    "commands.jsonl": "86e4bba5207f186e36e42cbcb45cc1cc21b0145312a1cae3d33b107b7ce2ee1c",
+    "manifest.json": "0730261f585817edc3628e86a5a559b98841ee268fdf59ef2e1bbed506400451",
+    "observations.jsonl": "56a05c2ce30f5bdc416af3644f7a5894eb1fe9e1a2cf243f456f44041869c98b",
+    "receipts.json": "22d98d3ded1715a9c6a24eb686070083112de251b0dd0251108187f1577858b5",
+    "summary.json": "b6419d57a737cf845a4bda0ca24ffec4f32120b35847f324ad94cf1790453f8b"
+  },
+  "input_and_receipt_checks": {
+    "all_fixture_lengths_and_sha256_match": true,
+    "all_memory_rss_samples_positive": true,
+    "all_preflight_receipts_match_independently_computed_expected_content": true
+  },
+  "large_jpeg_outcome": {
+    "allocation_requests_median_paired_difference_per_read": -1.0,
+    "bytes": 162337,
+    "held_allocator_bytes_median_paired_difference": 0.0,
+    "held_rss_bytes_median_paired_difference": 57344.0,
+    "released_rss_bytes_median_paired_difference": 159744.0,
+    "requested_allocation_bytes_median_paired_difference_per_read": -65536.0
+  },
+  "memory_median_paired_differences_bytes": {
+    "bytes-0": {
+      "held_allocator": 0.0,
+      "held_resident": 0.0,
+      "released_allocator": 0.0,
+      "released_resident": 0.0
+    },
+    "bytes-1048576": {
+      "held_allocator": -98304.0,
+      "held_resident": 53248.0,
+      "released_allocator": 0.0,
+      "released_resident": 53248.0
+    },
+    "bytes-16777216": {
+      "held_allocator": -2146304.0,
+      "held_resident": 49152.0,
+      "released_allocator": 0.0,
+      "released_resident": 49152.0
+    },
+    "bytes-16777217": {
+      "held_allocator": 0.0,
+      "held_resident": 0.0,
+      "released_allocator": 0.0,
+      "released_resident": 0.0
+    },
+    "bytes-262144": {
+      "held_allocator": -65536.0,
+      "held_resident": 57344.0,
+      "released_allocator": 0.0,
+      "released_resident": 57344.0
+    },
+    "bytes-4096": {
+      "held_allocator": 0.0,
+      "held_resident": 0.0,
+      "released_allocator": 0.0,
+      "released_resident": 0.0
+    },
+    "bytes-5242880": {
+      "held_allocator": -819200.0,
+      "held_resident": 53248.0,
+      "released_allocator": 0.0,
+      "released_resident": 53248.0
+    },
+    "bytes-65535": {
+      "held_allocator": 0.0,
+      "held_resident": 0.0,
+      "released_allocator": 0.0,
+      "released_resident": 0.0
+    },
+    "bytes-65536": {
+      "held_allocator": 0.0,
+      "held_resident": 0.0,
+      "released_allocator": 0.0,
+      "released_resident": 0.0
+    },
+    "bytes-65537": {
+      "held_allocator": -12288.0,
+      "held_resident": -4096.0,
+      "released_allocator": 0.0,
+      "released_resident": 4096.0
+    },
+    "missing": {
+      "held_allocator": 0.0,
+      "held_resident": 0.0,
+      "released_allocator": 0.0,
+      "released_resident": 0.0
+    },
+    "noise-320x180": {
+      "held_allocator": 0.0,
+      "held_resident": 0.0,
+      "released_allocator": 0.0,
+      "released_resident": 0.0
+    },
+    "noise-640x360": {
+      "held_allocator": 0.0,
+      "held_resident": 57344.0,
+      "released_allocator": 0.0,
+      "released_resident": 159744.0
+    }
+  },
+  "positive_median_paired_rss_differences_bytes": {
+    "resident_held_delta_bytes": {
+      "bytes-1048576": 53248.0,
+      "bytes-16777216": 49152.0,
+      "bytes-262144": 57344.0,
+      "bytes-5242880": 53248.0,
+      "noise-640x360": 57344.0
+    },
+    "resident_released_delta_bytes": {
+      "bytes-1048576": 53248.0,
+      "bytes-16777216": 49152.0,
+      "bytes-262144": 57344.0,
+      "bytes-5242880": 53248.0,
+      "bytes-65537": 4096.0,
+      "noise-640x360": 159744.0
+    }
+  },
+  "positive_median_paired_wall_changes_percent": {
+    "bytes-16777216": 11.979226176468998,
+    "bytes-16777217": 7.965497056068495,
+    "bytes-262144": 18.835291544264045,
+    "bytes-4096": 2.5484975628469138,
+    "bytes-65535": 3.024698361732756,
+    "bytes-65536": 13.608645761012387,
+    "missing": 6.5424961600402645
+  },
+  "schema": 1,
+  "small_jpeg_control": {
+    "allocation_requests_per_read": [
+      15.0,
+      15.0
+    ],
+    "bytes": 41904,
+    "held_allocator_delta_bytes": [
+      41920.0,
+      41920.0
+    ],
+    "requested_bytes_per_read": [
+      215534.0,
+      215534.0
+    ]
+  },
+  "status": "passed"
+}

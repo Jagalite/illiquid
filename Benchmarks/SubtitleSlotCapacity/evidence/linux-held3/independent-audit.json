@@ -1,0 +1,511 @@
+{
+  "all_summary_metrics_independently_recomputed": true,
+  "audited_utc": "2026-10-24T14:36:11.664500+00:00",
+  "auditor_sha256": "012dde340455aba1e6fbd70419f7267e74c3bb953cd2ecd00e480844b4cfa745",
+  "balanced_order": true,
+  "baseline_revision": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "binary_and_compiler_hashes_verified": true,
+  "cases": 12,
+  "command_receipts_verified": 175,
+  "current_production_matches_measured": true,
+  "exact_generated_source_extractions": 6,
+  "fresh_measurement_processes": 144,
+  "held_snapshot_limit_and_final_count": 3,
+  "independently_reconstructed_active_pixel_patterns": 12,
+  "input_sha256": {
+    "Main.swift": "666c97aeb8f0a657173337b184b58447223085e7937b9dfa192432eb9fd3e20c",
+    "commands.json": "07cf0cd3f8aabf24fa87acff721e4fe6f663e3f26625c169a3c6e4694943bc6e",
+    "extractor.py": "c589e8c66e197eca371b25ce71ccf6a9597b255e516157f02baab5366dce1b4e",
+    "manifest.json": "74be683cd5c36aac9ffba34d0e4085d4418a24d086b2ad02879bcf775b81c131",
+    "observations.jsonl": "90f5a345c49235f84099f242315e8b5ce552c54b10d1f3aac5fccc19bd4966c3",
+    "run.py": "affb09af6393b257f78f1873605697c94703fef8ab0e2f7609a59fa96307cd41",
+    "summary.json": "ed8827df5ca50d11b56b93263dede98e8ab4e335515e72ea90372c80339b7397",
+    "verification.json": "11b012482d75096f9aace59d288897c791f00c8c067dbf9d84818f56e8f7ec41"
+  },
+  "limitations": [
+    "Linux extracted production CPU packer experiment; no macOS, Metal GPU, live playback or end-to-end latency claim.",
+    "Retained bytes are reusable Data lengths and budget reservations, not allocator capacity or physical RAM.",
+    "Spike workloads reduce reusable-slot logical capacity by 44\u201350%; RSS results include additional live COW snapshot ownership.",
+    "Delayed-large workloads end at equal reusable-slot capacity; RSS also includes the older retained snapshot and allocator/page behavior.",
+    "Cold wall timings are variable and exploratory; no statistical significance or latency improvement is established.",
+    "Verification processes check every active frame and immutable held snapshots; timed processes hash only their final active frame.",
+    "This audit binds the held3 evidence to committed 7716424 snapshots; retained_bytes excludes older snapshot storage outside the packer slots.",
+    "Compiler, binaries and generated Swift sources are present and hashed locally; any later archival omission must be disclosed separately."
+  ],
+  "measured_candidate_revision": "7716424b40a3aec8c9847d4653588a1d12b444cb",
+  "measured_sources_match_committed_snapshots": true,
+  "measurement_frame_accounting_receipts": 792,
+  "measurement_stdout_hashes_reconstructed": 144,
+  "pairs_per_case": 6,
+  "production_behavioral_lines_changed": 2,
+  "results": [
+    {
+      "case": "r8-spike",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 50331648,
+        "candidate": 16908288
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          16777216,
+          16777216,
+          16777216
+        ],
+        "candidate": [
+          65536,
+          16777216,
+          65536
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 79798272.0,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 46430208.0,
+        "paired_median_difference": -33419264.0,
+        "paired_median_percent_change": -41.87241861471263
+      },
+      "retained_bytes": {
+        "baseline_median": 33554432.0,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 16842752.0,
+        "paired_median_difference": -16711680.0,
+        "paired_median_percent_change": -49.8046875
+      }
+    },
+    {
+      "case": "r8-stable-small",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 196608,
+        "candidate": 196608
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          65536,
+          65536,
+          65536
+        ],
+        "candidate": [
+          65536,
+          65536,
+          65536
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 17063936.0,
+        "candidate_lower_pairs": 2,
+        "candidate_median": 17129472.0,
+        "paired_median_difference": 32768.0,
+        "paired_median_percent_change": 0.19198464122870407
+      },
+      "retained_bytes": {
+        "baseline_median": 131072.0,
+        "candidate_lower_pairs": 0,
+        "candidate_median": 131072.0,
+        "paired_median_difference": 0.0,
+        "paired_median_percent_change": 0.0
+      }
+    },
+    {
+      "case": "r8-stable-large",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 50331648,
+        "candidate": 50331648
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          16777216,
+          16777216,
+          16777216
+        ],
+        "candidate": [
+          16777216,
+          16777216,
+          16777216
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 79624192.0,
+        "candidate_lower_pairs": 3,
+        "candidate_median": 79618048.0,
+        "paired_median_difference": 40960.0,
+        "paired_median_percent_change": 0.05153838236283681
+      },
+      "retained_bytes": {
+        "baseline_median": 33554432.0,
+        "candidate_lower_pairs": 0,
+        "candidate_median": 33554432.0,
+        "paired_median_difference": 0.0,
+        "paired_median_percent_change": 0.0
+      }
+    },
+    {
+      "case": "r8-delayed-large",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 50331648,
+        "candidate": 33619968
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          16777216,
+          16777216,
+          16777216
+        ],
+        "candidate": [
+          65536,
+          16777216,
+          16777216
+        ]
+      },
+      "fourth_frame_elapsed_ns": {
+        "baseline_median": 35230572.5,
+        "candidate_lower_pairs": 5,
+        "candidate_median": 11772287.5,
+        "paired_differences": [
+          -18023028,
+          -27626812,
+          -45396383,
+          -14538434,
+          -9617029,
+          47465808
+        ],
+        "paired_median_difference": -16280731.0,
+        "paired_median_percent_change": -58.464216272092045,
+        "paired_percent_changes": [
+          -71.35212482164471,
+          -70.14328221863185,
+          -79.3899619483674,
+          -46.78515032555224,
+          -46.364234437535124,
+          106.80761446458082
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 63121408.0,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 54855680.0,
+        "paired_median_difference": -8153088.0,
+        "paired_median_percent_change": -12.942752859565203
+      },
+      "retained_bytes": {
+        "baseline_median": 33554432.0,
+        "candidate_lower_pairs": 0,
+        "candidate_median": 33554432.0,
+        "paired_median_difference": 0.0,
+        "paired_median_percent_change": 0.0
+      }
+    },
+    {
+      "case": "bitmap-spike",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 50331648,
+        "candidate": 17825792
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          16777216,
+          16777216,
+          16777216
+        ],
+        "candidate": [
+          524288,
+          16777216,
+          524288
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 84371456.0,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 51853312.0,
+        "paired_median_difference": -32532480.0,
+        "paired_median_percent_change": -38.51089588377724
+      },
+      "retained_bytes": {
+        "baseline_median": 33554432.0,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 17301504.0,
+        "paired_median_difference": -16252928.0,
+        "paired_median_percent_change": -48.4375
+      }
+    },
+    {
+      "case": "bitmap-stable-small",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 1572864,
+        "candidate": 1572864
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          524288,
+          524288,
+          524288
+        ],
+        "candidate": [
+          524288,
+          524288,
+          524288
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 18941952.0,
+        "candidate_lower_pairs": 4,
+        "candidate_median": 18786304.0,
+        "paired_median_difference": -126976.0,
+        "paired_median_percent_change": -0.6657640060272529
+      },
+      "retained_bytes": {
+        "baseline_median": 1048576.0,
+        "candidate_lower_pairs": 0,
+        "candidate_median": 1048576.0,
+        "paired_median_difference": 0.0,
+        "paired_median_percent_change": 0.0
+      }
+    },
+    {
+      "case": "bitmap-stable-large",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 50331648,
+        "candidate": 50331648
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          16777216,
+          16777216,
+          16777216
+        ],
+        "candidate": [
+          16777216,
+          16777216,
+          16777216
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 83791872.0,
+        "candidate_lower_pairs": 3,
+        "candidate_median": 83724288.0,
+        "paired_median_difference": 69632.0,
+        "paired_median_percent_change": 0.08307524068413841
+      },
+      "retained_bytes": {
+        "baseline_median": 33554432.0,
+        "candidate_lower_pairs": 0,
+        "candidate_median": 33554432.0,
+        "paired_median_difference": 0.0,
+        "paired_median_percent_change": 0.0
+      }
+    },
+    {
+      "case": "bitmap-delayed-large",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 50331648,
+        "candidate": 34078720
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          16777216,
+          16777216,
+          16777216
+        ],
+        "candidate": [
+          524288,
+          16777216,
+          16777216
+        ]
+      },
+      "fourth_frame_elapsed_ns": {
+        "baseline_median": 64354067.5,
+        "candidate_lower_pairs": 4,
+        "candidate_median": 44812944.5,
+        "paired_differences": [
+          1935486148,
+          -7656501,
+          -72158570,
+          176731127,
+          -10974687,
+          -98282256
+        ],
+        "paired_median_difference": -9315594.0,
+        "paired_median_percent_change": -34.14569276624781,
+        "paired_percent_changes": [
+          2407.869438923218,
+          -15.843294494349836,
+          -59.578796150073345,
+          581.4534381089976,
+          -52.44809103814578,
+          -86.43042897555655
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 67905536.0,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 60098560.0,
+        "paired_median_difference": -7763968.0,
+        "paired_median_percent_change": -11.42937324886763
+      },
+      "retained_bytes": {
+        "baseline_median": 33554432.0,
+        "candidate_lower_pairs": 0,
+        "candidate_median": 33554432.0,
+        "paired_median_difference": 0.0,
+        "paired_median_percent_change": 0.0
+      }
+    },
+    {
+      "case": "bgra-spike",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 24883200,
+        "candidate": 10137600
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          8294400,
+          8294400,
+          8294400
+        ],
+        "candidate": [
+          921600,
+          8294400,
+          921600
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 41951232.0,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 26992640.0,
+        "paired_median_difference": -14880768.0,
+        "paired_median_percent_change": -35.55950050396621
+      },
+      "retained_bytes": {
+        "baseline_median": 16588800.0,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 9216000.0,
+        "paired_median_difference": -7372800.0,
+        "paired_median_percent_change": -44.44444444444444
+      }
+    },
+    {
+      "case": "bgra-stable-small",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 2764800,
+        "candidate": 2764800
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          921600,
+          921600,
+          921600
+        ],
+        "candidate": [
+          921600,
+          921600,
+          921600
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 19724288.0,
+        "candidate_lower_pairs": 3,
+        "candidate_median": 19675136.0,
+        "paired_median_difference": -10240.0,
+        "paired_median_percent_change": -0.0526520117049567
+      },
+      "retained_bytes": {
+        "baseline_median": 1843200.0,
+        "candidate_lower_pairs": 0,
+        "candidate_median": 1843200.0,
+        "paired_median_difference": 0.0,
+        "paired_median_percent_change": 0.0
+      }
+    },
+    {
+      "case": "bgra-stable-large",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 24883200,
+        "candidate": 24883200
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          8294400,
+          8294400,
+          8294400
+        ],
+        "candidate": [
+          8294400,
+          8294400,
+          8294400
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 41701376.0,
+        "candidate_lower_pairs": 2,
+        "candidate_median": 41799680.0,
+        "paired_median_difference": 88064.0,
+        "paired_median_percent_change": 0.2110325873576735
+      },
+      "retained_bytes": {
+        "baseline_median": 16588800.0,
+        "candidate_lower_pairs": 0,
+        "candidate_median": 16588800.0,
+        "paired_median_difference": 0.0,
+        "paired_median_percent_change": 0.0
+      }
+    },
+    {
+      "case": "bgra-delayed-large",
+      "derived_final_held_frame_data_length_sum": {
+        "baseline": 24883200,
+        "candidate": 17510400
+      },
+      "derived_final_held_frame_data_lengths": {
+        "baseline": [
+          8294400,
+          8294400,
+          8294400
+        ],
+        "candidate": [
+          921600,
+          8294400,
+          8294400
+        ]
+      },
+      "fourth_frame_elapsed_ns": {
+        "baseline_median": 35761414.5,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 1299815.0,
+        "paired_differences": [
+          -31119777,
+          -37270186,
+          -54636621,
+          -24845856,
+          -17797452,
+          -36288989
+        ],
+        "paired_median_difference": -33704383.0,
+        "paired_median_percent_change": -96.15477976563389,
+        "paired_percent_changes": [
+          -94.44763217603806,
+          -96.62099629878878,
+          -97.68252995091544,
+          -95.688563232479,
+          -96.72155041843494,
+          -92.38523112837154
+        ]
+      },
+      "resident_bytes": {
+        "baseline_median": 33669120.0,
+        "candidate_lower_pairs": 6,
+        "candidate_median": 25733120.0,
+        "paired_median_difference": -8003584.0,
+        "paired_median_percent_change": -23.770658301781864
+      },
+      "retained_bytes": {
+        "baseline_median": 16588800.0,
+        "candidate_lower_pairs": 0,
+        "candidate_median": 16588800.0,
+        "paired_median_difference": 0.0,
+        "paired_median_percent_change": 0.0
+      }
+    }
+  ],
+  "status": "passed",
+  "verification_processes": 24,
+  "verified_frame_receipts": 132
+}

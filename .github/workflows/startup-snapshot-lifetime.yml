@@ -1,0 +1,131 @@
+name: Startup snapshot lifetime
+
+on:
+  push:
+    branches: ['perf/startup-snapshot-lifetime-20261023']
+    paths:
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidApp/App/ReadOnlyStartupLoader.swift'
+      - 'Sources/IlliquidApp/App/SourceStartupSnapshot.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/ReadOnlyStartupLoaderTests.swift'
+      - 'Tests/IlliquidAppTests/SourceStartupSnapshotTests.swift'
+      - 'Benchmarks/StartupSnapshotLifetime/**'
+      - '.github/workflows/startup-snapshot-lifetime.yml'
+      - '!Benchmarks/StartupSnapshotLifetime/*.md'
+      - '!Benchmarks/StartupSnapshotLifetime/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidApp/App/ReadOnlyStartupLoader.swift'
+      - 'Sources/IlliquidApp/App/SourceStartupSnapshot.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/ReadOnlyStartupLoaderTests.swift'
+      - 'Tests/IlliquidAppTests/SourceStartupSnapshotTests.swift'
+      - 'Benchmarks/StartupSnapshotLifetime/**'
+      - '.github/workflows/startup-snapshot-lifetime.yml'
+      - '!Benchmarks/StartupSnapshotLifetime/*.md'
+      - '!Benchmarks/StartupSnapshotLifetime/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: startup-snapshot-lifetime-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test ownership and measure saved-source lifetime
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = pull_request; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/StartupSnapshotLifetime/run.py \
+            --output "$RUNNER_TEMP/startup-snapshot" \
+            --pairs 6 --sizes 1,32,1000,10000,100000 "${mode[@]}"
+      - name: Emit reproducible evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'startup-snapshot'
+          paths = set(root.glob('*.json')) | set(root.glob('*.jsonl')) | set(root.glob('logs/*.log'))
+          files = {str(p.relative_to(root)): p.read_text() for p in sorted(paths) if p.is_file()}
+          run = {'id': os.environ['GITHUB_RUN_ID'], 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+                 'sha': os.environ['GITHUB_SHA'], 'event': os.environ['GITHUB_EVENT_NAME'],
+                 'url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"}
+          files['github-run.json'] = json.dumps(run, indent=2) + '\n'
+          (root / 'github-run.json').write_text(files['github-run.json'])
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log bundle limit; use the uploaded artifact')
+          print('STARTUP_SNAPSHOT_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('STARTUP_SNAPSHOT_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          if 'summary.json' in files:
+              summary = json.loads(files['summary.json'])
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+                  out.write('## Startup snapshot lifetime\n\n')
+                  out.write('Exact production loader and source-model tests pass.\n\n')
+                  if not summary.get('tests_only'):
+                      out.write('| Saved items | Mutation | Baseline live heap delta | Candidate live heap delta | Paired bytes saved |\n')
+                      out.write('|---:|---|---:|---:|---:|\n')
+                      for row in summary['results']:
+                          metric = row['metrics']['retained_allocator_delta_bytes']
+                          out.write(f"| {row['saved_item_count']} | {row['scenario']} | {metric['baseline_median']:,.0f} | "
+                                    f"{metric['candidate_median']:,.0f} | {metric['paired_median_saved']:,.0f} |\n")
+                      out.write('\nComponent allocator measurements after changes to saved explicit-source items; not whole-player RSS or recursive folder contents.\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: startup-snapshot-component
+          path: |
+            ${{ runner.temp }}/startup-snapshot/*.json
+            ${{ runner.temp }}/startup-snapshot/*.jsonl
+            ${{ runner.temp }}/startup-snapshot/logs/
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build app graph and qualify startup and source behavior
+        run: |
+          mkdir -p "$RUNNER_TEMP/startup-integration"
+          sw_vers > "$RUNNER_TEMP/startup-integration/host.txt"
+          swift --version >> "$RUNNER_TEMP/startup-integration/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/startup-integration/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'ReadOnlyStartupLoaderTests|SourceStartupSnapshotTests|LaunchOpenQueueTests|SourceTabMergeTests|SourceTabMembershipTests|SourceNavigationStateTests' \
+            2>&1 | tee "$RUNNER_TEMP/startup-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: startup-snapshot-integration
+          path: ${{ runner.temp }}/startup-integration/
+          retention-days: 14

@@ -1,0 +1,52 @@
+{
+  "arguments": {
+    "output": "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux",
+    "pairs": 6,
+    "swiftc": "swiftc",
+    "target_ms": 80.0
+  },
+  "baseline": {
+    "commit": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+    "frame_excerpt_sha256": "538597172d2344257e80e576268ff55d8d56f121414762b3d277d4ab819c2926",
+    "git_blob": "d92e6e9a83e8519f7f8d2daa19b00a3585562dc7",
+    "path": "Sources/IlliquidNativePlayback/Media/AudioDelayTimeline.swift",
+    "sha256": "e120aa9b10ef63704db575203d7bff6c06f3df3a9bfbe1abec4ba2704da61815"
+  },
+  "binary_sha256": {
+    "baseline-debug": "bdc6323e456d393361682efd652222184ac8d6b31d9e5b93962da27e7e226d18",
+    "baseline-release": "0cbe41f758529e1c731ff3c3e917448041395ec9d2da58d90533ac14ce93354e",
+    "candidate-debug": "0ae00085bfcd4df7aa6e5e9def6f3fc195a78a63d3f1102b098d2e27a09d42de",
+    "candidate-release": "ec84cd91482b1075368af285c5014d3fb10286515bb260f1c03488c46d5a0e1b"
+  },
+  "cases_sha256": "4ae8540e214d5608c3dc13a226c996f522138a86d859881399686e5ef166bfe7",
+  "checkout_head": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "framework_boundary": "finite rational CMTime test shim",
+  "harness_sha256": {
+    "Harness.swift": "64a0dae75ecdf682e7880fa40af425a837c76e447be2289dc988def1e885e018",
+    "Platform.swift": "03c634ff80c52b865608f79669725811e901a6fc4ab4cebae2a3a4a09bc82a3e",
+    "cases.py": "2a24929d01eb86d876cba16f3543fba4ea6ea0d70f5695fa168a8a6296e372ed",
+    "run.py": "5ea6261c1e57c62f443dc484cf9c42ee96265dc934a218100d4c0bb83abf60c1"
+  },
+  "machine": "x86_64",
+  "measurement_scope": "timeline service time and live immutable PCM payload addresses; not player RSS",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "source_sha256": {
+    "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": "c12caf15537ff3b774eaa77080ddc36ac42e7e05ec7d9fce5419fdf184ec45b3",
+    "Sources/IlliquidNativePlayback/Media/AudioDelayTimeline.swift": "70a417988180146a1112b4b1e27ffe247047bd5e358d69a158e5a8f74075e6d6",
+    "Tests/IlliquidNativePlaybackTests/AudioDelayMemoryTests.swift": "c5c2b5ad6e42dfb13b3c8571bb5916b6bb165cd4170a0fe7e721b55c02da2f3b",
+    "Tests/IlliquidNativePlaybackTests/AudioDelayTests.swift": "0a4f0f2928fe8a00147b7307ceda900e122d4c9816866c90680a3c0415507207"
+  },
+  "started_utc": "2026-10-24T03:12:38Z"
+}

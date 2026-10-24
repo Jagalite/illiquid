@@ -1,0 +1,416 @@
+{
+  "baseline_negative_control": {
+    "builds_succeeded": true,
+    "configurations": [
+      "debug",
+      "release"
+    ],
+    "failed_expectations_per_configuration": 24
+  },
+  "baseline_revision": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "candidate_tests": {
+    "configurations": [
+      "debug",
+      "release"
+    ],
+    "functions": 8,
+    "parameter_cases": 15,
+    "passed": true
+  },
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "debug_order": {
+    "AB": 10
+  },
+  "excluded": [
+    "whole-player RAM",
+    "process RSS",
+    "allocator bucket size/page return",
+    "filter output pools",
+    "graph/thread allocations",
+    "CoreVideo/Metal allocations"
+  ],
+  "ffmpeg_version": "8.1.2",
+  "finished_utc": "2026-10-24T03:23:12.580109+00:00",
+  "full_output_comparisons": 50,
+  "measurement": "Live tagged input AVBufferRef.size bytes; final-free callbacks, filter kept alive",
+  "measurement_processes": 100,
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "release_order": {
+    "AB": 20,
+    "BA": 20
+  },
+  "rows": [
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 0,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 0,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 0,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 0,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 0,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 0,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "empty"
+    },
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "progressive"
+    },
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 0,
+          "liveAllocations": 1,
+          "liveBytes": 645504
+        },
+        "afterDrain": {
+          "freedAllocations": 0,
+          "liveAllocations": 1,
+          "liveBytes": 645504
+        },
+        "afterReset": {
+          "freedAllocations": 1,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 1,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 1,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 1,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "one_tff"
+    },
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 1291008
+        },
+        "afterDrain": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 1291008
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "sd_tff"
+    },
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 6267648
+        },
+        "afterDrain": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 6267648
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "hd_tff"
+    },
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 6267648
+        },
+        "afterDrain": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 6267648
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "hd_bff"
+    },
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 50135808
+        },
+        "afterDrain": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 50135808
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "uhd10_tff"
+    },
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 3,
+          "liveAllocations": 1,
+          "liveBytes": 3133824
+        },
+        "afterDrain": {
+          "freedAllocations": 3,
+          "liveAllocations": 1,
+          "liveBytes": 3133824
+        },
+        "afterReset": {
+          "freedAllocations": 4,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 4,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 4,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 4,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "mixed"
+    },
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 6267648
+        },
+        "afterDrain": {
+          "freedAllocations": 4,
+          "liveAllocations": 2,
+          "liveBytes": 6267648
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterReset": {
+          "freedAllocations": 6,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "format_change"
+    },
+    {
+      "baseline": {
+        "afterConsumerRelease": {
+          "freedAllocations": 3,
+          "liveAllocations": 1,
+          "liveBytes": 3133824
+        },
+        "afterDrain": {
+          "freedAllocations": 3,
+          "liveAllocations": 1,
+          "liveBytes": 3133824
+        },
+        "afterReset": {
+          "freedAllocations": 4,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "candidate": {
+        "afterConsumerRelease": {
+          "freedAllocations": 4,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        },
+        "afterDrain": {
+          "freedAllocations": 3,
+          "liveAllocations": 1,
+          "liveBytes": 3133824
+        },
+        "afterReset": {
+          "freedAllocations": 4,
+          "liveAllocations": 0,
+          "liveBytes": 0
+        }
+      },
+      "case": "held_output"
+    }
+  ],
+  "source_hashes_match_proposed_files": true,
+  "started_utc": "2026-10-24T03:22:05.679361+00:00"
+}

@@ -1,0 +1,190 @@
+{
+  "archive": {
+    "all_archived_payloads_rechecked_against_original_zip": true,
+    "filename": "receipts.tar.gz",
+    "files": 948,
+    "includes": [
+      "Unmodified raw observations, all summary controls, calibration, command receipts, and complete stdout/stderr logs.",
+      "All verification traces, native dependency/header hash receipts, original production source snapshots, compiled source inputs, and harness/runner snapshots.",
+      "Complete failed native-tests.log, test host receipt, fixture generation commands, fixture manifests, and generator receipt."
+    ],
+    "member_inventory": "archive-members.jsonl.gz",
+    "member_inventory_uncompressed_sha256": "d2eb20dcb1e2518a7652482e89d3e0fe35505ebe8d7da7c0f724f88d61d33867",
+    "normalization": "Original member paths and payload bytes preserved. Sorted POSIX paths; regular files mode0644; uid/gid/mtime0; empty owner/group names; PAX tar; gzip level9, mtime0, empty filename.",
+    "repeated_creation_byte_identical": true,
+    "uncompressed_file_bytes": 3093792
+  },
+  "artifact_api_url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12562798667",
+  "artifact_created_at": "2026-10-24T14:19:32Z",
+  "artifact_download_api_url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12562798667/zip",
+  "artifact_expires_at": "2026-11-07T14:19:29Z",
+  "artifact_id": 12562798667,
+  "artifact_name": "auxiliary-font-memory-native",
+  "artifact_size_bytes": 1221430,
+  "artifact_url": "https://github.com/Jagalite/illiquid/actions/runs/40101084730/artifacts/12562798667",
+  "artifact_zip_sha256": "1b1ebc11ec33c6f9b57d28d86d811c0e0d4c5e6b7a952364ababfec0ff070583",
+  "audit_limits": [
+    "This is a byte-preserving evidence package, not a rerun or new statistical analysis.",
+    "A retained binary hash alone cannot recreate or independently rehash an omitted binary after the original hosted artifact expires.",
+    "Component memory measurements do not constitute a whole-player memory measurement or native playback test pass."
+  ],
+  "baseline_revision": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "command_receipts": {
+    "complete_benchmark_stdout_stderr_files": 878,
+    "no_adverse_observations_or_controls_removed": true,
+    "rows": 439
+  },
+  "component_completed_utc": "2026-10-24T14:14:13.674727+00:00",
+  "correction_commit": "a95e1f09b379a31892181b20f6d9de0a042179c0",
+  "correction_commit_url": "https://github.com/Jagalite/illiquid/commit/a95e1f09b379a31892181b20f6d9de0a042179c0",
+  "correction_description": "Added explicit try expressions inside assertion macros; production code and benchmark harness were unchanged.",
+  "correction_files": [
+    "Tests/IlliquidNativePlaybackTests/AuxiliaryFontAttachmentTests.swift",
+    "Tests/IlliquidNativePlaybackTests/AuxiliaryFontPlaybackTests.swift"
+  ],
+  "head_commit": "4e64b3d2b6098536c61710dca2354442c718961c",
+  "head_commit_url": "https://github.com/Jagalite/illiquid/commit/4e64b3d2b6098536c61710dca2354442c718961c",
+  "independent_audit": {
+    "retained_filename": "independent-audit.json",
+    "scope": "Independent component evidence audit; not an assertion that the native app test suite passed.",
+    "source_filename": "auxiliary-font-audit-first.json",
+    "status_as_recorded": "passed"
+  },
+  "not_present_in_original_artifact": [
+    "Generated media/font fixture payloads; hashes and exact generation commands are retained.",
+    "Full compiler, macOS SDK, installed FFmpeg libraries/headers and Swift module cache; recorded toolchain/dependency hashes identify them."
+  ],
+  "omission_rationale": "Only the 12 benchmark executables, dylibs, generated ABI JSON files and compiled Swift module products are omitted. Their source inputs, build commands, original binary hashes and the independent audit are retained; avoid committing reproducible platform-specific build products.",
+  "omitted_artifact_files": [
+    {
+      "bytes": 149,
+      "path": "auxiliary-font-results/baseline/AuxiliaryInputs.abi.json",
+      "sha256": "4277ac6b49f8511196028a5ac20f5b1b1dfa754c24615d34068089f0b1739728"
+    },
+    {
+      "bytes": 9672,
+      "path": "auxiliary-font-results/baseline/AuxiliaryInputs.swiftdoc",
+      "sha256": "23a5ca5f40ade2059aa2a1017bb95399d3c057d89d6ad7c0c77b1bfafc9e3c48"
+    },
+    {
+      "bytes": 275804,
+      "path": "auxiliary-font-results/baseline/AuxiliaryInputs.swiftmodule",
+      "sha256": "d6a22c864cd1b5eff78cd01e32793fcf581078249a3de65b55413f4e56dddb97"
+    },
+    {
+      "bytes": 60712,
+      "path": "auxiliary-font-results/baseline/AuxiliaryInputs.swiftsourceinfo",
+      "sha256": "76e7ce4a3192a8b51ccc72cf874bd72f4a8635d3e4381af42c8caed9ce6800b1"
+    },
+    {
+      "bytes": 141208,
+      "path": "auxiliary-font-results/baseline/auxiliary-input-benchmark",
+      "sha256": "945f3c2edc792ff8216b1dc8178f9f74f5286e0da3d927a479914f31faeffd09"
+    },
+    {
+      "bytes": 392968,
+      "path": "auxiliary-font-results/baseline/libAuxiliaryInputs.dylib",
+      "sha256": "25f5803e237cc50ed25dcc6f2f4ca13a705502af40242151f4a9c5ca6ee41918"
+    },
+    {
+      "bytes": 149,
+      "path": "auxiliary-font-results/candidate/AuxiliaryInputs.abi.json",
+      "sha256": "4277ac6b49f8511196028a5ac20f5b1b1dfa754c24615d34068089f0b1739728"
+    },
+    {
+      "bytes": 10264,
+      "path": "auxiliary-font-results/candidate/AuxiliaryInputs.swiftdoc",
+      "sha256": "3e15e279d01a32688ca17aa83e739c3e7250c52cd12123ac6e10f65886b356de"
+    },
+    {
+      "bytes": 276676,
+      "path": "auxiliary-font-results/candidate/AuxiliaryInputs.swiftmodule",
+      "sha256": "0e9a50f9065121f3611ba9357258a75e7e2e61a4b74c0702901756be1c35c4d4"
+    },
+    {
+      "bytes": 60872,
+      "path": "auxiliary-font-results/candidate/AuxiliaryInputs.swiftsourceinfo",
+      "sha256": "c1ea45ed06b903b43805686112c5729bbd082f3c33d1cc17a0c66a38f4dfce0f"
+    },
+    {
+      "bytes": 141640,
+      "path": "auxiliary-font-results/candidate/auxiliary-input-benchmark",
+      "sha256": "13c3e66a10d623e68fcf2635ecc6badb272af60619b035902097ebb0c66c332a"
+    },
+    {
+      "bytes": 393656,
+      "path": "auxiliary-font-results/candidate/libAuxiliaryInputs.dylib",
+      "sha256": "684b47a2f5938f17ad969b4f117c4aae1e3dc2d1dc5116b5a45c75d074d20928"
+    }
+  ],
+  "original_zip": {
+    "all_extracted_file_bytes_checked_against_zip": true,
+    "bytes": 1221430,
+    "file_count": 960,
+    "filename": "illiquid-aux-font-native-40101084730.zip",
+    "retained_in_repository": false,
+    "sha256": "1b1ebc11ec33c6f9b57d28d86d811c0e0d4c5e6b7a952364ababfec0ff070583"
+  },
+  "packaging_script_sha256": "9389752cb51b22ca8f98ffe5e758a668dfe3bd1e47ce8da2dc1f20ee58050b41",
+  "qualification": {
+    "component_benchmark": "completed; all raw observations and controls retained",
+    "correction_validation": "The correction commit is recorded separately; this archive does not establish that its tests passed.",
+    "failure": "New test assertions omitted try inside #require-wrapped throwing copyCodecParameters calls.",
+    "failure_log": "native-tests.log",
+    "native_app_test_step": "failed during compilation before tests ran"
+  },
+  "raw_observations": {
+    "decompressed_bytes_identical_to_original": true,
+    "filename": "observations.jsonl.gz",
+    "rows": 416,
+    "uncompressed_bytes": 385503,
+    "uncompressed_sha256": "bd31b04788d1c06770dae9279572333e17a56c2b17f0e2c890d01d860ac524ad"
+  },
+  "repository": "Jagalite/illiquid",
+  "retained_files": {
+    "archive-members.jsonl.gz": {
+      "bytes": 24580,
+      "sha256": "e27169ba4352974345220d50c9ad23770298d19dc6c1a5903773f1c3bdb0845f"
+    },
+    "independent-audit.json": {
+      "bytes": 111244,
+      "sha256": "b7227c182406155a1366e13be4a872ea073f82dfeeeef602cbbdf4660f06362f"
+    },
+    "manifest.json": {
+      "bytes": 25250,
+      "sha256": "2354c215386d26f9f5a2b350f474997e98dbae1c05d75ada0e2885be85a72bfd"
+    },
+    "native-tests.log": {
+      "bytes": 13641,
+      "sha256": "3ec43f467a1474d1aa3b362a76dbc3f04bebbcc04aea692f4acc0e1a848b5bc9"
+    },
+    "observations.jsonl.gz": {
+      "bytes": 16367,
+      "sha256": "4531707370f99602895438384fffd0cdf69499cd6b97e8bef5838ac9da99eb2c"
+    },
+    "parity.json": {
+      "bytes": 1531,
+      "sha256": "6993fc355c73b670ce649d94449e7a04c797d692047e51f61731e9c3112ac7c3"
+    },
+    "receipts.tar.gz": {
+      "bytes": 245152,
+      "sha256": "53c8909a8798faa61d60ffea0faee7d6aaed2d648e848d9c5244ca0f4eac5786"
+    },
+    "summary.json": {
+      "bytes": 102179,
+      "sha256": "0d0d605e067877a11e572e262f81da56bb52446d81d71412fb0219acd77346e5"
+    }
+  },
+  "run_attempt": 1,
+  "run_conclusion": "failure",
+  "schema_version": 1,
+  "standalone_copy_sources": {
+    "manifest.json": "auxiliary-font-results/manifest.json",
+    "native-tests.log": "auxiliary-font-tests/native-tests.log",
+    "parity.json": "auxiliary-font-results/parity.json",
+    "summary.json": "auxiliary-font-results/summary.json"
+  },
+  "workflow_path": ".github/workflows/auxiliary-font-memory.yml",
+  "workflow_run_id": 40101084730,
+  "workflow_run_url": "https://github.com/Jagalite/illiquid/actions/runs/40101084730"
+}

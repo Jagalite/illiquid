@@ -138,6 +138,13 @@ memory use.
 
 ## Reproduce on Apple Silicon macOS
 
+The manual `attachment-admission.yml` benchmark job checks out its recorded
+candidate `d3fcfe25c9933a17c9dee0506d67d8231cb00323`. Its strict dependency
+checks intentionally reject later changes to the executor. Pull requests still
+run the native attachment regressions against current code. The separate
+[`AuxiliaryFontAttachments`](../AuxiliaryFontAttachments) study compares
+auxiliary-reader font ownership against its own current baseline.
+
 Use the repository's pinned FFmpeg SDK and the compiler selected by
 `.github/workflows/attachment-admission.yml`. The workflow validates the SDK
 and corresponding source before installing it on an ephemeral runner.

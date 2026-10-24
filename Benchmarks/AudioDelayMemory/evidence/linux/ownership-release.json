@@ -1,0 +1,150 @@
+{
+  "queue_and_stress": [
+    {
+      "baseline": {
+        "all_full_chunks": true,
+        "channels": 2,
+        "distinct_payload_addresses": 48,
+        "logical_pcm_bytes": 393216,
+        "retained_chunks": 48,
+        "scope": "48 queued silence chunks",
+        "unique_payload_bytes": 393216
+      },
+      "candidate": {
+        "all_full_chunks": true,
+        "channels": 2,
+        "distinct_payload_addresses": 1,
+        "logical_pcm_bytes": 393216,
+        "retained_chunks": 48,
+        "scope": "48 queued silence chunks",
+        "unique_payload_bytes": 8192
+      }
+    },
+    {
+      "baseline": {
+        "all_full_chunks": false,
+        "channels": 2,
+        "distinct_payload_addresses": 469,
+        "logical_pcm_bytes": 3840000,
+        "retained_chunks": 469,
+        "scope": "retained complete 10-second silence stress case",
+        "unique_payload_bytes": 3840000
+      },
+      "candidate": {
+        "all_full_chunks": false,
+        "channels": 2,
+        "distinct_payload_addresses": 2,
+        "logical_pcm_bytes": 3840000,
+        "retained_chunks": 469,
+        "scope": "retained complete 10-second silence stress case",
+        "unique_payload_bytes": 14336
+      }
+    },
+    {
+      "baseline": {
+        "all_full_chunks": true,
+        "channels": 6,
+        "distinct_payload_addresses": 48,
+        "logical_pcm_bytes": 1179648,
+        "retained_chunks": 48,
+        "scope": "48 queued silence chunks",
+        "unique_payload_bytes": 1179648
+      },
+      "candidate": {
+        "all_full_chunks": true,
+        "channels": 6,
+        "distinct_payload_addresses": 1,
+        "logical_pcm_bytes": 1179648,
+        "retained_chunks": 48,
+        "scope": "48 queued silence chunks",
+        "unique_payload_bytes": 24576
+      }
+    },
+    {
+      "baseline": {
+        "all_full_chunks": false,
+        "channels": 6,
+        "distinct_payload_addresses": 469,
+        "logical_pcm_bytes": 11520000,
+        "retained_chunks": 469,
+        "scope": "retained complete 10-second silence stress case",
+        "unique_payload_bytes": 11520000
+      },
+      "candidate": {
+        "all_full_chunks": false,
+        "channels": 6,
+        "distinct_payload_addresses": 2,
+        "logical_pcm_bytes": 11520000,
+        "retained_chunks": 469,
+        "scope": "retained complete 10-second silence stress case",
+        "unique_payload_bytes": 43008
+      }
+    },
+    {
+      "baseline": {
+        "all_full_chunks": true,
+        "channels": 8,
+        "distinct_payload_addresses": 48,
+        "logical_pcm_bytes": 1572864,
+        "retained_chunks": 48,
+        "scope": "48 queued silence chunks",
+        "unique_payload_bytes": 1572864
+      },
+      "candidate": {
+        "all_full_chunks": true,
+        "channels": 8,
+        "distinct_payload_addresses": 1,
+        "logical_pcm_bytes": 1572864,
+        "retained_chunks": 48,
+        "scope": "48 queued silence chunks",
+        "unique_payload_bytes": 32768
+      }
+    },
+    {
+      "baseline": {
+        "all_full_chunks": false,
+        "channels": 8,
+        "distinct_payload_addresses": 469,
+        "logical_pcm_bytes": 15360000,
+        "retained_chunks": 469,
+        "scope": "retained complete 10-second silence stress case",
+        "unique_payload_bytes": 15360000
+      },
+      "candidate": {
+        "all_full_chunks": false,
+        "channels": 8,
+        "distinct_payload_addresses": 2,
+        "logical_pcm_bytes": 15360000,
+        "retained_chunks": 469,
+        "scope": "retained complete 10-second silence stress case",
+        "unique_payload_bytes": 57344
+      }
+    }
+  ],
+  "template": [
+    {
+      "baseline": {
+        "delay": 0,
+        "source_pcm_bytes": 15360,
+        "source_releases_while_timeline_alive": 0
+      },
+      "candidate": {
+        "delay": 0,
+        "source_pcm_bytes": 15360,
+        "source_releases_while_timeline_alive": 1
+      }
+    },
+    {
+      "baseline": {
+        "delay": -10,
+        "source_pcm_bytes": 15360,
+        "source_releases_while_timeline_alive": 0
+      },
+      "candidate": {
+        "delay": -10,
+        "source_pcm_bytes": 15360,
+        "source_releases_while_timeline_alive": 1
+      }
+    }
+  ]
+}

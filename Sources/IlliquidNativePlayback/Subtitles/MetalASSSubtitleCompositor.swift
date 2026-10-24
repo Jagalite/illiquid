@@ -120,9 +120,9 @@ struct ASSPreparedSubtitleFrame: Sendable {
 }
 
 /// CPU preparation shared by the Metal overlay and the correctness harness.
-/// The buffers grow as needed and are reused within one subtitle source. A
-/// prepared frame holds a value-semantic Data snapshot, while the private
-/// reusable storage is serialized by `state`.
+/// Each buffer grows only for the frames prepared in that slot and is reused
+/// within one subtitle source. A prepared frame holds a value-semantic Data
+/// snapshot, while the private reusable storage is serialized by `state`.
 final class ASSSubtitleFramePacker: Sendable {
     private struct Placement {
         let x: Int
@@ -245,7 +245,9 @@ final class ASSSubtitleFramePacker: Sendable {
         state.nextAtlasStorageIndex =
             (state.nextAtlasStorageIndex + 1) % state.atlasStorage.count
         let previousMaximumStorage = state.atlasStorage.map(\.count).max() ?? 0
-        let requestedStorage = max(byteCount, previousMaximumStorage)
+        // A large frame in the other slot must not force this one to allocate
+        // the same capacity when preparing a smaller frame.
+        let requestedStorage = max(byteCount, state.atlasStorage[storageIndex].count)
         let projectedStorageBytes = state.atlasStorage.enumerated().reduce(0) {
             $0 + ($1.offset == storageIndex ? requestedStorage : $1.element.count)
         } + state.bgraStorage.reduce(0) { $0 + $1.count }
@@ -344,7 +346,7 @@ final class ASSSubtitleFramePacker: Sendable {
         state.nextBGRAStorageIndex =
             (state.nextBGRAStorageIndex + 1) % state.bgraStorage.count
         let previousMaximumStorage = state.bgraStorage.map(\.count).max() ?? 0
-        let requestedStorage = max(byteCount, previousMaximumStorage)
+        let requestedStorage = max(byteCount, state.bgraStorage[storageIndex].count)
         let projectedStorageBytes = state.bgraStorage.enumerated().reduce(0) {
             $0 + ($1.offset == storageIndex ? requestedStorage : $1.element.count)
         } + state.atlasStorage.reduce(0) { $0 + $1.count }

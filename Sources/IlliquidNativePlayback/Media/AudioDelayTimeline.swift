@@ -21,7 +21,9 @@ struct AudioDelayTimeline {
 
     mutating func consume(_ source: NativeDecodedAudioFrame,
                           emit: (NativeDecodedAudioFrame) -> Bool) -> Bool {
-        template = source
+        // Tail padding needs the latest format, not ownership of decoded PCM.
+        template = source.replacing(time: source.presentationTime, data: Data(),
+                                    sampleCount: 0, duration: .zero)
         let shifted = source.replacing(time: CMTimeAdd(source.presentationTime,
             CMTime(seconds: delay, preferredTimescale: 60_000)))
         guard let frame = shifted.trimmingSamples(before: cursor) else { return true }
@@ -52,12 +54,24 @@ struct AudioDelayTimeline {
                                   emit: (NativeDecodedAudioFrame) -> Bool) -> Bool {
         let endSample = Int64((end * Double(frame.sampleRate)).rounded())
         var nextSample = Int64((cursor * Double(frame.sampleRate)).rounded())
+        // All full chunks contain identical immutable samples. Sharing their
+        // backing storage keeps queued silence from retaining one allocation
+        // per chunk; a partial tail still has exactly its advertised byte count.
+        let fullChunkSilence = endSample - nextSample >= 1_024
+            ? Data(count: 1_024 * frame.channelCount * MemoryLayout<Float>.size)
+            : nil
         while nextSample < endSample {
             let count = Int(min(1_024, endSample - nextSample))
             let duration = CMTime(value: Int64(count), timescale: Int32(frame.sampleRate))
+            let data: Data
+            if count == 1_024, let fullChunkSilence {
+                data = fullChunkSilence
+            } else {
+                data = Data(count: count * frame.channelCount * MemoryLayout<Float>.size)
+            }
             let silent = frame.replacing(
                 time: CMTime(value: nextSample, timescale: Int32(frame.sampleRate)),
-                data: Data(count: count * frame.channelCount * MemoryLayout<Float>.size),
+                data: data,
                 sampleCount: count, duration: duration)
             guard emit(silent) else { return false }
             hasOutput = true

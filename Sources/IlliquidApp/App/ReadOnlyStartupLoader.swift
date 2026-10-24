@@ -1,18 +1,22 @@
 import Foundation
 
-/// Coalesces one read-only startup operation. Stopping prevents late publication
-/// and new work; shutdown need not wait for a non-interruptible preferences read.
+/// Coalesces one read-only startup operation. Finishing releases the startup
+/// snapshot after its owner adopts it, while allowing existing readers to return.
+/// Stopping also rejects late results; shutdown need not wait for a blocked read.
 @MainActor
 final class ReadOnlyStartupLoader<Value: Sendable> {
     private let read: @Sendable () async -> Value
     private var task: Task<Value, Never>?
     private var cached: Value?
-    private var stopped = false
+    private enum State {
+        case active, finished, stopped
+    }
+    private var state = State.active
 
     init(read: @escaping @Sendable () async -> Value) { self.read = read }
 
     func load() async -> Value? {
-        guard !stopped else { return nil }
+        guard state == .active else { return nil }
         if let cached { return cached }
         let pending: Task<Value, Never>
         if let task { pending = task }
@@ -21,14 +25,25 @@ final class ReadOnlyStartupLoader<Value: Sendable> {
             task = pending
         }
         let value = await pending.value
-        guard !stopped else { return nil }
-        cached = value
-        task = nil
+        guard state != .stopped else { return nil }
+        if state == .active {
+            cached = value
+            task = nil
+        }
         return value
     }
 
+    /// The shared owner has been published. Existing readers still receive
+    /// their result, but no late reader may repopulate the cache or start a read.
+    func finish() {
+        guard state == .active else { return }
+        state = .finished
+        cached = nil
+        task = nil
+    }
+
     func stop() {
-        stopped = true
+        state = .stopped
         cached = nil
         task?.cancel()
         task = nil

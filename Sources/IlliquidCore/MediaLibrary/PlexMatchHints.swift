@@ -4,13 +4,20 @@ import Foundation
 /// Pattern directives are not interpreted as regular expressions or executed.
 public struct PlexMatchHints: Sendable {
     public let metadata: MediaMetadataHints
-    private let episodes: [String: MediaMetadataHints]
+    // Every mapping supplies only episode identity. Keep unused series metadata
+    // fields out of the retained index and materialize a full hint on lookup.
+    private struct EpisodeMapping: Sendable {
+        let season: Int?
+        let episode: Int
+        let lastEpisode: Int?
+    }
+    private let episodes: [String: EpisodeMapping]
 
     public static func parse(_ text: String) -> Self? {
         guard text.utf8.count <= 128 * 1024 else { return nil }
         var metadata = MediaMetadataHints()
         metadata.content = .show
-        var episodes: [String: MediaMetadataHints] = [:]
+        var episodes: [String: EpisodeMapping] = [:]
         var hasSupportedHint = false
         for line in text.trimmingCharacters(in: CharacterSet(charactersIn: "\u{feff}")).split(whereSeparator: \.isNewline) {
             let line = line.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -59,8 +66,14 @@ public struct PlexMatchHints: Sendable {
     }
 
     func episodeHint(for relativePath: String, inheritsDescendantMappings: Bool) -> MediaMetadataHints? {
-        guard inheritsDescendantMappings || !relativePath.contains("/") else { return nil }
-        return episodes[relativePath]
+        guard inheritsDescendantMappings || !relativePath.contains("/"),
+              let episode = episodes[relativePath] else { return nil }
+        var hint = MediaMetadataHints()
+        hint.content = .episode
+        hint.season = episode.season
+        hint.episode = episode.episode
+        hint.lastEpisode = episode.lastEpisode
+        return hint
     }
 
     private static func validRelativePath(_ path: String) -> Bool {
@@ -74,19 +87,16 @@ public struct PlexMatchHints: Sendable {
     private static let episodePattern = try! NSRegularExpression(
         pattern: #"(?i)^(?:S([0-9]{1,3})E|SP|E)?([0-9]{1,4})(?:-(?:S([0-9]{1,3})E|E)?([0-9]{1,4}))?$"#)
 
-    private static func episodeNumber(_ text: String) -> MediaMetadataHints? {
+    private static func episodeNumber(_ text: String) -> EpisodeMapping? {
         guard let match = episodePattern.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) else { return nil }
         func number(_ index: Int) -> Int? {
             Range(match.range(at: index), in: text).flatMap { Int(text[$0]) }
         }
         guard let first = number(2) else { return nil }
-        var hint = MediaMetadataHints()
-        hint.content = .episode
-        hint.season = text.uppercased().hasPrefix("SP") ? 0 : number(1)
-        hint.episode = first
-        hint.lastEpisode = number(4)
-        if let endSeason = number(3), endSeason != hint.season { return nil }
-        if let last = hint.lastEpisode, last <= first { return nil }
-        return hint
+        let season = text.uppercased().hasPrefix("SP") ? 0 : number(1)
+        let lastEpisode = number(4)
+        if let endSeason = number(3), endSeason != season { return nil }
+        if let lastEpisode, lastEpisode <= first { return nil }
+        return EpisodeMapping(season: season, episode: first, lastEpisode: lastEpisode)
     }
 }

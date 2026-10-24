@@ -49,7 +49,14 @@ final class FFmpegDemuxer {
     var bytesRead: Int64 { context?.pointee.pb?.pointee.bytes_read ?? 0 }
     let mediaInfo: FFmpegMediaInfo
 
-    init(url: URL, interruptState: AnyObject? = nil) throws {
+    /// Auxiliary readers need stream metadata and codec parameters, but do not
+    /// register fonts. They can omit the owned Swift attachment copies while
+    /// leaving FFmpeg's native attachment data available to the demuxer.
+    init(
+        url: URL,
+        interruptState: AnyObject? = nil,
+        loadFontAttachments: Bool = true
+    ) throws {
         guard url.isFileURL else {
             throw CocoaError(.fileReadUnsupportedScheme)
         }
@@ -82,7 +89,11 @@ final class FFmpegDemuxer {
                 operation: "Read stream metadata"
             )
             context = openedContext
-            mediaInfo = Self.makeMediaInfo(url: url, context: openedContext)
+            mediaInfo = Self.makeMediaInfo(
+                url: url,
+                context: openedContext,
+                loadFontAttachments: loadFontAttachments
+            )
         } catch {
             var temporary: UnsafeMutablePointer<AVFormatContext>? = openedContext
             avformat_close_input(&temporary)
@@ -326,7 +337,8 @@ final class FFmpegDemuxer {
 
     private static func makeMediaInfo(
         url: URL,
-        context: UnsafeMutablePointer<AVFormatContext>
+        context: UnsafeMutablePointer<AVFormatContext>,
+        loadFontAttachments: Bool = true
     ) -> FFmpegMediaInfo {
         var streams: [FFmpegStreamInfo] = []
         var attachments: [FontAttachment] = []
@@ -409,7 +421,8 @@ final class FFmpegDemuxer {
             )
             streams.append(info)
 
-            if kind == .attachment,
+            if loadFontAttachments,
+               kind == .attachment,
                let data = parameters.pointee.extradata,
                parameters.pointee.extradata_size > 0
             {
