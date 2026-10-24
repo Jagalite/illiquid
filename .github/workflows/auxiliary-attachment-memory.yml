@@ -1,0 +1,133 @@
+name: Auxiliary attachment memory
+
+on:
+  push:
+    branches: ['perf/auxiliary-font-memory-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/**'
+      - 'Sources/IlliquidNativePlayback/Subtitles/PreparedExternalSubtitle.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryAttachmentPolicyTests.swift'
+      - 'Benchmarks/AuxiliaryAttachments/**'
+      - '.github/workflows/auxiliary-attachment-memory.yml'
+      - '!Benchmarks/AuxiliaryAttachments/*.md'
+      - '!Benchmarks/AuxiliaryAttachments/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeFrameStepReader.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailMetadataReader.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeTimelineThumbnailGenerator.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/PreparedExternalSubtitle.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryAttachmentPolicyTests.swift'
+      - 'Benchmarks/AuxiliaryAttachments/**'
+      - '.github/workflows/auxiliary-attachment-memory.yml'
+      - '!Benchmarks/AuxiliaryAttachments/*.md'
+      - '!Benchmarks/AuxiliaryAttachments/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auxiliary-attachment-memory-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-memory:
+    if: github.event_name != 'pull_request'
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate controlled font fixtures
+        run: python3 Benchmarks/AuxiliaryAttachments/generate-fixtures.py --output "$RUNNER_TEMP/auxiliary-fixtures"
+      - name: Measure retained native inputs in paired fresh processes
+        run: |
+          python3 Benchmarks/AuxiliaryAttachments/run.py \
+            --fixtures "$RUNNER_TEMP/auxiliary-fixtures" \
+            --output "$RUNNER_TEMP/auxiliary-memory" --pairs 8
+      - name: Emit memory results and reproducibility receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'auxiliary-memory'
+          fixtures = Path(os.environ['RUNNER_TEMP']) / 'auxiliary-fixtures'
+          paths = set(root.glob('*.json')) | set(root.glob('*.jsonl')) | set(root.glob('*.log'))
+          paths |= set((root / 'logs').glob('*'))
+          files = {str(p.relative_to(root)): p.read_text() for p in sorted(paths) if p.is_file()}
+          files.update({'fixtures/' + p.name: p.read_text() for p in sorted(fixtures.glob('*.json'))})
+          if 'summary.json' in files:
+              print('::group::summary.json')
+              print(files['summary.json'])
+              print('::endgroup::')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log bundle limit; use the artifact')
+          print('AUXILIARY_ATTACHMENT_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('AUXILIARY_ATTACHMENT_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: auxiliary-attachment-memory
+          path: |
+            ${{ runner.temp }}/auxiliary-memory/*.json
+            ${{ runner.temp }}/auxiliary-memory/*.jsonl
+            ${{ runner.temp }}/auxiliary-memory/*.log
+            ${{ runner.temp }}/auxiliary-memory/logs/*
+            ${{ runner.temp }}/auxiliary-fixtures/*.json
+          retention-days: 14
+
+  native-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate required native fixtures
+        run: python3 Benchmarks/AuxiliaryAttachments/generate-fixtures.py --output "$RUNNER_TEMP/auxiliary-fixtures"
+      - name: Build application graph and test font ownership and subtitle registration
+        run: |
+          mkdir -p "$RUNNER_TEMP/auxiliary-tests"
+          sw_vers > "$RUNNER_TEMP/auxiliary-tests/host.txt"
+          swift --version >> "$RUNNER_TEMP/auxiliary-tests/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/auxiliary-tests/host.txt"
+          export ILLIQUID_ATTACHMENT_ADMISSION_FIXTURE="$RUNNER_TEMP/auxiliary-fixtures/attachment-admission.mkv"
+          export ILLIQUID_AUXILIARY_REAL_FONT_FIXTURE="$RUNNER_TEMP/auxiliary-fixtures/real-font.mkv"
+          test -s "$ILLIQUID_ATTACHMENT_ADMISSION_FIXTURE"
+          test -s "$ILLIQUID_AUXILIARY_REAL_FONT_FIXTURE"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'AuxiliaryAttachmentPolicyTests|FontAttachmentAdmissionTests|NativePlaybackFoundationTests' \
+            2>&1 | tee "$RUNNER_TEMP/auxiliary-tests/native-tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: auxiliary-attachment-regressions
+          path: ${{ runner.temp }}/auxiliary-tests/
+          retention-days: 14
