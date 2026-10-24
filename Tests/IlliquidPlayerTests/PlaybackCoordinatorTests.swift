@@ -1582,6 +1582,178 @@ struct PlaybackCoordinatorTests {
         #expect(result.map(\.id) == [files[0].id, files[2].id, files[3].id])
     }
 
+    @Test func restorationSnapshotRetiresAfterDirectCommitAndReplacement() async throws {
+        let fixture = try CoordinatorFixture()
+        let selected = try fixture.createFile("restored-17.mkv")
+        let items = (0..<128).map {
+            FolderPlaylistItem(url: fixture.root.appendingPathComponent("restored-\($0).mkv"))
+        }
+        try fixture.sessionStore.save(PlaybackSessionRecord(
+            source: .localFile(selected), playlistItems: items, playlistIndex: 17,
+            position: 42, wasPaused: true
+        ))
+
+        #expect(fixture.coordinator.restoreLastSession())
+        try await waitForPreparation(fixture.coordinator)
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == items.count)
+        let restored = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: restored.identity)
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == nil)
+        #expect(fixture.coordinator.state.playlist == items)
+        #expect(fixture.coordinator.state.currentPlaylistIndex == 17)
+        #expect(fixture.coordinator.state.isPauseDesired)
+        #expect(fixture.runtime.seeks.last == SeekRecord(value: 42, mode: .absoluteExact))
+
+        let replacement = try fixture.createFile("replacement.mkv")
+        fixture.coordinator.open(url: replacement)
+        try await waitForPreparation(fixture.coordinator)
+        let next = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: next.identity)
+        #expect(fixture.coordinator.state.playlist.map(\.url) == [replacement])
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == nil)
+        await fixture.coordinator.shutdown()
+    }
+
+    @Test func restorationSnapshotRetiresAfterFolderDiscoveryCommits() async throws {
+        let fixture = try CoordinatorFixture()
+        let folder = try fixture.createDirectory("restored-folder")
+        let first = try fixture.createFile("episode-0.mkv", in: folder)
+        let selected = try fixture.createFile("episode-1.mkv", in: folder)
+        let savedItems = (0..<128).map {
+            FolderPlaylistItem(url: folder.appendingPathComponent("episode-\($0).mkv"))
+        }
+        try fixture.sessionStore.save(PlaybackSessionRecord(
+            source: .localFile(selected), collectionFolder: folder,
+            playlistItems: savedItems, playlistIndex: 1, position: 42, wasPaused: true
+        ))
+
+        #expect(fixture.coordinator.restoreLastSession())
+        try await waitForPreparation(fixture.coordinator)
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == savedItems.count)
+        let load = try #require(fixture.runtime.loads.last)
+        #expect(load.identity.source == .localFile(selected))
+        fixture.runtime.emit(.loaded, identity: load.identity)
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == nil)
+        #expect(Set(fixture.coordinator.state.playlist.map(\.url)) == [first, selected])
+        #expect(fixture.coordinator.state.currentURL == selected)
+        #expect(fixture.coordinator.state.isPauseDesired)
+        #expect(fixture.runtime.seeks.last == SeekRecord(value: 42, mode: .absoluteExact))
+        await fixture.coordinator.shutdown()
+    }
+
+    @Test func restorationSnapshotSurvivesLocatedNativeFailureUntilRetryCommits() async throws {
+        let fixture = try CoordinatorFixture()
+        let missing = fixture.root.appendingPathComponent("missing.mkv")
+        let companion = fixture.root.appendingPathComponent("companion.mkv")
+        let located = try fixture.createFile("located.mkv")
+        try fixture.sessionStore.save(PlaybackSessionRecord(
+            source: .localFile(missing),
+            playlistItems: [FolderPlaylistItem(url: companion), FolderPlaylistItem(url: missing)],
+            playlistIndex: 1, position: 42, wasPaused: true
+        ))
+        #expect(fixture.coordinator.restoreLastSession())
+        try await waitForPreparation(fixture.coordinator)
+        #expect(fixture.coordinator.state.recoveryIssue?.kind == .unavailableRestore(isFolder: false))
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == 2)
+
+        fixture.coordinator.locateUnavailableSession(at: located)
+        try await waitForPreparation(fixture.coordinator)
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == 2)
+        let failed = try #require(fixture.runtime.executedEffects.last {
+            if case .openSource = $0.kind { return true }; return false
+        })
+        fixture.runtime.emitResult(context: failed.context, kind: .failed)
+        #expect(fixture.coordinator.state.recoveryIssue?.kind == .failedSource(canSkip: false))
+        #expect(try fixture.sessionStore.load()?.source == .localFile(missing))
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == 2)
+
+        fixture.coordinator.retryRecovery()
+        let retried = try #require(fixture.runtime.loads.last)
+        #expect(retried.identity.source == .localFile(located))
+        fixture.runtime.emit(.loaded, identity: retried.identity)
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == nil)
+        #expect(fixture.coordinator.state.playlist.map(\.url) == [companion, located])
+        #expect(fixture.coordinator.state.currentPlaylistIndex == 1)
+        #expect(fixture.coordinator.state.isPauseDesired)
+        #expect(fixture.runtime.seeks.last == SeekRecord(value: 42, mode: .absoluteExact))
+        await fixture.coordinator.shutdown()
+        #expect(try fixture.sessionStore.load()?.source == .localFile(located))
+    }
+
+    @Test func restorationSnapshotSurvivesFailedFolderLocateUntilSuccessfulCommit() async throws {
+        let fixture = try CoordinatorFixture()
+        let missingFolder = fixture.root.appendingPathComponent("offline", isDirectory: true)
+        let missingFile = missingFolder.appendingPathComponent("episode.mkv")
+        let savedItems = [FolderPlaylistItem(url: missingFile)]
+        try fixture.sessionStore.save(PlaybackSessionRecord(
+            source: .localFile(missingFile), collectionFolder: missingFolder,
+            playlistItems: savedItems, playlistIndex: 0, position: 42, wasPaused: true
+        ))
+        #expect(fixture.coordinator.restoreLastSession())
+        try await waitForPreparation(fixture.coordinator)
+        #expect(fixture.coordinator.state.recoveryIssue?.kind == .unavailableRestore(isFolder: true))
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == 1)
+
+        // Locate resolves this path, then asynchronous folder discovery rejects
+        // the regular file. A second Locate still needs the original record.
+        let notAFolder = try fixture.createFile("not-a-folder.mkv")
+        fixture.coordinator.locateUnavailableSession(at: notAFolder)
+        try await waitForPreparation(fixture.coordinator)
+        #expect(fixture.coordinator.state.recoveryIssue?.kind == .unavailableRestore(isFolder: true))
+        #expect(fixture.runtime.loads.isEmpty)
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == 1)
+
+        let locatedFolder = try fixture.createDirectory("located-folder")
+        let locatedFile = try fixture.createFile("episode.mkv", in: locatedFolder)
+        fixture.coordinator.locateUnavailableSession(at: locatedFolder)
+        try await waitForPreparation(fixture.coordinator)
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == 1)
+        let load = try #require(fixture.runtime.loads.last)
+        #expect(load.identity.source == .localFile(locatedFile))
+        fixture.runtime.emit(.loaded, identity: load.identity)
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == nil)
+        #expect(fixture.coordinator.state.currentURL == locatedFile)
+        #expect(fixture.coordinator.state.isPauseDesired)
+        #expect(fixture.runtime.seeks.last == SeekRecord(value: 42, mode: .absoluteExact))
+        await fixture.coordinator.shutdown()
+    }
+
+    enum RestorationSnapshotTerminalAction: CaseIterable, Sendable {
+        case stop, close, forget, shutdown, historyOptOut
+    }
+
+    @Test(arguments: RestorationSnapshotTerminalAction.allCases)
+    func restorationSnapshotRetiresAtTerminalBoundary(_ action: RestorationSnapshotTerminalAction) async throws {
+        let fixture = try CoordinatorFixture()
+        let missing = fixture.root.appendingPathComponent("offline.mkv")
+        fixture.persistence.setPlaybackPosition(42, for: missing)
+        try fixture.sessionStore.save(PlaybackSessionRecord(
+            source: .localFile(missing), playlistItems: [FolderPlaylistItem(url: missing)],
+            playlistIndex: 0, position: 42, wasPaused: true
+        ))
+        #expect(fixture.coordinator.restoreLastSession())
+        try await waitForPreparation(fixture.coordinator)
+        #expect(fixture.coordinator.state.recoveryIssue?.kind == .unavailableRestore(isFolder: false))
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == 1)
+
+        switch action {
+        case .stop: fixture.coordinator.stop()
+        case .close: fixture.coordinator.closeCurrentVideo()
+        case .forget: fixture.coordinator.forgetUnavailableSession()
+        case .shutdown: await fixture.coordinator.shutdown()
+        case .historyOptOut: fixture.coordinator.setRemembersPlaybackHistory(false)
+        }
+        #expect(try retainedPreparedRestorePlaylistCount(fixture.coordinator) == nil)
+        #expect(fixture.persistence.playbackPosition(for: missing) == 42)
+        await fixture.coordinator.shutdown()
+        switch action {
+        case .close, .forget:
+            #expect(try fixture.sessionStore.load() == nil)
+        case .stop, .shutdown, .historyOptOut:
+            #expect(try fixture.sessionStore.load()?.source == .localFile(missing))
+        }
+    }
+
     @Test(arguments: [false, true])
     func unavailableRestoreRetainsSessionAndCanRetry(folderSource: Bool) async throws {
         let fixture = try CoordinatorFixture()
@@ -2038,6 +2210,20 @@ struct PlaybackCoordinatorTests {
         fixture.coordinator.selectSubtitleTrack(nil)
         #expect(fixture.persistence.mediaSettings(for: first)?.areSubtitlesVisible == false)
     }
+}
+
+/// Inspect only the ownership boundary under test. Returning an integer avoids
+/// keeping a reflected record (and its arrays) alive across the next operation.
+@MainActor
+private func retainedPreparedRestorePlaylistCount(_ coordinator: PlaybackCoordinator) throws -> Int? {
+    let field = try #require(Mirror(reflecting: coordinator).children.first {
+        $0.label == "preparedRestoreSession"
+    })
+    let optional = Mirror(reflecting: field.value)
+    try #require(optional.displayStyle == .optional)
+    guard let value = optional.children.first else { return nil }
+    let record = try #require(value.value as? PlaybackSessionRecord)
+    return record.playlistItems.count
 }
 
 private struct SeekRecord: Equatable {
