@@ -1,0 +1,65 @@
+{
+  "candidate_runtime_sha256": "7477ad521faedf4830f858f65b741832effc7f2513e72c67013a4d228e1b5eca",
+  "checks": {
+    "all_candidate_completed_task_handle_counts_zero": true,
+    "all_pending_physical_stop_handles_preserved_until_release": true,
+    "all_staged_receipts_match_completed_experiment": true,
+    "balanced_order_and_terminal_count_digest_parity": true,
+    "cohorts": 12,
+    "compiled_input_hashes_verified": 42,
+    "every_sample_waited_for_all_capture_lifetime_probes": true,
+    "executable_hashes_verified": 2,
+    "harness_snapshot_and_current_file_hashes_verified": 5,
+    "matched_pairs": 72,
+    "production_source_snapshots_verified": 36,
+    "qualification_scenarios_per_variant": 6,
+    "summary_metric_groups_recomputed": 72,
+    "unique_observations": 144
+  },
+  "controls": "Ordinary completion and explicit cancellation retain zero completed task handles in both variants. Their signed allocator differences are small and noisy; no general performance improvement is inferred.",
+  "evidence_sha256": {
+    "baseline-build.log": "dd6cfb9d4dd138d9d8056a3ffa90a1cf9b51dde92db6e326eca342f68938c94b",
+    "baseline-qualification.log": "d2cf93f2ac84d0bc9f84b4d858414392153c13d41006ed0f9dbb7983e4e4cdaa",
+    "candidate-build.log": "f0533dbd9b3a09743bdb939a018ef0b31935ed132510a64abca239088f005ee5",
+    "candidate-qualification.log": "60fab5c1abda5a912b55aa64a7459f0ef98dcc16aeeff709b746c51ecd2f904e",
+    "commands.json": "8c19daeb61d52ca17e83bfba2cf203e8e39f5683a7c1c5f87744386dbb75d4a2",
+    "manifest.json": "58b9c9fa5743784873bd1505354666e31886eaba8d97807f96d5d3428ace02fe",
+    "observations.jsonl": "1d36e7f8e961ff7d7b1697be6c225e655f36b2cf0fa03afdf93420abb6b0babc",
+    "qualification.json": "1178aab4fba660ad1180dfdf21dd3decf9ecd0cc096af2df8b3068d9a73b0b3d",
+    "summary.json": "63044be24c6fbd89bab3f0415417d08541ab776ab28edf4d33d00ef807d51925"
+  },
+  "limits": [
+    "Heap samples are allocator live-byte deltas for an extracted-method component, including runtime and scheduler allocations; they are not whole-player memory or RSS.",
+    "All callback capture probes were destroyed before settled sampling. Completed task-handle retention does not establish retained decoder or media payloads.",
+    "Synthetic timing includes actor/lifetime barriers and a common quiet interval; it does not establish playback or renderer throughput.",
+    "Native macOS renderer, subtitle, and physical worker behavior is outside this audit and requires the dedicated integration tests.",
+    "The candidate was built from a local worktree; exact source hashes, not the worktree HEAD alone, identify the measured implementation.",
+    "An earlier sandboxed attempt failed before measurements; this audit covers the separately completed unsandboxed run. Environment diagnostics are preserved separately."
+  ],
+  "native_integration_status": "Pending macOS integration; this Linux component audit does not establish native qualification.",
+  "physical_stop_32768": {
+    "baseline_completed_handles": 32767,
+    "baseline_retained_allocator_delta_median_bytes": 45408904,
+    "candidate_completed_handles": 0,
+    "candidate_empty_registry_clear_reclaimed_median_bytes": 1060864,
+    "candidate_retained_allocator_delta_median_bytes": 1426904,
+    "interpretation": "Zero completed handles does not mean zero registry bytes. Clearing the empty candidate registry releases capacity retained after the peak simultaneous physical waits; storage is related to active-work high water rather than accumulating completed handles.",
+    "median_paired_allocator_savings_bytes": 43971512,
+    "pending_handles_before_release_each_variant": 32768
+  },
+  "runner_sha256": "2211c42caa0d29a506d61d40fb99583406a049f5320c1bfb664fb8c44d1c0912",
+  "schema_version": 1,
+  "scope": "Independent arithmetic, semantic-count and source-provenance audit of the completed Linux component experiment.",
+  "status": "passed",
+  "supersede_32768": {
+    "baseline_completed_handles": 32767,
+    "baseline_registry_clear_reclaimed_median_bytes": 45091648,
+    "baseline_retained_allocator_delta_median_bytes": 45193008,
+    "candidate_completed_handles": 0,
+    "candidate_lower_pairs": 6,
+    "candidate_registry_clear_reclaimed_median_bytes": 0,
+    "candidate_retained_allocator_delta_median_bytes": 100528,
+    "median_paired_allocator_savings_bytes": 45092448,
+    "total_pairs": 6
+  }
+}

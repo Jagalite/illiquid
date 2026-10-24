@@ -1,0 +1,124 @@
+import Foundation
+import IlliquidPlaybackCore
+
+// The C/renderer boundary is a deterministic Boolean; no renderer is simulated.
+@MainActor final class PresentationProbe {
+    var ready = true
+    private(set) var polls = 0
+    func flushCompleted(_ fence: PresentationFence) -> Bool {
+        polls += 1
+        return ready
+    }
+}
+
+@MainActor final class PhysicalStopGate {
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+    var waitingCount: Int { waiters.count }
+    func wait() async { await withCheckedContinuation { waiters.append($0) } }
+    func release() {
+        let ready = waiters
+        waiters = []
+        for continuation in ready { continuation.resume() }
+    }
+}
+
+final class ClosureLifetimeCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var completed = 0
+    var count: Int { lock.withLock { completed } }
+    func finish() { lock.withLock { completed += 1 } }
+}
+final class ClosureLifetimeProbe: @unchecked Sendable {
+    let counter: ClosureLifetimeCounter
+    init(_ counter: ClosureLifetimeCounter) { self.counter = counter }
+    deinit { counter.finish() }
+}
+
+// Actual operation methods are inserted verbatim below. Only dependency setup,
+// bounded effect-result receipts, deadline scheduling, and native stop work are
+// laboratory adapters. Task storage and the ledger have their production types.
+@MainActor final class BenchmarkRuntime {
+    private var operations = NativeOperationLedger()
+    private var operationWorkTasks: [PlaybackEffectID: Task<Void, Never>] = [:]
+    let presentation = PresentationProbe()
+    let physicalStop = PhysicalStopGate()
+    let lifetime = ClosureLifetimeCounter()
+    private var deadlines: Set<PlaybackEffectID> = []
+    private(set) var success = 0
+    private(set) var cancelled = 0
+    private(set) var failed = 0
+    private(set) var resultDigest: UInt64 = 14_695_981_039_346_656_037
+    private(set) var callbacks = 0
+    private(set) var staleCallbacks = 0
+    var onCancelled: (() -> Void)?
+    var trackedTasks: Int { operationWorkTasks.count }
+    var ledgerCount: Int { operations.retainedCount }
+    var deadlineCount: Int { deadlines.count }
+
+    private func scheduleOperationDeadline(_ transaction: NativeOperationTransaction) {
+%%DEADLINE_ADMISSION%%
+        deadlines.insert(transaction.effectID)
+    }
+    private func cancelOperationDeadline(effectID: PlaybackEffectID) {
+        deadlines.remove(effectID)
+    }
+    private func record(_ effect: PlaybackEffect, tag: UInt64, code: String?) {
+        resultDigest = (resultDigest ^ effect.context.effectID.rawValue) &* 1_099_511_628_211
+        resultDigest = (resultDigest ^ tag) &* 1_099_511_628_211
+        for byte in (code ?? "").utf8 {
+            resultDigest = (resultDigest ^ UInt64(byte)) &* 1_099_511_628_211
+        }
+    }
+    private func finish(_ effect: PlaybackEffect, succeeded: Bool = true, code: String? = nil) {
+        if succeeded { success += 1 } else { failed += 1 }
+        record(effect, tag: succeeded ? 1 : 2, code: code)
+    }
+    private func cancel(_ effect: PlaybackEffect, code: String) {
+        cancelled += 1
+        record(effect, tag: 3, code: code)
+        onCancelled?()
+    }
+
+    func arm(_ rawID: UInt64, physical: Bool = false) {
+        let effect = PlaybackEffect(executor: .presentation,
+            context: PlaybackEffectContext(authority: .application(ApplicationEpochID(rawValue: 1)),
+                operationID: PlaybackOperationID(rawValue: rawID),
+                effectID: PlaybackEffectID(rawValue: rawID)),
+            kind: physical ? .cancelSession : .installPresentationFence(removeDisplayedImage: false))
+        let transaction = beginOperation(effect,
+            kind: physical ? .sessionCancellation : .presentationFlush,
+            requestedState: physical ? .cancelSession : .presentationFlush,
+            supersessionCode: "superseded")
+        let probe = ClosureLifetimeProbe(lifetime)
+        if physical {
+            // This latch is synthetic physical work. The exact production
+            // begin/finish methods determine handle custody and acknowledgments.
+            operationWorkTasks[transaction.effectID] = Task { [weak self, probe] in
+                guard let self else { return }
+                await self.physicalStop.wait()
+                self.finishOperation(effectID: transaction.effectID)
+                withExtendedLifetime(probe) {}
+            }
+        } else {
+            finishWhenPresentationFlushCompletes(effectID: transaction.effectID,
+                fence: PresentationFence(rawValue: rawID)) { [weak self, probe] in
+                    guard let self else { return }
+                    self.callbacks += 1
+                    if self.operations.transaction(effectID: transaction.effectID) == nil {
+                        self.staleCallbacks += 1
+                    }
+                    withExtendedLifetime(probe) {}
+                }
+        }
+    }
+    func cancelCurrent() { cancelOperation(kind: .presentationFlush, code: "explicitCancel") }
+    func finishLate(_ rawID: UInt64) { finishOperation(effectID: PlaybackEffectID(rawValue: rawID)) }
+    func clearResearchRegistry() {
+        for task in operationWorkTasks.values { task.cancel() }
+        operationWorkTasks = [:]
+    }
+
+%%PRODUCTION_METHODS%%
+}
+
+%%PRESENTATION_FENCE%%
