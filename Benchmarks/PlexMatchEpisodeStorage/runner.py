@@ -21,6 +21,7 @@ SOURCE_NAMES = ["MediaNameRecognition", "MediaMetadataHints", "PlexMatchHints",
                 "NFOMetadataHints", "MediaSidecarReader"]
 TEST_NAMES = ["PlexMatchHintsRegressionTests", "PlexMatchReaderRegressionTests", "MediaSidecarTests"]
 SOURCE_PATHS = [f"Sources/IlliquidCore/MediaLibrary/{name}.swift" for name in SOURCE_NAMES]
+FOCAL_SOURCE = "Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift"
 TEST_PATHS = [f"Tests/IlliquidCoreTests/{name}.swift" for name in TEST_NAMES]
 HARNESS_PATHS = [f"Benchmarks/PlexMatchEpisodeStorage/{name}"
                  for name in ("Harness.swift", "MemoryProbe.c", "runner.py")]
@@ -256,13 +257,21 @@ def main() -> None:
     snapshot = evidence / "sources"
     inputs = SOURCE_PATHS + TEST_PATHS + HARNESS_PATHS
     input_hashes = {name: digest(repo / name) for name in inputs}
+    historical_sources = {name: git(repo, "show", f"{BASELINE}:{name}") for name in SOURCE_PATHS}
+    historical_hashes = {}
+    for name, data in historical_sources.items():
+        original = snapshot / "historical" / name
+        original.parent.mkdir(parents=True, exist_ok=True)
+        original.write_bytes(data)
+        historical_hashes[name] = digest(original)
     packages, source_hashes = {}, {}
     for variant in ("baseline", "candidate"):
         package = output / "packages" / variant
         packages[variant] = package
         source_hashes[variant] = {}
         for name in SOURCE_PATHS:
-            data = git(repo, "show", f"{BASELINE}:{name}") if variant == "baseline" else (repo / name).read_bytes()
+            # Isolate the parser change even when shared support code evolves.
+            data = historical_sources[name] if variant == "baseline" and name == FOCAL_SOURCE else (repo / name).read_bytes()
             path = package / "Sources" / "IlliquidCore" / Path(name).name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(data)
@@ -276,7 +285,7 @@ def main() -> None:
             shutil.copyfile(repo / name, path)
         (package / "Package.swift").write_text(PACKAGE)
     changed = [name for name in SOURCE_PATHS if source_hashes["baseline"][name] != source_hashes["candidate"][name]]
-    if changed != ["Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift"]:
+    if changed != [FOCAL_SOURCE]:
         raise RuntimeError(f"expected only PlexMatchHints.swift to differ, found {changed}")
     for name in TEST_PATHS + HARNESS_PATHS:
         path = snapshot / "common" / name
@@ -293,6 +302,10 @@ def main() -> None:
                 "candidateStatus": git(repo, "status", "--short", "--untracked-files=all", "--", *inputs).decode(),
                 "candidateDiffSHA256": hashlib.sha256(candidate_diff).hexdigest(),
                 "inputSHA256": input_hashes, "productionSHA256": source_hashes,
+                "baselineSourcePolicy": "pinned PlexMatchHints.swift with current shared support sources",
+                "historicalProductionSHA256": historical_hashes,
+                "sharedSupportChangedSinceBaseline": [name for name in SOURCE_PATHS if name != FOCAL_SOURCE
+                    and historical_hashes[name] != source_hashes["candidate"][name]],
                 "changedProductionSources": changed, "platform": platform.platform(),
                 "machine": platform.machine(), "pythonVersion": sys.version,
                 "arguments": vars(args) | {"output": str(output), "swift": str(args.swift) if args.swift else None},

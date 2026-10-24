@@ -25,11 +25,13 @@ it does not change the cache policy or extend any object's lifetime.
 
 ## Qualification
 
-The pinned baseline is `4abf4b44f13386ccd04f1ce4ad0e756255ca4d14`.
+The baseline parser comes from `4abf4b44f13386ccd04f1ce4ad0e756255ca4d14`.
 The runner compiles actual production sources, with `PlexMatchHints.swift` as the
-only differing production file. Shared dependencies, tests, and measurement
-driver are identical in the two variants. Source and binary hashes accompany
-the raw observations.
+only differing production file. It snapshots the current four support files,
+tests, and measurement driver identically for both variants, and records the
+historical support hashes too. This keeps later support changes from invalidating
+the comparison solely because they differ from an old commit. Source and binary
+hashes accompany the raw observations.
 
 Both representations run the same parser and real-filesystem sidecar regressions
 in debug and release. The additional regressions compare complete raw and merged
