@@ -33,6 +33,10 @@ measures whole-player CPU, memory, energy, or input-to-screen latency.
 - The runner extracts the current geometry declarations verbatim, substitutes only
   that original function for the baseline, and checks the reconstructed geometry
   against its pinned hash. The two timed builds use the same callers and data.
+  The excerpt also includes the placement preference store. In the temporary
+  component package only, its `AppPreferences.defaults` dependency is adapted
+  to `.standard`, matching the original store; geometry bodies are unchanged.
+  Receipts record both the production excerpt hash and the adapted geometry hash.
 - The focused package runs the existing placement, geometry, and timeline suites,
   plus `ElasticGeometryPerformanceRegressionTests` from the application tests.
 - `Differential.swift` compares both implementations on identical inputs, then

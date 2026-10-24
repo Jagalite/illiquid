@@ -25,7 +25,7 @@ final class DefaultVideoPlayer {
     init(
         applicationURL: URL = Bundle.main.bundleURL,
         extensions: [String] = DefaultVideoPlayer.declaredExtensions,
-        defaults: UserDefaults = .standard,
+        defaults: UserDefaults = AppPreferences.defaults,
         resolve: @escaping (String) -> UTType? = { UTType(filenameExtension: $0, conformingTo: .movie) },
         currentApplication: @escaping (UTType) -> URL? = {
             NSWorkspace.shared.urlForApplication(toOpen: $0)

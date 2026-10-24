@@ -24,6 +24,10 @@ The test command defaults to testing **both** source versions. `--variant
 candidate` or `--variant baseline` selects one. The isolated package copies both
 the pre-existing shortcut tests and the new dispatch tests; it does not resolve
 the full player's native dependency graph.
+The temporary package adapts the initializer's `AppPreferences.defaults` default
+to the legacy `.standard` dependency because it has no app/session context.
+Source receipts record this separately from platform import adaptations;
+dispatch logic and the pinned baseline remain unchanged.
 
 The benchmark defaults to ten paired rounds and a base iteration count of
 10,000. Each workload receives five AB and five BA pairs. Short paths multiply

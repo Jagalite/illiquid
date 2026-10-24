@@ -20,6 +20,8 @@ struct PlayerRootView: View {
                 }
             chrome.scaledPlayerInterface()
         }
+        .coordinateSpace(name: AgentUITargetGeometry.coordinateSpace)
+        .agentUIRootGeometry(model: model)
     }
 
     private var chrome: some View {
@@ -239,12 +241,8 @@ private struct PlayerPane: View {
                 }
             }
         }
-        .contentShape(Rectangle())
-        .onHover { isHovering in
-            if !isHovering {
-                model.pointerExitedWindow()
-            }
-        }
+        // Empty chrome space must pass clicks through to the native video.
+        // Window exit is tracked by the native surface and AppModel monitors.
     }
 }
 
@@ -333,6 +331,7 @@ private struct CenterTransportControls: View {
             HStack(spacing: 24) {
                 transportButton(
                     "Seek Backward 10 Seconds",
+                    identifier: "illiquid.transport.seek-backward",
                     systemImage: "gobackward.10",
                     diameter: 74,
                     symbolSize: 34,
@@ -343,6 +342,7 @@ private struct CenterTransportControls: View {
 
                 transportButton(
                     model.state.isPauseDesired ? "Play" : "Pause",
+                    identifier: "illiquid.transport.play-pause",
                     systemImage: model.state.isPauseDesired ? "play.fill" : "pause.fill",
                     diameter: 100,
                     symbolSize: model.state.isPauseDesired ? 46 : 40,
@@ -353,6 +353,7 @@ private struct CenterTransportControls: View {
 
                 transportButton(
                     "Seek Forward 10 Seconds",
+                    identifier: "illiquid.transport.seek-forward",
                     systemImage: "goforward.10",
                     diameter: 74,
                     symbolSize: 34,
@@ -370,6 +371,7 @@ private struct CenterTransportControls: View {
 
     private func transportButton(
         _ title: String,
+        identifier: String,
         systemImage: String,
         diameter: CGFloat,
         symbolSize: CGFloat,
@@ -403,6 +405,7 @@ private struct CenterTransportControls: View {
         .disabled(!isEnabled)
         .help(title)
         .accessibilityLabel(title)
+        .accessibilityIdentifier(identifier)
     }
 }
 
@@ -422,7 +425,7 @@ struct SourcesSidebarState {
     var knownSourceFolderIDs: Set<String> = []
     var hasInitializedExpansion = false
 
-    static func restored(defaults: UserDefaults = .standard) -> Self {
+    static func restored(defaults: UserDefaults = AppPreferences.defaults) -> Self {
         guard let snapshot = SourcesSidebarExpansionStore.restore(
             from: defaults.data(forKey: SourcesSidebarExpansionStore.defaultsKey)
         ) else {
@@ -623,9 +626,11 @@ private struct EmptyPlayerView: View {
         Button(action: model.openFilePanel) {
             Text("Open File…").playerProminentButtonTextStyle()
         }
+        .accessibilityIdentifier("illiquid.empty.open-file")
         .keyboardShortcut(.defaultAction)
         .buttonStyle(.borderedProminent)
         Button("Add Folder…", action: model.addSourceFoldersPanel)
+            .accessibilityIdentifier("illiquid.empty.add-folder")
             .buttonStyle(.bordered)
     }
 }

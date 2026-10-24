@@ -147,6 +147,12 @@ search_directories+=(/opt/homebrew/lib /usr/local/lib)
 
 resolve_dependency() {
     local dependency=$1 owner=$2 candidate= name=
+    # Match the release packager's pinned SDK lookup. Homebrew opt links may
+    # advance while an installed FFmpeg still needs an older dependency ABI.
+    if candidate=$(illiquid_pinned_native_library "$dependency"); then
+        python3 -c 'import pathlib, sys; print(pathlib.Path(sys.argv[1]).resolve(strict=True))' "$candidate"
+        return
+    fi
     case "$dependency" in
         /*) candidate=$dependency ;;
         @loader_path/*) candidate="$(dirname "$owner")/${dependency#@loader_path/}" ;;

@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "name": "playback-shortcuts",
+  "description": "SETUP: open generated fixtures/video.mp4 (12 seconds) in the isolated benchmark build before running; default shortcut overrides, VoiceOver off, player focused, no text field/modal/popover. Hooks establish pause/seek setup and read state; Space/Right/Left are real input. Main-actor state assertions are not visible frame or audio-output proof.",
+  "requires": [],
+  "steps": [
+    {
+      "id": "discover-state-hook",
+      "command": "hook",
+      "args": {
+        "action": "capabilities"
+      },
+      "expect": {
+        "path": "data.state.data.commands",
+        "op": "contains",
+        "value": "agent-state"
+      }
+    },
+    {
+      "id": "fixture-duration",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.duration_seconds",
+          "op": "gte",
+          "value": 10
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "fixture-loaded",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.loading",
+          "op": "eq",
+          "value": false
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "player-focused",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.window.key",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "setup-paused",
+      "command": "hook",
+      "args": {
+        "action": "pause"
+      }
+    },
+    {
+      "id": "confirm-paused-setup",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.pause_desired",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "space-to-play",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": "space",
+        "modifiers": []
+      }
+    },
+    {
+      "id": "play-request-observed",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.pause_desired",
+          "op": "eq",
+          "value": false
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "space-to-pause",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": "space",
+        "modifiers": []
+      }
+    },
+    {
+      "id": "pause-request-observed",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.pause_desired",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "setup-seek-origin",
+      "command": "hook",
+      "args": {
+        "action": "seek-exact",
+        "targetSeconds": 2
+      }
+    },
+    {
+      "id": "seek-origin-lower-bound",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.position_seconds",
+          "op": "gte",
+          "value": 1.8
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "seek-origin-upper-bound",
+      "command": "assert",
+      "args": {
+        "path": "data.state.data.playback.position_seconds",
+        "op": "lte",
+        "value": 2.2
+      }
+    },
+    {
+      "id": "right-to-seek-forward",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": "right",
+        "modifiers": []
+      }
+    },
+    {
+      "id": "forward-seek-lower-bound",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.position_seconds",
+          "op": "gte",
+          "value": 6.5
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "forward-seek-upper-bound",
+      "command": "assert",
+      "args": {
+        "path": "data.state.data.playback.position_seconds",
+        "op": "lte",
+        "value": 7.5
+      }
+    },
+    {
+      "id": "left-to-seek-backward",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": "left",
+        "modifiers": []
+      }
+    },
+    {
+      "id": "backward-seek-upper-bound",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.position_seconds",
+          "op": "lte",
+          "value": 2.5
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "backward-seek-lower-bound",
+      "command": "assert",
+      "args": {
+        "path": "data.state.data.playback.position_seconds",
+        "op": "gte",
+        "value": 1.5
+      }
+    }
+  ],
+  "metrics": {
+    "required": []
+  }
+}

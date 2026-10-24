@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "name": "inspection",
+  "description": "SETUP: launch one isolated benchmark player; no media fixture needed. Requires Accessibility and Screen Recording for capture. Bounded inspection/window existence and capture smoke only; does not qualify every control or display output.",
+  "requires": [],
+  "steps": [
+    {
+      "id": "inspect-owned-target",
+      "command": "inspect",
+      "args": {}
+    },
+    {
+      "id": "window-exists",
+      "command": "assert",
+      "args": {
+        "path": "data.windows.0",
+        "op": "exists"
+      }
+    },
+    {
+      "id": "capture-owned-window",
+      "command": "capture",
+      "args": {
+        "output": "inspection.png"
+      }
+    }
+  ],
+  "metrics": {
+    "required": []
+  }
+}

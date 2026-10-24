@@ -920,7 +920,7 @@ struct PlaybackChromeActivityTests {
         #expect(loadingPin)
     }
 
-    @Test func playbackActivityAlwaysReceivesAnAutoHideDeadline() {
+    @Test func playingActivityReceivesAnAutoHideDeadline() {
         var machine = PlaybackChromeStateMachine()
         machine.registerActivity(at: 2)
         #expect(machine.phase == .visible)
@@ -928,6 +928,212 @@ struct PlaybackChromeActivityTests {
 
         machine.deadlineReached(at: 4.5, reducedMotion: true)
         #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
+    }
+
+    @Test func pausingCancelsScheduledAutoHideWithoutChangingVisibility() {
+        var machine = PlaybackChromeStateMachine()
+        machine.registerActivity(at: 1)
+        #expect(machine.deadline == .autoHide(3.5))
+
+        machine.setPlaybackPaused(true, now: 2)
+
+        #expect(machine.phase == .visible)
+        #expect(machine.pinReasons.isEmpty)
+        #expect(machine.deadline == nil)
+
+        machine.deadlineReached(at: 3.5, reducedMotion: false)
+        machine.setPlaybackPaused(true, now: 10)
+
+        #expect(machine.phase == .visible)
+        #expect(machine.deadline == nil)
+    }
+
+    @Test func pausedActivityRevealsWithoutSchedulingAutoHide() {
+        var machine = PlaybackChromeStateMachine()
+        machine.setPlaybackPaused(true, now: 1)
+        machine.hideImmediately(reducedMotion: true, now: 2)
+
+        machine.registerActivity(at: 3)
+
+        #expect(machine.phase == .revealing)
+        #expect(machine.deadline == nil)
+
+        machine.settleReveal()
+        machine.registerPointerActivity(at: 4)
+
+        #expect(machine.phase == .visible)
+        #expect(machine.deadline == nil)
+
+        machine.deadlineReached(at: 100, reducedMotion: true)
+        #expect(machine.phase == .visible)
+    }
+
+    @Test func pausedKeyboardNavigationAndLaunchRevealWithoutAutoHide() {
+        var machine = PlaybackChromeStateMachine()
+        machine.setPlaybackPaused(true, now: 1)
+        machine.hideImmediately(reducedMotion: true, now: 2)
+
+        machine.revealForKeyboardNavigation(at: 3)
+
+        #expect(machine.phase == .revealing)
+        #expect(machine.deadline == nil)
+
+        machine.settleReveal()
+        machine.hideImmediately(reducedMotion: true, now: 4)
+        machine.revealForLaunch(at: 5)
+
+        #expect(machine.phase == .revealing)
+        #expect(machine.deadline == nil)
+    }
+
+    @Test func removingLastPinWhilePausedDoesNotScheduleAutoHide() {
+        for reason in PlaybackChromePinReason.allCases {
+            var machine = PlaybackChromeStateMachine()
+            machine.setPlaybackPaused(true, now: 1)
+            machine.setPin(reason, active: true, now: 2)
+            machine.hideImmediately(reducedMotion: true, now: 3)
+
+            #expect(machine.phase == .pinned)
+            #expect(machine.pinReasons == [reason])
+            #expect(machine.deadline == nil)
+
+            machine.setPin(reason, active: false, now: 4)
+
+            #expect(machine.phase == .visible)
+            #expect(machine.pinReasons.isEmpty)
+            #expect(machine.deadline == nil)
+        }
+    }
+
+    @Test func resumingVisibleChromeArmsOneFreshAutoHideDeadline() {
+        var machine = PlaybackChromeStateMachine()
+        machine.registerActivity(at: 1)
+        machine.setPlaybackPaused(true, now: 2)
+
+        machine.setPlaybackPaused(false, now: 10)
+
+        #expect(machine.phase == .visible)
+        #expect(machine.deadline == .autoHide(12.5))
+
+        machine.setPlaybackPaused(false, now: 11)
+        #expect(machine.deadline == .autoHide(12.5))
+
+        machine.deadlineReached(at: 12.5, reducedMotion: true)
+        #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
+    }
+
+    @Test func resumingDuringRevealArmsAutoHideWithoutRestartingReveal() {
+        var machine = PlaybackChromeStateMachine()
+        machine.setPlaybackPaused(true, now: 1)
+        machine.hideImmediately(reducedMotion: true, now: 2)
+        machine.revealForKeyboardNavigation(at: 3)
+
+        machine.setPlaybackPaused(false, now: 4)
+
+        #expect(machine.phase == .revealing)
+        #expect(machine.deadline == .autoHide(6.5))
+
+        machine.settleReveal()
+        #expect(machine.phase == .visible)
+        #expect(machine.deadline == .autoHide(6.5))
+    }
+
+    @Test func resumingPinnedChromeWaitsForLastPinRemoval() {
+        var machine = PlaybackChromeStateMachine()
+        machine.setPlaybackPaused(true, now: 1)
+        machine.setPin(.loading, active: true, now: 2)
+        machine.setPin(.scrubbing, active: true, now: 2)
+
+        machine.setPlaybackPaused(false, now: 3)
+        machine.setPin(.loading, active: false, now: 4)
+
+        #expect(machine.phase == .pinned)
+        #expect(machine.pinReasons == [.scrubbing])
+        #expect(machine.deadline == nil)
+
+        machine.setPin(.scrubbing, active: false, now: 5)
+        #expect(machine.phase == .visible)
+        #expect(machine.deadline == .autoHide(7.5))
+    }
+
+    @Test func repeatedPauseSnapshotsAndResumePreserveExplicitlyHiddenChrome() {
+        var machine = PlaybackChromeStateMachine()
+        machine.setPlaybackPaused(true, now: 1)
+        machine.handleSurfaceClick(reducedMotion: true, now: 2)
+
+        machine.setPlaybackPaused(true, now: 3)
+        #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
+
+        machine.setPlaybackPaused(false, now: 4)
+        #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
+
+        machine.registerPointerActivity(at: 5)
+        #expect(machine.phase == .revealing)
+        #expect(machine.deadline == .autoHide(7.5))
+    }
+
+    @Test func pausedExplicitHideStillFadesAndResumePreservesItsCompletion() {
+        var machine = PlaybackChromeStateMachine(fadeDuration: 0.25)
+        machine.setPlaybackPaused(true, now: 1)
+        machine.handleSurfaceClick(reducedMotion: false, now: 2)
+
+        #expect(machine.phase == .hiding)
+        #expect(machine.deadline == .finishHiding(2.25))
+
+        machine.setPlaybackPaused(true, now: 2.1)
+        machine.setPlaybackPaused(false, now: 2.2)
+        #expect(machine.phase == .hiding)
+        #expect(machine.deadline == .finishHiding(2.25))
+
+        machine.deadlineReached(at: 2.25, reducedMotion: false)
+        #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
+    }
+
+    @Test func pausingDuringAutoHideFadePreservesItsCompletion() {
+        var machine = PlaybackChromeStateMachine(fadeDuration: 0.25)
+        machine.registerActivity(at: 1)
+        machine.deadlineReached(at: 3.5, reducedMotion: false)
+
+        machine.setPlaybackPaused(true, now: 3.6)
+
+        #expect(machine.phase == .hiding)
+        #expect(machine.deadline == .finishHiding(3.75))
+
+        machine.deadlineReached(at: 3.75, reducedMotion: false)
+        #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
+    }
+
+    @Test func pausedPointerExitAndOutsideUnpinStillHideChrome() {
+        var machine = PlaybackChromeStateMachine()
+        machine.setPlaybackPaused(true, now: 1)
+        machine.setPin(.scrubbing, active: true, now: 2)
+        machine.hideForPointerExit(reducedMotion: true, now: 3)
+
+        #expect(machine.phase == .pinned)
+        #expect(machine.isPointerOutside)
+
+        machine.setPin(.scrubbing, active: false, now: 4)
+        machine.registerActivity(at: 5)
+        machine.setPlaybackPaused(true, now: 6)
+
+        #expect(machine.phase == .hidden)
+        #expect(machine.pinReasons.isEmpty)
+        #expect(machine.deadline == nil)
+
+        machine.registerPointerActivity(at: 7)
+        #expect(machine.phase == .revealing)
+        #expect(!machine.isPointerOutside)
+        #expect(machine.deadline == nil)
+
+        machine.hideForPointerExit(reducedMotion: true, now: 8)
+        #expect(machine.phase == .hidden)
+        #expect(machine.isPointerOutside)
         #expect(machine.deadline == nil)
     }
 
@@ -946,6 +1152,104 @@ struct PlaybackChromeActivityTests {
 
         #expect(machine.phase == .visible)
         #expect(machine.deadline == .autoHide(13.5))
+    }
+
+    @Test func changingHideTimeoutReplacesThePendingDeadline() {
+        var machine = PlaybackChromeStateMachine()
+        machine.registerActivity(at: 10)
+        machine.setAutoHideInterval(7.5, now: 11)
+        #expect(machine.deadline == .autoHide(18.5))
+        machine.deadlineReached(at: 12.5, reducedMotion: true)
+        #expect(machine.phase == .visible)
+        machine.deadlineReached(at: 18.5, reducedMotion: true)
+        #expect(machine.phase == .hidden)
+    }
+
+    @Test(arguments: [false, true])
+    func videoPressHidesBeforeRecognitionAndDelayedClickCannotReveal(_ isPaused: Bool) {
+        var machine = PlaybackChromeStateMachine(fadeDuration: 0.225)
+        machine.setPlaybackPaused(isPaused, now: 0)
+        machine.setVideoSurfaceClickPending(true, now: 1)
+        machine.handleVideoSurfacePress(reducedMotion: false, now: 1)
+        #expect(machine.phase == .hiding)
+        #expect(machine.deadline == .finishHiding(1.225))
+        machine.hideImmediately(reducedMotion: true, now: 1.225)
+        machine.handleVideoSurfaceClick(reducedMotion: false, now: 2)
+        #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
+        machine.setVideoSurfaceClickPending(false, now: 2)
+        #expect(machine.phase == .hidden)
+    }
+
+    @Test func cancelledVideoPressDoesNotRevealControls() {
+        var machine = PlaybackChromeStateMachine()
+        machine.setVideoSurfaceClickPending(true, now: 1)
+        machine.handleVideoSurfacePress(reducedMotion: true, now: 1)
+        machine.setVideoSurfaceClickPending(false, now: 2)
+        #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
+    }
+
+    @Test func pendingVideoClickCannotBeReversedByAShortAutoHideTimeout() {
+        var machine = PlaybackChromeStateMachine(autoHideInterval: 0.5)
+        machine.registerActivity(at: 1)
+        machine.setVideoSurfaceClickPending(true, now: 1.4)
+        machine.deadlineReached(at: 2, reducedMotion: true)
+        #expect(machine.phase == .visible)
+        #expect(machine.deadline == nil)
+
+        machine.handleVideoSurfaceClick(reducedMotion: true, now: 2)
+        machine.setVideoSurfaceClickPending(false, now: 2)
+        #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
+    }
+
+    @Test(arguments: [false, true])
+    func cancellingPendingVideoClickRestoresOnlyThePlayingCountdown(_ isPaused: Bool) {
+        var machine = PlaybackChromeStateMachine(autoHideInterval: 0.5)
+        machine.setPlaybackPaused(isPaused, now: 1)
+        machine.setVideoSurfaceClickPending(true, now: 1.1)
+        machine.registerActivity(at: 2)
+        #expect(machine.deadline == nil)
+        machine.setVideoSurfaceClickPending(false, now: 3)
+        #expect(machine.phase == .visible)
+        #expect(machine.deadline == (isPaused ? nil : .autoHide(3.5)))
+    }
+
+    @Test func pendingVideoClickDoesNotRevealHiddenControlsBeforeRecognition() {
+        var machine = PlaybackChromeStateMachine(autoHideInterval: 0.5)
+        machine.hideImmediately(reducedMotion: true, now: 1)
+        machine.setVideoSurfaceClickPending(true, now: 2)
+        machine.handleVideoSurfacePress(reducedMotion: true, now: 2)
+        #expect(machine.phase == .hidden)
+        machine.handleVideoSurfaceClick(reducedMotion: true, now: 3)
+        #expect(machine.phase == .revealing)
+        #expect(machine.deadline == nil)
+        machine.setVideoSurfaceClickPending(false, now: 3)
+        #expect(machine.deadline == .autoHide(3.5))
+    }
+
+    @Test func changingHideTimeoutWhilePausedOnlyAppliesAfterResume() {
+        var machine = PlaybackChromeStateMachine()
+        machine.registerActivity(at: 10)
+        machine.setPlaybackPaused(true, now: 11)
+        machine.setAutoHideInterval(8, now: 12)
+        #expect(machine.deadline == nil)
+        machine.setPlaybackPaused(false, now: 20)
+        #expect(machine.deadline == .autoHide(28))
+    }
+
+    @Test func changingHideTimeoutPreservesExplicitHideAndItsFade() {
+        var machine = PlaybackChromeStateMachine()
+        machine.handleVideoSurfaceClick(reducedMotion: false, now: 10)
+        let fadeDeadline = machine.deadline
+        machine.setAutoHideInterval(8, now: 10.1)
+        #expect(machine.phase == .hiding)
+        #expect(machine.deadline == fadeDeadline)
+        machine.deadlineReached(at: 11, reducedMotion: false)
+        machine.setAutoHideInterval(6, now: 12)
+        #expect(machine.phase == .hidden)
+        #expect(machine.deadline == nil)
     }
 
     @Test func launchRevealsHiddenChromeThenUsesTheSharedDeadline() {
@@ -1038,6 +1342,20 @@ struct PlaybackChromeActivityTests {
         #expect(machine.deadline == nil)
     }
 
+    @Test(arguments: [false, true])
+    func clickingVideoHidesChromeDuringPlaybackOrPause(_ isPaused: Bool) {
+        var machine = PlaybackChromeStateMachine()
+        machine.setPlaybackPaused(isPaused, now: 1)
+        machine.setPin(.playbackFocus, active: true, now: 1)
+        machine.setPin(.pointerOverSidebar, active: true, now: 1)
+
+        machine.handleVideoSurfaceClick(reducedMotion: true, now: 2)
+
+        #expect(machine.phase == .hidden)
+        #expect(machine.pinReasons.isEmpty)
+        #expect(machine.deadline == nil)
+    }
+
     @Test func videoSurfaceClickRevealsHiddenChrome() {
         var machine = PlaybackChromeStateMachine()
         machine.registerActivity(at: 1)
@@ -1098,10 +1416,13 @@ struct PlaybackChromeActivityTests {
 
     @Test func keyboardPlayHidesImmediatelyThroughPassiveHoverPins() {
         var machine = PlaybackChromeStateMachine()
+        machine.setPlaybackPaused(true, now: 1)
         machine.registerActivity(at: 1)
         machine.setPin(.pointerOverSidebar, active: true, now: 2)
 
+        machine.setPlaybackPaused(false, now: 3)
         machine.hideImmediatelyForKeyboardPlay()
+        machine.setPlaybackPaused(false, now: 4)
 
         #expect(machine.phase == .hidden)
         #expect(machine.deadline == nil)

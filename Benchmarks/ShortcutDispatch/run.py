@@ -97,11 +97,22 @@ def prepare(variant: str, directory: Path) -> dict[str, object]:
     inputs = source_inputs(variant)
     receipt = {"variant": variant, "platform": "native-appkit" if NATIVE else "linux-value-stubs", "sources": {}}
     for name, data in inputs.items():
-        generated = portable(data.decode()).encode()
+        portable_source = portable(data.decode())
+        generated = portable_source
+        if name == "PlayerShortcutBindings.swift":
+            # This component has no app/session preference context. Tests and
+            # benchmarks inject their own store; retain the legacy default for
+            # the extracted initializer without changing dispatch logic.
+            generated = generated.replace(
+                "init(defaults: UserDefaults = AppPreferences.defaults)",
+                "init(defaults: UserDefaults = .standard)")
+        preference_adaptation = generated != portable_source
+        generated = generated.encode()
         (directory / name).write_bytes(generated)
         receipt["sources"][name] = {
             "input_sha256": digest(data), "compiled_sha256": digest(generated),
-            "import_adaptation": data != generated,
+            "import_adaptation": data.decode() != portable_source,
+            "preference_default_adaptation": preference_adaptation,
         }
     return receipt
 

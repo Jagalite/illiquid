@@ -30,7 +30,7 @@ cd "$repository_root"
 "$script_directory/tests/illiquid-packaging-tests.sh"
 python3 "$script_directory/tests/update-feed-tests.py"
 swift test --force-resolved-versions -c release --filter \
-    'AppUpdateControllerTests|DefaultVideoPlayerTests|ProductMetadataTests|LaunchOpenQueueTests|illiquidRetainsLegacy|PlayerInterfaceScaleTests|TimelineThumbnailHoverPolicyTests|TimelineThumbnailHoverRecoveryTests'
+    'AppUpdateControllerTests|DefaultVideoPlayerTests|ProductMetadataTests|LaunchOpenQueueTests|illiquidRetainsLegacy|PlayerInterfaceScaleTests|PlaybackChromeActivityTests|PlaybackChromePreferencesTests|SourcesSidebarPreferencesTests|NativePlayerClickRoutingTests|TimelineThumbnailHoverPolicyTests|TimelineThumbnailHoverRecoveryTests'
 
 created_build_root=false
 if [[ -z "${ILLIQUID_BUILD_ROOT:-}" ]]; then

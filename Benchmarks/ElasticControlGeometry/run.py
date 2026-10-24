@@ -72,6 +72,13 @@ def extract_sources(output: Path) -> tuple[str, str, dict[str, str]]:
     source = (ROOT / GEOMETRY_PATH).read_text()
     geometry = excerpt(source, "enum ElasticPlaybackControlBarSide:",
                        "\nstruct ElasticPlaybackControlBarShape:")
+    production_geometry_hash = sha256(geometry.encode())
+    # The focused package has no application preference context. Adapt only
+    # the placement store's default dependency to its original UserDefaults
+    # value; all geometry bodies and the pinned baseline hash remain checked.
+    store = excerpt(geometry, "enum ElasticPlaybackControlBarPlacementStore {",
+                    "\nstruct ElasticPlaybackControlBarGeometry")
+    geometry = geometry.replace(store, store.replace("AppPreferences.defaults", ".standard"), 1)
     candidate_body = excerpt(geometry, "    private func rawPoint(at s: CGFloat) -> CGPoint {",
                              "\n    func pointOnSurface(")
     baseline_body = (HERE / "baseline-raw-point.swift").read_text()
@@ -83,6 +90,7 @@ def extract_sources(output: Path) -> tuple[str, str, dict[str, str]]:
         raise ValueError("Reconstructed baseline differs from the pinned production geometry")
     imports = "import Foundation\n#if canImport(SwiftUI)\nimport SwiftUI\n#endif\n\n"
     hashes = {str(GEOMETRY_PATH): sha256(source.encode()),
+              "production_geometry": production_geometry_hash,
               "candidate_geometry": sha256(geometry.encode()),
               "baseline_geometry": sha256(baseline.encode())}
     return imports + geometry, imports + baseline, hashes

@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "name": "settings-menu",
+  "description": "SETUP: one visible focused player and no other app windows or modals; shared benchmark preference domain; verify effective preferences before use. No media fixture. Command-comma and Command-W are real native menu shortcuts. This requests Settings, observes a second owned window, inspects, sends close, and checks player focus return. It does not identify Settings content; per-control settings changes and menu traversal remain pending.",
+  "requires": [],
+  "steps": [
+    {
+      "id": "before-settings",
+      "command": "inspect",
+      "args": {}
+    },
+    {
+      "id": "player-window-exists",
+      "command": "assert",
+      "args": {
+        "path": "data.windows.0",
+        "op": "exists"
+      }
+    },
+    {
+      "id": "open-settings-shortcut",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": ",",
+        "modifiers": [
+          "command"
+        ]
+      }
+    },
+    {
+      "id": "settings-window-arrives",
+      "command": "wait",
+      "args": {
+        "command": "inspect",
+        "args": {},
+        "condition": {
+          "path": "data.windows.1",
+          "op": "exists"
+        },
+        "timeout": 10,
+        "interval": 0.2
+      }
+    },
+    {
+      "id": "settings-tree",
+      "command": "inspect",
+      "args": {}
+    },
+    {
+      "id": "close-settings-shortcut",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": "w",
+        "modifiers": [
+          "command"
+        ]
+      }
+    },
+    {
+      "id": "player-focus-returned",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.window.key",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    }
+  ],
+  "metrics": {
+    "required": []
+  }
+}

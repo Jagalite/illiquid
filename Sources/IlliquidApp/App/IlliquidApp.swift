@@ -10,17 +10,26 @@ struct IlliquidApp: App {
     @State private var showsDefaultPlayerResult = false
     @State private var themeStore: PlayerThemeStore
     @State private var interfaceScale: PlayerInterfaceScaleStore
+    private let preferenceDefaults: UserDefaults
 
     init() {
         let timing = LifecyclePerformance.begin("app-init")
         defer { LifecyclePerformance.end("app-init", since: timing) }
+        preferenceDefaults = AppPreferences.defaults
         if Bundle.main.bundleIdentifier == LegacyPreferencesMigration.bundleIdentifier {
             LegacyPreferencesMigration.migrateIfNeeded(
+                defaults: preferenceDefaults,
                 destinationDomain: LegacyPreferencesMigration.bundleIdentifier
             )
         }
+        SourcesSidebarPreferences.initializeSortPreferences(defaults: preferenceDefaults)
         _themeStore = State(initialValue: PlayerThemeStore.shared)
         _interfaceScale = State(initialValue: PlayerInterfaceScaleStore.shared)
+        do { try AppPreferences.recordDiagnostics() }
+        catch {
+            FileHandle.standardError.write(Data("[agent-ui-preferences] receipt failed: \(error)\n".utf8))
+            exit(78)
+        }
     }
 
     var body: some Scene {
@@ -43,6 +52,7 @@ struct IlliquidApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1_200, height: 760)
+        .defaultAppStorage(preferenceDefaults)
         .commands {
             UpdateCommands()
             if let model { PlayerCommands(model: model) }
@@ -67,6 +77,7 @@ struct IlliquidApp: App {
                     .task { model = await AppModel.loadShared() }
             }
         }
+        .defaultAppStorage(preferenceDefaults)
     }
 
     private func playerView(_ model: AppModel) -> some View {

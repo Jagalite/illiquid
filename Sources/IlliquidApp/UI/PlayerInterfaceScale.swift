@@ -6,6 +6,7 @@ import SwiftUI
 final class PlayerInterfaceScaleStore {
     static let shared = PlayerInterfaceScaleStore()
     static let storageKey = "Illiquid.interface-scale.v1"
+    static let defaultPercentage = 90
     static let percentages = Array(stride(from: 80, through: 150, by: 10))
 
     private let defaults: UserDefaults
@@ -14,10 +15,10 @@ final class PlayerInterfaceScaleStore {
     var canIncrease: Bool { percentage < 150 }
     var canDecrease: Bool { percentage > 80 }
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = AppPreferences.defaults) {
         self.defaults = defaults
         let saved = defaults.object(forKey: Self.storageKey) as? Int
-        percentage = saved.flatMap { Self.percentages.contains($0) ? $0 : nil } ?? 100
+        percentage = saved.flatMap { Self.percentages.contains($0) ? $0 : nil } ?? Self.defaultPercentage
     }
 
     func select(_ percentage: Int) {
@@ -28,7 +29,7 @@ final class PlayerInterfaceScaleStore {
 
     func increase() { select(min(150, percentage + 10)) }
     func decrease() { select(max(80, percentage - 10)) }
-    func reset() { select(100) }
+    func reset() { select(Self.defaultPercentage) }
 }
 
 /// Propose logical dimensions to the content and reserve its scaled footprint.

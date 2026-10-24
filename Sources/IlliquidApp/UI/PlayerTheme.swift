@@ -1508,7 +1508,7 @@ final class PlayerThemeStore {
     private(set) var textColorMode: PlayerTextColorMode
     private(set) var rainbowPalette: PlayerRainbowPalette
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = AppPreferences.defaults) {
         self.defaults = defaults
         selection = defaults.string(forKey: Self.storageKey)
             .flatMap(PlayerTheme.init(rawValue:))

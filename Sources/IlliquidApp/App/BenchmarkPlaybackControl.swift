@@ -10,6 +10,10 @@ struct BenchmarkPlaybackControlCommand: Decodable, Equatable {
     let targetSeconds: TimeInterval?
     let sourcePath: String?
 
+    var isAgentUIAction: Bool {
+        action == "capabilities" || action == "agent-state"
+    }
+
     var isApplicationAction: Bool {
         ["ping", "open", "close-window", "reopen-window", "toggle-sidebar", "resize-window", "window-animation",
          "hover-preview", "clear-previews", "source-query", "memory-pressure"].contains(action)
@@ -25,6 +29,35 @@ struct BenchmarkPlaybackControlCommand: Decodable, Equatable {
         case "renderer-metrics": .rendererMetrics
         default: nil
         }
+    }
+}
+
+/// Read-only hook responses. Completion means the snapshot was sampled on the
+/// main actor; it does not acknowledge native input, drawing, or presentation.
+enum AgentUIStateDiagnostic {
+    static let prefix = "[agent-ui-state] "
+
+    static func line(
+        command: BenchmarkPlaybackControlCommand,
+        data: [String: Any],
+        monotonicNanoseconds: UInt64 = DispatchTime.now().uptimeNanoseconds
+    ) throws -> Data {
+        let envelope: [String: Any] = [
+            "schema_version": 1,
+            "session": command.session,
+            "id": command.id,
+            "action": command.action,
+            "status": "ok",
+            "monotonic_ns": monotonicNanoseconds,
+            "pid": ProcessInfo.processInfo.processIdentifier,
+            "data": data,
+        ]
+        let json = try JSONSerialization.data(withJSONObject: envelope, options: [.sortedKeys])
+        return Data(prefix.utf8) + json + Data([10])
+    }
+
+    static func finite(_ value: Double) -> Any {
+        value.isFinite ? value as Any : NSNull()
     }
 }
 
@@ -98,6 +131,16 @@ final class BenchmarkPlaybackControl {
         }
     }
 
+    static func accepts(
+        _ command: BenchmarkPlaybackControlCommand,
+        session: String,
+        lifecycleEnabled: Bool
+    ) -> Bool {
+        command.session == session && isValidToken(command.id)
+            && (command.playbackAction != nil || command.isAgentUIAction
+                || (lifecycleEnabled && command.isApplicationAction))
+    }
+
     static func install(
         player: PlaybackController,
         environment: [String: String] = ProcessInfo.processInfo.environment,
@@ -163,9 +206,8 @@ final class BenchmarkPlaybackControl {
             }
             let data = try Data(contentsOf: configuration.commandFileURL)
             let command = try JSONDecoder().decode(BenchmarkPlaybackControlCommand.self, from: data)
-            guard command.session == configuration.session,
-                  Self.isValidToken(command.id),
-                  command.playbackAction != nil || (LifecyclePerformance.isEnabled && command.isApplicationAction)
+            guard Self.accepts(command, session: configuration.session,
+                               lifecycleEnabled: LifecyclePerformance.isEnabled)
             else {
                 writeDiagnostic(
                     "session=\(configuration.session) phase=rejected reason=invalid-command"

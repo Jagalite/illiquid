@@ -21,7 +21,7 @@ final class AppUpdateController: NSObject, ObservableObject, SPUUpdaterDelegate 
     private let defaults: UserDefaults
     private var controller: SPUStandardUpdaterController?
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = AppPreferences.defaults) {
         self.defaults = defaults
         includesPrereleases = defaults.bool(forKey: Self.prereleasesKey)
         super.init()
