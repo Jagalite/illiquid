@@ -1,0 +1,105 @@
+name: Planar ownership history memory
+
+on:
+  push:
+    branches: ['perf/planar-buffer-history-memory-20261023']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift'
+      - 'Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlanarOwnershipHistoryTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift'
+      - 'Benchmarks/PlanarHistoryMemory/**'
+      - 'Benchmarks/PlanarOwnership/**'
+      - '.github/workflows/planar-history-memory.yml'
+      - '.github/workflows/planar-ownership-performance.yml'
+      - '!Benchmarks/PlanarHistoryMemory/*.md'
+      - '!Benchmarks/PlanarHistoryMemory/evidence/**'
+      - '!Benchmarks/PlanarOwnership/*.md'
+      - '!Benchmarks/PlanarOwnership/evidence/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift'
+      - 'Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlanarOwnershipHistoryTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift'
+      - 'Benchmarks/PlanarHistoryMemory/**'
+      - 'Benchmarks/PlanarOwnership/**'
+      - '.github/workflows/planar-history-memory.yml'
+      - '.github/workflows/planar-ownership-performance.yml'
+      - '!Benchmarks/PlanarHistoryMemory/*.md'
+      - '!Benchmarks/PlanarHistoryMemory/evidence/**'
+      - '!Benchmarks/PlanarOwnership/*.md'
+      - '!Benchmarks/PlanarOwnership/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: planar-history-memory-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -e /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo '::error::Kyoto is available; route compilation through the shared queue before running this job.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this hosted runner. Direct component compilation will use this job’s isolated build directory.'
+      - name: Qualify native ownership history
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/PlanarHistoryMemory/run.py \
+            --output "$RUNNER_TEMP/planar-history" \
+            --pairs 6 --counts 16,128,1024,8192 \
+            --steps 2000 --iterations 50000 "${mode[@]}"
+      - name: Print native qualification results
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'planar-history/evidence'
+          for name in ['summary.json', 'native-tests.json', 'completion.json']:
+              path = root / name
+              if path.is_file():
+                  print(f'::group::{name}')
+                  print(path.read_text())
+                  print('::endgroup::')
+          PY
+      - name: Export research evidence to the log
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          python3 - <<'PY'
+          import base64, io, os, tarfile
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'planar-history/evidence'
+          if root.is_dir():
+              packed = io.BytesIO()
+              with tarfile.open(fileobj=packed, mode='w:gz') as archive:
+                  for path in sorted(root.rglob('*')):
+                      if path.is_file() and not path.is_symlink():
+                          archive.add(path, arcname=path.relative_to(root).as_posix(), recursive=False)
+              print('PLANAR_HISTORY_EVIDENCE_BASE64=' + base64.b64encode(packed.getvalue()).decode('ascii'))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: planar-history-native
+          path: ${{ runner.temp }}/planar-history/evidence/
+          retention-days: 14

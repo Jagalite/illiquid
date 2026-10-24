@@ -9,6 +9,7 @@ on:
       - Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift
       - Benchmarks/PlanarOwnership/**
       - .github/workflows/planar-ownership-performance.yml
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -35,6 +36,7 @@ jobs:
             --output "$RUNNER_TEMP/planar-ownership/tests"
           cat "$RUNNER_TEMP/planar-ownership/tests/native-tests.json"
       - name: Measure native component frame lifecycles
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python3 Benchmarks/PlanarOwnership/run.py \
             --rounds 8 --iterations 100000 --warmup 10000 \
