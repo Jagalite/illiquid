@@ -1,0 +1,179 @@
+{
+  "baseline_revision": "4abf4b44f13386ccd04f1ce4ad0e756255ca4d14",
+  "build_coordination": "Kyoto unavailable in local Linux research workspace; direct serial isolated builds as documented fallback; no shared .build.",
+  "candidate_checkout_revision": "931f5df7eb32b58b8562ab64880c081fc7c989f9",
+  "candidate_worktree_status": " M .github/workflows/thumbnail-disk-eviction.yml\n M Benchmarks/NonDecodeFourthPass/test-codec-adapters.py\n M Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift\n?? Benchmarks/ThumbnailReadAllocation/\n",
+  "compiled_sha256": {
+    "build/Metrics.o": "5ab4022eb723b6fdbb64d547c624d211f7f477d272887b76c2c096c52b112834",
+    "build/baseline/allocations": "efde46c1bb936c632e7e6e69b52e2516ce2f69ed1d949066e70a65277cb988b6",
+    "build/baseline/libThumbnailReadProjection.so": "749f5c746af44b7623db4b77e15f0a645754ed477df803bcb9e78a75f422bffb",
+    "build/baseline/plain": "b6ec6422ef717d1e3bfbe366891d3b677517a6aef63ee2f54a1c6c62e55e2e66",
+    "build/candidate/allocations": "ab564eb637e4dde8e2716451610d8f26491867d9863403c48e200b849df7896b",
+    "build/candidate/libThumbnailReadProjection.so": "ebfa67dcf161dfe24f3fad81857bcae2491fc0caa0f07574090e27fb5f1cde24",
+    "build/candidate/plain": "1990ce4c6237bd3e35e248527e4bf5db436778861187c5a5d48db0fc69198ab6",
+    "build/libthumbnail_allocmeter.so": "ec5281f4bb277cc549642d86845ea417a547a63e18e3c8be03e048e9a16ebc21"
+  },
+  "created_utc": "2026-10-24T14:43:04.905848+00:00",
+  "fixtures": [
+    {
+      "bytes": 0,
+      "expected_checksum_per_read": 0,
+      "expected_rejected": false,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-0",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-0.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 4096,
+      "expected_checksum_per_read": 4351,
+      "expected_rejected": false,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-4096",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-4096.bin",
+      "sha256": "c8f5d0341d54d951a71b136e6e2afcb14d11ed8489a7ae126a8fee0df6ecf193"
+    },
+    {
+      "bytes": 65535,
+      "expected_checksum_per_read": 65789,
+      "expected_rejected": false,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-65535",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-65535.bin",
+      "sha256": "5f1bf999bcba5e05d4c34a13710d2e4bff005877874dcce49ac87af61076231e"
+    },
+    {
+      "bytes": 65536,
+      "expected_checksum_per_read": 65791,
+      "expected_rejected": false,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-65536",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-65536.bin",
+      "sha256": "7daca2095d0438260fa849183dfc67faa459fdf4936e1bc91eec6b281b27e4c2"
+    },
+    {
+      "bytes": 65537,
+      "expected_checksum_per_read": 65537,
+      "expected_rejected": false,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-65537",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-65537.bin",
+      "sha256": "2deb0bd2129a9d3aed91e3cff58b3993752be549642890a3e853ec1065f9b617"
+    },
+    {
+      "bytes": 262144,
+      "expected_checksum_per_read": 262399,
+      "expected_rejected": false,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-262144",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-262144.bin",
+      "sha256": "2312394bd99545d9de131c24efb781e765ac1aec243f2ed9347597a793a415e9"
+    },
+    {
+      "bytes": 1048576,
+      "expected_checksum_per_read": 1048831,
+      "expected_rejected": false,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-1048576",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-1048576.bin",
+      "sha256": "fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83"
+    },
+    {
+      "bytes": 5242880,
+      "expected_checksum_per_read": 5243135,
+      "expected_rejected": false,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-5242880",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-5242880.bin",
+      "sha256": "2e7cab6314e9614b6f2da12630661c3038e5592025f6534ba5823c3b340a1cb6"
+    },
+    {
+      "bytes": 16777216,
+      "expected_checksum_per_read": 16777471,
+      "expected_rejected": false,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-16777216",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-16777216.bin",
+      "sha256": "341aacac661ccb210720bedaa9ead5d668fe5ea41a73532fc147c71e34040df1"
+    },
+    {
+      "bytes": 16777217,
+      "expected_checksum_per_read": 1,
+      "expected_rejected": true,
+      "kind": "deterministic raw bytes; bounded-reader stress, not JPEG decode",
+      "name": "bytes-16777217",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/bytes-16777217.bin",
+      "sha256": "94a8ba1341747e2adc81d6d0b4cc2306595034bec4499ed4674562adbae940e8"
+    },
+    {
+      "bytes": 41904,
+      "expected_checksum_per_read": 42121,
+      "expected_rejected": false,
+      "height": 180,
+      "kind": "valid JPEG of deterministic high-detail RGB noise",
+      "name": "noise-320x180",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/noise-320x180.jpg",
+      "sha256": "cade4b216205c532471918ecaa01291737090da0ac707f11d89fbfd2bca065ab",
+      "width": 320
+    },
+    {
+      "bytes": 162337,
+      "expected_checksum_per_read": 162554,
+      "expected_rejected": false,
+      "height": 360,
+      "kind": "valid JPEG of deterministic high-detail RGB noise",
+      "name": "noise-640x360",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/noise-640x360.jpg",
+      "sha256": "28d2c467b73d179b2395c27c96b470992b77c1604f547f8481b0d042aa04c5b1",
+      "width": 640
+    },
+    {
+      "bytes": -1,
+      "expected_checksum_per_read": 1,
+      "expected_rejected": true,
+      "kind": "unavailable-file control",
+      "name": "missing",
+      "path": "/workspace/scratch/aa530e666cbb/thumbnail-read-final-linux/fixtures/missing-file.jpg",
+      "sha256": null
+    }
+  ],
+  "harness_sha256": {
+    "CThumbnailReadMetrics/Metrics.c": "aa298338120c5b377df89e7dfdf17ef40cfa71d5b422812f13dc75dd5234cf87",
+    "CThumbnailReadMetrics/Metrics.h": "8f75d281744676766e3e555971c760d1112d92b07abef7ad8d09bdcf3c871415",
+    "CThumbnailReadMetrics/module.modulemap": "cc3254d6a79b074c400bca54b8ba02aea261d9c1c88baf7ea36e476f790743a7",
+    "Fixtures/noise-320x180.jpg": "cade4b216205c532471918ecaa01291737090da0ac707f11d89fbfd2bca065ab",
+    "Fixtures/noise-640x360.jpg": "28d2c467b73d179b2395c27c96b470992b77c1604f547f8481b0d042aa04c5b1",
+    "Fixtures/provenance.json": "255fcbe2ef0f1be4333f962d6b4dec7c5c5654a504bfa7aa72b6ea0d2dfe770e",
+    "Harness.swift": "541530e5081c6423218ee2ef6cee678c7498a58b2bbd16a3e4e92837d9ed8d66",
+    "allocmeter.c": "b3ef266d628e2f8c2d474a804de16c090f7503d7f6fc72b4fef42a3998cb4acc",
+    "run.py": "7ccecec180453b06aace47f817e07f455a40ac57786949a14391b39a4e4b8a58"
+  },
+  "machine": "x86_64",
+  "pairs": 8,
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "protocol": {
+    "allocation_traffic": "Linux/glibc only; successful intercepted malloc/calloc/realloc requests, excluding aligned and other APIs; separate binary and LD_PRELOAD counter; not live bytes or peak",
+    "memory": "one held Data in out-of-line helper; release sampled after helper returns; samples precede full-byte verification",
+    "pair_order": "AB for even pairs, BA for odd pairs; fresh process for every observation",
+    "scope": "complete bounded read function only; excludes ImageIO, full cache actor and player",
+    "timing": "plain binary, no allocation interposer; wall and process CPU reported separately",
+    "warm_up": "one same-input read, released before each measured phase"
+  },
+  "schema": 1,
+  "source": "Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift",
+  "source_receipts": {
+    "baseline": {
+      "complete_source": "build/baseline/NativeThumbnailDiskCache.swift",
+      "complete_source_sha256": "da0a647285f935bebeead0fd0cec73a9f49e0932b80daa6e0c5dd92a90f7eaa5",
+      "projection": "build/baseline/Projection.swift",
+      "projection_sha256": "33d6196a765e8348208c1e9cf50178c632632a28e5b2cae2be47d50585e7e708"
+    },
+    "candidate": {
+      "complete_source": "build/candidate/NativeThumbnailDiskCache.swift",
+      "complete_source_sha256": "4df8edde50b3e1a610a926b74f081f967060a8d0011f5c3413a17e3b61475706",
+      "projection": "build/candidate/Projection.swift",
+      "projection_sha256": "b39866afed083e7947da20d6e0be35689167ce22c3486915e1f77c7488cd6422"
+    }
+  },
+  "swift_version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+}
