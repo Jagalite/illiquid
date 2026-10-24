@@ -1,0 +1,76 @@
+{
+  "archive": "linux-correctness.tar.gz",
+  "archive_sha256": "577fc82a47cd139a8a149c487ac6558afa6c3eca037ebf7643f00f45b93fd999",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "completion": {
+    "complete_output_comparisons": 17,
+    "passed": true,
+    "source_and_binary_hashes_rechecked": true,
+    "tests_only": true
+  },
+  "files": {
+    "baseline-sources.json": "1cea329e05ad732b285ab1b4e942c73f34898b836a88cdacefb38e553337490e",
+    "candidate-sources.json": "4880fa04491b0a8e51fa4584ee3ebbd8da0d39e8da6ba115d45299b66a075ba3",
+    "commands.jsonl": "00d7582fd56d1e53445e814673bc6631fb1b25ad72c204b9b4972971845d93b1",
+    "completion.json": "ea968972030b70e72db17ba5d396c0d73f80433851a2c57b0b620c8ae550e354",
+    "environment.json": "8fd47db67f3fc0416f6c4b7be4fbd3c70754b1357b639257c4623806e4097235",
+    "expected-baseline-storage-failure.log": "a4a82adc976a60c22f35b28b0233117576334c6317a6c4086b49f528bdd81af0",
+    "parity.json": "16187ce9d0c4a1d317e392e62b8c59eb3f74f3238299e5de6e2c3b31d029e2ca",
+    "production.diff": "9073ba52c2082dcbfc1704b6f292aa787ed9626420090dd9f8f8db45364f65d7",
+    "semantic-output/annotate_first.json.gz": "3004e9d2dc969c2fcedb604b5f55d31ead9ada7c18863f937a825c5a5372ba89",
+    "semantic-output/annotate_last.json.gz": "68de4b7736fabb8561e72a7213853cefad48e4b7db09e843f510a6d5053a2ee1",
+    "semantic-output/annotate_middle.json.gz": "b65fd103a916629b2465ac139cbc148248163065362de08d8ef7e5c57ea7aaa9",
+    "semantic-output/cache_hit.json.gz": "112266f8e0e7bfb8b771803bcd12f971bae36c7c955cf7c226a3f3fbbf7dac58",
+    "semantic-output/files.json.gz": "112266f8e0e7bfb8b771803bcd12f971bae36c7c955cf7c226a3f3fbbf7dac58",
+    "semantic-output/folders.json.gz": "d0ce2b2d49b32dfb953355e61d28158b4d099347ff68df8ed4812387a98ea5e4",
+    "semantic-output/hide_all.json.gz": "e676492c9a15c79b39a0bfb3f044c2c3ce4c85bfda6dfa5907923c481644aa22",
+    "semantic-output/hide_first.json.gz": "9d88abc5d4a304667481afb4e5ac13ae4d93175e9ff7b0d5d3b9275e853274c4",
+    "semantic-output/hide_last.json.gz": "35918ce31a062b33b770684dc76b391ac4aecad04cdd4b4b6bf4fc44cf63222d",
+    "semantic-output/hide_middle.json.gz": "a96a1ae433c1193c6c1b08ae3dcdc7547c3caad0cc64ef17df12cdfd40b52da1",
+    "semantic-output/hide_most.json.gz": "48170aa461f5ffc9e749a24c90d6501736fbe6f71a2f151030e4cb85aa88f934",
+    "semantic-output/media.json.gz": "33be4cfd6cb21e832ce212f58095d520dc42b1595cf6941a9496771d585469c9",
+    "semantic-output/no_match.json.gz": "6beacc40db97230e37ff95a553088becad603c0cf1db2f4a299c1dcd7336ccca",
+    "semantic-output/preannotated.json.gz": "3d3709f174081293e8673ce3d6191e4c16da90d4f8f75d5e9957b4784ea9b12a",
+    "semantic-output/reset_annotations.json.gz": "112266f8e0e7bfb8b771803bcd12f971bae36c7c955cf7c226a3f3fbbf7dac58",
+    "semantic-output/search.json.gz": "75c2774f793aeccd2b88c1b6d3f29c138c361073912405f316dfe194d9533dee",
+    "semantic-output/tree.json.gz": "112266f8e0e7bfb8b771803bcd12f971bae36c7c955cf7c226a3f3fbbf7dac58",
+    "staged-sources.tar.gz": "4d9f5cfcc2f2f510dea1c3a8cfd77b03677807f5f669ea30a1b43f353505ea5d",
+    "tests-baseline-release.log": "81241a88fb39ef046230bba4b26b141bf9e2fe8a3a56ddd42d2bed5d6dc9ae68",
+    "tests-candidate-debug.log": "734ba494c89a7c24151a52d6e8227c4c5578f3d2cedb465f59b49366a22cfd77",
+    "tests-candidate-release.log": "fc8aee1bb70217d234e16fec18029a677a4947e68ce166146be5eead10c2af61",
+    "tests.json": "7cfe6835d7a0083617885b482fc9be112d1c902f06922915591bd4f860d655eb"
+  },
+  "pid_namespace": {
+    "pid": 42454,
+    "proc_self": "42454"
+  },
+  "source_commit": "914b87e4a587676b6d9e97aab0d4b8d26f4fd244",
+  "tests": [
+    {
+      "configuration": "release",
+      "passed": true,
+      "reported_tests": 44,
+      "skip": "\\.SourceBrowserRowStorageTests/",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "passed": true,
+      "reported_tests": 47,
+      "skip": null,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "passed": true,
+      "reported_tests": 47,
+      "skip": null,
+      "variant": "candidate"
+    },
+    {
+      "expected_storage_regression": true,
+      "returncode": 1,
+      "variant": "baseline"
+    }
+  ]
+}
