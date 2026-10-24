@@ -1,0 +1,50 @@
+name: Playlist deduplication memory
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistDeduplicationTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistSessionRecordTests.swift'
+      - 'Benchmarks/PlaylistDeduplication/**'
+      - '.github/workflows/playlist-deduplication-memory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playlist-deduplication-memory-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-foundation:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify behavior and measure playlist array sharing
+        run: |
+          python3 Benchmarks/PlaylistDeduplication/run.py \
+            --pairs 6 --target-ms 40 \
+            --output "$RUNNER_TEMP/playlist-deduplication"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-deduplication-macos
+          path: |
+            ${{ runner.temp }}/playlist-deduplication/*.json
+            ${{ runner.temp }}/playlist-deduplication/*.jsonl
+            ${{ runner.temp }}/playlist-deduplication/logs/
+            ${{ runner.temp }}/playlist-deduplication/sources/
+          retention-days: 14
