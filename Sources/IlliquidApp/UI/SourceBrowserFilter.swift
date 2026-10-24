@@ -176,8 +176,11 @@ actor SourceBrowserFilter {
         // retaining this projection's first encountered spelling as the title.
         var canonicalByTitle: [String: (raw: String, canonical: String)] = [:]
         let locale = Locale(identifier: "en_US_POSIX")
-        let sections = Dictionary(grouping: rows) { row in
-            let title = row.recognizedMedia?.section ?? "Other Videos"
+        // Group and sort indices so temporary section buffers do not duplicate
+        // the complete rows and their metadata. Materialize each row only once
+        // in the final projection.
+        let sections = Dictionary(grouping: rows.indices) { index in
+            let title = rows[index].recognizedMedia?.section ?? "Other Videos"
             // String keys equate canonical Unicode spellings. Reuse folding
             // only for identical bytes, preserving Foundation's original input.
             if let cached = canonicalByTitle[title],
@@ -199,26 +202,33 @@ actor SourceBrowserFilter {
             if rank($0) != rank($1) { return rank($0) < rank($1) }
             return $0.localizedStandardCompare($1) == .orderedAscending
         }
+        guard !Task.isCancelled else { return [] }
         var result: [SourceTreeDisplayRow] = []
+        result.reserveCapacity(rows.count + sections.count)
         for title in titles {
             guard !Task.isCancelled else { return [] }
-            guard let members = sections[title], let first = members.first else { continue }
+            guard let members = sections[title], let firstIndex = members.first else { continue }
+            let first = rows[firstIndex]
             result.append(SourceTreeDisplayRow(
                 id: "media-section:\(title)", folderID: "", url: first.url,
                 displayName: "\(title) (\(members.count))", depth: 0,
                 ancestorIDs: [], kind: .mediaSection))
             // Episode order has semantic meaning; retain the selected file sort
             // for movies, extras, unknown files, and alternate versions of an episode.
+            let orderedMembers: [Int]
             if first.recognizedMedia?.kind == .episode {
-                result.append(contentsOf: members.enumerated().sorted { lhs, rhs in
-                    guard let a = lhs.element.recognizedMedia, let b = rhs.element.recognizedMedia
-                    else { return lhs.offset < rhs.offset }
+                orderedMembers = members.sorted { lhs, rhs in
+                    guard let a = rows[lhs].recognizedMedia, let b = rows[rhs].recognizedMedia
+                    else { return lhs < rhs }
                     if a.episode != b.episode { return (a.episode ?? 0) < (b.episode ?? 0) }
                     if a.airDate != b.airDate { return (a.airDate ?? "") < (b.airDate ?? "") }
-                    return lhs.offset < rhs.offset
-                }.map(\.element))
+                    return lhs < rhs
+                }
             } else {
-                result.append(contentsOf: members)
+                orderedMembers = members
+            }
+            for index in orderedMembers {
+                result.append(rows[index])
             }
         }
         return result
