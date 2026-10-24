@@ -24,10 +24,24 @@ The `ExecutorKind` enum is the exact prefix of production `EventsAndEffects.swif
 No ledger, identity type, native API, or executor stand-in is substituted. Original
 source bytes, SHA-256 hashes, compiler identity, flags, generated packages, binary
 hashes, and every subprocess command/stdout/stderr are retained in the output.
+Baseline/candidate dependency equality is required for the complete identity and
+track files and for the exact compiled `ExecutorKind` prefix. Changes elsewhere
+in `EventsAndEffects.swift` do not enter this package and may differ between
+variants. Its full source bytes and hashes are still retained, and resume checks
+still reject any candidate source change after preparation, including that
+uncompiled remainder. Missing or ambiguous prefix boundaries remain errors.
 The focused package does not replace the application's normal native build.
 Test builds use a separate scratch directory from measured executables. Linux
 uses SwiftPM's integrated driver to avoid a standalone-driver process-statistics
 failure in restricted PID namespaces; macOS uses its ordinary driver.
+
+The source-boundary qualification exercises preparation and resume receipts with
+controlled source changes, including rejection of changed compiled dependencies.
+It requires only Python and does not invoke Swift or build the packages:
+
+```sh
+python3 Benchmarks/RuntimeLeaseHistory/test_source_boundaries.py
+```
 
 The candidate runs all seven `RuntimeLeaseHistoryTests` in debug and release.
 The baseline runs the two unchanged-contract tests in each configuration, then a

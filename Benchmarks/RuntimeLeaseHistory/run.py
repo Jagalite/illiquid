@@ -144,9 +144,13 @@ let package = Package(name: "RuntimeLeaseHistory", platforms: [.macOS("26.0")],
 ''')
         source_hashes[variant] = {SOURCES[key]: sha256(value) for key, value in raw.items()}
         source_hashes[variant]["ExecutorKind exact prefix"] = sha256(executor_kind)
-    for key in ["identity", "track", "events"]:
+    for key in ["identity", "track"]:
         if source_hashes["baseline"][SOURCES[key]] != source_hashes["candidate"][SOURCES[key]]:
             raise ValueError(f"Dependency changed between variants: {SOURCES[key]}")
+    # Only this exact prefix is compiled. Keep the full events source receipt,
+    # but changes to uncompiled effect contracts cannot affect this experiment.
+    if source_hashes["baseline"]["ExecutorKind exact prefix"] != source_hashes["candidate"]["ExecutorKind exact prefix"]:
+        raise ValueError(f"Dependency changed between variants: {SOURCES['events']} (ExecutorKind prefix)")
     effective_swiftc = (command(["xcrun", "--find", "swiftc"], output).stdout.strip()
                        if platform.system() == "Darwin" else str(Path(args.swift).resolve().with_name("swiftc")))
     compiler_directory = Path(effective_swiftc).parent
