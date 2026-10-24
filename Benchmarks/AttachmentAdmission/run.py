@@ -179,12 +179,29 @@ class Runner:
         original = {variant: {path: self.source(variant, path)
                               for path in FULL_SOURCES + [PRESENTATION, BITMAP] + C_SOURCES}
                     for variant in VARIANTS}
-        # The executor now forwards an optional attachment-inclusion policy.
-        # This historical benchmark uses its unchanged default; the complete
-        # returned metadata and payload hashes must still match the baseline.
         executor = "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"
-        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT, executor}:
-            if original["baseline"][path] != original["candidate"][path]:
+        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT}:
+            candidate = original["candidate"][path]
+            if path == executor:
+                # Permit only the optional, default-enabled forwarding change.
+                # Every unrelated executor byte must still match the historical
+                # baseline; output checks also verify the preserved default.
+                forwarding = (
+                    ("        cancellationSignal: FFmpegInputCancellationSignal? = nil,\n"
+                     "        includeFontAttachments: Bool = true\n",
+                     "        cancellationSignal: FFmpegInputCancellationSignal? = nil\n"),
+                    ("                    try FFmpegDemuxer(\n"
+                     "                        url: url,\n"
+                     "                        interruptState: openingInterruptState,\n"
+                     "                        includeFontAttachments: includeFontAttachments\n"
+                     "                    ),",
+                     "                    try FFmpegDemuxer(url: url, interruptState: openingInterruptState),"),
+                )
+                for new, previous in forwarding:
+                    if candidate.count(new) != 1:
+                        raise ValueError("Expected exact optional attachment forwarding in executor")
+                    candidate = candidate.replace(new, previous, 1)
+            if original["baseline"][path] != candidate:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
         error = {v: extract(original[v][PRESENTATION], "struct PresentationError:", "\nfunc checkOSStatus(")
                  for v in VARIANTS}
