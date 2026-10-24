@@ -39,9 +39,29 @@ metadata, preserve the distinction between an omitted season and season zero,
 check replacement of an earlier season/range, and verify that mutating returned
 hints cannot alter the stored index or its copies.
 
-Native measurement and complete-output parity results will be recorded here
-after the first successful qualification run. This initial branch does not claim
-a measured improvement.
+The [native qualification run](https://github.com/Jagalite/illiquid/actions/runs/40103110705)
+is queued. Native measurements will be recorded after it completes; this branch
+does not yet claim a measured macOS improvement.
+
+### Supporting Linux validation
+
+Swift 6.3.2 passed all 14 pure-parser tests on both representations in debug and
+release, with identical current tests and unchanged production source bytes.
+Both optimized benchmark executables also compiled in Swift 6 mode and produced
+identical complete semantic output. Eight single-process smoke samples exercised
+the metadata-only, 1,024-mapping, near-limit, and real 32-sidecar cache scenarios.
+The cache read exactly 32 sidecars and performed no additional reads on reuse.
+
+The smoke used the unchanged native harness with explicitly recorded Linux
+platform adaptations: POSIX/XML imports, a separate autorelease-pool shim, and a
+`mallinfo2` probe. Its single observations are supporting checks, not repeated
+native measurements or a timing result. Complete unique semantic output, source
+and tool hashes, platform diffs, commands, test logs, raw smoke observations, and
+the deterministic fixture recipe are retained in
+[linux-validation.tar.gz](evidence/linux-validation.tar.gz). The
+[archive receipt](evidence/linux-validation.json) records its SHA-256. An initial
+sandboxed compiler attempt failed before tests; the isolated approved retry
+passed all four configurations without source changes.
 
 ## Reproduction
 
