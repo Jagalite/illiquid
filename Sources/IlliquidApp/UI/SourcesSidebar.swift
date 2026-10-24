@@ -32,7 +32,7 @@ struct SourcesSidebar: View {
     @State private var recursiveMediaLoadKey: String?
     @State private var isRecursiveMediaLoading = false
     @State private var filesystemMonitor: SourceFilesystemMonitor?
-    @State private var pendingFilesystemEvents: [SourceFilesystemEvent] = []
+    @State private var pendingFilesystemEvents = SourceFilesystemEventBuffer()
     @State private var filesystemDebounceTask: Task<Void, Never>?
     @State private var browserFilter = SourceBrowserFilter()
     @State private var filterTask: Task<Void, Never>?
@@ -942,8 +942,7 @@ struct SourcesSidebar: View {
                 return
             }
             guard !Task.isCancelled else { return }
-            let events = pendingFilesystemEvents
-            pendingFilesystemEvents.removeAll()
+            let events = pendingFilesystemEvents.take()
             filesystemDebounceTask = nil
             applyFilesystemEvents(events)
         }

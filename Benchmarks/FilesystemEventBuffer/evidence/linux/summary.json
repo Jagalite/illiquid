@@ -1,0 +1,155 @@
+{
+  "allocator_note": "Allocator-accounted bytes include allocator overhead/caches; these are not RSS, physical footprint, or peak process memory measurements.",
+  "method": "Fresh sequential processes, alternating AB/BA pairs, input batches destroyed before allocator sample, result summarization after sample.",
+  "metric": "mallinfo2.uordblks + mallinfo2.hblkhd",
+  "peak_count_note": "Peak buffer event count sampled after each append; transient callback arrays are excluded.",
+  "workloads": {
+    "boundary4096": {
+      "baseline": {
+        "allocatorRetainedDeltaBytes": 909888.0,
+        "elapsedNanoseconds": 10020697.5,
+        "peakBufferedEventsAfterAppend": 4096.0,
+        "retainedEvents": 4096.0,
+        "retainedPathUTF8Bytes": 524256.0
+      },
+      "candidate": {
+        "allocatorRetainedDeltaBytes": 909888.0,
+        "elapsedNanoseconds": 10594503.5,
+        "peakBufferedEventsAfterAppend": 4096.0,
+        "retainedEvents": 4096.0,
+        "retainedPathUTF8Bytes": 524256.0
+      },
+      "input_events": 4096,
+      "loss_marker": false,
+      "median_paired_allocator_reduction_bytes": 0.0,
+      "median_paired_allocator_reduction_percent": 0.0,
+      "pairs": 4
+    },
+    "loss512": {
+      "baseline": {
+        "allocatorRetainedDeltaBytes": 104688.0,
+        "elapsedNanoseconds": 1495445.5,
+        "peakBufferedEventsAfterAppend": 512.0,
+        "retainedEvents": 512.0,
+        "retainedPathUTF8Bytes": 65308.0
+      },
+      "candidate": {
+        "allocatorRetainedDeltaBytes": 0.0,
+        "elapsedNanoseconds": 2104708.0,
+        "peakBufferedEventsAfterAppend": 1.0,
+        "retainedEvents": 1.0,
+        "retainedPathUTF8Bytes": 1.0
+      },
+      "input_events": 512,
+      "loss_marker": true,
+      "median_paired_allocator_reduction_bytes": 104688.0,
+      "median_paired_allocator_reduction_percent": 100.0,
+      "pairs": 4
+    },
+    "normal512": {
+      "baseline": {
+        "allocatorRetainedDeltaBytes": 104688.0,
+        "elapsedNanoseconds": 1363617.5,
+        "peakBufferedEventsAfterAppend": 512.0,
+        "retainedEvents": 512.0,
+        "retainedPathUTF8Bytes": 65308.0
+      },
+      "candidate": {
+        "allocatorRetainedDeltaBytes": 104688.0,
+        "elapsedNanoseconds": 1500513.0,
+        "peakBufferedEventsAfterAppend": 512.0,
+        "retainedEvents": 512.0,
+        "retainedPathUTF8Bytes": 65308.0
+      },
+      "input_events": 512,
+      "loss_marker": false,
+      "median_paired_allocator_reduction_bytes": 0.0,
+      "median_paired_allocator_reduction_percent": 0.0,
+      "pairs": 4
+    },
+    "normal64": {
+      "baseline": {
+        "allocatorRetainedDeltaBytes": 8112.0,
+        "elapsedNanoseconds": 185995.0,
+        "peakBufferedEventsAfterAppend": 64.0,
+        "retainedEvents": 64.0,
+        "retainedPathUTF8Bytes": 8160.0
+      },
+      "candidate": {
+        "allocatorRetainedDeltaBytes": 8112.0,
+        "elapsedNanoseconds": 147887.5,
+        "peakBufferedEventsAfterAppend": 64.0,
+        "retainedEvents": 64.0,
+        "retainedPathUTF8Bytes": 8160.0
+      },
+      "input_events": 64,
+      "loss_marker": false,
+      "median_paired_allocator_reduction_bytes": 0.0,
+      "median_paired_allocator_reduction_percent": 0.0,
+      "pairs": 4
+    },
+    "overflow4097": {
+      "baseline": {
+        "allocatorRetainedDeltaBytes": 1012400.0,
+        "elapsedNanoseconds": 13966613.5,
+        "peakBufferedEventsAfterAppend": 4097.0,
+        "retainedEvents": 4097.0,
+        "retainedPathUTF8Bytes": 524353.0
+      },
+      "candidate": {
+        "allocatorRetainedDeltaBytes": 11200.0,
+        "elapsedNanoseconds": 16808022.0,
+        "peakBufferedEventsAfterAppend": 4096.0,
+        "retainedEvents": 1.0,
+        "retainedPathUTF8Bytes": 1.0
+      },
+      "input_events": 4097,
+      "loss_marker": false,
+      "median_paired_allocator_reduction_bytes": 1001200.0,
+      "median_paired_allocator_reduction_percent": 98.89371789806401,
+      "pairs": 4
+    },
+    "sustained100000": {
+      "baseline": {
+        "allocatorRetainedDeltaBytes": 23986000.0,
+        "elapsedNanoseconds": 343884752.5,
+        "peakBufferedEventsAfterAppend": 100000.0,
+        "retainedEvents": 100000.0,
+        "retainedPathUTF8Bytes": 12799475.0
+      },
+      "candidate": {
+        "allocatorRetainedDeltaBytes": 13712.0,
+        "elapsedNanoseconds": 285427029.5,
+        "peakBufferedEventsAfterAppend": 4096.0,
+        "retainedEvents": 1.0,
+        "retainedPathUTF8Bytes": 1.0
+      },
+      "input_events": 100000,
+      "loss_marker": false,
+      "median_paired_allocator_reduction_bytes": 23972288.0,
+      "median_paired_allocator_reduction_percent": 99.94283331943633,
+      "pairs": 4
+    },
+    "sustained1000000": {
+      "baseline": {
+        "allocatorRetainedDeltaBytes": 240236672.0,
+        "elapsedNanoseconds": 2697164817.0,
+        "peakBufferedEventsAfterAppend": 1000000.0,
+        "retainedEvents": 1000000.0,
+        "retainedPathUTF8Bytes": 127999500.0
+      },
+      "candidate": {
+        "allocatorRetainedDeltaBytes": 12880.0,
+        "elapsedNanoseconds": 2606087260.5,
+        "peakBufferedEventsAfterAppend": 4096.0,
+        "retainedEvents": 1.0,
+        "retainedPathUTF8Bytes": 1.0
+      },
+      "input_events": 1000000,
+      "loss_marker": false,
+      "median_paired_allocator_reduction_bytes": 240223792.0,
+      "median_paired_allocator_reduction_percent": 99.9946386203685,
+      "pairs": 4
+    }
+  }
+}

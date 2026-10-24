@@ -1,0 +1,34 @@
+{
+  "allocator_support_provenance": "Benchmarks/RuntimeLeaseHistory/CLeaseHeap",
+  "baseline_commit": "af1c1add701e49b355448cf8983eaed1e7623108",
+  "baseline_extracted_statements": {
+    "append": "pendingFilesystemEvents.append(contentsOf: events)",
+    "declaration": "private var pendingFilesystemEvents: [SourceFilesystemEvent] = []",
+    "drain": "let events = pendingFilesystemEvents\n            pendingFilesystemEvents.removeAll()"
+  },
+  "baseline_sidebar_sha256": "32b335e641cf366b6810fe48b00244612f3c5e5157f1b5910daf8c69312cfecf",
+  "candidate_head": "af1c1add701e49b355448cf8983eaed1e7623108",
+  "candidate_sidebar_sha256": "1bd5f99ab40e323ee3869fad49fb69aaf1532cd7df151bf7d2deb5f78b35477c",
+  "candidate_uses_worktree_source": true,
+  "evidence_sources_sha256": {
+    "CLeaseHeap.h": "b1a8779acea8c01bd5769a04bc95e1e510e072b236f74bf0ce06cdfb56d58bfb",
+    "Harness.swift": "93aae246217b60ec32e04bd1af96e5a6931d6d8294d2389f6cb436f51a469679",
+    "baseline-MeasuredBuffer.swift": "d1ff75f58c8785cc8ddbecf81b74b53b21c6dcb2ea4374fd3ad64def3c6befc1",
+    "baseline-SourceFilesystemInvalidation.swift": "5e02e8dba3b1c20843d8668e91257109571f773b99158bc9266890d14c93183f",
+    "baseline-SourcesSidebar.swift": "32b335e641cf366b6810fe48b00244612f3c5e5157f1b5910daf8c69312cfecf",
+    "candidate-MeasuredBuffer.swift": "6be3dd29d545a03edb6268beea01191157c2135cd854a52f290d9b4581e1af0e",
+    "candidate-SourceFilesystemInvalidation.swift": "a47c4b70e6953687c0d1cbca39272959881a19e082028a5fb63d656f2e71c770",
+    "candidate-SourcesSidebar.swift": "1bd5f99ab40e323ee3869fad49fb69aaf1532cd7df151bf7d2deb5f78b35477c",
+    "heap.c": "1994cc5c27fab344e6cbb725027314519c14b8190cdcb3b84f04cca55e4b5a3d",
+    "run.py": "70c5a4014ba5f3e4533636aabca9a9f1ec3d2fb5081537256fca09ede95c34d3"
+  },
+  "executables_sha256": {
+    "baseline": "5cddca6a1cca07843ca45fbb0947d3ba2d17b4098cd784d87c21aa58f214543f",
+    "candidate": "052a699cbcf6a3174fb9bb67c86cf824fc59e649e456337ae535cfce9ceaa0ea"
+  },
+  "production_path": "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift",
+  "production_sha256": {
+    "baseline": "5e02e8dba3b1c20843d8668e91257109571f773b99158bc9266890d14c93183f",
+    "candidate": "a47c4b70e6953687c0d1cbca39272959881a19e082028a5fb63d656f2e71c770"
+  }
+}

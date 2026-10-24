@@ -967,7 +967,7 @@ public struct PlaybackCore: Sendable {
     EventDisposition, [PlaybackEffect]
   ) {
     let effectID = result.context.effectID
-    if state.completedEffectIDs.contains(effectID) {
+    if state.containsCompletedEffect(effectID) {
       return (.duplicate(effectID: effectID), [])
     }
     guard let record = state.outstandingEffects[effectID] else {
@@ -981,7 +981,7 @@ public struct PlaybackCore: Sendable {
     }
 
     state.outstandingEffects.removeValue(forKey: effectID)
-    state.completedEffectIDs.insert(effectID)
+    state.recordCompletedEffect(effectID)
 
     if !record.effect.isCleanup,
       !authorityIsCurrent(record.effect.context.authority)
@@ -1688,7 +1688,7 @@ public struct PlaybackCore: Sendable {
       .map(\.key)
     for effectID in settled {
       state.outstandingEffects.removeValue(forKey: effectID)
-      state.completedEffectIDs.insert(effectID)
+      state.recordCompletedEffect(effectID)
     }
   }
 
