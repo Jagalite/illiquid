@@ -4,14 +4,29 @@ import Foundation
 // Component-only stand-ins for the native graph. The generated AppModel file
 // contains the exact production static startup methods, with this instance
 // storage replacing windowing, playback, source-index and observation work.
-final class PlaybackPersistenceStore: Sendable {}
+final class PlaybackPersistenceStore: Sendable {
+    init(userDefaults: UserDefaults = .standard) {}
+}
+
+// Support the isolated-preferences/session-store wiring added by PR #91.
+// These stand-ins perform no preferences or filesystem writes.
+enum AppPreferences {
+    static var defaults: UserDefaults { .standard }
+    static var sessionFileURL: URL? { nil }
+}
+
+final class AtomicPlaybackSessionStore: Sendable {
+    init(fileURL: URL?) {}
+}
 
 @MainActor
 final class PlaybackController {
     let persistence: PlaybackPersistenceStore
     let shutdownPersistenceError: String? = nil
 
-    init(persistence: PlaybackPersistenceStore, thumbnailCacheDirectory: URL? = nil) {
+    init(persistence: PlaybackPersistenceStore,
+         sessionStore: AtomicPlaybackSessionStore? = nil,
+         thumbnailCacheDirectory: URL? = nil) {
         self.persistence = persistence
     }
 }

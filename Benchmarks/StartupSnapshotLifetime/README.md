@@ -4,6 +4,15 @@ This component experiment measures the extra owner retained by
 `AppModel.historyStartup` after the shared model has been published. The baseline
 is `6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635`; the candidate is the working tree.
 
+The committed Linux evidence was captured with the harness in commit
+`8fa341c43e432462c59fb3f0fc05a0b6c45eedfc`; its manifest hashes refer to that
+revision. The harness subsequently gained no-I/O stand-ins for the preferences
+and session-store arguments added by PR #91, which merged while this work was
+being published. The ownership logic and measured array operations are
+unchanged. Check out the recorded revision to reproduce the exact historical
+inputs. The macOS PR workflow passes its current base commit with `--baseline`
+so both compared variants use the same newer startup dependencies.
+
 The runner extracts the **unchanged static startup block** from each version of
 `AppModel.swift`, from `sharedInstance` through `shutdownShared`. It compiles that
 block with the actual `ReadOnlyStartupLoader`, `SourceTab`, `SourceTabItem`,

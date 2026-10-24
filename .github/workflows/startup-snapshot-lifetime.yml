@@ -28,11 +28,16 @@ jobs:
     timeout-minutes: 40
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      STARTUP_BASELINE: ${{ github.event.pull_request.base.sha || '6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Explain hosted build coordination
+        run: |
+          echo 'The shared local Kyoto queue is unavailable on this ephemeral hosted runner.'
+          echo 'Compiler steps run sequentially within this isolated job.'
       - name: Verify coalescing, shutdown, and reference lifetimes
         run: |
           mkdir -p "$RUNNER_TEMP/startup-snapshot-lifetime"
@@ -45,7 +50,8 @@ jobs:
       - name: Measure native startup snapshot ownership
         run: |
           python3 Benchmarks/StartupSnapshotLifetime/run.py \
-            --pairs 4 --output "$RUNNER_TEMP/startup-snapshot-lifetime/benchmark"
+            --baseline "$STARTUP_BASELINE" --pairs 4 \
+            --output "$RUNNER_TEMP/startup-snapshot-lifetime/benchmark"
       - name: Prepare the pinned native SDK
         run: |
           if ! xcrun -sdk macosx metal --version; then
