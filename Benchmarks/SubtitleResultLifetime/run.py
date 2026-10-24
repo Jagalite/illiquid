@@ -72,7 +72,16 @@ def source_inputs() -> tuple[dict[str, bytes], dict]:
     inputs = {}
     for path in FULL_SUPPORT + [item[0] for item in EXTRACTED_SUPPORT]:
         data = (ROOT / path).read_bytes()
-        if sha(data) != manifest["source_sha256"][path]:
+        extracted_hash = manifest.get("extracted_sha256", {}).get(path)
+        if extracted_hash is not None:
+            _, begin, end = next(item for item in EXTRACTED_SUPPORT if item[0] == path)
+            text = data.decode()
+            if (begin and text.count(begin) != 1) or text.count(end) != 1:
+                raise ValueError(f"Declaration boundary changed: {path}")
+            first = text.index(begin) if begin else 0
+            if sha(text[first:text.index(end)].encode()) != extracted_hash:
+                raise ValueError(f"Shared declaration changed: {path}; explicitly review and requalify")
+        elif sha(data) != manifest["source_sha256"][path]:
             raise ValueError(f"Shared source changed: {path}; explicitly review and requalify")
         inputs[path] = data
     inputs["baseline/SubtitleDecoder.swift"] = frozen

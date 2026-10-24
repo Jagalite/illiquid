@@ -193,3 +193,13 @@ valid only when `completion.json` reports `complete: true`. The retained
 [`completion.json`](evidence/native/component/completion.json) records a fully
 successful run; [`summary.json`](evidence/native/component/summary.json) contains
 the individual native measurements and output hashes.
+
+## Current-source compatibility
+
+For support files from which the runner compiles a declaration, the frozen
+manifest now also records the hash of that exact declaration from the original
+baseline. The runner checks those bytes rather than rejecting unrelated edits
+to the containing file; full compiled support files still require their original
+hashes. All four extracted declarations were verified byte-for-byte against
+`af1c1add701e49b355448cf8983eaed1e7623108`. Full source hashes remain in each
+new run receipt.

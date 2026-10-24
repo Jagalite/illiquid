@@ -116,6 +116,15 @@ class Audit:
                                if key.startswith(variant + ":") and Path(key.split(":", 1)[1]).name == name]
                     require(len(matches) == 1, f"Ambiguous compiled source: {relative}")
                     expected = matches[0]
+                    if name == "FFmpegInputExecutor.swift":
+                        path = "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"
+                        extraction = m.get("source_extractions", {}).get(path)
+                        if extraction is not None:
+                            require(extraction == {"end": "/// Sole owner of AVFormatContext"},
+                                    "Unexpected input support extraction")
+                            marker = extraction["end"].encode()
+                            require(expected.count(marker) == 1, "Input support boundary changed")
+                            expected = expected[:expected.index(marker)]
                     if name == "FFmpegDemuxer.swift":
                         marker = b"    private static func makeMediaInfo("
                         require(expected.count(marker) == 1, "Projection access marker changed")

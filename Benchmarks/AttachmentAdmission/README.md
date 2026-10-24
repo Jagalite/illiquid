@@ -214,3 +214,12 @@ Its setup controls settled near zero, and all affected setup cases repeated
 the improvement. Both complete studies are retained; the confirmation's
 28–34% setup reduction is the principal finding, rather than the larger
 percentages from the initial short samples.
+
+## Current-source compatibility
+
+The current runner compiles only the unchanged input support declarations before
+`FFmpegInputExecutor`, because this study opens `FFmpegDemuxer` directly. Their
+bytes must still match the original baseline. New receipts describe that
+extraction; the auditor also preserves the historical full-file reconstruction
+path used by the archived results above. The auxiliary-reader font policy keeps
+this study on the default, font-including path.

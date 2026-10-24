@@ -26,6 +26,8 @@ HERE = Path(__file__).resolve().parent
 BASELINE = "7f9ba073394b77a908e0589447c6edc8d10b832c"
 DEMUXER = "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift"
 FONT = "Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift"
+INPUT = "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"
+INPUT_END = "/// Sole owner of AVFormatContext"
 FULL_SOURCES = [
     DEMUXER, FONT,
     "Sources/IlliquidNativePlayback/Media/FFmpegStreamInfo.swift",
@@ -179,9 +181,18 @@ class Runner:
         original = {variant: {path: self.source(variant, path)
                               for path in FULL_SOURCES + [PRESENTATION, BITMAP] + C_SOURCES}
                     for variant in VARIANTS}
-        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT}:
+        # This study opens the demuxer directly. Compile only the unchanged
+        # interruption/support declarations, not the executor's constructor.
+        # Record the extraction so archived full-file receipts remain auditable.
+        self.record["source_extractions"] = {INPUT: {"end": INPUT_END}}
+        for variant in VARIANTS:
+            if original[variant][INPUT].count(INPUT_END) != 1:
+                raise ValueError("Input support declaration boundary changed")
+        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT, INPUT}:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
+        if original["baseline"][INPUT].split(INPUT_END)[0] != original["candidate"][INPUT].split(INPUT_END)[0]:
+            raise ValueError("Shared input support declarations differ")
         error = {v: extract(original[v][PRESENTATION], "struct PresentationError:", "\nfunc checkOSStatus(")
                  for v in VARIANTS}
         packets = {v: extract(original[v][BITMAP], "enum PGSSubtitlePacket {", "\nstruct NativeBitmapSubtitleRegion:")
@@ -218,6 +229,8 @@ class Runner:
             inputs = []
             for path in FULL_SOURCES:
                 source = original[variant][path]
+                if path == INPUT:
+                    source = source[:source.index(INPUT_END)]
                 if path == DEMUXER:
                     marker = "    private static func makeMediaInfo("
                     replacement = "    static func makeMediaInfo("
