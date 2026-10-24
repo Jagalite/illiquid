@@ -1,0 +1,143 @@
+{
+  "all_pair_parity_checks_passed": true,
+  "arguments": {
+    "baseline_source": null,
+    "iterations": null,
+    "output": "/workspace/scratch/f950179bb164/source-presence-snapshot-formal",
+    "pairs": 6,
+    "prepare_only": false,
+    "scenarios": [
+      "empty",
+      "narrow8",
+      "narrow256",
+      "library",
+      "root"
+    ],
+    "sizes": [
+      1000,
+      10000,
+      100000
+    ],
+    "swift": "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+    "target_ms": 80.0
+  },
+  "baseline_commit": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "binary_hashes": {
+    "baseline": "ee6769274804c629f871f115b6cb3e7e3f55ffa4f4b7553cafae7291e4df74d0",
+    "candidate": "e7dd654ea7799933564906c008b9687e2896587890049fa75f343367b33fa6b5"
+  },
+  "candidate_sources": "current worktree captured once before compilation",
+  "checkout_head": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "completed_utc": "2026-10-24T03:14:37Z",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "environment": {
+    "SWIFT_DETERMINISTIC_HASHING": "1"
+  },
+  "generated_sources": {
+    "baseline": {
+      "generated_shell_sha256": "c67d259cfee4a1decd1077511866a8c34d0cae09d8fe5e517809dd22bcc41845",
+      "snapshot_block_first_line": 104,
+      "snapshot_block_last_line": 107,
+      "snapshot_block_sha256": "6ac3578c1b84c2d70a1b380a0d097db77c48e0a33f3d919e5aa1fcfabbfe0298",
+      "summary_sha256": "0e51200b4498bdb841aeba7c8dc59d8257de5328ba5640fe83f866325ecc6ecc",
+      "transformations": "Snapshot block and Summary copied verbatim into a minimal collection owner; no Observation/UI/scanning code compiled"
+    },
+    "candidate": {
+      "generated_shell_sha256": "c8cb7741c6a8fd701dc489f239215e389cff8abc9e08979ead934179ddea13e8",
+      "snapshot_block_first_line": 104,
+      "snapshot_block_last_line": 110,
+      "snapshot_block_sha256": "59b224b247b2677c0b5709424d42d637aef934e250e3b0583c626e35dbf9b325",
+      "summary_sha256": "0e51200b4498bdb841aeba7c8dc59d8257de5328ba5640fe83f866325ecc6ecc",
+      "transformations": "Snapshot block and Summary copied verbatim into a minimal collection owner; no Observation/UI/scanning code compiled"
+    }
+  },
+  "machine": "x86_64",
+  "memory_boundary": "Warm tiny collection paths, build source fixture, read allocator, construct one snapshot, read allocator with source dictionaries and snapshot alive; verify afterward",
+  "method": "Sequential balanced AB/BA pairs; new process per variant and measurement mode",
+  "observations": 360,
+  "package_sha256": "5a2c6f0a32f5408c9f73bf33f838ec169ae5dc10fb7949b9462a4b1bd63eea55",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "scope": "Additional live allocator-accounted storage for a repair snapshot; neither RSS, whole-player memory nor copied string payload bytes",
+  "source_hashes": {
+    "baseline/SnapshotSubject.swift": {
+      "bytes": 714,
+      "git_blob_sha1": "f2e95364bb9e4dce6c8d7f0411c78a6e10012535",
+      "sha256": "c67d259cfee4a1decd1077511866a8c34d0cae09d8fe5e517809dd22bcc41845"
+    },
+    "baseline/SourceMediaPresenceScanner.swift": {
+      "bytes": 13753,
+      "git_blob_sha1": "a0399a4baff787faac95634b02e3e4005f1462c2",
+      "sha256": "a90ba7735ac9790bf7f7d3aa42233f4558c7712b4e22cab9c9fff92d87a6db1b"
+    },
+    "candidate/SnapshotSubject.swift": {
+      "bytes": 921,
+      "git_blob_sha1": "428b5ee5132045b3fb56c6f0c0e534dec8dcac43",
+      "sha256": "c8cb7741c6a8fd701dc489f239215e389cff8abc9e08979ead934179ddea13e8"
+    },
+    "candidate/SourceMediaPresenceScanner.swift": {
+      "bytes": 13921,
+      "git_blob_sha1": "3bfcdf74d4f65c6095a1b8866f507bb7ad88e2c1",
+      "sha256": "87f4195f7827159165ed5949631b0b05abdce7221744089f887b97dedd0cd72e"
+    },
+    "candidate/SourceMediaPresenceSnapshot.swift": {
+      "bytes": 615,
+      "git_blob_sha1": "89452173f5230b234590974b16237cc20a553718",
+      "sha256": "0c0ff083e5808c9dbac0e153effe52c8c7fadfa51878c3b6f1354cfe3bd1e41c"
+    },
+    "harness/CSourcePresenceHeap/heap.c": {
+      "bytes": 1209,
+      "git_blob_sha1": "909e0c4b182f290c7365345a1916152be5dd51b7",
+      "sha256": "6d2587e880de3b143f92615e51505a0921b6b5bb5441ffdaaf8079b5aee3b992"
+    },
+    "harness/CSourcePresenceHeap/include/CSourcePresenceHeap.h": {
+      "bytes": 294,
+      "git_blob_sha1": "4bd9145ea44c3609ae4ad13e7b15e839cae6ba72",
+      "sha256": "e95db0b88cbc16fd24cc20be7d7c75b573bf6a7982ac55b14f6fcaafe7378e56"
+    },
+    "harness/Harness.swift": {
+      "bytes": 9996,
+      "git_blob_sha1": "4786881e069bf2fb9eba60c28d0b0a2f666ffbb5",
+      "sha256": "10c98f88f3d30757ac7ecd95a89b7e9d6bb88638b5628e1f542229e6f71aede2"
+    },
+    "harness/run.py": {
+      "bytes": 21094,
+      "git_blob_sha1": "d27c5e6b51c8039be5209be907a10bd037eb8d68",
+      "sha256": "660a0d83d1951f349829af04d6fccfb9a5adf47068d2acda7d86053cc8c44f77"
+    },
+    "shared/NormalizedFileURL.swift": {
+      "bytes": 2191,
+      "git_blob_sha1": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+      "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "shared/SourceTreeIdentity.swift": {
+      "bytes": 752,
+      "git_blob_sha1": "a2e59eee06504c58a482e20913b425583168dd61",
+      "sha256": "317747b169305d4656b1fa307fafb393d3bea4efeba941c0f9b801021ad154aa"
+    },
+    "shared/SourcesSidebar.swift": {
+      "bytes": 98934,
+      "git_blob_sha1": "2348a1993df74d01b1c4d9251549702e30e2b435",
+      "sha256": "1bd5f99ab40e323ee3869fad49fb69aaf1532cd7df151bf7d2deb5f78b35477c"
+    }
+  },
+  "source_identity": {
+    "declaration_sha256": "3618ed409ed18dff737bbc352431b69e5e486100c898b05efdc518c075072654",
+    "identical_to_baseline": true,
+    "normalized_file_url_sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+  },
+  "started_utc": "2026-10-24T03:13:45Z",
+  "timing_boundary": "Three warm constructions, then bracket each construction; same iterations per pair; destruction and result consumption outside brackets; both CPU and monotonic wall clocks",
+  "toolchain": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+}

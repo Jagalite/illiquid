@@ -1,0 +1,71 @@
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/20] Write swift-version-79F5DDD9F357E4C6.txt
+[1/20] Emitting module for IlliquidApp
+[2/20] Compiling IlliquidApp SourceMediaPresenceSnapshot.swift
+[3/20] Compiling IlliquidApp SourceMediaPresenceRecomputation.swift
+[4/20] Emitting module for IlliquidAppTests
+[5/20] Compiling IlliquidAppTests SourceMediaPresenceSnapshotTests.swift
+[6/20] Wrapping AST for IlliquidAppTests for debugging
+[7/20] Wrapping AST for IlliquidApp for debugging
+[8/20] Compiling IlliquidAppTests SourceMediaPresenceRecomputationTests.swift
+[9/20] /tmp/illiquid-source-presence.SAAu9m/.build/x86_64-unknown-linux-gnu/debug/SourcePresenceRegressionsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[10/20] Compiling SourcePresenceRegressionsPackageDiscoveredTests all-discovered-tests.swift
+[11/20] Emitting module for SourcePresenceRegressionsPackageDiscoveredTests
+[12/20] /tmp/illiquid-source-presence.SAAu9m/.build/x86_64-unknown-linux-gnu/debug/SourcePresenceRegressionsPackageTests.derived/runner.swift
+[13/20] Wrapping AST for SourcePresenceRegressionsPackageDiscoveredTests for debugging
+[14/20] Compiling SourcePresenceRegressionsPackageDiscoveredTests IlliquidAppTests.swift
+[15/20] Emitting module for SourcePresenceRegressionsPackageTests
+[16/20] Wrapping AST for SourcePresenceRegressionsPackageTests for debugging
+[17/20] Compiling SourcePresenceRegressionsPackageTests runner.swift
+[18/20] Write Objects.LinkFileList
+[19/20] Linking SourcePresenceRegressionsPackageTests.xctest
+Build complete! (8.79s)
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Source media presence recomputation" started.
+◇ Test emptyInputsAndUnwatchedChangesProduceNoWork() started.
+✔ Test emptyInputsAndUnwatchedChangesProduceNoWork() passed after 0.001 seconds.
+◇ Test duplicatesAndSharedAncestorsAreScheduledOnlyOnce() started.
+✔ Test duplicatesAndSharedAncestorsAreScheduledOnlyOnce() passed after 0.001 seconds.
+◇ Test prefixSiblingsStayOutsideTheWatchedRoot() started.
+✔ Test prefixSiblingsStayOutsideTheWatchedRoot() passed after 0.001 seconds.
+◇ Test nestedAndDisjointRootsRetainTheirBoundaries() started.
+✔ Test nestedAndDisjointRootsRetainTheirBoundaries() passed after 0.001 seconds.
+◇ Test filesystemRootIsIncludedOnceAndTerminatesTheWalk() started.
+✔ Test filesystemRootIsIncludedOnceAndTerminatesTheWalk() passed after 0.001 seconds.
+◇ Test canonicalUnicodePathsAndDictionaryKeysRemainUsable() started.
+✔ Test canonicalUnicodePathsAndDictionaryKeysRemainUsable() passed after 0.001 seconds.
+◇ Test equivalentUnicodeSpellingsDoNotPutAParentBeforeItsChild() started.
+✔ Test equivalentUnicodeSpellingsDoNotPutAParentBeforeItsChild() passed after 0.001 seconds.
+◇ Test deepAndWideBatchesHaveOneEntryPerAffectedFolder() started.
+✔ Test deepAndWideBatchesHaveOneEntryPerAffectedFolder() passed after 0.072 seconds.
+◇ Test aChangedParentSummaryIsEvaluatedEvenWhenItsChildStaysFalse() started.
+✔ Test aChangedParentSummaryIsEvaluatedEvenWhenItsChildStaysFalse() passed after 0.001 seconds.
+◇ Test incompleteUnreadableAndMissingSummariesCannotEstablishAbsence() started.
+✔ Test incompleteUnreadableAndMissingSummariesCannotEstablishAbsence() passed after 0.001 seconds.
+◇ Test positiveEvidencePropagatesThroughIncompleteUnreadableAncestors() started.
+✔ Test positiveEvidencePropagatesThroughIncompleteUnreadableAncestors() passed after 0.001 seconds.
+◇ Test missingChangedSummariesClearStaleValuesWithoutTouchingOtherTrees() started.
+✔ Test missingChangedSummariesClearStaleValuesWithoutTouchingOtherTrees() passed after 0.001 seconds.
+◇ Test seededValidTreesMatchThePreviousAncestorWalk() started.
+✔ Test seededValidTreesMatchThePreviousAncestorWalk() passed after 0.553 seconds.
+✔ Suite "Source media presence recomputation" passed after 0.631 seconds.
+◇ Suite "Source media presence repair snapshots" started.
+◇ Test narrowRepairKeepsItsRootAndDescendantsButNotAncestorsOrPrefixSiblings() started.
+✔ Test narrowRepairKeepsItsRootAndDescendantsButNotAncestorsOrPrefixSiblings() passed after 0.001 seconds.
+◇ Test onlyCompleteReadableSummariesCanSupplyCachedPresenceOrAbsence() started.
+✔ Test onlyCompleteReadableSummariesCanSupplyCachedPresenceOrAbsence() passed after 0.001 seconds.
+◇ Test filesystemRootIncludesEveryAbsoluteCachedPathAndStillAppliesEligibility() started.
+✔ Test filesystemRootIncludesEveryAbsoluteCachedPathAndStillAppliesEligibility() passed after 0.001 seconds.
+◇ Test emptyOrUnrelatedCachesDoNotConsultSummaryState() started.
+✔ Test emptyOrUnrelatedCachesDoNotConsultSummaryState() passed after 0.001 seconds.
+◇ Test unicodePathsPreserveCanonicalIdentityWithoutCaseOrSeparatorCollisions() started.
+✔ Test unicodePathsPreserveCanonicalIdentityWithoutCaseOrSeparatorCollisions() passed after 0.001 seconds.
+◇ Test treeMembershipMatchesAnIndependentComponentAncestryOracle() started.
+✔ Test treeMembershipMatchesAnIndependentComponentAncestryOracle() passed after 0.008 seconds.
+◇ Test snapshotRetainsItsValuesAcrossLaterCacheMutations() started.
+✔ Test snapshotRetainsItsValuesAcrossLaterCacheMutations() passed after 0.001 seconds.
+✔ Suite "Source media presence repair snapshots" passed after 0.010 seconds.
+✔ Test run with 20 tests in 2 suites passed after 0.642 seconds.

@@ -1,11 +1,14 @@
 name: Source presence performance
 
 on:
+  push:
+    branches: ['perf/source-presence-snapshot-*']
   pull_request:
     paths:
       - 'Sources/IlliquidApp/UI/SourceMediaPresence*.swift'
       - 'Tests/IlliquidAppTests/SourceMediaPresence*.swift'
       - 'Benchmarks/SourceMediaPresence/**'
+      - 'Benchmarks/SourcePresenceSnapshot/**'
       - 'Scripts/test-source-presence-regressions.sh'
       - '.github/workflows/source-presence-performance.yml'
   workflow_dispatch:
@@ -41,6 +44,12 @@ jobs:
           python3 Benchmarks/SourceMediaPresence/run.py \
             --pairs 10 --target-ms 30 \
             --output "$RUNNER_TEMP/source-presence/benchmark"
+      - name: Measure repair snapshot retention and construction
+        run: |
+          python3 Benchmarks/SourcePresenceSnapshot/run.py \
+            --pairs 6 --sizes 1000,10000,100000 --target-ms 80 \
+            --output "$RUNNER_TEMP/source-presence/snapshot"
+          cat "$RUNNER_TEMP/source-presence/snapshot/summary.json"
       - name: Summarize measured publication cost
         run: |
           python3 - <<'PY'
@@ -67,6 +76,9 @@ jobs:
           path: |
             ${{ runner.temp }}/source-presence/
             !${{ runner.temp }}/source-presence/benchmark/build/**
+            !${{ runner.temp }}/source-presence/snapshot/build/**
+            !${{ runner.temp }}/source-presence/snapshot/module-cache/**
+            !${{ runner.temp }}/source-presence/snapshot/package-cache/**
           retention-days: 14
 
   native-scanner:
@@ -90,7 +102,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/source-presence-native"
           set -o pipefail
           swift test --force-resolved-versions --filter \
-            'SourceMediaPresenceScannerTests|SourceMediaPresenceRecomputationTests' \
+            'SourceMediaPresenceScannerTests|SourceMediaPresenceRecomputationTests|SourceMediaPresenceSnapshotTests' \
             2>&1 | tee "$RUNNER_TEMP/source-presence-native/tests.txt"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

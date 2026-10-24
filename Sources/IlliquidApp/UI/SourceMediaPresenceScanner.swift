@@ -101,12 +101,15 @@ final class SourceMediaPresenceScanner {
                 let path = self.pending.removeFirst()
                 self.startedJobCount += 1
                 let jobRevision = self.revision
-                let reusableResults = self.results.filter { entry in
-                    self.summaries[entry.key]?.isComplete == true
-                        && self.summaries[entry.key]?.isReadable == true
+                let rootURL = URL(fileURLWithPath: path, isDirectory: true)
+                let reusableResults = SourceMediaPresenceSnapshot.reusableResults(
+                    under: SourceTreeIdentity.folderID(for: rootURL), results: self.results
+                ) { folder in
+                    self.summaries[folder]?.isComplete == true
+                        && self.summaries[folder]?.isReadable == true
                 }
                 let cursor = SourceMediaPresenceCursor(
-                    root: URL(fileURLWithPath: path, isDirectory: true), cachedResults: reusableResults)
+                    root: rootURL, cachedResults: reusableResults)
                 do {
                     var bufferedSummaries: [String: SourceMediaPresenceCursor.Summary] = [:]
                     var lastPublication = ProcessInfo.processInfo.systemUptime

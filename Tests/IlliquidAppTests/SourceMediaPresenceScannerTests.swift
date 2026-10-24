@@ -97,6 +97,136 @@ struct SourceMediaPresenceScannerTests {
         #expect(visited == 2)
     }
 
+    @Test func scopedRepairSnapshotPreservesPositiveAndNegativeSubtreeReuse() throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let present = root.appendingPathComponent("Present", isDirectory: true)
+        let absent = root.appendingPathComponent("Absent", isDirectory: true)
+        let changed = root.appendingPathComponent("Changed", isDirectory: true)
+        for folder in [present, absent, changed] {
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        }
+        try Data().write(to: present.appendingPathComponent("video.mp4"))
+        for index in 0..<20 {
+            try Data().write(to: absent.appendingPathComponent("notes-\(index).txt"))
+        }
+
+        // The prepared namespace can differ from DirectoryEnumerator's URLs
+        // on macOS (/var versus /private/var). Build every cache identity with
+        // the same public boundary used by the scanner, not enumerator paths.
+        let rootID = SourceTreeIdentity.folderID(for: root)
+        let presentID = SourceTreeIdentity.folderID(for: present)
+        let absentID = SourceTreeIdentity.folderID(for: absent)
+        let changedID = SourceTreeIdentity.folderID(for: changed)
+        let wholeCache = [
+            presentID: true, absentID: false,
+            rootID + "-other/Present": true, "/Unrelated/Absent": false,
+        ]
+        let scoped = SourceMediaPresenceSnapshot.reusableResults(
+            under: rootID, results: wholeCache, isReusable: { _ in true }
+        )
+        #expect(scoped == [presentID: true, absentID: false])
+
+        func scan(_ cache: [String: Bool]) throws -> (results: [String: Bool], visited: Int) {
+            let cursor = SourceMediaPresenceCursor(root: root, cachedResults: cache)
+            var results: [String: Bool] = [:]
+            var visited = 0
+            while true {
+                let batch = try cursor.nextBatch(maximumEntries: 1)
+                results.merge(batch.results) { _, new in new }
+                visited += batch.visitedEntries
+                if batch.isComplete { return (results, visited) }
+            }
+        }
+        let original = try scan(wholeCache)
+        let candidate = try scan(scoped)
+        #expect(candidate.results == original.results)
+        #expect(candidate.results == [rootID: true, changedID: false])
+        #expect(candidate.visited == original.visited)
+        #expect(candidate.visited == 3)
+        let uncached = try scan([:])
+        #expect(uncached.visited == 24)
+        #expect(uncached.results == [rootID: true, presentID: true, absentID: false, changedID: false])
+    }
+
+    @MainActor @Test func narrowRepairKeepsCachedChildrenAndOtherWatchedRootsCorrect() async throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let library = root.appendingPathComponent("Library", isDirectory: true)
+        // The other watched root is deliberately a textual prefix sibling.
+        let archive = root.appendingPathComponent("Library-Archive", isDirectory: true)
+        let repair = library.appendingPathComponent("Repair", isDirectory: true)
+        let present = repair.appendingPathComponent("Present", isDirectory: true)
+        let absent = repair.appendingPathComponent("Absent", isDirectory: true)
+        let unchanged = library.appendingPathComponent("Unchanged", isDirectory: true)
+        let archivePresent = archive.appendingPathComponent("Present", isDirectory: true)
+        let archiveAbsent = archive.appendingPathComponent("Absent", isDirectory: true)
+        for folder in [present, absent, unchanged, archivePresent, archiveAbsent] {
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        }
+        let presentMedia = present.appendingPathComponent("episode.mkv")
+        let directMedia = repair.appendingPathComponent("new.mp4")
+        try Data().write(to: presentMedia)
+        try Data().write(to: archivePresent.appendingPathComponent("film.mp4"))
+        try Data().write(to: absent.appendingPathComponent("notes.txt"))
+
+        let libraryID = SourceTreeIdentity.folderID(for: library)
+        let repairID = SourceTreeIdentity.folderID(for: repair)
+        let presentID = SourceTreeIdentity.folderID(for: present)
+        let absentID = SourceTreeIdentity.folderID(for: absent)
+        let unchangedID = SourceTreeIdentity.folderID(for: unchanged)
+        let archiveID = SourceTreeIdentity.folderID(for: archive)
+        let archivePresentID = SourceTreeIdentity.folderID(for: archivePresent)
+        let archiveAbsentID = SourceTreeIdentity.folderID(for: archiveAbsent)
+        let scanner = SourceMediaPresenceScanner()
+        defer { scanner.stop() }
+        func waitForScan() async throws {
+            let deadline = ContinuousClock.now + .seconds(5)
+            while scanner.isScanning && ContinuousClock.now < deadline {
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            try #require(!scanner.isScanning)
+        }
+        scanner.setRoots([library, archive])
+        try await waitForScan()
+        let initial = [
+            libraryID: true, repairID: true, presentID: true, absentID: false,
+            unchangedID: false, archiveID: true, archivePresentID: true, archiveAbsentID: false,
+        ]
+        #expect(scanner.results == initial)
+        #expect(scanner.startedJobCount == 2)
+
+        // The narrow repair changes only this directory's listing. Both known
+        // positive and negative children remain valid cursor shortcuts.
+        try Data().write(to: directMedia)
+        scanner.invalidate(paths: [repairID])
+        #expect(scanner.results[libraryID] == nil)
+        #expect(scanner.results[repairID] == nil)
+        #expect(scanner.results[presentID] == true)
+        #expect(scanner.results[absentID] == false)
+        #expect(scanner.results[archiveID] == true)
+        try await waitForScan()
+        #expect(scanner.results == initial)
+        #expect(scanner.startedJobCount == 3)
+
+        // Invalidate the changed child as well, so its earlier positive result
+        // cannot mask disappearance. The parent repair subsumes that child job.
+        try FileManager.default.removeItem(at: directMedia)
+        try FileManager.default.removeItem(at: presentMedia)
+        scanner.invalidate(paths: [repairID, presentID])
+        #expect(scanner.results[presentID] == nil)
+        #expect(scanner.results[absentID] == false)
+        #expect(scanner.results[unchangedID] == false)
+        #expect(scanner.results[archivePresentID] == true)
+        #expect(scanner.results[archiveAbsentID] == false)
+        try await waitForScan()
+        #expect(scanner.results == [
+            libraryID: false, repairID: false, presentID: false, absentID: false,
+            unchangedID: false, archiveID: true, archivePresentID: true, archiveAbsentID: false,
+        ])
+        #expect(scanner.startedJobCount == 4)
+    }
+
     @MainActor @Test func eventBurstDoesNotRestartActiveJobAndRepairsAncestorStatus() async throws {
         let root = try makeRoot()
         defer { try? FileManager.default.removeItem(at: root) }
