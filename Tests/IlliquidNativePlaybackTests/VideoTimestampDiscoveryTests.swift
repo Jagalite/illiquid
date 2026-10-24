@@ -1,4 +1,5 @@
 import CoreMedia
+import CoreVideo
 import Foundation
 import Testing
 @testable import IlliquidNativePlayback
@@ -296,6 +297,79 @@ struct VideoTimestampDiscoveryTests {
         if filename.hasSuffix(".mpg") {
             #expect(remaining.filteredFrames == remaining.times.count)
         }
+    }
+
+    @Test func consumerErrorDuringEOFDrainPreservesHeldFrameAndFlushReplay() throws {
+        let (url, _) = try fixture("timestamp-single.mp4")
+        let normal = try decode(url, mode: .frames, seek: 0)
+        #expect(normal.times.count == 1)
+        #expect(normal.drainedFrames == 1)
+        let (input, decoder, index) = try open(url)
+        var outputsBeforeDrain = 0
+        while let packet = try input.readPacket(generation: 41) {
+            guard packet.streamIndex == index else { continue }
+            try decoder.decode(packet, while: { true }) { _ in outputsBeforeDrain += 1 }
+        }
+        try #require(outputsBeforeDrain == 0,
+                     "The single-frame fixture must delay its output until EOF drain")
+
+        var held: NativeDecodedVideoFrame?
+        var outputsDuringDrain = 0
+        var caught: DeliveryFailure?
+        do {
+            try decoder.drain(generation: 41, while: { true }) { frame in
+                outputsDuringDrain += 1
+                held = frame
+                throw DeliveryFailure.requested
+            }
+        } catch let error as DeliveryFailure {
+            caught = error
+        }
+        #expect(caught == .requested)
+        #expect(outputsDuringDrain == 1)
+        let frame = try #require(held)
+        let expectedTime = try #require(normal.times.first)
+        #expect(frame.presentationTime == expectedTime)
+        #expect(frame.generation == 41)
+        #expect(frame.deinterlacingFailure == nil)
+
+        // Read active BGRA pixels, excluding allocator-dependent row padding.
+        // The emitted buffer must remain valid after scratch cleanup, flushing,
+        // and a new generation's output-pool allocation.
+        func pixels() throws -> Data {
+            let buffer = frame.pixelBuffer
+            try #require(CVPixelBufferGetPixelFormatType(buffer) == kCVPixelFormatType_32BGRA)
+            try #require(CVPixelBufferLockBaseAddress(buffer, .readOnly) == kCVReturnSuccess)
+            defer { CVPixelBufferUnlockBaseAddress(buffer, .readOnly) }
+            let base = try #require(CVPixelBufferGetBaseAddress(buffer))
+            let rowBytes = CVPixelBufferGetWidth(buffer) * 4
+            let stride = CVPixelBufferGetBytesPerRow(buffer)
+            let height = CVPixelBufferGetHeight(buffer)
+            try #require(stride >= rowBytes && rowBytes > 0 && height > 0)
+            var result = Data()
+            result.reserveCapacity(rowBytes * height)
+            for row in 0..<height {
+                result.append(base.advanced(by: row * stride).assumingMemoryBound(to: UInt8.self),
+                              count: rowBytes)
+            }
+            return result
+        }
+        let retainedPixels = try pixels()
+        let retainedDuration = frame.duration
+        let retainedSize = frame.displaySize
+        decoder.flush()
+        #expect(!decoder.hasSoftwareOutputPoolForDiagnostics)
+        #expect(try pixels() == retainedPixels)
+        try input.seek(to: input.mediaInfo.startTime, exact: false)
+        let replay = try consume(input: input, decoder: decoder, streamIndex: index,
+                                 mode: .frames, generation: 42)
+        #expect(replay.times == normal.times)
+        #expect(replay.drainedFrames == normal.drainedFrames)
+        #expect(replay.filteredFrames == normal.filteredFrames)
+        #expect(try pixels() == retainedPixels)
+        #expect(frame.duration == retainedDuration)
+        #expect(frame.displaySize == retainedSize)
+        #expect(frame.generation == 41)
     }
 
     @Test func timestampDiscoveryAlsoBypassesPlanarOutputStorage() throws {

@@ -1,0 +1,87 @@
+name: Video scratch frame memory lifetime
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_ref:
+        description: Candidate commit for the frozen native ownership comparison
+        required: true
+        type: string
+        default: 40b8cae2651e643491f82af34f1c4b608e1cbc62
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-scratch-frame-lifetime-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-memory:
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.candidate_ref }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate required timestamp and deinterlacing fixtures
+        run: |
+          python3 Benchmarks/FrameStepTimestamps/generate-fixtures.py \
+            --output "$RUNNER_TEMP/video-scratch-frame-lifetime/fixtures"
+      - name: Build, qualify, and compare actual decoder ownership
+        run: |
+          python3 Benchmarks/VideoScratchFrameLifetime/run.py \
+            --output "$RUNNER_TEMP/video-scratch-frame-lifetime/results" \
+            --fixtures "$RUNNER_TEMP/video-scratch-frame-lifetime/fixtures" \
+            --pairs 4
+      - name: Emit reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'video-scratch-frame-lifetime'
+          files = {}
+          excluded = {'baseline-tree', 'baseline-build', 'candidate-build', '.build', '.git'}
+          suffixes = {'.json', '.jsonl', '.log', '.txt', '.swift', '.py', '.h', '.modulemap'}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if path.is_file() and path.suffix in suffixes and not (excluded & set(relative.parts)):
+                  files[str(relative)] = path.read_text()
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          root.mkdir(parents=True, exist_ok=True)
+          (root / 'evidence.json.gz').write_bytes(packed)
+          print('VIDEO_SCRATCH_LIFETIME_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          if len(packed) <= 2 * 1024 * 1024:
+              print('VIDEO_SCRATCH_LIFETIME_BASE64 ' + base64.b64encode(packed).decode())
+          else:
+              print('Evidence exceeds the inline log limit; use the uploaded evidence.json.gz artifact.')
+          for name, value in files.items():
+              if name.endswith(('summary.json', 'regressions.json', 'completion.json')):
+                  print(name + '\n' + value)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-scratch-frame-lifetime-native
+          path: |
+            ${{ runner.temp }}/video-scratch-frame-lifetime/evidence.json.gz
+            ${{ runner.temp }}/video-scratch-frame-lifetime/results/*.json
+            ${{ runner.temp }}/video-scratch-frame-lifetime/results/*.jsonl
+            ${{ runner.temp }}/video-scratch-frame-lifetime/results/*.log
+            ${{ runner.temp }}/video-scratch-frame-lifetime/results/*.py
+            ${{ runner.temp }}/video-scratch-frame-lifetime/results/sources/
+            ${{ runner.temp }}/video-scratch-frame-lifetime/fixtures/*.json
+            ${{ runner.temp }}/video-scratch-frame-lifetime/fixtures/*.log
+          retention-days: 14
