@@ -308,7 +308,7 @@ struct ShortcutHelpView: View {
         var entries: [(String, String)] = [
             ("Command-O", "Open a file"),
             ("Command-Shift-O", "Add a source folder"),
-            ("Command-T", "New source tab"),
+            ("Command-T", "New Video Tab"),
             ("?", "Show keyboard shortcuts"),
             ("Space", "Play or pause"),
             ("Video click / double-click", "Show or hide controls / toggle fullscreen"),

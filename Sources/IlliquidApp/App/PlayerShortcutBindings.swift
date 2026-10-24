@@ -92,7 +92,7 @@ final class PlayerShortcutBindings {
     private let defaults: UserDefaults
     private static let storageKey = "player.shortcut-overrides.v1"
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = AppPreferences.defaults) {
         self.defaults = defaults
         overrides = [:]
         let saved = defaults.dictionary(forKey: Self.storageKey) as? [String: String] ?? [:]

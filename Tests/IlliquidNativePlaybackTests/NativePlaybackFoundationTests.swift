@@ -242,20 +242,27 @@ struct NativePlayerClickRoutingTests {
         try await Task.sleep(for: .seconds(NSEvent.doubleClickInterval + 0.1))
     }
 
+    private func completedInteractions(_ interactions: [PlaybackSurfaceInteraction]) -> [PlaybackSurfaceInteraction] {
+        interactions.filter {
+            if case .primaryClickPending = $0 { return false }
+            return true
+        }
+    }
+
     @Test func singleClickWaitsForDoubleClickInterval() async throws {
         let (view, window) = makeSurface()
         defer { window.close() }
         var interactions: [PlaybackSurfaceInteraction] = []
         view.onInteraction = { interactions.append($0) }
         try click(view, window: window)
-        #expect(interactions.isEmpty)
+        #expect(interactions == [.primaryClickPending(true)])
         // A sleeping test and the delayed click can become runnable together.
         // Wait for delivery instead of assuming which resumes first under load.
         let deadline = ContinuousClock.now + .seconds(NSEvent.doubleClickInterval + 3)
-        while interactions.isEmpty, ContinuousClock.now < deadline {
+        while !interactions.contains(.primaryClick), ContinuousClock.now < deadline {
             try await Task.sleep(for: .milliseconds(10))
         }
-        #expect(interactions == [.primaryClick])
+        #expect(interactions == [.primaryClickPending(true), .primaryClick, .primaryClickPending(false)])
     }
 
     @Test(arguments: [CGFloat(20), 200, 380])
@@ -268,9 +275,9 @@ struct NativePlayerClickRoutingTests {
         try click(view, window: window, count: 2, x: x)
         let expected: PlaybackSurfaceInteraction = x == 20 ? .doubleClickSeek(-5)
             : x == 380 ? .doubleClickSeek(5) : .doubleClick
-        #expect(interactions == [expected])
+        #expect(interactions == [.primaryClickPending(true), .primaryClickPending(false), expected])
         try await waitForSingleClick()
-        #expect(interactions == [expected])
+        #expect(interactions == [.primaryClickPending(true), .primaryClickPending(false), expected])
     }
 
     @Test(arguments: [CGFloat(20), 200, 380])
@@ -283,10 +290,10 @@ struct NativePlayerClickRoutingTests {
             try click(view, window: window, count: count, x: x)
         }
         if x == 200 {
-            #expect(interactions == [.doubleClick])
+            #expect(completedInteractions(interactions) == [.doubleClick])
         } else {
             let seek: PlaybackSurfaceInteraction = .doubleClickSeek(x == 20 ? -5 : 5)
-            #expect(interactions == [seek, seek, seek])
+            #expect(completedInteractions(interactions) == [seek, seek, seek])
         }
     }
 
@@ -302,7 +309,7 @@ struct NativePlayerClickRoutingTests {
         try click(view, window: window, count: 2, x: -1)
         window.keyForTesting = false
         try click(view, window: window, count: 2)
-        #expect(interactions.isEmpty)
+        #expect(completedInteractions(interactions).isEmpty)
     }
 
     @Test func detachingSurfaceCancelsPendingSingleClick() async throws {
@@ -314,7 +321,7 @@ struct NativePlayerClickRoutingTests {
         window.contentView = nil
         window.contentView = view
         try await waitForSingleClick()
-        #expect(interactions.isEmpty)
+        #expect(interactions == [.primaryClickPending(true), .primaryClickPending(false)])
     }
 }
 

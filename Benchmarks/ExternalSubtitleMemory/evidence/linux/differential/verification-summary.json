@@ -1,0 +1,22 @@
+{
+  "cases": 1698,
+  "exact_utf8_and_error_match": true,
+  "original_verification_sha256": "e930274c708f4ae4ac41e162081e5be858b38ddd9d1c7ab12a67f9af7956ab41",
+  "receipts": {
+    "baseline": {
+      "decoded_json_sha256": "64ee9aeb7dae1964d30ab301a0f1fa23c46b1d43b031a675588c94c9a2c28e72",
+      "records": 1698
+    },
+    "candidate": {
+      "decoded_json_sha256": "64ee9aeb7dae1964d30ab301a0f1fa23c46b1d43b031a675588c94c9a2c28e72",
+      "records": 1698
+    }
+  },
+  "error_counts": {
+    "None": 1694,
+    "noValidCues.srt": 2,
+    "noValidCues.webVTT": 1,
+    "missingWebVTTSignature": 1
+  },
+  "reproduce": "python3 Benchmarks/ExternalSubtitleConversion/run.py verify --output /tmp/external-subtitle-conversion-parity"
+}

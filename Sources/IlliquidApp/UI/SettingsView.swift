@@ -115,9 +115,11 @@ struct SettingsView: View {
         NavigationSplitView {
             List(SettingsDestination.allCases, selection: $selection) { destination in
                 Label(destination.title, systemImage: destination.systemImage)
+                    .accessibilityIdentifier("illiquid.settings.destination.\(destination.rawValue)")
                     .tag(destination)
                     .padding(.vertical, 3)
             }
+            .accessibilityIdentifier("illiquid.settings.navigation")
             .listStyle(.sidebar)
             .navigationTitle("Illiquid")
             .navigationSplitViewColumnWidth(min: 184, ideal: 196, max: 220)
@@ -135,6 +137,7 @@ struct SettingsView: View {
             }
             .background(Color(nsColor: .windowBackgroundColor))
         }
+        .accessibilityIdentifier("illiquid.settings")
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 820, minHeight: 600)
         .confirmationDialog(
@@ -149,7 +152,9 @@ struct SettingsView: View {
             Button(action.buttonTitle, role: .destructive) {
                 performClearAction(action)
             }
+            .accessibilityIdentifier("illiquid.settings.clear-confirm")
             Button("Cancel", role: .cancel) {}
+            .accessibilityIdentifier("illiquid.settings.clear-cancel")
         } message: { action in
             Text(action.message)
         }
@@ -183,11 +188,13 @@ struct SettingsView: View {
             SettingsCard {
                 Toggle("Ask at launch if Illiquid isn’t the default player",
                        isOn: $defaultVideoPlayer.asksOnLaunch)
+                .accessibilityIdentifier("illiquid.settings.ask-default-player")
                 Text("Open supported video files in Illiquid when you double-click them in Finder.")
                 Button(defaultVideoPlayer.isChanging ? "Changing Defaults…" : "Make Default") {
                     Task { await defaultVideoPlayer.makeDefault() }
                 }
                 .disabled(defaultVideoPlayer.isChanging)
+                .accessibilityIdentifier("illiquid.settings.make-default-player")
                 if let result = defaultVideoPlayer.result {
                     Text(result).font(.caption).foregroundStyle(.secondary)
                         .textSelection(.enabled)
@@ -197,6 +204,7 @@ struct SettingsView: View {
             SettingsCard {
                 Toggle("Keep Illiquid running after closing the last window",
                        isOn: $keepsRunningAfterLastWindowClosed)
+                .accessibilityIdentifier("illiquid.settings.keep-running")
                 Text("Closing the player stops playback unless Picture in Picture is active. Click Illiquid in the Dock to reopen it. Quit Illiquid (⌘Q) always exits the app.")
                     .font(.caption).foregroundStyle(.secondary)
             }
@@ -204,6 +212,7 @@ struct SettingsView: View {
             SettingsSectionLabel("Session Restoration")
             SettingsCard {
                 Toggle("Restore the previous session paused", isOn: $model.restoresSessionPaused)
+                .accessibilityIdentifier("illiquid.settings.restore-paused")
                 Text("Files you explicitly open play automatically.")
                     .font(.caption).foregroundStyle(.secondary)
             }
@@ -215,10 +224,48 @@ struct SettingsView: View {
             SettingsSectionLabel("Controls")
             SettingsCard {
                 Toggle("Always show playback controls", isOn: $model.areControlsAlwaysVisible)
-                Text("Automatic hiding waits 2.5 seconds after activity. Focus and active interactions keep controls visible.")
+                .accessibilityIdentifier("illiquid.settings.always-show-controls")
+                SettingsRow(
+                    title: "Auto-hide timeout",
+                    detail: "Seconds of inactivity while playing (0.5–60). Focus and active interactions keep controls visible."
+                ) {
+                    HStack(spacing: 8) {
+                        TextField(
+                            "Auto-hide timeout in seconds",
+                            value: $model.controlsAutoHideTimeout,
+                            format: .number
+                        )
+                        .labelsHidden()
+                        .accessibilityIdentifier("illiquid.settings.auto-hide-timeout")
+                        .textFieldStyle(.roundedBorder)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 72)
+                        .accessibilityLabel("Auto-hide timeout in seconds")
+                        .accessibilityHint("Enter a delay from 0.5 to 60 seconds.")
+
+                        Text("seconds")
+                            .foregroundStyle(.secondary)
+
+                        Stepper(
+                            "Adjust auto-hide timeout",
+                            value: $model.controlsAutoHideTimeout,
+                            in: PlaybackChromePreferences.allowedRange,
+                            step: 0.5
+                        )
+                        .labelsHidden()
+                        .accessibilityIdentifier("illiquid.settings.auto-hide-step")
+                        .fixedSize()
+                        .accessibilityLabel("Adjust auto-hide timeout in seconds")
+                        .accessibilityValue(Text("\(model.controlsAutoHideTimeout, format: .number) seconds"))
+                    }
+                    .disabled(model.areControlsAlwaysVisible)
+                }
+                Text("Paused controls stay visible until manually hidden. Click the video to hide controls while playing or paused.")
                     .font(.caption).foregroundStyle(.secondary)
                 Toggle("Lock controls position", isOn: $model.isControlsPositionLocked)
+                .accessibilityIdentifier("illiquid.settings.lock-controls")
                 Button("Reset Controls Position", action: model.resetControlsPosition)
+                .accessibilityIdentifier("illiquid.settings.reset-controls")
             }
             SettingsSectionLabel("Playback Preferences")
             SettingsCard {
@@ -236,6 +283,7 @@ struct SettingsView: View {
                         )
                         .frame(width: 220)
                         .accessibilityLabel("Remembered volume")
+                        .accessibilityIdentifier("illiquid.settings.volume")
                         .accessibilityValue("\(Int(model.state.volume.rounded())) percent")
 
                         Text("\(Int(model.state.volume.rounded()))%")
@@ -259,6 +307,7 @@ struct SettingsView: View {
                         )
                     )
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.muted")
                 }
 
                 SettingsDivider()
@@ -281,6 +330,7 @@ struct SettingsView: View {
                         }
                     }
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.playback-speed")
                     .frame(width: 112)
                     .disabled(!model.player.supports(.changePlaybackSpeed))
                 }
@@ -305,6 +355,7 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.repeat")
                     .frame(width: 210)
                 }
 
@@ -322,6 +373,7 @@ struct SettingsView: View {
                         )
                     )
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.shuffle")
                 }
             }
         }
@@ -352,6 +404,7 @@ struct SettingsView: View {
                         }
                     }
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.subtitle-encoding")
                     .frame(width: 190)
                 }
             }
@@ -421,6 +474,7 @@ struct SettingsView: View {
                         Text("Off").tag(HardwareDecodingPolicy.off)
                     }
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.hardware-decoding")
                     .frame(width: 150)
                 }
             }
@@ -477,6 +531,7 @@ struct SettingsView: View {
                         }
                     }
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.interface-scale")
                     .frame(width: 100)
                 }
             }
@@ -498,6 +553,7 @@ struct SettingsView: View {
                         }
                     }
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.theme")
                     .frame(width: 180)
                 }
             }
@@ -521,6 +577,7 @@ struct SettingsView: View {
                             }
                         }
                         .labelsHidden()
+                        .accessibilityIdentifier("illiquid.settings.text-appearance")
                         .frame(width: 180)
                     }
 
@@ -544,6 +601,7 @@ struct SettingsView: View {
                                 }
                             }
                             .labelsHidden()
+                            .accessibilityIdentifier("illiquid.settings.rainbow-palette")
                             .frame(width: 180)
                         }
                     }
@@ -564,6 +622,7 @@ struct SettingsView: View {
                         )
                     )
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.aspect-lock")
                 }
 
                 SettingsDivider()
@@ -580,6 +639,7 @@ struct SettingsView: View {
                         )
                     )
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.always-on-top")
                 }
             }
         }
@@ -601,6 +661,7 @@ struct SettingsView: View {
                         )
                     )
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.sidebar-visible")
                 }
 
                 SettingsDivider()
@@ -613,6 +674,7 @@ struct SettingsView: View {
                         Slider(value: $storedSidebarWidth, in: 300...720, step: 1)
                             .frame(width: 190)
                             .accessibilityLabel("Sidebar width")
+                            .accessibilityIdentifier("illiquid.settings.sidebar-width")
                             .accessibilityValue("\(Int(storedSidebarWidth.rounded())) points")
                         Text("\(Int(storedSidebarWidth.rounded())) pt")
                             .font(.caption.monospacedDigit())
@@ -640,6 +702,7 @@ struct SettingsView: View {
                         }
                     }
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.source-view-mode")
                     .frame(width: 130)
                     .disabled(model.activeSourceTab == nil)
                 }
@@ -658,6 +721,7 @@ struct SettingsView: View {
                         )
                     )
                     .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.source-show-hidden")
                     .disabled(model.activeSourceTab == nil)
                 }
 
@@ -681,18 +745,21 @@ struct SettingsView: View {
             SettingsSectionLabel("Sorting")
             SettingsCard {
                 sortRow(
+                    identifier: "name",
                     title: "Name",
                     detail: "Natural filename ordering.",
                     selection: $storedNameSortDirection
                 )
                 SettingsDivider()
                 sortRow(
+                    identifier: "date-created",
                     title: "Date Created",
                     detail: "Uses file creation metadata when available.",
                     selection: $storedDateSortDirection
                 )
                 SettingsDivider()
                 sortRow(
+                    identifier: "type",
                     title: "Type",
                     detail: "Groups folders and media files.",
                     selection: $storedTypeSortDirection
@@ -734,16 +801,19 @@ struct SettingsView: View {
                 SettingsCard {
                     Text("Saved history could not be read. It is protected from automatic replacement.")
                     Button("Reset Unreadable History…", role: .destructive) { pendingClearAction = .unreadableHistory }
+                    .accessibilityIdentifier("illiquid.settings.reset-unreadable-history")
                 }
             }
             SettingsSectionLabel("Playback Data")
             SettingsCard {
                 Toggle("Remember playback history", isOn: $model.remembersPlaybackHistory)
+                .accessibilityIdentifier("illiquid.settings.remember-history")
                 Text("When off, new progress and per-file choices are not saved, and sessions are not restored. Existing history stays until you clear it. Source tabs and app preferences are still saved.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             SettingsCard {
                 destructiveDataRow(
+                    identifier: "clear-playback-progress",
                     title: "Playback progress",
                     detail:
                         "Resume positions, completed status, last-opened media, and remembered folder files.",
@@ -755,6 +825,7 @@ struct SettingsView: View {
                 SettingsDivider()
 
                 destructiveDataRow(
+                    identifier: "clear-media-choices",
                     title: "Remembered media choices",
                     detail:
                         "Per-file audio track, subtitles, subtitle visibility, and subtitle delay.",
@@ -799,6 +870,7 @@ struct SettingsView: View {
             }
         }
         .labelsHidden()
+        .accessibilityIdentifier("illiquid.settings.audio-output")
         .frame(width: 190)
         .disabled(!supportsSelection)
     }
@@ -857,6 +929,7 @@ struct SettingsView: View {
     }
 
     private func sortRow(
+        identifier: String,
         title: String,
         detail: String,
         selection: Binding<String>
@@ -868,11 +941,13 @@ struct SettingsView: View {
                 }
             }
             .labelsHidden()
+            .accessibilityIdentifier("illiquid.settings.sort.\(identifier)")
             .frame(width: 120)
         }
     }
 
     private func destructiveDataRow(
+        identifier: String,
         title: String,
         detail: String,
         buttonTitle: String,
@@ -889,6 +964,7 @@ struct SettingsView: View {
             }
             Spacer(minLength: 24)
             Button(buttonTitle, role: .destructive, action: action)
+                .accessibilityIdentifier("illiquid.settings.\(identifier)")
         }
         .padding(16)
     }

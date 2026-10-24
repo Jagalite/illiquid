@@ -60,7 +60,7 @@ final class ThumbnailBackgroundScheduler {
     @ObservationIgnored private var recent: [URL: Date] = [:]
     @ObservationIgnored private var focus: [URL: Double] = [:]
 
-    init(player: PlaybackController, defaults: UserDefaults = .standard,
+    init(player: PlaybackController, defaults: UserDefaults = AppPreferences.defaults,
          readDuration: (@MainActor (URL) async -> Double?)? = nil,
          generate: (@MainActor (URL, Double) async -> Bool)? = nil,
          releaseResources: (@MainActor () async -> Void)? = nil) {

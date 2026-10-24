@@ -119,7 +119,7 @@ struct PlayerCommands: Commands {
                 .disabled(!interfaceScale.canDecrease)
             Button("Reset UI Size", action: interfaceScale.reset)
                 .keyboardShortcut("0", modifiers: .command)
-                .disabled(interfaceScale.percentage == 100)
+                .disabled(interfaceScale.percentage == PlayerInterfaceScaleStore.defaultPercentage)
             Divider()
             Button(model.isSidebarPresented ? "Hide Sources" : "Show Sources") {
                 model.toggleSidebar()

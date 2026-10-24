@@ -22,7 +22,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         shutdown: @escaping @MainActor () async -> String?,
         presentSaveFailure: @escaping @MainActor (String) -> Void = AppDelegate.showSaveFailure,
         keepsRunningAfterLastWindowClosed: @escaping @MainActor () -> Bool = {
-            UserDefaults.standard.bool(forKey: WindowCloseBehavior.keepsRunningKey)
+            AppPreferences.defaults.bool(forKey: WindowCloseBehavior.keepsRunningKey)
         }
     ) {
         self.keepsRunningAfterLastWindowClosed = keepsRunningAfterLastWindowClosed

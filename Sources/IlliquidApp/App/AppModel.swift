@@ -218,10 +218,10 @@ final class AppModel {
     private static let historyStartup = ReadOnlyStartupLoader {
         await Task.detached(priority: .userInitiated) {
             let timing = LifecyclePerformance.begin("history-load")
-            let persistence = PlaybackPersistenceStore()
+            let persistence = PlaybackPersistenceStore(userDefaults: AppPreferences.defaults)
             LifecyclePerformance.end("history-load", since: timing)
             let sourceTiming = LifecyclePerformance.begin("source-settings-load")
-            let sources = SourceStartupSnapshot.load(defaults: .standard)
+            let sources = SourceStartupSnapshot.load(defaults: AppPreferences.defaults)
             LifecyclePerformance.end("source-settings-load", since: sourceTiming)
             return StartupResources(persistence: persistence, sources: sources)
         }.value
@@ -238,9 +238,12 @@ final class AppModel {
         if LifecyclePerformance.isEnabled {
             let directory = ProcessInfo.processInfo.environment["ILLIQUID_BENCHMARK_THUMBNAIL_CACHE"]
                 .flatMap { $0.hasPrefix("/") ? URL(fileURLWithPath: $0, isDirectory: true) : nil }
-            player = PlaybackController(persistence: startup.persistence, thumbnailCacheDirectory: directory)
+            player = PlaybackController(persistence: startup.persistence,
+                sessionStore: AtomicPlaybackSessionStore(fileURL: AppPreferences.sessionFileURL),
+                thumbnailCacheDirectory: directory)
         } else {
-            player = PlaybackController(persistence: startup.persistence)
+            player = PlaybackController(persistence: startup.persistence,
+                sessionStore: AtomicPlaybackSessionStore(fileURL: AppPreferences.sessionFileURL))
         }
         let model = AppModel(player: player, sources: startup.sources)
         LifecyclePerformance.end("model-init", since: timing)
@@ -325,6 +328,8 @@ final class AppModel {
     @ObservationIgnored private var globalPointerEventMonitor: Any?
     @ObservationIgnored private var keyboardEventMonitor: Any?
     @ObservationIgnored private var benchmarkPlaybackControl: BenchmarkPlaybackControl?
+    @ObservationIgnored private weak var agentUIRootGeometryView: AgentUIRootGeometryView?
+    @ObservationIgnored private var agentUITargetObservations: [String: AgentUITargetGeometry.Observation] = [:]
     @ObservationIgnored private var windowObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var didRestorePlaybackSession = false
     @ObservationIgnored private var pointerRevealGate = PointerRevealGate()
@@ -348,16 +353,28 @@ final class AppModel {
     var restoresSessionPaused: Bool {
         didSet { player.setRestoresSessionPaused(restoresSessionPaused) }
     }
-    var areControlsAlwaysVisible = UserDefaults.standard.bool(forKey: "Illiquid.controls-always-visible") {
+    var areControlsAlwaysVisible = AppPreferences.defaults.bool(forKey: "Illiquid.controls-always-visible") {
         didSet {
-            UserDefaults.standard.set(areControlsAlwaysVisible, forKey: "Illiquid.controls-always-visible")
+            AppPreferences.defaults.set(areControlsAlwaysVisible, forKey: "Illiquid.controls-always-visible")
             setChromePin(.alwaysVisible, active: areControlsAlwaysVisible)
         }
     }
-    var isControlsPositionLocked = UserDefaults.standard.bool(forKey: "Illiquid.controls-position-locked") {
+    private var storedControlsAutoHideTimeout = PlaybackChromePreferences.load()
+    var controlsAutoHideTimeout: TimeInterval {
+        get { storedControlsAutoHideTimeout }
+        set {
+            let interval = PlaybackChromePreferences.resolve(newValue)
+            guard interval != storedControlsAutoHideTimeout else { return }
+            storedControlsAutoHideTimeout = interval
+            AppPreferences.defaults.set(interval, forKey: PlaybackChromePreferences.storageKey)
+            chromeMachine.setAutoHideInterval(interval, now: Self.currentTime())
+            synchronizeChrome()
+        }
+    }
+    var isControlsPositionLocked = AppPreferences.defaults.bool(forKey: "Illiquid.controls-position-locked") {
         didSet {
             cancelActiveInteraction()
-            UserDefaults.standard.set(isControlsPositionLocked, forKey: "Illiquid.controls-position-locked")
+            AppPreferences.defaults.set(isControlsPositionLocked, forKey: "Illiquid.controls-position-locked")
         }
     }
     @ObservationIgnored private var surfaceScrollAccumulator = SurfaceScrollAccumulator()
@@ -387,13 +404,14 @@ final class AppModel {
         systemCoordinator = PlaybackSystemCoordinator(player: player)
         nowPlayingCoordinator = NowPlayingCoordinator(player: player)
         hidesSidebarForBenchmark = Self.benchmarkHidesSidebar()
-        let defaults = UserDefaults.standard
+        let defaults = AppPreferences.defaults
         sourceTabs = sources.tabs
         activeSourceTabID = sources.selectedID
         isWindowAspectLocked = defaults.object(forKey: Self.windowAspectLockKey) as? Bool
             ?? true
         isAlwaysOnTop = defaults.bool(forKey: Self.alwaysOnTopKey)
         let now = Self.currentTime()
+        chromeMachine.setAutoHideInterval(controlsAutoHideTimeout, now: now)
         chromeMachine.setPin(.alwaysVisible, active: areControlsAlwaysVisible, now: now)
         chromeMachine.setPin(.noMedia, active: true, now: now)
         chromeMachine.setPin(
@@ -406,6 +424,8 @@ final class AppModel {
         benchmarkPlaybackControl?.applicationCommand = { [weak self] command in
             guard let self else { return false }
             switch command.action {
+            case "capabilities", "agent-state":
+                return self.writeAgentUIState(command)
             case "ping": break
             case "hover-preview":
                 guard let target = command.targetSeconds, target.isFinite else { return false }
@@ -462,6 +482,140 @@ final class AppModel {
             }
             restorePlayerWindowForPictureInPicture(completion: completion)
         }
+    }
+
+    var isAgentUIDiagnosticsEnabled: Bool { benchmarkPlaybackControl != nil }
+
+    func publishAgentUITarget(_ identifier: String, observation: AgentUITargetGeometry.Observation?) {
+        guard isAgentUIDiagnosticsEnabled else { return }
+        if let observation {
+            agentUITargetObservations[identifier] = observation
+        } else {
+            agentUITargetObservations.removeValue(forKey: identifier)
+        }
+    }
+
+    func publishAgentUIRootGeometry(_ view: AgentUIRootGeometryView) {
+        guard isAgentUIDiagnosticsEnabled else { return }
+        agentUIRootGeometryView = view
+    }
+
+    private func writeAgentUIState(_ command: BenchmarkPlaybackControlCommand) -> Bool {
+        guard isAgentUIDiagnosticsEnabled, command.isAgentUIAction else { return false }
+        let data: [String: Any]
+        if command.action == "capabilities" {
+            data = [
+                "commands": ["capabilities", "agent-state"],
+                "capabilities": ["capabilities", "agent-state", "timeline-grip-global-input"],
+                "mode": "app-hook",
+                "completion": "main-actor-snapshot",
+                "state_sections": ["playback", "source", "chrome", "window", "readiness", "targets"],
+                "target_coordinate_space": AgentUITargetGeometry.coordinateSpace,
+                "target_coordinate_space_description": AgentUITargetGeometry.coordinateSpaceDescription,
+                "target_input_coordinate_space": AgentUITargetGeometry.screenCoordinateSpace,
+                "observes_presentation": false,
+            ]
+        } else {
+            data = agentUIStateSnapshot()
+        }
+        do {
+            FileHandle.standardError.write(try AgentUIStateDiagnostic.line(command: command, data: data))
+            return true
+        } catch {
+            // The existing channel acknowledgement reports accepted=no.
+            return false
+        }
+    }
+
+    /// Sampled synchronously; no layout flush or renderer query is performed.
+    func agentUIStateSnapshot() -> [String: Any] {
+        func rect(_ value: CGRect) -> [String: Any] {
+            ["x": AgentUIStateDiagnostic.finite(value.minX), "y": AgentUIStateDiagnostic.finite(value.minY),
+             "width": AgentUIStateDiagnostic.finite(value.width), "height": AgentUIStateDiagnostic.finite(value.height)]
+        }
+        let window: Any
+        if let playerWindow {
+            window = [
+                "id": playerWindow.windowNumber,
+                "identifier": "illiquid.player.window",
+                "visible": playerWindow.isVisible,
+                "key": playerWindow.isKeyWindow,
+                "miniaturized": playerWindow.isMiniaturized,
+                "fullscreen": state.isFullscreen,
+                "frame": rect(playerWindow.frame),
+                "coordinate_space": "appkit-screen-bottom-left-points",
+                "coordinate_space_description": "AppKit global screen points; origin at the primary screen's bottom-left, x right, y up. Not backing pixels or AX top-left screen coordinates.",
+                "backing_scale": AgentUIStateDiagnostic.finite(playerWindow.backingScaleFactor),
+                "interface_scale": AgentUIStateDiagnostic.finite(PlayerInterfaceScaleStore.shared.factor),
+                "sidebar_presented": isSidebarPresented,
+                "focused_identifier": (playerWindow.firstResponder as? NSView)?.accessibilityIdentifier() as Any? ?? NSNull(),
+            ] as [String: Any]
+        } else {
+            window = NSNull()
+        }
+        let targets: [[String: Any]] = agentUITargetObservations.keys.sorted().compactMap { identifier in
+            guard isPlaybackChromeVisible, state.currentSource != nil,
+                  !state.pictureInPicture.isActive, playerWindow?.isVisible == true,
+                  playerWindow?.isMiniaturized == false,
+                  let observation = agentUITargetObservations[identifier],
+                  observation.isCurrent(for: player.interactionSourceRevision),
+                  observation.interfaceScale == PlayerInterfaceScaleStore.shared.factor,
+                  observation.sidebarPresented == isSidebarPresented,
+                  observation.cancellationRevision == interactionCancellationRevision,
+                  observation.positionRevision == controlsPositionRevision,
+                  let playerWindow,
+                  let screenGeometry = agentUIRootGeometryView?.screenGeometry(
+                    for: observation.bounds, expectedWindow: playerWindow) else { return nil }
+            return ["identifier": identifier, "bounds": rect(observation.bounds),
+                    "coordinate_space": AgentUITargetGeometry.coordinateSpace,
+                    "coordinate_space_description": AgentUITargetGeometry.coordinateSpaceDescription,
+                    "geometry_observation": "published-layout-with-current-nsview-screen-conversion; presentation-unverified",
+                    "screen_geometry": screenGeometry,
+                    "sampled_monotonic_ns": DispatchTime.now().uptimeNanoseconds,
+                    "accessibility_hidden": true,
+                    "enabled": !isControlsPositionLocked,
+                    "source_revision": observation.sourceRevision]
+        }
+        return [
+            "playback": [
+                "phase": state.phase.rawValue,
+                "position_seconds": AgentUIStateDiagnostic.finite(state.position),
+                "duration_seconds": AgentUIStateDiagnostic.finite(state.duration),
+                "pause_desired": state.isPauseDesired,
+                "loading": state.isLoading,
+                "buffering": state.bufferStatus.isBuffering,
+                "last_error": state.lastError as Any? ?? NSNull(),
+            ],
+            "source": ["url": state.currentSource?.url.absoluteString as Any? ?? NSNull(),
+                       "revision": player.interactionSourceRevision],
+            "chrome": [
+                "phase": String(describing: chromePhase),
+                "visible": isPlaybackChromeVisible,
+                "mounted": isPlaybackChromeMounted,
+                "pins": chromeMachine.pinReasons.map { String(describing: $0) }.sorted(),
+                "interaction_pins": chromeMachine.pinReasons.filter {
+                    [.scrubbing, .chromeDrag, .sidebarResize, .manipulation].contains($0)
+                }.map { String(describing: $0) }.sorted(),
+                "surface_click_pending": chromeMachine.isVideoSurfaceClickPending,
+                "transient_owners": transientOwners.sorted(),
+                "interaction_cancellation_revision": interactionCancellationRevision,
+                "controls_position_revision": controlsPositionRevision,
+                "controls_position_locked": isControlsPositionLocked,
+            ],
+            "window": window,
+            "readiness": [
+                "model_initialized": true,
+                "window_attached": playerWindow != nil,
+                "source_roots_ready": areSourceRootsReady,
+                "playback_loading": state.isLoading,
+                "pending_operation": state.isLoading || state.bufferStatus.isBuffering
+                    ? player.pendingOperationLabel as Any : NSNull(),
+                "layout_settled": NSNull(),
+                "draw_submitted": NSNull(),
+                "presentation_observed": NSNull(),
+            ],
+            "targets": targets,
+        ]
     }
 
     static func benchmarkPinsPlaybackChrome(
@@ -942,7 +1096,7 @@ final class AppModel {
     func setWindowAspectLocked(_ isLocked: Bool) {
         guard isWindowAspectLocked != isLocked else { return }
         isWindowAspectLocked = isLocked
-        UserDefaults.standard.set(isWindowAspectLocked, forKey: Self.windowAspectLockKey)
+        AppPreferences.defaults.set(isWindowAspectLocked, forKey: Self.windowAspectLockKey)
         if let window = playerWindow ?? NSApp.keyWindow {
             applyWindowAspectLock(to: window, resizeToVideo: true)
         }
@@ -956,7 +1110,7 @@ final class AppModel {
     func setAlwaysOnTop(_ enabled: Bool) {
         guard isAlwaysOnTop != enabled else { return }
         isAlwaysOnTop = enabled
-        UserDefaults.standard.set(isAlwaysOnTop, forKey: Self.alwaysOnTopKey)
+        AppPreferences.defaults.set(isAlwaysOnTop, forKey: Self.alwaysOnTopKey)
         applyAlwaysOnTop()
         registerUserActivity()
     }
@@ -1201,6 +1355,16 @@ final class AppModel {
         case let .doubleClickSeek(seconds):
             guard !hasTransientPresentation, playerWindow?.attachedSheet == nil else { return }
             performRelativeSeek(seconds)
+        case let .primaryClickPending(isPending):
+            chromeMachine.setVideoSurfaceClickPending(isPending, now: Self.currentTime())
+            if isPending, !hasTransientPresentation, playerWindow?.attachedSheet == nil {
+                playbackFocusOwners.removeAll()
+                chromeMachine.handleVideoSurfacePress(
+                    reducedMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
+                    now: Self.currentTime()
+                )
+            }
+            synchronizeChrome()
         case .primaryClick:
             guard !hasTransientPresentation, playerWindow?.attachedSheet == nil else { return }
             // The native surface now owns first responder. Do not let stale
@@ -1460,6 +1624,7 @@ final class AppModel {
             return
         }
         playerWindow = window
+        window.setAccessibilityIdentifier("illiquid.player.window")
         updateThumbnailScheduling()
         PlayerWindowControls.configure(window)
         window.minSize = NSSize(width: 720, height: 440)
@@ -1483,7 +1648,7 @@ final class AppModel {
             applyOpenRequest(request)
         }
 
-        if let frameString = UserDefaults.standard.string(forKey: Self.windowFrameKey) {
+        if let frameString = AppPreferences.defaults.string(forKey: Self.windowFrameKey) {
             let frame = NSRectFromString(frameString)
             if let reachable = PlayerWindowGeometry.restoredFrame(frame, screens: NSScreen.screens.map(\.visibleFrame)) {
                 window.setFrame(reachable, display: false)
@@ -1969,7 +2134,7 @@ final class AppModel {
     }
 
     private func persistSourceTabs() {
-        let defaults = UserDefaults.standard
+        let defaults = AppPreferences.defaults
         defaults.set(SourceTabStore.encode(sourceTabs), forKey: Self.sourceTabsKey)
         if let activeSourceTabID {
             defaults.set(activeSourceTabID, forKey: Self.activeSourceTabKey)
@@ -2000,7 +2165,7 @@ final class AppModel {
 
     private func saveFrame(of window: NSWindow) {
         guard !window.styleMask.contains(.fullScreen) else { return }
-        UserDefaults.standard.set(NSStringFromRect(window.frame), forKey: Self.windowFrameKey)
+        AppPreferences.defaults.set(NSStringFromRect(window.frame), forKey: Self.windowFrameKey)
     }
 
     private func playerWindowWillClose(_ window: NSWindow) {
@@ -2268,6 +2433,7 @@ final class AppModel {
 
     private func updatePlaybackChromePins() {
         let now = Self.currentTime()
+        chromeMachine.setPlaybackPaused(state.isPauseDesired, now: now)
         chromeMachine.setPin(
             .windowResize,
             active: playerWindow?.inLiveResize == true && state.phase == .paused,
@@ -2365,6 +2531,7 @@ final class AppModel {
         validationMessage: String?
     ) {
         guard let playerWindow, !isShuttingDown else { return }
+        let source = state.currentSource
 
         let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
         input.placeholderString = "0"
@@ -2384,6 +2551,10 @@ final class AppModel {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 guard response == .alertFirstButtonReturn else {
+                    self.setTransientPresentation(false, owner: "subtitle-delay")
+                    return
+                }
+                guard !self.isShuttingDown, source == self.state.currentSource else {
                     self.setTransientPresentation(false, owner: "subtitle-delay")
                     return
                 }

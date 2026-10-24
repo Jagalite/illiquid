@@ -91,13 +91,16 @@ struct PlaybackChromeStateMachine {
     static let defaultAutoHideInterval: TimeInterval = 2.5
     static let defaultFadeDuration: TimeInterval = IlliquidMotion.Duration.panel
 
-    let autoHideInterval: TimeInterval
+    private(set) var autoHideInterval: TimeInterval
     let fadeDuration: TimeInterval
 
     private(set) var phase: PlaybackChromePhase = .visible
     private(set) var pinReasons: Set<PlaybackChromePinReason> = []
     private(set) var deadline: PlaybackChromeDeadline?
     private(set) var isPointerOutside = false
+    private(set) var isPlaybackPaused = false
+    private(set) var isVideoSurfaceClickPending = false
+    private var didHideForPendingVideoClick = false
 
     init(
         autoHideInterval: TimeInterval = Self.defaultAutoHideInterval,
@@ -105,6 +108,39 @@ struct PlaybackChromeStateMachine {
     ) {
         self.autoHideInterval = autoHideInterval
         self.fadeDuration = fadeDuration
+    }
+
+    mutating func setAutoHideInterval(_ interval: TimeInterval, now: TimeInterval) {
+        guard interval.isFinite, interval > 0, interval != autoHideInterval else { return }
+        autoHideInterval = interval
+        if pinReasons.isEmpty, !isPointerOutside, phase == .visible || phase == .revealing {
+            deadline = autoHideDeadline(at: now)
+        }
+    }
+
+    /// Pause suspends idle hiding without blocking explicit hides or their fades.
+    mutating func setPlaybackPaused(_ isPaused: Bool, now: TimeInterval) {
+        guard isPlaybackPaused != isPaused else { return }
+        isPlaybackPaused = isPaused
+
+        if isPaused {
+            if case .autoHide? = deadline {
+                deadline = nil
+            }
+        } else if pinReasons.isEmpty, phase == .visible || phase == .revealing {
+            deadline = autoHideDeadline(at: now)
+        }
+    }
+
+    mutating func setVideoSurfaceClickPending(_ isPending: Bool, now: TimeInterval) {
+        guard isVideoSurfaceClickPending != isPending else { return }
+        isVideoSurfaceClickPending = isPending
+        didHideForPendingVideoClick = false
+        if isPending {
+            if case .autoHide? = deadline { deadline = nil }
+        } else if pinReasons.isEmpty, !isPointerOutside, phase == .visible || phase == .revealing {
+            deadline = autoHideDeadline(at: now)
+        }
     }
 
     mutating func setPin(
@@ -127,7 +163,7 @@ struct PlaybackChromeStateMachine {
                 deadline = nil
             } else {
                 phase = .visible
-                deadline = .autoHide(now + autoHideInterval)
+                deadline = autoHideDeadline(at: now)
             }
         }
     }
@@ -144,12 +180,12 @@ struct PlaybackChromeStateMachine {
             return
         }
         phase = phase == .hidden || phase == .hiding ? .revealing : .visible
-        deadline = .autoHide(now + autoHideInterval)
+        deadline = autoHideDeadline(at: now)
     }
 
     mutating func revealForKeyboardNavigation(at now: TimeInterval) {
         phase = pinReasons.isEmpty ? .revealing : .pinned
-        deadline = pinReasons.isEmpty ? .autoHide(now + autoHideInterval) : nil
+        deadline = pinReasons.isEmpty ? autoHideDeadline(at: now) : nil
     }
 
     mutating func registerPointerActivity(at now: TimeInterval) {
@@ -177,10 +213,19 @@ struct PlaybackChromeStateMachine {
         }
     }
 
+    /// Dismiss on press rather than waiting for double-click recognition.
+    mutating func handleVideoSurfacePress(reducedMotion: Bool, now: TimeInterval) {
+        guard isVideoSurfaceClickPending, phase.isOpaque else { return }
+        pinReasons.remove(.playbackFocus)
+        handleSurfaceClick(reducedMotion: reducedMotion, now: now)
+        didHideForPendingVideoClick = phase == .hidden || phase == .hiding
+    }
+
     /// Native video mouseDown has already moved first responder to the video.
     /// SwiftUI can publish its focus loss after mouseUp, so retire that pin here
     /// without waiting for a later focus callback to unblock this explicit hide.
     mutating func handleVideoSurfaceClick(reducedMotion: Bool, now: TimeInterval) {
+        guard !didHideForPendingVideoClick else { return }
         pinReasons.remove(.playbackFocus)
         handleSurfaceClick(reducedMotion: reducedMotion, now: now)
     }
@@ -211,6 +256,10 @@ struct PlaybackChromeStateMachine {
         pinReasons.remove(.pointerOverSidebar)
         pinReasons.remove(.chromeFocus)
         hideImmediately(reducedMotion: reducedMotion, now: now)
+    }
+
+    private func autoHideDeadline(at now: TimeInterval) -> PlaybackChromeDeadline? {
+        isPlaybackPaused || isVideoSurfaceClickPending ? nil : .autoHide(now + autoHideInterval)
     }
 
     private mutating func hideImmediatelyClearingPassivePins() {

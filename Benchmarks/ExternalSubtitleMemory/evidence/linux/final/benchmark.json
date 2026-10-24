@@ -1,0 +1,23 @@
+{
+  "cases": [
+    "srt-2000",
+    "srt-50000",
+    "srt-200000",
+    "srt-long-payload",
+    "srt-unicode-long-payload",
+    "srt-crlf",
+    "srt-malformed",
+    "srt-blank-heavy",
+    "vtt-2000",
+    "vtt-50000",
+    "vtt-200000",
+    "vtt-long-payload",
+    "vtt-unicode-long-payload",
+    "vtt-crlf",
+    "vtt-malformed",
+    "vtt-blank-heavy"
+  ],
+  "protocol": "One conversion per fresh process, no warm conversion; adjacent AB/BA pairs, reversed cases each round; all samples retained.",
+  "rounds": 6,
+  "rss_scope": "Whole process peak including runtime and input loading; sampled before output encoding/writing and JSON."
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "name": "timeline-grip",
+  "description": "Real pointer drag of the AX-hidden timeline grip using fresh app-published NSView/window-to-Quartz geometry. Requires a loaded seekable video, one focused player window, visible chrome, unlocked controls and idle physical input. Pauses via hook setup; asserts movement, released interaction pins and no accidental seek. Input and model geometry outcome only; live and presentation qualification require separate receipts. The historical filename is retained for inventory references.",
+  "requires": [
+    "timeline-grip-global-input"
+  ],
+  "steps": [
+    {
+      "id": "pause-setup",
+      "command": "hook",
+      "args": {
+        "action": "pause"
+      }
+    },
+    {
+      "id": "wait-paused",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.pause_desired",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 5
+      }
+    },
+    {
+      "id": "drag-grip",
+      "command": "act",
+      "args": {
+        "action": "drag",
+        "mode": "input",
+        "diagnostic_target": {
+          "identifier": "illiquid.timeline.grip"
+        },
+        "delta": {
+          "x": 0,
+          "y": -80
+        },
+        "duration": 0.6,
+        "expected_outcome": "moved",
+        "timeout": 10
+      },
+      "expect": {
+        "path": "data.outcome_verified",
+        "op": "eq",
+        "value": true
+      }
+    }
+  ],
+  "metrics": {
+    "required": []
+  }
+}

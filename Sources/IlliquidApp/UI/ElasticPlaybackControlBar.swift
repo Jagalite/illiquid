@@ -101,7 +101,7 @@ struct ElasticPlaybackControlBarPlacement: Codable, Equatable {
 enum ElasticPlaybackControlBarPlacementStore {
     static let defaultsKey = "elasticPlaybackControlBarPlacement.v1"
 
-    static func restored(defaults: UserDefaults = .standard) -> ElasticPlaybackControlBarPlacement {
+    static func restored(defaults: UserDefaults = AppPreferences.defaults) -> ElasticPlaybackControlBarPlacement {
         guard let data = defaults.data(forKey: defaultsKey),
               let placement = try? JSONDecoder().decode(
                   ElasticPlaybackControlBarPlacement.self,
@@ -114,7 +114,7 @@ enum ElasticPlaybackControlBarPlacementStore {
 
     static func persist(
         _ placement: ElasticPlaybackControlBarPlacement,
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = AppPreferences.defaults
     ) {
         guard placement.isValid,
               let data = try? JSONEncoder().encode(placement)
@@ -1044,8 +1044,18 @@ private struct ElasticPlaybackTimelineAccessibility: View {
     var body: some View {
         let bounds = geometry.path(from: geometry.trackStartS, through: geometry.trackEndS)
             .boundingRect.insetBy(dx: -10, dy: -16)
+        ElasticPlaybackTimelineAccessibilityContent(model: model)
+            .frame(width: max(44, bounds.width), height: max(44, bounds.height))
+            .position(x: bounds.midX, y: bounds.midY)
+    }
+}
+
+/// Position updates should move the accessibility element, not rebuild its slider.
+private struct ElasticPlaybackTimelineAccessibilityContent: View {
+    @Bindable var model: AppModel
+
+    var body: some View {
         Color.clear
-        .frame(width: max(44, bounds.width), height: max(44, bounds.height))
         .allowsHitTesting(false)
         .focusable()
         .playbackFocusVisibility(model)
@@ -1063,9 +1073,9 @@ private struct ElasticPlaybackTimelineAccessibility: View {
                 Text("Playback position")
             }
             .accessibilityValue("\(TimecodeFormatter.string(from: model.state.position)) of \(TimecodeFormatter.string(from: model.state.duration))")
+            .accessibilityIdentifier("illiquid.timeline.position")
             .disabled(model.state.duration <= 0)
         }
-        .position(x: bounds.midX, y: bounds.midY)
     }
 }
 
@@ -1233,7 +1243,7 @@ enum TimelineThumbnailHoverPolicy {
     }
 }
 
-enum ElasticPlaybackUtility: Hashable {
+enum ElasticPlaybackUtility: String, Hashable {
     case volume
     case audio
     case subtitles
@@ -1298,7 +1308,7 @@ struct ElasticPlaybackControlBar: View {
     init(
         model: AppModel,
         sidebarOccupiedWidth: CGFloat = 0,
-        placementDefaults: UserDefaults = .standard
+        placementDefaults: UserDefaults = AppPreferences.defaults
     ) {
         self.model = model
         self.sidebarOccupiedWidth = sidebarOccupiedWidth
@@ -1353,6 +1363,7 @@ struct ElasticPlaybackControlBar: View {
                     .foregroundStyle(theme.secondaryColor)
                     .frame(width: 24, height: 40)
                     .contentShape(Rectangle())
+                    .agentUITarget(AgentUITargetGeometry.timelineGrip, model: model)
                     .rotationEffect(.radians(geometry.tangentAngle(at: geometry.dragHandleS)))
                     .position(geometry.point(at: geometry.dragHandleS))
                     .gesture(barDragGesture(geometry: geometry, size: size, utilityCount: utilities.count))
@@ -1370,7 +1381,12 @@ struct ElasticPlaybackControlBar: View {
                 )
 
                 ForEach(Array(utilities.enumerated()), id: \.offset) { index, utility in
-                    utilityControl(utility, popoverEdge: popoverEdge(for: geometry))
+                    ElasticPlaybackUtilityControl(
+                        model: model,
+                        utility: utility,
+                        popoverEdge: popoverEdge(for: geometry),
+                        isVolumePopoverPresented: $isVolumePopoverPresented
+                    )
                         .playbackFocusVisibility(model)
                         .position(geometry.utilityPositions[index])
                         .dynamicPlayerTextStyle(
@@ -1661,321 +1677,6 @@ struct ElasticPlaybackControlBar: View {
         }
         utilities.append(contentsOf: [.settings, .more])
         return utilities
-    }
-
-    @ViewBuilder
-    private func utilityControl(
-        _ utility: ElasticPlaybackUtility,
-        popoverEdge: Edge,
-        inMenu: Bool = false
-    ) -> some View {
-        switch utility {
-        case .volume:
-            Button {
-                isVolumePopoverPresented.toggle()
-            } label: {
-                compactMenuLabel(
-                    model.state.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
-                    title: "Volume",
-                    animatesSymbolReplacement: true
-                )
-            }
-            .buttonStyle(.borderless)
-            .help("Volume")
-            .accessibilityLabel("Volume")
-            .popover(isPresented: $isVolumePopoverPresented, arrowEdge: popoverEdge) {
-                VolumePopover(model: model)
-                    .background(PopoverDismissalBoundary { isVolumePopoverPresented = false })
-            }
-
-        case .audio:
-            Menu {
-                if model.state.audioTracks.isEmpty {
-                    Text("No audio tracks")
-                } else {
-                    ForEach(model.state.audioTracks) { track in
-                        Button {
-                            model.selectAudioTrackFromUser(track)
-                        } label: {
-                            menuSelectionLabel(
-                                track.displayName,
-                                selected: track.id == model.state.selectedAudioTrack?.id
-                            )
-                        }
-                    }
-                }
-            } label: {
-                if inMenu {
-                    Text("Audio Track")
-                } else {
-                    compactMenuLabel("waveform", title: "Audio Track")
-                }
-            }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .help("Audio Track")
-            .accessibilityLabel("Audio Track")
-
-        case .subtitles:
-            Menu {
-                Button {
-                    model.selectSubtitleTrackFromUser(nil)
-                } label: {
-                    menuSelectionLabel(
-                        "Off",
-                        selected: model.state.selectedSubtitleTrack == nil
-                    )
-                }
-                Divider()
-                ForEach(model.state.subtitleTracks) { track in
-                    Button {
-                        model.selectSubtitleTrackFromUser(track)
-                    } label: {
-                        menuSelectionLabel(
-                            track.displayName,
-                            selected: track.id == model.state.selectedSubtitleTrack?.id
-                        )
-                    }
-                }
-                Divider()
-                Section("Timing for This Video") {
-                    Text("Current: \(SubtitleDelayInput.displayText(for: model.state.subtitleDelay))")
-                    Button("Set Subtitle Delay…", action: model.openSubtitleDelayPanel)
-                    Button("Reset Subtitle Delay") {
-                        model.setSubtitleDelayFromUser(0)
-                    }
-                    .disabled(abs(model.state.subtitleDelay) < 0.001)
-                }
-                Divider()
-                Button("Load External Subtitle…", action: model.openSubtitlePanel)
-            } label: {
-                if inMenu {
-                    Text("Subtitles")
-                } else {
-                    compactMenuLabel("captions.bubble", title: "Subtitles")
-                    .playbackControlSelectionTint(
-                        SubtitleControlVisualState(
-                            selectedTrack: model.state.selectedSubtitleTrack
-                        ).usesAccentTint,
-                        accent: theme.accentColor
-                    )
-                }
-            }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .help("Subtitles")
-            .accessibilityLabel("Subtitles")
-            .accessibilityValue(SubtitleControlVisualState(
-                selectedTrack: model.state.selectedSubtitleTrack
-            ).accessibilityValue)
-
-        case .sidebar:
-            iconButton(
-                SidebarToggleControlPolicy.title(
-                    isSidebarVisible: model.isSidebarPresented
-                ),
-                systemImage: "sidebar.left",
-                action: model.toggleSidebar
-            )
-            .disabled(!model.isSidebarAvailable)
-            .help(model.isSidebarAvailable ? "Sources" : "Widen the window to show Sources")
-
-        case .pictureInPicture:
-            iconButton(
-                model.state.pictureInPicture.isActive
-                    ? "Stop Picture in Picture"
-                    : "Start Picture in Picture",
-                image: Image(nsImage: model.state.pictureInPicture.isActive
-                    ? AVPictureInPictureController.pictureInPictureButtonStopImage
-                    : AVPictureInPictureController.pictureInPictureButtonStartImage),
-                action: model.togglePictureInPicture
-            )
-
-        case .settings:
-            SettingsLink {
-                Image(systemName: "gearshape.fill")
-                    .resizable()
-                    .renderingMode(.template)
-                    .scaledToFit()
-                    .frame(width: 17, height: 17)
-                    .frame(width: 30, height: 38)
-                    .contentShape(Circle())
-                    .playerIconHoverEffect(
-                        in: RoundedRectangle(cornerRadius: 7, style: .continuous),
-                        highlightInsets: PlayerControlHoverPolicy.bottomIslandHighlightInsets
-                    )
-            }
-            .buttonStyle(.borderless)
-            .help("Settings")
-            .accessibilityLabel("Settings")
-
-        case .more:
-            Menu {
-                // Keep compacted controls reachable without shrinking hit targets.
-                Menu("Volume") {
-                    Button(model.state.isMuted ? "Unmute" : "Mute", action: model.toggleMuteFromUser)
-                    Button("Increase Volume") { model.setVolumeFromUser(model.state.volume + 5) }
-                    Button("Decrease Volume") { model.setVolumeFromUser(model.state.volume - 5) }
-                }
-                Button(SidebarToggleControlPolicy.title(isSidebarVisible: model.isSidebarPresented),
-                       action: model.toggleSidebar)
-                    .disabled(!model.isSidebarAvailable)
-                AnyView(utilityControl(.audio, popoverEdge: popoverEdge, inMenu: true))
-                AnyView(utilityControl(.subtitles, popoverEdge: popoverEdge, inMenu: true))
-                if model.canTogglePictureInPicture {
-                    Button(model.state.pictureInPicture.isActive
-                        ? "Stop Picture in Picture" : "Start Picture in Picture",
-                        action: model.togglePictureInPicture)
-                }
-                SettingsLink { Text("Settings…") }
-                Divider()
-                if !model.state.chapters.isEmpty {
-                    Section("Chapters") {
-                        ForEach(model.state.chapters) { chapter in
-                            Button {
-                                model.player.selectChapter(chapter)
-                            } label: {
-                                menuSelectionLabel(
-                                    chapter.title ?? "Chapter \(chapter.id + 1)",
-                                    selected: chapter.id == model.state.currentChapterID
-                                )
-                            }
-                        }
-                    }
-                    Divider()
-                }
-
-                Toggle("Lock Controls Position", isOn: $model.isControlsPositionLocked)
-                Button("Reset Controls Position", action: model.resetControlsPosition)
-                Button("Controls Help…") { model.isShortcutHelpPresented = true }
-                Divider()
-                Button("Fit Window to Video", action: model.fitWindowToVideo)
-                    .disabled(!model.canFitWindowToVideo)
-
-                if model.player.supports(.saveScreenshot) {
-                    Button("Save Screenshot…", action: model.saveScreenshot)
-                        .disabled(model.state.currentSource == nil)
-                }
-
-                Button("Playback Inspector…") {
-                    model.isInspectorPresented = true
-                }
-
-                Divider()
-
-                if model.player.supports(.changePlaybackSpeed) {
-                    Section("Playback Speed") {
-                        ForEach([0.5, 0.75, 1, 1.25, 1.5, 2], id: \.self) { speed in
-                            Button {
-                                model.player.setPlaybackSpeed(speed)
-                            } label: {
-                                menuSelectionLabel(
-                                    String(format: "%g×", speed),
-                                    selected: abs(model.state.playbackSpeed - speed) < 0.001
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Section("Track Sync") {
-                    if model.player.supports(.changeAudioDelay) {
-                        Button("Audio −0.1 s") {
-                            model.player.setAudioDelay(model.state.audioDelay - 0.1)
-                        }
-                        Button("Reset Audio Delay") {
-                            model.player.setAudioDelay(0)
-                        }
-                        .disabled(abs(model.state.audioDelay) < 0.001)
-                        Button("Audio +0.1 s") {
-                            model.player.setAudioDelay(model.state.audioDelay + 0.1)
-                        }
-                        Divider()
-                    }
-
-                    if model.player.supports(.changeSubtitleDelay) {
-                        Text(
-                            "Subtitle Delay: \(SubtitleDelayInput.displayText(for: model.state.subtitleDelay))"
-                        )
-                        Button("Set Subtitle Delay…", action: model.openSubtitleDelayPanel)
-                        Button("Reset Subtitle Delay") {
-                            model.setSubtitleDelayFromUser(0)
-                        }
-                        .disabled(abs(model.state.subtitleDelay) < 0.001)
-                    }
-                }
-            } label: {
-                compactMenuLabel("ellipsis", title: "More Playback Controls")
-            }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .help("More Playback Controls")
-            .accessibilityLabel("More Playback Controls")
-        }
-    }
-
-    private func iconButton(
-        _ title: String,
-        systemImage: String,
-        action: @escaping () -> Void
-    ) -> some View {
-        iconButton(title, image: Image(systemName: systemImage), action: action)
-    }
-
-    private func iconButton(
-        _ title: String,
-        image: Image,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            image
-                .resizable()
-                .renderingMode(.template)
-                .scaledToFit()
-                .frame(width: 17, height: 17)
-                .frame(width: 30, height: 38)
-                .contentShape(Circle())
-                .playerIconHoverEffect(
-                    in: RoundedRectangle(cornerRadius: 7, style: .continuous),
-                    highlightInsets: PlayerControlHoverPolicy.bottomIslandHighlightInsets
-                )
-        }
-        .buttonStyle(.borderless)
-        .help(title)
-        .accessibilityLabel(title)
-    }
-
-    private func compactMenuLabel(
-        _ systemImage: String,
-        title: String,
-        animatesSymbolReplacement: Bool = false
-    ) -> some View {
-        Image(systemName: systemImage)
-            .font(.system(size: 16, weight: .medium))
-            .contentTransition(
-                animatesSymbolReplacement ? .symbolEffect(.replace) : .identity
-            )
-            .animation(
-                animatesSymbolReplacement
-                    ? IlliquidMotion.stateMorph(reduceMotion: reduceMotion)
-                    : nil,
-                value: systemImage
-            )
-            .frame(width: 30, height: 38)
-            .contentShape(Rectangle())
-            .playerIconHoverEffect(
-                in: RoundedRectangle(cornerRadius: 7, style: .continuous),
-                highlightInsets: PlayerControlHoverPolicy.bottomIslandHighlightInsets
-            )
-            .accessibilityLabel(title)
-    }
-
-    private func menuSelectionLabel(_ title: String, selected: Bool) -> some View {
-        HStack {
-            Image(systemName: "checkmark")
-                .opacity(selected ? 1 : 0)
-            Text(title)
-        }
     }
 
     private func popoverEdge(for geometry: ElasticPlaybackControlBarGeometry) -> Edge {
@@ -2298,4 +1999,335 @@ struct ElasticPlaybackControlBar: View {
             model.player.seek(to: target)
         }
     }
+}
+
+/// Keep menu construction independent of the bar's per-frame placement changes.
+private struct ElasticPlaybackUtilityControl: View {
+    @Bindable var model: AppModel
+    let utility: ElasticPlaybackUtility
+    let popoverEdge: Edge
+    @Binding var isVolumePopoverPresented: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.playerTheme) private var theme
+
+    var body: some View {
+        utilityControl(utility, popoverEdge: popoverEdge)
+            .accessibilityIdentifier("illiquid.utility.\(utility.rawValue)")
+    }
+
+    @ViewBuilder
+    private func utilityControl(
+        _ utility: ElasticPlaybackUtility,
+        popoverEdge: Edge,
+        inMenu: Bool = false
+    ) -> some View {
+        switch utility {
+        case .volume:
+            Button {
+                isVolumePopoverPresented.toggle()
+            } label: {
+                compactMenuLabel(
+                    model.state.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
+                    title: "Volume",
+                    animatesSymbolReplacement: true
+                )
+            }
+            .buttonStyle(.borderless)
+            .help("Volume")
+            .accessibilityLabel("Volume")
+            .popover(isPresented: $isVolumePopoverPresented, arrowEdge: popoverEdge) {
+                VolumePopover(model: model)
+                    .background(PopoverDismissalBoundary { isVolumePopoverPresented = false })
+            }
+
+        case .audio:
+            Menu {
+                if model.state.audioTracks.isEmpty {
+                    Text("No audio tracks")
+                } else {
+                    ForEach(model.state.audioTracks) { track in
+                        Button {
+                            model.selectAudioTrackFromUser(track)
+                        } label: {
+                            menuSelectionLabel(
+                                track.displayName,
+                                selected: track.id == model.state.selectedAudioTrack?.id
+                            )
+                        }
+                    }
+                }
+            } label: {
+                if inMenu {
+                    Text("Audio Track")
+                } else {
+                    compactMenuLabel("waveform", title: "Audio Track")
+                }
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .help("Audio Track")
+            .accessibilityLabel("Audio Track")
+
+        case .subtitles:
+            Menu {
+                Button {
+                    model.selectSubtitleTrackFromUser(nil)
+                } label: {
+                    menuSelectionLabel(
+                        "Off",
+                        selected: model.state.selectedSubtitleTrack == nil
+                    )
+                }
+                Divider()
+                ForEach(model.state.subtitleTracks) { track in
+                    Button {
+                        model.selectSubtitleTrackFromUser(track)
+                    } label: {
+                        menuSelectionLabel(
+                            track.displayName,
+                            selected: track.id == model.state.selectedSubtitleTrack?.id
+                        )
+                    }
+                }
+                Divider()
+                Section("Timing for This Video") {
+                    Text("Current: \(SubtitleDelayInput.displayText(for: model.state.subtitleDelay))")
+                    Button("Set Subtitle Delay…", action: model.openSubtitleDelayPanel)
+                    Button("Reset Subtitle Delay") {
+                        model.setSubtitleDelayFromUser(0)
+                    }
+                    .disabled(abs(model.state.subtitleDelay) < 0.001)
+                }
+                Divider()
+                Button("Load External Subtitle…", action: model.openSubtitlePanel)
+            } label: {
+                if inMenu {
+                    Text("Subtitles")
+                } else {
+                    compactMenuLabel("captions.bubble", title: "Subtitles")
+                    .playbackControlSelectionTint(
+                        SubtitleControlVisualState(
+                            selectedTrack: model.state.selectedSubtitleTrack
+                        ).usesAccentTint,
+                        accent: theme.accentColor
+                    )
+                }
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .help("Subtitles")
+            .accessibilityLabel("Subtitles")
+            .accessibilityValue(SubtitleControlVisualState(
+                selectedTrack: model.state.selectedSubtitleTrack
+            ).accessibilityValue)
+
+        case .sidebar:
+            iconButton(
+                SidebarToggleControlPolicy.title(
+                    isSidebarVisible: model.isSidebarPresented
+                ),
+                systemImage: "sidebar.left",
+                action: model.toggleSidebar
+            )
+            .disabled(!model.isSidebarAvailable)
+            .help(model.isSidebarAvailable ? "Sources" : "Widen the window to show Sources")
+
+        case .pictureInPicture:
+            iconButton(
+                model.state.pictureInPicture.isActive
+                    ? "Stop Picture in Picture"
+                    : "Start Picture in Picture",
+                image: Image(nsImage: model.state.pictureInPicture.isActive
+                    ? AVPictureInPictureController.pictureInPictureButtonStopImage
+                    : AVPictureInPictureController.pictureInPictureButtonStartImage),
+                action: model.togglePictureInPicture
+            )
+
+        case .settings:
+            SettingsLink {
+                Image(systemName: "gearshape.fill")
+                    .resizable()
+                    .renderingMode(.template)
+                    .scaledToFit()
+                    .frame(width: 17, height: 17)
+                    .frame(width: 30, height: 38)
+                    .contentShape(Circle())
+                    .playerIconHoverEffect(
+                        in: RoundedRectangle(cornerRadius: 7, style: .continuous),
+                        highlightInsets: PlayerControlHoverPolicy.bottomIslandHighlightInsets
+                    )
+            }
+            .buttonStyle(.borderless)
+            .help("Settings")
+            .accessibilityLabel("Settings")
+
+        case .more:
+            Menu {
+                // Keep compacted controls reachable without shrinking hit targets.
+                Menu("Volume") {
+                    Button(model.state.isMuted ? "Unmute" : "Mute", action: model.toggleMuteFromUser)
+                    Button("Increase Volume") { model.setVolumeFromUser(model.state.volume + 5) }
+                    Button("Decrease Volume") { model.setVolumeFromUser(model.state.volume - 5) }
+                }
+                Button(SidebarToggleControlPolicy.title(isSidebarVisible: model.isSidebarPresented),
+                       action: model.toggleSidebar)
+                    .disabled(!model.isSidebarAvailable)
+                AnyView(utilityControl(.audio, popoverEdge: popoverEdge, inMenu: true))
+                AnyView(utilityControl(.subtitles, popoverEdge: popoverEdge, inMenu: true))
+                if model.canTogglePictureInPicture {
+                    Button(model.state.pictureInPicture.isActive
+                        ? "Stop Picture in Picture" : "Start Picture in Picture",
+                        action: model.togglePictureInPicture)
+                }
+                SettingsLink { Text("Settings…") }
+                Divider()
+                if !model.state.chapters.isEmpty {
+                    Section("Chapters") {
+                        ForEach(model.state.chapters) { chapter in
+                            Button {
+                                model.player.selectChapter(chapter)
+                            } label: {
+                                menuSelectionLabel(
+                                    chapter.title ?? "Chapter \(chapter.id + 1)",
+                                    selected: chapter.id == model.state.currentChapterID
+                                )
+                            }
+                        }
+                    }
+                    Divider()
+                }
+
+                Toggle("Lock Controls Position", isOn: $model.isControlsPositionLocked)
+                Button("Reset Controls Position", action: model.resetControlsPosition)
+                Button("Controls Help…") { model.isShortcutHelpPresented = true }
+                Divider()
+                Button("Fit Window to Video", action: model.fitWindowToVideo)
+                    .disabled(!model.canFitWindowToVideo)
+
+                if model.player.supports(.saveScreenshot) {
+                    Button("Save Screenshot…", action: model.saveScreenshot)
+                        .disabled(model.state.currentSource == nil)
+                }
+
+                Button("Playback Inspector…") {
+                    model.isInspectorPresented = true
+                }
+
+                Divider()
+
+                if model.player.supports(.changePlaybackSpeed) {
+                    Section("Playback Speed") {
+                        ForEach([0.5, 0.75, 1, 1.25, 1.5, 2], id: \.self) { speed in
+                            Button {
+                                model.player.setPlaybackSpeed(speed)
+                            } label: {
+                                menuSelectionLabel(
+                                    String(format: "%g×", speed),
+                                    selected: abs(model.state.playbackSpeed - speed) < 0.001
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Section("Track Sync") {
+                    if model.player.supports(.changeAudioDelay) {
+                        Button("Audio −0.1 s") {
+                            model.player.setAudioDelay(model.state.audioDelay - 0.1)
+                        }
+                        Button("Reset Audio Delay") {
+                            model.player.setAudioDelay(0)
+                        }
+                        .disabled(abs(model.state.audioDelay) < 0.001)
+                        Button("Audio +0.1 s") {
+                            model.player.setAudioDelay(model.state.audioDelay + 0.1)
+                        }
+                        Divider()
+                    }
+
+                    if model.player.supports(.changeSubtitleDelay) {
+                        Text(
+                            "Subtitle Delay: \(SubtitleDelayInput.displayText(for: model.state.subtitleDelay))"
+                        )
+                        Button("Set Subtitle Delay…", action: model.openSubtitleDelayPanel)
+                        Button("Reset Subtitle Delay") {
+                            model.setSubtitleDelayFromUser(0)
+                        }
+                        .disabled(abs(model.state.subtitleDelay) < 0.001)
+                    }
+                }
+            } label: {
+                compactMenuLabel("ellipsis", title: "More Playback Controls")
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .help("More Playback Controls")
+            .accessibilityLabel("More Playback Controls")
+        }
+    }
+
+    private func iconButton(
+        _ title: String,
+        systemImage: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        iconButton(title, image: Image(systemName: systemImage), action: action)
+    }
+
+    private func iconButton(
+        _ title: String,
+        image: Image,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            image
+                .resizable()
+                .renderingMode(.template)
+                .scaledToFit()
+                .frame(width: 17, height: 17)
+                .frame(width: 30, height: 38)
+                .contentShape(Circle())
+                .playerIconHoverEffect(
+                    in: RoundedRectangle(cornerRadius: 7, style: .continuous),
+                    highlightInsets: PlayerControlHoverPolicy.bottomIslandHighlightInsets
+                )
+        }
+        .buttonStyle(.borderless)
+        .help(title)
+        .accessibilityLabel(title)
+    }
+
+    private func compactMenuLabel(
+        _ systemImage: String,
+        title: String,
+        animatesSymbolReplacement: Bool = false
+    ) -> some View {
+        Image(systemName: systemImage)
+            .font(.system(size: 16, weight: .medium))
+            .contentTransition(
+                animatesSymbolReplacement ? .symbolEffect(.replace) : .identity
+            )
+            .animation(
+                animatesSymbolReplacement
+                    ? IlliquidMotion.stateMorph(reduceMotion: reduceMotion)
+                    : nil,
+                value: systemImage
+            )
+            .frame(width: 30, height: 38)
+            .contentShape(Rectangle())
+            .playerIconHoverEffect(
+                in: RoundedRectangle(cornerRadius: 7, style: .continuous),
+                highlightInsets: PlayerControlHoverPolicy.bottomIslandHighlightInsets
+            )
+            .accessibilityLabel(title)
+    }
+
+    private func menuSelectionLabel(_ title: String, selected: Bool) -> some View {
+        HStack {
+            Image(systemName: "checkmark")
+                .opacity(selected ? 1 : 0)
+            Text(title)
+        }
+    }
+
 }

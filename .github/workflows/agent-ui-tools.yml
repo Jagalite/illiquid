@@ -1,0 +1,56 @@
+name: Agent UI tools
+
+on:
+  pull_request:
+    paths:
+      - 'Scripts/agent-ui/**'
+      - 'Tests/AgentUI/**'
+      - 'Documentation/MACOS_AGENT_UI_AUTOMATION_*.md'
+      - '.github/workflows/agent-ui-tools.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  component-tests:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test runner and native helper contracts
+        # test_native.py compiles Swift. Local/shared runners must use Kyoto.
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          import shutil
+          import subprocess
+          import sys
+
+          if not shutil.which('swiftc'):
+              raise SystemExit('swiftc is required; native compilation must not be skipped')
+          command = [sys.executable, '-m', 'unittest', 'discover',
+                     '-s', 'Scripts/agent-ui/tests', '-p', 'test_*.py', '-v']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Shared Kyoto queue is unavailable on this hosted runner; '
+                'running component tests and their helper compilation directly.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Validate scenario and inventory contracts without UI
+        run: python3 -m unittest discover -s Tests/AgentUI -p 'test_*.py' -v
+      # Live input and rendering qualification run on a dedicated logged-in Mac.
+      # This job does not claim interactive coverage or frame-rate measurements.

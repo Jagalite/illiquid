@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "name": "chrome",
+  "description": "SETUP: loaded generated video fixture; player focused, VoiceOver off, default shortcuts; controls-always-visible false and benchmark chrome pin disabled. No menu, popover or focus pins; pointer stationary. A real Space play transition hides controls, and a real Space pause transition reveals them. Hooks only establish setup/read state; no pointer, timeout, or presented-frame qualification.",
+  "requires": [],
+  "steps": [
+    {
+      "id": "loaded-fixture",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.duration_seconds",
+          "op": "gte",
+          "value": 10
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "player-focused",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.window.key",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "setup-paused",
+      "command": "hook",
+      "args": {
+        "action": "pause"
+      }
+    },
+    {
+      "id": "paused-setup-observed",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.pause_desired",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "play-using-real-shortcut",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": "space",
+        "modifiers": []
+      }
+    },
+    {
+      "id": "play-request-observed",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.pause_desired",
+          "op": "eq",
+          "value": false
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "playing-chrome-hidden",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.chrome.visible",
+          "op": "eq",
+          "value": false
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "pause-using-real-shortcut",
+      "command": "act",
+      "args": {
+        "action": "key",
+        "mode": "input",
+        "key": "space",
+        "modifiers": []
+      }
+    },
+    {
+      "id": "pause-request-observed",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.playback.pause_desired",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    },
+    {
+      "id": "paused-chrome-visible",
+      "command": "wait",
+      "args": {
+        "command": "hook",
+        "args": {
+          "action": "agent-state"
+        },
+        "condition": {
+          "path": "data.state.data.chrome.visible",
+          "op": "eq",
+          "value": true
+        },
+        "timeout": 10,
+        "interval": 0.1
+      }
+    }
+  ],
+  "metrics": {
+    "required": []
+  }
+}
