@@ -1,0 +1,96 @@
+name: Subtitle staging slot memory
+
+on:
+  push:
+    branches: ['perf/subtitle-slot-capacity-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/**'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleStagingReuseTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/MetalASSSubtitleCompositorTests.swift'
+      - 'Benchmarks/SubtitleSlotCapacity/**'
+      - 'Benchmarks/SubtitleStaging/**'
+      - '.github/workflows/subtitle-slot-capacity.yml'
+      - '!Benchmarks/**/evidence/**'
+      - '!Benchmarks/**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-slot-capacity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-qualification:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Run portable regressions in debug and release
+        run: |
+          python3 Benchmarks/SubtitleStaging/run.py test \
+            --output "$RUNNER_TEMP/subtitle-slot/debug"
+          python3 Benchmarks/SubtitleStaging/run.py test --configuration release \
+            --output "$RUNNER_TEMP/subtitle-slot/release"
+      - name: Measure independent slot capacity and deferred growth
+        run: |
+          python3 Benchmarks/SubtitleSlotCapacity/run.py \
+            --output "$RUNNER_TEMP/subtitle-slot/memory" --pairs 6
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and qualify main and PiP subtitle consumers
+        run: |
+          mkdir -p "$RUNNER_TEMP/subtitle-slot/native"
+          sw_vers > "$RUNNER_TEMP/subtitle-slot/native/host.txt"
+          swift --version >> "$RUNNER_TEMP/subtitle-slot/native/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/subtitle-slot/native/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'SubtitleStagingReuseTests|MetalASSSubtitleCompositorTests|PiPSubtitlePipelineTests|PiPSubtitleUploadReuseTests' \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-slot/native/tests.log"
+      - name: Emit compact evidence bundle
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-slot"
+          paths = []
+          for directory in ("debug", "release", "memory", "native"):
+              for extension in ("*.json", "*.jsonl", "*.log", "*.txt"):
+                  paths.extend((root / directory).glob(extension))
+          files = {str(p.relative_to(root)): p.read_text() for p in sorted(set(paths)) if p.is_file()}
+          for name in ("memory/failure.json", "memory/summary.json"):
+              if name in files:
+                  print(f"::group::{name}")
+                  print(files[name])
+                  print("::endgroup::")
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit("Evidence exceeds the log bundle limit; use the uploaded artifact")
+          print("SUBTITLE_SLOT_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          print("SUBTITLE_SLOT_BUNDLE_BASE64 " + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-slot-capacity-evidence
+          path: |
+            ${{ runner.temp }}/subtitle-slot/*/*.json
+            ${{ runner.temp }}/subtitle-slot/*/*.jsonl
+            ${{ runner.temp }}/subtitle-slot/*/*.log
+            ${{ runner.temp }}/subtitle-slot/*/*.txt
+            ${{ runner.temp }}/subtitle-slot/memory/baseline/*.swift
+            ${{ runner.temp }}/subtitle-slot/memory/candidate/*.swift
+          retention-days: 14

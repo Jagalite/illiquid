@@ -149,9 +149,10 @@ def benchmark(args: argparse.Namespace, output: Path, env: dict, swift: str) -> 
         binaries[name], manifests[name] = build_binary(name, ref, output, env, swiftc)
     write_json(output / "manifests.json", manifests)
 
-    # The comparison covers complete historical Data snapshots, geometry,
-    # upload/copy work and source retirement. Clear accounting intentionally
-    # changes; the verification receipt excludes that one diagnostic metric.
+    # Compare the active pixels, geometry, upload/copy work and retirement.
+    # Each variant independently verifies full held snapshots and zero unused
+    # tails. Slot capacity and clear accounting are internal storage policies
+    # and may intentionally differ; they are not GPU-visible output bytes.
     receipts = {}
     for name, binary in binaries.items():
         receipt = json.loads(execute([str(binary), "verify"], output, f"verify-{name}", env))

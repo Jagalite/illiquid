@@ -15,6 +15,12 @@ struct SubtitleStagingReuseTests {
         let expectedPixels: Data
     }
 
+    enum PackingPath: String, CaseIterable {
+        case r8Atlas
+        case bitmapAtlas
+        case bgraSurface
+    }
+
     @Test(arguments: [false, true])
     func atlasSnapshotsMatchFreshPackingAcrossSizeAndPixelFormatChanges(
         retainSnapshots: Bool
@@ -68,9 +74,8 @@ struct SubtitleStagingReuseTests {
         let large = Input(regions: [region(width: 124, height: 124, value: 79)])
         let small = Input(regions: [region(width: 1, height: 1, value: 151)])
         var snapshots: [Snapshot] = []
-        var highWaterBytes = 0
         for _ in 0..<2 {
-            snapshots.append(try checkedPrepare(large, packer: packer, highWaterBytes: &highWaterBytes))
+            snapshots.append(try checkedPrepare(large, packer: packer))
         }
         let retainedBeforeFailures = packer.retainedStorageByteCountForTesting
 
@@ -98,7 +103,7 @@ struct SubtitleStagingReuseTests {
         #expect(packer.retainedStorageByteCountForTesting == retainedBeforeFailures)
 
         for _ in 0..<4 {
-            snapshots.append(try checkedPrepare(small, packer: packer, highWaterBytes: &highWaterBytes))
+            snapshots.append(try checkedPrepare(small, packer: packer))
         }
         for snapshot in snapshots {
             #expect(snapshot.frame.pixels == snapshot.expectedPixels)
@@ -116,10 +121,9 @@ struct SubtitleStagingReuseTests {
         let initialBytes = initialReference.metrics.uploadBytes
         let budget = SubtitleMemoryBudget(limitBytes: 3 * initialBytes, ownerLimitsBytes: [:])
         let packer = makePacker(memoryBudget: budget)
-        var highWaterBytes = 0
         var snapshots: [Snapshot] = []
         for _ in 0..<2 {
-            snapshots.append(try checkedPrepare(initial, packer: packer, highWaterBytes: &highWaterBytes))
+            snapshots.append(try checkedPrepare(initial, packer: packer))
         }
         #expect(packer.retainedStorageByteCountForTesting == 2 * initialBytes)
         let blocker = try #require(budget.acquire(owner: .bitmapEvents, bytes: initialBytes))
@@ -129,11 +133,11 @@ struct SubtitleStagingReuseTests {
         #expect(budget.snapshot.reservedBytes == 3 * initialBytes)
         #expect(packer.retainedStorageByteCountForTesting == 2 * initialBytes)
         for _ in 0..<4 {
-            snapshots.append(try checkedPrepare(small, packer: packer, highWaterBytes: &highWaterBytes))
+            snapshots.append(try checkedPrepare(small, packer: packer))
         }
 
         #expect(blocker.resize(to: 0))
-        snapshots.append(try checkedPrepare(growth, packer: packer, highWaterBytes: &highWaterBytes))
+        snapshots.append(try checkedPrepare(growth, packer: packer))
         #expect(budget.snapshot.reservedBytes == packer.retainedStorageByteCountForTesting)
         #expect(budget.snapshot.rejectedAcquisitions == 1)
         for snapshot in snapshots {
@@ -146,11 +150,10 @@ struct SubtitleStagingReuseTests {
         let packer = makePacker(memoryBudget: budget)
         var snapshots: [Snapshot] = []
         for strategy in [SubtitleCompositionStrategy.metalR8Atlas, .metalBGRA] {
-            var highWaterBytes = 0
             for _ in 0..<2 {
                 snapshots.append(try checkedPrepare(
                     sizedInput(strategy: strategy, large: true),
-                    packer: packer, highWaterBytes: &highWaterBytes
+                    packer: packer
                 ))
             }
         }
@@ -161,11 +164,10 @@ struct SubtitleStagingReuseTests {
         #expect(packer.retainedStorageByteCountForTesting == 0)
         #expect(budget.snapshot.reservedBytes == 0)
         for strategy in [SubtitleCompositionStrategy.metalR8Atlas, .metalBGRA] {
-            var highWaterBytes = 0
             for _ in 0..<3 {
                 snapshots.append(try checkedPrepare(
                     tinyInput(strategy: strategy),
-                    packer: packer, highWaterBytes: &highWaterBytes
+                    packer: packer
                 ))
             }
         }
@@ -174,38 +176,78 @@ struct SubtitleStagingReuseTests {
         }
     }
 
-    @Test(arguments: [SubtitleCompositionStrategy.metalR8Atlas, .metalBGRA])
-    func clearMetricsIncludeThePreviousDirtyPrefixOnlyOnItsFirstReuse(
-        strategy: SubtitleCompositionStrategy
+    @Test(arguments: PackingPath.allCases)
+    func slotCapacityAndClearMetricsRemainLocalToEachBuffer(
+        path: PackingPath
     ) throws {
         let packer = makePacker()
-        let large = sizedInput(strategy: strategy, large: true)
-        let small = tinyInput(strategy: strategy)
+        let (large, small) = slotInputs(path: path)
         let largeBytes = try #require(prepare(large, using: makePacker())).metrics.uploadBytes
         let smallBytes = try #require(prepare(small, using: makePacker())).metrics.uploadBytes
         #expect(largeBytes > smallBytes)
 
-        // A previously untouched slot allocates the historical high-water size,
-        // even when the current frame is small. Both slots must be cleaned once.
-        let inputs = [large, small, small, small, small]
-        let expectedClears = [largeBytes, largeBytes, largeBytes, smallBytes, smallBytes]
-        let expectedGrowth = [true, false, false, false, false]
+        // Slot 1 stays small until a large frame is actually prepared there.
+        // Each former large dirty prefix is cleared once, without shrinking.
+        let inputs = [large, small, small, small, small, large, small, small]
+        let expectedCapacity = [largeBytes, smallBytes, largeBytes, smallBytes,
+                                largeBytes, largeBytes, largeBytes, largeBytes]
+        let expectedClears = [largeBytes, smallBytes, largeBytes, smallBytes,
+                              smallBytes, largeBytes, smallBytes, largeBytes]
+        var snapshots: [Snapshot] = []
         for index in inputs.indices {
-            let frame = try #require(prepare(inputs[index], using: packer))
-            #expect(frame.pixels.count == largeBytes)
+            let snapshot = try checkedPrepare(inputs[index], packer: packer)
+            snapshots.append(snapshot)
+            let frame = snapshot.frame
+            #expect(frame.pixels.count == expectedCapacity[index])
             #expect(frame.metrics.atlasClearBytes == expectedClears[index])
-            #expect(frame.metrics.atlasReallocated == expectedGrowth[index])
-            #expect(frame.metrics.uploadBytes == (index == 0 ? largeBytes : smallBytes))
+            // The existing metric counts source-pool high-water growth, not
+            // individual slot allocations. Growing slot 1 to the prior peak
+            // therefore does not add another high-water event.
+            #expect(frame.metrics.atlasReallocated == (index == 0))
+            #expect(frame.metrics.uploadBytes == (index == 0 || index == 5 ? largeBytes : smallBytes))
+            if (1...4).contains(index) {
+                #expect(packer.retainedStorageByteCountForTesting == largeBytes + smallBytes)
+            }
         }
         #expect(packer.retainedStorageByteCountForTesting == 2 * largeBytes)
+        for snapshot in snapshots {
+            #expect(snapshot.frame.pixels == snapshot.expectedPixels)
+        }
+    }
+
+    @Test(arguments: PackingPath.allCases)
+    func smallSecondSlotFitsWithoutDuplicatingPeakCapacity(path: PackingPath) throws {
+        let (large, small) = slotInputs(path: path)
+        let largeBytes = try #require(prepare(large, using: makePacker())).metrics.uploadBytes
+        let smallBytes = try #require(prepare(small, using: makePacker())).metrics.uploadBytes
+        let budget = SubtitleMemoryBudget(limitBytes: largeBytes + smallBytes, ownerLimitsBytes: [:])
+        let packer = makePacker(memoryBudget: budget)
+        var snapshots = [try checkedPrepare(large, packer: packer)]
+        for _ in 0..<5 {
+            snapshots.append(try checkedPrepare(small, packer: packer))
+            #expect(budget.snapshot.reservedBytes == largeBytes + smallBytes)
+            #expect(packer.retainedStorageByteCountForTesting == largeBytes + smallBytes)
+        }
+        #expect(budget.snapshot.rejectedAcquisitions == 0)
+
+        // Reusing the already-large slot fits; growing the other slot does not.
+        snapshots.append(try checkedPrepare(large, packer: packer))
+        #expect(prepare(large, using: packer) == nil)
+        #expect(budget.snapshot.rejectedAcquisitions == 1)
+        #expect(budget.snapshot.reservedBytes == largeBytes + smallBytes)
+        #expect(packer.retainedStorageByteCountForTesting == largeBytes + smallBytes)
+        snapshots.append(try checkedPrepare(small, packer: packer))
+        snapshots.append(try checkedPrepare(small, packer: packer))
+        for snapshot in snapshots {
+            #expect(snapshot.frame.pixels == snapshot.expectedPixels)
+        }
     }
 
     private func verifySequence(_ inputs: [Input], retainSnapshots: Bool) throws {
         let packer = makePacker()
-        var highWaterBytes = 0
         var snapshots: [Snapshot] = []
         for input in inputs {
-            let snapshot = try checkedPrepare(input, packer: packer, highWaterBytes: &highWaterBytes)
+            let snapshot = try checkedPrepare(input, packer: packer)
             if retainSnapshots {
                 snapshots.append(snapshot)
             }
@@ -216,18 +258,19 @@ struct SubtitleStagingReuseTests {
     }
 
     /// A fresh packer provides current-frame pixels without any prior contents.
-    /// Appending zeros expresses the full grow-only snapshot contract without
-    /// duplicating the storage-reuse algorithm under test.
+    /// Each reused slot must match those active bytes and contain only zeros
+    /// beyond them. Capacity policy is checked separately so this pixel oracle
+    /// does not duplicate the storage-reuse algorithm under test.
     private func checkedPrepare(
         _ input: Input,
-        packer: ASSSubtitleFramePacker,
-        highWaterBytes: inout Int
+        packer: ASSSubtitleFramePacker
     ) throws -> Snapshot {
         let reference = try #require(prepare(input, using: makePacker()))
         let frame = try #require(prepare(input, using: packer))
-        highWaterBytes = max(highWaterBytes, reference.pixels.count)
+        let unusedBytes = frame.pixels.count - reference.pixels.count
+        try #require(unusedBytes >= 0)
         var expectedPixels = reference.pixels
-        expectedPixels.append(Data(count: highWaterBytes - expectedPixels.count))
+        expectedPixels.append(Data(count: unusedBytes))
 
         #expect(frame.strategy == reference.strategy)
         #expect(frame.canvasSize == reference.canvasSize)
@@ -251,6 +294,18 @@ struct SubtitleStagingReuseTests {
         ASSSubtitleFramePacker(
             maximumTextureDimension: 512, atlasPadding: 2, memoryBudget: memoryBudget
         )
+    }
+
+    private func slotInputs(path: PackingPath) -> (Input, Input) {
+        switch path {
+        case .r8Atlas:
+            (sizedInput(strategy: .metalR8Atlas, large: true), tinyInput(strategy: .metalR8Atlas))
+        case .bitmapAtlas:
+            (Input(regions: [region(width: 92, height: 60, value: 83, bitmap: true)]),
+             Input(regions: [region(width: 1, height: 1, value: 199, bitmap: true)]))
+        case .bgraSurface:
+            (sizedInput(strategy: .metalBGRA, large: true), tinyInput(strategy: .metalBGRA))
+        }
     }
 
     private func sizedInput(strategy: SubtitleCompositionStrategy, large: Bool) -> Input {
