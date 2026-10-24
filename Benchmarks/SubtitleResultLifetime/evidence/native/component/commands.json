@@ -1,0 +1,731 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.05371275000000253,
+    "log": "logs/head.log",
+    "log_sha256": "90bd22edcaf4455cd59bebafe056fb521db954e9a67787199839bcc571a8e5f8",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "90bd22edcaf4455cd59bebafe056fb521db954e9a67787199839bcc571a8e5f8"
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "elapsed_seconds": 0.9265535410000041,
+    "log": "logs/status.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "show",
+      "af1c1add701e49b355448cf8983eaed1e7623108:Sources/IlliquidNativePlayback/Media/SubtitleDecoder.swift"
+    ],
+    "elapsed_seconds": 0.012503207999998267,
+    "log": "logs/baseline-source.log",
+    "log_sha256": "5694cf676313149a759a4c57793f36c7a8b6415f9aeaff9e50c57e81662e90f8",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5694cf676313149a759a4c57793f36c7a8b6415f9aeaff9e50c57e81662e90f8"
+  },
+  {
+    "argv": [
+      "git",
+      "merge-base",
+      "--is-ancestor",
+      "af1c1add701e49b355448cf8983eaed1e7623108",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.010984500000006392,
+    "log": "logs/baseline-ancestry.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/usr/bin/swiftc",
+      "--version"
+    ],
+    "elapsed_seconds": 2.832027750000009,
+    "log": "logs/swift-version.log",
+    "log_sha256": "00aa49fe91b635b848be0c6e380090c1ca9ba8eba40af687930dcdaaf86bcdc7",
+    "returncode": 0,
+    "stderr_sha256": "542ca724f46d8a3dffb85c3cd4b6e0d2fdf6c1bd4c484e6978dd9ed2f22cd639",
+    "stdout_sha256": "b674f79b747370a1c05ae7cec551fffe557816c6c807f35f39f933ecbcca80d7"
+  },
+  {
+    "argv": [
+      "sw_vers"
+    ],
+    "elapsed_seconds": 0.015485124999997879,
+    "log": "logs/macos-version.log",
+    "log_sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+  },
+  {
+    "argv": [
+      "sysctl",
+      "-n",
+      "machdep.cpu.brand_string"
+    ],
+    "elapsed_seconds": 0.007732833999995137,
+    "log": "logs/hardware.log",
+    "log_sha256": "ff76851c55aca2697f22e6534c9378088cae0334bbb5d13675e90a9097fc2713",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ff76851c55aca2697f22e6534c9378088cae0334bbb5d13675e90a9097fc2713"
+  },
+  {
+    "argv": [
+      "xcrun",
+      "--sdk",
+      "macosx",
+      "--show-sdk-path"
+    ],
+    "elapsed_seconds": 0.013438374999992675,
+    "log": "logs/sdk.log",
+    "log_sha256": "0f808f2e6b513e3677dcb3492d4b0577b7f2680ca95d988f4ea653b04edc4a89",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0f808f2e6b513e3677dcb3492d4b0577b7f2680ca95d988f4ea653b04edc4a89"
+  },
+  {
+    "argv": [
+      "/usr/bin/swiftc",
+      "-Onone",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-warnings-as-errors",
+      "-target",
+      "arm64-apple-macosx26.0",
+      "-sdk",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-I",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/CFFmpeg",
+      "-I",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/LifetimeProbe",
+      "-Xcc",
+      "-I/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/CFFmpeg/include",
+      "-Xcc",
+      "-I/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/include",
+      "-L",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-module-cache-path",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/module-cache",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FFmpegPacket.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/MediaTime.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FFmpegError.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/PacketQueue.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FixedRingBuffer.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/SubtitleMemoryBudget.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/BitmapSubtitleTimeline.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/PGSSubtitlePresentation.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/SupportDeclarations.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/baseline/SubtitleDecoder.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/Driver.swift",
+      "-o",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/baseline"
+    ],
+    "elapsed_seconds": 11.597465584000005,
+    "log": "logs/debug-baseline-compile.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/usr/bin/swiftc",
+      "-Onone",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-warnings-as-errors",
+      "-target",
+      "arm64-apple-macosx26.0",
+      "-sdk",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-I",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/CFFmpeg",
+      "-I",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/LifetimeProbe",
+      "-Xcc",
+      "-I/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/CFFmpeg/include",
+      "-Xcc",
+      "-I/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/include",
+      "-L",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-module-cache-path",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/module-cache",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FFmpegPacket.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/MediaTime.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FFmpegError.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/PacketQueue.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FixedRingBuffer.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/SubtitleMemoryBudget.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/BitmapSubtitleTimeline.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/PGSSubtitlePresentation.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/SupportDeclarations.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/candidate/SubtitleDecoder.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/Driver.swift",
+      "-o",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/candidate"
+    ],
+    "elapsed_seconds": 5.573733125000004,
+    "log": "logs/debug-candidate-compile.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/usr/bin/swiftc",
+      "-O",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-warnings-as-errors",
+      "-target",
+      "arm64-apple-macosx26.0",
+      "-sdk",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-I",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/CFFmpeg",
+      "-I",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/LifetimeProbe",
+      "-Xcc",
+      "-I/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/CFFmpeg/include",
+      "-Xcc",
+      "-I/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/include",
+      "-L",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-module-cache-path",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/module-cache",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FFmpegPacket.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/MediaTime.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FFmpegError.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/PacketQueue.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FixedRingBuffer.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/SubtitleMemoryBudget.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/BitmapSubtitleTimeline.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/PGSSubtitlePresentation.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/SupportDeclarations.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/baseline/SubtitleDecoder.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/Driver.swift",
+      "-o",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/baseline"
+    ],
+    "elapsed_seconds": 15.201014832999988,
+    "log": "logs/release-baseline-compile.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/usr/bin/swiftc",
+      "-O",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-warnings-as-errors",
+      "-target",
+      "arm64-apple-macosx26.0",
+      "-sdk",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-I",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/CFFmpeg",
+      "-I",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/LifetimeProbe",
+      "-Xcc",
+      "-I/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/CFFmpeg/include",
+      "-Xcc",
+      "-I/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/include",
+      "-L",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib",
+      "-module-cache-path",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/module-cache",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FFmpegPacket.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/MediaTime.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FFmpegError.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/PacketQueue.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/FixedRingBuffer.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/SubtitleMemoryBudget.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/BitmapSubtitleTimeline.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/PGSSubtitlePresentation.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/shared/SupportDeclarations.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/candidate/SubtitleDecoder.swift",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/sources/Driver.swift",
+      "-o",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate"
+    ],
+    "elapsed_seconds": 9.968957500000016,
+    "log": "logs/release-candidate-compile.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "otool",
+      "-L",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate"
+    ],
+    "elapsed_seconds": 1.7362360420000016,
+    "log": "logs/dependencies.log",
+    "log_sha256": "a8cdb90a7e42cbd53a61279f1069c399a54cd5c66f44c74ef9670d146bd18961",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a8cdb90a7e42cbd53a61279f1069c399a54cd5c66f44c74ef9670d146bd18961"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/baseline",
+      "text",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-text-baseline.bin"
+    ],
+    "elapsed_seconds": 0.2002722500000118,
+    "log": "logs/debug-text-baseline.log",
+    "log_sha256": "414b78699214d662564d1ef2e4b8eaa66fbd067ed2ad763ffc0b216761ada785",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "414b78699214d662564d1ef2e4b8eaa66fbd067ed2ad763ffc0b216761ada785"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/candidate",
+      "text",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-text-candidate.bin"
+    ],
+    "elapsed_seconds": 0.09001412500001038,
+    "log": "logs/debug-text-candidate.log",
+    "log_sha256": "1a412b87e8c43597d9190603c312e89a34dcc6dbd7c380473c11eefdfa191899",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1a412b87e8c43597d9190603c312e89a34dcc6dbd7c380473c11eefdfa191899"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/candidate",
+      "pgs_tiny",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_tiny-candidate.bin"
+    ],
+    "elapsed_seconds": 0.14424516700000822,
+    "log": "logs/debug-pgs_tiny-candidate.log",
+    "log_sha256": "d001cc86ff657530442e9d734c75db3f94fd3161e1f2fc852a375d0a5a0bdf80",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d001cc86ff657530442e9d734c75db3f94fd3161e1f2fc852a375d0a5a0bdf80"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/baseline",
+      "pgs_tiny",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_tiny-baseline.bin"
+    ],
+    "elapsed_seconds": 0.14929645899999855,
+    "log": "logs/debug-pgs_tiny-baseline.log",
+    "log_sha256": "d24d249ebc67518198f8d4b3a4fd6201095b5149841d74c0a8433770c4c0cc06",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d24d249ebc67518198f8d4b3a4fd6201095b5149841d74c0a8433770c4c0cc06"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/baseline",
+      "pgs_1080p",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_1080p-baseline.bin"
+    ],
+    "elapsed_seconds": 0.3652322089999984,
+    "log": "logs/debug-pgs_1080p-baseline.log",
+    "log_sha256": "24b5c7da58212ccb543e9b438aaf2bcea99dc4b6cd7676a0287b26338925b871",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "24b5c7da58212ccb543e9b438aaf2bcea99dc4b6cd7676a0287b26338925b871"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/candidate",
+      "pgs_1080p",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_1080p-candidate.bin"
+    ],
+    "elapsed_seconds": 0.3054297090000091,
+    "log": "logs/debug-pgs_1080p-candidate.log",
+    "log_sha256": "093055b8d1693a87f98ea9591b941456bc3c6e0c317af157c6fd4b7906c60545",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "093055b8d1693a87f98ea9591b941456bc3c6e0c317af157c6fd4b7906c60545"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/candidate",
+      "pgs_large_cropped",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_large_cropped-candidate.bin"
+    ],
+    "elapsed_seconds": 0.09442362500001877,
+    "log": "logs/debug-pgs_large_cropped-candidate.log",
+    "log_sha256": "8db1df8514abc9920b6e37a68cda422017c4d35c23c4a2cc982c3b15a479e73a",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8db1df8514abc9920b6e37a68cda422017c4d35c23c4a2cc982c3b15a479e73a"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/baseline",
+      "pgs_large_cropped",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_large_cropped-baseline.bin"
+    ],
+    "elapsed_seconds": 0.18881049999998822,
+    "log": "logs/debug-pgs_large_cropped-baseline.log",
+    "log_sha256": "05c1a780523c4d34b1a59e995db96cd8b51b0fb42d426a27801d5ea0de5c61db",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "05c1a780523c4d34b1a59e995db96cd8b51b0fb42d426a27801d5ea0de5c61db"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/baseline",
+      "pgs_display_rejected",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_display_rejected-baseline.bin"
+    ],
+    "elapsed_seconds": 0.09098170799998684,
+    "log": "logs/debug-pgs_display_rejected-baseline.log",
+    "log_sha256": "42e21f6d48ac556b5dcb39977238a40e0399e70ff421bc5af54f002d9cb7f5d5",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "42e21f6d48ac556b5dcb39977238a40e0399e70ff421bc5af54f002d9cb7f5d5"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/candidate",
+      "pgs_display_rejected",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_display_rejected-candidate.bin"
+    ],
+    "elapsed_seconds": 0.15860745800000586,
+    "log": "logs/debug-pgs_display_rejected-candidate.log",
+    "log_sha256": "9014ae268a135e5c10ad90cb6a2f7de2e616c0b00756ef1af798fe7ef941dea4",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9014ae268a135e5c10ad90cb6a2f7de2e616c0b00756ef1af798fe7ef941dea4"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/candidate",
+      "pgs_budget_rejected",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_budget_rejected-candidate.bin"
+    ],
+    "elapsed_seconds": 0.14566454199999157,
+    "log": "logs/debug-pgs_budget_rejected-candidate.log",
+    "log_sha256": "3e43b25062e22efc27085522c2c81ea3e50dfb0e68c0e36a78ff2085ec55eae3",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3e43b25062e22efc27085522c2c81ea3e50dfb0e68c0e36a78ff2085ec55eae3"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/baseline",
+      "pgs_budget_rejected",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_budget_rejected-baseline.bin"
+    ],
+    "elapsed_seconds": 0.13276079199999913,
+    "log": "logs/debug-pgs_budget_rejected-baseline.log",
+    "log_sha256": "0c5bd694a5e8027ea9f4baaf35233767c53d97f4126aa1f582d02823c989db91",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0c5bd694a5e8027ea9f4baaf35233767c53d97f4126aa1f582d02823c989db91"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/baseline",
+      "pgs_malformed",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_malformed-baseline.bin"
+    ],
+    "elapsed_seconds": 0.14531662499999243,
+    "log": "logs/debug-pgs_malformed-baseline.log",
+    "log_sha256": "a547fb914bcede50f1f2123e006f8b12825284bf50dfb4cd83ff6c0c2e85648e",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a547fb914bcede50f1f2123e006f8b12825284bf50dfb4cd83ff6c0c2e85648e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/candidate",
+      "pgs_malformed",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-pgs_malformed-candidate.bin"
+    ],
+    "elapsed_seconds": 0.15537066699999968,
+    "log": "logs/debug-pgs_malformed-candidate.log",
+    "log_sha256": "a547fb914bcede50f1f2123e006f8b12825284bf50dfb4cd83ff6c0c2e85648e",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a547fb914bcede50f1f2123e006f8b12825284bf50dfb4cd83ff6c0c2e85648e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/candidate",
+      "dvb_tiny",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-dvb_tiny-candidate.bin"
+    ],
+    "elapsed_seconds": 0.14864595800000302,
+    "log": "logs/debug-dvb_tiny-candidate.log",
+    "log_sha256": "273ff36ee2616394c96e25afcc5a51cae2de35eb1898380f52d8de21163b071e",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "273ff36ee2616394c96e25afcc5a51cae2de35eb1898380f52d8de21163b071e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/debug/baseline",
+      "dvb_tiny",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/debug-dvb_tiny-baseline.bin"
+    ],
+    "elapsed_seconds": 0.15059616700000333,
+    "log": "logs/debug-dvb_tiny-baseline.log",
+    "log_sha256": "03ed0dde6ec1683c93676707131a9d3efb85db491f443718ddbadea4bca1f66d",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "03ed0dde6ec1683c93676707131a9d3efb85db491f443718ddbadea4bca1f66d"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/baseline",
+      "text",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-text-baseline.bin"
+    ],
+    "elapsed_seconds": 0.10664908399999717,
+    "log": "logs/release-text-baseline.log",
+    "log_sha256": "414b78699214d662564d1ef2e4b8eaa66fbd067ed2ad763ffc0b216761ada785",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "414b78699214d662564d1ef2e4b8eaa66fbd067ed2ad763ffc0b216761ada785"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate",
+      "text",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-text-candidate.bin"
+    ],
+    "elapsed_seconds": 0.10616487499999039,
+    "log": "logs/release-text-candidate.log",
+    "log_sha256": "1a412b87e8c43597d9190603c312e89a34dcc6dbd7c380473c11eefdfa191899",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1a412b87e8c43597d9190603c312e89a34dcc6dbd7c380473c11eefdfa191899"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate",
+      "pgs_tiny",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_tiny-candidate.bin"
+    ],
+    "elapsed_seconds": 0.138028625000004,
+    "log": "logs/release-pgs_tiny-candidate.log",
+    "log_sha256": "d001cc86ff657530442e9d734c75db3f94fd3161e1f2fc852a375d0a5a0bdf80",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d001cc86ff657530442e9d734c75db3f94fd3161e1f2fc852a375d0a5a0bdf80"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/baseline",
+      "pgs_tiny",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_tiny-baseline.bin"
+    ],
+    "elapsed_seconds": 0.09084504099999435,
+    "log": "logs/release-pgs_tiny-baseline.log",
+    "log_sha256": "d24d249ebc67518198f8d4b3a4fd6201095b5149841d74c0a8433770c4c0cc06",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d24d249ebc67518198f8d4b3a4fd6201095b5149841d74c0a8433770c4c0cc06"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/baseline",
+      "pgs_1080p",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_1080p-baseline.bin"
+    ],
+    "elapsed_seconds": 0.25715995799998836,
+    "log": "logs/release-pgs_1080p-baseline.log",
+    "log_sha256": "24b5c7da58212ccb543e9b438aaf2bcea99dc4b6cd7676a0287b26338925b871",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "24b5c7da58212ccb543e9b438aaf2bcea99dc4b6cd7676a0287b26338925b871"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate",
+      "pgs_1080p",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_1080p-candidate.bin"
+    ],
+    "elapsed_seconds": 0.2119045420000134,
+    "log": "logs/release-pgs_1080p-candidate.log",
+    "log_sha256": "093055b8d1693a87f98ea9591b941456bc3c6e0c317af157c6fd4b7906c60545",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "093055b8d1693a87f98ea9591b941456bc3c6e0c317af157c6fd4b7906c60545"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate",
+      "pgs_large_cropped",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_large_cropped-candidate.bin"
+    ],
+    "elapsed_seconds": 0.1253795839999725,
+    "log": "logs/release-pgs_large_cropped-candidate.log",
+    "log_sha256": "8db1df8514abc9920b6e37a68cda422017c4d35c23c4a2cc982c3b15a479e73a",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8db1df8514abc9920b6e37a68cda422017c4d35c23c4a2cc982c3b15a479e73a"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/baseline",
+      "pgs_large_cropped",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_large_cropped-baseline.bin"
+    ],
+    "elapsed_seconds": 0.11648554100000297,
+    "log": "logs/release-pgs_large_cropped-baseline.log",
+    "log_sha256": "05c1a780523c4d34b1a59e995db96cd8b51b0fb42d426a27801d5ea0de5c61db",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "05c1a780523c4d34b1a59e995db96cd8b51b0fb42d426a27801d5ea0de5c61db"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/baseline",
+      "pgs_display_rejected",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_display_rejected-baseline.bin"
+    ],
+    "elapsed_seconds": 0.14750587499997891,
+    "log": "logs/release-pgs_display_rejected-baseline.log",
+    "log_sha256": "42e21f6d48ac556b5dcb39977238a40e0399e70ff421bc5af54f002d9cb7f5d5",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "42e21f6d48ac556b5dcb39977238a40e0399e70ff421bc5af54f002d9cb7f5d5"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate",
+      "pgs_display_rejected",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_display_rejected-candidate.bin"
+    ],
+    "elapsed_seconds": 0.08755270899999346,
+    "log": "logs/release-pgs_display_rejected-candidate.log",
+    "log_sha256": "9014ae268a135e5c10ad90cb6a2f7de2e616c0b00756ef1af798fe7ef941dea4",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9014ae268a135e5c10ad90cb6a2f7de2e616c0b00756ef1af798fe7ef941dea4"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate",
+      "pgs_budget_rejected",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_budget_rejected-candidate.bin"
+    ],
+    "elapsed_seconds": 0.09571962500001518,
+    "log": "logs/release-pgs_budget_rejected-candidate.log",
+    "log_sha256": "3e43b25062e22efc27085522c2c81ea3e50dfb0e68c0e36a78ff2085ec55eae3",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3e43b25062e22efc27085522c2c81ea3e50dfb0e68c0e36a78ff2085ec55eae3"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/baseline",
+      "pgs_budget_rejected",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_budget_rejected-baseline.bin"
+    ],
+    "elapsed_seconds": 0.14891433299999335,
+    "log": "logs/release-pgs_budget_rejected-baseline.log",
+    "log_sha256": "0c5bd694a5e8027ea9f4baaf35233767c53d97f4126aa1f582d02823c989db91",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0c5bd694a5e8027ea9f4baaf35233767c53d97f4126aa1f582d02823c989db91"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/baseline",
+      "pgs_malformed",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_malformed-baseline.bin"
+    ],
+    "elapsed_seconds": 0.18054841600002192,
+    "log": "logs/release-pgs_malformed-baseline.log",
+    "log_sha256": "a547fb914bcede50f1f2123e006f8b12825284bf50dfb4cd83ff6c0c2e85648e",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a547fb914bcede50f1f2123e006f8b12825284bf50dfb4cd83ff6c0c2e85648e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate",
+      "pgs_malformed",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-pgs_malformed-candidate.bin"
+    ],
+    "elapsed_seconds": 0.1834855000000175,
+    "log": "logs/release-pgs_malformed-candidate.log",
+    "log_sha256": "a547fb914bcede50f1f2123e006f8b12825284bf50dfb4cd83ff6c0c2e85648e",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a547fb914bcede50f1f2123e006f8b12825284bf50dfb4cd83ff6c0c2e85648e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/candidate",
+      "dvb_tiny",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-dvb_tiny-candidate.bin"
+    ],
+    "elapsed_seconds": 0.09163174999997636,
+    "log": "logs/release-dvb_tiny-candidate.log",
+    "log_sha256": "273ff36ee2616394c96e25afcc5a51cae2de35eb1898380f52d8de21163b071e",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "273ff36ee2616394c96e25afcc5a51cae2de35eb1898380f52d8de21163b071e"
+  },
+  {
+    "argv": [
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/build/release/baseline",
+      "dvb_tiny",
+      "/Users/runner/work/_temp/subtitle-result-lifetime/component/outputs/release-dvb_tiny-baseline.bin"
+    ],
+    "elapsed_seconds": 0.14157970799999475,
+    "log": "logs/release-dvb_tiny-baseline.log",
+    "log_sha256": "03ed0dde6ec1683c93676707131a9d3efb85db491f443718ddbadea4bca1f66d",
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "03ed0dde6ec1683c93676707131a9d3efb85db491f443718ddbadea4bca1f66d"
+  }
+]
