@@ -115,3 +115,12 @@ compiler/SDK/host identity, dynamic library hashes/linkage, and executable hashe
 The runner verifies source, driver, binary, and fixture stability at completion.
 The results describe this native component and synthetic workload, not playback
 frame rate, display latency, battery life, or a universal player speedup.
+
+Recorded native results, controls, and limitations are described in
+[`Documentation/AUXILIARY_FONT_MEMORY_PERFORMANCE.md`](../../Documentation/AUXILIARY_FONT_MEMORY_PERFORMANCE.md).
+The study finds fewer live allocator-accounted bytes and less auxiliary input
+open/close work for font-bearing fixtures. Current RSS is approximately 16 MiB
+higher in the larger fixtures, and peak RSS is essentially unchanged; do not
+interpret the allocation reduction as an equivalent physical-memory saving.
+The [evidence index](evidence/README.md) explains the retained measurements,
+verification traces, test logs, source receipts, and archive omissions.
