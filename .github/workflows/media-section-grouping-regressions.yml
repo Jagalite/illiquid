@@ -1,0 +1,52 @@
+name: Media section grouping regressions
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidCore/Utilities/**'
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidAppTests/SourceBrowserFilterTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaOrganizationTests.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaGroupingTests.swift'
+      - 'Benchmarks/MediaSectionGrouping/**'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - '.github/workflows/media-section-grouping-regressions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-section-grouping-regressions-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  current-source-parity:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test integrated sources in debug and release
+        run: python3 Benchmarks/MediaSectionGrouping/run.py --current-support --mode tests --output "$RUNNER_TEMP/media-grouping-tests"
+      - name: Compare complete projection outputs
+        run: python3 Benchmarks/MediaSectionGrouping/run.py --current-support --mode verify --output "$RUNNER_TEMP/media-grouping-parity"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-grouping-current-source
+          path: |
+            ${{ runner.temp }}/media-grouping-tests/
+            ${{ runner.temp }}/media-grouping-parity/
+            !${{ runner.temp }}/media-grouping-*/build/**
+            !${{ runner.temp }}/media-grouping-*/cache/**
+          retention-days: 14

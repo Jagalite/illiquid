@@ -1,0 +1,106 @@
+name: Audio format metadata performance
+
+on:
+  push:
+    branches: ['perf/audio-format-metadata-*']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/AudioDecoder.swift'
+      - 'Sources/IlliquidNativePlayback/Media/AudioSourceFormat.swift'
+      - 'Sources/CFFmpeg/include/ffmpeg_shim.h'
+      - 'Tests/IlliquidNativePlaybackTests/AudioSourceFormatTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AudioResamplerDrainTests.swift'
+      - 'Benchmarks/AudioFormatMetadata/**'
+      - '.github/workflows/audio-format-metadata.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audio-format-metadata-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-audio:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Record the native environment
+        run: |
+          mkdir -p "$RUNNER_TEMP/audio-format-metadata"
+          sw_vers > "$RUNNER_TEMP/audio-format-metadata/host.txt"
+          uname -a >> "$RUNNER_TEMP/audio-format-metadata/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/audio-format-metadata/host.txt"
+          swift --version >> "$RUNNER_TEMP/audio-format-metadata/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/audio-format-metadata/host.txt"
+      - name: Test metadata edge cases and measure paired production code
+        run: |
+          python3 Benchmarks/AudioFormatMetadata/run-tests.py \
+            --output "$RUNNER_TEMP/audio-format-metadata/tests"
+          python3 Benchmarks/AudioFormatMetadata/run.py \
+            --pairs 6 --target-ms 80 \
+            --output "$RUNNER_TEMP/audio-format-metadata/benchmark"
+      - name: Generate native playback fixtures
+        run: |
+          mkdir -p "$RUNNER_TEMP/audio-format-metadata/fixtures"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'anullsrc=r=48000:cl=7.1' -t 2 -c:a flac \
+            "$RUNNER_TEMP/audio-format-metadata/fixtures/audio-7.1.flac"
+          test -s "$RUNNER_TEMP/audio-format-metadata/fixtures/audio-7.1.flac"
+          # AudioDelayTests also loads the standard H.264/AAC fixture.
+          # Match its definition in Scripts/generate-native-fixtures.sh.
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'testsrc2=size=640x360:rate=30' \
+            -f lavfi -i 'sine=frequency=440:sample_rate=48000' \
+            -t 3 -shortest \
+            -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac \
+            "$RUNNER_TEMP/audio-format-metadata/fixtures/h264-aac.mp4"
+          test -s "$RUNNER_TEMP/audio-format-metadata/fixtures/h264-aac.mp4"
+      - name: Build the app graph and qualify audio output and draining
+        run: |
+          export ILLIQUID_NATIVE_FIXTURE_DIR="$RUNNER_TEMP/audio-format-metadata/fixtures"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+            'AudioSourceFormatTests|AudioResamplerDrainTests|MultichannelAudioTests|AudioSampleSanitizationTests|AudioDelayTests|audioSanitizationZerosInvalidSamplesOnly|resampledAudioBuffersUseAContinuousOutputClock|resampledAudioClockPreservesRealGapsAndResets|exactSeekTrimsAudioAtTheFirstSampleOnOrAfterTarget' \
+            2>&1 | tee "$RUNNER_TEMP/audio-format-metadata/native-audio.log"
+      - name: Print compact result receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "audio-format-metadata"
+          paths = [root / "host.txt"]
+          for directory in ["tests", "benchmark"]:
+              paths.extend(sorted((root / directory).glob("*.json")))
+          for path in paths:
+              if path.is_file() and not path.name.endswith("-trace.json"):
+                  print(f"::group::{path.relative_to(root)}")
+                  print(path.read_text())
+                  print("::endgroup::")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: audio-format-metadata-native
+          path: |
+            ${{ runner.temp }}/audio-format-metadata/
+            !${{ runner.temp }}/audio-format-metadata/tests/build-*/**
+            !${{ runner.temp }}/audio-format-metadata/tests/cache/**
+            !${{ runner.temp }}/audio-format-metadata/tests/module-cache/**
+            !${{ runner.temp }}/audio-format-metadata/benchmark/module-cache/**
+          retention-days: 14

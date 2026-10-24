@@ -221,10 +221,14 @@ native process stdout, every recorded survivor receipt, exact byte totals,
 source and executable hashes, Git revisions, and all summary arithmetic.
 The [audit report](evidence/macos-arm64-20261019/independent-audit.json) also
 retains all paired ratios, ranges, absolute savings, and AB/BA group medians.
-The production sources, tests, and timed driver have not changed since the
-qualified commit; subsequent changes record results, update workflow
-triggers, and add the helper to four existing manual benchmark build lists.
-The representative FourthPass check above validates that build integration.
+The production sources, tests, and timed driver were unchanged between the
+qualified commit `52767f6` and this study's original final head `0841d30`.
+Changes within that range recorded results, updated workflow triggers, and
+added the helper to four existing manual benchmark build lists. The
+representative FourthPass check above validated that historical build integration.
+Later changes in PR #65 replaced the image reader and added an encoded-size
+insertion guard. These retained measurements describe the original qualified
+sources; they do not qualify the current combined cache implementation.
 
 - [Raw timed observations](evidence/macos-arm64-20261019/observations.jsonl),
   [summary with every range and ratio](evidence/macos-arm64-20261019/summary.json),

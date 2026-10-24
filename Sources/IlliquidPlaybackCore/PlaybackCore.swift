@@ -967,7 +967,7 @@ public struct PlaybackCore: Sendable {
     EventDisposition, [PlaybackEffect]
   ) {
     let effectID = result.context.effectID
-    if state.completedEffectIDs.contains(effectID) {
+    if state.containsCompletedEffect(effectID) {
       return (.duplicate(effectID: effectID), [])
     }
     guard let record = state.outstandingEffects[effectID] else {
@@ -981,7 +981,7 @@ public struct PlaybackCore: Sendable {
     }
 
     state.outstandingEffects.removeValue(forKey: effectID)
-    state.completedEffectIDs.insert(effectID)
+    state.recordCompletedEffect(effectID)
 
     if !record.effect.isCleanup,
       !authorityIsCurrent(record.effect.context.authority)
@@ -1688,7 +1688,7 @@ public struct PlaybackCore: Sendable {
       .map(\.key)
     for effectID in settled {
       state.outstandingEffects.removeValue(forKey: effectID)
-      state.completedEffectIDs.insert(effectID)
+      state.recordCompletedEffect(effectID)
     }
   }
 
@@ -1714,7 +1714,11 @@ public struct PlaybackCore: Sendable {
     }
   }
 
-  private func authorityIsCurrent(_ authority: PlaybackAuthority) -> Bool {
+  /// Whether ordinary playback work still has authority to affect a session.
+  /// Dispatchers must share this result-admission rule when retiring work that
+  /// never reached an executor; subtitle/overlay-only invalidation is orthogonal.
+  /// Cleanup and effect-specific revision checks remain the reducer's concern.
+  public func authorityIsCurrent(_ authority: PlaybackAuthority) -> Bool {
     switch authority {
     case .application(let epoch):
       return epoch == state.applicationEpoch

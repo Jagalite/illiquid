@@ -56,12 +56,20 @@ final class SubtitleDecoder {
         avcodec_free_context(&context)
     }
 
+    /// Exposes scratch-output ownership to lifecycle tests without borrowing it.
+    var hasRetainedDecodedOutput: Bool {
+        result.map { illiquid_subtitle_result_has_output($0) != 0 } ?? false
+    }
+
     func decode(_ packet: FFmpegPacket) throws -> [NativeDecodedSubtitleEvent] {
         guard let context, let result, let packetPointer = packet.pointer else {
             return []
         }
+        // Returned events own copied ASS/BGRA bytes. Free the temporary native
+        // rectangles now; the next subtitle packet may be arbitrarily far away.
+        defer { illiquid_subtitle_result_reset(result) }
         if stream.codecID == Int32(AV_CODEC_ID_HDMV_PGS_SUBTITLE.rawValue),
-           let data = packet.data, let presentation = try PGSSubtitlePresentation.update(in: data) {
+           let presentation = try PGSSubtitlePresentation.update(in: packet) {
             pgsPresentation = presentation
         }
         try checkFFmpeg(

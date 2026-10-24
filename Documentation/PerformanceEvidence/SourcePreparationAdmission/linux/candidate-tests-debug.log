@@ -1,0 +1,64 @@
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/18] Write swift-version--393CCDFAED8FB69E.txt
+[1/18] Emitting module for IlliquidCore
+[2/18] Emitting module for IlliquidCoreTests
+[3/18] Compiling IlliquidCore SourcePreparationExecutor.swift
+[4/18] Wrapping AST for IlliquidCoreTests for debugging
+[5/18] Wrapping AST for IlliquidCore for debugging
+[6/18] Compiling IlliquidCoreTests SourcePreparationExecutorTests.swift
+[7/18] /workspace/scratch/4509bd785b93/admission-object-identity-tests-04/tests/.build/x86_64-unknown-linux-gnu/debug/SourcePreparationContractPackageDiscoveredTests.derived/all-discovered-tests.swift
+[8/18] Compiling SourcePreparationContractPackageDiscoveredTests IlliquidCoreTests.swift
+[9/18] Emitting module for SourcePreparationContractPackageDiscoveredTests
+[10/18] /workspace/scratch/4509bd785b93/admission-object-identity-tests-04/tests/.build/x86_64-unknown-linux-gnu/debug/SourcePreparationContractPackageTests.derived/runner.swift
+[11/18] Compiling SourcePreparationContractPackageDiscoveredTests all-discovered-tests.swift
+[12/18] Wrapping AST for SourcePreparationContractPackageDiscoveredTests for debugging
+[13/18] Emitting module for SourcePreparationContractPackageTests
+[14/18] Wrapping AST for SourcePreparationContractPackageTests for debugging
+[15/18] Compiling SourcePreparationContractPackageTests runner.swift
+[16/18] Write Objects.LinkFileList
+[17/18] Linking SourcePreparationContractPackageTests.xctest
+Build complete! (22.60s)
+Test Suite 'All tests' started at 2026-10-21 15:18:39.972
+Test Suite 'debug.xctest' started at 2026-10-21 15:18:39.978
+Test Suite 'debug.xctest' passed at 2026-10-21 15:18:39.978
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-21 15:18:39.978
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Bounded source preparation" started.
+◇ Test healthyBackgroundBurstsWakeOnCompletionRatherThanPollingIntoTheirDeadline() started.
+✔ Test healthyBackgroundBurstsWakeOnCompletionRatherThanPollingIntoTheirDeadline() passed after 0.053 seconds.
+◇ Test stalledBackgroundScanLeavesAnInteractiveSlotAndCancellationDoesNotFreeIt() started.
+STORAGE_HEALTHY_BURST count=32 wall=0.051686162 seconds
+STORAGE_INTERACTIVE_WHILE_SCAN_STALLED 0.0006266 seconds
+✔ Test stalledBackgroundScanLeavesAnInteractiveSlotAndCancellationDoesNotFreeIt() passed after 0.043 seconds.
+◇ Test cancellationReturnsBeforeBlockedWorkAndRetainsPhysicalAdmission() started.
+✔ Test cancellationReturnsBeforeBlockedWorkAndRetainsPhysicalAdmission() passed after 0.006 seconds.
+◇ Test deadlineKeepsStalledWorkBoundedAndRunsOffTheMainThread() started.
+✔ Test deadlineKeepsStalledWorkBoundedAndRunsOffTheMainThread() passed after 0.050 seconds.
+◇ Test backgroundWaitersShareThePhysicalLimitAndKeepOneDeadline() started.
+✔ Test backgroundWaitersShareThePhysicalLimitAndKeepOneDeadline() passed after 0.160 seconds.
+◇ Test backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) started.
+◇ Test case passing 1 argument capacity → 1 to backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) started.
+◇ Test case passing 1 argument capacity → 2 to backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) started.
+◇ Test case passing 1 argument capacity → 4 to backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) started.
+✔ Test backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) with 3 test cases passed after 0.168 seconds.
+◇ Test cancellingASaturatedQueueReclaimsTheEntireLogicalBudget() started.
+✔ Test cancellingASaturatedQueueReclaimsTheEntireLogicalBudget() passed after 0.012 seconds.
+◇ Test queuedTimeoutsReleaseAdmissionWithoutStartingTheirWork() started.
+✔ Test queuedTimeoutsReleaseAdmissionWithoutStartingTheirWork() passed after 0.215 seconds.
+◇ Test queuedBackgroundWorkPreservesTheInteractiveSlotAtHigherCapacity() started.
+✔ Test queuedBackgroundWorkPreservesTheInteractiveSlotAtHigherCapacity() passed after 0.006 seconds.
+◇ Test retiredQueuedRequestsReleaseCapturedWorkBeforeThePhysicalHolderExits(cancel:) started.
+◇ Test case passing 1 argument cancel → false to retiredQueuedRequestsReleaseCapturedWorkBeforeThePhysicalHolderExits(cancel:) started.
+◇ Test case passing 1 argument cancel → true to retiredQueuedRequestsReleaseCapturedWorkBeforeThePhysicalHolderExits(cancel:) started.
+✔ Test retiredQueuedRequestsReleaseCapturedWorkBeforeThePhysicalHolderExits(cancel:) with 2 test cases passed after 0.130 seconds.
+◇ Test admissionDelayCountsAgainstTheExecutingRequestsDeadline() started.
+✔ Test admissionDelayCountsAgainstTheExecutingRequestsDeadline() passed after 1.005 seconds.
+◇ Test cancellationRacingWithHandoffNeitherDuplicatesWorkNorLeaksCapacity() started.
+✔ Test cancellationRacingWithHandoffNeitherDuplicatesWorkNorLeaksCapacity() passed after 0.035 seconds.
+✔ Suite "Bounded source preparation" passed after 1.893 seconds.
+✔ Test run with 12 tests in 1 suite passed after 1.894 seconds.

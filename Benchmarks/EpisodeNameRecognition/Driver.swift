@@ -26,6 +26,10 @@ private protocol NameResult {
 }
 extension RecognizedMediaName: NameResult { fileprivate var kindName: String { kind.rawValue } }
 extension BaselineRecognizedMediaName: NameResult { fileprivate var kindName: String { kind.rawValue } }
+#if FOUNDATION_BOUNDARY_PROOF
+extension AdaptedRecognizedMediaName: NameResult { fileprivate var kindName: String { kind.rawValue } }
+extension AdaptedBaselineRecognizedMediaName: NameResult { fileprivate var kindName: String { kind.rawValue } }
+#endif
 
 // Compare every stored field and the strings shown by library projections. Optionals
 // and ordered arrays retain their identity; a hash alone is not a correctness oracle.
@@ -160,11 +164,112 @@ private func fail(_ message: String) -> Never {
     exit(1)
 }
 
+private func validatedDifferentialPaths() -> [String] {
+    let paths = differentialPaths()
+    guard paths.count == 16_300, paths.filter({ $0.isEmpty }).count == 1,
+          paths.filter({ $0 == ".mkv" }).count == 1,
+          paths.filter({ $0.hasSuffix("/") }).count == 27 else {
+        fail("Original differential corpus invariants changed")
+    }
+    return paths
+}
+
+#if FOUNDATION_BOUNDARY_PROOF
+private func proveFoundationBoundary() {
+    // Explicit parent and guard expectations exercise both sides of the boundary.
+    // Native Foundation supplies an independent oracle for every entry as well.
+    var edges: [(path: String, parent: String, adapted: Bool)] = [
+        ("", "", false), ("/", "/", false), ("//", "/", false), ("///", "/", false),
+        ("/a", "/", false), ("/a/", "/", false), ("//a///", "/", false),
+        ("ab", "", false), ("ab/", "", false), ("a/b", "a", false),
+        ("a//b///", "a", false), ("/a/b/", "/a", false),
+        ("./a", ".", false), ("../a", "..", false), ("..", "", false),
+        (".mkv", "", false), ("Café/世界.mkv", "Café", false),
+        ("Cafe\u{301}/S01E02.mkv", "Cafe\u{301}", false),
+        ("TV/Show (2020)/Season 01/S01E02.mkv", "TV/Show (2020)/Season 01", false),
+    ]
+    for scalar in ["a", "é", "中", ".", "\\", "\u{200B}", "\u{00AD}", "\u{FEFF}",
+                   "\u{200D}", "\u{034F}", "\u{FE0F}"] {
+        for suffix in ["", "/", "///"] { edges.append((scalar + suffix, "", true)) }
+    }
+    for text in ["😀", "\u{10000}", "e\u{301}", "🧑🏽‍🚀", "\u{200B}\u{00AD}"] {
+        for suffix in ["", "/", "///"] { edges.append((text + suffix, "", false)) }
+    }
+    var rootGuardDetected = 0, slidingPathDetected = 0
+    for edge in edges {
+        let path = edge.path as NSString
+        let native = path.deletingLastPathComponent
+        guard native == edge.parent, benchmarkParentPath(path) == native,
+              benchmarkNeedsParentPathBoundary(path) == edge.adapted else {
+            fail("Focused Foundation boundary mismatch: \(String(reflecting: edge.path))")
+        }
+        // Deliberate mutants: omitting the root exclusion, and appending a dummy
+        // path component to dodge Foundation's assertion. The same parent-path
+        // comparison must reject both approaches on these fixtures.
+        let scalars = edge.path.unicodeScalars
+        let wrongGuard = scalars.first.map { $0.value <= 0xFFFF } == true
+            && scalars.dropFirst().allSatisfy { $0.value == 0x2F }
+        let wrongParent = wrongGuard ? "" : native
+        if wrongParent != native { rootGuardDetected += 1 }
+        let slid = (path.appendingPathComponent("__boundary_probe__") as NSString).deletingLastPathComponent
+        if slid != native { slidingPathDetected += 1 }
+    }
+    guard rootGuardDetected > 0, slidingPathDetected > 0 else { fail("Negative controls were not detected") }
+
+    let paths = validatedDifferentialPaths()
+    var guardedIndices: [Int] = []
+    var checksum: UInt64 = 0
+    for (index, path) in (paths + edges.map(\.path)).enumerated() {
+        let nativeParent = (path as NSString).deletingLastPathComponent
+        guard benchmarkParentPath(path as NSString) == nativeParent else {
+            fail("Parent-path mismatch at \(index): \(String(reflecting: path))")
+        }
+        if index < paths.count, benchmarkNeedsParentPathBoundary(path as NSString) { guardedIndices.append(index) }
+        let baseline = BaselineMediaNameRecognition.recognize(relativePath: path)
+        let candidate = MediaNameRecognition.recognize(relativePath: path)
+        let adaptedBaseline = AdaptedBaselineMediaNameRecognition.recognize(relativePath: path)
+        let adaptedCandidate = AdaptedMediaNameRecognition.recognize(relativePath: path)
+        let before = Snapshot(baseline), after = Snapshot(candidate)
+        guard before == Snapshot(adaptedBaseline), after == Snapshot(adaptedCandidate), before == after,
+              fingerprint(baseline) == fingerprint(adaptedBaseline),
+              fingerprint(candidate) == fingerprint(adaptedCandidate),
+              fingerprint(baseline) == fingerprint(candidate) else {
+            emit(["ok": false, "mode": "foundation-proof", "index": index, "path": path,
+                  "baseline": before.json, "adapted_baseline": Snapshot(adaptedBaseline).json,
+                  "candidate": after.json, "adapted_candidate": Snapshot(adaptedCandidate).json])
+            exit(1)
+        }
+        if index < paths.count { checksum &+= fingerprint(candidate) }
+    }
+    guard guardedIndices == [16143, 16157, 16171, 16185, 16199, 16213] else {
+        fail("Unexpected corpus Foundation boundary indices: \(guardedIndices)")
+    }
+    emit(["ok": true, "mode": "foundation-proof", "cases": paths.count, "focused_cases": edges.count,
+          "parent_path_comparisons": paths.count + edges.count,
+          "original_adapted_snapshot_comparisons_per_implementation": paths.count + edges.count,
+          "guarded_corpus_indices": guardedIndices, "guarded_corpus_cases_per_implementation": guardedIndices.count,
+          "focused_guarded_cases": edges.filter(\.adapted).count,
+          "negative_controls": ["incorrect_root_guard_detected": rootGuardDetected,
+                                "sliding_path_detected": slidingPathDetected],
+          "checksum": String(checksum)])
+}
+#endif
+
 @main private struct Driver {
     static func main() {
         let arguments = Array(CommandLine.arguments.dropFirst())
+        if arguments == ["--corpus"] {
+            emit(["paths": validatedDifferentialPaths()])
+            return
+        }
+        #if FOUNDATION_BOUNDARY_PROOF
+        if arguments == ["--foundation-proof"] {
+            proveFoundationBoundary()
+            return
+        }
+        #endif
         if arguments == ["--differential"] {
-            let paths = differentialPaths()
+            let paths = validatedDifferentialPaths()
             var checksum: UInt64 = 0
             for (index, path) in paths.enumerated() {
                 let baseline = BaselineMediaNameRecognition.recognize(relativePath: path)
@@ -177,9 +282,25 @@ private func fail(_ message: String) -> Never {
                 }
                 checksum &+= fingerprint(candidate)
             }
-            emit(["ok": true, "mode": "differential", "cases": paths.count, "checksum": String(checksum)])
+            var report: [String: Any] = ["ok": true, "mode": "differential", "cases": paths.count,
+                                       "checksum": String(checksum)]
+            #if ADAPTED_FOUNDATION_BOUNDARY
+            report["qualification_scope"] = "adapted Foundation boundary"
+            let guarded = paths.indices.filter { benchmarkNeedsParentPathBoundary(paths[$0] as NSString) }
+            guard guarded == [16143, 16157, 16171, 16185, 16199, 16213] else {
+                fail("Unexpected corpus Foundation boundary indices: \(guarded)")
+            }
+            report["guarded_corpus_indices"] = guarded
+            report["guarded_corpus_cases_per_implementation"] = guarded.count
+            #else
+            report["qualification_scope"] = "native Foundation"
+            #endif
+            emit(report)
             return
         }
+        #if ADAPTED_FOUNDATION_BOUNDARY || FOUNDATION_BOUNDARY_PROOF
+        fail("Adapted/proof binaries are correctness-only; timing requires original source")
+        #else
         guard arguments.count == 5, arguments[0] == "--benchmark",
               ["baseline", "candidate"].contains(arguments[1]), scenarios.contains(arguments[2]),
               let iterations = Int(arguments[3]), iterations > 0, iterations <= 1_000_000,
@@ -211,5 +332,6 @@ private func fail(_ message: String) -> Never {
               "corpus_size": paths.count, "iterations": iterations, "rounds": rounds,
               "operations_per_round": iterations * paths.count, "nanoseconds_per_operation": samples,
               "checksum": String(expected)])
+        #endif
     }
 }

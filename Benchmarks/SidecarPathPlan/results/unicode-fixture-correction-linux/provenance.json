@@ -1,0 +1,97 @@
+{
+  "purpose": "Preserve focused Linux validation of the macOS Unicode fixture correction and exact control mutations; no production or timing changes.",
+  "baseline_revision": "7f9ba073394b77a908e0589447c6edc8d10b832c",
+  "measured_candidate_revision": "56f73526c32de7e4e5f25baf324588482a84a464",
+  "fixture_correction_revision": "e6691567bd74b44f9e42364a70c9ef514cba96e7",
+  "test_path": "Tests/IlliquidCoreTests/MediaSidecarPathPlanTests.swift",
+  "original_test_sha256": "212a44464b873418bcfec7b78a1f1ee0475039b143221f5cf85e78cb6bb69437",
+  "corrected_test_sha256": "4d750d076cea2d70fec3cce50e5fd3ebfc82db7acadf4a4aa7e899bd5c0a9e5d",
+  "compiled_candidate_reader_sha256": "1afb8689591b9e8fc424c9994acaf411b152ed6f46b81e80ad9f94a8438ac19f",
+  "shared_production_source_manifest": "../linux-exploratory/candidate-sources.json",
+  "configuration": "debug",
+  "swift_version": "Swift 6.3.2 (swift-6.3.2-RELEASE), x86_64-unknown-linux-gnu",
+  "test_filter": "unicodeEquivalentStringsKeepTheirExactURLBoundaries",
+  "baseline_and_candidate_expected_exit_codes": {
+    "baseline": 0,
+    "candidate": 0
+  },
+  "canonical_string_key_control": {
+    "changes": [
+      [
+        "plan.root.utf8.elementsEqual(rootKey.utf8)",
+        "plan.root == rootKey"
+      ],
+      [
+        "plan.parent.utf8.elementsEqual(parentKey.utf8)",
+        "plan.parent == parentKey"
+      ]
+    ],
+    "expected_exit_code": 0,
+    "mutant_sha256": "b025523d5b9b17c2cf75b728038dc81a9c9048cc60659790c0e376f774e976e5",
+    "explanation": "Keeping percent-encoded absoluteString keys while replacing their byte comparisons with String equality does not collapse these distinct ASCII keys; this control passes."
+  },
+  "decoded_path_key_control": {
+    "changes": [
+      [
+        "let rootKey = root.absoluteString",
+        "let rootKey = root.path"
+      ],
+      [
+        "let parentKey = parent.absoluteString",
+        "let parentKey = parent.path"
+      ],
+      [
+        "plan.root.utf8.elementsEqual(rootKey.utf8)",
+        "plan.root == rootKey"
+      ],
+      [
+        "plan.parent.utf8.elementsEqual(parentKey.utf8)",
+        "plan.parent == parentKey"
+      ]
+    ],
+    "expected_exit_code": 1,
+    "mutant_sha256": "ed3d19edeb03e6f520cde5ce77ff8635b4b40d9b54d9cb9e7d39894f34c02ceb",
+    "expected_issues": 2,
+    "explanation": "Replacing absoluteString keys with decoded paths and using canonical String equality incorrectly shares plans between distinct Unicode URL boundaries; the corrected regression fails."
+  },
+  "reproduction": [
+    "Check out fixture_correction_revision and use the five-source staging and Linux import adaptations recorded by Benchmarks/SidecarPathPlan/runner.py.",
+    "Both variants use corrected test snapshot; only baseline MediaSidecarReader.swift is taken from baseline_revision.",
+    "Run swift test --package-path <variant-package> --no-parallel --jobs 2 --filter unicodeEquivalentStringsKeepTheirExactURLBoundaries for the debug passing cases.",
+    "For each control start from an unmodified candidate staged reader, apply exactly the listed single replacements, check its mutant_sha256, then run the same filtered command. Restore the original staged reader before the other control."
+  ],
+  "files": {
+    "MediaSidecarPathPlanTests.swift": {
+      "sha256": "4d750d076cea2d70fec3cce50e5fd3ebfc82db7acadf4a4aa7e899bd5c0a9e5d",
+      "bytes": 12771
+    },
+    "baseline-debug.log": {
+      "sha256": "7834d9a3a2794408a493f3a2722a6429a45ee2fb2bb2826f74193c6bd12dd0c8",
+      "bytes": 1493
+    },
+    "candidate-debug.log": {
+      "sha256": "da7037104be0d8aea37c171c2008ccef870d44527a60628f411b738eee98d0b7",
+      "bytes": 1494
+    },
+    "summary.json": {
+      "sha256": "1997f797341ab27803b4d756cd26211e3e757d14c2f7c754e7a56926e3de608f",
+      "bytes": 857
+    },
+    "canonical-string-key-negative-control.log": {
+      "sha256": "ed99c828ac6f102556db616bba468512a2b6222b9daad426a4a06d00b11186a2",
+      "bytes": 1102
+    },
+    "negative-control.json": {
+      "sha256": "baa20a6aa894e5001195e93d687a3cd9ae1da08f97270f51b8e6afc543ef396d",
+      "bytes": 545
+    },
+    "decoded-path-key-negative-control.log": {
+      "sha256": "15a655f3221a000e2e7bbf88ad017a45d2d9938b23092ed60a09b6a67b845e45",
+      "bytes": 1668
+    },
+    "decoded-path-key-negative-control.json": {
+      "sha256": "052cd0728dc574329249b5d296c7d350a8d781006f8cabdd4d0f8dbb64b921dc",
+      "bytes": 944
+    }
+  }
+}

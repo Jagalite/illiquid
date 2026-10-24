@@ -1,0 +1,69 @@
+{
+  "baseline_revision": "7f9ba073394b77a908e0589447c6edc8d10b832c",
+  "candidate_revision": "8ebc569187ec03355e09885eeebab21b391eb91e",
+  "compiler_flags": [
+    "-swift-version",
+    "6",
+    "-O",
+    "-whole-module-optimization",
+    "-parse-as-library",
+    "-warnings-as-errors",
+    "-module-cache-path",
+    "/Users/runner/work/_temp/screenshot-context-reuse/module-cache",
+    "-target",
+    "arm64-apple-macosx26.0",
+    "-sdk",
+    "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk"
+  ],
+  "harness_sha256": "9764cd3684ad97fd4218b105f551df67369cea815f82a59bd47340fc92eaf60a",
+  "pairs": 6,
+  "runner_sha256": "f90f2bcbf5ec2a0141468a8dd19fc87513f36c110b0ed60686ae8f5a1b924434",
+  "scenarios": [
+    "bgra-1080p",
+    "nv12-1080p",
+    "p010-1080p",
+    "bgra-4k",
+    "subtitle-1080p"
+  ],
+  "sources": {
+    "baseline": {
+      "binary_sha256": "fae6eb99356b8b99d1034e3bdb102939faf801b359dc5f0912966b411146d36f",
+      "input_sha256": {
+        "Sources/IlliquidCore/Player/PlaybackModels.swift": "fbe90597e20f22923c627fdc951665137f6ed4b67fac0684d2fcc2c1d14201d0",
+        "Sources/IlliquidCore/Player/VideoPresentationGeometry.swift": "f2fd065b34c5d4c64c2847674a3e5ea9ce2c9ae5742de7854011537796234664",
+        "Sources/IlliquidNativePlayback/Presentation/NativeScreenshot.swift": "4877bd488cdd7634fac8d0e9f591adbef776395754e978d0f103c9a526f86842",
+        "Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift": "3b1d16383cc338da440beac9441704ae4d808f16e70703ea5aede5ca2ff3f4d8",
+        "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "089275255bd99ad57b2166489532a24373b0e218c0a6c346067c1d98b4a229f8",
+        "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+      },
+      "staged_sha256": {
+        "sources/core/VideoAdjustmentState.swift": "3116e6bcc5b54ab429cd129e09f227ed8db0446c73a7171fea34e1ce537f694a",
+        "sources/core/VideoPresentationGeometry.swift": "f2fd065b34c5d4c64c2847674a3e5ea9ce2c9ae5742de7854011537796234664",
+        "sources/native/NativeScreenshot.swift": "4877bd488cdd7634fac8d0e9f591adbef776395754e978d0f103c9a526f86842",
+        "sources/native/ScreenshotSupport.swift": "e2a2d914233c167a70c4156e74c1ba45a374838dc67caf17c0ba4147b66cd5e8",
+        "sources/native/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+      }
+    },
+    "candidate": {
+      "binary_sha256": "f2641e4f5df9ce89148107028f2635402cb08bea488075df562963ef7259d627",
+      "input_sha256": {
+        "Sources/IlliquidCore/Player/PlaybackModels.swift": "fbe90597e20f22923c627fdc951665137f6ed4b67fac0684d2fcc2c1d14201d0",
+        "Sources/IlliquidCore/Player/VideoPresentationGeometry.swift": "f2fd065b34c5d4c64c2847674a3e5ea9ce2c9ae5742de7854011537796234664",
+        "Sources/IlliquidNativePlayback/Presentation/NativeScreenshot.swift": "1f41e353919ad3fd830dbb4fd61c930cd10e1241fa3a937c5d1ee3ee20e6c7ca",
+        "Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift": "3b1d16383cc338da440beac9441704ae4d808f16e70703ea5aede5ca2ff3f4d8",
+        "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "089275255bd99ad57b2166489532a24373b0e218c0a6c346067c1d98b4a229f8",
+        "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+      },
+      "staged_sha256": {
+        "sources/core/VideoAdjustmentState.swift": "3116e6bcc5b54ab429cd129e09f227ed8db0446c73a7171fea34e1ce537f694a",
+        "sources/core/VideoPresentationGeometry.swift": "f2fd065b34c5d4c64c2847674a3e5ea9ce2c9ae5742de7854011537796234664",
+        "sources/native/NativeScreenshot.swift": "1f41e353919ad3fd830dbb4fd61c930cd10e1241fa3a937c5d1ee3ee20e6c7ca",
+        "sources/native/ScreenshotSupport.swift": "e2a2d914233c167a70c4156e74c1ba45a374838dc67caf17c0ba4147b66cd5e8",
+        "sources/native/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+      }
+    }
+  },
+  "started_utc": "2026-10-22T19:57:28Z",
+  "warm_iterations": 6,
+  "working_tree": ""
+}

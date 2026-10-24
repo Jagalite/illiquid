@@ -1,0 +1,47 @@
+{
+  "baseline_revision": "af1c1add701e49b355448cf8983eaed1e7623108",
+  "compiler": "Swift 6.3.2, x86_64-unknown-linux-gnu",
+  "source_sha256": {
+    "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift": "c58c9d528b3fc112d07fc577af7895a6d4f14bf94d87e5dc8ca998d26575bd7e",
+    "Sources/IlliquidApp/UI/SourcesSidebar.swift": "1bd5f99ab40e323ee3869fad49fb69aaf1532cd7df151bf7d2deb5f78b35477c",
+    "Tests/IlliquidAppTests/SourceFilesystemEventBufferTests.swift": "44b9ae3511b73bc504d2482d93da71d9d132d4c303085328ba2151e924cecb92",
+    "Scripts/test-filesystem-event-loss-regressions.sh": "fddcee0739366b5ed5dad3848f9cedf77be0ec3e4f8a643589b64d8b82db994d"
+  },
+  "candidate": {
+    "debug": {
+      "exit_status": 0,
+      "tests": 30,
+      "suites": 3
+    },
+    "release": {
+      "exit_status": 0,
+      "tests": 30,
+      "suites": 3
+    }
+  },
+  "generated_cases": {
+    "below_capacity_batches": 800,
+    "overflow_batches": 160
+  },
+  "negative_control": {
+    "description": "Unchanged baseline planner with test-only adapter of baseline unbounded Array operations",
+    "exit_status": 1,
+    "tests_failed": 2,
+    "assertion_failures": 5,
+    "filter": "firstEventBeyondDefaultCapacityRequestsRecovery|overflowUsesCurrentNormalizedRootsAndNoRootsMeansNoWork"
+  },
+  "common_flags": [
+    "--jobs",
+    "2",
+    "--use-integrated-swift-driver",
+    "--cache-path",
+    "/tmp/illiquid-test-cache",
+    "--config-path",
+    "/tmp/illiquid-test-config",
+    "--security-path",
+    "/tmp/illiquid-test-security",
+    "-Xswiftc",
+    "-warnings-as-errors"
+  ],
+  "limits": "Pure production event-buffer and planner source compiled in isolated package. No AppKit, SwiftUI view build, native FSEvents delivery, or actual sidebar interaction exercised."
+}

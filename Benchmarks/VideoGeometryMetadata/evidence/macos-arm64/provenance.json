@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "repository": "Jagalite/illiquid",
+  "baseline_commit": "7f9ba073394b77a908e0589447c6edc8d10b832c",
+  "qualified_commit": "9b0e52193bbc41e42e7c0cd821f05e557bb32975",
+  "workflow": {
+    "run_id": 39856561208,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39856561208",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-10-22T21:21:18Z",
+    "updated_at": "2026-10-22T21:41:12Z"
+  },
+  "component": {
+    "job_id": 120096177866,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39856561208/job/120096177866",
+    "conclusion": "success",
+    "retained_bundle": "component-records.json.gz",
+    "retained_bundle_sha256": "60f64689664ee4ad734d4eb5e29753997b9a85ff17fe352a5698cfe83d27bb95",
+    "record_count": 247,
+    "observations": 192,
+    "calibrations": 24,
+    "workloads": 12,
+    "pairs_per_workload": 8,
+    "tests": [
+      {
+        "variant": "baseline",
+        "configuration": "debug",
+        "passed": 13
+      },
+      {
+        "variant": "baseline",
+        "configuration": "release",
+        "passed": 13
+      },
+      {
+        "variant": "candidate",
+        "configuration": "debug",
+        "passed": 13
+      },
+      {
+        "variant": "candidate",
+        "configuration": "release",
+        "passed": 13
+      }
+    ],
+    "output_parity": {
+      "step_snapshots_per_variant": 384,
+      "final_buffer_snapshots_per_variant": 43,
+      "matched": true
+    },
+    "artifact": {
+      "id": 12460182920,
+      "name": "video-geometry-metadata-component",
+      "size_in_bytes": 179738,
+      "github_reported_digest": "sha256:67d3f51a6772b68d4fd19e121ff6a765043f660696c6430e633b465f2822bffe"
+    }
+  },
+  "native_app": {
+    "job_id": 120096177301,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39856561208/job/120096177301",
+    "conclusion": "success",
+    "retained_archive": "native-app.zip",
+    "retained_archive_sha256": "2e1cb000ac97494e9e827b6d9e57d453d444fe49b87b835bea8ca81e5c6ac90e",
+    "archive_digest_verified": true,
+    "retained_files": 33,
+    "test_declarations": 26,
+    "expanded_test_invocations": 44,
+    "suites": 5,
+    "skipped_tests": 0,
+    "build": "release app executable and test graph",
+    "geometry_fixture_commands": 6,
+    "timestamp_fixture_commands": 21,
+    "geometry_fixture_manifest_entries": 4,
+    "timestamp_fixture_manifest_entries": 8,
+    "independently_verified_oracle_timestamps": 545,
+    "raw_media_retained": false,
+    "media_hashes": "runner-produced receipts; raw media not locally rehashed",
+    "warnings": [
+      "Compiler diagnostics in files unchanged from baseline: Metal sendability, redundant #require expressions, weak-variable mutability.",
+      "One MPEG-TS Packet corrupt warning at synthetic concatenated resolution boundary; both resolutions and their per-frame aperture checks passed.",
+      "Artifact tooling Node deprecation warnings."
+    ]
+  },
+  "superseded_prototype": {
+    "commit": "254deca9e05ddbd584d910f9a16837206b78880c",
+    "run_id": 39853545272,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/39853545272",
+    "reason": "Consolidated native integration and added clearing control while both prototype jobs were still queued.",
+    "measured_observations": 0,
+    "jobs": [
+      {
+        "id": 120085740193,
+        "name": "native-app",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "steps": null
+      },
+      {
+        "id": 120085740677,
+        "name": "native-component",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "steps": null
+      }
+    ]
+  },
+  "scope": "One native component campaign on a hosted virtual Apple M1. Warm metadata preparation plus real attachment writes; no whole-player CPU/frame-rate/energy claim. All adverse controls and outliers retained."
+}

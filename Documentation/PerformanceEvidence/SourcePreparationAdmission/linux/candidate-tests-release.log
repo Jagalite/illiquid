@@ -1,0 +1,55 @@
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for production...
+[0/9] Write swift-version--393CCDFAED8FB69E.txt
+[1/9] Compiling IlliquidCore SourcePreparationExecutor.swift
+[2/9] Compiling IlliquidCoreTests SourcePreparationExecutorTests.swift
+[3/9] /workspace/scratch/4509bd785b93/admission-object-identity-tests-04/tests/.build/x86_64-unknown-linux-gnu/release/SourcePreparationContractPackageDiscoveredTests.derived/all-discovered-tests.swift
+[4/9] Compiling SourcePreparationContractPackageDiscoveredTests IlliquidCoreTests.swift
+[5/9] /workspace/scratch/4509bd785b93/admission-object-identity-tests-04/tests/.build/x86_64-unknown-linux-gnu/release/SourcePreparationContractPackageTests.derived/runner.swift
+[6/9] Compiling SourcePreparationContractPackageTests runner.swift
+[7/9] Write Objects.LinkFileList
+[8/9] Linking SourcePreparationContractPackageTests.xctest
+Build complete! (93.99s)
+Test Suite 'All tests' started at 2026-10-21 15:20:48.458
+Test Suite 'release.xctest' started at 2026-10-21 15:20:48.467
+Test Suite 'release.xctest' passed at 2026-10-21 15:20:48.467
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-21 15:20:48.467
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Bounded source preparation" started.
+◇ Test healthyBackgroundBurstsWakeOnCompletionRatherThanPollingIntoTheirDeadline() started.
+STORAGE_HEALTHY_BURST count=32 wall=0.037382885 seconds
+✔ Test healthyBackgroundBurstsWakeOnCompletionRatherThanPollingIntoTheirDeadline() passed after 0.038 seconds.
+◇ Test stalledBackgroundScanLeavesAnInteractiveSlotAndCancellationDoesNotFreeIt() started.
+STORAGE_INTERACTIVE_WHILE_SCAN_STALLED 0.000172661 seconds
+✔ Test stalledBackgroundScanLeavesAnInteractiveSlotAndCancellationDoesNotFreeIt() passed after 0.042 seconds.
+◇ Test cancellationReturnsBeforeBlockedWorkAndRetainsPhysicalAdmission() started.
+✔ Test cancellationReturnsBeforeBlockedWorkAndRetainsPhysicalAdmission() passed after 0.005 seconds.
+◇ Test deadlineKeepsStalledWorkBoundedAndRunsOffTheMainThread() started.
+✔ Test deadlineKeepsStalledWorkBoundedAndRunsOffTheMainThread() passed after 0.050 seconds.
+◇ Test backgroundWaitersShareThePhysicalLimitAndKeepOneDeadline() started.
+✔ Test backgroundWaitersShareThePhysicalLimitAndKeepOneDeadline() passed after 0.153 seconds.
+◇ Test backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) started.
+◇ Test case passing 1 argument capacity → 1 to backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) started.
+◇ Test case passing 1 argument capacity → 2 to backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) started.
+◇ Test case passing 1 argument capacity → 4 to backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) started.
+✔ Test backgroundBurstsRespectCapacityAndExecuteEachJobOnce(capacity:) with 3 test cases passed after 0.134 seconds.
+◇ Test cancellingASaturatedQueueReclaimsTheEntireLogicalBudget() started.
+✔ Test cancellingASaturatedQueueReclaimsTheEntireLogicalBudget() passed after 0.011 seconds.
+◇ Test queuedTimeoutsReleaseAdmissionWithoutStartingTheirWork() started.
+✔ Test queuedTimeoutsReleaseAdmissionWithoutStartingTheirWork() passed after 0.210 seconds.
+◇ Test queuedBackgroundWorkPreservesTheInteractiveSlotAtHigherCapacity() started.
+✔ Test queuedBackgroundWorkPreservesTheInteractiveSlotAtHigherCapacity() passed after 0.004 seconds.
+◇ Test retiredQueuedRequestsReleaseCapturedWorkBeforeThePhysicalHolderExits(cancel:) started.
+◇ Test case passing 1 argument cancel → false to retiredQueuedRequestsReleaseCapturedWorkBeforeThePhysicalHolderExits(cancel:) started.
+◇ Test case passing 1 argument cancel → true to retiredQueuedRequestsReleaseCapturedWorkBeforeThePhysicalHolderExits(cancel:) started.
+✔ Test retiredQueuedRequestsReleaseCapturedWorkBeforeThePhysicalHolderExits(cancel:) with 2 test cases passed after 0.124 seconds.
+◇ Test admissionDelayCountsAgainstTheExecutingRequestsDeadline() started.
+✔ Test admissionDelayCountsAgainstTheExecutingRequestsDeadline() passed after 1.005 seconds.
+◇ Test cancellationRacingWithHandoffNeitherDuplicatesWorkNorLeaksCapacity() started.
+✔ Test cancellationRacingWithHandoffNeitherDuplicatesWorkNorLeaksCapacity() passed after 0.016 seconds.
+✔ Suite "Bounded source preparation" passed after 1.801 seconds.
+✔ Test run with 12 tests in 1 suite passed after 1.801 seconds.

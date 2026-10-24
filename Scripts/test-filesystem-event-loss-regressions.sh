@@ -21,7 +21,7 @@ else:
     source = "import Foundation\n\n" + source[start:end]
 pathlib.Path(sys.argv[2]).write_text(source, encoding="utf-8")
 PY
-for file in SourceFilesystemMonitorTests SourceFilesystemEventLossTests; do
+for file in SourceFilesystemMonitorTests SourceFilesystemEventLossTests SourceFilesystemEventBufferTests; do
     cp "$root/Tests/IlliquidAppTests/$file.swift" "$work/Tests/IlliquidAppTests/"
 done
 cat > "$work/Package.swift" <<'SWIFT'

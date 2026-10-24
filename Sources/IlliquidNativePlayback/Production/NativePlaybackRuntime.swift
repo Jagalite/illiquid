@@ -453,6 +453,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     }
 
     let presentation: NativePresentationCoordinator
+    private var presentationObservationCadence = PresentationObservationCadence()
     private let subtitleMemoryBudget: SubtitleMemoryBudget
     private(set) var subtitles: SubtitlePipeline
     private var pictureInPictureSubtitles: SubtitlePipeline?
@@ -3222,9 +3223,12 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
             $0.index == session?.mediaInfo.selectedVideoIndex
         }?.averageFrameRate
         let frameRate = sourceFrameRate.map { $0 * (lastSnapshot?.usesDeinterlacingFilter == true ? 2 : 1) }
-        presentation.setPresentationTimeObservationInterval(
-            NativeSubtitleRenderPolicy.observationInterval(hasSubtitles: hasSubtitles, frameRate: frameRate)
+        let interval = NativeSubtitleRenderPolicy.observationInterval(
+            hasSubtitles: hasSubtitles, frameRate: frameRate
         )
+        presentationObservationCadence.update(interval) {
+            presentation.setPresentationTimeObservationInterval($0)
+        }
     }
 
     private func dispatchPendingPreviewSeekIfReady(session: MediaSession) {

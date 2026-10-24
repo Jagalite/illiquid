@@ -31,6 +31,47 @@ struct SourceFilesystemEvent: Equatable, Sendable {
     let flags: Flags
 }
 
+/// Bounds event retention while the sidebar waits for its debounce deadline.
+/// A sustained stream can keep postponing that deadline. Once detail exceeds
+/// the budget, use the planner's existing event-loss recovery for every root.
+/// Native callback arrays and tasks awaiting main-actor delivery are separate.
+struct SourceFilesystemEventBuffer {
+    private let maximumCount: Int
+    private var events: [SourceFilesystemEvent] = []
+    private var requiresFullRescan = false
+
+    init(maximumCount: Int = 4096) {
+        self.maximumCount = max(1, maximumCount)
+    }
+
+    var count: Int { events.count }
+
+    mutating func append(contentsOf incoming: [SourceFilesystemEvent]) {
+        guard !requiresFullRescan else { return }
+        if incoming.count > maximumCount - events.count
+            || incoming.contains(where: { $0.flags.contains(.eventsDropped) })
+        {
+            // Drop this buffer's references to accumulated paths and storage.
+            // The marker path is ignored by event-loss recovery.
+            events = [.init(path: "/", flags: [.eventsDropped])]
+            requiresFullRescan = true
+        } else {
+            events.append(contentsOf: incoming)
+        }
+    }
+
+    mutating func take() -> [SourceFilesystemEvent] {
+        let result = events
+        removeAll()
+        return result
+    }
+
+    mutating func removeAll() {
+        events = []
+        requiresFullRescan = false
+    }
+}
+
 struct SourceFilesystemInvalidationPlan: Equatable, Sendable {
     var directoriesToReload: Set<String> = []
     var treesToInvalidate: Set<String> = []
@@ -81,20 +122,26 @@ enum SourceFilesystemInvalidationPlanner {
 
         var plan = SourceFilesystemInvalidationPlan()
         for event in events {
-            let eventPath = normalizedPath(event.path)
+            let eventURL = URL(fileURLWithPath: event.path, isDirectory: false)
+                .absoluteURL.standardized
+            let eventPath = eventURL.path
+            let requiresFullRescan = event.flags.requiresFullRescan
             let matchingRoots = rootPaths.filter {
                 contains(eventPath, within: $0)
-                    || (event.flags.requiresFullRescan && contains($0, within: eventPath))
+                    || (requiresFullRescan && contains($0, within: eventPath))
             }
             guard !matchingRoots.isEmpty else { continue }
 
-            if event.flags.requiresFullRescan {
+            if requiresFullRescan {
                 plan.rootsToRescan.formUnion(matchingRoots)
                 continue
             }
-            let eventURL = URL(fileURLWithPath: eventPath)
-            let isMetadata = eventURL.lastPathComponent == ".plexmatch" || eventURL.pathExtension.lowercased() == "nfo"
-            guard event.flags.changesDirectoryListing || isMetadata else { continue }
+            // Structural changes already require a reload. Only content-only
+            // events need metadata classification, using the normalized URL.
+            guard event.flags.changesDirectoryListing
+                || eventURL.lastPathComponent == ".plexmatch"
+                || eventURL.pathExtension.lowercased() == "nfo"
+            else { continue }
 
             let parentPath = URL(fileURLWithPath: eventPath, isDirectory: false)
                 .deletingLastPathComponent()
@@ -138,10 +185,6 @@ enum SourceFilesystemInvalidationPlanner {
                 })
         }
         return plan
-    }
-
-    private static func normalizedPath(_ path: String) -> String {
-        URL(fileURLWithPath: path, isDirectory: false).absoluteURL.standardized.path
     }
 
     private static func normalizedPath(_ url: URL) -> String {

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Exact inventory code with real Foundation I/O; image types are compile-only adapters."""
-import argparse,hashlib,json,pathlib,platform,statistics,subprocess,time
+import argparse,hashlib,json,pathlib,platform,runpy,statistics,subprocess,time
 H=pathlib.Path(__file__).resolve().parent;R=H.parent.parent
+adapt_disk_codecs=runpy.run_path(str(R/'Benchmarks/NonDecodeFourthPass/build.py'))['adapt_disk_codecs']
 
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=pathlib.Path,required=True)
@@ -25,34 +26,9 @@ def main():
  for v in ['v2','v3']:
   d=a.output/v;d.mkdir()
   cp=src/'NativeThumbnailCache.swift';dp=H/'baseline/NativeThumbnailDiskCacheV2.swift' if v=='v2' else src/'NativeThumbnailDiskCache.swift'
-  cache=cp.read_text();disk=dp.read_text()
+  cache=cp.read_text();disk=adapt_disk_codecs(dp.read_text(),dp)
   for name in ['CoreGraphics','CryptoKit','IlliquidCore','ImageIO','UniformTypeIdentifiers']:
    cache=cache.replace('import '+name+'\n','');disk=disk.replace('import '+name+'\n','')
-  if '    private nonisolated static func readImage(' in disk:
-   begin=disk.index('    private nonisolated static func readImage(')
-   end=disk.index('    private static func filenames',begin)
-   disk=disk[:begin]+'''    // CODEC ADAPTER ONLY; production lookup and inventory flow retained.
-    private nonisolated static func readImage(at url: URL, key: Key) -> CGImage? {
-        guard let data = try? Data(contentsOf: url), let image = CGImage.decode(data),
-              image.width <= key.width, image.height <= key.height else { return nil }
-        return image
-    }
-'''+disk[end:]
-  else:
-   begin=disk.index('    func image(for key:');end=disk.index('    func insert(',begin)
-   disk=disk[:begin]+'''    // ADAPTER: not called by inventory timing or inventory tests.
-     func image(for key: Key, background: Bool) -> CGImage? {
-         guard preferences.diskMiB > 0 else { return nil }
-         loadDisk()
-         guard let entry = files[key.digest], let data = try? Data(contentsOf: entry.url),
-               let image = CGImage.decode(data), image.width <= key.width, image.height <= key.height else { return nil }
-         if !background { promoteDisk(key.digest) }
-         return image
-     }
- '''+disk[end:]
-  begin=disk.index('    private nonisolated static func encode');end=disk.index('    private func promoteDisk',begin)
-  disk=disk[:begin]+'''    private nonisolated static func encode(_ image: CGImage) -> Data? { image.encoded() }
-'''+disk[end:]
   disk+='''\nextension NativeThumbnailDiskCache {
     func testEntryCount() -> Int { files.count }
     #if CANDIDATE

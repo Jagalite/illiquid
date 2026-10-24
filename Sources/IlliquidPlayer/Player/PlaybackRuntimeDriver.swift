@@ -31,15 +31,18 @@ final class PlaybackRuntimeDriver {
     private var lastRelativeSeekDispatch: ContinuousClock.Instant?
     private var pendingRelativeSeekReceivedAt: ContinuousClock.Instant?
     private static let relativeSeekDispatchInterval: Duration = .milliseconds(40)
+    private let relativeSeekNow: () -> ContinuousClock.Instant
 
     var currentSnapshot: PlaybackUISnapshot { PlaybackUISnapshot(state: model.core.state) }
 
     init(
         runtime: any PlaybackRuntime,
-        model: PlaybackModelRuntime = PlaybackModelRuntime(recordsReplaySteps: false)
+        model: PlaybackModelRuntime = PlaybackModelRuntime(recordsReplaySteps: false),
+        relativeSeekNow: @escaping () -> ContinuousClock.Instant = { .now }
     ) {
         self.runtime = runtime
         self.model = model
+        self.relativeSeekNow = relativeSeekNow
         runtime.eventHandler = { [weak self] event in self?.receive(event) }
     }
 
@@ -228,7 +231,7 @@ final class PlaybackRuntimeDriver {
     }
 
     @discardableResult
-    private func sendEvent(_ event: PlaybackEvent) -> Bool {
+    func sendEvent(_ event: PlaybackEvent) -> Bool {
         let transition = model.send(event)
         process(transition)
         if case .accepted = transition.disposition { return true }
@@ -296,7 +299,7 @@ final class PlaybackRuntimeDriver {
     }
 
     private func isCurrentSeek(_ effect: PlaybackEffect) -> Bool {
-        effect.context.authority == model.core.state.activeSession?.authority &&
+        model.core.authorityIsCurrent(effect.context.authority) &&
             model.core.state.outstandingEffects[effect.context.effectID] != nil
     }
 
@@ -308,15 +311,11 @@ final class PlaybackRuntimeDriver {
         pendingRelativeSeekReceivedAt = nil
 
         // A superseded deferred seek never reached the native executor, so
-        // nobody else can settle its effect. Only retire an old session or
-        // generation: sleep also detaches a current seek here before dispatch,
-        // and subtitle-only revisions do not invalidate its core authority.
+        // nobody else can settle its effect. Use the core's authority rule:
+        // recovery/format revisions can invalidate work in the same generation,
+        // but subtitle/overlay-only revisions and sleep handoff keep it live.
         guard let cancelled, model.core.state.lifecycle == .running,
-              case let .playback(sessionID, generation, _) = cancelled.context.authority,
-              model.core.state.activeSession?.id != sessionID
-                || model.core.state.activeSession?.generation != generation,
-              model.core.state.pendingSession?.id != sessionID
-                || model.core.state.pendingSession?.generation != generation
+              !model.core.authorityIsCurrent(cancelled.context.authority)
         else { return }
         if let transition = model.complete(
             effectID: cancelled.context.effectID,
@@ -327,7 +326,7 @@ final class PlaybackRuntimeDriver {
     }
 
     private func dispatchRelativeSeek(_ effect: PlaybackEffect) {
-        let now = ContinuousClock.now
+        let now = relativeSeekNow()
         let deadline = lastRelativeSeekDispatch.map { $0 + Self.relativeSeekDispatchInterval }
         guard let deadline, now < deadline else {
             cancelPendingRelativeSeek()
@@ -344,11 +343,14 @@ final class PlaybackRuntimeDriver {
             guard let self, !Task.isCancelled else { return }
             relativeSeekDispatchTask = nil
             guard let pending = pendingRelativeSeek else { return }
+            guard isCurrentSeek(pending) else {
+                cancelPendingRelativeSeek()
+                return
+            }
             let receivedAt = pendingRelativeSeekReceivedAt
             pendingRelativeSeek = nil
             pendingRelativeSeekReceivedAt = nil
-            guard isCurrentSeek(pending) else { return }
-            lastRelativeSeekDispatch = .now
+            lastRelativeSeekDispatch = relativeSeekNow()
             if let receivedAt {
                 let delay = receivedAt.duration(to: .now).components
                 let ms = Double(delay.seconds) * 1_000 + Double(delay.attoseconds) / 1e15

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import copy
 import hashlib
 import json
 import os
@@ -23,7 +24,7 @@ import time
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-BASELINE = "ad647a61f995541789f2f77014894614ed2d0b4a"
+BASELINE = "2c25829e108d6eee065f2a2bc3b2d58f8fa7e122"
 CORE = [
     "Utilities/NormalizedFileURL.swift", "Utilities/MediaFileSupport.swift",
     "Utilities/SourcePreparationExecutor.swift", "MediaLibrary/MediaNameRecognition.swift",
@@ -107,6 +108,53 @@ def snapshot(read_source) -> tuple[dict[str, bytes], dict]:
     return files, records
 
 
+def comparison_sources(
+    baseline_files, baseline_records, candidate_files, candidate_records, *,
+    focal_sources, baseline_revision, worktree_head, current_support=False,
+):
+    """Select shared comparison inputs without allowing unequal support files.
+
+    Historical runs retain every baseline byte. Explicit integration runs keep
+    the historical focal implementations and use one current support snapshot
+    for both variants. Callers still enforce their shared-source equality gate.
+    """
+    names = set(baseline_files)
+    if names != set(candidate_files) or names != set(baseline_records) or names != set(candidate_records):
+        raise ValueError("Baseline/candidate source inventories differ")
+    focal_sources = set(focal_sources)
+    if not focal_sources or not focal_sources <= names:
+        raise ValueError("Comparison focal sources are missing from the snapshot")
+    for files, records in [(baseline_files, baseline_records), (candidate_files, candidate_records)]:
+        for name, raw in files.items():
+            if digest(raw) != records[name]["snapshot_sha256"]:
+                raise ValueError(f"Source snapshot does not match its receipt: {name}")
+
+    baseline_files = dict(baseline_files)
+    baseline_records = copy.deepcopy(baseline_records)
+    candidate_records = copy.deepcopy(candidate_records)
+    for name in names:
+        candidate_records[name].update(
+            origin="working-tree", revision=None, worktree_head=worktree_head,
+            comparison_role="focal" if name in focal_sources else "support",
+        )
+        if current_support and name not in focal_sources:
+            baseline_files[name] = candidate_files[name]
+            baseline_records[name] = copy.deepcopy(candidate_records[name])
+        else:
+            baseline_records[name].update(
+                origin="pinned-baseline", revision=baseline_revision,
+                comparison_role="focal" if name in focal_sources else "support",
+            )
+    comparison = {
+        "mode": "current-support" if current_support else "historical-strict",
+        "focal_sources": sorted(focal_sources),
+        "focal_baseline_revision": baseline_revision,
+        "candidate_worktree_head": worktree_head,
+        "working_tree_revision_note": "Working-tree revision is null: source/snapshot hashes identify the exact bytes; worktree_head identifies their checkout ancestor.",
+    }
+    return baseline_files, baseline_records, candidate_records, comparison
+
+
 class Runner:
     def __init__(self, args):
         self.args = args
@@ -150,15 +198,23 @@ class Runner:
                 raise ValueError(f"Retained baseline changed: {relative}")
             baseline_files[relative] = raw
         candidate_files, candidate_records = snapshot(lambda name: (ROOT / name).read_bytes())
+        head = self.execute(["git", "rev-parse", "HEAD"], "revision").stdout.strip()
+        baseline_files, baseline_records, candidate_records, comparison = comparison_sources(
+            baseline_files, baseline["files"], candidate_files, candidate_records,
+            focal_sources={"Sources/IlliquidApp/SourceBrowserFilter.swift",
+                           "Sources/IlliquidApp/SourceTreeProjectionInput.swift"},
+            baseline_revision=BASELINE, worktree_head=head,
+            current_support=self.args.current_support,
+        )
         for relative, raw in candidate_files.items():
             if Path(relative).name not in {"SourceBrowserFilter.swift", "SourceTreeProjectionInput.swift"}:
                 if raw != baseline_files[relative]:
                     raise ValueError(f"Unrelated staged production dependency changed: {relative}")
-        for variant, files, records in [("baseline", baseline_files, baseline["files"]),
+        for variant, files, records in [("baseline", baseline_files, baseline_records),
                                         ("candidate", candidate_files, candidate_records)]:
             package = self.output / "packages" / variant
             manifest = {"variant": variant, "baseline_revision": BASELINE, "production": records,
-                        "staged": {}, "adaptations": []}
+                        "comparison": comparison, "staged": {}, "adaptations": []}
             staging = dict(files)
             staging["Sources/SourceTreeBenchmark/Harness.swift"] = (HERE / "Harness.swift").read_bytes()
             for name in TESTS:
@@ -201,7 +257,7 @@ class Runner:
             "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "platform": platform.platform(), "machine": platform.machine(), "python": sys.version,
             "swift": self.execute([self.swift, "--version"], "swift-version").stdout.strip(),
-            "head": self.execute(["git", "rev-parse", "HEAD"], "revision").stdout.strip(),
+            "head": head, "comparison": comparison,
             "worktree": self.execute(["git", "status", "--short"], "worktree").stdout,
             "baseline": BASELINE, "driver_hashes": self.driver_hashes,
             "sizes": self.args.sizes, "cases": self.args.cases, "pairs": self.args.pairs,
@@ -361,6 +417,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--mode", choices=["all", "test", "benchmark", "build"], default="all")
     parser.add_argument("--swift")
+    parser.add_argument("--current-support", action="store_true",
+                        help="Keep historical Filter/Input implementations; use identical current supporting sources in both variants")
     parser.add_argument("--jobs", type=int, default=1)
     parser.add_argument("--pairs", "--samples", dest="pairs", type=int, default=6)
     parser.add_argument("--tests-only", action="store_true", help="alias for --mode test")

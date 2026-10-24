@@ -1,0 +1,26 @@
+{
+  "artifact_digest_verified": true,
+  "artifact_id": 12381985082,
+  "artifact_name": "media-section-grouping-macos-confirmation",
+  "artifact_sha256": "7d9a9bfd77221ecc2c5501c2b923bafa1007b9393ca7d66e68d1bf71f7aadb18",
+  "baseline_revision": "a2de305c8dbcaa81aac1477df7c9a0017c14eae3",
+  "job_id": 119470364938,
+  "measured_candidate_revision": "1a981a0cb89b650f19f678448e39eda2a855df16",
+  "production_tests_and_driver_identical_to": "cf27b1e73cd2b1ecd5bfd8b9e5bb0fd273b42536",
+  "retention_note": "All observations and calibrations are retained unchanged here. Full traces, staged sources, exact drivers and command logs are in the Actions artifact with 14-day retention. Build binaries/cache were excluded; binary hashes are recorded, not independently rehashed from the archive.",
+  "role": "Native confirmation of all eight workloads at 1000 files with longer batches and more balanced pairs",
+  "sha256": {
+    "baseline-sources.json": "269783075ca60f40e795ed056f7167281cde17a074dadbe3f3924e8a900e7159",
+    "binaries.json": "cd506d996b15ef8f1223ffba332c3b9ac36404c11cb7308e82da7f8e6ae46aa6",
+    "calibration.jsonl": "fc1c4c6bdb55b44a3ab8207c687047dd53b42a0eb7be5b87545fd80789283e30",
+    "candidate-sources.json": "9fcfc631f1bc4c1c01153d4d0545317d2bd82037707b7c0f64ffb369e7332198",
+    "completion.json": "b4683e9137fe986dba94e436d16e80530aacf1b91252564f853a3555544e6553",
+    "environment.json": "082e604797326c2b1ca090fddb5c3361e7e208bdd7e5dd9dff0989ed7f00df99",
+    "measurements.jsonl": "21de3af7e0a911123e54796a5f35ed08fe6f0ce199780d3bc99e1c6e99383971",
+    "summary.json": "e69fb1ce8aa96d51b54afaf0d336eabef1647b4be8e2f3ef80441867d1786e7c",
+    "verification.json": "a5ff55ffcda9f837bd76a4914cd92b00e35731be61ebe369f4fd0e909dfb5b4b"
+  },
+  "study_decision": "Confirmation settings were chosen after the initial cohort exposed wall/CPU disagreements, low per-process operation counts, and variable controls. All eight workloads were retained at the same predefined middle size; the initial cohort is preserved separately.",
+  "test_scope": "Benchmark mode rebuilt both release binaries and verified eight complete projection pairs. It did not rerun tests; the identical production/test/driver sources had already passed all four native debug/release test configurations in run39667766429.",
+  "workflow_run": "https://github.com/Jagalite/illiquid/actions/runs/39671527994"
+}

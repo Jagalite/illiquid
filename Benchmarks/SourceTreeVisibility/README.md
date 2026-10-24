@@ -3,10 +3,12 @@
 Measure the real background browser projection when visibility settings change
 without changing the underlying source tree. The current baseline for native
 qualification is integration ancestor
-`ad647a61f995541789f2f77014894614ed2d0b4a`, which combines PRs #55 and #57
-before adding the visibility-cache change from #58. Both variants therefore
-use the reviewed search-ID construction and source-tree sorting. The strict
-shared-source equality checks remain enabled.
+`2c25829e108d6eee065f2a2bc3b2d58f8fa7e122`, which extends the pre-visibility-cache
+baseline with the production changes from PRs #67, #70 and #72 and the
+filesystem-root sidebar and sidecar repairs. Both variants use the same flat-file fast path,
+source-preparation admission, media-section grouping and sidebar declarations.
+Only the original visibility-cache production diff remains between them, and
+the strict shared-source equality checks remain enabled.
 
 The original Linux measurements used
 `68274d1b09dcc866296321a5a8858efc297c4f19` and remain historical evidence with
@@ -18,6 +20,10 @@ are unchanged between the two revisions; new native measurements identify the
 refreshed baseline independently of the original Linux cohort. The October 20
 integration refresh adds the search and sorting changes to both variants;
 only the original visibility-cache production diff remains between them.
+The October 22 refresh preserves that comparison while adding the three new
+independent optimizations and the filesystem-root sidebar and sidecar repairs to both variants.
+Its baseline commit is retained as an integration ancestor. Historical
+measurements and manifests are unchanged.
 The retained October 19 native measurements still identify baseline
 `33fff16155c3472960f88e04c72dfdfdefd56dcf` and have not been rewritten.
 
@@ -52,6 +58,36 @@ Each output directory must be new or empty. `--swift` selects the compiler
 driver. An exploratory smoke can use `--smoke --samples 1 --sizes 100`;
 one-pair output is not the formal performance result. `--case` narrows the
 workloads, and `--sizes 100000` enables a larger stress fixture.
+
+### Verify the comparison with current supporting code
+
+PR CI passes `--current-support` to test the visibility-cache optimization in
+the current integration context:
+
+```sh
+python3 Benchmarks/SourceTreeVisibility/run.py --current-support \
+  --output /tmp/source-tree-current-support
+```
+
+This mode retains the frozen baseline `SourceBrowserFilter.swift` and
+`SourceTreeProjectionInput.swift` implementations. All supporting files and
+declarations come from one current snapshot and are compiled identically in
+both variants. In particular, both variants' filesystem/sidecar regression tests
+exercise the current recursive scanner. The shared-source equality gate remains
+enabled; unequal supporting code is never accepted as part of the comparison.
+
+Receipts identify the mode and the focal baseline revision. Each production
+source also records its own origin, revision, role, and original/snapshot hashes.
+Working-tree sources have a null `revision` and a separate `worktree_head`;
+their hashes identify the exact staged bytes, including uncommitted changes.
+The global baseline revision therefore does not label current support as
+historical source. Any timings from this mode are a new integration-context
+experiment and must not be combined with the retained historical cohorts.
+
+Without this flag, the strict historical baseline comparison is unchanged and
+still rejects changed shared dependencies. Reproduce historical measurements
+from their recorded source revisions; existing baseline files and evidence are
+not rewritten by either mode.
 
 ## Workloads and timing boundary
 

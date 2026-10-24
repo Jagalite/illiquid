@@ -1,0 +1,60 @@
+{
+  "baseline_commit": "af1c1add701e49b355448cf8983eaed1e7623108",
+  "claim": "Eliminates transient AVSubtitle output allocations retained after decode returns, including post-decode rejection paths.",
+  "component": {
+    "baseline_lifetime_failures_reproduced": 14,
+    "candidate_empty_ownership_snapshots": 128,
+    "complete": true,
+    "completion": "native/component/completion.json",
+    "configurations": [
+      "debug",
+      "release"
+    ],
+    "exact_output_comparisons": 16,
+    "process_observations": 32,
+    "receipt": "native/component/receipt.json",
+    "summary": "native/component/summary.json"
+  },
+  "followup_changes": "Evidence and documentation only; production, tests, measurement harness, and workflow remain those of the measured commit.",
+  "independent_audit": "independent-audit.json",
+  "log_bundle": {
+    "all_match": true,
+    "files_byte_compared_to_artifact": 117,
+    "gzip_sha256": "9a24d659dcac12a2d9d81ec03f52a2e8d41ab5a0d72efd040f129d9ef7ee7c38"
+  },
+  "measured_commit": "a27c73f17736ccfffc0cb0d1de8628464dc2ec85",
+  "native_artifact": {
+    "archive_bytes": 127356,
+    "file_contents_unmodified": true,
+    "id": 12524192116,
+    "name": "subtitle-result-lifetime-native",
+    "restored_files": 137,
+    "sha256": "d596e64e14da6598aa08750537e7662fad79c2c1f8acb11f63c72afd201fec8e"
+  },
+  "native_tests": {
+    "all_passed": true,
+    "application_graph_built": true,
+    "configuration": "release",
+    "invocations_including_parameters": 53,
+    "log": "native/native-tests.log",
+    "skipped": 0,
+    "suites": 5,
+    "test_methods": 41
+  },
+  "not_measured": [
+    "process RSS",
+    "whole-player footprint",
+    "peak memory during decode",
+    "decoder throughput",
+    "frame rate"
+  ],
+  "outcome": "success",
+  "schema_version": 1,
+  "workflow_run": {
+    "conclusion": "success",
+    "id": 40004809868,
+    "job_id": 120589894853,
+    "job_name": "native-memory",
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40004809868"
+  }
+}

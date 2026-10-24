@@ -9,7 +9,21 @@ public final class MediaSidecarReader {
         case plex(PlexMatchHints)
         case nfo(MediaMetadataHints)
     }
+    private struct FolderSidecarPaths {
+        let show: URL
+        let plex: URL
+    }
+    private struct AncestorPathPlan {
+        let root: String
+        let parent: String
+        // Discovery visits parent first; sidecar reads visit root first.
+        let folders: [URL]
+        let sidecars: [FolderSidecarPaths]
+    }
     private var cache: [String: Sidecar] = [:]
+    // A metadata pass normally visits sibling files consecutively. Retain only
+    // their last validated path plan, bounded by the existing 64-folder limit.
+    private var ancestorPathPlan: AncestorPathPlan?
     private var remainingBytes = 16 * 1024 * 1024
     public private(set) var filesRead = 0
     public static let maximumFileBytes = 128 * 1024
@@ -22,34 +36,67 @@ public final class MediaSidecarReader {
         guard recognized.kind != .extra else { return recognized }
         let root = root.standardizedFileURL
         let parent = file.deletingLastPathComponent().standardizedFileURL
-        guard parent.path == root.path || parent.path.hasPrefix(root.path + "/") else { return recognized }
-        var folders: [URL] = []
-        var cursor = parent
-        while folders.count < 64 {
-            try checkCancellation()
-            folders.append(cursor)
-            if cursor == root { break }
-            let next = cursor.deletingLastPathComponent()
-            guard next != cursor else { return recognized }
-            cursor = next
+        guard Self.relativePath(parent.path, within: root.path) != nil else { return recognized }
+        let rootKey = root.absoluteString
+        let parentKey = parent.absoluteString
+        let cachedPlan: AncestorPathPlan?
+        // Canonically equivalent Swift strings can name different URL paths.
+        // Reuse only the exact representations that passed the root walk.
+        if let plan = ancestorPathPlan,
+           plan.root.utf8.elementsEqual(rootKey.utf8),
+           plan.parent.utf8.elementsEqual(parentKey.utf8) {
+            cachedPlan = plan
+        } else {
+            cachedPlan = nil
         }
-        guard folders.last == root else { return recognized }
+        var folders: [URL] = []
+        if let cachedPlan {
+            folders = cachedPlan.folders
+            // Preserve the discovery checkpoints before any sidecar reads,
+            // including on hits and when a check throws partway through them.
+            for _ in folders { try checkCancellation() }
+        } else {
+            var cursor = parent
+            while folders.count < 64 {
+                try checkCancellation()
+                folders.append(cursor)
+                if cursor == root { break }
+                let next = cursor.deletingLastPathComponent()
+                guard next != cursor else { return recognized }
+                cursor = next
+            }
+            guard folders.last == root else { return recognized }
+        }
+        var plannedSidecars: [FolderSidecarPaths] = []
+        if cachedPlan == nil { plannedSidecars.reserveCapacity(folders.count) }
         var hints = MediaMetadataHints()
         var foundSeriesPlex = false
         var mappedEpisode: MediaMetadataHints?
-        for folder in folders.reversed() {
+        for (offset, folder) in folders.reversed().enumerated() {
             try checkCancellation()
-            if case let .nfo(nfo) = read(folder.appendingPathComponent("tvshow.nfo")), nfo.content == .show {
+            let cachedPaths = cachedPlan?.sidecars[offset]
+            let showURL = cachedPaths?.show ?? folder.appendingPathComponent("tvshow.nfo")
+            if case let .nfo(nfo) = read(showURL), nfo.content == .show {
                 hints = nfo.overriding(hints)
             }
-            if case let .plex(plex) = read(folder.appendingPathComponent(".plexmatch")) {
-                let relative = String(file.path.dropFirst(folder.path.count + 1))
-                if let mapping = plex.episodeHint(for: relative, inheritsDescendantMappings: !foundSeriesPlex) {
+            let plexURL = cachedPaths?.plex ?? folder.appendingPathComponent(".plexmatch")
+            if case let .plex(plex) = read(plexURL) {
+                if let relative = Self.relativePath(file.path, within: folder.path),
+                   let mapping = plex.episodeHint(for: relative, inheritsDescendantMappings: !foundSeriesPlex) {
                     mappedEpisode = mapping
                 }
                 hints = plex.metadata.overriding(hints)
                 foundSeriesPlex = true
             }
+            if cachedPaths == nil {
+                plannedSidecars.append(FolderSidecarPaths(show: showURL, plex: plexURL))
+            }
+        }
+        if cachedPlan == nil {
+            // Publish only after all ancestor reads. Later calls still perform
+            // those reads, preserving negative caching and byte/entry budgets.
+            ancestorPathPlan = AncestorPathPlan(root: rootKey, parent: parentKey,
+                folders: folders, sidecars: plannedSidecars)
         }
         if var mapping = mappedEpisode {
             mapping.season = mapping.season ?? hints.season ?? directorySeason(parent.lastPathComponent) ?? 1
@@ -80,6 +127,15 @@ public final class MediaSidecarReader {
         }
         recognized = recognized.applying(hints)
         return recognized
+    }
+
+    /// Use the same component boundary for containment and PlexMatch mapping keys.
+    /// The filesystem root already includes its descendant separator.
+    static func relativePath(_ path: String, within root: String) -> String? {
+        if path == root { return "" }
+        let prefix = root == "/" ? "/" : root + "/"
+        guard path.hasPrefix(prefix) else { return nil }
+        return String(path.dropFirst(prefix.count))
     }
 
     private func read(_ url: URL) -> Sidecar {

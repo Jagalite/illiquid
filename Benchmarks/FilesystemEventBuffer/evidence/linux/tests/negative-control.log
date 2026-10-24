@@ -1,0 +1,39 @@
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/18] Write swift-version-79F5DDD9F357E4C6.txt
+[1/18] Emitting module for IlliquidApp
+[2/18] Emitting module for IlliquidAppTests
+[3/18] Compiling IlliquidApp Planner.swift
+[4/18] Wrapping AST for IlliquidAppTests for debugging
+[5/18] Wrapping AST for IlliquidApp for debugging
+[6/18] Compiling IlliquidAppTests SourceFilesystemEventBufferTests.swift
+[7/18] /workspace/scratch/8cb5bbbe926a/filesystem-event-buffer-tests/negative-control/.build/x86_64-unknown-linux-gnu/debug/IlliquidEventBufferNegativeControlPackageDiscoveredTests.derived/all-discovered-tests.swift
+[8/18] Emitting module for IlliquidEventBufferNegativeControlPackageDiscoveredTests
+[9/18] Compiling IlliquidEventBufferNegativeControlPackageDiscoveredTests IlliquidAppTests.swift
+[10/18] /workspace/scratch/8cb5bbbe926a/filesystem-event-buffer-tests/negative-control/.build/x86_64-unknown-linux-gnu/debug/IlliquidEventBufferNegativeControlPackageTests.derived/runner.swift
+[11/18] Compiling IlliquidEventBufferNegativeControlPackageDiscoveredTests all-discovered-tests.swift
+[12/18] Wrapping AST for IlliquidEventBufferNegativeControlPackageDiscoveredTests for debugging
+[13/18] Emitting module for IlliquidEventBufferNegativeControlPackageTests
+[14/18] Wrapping AST for IlliquidEventBufferNegativeControlPackageTests for debugging
+[15/18] Compiling IlliquidEventBufferNegativeControlPackageTests runner.swift
+[16/18] Write Objects.LinkFileList
+[17/18] Linking IlliquidEventBufferNegativeControlPackageTests.xctest
+Build complete! (6.57s)
+Test Suite 'Selected tests' started at 2026-10-23 13:59:30.797
+Test Suite 'Selected tests' passed at 2026-10-23 13:59:30.798
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Bounded source filesystem event retention" started.
+◇ Test firstEventBeyondDefaultCapacityRequestsRecovery() started.
+◇ Test overflowUsesCurrentNormalizedRootsAndNoRootsMeansNoWork() started.
+✘ Test overflowUsesCurrentNormalizedRootsAndNoRootsMeansNoWork() recorded an issue at SourceFilesystemEventBufferTests.swift:156:9: Expectation failed: (plan → SourceFilesystemInvalidationPlan(directoriesToReload: Set([]), treesToInvalidate: Set([]), rootsToRescan: Set([]))) == (SourceFilesystemInvalidationPlan(rootsToRescan: ["/new/root", "/other/root"]) → SourceFilesystemInvalidationPlan(directoriesToReload: Set([]), treesToInvalidate: Set([]), rootsToRescan: Set(["/new/root", "/other/root"])))
+✘ Test overflowUsesCurrentNormalizedRootsAndNoRootsMeansNoWork() failed after 0.001 seconds with 1 issue.
+✘ Test firstEventBeyondDefaultCapacityRequestsRecovery() recorded an issue at SourceFilesystemEventBufferTests.swift:41:9: Expectation failed: (buffer.count → 4097) == 1
+✘ Test firstEventBeyondDefaultCapacityRequestsRecovery() recorded an issue at SourceFilesystemEventBufferTests.swift:232:9: Expectation failed: (events.count → 4097) == 1
+✘ Test firstEventBeyondDefaultCapacityRequestsRecovery() recorded an issue at SourceFilesystemEventBufferTests.swift:233:9: Expectation failed: (events.first?.flags.contains(.eventsDropped) → false) == true
+✘ Test firstEventBeyondDefaultCapacityRequestsRecovery() recorded an issue at SourceFilesystemEventBufferTests.swift:235:9: Expectation failed: (plan → SourceFilesystemInvalidationPlan(directoriesToReload: Set(["/media/movies"]), treesToInvalidate: Set([]), rootsToRescan: Set([]))) == (SourceFilesystemInvalidationPlan(rootsToRescan: Set(roots.map(\.path))) → SourceFilesystemInvalidationPlan(directoriesToReload: Set([]), treesToInvalidate: Set([]), rootsToRescan: Set(["/media/movies", "/media/shows", "/media/shows/Season 1", "/Volumes/External/Library"])))
+✘ Test firstEventBeyondDefaultCapacityRequestsRecovery() failed after 0.037 seconds with 4 issues.
+✘ Suite "Bounded source filesystem event retention" failed after 0.037 seconds with 5 issues.
+✘ Test run with 2 tests in 1 suite failed after 0.037 seconds with 5 issues.

@@ -289,16 +289,11 @@ final class LibassContext {
             if value.w > 0, value.h > 0, value.bitmap != nil {
                 let width = Int(value.w)
                 let height = Int(value.h)
-                let stride = Int(value.stride)
-                let (byteCount, byteCountOverflow) = stride.multipliedReportingOverflow(
-                    by: height
-                )
                 let (nextImageCount, imageCountOverflow) = retainedImageCount
                     .addingReportingOverflow(1)
-                let (nextMaskBytes, maskBytesOverflow) = retainedMaskBytes
-                    .addingReportingOverflow(byteCount)
-                guard stride >= width,
-                      !byteCountOverflow,
+                guard let layout = ASSBitmapCopyLayout(
+                    width: width, height: height, sourceStride: Int(value.stride)
+                ),
                       !imageCountOverflow
                 else {
                     return ASSRenderResult(
@@ -312,6 +307,10 @@ final class LibassContext {
                         copyNanoseconds: 0
                     )
                 }
+                // Charge only the owned visible pixels. Source padding is not
+                // copied, so more regions may fit without increasing this limit.
+                let (nextMaskBytes, maskBytesOverflow) = retainedMaskBytes
+                    .addingReportingOverflow(layout.byteCount)
                 if !maskBytesOverflow,
                    nextImageCount <= boundedImageCount,
                    nextMaskBytes <= boundedBitmapBytes
@@ -337,10 +336,16 @@ final class LibassContext {
             if value.w > 0, value.h > 0, let bitmap = value.bitmap {
                 let width = Int(value.w)
                 let height = Int(value.h)
-                let stride = Int(value.stride)
-                let byteCount = stride * height
+                // The complete list was validated before any copies. Keep the
+                // checked layout here as well so pointer arithmetic stays local.
+                guard let layout = ASSBitmapCopyLayout(
+                    width: width, height: height, sourceStride: Int(value.stride)
+                ) else {
+                    image = value.next
+                    continue
+                }
                 let (nextMaskBytes, maskBytesOverflow) = maskBytes
-                    .addingReportingOverflow(byteCount)
+                    .addingReportingOverflow(layout.byteCount)
                 guard !maskBytesOverflow,
                       output.count < boundedImageCount,
                       nextMaskBytes <= boundedBitmapBytes
@@ -354,14 +359,14 @@ final class LibassContext {
                     width: width,
                     height: height
                 )
-                // Preserve libass's top-to-bottom row order for direct Metal
-                // upload and the independent CPU correctness oracle.
-                let bytes = Data(bytes: bitmap, count: byteCount)
+                // Preserve top-to-bottom row order without retaining padding
+                // or reading past libass's potentially unpadded final row.
+                let bytes = layout.copy(from: bitmap)
                 output.append(ASSRenderedRegion(
                     bitmap: bytes,
                     color: value.color,
                     frame: frame,
-                    stride: stride
+                    stride: width
                 ))
                 bitmapCopies += 1
                 maskBytes = nextMaskBytes
