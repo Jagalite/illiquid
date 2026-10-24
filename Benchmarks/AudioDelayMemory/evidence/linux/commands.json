@@ -1,0 +1,1688 @@
+[
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "--version"
+    ],
+    "elapsed_seconds": 0.044686891000310425,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1d762e32f31ac0d0550e913ae47faf3b2ca9c548411ab9ec48a84588438d92cf"
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.001785396998457145,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b640f50a3ad13bcf89a3b847e050f87275a5a33f6d5a96743f0a084f7aa1ba79"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-Onone",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-module-cache-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/module-cache",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/AudioFrame.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/Platform.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/Harness.swift",
+      "-o",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug"
+    ],
+    "elapsed_seconds": 2.197943144994497,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-Onone",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-module-cache-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/module-cache",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/AudioFrame.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/Platform.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/Harness.swift",
+      "-o",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug"
+    ],
+    "elapsed_seconds": 1.2830803969991393,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug",
+      "trace",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/cases.json",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/trace-baseline-debug.bin"
+    ],
+    "elapsed_seconds": 0.3917856420011958,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "231384b60278c571df0ff7369946787a96eec10efe58553bed277eb00fc19c13"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug",
+      "trace",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/cases.json",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/trace-candidate-debug.bin"
+    ],
+    "elapsed_seconds": 0.38999852500273846,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "231384b60278c571df0ff7369946787a96eec10efe58553bed277eb00fc19c13"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug",
+      "residency",
+      "2",
+      "48"
+    ],
+    "elapsed_seconds": 0.014759755998966284,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3e62364ddcb5601a0751beabc25c34e8e7e72603b389f58fc358728be8a9b40a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug",
+      "residency",
+      "2",
+      "48"
+    ],
+    "elapsed_seconds": 0.013481039997714106,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ea4c767fc3395d1d8abda3fd1e7fb5de704995a4b196d5936826bf6681f3a62c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug",
+      "residency",
+      "2",
+      "469"
+    ],
+    "elapsed_seconds": 0.06051508299424313,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6cd77727c838276c85d496c6e6d89470ac67f7bf6405a3f7057638944ca4dc00"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug",
+      "residency",
+      "2",
+      "469"
+    ],
+    "elapsed_seconds": 0.05950487099471502,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "14c6f0aac7ff9a59ce78e22f9c2e546f6eec4f3e830cd03fc09097460e1635c2"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug",
+      "residency",
+      "6",
+      "48"
+    ],
+    "elapsed_seconds": 0.02245431699702749,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "265b7bdafc5e64e1852c9f14c4f877d8cc3463c93fb48401bf7c5723f08a3e36"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug",
+      "residency",
+      "6",
+      "48"
+    ],
+    "elapsed_seconds": 0.02399117999448208,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "21d18eb4777abae5da257cddc73771d2c61017f580171a7d110883a688b976cd"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug",
+      "residency",
+      "6",
+      "469"
+    ],
+    "elapsed_seconds": 0.1370743939987733,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d7a7fc8b61e8a356973cd2c4d50e1647bea1b001d1dee045325a7898a2cd3271"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug",
+      "residency",
+      "6",
+      "469"
+    ],
+    "elapsed_seconds": 0.14399031300126808,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "255008c441e85fa9b59e9bad4fefe9aa3a07622075f93d76fdcca4f11c4b82d2"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug",
+      "residency",
+      "8",
+      "48"
+    ],
+    "elapsed_seconds": 0.02834307000011904,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9c62cc32843649819b61fdc810c534c95ef210fd55766fe4d985ca831e0dfcd2"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug",
+      "residency",
+      "8",
+      "48"
+    ],
+    "elapsed_seconds": 0.02850356200360693,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4aea6da71cd87cf2b3d41f3408ef4cde2d042fec76aaa9d9a892532d5573cec3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug",
+      "residency",
+      "8",
+      "469"
+    ],
+    "elapsed_seconds": 0.18831873199815163,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "036edd4c1aea4acea85c1db37a55ca94511dfc4d87cea3f8d1278fac0ebb12a3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug",
+      "residency",
+      "8",
+      "469"
+    ],
+    "elapsed_seconds": 0.1857928509998601,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "11faaaeafbd194b0c393e07ffa3fd7ab1f4dd723d333ce3d0a6ef8d52b8fb184"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug",
+      "lifetime",
+      "0"
+    ],
+    "elapsed_seconds": 0.007669894002901856,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a63e8950689eecdf9d21fd1675d928ef94465b39c8cec04cd2edfdf67ea53013"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug",
+      "lifetime",
+      "0"
+    ],
+    "elapsed_seconds": 0.008900977001758292,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "41b4fab5bdbabf31cb538ec186a4a257390ec4a1f3088631848d571f392e5c0e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-debug",
+      "lifetime",
+      "-10"
+    ],
+    "elapsed_seconds": 0.006133481001597829,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "17524105eef9d44b0f2330700c3562ced717e4bc0b6f7b79f27beb4f60657834"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-debug",
+      "lifetime",
+      "-10"
+    ],
+    "elapsed_seconds": 0.006252270999539178,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "62d65ce859da3c21a17f4608b3d635b4af727529f467267c436461c0056242db"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "test",
+      "--use-integrated-swift-driver",
+      "--package-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-baseline",
+      "--scratch-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-baseline/.build",
+      "--cache-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-cache",
+      "--config-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-config",
+      "--security-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-security",
+      "--jobs",
+      "2",
+      "-c",
+      "debug",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "--filter",
+      "AudioDelayTests"
+    ],
+    "elapsed_seconds": 11.7779313669962,
+    "returncode": 0,
+    "stderr_sha256": "1e8d1bc5a745c33fe7183f6f333bd6cfbf43f2074276f8eba6c85c54e7dda2ee",
+    "stdout_sha256": "afa08649f1ecce0d89c25700099a796463ec6ad01c1b2397fe2e27a57aad6935"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "test",
+      "--use-integrated-swift-driver",
+      "--package-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-candidate",
+      "--scratch-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-candidate/.build",
+      "--cache-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-cache",
+      "--config-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-config",
+      "--security-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-security",
+      "--jobs",
+      "2",
+      "-c",
+      "debug",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "elapsed_seconds": 12.086964219000947,
+    "returncode": 0,
+    "stderr_sha256": "5ba1095f5d2339375d75fda3a876a8fe2f12ddb680b78f2377269842a442a12b",
+    "stdout_sha256": "b29fc859cacd9308bf13cf8ba9dc9007947f2a25949d65bcc1aded116d1528c8"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-module-cache-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/module-cache",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/AudioFrame.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/Platform.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/Harness.swift",
+      "-o",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release"
+    ],
+    "elapsed_seconds": 4.179926466997131,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-module-cache-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/module-cache",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/AudioFrame.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/Platform.swift",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/Harness.swift",
+      "-o",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release"
+    ],
+    "elapsed_seconds": 3.5159137439986807,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "trace",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/cases.json",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/trace-baseline-release.bin"
+    ],
+    "elapsed_seconds": 0.386744606999855,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "231384b60278c571df0ff7369946787a96eec10efe58553bed277eb00fc19c13"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "trace",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/cases.json",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/trace-candidate-release.bin"
+    ],
+    "elapsed_seconds": 0.37474221699812915,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "231384b60278c571df0ff7369946787a96eec10efe58553bed277eb00fc19c13"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "residency",
+      "2",
+      "48"
+    ],
+    "elapsed_seconds": 0.011630183995293919,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3e62364ddcb5601a0751beabc25c34e8e7e72603b389f58fc358728be8a9b40a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "residency",
+      "2",
+      "48"
+    ],
+    "elapsed_seconds": 0.010127063003892545,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ea4c767fc3395d1d8abda3fd1e7fb5de704995a4b196d5936826bf6681f3a62c"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "residency",
+      "2",
+      "469"
+    ],
+    "elapsed_seconds": 0.027643005996651482,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6cd77727c838276c85d496c6e6d89470ac67f7bf6405a3f7057638944ca4dc00"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "residency",
+      "2",
+      "469"
+    ],
+    "elapsed_seconds": 0.02582908699696418,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "14c6f0aac7ff9a59ce78e22f9c2e546f6eec4f3e830cd03fc09097460e1635c2"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "residency",
+      "6",
+      "48"
+    ],
+    "elapsed_seconds": 0.01309747299819719,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "265b7bdafc5e64e1852c9f14c4f877d8cc3463c93fb48401bf7c5723f08a3e36"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "residency",
+      "6",
+      "48"
+    ],
+    "elapsed_seconds": 0.012233284003741574,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "21d18eb4777abae5da257cddc73771d2c61017f580171a7d110883a688b976cd"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "residency",
+      "6",
+      "469"
+    ],
+    "elapsed_seconds": 0.0637185049999971,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d7a7fc8b61e8a356973cd2c4d50e1647bea1b001d1dee045325a7898a2cd3271"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "residency",
+      "6",
+      "469"
+    ],
+    "elapsed_seconds": 0.05940494400419993,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "255008c441e85fa9b59e9bad4fefe9aa3a07622075f93d76fdcca4f11c4b82d2"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "residency",
+      "8",
+      "48"
+    ],
+    "elapsed_seconds": 0.016069065997726284,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9c62cc32843649819b61fdc810c534c95ef210fd55766fe4d985ca831e0dfcd2"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "residency",
+      "8",
+      "48"
+    ],
+    "elapsed_seconds": 0.015490245001274161,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "4aea6da71cd87cf2b3d41f3408ef4cde2d042fec76aaa9d9a892532d5573cec3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "residency",
+      "8",
+      "469"
+    ],
+    "elapsed_seconds": 0.0873299640006735,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "036edd4c1aea4acea85c1db37a55ca94511dfc4d87cea3f8d1278fac0ebb12a3"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "residency",
+      "8",
+      "469"
+    ],
+    "elapsed_seconds": 0.07966034999844851,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "11faaaeafbd194b0c393e07ffa3fd7ab1f4dd723d333ce3d0a6ef8d52b8fb184"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "lifetime",
+      "0"
+    ],
+    "elapsed_seconds": 0.008487134997267276,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a63e8950689eecdf9d21fd1675d928ef94465b39c8cec04cd2edfdf67ea53013"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "lifetime",
+      "0"
+    ],
+    "elapsed_seconds": 0.005839199002366513,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "41b4fab5bdbabf31cb538ec186a4a257390ec4a1f3088631848d571f392e5c0e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "lifetime",
+      "-10"
+    ],
+    "elapsed_seconds": 0.005717664993426297,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "17524105eef9d44b0f2330700c3562ced717e4bc0b6f7b79f27beb4f60657834"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "lifetime",
+      "-10"
+    ],
+    "elapsed_seconds": 0.008892723999451846,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "62d65ce859da3c21a17f4608b3d635b4af727529f467267c436461c0056242db"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "test",
+      "--use-integrated-swift-driver",
+      "--package-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-baseline",
+      "--scratch-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-baseline/.build",
+      "--cache-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-cache",
+      "--config-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-config",
+      "--security-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-security",
+      "--jobs",
+      "2",
+      "-c",
+      "release",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "--filter",
+      "AudioDelayTests"
+    ],
+    "elapsed_seconds": 15.167734287999338,
+    "returncode": 0,
+    "stderr_sha256": "3fd182283d9980d90e95a3ac4377d1aa8f7d65967ed18bc03e797325c5ff3d6c",
+    "stdout_sha256": "df4155c3f30993d4557a7300fa13722949c4b6f73b43b11ae8bc6f5520cfd63d"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "test",
+      "--use-integrated-swift-driver",
+      "--package-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-candidate",
+      "--scratch-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-candidate/.build",
+      "--cache-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-cache",
+      "--config-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-config",
+      "--security-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-security",
+      "--jobs",
+      "2",
+      "-c",
+      "release",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "elapsed_seconds": 15.410622294999484,
+    "returncode": 0,
+    "stderr_sha256": "5507988410e280e1cc2d7bce1421ae4f4806858fd5d571d723557ada39729cc7",
+    "stdout_sha256": "dc3b955d91936f9a46ca4bd83878c53c4639d4d37368c3c4fd3bcbd6cf62858b"
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "test",
+      "--use-integrated-swift-driver",
+      "--package-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-baseline",
+      "--scratch-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/tests-baseline/.build",
+      "--cache-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-cache",
+      "--config-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-config",
+      "--security-path",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/swiftpm-security",
+      "--jobs",
+      "2",
+      "-c",
+      "release",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "--filter",
+      "completedInputStorageIsReleasedWhileTailFormatRemainsAvailable|retainedFullSilenceChunksShareStorageAndTailHasExactSize"
+    ],
+    "elapsed_seconds": 9.162807136002812,
+    "returncode": 1,
+    "stderr_sha256": "d04c946318ffd6ddff528ac4b283588e7c8c18ae2b255e0f8abc909589306987",
+    "stdout_sha256": "725e8eea5a84255101e2493a778171c8f60b0d6a756e077b9d734471d85b2785"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "200"
+    ],
+    "elapsed_seconds": 0.008363848995941225,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b59ffcbc91d61bd1dcbb6200ddbb05298d31723206dcf7ba965ae10b7ef4839b"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.09690981700259726,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "97313bb84d8b3212c173d280a7f8260e2c8a8c548c7b1562d51a8fd46b3ae61a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.08321382699796231,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "771a6385a4c59a9b6a634b3296376906a873744b7534fe4bbff0a157f4f21009"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.10210137099784333,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f78c43ba9dc024cab39d852cf51a174abbc3015474e1c39eb62224456b2d9108"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.09925028999714414,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "30bd3a3708a9f856929d8cec50650903d33f86ce415cbe69907ffabd1e1366f5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.08600785299495328,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "14ffdb667ed27ecca11b81158046a44450505721124aca207ac9d3328d9b5e2a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.10870558700116817,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "02a11c6dad731a45e1c2a2752b7698bd390ad669e71fec3f61d0062486afada8"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.12801539999782108,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "56fc68b548ae3b6fef4760b920961d82e2009be08b7ec92fb151dcf07c12b05f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.1163540190027561,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "368a39b11275da7b663e3d3c352d9f819764956c6a0abc02dc976a3441dd6724"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.11720738399890251,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a425add684218457e5a0491b790980d247b3e0acbacb25c544afd914b918e0aa"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.1433099309942918,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "def15535f69ce8951b15d32c559c36f8af9238ad2c799154163bfbf6f0121d7e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.09876475499913795,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "97ab75346f2d6947a1c4b08b75d8b84f589352cadfa37b85ad905b8d598b1693"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "0",
+      "193554"
+    ],
+    "elapsed_seconds": 0.08824673300114227,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9b437c6d6d80310bfb114abea4aac45617ef6d2f2f7e2f3c8411f4980790bd48"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "200"
+    ],
+    "elapsed_seconds": 0.01184138300595805,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ecd4b7b42da2f80805cd67d75cea12e266d680654602bde81ff787f147f35baf"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.06942336100473767,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "25859979e6a34fc4627a723a8f0bdb18455641edb9bd487d200b98e0da4988d4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.054201430997636635,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e5073e5fedaadf5255575a14700dd345f76f4a8ef2434f1556cb5b30b620999f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.06228437599929748,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "842b7f13f7c870e66302f0fe4c0c747a483a8d56ae97e591c7e0a3208ac4c9af"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.07338247099687578,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2ea8cc026ebaecdbe33115c27c5e9916183eaf5e02afc4dc32829f457b280477"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.07186914799967781,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d3cfe1059760c313d67616545ec90baac73a45e2a604d4e24ebf9bfc3275a888"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.06164847200125223,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7e5c69406ea5e66f401a9b60b499049c3a63ae55924e5b13a8707cfea2cf4f90"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.05428334599855589,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "db16d185ca8fa76db63a7ceea3dca24517c9e2c84732259a538bc082f18f8c90"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.1261483810012578,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7d498c71d86e47acd4aae208dabffdd5ffa39cb3b5a00f2007d6db23337f0e2a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.07376702300098259,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "145fdff8d407343f84dce852bb515499e1dfad45eb196f7985dbedef8ea6c581"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.06529214599868283,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "b4da877dbeb6cb5f1dcd5ceff86c0c1acd38d53bcfb96288fddcfb5a9fa159e7"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.08736178999970434,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e980da73e196a0e2ba09eb469ced7d61188e619caf035b7c8f42f0fbc5963085"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "1",
+      "34968"
+    ],
+    "elapsed_seconds": 0.11895442700188141,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e13978486311139f06c1a5379a6c68fda0e882b4f27b73d88c16ff6be860413e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "200"
+    ],
+    "elapsed_seconds": 0.08448393899743678,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a84d47e2220920810102af0792bae1748b8f6a8b2116a60e48f60756398ec01d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.11041757700149901,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "129d6708aa3cde7965b3326cfc07cc8dee27eecbaa407e826ead3307cff215c7"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.03652693899493897,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6f8a1a95b4b0febda4e344d41f7f56244cf13967ead18029a43aead8613286ab"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.08036498299770756,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f6437b4efb595f18befdb519973040fd38ee136fb8f313e64bc2cde98d844f12"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.0460068790052901,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1bffeb235d445fbca154e1d71dcce37303fd9480d65fcdefb29680cb5fdfefe6"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.07914250400062883,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f9db89a652a969f36531a33d8a005a52f7ddceaab1b25271e636d730b2f70e9f"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.058945764001691714,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ac27787f0719cdf5e6005fbd8df6c9d945dade8f2db4e828107c1fe72ff754d6"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.05936119899706682,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ed5d4ec23f340ed3eaaddd7e397afb1660f35e2c64819e6bd52839b2d1a831c9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.0627004650013987,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "bb4e2274a0b47b76abede71469d308fec02f714146814332566101ad34258f26"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.08586995000223396,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5521bd018b2cb3f8b927bf8fe30b0f1fb92d68cce70b8786162541307741a645"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.03557221200026106,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a4c02903c713cf5161638c1c65385e9e3b57733f73343613e4e913bb733df89e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.04030056900228374,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "19dbd7771ccdbda9b88735524526e29c4c59d2dde6f80af37e0aec1be2008c44"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "2",
+      "245"
+    ],
+    "elapsed_seconds": 0.04245178700512042,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "be5981df27d40d2fb371a40e2c37e8d94d9cb237f179456d5e880676b0ff8c2e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "200"
+    ],
+    "elapsed_seconds": 0.08812777799903415,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0bf9f0be8e5b75d145100bffd6d8e5e3454b43cc9a872ae1aaf639a14576c2fa"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.08966570199845592,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d063f9b9b39c99aca1d44d7c739101ed75448998140295957e237d0cf65cb6b6"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.020143710004049353,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "0fc4802d3ad295b53f5f3626ab6821bcf9fb13d8de99c591912be53fc06eefa6"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.01693400899966946,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "86dd3f6b294759a5f8108d19dce55cdea718df9127c4f405ba2b480036f7bdde"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.09915901200292865,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ca28ca4137d508518e355e52d1ea525c8950988e8ee219709ce606f6bb2f42fb"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.07232719500461826,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9a3dec2df4bc2a30443071b9edf0f0931c0472621edbafe9d81fe496c5db5b22"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.019363876002898905,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "127b595cb4d4241911604c1eb163d2c52b3f5f8222caac345698b4b3e6758b98"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.016629120000288822,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5d95c406a4320083ee592f68154d17b977cd826c072fc9911763f980ea07e0bc"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.07338645999698201,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "1242ac956460576af5312fda36448b2f12580e15c7fc36a8f2d0038d9925f431"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.07413031999749364,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "357777702681f59e8fa7e92b4c006feafc95a13541bedabb27304857624d8ab7"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.019602955995651428,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c78540e909ca8a6500598f647dfc6e58301b45c617bfe7a268357a88721e0531"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.02873399999953108,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c224c445253c75d817d6fdb9a4e881ea3d8267831dc58de8b4da5ade2cc9dfcc"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "3",
+      "209"
+    ],
+    "elapsed_seconds": 0.0771728580002673,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "30207d94cf7c086903b6272277587244004e72b2d7a7f0baf189d7cf87d79302"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "200"
+    ],
+    "elapsed_seconds": 0.0758026159965084,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "13589c09248c9550ac27550ca3b7fec14911394b8c0c59a434a59d5fb3811a4e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.08719557400036138,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "f4d2db655b3e20b826f10b6f785669ff96353e6a1dce42a8936e3214614824bf"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.020469349998165853,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c567d2c7bb2773d579f788387ed0e1825ae19b75a931e1540bbf40dd6d151969"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.021143204998224974,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "fd10494c60195e516aae358dd8cf591314d9483d59544a301684b731ad4972a9"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.08514245400147047,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "ce38b3ee5701e94f00ca452b310afe963195deebc021548b42ba38c2a719f110"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.08487684400461148,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "172fc89197ab74a12cc0243a1a6aee81d0fd29a88f694c17cf384ac2f177585a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.02361333199951332,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "3c4acd12dc701564710ccc1ce62deac8f5a6716beadc65b4d425b9a32c408caa"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.027114192002045456,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "395e8580107038cc5a6efcf5b8a2dd6fcd12835ce64a7b907132e92e1af1b65e"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.08476052899641218,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "21e22b386fba37f3013f2a9dcdedf72dc437256c34577e7093e95712df730285"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.11078963799809571,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "6aa5447ec8a58164cd4a10e3b40ed9d0ccd1cb48156c3fc0470e37f43935ac33"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.019139267998980358,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "2d4a9d02c99ad5ab89c8e2137ed44e31301591d82371c6ec5574cb24aebbb18a"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.019267290001153015,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "d0e459ccd552470c6da3a82c23033e54f5856739c097c45696aa0f21b306023d"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "4",
+      "243"
+    ],
+    "elapsed_seconds": 0.087919805002457,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "7c1b1ecd85a7dfe2238f0a8e17406c36585500a4e6ba2dbd1053a3c70a9f49c4"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "200"
+    ],
+    "elapsed_seconds": 0.009222681001119781,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5475447ffdea9f5f4a994567886d6328c50d7cf995d6601ba56d5eea8715ce36"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.09611627199774375,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "83672eb8f4cbc5c50373d5818513d8df3536d1adeff9996c2179b83a6ed52680"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.11346079900249606,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8108d76f8e8a2659267fb3d0cccc5288c0685fb104911e48e055d7d47454b2f8"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.10834775100374827,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "5f8b043e6c0985f1654eb54349209551a820b717b1814698fb81b4971b7c0f99"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.08240323200152488,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "dda6153803cea87316a84db37c39826cbb46eecc2b84297728f398541e697af7"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.08665317799750483,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "9117eeac3e826f806cb9d5d9aa06f3409ab7b4452eb7540670b1948fd6394854"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.1289368520010612,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "363ec20c74a652c247d872a08e0f69b2b63af327bb13e7c41ec02ff58138c419"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.10622779199911747,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "8de5d163a8a22265f9a7d588ab3cae5ddefd1135f845252e1aa5eade89bdf393"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.0885297620043275,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "beaa8d7330a5257ddf77fafa906d3a551dd7c9c6f635499fee5d8b648676d323"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.11824864500522381,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "16953744e43835b94c0b14fe2ae5500c0a5ecaf4d85484e5e48bddf41475c2e5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.11795377099770121,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "cdfa87cc51a6184ef679fb3a915629b2912019d9c3c1c7e67129b8a96917b8c5"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/candidate-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.08439387800171971,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "768e0fad26319f01eb61c8377c9ae3f019b4cba983322892e403ab227ae2e574"
+  },
+  {
+    "argv": [
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/build/baseline-release",
+      "measure",
+      "/workspace/scratch/0b6bd93d329f/illiquid/Benchmarks/AudioDelayMemory/evidence/linux/measurement-cases.json",
+      "5",
+      "373535"
+    ],
+    "elapsed_seconds": 0.08131476199923782,
+    "returncode": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "c3af6aa7adb0bbc41803648f1f66ea58e125754dcbe40a7d96d5bfb287c5f4de"
+  }
+]
