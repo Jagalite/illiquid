@@ -1,0 +1,131 @@
+Test Suite 'All tests' started at 2026-10-24 23:19:26.364
+Test Suite 'release.xctest' started at 2026-10-24 23:19:26.368
+Test Suite 'release.xctest' passed at 2026-10-24 23:19:26.368
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-24 23:19:26.368
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "External subtitle filename tokenization" started.
+◇ Suite "External subtitle matching with an empty subtitle inventory" started.
+◇ Suite "External subtitle qualifier storage" started.
+◇ Suite "External subtitle matching" started.
+◇ Test duplicateMediaKeysKeepOneEmptyValue() started.
+◇ Test unicodeNormalizationStillProducesAmbiguousAndUniqueAssociations() started.
+◇ Test emptyInventoryPreservesEveryOriginalMediaKey() started.
+◇ Test "Matches exact, language, forced, and quality-suffixed names" started.
+◇ Test nonemptySubtitleInventoryStillMatchesAndSorts() started.
+◇ Test cancellationAtTheEmptyReturnBoundaryDiscardsAllKeys() started.
+◇ Test indexedMatchingAgreesWithExhaustiveScoringAcrossAllSubsets() started.
+◇ Test emptyInputsReturnAnEmptyDictionary() started.
+◇ Test defaultCancellationPredicateObservesTheCurrentTask() started.
+◇ Test asciiDelimitersKeepSeparateAndConcatenatedTitlesDistinct() started.
+◇ Test everyASCIIScalarAgreesWithFoundationNormalization() started.
+◇ Test longQualifierChainsKeepReleaseSpecificRawNames() started.
+◇ Test cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) started.
+◇ Test "Episode one subtitle does not match episode ten" started.
+◇ Test titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test cancellationBeforeInsertionReturnsNoKeys() started.
+◇ Test "Matches WebVTT and ignores unsupported bitmap subtitle formats" started.
+◇ Test cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) started.
+◇ Test cancelledMatchingDoesNotReturnPartialAssociations() started.
+◇ Test cancellationWithOnlyUnsupportedFilesReturnsNoAssociations() started.
+◇ Test cancellationDuringQualifiedIndexingAndAfterAMatchDiscardsAllAssociations() started.
+◇ Test namesWithoutQualifiersKeepExactScoresAndPrefixAmbiguity() started.
+◇ Test "Ambiguous generic subtitle is not assigned to every episode" started.
+◇ Test allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test allQualifierStemsKeepTheirFirstToken(media:subtitle:score:) started.
+◇ Test identicalStemsInDifferentContainersRemainAmbiguous() started.
+◇ Test cancellationDuringInsertionDiscardsEarlierKeys() started.
+◇ Test standaloneLettersRemainPartOfTheMediaTitle(_:) started.
+◇ Test indexedMatchingPreservesExhaustiveScoresAndAmbiguity() started.
+◇ Test punctuationOnlyNamesDoNotAcquireTokens() started.
+◇ Test languageWordInTitleSurvivesLongMediaQualifierChains() started.
+◇ Test duplicateMediaAndUnrelatedInputsDoNotCreateAmbiguity() started.
+◇ Test releaseSpecificSubtitlesDisambiguateOtherwiseEqualEncodes() started.
+◇ Test unicodeNamesRetainFoundationCaseDiacriticAndWidthSemantics() started.
+◇ Test releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument singleObservation → false to cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) started.
+◇ Test case passing 1 argument singleObservation → true to cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) started.
+◇ Test case passing 1 argument suffix → ".srt" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument suffix → ".en.srt" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument suffix → ".en.forced.ass" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument suffix → ".en.sdh.vtt" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument singleObservation → false to cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) started.
+◇ Test case passing 1 argument singleObservation → true to cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) started.
+◇ Test case passing 1 argument fileExtension → "ass" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "idx" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "srt" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 3 arguments media → "1080p.720p.HEVC.mkv", subtitle → "1080p.en.forced.srt", score → 10005 to allQualifierStemsKeepTheirFirstToken(media:subtitle:score:) started.
+◇ Test case passing 1 argument fileExtension → "vtt" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 3 arguments media → "en.mkv", subtitle → "en.eng.forced.srt", score → 10002 to allQualifierStemsKeepTheirFirstToken(media:subtitle:score:) started.
+◇ Test case passing 1 argument fileExtension → "ssa" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 3 arguments media → "HEVC.mkv", subtitle → "HEVC.srt", score → 10004 to allQualifierStemsKeepTheirFirstToken(media:subtitle:score:) started.
+◇ Test case passing 1 argument letter → "I" to standaloneLettersRemainPartOfTheMediaTitle(_:) started.
+◇ Test case passing 1 argument letter → "P" to standaloneLettersRemainPartOfTheMediaTitle(_:) started.
+✔ Test cancellationAtTheEmptyReturnBoundaryDiscardsAllKeys() passed after 0.018 seconds.
+✔ Test emptyInputsReturnAnEmptyDictionary() passed after 0.018 seconds.
+✔ Test emptyInventoryPreservesEveryOriginalMediaKey() passed after 0.019 seconds.
+◇ Test case passing 1 argument release → "1080p" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "1080i" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "HEVC" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "1080p.WEB-DL.x265" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+✔ Test longQualifierChainsKeepReleaseSpecificRawNames() passed after 0.018 seconds.
+✔ Test "Matches exact, language, forced, and quality-suffixed names" passed after 0.019 seconds.
+✔ Test "Episode one subtitle does not match episode ten" passed after 0.018 seconds.
+✔ Test cancellationBeforeInsertionReturnsNoKeys() passed after 0.018 seconds.
+✔ Test unicodeNormalizationStillProducesAmbiguousAndUniqueAssociations() passed after 0.019 seconds.
+✔ Test cancelledMatchingDoesNotReturnPartialAssociations() passed after 0.017 seconds.
+✔ Test cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) with 2 test cases passed after 0.017 seconds.
+✔ Test cancellationWithOnlyUnsupportedFilesReturnsNoAssociations() passed after 0.017 seconds.
+✔ Test namesWithoutQualifiersKeepExactScoresAndPrefixAmbiguity() passed after 0.017 seconds.
+✔ Test titleWordsAreNotMistakenForSubtitleSuffixes(_:) with 4 test cases passed after 0.018 seconds.
+✔ Test cancellationDuringQualifiedIndexingAndAfterAMatchDiscardsAllAssociations() passed after 0.017 seconds.
+✔ Test nonemptySubtitleInventoryStillMatchesAndSorts() passed after 0.019 seconds.
+✔ Test allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) with 5 test cases passed after 0.021 seconds.
+✔ Test "Ambiguous generic subtitle is not assigned to every episode" passed after 0.021 seconds.
+✔ Test "Matches WebVTT and ignores unsupported bitmap subtitle formats" passed after 0.023 seconds.
+✔ Test allQualifierStemsKeepTheirFirstToken(media:subtitle:score:) with 3 test cases passed after 0.021 seconds.
+✔ Test identicalStemsInDifferentContainersRemainAmbiguous() passed after 0.021 seconds.
+✔ Test cancellationDuringInsertionDiscardsEarlierKeys() passed after 0.021 seconds.
+✔ Test punctuationOnlyNamesDoNotAcquireTokens() passed after 0.021 seconds.
+✔ Test languageWordInTitleSurvivesLongMediaQualifierChains() passed after 0.021 seconds.
+✔ Test standaloneLettersRemainPartOfTheMediaTitle(_:) with 2 test cases passed after 0.021 seconds.
+✔ Test releaseSpecificSubtitlesDisambiguateOtherwiseEqualEncodes() passed after 0.020 seconds.
+✔ Test duplicateMediaKeysKeepOneEmptyValue() passed after 0.024 seconds.
+✔ Test asciiDelimitersKeepSeparateAndConcatenatedTitlesDistinct() passed after 0.024 seconds.
+✔ Test cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) with 2 test cases passed after 0.023 seconds.
+✔ Test duplicateMediaAndUnrelatedInputsDoNotCreateAmbiguity() passed after 0.021 seconds.
+✔ Test defaultCancellationPredicateObservesTheCurrentTask() passed after 0.024 seconds.
+✔ Suite "External subtitle matching with an empty subtitle inventory" passed after 0.025 seconds.
+✔ Suite "External subtitle qualifier storage" passed after 0.025 seconds.
+✔ Test releaseSuffixDoesNotReduceTitleSpecificity(_:) with 4 test cases passed after 0.020 seconds.
+✔ Test indexedMatchingPreservesExhaustiveScoresAndAmbiguity() passed after 0.029 seconds.
+✔ Test unicodeNamesRetainFoundationCaseDiacriticAndWidthSemantics() passed after 0.027 seconds.
+✔ Test everyASCIIScalarAgreesWithFoundationNormalization() passed after 0.032 seconds.
+✔ Suite "External subtitle filename tokenization" passed after 0.034 seconds.
+✔ Test indexedMatchingAgreesWithExhaustiveScoringAcrossAllSubsets() passed after 0.702 seconds.
+✔ Suite "External subtitle matching" passed after 0.703 seconds.
+✔ Test run with 35 tests in 4 suites passed after 0.704 seconds.
+Building for production...
+[0/16] Write sources
+[3/16] Compiling CMemoryProbe MemoryProbe.c
+[4/16] Write sources
+[5/16] Write swift-version-79F5DDD9F357E4C6.txt
+[7/17] Compiling IlliquidCore ExternalSubtitleMatcher.swift
+[8/19] Compiling MemoryDriver MemoryDriver.swift
+[9/20] Compiling AssociationDriver Driver.swift
+[9/20] Write Objects.LinkFileList
+[11/20] Linking MemoryDriver
+[12/20] Linking AssociationDriver
+[14/20] Compiling IlliquidCoreTests ExternalSubtitleMatcherEmptyTests.swift
+[14/20] /workspace/scratch/f4995c2fe1e0/qualifier-linux-1/candidate/.build/x86_64-unknown-linux-gnu/release/SubtitleQualifierStorageQualificationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[15/20] Write sources
+[17/21] Compiling SubtitleQualifierStorageQualificationPackageDiscoveredTests IlliquidCoreTests.swift
+[17/21] /workspace/scratch/f4995c2fe1e0/qualifier-linux-1/candidate/.build/x86_64-unknown-linux-gnu/release/SubtitleQualifierStorageQualificationPackageTests.derived/runner.swift
+[18/21] Write sources
+[20/22] Compiling SubtitleQualifierStorageQualificationPackageTests runner.swift
+[20/22] Write Objects.LinkFileList
+[21/22] Linking SubtitleQualifierStorageQualificationPackageTests.xctest
+Build complete! (83.38s)

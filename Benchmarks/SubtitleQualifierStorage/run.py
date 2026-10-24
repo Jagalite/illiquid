@@ -171,6 +171,9 @@ let package = Package(name: "SubtitleQualifierStorageQualification", platforms: 
         if args.tests_only:
             continue
         if reused:
+            for key, digest in manifest["sources"].items():
+                if prior_manifest["sources"].get(key) != digest:
+                    raise ValueError("Reused historical source receipt differs: " + key)
             files = [package / "Package.swift"]
             files += sorted(p for directory in ("Sources", "Tests")
                             for p in (package / directory).rglob("*") if p.is_file())
