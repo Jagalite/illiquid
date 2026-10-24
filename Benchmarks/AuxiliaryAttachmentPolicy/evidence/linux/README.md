@@ -23,6 +23,7 @@ for results and the [benchmark README](../../README.md) for reproduction.
 | `toolchain-download.json` | Official Swift archive URL, size and measured SHA-256. |
 | `independent-audit.json` | 3,460 independently reconstructed checks; zero failures. |
 | `independent-audit.py` | Verbatim independent audit script used for that receipt. |
+| `finalization.json` | Independent verification that final driver packaging only removes one extra trailing blank line; measured source is preserved verbatim in the archive. |
 | `full-receipts.json.gz` | 509 text files: every final subprocess stdout/stderr, command, build log, exact original/staged source snapshot and driver. |
 | `exploratory-receipts.json.gz` | Two earlier smoke cohorts, kept separate from final statistics. |
 | `index.json` | Packaged-file byte counts and SHA-256 hashes, excluding the index itself. |

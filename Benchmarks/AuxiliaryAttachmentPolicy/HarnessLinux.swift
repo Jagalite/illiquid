@@ -330,4 +330,3 @@ private enum AuxiliaryAttachmentProjectionLinuxHarness {
         FileHandle.standardOutput.write(Data([0x0A]))
     }
 }
-

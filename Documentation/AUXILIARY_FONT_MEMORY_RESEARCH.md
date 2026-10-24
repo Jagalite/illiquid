@@ -225,3 +225,9 @@ subprocess stdout/stderr, command, original/staged source snapshot and build
 log; executable/native-library hashes are recorded instead of committing
 binaries. Earlier smoke results are archived separately. The evidence index
 provides SHA-256 hashes for the packaged records.
+
+Final packaging removed one extra blank line at the end of `HarnessLinux.swift`.
+The exact measured driver remains in the compressed receipts; the separate
+`finalization.json` records both hashes and verifies that this is the only
+driver-byte difference. Production source and executable behavior are
+unchanged by that whitespace cleanup.
