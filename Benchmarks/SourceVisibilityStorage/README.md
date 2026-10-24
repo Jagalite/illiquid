@@ -2,10 +2,10 @@
 
 This experiment compares the complete production `SourceBrowserFilter` at
 `6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635` with the working-tree implementation.
-It measures the live allocator growth retained by one cold source-browser
-projection after its input fixture has been created. The input and actor cache
-remain alive through sampling. Results do not describe whole-player memory,
-resident memory, physical footprint, or peak allocation traffic.
+It measures live allocator growth immediately after one cold source-browser
+projection returns, after its input fixture has been created. The input and
+actor cache remain alive through sampling. Results do not describe whole-player
+memory, resident memory, physical footprint, or peak allocation traffic.
 
 ## Reproduce
 
@@ -48,6 +48,9 @@ source-tree benchmark. Native macOS sources receive no such adaptations.
 | `hide_last` | Prepared rows, final row manually hidden | Late-prefix materialization control |
 | `preview` | Prepared rows, alternate rows annotated and revealed | Annotation/control path |
 | `tree_input` | Immutable tree input, one source listing | Real cached tree construction plus visibility |
+| `hide_penultimate` | Prepared rows, next-to-last row hidden | Late prefix followed by an append |
+| `preview_last` | Prepared rows, only final row annotated | Late annotation growth control |
+| `keep_one` | Prepared rows, all except the final row hidden | Sparse-output allocation control |
 
 Inputs use deterministic lexical URLs and synthetic file metadata. No media
 files are decoded or scanned. The largest workload is a stress case, not a
@@ -64,8 +67,12 @@ only after sampling.
 
 The allocator probes are `malloc_zone_statistics(NULL).size_in_use` on macOS
 and `mallinfo2().uordblks + mallinfo2().hblkhd` on glibc Linux. These are
-process-wide allocator counters: small runtime/background allocations can
-contribute noise. Common input storage is already included before sampling and
+process-wide allocator counters: runtime/background allocations can contribute
+noise. There is no forced autorelease-pool drain or quiescence interval, so the
+sample can include autorelease-pending Foundation allocations. The output field
+`retained_allocator_delta_bytes` means this at-return live allocation delta;
+it is not a measurement of steady-state or post-drain retained heap. Common
+input storage is already included before sampling and
 is not counted again for every value alias. A nested pair of live array borrows
 independently verifies storage sharing in the unchanged prepared-row cases.
 
@@ -81,7 +88,7 @@ The path set and thumbnail candidates are still constructed in all variants.
 - Only the new positive storage-sharing test is excluded from baseline semantic
   tests. It is then run alone and must fail, demonstrating the old duplicate
   row-array retention.
-- Twenty-four independent verification workloads (six cases at zero, one, 31
+- Thirty-six independent verification workloads (nine cases at zero, one, 31
   and 257 rows) compare complete, length-delimited output bytes. The encoding
   includes every row field, annotation, recognized metadata field, hidden/rule
   counts, thumbnail URL and sorted media path. Raw outputs are retained as
@@ -105,6 +112,13 @@ The candidate deliberately does not reserve capacity for the entire input, so
 sparse filtered results do not acquire a full-sized output buffer. Controls
 may still have similar allocation and CPU costs to the baseline. All paired
 observations, including unfavorable ones, belong in the report.
+
+When that prefix is nearly full, the next geometric growth request is capped
+at the input count. This avoids requesting almost twice the needed capacity
+after a late exclusion or annotation. Swift may round actual capacity above
+the request; the driver records actual capacities separately from allocator
+bytes. The `hide_penultimate`, `preview_last`, and `keep_one` controls qualify
+both late growth and sparse results.
 
 See [the research report](../../Documentation/SOURCE_VISIBILITY_STORAGE_MEMORY.md)
 for qualified results and validation receipts.

@@ -40,8 +40,13 @@ remain alive during live allocator sampling. Timing includes one cold awaited
 projection; fixture generation and output encoding occur outside measurement.
 The full tree-input case additionally includes row construction and sorting.
 
-The principal metric is incremental live allocator bytes retained after the
-projection. It is not RSS, physical footprint, peak memory, or total app memory.
+The principal metric is incremental live allocator bytes immediately after the
+projection returns, with its input, actor and result held. There is no forced
+autorelease-pool drain or quiescence interval: this sample can include pending
+Foundation autoreleases and runtime allocations. The runner's
+`retained_allocator_delta_bytes` field denotes this at-return delta, not a
+measurement of steady-state or post-drain retained heap. It is not RSS,
+physical footprint, peak memory, or total app memory.
 The row array's URL/string/metadata references are not claimed as deep copies.
 Unchanged values share these references in both variants; the eliminated
 allocation is the duplicate array backing storage and its capacity overhead.

@@ -176,6 +176,13 @@ actor SourceBrowserFilter {
                 rows = Array(allRows[..<index])
             }
             row.visibility = visibility
+            // A late changed row can fill an almost-complete copied prefix.
+            // Cap requested growth at the input size, while retaining geometric
+            // growth for small filtered results. reserveCapacity may round up.
+            if let outputCount = rows?.count, outputCount == rows?.capacity {
+                let growth = min(max(outputCount, 1), allRows.count - outputCount)
+                rows?.reserveCapacity(outputCount + growth)
+            }
             rows?.append(row)
         }
 

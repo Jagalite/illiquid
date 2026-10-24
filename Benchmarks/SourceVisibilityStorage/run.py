@@ -21,7 +21,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASELINE = "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635"
 FOCAL = "Sources/IlliquidApp/SourceBrowserFilter.swift"
-CASES = ["unchanged", "nonmatching_rule", "hide_half", "hide_last", "preview", "tree_input"]
+CASES = ["unchanged", "nonmatching_rule", "hide_half", "hide_last", "preview", "tree_input",
+         "hide_penultimate", "preview_last", "keep_one"]
 TESTS = ["SourceBrowserFilterTests.swift", "SourceMediaOrganizationTests.swift",
          "SourceTreeVisibilityCacheTests.swift", "SourceBrowserSearchTests.swift",
          "SourceVisibilityStorageTests.swift"]
@@ -67,6 +68,7 @@ class Study:
                              "included": "Live allocator growth from a cold production filter/projection with the input fixture retained",
                              "excluded": ["fixture construction", "output encoding/checksums", "RSS", "physical footprint", "whole-player memory", "peak allocations"],
                              "timing": "One awaited cold production projection, after three independent 8-row warmups",
+                             "sampling_limit": "Immediate at-return sample; no forced autorelease drain or quiescence interval",
                              "ordering": "Fresh process per variant; balanced alternating AB/BA pairs",
                              "tree_input": "Includes production row construction/sorting and visibility; other cases accept prepared rows",
                          }, "source_manifests": {}, "harness_hashes": {}, "binary_hashes": {}}

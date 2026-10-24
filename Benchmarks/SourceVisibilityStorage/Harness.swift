@@ -26,8 +26,12 @@ private struct Fixture: Sendable {
                 url: url, displayName: name, contextLabel: "Season 01", visibilityPath: url.path,
                 depth: 0, ancestorIDs: [], kind: .media(dateAdded: Date(timeIntervalSince1970: Double(index))))
         }
-        if scenario == "hide_last", let last = values.last {
+        if ["hide_last", "preview_last"].contains(scenario), let last = values.last {
             configuration.manuallyHiddenPaths = [last.visibilityPath!]
+        } else if scenario == "hide_penultimate", values.count > 1 {
+            configuration.manuallyHiddenPaths = [values[values.count - 2].visibilityPath!]
+        } else if scenario == "keep_one" {
+            configuration.manuallyHiddenPaths = Set(values.dropLast().compactMap(\.visibilityPath))
         }
         if scenario == "tree_input" {
             let entries = values.map { row in
@@ -44,7 +48,7 @@ private struct Fixture: Sendable {
             input = nil
         }
         self.configuration = configuration
-        preview = scenario == "preview"
+        preview = scenario == "preview" || scenario == "preview_last"
     }
 }
 
@@ -139,6 +143,8 @@ private struct Observation: Encodable {
     let wall_nanoseconds: UInt64
     let cpu_nanoseconds: UInt64
     let row_stride: Int
+    let input_row_capacity: Int?
+    let output_row_capacity: Int
     let output_rows: Int
     let hidden_count: Int
     let regex_counts: [String: Int]
@@ -154,7 +160,8 @@ private struct Observation: Encodable {
         let args = CommandLine.arguments
         guard args.count == 4 || args.count == 5,
               ["measure", "verify"].contains(args[1]), let size = Int(args[3]), size >= 0,
-              ["unchanged", "nonmatching_rule", "hide_half", "hide_last", "preview", "tree_input"].contains(args[2])
+              ["unchanged", "nonmatching_rule", "hide_half", "hide_last", "preview", "tree_input",
+               "hide_penultimate", "preview_last", "keep_one"].contains(args[2])
         else { throw Failure.arguments }
         let metric = String(cString: visibility_heap_metric())
         guard metric != "unsupported" else { throw Failure.unsupportedMetric }
@@ -186,6 +193,8 @@ private struct Observation: Encodable {
             heap_before: heapBefore, heap_live: live,
             retained_allocator_delta_bytes: Int64(live) - Int64(heapBefore),
             wall_nanoseconds: wall, cpu_nanoseconds: cpu, row_stride: MemoryLayout<SourceTreeDisplayRow>.stride,
+            input_row_capacity: fixture.input == nil ? fixture.rows.capacity : nil,
+            output_row_capacity: result.rows.capacity,
             output_rows: result.rows.count, hidden_count: result.hiddenCount,
             regex_counts: result.regexCounts, thumbnail_count: result.thumbnailCandidates.count,
             media_path_count: result.mediaPaths.count, input_output_share_rows: shares,
