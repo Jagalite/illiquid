@@ -21,6 +21,10 @@ concurrency:
 
 jobs:
   native-benchmark:
+    # The frozen admission study requires its original executor dependencies.
+    # Current attachment behavior remains covered by native-regressions below;
+    # auxiliary-reader memory has a separate current-base comparison.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: macos-26
     timeout-minutes: 25
     env:
@@ -28,6 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
+          ref: d3fcfe25c9933a17c9dee0506d67d8231cb00323
           persist-credentials: false
           fetch-depth: 0
       - name: Prepare pinned native dependencies
