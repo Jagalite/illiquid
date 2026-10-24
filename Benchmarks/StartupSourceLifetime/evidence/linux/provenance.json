@@ -1,0 +1,23 @@
+{
+  "scope": "Portable production-loader unit tests; no native app graph or memory measurements",
+  "files": {
+    "linux-release-tests.log": {
+      "sha256": "ef9d59db0b098867b4b4d4c9ffa0a8ae6f5460857e8c742220493b2e8c4fa2b3",
+      "expected_failure": false
+    },
+    "negative-no-retirement.log": {
+      "sha256": "d39141635355c61aba636360a2557cd0fca170821a04787dc90ede555285d5f0",
+      "expected_failure": true
+    },
+    "negative-guard-order.log": {
+      "sha256": "41c1cb55dcbb49f7dca8cc4227cbd676b52a8dae482bd4db8839e81fd2b5bcbd",
+      "expected_failure": true
+    }
+  },
+  "production_sha256": {
+    "Sources/IlliquidApp/App/ReadOnlyStartupLoader.swift": "2dbc5c1f2c87f9b19075d36a486d13be3db566c507491914a2c884e23c4d3048",
+    "Sources/IlliquidApp/App/AppModel.swift": "f8071cb64d391eaba1bd9adcbbcc64723ac3b2040f1c31f3dc6bb20ec61f7b25",
+    "Tests/IlliquidAppTests/ReadOnlyStartupLoaderTests.swift": "8978da7b6b4674049ea6d9b3b79baec16b48afdfa22918f951160fc3e12b2287",
+    "Scripts/test-startup-source-lifetime.sh": "f7eb5a2a00f1d51ef9b7b9dba359a421d385414456f8c9ea425a6a1a62fbe112"
+  }
+}

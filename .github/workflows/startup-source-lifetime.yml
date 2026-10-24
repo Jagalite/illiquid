@@ -1,0 +1,129 @@
+name: Startup source snapshot lifetime
+
+on:
+  push:
+    branches: ['perf/startup-source-lifetime-20261023-0fa33058']
+    paths:
+      - 'Sources/IlliquidApp/App/ReadOnlyStartupLoader.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidApp/App/SourceStartupSnapshot.swift'
+      - 'Tests/IlliquidAppTests/ReadOnlyStartupLoaderTests.swift'
+      - 'Scripts/test-startup-source-lifetime.sh'
+      - 'Benchmarks/StartupSourceLifetime/**'
+      - '.github/workflows/startup-source-lifetime.yml'
+      - '!Benchmarks/StartupSourceLifetime/*.md'
+      - '!Benchmarks/StartupSourceLifetime/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/ReadOnlyStartupLoader.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidApp/App/SourceStartupSnapshot.swift'
+      - 'Tests/IlliquidAppTests/ReadOnlyStartupLoaderTests.swift'
+      - 'Scripts/test-startup-source-lifetime.sh'
+      - 'Benchmarks/StartupSourceLifetime/**'
+      - '.github/workflows/startup-source-lifetime.yml'
+      - '!Benchmarks/StartupSourceLifetime/*.md'
+      - '!Benchmarks/StartupSourceLifetime/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: startup-source-lifetime-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify startup concurrency and ownership
+        run: |
+          echo 'The shared Kyoto queue is unavailable on this hosted runner; component builds run directly and serially.'
+          evidence="$RUNNER_TEMP/startup-source-lifetime"
+          mkdir -p "$evidence"
+          set -o pipefail
+          bash Scripts/test-startup-source-lifetime.sh -c debug --jobs 2 -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$evidence/component-tests.log"
+          bash Scripts/test-startup-source-lifetime.sh -c release --jobs 2 -Xswiftc -warnings-as-errors \
+            2>&1 | tee -a "$evidence/component-tests.log"
+      - name: Compare native retained source storage
+        run: |
+          python3 Benchmarks/StartupSourceLifetime/run.py \
+            --output "$RUNNER_TEMP/startup-source-lifetime/benchmark" --pairs 8
+      - name: Emit reviewable memory evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'startup-source-lifetime'
+          files = {}
+          for path in sorted(root.rglob('*')):
+              if (path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}
+                      and not any(part in {'build', 'module-cache', 'cache', '.build'} for part in path.relative_to(root).parts)):
+                  files[str(path.relative_to(root))] = path.read_text()
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log bundle limit; use the uploaded artifact')
+          print('STARTUP_SOURCE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('STARTUP_SOURCE_BASE64 ' + base64.b64encode(packed).decode())
+          for name, value in files.items():
+              if name.endswith(('summary.json', 'parity.json', 'completion.json')):
+                  print(name + '\n' + value)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: startup-source-lifetime-native-component
+          path: |
+            ${{ runner.temp }}/startup-source-lifetime/**/*.json
+            ${{ runner.temp }}/startup-source-lifetime/**/*.jsonl
+            ${{ runner.temp }}/startup-source-lifetime/**/*.log
+            ${{ runner.temp }}/startup-source-lifetime/**/*.txt
+            ${{ runner.temp }}/startup-source-lifetime/**/*.swift
+            ${{ runner.temp }}/startup-source-lifetime/**/*.py
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies and Metal
+        run: |
+          echo 'The shared Kyoto queue is unavailable on this hosted runner; this app build uses its own isolated checkout.'
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the application graph and test startup and source behavior
+        run: |
+          evidence="$RUNNER_TEMP/startup-source-integration"
+          mkdir -p "$evidence"
+          sw_vers > "$evidence/host.txt"
+          uname -a >> "$evidence/host.txt"
+          swift --version >> "$evidence/host.txt"
+          git rev-parse HEAD >> "$evidence/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'ReadOnlyStartupLoaderTests|SourceStartupSnapshotTests|SourceTabMergeTests|LaunchOpenQueueTests' \
+            2>&1 | tee "$evidence/native-tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: startup-source-lifetime-native-integration
+          path: ${{ runner.temp }}/startup-source-integration/
+          retention-days: 14

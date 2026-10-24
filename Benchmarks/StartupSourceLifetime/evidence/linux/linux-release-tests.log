@@ -1,0 +1,46 @@
+Building for production...
+[0/9] Write sources
+[2/9] Write swift-version-79F5DDD9F357E4C6.txt
+[4/10] Compiling IlliquidApp ReadOnlyStartupLoader.swift
+[5/11] Compiling IlliquidAppTests ReadOnlyStartupLoaderTests.swift
+[5/11] /tmp/illiquid-startup-source-lifetime.3ApiFQ/.build/x86_64-unknown-linux-gnu/release/IlliquidStartupSourceLifetimeTestsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/11] Write sources
+[8/12] Compiling IlliquidStartupSourceLifetimeTestsPackageDiscoveredTests IlliquidAppTests.swift
+[8/12] /tmp/illiquid-startup-source-lifetime.3ApiFQ/.build/x86_64-unknown-linux-gnu/release/IlliquidStartupSourceLifetimeTestsPackageTests.derived/runner.swift
+[9/12] Write sources
+[11/13] Compiling IlliquidStartupSourceLifetimeTestsPackageTests runner.swift
+[11/13] Write Objects.LinkFileList
+[12/13] Linking IlliquidStartupSourceLifetimeTestsPackageTests.xctest
+Build complete! (60.20s)
+Test Suite 'All tests' started at 2026-10-24 23:16:52.316
+Test Suite 'release.xctest' started at 2026-10-24 23:16:52.329
+Test Suite 'release.xctest' passed at 2026-10-24 23:16:52.329
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-24 23:16:52.329
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Read-only application startup" started.
+◇ Test startupSnapshotReleasesSourcesWhenPublishedOwnerRemovesThem() started.
+◇ Test shutdownDuringReadRejectsEveryWaiter(hasPublishedModel:) started.
+◇ Test retiredLoaderWithoutSharedModelDoesNotPublish() started.
+◇ Test sceneAndDelegateWaitersShareOneReadAndCachedValue() started.
+◇ Test shutdownPreventsLatePublicationOrAnotherRead() started.
+◇ Test case passing 1 argument hasPublishedModel → true to shutdownDuringReadRejectsEveryWaiter(hasPublishedModel:) started.
+◇ Test case passing 1 argument hasPublishedModel → false to shutdownDuringReadRejectsEveryWaiter(hasPublishedModel:) started.
+◇ Test concurrentWaitersPublishOnceAndCompleteQueuedRequestsInOrder() started.
+◇ Test shutdownBeforeLoadWinsOverExistingModel(hasPublishedModel:) started.
+◇ Test case passing 1 argument hasPublishedModel → false to shutdownBeforeLoadWinsOverExistingModel(hasPublishedModel:) started.
+◇ Test case passing 1 argument hasPublishedModel → true to shutdownBeforeLoadWinsOverExistingModel(hasPublishedModel:) started.
+◇ Test suspendedWaiterReturnsSharedModelAfterAnotherCallerRetiresLoader() started.
+✔ Test shutdownBeforeLoadWinsOverExistingModel(hasPublishedModel:) with 2 test cases passed after 0.003 seconds.
+✔ Test shutdownDuringReadRejectsEveryWaiter(hasPublishedModel:) with 2 test cases passed after 0.003 seconds.
+✔ Test suspendedWaiterReturnsSharedModelAfterAnotherCallerRetiresLoader() passed after 0.004 seconds.
+✔ Test shutdownPreventsLatePublicationOrAnotherRead() passed after 0.005 seconds.
+✔ Test sceneAndDelegateWaitersShareOneReadAndCachedValue() passed after 0.005 seconds.
+✔ Test retiredLoaderWithoutSharedModelDoesNotPublish() passed after 0.005 seconds.
+✔ Test startupSnapshotReleasesSourcesWhenPublishedOwnerRemovesThem() passed after 0.006 seconds.
+✔ Test concurrentWaitersPublishOnceAndCompleteQueuedRequestsInOrder() passed after 0.005 seconds.
+✔ Suite "Read-only application startup" passed after 0.007 seconds.
+✔ Test run with 8 tests in 1 suite passed after 0.008 seconds.

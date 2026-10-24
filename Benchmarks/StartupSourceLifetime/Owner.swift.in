@@ -1,0 +1,33 @@
+import Foundation
+import Observation
+import IlliquidCore
+
+// Both variants use this same staged owner. Marked sections are inserted as
+// byte-exact excerpts from each variant's AppModel.swift. Native playback,
+// source indexing, preference writes, and UI behavior are outside this probe.
+@MainActor
+@Observable
+final class AppModel {
+// PRODUCTION_STARTUP
+
+    let player: PlaybackController
+// PRODUCTION_SOURCE_PROPERTIES
+
+    private init(player: PlaybackController, sources: SourceStartupSnapshot) {
+        self.player = player
+        sourceTabs = sources.tabs
+        activeSourceTabID = sources.selectedID
+        sourceRootIndex.replace(tabs: sourceTabs)
+    }
+
+// PRODUCTION_CLOSE_TAB
+
+    private func persistSourceTabs() {}
+    private func handleOpenURLs(_ urls: [URL]) {
+        precondition(urls.isEmpty, "The fixture does not enqueue file opens")
+    }
+
+    // A diagnostic intervention after the measured close/control stage.
+    // No real application code calls this benchmark-only entry point.
+    static func stopStartupForProbe() { historyStartup.stop() }
+}

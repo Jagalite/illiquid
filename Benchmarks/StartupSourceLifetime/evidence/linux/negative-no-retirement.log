@@ -1,0 +1,29 @@
+Building for production...
+[0/9] Write sources
+[2/9] Write swift-version-79F5DDD9F357E4C6.txt
+[4/10] Compiling IlliquidApp ReadOnlyStartupLoader.swift
+[5/11] Compiling IlliquidAppTests ReadOnlyStartupLoaderTests.swift
+[5/11] /tmp/illiquid-startup-source-validation-0fa33058/negative-control-package/.build/x86_64-unknown-linux-gnu/release/StartupNegativeControlsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/11] Write sources
+[8/12] Compiling StartupNegativeControlsPackageDiscoveredTests IlliquidAppTests.swift
+[8/12] /tmp/illiquid-startup-source-validation-0fa33058/negative-control-package/.build/x86_64-unknown-linux-gnu/release/StartupNegativeControlsPackageTests.derived/runner.swift
+[9/12] Write sources
+[11/13] Compiling StartupNegativeControlsPackageTests runner.swift
+[11/13] Write Objects.LinkFileList
+[12/13] Linking StartupNegativeControlsPackageTests.xctest
+Build complete! (41.28s)
+Test Suite 'Selected tests' started at 2026-10-24 23:18:16.415
+Test Suite 'Selected tests' passed at 2026-10-24 23:18:16.443
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Read-only application startup" started.
+◇ Test startupSnapshotReleasesSourcesWhenPublishedOwnerRemovesThem() started.
+✘ Test startupSnapshotReleasesSourcesWhenPublishedOwnerRemovesThem() recorded an issue at ReadOnlyStartupLoaderTests.swift:254:9: Expectation failed: await factory.livingIDs == [2]
+✘ Test startupSnapshotReleasesSourcesWhenPublishedOwnerRemovesThem() recorded an issue at ReadOnlyStartupLoaderTests.swift:256:9: Expectation failed: await factory.livingIDs.isEmpty
+✘ Test startupSnapshotReleasesSourcesWhenPublishedOwnerRemovesThem() recorded an issue at ReadOnlyStartupLoaderTests.swift:257:9: Expectation failed: await loader.load() == nil
+✘ Test startupSnapshotReleasesSourcesWhenPublishedOwnerRemovesThem() recorded an issue at ReadOnlyStartupLoaderTests.swift:265:9: Expectation failed: await factory.livingIDs.isEmpty
+✘ Test startupSnapshotReleasesSourcesWhenPublishedOwnerRemovesThem() failed after 0.001 seconds with 4 issues.
+✘ Suite "Read-only application startup" failed after 0.003 seconds with 4 issues.
+✘ Test run with 1 test in 1 suite failed after 0.003 seconds with 4 issues.
