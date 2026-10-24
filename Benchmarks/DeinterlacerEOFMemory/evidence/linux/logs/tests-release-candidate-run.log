@@ -1,0 +1,40 @@
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-23 23:22:54.566
+Test Suite 'Selected tests' passed at 2026-10-23 23:22:54.567
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "BWDIF end-of-stream storage lifetime" started.
+◇ Test completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) started.
+◇ Test case passing 1 argument topFirst → true to completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) started.
+◇ Test case passing 1 argument topFirst → false to completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) started.
+✔ Test completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) with 2 test cases passed after 0.001 seconds.
+◇ Test retainedOutputSurvivesGraphRetirement(progressiveTail:) started.
+◇ Test case passing 1 argument progressiveTail → false to retainedOutputSurvivesGraphRetirement(progressiveTail:) started.
+◇ Test case passing 1 argument progressiveTail → true to retainedOutputSurvivesGraphRetirement(progressiveTail:) started.
+✔ Test retainedOutputSurvivesGraphRetirement(progressiveTail:) with 2 test cases passed after 0.001 seconds.
+◇ Test cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) started.
+◇ Test case passing 1 argument cancelAfterFields → 0 to cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) started.
+◇ Test case passing 1 argument cancelAfterFields → 1 to cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) started.
+◇ Test case passing 1 argument cancelAfterFields → 2 to cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) started.
+✔ Test cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) with 3 test cases passed after 0.002 seconds.
+◇ Test throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) started.
+◇ Test case passing 1 argument throwAfterFields → 1 to throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) started.
+◇ Test case passing 1 argument throwAfterFields → 2 to throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) started.
+✔ Test throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) with 2 test cases passed after 0.001 seconds.
+◇ Test resetReleasesUndrainedInputAndAllowsReuse() started.
+✔ Test resetReleasesUndrainedInputAndAllowsReuse() passed after 0.001 seconds.
+◇ Test sameFormatAfterDrainRequiresReset(interlaced:) started.
+◇ Test case passing 1 argument interlaced → false to sameFormatAfterDrainRequiresReset(interlaced:) started.
+◇ Test case passing 1 argument interlaced → true to sameFormatAfterDrainRequiresReset(interlaced:) started.
+✔ Test sameFormatAfterDrainRequiresReset(interlaced:) with 2 test cases passed after 0.001 seconds.
+◇ Test changedFormatAfterDrainStillStartsANewGraph(interlaced:) started.
+◇ Test case passing 1 argument interlaced → false to changedFormatAfterDrainStillStartsANewGraph(interlaced:) started.
+◇ Test case passing 1 argument interlaced → true to changedFormatAfterDrainStillStartsANewGraph(interlaced:) started.
+✔ Test changedFormatAfterDrainStillStartsANewGraph(interlaced:) with 2 test cases passed after 0.001 seconds.
+◇ Test destructionReleasesAnInterruptedDrain() started.
+✔ Test destructionReleasesAnInterruptedDrain() passed after 0.001 seconds.
+✔ Suite "BWDIF end-of-stream storage lifetime" passed after 0.011 seconds.
+✔ Test run with 8 tests in 1 suite passed after 0.011 seconds.

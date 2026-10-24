@@ -66,7 +66,9 @@ final class VideoDeinterlacer {
                  emit: (Output) throws -> Void) throws {
         guard shouldContinue() else { throw SoftwarePixelBufferPoolError.cancelled }
         let interlaced = input.pointee.flags & AV_FRAME_FLAG_INTERLACED != 0
-        guard graph != nil || interlaced else {
+        // A drained graph releases its storage but remembers its format, so
+        // same-format input still requires reset before it can be accepted.
+        guard graph != nil || format != nil || interlaced else {
             try emit(Output(frame: input, timeBase: timeBase, filtered: false, copiedHardware: false))
             return
         }
@@ -109,9 +111,13 @@ final class VideoDeinterlacer {
     }
 
     func drain(while shouldContinue: () -> Bool, emit: (Output) throws -> Void) throws {
-        guard !ended, let source else { return }
-        try checkFFmpeg(av_buffersrc_add_frame_flags(source, nil, 0), operation: "Drain deinterlacer")
-        ended = true
+        guard let source else { return }
+        if !ended {
+            try checkFFmpeg(av_buffersrc_add_frame_flags(source, nil, 0), operation: "Drain deinterlacer")
+            ended = true
+        }
+        // Cancellation or a throwing consumer can interrupt delivery after
+        // input EOF. Resume the remaining fields without submitting EOF again.
         try receive(while: shouldContinue, emit: emit)
     }
 
@@ -160,7 +166,15 @@ final class VideoDeinterlacer {
             guard shouldContinue() else { throw SoftwarePixelBufferPoolError.cancelled }
             av_frame_unref(outputFrame)
             let result = av_buffersink_get_frame(sink, outputFrame)
-            if result == illiquid_averror_eagain() || result == illiquid_averror_eof() { return }
+            if result == illiquid_averror_eagain() { return }
+            if result == illiquid_averror_eof() {
+                // BWDIF keeps its temporal input frames after EOF. The output
+                // consumer owns any retained frames independently of the graph.
+                avfilter_graph_free(&graph)
+                source = nil
+                self.sink = nil
+                return
+            }
             try checkFFmpeg(result, operation: "Receive deinterlaced field")
             defer { av_frame_unref(outputFrame) }
             try emit(Output(frame: outputFrame, timeBase: FFmpegRational(av_buffersink_get_time_base(sink)),
