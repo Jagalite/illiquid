@@ -92,6 +92,46 @@ struct SourceBrowserRowSemanticsTests {
         RowStorageFixture.expect(result, rows: rows, hiddenCount: 1)
     }
 
+    @Test(arguments: [false, true])
+    func equivalentRuleIDsReplaceAnnotationsWithConfiguredBytes(decomposedInput: Bool) async throws {
+        let composedID = "caf\u{e9}"
+        let decomposedID = "cafe\u{301}"
+        let previousID = decomposedInput ? decomposedID : composedID
+        let configuredID = decomposedInput ? composedID : decomposedID
+        #expect(previousID == configuredID)
+        #expect(Array(previousID.utf8) != Array(configuredID.utf8))
+
+        var rows = RowStorageFixture.files()
+        rows[2].visibility = SourceRowVisibility(
+            matches: [.regex(.init(id: previousID, colorIndex: 2))], isInherited: false
+        )
+        var expected = rows
+        expected[2].visibility = SourceRowVisibility(
+            matches: [.regex(.init(id: configuredID, colorIndex: 2))], isInherited: false
+        )
+        var configuration = SourceVisibilityConfiguration.default
+        configuration.regexRules = [
+            .init(id: configuredID, pattern: "file-2\\.mkv$", colorIndex: 2, isEnabled: true),
+        ]
+
+        for preview in [false, true] {
+            configuration.showsHiddenItems = !preview
+            let result = try await RowStorageFixture.project(
+                rows, configuration: configuration, revealsRulePreview: preview
+            )
+            RowStorageFixture.expect(result, rows: expected, hiddenCount: 1,
+                                     regexCounts: [configuredID: 1])
+            // String equality treats these IDs as equal. The projection must
+            // still publish the newly computed annotation's exact spelling.
+            let returnedMatch = try #require(result.rows[2].visibility?.regexMatches.first)
+            #expect(Array(returnedMatch.id.utf8) == Array(configuredID.utf8))
+            let countedID = try #require(result.regexCounts.keys.first)
+            #expect(Array(countedID.utf8) == Array(configuredID.utf8))
+            let originalMatch = try #require(rows[2].visibility?.regexMatches.first)
+            #expect(Array(originalMatch.id.utf8) == Array(previousID.utf8))
+        }
+    }
+
     @Test func alreadyAnnotatedFoldersStillSupplyInheritedVisibility() async throws {
         var parent = RowStorageFixture.row("parent", kind: .folder(isRoot: false))
         parent.visibility = RowStorageFixture.manualVisibility()
@@ -314,20 +354,6 @@ struct SourceBrowserRowStorageTests {
         let result = try await RowStorageFixture.project(rows, configuration: configuration)
         RowStorageFixture.expect(result, rows: rows,
                                  regexCounts: ["rule": alwaysShown ? rows.count : 0])
-        #expect(RowStorageFixture.sharesStorage(rows, result.rows))
-    }
-
-    @Test(arguments: [false, true])
-    func alreadyCorrectRevealedAnnotationsShareTheInputBuffer(preview: Bool) async throws {
-        var rows = RowStorageFixture.files()
-        rows[2].visibility = RowStorageFixture.manualVisibility()
-        var configuration = SourceVisibilityConfiguration.default
-        configuration.manuallyHiddenPaths = [rows[2].url.path]
-        configuration.showsHiddenItems = !preview
-        let result = try await RowStorageFixture.project(
-            rows, configuration: configuration, revealsRulePreview: preview
-        )
-        RowStorageFixture.expect(result, rows: rows, hiddenCount: 1)
         #expect(RowStorageFixture.sharesStorage(rows, result.rows))
     }
 

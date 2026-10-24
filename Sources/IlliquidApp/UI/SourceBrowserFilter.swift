@@ -103,8 +103,9 @@ actor SourceBrowserFilter {
             uniqueKeysWithValues: configuration.regexRules.map { ($0.id, 0) }
         )
         var hiddenCount = 0
-        // Most projections leave every row unchanged. Share the tree's array
-        // until filtering or an annotation actually requires different values.
+        // Share unannotated rows until visibility changes the output. Refresh
+        // existing annotations even when String equality equates their rule IDs:
+        // the newly evaluated spelling can have different Unicode bytes.
         var rows: [SourceTreeDisplayRow]?
 
         for (index, var row) in allRows.enumerated() {
@@ -169,7 +170,7 @@ actor SourceBrowserFilter {
                 continue
             }
             if rows == nil {
-                guard row.visibility != visibility else { continue }
+                if row.visibility == nil, visibility == nil { continue }
                 rows = Array(allRows[..<index])
             }
             row.visibility = visibility

@@ -9,9 +9,10 @@ visibility annotations were unchanged. Strings and other referenced values
 already have their own sharing behavior; the redundant allocation investigated
 here is the array of `SourceTreeDisplayRow` values itself.
 
-The candidate keeps an optional output array. Until the first excluded row or
-changed visibility annotation, it can return the original array. At the first
-difference it copies the preceding unchanged prefix, then appends accepted rows.
+The candidate keeps an optional output array. While every row remains included
+and both its existing and computed visibility annotations are absent, it can
+return the original array. At the first exclusion or annotation it copies the
+preceding unchanged prefix, then appends accepted rows.
 Array copy-on-write preserves independent values for previously published
 projections and callers that subsequently mutate their own arrays.
 
@@ -22,8 +23,10 @@ capacity; the allocator can still round the actual capacity upward.
 
 Visibility evaluation, regex counts, hidden-item counts, inherited folder
 annotations, ordering, search, media grouping and cancellation checks remain in
-their existing paths. Sharing requires that every included row's existing
-annotation equals the newly computed annotation. Stale annotations still clear.
+their existing paths. Existing nonnil annotations always take the assignment
+path, including when they compare equal: Swift String equality can equate rule
+IDs with different Unicode bytes, and the newly computed spelling must still
+replace the old one. Stale annotations still clear.
 
 ## Qualification status
 

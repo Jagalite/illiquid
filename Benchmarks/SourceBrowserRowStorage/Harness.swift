@@ -6,7 +6,8 @@ import IlliquidCore
 
 // Fixtures use the actual production row, matcher, projection, and actor types.
 // Inputs, metadata recognition, warming, and semantic serialization are outside
-// the timed calls and the retained-allocation measurement interval.
+// the timed calls and the projection-allocation interval. Fixture construction
+// is deliberately included in the separate fixture-allocation delta.
 private enum Scenario: String, CaseIterable {
     case tree, files, folders
     case noMatch = "no_match"
