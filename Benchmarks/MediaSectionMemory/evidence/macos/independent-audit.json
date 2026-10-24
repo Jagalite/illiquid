@@ -1,0 +1,457 @@
+{
+  "audit_script_sha256": "2094e7397d971f3111887007b7524dcc63c307b301d592664952865eb2c00d30",
+  "audited_at_utc": "2026-10-24T14:30:31.574886+00:00",
+  "cohorts": [
+    {
+      "ab_pairs_per_cell": 3,
+      "all_proposed_sources_reconstructed": true,
+      "ba_pairs_per_cell": 3,
+      "baseline": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+      "binaries_present_and_hashed": 0,
+      "byte_verified_observations": 384,
+      "command_logs_hashed": 858,
+      "command_logs_omitted": 0,
+      "comparison_mode": "current-support",
+      "driver_hashes": {
+        "Harness.swift": "ace9d5390c16395a0cd6d7a436b914a06aba39771e8f099ebefe97385e2c1a25",
+        "run.py": "4c98489a05e58ef78c911d92bb6dce735efd5181bc15dbfae0c4324a5778a1a9",
+        "source-snapshot-helper.py": "3f8816a23f67ec22d6eb625c6004440c799b3bf6bdeab33531607e649a285873"
+      },
+      "exploratory": false,
+      "grid_cells": 32,
+      "index_stride_bytes": [
+        8
+      ],
+      "input_sha256": {
+        "baseline-sources.json": "22da1bbfaa5c2e9e60514ab26264ced38e19e9c43a47fcd794d1639759949d9c",
+        "candidate-sources.json": "d7fc54c734427ec7d44418fdcc8a346322921e57af6b0c7d256beed77005dc72",
+        "commands.jsonl": "9cf368f88a6464e2ade473b15030e6e3531ad722968d8ecba8d72cd5979171f2",
+        "completion.json": "7cb0ad51b3b571fa0b88bb5cd5d40c9d8a88badc82946996905bdb160e523056",
+        "environment.json": "7e45a9c09c0e5ea4f1dd5abdc8a62f80f012c9d79692767173ba791ff1ecda97",
+        "observations.jsonl": "69fc84ce59e83f7e3aefb48eccf57695ec91ece5fec86adf1cc6a1c8c9c4ce3a",
+        "summary.json": "eaaea79253164cf74dff714377216f92a715ffc3abb8e2bc38440edf1471fd98",
+        "verification.json": "8e385a5724d5a985c9df63359f4dcd0a29e723fff00c1eecaeec9088b865ba2e"
+      },
+      "observations": 384,
+      "pairs": 192,
+      "pairs_per_cell": 6,
+      "path": "/tmp/illiquid-native-evidence-40101170623/main",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "row_stride_bytes": [
+        320
+      ],
+      "staged_files_present_and_hashed": 38,
+      "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+      "tests": [
+        {
+          "configuration": "debug",
+          "count": 33,
+          "passed": true,
+          "variant": "baseline"
+        },
+        {
+          "configuration": "debug",
+          "count": 33,
+          "passed": true,
+          "variant": "candidate"
+        },
+        {
+          "configuration": "release",
+          "count": 33,
+          "passed": true,
+          "variant": "baseline"
+        },
+        {
+          "configuration": "release",
+          "count": 33,
+          "passed": true,
+          "variant": "candidate"
+        }
+      ],
+      "trace_pairs_byte_compared": 16,
+      "verification_datasets": 16,
+      "workloads": [
+        {
+          "case": "movies",
+          "cpu_median_paired_change_percent": 18.398748948391674,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -4.299583911234395,
+          "size": 1000,
+          "wall_median_paired_change_percent": 18.189700545930943
+        },
+        {
+          "case": "movies",
+          "cpu_median_paired_change_percent": -4.896391215056834,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -4.38829787234043,
+          "size": 1000,
+          "wall_median_paired_change_percent": -4.807369596629895
+        },
+        {
+          "case": "movies",
+          "cpu_median_paired_change_percent": 7.357151964696939,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -7.181328545780974,
+          "size": 10000,
+          "wall_median_paired_change_percent": 7.385196977927722
+        },
+        {
+          "case": "movies",
+          "cpu_median_paired_change_percent": -6.592178619854645,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -7.577235772357726,
+          "size": 10000,
+          "wall_median_paired_change_percent": -6.655657408611287
+        },
+        {
+          "case": "seasons",
+          "cpu_median_paired_change_percent": -22.240281971204745,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -10.215664018161185,
+          "size": 1000,
+          "wall_median_paired_change_percent": -22.076979722436114
+        },
+        {
+          "case": "seasons",
+          "cpu_median_paired_change_percent": -50.80900137994782,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -15.644171779141104,
+          "size": 1000,
+          "wall_median_paired_change_percent": -50.173550197429606
+        },
+        {
+          "case": "seasons",
+          "cpu_median_paired_change_percent": -42.003227442817675,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -14.86526502813148,
+          "size": 10000,
+          "wall_median_paired_change_percent": -42.43981118353728
+        },
+        {
+          "case": "seasons",
+          "cpu_median_paired_change_percent": -72.58696748916863,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -14.50340136054422,
+          "size": 10000,
+          "wall_median_paired_change_percent": -72.94054998566558
+        },
+        {
+          "case": "unicode_groups",
+          "cpu_median_paired_change_percent": -37.888588342336554,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -3.136308805790111,
+          "size": 1000,
+          "wall_median_paired_change_percent": -37.908986332857566
+        },
+        {
+          "case": "unicode_groups",
+          "cpu_median_paired_change_percent": -66.46956968571708,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -5.361173814898418,
+          "size": 1000,
+          "wall_median_paired_change_percent": -66.47337226541649
+        },
+        {
+          "case": "unicode_groups",
+          "cpu_median_paired_change_percent": -27.533979989697492,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -14.39426969019862,
+          "size": 10000,
+          "wall_median_paired_change_percent": -27.603711671964852
+        },
+        {
+          "case": "unicode_groups",
+          "cpu_median_paired_change_percent": -61.52538535273142,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -14.856230031948881,
+          "size": 10000,
+          "wall_median_paired_change_percent": -61.52231572097935
+        },
+        {
+          "case": "unique_sections",
+          "cpu_median_paired_change_percent": -0.13161146870565577,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -7.330415754923414,
+          "size": 1000,
+          "wall_median_paired_change_percent": -0.0457665115994601
+        },
+        {
+          "case": "unique_sections",
+          "cpu_median_paired_change_percent": -10.084752726382673,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -9.674234945705829,
+          "size": 1000,
+          "wall_median_paired_change_percent": -10.09093329154735
+        },
+        {
+          "case": "unique_sections",
+          "cpu_median_paired_change_percent": -8.947129699991812,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -18.157894736842106,
+          "size": 10000,
+          "wall_median_paired_change_percent": -9.138378564939764
+        },
+        {
+          "case": "unique_sections",
+          "cpu_median_paired_change_percent": -5.121780190597757,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -15.608023401587968,
+          "size": 10000,
+          "wall_median_paired_change_percent": -5.074527324749761
+        },
+        {
+          "case": "broad_search",
+          "cpu_median_paired_change_percent": -16.368029904364754,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -8.213096559378464,
+          "size": 1000,
+          "wall_median_paired_change_percent": -16.98862501279243
+        },
+        {
+          "case": "broad_search",
+          "cpu_median_paired_change_percent": -41.80577102051703,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -12.550607287449388,
+          "size": 1000,
+          "wall_median_paired_change_percent": -41.7922204386961
+        },
+        {
+          "case": "broad_search",
+          "cpu_median_paired_change_percent": -38.37073717318656,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -13.627478358000555,
+          "size": 10000,
+          "wall_median_paired_change_percent": -38.57499707755929
+        },
+        {
+          "case": "broad_search",
+          "cpu_median_paired_change_percent": -64.43356714361376,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -11.11395646606914,
+          "size": 10000,
+          "wall_median_paired_change_percent": -64.42334182468844
+        },
+        {
+          "case": "narrow_search",
+          "cpu_median_paired_change_percent": -3.116628569986468,
+          "measurement": "cold",
+          "rss_lower_pairs": 1,
+          "rss_median_paired_change_percent": 0.0,
+          "size": 1000,
+          "wall_median_paired_change_percent": -2.959318022109386
+        },
+        {
+          "case": "narrow_search",
+          "cpu_median_paired_change_percent": -0.9638399652893426,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -0.1310615989515096,
+          "size": 1000,
+          "wall_median_paired_change_percent": -0.9743472722041902
+        },
+        {
+          "case": "narrow_search",
+          "cpu_median_paired_change_percent": -5.391159281574626,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -0.4980842911877392,
+          "size": 10000,
+          "wall_median_paired_change_percent": -5.420726457683072
+        },
+        {
+          "case": "narrow_search",
+          "cpu_median_paired_change_percent": -2.935547334329763,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -0.43993879112471657,
+          "size": 10000,
+          "wall_median_paired_change_percent": -1.4254160430594909
+        },
+        {
+          "case": "files_control",
+          "cpu_median_paired_change_percent": -0.9274420018010765,
+          "measurement": "cold",
+          "rss_lower_pairs": 0,
+          "rss_median_paired_change_percent": 0.2673796791443861,
+          "size": 1000,
+          "wall_median_paired_change_percent": -1.3648273899006524
+        },
+        {
+          "case": "files_control",
+          "cpu_median_paired_change_percent": -20.266845557543235,
+          "measurement": "refresh",
+          "rss_lower_pairs": 0,
+          "rss_median_paired_change_percent": 0.2673796791443861,
+          "size": 1000,
+          "wall_median_paired_change_percent": -20.56354280818168
+        },
+        {
+          "case": "files_control",
+          "cpu_median_paired_change_percent": -0.1837661117532865,
+          "measurement": "cold",
+          "rss_lower_pairs": 0,
+          "rss_median_paired_change_percent": 0.11618900077459138,
+          "size": 10000,
+          "wall_median_paired_change_percent": -0.8143167955932009
+        },
+        {
+          "case": "files_control",
+          "cpu_median_paired_change_percent": 2.233407386836988,
+          "measurement": "refresh",
+          "rss_lower_pairs": 0,
+          "rss_median_paired_change_percent": 0.11618900077459138,
+          "size": 10000,
+          "wall_median_paired_change_percent": -5.299673888262419
+        },
+        {
+          "case": "tree_control",
+          "cpu_median_paired_change_percent": 6.2073880438267,
+          "measurement": "cold",
+          "rss_lower_pairs": 0,
+          "rss_median_paired_change_percent": 0.4048582995951344,
+          "size": 1000,
+          "wall_median_paired_change_percent": 7.479109437257436
+        },
+        {
+          "case": "tree_control",
+          "cpu_median_paired_change_percent": 23.548510313216198,
+          "measurement": "refresh",
+          "rss_lower_pairs": 0,
+          "rss_median_paired_change_percent": 0.4048582995951344,
+          "size": 1000,
+          "wall_median_paired_change_percent": 14.61362151543404
+        },
+        {
+          "case": "tree_control",
+          "cpu_median_paired_change_percent": 2.771847624547663,
+          "measurement": "cold",
+          "rss_lower_pairs": 0,
+          "rss_median_paired_change_percent": 0.12019230769231282,
+          "size": 10000,
+          "wall_median_paired_change_percent": 3.3593726114223843
+        },
+        {
+          "case": "tree_control",
+          "cpu_median_paired_change_percent": 28.169866805051022,
+          "measurement": "refresh",
+          "rss_lower_pairs": 0,
+          "rss_median_paired_change_percent": 0.12019230769231282,
+          "size": 10000,
+          "wall_median_paired_change_percent": 29.68510790217872
+        }
+      ]
+    },
+    {
+      "ab_pairs_per_cell": 3,
+      "all_proposed_sources_reconstructed": true,
+      "ba_pairs_per_cell": 3,
+      "baseline": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+      "binaries_present_and_hashed": 0,
+      "byte_verified_observations": 48,
+      "command_logs_hashed": 122,
+      "command_logs_omitted": 0,
+      "comparison_mode": "current-support",
+      "driver_hashes": {
+        "Harness.swift": "ace9d5390c16395a0cd6d7a436b914a06aba39771e8f099ebefe97385e2c1a25",
+        "run.py": "4c98489a05e58ef78c911d92bb6dce735efd5181bc15dbfae0c4324a5778a1a9",
+        "source-snapshot-helper.py": "3f8816a23f67ec22d6eb625c6004440c799b3bf6bdeab33531607e649a285873"
+      },
+      "exploratory": false,
+      "grid_cells": 4,
+      "index_stride_bytes": [
+        8
+      ],
+      "input_sha256": {
+        "baseline-sources.json": "22da1bbfaa5c2e9e60514ab26264ced38e19e9c43a47fcd794d1639759949d9c",
+        "candidate-sources.json": "d7fc54c734427ec7d44418fdcc8a346322921e57af6b0c7d256beed77005dc72",
+        "commands.jsonl": "c47181595753d7efa9f49b3bbc7389857d7b99b03c59b1cf29659622750c7026",
+        "completion.json": "73c94ffb9874d0464439aa3757cab0445b18185c754fc767991097fdbb3ab071",
+        "environment.json": "b3721ab827ea45370bd29540aef1ccc26a7d8e0aace7256bd58d302061184178",
+        "observations.jsonl": "a5e78240623fe5d1295864ed826321a768b0274563952a41ec0240d2f5e07178",
+        "summary.json": "817851856e29af76f7b48f9d5f30980812d81a93776d32cd32108bdad3a67015",
+        "verification.json": "8f1f28987a8553cf481cd6b4e837a511fbc5b1f8d4681a11eeabce479a424800"
+      },
+      "observations": 48,
+      "pairs": 24,
+      "pairs_per_cell": 6,
+      "path": "/tmp/illiquid-native-evidence-40101170623/stress",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "row_stride_bytes": [
+        320
+      ],
+      "staged_files_present_and_hashed": 38,
+      "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+      "tests": [],
+      "trace_pairs_byte_compared": 2,
+      "verification_datasets": 2,
+      "workloads": [
+        {
+          "case": "movies",
+          "cpu_median_paired_change_percent": -3.750241470069188,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -9.034321777470389,
+          "size": 50000,
+          "wall_median_paired_change_percent": -3.7113801425109285
+        },
+        {
+          "case": "movies",
+          "cpu_median_paired_change_percent": -5.386342549817918,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -8.49953973611537,
+          "size": 50000,
+          "wall_median_paired_change_percent": -3.383818103476349
+        },
+        {
+          "case": "seasons",
+          "cpu_median_paired_change_percent": -35.053097011868786,
+          "measurement": "cold",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -9.631694996328616,
+          "size": 50000,
+          "wall_median_paired_change_percent": -34.72267407562882
+        },
+        {
+          "case": "seasons",
+          "cpu_median_paired_change_percent": -76.8498445258869,
+          "measurement": "refresh",
+          "rss_lower_pairs": 6,
+          "rss_median_paired_change_percent": -9.646055265591702,
+          "size": 50000,
+          "wall_median_paired_change_percent": -76.89869763801329
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "RSS is process high-water memory, not live heap or whole-player memory.",
+    "Refresh RSS includes priming; high-water growth is not allocated bytes.",
+    "Timing changes are reported for every workload, including regressions and controls.",
+    "Omitted binaries/logs/traces are not independently revalidated from hashes alone."
+  ],
+  "same_staged_sources_across_cohorts": true,
+  "status": "passed",
+  "total_observations": 432,
+  "total_pairs": 216
+}

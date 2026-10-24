@@ -70,5 +70,29 @@ production, test, harness, or staged source bytes change during the run.
 The checked-in evidence keeps compact receipts and observations; temporary build
 trees and large generated traces can be reproduced with the command above.
 
+The authoritative recorded study is the successful native macOS run linked in
+[`evidence/macos/provenance.json`](evidence/macos/provenance.json). Readable
+summaries and the independent full-artifact audit are alongside a 124 KB compact
+archive containing raw observations, command receipts, driver snapshots, and
+test/process logs. The archive omits large verification traces and staged source
+copies, which the original audit checked in the complete Actions artifact.
+
+Audit the compact archive from this reviewed source checkout, with the pinned
+baseline commit available locally:
+
+```sh
+mkdir -p /tmp/media-section-receipts
+tar -xzf Benchmarks/MediaSectionMemory/evidence/macos/receipts.tar.gz \
+  -C /tmp/media-section-receipts
+python3 Benchmarks/MediaSectionMemory/audit-results.py \
+  --results /tmp/media-section-receipts/main /tmp/media-section-receipts/stress \
+  --output /tmp/media-section-receipts/audit.json
+```
+
+The auditor reconstructs production source excerpts and permitted platform
+adaptations, checks raw observations and available logs, and recomputes every
+summary statistic. Its receipt explicitly records omitted traces, staged files,
+or binaries; it does not treat their hashes as a substitute for reading them.
+
 See [the research report](../../Documentation/MEDIA_SECTION_MEMORY_PERFORMANCE.md)
 for results, the exact measured protocol, and platform limitations.
