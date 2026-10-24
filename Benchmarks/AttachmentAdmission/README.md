@@ -153,6 +153,11 @@ ILLIQUID_ATTACHMENT_ADMISSION_FIXTURE=/tmp/attachment-fixtures/attachment-admiss
 ```
 
 Both output directories must be new or empty as specified by their runner.
+The current runner also permits the executor's default-enabled font-inclusion
+option to differ from the historical baseline. This benchmark continues to use
+the default font-inclusive behavior and requires the same complete metadata and
+payload hashes from both versions. Auxiliary readers' opt-out is measured
+separately in [`../AuxiliaryFontAttachments`](../AuxiliaryFontAttachments).
 All generated containers have a 0.25-second stereo FLAC audio track. Attachment
 payloads are dense deterministic repetitions of bytes 0 through 255, except for
 the real encoded PNG control and the small native integration fixture.

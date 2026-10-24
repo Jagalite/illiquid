@@ -1,0 +1,101 @@
+name: Auxiliary input font memory
+
+on:
+  push:
+    branches: ['perf/auxiliary-font-attachments-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/**'
+      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryFontAttachmentTests.swift'
+      - 'Benchmarks/AuxiliaryFontAttachments/**'
+      - '.github/workflows/auxiliary-font-attachments.yml'
+      - '!Benchmarks/AuxiliaryFontAttachments/README.md'
+      - '!Benchmarks/AuxiliaryFontAttachments/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeTimelineThumbnailGenerator.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailMetadataReader.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeFrameStepReader.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/PreparedExternalSubtitle.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryFontAttachmentTests.swift'
+      - 'Benchmarks/AuxiliaryFontAttachments/**'
+      - '.github/workflows/auxiliary-font-attachments.yml'
+      - '!Benchmarks/AuxiliaryFontAttachments/README.md'
+      - '!Benchmarks/AuxiliaryFontAttachments/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auxiliary-font-attachments-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-memory-and-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate media with controlled font attachments
+        run: |
+          python3 Benchmarks/AuxiliaryFontAttachments/generate-fixtures.py \
+            --output "$RUNNER_TEMP/auxiliary-font-fixtures"
+      - name: Measure retained memory and verify complete input parity
+        run: |
+          python3 Benchmarks/AuxiliaryFontAttachments/run.py \
+            --fixtures "$RUNNER_TEMP/auxiliary-font-fixtures" \
+            --output "$RUNNER_TEMP/auxiliary-font-results" --pairs 6
+      - name: Build the app and test native reader behavior
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          mkdir -p "$RUNNER_TEMP/auxiliary-font-tests"
+          export ILLIQUID_AUXILIARY_FONT_FIXTURES="$RUNNER_TEMP/auxiliary-font-fixtures"
+          test -s "$ILLIQUID_AUXILIARY_FONT_FIXTURES/manifest.json"
+          set -o pipefail
+          for configuration in debug release; do
+            swift test --force-resolved-versions -c "$configuration" --jobs 2 --no-parallel --filter \
+              'AuxiliaryFontAttachmentTests|FontAttachmentAdmissionTests|NativePlaybackFoundationTests|FrameStepPerformanceTests|VideoTimestampDiscoveryTests|ThumbnailOptimizationQualificationTests' \
+              2>&1 | tee "$RUNNER_TEMP/auxiliary-font-tests/$configuration.log"
+          done
+      - name: Print compact evidence for review
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import gzip, base64, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'auxiliary-font-results'
+          for name in ('summary.json', 'failure.json'):
+              path = root / name
+              if path.exists():
+                  print(name + ' ' + path.read_text())
+          names = ('manifest.json', 'summary.json', 'observations.jsonl', 'parity.json', 'fixtures.json', 'commands.json')
+          evidence = {name: (root / name).read_text() for name in names if (root / name).exists()}
+          packed = gzip.compress(json.dumps(evidence, sort_keys=True).encode(), mtime=0)
+          print('AUXILIARY_FONT_EVIDENCE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('AUXILIARY_FONT_EVIDENCE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: auxiliary-font-native-evidence
+          path: |
+            ${{ runner.temp }}/auxiliary-font-results/
+            ${{ runner.temp }}/auxiliary-font-tests/
+            ${{ runner.temp }}/auxiliary-font-fixtures/manifest.json
+            ${{ runner.temp }}/auxiliary-font-fixtures/fixture-commands.json
+            !${{ runner.temp }}/auxiliary-font-results/module-cache/**
+          retention-days: 14

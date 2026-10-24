@@ -179,7 +179,11 @@ class Runner:
         original = {variant: {path: self.source(variant, path)
                               for path in FULL_SOURCES + [PRESENTATION, BITMAP] + C_SOURCES}
                     for variant in VARIANTS}
-        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT}:
+        # The executor now forwards an optional attachment-inclusion policy.
+        # This historical benchmark uses its unchanged default; the complete
+        # returned metadata and payload hashes must still match the baseline.
+        executor = "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift"
+        for path in set(FULL_SOURCES + C_SOURCES) - {DEMUXER, FONT, executor}:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
         error = {v: extract(original[v][PRESENTATION], "struct PresentationError:", "\nfunc checkOSStatus(")
