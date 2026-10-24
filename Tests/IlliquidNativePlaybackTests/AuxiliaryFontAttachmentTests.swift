@@ -50,7 +50,7 @@ struct AuxiliaryFontAttachmentTests {
             #expect(input.mediaInfo.attachments.isEmpty)
             expectSameMetadata(primary.mediaInfo, input.mediaInfo)
             return try primary.mediaInfo.streams.map { stream in
-                let parameters = try #require(input.copyCodecParameters(streamIndex: stream.index))
+                let parameters = try #require(try input.copyCodecParameters(streamIndex: stream.index))
                 let expected = primary.codecPrivateData(streamIndex: stream.index)
                 #expect(input.codecPrivateData(streamIndex: stream.index) == expected)
                 return (parameters, expected)

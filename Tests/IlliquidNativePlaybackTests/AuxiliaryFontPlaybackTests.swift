@@ -44,8 +44,8 @@ struct AuxiliaryFontPlaybackTests {
         let input = try FFmpegInputExecutor(url: url, loadFontAttachments: false)
         #expect(input.mediaInfo.attachments.isEmpty)
         #expect(input.mediaInfo.streams == source.mediaInfo.streams)
-        let parameters = try #require(input.copyCodecParameters(streamIndex: stream.index))
-        let decoder = try #require(parameters.withUnsafePointer {
+        let parameters = try #require(try input.copyCodecParameters(streamIndex: stream.index))
+        let decoder = try #require(try parameters.withUnsafePointer {
             try SubtitleDecoder(parameters: $0, stream: stream)
         })
         let size = try #require(source.mediaInfo.videoStreams.first?.codedSize)
