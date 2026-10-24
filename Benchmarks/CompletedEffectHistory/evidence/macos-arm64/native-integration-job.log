@@ -1,0 +1,859 @@
+﻿2026-10-23T18:37:59.4932260Z Current runner version: '2.338.0'
+2026-10-23T18:37:59.4947120Z ##[group]Runner Image Provisioner
+2026-10-23T18:37:59.4947660Z Hosted Compute Agent
+2026-10-23T18:37:59.4948040Z Version: 20261012.601
+2026-10-23T18:37:59.4948450Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-23T18:37:59.4948920Z Build Date: 2026-10-12T17:48:21Z
+2026-10-23T18:37:59.4949410Z Worker ID: {adf33081-e0ce-42ec-8228-c79441ce5570}
+2026-10-23T18:37:59.4949870Z Region: westus
+2026-10-23T18:37:59.4950230Z Cloud: MacCloud
+2026-10-23T18:37:59.4950590Z ##[endgroup]
+2026-10-23T18:37:59.4951440Z ##[group]Operating System
+2026-10-23T18:37:59.4951830Z macOS
+2026-10-23T18:37:59.4952260Z 26.6.2
+2026-10-23T18:37:59.4952640Z 25G83
+2026-10-23T18:37:59.4952980Z ##[endgroup]
+2026-10-23T18:37:59.4953350Z ##[group]Runner Image
+2026-10-23T18:37:59.4953730Z Image: macos-26-arm64
+2026-10-23T18:37:59.4954160Z Version: 20261013.0424.1
+2026-10-23T18:37:59.4954980Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20261013.0424/images/macos/macos-26-arm64-Readme.md
+2026-10-23T18:37:59.4956020Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20261013.0424
+2026-10-23T18:37:59.4956680Z ##[endgroup]
+2026-10-23T18:37:59.4957430Z ##[group]GITHUB_TOKEN Permissions
+2026-10-23T18:37:59.4958540Z Contents: read
+2026-10-23T18:37:59.4958970Z Metadata: read
+2026-10-23T18:37:59.4959490Z ##[endgroup]
+2026-10-23T18:37:59.4960830Z Secret source: Actions
+2026-10-23T18:37:59.4961440Z Cache mode: write
+2026-10-23T18:37:59.4961950Z Prepare workflow directory
+2026-10-23T18:37:59.5215570Z Prepare all required actions
+2026-10-23T18:37:59.5253660Z Getting action download info
+2026-10-23T18:37:59.9115130Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-23T18:38:00.0739440Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-23T18:38:00.2319060Z Complete job name: native-integration
+2026-10-23T18:38:00.2779600Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-23T18:38:00.2780320Z with:
+2026-10-23T18:38:00.2780680Z   persist-credentials: false
+2026-10-23T18:38:00.2781060Z   repository: Jagalite/illiquid
+2026-10-23T18:38:00.2783980Z   token: ***
+2026-10-23T18:38:00.2784470Z   ssh-strict: true
+2026-10-23T18:38:00.2784900Z   ssh-user: git
+2026-10-23T18:38:00.2785210Z   clean: true
+2026-10-23T18:38:00.2785540Z   sparse-checkout-cone-mode: true
+2026-10-23T18:38:00.2785920Z   fetch-depth: 1
+2026-10-23T18:38:00.2786240Z   fetch-tags: false
+2026-10-23T18:38:00.2786570Z   show-progress: true
+2026-10-23T18:38:00.2786910Z   lfs: false
+2026-10-23T18:38:00.2787220Z   submodules: false
+2026-10-23T18:38:00.2787600Z   set-safe-directory: true
+2026-10-23T18:38:00.2787980Z   allow-unsafe-pr-checkout: false
+2026-10-23T18:38:00.2788550Z env:
+2026-10-23T18:38:00.2788960Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-23T18:38:00.2789490Z ##[endgroup]
+2026-10-23T18:38:00.4977520Z Syncing repository: Jagalite/illiquid
+2026-10-23T18:38:00.4979660Z ##[group]Getting Git version info
+2026-10-23T18:38:00.4980470Z Working directory is '/Users/runner/work/illiquid/illiquid'
+2026-10-23T18:38:00.4981270Z [command]/opt/homebrew/bin/git version
+2026-10-23T18:38:00.5209730Z git version 2.56.0
+2026-10-23T18:38:00.5223870Z ##[endgroup]
+2026-10-23T18:38:00.5230660Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/544b70bf-d31c-40f4-a7e2-ad9322018e1f/.gitconfig'
+2026-10-23T18:38:00.5237920Z Temporarily overriding HOME='/Users/runner/work/_temp/544b70bf-d31c-40f4-a7e2-ad9322018e1f' before making global git config changes
+2026-10-23T18:38:00.5238890Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-23T18:38:00.5241430Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-23T18:38:00.5340830Z Deleting the contents of '/Users/runner/work/illiquid/illiquid'
+2026-10-23T18:38:00.5342920Z ##[group]Initializing the repository
+2026-10-23T18:38:00.5346850Z [command]/opt/homebrew/bin/git init /Users/runner/work/illiquid/illiquid
+2026-10-23T18:38:00.5528510Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-23T18:38:00.5529290Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-23T18:38:00.5529980Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-23T18:38:00.5530570Z hint: call:
+2026-10-23T18:38:00.5530950Z hint:
+2026-10-23T18:38:00.5531360Z hint: 	git config --global init.defaultBranch <name>
+2026-10-23T18:38:00.5531850Z hint:
+2026-10-23T18:38:00.5532410Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-23T18:38:00.5533160Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-23T18:38:00.5533750Z hint:
+2026-10-23T18:38:00.5534170Z hint: 	git branch -m <name>
+2026-10-23T18:38:00.5534630Z hint:
+2026-10-23T18:38:00.5535260Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-23T18:38:00.5536000Z Initialized empty Git repository in /Users/runner/work/illiquid/illiquid/.git/
+2026-10-23T18:38:00.5541440Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Jagalite/illiquid
+2026-10-23T18:38:00.5613560Z ##[endgroup]
+2026-10-23T18:38:00.5614190Z ##[group]Disabling automatic garbage collection
+2026-10-23T18:38:00.5615940Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-23T18:38:00.5676250Z ##[endgroup]
+2026-10-23T18:38:00.5676830Z ##[group]Setting up auth
+2026-10-23T18:38:00.5681410Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-23T18:38:00.5742070Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-23T18:38:00.6611000Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-23T18:38:00.6674300Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-23T18:38:00.7413010Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-23T18:38:00.7479120Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-23T18:38:00.8258330Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-23T18:38:00.8302590Z ##[endgroup]
+2026-10-23T18:38:00.8303420Z ##[group]Fetching the repository
+2026-10-23T18:38:00.8308790Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +386c1160c934472c83ac1045aed4f50945e0150c:refs/remotes/origin/perf/completed-effect-history-20261023-16dfe
+2026-10-23T18:38:04.1196880Z From https://github.com/Jagalite/illiquid
+2026-10-23T18:38:04.1199420Z  * [new ref]         386c1160c934472c83ac1045aed4f50945e0150c -> origin/perf/completed-effect-history-20261023-16dfe
+2026-10-23T18:38:04.1201720Z ##[endgroup]
+2026-10-23T18:38:04.1202870Z ##[group]Determining the checkout info
+2026-10-23T18:38:04.1203590Z ##[endgroup]
+2026-10-23T18:38:04.1204130Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-23T18:38:04.1285250Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-23T18:38:04.1344540Z ##[group]Checking out the ref
+2026-10-23T18:38:04.1351680Z [command]/opt/homebrew/bin/git checkout --progress --force -B perf/completed-effect-history-20261023-16dfe refs/remotes/origin/perf/completed-effect-history-20261023-16dfe
+2026-10-23T18:38:04.7009440Z Switched to a new branch 'perf/completed-effect-history-20261023-16dfe'
+2026-10-23T18:38:04.7018040Z branch 'perf/completed-effect-history-20261023-16dfe' set up to track 'origin/perf/completed-effect-history-20261023-16dfe'.
+2026-10-23T18:38:04.7087940Z ##[endgroup]
+2026-10-23T18:38:04.7194340Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-23T18:38:04.7267980Z 386c1160c934472c83ac1045aed4f50945e0150c
+2026-10-23T18:38:04.7274780Z ##[group]Removing auth
+2026-10-23T18:38:04.7278020Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-23T18:38:04.7341010Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-23T18:38:04.8099980Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-23T18:38:04.8152600Z http.https://github.com/.extraheader
+2026-10-23T18:38:04.8158400Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-23T18:38:04.8222720Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-23T18:38:04.8991670Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-23T18:38:04.9053020Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-23T18:38:04.9763530Z ##[endgroup]
+2026-10-23T18:38:04.9898040Z ##[group]Run if ! xcrun -sdk macosx metal --version; then
+2026-10-23T18:38:04.9898440Z [36;1mif ! xcrun -sdk macosx metal --version; then[0m
+2026-10-23T18:38:04.9898760Z [36;1m  xcodebuild -downloadComponent MetalToolchain[0m
+2026-10-23T18:38:04.9898990Z [36;1mfi[0m
+2026-10-23T18:38:04.9899370Z [36;1mpython3 Scripts/verify-corresponding-source.py DependencySources[0m
+2026-10-23T18:38:04.9899720Z [36;1mpython3 Scripts/install-ci-native-sdk.py[0m
+2026-10-23T18:38:04.9936080Z shell: /bin/bash -e {0}
+2026-10-23T18:38:04.9936290Z env:
+2026-10-23T18:38:04.9936530Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-23T18:38:04.9936860Z ##[endgroup]
+2026-10-23T18:38:07.9410620Z Apple metal version 32023.883 (metalfe-32023.883)
+2026-10-23T18:38:07.9512090Z Target: air64-apple-darwin25.6.0
+2026-10-23T18:38:07.9525910Z Thread model: posix
+2026-10-23T18:38:07.9705560Z InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.KgVUj0/Metal.xctoolchain/usr/metal/current/bin
+2026-10-23T18:38:15.9738460Z Verified 28 source/resource/patch inputs and 114 notice documents
+2026-10-23T18:38:16.7706950Z Installed checksum-verified SDK on ephemeral runner
+2026-10-23T18:38:16.7815690Z ##[group]Run mkdir -p "$RUNNER_TEMP/effect-history-integration"
+2026-10-23T18:38:16.7816520Z [36;1mmkdir -p "$RUNNER_TEMP/effect-history-integration"[0m
+2026-10-23T18:38:16.7816940Z [36;1msw_vers > "$RUNNER_TEMP/effect-history-integration/host.txt"[0m
+2026-10-23T18:38:16.7817950Z [36;1mswift --version >> "$RUNNER_TEMP/effect-history-integration/host.txt"[0m
+2026-10-23T18:38:16.7818520Z [36;1mgit rev-parse HEAD >> "$RUNNER_TEMP/effect-history-integration/host.txt"[0m
+2026-10-23T18:38:16.7818950Z [36;1mset -o pipefail[0m
+2026-10-23T18:38:16.7819310Z [36;1mswift test --force-resolved-versions -c release --jobs 2 --no-parallel \[0m
+2026-10-23T18:38:16.7820840Z [36;1m  --filter 'CompletedEffectHistoryTests|PlaybackCoreTests|PlaybackParityCoreTests|RendererRecoveryRegressionTests|PlaybackStateSpaceTests|RelativeSeekEffectLifetimeTests|PlaybackCoordinatorTests' \[0m
+2026-10-23T18:38:16.7821830Z [36;1m  2>&1 | tee "$RUNNER_TEMP/effect-history-integration/tests.log"[0m
+2026-10-23T18:38:16.8023210Z shell: /bin/bash -e {0}
+2026-10-23T18:38:16.8023450Z env:
+2026-10-23T18:38:16.8025290Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-23T18:38:16.8028460Z   PKG_CONFIG_LIBDIR: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-23T18:38:16.8034250Z   PKG_CONFIG_PATH: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-23T18:38:16.8037360Z ##[endgroup]
+2026-10-23T18:38:24.0353050Z Fetching https://github.com/swiftlang/swift-testing.git
+2026-10-23T18:38:24.0353990Z Fetching https://github.com/sparkle-project/Sparkle.git
+2026-10-23T18:38:24.6873100Z [1/44215] Fetching sparkle
+2026-10-23T18:38:25.0224520Z [6192/89270] Fetching sparkle, swift-testing
+2026-10-23T18:38:26.4513890Z Fetched https://github.com/swiftlang/swift-testing.git from cache (2.42s)
+2026-10-23T18:38:26.4615390Z Fetched https://github.com/sparkle-project/Sparkle.git from cache (2.42s)
+2026-10-23T18:38:26.4716930Z Fetching https://github.com/swiftlang/swift-syntax.git
+2026-10-23T18:38:28.0753670Z [1/81056] Fetching swift-syntax
+2026-10-23T18:38:30.2480100Z Fetched https://github.com/swiftlang/swift-syntax.git from cache (3.79s)
+2026-10-23T18:38:30.2626860Z Creating working copy for https://github.com/sparkle-project/Sparkle.git
+2026-10-23T18:38:30.2627890Z Creating working copy for https://github.com/swiftlang/swift-testing.git
+2026-10-23T18:38:30.3243960Z Creating working copy for https://github.com/swiftlang/swift-syntax.git
+2026-10-23T18:38:30.5363680Z Working copy of https://github.com/swiftlang/swift-testing.git resolved at swift-6.3.2-RELEASE (70eff26)
+2026-10-23T18:38:30.6890610Z Working copy of https://github.com/swiftlang/swift-syntax.git resolved at 603.0.2
+2026-10-23T18:38:30.7190120Z Working copy of https://github.com/sparkle-project/Sparkle.git resolved at 2.10.0
+2026-10-23T18:38:34.5490900Z Downloading binary artifact https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+2026-10-23T18:38:34.6893680Z [16375/10193895] Downloading https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip
+2026-10-23T18:38:35.2498310Z Downloaded https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip (0.70s)
+2026-10-23T18:38:35.3800970Z Downloading package prebuilt https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip
+2026-10-23T18:38:35.4840360Z Downloaded https://download.swift.org/prebuilts/swift-syntax/603.0.2/swiftlang-6.3.3.1.3-macosx26.5-MacroSupport.zip (0.11s)
+2026-10-23T18:38:36.9141610Z Building for production...
+2026-10-23T18:38:36.9343270Z [0/49] /Users/runner/work/illiquid/illiquid/.build/arm64-apple-macosx/release/IlliquidPackageTests.derived/runner.swift
+2026-10-23T18:38:37.0594130Z [1/49] Write swift-version-7974D3F7F03D5E95.txt
+2026-10-23T18:38:37.4149760Z [2/49] Compiling _TestingInternals WillThrow.cpp
+2026-10-23T18:38:37.5643940Z [3/49] Compiling _TestingInternals ExecutablePath.cpp
+2026-10-23T18:38:37.6707310Z [4/49] Compiling _TestingInternals Discovery.cpp
+2026-10-23T18:38:37.6708640Z [5/49] Write sources
+2026-10-23T18:38:37.8724090Z [8/50] Compiling _TestingInternals Versions.cpp
+2026-10-23T18:38:37.8854060Z [9/50] Copying Sparkle.framework
+2026-10-23T18:38:39.7816870Z [11/51] Compiling _TestDiscovery WinSDKAdditions.swift
+2026-10-23T18:38:39.7929200Z [11/51] Copying NativePlaybackShaders.metal
+2026-10-23T18:38:39.8033270Z [11/51] Copying Resources
+2026-10-23T18:38:39.8134570Z [13/51] Write sources
+2026-10-23T18:38:42.5329750Z [33/51] Compiling CNativeAudio AudioOutputDevice.m
+2026-10-23T18:38:47.4296130Z [35/52] Compiling TestingMacros ConditionMacro.swift
+2026-10-23T18:38:47.4418880Z [35/52] Write Objects.LinkFileList
+2026-10-23T18:38:48.0216250Z [36/52] Linking TestingMacros-tool
+2026-10-23T18:38:59.2460040Z [38/53] Compiling IlliquidCore MediaMetadataHints.swift
+2026-10-23T18:39:14.0622430Z [39/54] Compiling IlliquidPlaybackCore CompletedPlaybackEffectHistory.swift
+2026-10-23T18:39:17.8040010Z [40/55] Compiling Testing ABI.Record+Streaming.swift
+2026-10-23T18:39:21.3224750Z [41/56] Compiling IlliquidPlayback Module.swift
+2026-10-23T18:39:26.5940600Z [42/57] Compiling IlliquidPlaybackStateSpace PlaybackPartialOrderReducer.swift
+2026-10-23T18:39:29.7006730Z [43/58] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+2026-10-23T18:39:31.1186520Z [44/59] Compiling IlliquidStateSpaceExplorer main.swift
+2026-10-23T18:39:34.6053660Z [45/60] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+2026-10-23T18:39:34.8608700Z [46/61] Compiling IlliquidPlaybackCoreTests CompletedEffectHistoryTests.swift
+2026-10-23T18:40:25.4816840Z [47/62] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+2026-10-23T18:40:25.4841070Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-23T18:40:25.4950980Z 1150 |             self.workQueue.async {
+2026-10-23T18:40:25.5057170Z 1151 |                 _ = resources.retainedCVTextures
+2026-10-23T18:40:25.5161790Z 1152 |                 guard commandBuffer.status != .error else {
+2026-10-23T18:40:25.5249590Z      |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+2026-10-23T18:40:25.5275260Z 1153 |                     completion(.failure(
+2026-10-23T18:40:25.5376340Z 1154 |                         commandBuffer.error
+2026-10-23T18:40:25.5477120Z 
+2026-10-23T18:40:25.5578610Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-23T18:40:25.5678330Z 243 |  */
+2026-10-23T18:40:25.5768030Z 244 | API_AVAILABLE(macos(10.11), ios(8.0))
+2026-10-23T18:40:25.5860930Z 245 | @protocol MTLCommandBuffer <NSObject>
+2026-10-23T18:40:25.5881960Z     |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+2026-10-23T18:40:25.5930790Z 246 | 
+2026-10-23T18:40:25.6031750Z 247 | /*!
+2026-10-23T18:40:25.6086540Z 
+2026-10-23T18:40:25.6157130Z /Users/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-23T18:40:25.6260300Z    4 | import CoreVideo
+2026-10-23T18:40:25.6380440Z    5 | import Foundation
+2026-10-23T18:40:25.6478320Z    6 | import Metal
+2026-10-23T18:40:25.6605070Z      | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+2026-10-23T18:40:25.6715960Z    7 | import OSLog
+2026-10-23T18:40:25.6829450Z    8 | import QuartzCore
+2026-10-23T18:40:25.6930290Z 
+2026-10-23T18:40:25.7001960Z [#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+2026-10-23T18:40:25.7036390Z [47/62] Write Objects.LinkFileList
+2026-10-23T18:40:26.0871560Z [48/62] Linking IlliquidStateSpaceExplorer
+2026-10-23T18:40:31.8655880Z [50/63] Compiling IlliquidRenderProfile main.swift
+2026-10-23T18:40:35.3923720Z [51/64] Compiling IlliquidCoreTests AspectFitWindowSizingTests.swift
+2026-10-23T18:40:35.3935360Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+2026-10-23T18:40:35.4054240Z  97 |             nil,
+2026-10-23T18:40:35.4101510Z  98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+2026-10-23T18:40:35.4102110Z  99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+2026-10-23T18:40:35.4102870Z     |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+2026-10-23T18:40:35.4103600Z 100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+2026-10-23T18:40:35.4104070Z 101 |         ]
+2026-10-23T18:40:35.4104240Z 
+2026-10-23T18:40:35.4104990Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+2026-10-23T18:40:35.4105950Z  98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+2026-10-23T18:40:35.4106400Z  99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+2026-10-23T18:40:35.4106950Z 100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+2026-10-23T18:40:35.4107680Z     |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+2026-10-23T18:40:35.4108270Z 101 |         ]
+2026-10-23T18:40:35.4110400Z 102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+2026-10-23T18:40:39.5968390Z [52/65] Compiling IlliquidPlayer ArchitectureValidation.swift
+2026-10-23T18:40:46.1316040Z [53/66] Compiling IlliquidDifferentialHarness main.swift
+2026-10-23T18:41:08.1796520Z [54/67] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+2026-10-23T18:41:09.3590060Z [55/68] Compiling IlliquidPlaybackStress main.swift
+2026-10-23T18:41:10.5347750Z [56/69] Compiling IlliquidArchitectureCheck main.swift
+2026-10-23T18:41:52.4857000Z [57/70] Compiling IlliquidApp AppDelegate.swift
+2026-10-23T18:41:52.4902610Z [57/70] Write Objects.LinkFileList
+2026-10-23T18:41:53.8301230Z [59/70] Linking IlliquidRenderProfile
+2026-10-23T18:41:54.8670110Z [60/70] Linking IlliquidPlaybackStress
+2026-10-23T18:41:54.8674920Z [61/70] Write Objects.LinkFileList
+2026-10-23T18:41:55.8955930Z [63/70] Linking IlliquidDifferentialHarness
+2026-10-23T18:41:56.9330610Z [64/70] Linking IlliquidArchitectureCheck
+2026-10-23T18:41:56.9335060Z [65/70] Write Objects.LinkFileList
+2026-10-23T18:41:58.3590330Z [66/70] Linking Illiquid
+2026-10-23T18:42:43.9876820Z [68/71] Compiling IlliquidNativePlaybackTests AudioDelayTests.swift
+2026-10-23T18:42:43.9906710Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PGSSubtitlePacketBorrowTests.swift:77:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-23T18:42:43.9907620Z  75 |             reference(x: 30, y: 40),
+2026-10-23T18:42:43.9907920Z  76 |         ]))
+2026-10-23T18:42:44.0062290Z  77 |         weak var released = owner
+2026-10-23T18:42:44.0062860Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-23T18:42:44.0063440Z  78 |         let metadata = try parseThenOverwrite(try #require(owner))
+2026-10-23T18:42:44.0063710Z  79 |         owner = nil
+2026-10-23T18:42:44.0063810Z 
+2026-10-23T18:42:44.0064390Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift:127:18: warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-23T18:42:44.0065310Z 125 |         let queue = BoundedQueue<Payload>(capacity: 1)
+2026-10-23T18:42:44.0065580Z 126 |         var value: Payload? = Payload()
+2026-10-23T18:42:44.0065790Z 127 |         weak var retained = value
+2026-10-23T18:42:44.0066200Z     |                  `- warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-23T18:42:44.0066630Z 128 |         #expect(queue.push(value!)); value = nil
+2026-10-23T18:42:44.0067310Z 129 |         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
+2026-10-23T18:42:44.0067600Z 
+2026-10-23T18:42:44.0068300Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift:99:13: warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+2026-10-23T18:42:44.0069570Z  97 |         let checkoutID = try #require(token).checkoutID
+2026-10-23T18:42:44.0069960Z  98 |         var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
+2026-10-23T18:42:44.0070370Z  99 |             ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+2026-10-23T18:42:44.0070970Z     |             `- warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+2026-10-23T18:42:44.0071570Z 100 |         )
+2026-10-23T18:42:44.0071740Z 101 |         token?.transition(to: .queued)
+2026-10-23T18:42:44.0071900Z 
+2026-10-23T18:42:44.0072490Z /Users/runner/work/illiquid/illiquid/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-23T18:42:44.0083650Z 166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+2026-10-23T18:42:44.0084040Z 167 |         var first: Value? = Value()
+2026-10-23T18:42:44.0084400Z 168 |         weak var released = first
+2026-10-23T18:42:44.0084980Z     |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+2026-10-23T18:42:44.0085570Z 169 |         ring.append(first!)
+2026-10-23T18:42:44.0085940Z 170 |         first = nil
+2026-10-23T18:42:44.0086070Z 
+2026-10-23T18:42:44.0086500Z [#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+2026-10-23T18:43:14.4171240Z [69/71] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+2026-10-23T18:43:17.3084930Z [70/72] Compiling IlliquidPackageTests runner.swift
+2026-10-23T18:43:17.3107740Z [70/72] Write Objects.LinkFileList
+2026-10-23T18:43:21.2664670Z [71/72] Linking IlliquidPackageTests
+2026-10-23T18:43:21.2750140Z Build complete! (297.25s)
+2026-10-23T18:43:22.9356140Z Test Suite 'Selected tests' started at 2026-10-23 18:43:22.412.
+2026-10-23T18:43:22.9356740Z Test Suite 'IlliquidPackageTests.xctest' started at 2026-10-23 18:43:22.417.
+2026-10-23T18:43:22.9362660Z Test Suite 'IlliquidPackageTests.xctest' passed at 2026-10-23 18:43:22.417.
+2026-10-23T18:43:22.9363360Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+2026-10-23T18:43:22.9363770Z Test Suite 'Selected tests' passed at 2026-10-23 18:43:22.417.
+2026-10-23T18:43:22.9364260Z 	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.005) seconds
+2026-10-23T18:43:22.9365460Z ◇ Test run started.
+2026-10-23T18:43:22.9368720Z ↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+2026-10-23T18:43:22.9369230Z ◇ Suite "Compact completed-effect history" started.
+2026-10-23T18:43:22.9369720Z ◇ Test consecutiveHistoryUsesOnlyAPrefixWithoutForgettingOldIDs() started.
+2026-10-23T18:43:22.9370520Z ✔ Test consecutiveHistoryUsesOnlyAPrefixWithoutForgettingOldIDs() passed after 0.008 seconds.
+2026-10-23T18:43:22.9371210Z ◇ Test outOfOrderCompletionsFillHolesAndDuplicatesDoNotChangeHistory() started.
+2026-10-23T18:43:22.9371940Z ✔ Test outOfOrderCompletionsFillHolesAndDuplicatesDoNotChangeHistory() passed after 0.001 seconds.
+2026-10-23T18:43:22.9372490Z ◇ Test closingManyCompletionGapsReleasesTheirPeakStorage() started.
+2026-10-23T18:43:22.9372970Z ✔ Test closingManyCompletionGapsReleasesTheirPeakStorage() passed after 0.001 seconds.
+2026-10-23T18:43:22.9373490Z ◇ Test anEarlyGapKeepsLaterIDsInASetUntilItActuallyCompletes() started.
+2026-10-23T18:43:22.9374000Z ✔ Test anEarlyGapKeepsLaterIDsInASetUntilItActuallyCompletes() passed after 0.002 seconds.
+2026-10-23T18:43:22.9374540Z ◇ Test zeroAndMaximumIDsDoNotOverflowOrBridgeMissingHistory() started.
+2026-10-23T18:43:22.9375050Z ✔ Test zeroAndMaximumIDsDoNotOverflowOrBridgeMissingHistory() passed after 0.001 seconds.
+2026-10-23T18:43:22.9375580Z ◇ Test randomizedHistoryMatchesSetIncludingSparseAndRepeatedIDs() started.
+2026-10-23T18:43:22.9376140Z ✔ Test randomizedHistoryMatchesSetIncludingSparseAndRepeatedIDs() passed after 0.052 seconds.
+2026-10-23T18:43:22.9376670Z ◇ Test shuffledCompleteHistoriesDrainToTheSameCanonicalPrefix() started.
+2026-10-23T18:43:22.9377260Z ✔ Test shuffledCompleteHistoriesDrainToTheSameCanonicalPrefix() passed after 0.104 seconds.
+2026-10-23T18:43:22.9377810Z ◇ Test publicSetMutationsAndValueCopiesKeepTheirOriginalSemantics() started.
+2026-10-23T18:43:22.9378380Z ✔ Test publicSetMutationsAndValueCopiesKeepTheirOriginalSemantics() passed after 0.001 seconds.
+2026-10-23T18:43:22.9378920Z ◇ Test stateCodablePreservesLegacySetFieldAndCanonicalReplay() started.
+2026-10-23T18:43:22.9379470Z ✔ Test stateCodablePreservesLegacySetFieldAndCanonicalReplay() passed after 0.001 seconds.
+2026-10-23T18:43:22.9380030Z ◇ Test productionCoreRetainsDuplicateClassificationAfterLongHistory() started.
+2026-10-23T18:43:22.9380700Z ✔ Test productionCoreRetainsDuplicateClassificationAfterLongHistory() passed after 0.037 seconds.
+2026-10-23T18:43:22.9384430Z ◇ Test outstandingHolesRemainLiveUntilTheirOwnResultsArrive() started.
+2026-10-23T18:43:22.9385320Z ✔ Test outstandingHolesRemainLiveUntilTheirOwnResultsArrive() passed after 0.001 seconds.
+2026-10-23T18:43:22.9385980Z ◇ Test arbitraryInitialIDsDoNotTurnUnknownIDsIntoDuplicates() started.
+2026-10-23T18:43:22.9386610Z ✔ Test arbitraryInitialIDsDoNotTurnUnknownIDsIntoDuplicates() passed after 0.001 seconds.
+2026-10-23T18:43:22.9387200Z ✔ Suite "Compact completed-effect history" passed after 0.209 seconds.
+2026-10-23T18:43:22.9387620Z ◇ Suite "Deterministic playback core" started.
+2026-10-23T18:43:22.9388100Z ◇ Test loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() started.
+2026-10-23T18:43:22.9388740Z ✔ Test loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() passed after 0.003 seconds.
+2026-10-23T18:43:22.9389320Z ◇ Test pausedLoadDoesNotRequestNonzeroRate() started.
+2026-10-23T18:43:22.9389810Z ✔ Test pausedLoadDoesNotRequestNonzeroRate() passed after 0.001 seconds.
+2026-10-23T18:43:22.9390400Z ◇ Test replacementKeepsCommittedSourceUntilCandidatePrerollCommits() started.
+2026-10-23T18:43:22.9391060Z ✔ Test replacementKeepsCommittedSourceUntilCandidatePrerollCommits() passed after 0.001 seconds.
+2026-10-23T18:43:22.9392010Z ◇ Test failedReplacementDiscardsPendingSourceWithoutMutatingCommittedAuthority() started.
+2026-10-23T18:43:22.9392810Z ✔ Test failedReplacementDiscardsPendingSourceWithoutMutatingCommittedAuthority() passed after 0.001 seconds.
+2026-10-23T18:43:22.9394890Z ◇ Test staleGenerationResultCannotResumeAfterSeek() started.
+2026-10-23T18:43:22.9395500Z ✔ Test staleGenerationResultCannotResumeAfterSeek() passed after 0.001 seconds.
+2026-10-23T18:43:22.9395920Z ◇ Test duplicateCompletionIsIdempotent() started.
+2026-10-23T18:43:22.9396370Z ✔ Test duplicateCompletionIsIdempotent() passed after 0.001 seconds.
+2026-10-23T18:43:22.9396830Z ◇ Test directEffectResultRetiresPendingRuntimeEffect() started.
+2026-10-23T18:43:22.9397420Z ✔ Test directEffectResultRetiresPendingRuntimeEffect() passed after 0.001 seconds.
+2026-10-23T18:43:22.9398010Z ◇ Test shutdownRequiresCleanupAcknowledgmentAndThenEmitsNothing() started.
+2026-10-23T18:43:22.9398630Z ✔ Test shutdownRequiresCleanupAcknowledgmentAndThenEmitsNothing() passed after 0.001 seconds.
+2026-10-23T18:43:22.9399250Z ◇ Test invalidTimeAndInvalidSeekAreRejectedWithoutEffects() started.
+2026-10-23T18:43:22.9399860Z ✔ Test invalidTimeAndInvalidSeekAreRejectedWithoutEffects() passed after 0.001 seconds.
+2026-10-23T18:43:22.9400480Z ◇ Test checkpointAndDiagnosticEventsCarryDeterministicIdentity() started.
+2026-10-23T18:43:22.9401120Z ✔ Test checkpointAndDiagnosticEventsCarryDeterministicIdentity() passed after 0.001 seconds.
+2026-10-23T18:43:22.9401800Z ◇ Test subtitleInvalidationOwnsRevisionsClearAndFinalCommitFence() started.
+2026-10-23T18:43:22.9402450Z ✔ Test subtitleInvalidationOwnsRevisionsClearAndFinalCommitFence() passed after 0.001 seconds.
+2026-10-23T18:43:22.9403030Z ◇ Test aggregateSeekAcknowledgmentRestoresRateOnlyAfterNativePreroll() started.
+2026-10-23T18:43:22.9403630Z ✔ Test aggregateSeekAcknowledgmentRestoresRateOnlyAfterNativePreroll() passed after 0.001 seconds.
+2026-10-23T18:43:22.9404240Z ◇ Test relativeSeekResolvesFromAcceptedClockAndAccumulatesPendingIntent() started.
+2026-10-23T18:43:22.9404870Z ✔ Test relativeSeekResolvesFromAcceptedClockAndAccumulatesPendingIntent() passed after 0.001 seconds.
+2026-10-23T18:43:22.9405570Z ◇ Test catalogDefaultsAndDrainFinalizationAreDeterministicAndExactlyOnce() started.
+2026-10-23T18:43:22.9406230Z ✔ Test catalogDefaultsAndDrainFinalizationAreDeterministicAndExactlyOnce() passed after 0.001 seconds.
+2026-10-23T18:43:22.9406830Z ◇ Test duplicateEOFInSameGenerationPreservesObservedDrainProgress() started.
+2026-10-23T18:43:22.9407400Z ✔ Test duplicateEOFInSameGenerationPreservesObservedDrainProgress() passed after 0.001 seconds.
+2026-10-23T18:43:22.9408030Z ◇ Test failedEOFCheckpointCannotAdvanceAndLateSuccessCannotReplaceNewMedia() started.
+2026-10-23T18:43:22.9409040Z ✔ Test failedEOFCheckpointCannotAdvanceAndLateSuccessCannotReplaceNewMedia() passed after 0.001 seconds.
+2026-10-23T18:43:22.9409760Z ◇ Test aggregateDuplicateEOFCannotSkipExistingDrainObligations() started.
+2026-10-23T18:43:22.9410430Z ✔ Test aggregateDuplicateEOFCannotSkipExistingDrainObligations() passed after 0.001 seconds.
+2026-10-23T18:43:22.9410940Z ◇ Test acceptedNewSeekGenerationRearmsFinalizedEOFCycle() started.
+2026-10-23T18:43:22.9411420Z ✔ Test acceptedNewSeekGenerationRearmsFinalizedEOFCycle() passed after 0.001 seconds.
+2026-10-23T18:43:22.9411910Z ◇ Test shutdownCleanupFailuresBecomeExplicitExternalWaits() started.
+2026-10-23T18:43:22.9412420Z ✔ Test shutdownCleanupFailuresBecomeExplicitExternalWaits() passed after 0.001 seconds.
+2026-10-23T18:43:22.9412960Z ◇ Test shutdownRejectsLateRawFactsBeforeTheyCanEmitPlaybackWork() started.
+2026-10-23T18:43:22.9413510Z ✔ Test shutdownRejectsLateRawFactsBeforeTheyCanEmitPlaybackWork() passed after 0.001 seconds.
+2026-10-23T18:43:22.9414100Z ◇ Test failedTrackReplacementRestoresPrerollAuthorityWithPriorPlayback() started.
+2026-10-23T18:43:22.9414850Z ✔ Test failedTrackReplacementRestoresPrerollAuthorityWithPriorPlayback() passed after 0.001 seconds.
+2026-10-23T18:43:22.9415730Z ◇ Test subtitleInvalidationDoesNotStrandInFlightSubtitleSelection() started.
+2026-10-23T18:43:22.9416310Z ✔ Test subtitleInvalidationDoesNotStrandInFlightSubtitleSelection() passed after 0.001 seconds.
+2026-10-23T18:43:22.9416930Z ◇ Test subtitleInvalidationDoesNotStrandTrackResumeRate() started.
+2026-10-23T18:43:22.9417720Z ✔ Test subtitleInvalidationDoesNotStrandTrackResumeRate() passed after 0.001 seconds.
+2026-10-23T18:43:22.9418300Z ◇ Test aggregatePrerollIsTheOnlyStartupRateAuthority() started.
+2026-10-23T18:43:22.9418820Z ✔ Test aggregatePrerollIsTheOnlyStartupRateAuthority() passed after 0.001 seconds.
+2026-10-23T18:43:22.9419310Z ◇ Test lateCatalogMetadataDoesNotRearmSatisfiedStartupPreroll() started.
+2026-10-23T18:43:22.9419900Z ✔ Test lateCatalogMetadataDoesNotRearmSatisfiedStartupPreroll() passed after 0.001 seconds.
+2026-10-23T18:43:22.9420530Z ◇ Test invariantRejectsPlaybackBeforeCurrentPrerollObligation() started.
+2026-10-23T18:43:22.9421120Z ✔ Test invariantRejectsPlaybackBeforeCurrentPrerollObligation() passed after 0.001 seconds.
+2026-10-23T18:43:22.9421840Z ◇ Test recoveryBudgetIsScopedToMediaSessionAndSelectedVideoLineage() started.
+2026-10-23T18:43:22.9422550Z ✔ Test recoveryBudgetIsScopedToMediaSessionAndSelectedVideoLineage() passed after 0.001 seconds.
+2026-10-23T18:43:22.9423190Z ◇ Test retryableVideoDecodeFailureDoesNotReachUserFacingSnapshot() started.
+2026-10-23T18:43:22.9423750Z ✔ Test retryableVideoDecodeFailureDoesNotReachUserFacingSnapshot() passed after 0.001 seconds.
+2026-10-23T18:43:22.9424340Z ◇ Test presentationRecoveryIsScopedThenRebuildsOnceBeforeTerminalFailure() started.
+2026-10-23T18:43:22.9425020Z ✔ Test presentationRecoveryIsScopedThenRebuildsOnceBeforeTerminalFailure() passed after 0.001 seconds.
+2026-10-23T18:43:22.9425590Z ◇ Test presentationRecoveryBudgetSurvivesRevisionAdvances() started.
+2026-10-23T18:43:22.9426080Z ✔ Test presentationRecoveryBudgetSurvivesRevisionAdvances() passed after 0.001 seconds.
+2026-10-23T18:43:22.9426610Z ◇ Test synchronizationOwnsPrerollBufferingDriftAndRateAcknowledgment() started.
+2026-10-23T18:43:22.9427190Z ✔ Test synchronizationOwnsPrerollBufferingDriftAndRateAcknowledgment() passed after 0.001 seconds.
+2026-10-23T18:43:22.9427760Z ◇ Test lifecycleReducerRemembersExactlyOneResumeAfterWakeDecision() started.
+2026-10-23T18:43:22.9428340Z ✔ Test lifecycleReducerRemembersExactlyOneResumeAfterWakeDecision() passed after 0.001 seconds.
+2026-10-23T18:43:22.9428910Z ◇ Test trackIntentsAreDistinctAndRollbackKeepsOldEffectiveSelection() started.
+2026-10-23T18:43:22.9429500Z ✔ Test trackIntentsAreDistinctAndRollbackKeepsOldEffectiveSelection() passed after 0.001 seconds.
+2026-10-23T18:43:22.9430010Z ◇ Test controlReducerOwnsRequestedAndAppliedSubtitleDelay() started.
+2026-10-23T18:43:22.9430520Z ✔ Test controlReducerOwnsRequestedAndAppliedSubtitleDelay() passed after 0.001 seconds.
+2026-10-23T18:43:22.9431280Z ✔ Suite "Deterministic playback core" passed after 0.027 seconds.
+2026-10-23T18:43:22.9431750Z ◇ Suite "Optional track recovery" started.
+2026-10-23T18:43:22.9432180Z ◇ Test audioDecodeFailureDisablesAudioWhenVideoCanContinue() started.
+2026-10-23T18:43:22.9432830Z ✔ Test audioDecodeFailureDisablesAudioWhenVideoCanContinue() passed after 0.001 seconds.
+2026-10-23T18:43:22.9433430Z ◇ Test subtitleReadFailureDisablesOnlyTheSubtitleTrack() started.
+2026-10-23T18:43:22.9433980Z ✔ Test subtitleReadFailureDisablesOnlyTheSubtitleTrack() passed after 0.001 seconds.
+2026-10-23T18:43:22.9434680Z ◇ Test audioPresentationFlushesThenRebuildsThenDisables() started.
+2026-10-23T18:43:22.9435260Z ✔ Test audioPresentationFlushesThenRebuildsThenDisables() passed after 0.001 seconds.
+2026-10-23T18:43:22.9435790Z ◇ Test audioOnlyDecodeFailureRemainsTerminal() started.
+2026-10-23T18:43:22.9436270Z ✔ Test audioOnlyDecodeFailureRemainsTerminal() passed after 0.001 seconds.
+2026-10-23T18:43:22.9436910Z ◇ Test recoveryStateDecodesDocumentsFromBeforeOptionalTrackBudgets() started.
+2026-10-23T18:43:22.9437810Z ✔ Test recoveryStateDecodesDocumentsFromBeforeOptionalTrackBudgets() passed after 0.001 seconds.
+2026-10-23T18:43:22.9438450Z ✔ Suite "Optional track recovery" passed after 0.001 seconds.
+2026-10-23T18:43:22.9438810Z ◇ Suite "Playback core replay" started.
+2026-10-23T18:43:22.9439260Z ◇ Test canonicalEncodingIgnoresSetAndDictionaryInsertionHistory() started.
+2026-10-23T18:43:22.9439960Z ✔ Test canonicalEncodingIgnoresSetAndDictionaryInsertionHistory() passed after 0.001 seconds.
+2026-10-23T18:43:22.9440530Z ◇ Test replayJSONRoundTripsWithStableBytes() started.
+2026-10-23T18:43:22.9441010Z ✔ Test replayJSONRoundTripsWithStableBytes() passed after 0.001 seconds.
+2026-10-23T18:43:22.9441550Z ◇ Test shrinkerProducesDeterministicNonemptyDeletionCandidates() started.
+2026-10-23T18:43:22.9442210Z ✔ Test shrinkerProducesDeterministicNonemptyDeletionCandidates() passed after 0.001 seconds.
+2026-10-23T18:43:22.9442720Z ✔ Suite "Playback core replay" passed after 0.002 seconds.
+2026-10-23T18:43:22.9443030Z ◇ Suite "Playback core model runtime" started.
+2026-10-23T18:43:22.9443400Z ◇ Test productionModeSkipsReplayEncodingAndRetention() started.
+2026-10-23T18:43:22.9443950Z ✔ Test productionModeSkipsReplayEncodingAndRetention() passed after 0.001 seconds.
+2026-10-23T18:43:22.9444580Z ◇ Test seededSequencesRemainDeterministicAndInvariantSafe() started.
+2026-10-23T18:43:22.9445250Z ✔ Test seededSequencesRemainDeterministicAndInvariantSafe() passed after 0.010 seconds.
+2026-10-23T18:43:22.9445800Z ✔ Suite "Playback core model runtime" passed after 0.010 seconds.
+2026-10-23T18:43:22.9446260Z ◇ Suite "Playback parity transport policies" started.
+2026-10-23T18:43:22.9446720Z ◇ Test speedSurvivesPauseSeekWakeAndSourceReplacement() started.
+2026-10-23T18:43:22.9447290Z ✔ Test speedSurvivesPauseSeekWakeAndSourceReplacement() passed after 0.003 seconds.
+2026-10-23T18:43:22.9447890Z ◇ Test loopUsesOneExactSeekAndDoesNotLeakToAnotherFile() started.
+2026-10-23T18:43:22.9448490Z ✔ Test loopUsesOneExactSeekAndDoesNotLeakToAnotherFile() passed after 0.002 seconds.
+2026-10-23T18:43:22.9449050Z ✔ Suite "Playback parity transport policies" passed after 0.006 seconds.
+2026-10-23T18:43:22.9449470Z ◇ Suite "Renderer recovery regression coverage" started.
+2026-10-23T18:43:22.9449980Z ◇ Test actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+2026-10-23T18:43:22.9450840Z ◇ Test case passing 2 arguments autoplay → true, stage → .enqueue to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+2026-10-23T18:43:22.9451830Z ◇ Test case passing 2 arguments autoplay → true, stage → .flush to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+2026-10-23T18:43:22.9452620Z ◇ Test case passing 2 arguments autoplay → true, stage → .render to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+2026-10-23T18:43:22.9453870Z ◇ Test case passing 2 arguments autoplay → false, stage → .enqueue to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+2026-10-23T18:43:22.9454840Z ◇ Test case passing 2 arguments autoplay → false, stage → .flush to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+2026-10-23T18:43:22.9455630Z ◇ Test case passing 2 arguments autoplay → false, stage → .render to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+2026-10-23T18:43:22.9456480Z ✔ Test actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) with 6 test cases passed after 0.001 seconds.
+2026-10-23T18:43:22.9457040Z ◇ Test lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9457990Z ◇ Test case passing 2 arguments route → .videoFlush, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9459200Z ◇ Test case passing 2 arguments route → .videoFlush, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9460330Z ◇ Test case passing 2 arguments route → .videoFlush, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9464670Z ◇ Test case passing 2 arguments route → .videoRebuild, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9465840Z ◇ Test case passing 2 arguments route → .videoRebuild, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9466880Z ◇ Test case passing 2 arguments route → .videoRebuild, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9467890Z ◇ Test case passing 2 arguments route → .hardwareFallback, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9468910Z ◇ Test case passing 2 arguments route → .hardwareFallback, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9469930Z ◇ Test case passing 2 arguments route → .hardwareFallback, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9471040Z ◇ Test case passing 2 arguments route → .softwareRestart, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9472190Z ◇ Test case passing 2 arguments route → .softwareRestart, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9473420Z ◇ Test case passing 2 arguments route → .softwareRestart, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9474560Z ◇ Test case passing 2 arguments route → .transientVideo, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9475750Z ◇ Test case passing 2 arguments route → .transientVideo, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9476740Z ◇ Test case passing 2 arguments route → .transientVideo, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9477800Z ◇ Test case passing 2 arguments route → .audioFlush, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9478900Z ◇ Test case passing 2 arguments route → .audioFlush, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9480250Z ◇ Test case passing 2 arguments route → .audioFlush, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9481400Z ◇ Test case passing 2 arguments route → .audioRebuild, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9482610Z ◇ Test case passing 2 arguments route → .audioRebuild, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9483740Z ◇ Test case passing 2 arguments route → .audioRebuild, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9485160Z ◇ Test case passing 2 arguments route → .disableAudio, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9486140Z ◇ Test case passing 2 arguments route → .disableAudio, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9487550Z ◇ Test case passing 2 arguments route → .disableAudio, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9488620Z ◇ Test case passing 2 arguments route → .disableSubtitle, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9489620Z ◇ Test case passing 2 arguments route → .disableSubtitle, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9490620Z ◇ Test case passing 2 arguments route → .disableSubtitle, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+2026-10-23T18:43:22.9491460Z ✔ Test lateRecoveryResultPreservesTerminalFailure(route:token:) with 27 test cases passed after 0.002 seconds.
+2026-10-23T18:43:22.9492120Z ◇ Test recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9492790Z ◇ Test case passing 1 argument route → .videoFlush to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9493660Z ◇ Test case passing 1 argument route → .videoRebuild to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9494470Z ◇ Test case passing 1 argument route → .hardwareFallback to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9495260Z ◇ Test case passing 1 argument route → .softwareRestart to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9496050Z ◇ Test case passing 1 argument route → .transientVideo to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9496820Z ◇ Test case passing 1 argument route → .audioFlush to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9497590Z ◇ Test case passing 1 argument route → .audioRebuild to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9498360Z ◇ Test case passing 1 argument route → .disableAudio to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9499150Z ◇ Test case passing 1 argument route → .disableSubtitle to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+2026-10-23T18:43:22.9499910Z ✔ Test recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) with 9 test cases passed after 0.001 seconds.
+2026-10-23T18:43:22.9500520Z ◇ Test recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9501240Z ◇ Test case passing 2 arguments route → .videoFlush, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9502270Z ◇ Test case passing 2 arguments route → .videoFlush, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9503190Z ◇ Test case passing 2 arguments route → .videoRebuild, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9504080Z ◇ Test case passing 2 arguments route → .videoRebuild, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9504970Z ◇ Test case passing 2 arguments route → .hardwareFallback, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9505860Z ◇ Test case passing 2 arguments route → .hardwareFallback, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9506760Z ◇ Test case passing 2 arguments route → .softwareRestart, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9521510Z ◇ Test case passing 2 arguments route → .softwareRestart, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9522830Z ◇ Test case passing 2 arguments route → .audioFlush, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9523700Z ◇ Test case passing 2 arguments route → .audioFlush, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9524580Z ◇ Test case passing 2 arguments route → .audioRebuild, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9525460Z ◇ Test case passing 2 arguments route → .audioRebuild, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+2026-10-23T18:43:22.9526260Z ✔ Test recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) with 12 test cases passed after 0.001 seconds.
+2026-10-23T18:43:22.9526850Z ◇ Test furtherFailureObservationsDoNotRestartATerminalSession() started.
+2026-10-23T18:43:22.9527360Z ✔ Test furtherFailureObservationsDoNotRestartATerminalSession() passed after 0.001 seconds.
+2026-10-23T18:43:22.9527950Z ◇ Test terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+2026-10-23T18:43:22.9528770Z ◇ Test case passing 2 arguments stage → .enqueue, recoverability → .fatal to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+2026-10-23T18:43:22.9529770Z ◇ Test case passing 2 arguments stage → .enqueue, recoverability → .cancelled to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+2026-10-23T18:43:22.9530760Z ◇ Test case passing 2 arguments stage → .flush, recoverability → .fatal to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+2026-10-23T18:43:22.9531730Z ◇ Test case passing 2 arguments stage → .flush, recoverability → .cancelled to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+2026-10-23T18:43:22.9532710Z ◇ Test case passing 2 arguments stage → .render, recoverability → .fatal to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+2026-10-23T18:43:22.9533800Z ◇ Test case passing 2 arguments stage → .render, recoverability → .cancelled to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+2026-10-23T18:43:22.9534700Z ✔ Test terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) with 6 test cases passed after 0.001 seconds.
+2026-10-23T18:43:22.9535380Z ◇ Test pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+2026-10-23T18:43:22.9536240Z ◇ Test case passing 1 argument route → .videoFlush to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+2026-10-23T18:43:22.9537080Z ◇ Test case passing 1 argument route → .videoRebuild to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+2026-10-23T18:43:22.9537940Z ◇ Test case passing 1 argument route → .hardwareFallback to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+2026-10-23T18:43:22.9538790Z ◇ Test case passing 1 argument route → .softwareRestart to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+2026-10-23T18:43:22.9539620Z ◇ Test case passing 1 argument route → .audioFlush to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+2026-10-23T18:43:22.9540440Z ◇ Test case passing 1 argument route → .audioRebuild to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+2026-10-23T18:43:22.9541240Z ✔ Test pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) with 6 test cases passed after 0.001 seconds.
+2026-10-23T18:43:22.9541790Z ◇ Test seekingDoesNotRefundTheRendererBudget() started.
+2026-10-23T18:43:22.9542290Z ✔ Test seekingDoesNotRefundTheRendererBudget() passed after 0.001 seconds.
+2026-10-23T18:43:22.9542710Z ◇ Test aNewLoadRestoresTheBudgetAfterTerminalFailure() started.
+2026-10-23T18:43:22.9543150Z ✔ Test aNewLoadRestoresTheBudgetAfterTerminalFailure() passed after 0.001 seconds.
+2026-10-23T18:43:22.9543710Z ◇ Test overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) started.
+2026-10-23T18:43:22.9544460Z ◇ Test case passing 1 argument flushFirst → true to overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) started.
+2026-10-23T18:43:22.9545310Z ◇ Test case passing 1 argument flushFirst → false to overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) started.
+2026-10-23T18:43:22.9546150Z ✔ Test overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) with 2 test cases passed after 0.001 seconds.
+2026-10-23T18:43:22.9546790Z ◇ Test persistenceAndTeardownStillCompleteAfterTerminalFailure() started.
+2026-10-23T18:43:22.9547320Z ✔ Test persistenceAndTeardownStillCompleteAfterTerminalFailure() passed after 0.001 seconds.
+2026-10-23T18:43:22.9547890Z ◇ Test failureOfARecoveryEffectIsNotErasedByAnOlderOptionalTrackCompletion() started.
+2026-10-23T18:43:22.9548510Z ✔ Test failureOfARecoveryEffectIsNotErasedByAnOlderOptionalTrackCompletion() passed after 0.001 seconds.
+2026-10-23T18:43:22.9549070Z ◇ Test automaticObservationsCannotReopenATerminalRecovery(event:) started.
+2026-10-23T18:43:22.9550020Z ◇ Test case passing 1 argument event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.supplyObserved(starved: true, cacheMicroseconds: 0)) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+2026-10-23T18:43:22.9551900Z ◇ Test case passing 1 argument event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackCore.SynchronizedStream.video, revision: IlliquidPlaybackCore.MediaFormatRevisionID(rawValue: 1))) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+2026-10-23T18:43:22.9553380Z ◇ Test case passing 1 argument event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemWillSleep) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+2026-10-23T18:43:22.9554450Z ◇ Test case passing 1 argument event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemDidWake) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+2026-10-23T18:43:22.9555410Z ◇ Test case passing 1 argument event → .demuxEndOfFile(requiredDrain: Set([])) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+2026-10-23T18:43:22.9556170Z ✔ Test automaticObservationsCannotReopenATerminalRecovery(event:) with 5 test cases passed after 0.001 seconds.
+2026-10-23T18:43:22.9556770Z ◇ Test otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9558430Z ◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.seek(target: IlliquidPlaybackCore.MediaTimestamp.valid(IlliquidPlaybackCore.ValidMediaTime(value: 12, timescale: 1)), mode: IlliquidPlaybackCore.SeekMode.exact)), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9560690Z ◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.seek(target: IlliquidPlaybackCore.MediaTimestamp.valid(IlliquidPlaybackCore.ValidMediaTime(value: 12, timescale: 1)), mode: IlliquidPlaybackCore.SeekMode.exact)), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9562930Z ◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.seek(target: IlliquidPlaybackCore.MediaTimestamp.valid(IlliquidPlaybackCore.ValidMediaTime(value: 12, timescale: 1)), mode: IlliquidPlaybackCore.SeekMode.exact)), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9565290Z ◇ Test case passing 2 arguments event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackCore.SynchronizedStream.video, revision: IlliquidPlaybackCore.MediaFormatRevisionID(rawValue: 1))), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9567540Z ◇ Test case passing 2 arguments event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackCore.SynchronizedStream.video, revision: IlliquidPlaybackCore.MediaFormatRevisionID(rawValue: 1))), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9569780Z ◇ Test case passing 2 arguments event → .synchronization(IlliquidPlaybackCore.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackCore.SynchronizedStream.video, revision: IlliquidPlaybackCore.MediaFormatRevisionID(rawValue: 1))), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9571590Z ◇ Test case passing 2 arguments event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemDidWake), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9572990Z ◇ Test case passing 2 arguments event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemDidWake), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9574500Z ◇ Test case passing 2 arguments event → .lifecycle(IlliquidPlaybackCore.LifecycleCoreEvent.systemDidWake), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9575970Z ◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.setSubtitleDelay(microseconds: 250000)), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9577480Z ◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.setSubtitleDelay(microseconds: 250000)), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9578990Z ◇ Test case passing 2 arguments event → .command(IlliquidPlaybackCore.PlaybackCommand.setSubtitleDelay(microseconds: 250000)), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+2026-10-23T18:43:22.9580240Z ✔ Test otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) with 12 test cases passed after 0.002 seconds.
+2026-10-23T18:43:22.9580830Z ◇ Test aLateDeadlineDoesNotReplaceTheFirstTerminalError() started.
+2026-10-23T18:43:22.9581290Z ✔ Test aLateDeadlineDoesNotReplaceTheFirstTerminalError() passed after 0.001 seconds.
+2026-10-23T18:43:22.9581800Z ◇ Test transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) started.
+2026-10-23T18:43:22.9582430Z ◇ Test case passing 1 argument command → .play to transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) started.
+2026-10-23T18:43:22.9583170Z ◇ Test case passing 1 argument command → .pause to transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) started.
+2026-10-23T18:43:22.9583890Z ✔ Test transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) with 2 test cases passed after 0.001 seconds.
+2026-10-23T18:43:22.9584470Z ◇ Test spentBudgetSurvivesCodableRoundTripAndLegacyDocuments() started.
+2026-10-23T18:43:22.9584980Z ✔ Test spentBudgetSurvivesCodableRoundTripAndLegacyDocuments() passed after 0.001 seconds.
+2026-10-23T18:43:22.9585450Z ◇ Test exhaustedRevisionCountersFailWithoutOverflow() started.
+2026-10-23T18:43:22.9586000Z ✔ Test exhaustedRevisionCountersFailWithoutOverflow() passed after 0.001 seconds.
+2026-10-23T18:43:22.9586450Z ✔ Suite "Renderer recovery regression coverage" passed after 0.013 seconds.
+2026-10-23T18:43:22.9586830Z ◇ Suite "Playback bounded state-space explorer" started.
+2026-10-23T18:43:22.9587130Z ◇ Test exposesAllSixIndependentModels() started.
+2026-10-23T18:43:22.9587480Z ✔ Test exposesAllSixIndependentModels() passed after 0.001 seconds.
+2026-10-23T18:43:22.9587870Z ◇ Test everyModelPublishesACompleteScenarioInventory() started.
+2026-10-23T18:43:22.9588310Z ✔ Test everyModelPublishesACompleteScenarioInventory() passed after 0.001 seconds.
+2026-10-23T18:43:22.9588810Z ◇ Test modelVersionsRecordPendingSourceAndRecoveryDependencySemantics() started.
+2026-10-23T18:43:22.9589400Z ✔ Test modelVersionsRecordPendingSourceAndRecoveryDependencySemantics() passed after 0.001 seconds.
+2026-10-23T18:43:22.9589890Z ◇ Test approvedProfilesFreezeConservativeBounds() started.
+2026-10-23T18:43:22.9590310Z ✔ Test approvedProfilesFreezeConservativeBounds() passed after 0.001 seconds.
+2026-10-23T18:43:22.9590720Z ◇ Test trendPolicyFlagsCountAndNormalizationDrift() started.
+2026-10-23T18:43:22.9591150Z ✔ Test trendPolicyFlagsCountAndNormalizationDrift() passed after 0.001 seconds.
+2026-10-23T18:43:22.9591610Z ◇ Test canonicalizationIsIdempotentAndAlphaRenamingInvariant() started.
+2026-10-23T18:43:22.9592110Z ✔ Test canonicalizationIsIdempotentAndAlphaRenamingInvariant() passed after 0.001 seconds.
+2026-10-23T18:43:22.9592630Z ◇ Test canonicalizationPreservesBehaviorallyDistinctPendingEffects() started.
+2026-10-23T18:43:22.9593180Z ✔ Test canonicalizationPreservesBehaviorallyDistinctPendingEffects() passed after 0.001 seconds.
+2026-10-23T18:43:22.9593670Z ◇ Test equalKeysExposeEqualNormalizedEnabledActions() started.
+2026-10-23T18:43:22.9594120Z ✔ Test equalKeysExposeEqualNormalizedEnabledActions() passed after 0.001 seconds.
+2026-10-23T18:43:22.9594640Z ◇ Test aggregateRecoveryAndReplacementSuccessWaitForExecutorPrerequisites() started.
+2026-10-23T18:43:22.9595250Z ✔ Test aggregateRecoveryAndReplacementSuccessWaitForExecutorPrerequisites() passed after 0.001 seconds.
+2026-10-23T18:43:22.9595830Z ◇ Test recoveryExecutorPrerequisitesAdvanceAbstractMechanismLifecycle() started.
+2026-10-23T18:43:22.9596410Z ✔ Test recoveryExecutorPrerequisitesAdvanceAbstractMechanismLifecycle() passed after 0.001 seconds.
+2026-10-23T18:43:22.9596940Z ◇ Test recoveryPrerequisitesExposeOnlyDependencyReadyActions() started.
+2026-10-23T18:43:22.9597440Z ✔ Test recoveryPrerequisitesExposeOnlyDependencyReadyActions() passed after 0.001 seconds.
+2026-10-23T18:43:22.9597910Z ◇ Test explorerTerminatesAtConfiguredWallClockBudget() started.
+2026-10-23T18:43:22.9598370Z ✔ Test explorerTerminatesAtConfiguredWallClockBudget() passed after 0.001 seconds.
+2026-10-23T18:43:22.9598970Z ◇ Test recoveryMechanismLifecycleParticipatesInStableCanonicalDigest() started.
+2026-10-23T18:43:22.9599560Z ✔ Test recoveryMechanismLifecycleParticipatesInStableCanonicalDigest() passed after 0.001 seconds.
+2026-10-23T18:43:28.6529980Z ◇ Test actionCardinalityBudgetsControlFailureAndDuplicateClasses() started.
+2026-10-23T18:43:28.6534600Z ✔ Test actionCardinalityBudgetsControlFailureAndDuplicateClasses() passed after 0.001 seconds.
+2026-10-23T18:43:28.6535310Z ◇ Test layeredBFSIsDeterministicAndUsesProductionTransitions() started.
+2026-10-23T18:43:28.6538150Z ✔ Test layeredBFSIsDeterministicAndUsesProductionTransitions() passed after 0.093 seconds.
+2026-10-23T18:43:28.6538810Z ◇ Test everyAdvertisedSeedCanBeConstructed() started.
+2026-10-23T18:43:28.6539430Z ✔ Test everyAdvertisedSeedCanBeConstructed() passed after 0.001 seconds.
+2026-10-23T18:43:28.6539930Z ◇ Test allSixModelsCompleteAtValidationBounds() started.
+2026-10-23T18:43:28.6540870Z ✔ Test allSixModelsCompleteAtValidationBounds() passed after 0.024 seconds.
+2026-10-23T18:43:28.6542310Z ◇ Test syntheticFailureProducesStableReplayableArtifact() started.
+2026-10-23T18:43:28.6543470Z ✔ Test syntheticFailureProducesStableReplayableArtifact() passed after 0.005 seconds.
+2026-10-23T18:43:28.6543990Z ◇ Test causalMinimizerReplaysProductionCoreForEveryAcceptedCandidate() started.
+2026-10-23T18:43:28.6544570Z ✔ Test causalMinimizerReplaysProductionCoreForEveryAcceptedCandidate() passed after 0.001 seconds.
+2026-10-23T18:43:28.6545120Z ◇ Test progressAnalysisSeparatesNamedWaitsCutoffsAndStuckSCCs() started.
+2026-10-23T18:43:28.6545640Z ✔ Test progressAnalysisSeparatesNamedWaitsCutoffsAndStuckSCCs() passed after 0.001 seconds.
+2026-10-23T18:43:28.6546120Z ◇ Test externalSubtitleSeedHasNoStuckProgressStates() started.
+2026-10-23T18:43:28.6546550Z ✔ Test externalSubtitleSeedHasNoStuckProgressStates() passed after 2.064 seconds.
+2026-10-23T18:43:28.6547030Z ◇ Test conservativePORMatchesUnreducedReachabilityAndFailures() started.
+2026-10-23T18:43:28.6547560Z ✔ Test conservativePORMatchesUnreducedReachabilityAndFailures() passed after 0.009 seconds.
+2026-10-23T18:43:28.6548070Z ◇ Test porValidationReportsEveryNonCommutingCandidatePair() started.
+2026-10-23T18:43:28.6548550Z ✔ Test porValidationReportsEveryNonCommutingCandidatePair() passed after 0.001 seconds.
+2026-10-23T18:43:28.6549090Z ◇ Test eligibleArtifactPromotesToRuntimeScheduleWithoutInventingMechanisms() started.
+2026-10-23T18:43:28.6549710Z ✔ Test eligibleArtifactPromotesToRuntimeScheduleWithoutInventingMechanisms() passed after 0.001 seconds.
+2026-10-23T18:43:28.6550270Z ✔ Suite "Playback bounded state-space explorer" passed after 2.203 seconds.
+2026-10-23T18:43:28.6550710Z ◇ Suite "Playback coordinator" started.
+2026-10-23T18:43:28.6551080Z ◇ Test closingVideoUnloadsMetadataAndRejectsLateCallbacks(loaded:) started.
+2026-10-23T18:43:28.6551690Z ◇ Test case passing 1 argument loaded → false to closingVideoUnloadsMetadataAndRejectsLateCallbacks(loaded:) started.
+2026-10-23T18:43:28.6552390Z ◇ Test case passing 1 argument loaded → true to closingVideoUnloadsMetadataAndRejectsLateCallbacks(loaded:) started.
+2026-10-23T18:43:28.6553100Z ✔ Test closingVideoUnloadsMetadataAndRejectsLateCallbacks(loaded:) with 2 test cases passed after 0.009 seconds.
+2026-10-23T18:43:28.6553790Z ◇ Test videoTabActivationRestoresPositionWithoutPersistentHistory(paused:) started.
+2026-10-23T18:43:28.6554450Z ◇ Test case passing 1 argument paused → true to videoTabActivationRestoresPositionWithoutPersistentHistory(paused:) started.
+2026-10-23T18:43:28.6555200Z ◇ Test case passing 1 argument paused → false to videoTabActivationRestoresPositionWithoutPersistentHistory(paused:) started.
+2026-10-23T18:43:28.6555950Z ✔ Test videoTabActivationRestoresPositionWithoutPersistentHistory(paused:) with 2 test cases passed after 0.002 seconds.
+2026-10-23T18:43:28.6556520Z ◇ Test videoTabActivationRejectsLateLoadFromPreviousTab() started.
+2026-10-23T18:43:28.6556990Z ✔ Test videoTabActivationRejectsLateLoadFromPreviousTab() passed after 0.001 seconds.
+2026-10-23T18:43:28.6557740Z ◇ Test chapterSelectionUsesIdentifiedSeekAndRestoresTransport(paused:) started.
+2026-10-23T18:43:28.6558390Z ◇ Test case passing 1 argument paused → false to chapterSelectionUsesIdentifiedSeekAndRestoresTransport(paused:) started.
+2026-10-23T18:43:28.6559100Z ◇ Test case passing 1 argument paused → true to chapterSelectionUsesIdentifiedSeekAndRestoresTransport(paused:) started.
+2026-10-23T18:43:28.6559920Z ✔ Test chapterSelectionUsesIdentifiedSeekAndRestoresTransport(paused:) with 2 test cases passed after 0.078 seconds.
+2026-10-23T18:43:28.6560600Z ◇ Test chapterSelectionSupersedesPendingSkipsAndRejectsOldCompletion() started.
+2026-10-23T18:43:28.6561200Z ✔ Test chapterSelectionSupersedesPendingSkipsAndRejectsOldCompletion() passed after 0.216 seconds.
+2026-10-23T18:43:28.6561940Z ◇ Test oversizedSeekAndSubtitleTimestampsAreRejectedWithoutIntegerTraps() started.
+2026-10-23T18:43:28.6562600Z ✔ Test oversizedSeekAndSubtitleTimestampsAreRejectedWithoutIntegerTraps() passed after 0.002 seconds.
+2026-10-23T18:43:28.6563220Z ◇ Test rapidSkipReversalClampsAtBothBoundariesAndPreservesPause() started.
+2026-10-23T18:43:28.6564720Z ✔ Test rapidSkipReversalClampsAtBothBoundariesAndPreservesPause() passed after 0.297 seconds.
+2026-10-23T18:43:28.6565300Z ◇ Test pendingSkipsDoNotStartAfterSleepOrShutdown() started.
+2026-10-23T18:43:28.6565740Z ✔ Test pendingSkipsDoNotStartAfterSleepOrShutdown() passed after 0.265 seconds.
+2026-10-23T18:43:28.6566260Z ◇ Test rapidRelativeSkipsCoalesceNativeWorkAndExposeTheFinalExactTarget() started.
+2026-10-23T18:43:28.6566870Z ✔ Test rapidRelativeSkipsCoalesceNativeWorkAndExposeTheFinalExactTarget() passed after 0.205 seconds.
+2026-10-23T18:43:28.6567460Z ◇ Test absoluteSeekAndStopRetirePendingRelativeSkips() started.
+2026-10-23T18:43:28.6567950Z ✔ Test absoluteSeekAndStopRetirePendingRelativeSkips() passed after 0.350 seconds.
+2026-10-23T18:43:28.6568470Z ◇ Test uxVerificationClearThenQuitDoesNotRecreateClearedProgress() started.
+2026-10-23T18:43:28.6569100Z ✔ Test uxVerificationClearThenQuitDoesNotRecreateClearedProgress() passed after 0.019 seconds.
+2026-10-23T18:43:28.6569690Z ◇ Test uxVerificationShutdownReportsFailedSaveWithoutSkippingNativeCleanup() started.
+2026-10-23T18:43:28.6570310Z ✔ Test uxVerificationShutdownReportsFailedSaveWithoutSkippingNativeCleanup() passed after 0.051 seconds.
+2026-10-23T18:43:28.6570940Z ◇ Test clearedProgressSurvivesPauseAndRepeatedPositionButRecordsFurtherPlayback() started.
+2026-10-23T18:43:28.6571610Z ✔ Test clearedProgressSurvivesPauseAndRepeatedPositionButRecordsFurtherPlayback() passed after 0.054 seconds.
+2026-10-23T18:43:28.6572220Z ◇ Test unverifiedContentCanAdvanceWithoutOverwritingEarlierHistory() started.
+2026-10-23T18:43:28.6572810Z ✔ Test unverifiedContentCanAdvanceWithoutOverwritingEarlierHistory() passed after 0.086 seconds.
+2026-10-23T18:43:28.6573350Z ◇ Test unchangedVersionKeepsResumeAndLocatedVersionKeepsSettings() started.
+2026-10-23T18:43:28.6573990Z ✔ Test unchangedVersionKeepsResumeAndLocatedVersionKeepsSettings() passed after 0.046 seconds.
+2026-10-23T18:43:28.6574680Z ◇ Test changedOrUnverifiedContentDoesNotInheritResumeAndPerFileChoices(unverified:) started.
+2026-10-23T18:43:28.6575440Z ◇ Test case passing 1 argument unverified → false to changedOrUnverifiedContentDoesNotInheritResumeAndPerFileChoices(unverified:) started.
+2026-10-23T18:43:28.6576390Z ◇ Test case passing 1 argument unverified → true to changedOrUnverifiedContentDoesNotInheritResumeAndPerFileChoices(unverified:) started.
+2026-10-23T18:43:28.6577200Z ✔ Test changedOrUnverifiedContentDoesNotInheritResumeAndPerFileChoices(unverified:) with 2 test cases passed after 0.062 seconds.
+2026-10-23T18:43:28.6577800Z ◇ Test changedRestoreStartsAtZeroButKeepsPausedIntent() started.
+2026-10-23T18:43:28.6578260Z ✔ Test changedRestoreStartsAtZeroButKeepsPausedIntent() passed after 0.043 seconds.
+2026-10-23T18:43:28.6578710Z ◇ Test blockedRestoreDoesNotBlockFinderOpenOrShutdown() started.
+2026-10-23T18:43:28.6579310Z ✔ Test blockedRestoreDoesNotBlockFinderOpenOrShutdown() passed after 0.015 seconds.
+2026-10-23T18:43:28.6579870Z ◇ Test shutdownJoinsBlockedSaveWithoutBlockingMainActorOrLosingLatestProgress() started.
+2026-10-23T18:43:28.6580660Z ✔ Test shutdownJoinsBlockedSaveWithoutBlockingMainActorOrLosingLatestProgress() passed after 0.225 seconds.
+2026-10-23T18:43:28.6581210Z ◇ Test failedCheckpointDoesNotAdvanceThePlaylist() started.
+2026-10-23T18:43:28.6581630Z ✔ Test failedCheckpointDoesNotAdvanceThePlaylist() passed after 0.062 seconds.
+2026-10-23T18:43:28.6582100Z ◇ Test directOpenResolvesAliasesAndStopRejectsPendingPreparation() started.
+2026-10-23T18:43:28.6582640Z ✔ Test directOpenResolvesAliasesAndStopRejectsPendingPreparation() passed after 0.065 seconds.
+2026-10-23T18:43:28.6583230Z ◇ Test finderFolderClassificationSharesCancellationAndCanonicalPreparation() started.
+2026-10-23T18:43:28.6583850Z ✔ Test finderFolderClassificationSharesCancellationAndCanonicalPreparation() passed after 0.074 seconds.
+2026-10-23T18:43:28.6584430Z ◇ Test finderRequestsRetainFolderOrderAndAppendDuringPreroll() started.
+2026-10-23T18:43:28.6584940Z ✔ Test finderRequestsRetainFolderOrderAndAppendDuringPreroll() passed after 0.053 seconds.
+2026-10-23T18:43:28.6585560Z ◇ Test preferredAudioOutputPersistsAndReappliesWhenAvailable() started.
+2026-10-23T18:43:28.6586060Z ✔ Test preferredAudioOutputPersistsAndReappliesWhenAvailable() passed after 0.002 seconds.
+2026-10-23T18:43:28.6586600Z ◇ Test audioOutputSelectionFailureIsPersistentWithoutFailingPlayback() started.
+2026-10-23T18:43:28.6587170Z ✔ Test audioOutputSelectionFailureIsPersistentWithoutFailingPlayback() passed after 0.013 seconds.
+2026-10-23T18:43:28.6587680Z ◇ Test disablingVideoColorSamplingResetsPublishedColor() started.
+2026-10-23T18:43:28.6588150Z ✔ Test disablingVideoColorSamplingResetsPublishedColor() passed after 0.002 seconds.
+2026-10-23T18:43:28.6588620Z ◇ Test productionUsesPlanarWithIsolatedBenchmarkOverrides() started.
+2026-10-23T18:43:28.6589110Z ✔ Test productionUsesPlanarWithIsolatedBenchmarkOverrides() passed after 0.001 seconds.
+2026-10-23T18:43:28.6589610Z ◇ Test benchmarkControlRequiresExactBundleOverrideAndSession() started.
+2026-10-23T18:43:28.6590270Z ✔ Test benchmarkControlRequiresExactBundleOverrideAndSession() passed after 0.001 seconds.
+2026-10-23T18:43:28.6590880Z ◇ Test benchmarkControlAcknowledgesTransportAndSeekCompletion() started.
+2026-10-23T18:43:28.6591420Z [benchmark-control] session=session-1 id=pause-1 action=pause phase=request accepted=yes
+2026-10-23T18:43:28.6592040Z [benchmark-control] session=session-1 id=pause-1 action=pause phase=completed accepted=yes result=transport-confirmed paused=yes elapsed-ms=0.185
+2026-10-23T18:43:28.6592670Z [benchmark-control] session=session-1 id=seek-1 action=seek-exact phase=request accepted=yes
+2026-10-23T18:43:28.6593300Z [benchmark-control] session=session-1 id=seek-1 action=seek-exact phase=completed accepted=yes result=seek-pipeline-completed elapsed-ms=0.054
+2026-10-23T18:43:28.6594150Z ✔ Test benchmarkControlAcknowledgesTransportAndSeekCompletion() passed after 0.014 seconds.
+2026-10-23T18:43:28.6594690Z ◇ Test benchmarkControlCapturesSynchronousTransportCompletion() started.
+2026-10-23T18:43:28.6595150Z [benchmark-control] session=session-1 id=pause-sync action=pause phase=request accepted=yes
+2026-10-23T18:43:28.6595890Z [benchmark-control] session=session-1 id=pause-sync action=pause phase=completed accepted=yes result=transport-confirmed paused=yes elapsed-ms=0.026
+2026-10-23T18:43:28.6596600Z ✔ Test benchmarkControlCapturesSynchronousTransportCompletion() passed after 0.017 seconds.
+2026-10-23T18:43:28.6597110Z ◇ Test loadedEventRestoresResumePositionThroughNativeRuntime() started.
+2026-10-23T18:43:28.6597660Z ✔ Test loadedEventRestoresResumePositionThroughNativeRuntime() passed after 0.019 seconds.
+2026-10-23T18:43:28.6598210Z ◇ Test durationPublishedDuringPrerollEnablesTimeline() started.
+2026-10-23T18:43:28.6598680Z ✔ Test durationPublishedDuringPrerollEnablesTimeline() passed after 0.018 seconds.
+2026-10-23T18:43:28.6599140Z ◇ Test staleEventsAreRejectedAndEOFAdvancesPlaylist() started.
+2026-10-23T18:43:28.6599580Z ✔ Test staleEventsAreRejectedAndEOFAdvancesPlaylist() passed after 0.028 seconds.
+2026-10-23T18:43:28.6600150Z ◇ Test openingFolderUsesDisplayedOrderAndStartsFirstPlayableItem() started.
+2026-10-23T18:43:28.6600700Z ✔ Test openingFolderUsesDisplayedOrderAndStartsFirstPlayableItem() passed after 0.039 seconds.
+2026-10-23T18:43:28.6601250Z ◇ Test sourceBrowserSelectionPlaysTheExactFileWithinItsFolderScope() started.
+2026-10-23T18:43:28.6601900Z ✔ Test sourceBrowserSelectionPlaysTheExactFileWithinItsFolderScope() passed after 0.089 seconds.
+2026-10-23T18:43:28.6602440Z ◇ Test appendPreservesCurrentWhileReplaceStartsTheNewSelection() started.
+2026-10-23T18:43:28.6602960Z ✔ Test appendPreservesCurrentWhileReplaceStartsTheNewSelection() passed after 0.086 seconds.
+2026-10-23T18:43:28.6603520Z ◇ Test failedCandidateKeepsCommittedPlaylistSourceAndPersistenceAuthority() started.
+2026-10-23T18:43:28.6604320Z ✔ Test failedCandidateKeepsCommittedPlaylistSourceAndPersistenceAuthority() passed after 0.030 seconds.
+2026-10-23T18:43:28.6604930Z ◇ Test failedAdvanceCanRetryOrSkipWithoutMovingCommittedIdentity() started.
+2026-10-23T18:43:28.6605500Z ✔ Test failedAdvanceCanRetryOrSkipWithoutMovingCommittedIdentity() passed after 0.019 seconds.
+2026-10-23T18:43:28.6606150Z ◇ Test unavailableRestoreCanBeForgottenWithoutDeletingHistory() started.
+2026-10-23T18:43:28.6606660Z ✔ Test unavailableRestoreCanBeForgottenWithoutDeletingHistory() passed after 0.019 seconds.
+2026-10-23T18:43:28.6607220Z ◇ Test subtitleEncodingPreferenceSurvivesOtherPreferenceChangesAndRelaunch() started.
+2026-10-23T18:43:28.6607950Z ✔ Test subtitleEncodingPreferenceSurvivesOtherPreferenceChangesAndRelaunch() passed after 0.004 seconds.
+2026-10-23T18:43:28.6608490Z ◇ Test locatedRestoreCommitsOnlyAfterSuccessfulOpen() started.
+2026-10-23T18:43:28.6608920Z ✔ Test locatedRestoreCommitsOnlyAfterSuccessfulOpen() passed after 0.101 seconds.
+2026-10-23T18:43:28.6609520Z ◇ Test candidatePrerollAtomicallyCommitsPlaylistSourceAndPersistence() started.
+2026-10-23T18:43:28.6610120Z ✔ Test candidatePrerollAtomicallyCommitsPlaylistSourceAndPersistence() passed after 0.069 seconds.
+2026-10-23T18:43:28.6610780Z ◇ Test mixedFolderAndFileDropExpandsAndDeduplicatesEverything() started.
+2026-10-23T18:43:28.6611300Z ✔ Test mixedFolderAndFileDropExpandsAndDeduplicatesEverything() passed after 0.060 seconds.
+2026-10-23T18:43:28.6611920Z ◇ Test subtitleOnlyDropLoadsOneAndReportsTheNativeMultiTrackLimit() started.
+2026-10-23T18:43:28.6612470Z ✔ Test subtitleOnlyDropLoadsOneAndReportsTheNativeMultiTrackLimit() passed after 0.059 seconds.
+2026-10-23T18:43:28.6613010Z ◇ Test sortingChangesPlaybackOrderWithoutChangingCurrentIdentity() started.
+2026-10-23T18:43:28.6613640Z ✔ Test sortingChangesPlaybackOrderWithoutChangingCurrentIdentity() passed after 0.021 seconds.
+2026-10-23T18:43:28.6614170Z ◇ Test repeatAndShuffleRemainVisibleAndPreserveCurrentIdentity() started.
+2026-10-23T18:43:28.6614890Z ✔ Test repeatAndShuffleRemainVisibleAndPreserveCurrentIdentity() passed after 0.038 seconds.
+2026-10-23T18:43:28.6615420Z ◇ Test repeatOneReloadsTheCompletedItemFromTheBeginning() started.
+2026-10-23T18:43:28.6615890Z ✔ Test repeatOneReloadsTheCompletedItemFromTheBeginning() passed after 0.034 seconds.
+2026-10-23T18:43:28.6616360Z ◇ Test finalEOFKeepsSourceAndQueueAndPlaySeeksBackToStart() started.
+2026-10-23T18:43:28.6616840Z ✔ Test finalEOFKeepsSourceAndQueueAndPlaySeeksBackToStart() passed after 0.034 seconds.
+2026-10-23T18:43:28.6617320Z ◇ Test ordinaryRestoreHonorsPausedRestorePreference(paused:) started.
+2026-10-23T18:43:28.6622890Z ◇ Test case passing 1 argument paused → true to ordinaryRestoreHonorsPausedRestorePreference(paused:) started.
+2026-10-23T18:43:28.6623550Z ◇ Test case passing 1 argument paused → false to ordinaryRestoreHonorsPausedRestorePreference(paused:) started.
+2026-10-23T18:43:28.6624200Z ✔ Test ordinaryRestoreHonorsPausedRestorePreference(paused:) with 2 test cases passed after 0.017 seconds.
+2026-10-23T18:43:28.6624750Z ◇ Test historyOptOutBlocksSessionRestoreAndFinalCheckpoint() started.
+2026-10-23T18:43:28.6625410Z ✔ Test historyOptOutBlocksSessionRestoreAndFinalCheckpoint() passed after 0.019 seconds.
+2026-10-23T18:43:28.6625890Z ◇ Test repeatAllWrapsFromTheLastDisplayedItemToTheFirst() started.
+2026-10-23T18:43:28.6626470Z ✔ Test repeatAllWrapsFromTheLastDisplayedItemToTheFirst() passed after 0.028 seconds.
+2026-10-23T18:43:28.6627060Z ◇ Test restoresDirectPlaylistIndexPausedStateAndExactPosition() started.
+2026-10-23T18:43:28.6627640Z ✔ Test restoresDirectPlaylistIndexPausedStateAndExactPosition() passed after 0.010 seconds.
+2026-10-23T18:43:28.6628230Z ◇ Test finderOpenSupersedesPausedRestoreForEveryRestoredField() started.
+2026-10-23T18:43:28.6628740Z ✔ Test finderOpenSupersedesPausedRestoreForEveryRestoredField() passed after 0.038 seconds.
+2026-10-23T18:43:28.6629390Z ◇ Test sameFileFinderOpenSupersedesRestoreAfterNativeLoadBegins(restoreCompleted:) started.
+2026-10-23T18:43:28.6630200Z ◇ Test case passing 1 argument restoreCompleted → false to sameFileFinderOpenSupersedesRestoreAfterNativeLoadBegins(restoreCompleted:) started.
+2026-10-23T18:43:28.6631180Z ◇ Test case passing 1 argument restoreCompleted → true to sameFileFinderOpenSupersedesRestoreAfterNativeLoadBegins(restoreCompleted:) started.
+2026-10-23T18:43:28.6632080Z ✔ Test sameFileFinderOpenSupersedesRestoreAfterNativeLoadBegins(restoreCompleted:) with 2 test cases passed after 0.050 seconds.
+2026-10-23T18:43:28.6632740Z ◇ Test failedSameSourceReloadPreservesCommittedSessionIdentity(failPreroll:) started.
+2026-10-23T18:43:28.6633420Z ◇ Test case passing 1 argument failPreroll → false to failedSameSourceReloadPreservesCommittedSessionIdentity(failPreroll:) started.
+2026-10-23T18:43:28.6634310Z ◇ Test case passing 1 argument failPreroll → true to failedSameSourceReloadPreservesCommittedSessionIdentity(failPreroll:) started.
+2026-10-23T18:43:28.6635190Z ✔ Test failedSameSourceReloadPreservesCommittedSessionIdentity(failPreroll:) with 2 test cases passed after 0.003 seconds.
+2026-10-23T18:43:28.6635750Z ◇ Test shuffleRestoresBaseOrderAcrossRelaunch() started.
+2026-10-23T18:43:28.6636170Z ✔ Test shuffleRestoresBaseOrderAcrossRelaunch() passed after 0.027 seconds.
+2026-10-23T18:43:28.6636600Z ◇ Test unshuffleRetainsAdditionsAndOmitsRemovedEntries() started.
+2026-10-23T18:43:28.6637060Z ✔ Test unshuffleRetainsAdditionsAndOmitsRemovedEntries() passed after 0.001 seconds.
+2026-10-23T18:43:28.6637650Z ◇ Test unavailableRestoreRetainsSessionAndCanRetry(folderSource:) started.
+2026-10-23T18:43:28.6638250Z ◇ Test case passing 1 argument folderSource → false to unavailableRestoreRetainsSessionAndCanRetry(folderSource:) started.
+2026-10-23T18:43:28.6639030Z ◇ Test case passing 1 argument folderSource → true to unavailableRestoreRetainsSessionAndCanRetry(folderSource:) started.
+2026-10-23T18:43:28.6639980Z ✔ Test unavailableRestoreRetainsSessionAndCanRetry(folderSource:) with 2 test cases passed after 0.062 seconds.
+2026-10-23T18:43:28.6642480Z ◇ Test rewatchCheckpointOverridesHistoricalCompletedBadge() started.
+2026-10-23T18:43:28.6643020Z ✔ Test rewatchCheckpointOverridesHistoricalCompletedBadge() passed after 0.009 seconds.
+2026-10-23T18:43:28.6643540Z ◇ Test completedSessionRestoresAtStartInsteadOfTheFinalSeconds() started.
+2026-10-23T18:43:28.6644070Z ✔ Test completedSessionRestoresAtStartInsteadOfTheFinalSeconds() passed after 0.010 seconds.
+2026-10-23T18:43:28.6644590Z ◇ Test batchOpenOfStoppedCurrentFileCreatesANewPlaybackSession() started.
+2026-10-23T18:43:28.6645120Z ✔ Test batchOpenOfStoppedCurrentFileCreatesANewPlaybackSession() passed after 0.016 seconds.
+2026-10-23T18:43:28.6645620Z ◇ Test quittingAfterStopKeepsTheLastPlaybackCheckpoint() started.
+2026-10-23T18:43:28.6646080Z ✔ Test quittingAfterStopKeepsTheLastPlaybackCheckpoint() passed after 0.014 seconds.
+2026-10-23T18:43:28.6646600Z ◇ Test shutdownFlushesLatestProgressWithoutDependingOnDebouncedTask() started.
+2026-10-23T18:43:28.6647180Z ✔ Test shutdownFlushesLatestProgressWithoutDependingOnDebouncedTask() passed after 0.009 seconds.
+2026-10-23T18:43:28.6647640Z ◇ Test shutdownIsForwardedExactlyOnce() started.
+2026-10-23T18:43:28.6648090Z ✔ Test shutdownIsForwardedExactlyOnce() passed after 0.001 seconds.
+2026-10-23T18:43:28.6648550Z ◇ Test repeatedAudioRouteChangesReprerollWithoutConsumingFailureRecovery() started.
+2026-10-23T18:43:28.6649160Z ✔ Test repeatedAudioRouteChangesReprerollWithoutConsumingFailureRecovery() passed after 0.012 seconds.
+2026-10-23T18:43:28.6649700Z ◇ Test audioRouteChangePreservesAnInFlightUserSeekTarget() started.
+2026-10-23T18:43:28.6650180Z ✔ Test audioRouteChangePreservesAnInFlightUserSeekTarget() passed after 0.018 seconds.
+2026-10-23T18:43:28.6650660Z ◇ Test lifecycleResumeDecisionComesFromDeterministicCore() started.
+2026-10-23T18:43:28.6651130Z ✔ Test lifecycleResumeDecisionComesFromDeterministicCore() passed after 0.010 seconds.
+2026-10-23T18:43:28.6651640Z ◇ Test pictureInPictureStateAndCommandsUseNativeRuntimeContract() started.
+2026-10-23T18:43:28.8280010Z ✔ Test pictureInPictureStateAndCommandsUseNativeRuntimeContract() passed after 0.010 seconds.
+2026-10-23T18:43:28.8281390Z ◇ Test capabilitiesGateUnavailableNativeFeatures() started.
+2026-10-23T18:43:28.8282020Z ✔ Test capabilitiesGateUnavailableNativeFeatures() passed after 0.007 seconds.
+2026-10-23T18:43:28.8282520Z ◇ Test capabilityModelIsTheSharedOperationSourceOfTruth() started.
+2026-10-23T18:43:28.8283000Z ✔ Test capabilityModelIsTheSharedOperationSourceOfTruth() passed after 0.001 seconds.
+2026-10-23T18:43:28.8283520Z ◇ Test unsupportedPersistedPlaybackSpeedIsSanitizedBeforePublication() started.
+2026-10-23T18:43:28.8284110Z ✔ Test unsupportedPersistedPlaybackSpeedIsSanitizedBeforePublication() passed after 0.001 seconds.
+2026-10-23T18:43:28.8284670Z ◇ Test productionDriverPreservesEffectIdentityAcrossHostileResults() started.
+2026-10-23T18:43:28.8285330Z ✔ Test productionDriverPreservesEffectIdentityAcrossHostileResults() passed after 0.001 seconds.
+2026-10-23T18:43:28.8285910Z ◇ Test invariantFailureStillPhysicallyShutsDownRuntime() started.
+2026-10-23T18:43:28.8286380Z ✔ Test invariantFailureStillPhysicallyShutsDownRuntime() passed after 0.001 seconds.
+2026-10-23T18:43:28.8286900Z ◇ Test coreTrackAndSubtitleCommandsPublishOnlyAcknowledgedValues() started.
+2026-10-23T18:43:28.8287440Z ✔ Test coreTrackAndSubtitleCommandsPublishOnlyAcknowledgedValues() passed after 0.023 seconds.
+2026-10-23T18:43:28.8287980Z ◇ Test externalLanguageRestoreWaitsForTheInstalledSidecarCatalog() started.
+2026-10-23T18:43:28.8288540Z ✔ Test externalLanguageRestoreWaitsForTheInstalledSidecarCatalog() passed after 0.012 seconds.
+2026-10-23T18:43:28.8289070Z ◇ Test perFileTrackSubtitleVisibilityAndDelayRestoreByMetadata() started.
+2026-10-23T18:43:28.8289600Z ✔ Test perFileTrackSubtitleVisibilityAndDelayRestoreByMetadata() passed after 0.049 seconds.
+2026-10-23T18:43:28.8290070Z ✔ Suite "Playback coordinator" passed after 3.597 seconds.
+2026-10-23T18:43:28.8290430Z ◇ Suite "Relative seek effect lifetime" started.
+2026-10-23T18:43:28.8291080Z ◇ Test burstRetainsOnlyDispatchedWorkAndTheLatestDeferredSeek() started.
+2026-10-23T18:43:28.8291810Z ✔ Test burstRetainsOnlyDispatchedWorkAndTheLatestDeferredSeek() passed after 0.005 seconds.
+2026-10-23T18:43:28.8292380Z ◇ Test retiredCancellationIsDuplicateAndPreservesTheLatestTarget() started.
+2026-10-23T18:43:28.8293040Z ✔ Test retiredCancellationIsDuplicateAndPreservesTheLatestTarget() passed after 0.001 seconds.
+2026-10-23T18:43:28.8293610Z ◇ Test exactSeekAndStopRetireUndispatchedRelativeWork(stop:) started.
+2026-10-23T18:43:28.8294180Z ◇ Test case passing 1 argument stop → false to exactSeekAndStopRetireUndispatchedRelativeWork(stop:) started.
+2026-10-23T18:43:28.8294840Z ◇ Test case passing 1 argument stop → true to exactSeekAndStopRetireUndispatchedRelativeWork(stop:) started.
+2026-10-23T18:43:28.8295500Z ✔ Test exactSeekAndStopRetireUndispatchedRelativeWork(stop:) with 2 test cases passed after 0.001 seconds.
+2026-10-23T18:43:28.8296090Z ◇ Test dispatchedSeekRemainsNativeOwnedUntilItsLateResultArrives() started.
+2026-10-23T18:43:28.8296660Z ✔ Test dispatchedSeekRemainsNativeOwnedUntilItsLateResultArrives() passed after 0.001 seconds.
+2026-10-23T18:43:28.8297470Z ◇ Test presentationRecoveryRetiresDeferredSeekInTheSameGeneration(rebuild:autoplay:) started.
+2026-10-23T18:43:28.8298330Z ◇ Test case passing 2 arguments rebuild → false, autoplay → false to presentationRecoveryRetiresDeferredSeekInTheSameGeneration(rebuild:autoplay:) started.
+2026-10-23T18:43:28.8299300Z ◇ Test case passing 2 arguments rebuild → false, autoplay → true to presentationRecoveryRetiresDeferredSeekInTheSameGeneration(rebuild:autoplay:) started.
+2026-10-23T18:43:28.8300260Z ◇ Test case passing 2 arguments rebuild → true, autoplay → false to presentationRecoveryRetiresDeferredSeekInTheSameGeneration(rebuild:autoplay:) started.
+2026-10-23T18:43:28.8301220Z ◇ Test case passing 2 arguments rebuild → true, autoplay → true to presentationRecoveryRetiresDeferredSeekInTheSameGeneration(rebuild:autoplay:) started.
+2026-10-23T18:43:28.8302290Z ✔ Test presentationRecoveryRetiresDeferredSeekInTheSameGeneration(rebuild:autoplay:) with 4 test cases passed after 0.001 seconds.
+2026-10-23T18:43:28.8303030Z ◇ Test formatRevisionRetiresDeferredSeekInTheSameGeneration(stream:autoplay:) started.
+2026-10-23T18:43:28.8303800Z ◇ Test case passing 2 arguments stream → .video, autoplay → false to formatRevisionRetiresDeferredSeekInTheSameGeneration(stream:autoplay:) started.
+2026-10-23T18:43:28.8304830Z ◇ Test case passing 2 arguments stream → .video, autoplay → true to formatRevisionRetiresDeferredSeekInTheSameGeneration(stream:autoplay:) started.
+2026-10-23T18:43:28.8305730Z ◇ Test case passing 2 arguments stream → .audio, autoplay → false to formatRevisionRetiresDeferredSeekInTheSameGeneration(stream:autoplay:) started.
+2026-10-23T18:43:28.8306620Z ◇ Test case passing 2 arguments stream → .audio, autoplay → true to formatRevisionRetiresDeferredSeekInTheSameGeneration(stream:autoplay:) started.
+2026-10-23T18:43:28.8307450Z ✔ Test formatRevisionRetiresDeferredSeekInTheSameGeneration(stream:autoplay:) with 4 test cases passed after 0.001 seconds.
+2026-10-23T18:43:28.8308100Z ◇ Test subtitleOnlyInvalidationPreservesDeferredSeekAndSleepHandoff() started.
+2026-10-23T18:43:28.8308680Z ✔ Test subtitleOnlyInvalidationPreservesDeferredSeekAndSleepHandoff() passed after 0.001 seconds.
+2026-10-23T18:43:28.8309310Z ◇ Test sleepDispatchesTheCurrentDeferredSeekWithoutCancellingItsEffect() started.
+2026-10-23T18:43:28.8309930Z ✔ Test sleepDispatchesTheCurrentDeferredSeekWithoutCancellingItsEffect() passed after 0.001 seconds.
+2026-10-23T18:43:28.8310520Z ◇ Test observerCanReenterWithDuplicateCancellationAfterRetirement() started.
+2026-10-23T18:43:28.8311090Z ✔ Test observerCanReenterWithDuplicateCancellationAfterRetirement() passed after 0.001 seconds.
+2026-10-23T18:43:28.8311620Z ◇ Test shutdownFinalizesWithoutDispatchingTheDeferredSeek() started.
+2026-10-23T18:43:28.8312110Z ✔ Test shutdownFinalizesWithoutDispatchingTheDeferredSeek() passed after 0.064 seconds.
+2026-10-23T18:43:28.8312770Z ✔ Suite "Relative seek effect lifetime" passed after 0.075 seconds.
+2026-10-23T18:43:28.8313260Z ✔ Test run with 186 tests in 10 suites passed after 6.150 seconds.
+2026-10-23T18:43:28.8333260Z swift-driver version: 1.148.6 
+2026-10-23T18:43:28.8442500Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-23T18:43:28.8442820Z with:
+2026-10-23T18:43:28.8442980Z   name: completed-effect-history-integration
+2026-10-23T18:43:28.8443260Z   path: /Users/runner/work/_temp/effect-history-integration/
+2026-10-23T18:43:28.8443510Z   retention-days: 14
+2026-10-23T18:43:28.8443670Z   if-no-files-found: warn
+2026-10-23T18:43:28.8443830Z   compression-level: 6
+2026-10-23T18:43:28.8443980Z   overwrite: false
+2026-10-23T18:43:28.8444130Z   include-hidden-files: false
+2026-10-23T18:43:28.8444300Z env:
+2026-10-23T18:43:28.8444490Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+2026-10-23T18:43:28.8447240Z   PKG_CONFIG_LIBDIR: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-23T18:43:28.8452420Z   PKG_CONFIG_PATH: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+2026-10-23T18:43:28.8455040Z ##[endgroup]
+2026-10-23T18:43:29.0639650Z (node:9892) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-23T18:43:29.0640290Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-23T18:43:29.0674810Z With the provided path, there will be 2 files uploaded
+2026-10-23T18:43:29.0677670Z Artifact name is valid!
+2026-10-23T18:43:29.0678010Z Root directory input is valid!
+2026-10-23T18:43:29.5016390Z (node:9892) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-23T18:43:29.5169380Z Beginning upload of artifact content to blob storage
+2026-10-23T18:43:29.7531410Z Uploaded bytes 10893
+2026-10-23T18:43:29.8273930Z Finished uploading artifact content to blob storage!
+2026-10-23T18:43:29.8277050Z SHA256 digest of uploaded artifact zip is c63205787fac7dba75c5fb2553a1b3afec7d1e671f11cefa9c0285286a2b2320
+2026-10-23T18:43:29.8279620Z Finalizing artifact upload
+2026-10-23T18:43:30.3765220Z Artifact completed-effect-history-integration.zip successfully finalized. Artifact ID 12523488063
+2026-10-23T18:43:30.3766620Z Artifact completed-effect-history-integration has been successfully uploaded! Final size is 10893 bytes. Artifact ID is 12523488063
+2026-10-23T18:43:30.3771440Z Artifact download URL: https://github.com/Jagalite/illiquid/actions/runs/40004876258/artifacts/12523488063
+2026-10-23T18:43:30.3912520Z Post job cleanup.
+2026-10-23T18:43:30.4747910Z [command]/opt/homebrew/bin/git version
+2026-10-23T18:43:30.4861630Z git version 2.56.0
+2026-10-23T18:43:30.4881610Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/7980fc51-9483-4a47-aaa5-e2c66d30663d/.gitconfig'
+2026-10-23T18:43:30.4888860Z Temporarily overriding HOME='/Users/runner/work/_temp/7980fc51-9483-4a47-aaa5-e2c66d30663d' before making global git config changes
+2026-10-23T18:43:30.4889600Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-23T18:43:30.4893180Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+2026-10-23T18:43:30.4979520Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-23T18:43:30.5041150Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-23T18:43:30.6042340Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-23T18:43:30.6102210Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-23T18:43:30.6941690Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-23T18:43:30.6999930Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-23T18:43:30.7943690Z Cleaning up orphan processes
+2026-10-23T18:43:37.1760120Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

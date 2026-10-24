@@ -84,7 +84,7 @@ public struct PlaybackCanonicalState: Codable, Equatable, Sendable {
         )
       }
       .sorted { $0.effectID < $1.effectID }
-    completedEffectIDs = state.completedEffectIDs.sorted()
+    completedEffectIDs = state.sortedCompletedEffectIDs
     resourceLeases = state.resourceLeases
       .map { key, record in
         CanonicalResourceLease(
