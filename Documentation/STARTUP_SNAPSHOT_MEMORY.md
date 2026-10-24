@@ -148,8 +148,12 @@ the acceptance criteria; the timings expose the moved destruction cost.
 - The CI runner rehashed measured binaries and source files after the experiment.
   Binary hash receipts are preserved; executable files themselves are not in the
   evidence bundle, so the independent audit does not rehash those binaries.
-- Full native app startup/source integration is still running on the research
-  branch; its result will be recorded before opening the PR.
+- The real app graph built successfully in release with the pinned native SDK.
+  All 27 tests in six startup/source suites passed: startup loading, pending launch
+  URLs, source restoration, navigation, membership, and tab merging. The
+  [integration receipt](../Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64/native-integration-receipt.json)
+  records the exact job and raw-log hash. The build contains existing warnings in
+  native Metal and unrelated tests; the changed loader/test files report none.
 
 The complete immutable component evidence is in
 [`Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64`](../Benchmarks/StartupSnapshotLifetime/evidence/macos-arm64):
