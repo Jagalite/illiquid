@@ -103,14 +103,21 @@ actor SourceBrowserFilter {
             uniqueKeysWithValues: configuration.regexRules.map { ($0.id, 0) }
         )
         var hiddenCount = 0
-        var rows: [SourceTreeDisplayRow] = []
+        // The tree cache already retains allRows. Share that immutable storage
+        // when visibility leaves every row unannotated and included; materialize
+        // the accepted prefix only when the output first differs. A nonnil old
+        // annotation still takes the original assignment path, including when
+        // the new annotation compares equal but contains different String bytes.
+        var rows: [SourceTreeDisplayRow]?
 
-        for var row in allRows {
+        for (index, original) in allRows.enumerated() {
             guard !Task.isCancelled else { return nil }
+            var row = original
             if !SourceVisibilityProjection.includes(
                 row.kind.itemKind,
                 in: configuration.viewMode
             ) {
+                if rows == nil { rows = Array(allRows[..<index]) }
                 continue
             }
 
@@ -161,12 +168,25 @@ actor SourceBrowserFilter {
             if visibility != nil, row.kind.itemKind != nil {
                 hiddenCount += 1
             }
-            guard visibility == nil || revealsHiddenItems else { continue }
+            guard visibility == nil || revealsHiddenItems else {
+                if rows == nil { rows = Array(allRows[..<index]) }
+                continue
+            }
+            if rows == nil, row.visibility != nil || visibility != nil {
+                rows = Array(allRows[..<index])
+            }
             row.visibility = visibility
-            rows.append(row)
+            // A late changed row can fill an almost-complete copied prefix.
+            // Cap requested growth at the input size, while retaining geometric
+            // growth for small filtered results. reserveCapacity may round up.
+            if let outputCount = rows?.count, outputCount == rows?.capacity {
+                let growth = min(max(outputCount, 1), allRows.count - outputCount)
+                rows?.reserveCapacity(outputCount + growth)
+            }
+            rows?.append(row)
         }
 
-        return SourceBrowserProjection(rows: rows, hiddenCount: hiddenCount, regexCounts: counts)
+        return SourceBrowserProjection(rows: rows ?? allRows, hiddenCount: hiddenCount, regexCounts: counts)
     }
 
     private static func organizeMedia(_ rows: [SourceTreeDisplayRow]) -> [SourceTreeDisplayRow] {
