@@ -29,14 +29,16 @@ public enum ExternalSubtitleMatcher {
         }
 
         let index = TokenIndex()
-        var media: [(url: URL, raw: [String], tokens: [String])] = []
+        // Keep one token buffer and the normalized prefix length per media.
+        // Retaining slices would enlarge every record, even without qualifiers.
+        var media: [(url: URL, raw: [String], tokenCount: Int)] = []
         for url in result.keys where MediaFileSupport.isSupportedMediaFile(url) {
             guard !isCancelled() else { return [:] }
             let raw = filenameTokens(url)
             let tokens = removingTrailingMediaQualifiers(from: raw)
             guard !tokens.isEmpty else { continue }
             index.insert(tokens, index: media.count)
-            media.append((url, raw, tokens))
+            media.append((url, raw, tokens.count))
         }
         for subtitleURL in subtitleURLs {
             guard !isCancelled() else { return [:] }
@@ -52,7 +54,7 @@ public enum ExternalSubtitleMatcher {
                 guard !isCancelled() else { return [:] }
                 let item = media[candidate]
                 guard let score = matchScore(
-                    rawMediaTokens: item.raw, mediaTokens: item.tokens,
+                    rawMediaTokens: item.raw, mediaTokens: item.raw.prefix(item.tokenCount),
                     rawSubtitleTokens: raw, subtitleTokens: tokens
                 ) else { continue }
                 if best == nil || score > best!.score {
@@ -82,7 +84,7 @@ public enum ExternalSubtitleMatcher {
         var children: [String: TokenIndex] = [:]
         var terminal: [Int] = []
 
-        func insert(_ tokens: [String], index: Int) {
+        func insert(_ tokens: ArraySlice<String>, index: Int) {
             var node = self
             for token in tokens {
                 if node.children[token] == nil { node.children[token] = TokenIndex() }
@@ -93,7 +95,7 @@ public enum ExternalSubtitleMatcher {
 
         // nil distinguishes an interrupted traversal from a completed lookup
         // with no candidates, so the caller can discard all earlier matches.
-        func candidates(for tokens: [String], isCancelled: () -> Bool) -> [Int]? {
+        func candidates(for tokens: ArraySlice<String>, isCancelled: () -> Bool) -> [Int]? {
             guard !tokens.isEmpty else { return [] }
             var result: [Int] = []
             var node = self
@@ -143,8 +145,8 @@ public enum ExternalSubtitleMatcher {
     }
 
     private static func matchScore(
-        rawMediaTokens: [String], mediaTokens: [String],
-        rawSubtitleTokens: [String], subtitleTokens: [String]
+        rawMediaTokens: [String], mediaTokens: ArraySlice<String>,
+        rawSubtitleTokens: [String], subtitleTokens: ArraySlice<String>
     ) -> Int? {
         guard !mediaTokens.isEmpty, !subtitleTokens.isEmpty else { return nil }
 
@@ -231,20 +233,20 @@ public enum ExternalSubtitleMatcher {
         } ?? nil
     }
 
-    private static func removingTrailingSubtitleQualifiers(from tokens: [String]) -> [String] {
-        var result = tokens
-        while result.count > 1, let last = result.last, subtitleQualifiers.contains(last) {
-            result.removeLast()
+    private static func removingTrailingSubtitleQualifiers(from tokens: [String]) -> ArraySlice<String> {
+        var count = tokens.count
+        while count > 1, subtitleQualifiers.contains(tokens[count - 1]) {
+            count -= 1
         }
-        return result
+        return tokens.prefix(count)
     }
 
-    private static func removingTrailingMediaQualifiers(from tokens: [String]) -> [String] {
-        var result = tokens
-        while result.count > 1, let last = result.last, isMediaQualifier(last) {
-            result.removeLast()
+    private static func removingTrailingMediaQualifiers(from tokens: [String]) -> ArraySlice<String> {
+        var count = tokens.count
+        while count > 1, isMediaQualifier(tokens[count - 1]) {
+            count -= 1
         }
-        return result
+        return tokens.prefix(count)
     }
 
     private static func isMediaQualifier(_ token: String) -> Bool {
@@ -260,12 +262,16 @@ public enum ExternalSubtitleMatcher {
         return false
     }
 
-    private static func hasOnlySubtitleQualifiers(after stem: [String], in tokens: [String]) -> Bool {
+    private static func hasOnlySubtitleQualifiers<Stem: Collection>(
+        after stem: Stem, in tokens: [String]
+    ) -> Bool where Stem.Element == String {
         isPrefix(stem, of: tokens)
             && tokens.dropFirst(stem.count).allSatisfy(subtitleQualifiers.contains)
     }
 
-    private static func isPrefix(_ prefix: [String], of values: [String]) -> Bool {
+    private static func isPrefix<Prefix: Collection, Values: Collection>(
+        _ prefix: Prefix, of values: Values
+    ) -> Bool where Prefix.Element == String, Values.Element == String {
         guard prefix.count <= values.count else {
             return false
         }
@@ -274,7 +280,7 @@ public enum ExternalSubtitleMatcher {
         }
     }
 
-    private static func tokenWeight(_ tokens: [String]) -> Int {
+    private static func tokenWeight<Tokens: Sequence>(_ tokens: Tokens) -> Int where Tokens.Element == String {
         tokens.reduce(0) { $0 + $1.count }
     }
 }

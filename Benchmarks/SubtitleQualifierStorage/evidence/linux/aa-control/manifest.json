@@ -1,0 +1,50 @@
+{
+  "cases": [
+    "ascii_4096",
+    "plain_4096"
+  ],
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "control": "A/A identical-binary control; A and B are arbitrary labels",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "environment": {
+    "CLANG_MODULE_CACHE_PATH": "/tmp/illiquid-swift-toolchain/module-cache",
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "LD_LIBRARY_PATH": "/tmp/illiquid-swift-toolchain/runtime-libs/usr/lib/x86_64-linux-gnu",
+    "PATH": "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin:/root/.codex/tmp/arg0/codex-arg00VycDs:/opt/codex/codex-path:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+    "SWIFT_DETERMINISTIC_HASHING": "1",
+    "SWIFT_MODULECACHE_PATH": "/tmp/illiquid-swift-toolchain/module-cache"
+  },
+  "iterations_per_sample": 5,
+  "label_binary": {
+    "A": "/workspace/scratch/f4995c2fe1e0/qualifier-linux-final/baseline/.build/x86_64-unknown-linux-gnu/release/AssociationDriver",
+    "B": "/workspace/scratch/f4995c2fe1e0/qualifier-linux-final/baseline/.build/x86_64-unknown-linux-gnu/release/AssociationDriver"
+  },
+  "label_binary_sha256": {
+    "A": "ce275ba0930c23f825debc25416522e91f797dd5765911aa34804861a6642699",
+    "B": "ce275ba0930c23f825debc25416522e91f797dd5765911aa34804861a6642699"
+  },
+  "machine": "x86_64",
+  "ordering": "Pair 0 A/B, pair 1 B/A, alternating for six pairs per case",
+  "pairs_per_case": 6,
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "processes": "Fresh process for every label/sample, sequential invocation",
+  "python": "3.12.14",
+  "runner_sha256": "b198ef7b91dc09d72f2ad439468b065186312c64227c20c26e50a0659c390440",
+  "schema_version": 1,
+  "started_utc": "2026-10-24T14:30:15.713891+00:00",
+  "timing_scope": "Existing driver: complete association, count consumption and result destruction; excludes fixture/oracle/preflight",
+  "toolchain_env_sha256": "c42e6ef57dd4f7cc664584fb26c821e0ba1a0b22ec060ba8d872c70eb4dc0ff6",
+  "warmup_per_sample": 4
+}
