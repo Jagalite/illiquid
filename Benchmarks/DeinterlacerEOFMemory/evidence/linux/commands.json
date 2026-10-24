@@ -1,0 +1,1925 @@
+[
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "--version"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.05398253000021214,
+    "log": "logs/swift-version.log",
+    "log_sha256": "1d762e32f31ac0d0550e913ae47faf3b2ca9c548411ab9ec48a84588438d92cf",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.0024474640013067983,
+    "log": "logs/git-head.log",
+    "log_sha256": "b640f50a3ad13bcf89a3b847e050f87275a5a33f6d5a96743f0a084f7aa1ba79",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.009081037998839747,
+    "log": "logs/git-status.log",
+    "log_sha256": "2fa3dda415e134cca05f8040f3238b779a0575bf797ec9214e6acda3e011c9f0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-Onone",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-warnings-as-errors",
+      "-I",
+      "/tmp/illiquid-deinterlacer-qualified/sources/CFFmpeg",
+      "-I",
+      "/tmp/illiquid-deinterlacer-qualified/sources/CDeinterlacerProbe",
+      "-module-cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/module-cache",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/SupportDeclarations.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/FFmpegError.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/LinuxSupport.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/baseline/VideoDeinterlacer.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/Driver.swift",
+      "-o",
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 2.1546394520046306,
+    "log": "logs/build-debug-baseline.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-Onone",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-warnings-as-errors",
+      "-I",
+      "/tmp/illiquid-deinterlacer-qualified/sources/CFFmpeg",
+      "-I",
+      "/tmp/illiquid-deinterlacer-qualified/sources/CDeinterlacerProbe",
+      "-module-cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/module-cache",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/SupportDeclarations.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/FFmpegError.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/LinuxSupport.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/candidate/VideoDeinterlacer.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/Driver.swift",
+      "-o",
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 1.1673459900048329,
+    "log": "logs/build-debug-candidate.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-O",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-warnings-as-errors",
+      "-I",
+      "/tmp/illiquid-deinterlacer-qualified/sources/CFFmpeg",
+      "-I",
+      "/tmp/illiquid-deinterlacer-qualified/sources/CDeinterlacerProbe",
+      "-module-cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/module-cache",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/SupportDeclarations.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/FFmpegError.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/LinuxSupport.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/baseline/VideoDeinterlacer.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/Driver.swift",
+      "-o",
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 3.154153971001506,
+    "log": "logs/build-release-baseline.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "-O",
+      "-swift-version",
+      "6",
+      "-parse-as-library",
+      "-warnings-as-errors",
+      "-I",
+      "/tmp/illiquid-deinterlacer-qualified/sources/CFFmpeg",
+      "-I",
+      "/tmp/illiquid-deinterlacer-qualified/sources/CDeinterlacerProbe",
+      "-module-cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/module-cache",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/SupportDeclarations.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/FFmpegError.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/LinuxSupport.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/candidate/VideoDeinterlacer.swift",
+      "/tmp/illiquid-deinterlacer-qualified/sources/shared/Driver.swift",
+      "-o",
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 2.202409769000951,
+    "log": "logs/build-release-candidate.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "build",
+      "--build-tests",
+      "--package-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/baseline",
+      "--scratch-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/baseline/build-debug",
+      "--cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-cache",
+      "--config-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-config",
+      "--security-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-security",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-enable-testing",
+      "--use-integrated-swift-driver",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 9.07366681300482,
+    "log": "logs/tests-debug-baseline-build.log",
+    "log_sha256": "dc5db01fcd257bb45146bf1d10b1345564e29b67b0cb217a845e71e0bead9b4c",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "test",
+      "--skip-build",
+      "--package-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/baseline",
+      "--scratch-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/baseline/build-debug",
+      "--cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-cache",
+      "--config-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-config",
+      "--security-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-security",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-enable-testing",
+      "--use-integrated-swift-driver",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl",
+      "--no-parallel",
+      "--filter",
+      "VideoDeinterlacerLifetimeTests"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.3435748439951567,
+    "log": "logs/tests-debug-baseline-run.log",
+    "log_sha256": "7a7e296bb0d10b1e2905edf195de07b4e004ab385298da20b842f13e49a2fcee",
+    "returncode": 1
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "build",
+      "--build-tests",
+      "--package-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/baseline",
+      "--scratch-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/baseline/build-release",
+      "--cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-cache",
+      "--config-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-config",
+      "--security-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-security",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-enable-testing",
+      "--use-integrated-swift-driver",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 10.949288919000537,
+    "log": "logs/tests-release-baseline-build.log",
+    "log_sha256": "2025049d83859f836e8c65202e0dc277decb1443a52240206969c318049d62c6",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "test",
+      "--skip-build",
+      "--package-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/baseline",
+      "--scratch-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/baseline/build-release",
+      "--cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-cache",
+      "--config-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-config",
+      "--security-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-security",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-enable-testing",
+      "--use-integrated-swift-driver",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl",
+      "--no-parallel",
+      "--filter",
+      "VideoDeinterlacerLifetimeTests"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.40346113000123296,
+    "log": "logs/tests-release-baseline-run.log",
+    "log_sha256": "31ca17cfd52b54e2ad825cfe42150685aa835ce5fa2910248605d941772ed01e",
+    "returncode": 1
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "build",
+      "--build-tests",
+      "--package-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/candidate",
+      "--scratch-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/candidate/build-debug",
+      "--cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-cache",
+      "--config-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-config",
+      "--security-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-security",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-enable-testing",
+      "--use-integrated-swift-driver",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 7.3792046070011565,
+    "log": "logs/tests-debug-candidate-build.log",
+    "log_sha256": "44983431548340d04eeb1c6d6628d7ef18c54a2bebf8bdc6d5366e9a5a233e8e",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "test",
+      "--skip-build",
+      "--package-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/candidate",
+      "--scratch-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/candidate/build-debug",
+      "--cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-cache",
+      "--config-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-config",
+      "--security-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-security",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-enable-testing",
+      "--use-integrated-swift-driver",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl",
+      "--no-parallel",
+      "--filter",
+      "VideoDeinterlacerLifetimeTests"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.3250321739978972,
+    "log": "logs/tests-debug-candidate-run.log",
+    "log_sha256": "21e475b18d994532798cbadf26368a9b510b0856898395cccee6b59822f03785",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "build",
+      "--build-tests",
+      "--package-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/candidate",
+      "--scratch-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/candidate/build-release",
+      "--cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-cache",
+      "--config-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-config",
+      "--security-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-security",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-enable-testing",
+      "--use-integrated-swift-driver",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 11.211801132994879,
+    "log": "logs/tests-release-candidate-build.log",
+    "log_sha256": "106e3051a114b5ccb6da9af0e9861204a3c15a1db08c15ba5a3c2ada3105dcc4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "test",
+      "--skip-build",
+      "--package-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/candidate",
+      "--scratch-path",
+      "/tmp/illiquid-deinterlacer-qualified/tests/candidate/build-release",
+      "--cache-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-cache",
+      "--config-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-config",
+      "--security-path",
+      "/tmp/illiquid-deinterlacer-qualified/swiftpm-security",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-enable-testing",
+      "--use-integrated-swift-driver",
+      "-Xcc",
+      "-I/tmp/illiquid-deinterlacer-memory-sdk/include",
+      "-Xlinker",
+      "-L/tmp/illiquid-deinterlacer-memory-sdk/lib",
+      "-Xlinker",
+      "-lavfilter",
+      "-Xlinker",
+      "-lswscale",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lpthread",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-ldl",
+      "--no-parallel",
+      "--filter",
+      "VideoDeinterlacerLifetimeTests"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.36807523800234776,
+    "log": "logs/tests-release-candidate-run.log",
+    "log_sha256": "5d691b9f9c33fe8928665f6d7892244580bfe0d3246671a20b37c3532454706a",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-empty-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-empty-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.009721402006107382,
+    "log": "logs/debug-empty-00-baseline.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-empty-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-empty-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.007057943003019318,
+    "log": "logs/debug-empty-00-candidate.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-progressive-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-progressive-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.08207768799911719,
+    "log": "logs/debug-progressive-00-baseline.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-progressive-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-progressive-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.05801622099534143,
+    "log": "logs/debug-progressive-00-candidate.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-one_tff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-one_tff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.014034123996680137,
+    "log": "logs/debug-one_tff-00-baseline.log",
+    "log_sha256": "76acda0b3529f266f75d0f954baa02a3f04032810d4ac05721339416137d87a2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-one_tff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-one_tff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.0200820659956662,
+    "log": "logs/debug-one_tff-00-candidate.log",
+    "log_sha256": "eaff99c57d2e2cba69ac0033dcfd316ca578843c710b7527acc99a83370eecf4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-sd_tff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-sd_tff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.05276494799909415,
+    "log": "logs/debug-sd_tff-00-baseline.log",
+    "log_sha256": "7e44ab9c28725caade753c19dba871868daa10113d3aa900c4441bd144e76cb4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-sd_tff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-sd_tff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.04540436900424538,
+    "log": "logs/debug-sd_tff-00-candidate.log",
+    "log_sha256": "39bca5016e69e74ae84123ff2830ab237d0cd8892f5f243298e6b1583630e308",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-hd_tff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-hd_tff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.13334142500389135,
+    "log": "logs/debug-hd_tff-00-baseline.log",
+    "log_sha256": "0f78126403e66a7d51a34d3bed20fd517a501ff8739b118eb4c8a239a7919ca0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-hd_tff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-hd_tff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.13046689800103195,
+    "log": "logs/debug-hd_tff-00-candidate.log",
+    "log_sha256": "f8c351e1750723235d78904b76850220dbf82664c0befb91ea6664b1af9e51b2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-hd_bff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-hd_bff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.17249179400096182,
+    "log": "logs/debug-hd_bff-00-baseline.log",
+    "log_sha256": "e21197797e6a66786b4850472a983c3998a436ae0507e3058136779a0eaee710",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-hd_bff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-hd_bff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.13042505199700827,
+    "log": "logs/debug-hd_bff-00-candidate.log",
+    "log_sha256": "f9cfc88d9088955e9c33f9159e34c82aae3772f92863b7cebc5fc28067596a15",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-uhd10_tff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-uhd10_tff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.6206533779986785,
+    "log": "logs/debug-uhd10_tff-00-baseline.log",
+    "log_sha256": "bf0abbc8941f1ced3fc4ee9f4b91ad6a7797a92161ea0c37b52d526ea2ba7c99",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-uhd10_tff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-uhd10_tff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.9165755799986073,
+    "log": "logs/debug-uhd10_tff-00-candidate.log",
+    "log_sha256": "5c2c1c5965e2510587ffbcdf12872ced8527fd1dacb47c63016a1ff12beeb74c",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-mixed-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-mixed-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.08329161699657561,
+    "log": "logs/debug-mixed-00-baseline.log",
+    "log_sha256": "373236c5aa1df3784c136f0d9b86b322897efc863b86fa3e9479187761f077c0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-mixed-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-mixed-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.08151699100562837,
+    "log": "logs/debug-mixed-00-candidate.log",
+    "log_sha256": "0fc09ce579fb704f1bb12a42a8651389b4a056374bfe10f042f3478c4ec97daf",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-format_change-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-format_change-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.09637289099919144,
+    "log": "logs/debug-format_change-00-baseline.log",
+    "log_sha256": "6144daddd4598fecfaaba9b5fd4c0dcd9da465dc768692ba4bb0e313e7dd881f",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-format_change-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-format_change-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.11401798000588315,
+    "log": "logs/debug-format_change-00-candidate.log",
+    "log_sha256": "5eb50c6b6a2dbe6e0a9801222fb9856f8389c75a638c34197dc9fb59f7b46ac7",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-baseline",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-held_output-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-held_output-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.10742387400387088,
+    "log": "logs/debug-held_output-00-baseline.log",
+    "log_sha256": "70084b29f232dd3e02e3cb28d4eed2a1147d7e93c446a07aa97515c6c2b0364f",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/debug-candidate",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/debug-held_output-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/debug-held_output-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.1111092799983453,
+    "log": "logs/debug-held_output-00-candidate.log",
+    "log_sha256": "44095a99e0dce383b768a5efd0113466ef2aec632546ee8a9e96e405d8dfde05",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-empty-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-empty-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.01242823700158624,
+    "log": "logs/release-empty-00-baseline.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-empty-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-empty-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.009165033996396232,
+    "log": "logs/release-empty-00-candidate.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-empty-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-empty-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.010497260002011899,
+    "log": "logs/release-empty-01-candidate.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-empty-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-empty-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.008042264002142474,
+    "log": "logs/release-empty-01-baseline.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-empty-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-empty-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.0072596660029375926,
+    "log": "logs/release-empty-02-baseline.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-empty-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-empty-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.00666646400350146,
+    "log": "logs/release-empty-02-candidate.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-empty-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-empty-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.006849689998489339,
+    "log": "logs/release-empty-03-candidate.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "empty",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-empty-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-empty-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.006710759997076821,
+    "log": "logs/release-empty-03-baseline.log",
+    "log_sha256": "101e08f9377641d2531434ea68d9071e1a0932c29f65a918e7a97716cac95a7d",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-progressive-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-progressive-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.03407576800236711,
+    "log": "logs/release-progressive-00-baseline.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-progressive-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-progressive-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.03434981999453157,
+    "log": "logs/release-progressive-00-candidate.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-progressive-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-progressive-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.03488512700278079,
+    "log": "logs/release-progressive-01-candidate.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-progressive-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-progressive-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.03489107399946079,
+    "log": "logs/release-progressive-01-baseline.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-progressive-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-progressive-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.03545026699430309,
+    "log": "logs/release-progressive-02-baseline.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-progressive-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-progressive-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.03465025300101843,
+    "log": "logs/release-progressive-02-candidate.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-progressive-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-progressive-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.035343445000762586,
+    "log": "logs/release-progressive-03-candidate.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "progressive",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-progressive-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-progressive-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.037072356994031,
+    "log": "logs/release-progressive-03-baseline.log",
+    "log_sha256": "5feddeedc21fd2e6532a577d72cc4e636b726bf8580e0f84883c7a2fbc3717de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-one_tff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-one_tff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.012591922000865452,
+    "log": "logs/release-one_tff-00-baseline.log",
+    "log_sha256": "76acda0b3529f266f75d0f954baa02a3f04032810d4ac05721339416137d87a2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-one_tff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-one_tff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.00979003500106046,
+    "log": "logs/release-one_tff-00-candidate.log",
+    "log_sha256": "eaff99c57d2e2cba69ac0033dcfd316ca578843c710b7527acc99a83370eecf4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-one_tff-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-one_tff-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.010353803001635242,
+    "log": "logs/release-one_tff-01-candidate.log",
+    "log_sha256": "eaff99c57d2e2cba69ac0033dcfd316ca578843c710b7527acc99a83370eecf4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-one_tff-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-one_tff-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.012094072997570038,
+    "log": "logs/release-one_tff-01-baseline.log",
+    "log_sha256": "76acda0b3529f266f75d0f954baa02a3f04032810d4ac05721339416137d87a2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-one_tff-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-one_tff-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.011785829003201798,
+    "log": "logs/release-one_tff-02-baseline.log",
+    "log_sha256": "76acda0b3529f266f75d0f954baa02a3f04032810d4ac05721339416137d87a2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-one_tff-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-one_tff-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.00991712800168898,
+    "log": "logs/release-one_tff-02-candidate.log",
+    "log_sha256": "eaff99c57d2e2cba69ac0033dcfd316ca578843c710b7527acc99a83370eecf4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-one_tff-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-one_tff-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.011731708000297658,
+    "log": "logs/release-one_tff-03-candidate.log",
+    "log_sha256": "eaff99c57d2e2cba69ac0033dcfd316ca578843c710b7527acc99a83370eecf4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "one_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-one_tff-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-one_tff-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.010345340997446328,
+    "log": "logs/release-one_tff-03-baseline.log",
+    "log_sha256": "76acda0b3529f266f75d0f954baa02a3f04032810d4ac05721339416137d87a2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-sd_tff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-sd_tff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.03281325799616752,
+    "log": "logs/release-sd_tff-00-baseline.log",
+    "log_sha256": "7e44ab9c28725caade753c19dba871868daa10113d3aa900c4441bd144e76cb4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-sd_tff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-sd_tff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.035733292999793775,
+    "log": "logs/release-sd_tff-00-candidate.log",
+    "log_sha256": "39bca5016e69e74ae84123ff2830ab237d0cd8892f5f243298e6b1583630e308",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-sd_tff-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-sd_tff-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.040397518001555,
+    "log": "logs/release-sd_tff-01-candidate.log",
+    "log_sha256": "39bca5016e69e74ae84123ff2830ab237d0cd8892f5f243298e6b1583630e308",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-sd_tff-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-sd_tff-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.029951659998914693,
+    "log": "logs/release-sd_tff-01-baseline.log",
+    "log_sha256": "7e44ab9c28725caade753c19dba871868daa10113d3aa900c4441bd144e76cb4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-sd_tff-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-sd_tff-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.035722690998227336,
+    "log": "logs/release-sd_tff-02-baseline.log",
+    "log_sha256": "7e44ab9c28725caade753c19dba871868daa10113d3aa900c4441bd144e76cb4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-sd_tff-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-sd_tff-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.029922565998276696,
+    "log": "logs/release-sd_tff-02-candidate.log",
+    "log_sha256": "39bca5016e69e74ae84123ff2830ab237d0cd8892f5f243298e6b1583630e308",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-sd_tff-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-sd_tff-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.03275128400127869,
+    "log": "logs/release-sd_tff-03-candidate.log",
+    "log_sha256": "39bca5016e69e74ae84123ff2830ab237d0cd8892f5f243298e6b1583630e308",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "sd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-sd_tff-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-sd_tff-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.03384303799975896,
+    "log": "logs/release-sd_tff-03-baseline.log",
+    "log_sha256": "7e44ab9c28725caade753c19dba871868daa10113d3aa900c4441bd144e76cb4",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_tff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_tff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.10383027499483433,
+    "log": "logs/release-hd_tff-00-baseline.log",
+    "log_sha256": "0f78126403e66a7d51a34d3bed20fd517a501ff8739b118eb4c8a239a7919ca0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_tff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_tff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.10575269900436979,
+    "log": "logs/release-hd_tff-00-candidate.log",
+    "log_sha256": "f8c351e1750723235d78904b76850220dbf82664c0befb91ea6664b1af9e51b2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_tff-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_tff-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.1073367320059333,
+    "log": "logs/release-hd_tff-01-candidate.log",
+    "log_sha256": "f8c351e1750723235d78904b76850220dbf82664c0befb91ea6664b1af9e51b2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_tff-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_tff-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.10729988799721468,
+    "log": "logs/release-hd_tff-01-baseline.log",
+    "log_sha256": "0f78126403e66a7d51a34d3bed20fd517a501ff8739b118eb4c8a239a7919ca0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_tff-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_tff-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.10400886400020681,
+    "log": "logs/release-hd_tff-02-baseline.log",
+    "log_sha256": "0f78126403e66a7d51a34d3bed20fd517a501ff8739b118eb4c8a239a7919ca0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_tff-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_tff-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.11876134799967986,
+    "log": "logs/release-hd_tff-02-candidate.log",
+    "log_sha256": "f8c351e1750723235d78904b76850220dbf82664c0befb91ea6664b1af9e51b2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_tff-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_tff-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.11968572899786523,
+    "log": "logs/release-hd_tff-03-candidate.log",
+    "log_sha256": "f8c351e1750723235d78904b76850220dbf82664c0befb91ea6664b1af9e51b2",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "hd_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_tff-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_tff-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.12620687499293126,
+    "log": "logs/release-hd_tff-03-baseline.log",
+    "log_sha256": "0f78126403e66a7d51a34d3bed20fd517a501ff8739b118eb4c8a239a7919ca0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_bff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_bff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.1119285770037095,
+    "log": "logs/release-hd_bff-00-baseline.log",
+    "log_sha256": "e21197797e6a66786b4850472a983c3998a436ae0507e3058136779a0eaee710",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_bff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_bff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.11960167600045679,
+    "log": "logs/release-hd_bff-00-candidate.log",
+    "log_sha256": "f9cfc88d9088955e9c33f9159e34c82aae3772f92863b7cebc5fc28067596a15",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_bff-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_bff-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.12044884100032505,
+    "log": "logs/release-hd_bff-01-candidate.log",
+    "log_sha256": "f9cfc88d9088955e9c33f9159e34c82aae3772f92863b7cebc5fc28067596a15",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_bff-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_bff-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.1197659429963096,
+    "log": "logs/release-hd_bff-01-baseline.log",
+    "log_sha256": "e21197797e6a66786b4850472a983c3998a436ae0507e3058136779a0eaee710",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_bff-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_bff-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.10664498500409536,
+    "log": "logs/release-hd_bff-02-baseline.log",
+    "log_sha256": "e21197797e6a66786b4850472a983c3998a436ae0507e3058136779a0eaee710",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_bff-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_bff-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.14287790800153743,
+    "log": "logs/release-hd_bff-02-candidate.log",
+    "log_sha256": "f9cfc88d9088955e9c33f9159e34c82aae3772f92863b7cebc5fc28067596a15",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_bff-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_bff-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.11348679700313369,
+    "log": "logs/release-hd_bff-03-candidate.log",
+    "log_sha256": "f9cfc88d9088955e9c33f9159e34c82aae3772f92863b7cebc5fc28067596a15",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "hd_bff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-hd_bff-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-hd_bff-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.212536202998308,
+    "log": "logs/release-hd_bff-03-baseline.log",
+    "log_sha256": "e21197797e6a66786b4850472a983c3998a436ae0507e3058136779a0eaee710",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-uhd10_tff-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-uhd10_tff-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.6244784599984996,
+    "log": "logs/release-uhd10_tff-00-baseline.log",
+    "log_sha256": "bf0abbc8941f1ced3fc4ee9f4b91ad6a7797a92161ea0c37b52d526ea2ba7c99",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-uhd10_tff-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-uhd10_tff-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.6697855060047004,
+    "log": "logs/release-uhd10_tff-00-candidate.log",
+    "log_sha256": "5c2c1c5965e2510587ffbcdf12872ced8527fd1dacb47c63016a1ff12beeb74c",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-uhd10_tff-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-uhd10_tff-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.6334205530001782,
+    "log": "logs/release-uhd10_tff-01-candidate.log",
+    "log_sha256": "5c2c1c5965e2510587ffbcdf12872ced8527fd1dacb47c63016a1ff12beeb74c",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-uhd10_tff-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-uhd10_tff-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.5845043810040806,
+    "log": "logs/release-uhd10_tff-01-baseline.log",
+    "log_sha256": "bf0abbc8941f1ced3fc4ee9f4b91ad6a7797a92161ea0c37b52d526ea2ba7c99",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-uhd10_tff-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-uhd10_tff-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.6262808069950552,
+    "log": "logs/release-uhd10_tff-02-baseline.log",
+    "log_sha256": "bf0abbc8941f1ced3fc4ee9f4b91ad6a7797a92161ea0c37b52d526ea2ba7c99",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-uhd10_tff-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-uhd10_tff-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.5304887279999093,
+    "log": "logs/release-uhd10_tff-02-candidate.log",
+    "log_sha256": "5c2c1c5965e2510587ffbcdf12872ced8527fd1dacb47c63016a1ff12beeb74c",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-uhd10_tff-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-uhd10_tff-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.6088737339960062,
+    "log": "logs/release-uhd10_tff-03-candidate.log",
+    "log_sha256": "5c2c1c5965e2510587ffbcdf12872ced8527fd1dacb47c63016a1ff12beeb74c",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "uhd10_tff",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-uhd10_tff-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-uhd10_tff-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.5647002230034559,
+    "log": "logs/release-uhd10_tff-03-baseline.log",
+    "log_sha256": "bf0abbc8941f1ced3fc4ee9f4b91ad6a7797a92161ea0c37b52d526ea2ba7c99",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-mixed-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-mixed-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07041269999899669,
+    "log": "logs/release-mixed-00-baseline.log",
+    "log_sha256": "373236c5aa1df3784c136f0d9b86b322897efc863b86fa3e9479187761f077c0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-mixed-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-mixed-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.08684542200353462,
+    "log": "logs/release-mixed-00-candidate.log",
+    "log_sha256": "0fc09ce579fb704f1bb12a42a8651389b4a056374bfe10f042f3478c4ec97daf",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-mixed-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-mixed-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07415173700428568,
+    "log": "logs/release-mixed-01-candidate.log",
+    "log_sha256": "0fc09ce579fb704f1bb12a42a8651389b4a056374bfe10f042f3478c4ec97daf",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-mixed-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-mixed-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07554625100601697,
+    "log": "logs/release-mixed-01-baseline.log",
+    "log_sha256": "373236c5aa1df3784c136f0d9b86b322897efc863b86fa3e9479187761f077c0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-mixed-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-mixed-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07068783399881795,
+    "log": "logs/release-mixed-02-baseline.log",
+    "log_sha256": "373236c5aa1df3784c136f0d9b86b322897efc863b86fa3e9479187761f077c0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-mixed-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-mixed-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.06977149500016822,
+    "log": "logs/release-mixed-02-candidate.log",
+    "log_sha256": "0fc09ce579fb704f1bb12a42a8651389b4a056374bfe10f042f3478c4ec97daf",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-mixed-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-mixed-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07118605400319211,
+    "log": "logs/release-mixed-03-candidate.log",
+    "log_sha256": "0fc09ce579fb704f1bb12a42a8651389b4a056374bfe10f042f3478c4ec97daf",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "mixed",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-mixed-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-mixed-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.0693186330026947,
+    "log": "logs/release-mixed-03-baseline.log",
+    "log_sha256": "373236c5aa1df3784c136f0d9b86b322897efc863b86fa3e9479187761f077c0",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-format_change-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-format_change-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.08022836199961603,
+    "log": "logs/release-format_change-00-baseline.log",
+    "log_sha256": "6144daddd4598fecfaaba9b5fd4c0dcd9da465dc768692ba4bb0e313e7dd881f",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-format_change-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-format_change-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07985535100306151,
+    "log": "logs/release-format_change-00-candidate.log",
+    "log_sha256": "5eb50c6b6a2dbe6e0a9801222fb9856f8389c75a638c34197dc9fb59f7b46ac7",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-format_change-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-format_change-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07640081399586052,
+    "log": "logs/release-format_change-01-candidate.log",
+    "log_sha256": "5eb50c6b6a2dbe6e0a9801222fb9856f8389c75a638c34197dc9fb59f7b46ac7",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-format_change-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-format_change-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07346783799584955,
+    "log": "logs/release-format_change-01-baseline.log",
+    "log_sha256": "6144daddd4598fecfaaba9b5fd4c0dcd9da465dc768692ba4bb0e313e7dd881f",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-format_change-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-format_change-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07744816899503348,
+    "log": "logs/release-format_change-02-baseline.log",
+    "log_sha256": "6144daddd4598fecfaaba9b5fd4c0dcd9da465dc768692ba4bb0e313e7dd881f",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-format_change-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-format_change-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07425037500070175,
+    "log": "logs/release-format_change-02-candidate.log",
+    "log_sha256": "5eb50c6b6a2dbe6e0a9801222fb9856f8389c75a638c34197dc9fb59f7b46ac7",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-format_change-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-format_change-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.09290696500102058,
+    "log": "logs/release-format_change-03-candidate.log",
+    "log_sha256": "5eb50c6b6a2dbe6e0a9801222fb9856f8389c75a638c34197dc9fb59f7b46ac7",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "format_change",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-format_change-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-format_change-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07448168299742974,
+    "log": "logs/release-format_change-03-baseline.log",
+    "log_sha256": "6144daddd4598fecfaaba9b5fd4c0dcd9da465dc768692ba4bb0e313e7dd881f",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-held_output-00-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-held_output-00-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.06798131899995496,
+    "log": "logs/release-held_output-00-baseline.log",
+    "log_sha256": "70084b29f232dd3e02e3cb28d4eed2a1147d7e93c446a07aa97515c6c2b0364f",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-held_output-00-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-held_output-00-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.06757684100011829,
+    "log": "logs/release-held_output-00-candidate.log",
+    "log_sha256": "44095a99e0dce383b768a5efd0113466ef2aec632546ee8a9e96e405d8dfde05",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-held_output-01-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-held_output-01-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.08231638000142993,
+    "log": "logs/release-held_output-01-candidate.log",
+    "log_sha256": "44095a99e0dce383b768a5efd0113466ef2aec632546ee8a9e96e405d8dfde05",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-held_output-01-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-held_output-01-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.08413696500065271,
+    "log": "logs/release-held_output-01-baseline.log",
+    "log_sha256": "70084b29f232dd3e02e3cb28d4eed2a1147d7e93c446a07aa97515c6c2b0364f",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-held_output-02-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-held_output-02-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.06936419100384228,
+    "log": "logs/release-held_output-02-baseline.log",
+    "log_sha256": "70084b29f232dd3e02e3cb28d4eed2a1147d7e93c446a07aa97515c6c2b0364f",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-held_output-02-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-held_output-02-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.08509554299962474,
+    "log": "logs/release-held_output-02-candidate.log",
+    "log_sha256": "44095a99e0dce383b768a5efd0113466ef2aec632546ee8a9e96e405d8dfde05",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-candidate",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-held_output-03-candidate.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-held_output-03-candidate.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.08402807099628262,
+    "log": "logs/release-held_output-03-candidate.log",
+    "log_sha256": "44095a99e0dce383b768a5efd0113466ef2aec632546ee8a9e96e405d8dfde05",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/tmp/illiquid-deinterlacer-qualified/binaries/release-baseline",
+      "held_output",
+      "/tmp/illiquid-deinterlacer-qualified/metrics/release-held_output-03-baseline.json",
+      "/tmp/illiquid-deinterlacer-qualified/payloads/release-held_output-03-baseline.bin"
+    ],
+    "cwd": "/workspace/scratch/807c584242e6/illiquid",
+    "elapsed_seconds": 0.07016137000027811,
+    "log": "logs/release-held_output-03-baseline.log",
+    "log_sha256": "70084b29f232dd3e02e3cb28d4eed2a1147d7e93c446a07aa97515c6c2b0364f",
+    "returncode": 0
+  }
+]

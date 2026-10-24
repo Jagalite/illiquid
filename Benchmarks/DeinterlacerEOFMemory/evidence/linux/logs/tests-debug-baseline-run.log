@@ -1,0 +1,66 @@
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-23 23:22:23.851
+Test Suite 'Selected tests' passed at 2026-10-23 23:22:23.852
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "BWDIF end-of-stream storage lifetime" started.
+◇ Test completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) started.
+◇ Test case passing 1 argument topFirst → true to completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) started.
+✘ Test completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) recorded an issue with 1 argument topFirst → true at VideoDeinterlacerLifetimeTests.swift:54:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) recorded an issue with 1 argument topFirst → true at VideoDeinterlacerLifetimeTests.swift:57:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+◇ Test case passing 1 argument topFirst → false to completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) started.
+✘ Test completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) recorded an issue with 1 argument topFirst → false at VideoDeinterlacerLifetimeTests.swift:54:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) recorded an issue with 1 argument topFirst → false at VideoDeinterlacerLifetimeTests.swift:57:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test completeDrainReleasesTemporalReferencesBeforeFilterDestruction(topFirst:) with 2 test cases failed after 0.002 seconds with 4 issues.
+◇ Test retainedOutputSurvivesGraphRetirement(progressiveTail:) started.
+◇ Test case passing 1 argument progressiveTail → false to retainedOutputSurvivesGraphRetirement(progressiveTail:) started.
+✘ Test retainedOutputSurvivesGraphRetirement(progressiveTail:) recorded an issue with 1 argument progressiveTail → false at VideoDeinterlacerLifetimeTests.swift:89:9: Expectation failed: observers.dropLast().allSatisfy { $0.referenceCount == 1 }
+↳ // A progressive tail is forwarded by reference through BWDIF. Only
+↳ // the observer and our retained output may still own that input.
+✘ Test retainedOutputSurvivesGraphRetirement(progressiveTail:) recorded an issue with 1 argument progressiveTail → false at VideoDeinterlacerLifetimeTests.swift:90:9: Expectation failed: (observers.last?.referenceCount → 3) == ((progressiveTail ? 2 : 1) → 1)
+✘ Test retainedOutputSurvivesGraphRetirement(progressiveTail:) recorded an issue with 1 argument progressiveTail → false at VideoDeinterlacerLifetimeTests.swift:92:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+◇ Test case passing 1 argument progressiveTail → true to retainedOutputSurvivesGraphRetirement(progressiveTail:) started.
+✘ Test retainedOutputSurvivesGraphRetirement(progressiveTail:) recorded an issue with 1 argument progressiveTail → true at VideoDeinterlacerLifetimeTests.swift:90:9: Expectation failed: (observers.last?.referenceCount → 4) == ((progressiveTail ? 2 : 1) → 2)
+✘ Test retainedOutputSurvivesGraphRetirement(progressiveTail:) recorded an issue with 1 argument progressiveTail → true at VideoDeinterlacerLifetimeTests.swift:92:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test retainedOutputSurvivesGraphRetirement(progressiveTail:) with 2 test cases failed after 0.002 seconds with 5 issues.
+◇ Test cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) started.
+◇ Test case passing 1 argument cancelAfterFields → 0 to cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) started.
+✘ Test cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) recorded an issue with 1 argument cancelAfterFields → 0 at VideoDeinterlacerLifetimeTests.swift:257:9: Expectation failed: (times.count → 4) == (count → 6)
+✘ Test cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) recorded an issue with 1 argument cancelAfterFields → 0 at VideoDeinterlacerLifetimeTests.swift:120:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+◇ Test case passing 1 argument cancelAfterFields → 1 to cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) started.
+✘ Test cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) recorded an issue with 1 argument cancelAfterFields → 1 at VideoDeinterlacerLifetimeTests.swift:257:9: Expectation failed: (times.count → 5) == (count → 6)
+✘ Test cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) recorded an issue with 1 argument cancelAfterFields → 1 at VideoDeinterlacerLifetimeTests.swift:120:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+◇ Test case passing 1 argument cancelAfterFields → 2 to cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) started.
+✘ Test cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) recorded an issue with 1 argument cancelAfterFields → 2 at VideoDeinterlacerLifetimeTests.swift:120:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test cancelledDrainKeepsPendingFieldsUntilResumed(cancelAfterFields:) with 3 test cases failed after 0.002 seconds with 5 issues.
+◇ Test throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) started.
+◇ Test case passing 1 argument throwAfterFields → 1 to throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) started.
+✘ Test throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) recorded an issue with 1 argument throwAfterFields → 1 at VideoDeinterlacerLifetimeTests.swift:257:9: Expectation failed: (times.count → 5) == (count → 6)
+✘ Test throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) recorded an issue with 1 argument throwAfterFields → 1 at VideoDeinterlacerLifetimeTests.swift:148:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+◇ Test case passing 1 argument throwAfterFields → 2 to throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) started.
+✘ Test throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) recorded an issue with 1 argument throwAfterFields → 2 at VideoDeinterlacerLifetimeTests.swift:148:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test throwingConsumerCanResumeWithoutDuplicateFields(throwAfterFields:) with 2 test cases failed after 0.001 seconds with 3 issues.
+◇ Test resetReleasesUndrainedInputAndAllowsReuse() started.
+✘ Test resetReleasesUndrainedInputAndAllowsReuse() recorded an issue at VideoDeinterlacerLifetimeTests.swift:172:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test resetReleasesUndrainedInputAndAllowsReuse() failed after 0.001 seconds with 1 issue.
+◇ Test sameFormatAfterDrainRequiresReset(interlaced:) started.
+◇ Test case passing 1 argument interlaced → false to sameFormatAfterDrainRequiresReset(interlaced:) started.
+✘ Test sameFormatAfterDrainRequiresReset(interlaced:) recorded an issue with 1 argument interlaced → false at VideoDeinterlacerLifetimeTests.swift:184:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+◇ Test case passing 1 argument interlaced → true to sameFormatAfterDrainRequiresReset(interlaced:) started.
+✘ Test sameFormatAfterDrainRequiresReset(interlaced:) recorded an issue with 1 argument interlaced → true at VideoDeinterlacerLifetimeTests.swift:184:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test sameFormatAfterDrainRequiresReset(interlaced:) with 2 test cases failed after 0.001 seconds with 2 issues.
+◇ Test changedFormatAfterDrainStillStartsANewGraph(interlaced:) started.
+◇ Test case passing 1 argument interlaced → false to changedFormatAfterDrainStillStartsANewGraph(interlaced:) started.
+✘ Test changedFormatAfterDrainStillStartsANewGraph(interlaced:) recorded an issue with 1 argument interlaced → false at VideoDeinterlacerLifetimeTests.swift:212:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test changedFormatAfterDrainStillStartsANewGraph(interlaced:) recorded an issue with 1 argument interlaced → false at VideoDeinterlacerLifetimeTests.swift:230:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+◇ Test case passing 1 argument interlaced → true to changedFormatAfterDrainStillStartsANewGraph(interlaced:) started.
+✘ Test changedFormatAfterDrainStillStartsANewGraph(interlaced:) recorded an issue with 1 argument interlaced → true at VideoDeinterlacerLifetimeTests.swift:212:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test changedFormatAfterDrainStillStartsANewGraph(interlaced:) recorded an issue with 1 argument interlaced → true at VideoDeinterlacerLifetimeTests.swift:230:9: Expectation failed: observers.allSatisfy { $0.referenceCount == 1 }
+✘ Test changedFormatAfterDrainStillStartsANewGraph(interlaced:) with 2 test cases failed after 0.001 seconds with 4 issues.
+◇ Test destructionReleasesAnInterruptedDrain() started.
+✔ Test destructionReleasesAnInterruptedDrain() passed after 0.001 seconds.
+✘ Suite "BWDIF end-of-stream storage lifetime" failed after 0.013 seconds with 24 issues.
+✘ Test run with 8 tests in 1 suite failed after 0.013 seconds with 24 issues.
