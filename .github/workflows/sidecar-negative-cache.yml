@@ -1,0 +1,150 @@
+name: Sidecar negative cache memory
+
+on:
+  push:
+    branches: ['perf/sidecar-negative-cache-20261023-d877']
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/MediaSidecar*Tests.swift'
+      - 'Tests/IlliquidCoreTests/NFOMetadataFieldSelectionTests.swift'
+      - 'Tests/IlliquidCoreTests/NFOEpisodeScopeRegressionTests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistDiscoveryTests.swift'
+      - 'Benchmarks/SidecarNegativeCache/**'
+      - 'Benchmarks/RuntimeLeaseHistory/CLeaseHeap/**'
+      - '.github/workflows/sidecar-negative-cache.yml'
+      - '!Benchmarks/SidecarNegativeCache/*.md'
+      - '!Benchmarks/SidecarNegativeCache/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecar*Tests.swift'
+      - 'Tests/IlliquidCoreTests/NFOMetadataFieldSelectionTests.swift'
+      - 'Tests/IlliquidCoreTests/NFOEpisodeScopeRegressionTests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistDiscoveryTests.swift'
+      - 'Benchmarks/SidecarNegativeCache/**'
+      - 'Benchmarks/RuntimeLeaseHistory/CLeaseHeap/**'
+      - '.github/workflows/sidecar-negative-cache.yml'
+      - '!Benchmarks/SidecarNegativeCache/*.md'
+      - '!Benchmarks/SidecarNegativeCache/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sidecar-negative-cache-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record native host and source revision
+        run: |
+          mkdir -p "$RUNNER_TEMP/sidecar-negative-cache"
+          sw_vers > "$RUNNER_TEMP/sidecar-negative-cache/host.txt"
+          uname -a >> "$RUNNER_TEMP/sidecar-negative-cache/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/sidecar-negative-cache/host.txt"
+          swift --version >> "$RUNNER_TEMP/sidecar-negative-cache/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/sidecar-negative-cache/host.txt"
+      - name: Qualify sidecar semantics and measure retained cache memory
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/SidecarNegativeCache/run.py \
+            --output "$RUNNER_TEMP/sidecar-negative-cache/results" \
+            --pairs 6 "${mode[@]}"
+      - name: Preserve component evidence in the job log
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+
+          root = Path(os.environ['RUNNER_TEMP']) / 'sidecar-negative-cache'
+          export = Path(os.environ['RUNNER_TEMP']) / 'sidecar-negative-cache-evidence'
+          export.mkdir(parents=True, exist_ok=True)
+          excluded = {'.build', 'build', 'cache', 'module-cache', 'config', 'security', 'fixtures'}
+          files = {}
+          artifact_suffixes = {'.json', '.jsonl', '.log', '.txt', '.swift', '.py', '.c', '.h', '.gz'}
+          log_suffixes = {'.json', '.jsonl', '.log', '.txt'}
+          for directory, children, names in os.walk(root):
+              children[:] = sorted(name for name in children if name not in excluded)
+              for name in sorted(names):
+                  path = Path(directory) / name
+                  if path.suffix not in artifact_suffixes:
+                      continue
+                  relative = path.relative_to(root)
+                  raw = path.read_bytes()
+                  target = export / relative
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(raw)
+                  if path.suffix in log_suffixes:
+                      files[str(relative)] = raw.decode('utf-8')
+          if not files:
+              raise SystemExit('No component evidence was produced')
+          for name, text in files.items():
+              if Path(name).name in {'summary.json', 'verification.json', 'tests.json'}:
+                  print('::group::' + name)
+                  print(text)
+                  print('::endgroup::')
+          payload = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(payload) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log bundle limit; use the uploaded artifact')
+          encoded = base64.b64encode(payload).decode()
+          print('SIDECAR_NEGATIVE_CACHE_EVIDENCE_BEGIN ' + hashlib.sha256(payload).hexdigest())
+          for offset in range(0, len(encoded), 4000):
+              print('SIDECAR_NEGATIVE_CACHE_EVIDENCE_CHUNK ' + encoded[offset:offset + 4000])
+          print('SIDECAR_NEGATIVE_CACHE_EVIDENCE_END')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: sidecar-negative-cache-component
+          path: ${{ runner.temp }}/sidecar-negative-cache-evidence/
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and qualify sidecar discovery
+        run: |
+          mkdir -p "$RUNNER_TEMP/sidecar-negative-cache-integration"
+          sw_vers > "$RUNNER_TEMP/sidecar-negative-cache-integration/host.txt"
+          swift --version >> "$RUNNER_TEMP/sidecar-negative-cache-integration/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/sidecar-negative-cache-integration/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'MediaSidecarTests|MediaSidecarPathPlanTests|MediaSidecarNegativeCacheTests|NFOMetadataFieldSelectionTests|NFOEpisodeScopeRegressionTests|PlexMatchHintsRegressionTests|PlexMatchReaderRegressionTests|FolderPlaylistDiscoveryTests' \
+            2>&1 | tee "$RUNNER_TEMP/sidecar-negative-cache-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: sidecar-negative-cache-integration
+          path: ${{ runner.temp }}/sidecar-negative-cache-integration/
+          retention-days: 14
