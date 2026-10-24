@@ -1,0 +1,171 @@
+{
+  "arguments": {
+    "cases": "empty,small-32-8,repair-1000-100,repair-10000-100,repair-100000-100,repair-100000-10000,mixed-100000-100,whole-tree-100000,filesystem-root-10000",
+    "output": "/tmp/illiquid-presence-snapshot-41171-linux",
+    "pairs": 6,
+    "skip_tests": false,
+    "swift": "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+    "target_ms": 50.0,
+    "tests_only": false
+  },
+  "baseline": {
+    "commit": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+    "path": "Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift",
+    "sha256": "a90ba7735ac9790bf7f7d3aa42233f4558c7712b4e22cab9c9fff92d87a6db1b"
+  },
+  "binarySHA256": {
+    "baseline": "8eca33139d8a3b05009d141a6e00eafa255187df52d3fe31b78c13c5d773d2fd",
+    "candidate": "5bf30d2f1e79a381bbf370d0f15afb9799ad0de3963114df0410e5f1b3748631"
+  },
+  "collectedAtUTC": "2026-10-24T03:16:50Z",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "gitHead": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "gitStatus": "M .github/workflows/source-presence-performance.yml\n M Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift\n?? Benchmarks/SourcePresenceSnapshot/\n?? Tests/IlliquidAppTests/SourceMediaPresenceReuseTests.swift",
+  "harnessSHA256": {
+    "CHeap/heap.c": "e4103758e65ab676bc0190ff1ec05f6760b9eeb2519d75110a2a022a459afb83",
+    "CHeap/include/CPresenceHeap.h": "2497e7c3730972b9c3ca4231b2193a5f42b8efb0d38716ba63e13853e46b65c0",
+    "Harness.swift": "92890533d41518830ed4233ad91e9a21b67ff03b8cde843d5b15929e64345ade",
+    "run.py": "baf82e7ee9b8d216d6847a40517db9957be0b98a58e19f23b49ed0baf5021b1a"
+  },
+  "machine": "x86_64",
+  "memoryScope": "Allocator-accounted incremental bytes before snapshot, after snapshot, after one source publication, and after snapshot release. Not RSS, physical footprint, or whole-player memory.",
+  "method": "Optimized observed MainActor snapshot expressions, exact cursor helper, separate module; balanced fresh-process AB/BA pairs; deterministic hashing with per-pair fixture seeds.",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "sourceReceipts": {
+    "baseline": {
+      "Package.swift": {
+        "origin": "generated isolated component package",
+        "sha256": "0fea8c320c02e8592454fc160dacc8233a70cde1f0562bf90b898a4b697180ba",
+        "transformation": "none"
+      },
+      "Sources/CPresenceHeap/heap.c": {
+        "origin": "Benchmarks/SourcePresenceSnapshot/CHeap/heap.c",
+        "sha256": "e4103758e65ab676bc0190ff1ec05f6760b9eeb2519d75110a2a022a459afb83",
+        "transformation": "none"
+      },
+      "Sources/CPresenceHeap/include/CPresenceHeap.h": {
+        "origin": "Benchmarks/SourcePresenceSnapshot/CHeap/include/CPresenceHeap.h",
+        "sha256": "2497e7c3730972b9c3ca4231b2193a5f42b8efb0d38716ba63e13853e46b65c0",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/BenchmarkScanner.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift",
+        "sha256": "568d59428467495f09c1c8383306ed60d0a6fb2b54ab8361be28e0928fb3b607",
+        "transformation": "exact snapshot statement and storage declarations in an observed MainActor shell; setup/publication adapters added"
+      },
+      "Sources/IlliquidApp/SourceMediaPresenceRecomputation.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourceMediaPresenceRecomputation.swift",
+        "sha256": "5702a74a421ad1fe34107a51c64b623b118ef5f753c26cc1c1f4b9e41cf5da98",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceMediaPresenceScanner.swift": {
+        "origin": "Benchmarks/SourcePresenceSnapshot/baseline/SourceMediaPresenceScanner.swift",
+        "sha256": "a90ba7735ac9790bf7f7d3aa42233f4558c7712b4e22cab9c9fff92d87a6db1b",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceRootPruning.swift": {
+        "origin": "Sources/IlliquidApp/App/SourceRootPruning.swift",
+        "sha256": "dafe89a38104ee37c43e954ef082c76d867486ec64092577176e3955b3999c82",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceTreeIdentity.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "sha256": "0bf2c6c70ad6c6454b442e11c4b898264b86729ffbf637298c66bf1213b32c7f",
+        "transformation": "exact SourceTreeIdentity declaration; imports added"
+      },
+      "Sources/IlliquidCore/MediaFileSupport.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/MediaFileSupport.swift",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/NormalizedFileURL.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/SourcePreparationExecutor.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift",
+        "sha256": "681fc16a1e263af5f5cf11bd5838fefa29b4bf77ef58aa3615a9180e5bbd7b16",
+        "transformation": "none"
+      },
+      "Sources/PresenceSnapshotBenchmark/Harness.swift": {
+        "origin": "Benchmarks/SourcePresenceSnapshot/Harness.swift",
+        "sha256": "92890533d41518830ed4233ad91e9a21b67ff03b8cde843d5b15929e64345ade",
+        "transformation": "none"
+      }
+    },
+    "candidate": {
+      "Package.swift": {
+        "origin": "generated isolated component package",
+        "sha256": "8270b2b87c7f4434a893fefe867fa9a377c03212db203584a4eba94f2b597e7e",
+        "transformation": "none"
+      },
+      "Sources/CPresenceHeap/heap.c": {
+        "origin": "Benchmarks/SourcePresenceSnapshot/CHeap/heap.c",
+        "sha256": "e4103758e65ab676bc0190ff1ec05f6760b9eeb2519d75110a2a022a459afb83",
+        "transformation": "none"
+      },
+      "Sources/CPresenceHeap/include/CPresenceHeap.h": {
+        "origin": "Benchmarks/SourcePresenceSnapshot/CHeap/include/CPresenceHeap.h",
+        "sha256": "2497e7c3730972b9c3ca4231b2193a5f42b8efb0d38716ba63e13853e46b65c0",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/BenchmarkScanner.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift",
+        "sha256": "78418c75ae17a665c77a283da6b6f9fa15f62dd84a01d685ee9dfc0da227bdd0",
+        "transformation": "exact snapshot statement and storage declarations in an observed MainActor shell; setup/publication adapters added"
+      },
+      "Sources/IlliquidApp/SourceMediaPresenceRecomputation.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourceMediaPresenceRecomputation.swift",
+        "sha256": "5702a74a421ad1fe34107a51c64b623b118ef5f753c26cc1c1f4b9e41cf5da98",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceMediaPresenceScanner.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift",
+        "sha256": "26e33271d4f289bb5f8dd18c4648a88bf4fc8484a07e9a43f6797b44b5852b28",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceRootPruning.swift": {
+        "origin": "Sources/IlliquidApp/App/SourceRootPruning.swift",
+        "sha256": "dafe89a38104ee37c43e954ef082c76d867486ec64092577176e3955b3999c82",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceTreeIdentity.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "sha256": "0bf2c6c70ad6c6454b442e11c4b898264b86729ffbf637298c66bf1213b32c7f",
+        "transformation": "exact SourceTreeIdentity declaration; imports added"
+      },
+      "Sources/IlliquidCore/MediaFileSupport.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/MediaFileSupport.swift",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/NormalizedFileURL.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/SourcePreparationExecutor.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift",
+        "sha256": "681fc16a1e263af5f5cf11bd5838fefa29b4bf77ef58aa3615a9180e5bbd7b16",
+        "transformation": "none"
+      },
+      "Sources/PresenceSnapshotBenchmark/Harness.swift": {
+        "origin": "Benchmarks/SourcePresenceSnapshot/Harness.swift",
+        "sha256": "92890533d41518830ed4233ad91e9a21b67ff03b8cde843d5b15929e64345ade",
+        "transformation": "none"
+      },
+      "Tests/IlliquidAppTests/SourceMediaPresenceRecomputationTests.swift": {
+        "origin": "Tests/IlliquidAppTests/SourceMediaPresenceRecomputationTests.swift",
+        "sha256": "d51ebb1e6b14fd4aa75886f839db8954309aa4fa6cba21cc7afa48624cfc5b53",
+        "transformation": "none"
+      },
+      "Tests/IlliquidAppTests/SourceMediaPresenceReuseTests.swift": {
+        "origin": "Tests/IlliquidAppTests/SourceMediaPresenceReuseTests.swift",
+        "sha256": "6598ee08c415214a5cce1c94aa5090fdb60aa79d26f26bb3d0ec3fd51633a5c1",
+        "transformation": "none"
+      }
+    }
+  },
+  "timingScope": "Snapshot construction and destruction only; excludes fixture setup, source publication, allocator sampling, lookup verification, traversal, and UI rendering."
+}

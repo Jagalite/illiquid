@@ -1,0 +1,89 @@
+Test Suite 'All tests' started at 2026-10-23 23:17:01.100
+Test Suite 'debug.xctest' started at 2026-10-23 23:17:01.101
+Test Suite 'debug.xctest' passed at 2026-10-23 23:17:01.101
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-23 23:17:01.101
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Source media presence recomputation" started.
+◇ Test emptyInputsAndUnwatchedChangesProduceNoWork() started.
+✔ Test emptyInputsAndUnwatchedChangesProduceNoWork() passed after 0.001 seconds.
+◇ Test duplicatesAndSharedAncestorsAreScheduledOnlyOnce() started.
+✔ Test duplicatesAndSharedAncestorsAreScheduledOnlyOnce() passed after 0.001 seconds.
+◇ Test prefixSiblingsStayOutsideTheWatchedRoot() started.
+✔ Test prefixSiblingsStayOutsideTheWatchedRoot() passed after 0.001 seconds.
+◇ Test nestedAndDisjointRootsRetainTheirBoundaries() started.
+✔ Test nestedAndDisjointRootsRetainTheirBoundaries() passed after 0.001 seconds.
+◇ Test filesystemRootIsIncludedOnceAndTerminatesTheWalk() started.
+✔ Test filesystemRootIsIncludedOnceAndTerminatesTheWalk() passed after 0.001 seconds.
+◇ Test canonicalUnicodePathsAndDictionaryKeysRemainUsable() started.
+✔ Test canonicalUnicodePathsAndDictionaryKeysRemainUsable() passed after 0.001 seconds.
+◇ Test equivalentUnicodeSpellingsDoNotPutAParentBeforeItsChild() started.
+✔ Test equivalentUnicodeSpellingsDoNotPutAParentBeforeItsChild() passed after 0.001 seconds.
+◇ Test deepAndWideBatchesHaveOneEntryPerAffectedFolder() started.
+✔ Test deepAndWideBatchesHaveOneEntryPerAffectedFolder() passed after 0.046 seconds.
+◇ Test aChangedParentSummaryIsEvaluatedEvenWhenItsChildStaysFalse() started.
+✔ Test aChangedParentSummaryIsEvaluatedEvenWhenItsChildStaysFalse() passed after 0.001 seconds.
+◇ Test incompleteUnreadableAndMissingSummariesCannotEstablishAbsence() started.
+✔ Test incompleteUnreadableAndMissingSummariesCannotEstablishAbsence() passed after 0.001 seconds.
+◇ Test positiveEvidencePropagatesThroughIncompleteUnreadableAncestors() started.
+✔ Test positiveEvidencePropagatesThroughIncompleteUnreadableAncestors() passed after 0.001 seconds.
+◇ Test missingChangedSummariesClearStaleValuesWithoutTouchingOtherTrees() started.
+✔ Test missingChangedSummariesClearStaleValuesWithoutTouchingOtherTrees() passed after 0.001 seconds.
+◇ Test seededValidTreesMatchThePreviousAncestorWalk() started.
+✔ Test seededValidTreesMatchThePreviousAncestorWalk() passed after 0.437 seconds.
+✔ Suite "Source media presence recomputation" passed after 0.489 seconds.
+◇ Suite "Source media presence cache snapshots" started.
+◇ Test rootAndDescendantsRetainBothPresenceValues() started.
+✔ Test rootAndDescendantsRetainBothPresenceValues() passed after 0.001 seconds.
+◇ Test ancestorsPrefixSiblingsAndOtherRootsAreExcluded() started.
+✔ Test ancestorsPrefixSiblingsAndOtherRootsAreExcluded() passed after 0.001 seconds.
+◇ Test filesystemRootMatchesAbsoluteDescendantsWithoutADoubleSeparator() started.
+✔ Test filesystemRootMatchesAbsoluteDescendantsWithoutADoubleSeparator() passed after 0.001 seconds.
+◇ Test missingIncompleteAndUnreadableSummariesCannotSeedReuse() started.
+✔ Test missingIncompleteAndUnreadableSummariesCannotSeedReuse() passed after 0.001 seconds.
+◇ Test canonicallyEquivalentUnicodePathsKeepTheirOriginalKeys() started.
+✔ Test canonicallyEquivalentUnicodePathsKeepTheirOriginalKeys() passed after 0.001 seconds.
+◇ Test snapshotRemainsIndependentWhenInputsChange() started.
+✔ Test snapshotRemainsIndependentWhenInputsChange() passed after 0.001 seconds.
+◇ Test scopedAndUnscopedCachesProduceEquivalentFilesystemTraversal() started.
+✔ Test scopedAndUnscopedCachesProduceEquivalentFilesystemTraversal() passed after 0.004 seconds.
+◇ Test repairingOneWatchedRootPreservesTheOtherRootsResults() started.
+✔ Test repairingOneWatchedRootPreservesTheOtherRootsResults() passed after 0.034 seconds.
+✔ Suite "Source media presence cache snapshots" passed after 0.041 seconds.
+✔ Test run with 21 tests in 2 suites passed after 0.531 seconds.
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/30] Compiling CPresenceHeap heap.c
+[1/30] Write swift-version-79F5DDD9F357E4C6.txt
+[2/30] Emitting module for IlliquidCore
+[3/30] Compiling IlliquidCore MediaFileSupport.swift
+[4/30] Compiling IlliquidCore SourcePreparationExecutor.swift
+[5/30] Wrapping AST for IlliquidCore for debugging
+[6/30] Emitting module for IlliquidApp
+[7/30] Compiling IlliquidApp SourceRootPruning.swift
+[8/30] Compiling PresenceSnapshotBenchmark Harness.swift
+[9/30] Emitting module for PresenceSnapshotBenchmark
+[10/30] Compiling IlliquidApp BenchmarkScanner.swift
+[11/30] Wrapping AST for PresenceSnapshotBenchmark for debugging
+[12/30] Emitting module for IlliquidAppTests
+[13/30] Compiling IlliquidAppTests SourceMediaPresenceReuseTests.swift
+[14/30] Wrapping AST for IlliquidAppTests for debugging
+[15/30] Wrapping AST for IlliquidApp for debugging
+[16/30] Write Objects.LinkFileList
+[17/30] Linking PresenceSnapshotBenchmark
+[18/30] Compiling IlliquidAppTests SourceMediaPresenceRecomputationTests.swift
+[19/30] /tmp/illiquid-presence-snapshot-41171-linux/build/candidate/.build/x86_64-unknown-linux-gnu/debug/SourcePresenceSnapshotPackageDiscoveredTests.derived/all-discovered-tests.swift
+[20/30] Compiling SourcePresenceSnapshotPackageDiscoveredTests IlliquidAppTests.swift
+[21/30] Compiling SourcePresenceSnapshotPackageDiscoveredTests all-discovered-tests.swift
+[22/30] Emitting module for SourcePresenceSnapshotPackageDiscoveredTests
+[23/30] /tmp/illiquid-presence-snapshot-41171-linux/build/candidate/.build/x86_64-unknown-linux-gnu/debug/SourcePresenceSnapshotPackageTests.derived/runner.swift
+[24/30] Wrapping AST for SourcePresenceSnapshotPackageDiscoveredTests for debugging
+[25/30] Emitting module for SourcePresenceSnapshotPackageTests
+[26/30] Wrapping AST for SourcePresenceSnapshotPackageTests for debugging
+[27/30] Compiling SourcePresenceSnapshotPackageTests runner.swift
+[28/30] Write Objects.LinkFileList
+[29/30] Linking SourcePresenceSnapshotPackageTests.xctest
+Build complete! (10.08s)

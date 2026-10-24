@@ -1,13 +1,25 @@
 name: Source presence performance
 
 on:
+  push:
+    branches: ['perf/source-presence-snapshot-memory-20261024']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaPresenceReuseTests.swift'
+      - 'Benchmarks/SourcePresenceSnapshot/**'
+      - '.github/workflows/source-presence-performance.yml'
+      - '!Benchmarks/SourcePresenceSnapshot/README.md'
+      - '!Benchmarks/SourcePresenceSnapshot/evidence/**'
   pull_request:
     paths:
       - 'Sources/IlliquidApp/UI/SourceMediaPresence*.swift'
       - 'Tests/IlliquidAppTests/SourceMediaPresence*.swift'
       - 'Benchmarks/SourceMediaPresence/**'
+      - 'Benchmarks/SourcePresenceSnapshot/**'
       - 'Scripts/test-source-presence-regressions.sh'
       - '.github/workflows/source-presence-performance.yml'
+      - '!Benchmarks/SourcePresenceSnapshot/README.md'
+      - '!Benchmarks/SourcePresenceSnapshot/evidence/**'
   workflow_dispatch:
 
 permissions:
@@ -37,11 +49,13 @@ jobs:
           bash Scripts/test-source-presence-regressions.sh -c release --jobs 2 -Xswiftc -warnings-as-errors \
             2>&1 | tee "$RUNNER_TEMP/source-presence/tests-release.txt"
       - name: Measure paired release publication workloads
+        if: github.event_name != 'push'
         run: |
           python3 Benchmarks/SourceMediaPresence/run.py \
             --pairs 10 --target-ms 30 \
             --output "$RUNNER_TEMP/source-presence/benchmark"
       - name: Summarize measured publication cost
+        if: github.event_name != 'push'
         run: |
           python3 - <<'PY'
           import json
@@ -60,6 +74,34 @@ jobs:
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as output:
               output.write(text)
           PY
+      - name: Qualify and measure scoped scanner snapshots
+        run: |
+          python3 Benchmarks/SourcePresenceSnapshot/run.py \
+            --pairs 6 --target-ms 50 \
+            --output "$RUNNER_TEMP/source-presence/snapshot"
+      - name: Emit snapshot summary and review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "source-presence/snapshot"
+          files = {
+              path.name: path.read_text()
+              for path in sorted(root.glob("*"))
+              if path.is_file() and path.suffix in {".json", ".jsonl", ".log"}
+          }
+          if "summary.json" in files:
+              summary = json.dumps(json.loads(files["summary.json"]), sort_keys=True, separators=(",", ":"))
+              print("SOURCE_PRESENCE_SNAPSHOT_SUMMARY " + summary)
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as output:
+                  output.write("## Source presence snapshot memory\n\n```json\n" + summary + "\n```\n")
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit("Snapshot evidence exceeds the 2 MiB log bundle limit; use the uploaded artifact")
+          print("SOURCE_PRESENCE_SNAPSHOT_SHA256 " + hashlib.sha256(packed).hexdigest())
+          print("SOURCE_PRESENCE_SNAPSHOT_BASE64 " + base64.b64encode(packed).decode())
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -67,6 +109,7 @@ jobs:
           path: |
             ${{ runner.temp }}/source-presence/
             !${{ runner.temp }}/source-presence/benchmark/build/**
+            !${{ runner.temp }}/source-presence/snapshot/build/**
           retention-days: 14
 
   native-scanner:
@@ -89,8 +132,8 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/source-presence-native"
           set -o pipefail
-          swift test --force-resolved-versions --filter \
-            'SourceMediaPresenceScannerTests|SourceMediaPresenceRecomputationTests' \
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+            'SourceMediaPresenceScannerTests|SourceMediaPresenceRecomputationTests|SourceMediaPresenceReuseTests' \
             2>&1 | tee "$RUNNER_TEMP/source-presence-native/tests.txt"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
