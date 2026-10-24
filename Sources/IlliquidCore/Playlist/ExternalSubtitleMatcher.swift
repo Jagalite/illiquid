@@ -45,16 +45,12 @@ public enum ExternalSubtitleMatcher {
             let tokens = removingTrailingSubtitleQualifiers(from: raw)
             var best: (index: Int, score: Int)?
             var tied = false
-            guard let candidates = index.candidates(for: tokens, isCancelled: isCancelled) else {
-                return [:]
-            }
-            for candidate in candidates {
-                guard !isCancelled() else { return [:] }
+            let completed = index.visitCandidates(for: tokens, isCancelled: isCancelled) { candidate in
                 let item = media[candidate]
                 guard let score = matchScore(
                     rawMediaTokens: item.raw, mediaTokens: item.tokens,
                     rawSubtitleTokens: raw, subtitleTokens: tokens
-                ) else { continue }
+                ) else { return }
                 if best == nil || score > best!.score {
                     best = (candidate, score)
                     tied = false
@@ -62,14 +58,18 @@ public enum ExternalSubtitleMatcher {
                     tied = true
                 }
             }
+            guard completed else { return [:] }
             if let best, !tied {
                 result[media[best.index].url, default: []].append(subtitleURL)
             }
         }
 
-        for mediaURL in Array(result.keys) {
+        // Replacing existing values preserves indices and avoids a key snapshot.
+        var resultIndex = result.startIndex
+        while resultIndex != result.endIndex {
             guard !isCancelled() else { return [:] }
-            result[mediaURL] = NaturalFilenameOrdering.sort(result[mediaURL, default: []])
+            result.values[resultIndex] = NaturalFilenameOrdering.sort(result.values[resultIndex])
+            result.formIndex(after: &resultIndex)
         }
 
         guard !isCancelled() else { return [:] }
@@ -91,25 +91,33 @@ public enum ExternalSubtitleMatcher {
             node.terminal.append(index)
         }
 
-        // nil distinguishes an interrupted traversal from a completed lookup
-        // with no candidates, so the caller can discard all earlier matches.
-        func candidates(for tokens: [String], isCancelled: () -> Bool) -> [Int]? {
-            guard !tokens.isEmpty else { return [] }
-            var result: [Int] = []
+        // Visit matches as they are found instead of retaining a candidate array.
+        // false distinguishes cancellation from a completed, possibly empty
+        // traversal, so the caller can discard all earlier associations.
+        func visitCandidates(
+            for tokens: [String], isCancelled: () -> Bool, _ visit: (Int) -> Void
+        ) -> Bool {
+            guard !tokens.isEmpty else { return true }
             var node = self
             for token in tokens {
-                guard !isCancelled() else { return nil }
-                result.append(contentsOf: node.terminal)
-                guard let child = node.children[token] else { return result }
+                guard !isCancelled() else { return false }
+                for candidate in node.terminal {
+                    guard !isCancelled() else { return false }
+                    visit(candidate)
+                }
+                guard let child = node.children[token] else { return true }
                 node = child
             }
             var pending = [node]
             while let current = pending.popLast() {
-                guard !isCancelled() else { return nil }
-                result.append(contentsOf: current.terminal)
+                guard !isCancelled() else { return false }
+                for candidate in current.terminal {
+                    guard !isCancelled() else { return false }
+                    visit(candidate)
+                }
                 pending.append(contentsOf: current.children.values)
             }
-            return result
+            return true
         }
     }
 

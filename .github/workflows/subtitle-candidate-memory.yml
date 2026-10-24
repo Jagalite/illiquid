@@ -1,0 +1,68 @@
+name: Subtitle matcher temporary memory
+
+on:
+  push:
+    branches: ['perf/subtitle-candidate-streaming-*']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitle*.swift'
+      - 'Scripts/test-subtitle-candidate-traversal.sh'
+      - 'Benchmarks/SubtitleCandidateStreaming/Harness.swift'
+      - 'Benchmarks/SubtitleCandidateStreaming/run.py'
+      - 'Benchmarks/SubtitleCandidateStreaming/CHeapProbe/**'
+      - '.github/workflows/subtitle-candidate-memory.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitle*.swift'
+      - 'Scripts/test-subtitle-candidate-traversal.sh'
+      - 'Benchmarks/SubtitleCandidateStreaming/**'
+      - '.github/workflows/subtitle-candidate-memory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-candidate-memory-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Run matcher regressions in debug and release
+        run: |
+          mkdir -p "$RUNNER_TEMP/subtitle-candidate-memory/tests"
+          set -o pipefail
+          bash Scripts/test-subtitle-candidate-traversal.sh --jobs 2 -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-candidate-memory/tests/debug.log"
+          bash Scripts/test-subtitle-candidate-traversal.sh -c release --jobs 2 -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-candidate-memory/tests/release.log"
+      - name: Compare paired memory and association timing
+        run: |
+          python3 Benchmarks/SubtitleCandidateStreaming/run.py \
+            --output "$RUNNER_TEMP/subtitle-candidate-memory/benchmark" \
+            --pairs 6
+          cat "$RUNNER_TEMP/subtitle-candidate-memory/benchmark/summary.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-candidate-memory
+          path: |
+            ${{ runner.temp }}/subtitle-candidate-memory/
+            !${{ runner.temp }}/subtitle-candidate-memory/benchmark/build/**
+            !${{ runner.temp }}/subtitle-candidate-memory/benchmark/module-cache/**
+            !${{ runner.temp }}/subtitle-candidate-memory/benchmark/package-cache/**
+          retention-days: 14
