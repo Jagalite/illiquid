@@ -21,6 +21,10 @@ public final class MediaSidecarReader {
         let sidecars: [FolderSidecarPaths]
     }
     private var cache: [String: Sidecar] = [:]
+    // A missing or unusable sidecar needs only its path. Keeping those entries
+    // out of the value dictionary avoids reserving the enum's metadata payload
+    // for every file in a library without per-file sidecars.
+    private var missingPaths: Set<String> = []
     // A metadata pass normally visits sibling files consecutively. Retain only
     // their last validated path plan, bounded by the existing 64-folder limit.
     private var ancestorPathPlan: AncestorPathPlan?
@@ -139,9 +143,11 @@ public final class MediaSidecarReader {
     }
 
     private func read(_ url: URL) -> Sidecar {
-        if let cached = cache[url.path] { return cached }
+        let path = url.path
+        if let cached = cache[path] { return cached }
+        if missingPaths.contains(path) { return .missing }
         // Bounds cover both parsed data and negative lookups in pathological trees.
-        guard cache.count < 50_000, remainingBytes > 0 else { return .missing }
+        guard cache.count + missingPaths.count < 50_000, remainingBytes > 0 else { return .missing }
         var result: Sidecar = .missing
         if let data = readBoundedRegularFile(url) {
             remainingBytes -= data.count
@@ -150,7 +156,10 @@ public final class MediaSidecarReader {
                let hints = PlexMatchHints.parse(text) { result = .plex(hints) }
             else if url.pathExtension.lowercased() == "nfo", let hints = NFOMetadataHints.parse(data) { result = .nfo(hints) }
         }
-        cache[url.path] = result
+        switch result {
+        case .missing: missingPaths.insert(path)
+        case .plex, .nfo: cache[path] = result
+        }
         return result
     }
 
