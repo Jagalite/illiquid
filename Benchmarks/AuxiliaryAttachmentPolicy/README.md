@@ -13,6 +13,12 @@ See [the research report](../../Documentation/AUXILIARY_FONT_MEMORY_RESEARCH.md)
 for the measured results and platform qualification. Evidence is under
 [`evidence/linux`](evidence/linux).
 
+A [separate source-pinned macOS replication](../../Documentation/AUXILIARY_FONT_MACOS_REPLICATION.md)
+confirms lower live allocations but measures higher retained RSS/physical
+footprint in the larger fixtures. Its raw evidence is under
+[`evidence/macos-replication-979bdd`](evidence/macos-replication-979bdd).
+It does not replace native qualification of this branch's exact implementation.
+
 ## Fixtures
 
 `generate-fixtures.py` creates one-second Matroska files with MPEG-4 video, FLAC
@@ -148,3 +154,4 @@ The experiment does not claim lower whole-player RAM, GPU memory, frame-drop
 rate or energy use. The portable mechanism is removal of one unnecessary Swift
 font-payload copy per opted-out auxiliary reader; measured allocator/RSS results
 apply to the recorded platform and workload.
+

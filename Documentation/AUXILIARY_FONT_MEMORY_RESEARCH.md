@@ -4,6 +4,21 @@ Research date: 2026-10-24. Baseline:
 `4abf4b44f13386ccd04f1ce4ad0e756255ca4d14`. Measured production candidate:
 `597a53ef2c6e799486abf7e6b59aa13f86bad87e`.
 
+## Independent native replication
+
+A separate Boolean-option implementation at `979bdd34` completed a macOS
+experiment with 228 fresh processes. It confirms reduced live heap ownership,
+but retained resident memory and physical footprint rise by approximately 4 MiB
+with 16 MiB of fonts and 16 MiB with 64 MiB. Its Debug and Release runs each
+passed 73 test functions and skipped ten; all 20 cases in its new auxiliary
+suite executed. Those results are source-pinned replication evidence, **not
+qualification of this PR's different policy-enum implementation or newer app
+source tree**. This PR's own native checks remain necessary.
+
+See [all native results and tradeoffs](AUXILIARY_FONT_MACOS_REPLICATION.md)
+and the complete retained receipts. The physical-memory increase needs
+investigation before describing this as an overall macOS RAM improvement.
+
 ## Result
 
 Secondary media readers do not need their own Swift copies of embedded font
@@ -231,3 +246,4 @@ The exact measured driver remains in the compressed receipts; the separate
 `finalization.json` records both hashes and verifies that this is the only
 driver-byte difference. Production source and executable behavior are
 unchanged by that whitespace cleanup.
+
