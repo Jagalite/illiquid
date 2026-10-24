@@ -7,21 +7,22 @@ import Testing
 struct AudioDelayMemoryTests {
     @Test(arguments: [1, 2, 6, 8])
     func retainedFullSilenceChunksShareStorageAndTailHasExactSize(channels: Int) throws {
-        let silenceSamples = 3 * 1_024 + 76
+        // 0.125 seconds is exact at both 48 kHz and the 60 kHz delay timescale.
+        let silenceSamples = 5 * 1_024 + 880
         let source = frame(samples: 480, channels: channels)
         var timeline = AudioDelayTimeline(delay: Double(silenceSamples) / 48_000)
         var output: [NativeDecodedAudioFrame] = []
         #expect(timeline.consume(source) { output.append($0); return true })
-        try #require(output.count == 5)
+        try #require(output.count == 7)
 
-        for index in 0..<3 {
+        for index in 0..<5 {
             #expect(output[index].sampleCount == 1_024)
             #expect(output[index].interleavedFloatPCM.count == 1_024 * channels * 4)
             #expect(abs(output[index].presentationTime.seconds - Double(index * 1_024) / 48_000) < 1e-9)
             expectSharedStorage(output[0].interleavedFloatPCM, output[index].interleavedFloatPCM)
         }
-        #expect(output[3].sampleCount == 76)
-        #expect(output[3].interleavedFloatPCM.count == 76 * channels * 4)
+        #expect(output[5].sampleCount == 880)
+        #expect(output[5].interleavedFloatPCM.count == 880 * channels * 4)
         #expect(output.dropLast().allSatisfy { $0.interleavedFloatPCM.allSatisfy { $0 == 0 } })
         #expect(output.dropLast().reduce(0) { $0 + $1.sampleCount } == silenceSamples)
         #expect(output.last?.interleavedFloatPCM == source.interleavedFloatPCM)
@@ -98,10 +99,10 @@ struct AudioDelayMemoryTests {
         withExtendedLifetime((timeline, output)) {}
     }
 
-    @Test(arguments: [0, 2, 3])
+    @Test(arguments: [0, 2, 5])
     func rejectedSilenceDoesNotAdvancePastAcceptedChunks(acceptedChunks: Int) throws {
         let source = frame(samples: 480, channels: 6)
-        var timeline = AudioDelayTimeline(delay: Double(3 * 1_024 + 76) / 48_000)
+        var timeline = AudioDelayTimeline(delay: 0.125)
         var attempts: [NativeDecodedAudioFrame] = []
         #expect(!timeline.consume(source) {
             attempts.append($0)
@@ -109,7 +110,7 @@ struct AudioDelayMemoryTests {
         })
         try #require(attempts.count == acceptedChunks + 1)
         #expect(abs(timeline.cursor - Double(acceptedChunks * 1_024) / 48_000) < 1e-9)
-        #expect(attempts.last?.sampleCount == (acceptedChunks == 3 ? 76 : 1_024))
+        #expect(attempts.last?.sampleCount == (acceptedChunks == 5 ? 880 : 1_024))
         #expect(attempts.allSatisfy { $0.interleavedFloatPCM.allSatisfy { $0 == 0 } })
         for attempted in attempts { expectFormat(attempted, matches: source) }
         if attempts.count >= 2 {

@@ -82,8 +82,6 @@ struct ASSCompositionMetrics: Equatable, Sendable {
     let drawCalls: Int
     let atlasWidth: Int
     let atlasHeight: Int
-    /// The frame exceeds this source pool's previous largest byte requirement.
-    /// This is not a count of individual staging-slot allocations or GPU uploads.
     let atlasReallocated: Bool
     /// Bytes initialized on growth or explicitly cleared on buffer reuse.
     /// Includes a previous larger frame's dirty prefix on its first reuse.

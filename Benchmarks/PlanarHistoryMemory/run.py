@@ -112,7 +112,9 @@ class Runner:
         save(self.evidence / "manifest.json", manifest)
 
     def compile(self):
-        ccflags = ["-isysroot", self.sdk] if self.sdk else []
+        # Darwin's native allocator and rusage interfaces require its full API
+        # namespace; strict POSIX mode hides malloc_zone_t and ru_maxrss.
+        ccflags = ["-isysroot", self.sdk, "-D_DARWIN_C_SOURCE"] if self.sdk else []
         self.command([self.args.clang, *ccflags, "-std=c11", "-D_POSIX_C_SOURCE=200809L", "-O2",
             "-Wall", "-Wextra", "-Werror", "-c", self.build / "Heap.c", "-o", self.build / "Heap.o"], "heap-compile.log")
         native_flags = ["-sdk", self.sdk, "-target", f"{platform.machine()}-apple-macos26.0"] if self.sdk else []
