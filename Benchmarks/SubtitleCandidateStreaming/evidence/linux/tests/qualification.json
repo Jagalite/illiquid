@@ -1,0 +1,89 @@
+{
+  "baseline_commit": "4abf4b44f13386ccd04f1ce4ad0e756255ca4d14",
+  "baseline_runner": "A persistent package with the identical runner Package.swift and identical four current test files; production sources obtained from the pinned baseline commit.",
+  "cache_policy": "Task-owned package/config/security and module caches; sequential builds; no repository .build use.",
+  "candidate_runner": "Scripts/test-subtitle-candidate-traversal.sh",
+  "candidate_source_commit": "a8d950d6c1a1d22381fc7debee7b12632ec65a18",
+  "collected_utc": "2026-10-24T14:29:37Z",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "known_tool_message": "SwiftPM reports --use-integrated-swift-driver as deprecated; compilation still uses -warnings-as-errors and all runs succeeded.",
+  "machine": "x86_64",
+  "package_manifest_sha256": "bc0d765ed147b586b3b0abe6f74f112d4f2b489e41d5bfed820c99a84abe636c",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "results": [
+    {
+      "configuration": "debug",
+      "log": "baseline-debug.log",
+      "log_sha256": "9369f8f00bf2bac67d2cf2a970843ec51cdb0e8f26d6a4553daaff1d94dda485",
+      "passed": true,
+      "suites": 4,
+      "test_execution_seconds": 1.379,
+      "tests": 38,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "log": "baseline-release.log",
+      "log_sha256": "0890fa64ebf75f07759264898f36d56d846f7bc141764c5a8694c6d8e18486a5",
+      "passed": true,
+      "suites": 4,
+      "test_execution_seconds": 0.809,
+      "tests": 38,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "log": "candidate-debug.log",
+      "log_sha256": "f0429c58d1c8eec56315586ff3c26a5171e6525365d98a0997a834df88348a3c",
+      "passed": true,
+      "suites": 4,
+      "test_execution_seconds": 1.056,
+      "tests": 38,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "log": "candidate-release.log",
+      "log_sha256": "107132c4e7b1469596a7c2435d808d7f973b8fb3a64397ff06c92420b202128a",
+      "passed": true,
+      "suites": 4,
+      "test_execution_seconds": 0.343,
+      "tests": 38,
+      "variant": "candidate"
+    }
+  ],
+  "runner_sha256": "489db7c426f9618bc4e1f92b85935d18682e91155bf30ebf66998297dd117d4b",
+  "scope": "Four portable Swift Testing suites compiled against the same three unmodified production source files; baseline sources pinned to main, candidate source hashes below; no native UI or playback execution.",
+  "shared_options": [
+    "--use-integrated-swift-driver",
+    "--jobs",
+    "2",
+    "--no-parallel",
+    "-Xswiftc",
+    "-warnings-as-errors",
+    "--disable-xctest",
+    "--enable-swift-testing"
+  ],
+  "source_files": {
+    "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift": {
+      "baseline_sha256": "32baa1287ed03126aedee7c57fadd72aaf44fccc196b76e544de48fcb4e884a8",
+      "candidate_sha256": "6a18f9eeee002ef2d578545aa6b7e443fa51d16f3ec5d7211dc45ae8ae6753b1"
+    },
+    "Sources/IlliquidCore/Utilities/MediaFileSupport.swift": {
+      "baseline_sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+      "candidate_sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+    },
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+      "baseline_sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+      "candidate_sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    }
+  },
+  "sources_manifest_sha256": "0dfa88aa0e0952ca786b159e8071ea67efa637c645a87153e3b71695dcb08f2d",
+  "tests": {
+    "Tests/IlliquidCoreTests/ExternalSubtitleCandidateTraversalTests.swift": "09cbe51e493ee7e7d976eac3d22bdd1d7ebd790ea237818669351e5711abcdff",
+    "Tests/IlliquidCoreTests/ExternalSubtitleMatcherEmptyTests.swift": "335fd5ed2057a0399663cd7d650b3755515479b2899cb1a9ac159953451a873d",
+    "Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift": "8e87e9870e636aa622ce977fdc3e36814e77607b250987fa1592484a3aa0c370",
+    "Tests/IlliquidCoreTests/ExternalSubtitleTokenizationTests.swift": "30cc9f50ad8a5123f9aefd403111bf2126006e088d2aba18eff6ac0d41aa9ab4"
+  },
+  "timing_note": "Test execution durations are qualification metadata, not benchmark measurements."
+}

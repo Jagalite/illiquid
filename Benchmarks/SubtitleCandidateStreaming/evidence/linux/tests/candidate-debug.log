@@ -1,0 +1,134 @@
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/20] Write swift-version-79F5DDD9F357E4C6.txt
+[1/20] Emitting module for IlliquidCore
+[2/20] Compiling IlliquidCore ExternalSubtitleMatcher.swift
+[3/20] Compiling IlliquidCore NaturalFilenameOrdering.swift
+[4/20] Emitting module for IlliquidCoreTests
+[5/20] Compiling IlliquidCoreTests ExternalSubtitleCandidateTraversalTests.swift
+[6/20] Compiling IlliquidCoreTests ExternalSubtitleMatcherTests.swift
+[7/20] Wrapping AST for IlliquidCoreTests for debugging
+[8/20] /tmp/illiquid-subtitle-candidates.jPcpRZ/.build/x86_64-unknown-linux-gnu/debug/SubtitleCandidateTraversalQualificationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[9/20] Wrapping AST for IlliquidCore for debugging
+[10/20] Compiling SubtitleCandidateTraversalQualificationPackageDiscoveredTests IlliquidCoreTests.swift
+[11/20] Emitting module for SubtitleCandidateTraversalQualificationPackageDiscoveredTests
+[12/20] /tmp/illiquid-subtitle-candidates.jPcpRZ/.build/x86_64-unknown-linux-gnu/debug/SubtitleCandidateTraversalQualificationPackageTests.derived/runner.swift
+[13/20] Wrapping AST for SubtitleCandidateTraversalQualificationPackageDiscoveredTests for debugging
+[14/20] Compiling SubtitleCandidateTraversalQualificationPackageDiscoveredTests all-discovered-tests.swift
+[15/20] Emitting module for SubtitleCandidateTraversalQualificationPackageTests
+[16/20] Wrapping AST for SubtitleCandidateTraversalQualificationPackageTests for debugging
+[17/20] Compiling SubtitleCandidateTraversalQualificationPackageTests runner.swift
+[18/20] Write Objects.LinkFileList
+[19/20] Linking SubtitleCandidateTraversalQualificationPackageTests.xctest
+Build complete! (54.68s)
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "External subtitle candidate traversal" started.
+◇ Test ancestorAndDescendantCandidatesCompeteUsingTheExistingScores() started.
+✔ Test ancestorAndDescendantCandidatesCompeteUsingTheExistingScores() passed after 0.001 seconds.
+◇ Test missingQueryChildStillCompletesWithAnAncestorMatch() started.
+✔ Test missingQueryChildStillCompletesWithAnAncestorMatch() passed after 0.001 seconds.
+◇ Test laterSpecificWinnerClearsAnAncestorTieAndLaterExactTiesRemainAmbiguous(_:) started.
+◇ Test case passing 1 argument reversed → false to laterSpecificWinnerClearsAnAncestorTieAndLaterExactTiesRemainAmbiguous(_:) started.
+◇ Test case passing 1 argument reversed → true to laterSpecificWinnerClearsAnAncestorTieAndLaterExactTiesRemainAmbiguous(_:) started.
+✔ Test laterSpecificWinnerClearsAnAncestorTieAndLaterExactTiesRemainAmbiguous(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test denseTerminalGroupKeepsReleaseSpecificityAndGenericAmbiguity() started.
+✔ Test denseTerminalGroupKeepsReleaseSpecificityAndGenericAmbiguity() passed after 0.008 seconds.
+◇ Test cancellationWithinADenseTerminalGroupDiscardsEarlierAssociations(_:) started.
+◇ Test case passing 1 argument sticky → false to cancellationWithinADenseTerminalGroupDiscardsEarlierAssociations(_:) started.
+◇ Test case passing 1 argument sticky → true to cancellationWithinADenseTerminalGroupDiscardsEarlierAssociations(_:) started.
+✔ Test cancellationWithinADenseTerminalGroupDiscardsEarlierAssociations(_:) with 2 test cases passed after 0.008 seconds.
+◇ Test associationOwnsItsOutputAndLeavesInputInventoriesUnchanged() started.
+✔ Test associationOwnsItsOutputAndLeavesInputInventoriesUnchanged() passed after 0.001 seconds.
+◇ Test eachMediaValueIsSortedWithoutLosingKeysOrDuplicateSubtitles() started.
+✔ Test eachMediaValueIsSortedWithoutLosingKeysOrDuplicateSubtitles() passed after 0.001 seconds.
+◇ Test emptyNormalizedQueryCompletesWithoutCandidates() started.
+✔ Test emptyNormalizedQueryCompletesWithoutCandidates() passed after 0.001 seconds.
+✔ Suite "External subtitle candidate traversal" passed after 0.024 seconds.
+◇ Suite "External subtitle matching with an empty subtitle inventory" started.
+◇ Test emptyInputsReturnAnEmptyDictionary() started.
+✔ Test emptyInputsReturnAnEmptyDictionary() passed after 0.001 seconds.
+◇ Test emptyInventoryPreservesEveryOriginalMediaKey() started.
+✔ Test emptyInventoryPreservesEveryOriginalMediaKey() passed after 0.001 seconds.
+◇ Test duplicateMediaKeysKeepOneEmptyValue() started.
+✔ Test duplicateMediaKeysKeepOneEmptyValue() passed after 0.001 seconds.
+◇ Test cancellationBeforeInsertionReturnsNoKeys() started.
+✔ Test cancellationBeforeInsertionReturnsNoKeys() passed after 0.001 seconds.
+◇ Test cancellationDuringInsertionDiscardsEarlierKeys() started.
+✔ Test cancellationDuringInsertionDiscardsEarlierKeys() passed after 0.001 seconds.
+◇ Test cancellationAtTheEmptyReturnBoundaryDiscardsAllKeys() started.
+✔ Test cancellationAtTheEmptyReturnBoundaryDiscardsAllKeys() passed after 0.001 seconds.
+◇ Test cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) started.
+◇ Test case passing 1 argument singleObservation → false to cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) started.
+◇ Test case passing 1 argument singleObservation → true to cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) started.
+✔ Test cancellationAtEveryObservedEmptyCheckpointDiscardsKeys(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test nonemptySubtitleInventoryStillMatchesAndSorts() started.
+✔ Test nonemptySubtitleInventoryStillMatchesAndSorts() passed after 0.001 seconds.
+✔ Suite "External subtitle matching with an empty subtitle inventory" passed after 0.003 seconds.
+◇ Suite "External subtitle matching" started.
+◇ Test indexedMatchingPreservesExhaustiveScoresAndAmbiguity() started.
+✔ Test indexedMatchingPreservesExhaustiveScoresAndAmbiguity() passed after 0.015 seconds.
+◇ Test indexedMatchingAgreesWithExhaustiveScoringAcrossAllSubsets() started.
+✔ Test indexedMatchingAgreesWithExhaustiveScoringAcrossAllSubsets() passed after 0.897 seconds.
+◇ Test releaseSpecificSubtitlesDisambiguateOtherwiseEqualEncodes() started.
+✔ Test releaseSpecificSubtitlesDisambiguateOtherwiseEqualEncodes() passed after 0.001 seconds.
+◇ Test allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "ass" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "idx" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "srt" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "ssa" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+◇ Test case passing 1 argument fileExtension → "vtt" to allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) started.
+✔ Test allSupportedFormatsPreserveUnicodeTitleSpecificity(_:) with 5 test cases passed after 0.003 seconds.
+◇ Test duplicateMediaAndUnrelatedInputsDoNotCreateAmbiguity() started.
+✔ Test duplicateMediaAndUnrelatedInputsDoNotCreateAmbiguity() passed after 0.006 seconds.
+◇ Test cancelledMatchingDoesNotReturnPartialAssociations() started.
+✔ Test cancelledMatchingDoesNotReturnPartialAssociations() passed after 0.001 seconds.
+◇ Test cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) started.
+◇ Test case passing 1 argument singleObservation → false to cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) started.
+◇ Test case passing 1 argument singleObservation → true to cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) started.
+✔ Test cancellationAtEveryCheckpointDiscardsEarlierMatches(_:) with 2 test cases passed after 0.005 seconds.
+◇ Test defaultCancellationPredicateObservesTheCurrentTask() started.
+✔ Test defaultCancellationPredicateObservesTheCurrentTask() passed after 0.001 seconds.
+◇ Test cancellationWithOnlyUnsupportedFilesReturnsNoAssociations() started.
+✔ Test cancellationWithOnlyUnsupportedFilesReturnsNoAssociations() passed after 0.001 seconds.
+◇ Test titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument suffix → ".srt" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument suffix → ".en.srt" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument suffix → ".en.forced.ass" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+◇ Test case passing 1 argument suffix → ".en.sdh.vtt" to titleWordsAreNotMistakenForSubtitleSuffixes(_:) started.
+✔ Test titleWordsAreNotMistakenForSubtitleSuffixes(_:) with 4 test cases passed after 0.002 seconds.
+◇ Test releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "1080p" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "1080i" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "HEVC" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+◇ Test case passing 1 argument release → "1080p.WEB-DL.x265" to releaseSuffixDoesNotReduceTitleSpecificity(_:) started.
+✔ Test releaseSuffixDoesNotReduceTitleSpecificity(_:) with 4 test cases passed after 0.002 seconds.
+◇ Test standaloneLettersRemainPartOfTheMediaTitle(_:) started.
+◇ Test case passing 1 argument letter → "I" to standaloneLettersRemainPartOfTheMediaTitle(_:) started.
+◇ Test case passing 1 argument letter → "P" to standaloneLettersRemainPartOfTheMediaTitle(_:) started.
+✔ Test standaloneLettersRemainPartOfTheMediaTitle(_:) with 2 test cases passed after 0.003 seconds.
+◇ Test identicalStemsInDifferentContainersRemainAmbiguous() started.
+✔ Test identicalStemsInDifferentContainersRemainAmbiguous() passed after 0.001 seconds.
+◇ Test "Matches exact, language, forced, and quality-suffixed names" started.
+✔ Test "Matches exact, language, forced, and quality-suffixed names" passed after 0.001 seconds.
+◇ Test "Episode one subtitle does not match episode ten" started.
+✔ Test "Episode one subtitle does not match episode ten" passed after 0.001 seconds.
+◇ Test "Ambiguous generic subtitle is not assigned to every episode" started.
+✔ Test "Ambiguous generic subtitle is not assigned to every episode" passed after 0.001 seconds.
+◇ Test "Matches WebVTT and ignores unsupported bitmap subtitle formats" started.
+✔ Test "Matches WebVTT and ignores unsupported bitmap subtitle formats" passed after 0.001 seconds.
+✔ Suite "External subtitle matching" passed after 0.952 seconds.
+◇ Suite "External subtitle filename tokenization" started.
+◇ Test everyASCIIScalarAgreesWithFoundationNormalization() started.
+✔ Test everyASCIIScalarAgreesWithFoundationNormalization() passed after 0.031 seconds.
+◇ Test asciiDelimitersKeepSeparateAndConcatenatedTitlesDistinct() started.
+✔ Test asciiDelimitersKeepSeparateAndConcatenatedTitlesDistinct() passed after 0.014 seconds.
+◇ Test unicodeNamesRetainFoundationCaseDiacriticAndWidthSemantics() started.
+✔ Test unicodeNamesRetainFoundationCaseDiacriticAndWidthSemantics() passed after 0.024 seconds.
+◇ Test unicodeNormalizationStillProducesAmbiguousAndUniqueAssociations() started.
+✔ Test unicodeNormalizationStillProducesAmbiguousAndUniqueAssociations() passed after 0.001 seconds.
+◇ Test punctuationOnlyNamesDoNotAcquireTokens() started.
+✔ Test punctuationOnlyNamesDoNotAcquireTokens() passed after 0.001 seconds.
+✔ Suite "External subtitle filename tokenization" passed after 0.074 seconds.
+✔ Test run with 38 tests in 4 suites passed after 1.056 seconds.
