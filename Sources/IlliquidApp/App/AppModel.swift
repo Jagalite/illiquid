@@ -228,30 +228,30 @@ final class AppModel {
     }
 
     static func loadShared() async -> AppModel? {
-        guard !sharedShutdownRequested else { return nil }
-        if let sharedInstance { return sharedInstance }
-        guard let startup = await historyStartup.load(), !sharedShutdownRequested else { return nil }
-        // Concurrent scene/delegate waiters share one model and native graph.
-        if let sharedInstance { return sharedInstance }
-        let timing = LifecyclePerformance.begin("model-init")
-        let player: PlaybackController
-        if LifecyclePerformance.isEnabled {
-            let directory = ProcessInfo.processInfo.environment["ILLIQUID_BENCHMARK_THUMBNAIL_CACHE"]
-                .flatMap { $0.hasPrefix("/") ? URL(fileURLWithPath: $0, isDirectory: true) : nil }
-            player = PlaybackController(persistence: startup.persistence,
-                sessionStore: AtomicPlaybackSessionStore(fileURL: AppPreferences.sessionFileURL),
-                thumbnailCacheDirectory: directory)
-        } else {
-            player = PlaybackController(persistence: startup.persistence,
-                sessionStore: AtomicPlaybackSessionStore(fileURL: AppPreferences.sessionFileURL))
+        await historyStartup.loadShared(
+            existing: { sharedInstance },
+            isShutdown: { sharedShutdownRequested }
+        ) { startup in
+            let timing = LifecyclePerformance.begin("model-init")
+            let player: PlaybackController
+            if LifecyclePerformance.isEnabled {
+                let directory = ProcessInfo.processInfo.environment["ILLIQUID_BENCHMARK_THUMBNAIL_CACHE"]
+                    .flatMap { $0.hasPrefix("/") ? URL(fileURLWithPath: $0, isDirectory: true) : nil }
+                player = PlaybackController(persistence: startup.persistence,
+                    sessionStore: AtomicPlaybackSessionStore(fileURL: AppPreferences.sessionFileURL),
+                    thumbnailCacheDirectory: directory)
+            } else {
+                player = PlaybackController(persistence: startup.persistence,
+                    sessionStore: AtomicPlaybackSessionStore(fileURL: AppPreferences.sessionFileURL))
+            }
+            let model = AppModel(player: player, sources: startup.sources)
+            LifecyclePerformance.end("model-init", since: timing)
+            sharedInstance = model
+            let requests = pendingStartupOpenRequests
+            pendingStartupOpenRequests.removeAll()
+            for urls in requests { model.handleOpenURLs(urls) }
+            return model
         }
-        let model = AppModel(player: player, sources: startup.sources)
-        LifecyclePerformance.end("model-init", since: timing)
-        sharedInstance = model
-        let requests = pendingStartupOpenRequests
-        pendingStartupOpenRequests.removeAll()
-        for urls in requests { model.handleOpenURLs(urls) }
-        return model
     }
 
     static func handleStartupOpenURLs(_ urls: [URL]) {
