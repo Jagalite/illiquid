@@ -1,0 +1,46 @@
+name: Subtitle qualifier storage
+
+on:
+  push:
+    branches: ['perf/subtitle-qualifier-storage-*']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitleQualifierStorageTests.swift'
+      - 'Benchmarks/SubtitleQualifierStorage/**'
+      - '.github/workflows/subtitle-qualifier-storage.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-qualifier-storage-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test both production matchers and measure live token storage
+        run: |
+          set -o pipefail
+          python3 Benchmarks/SubtitleQualifierStorage/run.py \
+            --pairs 6 --output "$RUNNER_TEMP/subtitle-qualifier-storage" \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-qualifier-storage.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-qualifier-storage-native
+          path: |
+            ${{ runner.temp }}/subtitle-qualifier-storage/
+            ${{ runner.temp }}/subtitle-qualifier-storage.log
+            !${{ runner.temp }}/subtitle-qualifier-storage/**/.build/**
+            !${{ runner.temp }}/subtitle-qualifier-storage/cache/**
+          retention-days: 14
