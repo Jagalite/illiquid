@@ -1,0 +1,102 @@
+name: Video decoder frame lifetime
+
+on:
+  push:
+    branches: ['perf/video-frame-exit-lifetime-668a']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoDecoderFrameLifetimeTests.swift'
+      - 'Benchmarks/VideoDecoderFrameLifetime/**'
+      - '.github/workflows/video-frame-lifetime.yml'
+      - '!Benchmarks/VideoDecoderFrameLifetime/*.md'
+      - '!Benchmarks/VideoDecoderFrameLifetime/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoDecoderFrameLifetimeTests.swift'
+      - 'Benchmarks/VideoDecoderFrameLifetime/**'
+      - '.github/workflows/video-frame-lifetime.yml'
+      - '!Benchmarks/VideoDecoderFrameLifetime/*.md'
+      - '!Benchmarks/VideoDecoderFrameLifetime/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-frame-lifetime-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-lifetime:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare the pinned native SDK
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate delayed and interlaced output fixtures
+        run: |
+          python3 Benchmarks/FrameStepTimestamps/generate-fixtures.py \
+            --output "$RUNNER_TEMP/video-frame-lifetime-fixtures"
+          cp "$RUNNER_TEMP/video-frame-lifetime-fixtures/timestamp-tff.mpg" \
+            "$RUNNER_TEMP/video-frame-lifetime-fixtures/interlaced-tff.mpg"
+          cp "$RUNNER_TEMP/video-frame-lifetime-fixtures/timestamp-bff.mpg" \
+            "$RUNNER_TEMP/video-frame-lifetime-fixtures/interlaced-bff.mpg"
+      - name: Qualify native frame ownership and compare the original lifetime
+        run: |
+          export ILLIQUID_FRAME_STEP_FIXTURE_DIR="$RUNNER_TEMP/video-frame-lifetime-fixtures"
+          export ILLIQUID_FRAME_STEP_REQUIRE_FIXTURES=1
+          export ILLIQUID_NATIVE_FIXTURE_DIR="$ILLIQUID_FRAME_STEP_FIXTURE_DIR"
+          python3 Benchmarks/VideoDecoderFrameLifetime/run.py \
+            --output "$RUNNER_TEMP/video-frame-lifetime" \
+            --configuration release
+      - name: Publish ownership and source receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'video-frame-lifetime'
+          paths = set(root.glob('*.json')) | set(root.glob('*.jsonl'))
+          paths |= set(root.rglob('*.log'))
+          paths |= set((root / 'receipts').rglob('*.json'))
+          paths |= set((root / 'sources').rglob('*.swift'))
+          paths |= set((root / 'sources').rglob('*.py'))
+          files = {str(p.relative_to(root)): p.read_text()
+                   for p in sorted(paths) if p.is_file()}
+          for name in ['summary.json', 'manifest.json']:
+              if name in files:
+                  print(f'::group::{name}')
+                  print(files[name])
+                  print('::endgroup::')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(),
+                                 compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log bundle limit; use the artifact')
+          print('VIDEO_FRAME_LIFETIME_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('VIDEO_FRAME_LIFETIME_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-frame-lifetime-native
+          path: |
+            ${{ runner.temp }}/video-frame-lifetime/*.json
+            ${{ runner.temp }}/video-frame-lifetime/*.jsonl
+            ${{ runner.temp }}/video-frame-lifetime/logs/
+            ${{ runner.temp }}/video-frame-lifetime/receipts/
+            ${{ runner.temp }}/video-frame-lifetime/sources/
+            ${{ runner.temp }}/video-frame-lifetime-fixtures/fixture-manifest.json
+            ${{ runner.temp }}/video-frame-lifetime-fixtures/commands.json
+          retention-days: 14

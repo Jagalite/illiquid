@@ -1138,7 +1138,10 @@ final class VideoDecoder {
                 retiredPlanarDiagnostics.cancellations += 1
                 throw SoftwarePixelBufferPoolError.cancelled
             }
-            av_frame_unref(frame)
+            // Release scratch output on early cancellation or delivery failure,
+            // before a following continuation check can leave the loop. Emitted
+            // frames and deinterlacing history own their pixels independently.
+            defer { av_frame_unref(frame) }
             let result = avcodec_receive_frame(context, frame)
             if result == illiquid_averror_eagain()
                 || result == illiquid_averror_eof()
