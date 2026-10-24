@@ -1,0 +1,71 @@
+{
+  "baseline_commit": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "binary_sha256": {
+    "baseline-debug": "ce49ba4f94b79feb0e24aefbe5cefcd4d4f40a152dcc206ab2ba50185f36ef2e",
+    "baseline-release": "20481eb653cd03195aad979f7f862ed099922bb4f8c5e0dc3a29f9c1c361541c",
+    "candidate-debug": "20deffffee52f186679da304e1323add53fd91a66ca8ea16b26a0477afff9c3d",
+    "candidate-release": "09bee7ea77ea2152426d9019df016ca77de5162e2b16acc49ca64a78bb21a8dd"
+  },
+  "candidate_head": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "candidate_source": "current worktree",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "coremedia": "Linux rational-time shim",
+  "exclusions": "Not malloc block sizes, cumulative allocation counts, renderer memory, process RSS, or timing",
+  "harness_sha256": {
+    "CoreMediaShim.swift": "489bb41d608f9b11c78d952dc517e32963a354a503d24c8ddbee2ae8613f7cc7",
+    "Harness.swift": "9150b776558296052b10f856ddc7d1282c11d74ced26340b2d1017884c451133",
+    "run.py": "9a6f09185fe7a3992d839e62c3418fcb3b64a54854cc45a9e2d07659b7d336aa"
+  },
+  "machine": "x86_64",
+  "method": "Exact production timeline and frame/trimming declarations; debug/release fresh processes",
+  "metric": "Union of simultaneously borrowed PCM payload byte ranges in batches of up to 48 frames",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "small_controls": "Inline/small Data cases are output-size controls; borrowed ranges are not allocator observations",
+  "source_receipts": {
+    "baseline": {
+      "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+        "byte_end": 5072,
+        "byte_start": 3070,
+        "extracted_sha256": "a6052f8a549b4a78165eb43b1b5f5a7d7a2c48a422a2d9a2c8d399a389ac3a8a",
+        "original_sha256": "c12caf15537ff3b774eaa77080ddc36ac42e7e05ec7d9fce5419fdf184ec45b3",
+        "transformation": "Exact frame struct and trimming extension, with imports"
+      },
+      "Sources/IlliquidNativePlayback/Media/AudioDelayTimeline.swift": {
+        "original_sha256": "e120aa9b10ef63704db575203d7bff6c06f3df3a9bfbe1abec4ba2704da61815",
+        "transformation": "none"
+      },
+      "Tests/IlliquidNativePlaybackTests/AudioDelayMemoryTests.swift": {
+        "original_sha256": "d35c94e2e702882a06cd53a11341da49acf11c9cd519260363bbb61be3383488",
+        "transformation": "none"
+      },
+      "Tests/IlliquidNativePlaybackTests/AudioDelayTests.swift": {
+        "extracted_sha256": "0f22ec26df530f33eb2ab473d8e4a31a4c22286a73a572fd9bce90803d6cb7df",
+        "original_sha256": "0a4f0f2928fe8a00147b7307ceda900e122d4c9816866c90680a3c0415507207",
+        "transformation": "Three existing component tests before first native @MainActor test; unused imports removed"
+      }
+    },
+    "candidate": {
+      "Sources/IlliquidNativePlayback/Media/AudioDecoder.swift": {
+        "byte_end": 5072,
+        "byte_start": 3070,
+        "extracted_sha256": "a6052f8a549b4a78165eb43b1b5f5a7d7a2c48a422a2d9a2c8d399a389ac3a8a",
+        "original_sha256": "c12caf15537ff3b774eaa77080ddc36ac42e7e05ec7d9fce5419fdf184ec45b3",
+        "transformation": "Exact frame struct and trimming extension, with imports"
+      },
+      "Sources/IlliquidNativePlayback/Media/AudioDelayTimeline.swift": {
+        "original_sha256": "76309b8e8cf629114ee5f7bedbb15ceab76328374251a294ffec18c7cdd138d4",
+        "transformation": "none"
+      },
+      "Tests/IlliquidNativePlaybackTests/AudioDelayMemoryTests.swift": {
+        "original_sha256": "d35c94e2e702882a06cd53a11341da49acf11c9cd519260363bbb61be3383488",
+        "transformation": "none"
+      },
+      "Tests/IlliquidNativePlaybackTests/AudioDelayTests.swift": {
+        "extracted_sha256": "0f22ec26df530f33eb2ab473d8e4a31a4c22286a73a572fd9bce90803d6cb7df",
+        "original_sha256": "0a4f0f2928fe8a00147b7307ceda900e122d4c9816866c90680a3c0415507207",
+        "transformation": "Three existing component tests before first native @MainActor test; unused imports removed"
+      }
+    }
+  },
+  "tests_skipped": false
+}

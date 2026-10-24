@@ -21,7 +21,10 @@ struct AudioDelayTimeline {
 
     mutating func consume(_ source: NativeDecodedAudioFrame,
                           emit: (NativeDecodedAudioFrame) -> Bool) -> Bool {
-        template = source
+        // Tail padding needs the last format, not ownership of its PCM. In
+        // particular, the worker can keep this timeline alive while at EOF.
+        template = source.replacing(time: source.presentationTime, data: Data(),
+                                    sampleCount: 0, duration: .zero)
         let shifted = source.replacing(time: CMTimeAdd(source.presentationTime,
             CMTime(seconds: delay, preferredTimescale: 60_000)))
         guard let frame = shifted.trimmingSamples(before: cursor) else { return true }
@@ -52,12 +55,19 @@ struct AudioDelayTimeline {
                                   emit: (NativeDecodedAudioFrame) -> Bool) -> Bool {
         let endSample = Int64((end * Double(frame.sampleRate)).rounded())
         var nextSample = Int64((cursor * Double(frame.sampleRate)).rounded())
+        guard nextSample < endSample else { return true }
+        // Full chunks contain the same immutable samples. Share their storage
+        // while keeping each emitted frame's timing independent. Size the first
+        // allocation to the interval so a one-sample preroll stays small.
+        let chunkSamples = Int(min(1_024, endSample - nextSample))
+        let bytesPerSample = frame.channelCount * MemoryLayout<Float>.size
+        let silencePCM = Data(count: chunkSamples * bytesPerSample)
         while nextSample < endSample {
             let count = Int(min(1_024, endSample - nextSample))
             let duration = CMTime(value: Int64(count), timescale: Int32(frame.sampleRate))
             let silent = frame.replacing(
                 time: CMTime(value: nextSample, timescale: Int32(frame.sampleRate)),
-                data: Data(count: count * frame.channelCount * MemoryLayout<Float>.size),
+                data: count == chunkSamples ? silencePCM : Data(count: count * bytesPerSample),
                 sampleCount: count, duration: duration)
             guard emit(silent) else { return false }
             hasOutput = true

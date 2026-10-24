@@ -1,0 +1,108 @@
+name: Audio delay memory
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/AudioDelayTimeline.swift'
+      - 'Sources/IlliquidNativePlayback/Media/AudioDecoder.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AudioDelayMemoryTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AudioDelayTests.swift'
+      - 'Benchmarks/AudioDelayMemory/**'
+      - '.github/workflows/audio-delay-memory.yml'
+      - '!Benchmarks/AudioDelayMemory/*.md'
+      - '!Benchmarks/AudioDelayMemory/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audio-delay-memory-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-audio:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record native environment
+        run: |
+          mkdir -p "$RUNNER_TEMP/audio-delay-memory"
+          sw_vers > "$RUNNER_TEMP/audio-delay-memory/host.txt"
+          uname -a >> "$RUNNER_TEMP/audio-delay-memory/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/audio-delay-memory/host.txt"
+          swift --version >> "$RUNNER_TEMP/audio-delay-memory/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/audio-delay-memory/host.txt"
+      - name: Compare output and PCM ownership with the pinned baseline
+        run: |
+          python3 Benchmarks/AudioDelayMemory/run.py \
+            --output "$RUNNER_TEMP/audio-delay-memory/component"
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate required audio fixtures
+        run: |
+          mkdir -p "$RUNNER_TEMP/audio-delay-memory/fixtures"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'anullsrc=r=48000:cl=7.1' -t 2 -c:a flac \
+            "$RUNNER_TEMP/audio-delay-memory/fixtures/audio-7.1.flac"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'testsrc2=size=640x360:rate=30' \
+            -f lavfi -i 'sine=frequency=440:sample_rate=48000' \
+            -t 3 -shortest -c:v libx264 -preset veryfast \
+            -pix_fmt yuv420p -c:a aac \
+            "$RUNNER_TEMP/audio-delay-memory/fixtures/h264-aac.mp4"
+          test -s "$RUNNER_TEMP/audio-delay-memory/fixtures/audio-7.1.flac"
+          test -s "$RUNNER_TEMP/audio-delay-memory/fixtures/h264-aac.mp4"
+      - name: Qualify native delay, seek, resampling, and multichannel output
+        env:
+          ILLIQUID_NATIVE_FIXTURE_DIR: ${{ runner.temp }}/audio-delay-memory/fixtures
+        run: |
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'AudioDelayMemoryTests|AudioDelayTests|AudioResamplerDrainTests|MultichannelAudioTests' \
+            2>&1 | tee "$RUNNER_TEMP/audio-delay-memory/native-audio.log"
+      - name: Print component evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'audio-delay-memory'
+          files = {}
+          for path in sorted((root / 'component').glob('*.json')):
+              files[str(path.relative_to(root))] = path.read_text()
+          receipts = root / 'component' / 'observations.json.gz'
+          if receipts.is_file():
+              files['component/observations.json.gz.base64'] = base64.b64encode(receipts.read_bytes()).decode()
+          for path in sorted((root / 'component').glob('*tests.log')):
+              files[str(path.relative_to(root))] = path.read_text()
+          for path in sorted((root / 'component').glob('*lifetime-failures.log')):
+              files[str(path.relative_to(root))] = path.read_text()
+          if (root / 'host.txt').is_file():
+              files['host.txt'] = (root / 'host.txt').read_text()
+          print('AUDIO_DELAY_MEMORY_EVIDENCE ' + json.dumps(files, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: audio-delay-memory-native
+          path: |
+            ${{ runner.temp }}/audio-delay-memory/**/*.json
+            ${{ runner.temp }}/audio-delay-memory/**/*.jsonl
+            ${{ runner.temp }}/audio-delay-memory/**/*.json.gz
+            ${{ runner.temp }}/audio-delay-memory/**/*.txt
+            ${{ runner.temp }}/audio-delay-memory/**/*.log
+            ${{ runner.temp }}/audio-delay-memory/**/*.log.gz
+            ${{ runner.temp }}/audio-delay-memory/**/*.swift
+          retention-days: 14
