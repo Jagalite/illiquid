@@ -1,0 +1,60 @@
+{
+  "baseline_commit": "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635",
+  "candidate_head": "1bf90fe673a062d100070abde2d793fed77588d4",
+  "candidate_is_worktree_source": true,
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "python": "3.12.14",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "configuration": "release",
+  "pairs": 4,
+  "source_counts": [
+    1000,
+    100000
+  ],
+  "runner_sha256": "04d48f47b1bd07b730e1aaedbdec4aa2221e5df1cdbf4364387ae398f270820e",
+  "harness_sha256": "4e6c76811593bc9e9c797d751972d9bd11e76ed39fe6e53c3e0e6aad2a6cab58",
+  "source_sha256": {
+    "baseline": {
+      "Sources/IlliquidApp/App/AppModel.swift": "78dd10a831b77f02b67a0f256c001d5b71e053fe595576b03b6d5fb7ad77d7d1",
+      "Sources/IlliquidApp/App/ReadOnlyStartupLoader.swift": "680f54f667dd893b699e9e71137ccbfa197725e8d1d93252c38673aac9efacad",
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "candidate": {
+      "Sources/IlliquidApp/App/AppModel.swift": "c9f30775b93b62a231fbb51d4ea9bb33dbafc964084bbf17bc31b0558d9380bb",
+      "Sources/IlliquidApp/App/ReadOnlyStartupLoader.swift": "680f54f667dd893b699e9e71137ccbfa197725e8d1d93252c38673aac9efacad",
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    }
+  },
+  "extracted_sha256": {
+    "baseline": {
+      "startup_block": "6e2aa7eb0ae86e3c936f93685a2b48400f30e0c2252abdf9f564cbb8feb774f3",
+      "value_types": "af49a572ae736324f12e47e949fb9646618dc184a60ed1a4489b53ac15a2d13b"
+    },
+    "candidate": {
+      "startup_block": "bcfaa491cd08bad2a1d3c2720c08a09649bf571b50d6f08c8a8b8fbfa20709a5",
+      "value_types": "af49a572ae736324f12e47e949fb9646618dc184a60ed1a4489b53ac15a2d13b"
+    }
+  },
+  "prepared_sha256": {
+    "baseline/AppModel.swift": "b5a7fa8fbf24d6fa662ae3cb29d1fea65d5fb7fbebc9179937d22834996beada",
+    "baseline/SourceTypes.swift": "b792663ff4be6e5a2c040778fbfc1507c1be63e9d7cec592d53b02029a5fc808",
+    "baseline/ReadOnlyStartupLoader.swift": "680f54f667dd893b699e9e71137ccbfa197725e8d1d93252c38673aac9efacad",
+    "baseline/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "baseline/Harness.swift": "4e6c76811593bc9e9c797d751972d9bd11e76ed39fe6e53c3e0e6aad2a6cab58",
+    "candidate/AppModel.swift": "f3ab216f42954791354d5345c1087d5027318347c7323e23415abf70fc50065f",
+    "candidate/SourceTypes.swift": "b792663ff4be6e5a2c040778fbfc1507c1be63e9d7cec592d53b02029a5fc808",
+    "candidate/ReadOnlyStartupLoader.swift": "680f54f667dd893b699e9e71137ccbfa197725e8d1d93252c38673aac9efacad",
+    "candidate/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "candidate/Harness.swift": "4e6c76811593bc9e9c797d751972d9bd11e76ed39fe6e53c3e0e6aad2a6cab58",
+    "CLeaseHeap/heap.c": "1994cc5c27fab344e6cbb725027314519c14b8190cdcb3b84f04cca55e4b5a3d",
+    "CLeaseHeap/include/CLeaseHeap.h": "b1a8779acea8c01bd5769a04bc95e1e510e072b236f74bf0ce06cdfb56d58bfb"
+  },
+  "scope": "exact static startup block and loader; fixture preference read and native graph stubs",
+  "allocator_scope": "component-process allocator live bytes, including runtime allocations; not RSS",
+  "ordering": "alternating AB/BA per count, fresh sequential processes",
+  "binary_sha256": {
+    "baseline": "46f235df4b543339e756c2740792295cfb224cedcf6dc0f9a35edc2445902556",
+    "candidate": "5929a86daee58ea5c347b57e4a34f9bac4ec4f3193765e910da802ba27a789d1"
+  }
+}

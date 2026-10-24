@@ -215,7 +215,7 @@ final class AppModel {
         let persistence: PlaybackPersistenceStore
         let sources: SourceStartupSnapshot
     }
-    private static let historyStartup = ReadOnlyStartupLoader {
+    private static var historyStartup: ReadOnlyStartupLoader<StartupResources>? = .init {
         await Task.detached(priority: .userInitiated) {
             let timing = LifecyclePerformance.begin("history-load")
             let persistence = PlaybackPersistenceStore()
@@ -230,7 +230,7 @@ final class AppModel {
     static func loadShared() async -> AppModel? {
         guard !sharedShutdownRequested else { return nil }
         if let sharedInstance { return sharedInstance }
-        guard let startup = await historyStartup.load(), !sharedShutdownRequested else { return nil }
+        guard let startup = await historyStartup?.load(), !sharedShutdownRequested else { return nil }
         // Concurrent scene/delegate waiters share one model and native graph.
         if let sharedInstance { return sharedInstance }
         let timing = LifecyclePerformance.begin("model-init")
@@ -245,6 +245,11 @@ final class AppModel {
         let model = AppModel(player: player, sources: startup.sources)
         LifecyclePerformance.end("model-init", since: timing)
         sharedInstance = model
+        // The live model now owns the startup resources. Retire this owner so
+        // its cached source snapshot cannot retain removed paths or force COW.
+        // Suspended load() callers keep their loader alive and still receive
+        // the shared model; stopping it here would discard their results.
+        historyStartup = nil
         let requests = pendingStartupOpenRequests
         pendingStartupOpenRequests.removeAll()
         for urls in requests { model.handleOpenURLs(urls) }
@@ -265,7 +270,8 @@ final class AppModel {
 
     static func shutdownShared() async -> String? {
         sharedShutdownRequested = true
-        historyStartup.stop()
+        historyStartup?.stop()
+        historyStartup = nil
         pendingStartupOpenRequests.removeAll()
         await sharedInstance?.shutdown()
         return sharedInstance?.player.shutdownPersistenceError
