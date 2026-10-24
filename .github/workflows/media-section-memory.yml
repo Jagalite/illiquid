@@ -1,0 +1,83 @@
+name: Media section projection memory
+
+on:
+  push:
+    branches: ['perf/media-section-index-memory-*']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Tests/IlliquidAppTests/MediaSectionGroupingMemoryTests.swift'
+      - 'Benchmarks/MediaSectionMemory/Harness.swift'
+      - 'Benchmarks/MediaSectionMemory/run.py'
+      - '.github/workflows/media-section-memory.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidCore/Utilities/**'
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidAppTests/SourceBrowserFilterTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaOrganizationTests.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaGroupingTests.swift'
+      - 'Tests/IlliquidAppTests/MediaSectionGroupingMemoryTests.swift'
+      - 'Benchmarks/MediaSectionMemory/Harness.swift'
+      - 'Benchmarks/MediaSectionMemory/run.py'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - '.github/workflows/media-section-memory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-section-memory-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test and measure all views at 1,000 and 10,000 items
+        run: >-
+          python3 Benchmarks/MediaSectionMemory/run.py
+          --current-support --pairs 6 --sizes 1000 10000
+          --output "$RUNNER_TEMP/media-section-memory/main"
+      - name: Measure large shared-section stress cases
+        run: >-
+          python3 Benchmarks/MediaSectionMemory/run.py
+          --current-support --mode benchmark --pairs 6
+          --cases movies seasons --sizes 50000
+          --output "$RUNNER_TEMP/media-section-memory/stress"
+      - name: Print measurements and qualification receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "media-section-memory"
+          for cohort in ["main", "stress"]:
+              for name in ["environment.json", "tests.json", "verification.json", "summary.json", "completion.json"]:
+                  path = root / cohort / name
+                  if path.exists():
+                      print(f"::group::{cohort}/{name}")
+                      print(path.read_text())
+                      print("::endgroup::")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-section-memory-macos
+          path: |
+            ${{ runner.temp }}/media-section-memory/
+            !${{ runner.temp }}/media-section-memory/**/build/**
+            !${{ runner.temp }}/media-section-memory/**/cache/**
+          retention-days: 14
