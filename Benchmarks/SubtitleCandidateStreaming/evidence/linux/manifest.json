@@ -1,0 +1,119 @@
+{
+  "all_parity_checks_passed": true,
+  "arguments": {
+    "baseline_dir": null,
+    "cpu": 0,
+    "iterations": null,
+    "memory_only": false,
+    "output": "/workspace/scratch/f950179bb164/subtitle-candidate-v2-formal",
+    "pairs": 6,
+    "prepare_only": false,
+    "scenarios": [
+      "broad",
+      "dense",
+      "exact",
+      "unrelated",
+      "empty"
+    ],
+    "sizes": [
+      64,
+      512,
+      4096,
+      32768
+    ],
+    "swift": "/tmp/illiquid-swift-toolchain/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+    "target_ms": 100.0,
+    "verify_only": false
+  },
+  "baseline_commit": "4abf4b44f13386ccd04f1ce4ad0e756255ca4d14",
+  "binary_sha256": {
+    "baseline": "50c07cd70feb28f96f00464cdda5c2e6c75a5a9716897f18ed2eaee24f6dae88",
+    "candidate": "429782f96f5d015b3fae218030d4a61c60f29e0e2f0fcb018af2fc42ce46ebd3"
+  },
+  "candidate_sources": "current worktree captured before compilation",
+  "checkout_head": "a8d950d6c1a1d22381fc7debee7b12632ec65a18",
+  "completed_utc": "2026-10-24T14:36:10Z",
+  "cpu_affinity": [
+    0
+  ],
+  "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "environment": {
+    "SWIFT_DETERMINISTIC_HASHING": "1"
+  },
+  "harness": {
+    "CHeapProbe/heap.c": {
+      "bytes": 1220,
+      "sha256": "8fbe87190aa1f9c263a3edf8814346d6d17881b56c8ea3447352ef7d905685ec"
+    },
+    "CHeapProbe/include/CHeapProbe.h": {
+      "bytes": 309,
+      "sha256": "8d6dd65e28f10824edbf05392d6065b96f96ea4c35c6869f73387f2b1ec1eeba"
+    },
+    "Harness.swift": {
+      "bytes": 9411,
+      "sha256": "1d7f107ff96c46ae79c616d4442b7a8e4b5d64486cbccdd2dacd4932f0505eda"
+    },
+    "run.py": {
+      "bytes": 21674,
+      "sha256": "0541b4bc2753225ab97c5ef892b8c30b77bc951009e900b09da80973b9c0ca9d"
+    }
+  },
+  "machine": "x86_64",
+  "memory_boundary": "Input URLs held alive; tiny warmup; initial allocator reading; associate with sampling false cancellation callback; return reading with output held alive; exact verification afterward",
+  "memory_limit": "Sampled live allocator high watermark is a lower bound on true peak; sampling occurs only at cancellation polls and after return, not every allocation",
+  "method": "Separate release IlliquidCore modules, unmodified production source; sequential balanced AB/BA pairs; fresh process per variant/case/mode/sample",
+  "observation_count": 480,
+  "package_sha256": "fdcd2895f43006d14e78d6b074ef372e3bfa1cf3b8158b3468a8d5a9d227db31",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "scope": "Component transient allocator growth and complete association timing; not process RSS or whole-player memory/latency",
+  "sources": {
+    "baseline": {
+      "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift": {
+        "bytes": 11256,
+        "git_blob_sha1": "4c36a744652c875b73f834d5b142dedee34bf816",
+        "sha256": "32baa1287ed03126aedee7c57fadd72aaf44fccc196b76e544de48fcb4e884a8",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/Utilities/MediaFileSupport.swift": {
+        "bytes": 876,
+        "git_blob_sha1": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+        "bytes": 2180,
+        "git_blob_sha1": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+        "transformation": "none"
+      }
+    },
+    "candidate": {
+      "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift": {
+        "bytes": 11667,
+        "git_blob_sha1": "c51e80d111803552cea2b7c981926eedc6c6e47f",
+        "sha256": "6a18f9eeee002ef2d578545aa6b7e443fa51d16f3ec5d7211dc45ae8ae6753b1",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/Utilities/MediaFileSupport.swift": {
+        "bytes": 876,
+        "git_blob_sha1": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+        "bytes": 2180,
+        "git_blob_sha1": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+        "transformation": "none"
+      }
+    }
+  },
+  "started_utc": "2026-10-24T14:30:01Z",
+  "timing_boundary": "Complete association, result-count consumption and result destruction; two warmup calls; false cancellation closure; no allocator sampling",
+  "toolchain": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "working_tree": [
+    "?? Benchmarks/SubtitleCandidateStreaming/evidence/",
+    "?? BuildInputs/.native-sdk.tar.gz.SA5KOo",
+    "?? DependencySources/archives/.openssl-3-3.6.3-build-source.tar.xz.sXIJWc"
+  ]
+}
