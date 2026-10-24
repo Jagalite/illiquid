@@ -1,0 +1,46 @@
+name: Source presence snapshot memory
+
+on:
+  push:
+    branches: ['perf/presence-subtree-snapshot-*']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaPresenceSnapshotTests.swift'
+      - 'Benchmarks/SourceMediaPresenceSnapshot/**'
+      - '.github/workflows/source-presence-snapshot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-presence-snapshot-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test production scanner and measure paired live snapshot retention
+        run: |
+          set -o pipefail
+          python3 Benchmarks/SourceMediaPresenceSnapshot/run.py \
+            --pairs 6 --output "$RUNNER_TEMP/presence-snapshot" \
+            2>&1 | tee "$RUNNER_TEMP/presence-snapshot.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-presence-snapshot-native
+          path: |
+            ${{ runner.temp }}/presence-snapshot/
+            ${{ runner.temp }}/presence-snapshot.log
+            !${{ runner.temp }}/presence-snapshot/package/.build/**
+          retention-days: 14

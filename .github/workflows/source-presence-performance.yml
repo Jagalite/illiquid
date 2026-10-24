@@ -90,7 +90,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/source-presence-native"
           set -o pipefail
           swift test --force-resolved-versions --filter \
-            'SourceMediaPresenceScannerTests|SourceMediaPresenceRecomputationTests' \
+            'SourceMediaPresenceScannerTests|SourceMediaPresenceRecomputationTests|SourceMediaPresenceSnapshotTests' \
             2>&1 | tee "$RUNNER_TEMP/source-presence-native/tests.txt"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

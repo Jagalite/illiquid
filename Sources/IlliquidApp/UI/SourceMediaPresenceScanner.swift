@@ -101,10 +101,8 @@ final class SourceMediaPresenceScanner {
                 let path = self.pending.removeFirst()
                 self.startedJobCount += 1
                 let jobRevision = self.revision
-                let reusableResults = self.results.filter { entry in
-                    self.summaries[entry.key]?.isComplete == true
-                        && self.summaries[entry.key]?.isReadable == true
-                }
+                let reusableResults = SourceMediaPresenceCursor.reusableResults(
+                    for: path, results: self.results, summaries: self.summaries)
                 let cursor = SourceMediaPresenceCursor(
                     root: URL(fileURLWithPath: path, isDirectory: true), cachedResults: reusableResults)
                 do {
@@ -209,6 +207,21 @@ final class SourceMediaPresenceCursor: @unchecked Sendable {
     private static let keys: Set<URLResourceKey> = [
         .isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey, .isPackageKey,
     ]
+
+    /// A repair only consults cached descendants of its normalized root. Do not
+    /// copy unrelated watched folders into the cursor's retained snapshot.
+    static func reusableResults(
+        for root: String,
+        results: [String: Bool],
+        summaries: [String: Summary]
+    ) -> [String: Bool] {
+        let descendantPrefix = root == "/" ? "/" : root + "/"
+        return results.filter { entry in
+            (entry.key == root || entry.key.hasPrefix(descendantPrefix))
+                && summaries[entry.key]?.isComplete == true
+                && summaries[entry.key]?.isReadable == true
+        }
+    }
 
     init(root: URL, cachedResults: [String: Bool] = [:]) {
         self.root = root
