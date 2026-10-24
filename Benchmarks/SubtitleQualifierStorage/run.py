@@ -66,14 +66,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--pairs", type=int, default=6)
-    parser.add_argument("--target-ms", type=int, default=50)
+    parser.add_argument("--target-ms", type=int, default=250)
     parser.add_argument("--skip-tests", action="store_true")
     parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--reuse-builds-from", type=Path,
+                        help="Reuse hash-verified identical staged packages; requires --skip-tests")
     args = parser.parse_args()
     if args.pairs < 2 or args.pairs % 2 or args.target_ms <= 0:
         parser.error("pairs must be even and >= 2; target-ms must be positive")
     if args.skip_tests and args.tests_only:
         parser.error("Conflicting test options")
+    if args.reuse_builds_from and not args.skip_tests:
+        parser.error("--reuse-builds-from requires --skip-tests")
     swift = shutil.which("swift")
     if swift is None:
         parser.error("Swift 6.1 or newer is required on PATH")
@@ -111,10 +115,17 @@ def main():
         "candidate_commit": command(["git", "rev-parse", "HEAD"]).strip(),
         "worktree_status": command(["git", "status", "--porcelain=v1"]),
         "baseline": baseline, "sources": {}, "pairs": args.pairs,
+        "target_cpu_ms": args.target_ms, "minimum_timing_iterations": 5,
         "runner_sha256": sha(__file__), "hashing": "SWIFT_DETERMINISTIC_HASHING=1",
         "protocol": "fresh process per sample; balanced AB/BA; first-subtitle poll samples the complete index; ordinary full-association CPU timed separately",
     }
     shutil.copyfile(__file__, output / "runner.snapshot.py")
+    reused = args.reuse_builds_from.resolve() if args.reuse_builds_from else None
+    prior_manifest = json.loads((reused / "manifest.json").read_text()) if reused else None
+    if reused:
+        if prior_manifest["compiler"] != manifest["compiler"]:
+            raise ValueError("Reused binaries have a different compiler")
+        manifest["reused_builds_from"] = str(reused)
     binaries = {}
     for variant in ("baseline", "candidate"):
         package = output / variant
@@ -159,10 +170,31 @@ let package = Package(name: "SubtitleQualifierStorageQualification", platforms: 
                         log=f"{variant}-{configuration}-tests.log")
         if args.tests_only:
             continue
-        print(f"Building {variant} release measurements", flush=True)
-        command([swift, "build", *flags, "-c", "release"], log=f"{variant}-build.log")
-        binpath = Path(command([swift, "build", "--package-path", package,
-                               "-c", "release", "--show-bin-path"]).strip())
+        if reused:
+            files = [package / "Package.swift"]
+            files += sorted(p for directory in ("Sources", "Tests")
+                            for p in (package / directory).rglob("*") if p.is_file())
+            previous_package = reused / variant
+            previous_files = [previous_package / "Package.swift"]
+            previous_files += sorted(p for directory in ("Sources", "Tests")
+                                     for p in (previous_package / directory).rglob("*") if p.is_file())
+            if ({p.relative_to(package) for p in files}
+                    != {p.relative_to(previous_package) for p in previous_files}):
+                raise ValueError("Reused package file set differs: " + variant)
+            for path in files:
+                previous = reused / variant / path.relative_to(package)
+                if not previous.is_file() or sha(previous) != sha(path):
+                    raise ValueError("Reused package differs: " + str(path))
+            binpath = reused / variant / ".build/release"
+            for name in ("MemoryDriver", "AssociationDriver"):
+                if sha(binpath / name) != prior_manifest["binaries"][variant][name]:
+                    raise ValueError("Reused binary hash differs: " + name)
+            print(f"Reusing verified {variant} release binaries", flush=True)
+        else:
+            print(f"Building {variant} release measurements", flush=True)
+            command([swift, "build", *flags, "-c", "release"], log=f"{variant}-build.log")
+            binpath = Path(command([swift, "build", "--package-path", package,
+                                   "-c", "release", "--show-bin-path"]).strip())
         binaries[variant] = {name: binpath / name for name in ("MemoryDriver", "AssociationDriver")}
         manifest.setdefault("binaries", {})[variant] = {k: sha(v) for k, v in binaries[variant].items()}
         write_json(output / "manifest.json", manifest)
@@ -203,7 +235,8 @@ let package = Package(name: "SubtitleQualifierStorageQualification", platforms: 
                 raise ValueError("Timing output mismatch")
             return row
         pilot = timed("baseline", 1)
-        iterations = max(1, min(100000, math.ceil(args.target_ms * 1e6 / pilot["cpuNsPerLookup"])))
+        # A slow one-shot pilot must not reduce a sample to one association.
+        iterations = max(5, min(100000, math.ceil(args.target_ms * 1e6 / pilot["cpuNsPerLookup"])))
         print(f"Timing {case}: {iterations} associations per sample", flush=True)
         for pair in range(args.pairs):
             order = ("baseline", "candidate") if pair % 2 == 0 else ("candidate", "baseline")
