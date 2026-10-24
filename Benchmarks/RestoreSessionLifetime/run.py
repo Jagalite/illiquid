@@ -83,7 +83,8 @@ def swift_arguments(package: Path, jobs: int) -> list[str | Path]:
             "--cache-path", package.parent / "cache",
             "--config-path", package.parent / "config",
             "--security-path", package.parent / "security",
-            "--configuration", "release", "--jobs", str(jobs)]
+            "--configuration", "release", "--jobs", str(jobs),
+            "-Xswiftc", "-enable-testing"]
 
 
 def summarize(rows: list[dict]) -> list[dict]:
