@@ -169,7 +169,7 @@ struct MetalASSSubtitleCompositorTests {
         #expect(results.allSatisfy { $0 })
     }
 
-    @Test func r8AtlasPacksTallMasksTogetherAndDoesNotShrinkStorage() throws {
+    @Test func r8AtlasPacksTallMasksAndPreservesEachSlotsCapacity() throws {
         func region(width: Int, height: Int, x: Int) -> ASSRenderedRegion {
             ASSRenderedRegion(
                 bitmap: Data(repeating: 255, count: width * height),
@@ -202,7 +202,19 @@ struct MetalASSSubtitleCompositorTests {
         ))
         #expect(smaller.textureSize == CGSize(width: 32, height: 32))
         #expect(!smaller.metrics.atlasReallocated)
-        #expect(smaller.pixels.count == packed.pixels.count)
+        #expect(smaller.pixels.count == smaller.metrics.uploadBytes)
+        #expect(smaller.pixels.count < packed.pixels.count)
+
+        let reusedLargeSlot = try #require(packer.prepare(
+            regions: [region(width: 1, height: 1, x: 0)],
+            canvasSize: CGSize(width: 1, height: 1),
+            strategy: .metalR8Atlas
+        ))
+        #expect(reusedLargeSlot.textureSize == smaller.textureSize)
+        #expect(reusedLargeSlot.pixels.count == packed.pixels.count)
+        #expect(reusedLargeSlot.pixels.prefix(smaller.pixels.count) == smaller.pixels)
+        #expect(reusedLargeSlot.pixels.dropFirst(smaller.pixels.count).allSatisfy { $0 == 0 })
+        #expect(packer.retainedStorageByteCountForTesting == packed.pixels.count + smaller.pixels.count)
 
         packer.retireSource()
         #expect(packer.retainedStorageByteCountForTesting == 0)

@@ -315,19 +315,25 @@ private struct SnapshotOracle {
 
 private func frameReceipt(
     _ frame: ASSPreparedSubtitleFrame,
-    label: String,
-    retainedBytes: Int
-) -> [String: Any] {
-    [
+    label: String
+) throws -> [String: Any] {
+    // GPU consumers upload only this prefix. Per-slot capacity may differ,
+    // but every retained tail byte must still be zero within each variant.
+    let activeBytes = frame.metrics.uploadBytes
+    guard frame.pixels.count >= activeBytes,
+          frame.pixels.dropFirst(activeBytes).allSatisfy({ $0 == 0 }) else {
+        throw HarnessError("Prepared frame has a short buffer or nonzero unused tail")
+    }
+    return [
         "label": label,
         "strategy": frame.strategy.rawValue,
         "canvas": [Double(frame.canvasSize.width), Double(frame.canvasSize.height)],
         "texture": [Double(frame.textureSize.width), Double(frame.textureSize.height)],
         "bytes_per_row": frame.bytesPerRow,
-        "pixels_count": frame.pixels.count,
-        "full_data_fnv1a64": fullHash(frame.pixels),
+        "active_pixels_count": activeBytes,
+        "active_data_fnv1a64": fullHash(Data(frame.pixels.prefix(activeBytes))),
+        "unused_tail_is_zero": true,
         "uses_bitmap_atlas": frame.usesBitmapAtlas,
-        "retained_bytes": retainedBytes,
         "quads": frame.quads.map { quad -> [String: Any] in
             [
                 "source": [Double(quad.source.minX), Double(quad.source.minY),
@@ -386,10 +392,9 @@ private func verify() throws -> [String: Any] {
             try snapshot.verify()
             snapshotChecks += 1
         }
-        receipts.append(frameReceipt(
+        receipts.append(try frameReceipt(
             frame,
-            label: label,
-            retainedBytes: packer.retainedStorageByteCountForTesting
+            label: label
         ))
         snapshots.append(SnapshotOracle(frame))
         // Three externally held frames exceed the two reusable slots and
@@ -430,10 +435,9 @@ private func verify() throws -> [String: Any] {
                 try snapshot.verify()
                 snapshotChecks += 1
             }
-            receipts.append(frameReceipt(
+            receipts.append(try frameReceipt(
                 frame,
-                label: "after-retirement-\(strategy.rawValue)-\(index)",
-                retainedBytes: packer.retainedStorageByteCountForTesting
+                label: "after-retirement-\(strategy.rawValue)-\(index)"
             ))
         }
     }
