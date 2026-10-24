@@ -1,0 +1,118 @@
+name: Source browser row storage memory
+
+on:
+  push:
+    branches: ['perf/source-browser-row-storage-20261024']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserRowStorageTests.swift'
+      - 'Benchmarks/SourceBrowserRowStorage/**'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - '.github/workflows/source-browser-row-storage.yml'
+      - '!Benchmarks/SourceBrowserRowStorage/*.md'
+      - '!Benchmarks/SourceBrowserRowStorage/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowser*Tests.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeVisibilityCacheTests.swift'
+      - 'Tests/IlliquidAppTests/SourceEmptyFolderVisibilityTests.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaOrganizationTests.swift'
+      - 'Benchmarks/SourceBrowserRowStorage/**'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - '.github/workflows/source-browser-row-storage.yml'
+      - '!Benchmarks/SourceBrowserRowStorage/*.md'
+      - '!Benchmarks/SourceBrowserRowStorage/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-browser-row-storage-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compare exact production sources, semantics, and retained allocations
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/SourceBrowserRowStorage/run.py \
+            --output "$RUNNER_TEMP/source-browser-row-storage" \
+            --pairs 6 --sizes 1000 10000 100000 --prove-baseline-failure "${mode[@]}"
+      - name: Emit compact reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-browser-row-storage' / 'evidence'
+          files = {path.name: path.read_text() for path in sorted(root.glob('*'))
+                   if path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt', '.diff'}}
+          for name in ['summary.json', 'parity.json', 'tests.json', 'completion.json']:
+              if name in files:
+                  print(f'::group::{name}')
+                  print(files[name])
+                  print('::endgroup::')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the 2 MiB log-bundle limit; use the uploaded artifact')
+          print('ROW_STORAGE_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('ROW_STORAGE_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-browser-row-storage-component
+          path: ${{ runner.temp }}/source-browser-row-storage/evidence/
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and qualify source-browser behavior
+        run: |
+          evidence="$RUNNER_TEMP/source-browser-row-storage-integration"
+          mkdir -p "$evidence"
+          sw_vers > "$evidence/host.txt"
+          uname -a >> "$evidence/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$evidence/host.txt"
+          swift --version >> "$evidence/host.txt"
+          git rev-parse HEAD >> "$evidence/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'SourceBrowserRowSemanticsTests|SourceBrowserRowStorageTests|SourceBrowserFilterTests|SourceBrowserSearchTests|SourceTreeVisibilityCacheTests|SourceEmptyFolderVisibilityTests|SourceMediaOrganizationTests' \
+            2>&1 | tee "$evidence/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-browser-row-storage-integration
+          path: ${{ runner.temp }}/source-browser-row-storage-integration/
+          retention-days: 14

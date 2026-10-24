@@ -103,14 +103,17 @@ actor SourceBrowserFilter {
             uniqueKeysWithValues: configuration.regexRules.map { ($0.id, 0) }
         )
         var hiddenCount = 0
-        var rows: [SourceTreeDisplayRow] = []
+        // Most projections leave every row unchanged. Share the tree's array
+        // until filtering or an annotation actually requires different values.
+        var rows: [SourceTreeDisplayRow]?
 
-        for var row in allRows {
+        for (index, var row) in allRows.enumerated() {
             guard !Task.isCancelled else { return nil }
             if !SourceVisibilityProjection.includes(
                 row.kind.itemKind,
                 in: configuration.viewMode
             ) {
+                if rows == nil { rows = Array(allRows[..<index]) }
                 continue
             }
 
@@ -161,12 +164,26 @@ actor SourceBrowserFilter {
             if visibility != nil, row.kind.itemKind != nil {
                 hiddenCount += 1
             }
-            guard visibility == nil || revealsHiddenItems else { continue }
+            guard visibility == nil || revealsHiddenItems else {
+                if rows == nil { rows = Array(allRows[..<index]) }
+                continue
+            }
+            if rows == nil {
+                guard row.visibility != visibility else { continue }
+                rows = Array(allRows[..<index])
+            }
             row.visibility = visibility
-            rows.append(row)
+            // A late first change can produce a nearly full prefix. Bound its
+            // next growth by the input count, while still growing small output
+            // arrays geometrically when most rows are filtered out.
+            if let count = rows?.count, count == rows?.capacity {
+                let growth = min(max(count, 1), allRows.count - count)
+                rows?.reserveCapacity(count + growth)
+            }
+            rows?.append(row)
         }
 
-        return SourceBrowserProjection(rows: rows, hiddenCount: hiddenCount, regexCounts: counts)
+        return SourceBrowserProjection(rows: rows ?? allRows, hiddenCount: hiddenCount, regexCounts: counts)
     }
 
     private static func organizeMedia(_ rows: [SourceTreeDisplayRow]) -> [SourceTreeDisplayRow] {
