@@ -4,9 +4,12 @@ on:
     paths:
       - Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift
       - Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift
+      - Sources/IlliquidNativePlayback/Subtitles/ASSBitmapCopy.swift
       - Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift
       - Tests/IlliquidNativePlaybackTests/SubtitleStagingReuseTests.swift
+      - Tests/IlliquidNativePlaybackTests/ASSBitmapCopyTests.swift
       - Benchmarks/SubtitleStaging/**
+      - Benchmarks/ASSBitmapCopy/**
       - .github/workflows/subtitle-staging-performance.yml
   workflow_dispatch:
 permissions:
@@ -30,6 +33,10 @@ jobs:
           python3 Benchmarks/SubtitleStaging/run.py test --output "$RUNNER_TEMP/subtitle-staging/debug"
           python3 Benchmarks/SubtitleStaging/run.py test --configuration release --output "$RUNNER_TEMP/subtitle-staging/release"
           python3 Benchmarks/SubtitleStaging/run.py benchmark --output "$RUNNER_TEMP/subtitle-staging/benchmark"
+      - name: Verify compact mask ownership and measure copy costs
+        run: |
+          python3 Benchmarks/ASSBitmapCopy/run.py \
+            --output "$RUNNER_TEMP/ass-bitmap-copy/component" --pairs 6 --target-ms 50
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -38,6 +45,14 @@ jobs:
             ${{ runner.temp }}/subtitle-staging/*/*.json
             ${{ runner.temp }}/subtitle-staging/*/*.jsonl
             ${{ runner.temp }}/subtitle-staging/*/*.log
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ass-bitmap-copy-macos-component
+          path: |
+            ${{ runner.temp }}/ass-bitmap-copy/component/*.json
+            ${{ runner.temp }}/ass-bitmap-copy/component/logs/*.log
           retention-days: 14
   native-regressions:
     runs-on: macos-26
@@ -48,6 +63,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+          fetch-depth: 0
       - name: Prepare the pinned native dependencies
         run: |
           if ! xcrun -sdk macosx metal --version; then
@@ -57,5 +73,27 @@ jobs:
           python3 Scripts/install-ci-native-sdk.py
       - name: Build the native app graph and test subtitle consumers
         run: |
+          mkdir -p "$RUNNER_TEMP/ass-bitmap-copy/native"
+          set -o pipefail
           swift test --force-resolved-versions --filter \
-            'SubtitleStagingReuseTests|MetalASSSubtitleCompositorTests|PiPSubtitlePipelineTests'
+            'ASSBitmapCopyTests|SubtitleStagingReuseTests|MetalASSSubtitleCompositorTests|PiPSubtitlePipelineTests' \
+            2>&1 | tee "$RUNNER_TEMP/ass-bitmap-copy/native/tests.log"
+      - name: Inventory pinned libass masks and measure representative shapes
+        run: |
+          python3 Benchmarks/ASSBitmapCopy/capture-libass.py \
+            --library /opt/homebrew/opt/libass/lib/libass.9.dylib \
+            --output "$RUNNER_TEMP/ass-bitmap-copy/native/inventory"
+          python3 Benchmarks/ASSBitmapCopy/run.py --benchmarks-only \
+            --output "$RUNNER_TEMP/ass-bitmap-copy/native/benchmark" \
+            --cases "$RUNNER_TEMP/ass-bitmap-copy/native/inventory/libass-cases.json" \
+            --pairs 6 --target-ms 50
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ass-bitmap-copy-macos-native
+          path: |
+            ${{ runner.temp }}/ass-bitmap-copy/native/tests.log
+            ${{ runner.temp }}/ass-bitmap-copy/native/inventory/*.json
+            ${{ runner.temp }}/ass-bitmap-copy/native/benchmark/*.json
+            ${{ runner.temp }}/ass-bitmap-copy/native/benchmark/logs/*.log
+          retention-days: 14
