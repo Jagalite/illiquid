@@ -138,7 +138,58 @@ temporary and excluded.
 
 ## Results and limits
 
-Pending execution; no performance result is claimed yet.
+### Linux component cohort
+
+[GitHub Actions run 40639635162](https://github.com/Jagalite/illiquid/actions/runs/40639635162),
+job `122654504613`, completed successfully on 2026-10-28 using Swift 6.4,
+Ubuntu 24.04.5, and an x86_64 AMD EPYC 7763 hosted runner (4 logical CPUs).
+The measured source commit is
+`9318c0726c88288b4fb6ce345e150cf817394f02`.
+
+All four test executions passed: 20 focused tests in debug and release for
+both baseline and candidate. Full output receipts matched for all 13 workloads.
+All calibration targets were reached. The final cohort contains 208 measured
+observations, eight fresh-process AB/BA pairs per workload.
+
+The table reports median CPU microseconds per complete invalidation and the
+geometric mean of paired baseline/candidate ratios. The speedup interval is the
+paired bootstrap interval described above.
+
+| Workload | Baseline µs | Candidate µs | Paired speedup | 95% interval |
+|---|---:|---:|---:|---:|
+| empty | 4.35 | 4.32 | 0.993× | 0.960–1.014× |
+| singleton | 5.07 | 4.87 | 1.040× | 1.033–1.046× |
+| small-mixed-32 | 19.14 | 15.94 | 1.195× | 1.163–1.226× |
+| narrow-256 | 48.38 | 30.67 | 1.574× | 1.552–1.597× |
+| narrow-4096 | 793.68 | 372.07 | 2.139× | 2.114–2.163× |
+| missing-4096 | 766.99 | 343.99 | 2.223× | 2.186–2.261× |
+| all-4096 | 1805.4 | 1194.9 | 1.510× | 1.502–1.520× |
+| all-errors-1024 | 587.27 | 597.37 | 0.985× | 0.971–0.999× |
+| missing-all-errors-1024 | 237.44 | 158.45 | 1.482× | 1.454–1.506× |
+| unicode-long-256 | 4148.0 | 2260.5 | 1.848× | 1.753–1.952× |
+| retained-snapshot-4096 | 879.06 | 502.97 | 1.740× | 1.715–1.764× |
+| prune-expansion-4096 | 1322.0 | 951.28 | 1.376× | 1.337–1.408× |
+| error-only-32 | 17.56 | 10.74 | 1.629× | 1.583–1.674× |
+
+The narrow 4,096-directory case improved from about 794 µs to 372 µs; the
+candidate was faster in all eight pairs. Empty-cache results overlap.
+The full all-error case is a small regression: about 587 µs to 597 µs, with a
+paired speedup of 0.985×. This is consistent with the extra containment scan
+when both dictionaries have the same keys, and is retained as a tradeoff rather
+than omitted. The other error-heavy control (an unmatched subtree) improved.
+
+`evidence/linux.json` retains the source/host manifest, all calibration and
+measurement rows, test counts, and summaries recovered from the CI log.
+The [uploaded artifact](https://github.com/Jagalite/illiquid/actions/runs/40639635162/artifacts/12794254567)
+also contains full test logs, command records, and exact byte receipts
+(14-day retention; archive SHA-256
+`93256f56a23cb5a4a14d6c991b48dca18135a361a2ae13792f74f1621baef241`).
+The committed evidence remains available after artifact expiry.
+
+### Native qualification
+
+The macOS 26 job is queued. The Linux results establish a portable component
+improvement; no macOS timing result is claimed yet.
 
 The measurement covers cached-tree invalidation. It does not measure filesystem
 enumeration, FSEvents delivery, debounce latency, SwiftUI rendering, decoding,
