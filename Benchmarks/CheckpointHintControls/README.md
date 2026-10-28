@@ -1,5 +1,16 @@
 # Checkpoint zero-index hint control
 
+## Recorded result
+
+The direct Linux comparison passed all four debug/release test configurations and
+1,158 complete-record equivalence checks. The missing singleton used 33.87% less
+CPU time, and the two-item stale/missing-zero workloads used 16.60–16.67% less
+by the median paired ratio. All eight pairs improved in those three workloads.
+The 17 control medians ranged from -0.56% to +1.53%, with noisy individual pairs.
+Native macOS validation remains pending; this is a narrow draft follow-up.
+See [the complete results, limits and provenance](RESULTS.md) and
+[raw Linux receipts](evidence/linux/).
+
 ## Scope and relationship to existing work
 
 This is a focused follow-up to [PR #140](https://github.com/Jagalite/illiquid/pull/140),

@@ -1,14 +1,6 @@
 name: Checkpoint zero-hint portable performance
 
 on:
-  push:
-    branches: ['codex/perf-checkpoint-zero-hint-fdd5ab']
-    paths:
-      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
-      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointIndexHintTests.swift'
-      - 'Benchmarks/CheckpointHintControls/Driver.swift'
-      - 'Benchmarks/CheckpointHintControls/run.py'
-      - '.github/workflows/checkpoint-hint-controls-portable.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
