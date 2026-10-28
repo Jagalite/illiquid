@@ -247,6 +247,39 @@ struct SourceTreeDirectoryStateTests {
         #expect(overlapping.relativePath(for: url("/Movies/Season/Episode.mkv")) == "Season/Episode.mkv")
     }
 
+    @Test func reloadSelectionNormalizesDuplicateAndRelativeRoots() {
+        let relativeRoot = URL(fileURLWithPath: "Movies/./", isDirectory: true,
+            relativeTo: url("/Library"))
+        let plan = SourceFilesystemInvalidationPlan(directoriesToReload: [
+            "/Library/Movies", "/Library/Movies/Expanded", "/Library/Movies/Collapsed",
+            "/Library/Movies2/Expanded",
+        ])
+        #expect(SourceTreeDirectoryState.reloadPaths(for: plan,
+            activeRoots: [relativeRoot, url("/Library/./Movies"), url("/Library/Movies")],
+            expandedFolderIDs: ["/Library/Movies/Expanded", "/Library/Movies2/Expanded"])
+            == ["/Library/Movies", "/Library/Movies/Expanded"])
+    }
+
+    @Test func reloadSelectionPreservesCanonicalUnicodeAndComponentBoundaries() {
+        let root = "/Caf\u{00E9}"
+        let child = "/Cafe\u{0301}/Season"
+        let sibling = "/Caf\u{00E9}2/Season"
+        let plan = SourceFilesystemInvalidationPlan(directoriesToReload: [root, child, sibling])
+        #expect(SourceTreeDirectoryState.reloadPaths(for: plan,
+            activeRoots: [url("/Cafe\u{0301}")], expandedFolderIDs: [child, sibling])
+            == [root, child])
+    }
+
+    @Test func reloadSelectionUnionsRescansAndIncludesCollapsedOverlappingRoots() {
+        let plan = SourceFilesystemInvalidationPlan(
+            directoriesToReload: ["/Movies", "/Movies/Season", "/Movies/Expanded", "/Movies/Collapsed"],
+            rootsToRescan: ["/Movies", "/Archive", "/Detached"])
+        #expect(SourceTreeDirectoryState.reloadPaths(for: plan,
+            activeRoots: [url("/Movies"), url("/Movies/Season"), url("/Archive")],
+            expandedFolderIDs: ["/Movies/Expanded", "/Detached"])
+            == ["/Movies", "/Movies/Season", "/Movies/Expanded", "/Archive"])
+    }
+
     private func url(_ path: String) -> URL { URL(fileURLWithPath: path, isDirectory: true) }
     private func folder(_ path: String) -> SourceTreeEntry {
         .init(url: url(path), kind: .folder, dateAdded: nil, creationDate: nil)

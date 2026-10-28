@@ -134,6 +134,9 @@ final class SourceTreeDirectoryState {
         activeRoots: [URL],
         expandedFolderIDs: Set<String>
     ) -> Set<String> {
+        guard !activeRoots.isEmpty,
+              !plan.directoriesToReload.isEmpty || !plan.rootsToRescan.isEmpty
+        else { return [] }
         let activeRootPaths = Set(activeRoots.map(SourceTreeIdentity.folderID))
         return Set(plan.directoriesToReload.union(plan.rootsToRescan).filter { path in
             // Exact roots are already visible. Collapsed descendants cannot

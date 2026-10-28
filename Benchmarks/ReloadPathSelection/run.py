@@ -149,6 +149,8 @@ def main() -> None:
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--target-ms", type=float, default=100)
     parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--via-kyoto", action="store_true",
+                        help="Confirm this entire command is executing as a submitted Kyoto job")
     args = parser.parse_args()
     if not args.swift:
         parser.error("Swift 6.1+ with its bundled Testing module is required")
@@ -156,6 +158,9 @@ def main() -> None:
         parser.error("--pairs must be even and between 2 and 20")
     if not 1 <= args.target_ms <= 1000:
         parser.error("--target-ms must be between 1 and 1000")
+    kyoto = Path("/Volumes/seed1/Projects/kyoto/kyoto.py")
+    if kyoto.exists() and not args.via_kyoto:
+        parser.error("Kyoto is available: submit this command through Kyoto with --via-kyoto; see README.md")
     out = args.output.resolve()
     if out.exists() and any(out.iterdir()):
         parser.error("Output directory must be new or empty")
@@ -175,13 +180,14 @@ def main() -> None:
         "candidate_source_sha256": digest((ROOT / CONSUMER).read_bytes()),
         "harness_sha256": digest((HERE / "Harness.swift").read_bytes()),
         "runner_sha256": digest(Path(__file__).read_bytes()),
-        "pairs": args.pairs, "target_ms": args.target_ms, "locale": env["LC_ALL"],
+        "pairs": args.pairs, "target_ms": args.target_ms, "minimum_variant_ms": 20,
+        "iteration_cap": 500000, "locale": env["LC_ALL"],
         "cpu_description": (Path("/proc/cpuinfo").read_text().split("\n\n")[0]
             if Path("/proc/cpuinfo").exists()
             else execute(["sysctl", "-n", "machdep.cpu.brand_string"], out, env).strip()),
     }
     save(out / "environment.json", environment)
-    if not Path("/Volumes/seed1/Projects/kyoto/kyoto.py").exists():
+    if not kyoto.exists():
         print("Kyoto is unavailable on this host; using serialized isolated component builds.", flush=True)
     spec = importlib.util.spec_from_file_location("browser_support", ROOT / "Scripts/test-source-browser-search.py")
     support = importlib.util.module_from_spec(spec)
@@ -239,7 +245,13 @@ def main() -> None:
             calibration = {variant: json.loads(execute([binary, "bench", name, "1"], out, env))
                            for variant, binary in binaries.items()}
             longest = max(row["elapsed_ns"] for row in calibration.values())
-            iterations = max(1, min(50000, math.ceil(args.target_ms * 1_000_000 / max(1, longest))))
+            shortest = min(max(1, row["elapsed_ns"]) for row in calibration.values())
+            # Keep one shared count while allowing the faster implementation
+            # at least 20 ms of work when practical. Cheap controls hit the cap.
+            iterations = max(1, min(500000, max(
+                math.ceil(args.target_ms * 1_000_000 / max(1, longest)),
+                math.ceil(20_000_000 / shortest),
+            )))
             save(out / (name + "-calibration.json"), calibration)
             for pair in range(args.pairs):
                 order = ("baseline", "candidate") if pair % 2 == 0 else ("candidate", "baseline")
