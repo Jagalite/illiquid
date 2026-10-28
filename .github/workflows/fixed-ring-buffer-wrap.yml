@@ -1,0 +1,93 @@
+name: Fixed ring buffer wrap performance
+
+on:
+  push:
+    branches: ['perf/video-color-layout-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Tests/IlliquidNativePlaybackTests/FixedRingBufferWrapTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift'
+      - 'Benchmarks/FixedRingBufferWrap/**'
+      - '.github/workflows/fixed-ring-buffer-wrap.yml'
+      - '!Benchmarks/FixedRingBufferWrap/*.md'
+      - '!Benchmarks/FixedRingBufferWrap/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Tests/IlliquidNativePlaybackTests/FixedRingBufferWrapTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift'
+      - 'Benchmarks/FixedRingBufferWrap/**'
+      - '.github/workflows/fixed-ring-buffer-wrap.yml'
+      - '!Benchmarks/FixedRingBufferWrap/*.md'
+      - '!Benchmarks/FixedRingBufferWrap/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Retain this branch's concurrency identity to retire its superseded sampler
+# experiment without affecting work on any other branch.
+concurrency:
+  group: video-color-sampler-layout-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    name: component (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination and select native toolchain
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds are serialized in this isolated checkout.'
+          if test "$RUNNER_OS" = 'macOS'; then
+            echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
+          fi
+      - name: Verify exact queue behavior and measure release builds
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/FixedRingBufferWrap/run.py \
+            --output "$RUNNER_TEMP/ring-wrap" --pairs 12 --target-ms 150 "${mode[@]}"
+      - name: Emit research receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'ring-wrap'
+          names = ['manifest.json', 'parity.json', 'tests.json', 'calibration.json',
+                   'observations.json', 'summary.json', 'completion.json', 'failure.json',
+                   'commands.json']
+          names += [p.name for p in sorted(root.glob('tests-*.log'))]
+          for name in names:
+              path = root / name
+              if path.exists():
+                  value = json.loads(path.read_text()) if path.suffix == '.json' else path.read_text()
+                  print('RING_EVIDENCE ' + name + ' ' + json.dumps(value, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: fixed-ring-buffer-wrap-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/ring-wrap/*.json
+            ${{ runner.temp }}/ring-wrap/*.log
+            ${{ runner.temp }}/ring-wrap/work/*/*/*.swift
+          retention-days: 14
