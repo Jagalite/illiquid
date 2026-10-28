@@ -2225,7 +2225,9 @@ struct SourceVisibilityMatcher {
     }
 
     private func matchingRootPath(for normalizedPath: String) -> String? {
-        rootPaths
+        // Select the longest match without allocating an intermediate array for
+        // each row and ancestor. Keep max's comparison and root-order semantics.
+        rootPaths.lazy
             .filter { rootPath in
                 SourceTreeIdentity.contains(normalizedPath, within: rootPath)
             }
