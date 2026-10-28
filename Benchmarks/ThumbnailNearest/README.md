@@ -1,6 +1,6 @@
 # Nearest thumbnail cache lookup research
 
-## Production path and proposed change
+## Production path
 
 `NativeTimelineThumbnailGenerator.cachedThumbnail` first tries an exact cache
 hit, then calls `NativeThumbnailCache.nearest` to display an existing preview
@@ -11,22 +11,22 @@ restart.
 The original lookup filters resident keys, constructs a `Set<Key>`, and sorts
 that set into another array. Hashing each complete key includes the media path,
 content version, dimensions, and renderer identifier. All admitted candidates
-already have the same source, version, and dimensions; only their integer
+already have equal source, version, and dimensions; only their integer
 half-second bucket varies.
 
 The candidate keeps the filtered array, deduplicates fallback times with a
-`Set<Int>` of those buckets, and sorts the array in place. It therefore avoids
-full-key hashing during candidate deduplication and the conversion from a set of
+`Set<Int>` of those buckets, and sorts the array in place. It avoids full-key
+hashing during candidate deduplication and the conversion from a set of
 complete keys back into an array. The normal image-cache lookup still uses its
 complete key.
 
 ## Behavioral contract
 
-The change retains the original resident key values. This is necessary because
-Swift string equality can consider differently encoded Unicode strings equal,
-while the JSON used for a disk-cache digest can preserve their different
-representations. Rebuilding resident keys from the query could change which
-disk entry gets promoted or loaded.
+The change retains the original resident key values. Swift string equality
+can consider differently encoded Unicode strings equal, while the JSON used
+for a disk-cache digest can preserve their different representations.
+Rebuilding resident keys from the query could change which disk entry gets
+promoted or loaded.
 
 All admitted resident keys have equal path, version, width, height, and renderer
 fields. The resident dictionary cannot contain two equal keys for the same
@@ -37,36 +37,93 @@ resident key when a fallback duplicates it.
 Distance calculations continue to convert each bucket to `Double` before
 subtraction. The existing inclusive distance bound, rounding of fallback times,
 invalid-input handling, earlier-bucket tie-break, cancellation checks, and
-ordered asynchronous image attempts are preserved. In particular, large
-integer buckets keep the existing floating-point precision and tie behavior.
+ordered asynchronous image attempts are preserved. Large integer buckets keep
+the existing floating-point precision and tie behavior.
 
-## Qualification plan
+## Reproduce
 
-The baseline is main commit
-`ea2ff568237e2667f7b1aeee67b11a44ebe95b72`; its complete
-`NativeThumbnailCache.swift` Git blob is
-`66b8127d5c1ea269860b2c1b63e3dcede4262807`.
+Follow [AGENTS.md](../../AGENTS.md) and submit builds through Kyoto when it is
+available. On an isolated macOS host without Kyoto, with Swift 6.1 or newer:
 
-The focused runner will compile the complete cache and its real dependencies,
-run the same regression tests against both variants in debug and release, and
-compare detailed lookup receipts. Tests cover source/version/size isolation,
-distance boundaries, duplicate and invalid fallback times, cancellation,
-Unicode key identity, and disk restart behavior.
+```sh
+python3 Benchmarks/ThumbnailNearest/run.py \
+  --output /tmp/illiquid-thumbnail-nearest --pairs 8 --target-ms 100
+```
 
-Timing will exercise actual asynchronous `nearest` calls with real resident
-`CGImage` values, including the existing cache hit and recency bookkeeping.
-Image construction, cache population, and verification serialization stay
-outside the clock. Timed fixtures exclude disk I/O; disk behavior is checked
-separately for correctness. Empty, small, mixed-identity, storyboard, and
-full-resident-cache cases provide controls.
+The output directory must be new or empty. `--tests-only` runs the regression
+suites without the optimized differential benchmark. The workflow checks for
+Kyoto before direct compilation and keeps its isolated builds sequential.
 
-Measurements must use optimized production modules and a separately compiled
-driver with cross-module optimization disabled. Fresh-process pairs use equal
-work counts, alternating baseline/candidate order, and validated result
-checksums. The runner records the compiler, host, source hashes, commands,
-calibration, raw measurements, and summaries.
+The historical cache baseline is main commit
+`ea2ff568237e2667f7b1aeee67b11a44ebe95b72`, Git blob
+`66b8127d5c1ea269860b2c1b63e3dcede4262807`. Its blob hash is verified.
+Both variants compile against the same frozen current supporting production
+sources. All input hashes are checked again before a successful receipt.
 
-This is a component experiment. It does not establish an improvement in video
-decoding, end-to-end hover latency, frame rate, battery life, or live UI
-responsiveness. A performance PR is warranted only after the experiment
-demonstrates a repeatable benefit with matching behavior.
+Five complete core files and six complete native files are compiled; there are
+no replacement cache implementations or FFmpeg dependencies. The same ten
+Swift Testing regressions run against both variants in debug and release.
+The runner requires ten tests to have executed successfully in every run.
+
+Optimized core and native modules are built separately from the driver with
+`-O -whole-module-optimization -disable-cmo` in Swift 6 language mode.
+The generated package and compiler target macOS 15 for this standalone cache
+component. The actual compiler, Xcode, SDK, architecture, and host versions are
+recorded in the manifest.
+
+## Workloads and receipts
+
+Each timed operation calls the actual asynchronous `nearest` method. The clock
+includes actor calls, candidate filtering/deduplication/sorting, foreground
+cache accounting, and consumption of the returned time and image dimensions.
+Fixture construction, cache population, 512 warmup lookups, and result
+serialization are outside the measured interval. Fixtures remain alive until
+after the stop clock.
+
+| Case | Resident entries | Fallback times | Search radius |
+|---|---:|---|---:|
+| empty | 0 | None | 7,200 s |
+| one-resident | 1 | None | 7,200 s |
+| 24-residents | 24 | None | 7,200 s |
+| 96-residents | 96 | None | 7,200 s |
+| 96-mixed-identities | 96; 24 match the request identity | None | 7,200 s |
+| 96-long-path | 96 | None | 7,200 s |
+| 24-fallback-duplicates | 24 | 24 times duplicating eight resident buckets | 7,200 s |
+| missing-fallbacks | 0 | 24 distinct missing buckets | 7,200 s |
+| 96-nearby | 96; only the nearby subset is eligible | None | 3 s |
+| 24-storyboard | 24 | 24 interleaved missing buckets | 7,200 s |
+
+Four query positions alternate within each case. The storyboard case tries a
+missing earlier fallback before a tied resident image. Real generated
+`CGImage` fixtures are 8–11 pixels wide and 8–10 pixels high, below the byte
+budget; this isolates lookup from pixel processing while covering the
+cache's maximum resident count. The long-path case uses 64 repeated directory
+components. Timed cases disable disk access.
+
+The optimized verification run compares all 59 selection receipts, including
+returned time bit patterns, image dimensions, decoded pixel checksums, and
+resident image identity. Additional assertions cover cancellation, signed
+distance ties, actual disk fallback rounding, and Unicode-sensitive disk
+promotion. The complete receipts must match before measurements start.
+
+Each case uses 1,000-call calibration and a pilot targeting 20 ms, then chooses
+a shared iteration count targeting 100 ms for the faster variant. There are
+eight fresh-process pairs per case, alternating baseline/candidate order.
+Case order is fixed. Every pair must have identical operation counts, hit
+counts, and result checksums. All 160 final observations are retained.
+
+Summaries report variant medians and ranges, every paired reduction, the
+median paired reduction, and the number of pairs favoring the candidate.
+There is no timing threshold in CI and no removal of inconvenient samples.
+The manifest, calibration, commands, complete source snapshots, logs,
+verification receipts, and raw timings are available in the workflow artifact.
+
+## Scope
+
+These synthetic component measurements establish the cost of choosing and
+retrieving a cached approximation on the recorded host. They do not measure
+video decoding, filesystem latency, end-to-end hover latency, frame rate,
+energy use, or live UI responsiveness. The macOS 26 player build and live
+playback path require their own qualification.
+
+Performance results will be recorded after native execution succeeds.
