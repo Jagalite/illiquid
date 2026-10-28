@@ -13,9 +13,9 @@ chain whose terminal is encountered last requires one scan per predecessor.
 
 The candidate first checks whether transaction reachability can affect the
 report. It skips propagation when there are no transactions or no settled
-seeds. It keeps one original forward scan for easy graphs, then builds an
-index of fair predecessors only if that scan added states and transactions
-remain unresolved. Each newly reachable state enters the worklist once.
+seeds. It keeps one original forward scan for easy graphs, then probes for a fair edge from an unresolved source into the reached set.
+It builds an index of fair predecessors only if that frontier exists and
+transactions remain unresolved. Each newly reachable state enters the worklist once.
 Classification, SCC analysis, and every report field are preserved.
 
 The fallback's expected time is O(V + E), with hash collections, and it uses
@@ -69,6 +69,7 @@ includes both exploration and analysis.
 | `synthetic-dense` | 256 cyclic transaction vertices with 16 edges each and a terminal exit |
 | `synthetic-all-settled` | 2,048 terminal vertices; reachability cannot change the report |
 | `synthetic-no-settled` | 2,048 transactions with no terminal/wait seed |
+| `synthetic-partial-settled` | One reachable transaction beside 2,046 closed transaction vertices |
 | `synthetic-no-fair` | Unfair exits must not establish fair reachability |
 
 Real fixtures use deterministic limits of 2,000 states and 20,000 edges, with
@@ -81,13 +82,13 @@ explorer measurements.
 The runner starts calibration at one iteration, selects the same iteration
 count for each variant, and records pilot observations separately. Final
 measurements use fresh serial processes and balanced AB/BA pairs; each performs
-one warm-up operation. The standard ten-round run produces 220 final
-observations across eleven workloads. Timings have no percentage-based CI gate.
+one warm-up operation. The standard ten-round run produces 240 final
+observations across twelve workloads. Timings have no percentage-based CI gate.
 
 ## Correctness and retained evidence
 
-Before timing, both binaries emit 148 complete normalized report receipts:
-the eleven timed fixtures, six real models at depth 3, three empty/singleton
+Before timing, both binaries emit 149 complete normalized report receipts:
+the twelve timed fixtures, six real models at depth 3, three empty/singleton
 cases, and 64 deterministic mixed graphs in both edge orders. Every report
 field, stuck-state ID, and SCC member is compared. Only the order of unordered
 SCC sets is normalized. Pair validation also requires identical graph metadata,

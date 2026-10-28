@@ -8,7 +8,7 @@ private let workloadNames = [
     "real-seek", "real-eof-drain", "real-stop-shutdown",
     "synthetic-chain-forward", "synthetic-chain-reverse", "synthetic-sparse",
     "synthetic-dense", "synthetic-all-settled", "synthetic-no-settled",
-    "synthetic-no-fair", "end-to-end-stop-shutdown",
+    "synthetic-no-fair", "synthetic-partial-settled", "end-to-end-stop-shutdown",
 ]
 
 private struct Failure: Error, CustomStringConvertible {
@@ -91,6 +91,13 @@ private func fixture(_ name: String) throws -> PlaybackSearchResult {
     case "synthetic-no-settled":
         return synthetic(name, nodes: (0..<2_048).map { _ in node() },
                          edges: (0..<2_048).map { edge($0, $0) })
+    case "synthetic-partial-settled":
+        // One transaction reaches a terminal immediately; the remaining
+        // transactions stay in disconnected closed SCCs. The initial scan is
+        // already a fixed point despite having unresolved transactions.
+        let nodes = (0..<2_047).map { _ in node() } + [node(.terminated)]
+        let edges = [edge(0, 2_047)] + (1..<2_047).map { edge($0, $0) }
+        return synthetic(name, nodes: nodes, edges: edges)
     case "synthetic-no-fair":
         let nodes = (0..<2_047).map { _ in node() } + [node(.terminated)]
         return synthetic(name, nodes: nodes,

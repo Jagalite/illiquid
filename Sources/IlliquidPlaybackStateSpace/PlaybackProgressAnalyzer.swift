@@ -64,7 +64,11 @@ public enum PlaybackProgressAnalyzer {
       for edge in result.graph.edges where edge.isFairProgress && canSettle.contains(edge.to) {
         if canSettle.insert(edge.from).inserted { changed = true }
       }
-      if changed, transactionIndices.contains(where: { !canSettle.contains($0) }) {
+      if changed, transactionIndices.contains(where: { !canSettle.contains($0) }),
+        result.graph.edges.contains(where: {
+          $0.isFairProgress && canSettle.contains($0.to) && !canSettle.contains($0.from)
+        })
+      {
         var predecessors: [Int: [Int]] = [:]
         for edge in result.graph.edges
           where edge.isFairProgress && !canSettle.contains(edge.from)
