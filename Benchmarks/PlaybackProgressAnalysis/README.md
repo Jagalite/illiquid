@@ -52,3 +52,11 @@ The artifact contains source hashes, commands, compiler/platform metadata,
 debug/release test logs, raw measurements, fixture and calibration receipts, and
 median/range/paired-reduction summaries. Timing is informational; correctness and
 receipt checks are gates, while a noisy speed threshold is not.
+
+## Recorded result
+
+The [research report](../../Documentation/PLAYBACK_PROGRESS_ANALYSIS_PERFORMANCE.md)
+and [Linux receipts](evidence/linux.json) retain the successful eight-pair run.
+Complete analysis used 27.7–43.6% less time across the six measured production
+graphs on Linux/Swift 6.4, with exact results and all regression tests passing. macOS
+qualification is pending; these timings are not an application playback claim.
