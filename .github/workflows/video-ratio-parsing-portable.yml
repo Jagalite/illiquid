@@ -46,18 +46,22 @@ jobs:
             Sources/IlliquidCore
             Benchmarks/VideoRatioParsing
             Benchmarks/VideoRatioParsingPortable
+      - name: Configure the container checkout and evidence path
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          printf 'VIDEO_RATIO_RESULTS=%s\n' "$RUNNER_TEMP/video-ratio-parser-portable" >> "$GITHUB_ENV"
       - name: Compare exact parser outputs and paired release timings
         run: |
           python3 Benchmarks/VideoRatioParsingPortable/run.py \
             --pairs 6 --target-ms 150 --minimum-ms 60 \
-            --output "$RUNNER_TEMP/video-ratio-parser-portable"
+            --output "$VIDEO_RATIO_RESULTS"
       - name: Emit reviewable evidence
         if: always()
         run: |
           python3 - <<'PY'
           import base64, gzip, hashlib, json, os
           from pathlib import Path
-          root = Path(os.environ['RUNNER_TEMP']) / 'video-ratio-parser-portable'
+          root = Path(os.environ['VIDEO_RATIO_RESULTS'])
           files = {}
           for path in sorted(root.rglob('*')):
               if (path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt', '.stdout', '.stderr'}
@@ -74,13 +78,13 @@ jobs:
         with:
           name: video-ratio-parser-portable
           path: |
-            ${{ runner.temp }}/video-ratio-parser-portable/**/*.json
-            ${{ runner.temp }}/video-ratio-parser-portable/**/*.jsonl
-            ${{ runner.temp }}/video-ratio-parser-portable/**/*.log
-            ${{ runner.temp }}/video-ratio-parser-portable/**/*.txt
-            ${{ runner.temp }}/video-ratio-parser-portable/**/*.stdout
-            ${{ runner.temp }}/video-ratio-parser-portable/**/*.stderr
-            ${{ runner.temp }}/video-ratio-parser-portable/**/*.swift
-            ${{ runner.temp }}/video-ratio-parser-portable/**/*.py
-            !${{ runner.temp }}/video-ratio-parser-portable/**/module-cache/**
+            ${{ env.VIDEO_RATIO_RESULTS }}/**/*.json
+            ${{ env.VIDEO_RATIO_RESULTS }}/**/*.jsonl
+            ${{ env.VIDEO_RATIO_RESULTS }}/**/*.log
+            ${{ env.VIDEO_RATIO_RESULTS }}/**/*.txt
+            ${{ env.VIDEO_RATIO_RESULTS }}/**/*.stdout
+            ${{ env.VIDEO_RATIO_RESULTS }}/**/*.stderr
+            ${{ env.VIDEO_RATIO_RESULTS }}/**/*.swift
+            ${{ env.VIDEO_RATIO_RESULTS }}/**/*.py
+            !${{ env.VIDEO_RATIO_RESULTS }}/**/module-cache/**
           retention-days: 14
