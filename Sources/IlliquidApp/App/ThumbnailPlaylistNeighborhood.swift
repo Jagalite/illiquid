@@ -8,26 +8,19 @@ struct ThumbnailPlaylistNeighborhood {
     let distances: [URL: Int]
 
     init(playlist: [FolderPlaylistItem], current: URL?) {
-        guard let current else {
+        guard let current,
+              let anchor = playlist.firstIndex(where: { $0.url == current })
+        else {
             urls = []
             distances = [:]
             return
         }
-        // A singleton needs no index search, capacity reservation, or window loop.
+
+        // A matching singleton has a complete result without a window-building loop.
         if playlist.count == 1 {
             let url = playlist[0].url
-            if url == current {
-                urls = [url]
-                distances = [url: 0]
-            } else {
-                urls = []
-                distances = [:]
-            }
-            return
-        }
-        guard let anchor = playlist.firstIndex(where: { $0.url == current }) else {
-            urls = []
-            distances = [:]
+            urls = [url]
+            distances = [url: 0]
             return
         }
 
