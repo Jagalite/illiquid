@@ -1,0 +1,114 @@
+name: Thumbnail playlist neighbor projection
+
+on:
+  push:
+    branches: ['perf/thumbnail-playlist-neighbors']
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighbors.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPassCursor.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborsTests.swift'
+      - 'Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift'
+      - 'Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift'
+      - 'Benchmarks/ThumbnailPlaylistNeighbors/**'
+      - 'Benchmarks/NonDecodePerformance/allocmeter.c'
+      - '.github/workflows/thumbnail-playlist-neighbors.yml'
+      - '!Benchmarks/ThumbnailPlaylistNeighbors/*.md'
+      - '!Benchmarks/ThumbnailPlaylistNeighbors/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighbors.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPassCursor.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborsTests.swift'
+      - 'Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift'
+      - 'Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift'
+      - 'Benchmarks/ThumbnailPlaylistNeighbors/**'
+      - 'Benchmarks/NonDecodePerformance/allocmeter.c'
+      - '.github/workflows/thumbnail-playlist-neighbors.yml'
+      - '!Benchmarks/ThumbnailPlaylistNeighbors/*.md'
+      - '!Benchmarks/ThumbnailPlaylistNeighbors/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-playlist-neighbors-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: ${{ matrix.os == 'macos-26' && '/Applications/Xcode_26.6.app/Contents/Developer' || '' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify semantics and measure projection cost
+        run: |
+          python3 - <<'PY'
+          import json, os, platform, subprocess, sys
+          from pathlib import Path
+          output = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-playlist-neighbors'
+          runner = [sys.executable, 'Benchmarks/ThumbnailPlaylistNeighbors/run.py']
+          commands = [runner + ['--output', str(output / 'timing'), '--pairs', '6', '--target-ms', '100']]
+          if platform.system() == 'Linux':
+              commands.append(runner + ['--output', str(output / 'allocations'),
+                  '--allocations', '--skip-tests', '--pairs', '2'])
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if not queue.is_file():
+              print('Shared Kyoto queue is unavailable on this hosted runner; '
+                    'building isolated components directly and serially.', flush=True)
+          for command in commands:
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = json.loads(submitted)['id']
+                  subprocess.run([*cli, 'show', job_id], check=True)
+                  result = subprocess.run([*cli, 'wait', job_id])
+                  subprocess.run([*cli, 'logs', job_id], check=True)
+                  if result.returncode:
+                      sys.exit(result.returncode)
+              else:
+                  subprocess.run(command, check=True)
+          PY
+      - name: Publish measurement summaries
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-playlist-neighbors'
+          for path in sorted(root.glob('*/summary.json')):
+              print(f'::group::{path.parent.name}')
+              print(path.read_text())
+              print('::endgroup::')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-playlist-neighbors-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/thumbnail-playlist-neighbors/*/*.json
+            ${{ runner.temp }}/thumbnail-playlist-neighbors/*/*.jsonl
+            ${{ runner.temp }}/thumbnail-playlist-neighbors/*/*.log
+          retention-days: 14
