@@ -13,9 +13,10 @@ using code commit
 [`1de4df35187b9e7483d40dd5731158ea0f79b2fc`](https://github.com/Jagalite/illiquid/commit/1de4df35187b9e7483d40dd5731158ea0f79b2fc).
 The comparison baseline remains
 [`ea2ff568237e2667f7b1aeee67b11a44ebe95b72`](https://github.com/Jagalite/illiquid/commit/ea2ff568237e2667f7b1aeee67b11a44ebe95b72).
-**Linux component qualification and the independent audit passed.** The
-[macOS job](https://github.com/Jagalite/illiquid/actions/runs/40734628101) remains
-queued; native qualification is pending. The [original report](../../README.md)
+**Linux component qualification and the independent audit passed.** Native
+measurements are not part of this cohort. The original macOS job had not started
+when this evidence was collected; [PR #230 checks](https://github.com/Jagalite/illiquid/pull/230/checks)
+track current native qualification. The [original report](../../README.md)
 retains the earlier experiment as a historical record.
 
 ## Why the earlier memory measurement was inconclusive
