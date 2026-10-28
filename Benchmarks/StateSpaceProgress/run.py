@@ -69,16 +69,13 @@ def stage(output: Path, variant: str, baseline: str) -> dict:
                               "destination": str(target.relative_to(package)),
                               "transformation": "none"}
 
-    copy("Sources/IlliquidCore/Player/MediaTrack.swift")
+    copy("Sources/IlliquidCore/Player/MediaTrack.swift", current=True)
     for folder in ["Sources/IlliquidPlaybackCore", "Sources/IlliquidPlaybackStateSpace"]:
-        # Both variants must have the same production file inventory.
-        paths = git("ls-tree", "-r", "--name-only", baseline, "--", folder).decode().splitlines()
-        current_paths = [str(p.relative_to(ROOT)) for p in sorted((ROOT / folder).rglob("*.swift"))]
-        paths = sorted(p for p in paths if p.endswith(".swift"))
-        if paths != current_paths:
-            raise ValueError(f"Production source inventory differs in {folder}")
-        for relative in paths:
-            copy(relative)
+        # Hold supporting production code constant even on later PRs. Only the
+        # analyzer under investigation comes from the pinned baseline.
+        for path in sorted((ROOT / folder).rglob("*.swift")):
+            relative = str(path.relative_to(ROOT))
+            copy(relative, current=relative != ANALYZER)
     # Run the same current regressions against both versions, including the new
     # fair-reachability/report tests. No test or production source is rewritten.
     for folder in ["Tests/IlliquidPlaybackCoreTests", "Tests/IlliquidPlaybackStateSpaceTests"]:
@@ -143,6 +140,7 @@ def main() -> None:
         "schema_version": 1, "baseline_commit": baseline,
         "candidate_head": git("rev-parse", "HEAD").decode().strip(),
         "candidate_sources": "current worktree",
+        "baseline_sources": "pinned analyzer; identical current production support, tests, and harness",
         "candidate_status": git("status", "--porcelain").decode(),
         "compiler": command([args.swift, "--version"], args.output, "compiler").strip(),
         "platform": platform.platform(), "machine": platform.machine(),
@@ -169,8 +167,8 @@ def main() -> None:
         binaries[variant] = Path(binary_path) / "StateSpaceProgressBenchmark"
     changed = [path for path, receipt in manifest["source_hashes"]["baseline"].items()
                if receipt["sha256"] != manifest["source_hashes"]["candidate"][path]["sha256"]]
-    if changed != [ANALYZER]:
-        raise ValueError(f"Expected only the progress analyzer to differ; observed {changed}")
+    if any(path != ANALYZER for path in changed):
+        raise ValueError(f"Only the progress analyzer may differ; observed {changed}")
     manifest["changed_source_paths"] = changed
     save(args.output / "manifest.json", manifest)
 
