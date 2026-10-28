@@ -184,6 +184,78 @@ struct PlanarOwnershipTransitionTests {
         withExtendedLifetime((buffers, tokens, attachments)) {}
     }
 
+    @Test func peakCountsIncludeMixedOwnersAndOverlappingIdentities() throws {
+        let ledger = PlanarBufferOwnershipLedger()
+        let buffers = try (0..<4).map { _ in try makeBuffer() }
+        var tokens: [PlanarFrameOwnershipToken?] = [
+            ledger.checkout(generation: 1, pixelBuffer: buffers[0]),
+        ]
+        var attachments: [PlanarRendererSampleLifetimeAttachment?] = [
+            try #require(ledger.makeRendererSampleAttachment(
+                checkoutID: try #require(tokens[0]).checkoutID
+            )),
+        ]
+        withExtendedLifetime(tokens[0]) {}
+        tokens[0] = nil
+
+        // An older renderer-only owner shares its buffer with a new checkout.
+        // The other checkouts have application-only and double ownership.
+        tokens.append(ledger.checkout(generation: 2, pixelBuffer: buffers[0]))
+        tokens.append(ledger.checkout(generation: 2, pixelBuffer: buffers[1]))
+        tokens.append(ledger.checkout(generation: 2, pixelBuffer: buffers[2]))
+        for index in [1, 3] {
+            attachments.append(try #require(ledger.makeRendererSampleAttachment(
+                checkoutID: try #require(tokens[index]).checkoutID
+            )))
+        }
+
+        var snapshot = ledger.snapshot(activeGeneration: 2)
+        #expect(snapshot.applicationFrames == 3)
+        #expect(snapshot.rendererSampleAttachments == 3)
+        #expect(snapshot.knownOutstandingBuffers == 3)
+        #expect(snapshot.peakApplicationFrames == 3)
+        #expect(snapshot.peakRendererSampleAttachments == 3)
+        #expect(snapshot.peakKnownOutstandingBuffers == 3)
+
+        // Release an application owner, then trigger peak accounting with a
+        // fresh identity. The renderer-only third buffer must still count.
+        withExtendedLifetime(tokens[3]) {}
+        tokens[3] = nil
+        tokens.append(ledger.checkout(generation: 2, pixelBuffer: buffers[3]))
+        attachments.append(try #require(ledger.makeRendererSampleAttachment(
+            checkoutID: try #require(tokens[4]).checkoutID
+        )))
+        snapshot = ledger.snapshot(activeGeneration: 2)
+        #expect(snapshot.applicationFrames == 3)
+        #expect(snapshot.rendererSampleAttachments == 4)
+        #expect(snapshot.knownOutstandingBuffers == 4)
+        #expect(snapshot.peakApplicationFrames == 3)
+        #expect(snapshot.peakRendererSampleAttachments == 4)
+        #expect(snapshot.peakKnownOutstandingBuffers == 4)
+
+        withExtendedLifetime((buffers, tokens, attachments)) {}
+        tokens.removeAll()
+        attachments.removeAll()
+        snapshot = ledger.snapshot(activeGeneration: 2)
+        #expect(snapshot.applicationFrames == 0)
+        #expect(snapshot.rendererSampleAttachments == 0)
+        #expect(snapshot.knownOutstandingBuffers == 0)
+
+        // A lower-occupancy growth event must not reset historical peaks.
+        let next = ledger.checkout(generation: 3, pixelBuffer: buffers[0])
+        let nextAttachment = try #require(
+            ledger.makeRendererSampleAttachment(checkoutID: next.checkoutID)
+        )
+        snapshot = ledger.snapshot(activeGeneration: 3)
+        #expect(snapshot.applicationFrames == 1)
+        #expect(snapshot.rendererSampleAttachments == 1)
+        #expect(snapshot.knownOutstandingBuffers == 1)
+        #expect(snapshot.peakApplicationFrames == 3)
+        #expect(snapshot.peakRendererSampleAttachments == 4)
+        #expect(snapshot.peakKnownOutstandingBuffers == 4)
+        withExtendedLifetime((buffers, next, nextAttachment)) {}
+    }
+
     private func phaseCounts(_ snapshot: PlanarBufferOwnershipSnapshot) -> [Int] {
         [snapshot.decodedFrames, snapshot.framesWaitingForQueue, snapshot.queuedFrames,
          snapshot.presentingFrames, snapshot.submittedApplicationFrames]
