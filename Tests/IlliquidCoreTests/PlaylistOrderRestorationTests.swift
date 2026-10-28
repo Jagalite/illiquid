@@ -51,12 +51,18 @@ struct PlaylistOrderRestorationTests {
         #expect(PlaylistMutation.restoringOrder(
             [first, other, duplicate], ids: [other.id, duplicate.id]
         ) == [other, first])
+        #expect(PlaylistMutation.restoringIDs(
+            [first, other, duplicate], ids: [other.id, duplicate.id]
+        ) == [other.id, first.id])
     }
 
     @Test func nonFileIdentitiesRetainDistinctQueryStrings() throws {
         let a = FolderPlaylistItem(url: try #require(URL(string: "https://example.invalid/media?id=1")))
         let b = FolderPlaylistItem(url: try #require(URL(string: "https://example.invalid/media?id=2")))
         #expect(PlaylistMutation.restoringOrder([b, a, b], ids: [a.id]) == [a, b])
+        #expect(PlaylistMutation.restoringIDs(
+            [b, a, b], ids: [a.id]
+        ) == [a.id, b.id])
     }
 
     @Test func repeatedShuffleEditsPreservePlaybackIdentityAndNewItemOrder() {
@@ -75,6 +81,49 @@ struct PlaylistOrderRestorationTests {
         ) == [c, d, e])
     }
 
+    @Test func checkpointIdentityProjectionPreservesOrderAcrossEdits() throws {
+        let a = item(0), b = item(1), c = item(2)
+        let d = item(3), e = item(4), f = item(5)
+        let originalIDs = [a.id, b.id, c.id]
+
+        // B was removed; D and E were appended while shuffled.
+        let firstItems = [c, a, d, e, item(0, revision: 7)]
+        var checkpointIDs = PlaylistMutation.restoringIDs(
+            firstItems, ids: originalIDs
+        )
+        #expect(checkpointIDs == [a.id, c.id, d.id, e.id])
+        let restoredIDs = try JSONDecoder().decode(
+            [FolderPlaylistItem.ID].self,
+            from: JSONEncoder().encode(checkpointIDs)
+        )
+        #expect(restoredIDs == checkpointIDs)
+        #expect(PlaylistMutation.restoringIDs(
+            firstItems, ids: restoredIDs
+        ) == checkpointIDs)
+        #expect(PlaylistMutation.restoringOrder(
+            firstItems, ids: restoredIDs
+        ) == [a, c, d, e])
+
+        // The next checkpoint removes A and appends F.
+        let secondItems = [e, d, c, item(2, revision: 9), f]
+        checkpointIDs = PlaylistMutation.restoringIDs(
+            secondItems, ids: restoredIDs
+        )
+        #expect(checkpointIDs == [c.id, d.id, e.id, f.id])
+        #expect(PlaylistMutation.restoringOrder(
+            secondItems, ids: checkpointIDs
+        ) == [c, d, e, f])
+
+        let finalItems = [f, c]
+        checkpointIDs = PlaylistMutation.restoringIDs(
+            finalItems, ids: checkpointIDs
+        )
+        #expect(checkpointIDs == [c.id, f.id])
+        #expect(PlaylistMutation.restoringOrder(
+            finalItems, ids: checkpointIDs
+        ) == [c, f])
+    }
+
     @Test func allSmallQueueAndSavedOrderSequencesMatchAnIndependentModel() {
         let currentSequences = sequences(alphabetSize: 3, maximumLength: 4)
         let savedSequences = sequences(alphabetSize: 4, maximumLength: 4)
@@ -88,15 +137,17 @@ struct PlaylistOrderRestorationTests {
             let items = current.enumerated().map { item($0.element, revision: $0.offset) }
             for saved in savedCases {
                 var expected: [FolderPlaylistItem] = []
+                var expectedIDs: [FolderPlaylistItem.ID] = []
                 var emitted: Set<Int> = []
                 // This oracle works with integer labels, not production ID maps.
                 for label in saved.labels + current {
                     guard let firstIndex = current.firstIndex(of: label),
                           emitted.insert(label).inserted else { continue }
                     expected.append(items[firstIndex])
+                    expectedIDs.append(identities[label])
                 }
                 #expect(PlaylistMutation.restoringOrder(items, ids: saved.ids) == expected)
-                #expect(PlaylistMutation.restoringIDs(items, ids: saved.ids) == expected.map(\.id))
+                #expect(PlaylistMutation.restoringIDs(items, ids: saved.ids) == expectedIDs)
                 checked += 1
             }
         }

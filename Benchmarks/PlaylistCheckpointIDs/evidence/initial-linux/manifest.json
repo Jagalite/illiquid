@@ -1,0 +1,99 @@
+{
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate_commit": "416f4d870ba67cce5579d241e6e456c0043caee5",
+  "candidate_status": "",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "swift": "Swift version 6.2.1 (swift-6.2.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "developer_dir": null,
+  "arguments": {
+    "output": "/__w/_temp/playlist-checkpoint-ids",
+    "pairs": 6,
+    "memory_pairs": 4,
+    "target_ms": 100,
+    "mode": "all"
+  },
+  "timestamp_utc": "2026-10-28T05:42:17Z",
+  "flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-warnings-as-errors"
+  ],
+  "cross_module_optimization": false,
+  "sampling": "Fresh process per variant/pair, alternating AB/BA",
+  "scope": "Production identity projection, excluding fixture setup and validation",
+  "autorelease_policy": "Each timed projection constructs and disposes inside one pool",
+  "memory_scope": "Separate cold process, one projection, sampled live allocator peak",
+  "sources": {
+    "baseline/FolderPlaylist.swift": {
+      "repository_path": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+      "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+    },
+    "baseline/PlaylistMutation.swift": {
+      "repository_path": "Sources/IlliquidCore/Playlist/PlaylistMutation.swift",
+      "sha256": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8"
+    },
+    "baseline/NormalizedFileURL.swift": {
+      "repository_path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+      "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "baseline/NaturalFilenameOrdering.swift": {
+      "repository_path": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+      "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    },
+    "candidate/FolderPlaylist.swift": {
+      "repository_path": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+      "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+    },
+    "candidate/PlaylistMutation.swift": {
+      "repository_path": "Sources/IlliquidCore/Playlist/PlaylistMutation.swift",
+      "sha256": "7aa3a7618f57928b8a6f982fd526129c125be1890a9c826f5d17cd3312c7a5cb"
+    },
+    "candidate/NormalizedFileURL.swift": {
+      "repository_path": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+      "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "candidate/NaturalFilenameOrdering.swift": {
+      "repository_path": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+      "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    },
+    "qualification/Harness.swift": {
+      "sha256": "5e24887e964c7b0cbc262ea530a4b3b4a4988a7e2fd4e29aebf1340d7819c182"
+    },
+    "qualification/MemoryProbe.c": {
+      "sha256": "20227f552fb0d8196c62cc244238fda147df613230ff292327079f4c18f86e59"
+    },
+    "qualification/MemoryProbe.h": {
+      "sha256": "4828949db7bc9a5a5cc4bd9c1bda89ab0d4f682d727e7ef47f22cfce84c1e346"
+    },
+    "qualification/run.py": {
+      "sha256": "d31fb3a0c6594bf1ccf28c0bce8b2b3dfa0b59927125a3eb951358de76638476"
+    },
+    "qualification/PlaylistMutationTests.swift": {
+      "sha256": "08b3ea822f18722007b7c32e5316911949a4198767e6bade300c8f88b2d0147f"
+    },
+    "qualification/PlaylistOrderRestorationTests.swift": {
+      "sha256": "86ef41457ee4a45d421d3652ef6e6d5c9c9063459b755124fdd1016d0fbcb90c"
+    },
+    "qualification/NaturalFilenameOrderingTests.swift": {
+      "sha256": "ba6e040919bdae7f7d4748d95ab6bc39da3547d0add10020dd2261908810f776"
+    },
+    "qualification/FolderPlaylistTests.swift": {
+      "sha256": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d"
+    }
+  },
+  "native_flags": [],
+  "controller_sha256": "148d40e5fc2bf02d9a749efa9d502164cb96c5063c531c464848aa976afe3a11",
+  "binaries": {
+    "baseline": {
+      "library_sha256": "d5a8928a1276751b752d9a231718e9ed8345eaebaa46cd953bac1f8966f95649",
+      "driver_sha256": "aa447c2fb25b5d8efb83be73ceaed574141a3f42c55ad2e6456a9b83622f2599"
+    },
+    "candidate": {
+      "library_sha256": "61bba4b9a7ac659cf26fce9a3493e589ac881169ee62a12c0930abf3379eaf44",
+      "driver_sha256": "75727c84595c8cfd9e9a5dc1a1ccb2048c55d98cf79b9c3a25817509bcb2f34c"
+    }
+  }
+}
