@@ -1,23 +1,8 @@
 name: Effect settlement memory
 
 on:
-  push:
-    branches: ['perf/effect-settlement-memory-20261028']
-    paths:
-      - 'Sources/IlliquidPlaybackCore/PlaybackCore.swift'
-      - 'Tests/IlliquidPlaybackCoreTests/EffectSettlementTests.swift'
-      - 'Benchmarks/EffectSettlement/**'
-      - '.github/workflows/effect-settlement-memory.yml'
-      - '!Benchmarks/EffectSettlement/*.md'
-      - '!Benchmarks/EffectSettlement/evidence/**'
-  pull_request:
-    paths:
-      - 'Sources/IlliquidPlaybackCore/PlaybackCore.swift'
-      - 'Tests/IlliquidPlaybackCoreTests/EffectSettlementTests.swift'
-      - 'Benchmarks/EffectSettlement/**'
-      - '.github/workflows/effect-settlement-memory.yml'
-      - '!Benchmarks/EffectSettlement/*.md'
-      - '!Benchmarks/EffectSettlement/evidence/**'
+  # Full measurements are opt-in. Completed effect history CI runs the core
+  # regression suites, including EffectSettlementTests, on relevant PRs.
   workflow_dispatch:
 
 permissions:
