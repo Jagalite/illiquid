@@ -3,6 +3,14 @@ name: Subtitle GPU resource lifetime
 on:
   push:
     branches: ['perf/subtitle-gpu-source-retirement-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleOverlayView.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleGPUResource*Tests.swift'
+      - 'Benchmarks/SubtitleGPUResourceLifetime/Probe.swift'
+      - 'Benchmarks/SubtitleGPUResourceLifetime/run.py'
+      - '.github/workflows/subtitle-gpu-resource-lifetime.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
