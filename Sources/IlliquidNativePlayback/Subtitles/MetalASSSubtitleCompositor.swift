@@ -722,22 +722,70 @@ final class MetalASSSubtitleRenderer {
         var color: SIMD4<UInt8>
     }
 
-    private final class FrameResources: @unchecked Sendable {
+    // A resource set is exclusively borrowed until its command buffer completes.
+    // Its source generation never changes, including while the GPU owns it.
+    final class FrameResources: @unchecked Sendable {
+        let sourceGeneration: UInt64
         var texture: (any MTLTexture)?
         var vertexBuffer: (any MTLBuffer)?
         var vertexCapacity = 0
+
+        init(sourceGeneration: UInt64) {
+            self.sourceGeneration = sourceGeneration
+        }
     }
 
-    private final class ResourcePool: @unchecked Sendable {
+    final class ResourcePool: @unchecked Sendable {
+        struct Snapshot: Equatable, Sendable {
+            let sourceGeneration: UInt64
+            let idleResourceCount: Int
+            let idleTextureBytes: Int
+            let idleVertexBufferBytes: Int
+        }
+
         private let lock = NSLock()
+        private var sourceGeneration: UInt64 = 0
         private var available: [FrameResources] = []
 
         func acquire() -> FrameResources {
-            lock.withLock { available.popLast() ?? FrameResources() }
+            lock.withLock {
+                available.popLast() ?? FrameResources(sourceGeneration: sourceGeneration)
+            }
         }
 
         func release(_ resources: FrameResources) {
-            lock.withLock { available.append(resources) }
+            lock.withLock {
+                // Completion still owns an old source's resources until this
+                // return; it must not repopulate the replacement source's cache.
+                guard resources.sourceGeneration == sourceGeneration else { return }
+                available.append(resources)
+            }
+        }
+
+        func retireSource() {
+            let retired = lock.withLock {
+                sourceGeneration &+= 1
+                let retired = available
+                available = []
+                return retired
+            }
+            // Metal resource destruction must happen after releasing the lock.
+            withExtendedLifetime(retired) {}
+        }
+
+        func snapshotForTesting() -> Snapshot {
+            lock.withLock {
+                Snapshot(
+                    sourceGeneration: sourceGeneration,
+                    idleResourceCount: available.count,
+                    idleTextureBytes: available.reduce(0) {
+                        $0 + ($1.texture?.allocatedSize ?? 0)
+                    },
+                    idleVertexBufferBytes: available.reduce(0) {
+                        $0 + ($1.vertexBuffer?.allocatedSize ?? 0)
+                    }
+                )
+            }
         }
     }
 
@@ -868,6 +916,16 @@ final class MetalASSSubtitleRenderer {
             )
         }
         self.sampler = sampler
+    }
+
+    /// Drops idle resources from the preceding authoritative subtitle source.
+    /// Submitted frames keep their resources until their GPU completion returns.
+    func retireSourceResources() {
+        resourcePool.retireSource()
+    }
+
+    var resourcePoolSnapshotForTesting: ResourcePool.Snapshot {
+        resourcePool.snapshotForTesting()
     }
 
     func draw(

@@ -1,0 +1,95 @@
+name: Subtitle GPU resource lifetime
+
+on:
+  push:
+    branches: ['perf/subtitle-gpu-source-retirement-20261028']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleOverlayView.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleGPUResource*Tests.swift'
+      - 'Benchmarks/SubtitleGPUResourceLifetime/**'
+      - '.github/workflows/subtitle-gpu-resource-lifetime.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-gpu-resource-lifetime-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  metal-memory:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify isolated build coordination and native Metal compiler
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds run serially in this isolated checkout.'
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+      - name: Test ownership and compare baseline and candidate Metal allocations
+        run: |
+          python3 Benchmarks/SubtitleGPUResourceLifetime/run.py \
+            --output "$RUNNER_TEMP/subtitle-gpu-memory"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-gpu-memory
+          path: |
+            ${{ runner.temp }}/subtitle-gpu-memory/*.json
+            ${{ runner.temp }}/subtitle-gpu-memory/*.jsonl
+            ${{ runner.temp }}/subtitle-gpu-memory/*.log
+            ${{ runner.temp }}/subtitle-gpu-memory/*/Sources/
+            ${{ runner.temp }}/subtitle-gpu-memory/*/Tests/
+            ${{ runner.temp }}/subtitle-gpu-memory/*/Package.swift
+          retention-days: 30
+
+  native-authority:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify isolated build coordination and prepare pinned dependencies
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds run serially in this isolated checkout.'
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Verify authority handoff and existing main and PiP subtitle behavior
+        run: |
+          mkdir -p "$RUNNER_TEMP/subtitle-gpu-native"
+          git rev-parse HEAD > "$RUNNER_TEMP/subtitle-gpu-native/revision.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --no-parallel --filter \
+            'SubtitleGPUResource|MetalASSSubtitleCompositorTests|PiPSubtitlePipelineTests' \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-gpu-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-gpu-native
+          path: ${{ runner.temp }}/subtitle-gpu-native/
+          retention-days: 30
