@@ -1,0 +1,100 @@
+name: Ring index performance
+
+on:
+  push:
+    branches: ['perf/ring-index-wrap-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Tests/IlliquidNativePlaybackTests/FixedRingBufferIndexTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift'
+      - 'Benchmarks/RingIndexWrap/**'
+      - '.github/workflows/ring-index-wrap-performance.yml'
+      - '!Benchmarks/RingIndexWrap/*.md'
+      - '!Benchmarks/RingIndexWrap/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Tests/IlliquidNativePlaybackTests/FixedRingBufferIndexTests.swift'
+      - 'Benchmarks/RingIndexWrap/**'
+      - '.github/workflows/ring-index-wrap-performance.yml'
+      - '!Benchmarks/RingIndexWrap/*.md'
+      - '!Benchmarks/RingIndexWrap/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ring-index-wrap-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-ring-index:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test ring semantics and benchmark complete queue transfers
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/RingIndexWrap/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'ring-index-wrap'),
+                     '--run-tests', '--enforce-performance']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'using isolated, serial component builds and benchmarks.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit reviewable measurement evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'ring-index-wrap'
+          text_files, semantics = {}, {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if any(part in {'build', 'module-cache'} for part in relative.parts):
+                  continue
+              if path.is_file() and path.suffix in {'.json', '.jsonl', '.log'}:
+                  text_files[str(relative)] = path.read_text()
+              elif path.is_file() and path.name.endswith('.json.gz'):
+                  semantics[str(relative)] = base64.b64encode(path.read_bytes()).decode()
+          for name in ['acceptance.json', 'tests.json', 'summary.json']:
+              if name in text_files:
+                  print(name + '\n' + text_files[name])
+          packed = gzip.compress(json.dumps({'text_files': text_files,
+              'semantics_base64': semantics}, sort_keys=True).encode(), mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log limit; use the uploaded artifact')
+          print('RING_INDEX_EVIDENCE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('RING_INDEX_EVIDENCE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ring-index-wrap-native
+          path: |
+            ${{ runner.temp }}/ring-index-wrap/*.json
+            ${{ runner.temp }}/ring-index-wrap/*.jsonl
+            ${{ runner.temp }}/ring-index-wrap/logs/*.log
+            ${{ runner.temp }}/ring-index-wrap/semantics/*.json.gz
+          retention-days: 14
