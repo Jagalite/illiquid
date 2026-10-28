@@ -91,7 +91,7 @@ jobs:
                       or excluded.intersection(relative.parts)
                       or path.name == 'native-log-bundle.json.gz'):
                   continue
-              if path.suffix not in {'.json', '.jsonl', '.log', '.txt'} and not path.name.endswith('.json.gz'):
+              if path.suffix not in {'.json', '.jsonl', '.log', '.txt', '.swift', '.py'} and not path.name.endswith('.json.gz'):
                   continue
               data = path.read_bytes()
               files[relative.as_posix()] = {
