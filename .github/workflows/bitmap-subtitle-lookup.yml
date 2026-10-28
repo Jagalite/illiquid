@@ -1,4 +1,4 @@
-name: Bitmap subtitle lookup performance
+name: Bitmap subtitle pruning performance
 
 on:
   push:
@@ -29,11 +29,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  native-components:
-    runs-on: macos-26
+  components:
+    name: components (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-26
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+            portable: ''
+          - os: ubuntu-24.04
+            developer_dir: ''
+            portable: --portable
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
       LOOKUP_BASELINE: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -47,12 +58,12 @@ jobs:
             exit 1
           fi
           echo "Kyoto is unavailable on this hosted runner; builds use sequential isolated workspaces."
-          python3 Benchmarks/BitmapSubtitleTimeline/run.py --tests-only \
+          python3 Benchmarks/BitmapSubtitleTimeline/run.py --tests-only ${{ matrix.portable }} \
             --baseline-ref "$LOOKUP_BASELINE" \
             --output "$RUNNER_TEMP/bitmap-subtitle-lookup/tests"
       - name: Measure lookup, pruning, stream, and insertion controls
         run: |
-          python3 Benchmarks/BitmapSubtitleTimeline/run.py \
+          python3 Benchmarks/BitmapSubtitleTimeline/run.py ${{ matrix.portable }} \
             --baseline-ref "$LOOKUP_BASELINE" \
             --cases lookup-front-1,lookup-front-8,lookup-front-32,lookup-front-128,lookup-middle-8,lookup-middle-32,lookup-middle-128,lookup-penultimate-8,lookup-penultimate-32,lookup-penultimate-128,lookup-tail4-8,lookup-tail4-32,lookup-tail4-128,lookup-latest-128,lookup-before-128,lookup-after-128,lookup-mixed-128,tick-front-1,tick-front-8,tick-front-32,tick-front-128,prune-front-128,stream-8,stream-32,stream-128,stream-centered-8,stream-centered-32,stream-centered-128,fill-ascending-128 \
             --pairs 8 --target-ms 80 --max-sample-ms 1500 \
@@ -75,6 +86,6 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: bitmap-subtitle-lookup-macos
+          name: bitmap-subtitle-pruning-${{ matrix.os }}
           path: ${{ runner.temp }}/bitmap-subtitle-lookup
           retention-days: 14

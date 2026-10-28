@@ -83,7 +83,8 @@ def region_source() -> str:
     end = "struct ASSRenderResult: Sendable {"
     if original.count(start) != 1 or original.count(end) != 1:
         raise RuntimeError("ASSRenderedRegion extraction boundaries changed")
-    return "import Foundation\nimport CoreGraphics\n\n" + original[
+    imports = "import Foundation\n" + ("import CoreGraphics\n" if sys.platform == "darwin" else "")
+    return imports + "\n" + original[
         original.index(start):original.index(end)]
 
 
@@ -93,7 +94,14 @@ def prepare_sources(variant: str, destination: Path,
     paths = []
     for relative in (TIMELINE, BUDGET):
         path = destination / Path(relative).name
-        shutil.copyfile(source_path(variant, relative, baseline_source), path)
+        original = source_path(variant, relative, baseline_source).read_text()
+        # Linux Foundation provides the geometry value types used here. Omit
+        # only this unavailable module import; all production bodies stay exact.
+        if sys.platform != "darwin" and relative == TIMELINE:
+            if original.count("import CoreGraphics\n") != 1:
+                raise RuntimeError("Timeline CoreGraphics import boundary changed")
+            original = original.replace("import CoreGraphics\n", "")
+        path.write_text(original)
         paths.append(path)
     support = destination / "ASSRenderedRegion.swift"
     support.write_text(region_source())
@@ -113,9 +121,16 @@ def build(variant: str, work: Path, output: Path,
          "-module-name", "IlliquidNativePlayback", "-emit-module-path",
          str(destination / "IlliquidNativePlayback.swiftmodule"), *paths, "-o", str(library)], output)
     executable = destination / "benchmark"
+    driver = HERE / "Driver.swift"
+    if sys.platform != "darwin":
+        driver = destination / "Driver.swift"
+        original_driver = (HERE / "Driver.swift").read_text()
+        if original_driver.count("import CoreGraphics\n") != 1:
+            raise RuntimeError("Driver CoreGraphics import boundary changed")
+        driver.write_text(original_driver.replace("import CoreGraphics\n", ""))
     run(["swiftc", "-swift-version", "6", "-O", "-warnings-as-errors", "-parse-as-library", "-I",
          str(destination), "-L", str(destination), "-lIlliquidNativePlayback", "-Xlinker", "-rpath",
-         "-Xlinker", str(destination), str(HERE / "Driver.swift"), "-o", str(executable)], output)
+         "-Xlinker", str(destination), str(driver), "-o", str(executable)], output)
     return executable
 
 
@@ -209,12 +224,14 @@ def main() -> None:
     parser.add_argument("--max-sample-ms", type=float, default=1500)
     parser.add_argument("--cases", default=",".join(CASES))
     parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--portable", action="store_true", help="Allow Linux Foundation component "
+                        "qualification, omitting only CoreGraphics imports from copied inputs.")
     parser.add_argument("--baseline-ref", help="Compare the complete timeline from this Git commit/ref; "
                         "support sources remain current. The frozen insertion baseline is the default.")
     args = parser.parse_args()
     cases = args.cases.split(",")
-    if sys.platform != "darwin":
-        parser.error("This native component harness requires macOS CoreGraphics")
+    if sys.platform != "darwin" and not (sys.platform.startswith("linux") and args.portable):
+        parser.error("Use macOS for native qualification, or --portable on Linux for Foundation components")
     if (args.pairs < 2 or args.pairs % 2 or args.target_ms <= 0 or
             args.max_sample_ms < args.target_ms or len(set(cases)) != len(cases) or
             any(case not in CASES + LOOKUP_CASES for case in cases)):
@@ -252,8 +269,12 @@ def main() -> None:
         "source_sha256": {variant: {path: digest(source_path(variant, path, baseline_source).read_bytes())
                                     for path in SOURCES} for variant in ("baseline", "candidate")},
         "region_declaration_sha256": digest(region_source().encode()),
-        "extraction": "Complete ASSRenderedRegion declaration from LibassContext.swift; "
-                      "only Foundation/CoreGraphics imports added. Timeline and budget copied whole.",
+        "extraction": "Complete ASSRenderedRegion declaration from LibassContext.swift; imports added. "
+                      "Timeline and budget bodies copied whole.",
+        "qualification": "native-macos" if sys.platform == "darwin" else "portable-linux-foundation",
+        "source_projection": "None" if sys.platform == "darwin" else
+                             "Omit only import CoreGraphics from timeline and driver; use Linux "
+                             "Foundation geometry for the unchanged component function bodies.",
         "driver_sha256": digest((HERE / "Driver.swift").read_bytes()),
         "runner_sha256": digest(Path(__file__).read_bytes()),
         "test_sha256": {path: digest((ROOT / "Tests/IlliquidNativePlaybackTests" / path).read_bytes())
@@ -264,6 +285,11 @@ def main() -> None:
     }
     if sys.platform == "darwin":
         manifest["hardware"] = run(["sysctl", "hw.model", "machdep.cpu.brand_string"], output).strip()
+    manifest["compiled_source_sha256"] = {
+        variant: {path.name: digest(path.read_bytes())
+                  for path in prepare_sources(variant, output / "sources" / variant, baseline_source)}
+        for variant in ("baseline", "candidate")
+    }
     write_json(output / "manifest.json", manifest)
     try:
         if args.tests_only:
