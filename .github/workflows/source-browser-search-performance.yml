@@ -1,6 +1,9 @@
 name: Source browser search performance
 
 on:
+  push:
+    branches:
+      - perf/source-search-indices-20261028
   pull_request:
     paths:
       - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
@@ -12,6 +15,9 @@ on:
       - Benchmarks/SourceBrowserSearch/run.py
       - .github/workflows/source-browser-search-performance.yml
   workflow_dispatch:
+
+env:
+  SOURCE_SEARCH_BASELINE: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
 
 permissions:
   contents: read
@@ -41,7 +47,7 @@ jobs:
         run: |
           for configuration in debug release; do
             python3 Scripts/test-source-browser-search.py \
-              --configuration "$configuration" --baseline-ref \
+              --configuration "$configuration" --baseline-ref "$SOURCE_SEARCH_BASELINE" \
               --output "$RUNNER_TEMP/source-search/baseline-$configuration"
             python3 Scripts/test-source-browser-search.py \
               --configuration "$configuration" \
@@ -51,14 +57,38 @@ jobs:
         run: |
           search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
           python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SOURCE_SEARCH_BASELINE" \
             --pairs 6 --target-ms 120 --cpu "$search_cpu" \
             --output "$RUNNER_TEMP/source-search/timing"
       - name: Measure allocation requests separately from timing
         run: |
           search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
           python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SOURCE_SEARCH_BASELINE" \
             --allocations --pairs 2 --cpu "$search_cpu" \
             --output "$RUNNER_TEMP/source-search/allocations"
+      - name: Report reproducible component evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "source-search"
+          files = [root / "host.txt"]
+          for variant in ("baseline", "candidate"):
+              for configuration in ("debug", "release"):
+                  files.append(root / f"{variant}-{configuration}" / "receipt.json")
+          for cohort in ("timing", "allocations"):
+              for name in ("environment.json", "baseline-build.json", "candidate-build.json",
+                           "measurements.jsonl", "summary.json", "completion.json"):
+                  files.append(root / cohort / name)
+          for path in files:
+              if path.is_file():
+                  relative = path.relative_to(root)
+                  print(f"SOURCE_SEARCH_EVIDENCE_BEGIN {relative}", flush=True)
+                  print(path.read_text(), end="", flush=True)
+                  print(f"SOURCE_SEARCH_EVIDENCE_END {relative}", flush=True)
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -91,7 +121,7 @@ jobs:
         run: |
           for configuration in debug release; do
             python3 Scripts/test-source-browser-search.py \
-              --configuration "$configuration" --baseline-ref \
+              --configuration "$configuration" --baseline-ref "$SOURCE_SEARCH_BASELINE" \
               --output "$RUNNER_TEMP/source-search/baseline-$configuration"
             python3 Scripts/test-source-browser-search.py \
               --configuration "$configuration" \
@@ -100,8 +130,31 @@ jobs:
       - name: Measure complete search and cached projection workloads
         run: |
           python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SOURCE_SEARCH_BASELINE" \
             --pairs 6 --target-ms 120 \
             --output "$RUNNER_TEMP/source-search/timing"
+      - name: Report reproducible component evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "source-search"
+          files = [root / "host.txt"]
+          for variant in ("baseline", "candidate"):
+              for configuration in ("debug", "release"):
+                  files.append(root / f"{variant}-{configuration}" / "receipt.json")
+          for cohort in ("timing", "allocations"):
+              for name in ("environment.json", "baseline-build.json", "candidate-build.json",
+                           "measurements.jsonl", "summary.json", "completion.json"):
+                  files.append(root / cohort / name)
+          for path in files:
+              if path.is_file():
+                  relative = path.relative_to(root)
+                  print(f"SOURCE_SEARCH_EVIDENCE_BEGIN {relative}", flush=True)
+                  print(path.read_text(), end="", flush=True)
+                  print(f"SOURCE_SEARCH_EVIDENCE_END {relative}", flush=True)
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
