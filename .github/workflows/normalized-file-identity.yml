@@ -41,6 +41,46 @@ jobs:
         run: |
           python3 Benchmarks/NormalizedFileIdentity/run.py \
             --output "$RUNNER_TEMP/normalized-file-identity" --pairs 10 --target-ms 150
+      - name: Diagnose unsupported relative URL fixtures
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          import re, subprocess
+          from pathlib import Path
+          source = Path('Tests/IlliquidCoreTests/NormalizedFileIdentityTests.swift').read_text()
+          start = source.index('    @Test func relativeReferencesQueriesAndAuthoritiesKeepTheirIdentity()')
+          stop = source.index('    @Test func ', start + 1)
+          test = source[start:stop]
+          declarations = []
+          for name in ('bases', 'references'):
+              match = re.search(rf'        let {name} = \[\n.*?\n        \]', test, re.S)
+              if not match:
+                  raise RuntimeError(f'Cannot find exact {name} test fixtures')
+              declarations.append(match.group(0))
+          program = 'import Foundation\n' + '\n'.join(declarations) + r'''
+          var tested = 0
+          var rejected = 0
+          for baseText in bases {
+              guard let base = URL(string: baseText) else {
+                  fatalError("Base cannot be constructed: \(baseText)")
+              }
+              for reference in references {
+                  tested += 1
+                  guard URL(string: reference, relativeTo: base) == nil else { continue }
+                  rejected += 1
+                  let record: [String: Any] = [
+                      "base": baseText,
+                      "reference": reference,
+                      "constructible": false,
+                  ]
+                  let data = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys])
+                  print("FILE_IDENTITY_URL_CONSTRUCTOR " + String(decoding: data, as: UTF8.self))
+              }
+          }
+          print("FILE_IDENTITY_URL_CONSTRUCTOR_SUMMARY tested=\(tested) rejected=\(rejected)")
+          '''
+          subprocess.run(['swift', '-'], input=program, text=True, check=True)
+          PY
       - name: Emit durable measurement receipts
         if: always()
         run: |
