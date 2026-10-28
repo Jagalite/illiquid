@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Measure thumbnail refinement scheduling using complete production Swift sources.
 
-Requires macOS, Swift 6.1+ and Python 3.10+. Builds and tests pinned baseline
+Requires macOS or Linux, Swift 6.1+ and Python 3.10+. Builds and tests pinned baseline
 and checkout sources in isolated packages, then runs balanced native pairs.
 """
 from __future__ import annotations
@@ -178,8 +178,8 @@ def main() -> None:
     parser.add_argument("--cases", help="Comma-separated subset; defaults to all driver cases")
     parser.add_argument("--tests-only", action="store_true")
     args = parser.parse_args()
-    if sys.platform != "darwin":
-        parser.error("This qualification requires the native macOS Swift toolchain")
+    if sys.platform not in ("darwin", "linux"):
+        parser.error("This qualification supports macOS and Linux Swift toolchains")
     if (args.pairs < 2 or args.pairs % 2 or args.target_ms <= 0 or
             args.max_sample_ms < args.target_ms):
         parser.error("Use an even positive pair count and positive timing bounds")
@@ -215,7 +215,8 @@ def main() -> None:
             "collected_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "platform": platform.platform(), "machine": platform.machine(),
             "swift": run(["swiftc", "--version"], output).strip(),
-            "hardware": run(["sysctl", "hw.model", "machdep.cpu.brand_string"], output).strip(),
+            "hardware": (run(["sysctl", "hw.model", "machdep.cpu.brand_string"], output).strip()
+                         if sys.platform == "darwin" else run(["lscpu"], output).strip()),
             "git_head": run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], output).strip(),
             "git_status": run(["git", "-C", str(ROOT), "status", "--porcelain"], output).strip(),
             "baseline_commit": baseline,
@@ -251,7 +252,7 @@ def main() -> None:
         executables = {variant: build(variant, work, output) for variant in ("baseline", "candidate")}
         manifest["binary_sha256"] = {
             variant: {path.name: digest(path.read_bytes()) for path in executable.parent.iterdir()
-                      if path.is_file() and (path.name == "benchmark" or path.suffix == ".dylib")}
+                      if path.is_file() and (path.name == "benchmark" or path.suffix in (".dylib", ".so"))}
             for variant, executable in executables.items()
         }
         write_json(output / "manifest.json", manifest)

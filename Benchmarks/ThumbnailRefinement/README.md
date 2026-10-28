@@ -38,7 +38,7 @@ When Kyoto is unavailable, explain that limitation before the direct command:
       --output /tmp/thumbnail-refinement-run
 
 Use an empty output directory. The hosted workflow checks Kyoto availability
-before running serial builds in its isolated macOS checkout.
+before running serial builds in its isolated checkout.
 
 ## Validation and timing method
 
@@ -68,6 +68,9 @@ The scheduler generates the first image before refinement. Full successful
 preset workloads are therefore 4 x 5 (economical), 8 x 11 (balanced/default),
 16 x 23 (extensive), and 64 x 63 at maximum bounded settings. Actual passes can
 be shorter or ragged because short videos or failed probes yield fewer samples.
+
+The workflow runs separate macOS and Linux jobs; their toolchains and results
+are recorded independently. Portable results do not qualify macOS performance.
 
 The workflow retains complete source snapshots, test logs, commands, raw
 samples, calibration and full output receipts as an artifact. A compact
