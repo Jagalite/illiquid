@@ -27,6 +27,33 @@ jobs:
       - name: Compare exact persistence-key bytes in debug and release
         shell: bash
         run: bash Benchmarks/PersistenceKey/check-parity.sh "$RUNNER_TEMP/persistence-key-portable"
+      - name: Fetch original production source
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Focused baseline and candidate identity regressions
+        shell: bash
+        run: |
+          echo "Kyoto is unavailable on this isolated runner; compiling focused regressions directly."
+          for variant in baseline candidate; do
+            package="$RUNNER_TEMP/persistence-key-portable/$variant-tests"
+            mkdir -p "$package/Sources/IlliquidCore" "$package/Tests/IlliquidCoreTests"
+            if [[ "$variant" == baseline ]]; then
+              git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:Sources/IlliquidCore/Utilities/NormalizedFileURL.swift > "$package/Sources/IlliquidCore/NormalizedFileURL.swift"
+            else
+              cp Sources/IlliquidCore/Utilities/NormalizedFileURL.swift "$package/Sources/IlliquidCore/"
+            fi
+            cp Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift "$package/Tests/IlliquidCoreTests/"
+            printf '%s\n' '// swift-tools-version: 6.1' 'import PackageDescription' 'let package = Package(name: "IdentityRegressions", targets: [.target(name: "IlliquidCore"), .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])])' > "$package/Package.swift"
+            for configuration in debug release; do
+              swift test --package-path "$package" --configuration "$configuration" --jobs 2 --no-parallel 2>&1 | tee "$RUNNER_TEMP/persistence-key-portable/tests-$variant-$configuration.log"
+            done
+            rm -rf "$package"
+          done
+      - name: Install benchmark Python
+        run: apt-get update -qq && apt-get install -y --no-install-recommends python3
+      - name: Paired original-source benchmark
+        shell: bash
+        run: |
+          python3 Benchmarks/PersistenceKey/run.py --rounds 12 --target-ms 50 --output "$RUNNER_TEMP/persistence-key-portable/results.json" 2>&1 | tee "$RUNNER_TEMP/persistence-key-portable/benchmark.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
