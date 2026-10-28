@@ -1,0 +1,33 @@
+{
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_extraction": "Two exact runPass blocks; only player.viewStore.playlist becomes the input parameter. Existing arrays and distance writes are unchanged.",
+  "binaries": {
+    "baseline": "8b5b5c82555c5d0296203852cd1bb314866d0e1317c2a9688a8e21648b07aa19",
+    "candidate": "59996793a478c64da66b183a40a3f4f178e839fb23d51c20cbad3dba6611f8ef"
+  },
+  "head": "ffe49b5905aa5aa6444b5b1db2035f4dda6f801e",
+  "inputs": {
+    "Benchmarks/PlaylistDeduplication/MemoryProbe.c": "313844f631b7f129c662924fe12edd9600ffbd0e24dfdcabcf459214d6b83866",
+    "Driver.swift": "832ddbaf4da37f819b0bccf390ef9b2bf8ebeacda6e5de5a9a29f6b960a0a5a9",
+    "Package.swift": "f62f0428be622786f8beb3bcf67b3697b951d06456330eb09e320a01164d9cbb",
+    "Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift": "d694c7203d6fb0615ec50eb29ef98ccd04b138618df61bde2f60766521b0373c",
+    "Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift": "a003b36b5a178404c6349a092b7a73bfb6617bdca2a411095024a9eed74a6e58",
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift": "9e4c918900177e36f9c0703eb1c480beee678212f63010a6bea2116d09b50600",
+    "baseline_extracted.swift": "f256ca988322d7c3961ae346e4c1d13abb8ae46c369ecf010c503f8bcaf0f5d1",
+    "baseline_full_scheduler": "24bee22ce1bc8b670af7e6a45eb49f1a2eac6425c588128af8745ee9ce5f3c9e",
+    "run.py": "45df9f12b9d4b1116fb7a44c2804c91e9b48badfdeec312f1087062b054e7ef8"
+  },
+  "machine": "x86_64",
+  "memory_scope": "Measured capacity and live allocation of the removed legacy URL projection; not total app RSS or a measurement of the candidate's peak heap.",
+  "method": "Separate Swift modules, fresh processes, independently calibrated loops, balanced AB/BA pairs, no empty-loop subtraction; input construction, oracle, warmup, validation, allocation inventory, and JSON output are untimed.",
+  "pairs": 8,
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "scope": "Playlist neighborhood construction only; no decode, I/O, UI, or energy measurement.",
+  "swift": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "target_ms": 40,
+  "worktree_status": ""
+}

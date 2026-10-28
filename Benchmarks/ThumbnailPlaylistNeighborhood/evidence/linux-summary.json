@@ -1,0 +1,1088 @@
+{
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "results": [
+    {
+      "case": "0/none",
+      "count": 0,
+      "cpu": {
+        "baseline_median_ns": 30.2395785,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 26.6271955,
+        "paired_median_reduction_percent": 11.715960698083705,
+        "samples_ns": {
+          "baseline": [
+            29.131064,
+            30.351727,
+            30.132218,
+            30.403425,
+            30.346939,
+            29.331547,
+            29.427314,
+            30.510383
+          ],
+          "candidate": [
+            26.56559,
+            26.580218,
+            26.674173,
+            26.686025,
+            26.718755,
+            25.976723,
+            26.674344,
+            26.056411
+          ]
+        }
+      },
+      "inventory": {
+        "count": 0,
+        "distances": {},
+        "iterations": 1,
+        "legacy_projection_capacity": 0,
+        "legacy_projection_count": 0,
+        "legacy_projection_live_allocator_delta_bytes": 0,
+        "legacy_projection_payload_bytes": 0,
+        "output_url_capacity": 0,
+        "output_url_count": 0,
+        "position": "none",
+        "url_stride_bytes": 16,
+        "urls": []
+      },
+      "iterations": {
+        "baseline": 1000000,
+        "candidate": 1000000
+      },
+      "pairs": 8,
+      "position": "none",
+      "wall": {
+        "baseline_median_ns": 30.241329,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 26.647256,
+        "paired_median_reduction_percent": 11.6836361921894,
+        "samples_ns": {
+          "baseline": [
+            29.191235,
+            30.381532,
+            30.142574,
+            30.415024,
+            30.340084,
+            29.341275,
+            29.460629,
+            30.523987
+          ],
+          "candidate": [
+            26.598024,
+            26.610157,
+            26.684355,
+            26.699574,
+            26.731313,
+            25.977441,
+            26.686239,
+            26.047064
+          ]
+        }
+      }
+    },
+    {
+      "case": "1/head",
+      "count": 1,
+      "cpu": {
+        "baseline_median_ns": 256.30573879679025,
+        "candidate_faster_pairs": 0,
+        "candidate_median_ns": 296.35216341717296,
+        "paired_median_reduction_percent": -15.35244506089094,
+        "samples_ns": {
+          "baseline": [
+            258.5379261553758,
+            255.75185631337757,
+            256.85962128020293,
+            258.63824037425826,
+            259.859468313607,
+            254.16538238462175,
+            253.79917398038202,
+            255.52938552043696
+          ],
+          "candidate": [
+            297.53019777493967,
+            295.1761296942941,
+            293.0112508028378,
+            299.32628804712937,
+            297.67167440590003,
+            293.30696826299123,
+            297.5281971400518,
+            294.6377595842223
+          ]
+        }
+      },
+      "inventory": {
+        "count": 1,
+        "distances": {
+          "file:///Media/Episode-0.mkv": 0
+        },
+        "iterations": 1,
+        "legacy_projection_capacity": 1,
+        "legacy_projection_count": 1,
+        "legacy_projection_live_allocator_delta_bytes": 0,
+        "legacy_projection_payload_bytes": 16,
+        "output_url_capacity": 1,
+        "output_url_count": 1,
+        "position": "head",
+        "url_stride_bytes": 16,
+        "urls": [
+          "file:///Media/Episode-0.mkv"
+        ]
+      },
+      "iterations": {
+        "baseline": 156897,
+        "candidate": 135457
+      },
+      "pairs": 8,
+      "position": "head",
+      "wall": {
+        "baseline_median_ns": 256.49559264995503,
+        "candidate_faster_pairs": 0,
+        "candidate_median_ns": 296.4837513011509,
+        "paired_median_reduction_percent": -15.426780306217914,
+        "samples_ns": {
+          "baseline": [
+            258.75026291133673,
+            255.8345538792966,
+            257.1566314206135,
+            258.7282357215243,
+            259.887410211795,
+            254.31620107459034,
+            253.9584185803425,
+            255.6869921030995
+          ],
+          "candidate": [
+            299.0597532796386,
+            295.3519345622596,
+            293.1456329314838,
+            299.40138937079666,
+            297.6893774408115,
+            293.49895538805674,
+            297.6155680400422,
+            294.8246602242778
+          ]
+        }
+      }
+    },
+    {
+      "case": "32/head",
+      "count": 32,
+      "cpu": {
+        "baseline_median_ns": 1530.600998063459,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 627.2503030774013,
+        "paired_median_reduction_percent": 58.49801353963187,
+        "samples_ns": {
+          "baseline": [
+            1536.748845523611,
+            1435.1301206614032,
+            1552.3668255623418,
+            1421.5729182183823,
+            1549.8740503500671,
+            1507.4428720393266,
+            1524.453150603307,
+            1542.1526143304036
+          ],
+          "candidate": [
+            637.4697855144544,
+            605.9450419645633,
+            617.4042430836183,
+            601.456729872552,
+            638.0716039788623,
+            625.9243083618278,
+            641.2391513832763,
+            628.5762977929749
+          ]
+        }
+      },
+      "inventory": {
+        "count": 32,
+        "distances": {
+          "file:///Media/Episode-0.mkv": 0,
+          "file:///Media/Episode-1.mkv": 1,
+          "file:///Media/Episode-2.mkv": 2,
+          "file:///Media/Episode-3.mkv": 3,
+          "file:///Media/Episode-4.mkv": 4
+        },
+        "iterations": 1,
+        "legacy_projection_capacity": 32,
+        "legacy_projection_count": 32,
+        "legacy_projection_live_allocator_delta_bytes": 0,
+        "legacy_projection_payload_bytes": 512,
+        "output_url_capacity": 5,
+        "output_url_count": 5,
+        "position": "head",
+        "url_stride_bytes": 16,
+        "urls": [
+          "file:///Media/Episode-0.mkv",
+          "file:///Media/Episode-1.mkv",
+          "file:///Media/Episode-2.mkv",
+          "file:///Media/Episode-3.mkv",
+          "file:///Media/Episode-4.mkv"
+        ]
+      },
+      "iterations": {
+        "baseline": 26852,
+        "candidate": 64340
+      },
+      "pairs": 8,
+      "position": "head",
+      "wall": {
+        "baseline_median_ns": 1531.6754617905558,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 627.5085250233136,
+        "paired_median_reduction_percent": 58.500726622844994,
+        "samples_ns": {
+          "baseline": [
+            1538.0211157455683,
+            1436.2606882168925,
+            1553.8242216594667,
+            1423.4223893937137,
+            1550.8244078653358,
+            1507.8995977953225,
+            1525.329807835543,
+            1543.046886637867
+          ],
+          "candidate": [
+            637.8536680136773,
+            606.1066055331054,
+            621.1849860118123,
+            601.7007615791109,
+            638.5455704072117,
+            626.1731893068076,
+            641.4832918868511,
+            628.8438607398197
+          ]
+        }
+      }
+    },
+    {
+      "case": "32/middle",
+      "count": 32,
+      "cpu": {
+        "baseline_median_ns": 2393.075948160854,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 1123.261350478396,
+        "paired_median_reduction_percent": 52.56191995656454,
+        "samples_ns": {
+          "baseline": [
+            2460.638587129153,
+            2590.408423861254,
+            2407.7415030811258,
+            2399.135760116892,
+            2349.4236706689535,
+            2340.1330919255447,
+            2385.8075090527923,
+            2387.0161362048157
+          ],
+          "candidate": [
+            1494.795112438296,
+            1390.1896824913158,
+            1074.0064293985008,
+            1071.3508135779146,
+            1136.6083551709428,
+            1146.6533000182826,
+            1088.1091474190994,
+            1109.9143457858493
+          ]
+        }
+      },
+      "inventory": {
+        "count": 32,
+        "distances": {
+          "file:///Media/Episode-12.mkv": 4,
+          "file:///Media/Episode-13.mkv": 3,
+          "file:///Media/Episode-14.mkv": 2,
+          "file:///Media/Episode-15.mkv": 1,
+          "file:///Media/Episode-16.mkv": 0,
+          "file:///Media/Episode-17.mkv": 1,
+          "file:///Media/Episode-18.mkv": 2,
+          "file:///Media/Episode-19.mkv": 3,
+          "file:///Media/Episode-20.mkv": 4
+        },
+        "iterations": 1,
+        "legacy_projection_capacity": 32,
+        "legacy_projection_count": 32,
+        "legacy_projection_live_allocator_delta_bytes": 0,
+        "legacy_projection_payload_bytes": 512,
+        "output_url_capacity": 9,
+        "output_url_count": 9,
+        "position": "middle",
+        "url_stride_bytes": 16,
+        "urls": [
+          "file:///Media/Episode-12.mkv",
+          "file:///Media/Episode-13.mkv",
+          "file:///Media/Episode-14.mkv",
+          "file:///Media/Episode-15.mkv",
+          "file:///Media/Episode-16.mkv",
+          "file:///Media/Episode-17.mkv",
+          "file:///Media/Episode-18.mkv",
+          "file:///Media/Episode-19.mkv",
+          "file:///Media/Episode-20.mkv"
+        ]
+      },
+      "iterations": {
+        "baseline": 15741,
+        "candidate": 32818
+      },
+      "pairs": 8,
+      "position": "middle",
+      "wall": {
+        "baseline_median_ns": 2398.431611714631,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 1123.6200408312511,
+        "paired_median_reduction_percent": 52.565198929500085,
+        "samples_ns": {
+          "baseline": [
+            2462.4112826376977,
+            2591.430912902611,
+            2408.8042055777905,
+            2414.859665840798,
+            2350.216123499142,
+            2343.0513309192556,
+            2387.080744552443,
+            2388.059017851471
+          ],
+          "candidate": [
+            1495.2044609665427,
+            1390.4869583765008,
+            1074.4032847827411,
+            1071.9616064354927,
+            1136.6380340057285,
+            1146.7621122554694,
+            1088.490523493205,
+            1110.6020476567737
+          ]
+        }
+      }
+    },
+    {
+      "case": "32/tail",
+      "count": 32,
+      "cpu": {
+        "baseline_median_ns": 1892.0603468154775,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 977.3767867424338,
+        "paired_median_reduction_percent": 48.24937903341463,
+        "samples_ns": {
+          "baseline": [
+            1939.457224553798,
+            1838.660056265277,
+            1849.6702947009178,
+            1925.7272978831343,
+            1835.1406631923626,
+            1891.687450998478,
+            1892.433242632477,
+            1941.179726052668
+          ],
+          "candidate": [
+            1060.7868175332314,
+            1015.9331113725686,
+            957.261396350164,
+            954.8216386712394,
+            1025.4372042956918,
+            978.9134353017748,
+            975.8401381830926,
+            947.1007835381881
+          ]
+        }
+      },
+      "inventory": {
+        "count": 32,
+        "distances": {
+          "file:///Media/Episode-27.mkv": 4,
+          "file:///Media/Episode-28.mkv": 3,
+          "file:///Media/Episode-29.mkv": 2,
+          "file:///Media/Episode-30.mkv": 1,
+          "file:///Media/Episode-31.mkv": 0
+        },
+        "iterations": 1,
+        "legacy_projection_capacity": 32,
+        "legacy_projection_count": 32,
+        "legacy_projection_live_allocator_delta_bytes": 0,
+        "legacy_projection_payload_bytes": 512,
+        "output_url_capacity": 5,
+        "output_url_count": 5,
+        "position": "tail",
+        "url_stride_bytes": 16,
+        "urls": [
+          "file:///Media/Episode-27.mkv",
+          "file:///Media/Episode-28.mkv",
+          "file:///Media/Episode-29.mkv",
+          "file:///Media/Episode-30.mkv",
+          "file:///Media/Episode-31.mkv"
+        ]
+      },
+      "iterations": {
+        "baseline": 21683,
+        "candidate": 39947
+      },
+      "pairs": 8,
+      "position": "tail",
+      "wall": {
+        "baseline_median_ns": 1892.7671678273302,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 977.9662552882569,
+        "paired_median_reduction_percent": 48.249763242294414,
+        "samples_ns": {
+          "baseline": [
+            1940.6051284416362,
+            1839.487617027164,
+            1851.065811926394,
+            1926.558179218743,
+            1836.176036526311,
+            1892.5578563851866,
+            1892.9764792694739,
+            1941.8222109486694
+          ],
+          "candidate": [
+            1061.1375822965429,
+            1016.3500888677497,
+            957.70731218865,
+            955.24720254337,
+            1026.300598292738,
+            979.6318121511002,
+            976.3006984254137,
+            948.5626455052945
+          ]
+        }
+      }
+    },
+    {
+      "case": "1000/middle",
+      "count": 1000,
+      "cpu": {
+        "baseline_median_ns": 21287.04485049834,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 6930.731504207573,
+        "paired_median_reduction_percent": 67.12834583504215,
+        "samples_ns": {
+          "baseline": [
+            20451.98338870432,
+            20720.490586932447,
+            21570.796788482836,
+            20441.3211517165,
+            22007.66334440753,
+            21463.01550387597,
+            21379.576411960134,
+            21194.513289036546
+          ],
+          "candidate": [
+            6937.917075736325,
+            6938.313990182328,
+            6913.799438990182,
+            6892.1376227208975,
+            6943.802769985975,
+            6923.545932678822,
+            6890.663920056101,
+            7177.227559607293
+          ]
+        }
+      },
+      "inventory": {
+        "count": 1000,
+        "distances": {
+          "file:///Media/Episode-496.mkv": 4,
+          "file:///Media/Episode-497.mkv": 3,
+          "file:///Media/Episode-498.mkv": 2,
+          "file:///Media/Episode-499.mkv": 1,
+          "file:///Media/Episode-500.mkv": 0,
+          "file:///Media/Episode-501.mkv": 1,
+          "file:///Media/Episode-502.mkv": 2,
+          "file:///Media/Episode-503.mkv": 3,
+          "file:///Media/Episode-504.mkv": 4
+        },
+        "iterations": 1,
+        "legacy_projection_capacity": 1000,
+        "legacy_projection_count": 1000,
+        "legacy_projection_live_allocator_delta_bytes": 16048,
+        "legacy_projection_payload_bytes": 16000,
+        "output_url_capacity": 9,
+        "output_url_count": 9,
+        "position": "middle",
+        "url_stride_bytes": 16,
+        "urls": [
+          "file:///Media/Episode-496.mkv",
+          "file:///Media/Episode-497.mkv",
+          "file:///Media/Episode-498.mkv",
+          "file:///Media/Episode-499.mkv",
+          "file:///Media/Episode-500.mkv",
+          "file:///Media/Episode-501.mkv",
+          "file:///Media/Episode-502.mkv",
+          "file:///Media/Episode-503.mkv",
+          "file:///Media/Episode-504.mkv"
+        ]
+      },
+      "iterations": {
+        "baseline": 1806,
+        "candidate": 5704
+      },
+      "pairs": 8,
+      "position": "middle",
+      "wall": {
+        "baseline_median_ns": 21287.567552602435,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 6933.20520687237,
+        "paired_median_reduction_percent": 67.10910949685953,
+        "samples_ns": {
+          "baseline": [
+            20462.091915836103,
+            20721.33665559247,
+            21573.461794019935,
+            20441.133444075305,
+            22021.57585825028,
+            21450.87430786268,
+            21379.506090808416,
+            21195.629014396458
+          ],
+          "candidate": [
+            6937.923913043478,
+            6938.013499298738,
+            6913.93443197756,
+            6895.888674614306,
+            6944.726683029453,
+            6928.486500701262,
+            6894.393934081347,
+            7181.106767180926
+          ]
+        }
+      }
+    },
+    {
+      "case": "1000/missing",
+      "count": 1000,
+      "cpu": {
+        "baseline_median_ns": 22339.239655172416,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 9146.536657559198,
+        "paired_median_reduction_percent": 59.12573243245488,
+        "samples_ns": {
+          "baseline": [
+            21896.391954022987,
+            22398.136781609195,
+            22398.58620689655,
+            22731.408045977012,
+            22280.342528735633,
+            21544.84540229885,
+            23967.280459770114,
+            22133.01091954023
+          ],
+          "candidate": [
+            9116.356102003643,
+            9150.867258652095,
+            9120.012750455373,
+            9180.86179417122,
+            9111.11179417122,
+            9146.952868852459,
+            9146.120446265939,
+            9190.036202185793
+          ]
+        }
+      },
+      "inventory": {
+        "count": 1000,
+        "distances": {},
+        "iterations": 1,
+        "legacy_projection_capacity": 1000,
+        "legacy_projection_count": 1000,
+        "legacy_projection_live_allocator_delta_bytes": 16048,
+        "legacy_projection_payload_bytes": 16000,
+        "output_url_capacity": 0,
+        "output_url_count": 0,
+        "position": "missing",
+        "url_stride_bytes": 16,
+        "urls": []
+      },
+      "iterations": {
+        "baseline": 1740,
+        "candidate": 4392
+      },
+      "pairs": 8,
+      "position": "missing",
+      "wall": {
+        "baseline_median_ns": 22339.04683908046,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 9148.858151183971,
+        "paired_median_reduction_percent": 59.12462289080389,
+        "samples_ns": {
+          "baseline": [
+            21910.117816091955,
+            22397.650574712643,
+            22398.842528735633,
+            22737.970689655172,
+            22280.443103448277,
+            21551.367816091955,
+            23974.605747126436,
+            22133.17816091954
+          ],
+          "candidate": [
+            9115.897996357013,
+            9150.986338797815,
+            9117.690801457195,
+            9184.224726775956,
+            9111.331284153006,
+            9146.729963570127,
+            9154.556238615665,
+            9189.544398907105
+          ]
+        }
+      }
+    },
+    {
+      "case": "100000/none",
+      "count": 100000,
+      "cpu": {
+        "baseline_median_ns": 1346355.2413793104,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 25.058436,
+        "paired_median_reduction_percent": 99.99816383941238,
+        "samples_ns": {
+          "baseline": [
+            1398466.5172413792,
+            1301493.3103448276,
+            1287156.2413793104,
+            1349131.448275862,
+            1405831.6206896552,
+            1301302.9655172413,
+            1379210.2413793104,
+            1343579.0344827587
+          ],
+          "candidate": [
+            25.257372,
+            25.173986,
+            24.347266,
+            24.579799,
+            24.942886,
+            25.217627,
+            25.432759,
+            24.564821
+          ]
+        }
+      },
+      "inventory": {
+        "count": 100000,
+        "distances": {},
+        "iterations": 1,
+        "legacy_projection_capacity": 100000,
+        "legacy_projection_count": 100000,
+        "legacy_projection_live_allocator_delta_bytes": 1600048,
+        "legacy_projection_payload_bytes": 1600000,
+        "output_url_capacity": 0,
+        "output_url_count": 0,
+        "position": "none",
+        "url_stride_bytes": 16,
+        "urls": []
+      },
+      "iterations": {
+        "baseline": 29,
+        "candidate": 1000000
+      },
+      "pairs": 8,
+      "position": "none",
+      "wall": {
+        "baseline_median_ns": 1346211,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 25.044619,
+        "paired_median_reduction_percent": 99.9981638360359,
+        "samples_ns": {
+          "baseline": [
+            1397984.0689655172,
+            1301004.6896551724,
+            1286645.103448276,
+            1349374.5172413792,
+            1405344.7241379311,
+            1300866.1724137932,
+            1379377.8620689656,
+            1343047.4827586208
+          ],
+          "candidate": [
+            25.244082,
+            25.159053,
+            24.334,
+            24.567316,
+            24.930185,
+            25.205469,
+            25.439297,
+            24.551837
+          ]
+        }
+      }
+    },
+    {
+      "case": "100000/head",
+      "count": 100000,
+      "cpu": {
+        "baseline_median_ns": 1330389.328125,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 609.4382165148145,
+        "paired_median_reduction_percent": 99.95402014101174,
+        "samples_ns": {
+          "baseline": [
+            1329555.59375,
+            1298063.46875,
+            1279417.4375,
+            1383187.125,
+            1317961.46875,
+            1331223.0625,
+            1368355.40625,
+            1347812.46875
+          ],
+          "candidate": [
+            577.4606786713538,
+            612.8856302460722,
+            574.683277136093,
+            649.6885859817777,
+            605.9908027835569,
+            711.0141760528015,
+            579.0708228710812,
+            619.7284310208767
+          ]
+        }
+      },
+      "inventory": {
+        "count": 100000,
+        "distances": {
+          "file:///Media/Episode-0.mkv": 0,
+          "file:///Media/Episode-1.mkv": 1,
+          "file:///Media/Episode-2.mkv": 2,
+          "file:///Media/Episode-3.mkv": 3,
+          "file:///Media/Episode-4.mkv": 4
+        },
+        "iterations": 1,
+        "legacy_projection_capacity": 100000,
+        "legacy_projection_count": 100000,
+        "legacy_projection_live_allocator_delta_bytes": 1600048,
+        "legacy_projection_payload_bytes": 1600000,
+        "output_url_capacity": 5,
+        "output_url_count": 5,
+        "position": "head",
+        "url_stride_bytes": 16,
+        "urls": [
+          "file:///Media/Episode-0.mkv",
+          "file:///Media/Episode-1.mkv",
+          "file:///Media/Episode-2.mkv",
+          "file:///Media/Episode-3.mkv",
+          "file:///Media/Episode-4.mkv"
+        ]
+      },
+      "iterations": {
+        "baseline": 32,
+        "candidate": 69695
+      },
+      "pairs": 8,
+      "position": "head",
+      "wall": {
+        "baseline_median_ns": 1330381.296875,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 609.2648898773226,
+        "paired_median_reduction_percent": 99.95402397124639,
+        "samples_ns": {
+          "baseline": [
+            1329173.09375,
+            1297680.40625,
+            1279039.625,
+            1382809.34375,
+            1317563.875,
+            1331589.5,
+            1367891.78125,
+            1347707.78125
+          ],
+          "candidate": [
+            577.2930339335677,
+            612.7068656288112,
+            574.5230791304972,
+            649.5204103594232,
+            605.822914125834,
+            710.8271468541502,
+            578.8715546308918,
+            619.5617906593012
+          ]
+        }
+      }
+    },
+    {
+      "case": "100000/middle",
+      "count": 100000,
+      "cpu": {
+        "baseline_median_ns": 1997566.9,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 652220.8977272727,
+        "paired_median_reduction_percent": 67.59366563017444,
+        "samples_ns": {
+          "baseline": [
+            1926965.05,
+            1990454.4,
+            2061795.35,
+            2151993,
+            1962558.85,
+            2071092.2,
+            2004679.4,
+            1962885.95
+          ],
+          "candidate": [
+            638660.9772727273,
+            643644.7954545454,
+            656199.5909090909,
+            653400.25,
+            681560.25,
+            647993.3863636364,
+            651041.5454545454,
+            654003.2045454546
+          ]
+        }
+      },
+      "inventory": {
+        "count": 100000,
+        "distances": {
+          "file:///Media/Episode-49996.mkv": 4,
+          "file:///Media/Episode-49997.mkv": 3,
+          "file:///Media/Episode-49998.mkv": 2,
+          "file:///Media/Episode-49999.mkv": 1,
+          "file:///Media/Episode-50000.mkv": 0,
+          "file:///Media/Episode-50001.mkv": 1,
+          "file:///Media/Episode-50002.mkv": 2,
+          "file:///Media/Episode-50003.mkv": 3,
+          "file:///Media/Episode-50004.mkv": 4
+        },
+        "iterations": 1,
+        "legacy_projection_capacity": 100000,
+        "legacy_projection_count": 100000,
+        "legacy_projection_live_allocator_delta_bytes": 1600048,
+        "legacy_projection_payload_bytes": 1600000,
+        "output_url_capacity": 9,
+        "output_url_count": 9,
+        "position": "middle",
+        "url_stride_bytes": 16,
+        "urls": [
+          "file:///Media/Episode-49996.mkv",
+          "file:///Media/Episode-49997.mkv",
+          "file:///Media/Episode-49998.mkv",
+          "file:///Media/Episode-49999.mkv",
+          "file:///Media/Episode-50000.mkv",
+          "file:///Media/Episode-50001.mkv",
+          "file:///Media/Episode-50002.mkv",
+          "file:///Media/Episode-50003.mkv",
+          "file:///Media/Episode-50004.mkv"
+        ]
+      },
+      "iterations": {
+        "baseline": 20,
+        "candidate": 44
+      },
+      "pairs": 8,
+      "position": "middle",
+      "wall": {
+        "baseline_median_ns": 1997255.325,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 652125.5227272727,
+        "paired_median_reduction_percent": 67.6028247999979,
+        "samples_ns": {
+          "baseline": [
+            1926215.95,
+            1989817.9,
+            2061095.2,
+            2151323.05,
+            1961892.2,
+            2070384.65,
+            2004692.75,
+            1962945.55
+          ],
+          "candidate": [
+            638376.2727272727,
+            643358.7727272727,
+            655843.9545454546,
+            653491.5909090909,
+            681514.0227272727,
+            647683.9090909091,
+            650759.4545454546,
+            653692.4318181818
+          ]
+        }
+      }
+    },
+    {
+      "case": "100000/tail",
+      "count": 100000,
+      "cpu": {
+        "baseline_median_ns": 2861193.5,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 1440834.5322580645,
+        "paired_median_reduction_percent": 50.10338048363022,
+        "samples_ns": {
+          "baseline": [
+            2788000.153846154,
+            3448834.3076923075,
+            2901474,
+            2966618.4615384615,
+            2677385.5384615385,
+            2750635.153846154,
+            2967591.076923077,
+            2820913
+          ],
+          "candidate": [
+            1359075.3548387096,
+            1446647,
+            1535378.8387096773,
+            1414921.3870967743,
+            1441708.0967741935,
+            1558003.2903225806,
+            1334298.8709677418,
+            1439960.9677419355
+          ]
+        }
+      },
+      "inventory": {
+        "count": 100000,
+        "distances": {
+          "file:///Media/Episode-99995.mkv": 4,
+          "file:///Media/Episode-99996.mkv": 3,
+          "file:///Media/Episode-99997.mkv": 2,
+          "file:///Media/Episode-99998.mkv": 1,
+          "file:///Media/Episode-99999.mkv": 0
+        },
+        "iterations": 1,
+        "legacy_projection_capacity": 100000,
+        "legacy_projection_count": 100000,
+        "legacy_projection_live_allocator_delta_bytes": 1600048,
+        "legacy_projection_payload_bytes": 1600000,
+        "output_url_capacity": 5,
+        "output_url_count": 5,
+        "position": "tail",
+        "url_stride_bytes": 16,
+        "urls": [
+          "file:///Media/Episode-99995.mkv",
+          "file:///Media/Episode-99996.mkv",
+          "file:///Media/Episode-99997.mkv",
+          "file:///Media/Episode-99998.mkv",
+          "file:///Media/Episode-99999.mkv"
+        ]
+      },
+      "iterations": {
+        "baseline": 13,
+        "candidate": 31
+      },
+      "pairs": 8,
+      "position": "tail",
+      "wall": {
+        "baseline_median_ns": 2860625.769230769,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 1440417.6612903227,
+        "paired_median_reduction_percent": 50.099894423862864,
+        "samples_ns": {
+          "baseline": [
+            2786961.846153846,
+            3449058.6153846155,
+            2901313.153846154,
+            2965436.769230769,
+            2676416.076923077,
+            2749638.3846153845,
+            2966484,
+            2819938.3846153845
+          ],
+          "candidate": [
+            1358655.8709677418,
+            1446223.3548387096,
+            1534883.2580645161,
+            1414460.2580645161,
+            1441262.935483871,
+            1558037.5483870967,
+            1334168.4516129033,
+            1439572.3870967743
+          ]
+        }
+      }
+    },
+    {
+      "case": "100000/missing",
+      "count": 100000,
+      "cpu": {
+        "baseline_median_ns": 2274353.7352941176,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 926156.1931818181,
+        "paired_median_reduction_percent": 59.24954461203323,
+        "samples_ns": {
+          "baseline": [
+            2248993.470588235,
+            2272514.411764706,
+            2297633.588235294,
+            2276338.588235294,
+            2303418.470588235,
+            2253000.3529411764,
+            2276193.0588235296,
+            2230397.6470588236
+          ],
+          "candidate": [
+            928687.5227272727,
+            921444.6818181818,
+            939070.5,
+            924869.7045454546,
+            935061.9090909091,
+            925021.3636363636,
+            921706.5454545454,
+            927291.0227272727
+          ]
+        }
+      },
+      "inventory": {
+        "count": 100000,
+        "distances": {},
+        "iterations": 1,
+        "legacy_projection_capacity": 100000,
+        "legacy_projection_count": 100000,
+        "legacy_projection_live_allocator_delta_bytes": 1600048,
+        "legacy_projection_payload_bytes": 1600000,
+        "output_url_capacity": 0,
+        "output_url_count": 0,
+        "position": "missing",
+        "url_stride_bytes": 16,
+        "urls": []
+      },
+      "iterations": {
+        "baseline": 17,
+        "candidate": 44
+      },
+      "pairs": 8,
+      "position": "missing",
+      "wall": {
+        "baseline_median_ns": 2273609.3823529407,
+        "candidate_faster_pairs": 8,
+        "candidate_median_ns": 926148.2159090908,
+        "paired_median_reduction_percent": 59.24967302638271,
+        "samples_ns": {
+          "baseline": [
+            2248139.3529411764,
+            2271755.9411764704,
+            2296919.470588235,
+            2275683.2352941176,
+            2302682,
+            2252000.1764705884,
+            2275462.8235294116,
+            2229668.294117647
+          ],
+          "candidate": [
+            928387.0681818182,
+            922088,
+            938781.5,
+            924594.75,
+            934693.1818181818,
+            924681.2727272727,
+            921415.4090909091,
+            927615.1590909091
+          ]
+        }
+      }
+    }
+  ],
+  "status": "passed",
+  "tests": {
+    "baseline": {
+      "debug": 6,
+      "release": 6
+    },
+    "candidate": {
+      "debug": 6,
+      "release": 6
+    }
+  }
+}

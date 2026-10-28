@@ -78,7 +78,64 @@ of the full application graph with thumbnail policy and scheduler regressions.
 Source identity, commands, test completions, calibration, raw paired samples,
 allocation inventory, and summaries are retained in its artifacts.
 
-A result is publishable only after inspecting the actual completed run. Runtime
-measurements and workflow links will be added here after validation. No
-live playback, displayed-frame, energy, or user-interface improvement is inferred
-from this construction benchmark.
+## Results: portable Swift qualification, 2026-10-28
+
+[Portable workflow run](https://github.com/Jagalite/illiquid/actions/runs/40635929066)
+completed successfully at `ffe49b5905aa5aa6444b5b1db2035f4dda6f801e`.
+Host: x86-64 Linux, glibc 2.39, Swift 6.4. These are **Linux component results**;
+they do not establish native macOS timing or full-application qualification.
+
+All six behavior tests passed on both baseline and candidate in both debug and
+release (24 test executions). All 12 timed workloads matched the independent
+oracle and each other's exact URL order and distances across eight paired runs.
+
+| Playlist size / selection | Baseline median, µs | Candidate median, µs | Paired wall-time reduction | Faster pairs |
+| --- | ---: | ---: | ---: | ---: |
+| 0 / none | 0.0302 | 0.0266 | 11.7% | 8/8 |
+| 1 / head | 0.2565 | 0.2965 | -15.4% | 0/8 |
+| 32 / head | 1.53 | 0.6275 | 58.5% | 8/8 |
+| 32 / middle | 2.40 | 1.12 | 52.6% | 8/8 |
+| 32 / tail | 1.89 | 0.9780 | 48.2% | 8/8 |
+| 1000 / middle | 21.29 | 6.93 | 67.1% | 8/8 |
+| 1000 / missing | 22.34 | 9.15 | 59.1% | 8/8 |
+| 100000 / none | 1346.21 | 0.0250 | 99.998% | 8/8 |
+| 100000 / head | 1330.38 | 0.6093 | 99.954% | 8/8 |
+| 100000 / middle | 1997.26 | 652.13 | 67.6% | 8/8 |
+| 100000 / tail | 2860.63 | 1440.42 | 50.1% | 8/8 |
+| 100000 / missing | 2273.61 | 926.15 | 59.2% | 8/8 |
+
+The large-list tail and missing-selection cases also improved in all eight CPU
+and wall-time pairs. The direct scan's larger item stride did not erase the
+benefit of removing the projection in this environment. Search is still linear.
+
+For 100,000 items, the separate projection inventory measured a 100,000-element
+URL buffer with a 16-byte stride: **1,600,000 bytes (1.53 MiB) of element payload**.
+The live glibc allocator delta during that isolated projection was 1,600,048
+bytes. The candidate returned zero to nine URLs, with capacities matching those
+counts on this host. These measurements support removing the large temporary
+projection; they are not a measurement of overall application memory savings.
+For small neighborhoods that cover the entire playlist, the inventory must not
+be interpreted as net saved storage: the old projection can also supply the
+returned neighborhood.
+
+The measured tradeoff is the singleton case: roughly **0.2565 → 0.2965 µs** per
+construction, a paired 15.4% increase (about 40 ns). This occurs once per library
+pass, whose idle interval is measured in seconds. This small absolute cost is retained as an explicit tradeoff.
+
+Full summaries, timing samples, source hashes, and test counts are retained in
+[evidence/linux-summary.json](evidence/linux-summary.json) and
+[evidence/linux-manifest.json](evidence/linux-manifest.json). Detailed command
+logs and exported source packages are in the workflow artifact.
+
+### Native qualification remains pending
+
+The [macOS workflow](https://github.com/Jagalite/illiquid/actions/runs/40635264617)
+was queued when these results were recorded. Both its component benchmark and
+full release application/scheduler test job must complete before marking the PR
+ready for merge. The queued native code revision is
+`21a6412280a62f9c7bf06dc60568a59309a3c087`; the portable run adds only a Linux
+workflow to that revision. No production or benchmark source changed between
+them.
+
+No live playback, displayed-frame, energy, or user-interface improvement is
+inferred from this construction benchmark.
