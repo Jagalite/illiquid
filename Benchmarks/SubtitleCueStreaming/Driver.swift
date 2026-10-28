@@ -335,7 +335,9 @@ private func verificationFixtures() throws -> [Fixture] {
     for name in ["srt-short", "vtt-short", "srt-crlf", "vtt-crlf",
                  "srt-multiline", "srt-dense",
                  "srt-long-line", "invalid-preamble"] {
-        fixtures.append(try makeFixture(name))
+        let fixture = try makeFixture(name)
+        fixtures.append(Fixture(id: "workload-\(name)", format: fixture.format,
+                                source: fixture.source))
     }
     try require(Set(fixtures.map(\.id)).count == fixtures.count, "Duplicate case ID")
     return fixtures
