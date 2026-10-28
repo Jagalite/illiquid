@@ -1,0 +1,68 @@
+{
+  "baseline_blob": "4ff4ebfd1b23235bf8843ee87eb2b9de4f0af574",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate_head": "898c52afcb9c5777320529962efbdae39f20fe01",
+  "cpu": "Apple M1 (Virtual)",
+  "finished_utc": "2026-10-28T05:42:16Z",
+  "host": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "input_sha256": {
+    "Benchmarks/VideoFrameColorSampling/Harness.swift": "d8434c4a1b710bb04543f0ccb0f3ba333ff44161abeb72b99eeb9640aa0c0ac8",
+    "Benchmarks/VideoFrameColorSampling/baseline/VideoFrameColorSampler.swift": "322086dbd5b17be713fe10fc760e0d5051ff3f66b47ca3e7a4c69ea90d7b3d19",
+    "Benchmarks/VideoFrameColorSampling/run.py": "b32c3cb5deba96af46c17d64069dd3bf7bb55ddd7c6eba5d21243f54f0c628ec",
+    "Sources/IlliquidCore/Player/VideoColorSample.swift": "e296cb8ddb45850b8c6356bdec8b6f128e22fe48119bc5c24c6c42f1e32fad06",
+    "Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift": "39f2c35a9c8d6e0154b01643c75045214b7d5b763936b8befbde8a988f206f16",
+    "Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift": "2fd7fe74c5d1c2c91e78f588407769c0ad742c534a0e752837bcb5dff65de261",
+    "Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerLayoutTests.swift": "f5b6835c6245ad82bc653b47b85d6fff7ab1b851cb0fb82060430b5b745c2d35",
+    "Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerTests.swift": "7c618f72484a20ee902f35be328dab602ecbe21bd9c879b5d1b68bf5f61a727f"
+  },
+  "kyoto_available": false,
+  "machine": "arm64",
+  "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+  "output_parity": {
+    "baseline_sha256": "2a3972639b65c39bb73fdbaf28681f0e147d8c7c68ce60c13e3adaab24cf7473",
+    "candidate_sha256": "2a3972639b65c39bb73fdbaf28681f0e147d8c7c68ce60c13e3adaab24cf7473",
+    "coverage": "Every RGB Double bit pattern in fixture and temporal receipts; see verify JSON files.",
+    "matched": true
+  },
+  "production_path": "Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift",
+  "protocol": {
+    "balanced_order": "AB/BA",
+    "excluded": [
+      "fixture allocation and filling",
+      "warmup",
+      "full output verification"
+    ],
+    "fresh_process_per_observation": true,
+    "pairs": 8,
+    "scope": "warm CPU-accessible IOSurface buffers; not end-to-end playback or GPU synchronization",
+    "target_ms": 150,
+    "timed_operation": "one sample() or sampleIfNeeded() call, including a lightweight result checksum"
+  },
+  "schema_version": 1,
+  "started_utc": "2026-10-28T05:39:06Z",
+  "status": "passed",
+  "swift_version": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "tests": [
+    {
+      "configuration": "debug",
+      "passed": 11,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "passed": 11,
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "passed": 11,
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "passed": 11,
+      "variant": "candidate"
+    }
+  ],
+  "worktree_status": ""
+}

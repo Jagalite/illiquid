@@ -11,6 +11,13 @@ successful pixel-buffer lock. It does not cache pointers, dimensions, or color
 metadata between calls. Sampling coordinates, conversion arithmetic, publication
 thresholds, and the default four-hertz cadence are unchanged.
 
+## Qualified result
+
+The [2026-10-28 native research report](../../Documentation/VIDEO_FRAME_COLOR_SAMPLING_PERFORMANCE.md)
+records the measured improvement, absolute impact, correctness checks, and limits.
+Paired summaries and all raw observations are committed in
+[`evidence/macos-2026-10-28`](evidence/macos-2026-10-28).
+
 ## Run
 
 Requires macOS 26 and Xcode with Swift 6.1 or newer. The isolated component
