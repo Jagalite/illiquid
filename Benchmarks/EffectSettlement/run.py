@@ -247,8 +247,8 @@ let package = Package(
             duration = min(row["wallNanoseconds"], row["cpuNanoseconds"])
             if duration >= self.args.target_ms * 1_000_000:
                 return batches
-            factor = min(100, max(2, math.ceil(self.args.target_ms * 1_000_000 / max(1, duration) * 1.25)))
-            batches *= factor
+            batches = max(batches + 1, math.ceil(
+                batches * self.args.target_ms * 1_000_000 / max(1, duration) * 1.15))
             if batches > 1_000_000:
                 break
         raise ValueError(f"Calibration failed: {variant} {case['id']}")
@@ -353,7 +353,7 @@ def main():
     parser.add_argument("--swift", default=shutil.which("swift") or "swift")
     parser.add_argument("--cc", default=shutil.which("cc") or "cc")
     parser.add_argument("--pairs", type=int, default=6)
-    parser.add_argument("--target-ms", type=float, default=240)
+    parser.add_argument("--target-ms", type=float, default=180)
     parser.add_argument("--minimum-ms", type=float, default=100)
     parser.add_argument("--cases", help="Optional comma-separated exploratory case IDs; full inventory is default")
     parser.add_argument("--skip-tests", action="store_true", help="Exploration only")
@@ -365,8 +365,8 @@ def main():
     study = Study(args)
     study.prepare()
     if not args.tests_only:
-        study.timing()
         study.allocations()
+        study.timing()
         study.summarize()
     else:
         study.receipt["complete"] = True

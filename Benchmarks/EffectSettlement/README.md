@@ -2,16 +2,20 @@
 
 This harness compares the complete production playback reducer at baseline
 ea2ff568237e2667f7b1aeee67b11a44ebe95b72 with the current working tree. The
-candidate collects matching effect IDs directly instead of filtering the
-outstanding-effects dictionary and then mapping its keys.
+candidate first checks whether all effects have the retiring authority. It maps
+the keys directly in that case, preserving the known-size array allocation;
+otherwise it collects matching IDs with compactMap. Both paths collect all IDs
+before mutating the outstanding-effects dictionary.
 
 Swift 6.3.3's native dictionary filter first records included entries in a
 bitset. It returns the original dictionary when every entry matches and an
 empty dictionary when none match; only a partial match builds another
 dictionary containing matching records. The candidate therefore removes that
-extra dictionary for mixed-authority cases, but may pay different array-growth
-costs when every entry matches. The experiment keeps all-match and no-match
-cases to expose that tradeoff rather than assuming every filter copies records.
+extra dictionary for partial matches. The all-match path preserves the original
+known-size key copy without the filter's selection bitset. Partial matches pay
+an additional authority scan through the first nonmatch; nearly-all-match cases
+can make that prefix long. The experiment includes those cases as well as
+all-match, sparse-match, and no-match controls.
 
 ## Run
 
@@ -25,7 +29,7 @@ required by the repository's AGENTS.md.
 
     python3 Benchmarks/EffectSettlement/run.py \
       --output /tmp/effect-settlement --swift "$(command -v swift)" \
-      --pairs 6 --target-ms 240
+      --pairs 6 --target-ms 180
 
 Use a new output directory. Builds and tests sharing a package's build directory
 are serialized. The isolated package copies the exact production MediaTrack.swift
@@ -59,6 +63,11 @@ Foreign authorities differ
 in application scope, session, generation, or subtitle revision. The cleanup
 path adds one cancellation-trigger record that is completed before the helper
 runs; its population label describes the records seen by the helper.
+
+Three load cases add 7-of-8, 127-of-128, and 1-of-128 matching records. Membership
+is fixed by insertion index, while hash iteration remains process-dependent.
+These expose nearly-full pre-scan and sparse-allocation tradeoffs. The full
+inventory contains 47 cases and 94 initial/final semantic traces.
 
 The 0/1/4/8 cases exercise small populations; 32/128/512 are scaling experiments.
 They do not establish that these effect counts occur frequently in the player.
@@ -99,7 +108,8 @@ populations use smaller batches to bound live fixture memory.
 
 Per-process samples accumulate disjoint batch windows. Their summed process CPU
 and monotonic wall durations must each be at least 100 ms. Both variants
-calibrate independently to a default target of 240 ms; values are normalized per
+calibrate independently to a default target of 180 ms, with a proportional
+batch-count estimate and 15% headroom; values are normalized per
 event. Six fresh-process pairs alternate baseline/candidate and
 candidate/baseline. All pilots, final samples, order, counts, checksums, ranges,
 and paired ratios are retained. No sample is selectively dropped. A short sample
@@ -114,7 +124,8 @@ with a known 12,345-byte allocation through dynamically resolved malloc/free;
 that positive self-check is reported in its observation. Fixture construction,
 state checks, printing, and
 teardown remain outside those windows. Allocation runs are separate from timing
-runs because interposition and atomic counting perturb timings. macOS records
+runs because interposition and atomic counting perturb timings. Allocation
+observations are collected and saved before the timing cohort. macOS records
 timing and correctness only and explicitly marks allocation measurement
 unsupported.
 

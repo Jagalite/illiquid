@@ -39,8 +39,8 @@ jobs:
       # Official Swift 6.3.3 Ubuntu 24.04 image, pinned to its manifest digest.
       image: swift:6.3.3-noble@sha256:1038d54c80063f5cdfabc4560990c30af64b5de8ebf28161deb22ca4ad5db866
     steps:
-      - name: Install Python and Git for the benchmark runner
-        run: apt-get update && apt-get install -y --no-install-recommends python3 git
+      - name: Install Python, Git, and the allocation-meter compiler
+        run: apt-get update && apt-get install -y --no-install-recommends python3 git gcc
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
@@ -56,7 +56,7 @@ jobs:
           echo 'Kyoto is unavailable on this hosted runner; compiling serially in isolated component packages.'
           python3 Benchmarks/EffectSettlement/run.py \
             --output "$RUNNER_TEMP/effect-settlement-linux" \
-            --pairs 6 --target-ms 240
+            --pairs 6 --target-ms 180
       - name: Emit compact review evidence
         if: always()
         run: |
@@ -123,7 +123,7 @@ jobs:
           echo 'Kyoto is unavailable on this hosted runner; compiling serially in isolated component packages.'
           python3 Benchmarks/EffectSettlement/run.py \
             --output "$RUNNER_TEMP/effect-settlement-macos" \
-            --pairs 6 --target-ms 240
+            --pairs 6 --target-ms 180
       - name: Emit compact review evidence
         if: always()
         run: |

@@ -1683,10 +1683,17 @@ public struct PlaybackCore: Sendable {
   }
 
   private mutating func settleEffects(for authority: PlaybackAuthority) {
-    // Collect only the IDs before mutating the dictionary. For a partial match,
-    // filtering would build a dictionary of records and retain their metadata.
-    let settled = state.outstandingEffects.compactMap { effectID, record in
-      record.effect.context.authority == authority ? effectID : nil
+    // Collect IDs before mutation, avoiding a filtered dictionary of records.
+    // Keep a known-size key copy when every effect belongs to this authority.
+    let settled: [PlaybackEffectID]
+    if state.outstandingEffects.values.allSatisfy({
+      $0.effect.context.authority == authority
+    }) {
+      settled = state.outstandingEffects.map(\.key)
+    } else {
+      settled = state.outstandingEffects.compactMap { effectID, record in
+        record.effect.context.authority == authority ? effectID : nil
+      }
     }
     for effectID in settled {
       state.outstandingEffects.removeValue(forKey: effectID)

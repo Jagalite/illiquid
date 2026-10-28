@@ -12,7 +12,13 @@ private struct CaseSpec: Codable, Sendable {
 
     var batchSize: Int { min(256, max(8, 8_192 / max(1, population + 1))) }
     func matches(_ index: Int) -> Bool {
-        matching == "all" || (matching == "mixed" && index.isMultiple(of: 2))
+        switch matching {
+        case "all": return true
+        case "mixed": return index.isMultiple(of: 2)
+        case "allButOne": return index != population - 1
+        case "one": return index == 0
+        default: return false
+        }
     }
 }
 
@@ -30,6 +36,8 @@ private func cases() -> [CaseSpec] {
             add(scenario, n, "none")
         }
     }
+    for n in [8, 128] { add("load", n, "allButOne") }
+    add("load", 128, "one")
     for n in [0, 8, 128] { add("control", n, "all") }
     for n in [8, 128] { add("load", n, "all", "snapshot") }
     return result
