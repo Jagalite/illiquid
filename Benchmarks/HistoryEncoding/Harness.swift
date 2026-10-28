@@ -3,7 +3,7 @@
 import Foundation
 import IlliquidCore
 
-private final class RecordingDefaults: UserDefaults, @unchecked Sendable {
+private final class RecordingDefaults: UserDefaults {
     private let recordingLock = NSLock()
     private var recording = false
     private var payloadSizes: [Int] = []
