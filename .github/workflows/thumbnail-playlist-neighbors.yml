@@ -1,0 +1,133 @@
+name: Thumbnail playlist neighbors
+
+on:
+  push:
+    branches: ['perf/thumbnail-playlist-neighbors-20261028']
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighbors.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborsTests.swift'
+      - 'Benchmarks/ThumbnailPlaylistNeighbors/**'
+      - '.github/workflows/thumbnail-playlist-neighbors.yml'
+      - '!Benchmarks/ThumbnailPlaylistNeighbors/*.md'
+      - '!Benchmarks/ThumbnailPlaylistNeighbors/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighbors.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborsTests.swift'
+      - 'Benchmarks/ThumbnailPlaylistNeighbors/**'
+      - '.github/workflows/thumbnail-playlist-neighbors.yml'
+      - '!Benchmarks/ThumbnailPlaylistNeighbors/*.md'
+      - '!Benchmarks/ThumbnailPlaylistNeighbors/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-playlist-neighbors-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify neighborhood semantics and measure paired native runs
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/ThumbnailPlaylistNeighbors/run.py \
+            --output "$RUNNER_TEMP/thumbnail-playlist-neighbors" --pairs 6 "${mode[@]}"
+      - name: Publish results and reproducibility receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-playlist-neighbors'
+          for name in ['summary.json', 'manifest.json', 'tests.json', 'source-receipts.json',
+                       'build-receipts.json', 'measurements.jsonl']:
+              path = root / name
+              if path.is_file():
+                  print('THUMBNAIL_NEIGHBORS_FILE_BEGIN ' + name)
+                  print(path.read_text())
+                  print('THUMBNAIL_NEIGHBORS_FILE_END ' + name)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-playlist-neighbors-component
+          path: |
+            ${{ runner.temp }}/thumbnail-playlist-neighbors/*.json
+            ${{ runner.temp }}/thumbnail-playlist-neighbors/*.jsonl
+            ${{ runner.temp }}/thumbnail-playlist-neighbors/*.log
+            ${{ runner.temp }}/thumbnail-playlist-neighbors/logs/
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run thumbnail scheduling regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-neighbors-integration"
+          sw_vers > "$RUNNER_TEMP/thumbnail-neighbors-integration/host.txt"
+          swift --version >> "$RUNNER_TEMP/thumbnail-neighbors-integration/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/thumbnail-neighbors-integration/host.txt"
+          set -o pipefail
+          python3 - <<'PY' 2>&1 | tee "$RUNNER_TEMP/thumbnail-neighbors-integration/tests.log"
+          import json, subprocess, sys
+          from pathlib import Path
+          command = [
+              'swift', 'test', '--force-resolved-versions', '-c', 'release',
+              '--jobs', '2', '--no-parallel', '--filter',
+              'ThumbnailPlaylistNeighborsTests|ThumbnailPolicyTests|'
+              'ThumbnailSchedulingPolicyRegressionTests|ThumbnailLifecycleRegressionTests|'
+              'currentVideoPreparationSharesIdleBudgetWithLibraryWork|'
+              'supersededCompletionCannotMarkNewSourcePrepared|'
+              'navigationReplacesPendingWorkAndPlaybackCancelsAnActivePass',
+          ]
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Shared Kyoto queue is unavailable on this hosted runner; '
+                'building the app graph and running tests directly and serially.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-playlist-neighbors-native
+          path: ${{ runner.temp }}/thumbnail-neighbors-integration/
+          retention-days: 14

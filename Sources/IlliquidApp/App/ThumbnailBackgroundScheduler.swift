@@ -271,22 +271,12 @@ final class ThumbnailBackgroundScheduler {
     }
 
     private func runPass(settings: ThumbnailPreferences, id: UUID) async {
-        let playlist = player.viewStore.playlist.map(\.url)
-        let anchor = current.flatMap { playlist.firstIndex(of: $0) }
-        let neighbors = anchor.map { index in
-            Array(playlist[max(0, index - 4)..<min(playlist.count, index + 5)])
-        } ?? []
+        let neighbors = ThumbnailPlaylistNeighbors(items: player.viewStore.playlist, current: current)
         var urls = current.map { [$0] } ?? []
-        urls += visible.sorted { $0.path < $1.path } + discovered + neighbors + recent.keys.sorted { $0.path < $1.path }
-        var distances: [URL: Int] = [:]
-        if let anchor {
-            for index in max(0, anchor - 4)..<min(playlist.count, anchor + 5) {
-                distances[playlist[index]] = abs(index - anchor)
-            }
-        }
+        urls += visible.sorted { $0.path < $1.path } + discovered + neighbors.urls + recent.keys.sorted { $0.path < $1.path }
         let candidates = urls.map { url in
             ThumbnailPolicy.Candidate(url: url, lastUsed: recent[url], isVisible: visible.contains(url),
-                neighborDistance: distances[url])
+                neighborDistance: neighbors.distances[url])
         }
         let source = current, location = folder, now = Date()
         let ranked = await Task.detached(priority: .utility) {
