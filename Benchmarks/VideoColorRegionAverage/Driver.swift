@@ -12,16 +12,22 @@ private enum Workload: String, CaseIterable {
 }
 
 private func samples() -> [VideoColorSample] {
-    (0..<8).map { seed in
-        let colors = (0..<96).map { index in
-            SampledVideoColor(
-                red: Double((index * 37 + seed * 19 + 11) % 257) / 256,
-                green: Double((index * 73 + seed * 31 + 19) % 251) / 250,
-                blue: Double((index * 17 + seed * 43 + 23) % 241) / 240
-            )
+    var result: [VideoColorSample] = []
+    for seed in 0..<8 {
+        var colors: [SampledVideoColor] = []
+        for index in 0..<96 {
+            let redCode: Int = (index * 37 + seed * 19 + 11) % 257
+            let greenCode: Int = (index * 73 + seed * 31 + 19) % 251
+            let blueCode: Int = (index * 17 + seed * 43 + 23) % 241
+            colors.append(SampledVideoColor(
+                red: Double(redCode) / 256,
+                green: Double(greenCode) / 250,
+                blue: Double(blueCode) / 240
+            ))
         }
-        return VideoColorSample(columns: 12, rows: 8, colors: colors)
+        result.append(VideoColorSample(columns: 12, rows: 8, colors: colors))
     }
+    return result
 }
 
 @inline(never)

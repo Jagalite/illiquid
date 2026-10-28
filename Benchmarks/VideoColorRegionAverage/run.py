@@ -46,6 +46,11 @@ def main():
         (out / name).mkdir()
     commands = []
     manifest = {}
+    linkage_records = {}
+    loader_environment = dict(os.environ)
+    loader_variables = ("LD_LIBRARY_PATH", "LD_PRELOAD", "DYLD_LIBRARY_PATH",
+                        "DYLD_FALLBACK_LIBRARY_PATH", "DYLD_INSERT_LIBRARIES")
+    removed_loader_variables = [name for name in loader_variables if loader_environment.pop(name, None)]
     swiftc = shutil.which(os.environ.get("SWIFTC", "swiftc"))
     swift = shutil.which("swift")
     if not swiftc or not swift:
@@ -54,7 +59,9 @@ def main():
     def run(argv, name, quiet=False, timeout=600):
         argv = [str(x) for x in argv]
         started = time.time()
-        result = subprocess.run(argv, cwd=ROOT, text=True, capture_output=True, timeout=timeout)
+        executable_is_probe = Path(argv[0]).name in ("measure", "ldd", "otool")
+        result = subprocess.run(argv, cwd=ROOT, text=True, capture_output=True, timeout=timeout,
+                                env=loader_environment if executable_is_probe else None)
         commands.append({"name": name, "argv": argv, "started_unix_seconds": started,
                          "elapsed_seconds": time.time() - started, "exit_code": result.returncode})
         save(out / "commands.json", commands)
@@ -91,6 +98,7 @@ def main():
             "platform": platform.platform(), "machine": platform.machine(),
             "swift": run([swiftc, "--version"], "swift-version").strip(),
             "python": sys.version, "pairs": args.pairs, "target_ms": args.target_ms,
+            "cleared_driver_loader_variables": removed_loader_variables,
             "scope": "Complete production average/region accessors on 12x8 samples; "
                      "no renderer, decoder, visible UI or whole-player performance measurement.",
             "method": "Separate production dynamic module and driver; no cross-module optimization; "
@@ -149,6 +157,14 @@ def main():
                      "-Xlinker", "-rpath", "-Xlinker", directory,
                      out / "sources/Driver.swift", "-o", binary],
                     variant + "-" + mode + "-driver-build")
+                linkage_tool = "otool" if sys.platform == "darwin" else "ldd"
+                linkage_args = ["-L"] if sys.platform == "darwin" else []
+                linkage = run([linkage_tool, *linkage_args, binary],
+                              variant + "-" + mode + "-linkage")
+                if str(library) not in linkage:
+                    raise RuntimeError("The benchmark does not resolve its own production library.")
+                linkage_records[variant + "-" + mode] = linkage
+                save(out / "linkage.json", linkage_records)
                 binaries[variant, mode] = binary
                 for path in (library, binary):
                     binary_hashes[str(path.relative_to(out))] = sha256(path.read_bytes())
