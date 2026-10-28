@@ -58,6 +58,7 @@ public enum PlaylistMutation {
         ids: [FolderPlaylistItem.ID]
     ) -> [FolderPlaylistItem.ID] {
         guard !items.isEmpty else { return [] }
+        guard items.count > 1 else { return [items[0].id] }
 
         var remaining: Set<FolderPlaylistItem.ID> = []
         var currentOrder: [FolderPlaylistItem.ID] = []

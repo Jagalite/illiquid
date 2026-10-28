@@ -28,7 +28,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: playlist-checkpoint-identity-${{ github.head_ref || github.ref }}
+  group: playlist-checkpoint-identity-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
