@@ -1,0 +1,135 @@
+name: File identity key performance
+
+on:
+  push:
+    branches: ['codex/perf-file-identity-20261028']
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Tests/IlliquidCoreTests/UtilitiesTests.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistLookupTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Tests/IlliquidCoreTests/FileIdentityKeyTests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/FileIdentityKeyCorpus.swift'
+      - 'Benchmarks/FileIdentityKeys/**'
+      - '.github/workflows/file-identity-keys-performance.yml'
+      - '!Benchmarks/FileIdentityKeys/README.md'
+      - '!Benchmarks/FileIdentityKeys/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Tests/IlliquidCoreTests/UtilitiesTests.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistLookupTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Tests/IlliquidCoreTests/FileIdentityKeyTests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/FileIdentityKeyCorpus.swift'
+      - 'Benchmarks/FileIdentityKeys/**'
+      - '.github/workflows/file-identity-keys-performance.yml'
+      - '!Benchmarks/FileIdentityKeys/README.md'
+      - '!Benchmarks/FileIdentityKeys/evidence/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: file-identity-keys-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          swiftc --version
+          git rev-parse HEAD
+
+      - name: Verify compatibility and measure paired performance
+        run: >-
+          python3 Benchmarks/FileIdentityKeys/run.py
+          --output "$RUNNER_TEMP/file-identity-keys/timing"
+
+      - name: Run baseline and candidate regressions in debug and release
+        run: >-
+          python3 Benchmarks/FileIdentityKeys/run.py --test
+          --output "$RUNNER_TEMP/file-identity-keys/tests"
+
+      - name: Emit results and exact evidence bundle
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64
+          import gzip
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "file-identity-keys"
+          review = root / "review"
+          review.mkdir(parents=True, exist_ok=True)
+          ignored = {".build", "build", "cache", "config", "security", "module-cache", "sources"}
+          files = {}
+          for phase in ("timing", "tests"):
+              for path in sorted((root / phase).rglob("*")):
+                  relative = path.relative_to(root)
+                  if (path.is_file() and not ignored.intersection(relative.parts)
+                          and path.suffix in {".json", ".jsonl", ".log", ".txt"}):
+                      files[str(relative)] = path.read_text()
+          metadata = {
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "sha": os.environ["GITHUB_SHA"],
+              "ref": os.environ["GITHUB_REF"],
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "event": os.environ["GITHUB_EVENT_NAME"],
+              "url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+          }
+          files["github-run.json"] = json.dumps(metadata, indent=2) + "\n"
+          for name, value in files.items():
+              if Path(name).name in {"summary.json", "tests.json", "verification.json", "failure.json", "manifest.json"}:
+                  print("FILE_IDENTITY_REVIEW " + json.dumps({"path": name, "data": json.loads(value)}, sort_keys=True))
+          serialized = json.dumps(files, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+          packed = gzip.compress(serialized, compresslevel=9, mtime=0)
+          digest = hashlib.sha256(packed).hexdigest()
+          (review / "evidence.json.gz").write_bytes(packed)
+          (review / "evidence.sha256").write_text(digest + "  evidence.json.gz\n")
+          print("FILE_IDENTITY_BUNDLE_SHA256 " + digest)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit("Evidence exceeds the log bundle limit; use the artifact.")
+          encoded = base64.b64encode(packed).decode()
+          chunks = [encoded[start:start + 12000] for start in range(0, len(encoded), 12000)]
+          for index, chunk in enumerate(chunks):
+              print("FILE_IDENTITY_BUNDLE_PART " + json.dumps({
+                  "index": index, "parts": len(chunks), "data": chunk,
+              }, separators=(",", ":")))
+          PY
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: file-identity-keys-macos
+          path: ${{ runner.temp }}/file-identity-keys/review/
+          if-no-files-found: warn
+          retention-days: 14
