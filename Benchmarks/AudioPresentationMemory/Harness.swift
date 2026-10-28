@@ -182,10 +182,13 @@ private func retained(_ scenario: Scenario, frames: [NativeDecodedAudioFrame],
             for (frame, sample) in zip(frames, buffers) {
                 let (address, count) = try pointer(sample)
                 try require(count == frame.interleavedFloatPCM.count, "Retained payload size changed")
-                try require(try payload(sample) == frame.interleavedFloatPCM, "Retained payload changed")
                 outputs[address] = count
             }
             let after = usage()
+            // Validate bytes after recording RSS so verification copies do not affect it.
+            for (frame, sample) in zip(frames, buffers) {
+                try require(try payload(sample) == frame.interleavedFloatPCM, "Retained payload changed")
+            }
             return [
                 "scenario": scenario.name, "buffers": frames.count,
                 "logical_pcm_bytes": frames.reduce(0) { $0 + $1.interleavedFloatPCM.count },

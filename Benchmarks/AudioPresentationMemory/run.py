@@ -187,7 +187,9 @@ def main() -> None:
             paired = {}
             for position, variant in enumerate(order):
                 row = json.loads(run([binaries[variant], "--time", name, str(iterations)]))
-                if row.get("scenario") != name or row.get("iterations") != iterations or row.get("wall_ns", 0) <= 0:
+                if (row.get("scenario") != name or row.get("iterations") != iterations
+                        or row.get("wall_ns", 0) <= 0 or row.get("cpu_ns", 0) <= 0
+                        or row.get("operations", 0) <= 0):
                     raise RuntimeError("Invalid timing receipt")
                 row.update(variant=variant, pair=pair, position=position)
                 paired[variant] = row

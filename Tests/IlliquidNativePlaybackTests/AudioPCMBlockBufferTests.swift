@@ -77,7 +77,7 @@ struct AudioPCMBlockBufferTests {
         try #require(samples.count == 2)
         #expect(released.count == 0)
         var retainedBlock: CMBlockBuffer? = CMSampleBufferGetDataBuffer(samples[0])
-        autoreleasepool { samples.removeFirst() }
+        autoreleasepool { _ = samples.removeFirst() }
         #expect(released.count == 0)
         #expect(try Self.bytes(CMSampleBufferGetDataBuffer(samples[0])) ==
             Data(repeating: 0x3f, count: Self.ownedByteCount))
@@ -208,8 +208,8 @@ struct AudioPCMBlockBufferTests {
 
     @inline(never)
     private static func ownedSamples(released: ReleaseProbe) throws -> [CMSampleBuffer] {
-        let frame = frame(trackedPCM(released: released), samples: ownedSamplesCount, channels: 2)
-        let format = try format()
+        let frame = Self.frame(trackedPCM(released: released), samples: ownedSamplesCount, channels: 2)
+        let format = try Self.format()
         return [
             try SampleBufferAudioPresenter.makeSampleBuffer(frame, formatDescription: format),
             try SampleBufferAudioPresenter.makeSampleBuffer(frame, formatDescription: format),
