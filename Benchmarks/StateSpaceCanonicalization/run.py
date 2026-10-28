@@ -93,10 +93,14 @@ def stage(output: Path, variant: str, baseline: str) -> dict:
         if relative == "Validation/IlliquidStateSpaceExplorer/main.swift" and platform.system() == "Linux":
             if not data.startswith(b"import Darwin\n"):
                 raise ValueError("Unexpected CLI import; inspect the portability adapter")
-            data = data.replace(
-                b"import Darwin\n",
-                b"import Glibc\nnonisolated(unsafe) let stderr = Glibc.stderr\n", 1)
-            transformation = "Darwin import -> Glibc and immutable stderr alias; CLI logic unchanged"
+            if data.count(b"fputs(") != data.count(b"stderr"):
+                raise ValueError("Unexpected CLI logging; inspect the portability adapter")
+            data = data.replace(b"import Darwin\n", b"import Glibc\n", 1)
+            data = re.sub(rb"\bfputs\(", b"benchmarkWriteError(", data)
+            data = re.sub(rb"\bstderr\b", b"()", data)
+            data += (b"\nprivate func benchmarkWriteError(_ message: String, _: Void) {\n"
+                     b"  FileHandle.standardError.write(Data(message.utf8))\n}\n")
+            transformation = "Darwin -> Glibc; fputs(stderr) -> Foundation stderr writer; search logic unchanged"
         destination = (Path("Sources/IlliquidStateSpaceExplorer/main.swift")
                        if relative.startswith("Validation/") else Path(relative))
         target = package / destination

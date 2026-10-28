@@ -20,7 +20,7 @@ separate baseline and candidate scratch packages.
 The runner copies byte-identical production source files into dependency-free
 Swift packages: the playback core's actual MediaTrack dependency and all playback
 core and state-space sources. The CLI is byte-identical on macOS. On Linux only
-its Darwin import is adapted to Glibc and an immutable stderr alias; that exact
+its Darwin import is adapted to Glibc and stderr logging uses Foundation; that exact
 transformation and both file hashes are recorded. There are no model stubs.
 Both variants use the same current tests and parity driver.
 
