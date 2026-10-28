@@ -6,13 +6,13 @@ recovery. Before this change, normal EOF leaves the final GOP owned by
 limits are 512 packets and 32 MiB of compressed payload.
 
 The candidate resets this buffer immediately after `VideoDecoder.drain` returns
-normally and before the existing output EOS queue push. Errors and cancellation
-skip the reset. The patch follows the existing EOS boundary; it does not introduce
+normally and before the existing output EOS queue push. Thrown errors, including
+cooperative cancellation, skip the reset. The patch follows the existing EOS boundary; it does not introduce
 new native decoder completion guarantees or alter presentation recovery.
 
 ## Reproduce
 
-Use macOS 26, the repository's pinned FFmpeg 8.1.2 SDK, and a Git checkout containing
+On macOS, use macOS 26, the repository's pinned FFmpeg 8.1.2 SDK, and a Git checkout containing
 baseline commit `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`:
 
 ```sh
@@ -22,6 +22,24 @@ python3 Benchmarks/VideoRecoveryEOFMemory/run.py \
 swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
   --filter 'VideoRecoveryEOFLifetimeTests|PacketOwnershipTests|VideoScratchFrameLifetimeTests'
 ```
+
+Linux can run the same ownership experiment against the same FFmpeg source:
+
+```sh
+ILLIQUID_FFMPEG_BUILD_JOBS=4 bash Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh \
+  /tmp/illiquid-recovery-eof-sdk
+python3 Benchmarks/VideoRecoveryEOFMemory/run.py \
+  --sdk-prefix /tmp/illiquid-recovery-eof-sdk \
+  --output /tmp/illiquid-recovery-eof-linux --pairs 2
+```
+
+The SDK builder verifies the included 8.1.2 archive against both corresponding-source
+manifests. The SDK and experiment destinations must be new. Linux compiles six
+complete production Swift files unchanged, extracts the exact rational/seconds
+declarations from MediaTime while omitting unused CoreMedia APIs, and extracts the
+seven required C shim helpers verbatim. The three session methods, native packet
+operations, ownership counter, and scenarios are unchanged. Only the controlled
+harness's platform imports are adapted. Linux results do not qualify the macOS app.
 
 Use a new output directory. When Kyoto is available, the component runner submits
 each build through the shared queue and retains its show/wait/logs receipts.
@@ -48,8 +66,8 @@ allocation ownership measurements, not whole-player RSS, physical footprint,
 GPU memory, playback throughput, or measurements of typical media GOP size.
 
 The synthetic small workload contains four 256 KiB packets (1 MiB payload). The
-budget workload contains 512 64 KiB packets (32 MiB payload). Both stop at the
-existing recovery-buffer limits.
+budget workload contains 512 64 KiB packets (32 MiB payload). Both stay within the
+existing recovery-buffer limits; the budget workload reaches both limits.
 
 ## Behavioral gates
 

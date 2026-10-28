@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shlex
 import shutil
 import subprocess
@@ -61,9 +62,23 @@ def extract(source):
     return methods
 
 
+def declaration(source, marker):
+    if source.count(marker) != 1:
+        raise RuntimeError(f"Review changed declaration boundary: {marker}")
+    start = source.index(marker)
+    opening = source.index("{", start)
+    depth = 1
+    for index in range(opening + 1, len(source)):
+        depth += (source[index] == "{") - (source[index] == "}")
+        if depth == 0:
+            return source[start:index + 1] + "\n"
+    raise RuntimeError("Unbalanced source declaration")
+
+
 class Study:
     def __init__(self, args):
         self.args = args
+        self.linux = platform.system() == "Linux"
         self.output = args.output.resolve()
         if self.output.exists() and any(self.output.iterdir()):
             raise ValueError("Use a new or empty output directory")
@@ -133,23 +148,46 @@ class Study:
     def prepare(self):
         self.receipt["head"] = self.command(["git", "rev-parse", "HEAD"], "head").stdout.strip()
         self.receipt["working_tree"] = self.command(["git", "status", "--short"], "status").stdout
-        self.swiftc = self.command(["xcrun", "--find", "swiftc"], "swiftc").stdout.strip()
+        if self.linux:
+            self.swiftc = shutil.which("swiftc")
+            if not self.swiftc or self.args.sdk_prefix is None:
+                raise RuntimeError("Linux requires swiftc and --sdk-prefix from the pinned SDK builder")
+            prefix = self.args.sdk_prefix.resolve()
+            libraries = {name: sha((prefix / "lib" / name).read_bytes())
+                         for name in ("libavcodec.a", "libavutil.a")}
+            self.receipt["sdk"] = {
+                "prefix": str(prefix), "libraries": libraries,
+                "source_receipt": json.loads((prefix / "source-receipt.json").read_text()),
+                "build_receipt": json.loads((prefix / "build-receipt.json").read_text()),
+            }
+            self.receipt["linux_adaptation"] = (
+                "Compile six complete production Swift files unchanged; extract exact FFmpegRational and "
+                "MediaTime.seconds declarations, omitting unused CoreMedia APIs. Extract seven exact C shim "
+                "helpers with portable includes. Only the controlled harness changes CoreMedia/Darwin imports. "
+                "Session methods, packet operations, buffer ownership and probe remain unchanged."
+            )
+            self.receipt["host"] = self.command(["uname", "-a"], "host").stdout.strip()
+            cflags = ["-I" + str(prefix / "include")]
+            libs = ["-L" + str(prefix / "lib"), "-lavcodec", "-lavutil", "-lm", "-lpthread", "-latomic", "-ldl"]
+            platform_flags = []
+        else:
+            self.swiftc = self.command(["xcrun", "--find", "swiftc"], "swiftc").stdout.strip()
+            self.receipt["host"] = self.command(["sw_vers"], "host").stdout.strip()
+            self.receipt["cpu"] = self.command(["sysctl", "-n", "machdep.cpu.brand_string"], "cpu").stdout.strip()
+            sdk = self.command(["xcrun", "--sdk", "macosx", "--show-sdk-path"], "sdk").stdout.strip()
+            self.receipt["sdk"] = sdk
+            self.receipt["sdk_version"] = self.command(["xcrun", "--sdk", "macosx", "--show-sdk-version"], "sdk-version").stdout.strip()
+            packages = ["libavformat", "libavfilter", "libavcodec", "libavutil", "libswresample", "libswscale"]
+            versions = self.command(["pkg-config", "--modversion", *packages], "ffmpeg-versions").stdout.splitlines()
+            self.receipt["ffmpeg"] = dict(zip(packages, versions))
+            expected = dict(zip(packages, ["62.12.102", "11.14.102", "62.28.102", "60.26.102", "6.3.102", "9.5.102"]))
+            if self.receipt["ffmpeg"] != expected:
+                raise RuntimeError("This experiment requires the repository's pinned FFmpeg 8.1.2 SDK")
+            cflags = shlex.split(self.command(["pkg-config", "--cflags", *packages], "cflags").stdout)
+            libs = shlex.split(self.command(["pkg-config", "--libs", *packages], "libs").stdout)
+            platform_flags = ["-sdk", sdk, "-target", f"{platform.machine()}-apple-macosx26.0"]
         self.receipt["compiler"] = self.command([self.swiftc, "--version"], "compiler-version").stdout.strip()
-        self.receipt["host"] = self.command(["sw_vers"], "host").stdout.strip()
-        self.receipt["cpu"] = self.command(["sysctl", "-n", "machdep.cpu.brand_string"], "cpu").stdout.strip()
-        sdk = self.command(["xcrun", "--sdk", "macosx", "--show-sdk-path"], "sdk").stdout.strip()
-        self.receipt["sdk"] = sdk
-        self.receipt["sdk_version"] = self.command(["xcrun", "--sdk", "macosx", "--show-sdk-version"], "sdk-version").stdout.strip()
-        packages = ["libavformat", "libavfilter", "libavcodec", "libavutil", "libswresample", "libswscale"]
-        versions = self.command(["pkg-config", "--modversion", *packages], "ffmpeg-versions").stdout.splitlines()
-        self.receipt["ffmpeg"] = dict(zip(packages, versions))
-        expected = dict(zip(packages, ["62.12.102", "11.14.102", "62.28.102", "60.26.102", "6.3.102", "9.5.102"]))
-        if self.receipt["ffmpeg"] != expected:
-            raise RuntimeError("This experiment requires the repository's pinned FFmpeg 8.1.2 SDK")
-        cflags = shlex.split(self.command(["pkg-config", "--cflags", *packages], "cflags").stdout)
-        libs = shlex.split(self.command(["pkg-config", "--libs", *packages], "libs").stdout)
-        self.flags = ["-swift-version", "6", "-parse-as-library", "-warnings-as-errors",
-                      "-sdk", sdk, "-target", f"{platform.machine()}-apple-macosx26.0",
+        self.flags = ["-swift-version", "6", "-parse-as-library", "-warnings-as-errors", *platform_flags,
                       "-I", str(self.output / "sources/CFFmpeg"),
                       "-I", str(self.output / "sources/CREcoveryEOFProbe"),
                       "-module-cache-path", str(self.output / "module-cache")]
@@ -165,18 +203,53 @@ class Study:
                          "Benchmarks/VideoRecoveryEOFMemory/Probe.h",
                          "Benchmarks/VideoRecoveryEOFMemory/Harness.swift.in",
                          "Benchmarks/VideoRecoveryEOFMemory/run.py",
-                         ".github/workflows/video-recovery-eof-memory.yml"]:
+                         ".github/workflows/video-recovery-eof-memory.yml",
+                         ".github/workflows/video-recovery-eof-portable.yml",
+                         "Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh",
+                         "DependencySources/source-manifest.json",
+                         "Licenses/corresponding-source-manifest.json"]:
             data = (ROOT / relative).read_bytes()
             self.receipt["source_hashes"][relative] = sha(data)
             self.stage("originals/" + relative, data)
             if relative in SUPPORT:
+                if self.linux and relative.endswith("/MediaTime.swift"):
+                    text = data.decode()
+                    rational = declaration(text, "struct FFmpegRational:")
+                    seconds = declaration(text, "    static func seconds(")
+                    data = ("import CFFmpeg\nimport Foundation\n\n" + rational
+                            + "\nenum MediaTime {\n" + seconds + "}\n").encode()
+                    self.receipt["extractions"]["linux_time"] = {
+                        "rational_sha256": sha(rational.encode()), "seconds_sha256": sha(seconds.encode())}
                 shared.append(self.stage("shared/" + Path(relative).name, data))
-        for relative in ["module.modulemap", "include/ffmpeg_shim.h"]:
-            self.stage("CFFmpeg/" + relative, (ROOT / "Sources/CFFmpeg" / relative).read_bytes())
+        if self.linux:
+            shim = (ROOT / "Sources/CFFmpeg/include/ffmpeg_shim.h").read_text()
+            header = "\n".join("#include <" + name + ">" for name in [
+                "errno.h", "stdint.h", "libavcodec/packet.h", "libavutil/avutil.h",
+                "libavutil/buffer.h", "libavutil/error.h", "libavutil/mem.h", "libavutil/rational.h"]) + "\n"
+            self.receipt["extractions"]["linux_c_helpers"] = {}
+            for name in ["illiquid_averror_nomem", "illiquid_packet_is_corrupt", "illiquid_packet_is_keyframe",
+                         "illiquid_nopts_value", "illiquid_averror_exit", "illiquid_averror_invaliddata",
+                         "illiquid_averror_eagain"]:
+                matches = re.findall(r"(?m)^static inline [^\n]*\b" + re.escape(name) + r"\(", shim)
+                if len(matches) != 1:
+                    raise RuntimeError(f"Review changed C helper: {name}")
+                fragment = declaration(shim, matches[0])
+                header += fragment + "\n"
+                self.receipt["extractions"]["linux_c_helpers"][name] = sha(fragment.encode())
+            self.stage("CFFmpeg/include/ffmpeg_shim.h", header)
+            self.stage("CFFmpeg/module.modulemap",
+                       'module CFFmpeg [system] {\n header "include/ffmpeg_shim.h"\n export *\n}\n')
+        else:
+            for relative in ["module.modulemap", "include/ffmpeg_shim.h"]:
+                self.stage("CFFmpeg/" + relative, (ROOT / "Sources/CFFmpeg" / relative).read_bytes())
         self.stage("CREcoveryEOFProbe/Probe.h", (HERE / "Probe.h").read_bytes())
         self.stage("CREcoveryEOFProbe/module.modulemap",
                    'module CREcoveryEOFProbe {\n header "Probe.h"\n export *\n}\n')
         template = (HERE / "Harness.swift.in").read_text()
+        if self.linux:
+            if template.count("import CoreMedia\n") != 1 or template.count("import Darwin\n") != 1:
+                raise RuntimeError("Review changed controlled-harness imports")
+            template = template.replace("import CoreMedia\n", "").replace("import Darwin\n", "import Glibc\n")
         marker = "    // __PRODUCTION_METHODS__"
         if template.count(marker) != 1:
             raise RuntimeError("Harness injection marker changed")
@@ -317,9 +390,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--pairs", type=int, default=2)
+    parser.add_argument("--sdk-prefix", type=Path, help="Pinned Linux SDK produced by build-linux-ffmpeg.sh")
     args = parser.parse_args()
-    if platform.system() != "Darwin":
-        parser.error("This native ownership experiment requires macOS and the pinned FFmpeg SDK")
+    if platform.system() not in ("Darwin", "Linux"):
+        parser.error("Use macOS or Linux with the pinned FFmpeg 8.1.2 SDK")
     if args.pairs < 2 or args.pairs % 2:
         parser.error("--pairs must be even and at least two")
     study = Study(args)
