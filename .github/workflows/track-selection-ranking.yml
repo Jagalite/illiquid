@@ -1,5 +1,15 @@
 name: Track selection ranking performance
 on:
+  push:
+    branches: ['perf/track-eligibility-streaming-*']
+    paths:
+      - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Tests/IlliquidCoreTests/TrackSelection*Tests.swift'
+      - 'Benchmarks/TrackSelectionRanking/**'
+      - '.github/workflows/track-selection-ranking.yml'
+      - '!Benchmarks/TrackSelectionRanking/**/*.md'
+      - '!Benchmarks/TrackSelectionRanking/evidence/**'
   pull_request:
     paths:
       - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
@@ -7,6 +17,8 @@ on:
       - 'Tests/IlliquidCoreTests/TrackSelection*Tests.swift'
       - 'Benchmarks/TrackSelectionRanking/**'
       - '.github/workflows/track-selection-ranking.yml'
+      - '!Benchmarks/TrackSelectionRanking/**/*.md'
+      - '!Benchmarks/TrackSelectionRanking/evidence/**'
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,33 +26,80 @@ concurrency:
   group: track-selection-ranking-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  native-component:
-    runs-on: macos-26
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            developer_dir: ''
+          - os: macos-26
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
+      BASELINE_REF: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - name: Record native environment
+      - name: Fetch the baseline before eligibility changes
+        run: git fetch --no-tags --depth=1 origin "$BASELINE_REF"
+      - name: Record component environment
         run: |
           mkdir -p "$RUNNER_TEMP/track-selection-ranking"
-          sw_vers > "$RUNNER_TEMP/track-selection-ranking/system.txt"
-          xcrun swiftc --version >> "$RUNNER_TEMP/track-selection-ranking/system.txt"
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            sw_vers > "$RUNNER_TEMP/track-selection-ranking/system.txt"
+            sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/track-selection-ranking/system.txt"
+          else
+            cat /etc/os-release > "$RUNNER_TEMP/track-selection-ranking/system.txt"
+            lscpu >> "$RUNNER_TEMP/track-selection-ranking/system.txt"
+          fi
+          uname -m >> "$RUNNER_TEMP/track-selection-ranking/system.txt"
+          swiftc --version >> "$RUNNER_TEMP/track-selection-ranking/system.txt"
           git rev-parse HEAD > "$RUNNER_TEMP/track-selection-ranking/revision.txt"
       - name: Check baseline and candidate in debug and release
         run: |
-          python3 Benchmarks/TrackSelectionRanking/run.py test --configuration debug --output "$RUNNER_TEMP/track-selection-ranking/debug"
-          python3 Benchmarks/TrackSelectionRanking/run.py test --configuration release --output "$RUNNER_TEMP/track-selection-ranking/release"
-      - name: Compare complete selected-ID receipts and native paired timings
+          python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-ref "$BASELINE_REF" --configuration debug --output "$RUNNER_TEMP/track-selection-ranking/debug"
+          python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-ref "$BASELINE_REF" --configuration release --output "$RUNNER_TEMP/track-selection-ranking/release"
+      - name: Compare complete selected-ID receipts and paired timings
         run: |
-          python3 Benchmarks/TrackSelectionRanking/run.py benchmark --rounds 10 --output "$RUNNER_TEMP/track-selection-ranking/benchmark"
+          python3 Benchmarks/TrackSelectionRanking/run.py benchmark --baseline-ref "$BASELINE_REF" --rounds 10 --target-ms 100 --output "$RUNNER_TEMP/track-selection-ranking/benchmark"
           cat "$RUNNER_TEMP/track-selection-ranking/benchmark/summary.json"
+      - name: Retain reviewable receipts in job logs
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "track-selection-ranking"
+          paths = [root / "system.txt", root / "revision.txt"]
+          for mode in ["debug", "release", "benchmark"]:
+              directory = root / mode
+              paths.extend(directory.glob("*.json"))
+              paths.extend(directory.glob("*.jsonl"))
+              paths.extend(directory.glob("*/*.json"))
+              paths.extend(directory.glob("*/*.log"))
+              paths.extend(directory.glob("build/*/manifest.json"))
+          for path in sorted(set(paths)):
+              if not path.is_file():
+                  continue
+              if path.name == "verification.json":
+                  data = path.read_bytes()
+                  value = json.loads(data)
+                  receipt = {"comparisons": value["comparisons"], "sha256": hashlib.sha256(data).hexdigest(),
+                             "full_results": "verification.json in the workflow artifact"}
+                  print("ELIGIBILITY_RECEIPT " + json.dumps({"path": "benchmark/parity.json",
+                        "content": json.dumps(receipt, indent=2) + "\n"}, separators=(",", ":")))
+              elif path.parent.name not in ["inputs", "processes"]:
+                  print("ELIGIBILITY_RECEIPT " + json.dumps({"path": str(path.relative_to(root)),
+                        "content": path.read_text()}, separators=(",", ":")))
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: track-selection-ranking-native
+          name: track-eligibility-${{ matrix.os }}
           path: |
             ${{ runner.temp }}/track-selection-ranking/**/*.json
             ${{ runner.temp }}/track-selection-ranking/**/*.jsonl

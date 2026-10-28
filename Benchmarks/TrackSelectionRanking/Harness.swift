@@ -1,5 +1,10 @@
 import Foundation
 import IlliquidCore
+#if canImport(Darwin)
+import Darwin
+#else
+import Glibc
+#endif
 
 // Each driver links a separately optimized production module. Inputs and
 // warm-up are outside timing; every selection contributes to emitted results.
@@ -8,7 +13,8 @@ private let workloadNames = [
     "audio-2-none", "audio-2-languages", "audio-8-none", "audio-8-languages",
     "audio-32-none", "audio-32-languages", "subtitle-automatic", "subtitle-off",
     "subtitle-always", "subtitle-forced-languages", "subtitle-forced-audio-fallback",
-    "mutable-preferences",
+    "mutable-preferences", "subtitle-automatic-first", "subtitle-automatic-last",
+    "single-audio-in-subtitles",
 ]
 
 private struct Input {
@@ -48,6 +54,16 @@ private func tracks(_ count: Int, kind: MediaTrackKind) -> [TrackSelectionCandid
 }
 
 private func inputs(for name: String) -> [Input] {
+    if name == "single-audio-in-subtitles" {
+        let other = tracks(32, kind: .subtitle)
+        let audio = tracks(1, kind: .audio)
+        return [
+            Input(preferences: .init(), tracks: other + audio, kind: .audio,
+                  fallbackID: nil, audioLanguage: nil),
+            Input(preferences: .init(), tracks: audio + other, kind: .audio,
+                  fallbackID: nil, audioLanguage: nil),
+        ]
+    }
     if name.hasPrefix("audio-") {
         let pieces = name.split(separator: "-")
         let count = Int(pieces[1])!
@@ -63,6 +79,13 @@ private func inputs(for name: String) -> [Input] {
     }
     let subtitles = tracks(8, kind: .subtitle)
     let mixed = tracks(2, kind: .audio) + subtitles
+    if name == "subtitle-automatic-first" || name == "subtitle-automatic-last" {
+        return [
+            Input(preferences: .init(), tracks: mixed, kind: .subtitle,
+                  fallbackID: name.hasSuffix("first") ? subtitles.first!.track.id : subtitles.last!.track.id,
+                  audioLanguage: nil),
+        ]
+    }
     if name == "mutable-preferences" {
         return (0..<4).map { index in
             var preferences = TrackSelectionPreferences()
@@ -253,12 +276,16 @@ private struct TrackSelectionRankingHarness {
         let batch = name == "mutable-preferences" ? mutableBatch : selectBatch
         let warmupIterations = min(iterations, 1_000)
         let warmup = batch(values, warmupIterations)
+        let cpuStart = clock()
         let start = DispatchTime.now().uptimeNanoseconds
         let result = batch(values, iterations)
         let elapsed = DispatchTime.now().uptimeNanoseconds - start
+        let cpuTicks = clock() - cpuStart
         emit(["schema_version": 1, "mode": "benchmark", "workload": name,
               "iterations": iterations, "operations": iterations * values.count,
-              "elapsed_ns": elapsed, "checksum": String(result.checksum),
+              "elapsed_ns": elapsed,
+              "cpu_ns": Double(cpuTicks) * 1_000_000_000 / Double(CLOCKS_PER_SEC),
+              "checksum": String(result.checksum),
               "selected_count": result.selectedCount, "warmup_iterations": warmupIterations,
               "warmup_checksum": String(warmup.checksum), "warmup_selected_count": warmup.selectedCount])
     }

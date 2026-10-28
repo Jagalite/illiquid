@@ -18,7 +18,10 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-TEST = Path("Tests/IlliquidCoreTests/TrackSelectionRankingTests.swift")
+TESTS = [
+    Path("Tests/IlliquidCoreTests/TrackSelectionRankingTests.swift"),
+    Path("Tests/IlliquidCoreTests/TrackSelectionEligibilityTests.swift"),
+]
 NATIVE = sys.platform == "darwin"
 VARIANTS = ("baseline", "candidate")
 
@@ -58,9 +61,31 @@ def command(args: list[str], log: Path, cache: Path) -> str:
     return result.stdout
 
 
-def snapshot(out: Path, include_tests: bool) -> dict[str, object]:
-    pinned = json.loads((HERE / "baseline/manifest.json").read_text())
-    baseline = (HERE / "baseline/TrackSelectionPreferences.swift").read_bytes()
+def snapshot(out: Path, include_tests: bool, baseline_ref: str | None = None) -> dict[str, object]:
+    pinned_bytes = (HERE / "baseline/manifest.json").read_bytes()
+    pinned = json.loads(pinned_bytes)
+    if baseline_ref is None:
+        baseline = (HERE / "baseline/TrackSelectionPreferences.swift").read_bytes()
+    else:
+        # Resolve once, then read immutable source objects. Only the selection
+        # implementation may differ; a changed shared MediaTrack fails below.
+        commit = subprocess.check_output(
+            ["git", "-C", str(ROOT), "rev-parse", "--verify", "--end-of-options",
+             f"{baseline_ref}^{{commit}}"], text=True
+        ).strip()
+        pinned = {"schema_version": 1, "commit": commit}
+        for label, path in (
+            ("selection", "Sources/IlliquidCore/Player/TrackSelectionPreferences.swift"),
+            ("media_track", "Sources/IlliquidCore/Player/MediaTrack.swift"),
+        ):
+            data = subprocess.check_output(["git", "-C", str(ROOT), "show", f"{commit}:{path}"])
+            pinned[label] = {
+                "path": path, "sha256": digest(data),
+                "git_blob": hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest(),
+            }
+            if label == "selection":
+                baseline = data
+        pinned_bytes = (json.dumps(pinned, indent=2, sort_keys=True) + "\n").encode()
     media = (ROOT / pinned["media_track"]["path"]).read_bytes()
     for label, data in (("selection", baseline), ("media_track", media)):
         blob = hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest()
@@ -72,10 +97,11 @@ def snapshot(out: Path, include_tests: bool) -> dict[str, object]:
         "MediaTrack.swift": media,
         "Harness.swift": (HERE / "Harness.swift").read_bytes(),
         "run.py": Path(__file__).read_bytes(),
-        "baseline-manifest.json": (HERE / "baseline/manifest.json").read_bytes(),
+        "baseline-manifest.json": pinned_bytes,
     }
     if include_tests:
-        inputs[TEST.name] = (ROOT / TEST).read_bytes()
+        for test_path in TESTS:
+            inputs[test_path.name] = (ROOT / test_path).read_bytes()
     hashes = {}
     for name, data in inputs.items():
         destination = out / "inputs" / name
@@ -163,7 +189,7 @@ def test(variant: str, configuration: str, out: Path, compiler: dict[str, str]) 
     for origin, destination in (
         (out / "inputs/MediaTrack.swift", sources / "MediaTrack.swift"),
         (out / "inputs" / variant / "TrackSelectionPreferences.swift", sources / "TrackSelectionPreferences.swift"),
-        (out / "inputs" / TEST.name, tests / TEST.name),
+        *((out / "inputs" / path.name, tests / path.name) for path in TESTS),
     ):
         shutil.copyfile(origin, destination)
     (folder / "Package.swift").write_text('''// swift-tools-version: 6.1
@@ -219,6 +245,20 @@ def summarize(rows: list[dict[str, object]]) -> list[dict[str, object]]:
         values.update({"workload": workload, "change_percent": (candidate / baseline - 1) * 100,
                        "saved_ns": baseline - candidate, "paired_ratio_median": statistics.median(ratios),
                        "paired_ratios": ratios, "iterations": selected[0]["iterations"]})
+        if all("cpu_ns" in row for row in selected):
+            cpu = {}
+            for variant in VARIANTS:
+                samples = [row["cpu_ns"] / row["operations"] for row in selected if row["variant"] == variant]
+                cpu[variant] = {"median_ns": statistics.median(samples), "min_ns": min(samples),
+                                "max_ns": max(samples), "samples": len(samples)}
+            cpu_ratios = []
+            for round_index in sorted({row["round"] for row in selected}):
+                pair = {row["variant"]: row for row in selected if row["round"] == round_index}
+                cpu_ratios.append(pair["candidate"]["cpu_ns"] / pair["baseline"]["cpu_ns"])
+            cpu.update({"paired_ratio_median": statistics.median(cpu_ratios),
+                        "paired_ratios": cpu_ratios,
+                        "change_percent": (cpu["candidate"]["median_ns"] / cpu["baseline"]["median_ns"] - 1) * 100})
+            values["cpu"] = cpu
         summaries.append(values)
     return summaries
 
@@ -241,7 +281,7 @@ def benchmark(out: Path, args: argparse.Namespace, compiler: dict[str, str]) -> 
         log = out / "processes" / f"{label}-{workload}-{variant}.log"
         command_args = [str(binaries[variant]), "benchmark", workload, str(iterations)]
         row = json.loads(command(command_args, log, out / "cache"))
-        if row["workload"] != workload or row["iterations"] != iterations or row["operations"] <= 0 or row["elapsed_ns"] <= 0:
+        if row["workload"] != workload or row["iterations"] != iterations or row["operations"] <= 0 or row["elapsed_ns"] <= 0 or row["cpu_ns"] <= 0:
             raise RuntimeError(f"Invalid benchmark receipt: {row}")
         row.update({"variant": variant, "command": command_args, "process_log_sha256": digest(log.read_bytes())})
         return row
@@ -259,7 +299,7 @@ def benchmark(out: Path, args: argparse.Namespace, compiler: dict[str, str]) -> 
                         row.update({"attempt": attempt, "order": list(order)})
                         receipt.write(json.dumps(row, sort_keys=True) + "\n")
                     receipt.flush()
-                    fastest = min(row["elapsed_ns"] for row in pair)
+                    fastest = min(row["cpu_ns"] for row in pair)
                     if fastest >= args.target_ms * 1_000_000:
                         break
                     count = max(count + 1, math.ceil(count * args.target_ms * 1_000_000 / fastest * 1.1))
@@ -294,10 +334,11 @@ def main() -> None:
     parser.add_argument("mode", choices=("test", "benchmark", "summarize"))
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--configuration", choices=("debug", "release"), default="debug")
+    parser.add_argument("--baseline-ref", help="Git revision for the original selection source; defaults to the frozen normalization-study baseline")
     parser.add_argument("--variant", choices=(*VARIANTS, "both"), default="both")
     parser.add_argument("--rounds", type=int, default=10)
     parser.add_argument("--iterations", type=int, help="Fixed iterations per workload; otherwise calibrate both variants")
-    parser.add_argument("--target-ms", type=float, default=20.0, help="Calibration target for the faster variant")
+    parser.add_argument("--target-ms", type=float, default=20.0, help="Process CPU calibration target for the faster variant")
     parser.add_argument("--swiftc")
     parser.add_argument("--swift")
     args = parser.parse_args()
@@ -310,7 +351,7 @@ def main() -> None:
     if args.mode == "summarize":
         write_json(out / "summary.json", summarize([json.loads(line) for line in (out / "measurements.jsonl").read_text().splitlines()]))
         return
-    receipt = snapshot(out, args.mode == "test")
+    receipt = snapshot(out, args.mode == "test", args.baseline_ref)
     compiler = toolchain(args, out)
     receipt.update({"recorded_utc": datetime.now(timezone.utc).isoformat(), "platform": platform.platform(),
                     "machine": platform.machine(), "cpu_count": os.cpu_count(), "python": sys.version,

@@ -58,16 +58,25 @@ public struct TrackSelectionPreferences: Codable, Equatable, Sendable {
                        fallbackID: Int64?, audioLanguage: String? = nil) -> Int64? {
         let preferences = sanitized()
         if kind == .subtitle, preferences.subtitles == .off { return nil }
-        var eligible = candidates.filter { $0.track.kind == kind }
         let languages = kind == .audio ? preferences.audioLanguages : preferences.subtitleLanguages
-        if kind == .subtitle, preferences.subtitles == .forcedOnly {
-            let forcedLanguages = languages.isEmpty
+        let requiresForced = kind == .subtitle && preferences.subtitles == .forcedOnly
+        let forcedLanguages: [String]
+        if requiresForced {
+            forcedLanguages = languages.isEmpty
                 ? Self.normalizedLanguage(audioLanguage).map { [$0] } ?? [] : languages
-            eligible = eligible.filter {
-                ($0.track.isForced || $0.canFilterForcedEvents) && (forcedLanguages.isEmpty || forcedLanguages.contains(
-                    Self.normalizedLanguage($0.track.languageCode) ?? ""
-                ))
-            }
+        } else {
+            forcedLanguages = []
+        }
+        // Visit eligible tracks in input order without materializing a catalog
+        // copy. Forced-language normalization still runs once per tested track.
+        let eligible = candidates.lazy.filter { candidate in
+            guard candidate.track.kind == kind else { return false }
+            return !requiresForced || (
+                (candidate.track.isForced || candidate.canFilterForcedEvents)
+                    && (forcedLanguages.isEmpty || forcedLanguages.contains(
+                        Self.normalizedLanguage(candidate.track.languageCode) ?? ""
+                    ))
+            )
         }
         // With no language policy, Automatic retains the demuxer's subtitle
         // choice. Forced-only and Always have explicit, different semantics.
@@ -76,7 +85,9 @@ public struct TrackSelectionPreferences: Codable, Equatable, Sendable {
             return eligible.first { $0.track.id == fallbackID }?.track.id
         }
         // A lone eligible track needs no ranking, including language normalization.
-        guard eligible.count > 1 else { return eligible.first?.track.id }
+        var iterator = eligible.makeIterator()
+        guard let first = iterator.next() else { return nil }
+        guard let second = iterator.next() else { return first.track.id }
         func rank(_ candidate: TrackSelectionCandidate) -> [Int] {
             let languageRank = languages.isEmpty ? 0 : languages.firstIndex(of:
                 Self.normalizedLanguage(candidate.track.languageCode) ?? "")
@@ -90,15 +101,17 @@ public struct TrackSelectionPreferences: Codable, Equatable, Sendable {
                     candidate.track.id == fallbackID ? 1 : 0]
         }
         // Retain the incumbent's rank instead of normalizing it again for every comparison.
-        var best = eligible[0]
+        var best = first
         var bestRank = rank(best)
-        for candidate in eligible.dropFirst() {
+        var next: TrackSelectionCandidate? = second
+        while let candidate = next {
             let candidateRank = rank(candidate)
             if bestRank == candidateRank ? best.track.id > candidate.track.id
                 : bestRank.lexicographicallyPrecedes(candidateRank) {
                 best = candidate
                 bestRank = candidateRank
             }
+            next = iterator.next()
         }
         return best.track.id
     }
