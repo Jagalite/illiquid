@@ -2,8 +2,8 @@
 
 ## Question
 
-Can playback checkpoints avoid repeated work after an index miss, and avoid
-unused source normalization, while returning the same complete session record?
+Can playback checkpoints avoid repeated work after an index miss while returning
+the same complete session record?
 
 `PlaybackCheckpoint.record()` runs on the coalescing persistence writer's queue.
 The controller requests a checkpoint during playback and lifecycle transitions;
@@ -13,14 +13,14 @@ unchanging current-source URL. It performs that scan even if there is no
 collection folder to preserve. The captured playlist index is not used to answer
 the membership question.
 
-The candidate skips the membership check when the folder or playlist is absent,
-normalizes the source after finding the first supported item, and verifies the
+The final candidate retains PR #140's early source-identity validation, skips
+the membership check when the folder or playlist is absent, and verifies the
 item at a valid captured index.
 A mismatching, missing, or out-of-range index falls back to a playlist scan.
 Singletons go directly to their one-item scan, avoiding a repeated comparison
 when the hinted item does not match.
-The fallback skips an item already checked by the indexed probe. A playlist
-containing only unsupported URLs never normalizes the source.
+The fallback skips an item already checked by the indexed probe. A lazy-source
+alternative was rejected after the malformed-input controls regressed.
 The index is only a hint: it never independently proves membership, and the
 saved index is not changed. No persistent cache or new ownership is introduced.
 
@@ -48,8 +48,8 @@ reuses the source key. It is stacked on
 scan was inspected at `9f21c84bbe097984642c8fc08b7c8c1fd31a6c41`.
 Both appeared while this research was running. This follow-up is stacked on
 PR #140 and attributes the principal index shortcut to that proposal. Its
-incremental changes are avoiding the separate singleton probe, skipping an
-already-probed item during fallback, and preparing the source key lazily.
+incremental changes are avoiding the separate singleton probe and skipping an
+already-probed item during fallback.
 The overlapping original-main improvements are not additive or a new claim.
 
 Only `Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift` differs
@@ -89,7 +89,7 @@ reduction in both wall and CPU time for the 1,000- and 10,000-item middle/late
 indexed workloads. That hypothesis is superseded as a novel contribution because
 PR #140 already implements the indexed shortcut.
 
-Before the first comparison against PR #140, the narrowed target is at least a
+Before the first comparison against PR #140, the narrowed target was at least a
 15% median paired reduction in both wall and CPU time for `single-absent` and
 `unsupported-unicode-1`. These targets are informed by the earlier exploratory
 findings; they are not presented as the original hypothesis. The ordinary
@@ -100,6 +100,14 @@ playlists and a Unicode singleton, because lazy source rejection can add work
 on malformed input. These are research decision criteria, not noisy timing
 assertions for routine CI. Small statistically unclear differences must be
 reported as inconclusive.
+
+That first comparison at `29de8634` met both targeted improvements but failed the
+malformed-input controls, so lazy source preparation was removed. Before the
+fresh final-source cohort, the retained target is at least a 15% median paired
+wall and CPU reduction for `single-absent`; the other 25 workloads are controls,
+including the now-abandoned `unsupported-unicode-1` target. The same regression
+investigation threshold applies. This is an explicitly narrowed follow-up to a
+rejected experiment, not a claim that all earlier hypotheses were confirmed.
 
 Native app integration separately builds the app/test graph and runs checkpoint
 and coordinator regression suites using the repository's pinned native SDK.
@@ -132,7 +140,7 @@ confirmatory study. `--tests-only` skips timings. Production sources, tests, dri
 compiler flags, toolchain information, binary hashes, command output, calibration,
 every observation, and summaries are retained under `OUTPUT/evidence/`.
 
-The native workflow runs the full experiment on the research branch and manual
+The portable and native workflow jobs run the full experiment on the research branch and manual
 invocation. PR runs use the short timing cohort and repeat semantic qualification.
 A separate job builds the full release app and tests checkpoint, coordinator,
 playlist, and session behavior.
@@ -149,5 +157,19 @@ fallback. The candidate was revised so singletons go directly to one comparison.
 The adverse cohort is retained as exploratory evidence, and a fresh complete
 cohort is required for the revised production source.
 
-The revised measurements and native qualification are in progress. No macOS
-performance or application-validation result is claimed while its jobs are queued.
+The first direct PR #140 comparison at `29de8634` passed all correctness checks
+and measured 416 observations across 26 workloads. `single-absent` improved by
+35.04% paired wall/CPU and `unsupported-unicode-1` by 98.02%, but the lazy-source
+proposal was rejected. With an invalid source and 1,000 unsupported playlist
+items, it performed an unnecessary membership pass and increased wall/CPU time
+by about 31%. With an invalid source and one raw Unicode item, median wall time
+rose from 0.855 to 10.978 microseconds (1,142.67% paired increase). The baseline
+rejects the source before touching that item, and singleton deduplication already
+returns without normalizing it. The lazy proposal introduced that normalization.
+The ordinary 10,000-item last-match control also showed an adverse 11.28% paired
+wall result and is retained without exclusion. None of this rejected cohort's
+improvements are attributed to the final eager-source implementation.
+
+Fresh final-source measurements and native qualification are in progress.
+No macOS performance or application-validation result is claimed while its jobs
+are queued.
