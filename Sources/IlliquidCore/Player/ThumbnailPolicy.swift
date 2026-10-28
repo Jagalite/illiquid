@@ -191,6 +191,7 @@ public enum ThumbnailPolicy {
     /// Half-second quantization matches foreground hover requests.
     public static func samples(duration: Double, focus: Double, count: Int) -> [Double] {
         guard duration.isFinite, duration > 0 else { return [] }
+        let limit = min(max(count, 1), 64)
         let last = max(0, floor((duration - 0.5) * 2) / 2)
         var result: [Double] = []
         func add(_ value: Double) {
@@ -198,15 +199,21 @@ public enum ThumbnailPolicy {
             if !result.contains(time) { result.append(time) }
         }
         add(focus.isFinite ? focus : 0)
+        // There is no remaining work for a one-sample request or a clip whose
+        // only quantized timestamp is zero.
+        if limit == 1 || last == 0 { return result }
         add(0)
         var divisions = 2
-        while result.count < min(max(count, 1), 64), divisions <= 128 {
+        while result.count < limit, divisions <= 128 {
             for numerator in stride(from: 1, to: divisions, by: 2) {
                 add(duration * Double(numerator) / Double(divisions))
+                // Later samples in this subdivision would be discarded. Stop
+                // at the requested prefix without changing its order or values.
+                if result.count == limit { break }
             }
             divisions *= 2
         }
-        return Array(result.prefix(min(max(count, 1), 64)))
+        return result
     }
 }
 
