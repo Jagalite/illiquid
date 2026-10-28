@@ -11,6 +11,11 @@ on:
       - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
       - 'Tests/IlliquidCoreTests/ScalarPreferenceValidationTests.swift'
       - 'Benchmarks/ScalarPreferenceValidation/**'
+      - 'Benchmarks/NonDecodeFollowup/run.py'
+      - 'Benchmarks/NonDecodeFollowup/test-core.py'
+      - 'Benchmarks/NonDecodeFollowup/test-differential.py'
+      - 'Benchmarks/NonDecodeThirdPass/run-history.py'
+      - 'Benchmarks/NonDecodeThirdPass/test-core.py'
       - '.github/workflows/scalar-preference-validation.yml'
   workflow_dispatch:
 
@@ -56,9 +61,51 @@ jobs:
                 'building isolated core packages directly and serially.', flush=True)
           subprocess.run(command, check=True)
           PY
+      - name: Verify older persistence runners against the current preference type
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          output = Path(os.environ['RUNNER_TEMP']) / 'scalar-preference-compatibility'
+          output.mkdir()
+          commands = [
+              [sys.executable, 'Benchmarks/NonDecodeFollowup/test-core.py',
+               '--output', str(output / 'followup-tests.log')],
+              [sys.executable, 'Benchmarks/NonDecodeThirdPass/test-core.py',
+               '--output', str(output / 'third-pass-tests.log')],
+              [sys.executable, 'Benchmarks/NonDecodeFollowup/test-differential.py',
+               '--output', str(output / 'differential')],
+              [sys.executable, 'Benchmarks/NonDecodeFollowup/run.py',
+               '--phase', 'store', '--build-only', '--output', str(output / 'followup-build')],
+              [sys.executable, 'Benchmarks/NonDecodeThirdPass/run-history.py',
+               '--build-only', '--output', str(output / 'third-pass-build')],
+          ]
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if not queue.is_file():
+              print('Shared Kyoto queue is unavailable; compiling compatibility '
+                    'checks directly and serially.', flush=True)
+          for command in commands:
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = json.loads(submitted)['id']
+                  subprocess.run([*cli, 'show', job_id], check=True)
+                  result = subprocess.run([*cli, 'wait', job_id])
+                  subprocess.run([*cli, 'logs', job_id], check=True)
+                  if result.returncode:
+                      sys.exit(result.returncode)
+              else:
+                  subprocess.run(command, check=True)
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: scalar-preference-validation
-          path: ${{ runner.temp }}/scalar-preference-validation/
+          path: |
+            ${{ runner.temp }}/scalar-preference-validation/
+            ${{ runner.temp }}/scalar-preference-compatibility/
+            !${{ runner.temp }}/scalar-preference-compatibility/**/build/**
+            !${{ runner.temp }}/scalar-preference-compatibility/differential/baseline
+            !${{ runner.temp }}/scalar-preference-compatibility/differential/candidate
           retention-days: 14

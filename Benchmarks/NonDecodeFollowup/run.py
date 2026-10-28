@@ -47,7 +47,7 @@ def main():
   data=(HERE/'fixtures'/name).read_bytes()
   actual=hashlib.sha1(f'blob {len(data)}\0'.encode()+data).hexdigest()
   if actual!=sha: raise RuntimeError(f'Baseline source mismatch: {name}')
- manifest={'platform':platform.platform(),'compiler':run(['swiftc','--version']),'flags':FLAGS,'phase':a.phase,'allocations':a.allocations,'baseline_git_blobs':EXPECTED,'source_sha256':{str(x.relative_to(ROOT)):hashlib.sha256(x.read_bytes()).hexdigest() for x in [*HERE.glob('*.swift'),*HERE.glob('fixtures/*.swift'),ROOT/'Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift',ROOT/'Sources/IlliquidCore/Persistence/CoalescingPersistenceWriter.swift',ROOT/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift']}}
+ manifest={'platform':platform.platform(),'compiler':run(['swiftc','--version']),'flags':FLAGS,'phase':a.phase,'allocations':a.allocations,'baseline_git_blobs':EXPECTED,'source_sha256':{str(x.relative_to(ROOT)):hashlib.sha256(x.read_bytes()).hexdigest() for x in [*HERE.glob('*.swift'),*HERE.glob('fixtures/*.swift'),ROOT/'Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift',ROOT/'Sources/IlliquidCore/Persistence/CoalescingPersistenceWriter.swift',ROOT/'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift',ROOT/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift']}}
  (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2))
  alloc=[]
  if a.allocations:
@@ -59,6 +59,7 @@ def main():
   if a.phase=='store':
    inputs += [source/'PlaybackPersistenceStore.swift',ROOT/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift']
    inputs += [x for x in sorted((HERE/'fixtures').glob('*.swift')) if x.name not in ['CoalescingPersistenceWriter.swift','PlaybackPersistenceStore.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']]
+   if variant=='candidate': inputs = [ROOT/'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift' if x.name == 'PlaybackPreferences.swift' else x for x in inputs]
   inputs += [HERE/('WriterHarness.swift' if a.phase=='writer' else 'StoreHarness.swift')]
   defines=['-D','CANDIDATE'] if variant=='candidate' else []
   run(['swiftc',*FLAGS,*defines,*alloc,*inputs,'-o',build/variant])

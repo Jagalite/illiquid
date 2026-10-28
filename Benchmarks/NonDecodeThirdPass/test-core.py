@@ -10,6 +10,7 @@ with tempfile.TemporaryDirectory(prefix='illiquid-core-tests-') as d:
  for name in ['PlaybackPersistenceStore.swift','CoalescingPersistenceWriter.swift']:
   path = here/'baseline/PlaybackPersistenceStoreV2.swift' if a.v2 and name == 'PlaybackPersistenceStore.swift' else root/'Sources/IlliquidCore/Persistence'/name
   shutil.copy2(path,source/name)
+ if not a.v2: shutil.copy2(root/'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift',source/'PlaybackPreferences.swift')
  shutil.copy2(root/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',source/'NonDecodePerformance.swift')
  tests=work/'Tests/IlliquidCoreTests';tests.mkdir(parents=True)
  for name in ['DeferredPersistenceTests.swift','IdempotentPersistenceTests.swift']: shutil.copy2(root/'Tests/IlliquidCoreTests'/name,tests/name)

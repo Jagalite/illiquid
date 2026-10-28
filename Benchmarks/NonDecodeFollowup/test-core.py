@@ -8,6 +8,7 @@ with tempfile.TemporaryDirectory(prefix='illiquid-core-tests-') as d:
  for path in (here/'fixtures').glob('*.swift'):
   if path.name not in ['PlaybackPersistenceStore.swift','CoalescingPersistenceWriter.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']: shutil.copy2(path,source/path.name)
  for name in ['PlaybackPersistenceStore.swift','CoalescingPersistenceWriter.swift']:shutil.copy2(root/'Sources/IlliquidCore/Persistence'/name,source/name)
+ shutil.copy2(root/'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift',source/'PlaybackPreferences.swift')
  shutil.copy2(root/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',source/'NonDecodePerformance.swift')
  tests=work/'Tests/IlliquidCoreTests';tests.mkdir(parents=True)
  shutil.copy2(root/'Tests/IlliquidCoreTests/DeferredPersistenceTests.swift',tests/'DeferredPersistenceTests.swift')

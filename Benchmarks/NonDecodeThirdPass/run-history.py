@@ -27,14 +27,15 @@ def main():
   extra=['-D','ALLOCATION_METER',build/'meter.o']
  support=[x for x in sorted((R/'Benchmarks/NonDecodeFollowup/fixtures').glob('*.swift')) if x.name not in ['PlaybackPersistenceStore.swift','CoalescingPersistenceWriter.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']]
  shared=[*support,R/'Sources/IlliquidCore/Persistence/CoalescingPersistenceWriter.swift',R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',H/'HistoryHarness.swift']
+ candidate_support=[R/'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift' if x.name == 'PlaybackPreferences.swift' else x for x in shared]
  sources={'v2':H/'baseline/PlaybackPersistenceStoreV2.swift','v3':R/'Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift'}
  flags=['-O','-swift-version','6','-warnings-as-errors']
- manifest={'compiler':run(['swiftc','--version']),'platform':platform.platform(),'flags':flags,'allocation_instrumented':a.allocations,'source_sha256':{str(x.relative_to(R)):hashlib.sha256(x.read_bytes()).hexdigest() for x in [*shared,*sources.values()]}}
+ manifest={'compiler':run(['swiftc','--version']),'platform':platform.platform(),'flags':flags,'allocation_instrumented':a.allocations,'source_sha256':{str(x.relative_to(R)):hashlib.sha256(x.read_bytes()).hexdigest() for x in [*shared,*candidate_support,*sources.values()]}}
  if a.resume:
   previous=json.loads((a.output/'manifest.json').read_text())
   if previous['source_sha256']!=manifest['source_sha256']:p.error('source changes prevent resuming')
  else:
-  for v,s in sources.items():run(['swiftc',*flags,*extra,*shared,s,'-o',build/v])
+  for v,s in sources.items():run(['swiftc',*flags,*extra,*(candidate_support if v=='v3' else shared),s,'-o',build/v])
  manifest['binaries_sha256']={v:hashlib.sha256((build/v).read_bytes()).hexdigest() for v in sources}
  if a.resume and previous['binaries_sha256']!=manifest['binaries_sha256']:p.error('binary hashes differ')
  (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2))

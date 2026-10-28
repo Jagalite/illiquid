@@ -15,6 +15,7 @@ for v in ['baseline','candidate']:
  source=H/'fixtures' if v=='baseline' else R/'Sources/IlliquidCore/Persistence'
  inputs=[source/'CoalescingPersistenceWriter.swift',source/'PlaybackPersistenceStore.swift',R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',H/'StoreDifferential.swift']
  inputs += [x for x in sorted((H/'fixtures').glob('*.swift')) if x.name not in ['CoalescingPersistenceWriter.swift','PlaybackPersistenceStore.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']]
+ if v == 'candidate': inputs = [R/'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift' if x.name == 'PlaybackPreferences.swift' else x for x in inputs]
  run(['swiftc','-O','-swift-version','6','-warnings-as-errors',*inputs,'-o',a.output/v])
  results[v]=run([a.output/v]);(a.output/(v+'.jsonl')).write_text(results[v])
 assert len(results['baseline'].splitlines())==200
