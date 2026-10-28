@@ -1,0 +1,106 @@
+name: Source root index reuse
+
+on:
+  push:
+    branches:
+      - perf/source-root-index-reuse-20261028-dbc1
+    paths:
+      - Sources/IlliquidApp/App/AppModel.swift
+      - Sources/IlliquidApp/App/SourceRootIndex.swift
+      - Tests/IlliquidAppTests/SourceRootIndexReuseTests.swift
+      - Benchmarks/SourceRootIndexReuse/**
+      - .github/workflows/source-root-index-reuse.yml
+      - '!Benchmarks/SourceRootIndexReuse/README.md'
+      - '!Benchmarks/SourceRootIndexReuse/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/App/AppModel.swift
+      - Sources/IlliquidApp/App/SourceRootIndex.swift
+      - Tests/IlliquidAppTests/SourceRootIndexReuseTests.swift
+      - Benchmarks/SourceRootIndexReuse/**
+      - .github/workflows/source-root-index-reuse.yml
+      - '!Benchmarks/SourceRootIndexReuse/README.md'
+      - '!Benchmarks/SourceRootIndexReuse/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-root-index-reuse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify production observer and measure paired index updates
+        env:
+          BENCHMARK_EVENT: ${{ github.event_name }}
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          if test "$BENCHMARK_EVENT" = pull_request; then
+            python3 Benchmarks/SourceRootIndexReuse/run.py \
+              --output "$RUNNER_TEMP/source-root-index" --tests-only
+          else
+            python3 Benchmarks/SourceRootIndexReuse/run.py \
+              --output "$RUNNER_TEMP/source-root-index" --pairs 6
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-root-index-component
+          path: |
+            ${{ runner.temp }}/source-root-index/**/*.json
+            ${{ runner.temp }}/source-root-index/**/*.jsonl
+            ${{ runner.temp }}/source-root-index/logs/*.log
+            !${{ runner.temp }}/source-root-index/**/.build/**
+            !${{ runner.temp }}/source-root-index/**/module-cache/**
+            !${{ runner.temp }}/source-root-index/**/swift-module-cache/**
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compile the full app graph and run source index regressions
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          mkdir -p "$RUNNER_TEMP/source-root-index-integration"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'SourceRootIndexReuseTests|SourceTabMembershipTests|SourceTabMergeTests|SourceRootPruningTests' \
+            2>&1 | tee "$RUNNER_TEMP/source-root-index-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-root-index-integration
+          path: ${{ runner.temp }}/source-root-index-integration/
+          retention-days: 14
