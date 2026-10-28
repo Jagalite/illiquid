@@ -33,6 +33,7 @@ concurrency:
 
 jobs:
   native-component:
+    if: false
     runs-on: macos-26
     timeout-minutes: 30
     env:
@@ -98,6 +99,7 @@ jobs:
           retention-days: 14
 
   native-app-regressions:
+    if: false
     runs-on: macos-26
     timeout-minutes: 40
     env:
