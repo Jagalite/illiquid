@@ -36,7 +36,9 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
       - name: Fetch the pinned research baseline
-        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
       - name: Compile actual sources and verify portable discovery behavior
         run: |
           echo 'The shared Kyoto queue is unavailable in this hosted Linux container; running isolated component builds directly and serially.'
@@ -46,7 +48,7 @@ jobs:
         if: always()
         run: |
           python3 - <<'PY'
-          import base64, gzip, hashlib, json, os
+          import base64, gzip, hashlib, json, os, shutil
           from pathlib import Path
           root = Path(os.environ['RUNNER_TEMP']) / 'folder-discovery-classification-linux'
           records = {}
@@ -60,6 +62,15 @@ jobs:
               if name in records:
                   print(name + '\n' + records[name])
           packed = gzip.compress(json.dumps(records, sort_keys=True).encode(), mtime=0)
+          archive = Path('folder-discovery-classification-linux-evidence')
+          archive.mkdir(exist_ok=True)
+          (archive / 'records.json.gz').write_bytes(packed)
+          for name in ['manifest.json', 'summary.json', 'verification.json',
+                       'tests.json', 'meter-controls.json', 'observations.jsonl']:
+              if name in records:
+                  (archive / name).write_text(records[name])
+          if (root / 'sources').is_dir():
+              shutil.copytree(root / 'sources', archive / 'sources')
           if len(packed) > 2 * 1024 * 1024:
               raise SystemExit('Evidence exceeds log bundle limit; use uploaded artifact')
           print('FOLDER_CLASSIFICATION_LINUX_SHA256 ' + hashlib.sha256(packed).hexdigest())
@@ -69,10 +80,5 @@ jobs:
         if: always()
         with:
           name: folder-discovery-classification-linux
-          path: |
-            ${{ runner.temp }}/folder-discovery-classification-linux/*.json
-            ${{ runner.temp }}/folder-discovery-classification-linux/*.jsonl
-            ${{ runner.temp }}/folder-discovery-classification-linux/logs/
-            ${{ runner.temp }}/folder-discovery-classification-linux/receipts/
-            ${{ runner.temp }}/folder-discovery-classification-linux/sources/
+          path: folder-discovery-classification-linux-evidence/
           retention-days: 14
