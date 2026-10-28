@@ -176,6 +176,43 @@ enum ExternalTextSubtitleConverter {
         } else {
             timestamp = trimmed[...]
         }
+        // The common fixed-width forms contain only ASCII. Keep the general
+        // parser below for variable-width, legacy and malformed timestamps.
+        if let parsed = timestamp.utf8.withContiguousStorageIfAvailable({ bytes -> Timestamp? in
+            func pair(_ offset: Int) -> Int64? {
+                let first = bytes[offset] &- 48
+                let second = bytes[offset + 1] &- 48
+                guard first <= 9, second <= 9 else { return nil }
+                return Int64(first) * 10 + Int64(second)
+            }
+            let hours: Int64
+            let minuteOffset: Int
+            if bytes.count == 12 {
+                guard bytes[2] == 58, let parsedHours = pair(0) else { return nil }
+                hours = parsedHours
+                minuteOffset = 3
+            } else if format == .webVTT, bytes.count == 9 {
+                hours = 0
+                minuteOffset = 0
+            } else {
+                return nil
+            }
+            let fractionSeparator = bytes[minuteOffset + 5]
+            guard bytes[minuteOffset + 2] == 58,
+                  fractionSeparator == 46 || (format == .srt && fractionSeparator == 44),
+                  let minutes = pair(minuteOffset), minutes < 60,
+                  let seconds = pair(minuteOffset + 3), seconds < 60,
+                  let fractionTail = pair(minuteOffset + 7)
+            else { return nil }
+            let fractionHead = bytes[minuteOffset + 6] &- 48
+            guard fractionHead <= 9 else { return nil }
+            let fraction = Int64(fractionHead) * 100 + fractionTail
+            let milliseconds = ((hours * 60 + minutes) * 60 + seconds) * 1_000 + fraction
+            // Two-digit hours remain below the ASS bound even with rounding carry.
+            return Timestamp(milliseconds: milliseconds, centiseconds: (milliseconds + 5) / 10)
+        }) ?? nil {
+            return parsed
+        }
         let parts = timestamp.split(separator: ":", omittingEmptySubsequences: false)
         let hours: Int64
         let minutesIndex: Int

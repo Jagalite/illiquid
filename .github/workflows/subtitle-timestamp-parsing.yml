@@ -1,0 +1,123 @@
+name: Subtitle timestamp parsing performance
+
+on:
+  push:
+    branches: ['perf/subtitle-timestamp-parsing-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/External*Subtitle*Tests.swift'
+      - 'Scripts/test-external-subtitle-regressions.sh'
+      - 'Benchmarks/SubtitleTimestampParsing/**'
+      - '.github/workflows/subtitle-timestamp-parsing.yml'
+      - '!Benchmarks/SubtitleTimestampParsing/*.md'
+      - '!Benchmarks/SubtitleTimestampParsing/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/External*Subtitle*Tests.swift'
+      - 'Scripts/test-external-subtitle-regressions.sh'
+      - 'Benchmarks/SubtitleTimestampParsing/**'
+      - '.github/workflows/subtitle-timestamp-parsing.yml'
+      - '!Benchmarks/SubtitleTimestampParsing/*.md'
+      - '!Benchmarks/SubtitleTimestampParsing/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-timestamp-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test both sources and measure complete subtitle conversion
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/SubtitleTimestampParsing/run.py', 'benchmark',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'subtitle-timestamps'),
+                     '--run-tests', '--rounds', '10', '--target-ms', '250']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job], check=True)
+              result = subprocess.run([*cli, 'wait', job])
+              subprocess.run([*cli, 'logs', job], check=True)
+              sys.exit(result.returncode)
+          print('Kyoto is unavailable on this hosted runner; running isolated builds directly.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-timestamp-native-component
+          path: |
+            ${{ runner.temp }}/subtitle-timestamps/*.json
+            ${{ runner.temp }}/subtitle-timestamps/*.jsonl
+            ${{ runner.temp }}/subtitle-timestamps/*.json.gz
+            ${{ runner.temp }}/subtitle-timestamps/*.log
+            ${{ runner.temp }}/subtitle-timestamps/*.swift
+            ${{ runner.temp }}/subtitle-timestamps/*.py
+            ${{ runner.temp }}/subtitle-timestamps/baseline/*.swift
+            ${{ runner.temp }}/subtitle-timestamps/baseline/*.log
+            ${{ runner.temp }}/subtitle-timestamps/candidate/*.swift
+            ${{ runner.temp }}/subtitle-timestamps/candidate/*.log
+            ${{ runner.temp }}/subtitle-timestamps/processes/*.log
+          retention-days: 14
+
+  native-app-regressions:
+    runs-on: macos-26
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build application graph and execute converter and import regressions
+        run: |
+          set -o pipefail
+          python3 - <<'PY' 2>&1 | tee "$RUNNER_TEMP/subtitle-timestamp-app-tests.log"
+          import json, subprocess, sys
+          from pathlib import Path
+          command = ['bash', 'Scripts/tests/run-native-swift-tests.sh', '--build', '--jobs', '2',
+                     '--filter', 'ExternalTextSubtitleConverterTests|ExternalSubtitleTimestampTests|ExternalSubtitleEscapingTests|ExternalSubtitleEncodingTests']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job], check=True)
+              result = subprocess.run([*cli, 'wait', job])
+              subprocess.run([*cli, 'logs', job], check=True)
+              sys.exit(result.returncode)
+          print('Kyoto is unavailable on this hosted runner; building the isolated checkout directly.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-timestamp-native-app-tests
+          path: ${{ runner.temp }}/subtitle-timestamp-app-tests.log
+          retention-days: 14
