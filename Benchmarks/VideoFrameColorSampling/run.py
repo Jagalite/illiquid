@@ -193,9 +193,14 @@ let package = Package(name: "VideoFrameColorSampling", platforms: [.macOS("26.0"
             raise RuntimeError("Invalid workload list")
         observations, calibrations, summary = [], [], []
         for case in cases:
+            expects_samples = case not in ("unsupported-argb", "throttled-bgra")
             probes = {}
             for variant, executable in executables.items():
                 row = json.loads(command([executable, "bench", case, "4096"], variant + "-calibrate-" + case))
+                if (row["workload"] != case or row["iterations"] != 4096
+                        or row["sampled_count"] != (4096 if expects_samples else 0)
+                        or row["warmup_sampled_count"] != (row["warmup_iterations"] if expects_samples else 0)):
+                    raise RuntimeError("Invalid calibration output: " + case)
                 row["variant"] = variant
                 calibrations.append(row)
                 probes[variant] = row["elapsed_ns"] / row["iterations"]
@@ -211,6 +216,8 @@ let package = Package(name: "VideoFrameColorSampling", platforms: [.macOS("26.0"
                     row = json.loads(command([executables[variant], "bench", case, str(count)],
                                              f"{case}-pair-{pair}-{variant}"))
                     if (row["workload"] != case or row["iterations"] != count
+                            or row["sampled_count"] != (count if expects_samples else 0)
+                            or row["warmup_sampled_count"] != (row["warmup_iterations"] if expects_samples else 0)
                             or row["elapsed_ns"] <= 0 or row["cpu_ns"] <= 0):
                         raise RuntimeError("Invalid measurement: " + case)
                     row.update(variant=variant, pair=pair, order=position)

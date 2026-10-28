@@ -168,10 +168,21 @@ private func verify() throws -> [String: Any] {
             for (step, matrix) in matrices.enumerated() {
                 // Change attachments on the same physical buffer, then remove them.
                 setMatrix(matrix, on: buffer)
+                let sample = VideoFrameColorSampler.sample(buffer)
+                if workload.format == kCVPixelFormatType_32ARGB {
+                    guard sample == nil else {
+                        throw HarnessFailure(description: "Unsupported format unexpectedly produced a sample")
+                    }
+                } else {
+                    guard let sample, sample.columns == 12, sample.rows == 8,
+                          sample.colors.count == 96 else {
+                        throw HarnessFailure(description: "Missing or malformed sample for \(workload.name), \(matrix), seed \(seed)")
+                    }
+                }
                 direct.append([
                     "workload": workload.name, "seed": seed, "step": step,
                     "matrix": matrix, "strides": strides,
-                    "sample": receipt(VideoFrameColorSampler.sample(buffer)),
+                    "sample": receipt(sample),
                 ])
             }
         }
@@ -216,10 +227,16 @@ private func verify() throws -> [String: Any] {
             "comparison": "All 96 RGB Double bit patterns, dimensions, and nil results"]
 }
 
+private struct BatchResult {
+    let checksum: UInt64
+    let sampledCount: Int
+}
+
 @inline(never)
 private func batch(_ buffers: [CVPixelBuffer], sampler: VideoFrameColorSampler?,
-                   iterations: Int) -> UInt64 {
+                   iterations: Int) -> BatchResult {
     var checksum: UInt64 = 0
+    var sampledCount = 0
     for index in 0..<iterations {
         let buffer = buffers[index % buffers.count]
         let sample = if let sampler {
@@ -228,6 +245,7 @@ private func batch(_ buffers: [CVPixelBuffer], sampler: VideoFrameColorSampler?,
             VideoFrameColorSampler.sample(buffer)
         }
         if let sample {
+            sampledCount += 1
             // Full RGB parity is checked outside timing. A varying cell keeps
             // results observable without making full-array hashing the workload.
             let color = sample.colors[(index &* 17) % sample.colors.count]
@@ -238,7 +256,7 @@ private func batch(_ buffers: [CVPixelBuffer], sampler: VideoFrameColorSampler?,
             checksum &+= 0xd1b5_4a32_d192_ed03
         }
     }
-    return checksum
+    return BatchResult(checksum: checksum, sampledCount: sampledCount)
 }
 
 private func cpuNanoseconds() throws -> UInt64 {
@@ -254,20 +272,23 @@ private func benchmark(_ workload: Workload, iterations: Int) throws -> [String:
     let buffers = try (0..<2).map { try makeBuffer(workload, seed: $0) }
     let sampler = workload.throttled ? VideoFrameColorSampler() : nil
     if let sampler {
-        _ = sampler.sampleIfNeeded(buffers[0], uptimeNanoseconds: 1_000_000_000)
+        guard sampler.sampleIfNeeded(buffers[0], uptimeNanoseconds: 1_000_000_000) != nil else {
+            throw HarnessFailure(description: "Throttle control failed to prime a real sample")
+        }
     }
     let warmupIterations = min(iterations, 512)
     let warmup = batch(buffers, sampler: sampler, iterations: warmupIterations)
     let cpuStart = try cpuNanoseconds()
     let wallStart = DispatchTime.now().uptimeNanoseconds
-    let checksum = batch(buffers, sampler: sampler, iterations: iterations)
+    let result = batch(buffers, sampler: sampler, iterations: iterations)
     let elapsed = DispatchTime.now().uptimeNanoseconds - wallStart
     let cpu = try cpuNanoseconds() - cpuStart
     return [
         "schema_version": 1, "workload": workload.name, "iterations": iterations,
         "operations": iterations, "elapsed_ns": elapsed, "cpu_ns": cpu,
-        "checksum": String(checksum), "warmup_iterations": warmupIterations,
-        "warmup_checksum": String(warmup),
+        "checksum": String(result.checksum), "sampled_count": result.sampledCount,
+        "warmup_iterations": warmupIterations, "warmup_checksum": String(warmup.checksum),
+        "warmup_sampled_count": warmup.sampledCount,
     ]
 }
 
