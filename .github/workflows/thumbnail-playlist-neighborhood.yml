@@ -1,0 +1,110 @@
+name: Thumbnail playlist neighborhood
+
+on:
+  push:
+    branches: ['perf/thumbnail-playlist-neighborhood']
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailBackgroundSchedulerTests.swift'
+      - 'Scripts/test-thumbnail-playlist-neighborhood.sh'
+      - 'Benchmarks/ThumbnailPlaylistNeighborhood/**'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/evidence/**'
+      - '.github/workflows/thumbnail-playlist-neighborhood.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailBackgroundSchedulerTests.swift'
+      - 'Scripts/test-thumbnail-playlist-neighborhood.sh'
+      - 'Benchmarks/ThumbnailPlaylistNeighborhood/**'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/evidence/**'
+      - '.github/workflows/thumbnail-playlist-neighborhood.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-playlist-neighborhood-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify the isolated build host and patch
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in an isolated checkout.'
+          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72 HEAD
+      - name: Debug and release neighborhood regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-neighborhood"
+          set -o pipefail
+          bash Scripts/test-thumbnail-playlist-neighborhood.sh --jobs 2 --no-parallel \
+            2>&1 | tee "$RUNNER_TEMP/thumbnail-neighborhood/tests.log"
+      - name: Paired before and after measurements with exact output parity
+        run: |
+          python3 Benchmarks/ThumbnailPlaylistNeighborhood/run.py \
+            --rounds 8 --target-ms 50 --counts 32,10000,100000 \
+            --output "$RUNNER_TEMP/thumbnail-neighborhood/results.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-neighborhood-component
+          path: ${{ runner.temp }}/thumbnail-neighborhood/
+          retention-days: 14
+
+  app-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK on the isolated build host
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in an isolated checkout.'
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the full app graph and test thumbnail scheduling
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-neighborhood-integration"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'ThumbnailPlaylistNeighborhoodTests|ThumbnailBackgroundSchedulerTests|ThumbnailPolicyTests' \
+            2>&1 | tee "$RUNNER_TEMP/thumbnail-neighborhood-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-neighborhood-integration
+          path: ${{ runner.temp }}/thumbnail-neighborhood-integration/
+          retention-days: 14
