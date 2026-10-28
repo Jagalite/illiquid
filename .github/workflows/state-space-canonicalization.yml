@@ -36,6 +36,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Trust this isolated container checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Ensure Python is available
         run: |
           if ! command -v python3 >/dev/null; then
