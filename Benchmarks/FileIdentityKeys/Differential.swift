@@ -182,7 +182,7 @@ struct Differential {
             // NSURL API's bridged value: Swift URL bridging can eagerly
             // convert a reference URL into its current path URL.
             guard let objcReference = (original as NSURL).fileReferenceURL(),
-                  let cfReference = CFURLCreateFileReferenceURL(kCFAllocatorDefault, original as CFURL, nil),
+                  let cfReference = CFURLCreateFileReferenceURL(kCFAllocatorDefault, original as CFURL, nil)?.takeRetainedValue(),
                   let rawReferenceString = CFURLGetString(cfReference) else {
                 throw NSError(domain: "IlliquidURLKeyResearch", code: 1,
                               userInfo: [NSLocalizedDescriptionKey: "Could not create a native file reference fixture"])

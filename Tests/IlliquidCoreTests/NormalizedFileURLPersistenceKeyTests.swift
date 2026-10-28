@@ -193,7 +193,7 @@ struct NormalizedFileURLPersistenceKeyTests {
         var creationError: Unmanaged<CFError>?
         defer { creationError?.release() }
         let reference = try #require(CFURLCreateFileReferenceURL(
-            kCFAllocatorDefault, original as CFURL, &creationError))
+            kCFAllocatorDefault, original as CFURL, &creationError)).takeRetainedValue()
         #expect(CFURLIsFileReferenceURL(reference))
         let spelling = try #require(CFURLGetString(reference)) as String
         let before = try #require(URL(string: spelling))

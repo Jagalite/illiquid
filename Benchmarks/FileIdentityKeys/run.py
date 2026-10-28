@@ -142,7 +142,7 @@ def main() -> None:
         "method": {
             "pairs": args.pairs, "baseline_target_cpu_ms": args.target_ms, "seed": args.seed,
             "module_flags": MODULE_FLAGS, "driver_flags": DRIVER_FLAGS,
-            "boundary": "Frozen baseline and live candidate are separate optimized Swift modules/objects. The driver imports them without cross-module optimization or @inlinable production methods.",
+            "boundary": "Frozen baseline and live candidate are separate optimized Swift modules/objects. The driver is compiled separately with no explicit CMO flag; Swift default CMO remains enabled. Production methods are not @inlinable. Inspect the executable to confirm retained per-iteration work when changing toolchains.",
             "scope": "Warm in-memory persistence keys and actual FolderPlaylist.index(of:) calls. No filesystem scan, whole-player CPU, frame-rate, or visible UI latency claim.",
             "timers": "One DispatchTime wall interval inside one CLOCK_PROCESS_CPUTIME_ID CPU interval per process. CPU includes wall-clock sampling and all process threads.",
             "outside_timers": "Fixture creation, actual playlist construction/sorting, full receipts before and after, two warmup rounds, and validation.",
