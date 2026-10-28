@@ -63,17 +63,30 @@ private struct Fixture {
     let expected: [Signature]
     init(_ configuration: Configuration, seed: UInt64) {
         self.configuration = configuration
-        let inputs = (0..<16).map { version -> Input in
-            let plans = (0..<configuration.videos).map { video -> [Double] in
+        var inputs: [Input] = []
+        inputs.reserveCapacity(16)
+        let seedOffset = Double(seed & 0xffff) / 8
+        for version in 0..<16 {
+            var plans: [[Double]] = []
+            plans.reserveCapacity(configuration.videos)
+            let versionOffset = Double(version) / 32
+            for video in 0..<configuration.videos {
                 let count: Int
                 if configuration.uneven {
                     count = video % 5 == 0 ? 0 : 1 + (video * 17 + version * 5) % configuration.samples
-                } else { count = configuration.samples }
-                return (0..<count).map { sample in
-                    Double(seed & 0xffff) / 8 + Double(version) / 32 + Double(video) * 100 + Double(sample) / 2
+                } else {
+                    count = configuration.samples
                 }
+                let videoOffset = Double(video) * 100
+                let origin = seedOffset + versionOffset + videoOffset
+                var positions: [Double] = []
+                positions.reserveCapacity(count)
+                for sample in 0..<count {
+                    positions.append(origin + Double(sample) / 2)
+                }
+                plans.append(positions)
             }
-            return Input(plans: plans, visit: configuration.visit)
+            inputs.append(Input(plans: plans, visit: configuration.visit))
         }
         self.inputs = inputs
         expected = inputs.map(oracle)
