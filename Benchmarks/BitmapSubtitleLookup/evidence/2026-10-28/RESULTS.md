@@ -75,8 +75,8 @@ produced no measurements and is not included in these totals.
 - [Portable Linux run 40641025640](https://github.com/Jagalite/illiquid/actions/runs/40641025640)
   and its [artifact](https://github.com/Jagalite/illiquid/actions/runs/40641025640/artifacts/12796092918)
 - Native artifact expires **2026-11-11 14:10 UTC**; Linux expires
-  **2026-11-11 06:10 UTC**. The saved JSON summaries and source runner
-  remain on this research branch.
+  **2026-11-11 06:10 UTC**. The saved raw measurements, per-workload summaries, calibration,
+  build/source receipts, and source runner remain on this research branch.
 
 Reproduce with the `run.py` commands in
 [the parent research README](../../README.md). Both jobs verified complete
