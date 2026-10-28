@@ -13,8 +13,10 @@ Checkpoints run every ten seconds of playback progress and at several pause,
 seek, playlist, and lifecycle boundaries.
 
 The candidate skips membership work for a nil folder, and validates an in-bounds
-captured index using the existing identity predicate. A matching item proves
-membership. A missing, invalid, or stale index falls back to the original scan.
+captured index beyond the first item using the existing identity predicate.
+A matching item proves membership. Index zero uses the original scan, which
+already stops at the first match; this avoids checking its item twice on a miss.
+A missing, invalid, or stale index also falls back to that scan.
 The saved index, playlist deduplication, all other record fields, and the
 persistence schema are unchanged.
 
@@ -95,5 +97,7 @@ record still performs O(n) deduplication. The experiment does not measure JSON
 encoding, atomic file writes, the coalescing writer, macOS window latency,
 media decoding, frame rate, battery use, or end-to-end shutdown. The checkpoint
 runs off the main actor. Workload frequencies and typical user playlist sizes
-have not been measured. A stale index may add one failed identity comparison
+have not been measured. The timed loop has no per-call autorelease pool, so
+Foundation temporaries may survive across calls within one sample process.
+A stale positive index may add one failed identity comparison
 before the existing scan; the controls quantify that tradeoff.
