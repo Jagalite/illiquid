@@ -91,6 +91,7 @@ enum PiPHDRTextureFixture {
         try #require(status == kCVReturnSuccess)
         let pixels = try #require(created)
         try #require(CVPixelBufferLockBaseAddress(pixels, []) == kCVReturnSuccess)
+        defer { CVPixelBufferUnlockBaseAddress(pixels, []) }
         for plane in 0..<2 {
             let base = try #require(CVPixelBufferGetBaseAddressOfPlane(pixels, plane))
                 .assumingMemoryBound(to: UInt16.self)
@@ -102,7 +103,6 @@ enum PiPHDRTextureFixture {
                 }
             }
         }
-        CVPixelBufferUnlockBaseAddress(pixels, [])
         let size = CGSize(width: width, height: height)
         return NativeDecodedVideoFrame(
             pixelBuffer: pixels, planarOwnershipToken: nil,
