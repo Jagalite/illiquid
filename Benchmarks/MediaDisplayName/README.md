@@ -50,7 +50,7 @@ loop is subtracted. Wall time uses `DispatchTime`; process CPU uses
 ## Correctness and sampling
 
 The runner tests baseline and candidate in debug and release with the existing
-recognition suites and `MediaDisplayNameTests`. These currently comprise 28 tests;
+recognition suites and `MediaDisplayNameTests`. These currently comprise 47 tests;
 the actual nonzero completed count is required and recorded for each invocation.
 The new regression oracle retains the original Foundation formatting expression,
 including all 10,000 bounded values, signed C conversion boundaries, nil values,

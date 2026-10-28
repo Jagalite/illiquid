@@ -24,7 +24,8 @@ BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 NATIVE = sys.platform == "darwin"
 VARIANTS = ("baseline", "candidate")
 TESTS = ("MediaNameRecognitionTests.swift", "MediaNameRecognitionFastPathTests.swift",
-         "MediaDisplayNameTests.swift")
+         "MediaNameRecognitionPerformanceRegressionTests.swift",
+         "EpisodeDisplayNameTests.swift", "MediaDisplayNameTests.swift")
 PACKAGE = '''// swift-tools-version: 6.1
 import PackageDescription
 let package = Package(

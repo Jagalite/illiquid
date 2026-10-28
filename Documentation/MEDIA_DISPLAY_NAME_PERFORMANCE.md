@@ -1,3 +1,8 @@
+> Requalification in progress: this follow-up now uses the exact implementation
+> from [PR #141](https://github.com/Jagalite/illiquid/pull/141). The retained results
+> below describe the earlier independent candidate at `99bb8f9`; fresh tests and
+> measurements for the adopted implementation are being collected before handoff.
+
 # Episode display-name formatting research
 
 ## Result and qualification

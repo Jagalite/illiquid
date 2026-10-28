@@ -6,6 +6,7 @@ on:
       - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
       - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
       - 'Tests/IlliquidCoreTests/MediaDisplayNameTests.swift'
+      - 'Tests/IlliquidCoreTests/EpisodeDisplayNameTests.swift'
       - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
       - 'Benchmarks/MediaDisplayName/**'
       - 'Benchmarks/MediaDisplayNameProjection/**'
@@ -140,7 +141,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/media-display-name-app"
           set -o pipefail
           swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
-            --filter 'MediaDisplayNameTests|MediaNameRecognitionTests|MediaNameRecognitionFastPathTests|MediaSidecarTests|SourceMediaOrganizationTests|SourceMediaGroupingTests' \
+            --filter 'MediaDisplayNameTests|EpisodeDisplayNameTests|MediaNameRecognition|MediaSidecarTests|SourceMediaOrganizationTests|SourceMediaGroupingTests' \
             2>&1 | tee "$RUNNER_TEMP/media-display-name-app/tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
