@@ -3,189 +3,193 @@ import Testing
 
 @testable import IlliquidPlaybackStateSpace
 
-@Suite("Playback progress fair reachability")
+@Suite("Playback fair-progress reachability")
 struct PlaybackProgressReachabilityTests {
-  @Test
-  func emptyAndAlreadySettledGraphsHaveNoTransactionWork() {
-    let empty = PlaybackProgressAnalyzer.analyze(makeResult(states: [], edges: []))
-    #expect(empty == PlaybackProgressReport(
-      terminalStates: 0, stableIntentionalWaitStates: 0, externalWaitStates: 0,
-      unmeasuredCutoffStates: 0, transactionStates: 0, settledTransactionStates: 0,
-      stuckStates: [], closedNonterminalSCCs: [], maximumObligationRank: 0
-    ))
-
-    let settled = PlaybackProgressAnalyzer.analyze(makeResult(
-      states: [.terminal, .stable, .external],
-      edges: [edge(0, 1), edge(1, 2), edge(2, 0)]
-    ))
-    #expect(settled == PlaybackProgressReport(
-      terminalStates: 1, stableIntentionalWaitStates: 1, externalWaitStates: 1,
-      unmeasuredCutoffStates: 0, transactionStates: 0, settledTransactionStates: 0,
-      stuckStates: [], closedNonterminalSCCs: [], maximumObligationRank: 1
-    ))
+  private enum Role: CaseIterable, Equatable {
+    case terminal, stable, external, cutoff, work
   }
 
   @Test
-  func fairReachabilityIsBackwardAndIndependentOfEdgeOrder() {
-    let edges = [
+  func emptyUnseededAndFullySettledGraphs() {
+    check([], [])
+    check([.work], [])
+    check([.work, .work], [edge(0, 1), edge(1, 0)])
+    check([.terminal, .stable, .external], [
+      edge(0, 1), edge(1, 2, fair: false), edge(2, 2),
+    ])
+  }
+
+  @Test
+  func everySettledClassificationSeedsFairPredecessors() {
+    check([.work, .work, .work, .terminal, .stable, .external], [
+      edge(0, 3), edge(1, 4), edge(2, 5),
+    ])
+  }
+
+  @Test
+  func cutoffNodesCanCarryFairPathsButDoNotSeedThem() {
+    check([.work, .cutoff, .work, .terminal], [
       edge(0, 1), edge(1, 2), edge(2, 3),
-      edge(1, 2), edge(1, 1), edge(4, 4),
-      // Reaching a state FROM a terminal is not a path TO settlement.
-      edge(3, 4),
-    ]
-    let expected = PlaybackProgressReport(
-      terminalStates: 1, stableIntentionalWaitStates: 0, externalWaitStates: 0,
-      unmeasuredCutoffStates: 0, transactionStates: 4, settledTransactionStates: 3,
-      stuckStates: [], closedNonterminalSCCs: [Set([4])], maximumObligationRank: 1
-    )
-    for order in [edges, Array(edges.reversed()), Array(edges.dropFirst(2)) + Array(edges.prefix(2))] {
-      let report = PlaybackProgressAnalyzer.analyze(makeResult(
-        states: [.transaction, .transaction, .transaction, .terminal, .transaction],
-        edges: order
-      ))
-      #expect(report == expected)
-    }
+    ])
+    check([.work, .cutoff, .work], [
+      edge(0, 1), edge(1, 0), edge(1, 2), edge(2, 2),
+    ])
   }
 
   @Test
-  func unfairEdgesAndDepthCutoffsDoNotSeedSettlement() {
-    let result = makeResult(
-      states: [.transaction, .transaction, .terminal, .cutoff, .stuck],
-      edges: [
-        edge(0, 1), edge(1, 1), edge(1, 2, fair: false),
-        edge(0, 3), edge(4, 2),
-      ]
-    )
-    #expect(PlaybackProgressAnalyzer.analyze(result) == PlaybackProgressReport(
-      terminalStates: 1, stableIntentionalWaitStates: 0, externalWaitStates: 0,
-      unmeasuredCutoffStates: 1, transactionStates: 2, settledTransactionStates: 0,
-      stuckStates: [4], closedNonterminalSCCs: [], maximumObligationRank: 1
-    ))
+  func unfairBridgesCyclesDuplicateEdgesAndSelfLoops() {
+    check([.work, .work, .terminal], [
+      edge(0, 1), edge(1, 2, fair: false), edge(1, 1),
+    ])
+    check([.work, .work, .terminal], [
+      edge(0, 1), edge(1, 0), edge(1, 2),
+    ])
+    check([.work, .terminal], [
+      edge(0, 0), edge(0, 0), edge(0, 1), edge(0, 1),
+    ])
   }
 
   @Test
-  func fairCyclesWithoutSettlementKeepTheirClosedComponent() {
-    let result = makeResult(
-      states: [.transaction, .transaction],
-      edges: [edge(0, 1), edge(1, 0), edge(0, 0), edge(1, 0)]
-    )
-    #expect(PlaybackProgressAnalyzer.analyze(result) == PlaybackProgressReport(
-      terminalStates: 0, stableIntentionalWaitStates: 0, externalWaitStates: 0,
-      unmeasuredCutoffStates: 0, transactionStates: 2, settledTransactionStates: 0,
-      stuckStates: [], closedNonterminalSCCs: [Set([0, 1])], maximumObligationRank: 1
-    ))
+  func edgeOrderDoesNotChangeADeepFairChain() {
+    let roles = Array(repeating: Role.work, count: 31) + [.terminal]
+    let edges = (0..<31).map { edge($0, $0 + 1) }
+    check(roles, edges)
+    check(roles, Array(edges.reversed()))
+    check(roles, edges.filter { $0.from.isMultiple(of: 2) }
+      + edges.filter { !$0.from.isMultiple(of: 2) })
   }
 
   @Test
-  func terminalStableAndDeclaredExternalWaitsAllSeedSettlement() {
-    let result = makeResult(
-      states: [
-        .transaction, .transaction, .transaction, .terminal,
-        .stable, .external, .cutoff, .transaction,
-      ],
-      edges: [edge(0, 3), edge(1, 4), edge(2, 5), edge(7, 6)]
-    )
-    #expect(PlaybackProgressAnalyzer.analyze(result) == PlaybackProgressReport(
-      terminalStates: 1, stableIntentionalWaitStates: 1, externalWaitStates: 1,
-      unmeasuredCutoffStates: 1, transactionStates: 4, settledTransactionStates: 3,
-      stuckStates: [], closedNonterminalSCCs: [], maximumObligationRank: 1
-    ))
-  }
-
-  @Test
-  func fairPathsMayPassThroughNontransactionStatesWithoutReclassifyingThem() {
-    let result = makeResult(
-      states: [.transaction, .cutoff, .stuck, .terminal],
-      edges: [edge(0, 1), edge(1, 2), edge(2, 3)]
-    )
-    #expect(PlaybackProgressAnalyzer.analyze(result) == PlaybackProgressReport(
-      terminalStates: 1, stableIntentionalWaitStates: 0, externalWaitStates: 0,
-      unmeasuredCutoffStates: 1, transactionStates: 1, settledTransactionStates: 1,
-      stuckStates: [2], closedNonterminalSCCs: [], maximumObligationRank: 1
-    ))
-  }
-
-  @Test
-  func exhaustiveFourStateGraphsAgreeWithForwardPathSearch() {
-    // Each transaction has a fair self-loop to keep its classification fixed.
-    // Enumerate all 512 fair/unfair assignments to the other outgoing edges.
-    let links = (0..<3).flatMap { from in
-      (0..<4).filter { $0 != from }.map { (from, $0) }
-    }
-    for mask in 0..<(1 << links.count) {
-      var edges = (0..<3).map { edge($0, $0) }
-      for (index, link) in links.enumerated() {
-        edges.append(edge(link.0, link.1, fair: mask & (1 << index) != 0))
+  func seededSmallGraphsMatchAnIndependentCompleteReportOracle() {
+    for seed in 0..<96 {
+      var state = UInt64(seed + 1)
+      func next() -> UInt64 {
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+        return state >> 32
       }
-      edges.append(edge(3, 0, fair: false))
-      let expected = (0..<3).count(where: { reachesTerminal(from: $0, edges: edges) })
-      for order in [edges, Array(edges.reversed())] {
-        let report = PlaybackProgressAnalyzer.analyze(makeResult(
-          states: [.transaction, .transaction, .transaction, .terminal], edges: order
-        ))
-        #expect(report.transactionStates == 3)
-        #expect(report.settledTransactionStates == expected)
+      let count = seed % 12
+      let roles = (0..<count).map { _ in
+        Role.allCases[Int(next() % UInt64(Role.allCases.count))]
       }
+      var edges: [PlaybackSearchGraph.Edge] = []
+      if count > 0 {
+        for _ in 0..<(count * 3) {
+          edges.append(edge(
+            Int(next() % UInt64(count)), Int(next() % UInt64(count)),
+            fair: next() % 3 != 0
+          ))
+        }
+      }
+      check(roles, edges)
     }
-  }
-
-  private func reachesTerminal(from start: Int, edges: [PlaybackSearchGraph.Edge]) -> Bool {
-    // Independent source-to-target search: follow outgoing fair paths from each
-    // transaction, rather than propagating a shared set backwards from terminal.
-    var pending = [start]
-    var visited: Set<Int> = []
-    while let current = pending.popLast() {
-      if current == 3 { return true }
-      guard visited.insert(current).inserted else { continue }
-      pending.append(contentsOf: edges.filter { $0.from == current && $0.isFairProgress }.map(\.to))
-    }
-    return false
-  }
-
-  private enum State {
-    case transaction, terminal, stable, external, cutoff, stuck
   }
 
   private func edge(_ from: Int, _ to: Int, fair: Bool = true) -> PlaybackSearchGraph.Edge {
     .init(from: from, to: to, actionClass: "fixture", isFairProgress: fair)
   }
 
-  private func makeResult(states: [State], edges: [PlaybackSearchGraph.Edge]) -> PlaybackSearchResult {
-    let nodes = states.map { kind -> PlaybackSearchNode in
-      var state = PlaybackCoreState()
-      var depth = 0
-      switch kind {
-      case .transaction:
-        state.lifecycle = .shuttingDown
-      case .terminal:
-        state.lifecycle = .terminated
-      case .stable:
-        break
-      case .external:
-        state.lifecycle = .shuttingDown
-        state.externalWaitReason = .shutdownCancellationFailed
-      case .cutoff:
-        state.lifecycle = .terminated
-        depth = 4
-      case .stuck:
-        state.lifecycle = .invariantFailed
+  private func rank(_ role: Role) -> Int {
+    role == .work || role == .external ? 1 : 0
+  }
+
+  private func result(_ roles: [Role], _ edges: [PlaybackSearchGraph.Edge])
+    -> PlaybackSearchResult
+  {
+    let configuration = PlaybackSearchConfiguration.validation(depthLimit: 4)
+      .withTimeLimitSeconds(nil)
+    let nodes = roles.map { role in
+      let lifecycle: PlaybackLifecyclePhase
+      switch role {
+      case .terminal: lifecycle = .terminated
+      case .external, .work: lifecycle = .shuttingDown
+      case .stable, .cutoff: lifecycle = .running
       }
       return PlaybackSearchNode(
-        model: .stopShutdown, coreState: state,
-        environment: .stopShutdown(StopShutdownSearchEnvironment()), depth: depth
+        model: .stopShutdown,
+        coreState: PlaybackCoreState(
+          lifecycle: lifecycle,
+          externalWaitReason: role == .external ? .shutdownCancellationFailed : nil
+        ),
+        environment: .stopShutdown(StopShutdownSearchEnvironment()),
+        depth: role == .cutoff ? configuration.depthLimit : 0
       )
     }
-    return PlaybackSearchResult(
-      summary: PlaybackSearchSummary(
-        model: .stopShutdown, modelVersion: 1, seedProfile: "manual-progress-graph",
-        configuration: .validation(depthLimit: 4), termination: .completeWithinBounds,
-        stateCount: nodes.count, edgeCount: edges.count, productionTransitionCount: 0,
-        gateRejectionCount: 0, peakFrontier: 0, deepestCompletedLayer: 0,
-        reducedEdgeCount: 0, validatedDiamondCount: 0, nonCommutingDiamondCount: 0,
-        canonicalDigest: "manual-progress-graph"
-      ),
-      oracle: .production, failures: [], graph: PlaybackSearchGraph(edges: edges),
-      nodes: nodes, predecessors: Array(repeating: nil, count: nodes.count)
+    let summary = PlaybackSearchSummary(
+      model: .stopShutdown, modelVersion: 1, seedProfile: "reachability-fixture",
+      configuration: configuration, termination: .completeWithinBounds,
+      stateCount: nodes.count, edgeCount: edges.count, productionTransitionCount: 0,
+      gateRejectionCount: 0, peakFrontier: 0, deepestCompletedLayer: 0,
+      reducedEdgeCount: 0, validatedDiamondCount: 0, nonCommutingDiamondCount: 0,
+      canonicalDigest: "fixture"
     )
+    return PlaybackSearchResult(
+      summary: summary, oracle: .production, failures: [],
+      graph: PlaybackSearchGraph(edges: edges), nodes: nodes,
+      predecessors: Array(repeating: nil, count: nodes.count)
+    )
+  }
+
+  private func check(_ roles: [Role], _ edges: [PlaybackSearchGraph.Edge]) {
+    let report = PlaybackProgressAnalyzer.analyze(result(roles, edges))
+    let fairSources = Set(edges.filter(\.isFairProgress).map(\.from))
+    let transactions = roles.indices.filter { roles[$0] == .work && fairSources.contains($0) }
+    let stuck = roles.indices.filter { roles[$0] == .work && !fairSources.contains($0) }
+
+    // Synchronous fixed-point rounds are deliberately independent of the
+    // production reverse adjacency/worklist. Only the previous round can
+    // justify adding a predecessor in the next round.
+    var canSettle = Set(roles.indices.filter {
+      roles[$0] == .terminal || roles[$0] == .stable || roles[$0] == .external
+    })
+    while true {
+      let predecessors = edges.filter {
+        $0.isFairProgress && canSettle.contains($0.to)
+      }.map(\.from)
+      let next = canSettle.union(predecessors)
+      if next == canSettle { break }
+      canSettle = next
+    }
+
+    // Small graphs permit an independent transitive-closure SCC oracle.
+    // This also verifies that the reachability change leaves every other
+    // report field and closed-component classification intact.
+    var reachable = Array(
+      repeating: Array(repeating: false, count: roles.count), count: roles.count
+    )
+    for vertex in roles.indices { reachable[vertex][vertex] = true }
+    for edge in edges { reachable[edge.from][edge.to] = true }
+    for intermediate in roles.indices {
+      for from in roles.indices where reachable[from][intermediate] {
+        for to in roles.indices where reachable[intermediate][to] {
+          reachable[from][to] = true
+        }
+      }
+    }
+    var assigned: Set<Int> = []
+    var closed: Set<Set<Int>> = []
+    for vertex in roles.indices where !assigned.contains(vertex) {
+      let component = Set(roles.indices.filter {
+        reachable[vertex][$0] && reachable[$0][vertex]
+      })
+      assigned.formUnion(component)
+      guard component.contains(where: { roles[$0] == .work }) else { continue }
+      let outgoing = edges.filter { component.contains($0.from) }
+      let hasExit = outgoing.contains { !component.contains($0.to) }
+      let hasFairDecrease = outgoing.contains {
+        $0.isFairProgress && rank(roles[$0.to]) < rank(roles[$0.from])
+      }
+      if !hasExit && !hasFairDecrease { closed.insert(component) }
+    }
+
+    #expect(report.terminalStates == roles.filter { $0 == .terminal }.count)
+    #expect(report.stableIntentionalWaitStates == roles.filter { $0 == .stable }.count)
+    #expect(report.externalWaitStates == roles.filter { $0 == .external }.count)
+    #expect(report.unmeasuredCutoffStates == roles.filter { $0 == .cutoff }.count)
+    #expect(report.transactionStates == transactions.count)
+    #expect(report.settledTransactionStates == transactions.filter { canSettle.contains($0) }.count)
+    #expect(report.stuckStates == stuck)
+    #expect(Set(report.closedNonterminalSCCs) == closed)
+    #expect(report.closedNonterminalSCCs.count == closed.count)
+    #expect(report.maximumObligationRank == (roles.map(rank).max() ?? 0))
   }
 }

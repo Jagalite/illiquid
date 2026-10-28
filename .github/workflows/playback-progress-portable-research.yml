@@ -1,4 +1,4 @@
-name: Playback progress portable research
+name: Playback progress guard comparison
 
 on:
   push:
@@ -30,13 +30,13 @@ jobs:
       - name: Check baseline and candidate state-space suites in debug and release
         run: |
           python3 Benchmarks/PlaybackProgressReachability/run.py test --configuration debug \
-            --output "$RUNNER_TEMP/playback-progress/debug"
+            --baseline-ref 4077f8ad538dd8ed911b38c9b300a98c787c5135 --output "$RUNNER_TEMP/playback-progress/debug"
           python3 Benchmarks/PlaybackProgressReachability/run.py test --configuration release \
-            --output "$RUNNER_TEMP/playback-progress/release"
+            --baseline-ref 4077f8ad538dd8ed911b38c9b300a98c787c5135 --output "$RUNNER_TEMP/playback-progress/release"
       - name: Compare complete progress reports and paired analyzer timings
         run: |
           python3 Benchmarks/PlaybackProgressReachability/run.py benchmark --rounds 10 --target-ms 100 \
-            --output "$RUNNER_TEMP/playback-progress/benchmark"
+            --baseline-ref 4077f8ad538dd8ed911b38c9b300a98c787c5135 --output "$RUNNER_TEMP/playback-progress/benchmark"
       - name: Retain complete research receipts
         if: always()
         run: |

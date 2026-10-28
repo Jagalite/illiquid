@@ -1,23 +1,6 @@
 name: Playback progress reachability performance
 
 on:
-  push:
-    branches: [perf/progress-reachability-c836a0c4]
-    paths:
-      - Sources/IlliquidPlaybackStateSpace/PlaybackProgressAnalyzer.swift
-      - Tests/IlliquidPlaybackStateSpaceTests/**
-      - Benchmarks/PlaybackProgressReachability/Harness.swift
-      - Benchmarks/PlaybackProgressReachability/run.py
-      - .github/workflows/playback-progress-reachability.yml
-  pull_request:
-    paths:
-      - Sources/IlliquidPlaybackStateSpace/**
-      - Sources/IlliquidPlaybackCore/**
-      - Sources/IlliquidCore/Player/MediaTrack.swift
-      - Tests/IlliquidPlaybackStateSpaceTests/**
-      - Benchmarks/PlaybackProgressReachability/Harness.swift
-      - Benchmarks/PlaybackProgressReachability/run.py
-      - .github/workflows/playback-progress-reachability.yml
   workflow_dispatch:
 
 permissions:
@@ -52,7 +35,6 @@ jobs:
         if: always()
         run: |
           python3 - <<'PY'
-          import base64
           import hashlib
           import json
           import os
@@ -84,12 +66,9 @@ jobs:
                   output.write(root / member["path"], member["path"])
               output.write(manifest, "archive-members.json")
           data = archive.read_bytes()
-          print("PLAYBACK_PROGRESS_ARCHIVE_BEGIN",
-                hashlib.sha256(data).hexdigest(), len(data))
-          encoded = base64.b64encode(data).decode("ascii")
-          for offset in range(0, len(encoded), 12000):
-              print(encoded[offset:offset + 12000])
-          print("PLAYBACK_PROGRESS_ARCHIVE_END")
+          print("Receipt archive:", archive.name,
+                "sha256=" + hashlib.sha256(data).hexdigest(),
+                "bytes=" + str(len(data)))
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
