@@ -25,8 +25,16 @@ struct PlaybackCheckpoint: Sendable {
     let unshuffledPlaylistIDs: [FolderPlaylistItem.ID]?
 
     func record() -> PlaybackSessionRecord {
-        let belongsToFolder = source.url.isFileURL && playlist.contains {
-            NormalizedFileURL.representsSameFile($0.url, source.url)
+        // The source identity is invariant across this scan. Keep normalizing
+        // each item: decoded playlists can contain unprepared URLs.
+        let belongsToFolder: Bool
+        if source.url.isFileURL, !playlist.isEmpty,
+           let sourceKey = NormalizedFileURL.persistenceKey(for: source.url) {
+            belongsToFolder = playlist.contains {
+                NormalizedFileURL.persistenceKey(for: $0.url) == sourceKey
+            }
+        } else {
+            belongsToFolder = false
         }
         return PlaybackSessionRecord(
             source: source,
