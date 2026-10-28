@@ -12,13 +12,17 @@ struct FixedRingBuffer<Element> {
 
     mutating func append(_ value: Element) {
         precondition(count < slots.count)
-        slots[(head + count) % slots.count] = value
+        // The tail can wrap only once. Compare before adding so even the
+        // intermediate index stays within the ring's capacity.
+        let distanceToEnd = slots.count - head
+        let tail = count < distanceToEnd ? head + count : count - distanceToEnd
+        slots[tail] = value
         count += 1
     }
 
     mutating func prepend(_ value: Element) {
         precondition(count < slots.count)
-        head = (head + slots.count - 1) % slots.count
+        head = head == 0 ? slots.count - 1 : head - 1
         slots[head] = value
         count += 1
     }
@@ -27,7 +31,7 @@ struct FixedRingBuffer<Element> {
         precondition(count > 0)
         let value = slots[head]!
         slots[head] = nil
-        head = (head + 1) % slots.count
+        head = head == slots.count - 1 ? 0 : head + 1
         count -= 1
         return value
     }
