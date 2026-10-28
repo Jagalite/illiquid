@@ -203,12 +203,17 @@ public enum ThumbnailPolicy {
         add(0)
         var divisions = 2
         while result.count < limit, divisions <= 128 {
-            for numerator in stride(from: 1, to: divisions, by: 2) {
-                add(duration * Double(numerator) / Double(divisions))
-                // Later samples only append; stop once the requested prefix is
-                // complete instead of filling and discarding the rest of this level.
-                if result.count == limit { return result }
-            }
+            var numerator = 1
+            repeat {
+                // Each attempt adds at most one sample. Bound a whole chunk by
+                // the remaining budget so full levels need no per-sample check.
+                // Quantized duplicates can leave room for another chunk.
+                let end = min(divisions, numerator + 2 * (limit - result.count))
+                for offset in stride(from: numerator, to: end, by: 2) {
+                    add(duration * Double(offset) / Double(divisions))
+                }
+                numerator = end
+            } while numerator < divisions && result.count < limit
             divisions *= 2
         }
         return result

@@ -8,6 +8,10 @@ and deduplicate timestamps that are discarded. The candidate returns as soon as
 the requested prefix is complete. It retains focus priority, half-second
 quantization, duplicate suppression, count bounds, and the 128-division limit.
 
+The player invokes this planner from [automatic thumbnail preparation](../../Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift)
+and from [storyboard fallback lookup after a thumbnail cache miss](../../Sources/IlliquidNativePlayback/Media/NativeTimelineThumbnailGenerator.swift).
+The background presets request 6, 12, or 24 samples; the storyboard requests 24.
+
 This is a bounded planning component. It does not change which frames are
 decoded, thumbnail quality, cache behavior, or rendering. Component timings do
 not establish a visible playback, startup, battery, or end-to-end decoding gain.
@@ -59,6 +63,26 @@ The workflow retains command logs and exact source snapshots as an artifact.
 Compilation and component-test success are separate from a performance-gate
 pass. Full-app builds and live playback are outside this experiment.
 
-## Results
+## Initial portable result: rejected
 
-Native measurements are pending. No performance improvement is claimed yet.
+[Run 40639460139](https://github.com/Jagalite/illiquid/actions/runs/40639460139)
+tested the per-sample-check candidate at
+`41e95be7893aa22248b86cd9be4e054bad45cdc5` on x86_64 Linux with Swift 6.4.1.
+All 53,075 bitwise differential comparisons passed in each of debug and release,
+all three selected-source unit suites passed in both configurations, and the
+320 timing-corpus outputs matched. The run collected 200 timing observations.
+
+The first candidate improved storyboard-24 by 23.6% and balanced-12 by 30.1%
+in median paired CPU, with 10/10 winning pairs each. However, exact-level-32
+regressed by 16.0%, exact-level-64 by 24.2%, and maximum-64 by 19.2%. It failed
+the predeclared control gate and is not accepted. Every observation is retained
+in [the initial receipt](results/linux-initial.json).
+
+The revised candidate attempts bounded chunks of at most the remaining sample
+budget. Each attempt can append at most one timestamp, so a chunk cannot
+overshoot. If quantized duplicates leave room, the next chunk continues the
+same subdivision sequence. This avoids a completion branch inside each sample
+iteration. The baseline, workload matrix, and acceptance rule remain unchanged.
+
+Revised portable and native measurements are pending. No production performance
+claim is made from the rejected initial candidate.
