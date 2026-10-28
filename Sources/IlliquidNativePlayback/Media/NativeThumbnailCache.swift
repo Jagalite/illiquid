@@ -255,14 +255,24 @@ actor NativeThumbnailCache {
     private func trimMemory(incoming: Int, background: Bool) {
         let limit = preferences.memoryMiB * 1024 * 1024
         guard memoryBytes + incoming > limit || (incoming > 0 && images.count >= maximumResidentImages) else { return }
-        let victims = images.filter { (!background || $0.value.background) && (!background || !storyboardKeys.contains($0.key)) }.sorted {
-            if storyboardKeys.contains($0.key) != storyboardKeys.contains($1.key) { return !storyboardKeys.contains($0.key) }
-            if $0.value.background != $1.value.background { return $0.value.background }
-            return $0.value.used < $1.value.used
+        // Snapshot only eviction metadata: retaining Resident values here keeps
+        // every candidate image alive until the entire trim finishes. Protection
+        // cannot change during this synchronous actor turn, so hash each key
+        // once instead of repeating storyboard lookups inside the sort.
+        let victims = images.compactMap { entry
+            -> (key: Key, bytes: Int, used: UInt64, background: Bool, storyboard: Bool)? in
+            guard !background || entry.value.background else { return nil }
+            let storyboard = storyboardKeys.contains(entry.key)
+            guard !background || !storyboard else { return nil }
+            return (entry.key, entry.value.bytes, entry.value.used, entry.value.background, storyboard)
+        }.sorted {
+            if $0.storyboard != $1.storyboard { return !$0.storyboard }
+            if $0.background != $1.background { return $0.background }
+            return $0.used < $1.used
         }
         for victim in victims {
             guard memoryBytes + incoming > limit || (incoming > 0 && images.count >= maximumResidentImages) else { break }
-            memoryBytes -= victim.value.bytes
+            memoryBytes -= victim.bytes
             images.removeValue(forKey: victim.key)
             storyboardKeys.remove(victim.key)
         }

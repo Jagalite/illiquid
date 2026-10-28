@@ -1,0 +1,96 @@
+name: Thumbnail resident eviction performance
+
+on:
+  push:
+    branches: [perf/thumbnail-resident-eviction-20261028]
+    paths:
+      - Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift
+      - Tests/IlliquidNativePlaybackTests/ThumbnailResidentEvictionTests.swift
+      - Benchmarks/ThumbnailResidentEviction/Harness.swift
+      - Benchmarks/ThumbnailResidentEviction/run.py
+      - .github/workflows/thumbnail-resident-eviction.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift
+      - Tests/IlliquidNativePlaybackTests/ThumbnailResidentEvictionTests.swift
+      - Benchmarks/ThumbnailResidentEviction/Harness.swift
+      - Benchmarks/ThumbnailResidentEviction/run.py
+      - .github/workflows/thumbnail-resident-eviction.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-resident-eviction-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds run serially in isolated output directories.'
+      - name: Test both implementations and measure native cache maintenance
+        run: |
+          python3 -m py_compile Benchmarks/ThumbnailResidentEviction/run.py
+          python3 Benchmarks/ThumbnailResidentEviction/run.py \
+            --output "$RUNNER_TEMP/thumbnail-resident-eviction" --pairs 10 --target-ms 150
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-resident-eviction-native
+          path: |
+            ${{ runner.temp }}/thumbnail-resident-eviction/*.json
+            ${{ runner.temp }}/thumbnail-resident-eviction/logs/
+            ${{ runner.temp }}/thumbnail-resident-eviction/inputs/
+            ${{ runner.temp }}/thumbnail-resident-eviction/build/*/hashes.json
+          retention-days: 14
+
+  native-app-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build app graph and run thumbnail cache regressions
+        run: |
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'ThumbnailResidentEvictionTests|NativeThumbnailCacheTests|ThumbnailImageLifetimeTests|ThumbnailPhysicalEntryTests|ThumbnailDiskEvictionTests|ThumbnailOptimizationQualificationTests' \
+            2>&1 | tee "$RUNNER_TEMP/thumbnail-resident-app-tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-resident-eviction-app-regressions
+          path: ${{ runner.temp }}/thumbnail-resident-app-tests.log
+          retention-days: 14
