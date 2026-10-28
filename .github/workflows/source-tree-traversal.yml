@@ -1,0 +1,60 @@
+name: Source tree traversal performance
+
+on:
+  push:
+    branches: ['perf/source-tree-traversal-memory-20261028-46a2']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeTraversalTests.swift'
+      - 'Benchmarks/SourceTreeTraversal/Harness.swift'
+      - 'Benchmarks/SourceTreeTraversal/run.py'
+      - '.github/workflows/source-tree-traversal.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeTraversalTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserFilterTests.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeVisibilityCacheTests.swift'
+      - 'Benchmarks/SourceTreeTraversal/Harness.swift'
+      - 'Benchmarks/SourceTreeTraversal/run.py'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - '.github/workflows/source-tree-traversal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-tree-traversal-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  traversal-qualification:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch the fixed comparison source
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Check traversal behavior and compare production sources
+        run: |
+          python3 Benchmarks/SourceTreeTraversal/run.py \
+            --output "$RUNNER_TEMP/source-tree-traversal" \
+            --pairs 6 --target-ms 25
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-tree-traversal-evidence
+          path: |
+            ${{ runner.temp }}/source-tree-traversal/*.json
+            ${{ runner.temp }}/source-tree-traversal/*.jsonl
+            ${{ runner.temp }}/source-tree-traversal/*.log
+            ${{ runner.temp }}/source-tree-traversal/*.gz
+          retention-days: 14

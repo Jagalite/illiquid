@@ -31,6 +31,9 @@ struct SourceTreeProjectionInput: Equatable, Sendable {
         }
 
         var rows: [SourceTreeDisplayRow] = []
+        // Only the current recursion path participates in cycle detection.
+        // Reuse one set instead of copying every ancestor set for each folder.
+        var visitedFolderIDs = Set<String>()
         let flattensSingleFolder =
             items.count == 1 && items.first?.kind == .folder
 
@@ -50,13 +53,14 @@ struct SourceTreeProjectionInput: Equatable, Sendable {
                 ))
             case .folder:
                 if flattensSingleFolder {
-                    appendActiveFolderContents(item.url, to: &rows)
+                    appendActiveFolderContents(item.url, visitedFolderIDs: &visitedFolderIDs, to: &rows)
                 } else {
                     appendFolder(
                         item.url,
                         depth: 0,
                         isRoot: true,
                         ancestors: [],
+                        visitedFolderIDs: &visitedFolderIDs,
                         to: &rows
                     )
                 }
@@ -123,10 +127,13 @@ struct SourceTreeProjectionInput: Equatable, Sendable {
 
     private func appendActiveFolderContents(
         _ folderURL: URL,
+        visitedFolderIDs: inout Set<String>,
         to rows: inout [SourceTreeDisplayRow]
     ) {
         guard !Task.isCancelled else { return }
         let folderID = SourceTreeIdentity.folderID(for: folderURL)
+        guard visitedFolderIDs.insert(folderID).inserted else { return }
+        defer { visitedFolderIDs.remove(folderID) }
         if let error = directoryErrors[folderID] {
             rows.append(SourceTreeDisplayRow(
                 id: "message:\(folderID)",
@@ -165,7 +172,7 @@ struct SourceTreeProjectionInput: Equatable, Sendable {
                     depth: 0,
                     isRoot: false,
                     ancestors: [],
-                    visitedFolderIDs: [folderID],
+                    visitedFolderIDs: &visitedFolderIDs,
                     to: &rows
                 )
             case .media:
@@ -189,13 +196,15 @@ struct SourceTreeProjectionInput: Equatable, Sendable {
         depth: Int,
         isRoot: Bool,
         ancestors: [String],
-        visitedFolderIDs: Set<String> = [],
+        visitedFolderIDs: inout Set<String>,
         to rows: inout [SourceTreeDisplayRow]
     ) {
         guard !Task.isCancelled else { return }
         let folderID = SourceTreeIdentity.folderID(for: folderURL)
-        guard !visitedFolderIDs.contains(folderID) else { return }
-        let visitedFolderIDs = visitedFolderIDs.union([folderID])
+        guard visitedFolderIDs.insert(folderID).inserted else { return }
+        // Remove on every exit so shared descendants and later roots keep their
+        // original occurrences; a global visited set would change the rows.
+        defer { visitedFolderIDs.remove(folderID) }
         rows.append(SourceTreeDisplayRow(
             id: "folder:\(folderID)",
             folderID: folderID,
@@ -248,7 +257,7 @@ struct SourceTreeProjectionInput: Equatable, Sendable {
                     depth: depth + 1,
                     isRoot: false,
                     ancestors: childAncestors,
-                    visitedFolderIDs: visitedFolderIDs,
+                    visitedFolderIDs: &visitedFolderIDs,
                     to: &rows
                 )
             case .media:
