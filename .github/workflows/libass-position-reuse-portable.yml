@@ -1,0 +1,129 @@
+name: Libass position-only mask reuse Linux exploration
+
+on:
+  push:
+    branches:
+      - perf/libass-position-mask-reuse-5ae1d4b5
+    paths:
+      - Benchmarks/LibassPositionReuse/portable.py
+      - .github/workflows/libass-position-reuse-portable.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: libass-position-reuse-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-exploratory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      SWIFT_IMAGE: swift:6.3.3-noble
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check both runner scripts without writing into the checkout
+        run: |
+          PYTHONPYCACHEPREFIX="$RUNNER_TEMP/pycache" \
+            python3 -m py_compile \
+              Benchmarks/LibassPositionReuse/run.py \
+              Benchmarks/LibassPositionReuse/portable.py
+      - name: Record the official Swift Linux image
+        run: |
+          docker pull "$SWIFT_IMAGE"
+          docker image inspect "$SWIFT_IMAGE" \
+            > "$RUNNER_TEMP/libass-position-reuse-image.json"
+      - name: Verify real-libass portable tests and paired exploratory measurements
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import shutil
+          import subprocess
+          import sys
+
+          script = r"""
+          set -euo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential ca-certificates git python3 pkg-config xz-utils \
+            libfreetype-dev libfribidi-dev libharfbuzz-dev libfontconfig1-dev \
+            libpng-dev zlib1g-dev nasm fontconfig fonts-liberation util-linux
+          fc-cache -f
+          python3 Benchmarks/LibassPositionReuse/portable.py \
+            --output /work/libass-position-reuse-portable \
+            --image-receipt /work/libass-position-reuse-image.json \
+            --jobs 2 --pairs 8 --target-ms 100 --max-sample-ms 1500
+          """
+          docker = shutil.which("docker")
+          if docker is None:
+              raise SystemExit("Docker is required for the official Swift image")
+          command = [
+              docker, "run", "--rm",
+              "-e", "PYTHONDONTWRITEBYTECODE=1",
+              "-e", "SWIFT_IMAGE=" + os.environ["SWIFT_IMAGE"],
+              "-e", "GIT_CONFIG_COUNT=1",
+              "-e", "GIT_CONFIG_KEY_0=safe.directory",
+              "-e", "GIT_CONFIG_VALUE_0=/repo",
+              "-v", os.environ["GITHUB_WORKSPACE"] + ":/repo:ro",
+              "-v", os.environ["RUNNER_TEMP"] + ":/work",
+              "-w", "/repo", os.environ["SWIFT_IMAGE"],
+              "bash", "-lc", script,
+          ]
+          queue = Path("/Volumes/seed1/Projects/kyoto/kyoto.py")
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, "submit", "--", *command], text=True)
+              print(submitted, flush=True)
+              job = str(json.loads(submitted)["id"])
+              shown = subprocess.run([*cli, "show", job])
+              waited = subprocess.run([*cli, "wait", job])
+              logged = subprocess.run([*cli, "logs", job])
+              shown.check_returncode()
+              waited.check_returncode()
+              logged.check_returncode()
+          else:
+              print("Shared Kyoto queue is unavailable on this hosted Linux runner. "
+                    "Running isolated native-C and Swift builds directly, in sequence. "
+                    "These exploratory results do not qualify macOS performance.",
+                    flush=True)
+              subprocess.run(command, check=True)
+          PY
+      - name: Emit portable review records
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "libass-position-reuse-portable"
+          for name in [
+              "manifest.json", "tests.json", "summary.json",
+              "qualification.json", "failure.json", "commands.jsonl",
+              "measurements.jsonl", "calibration.jsonl",
+              "Package.resolved", "portable-Package.swift", "container-image.json",
+          ]:
+              path = root / name
+              if path.is_file():
+                  print("LIBASS_PORTABLE_REVIEW_JSON " + json.dumps({
+                      "path": name, "content": path.read_text(),
+                  }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: libass-position-reuse-linux-exploratory
+          path: |
+            ${{ runner.temp }}/libass-position-reuse-portable/
+            ${{ runner.temp }}/libass-position-reuse-image.json
+            !${{ runner.temp }}/libass-position-reuse-portable/build/**
+          retention-days: 14
