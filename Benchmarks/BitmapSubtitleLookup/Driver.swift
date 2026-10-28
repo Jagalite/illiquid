@@ -46,7 +46,7 @@ private struct BenchmarkCase {
         self.name = name
         let parts = name.split(separator: "-")
         guard let first = parts.first, let operation = Operation(rawValue: String(first)),
-              let last = parts.last, let count = Int(last), [1, 8, 32, 128].contains(count)
+              let last = parts.last, let count = Int(last), [1, 2, 8, 32, 128].contains(count)
         else { throw DriverError.unknownCase(name) }
         self.operation = operation
         self.count = count
@@ -54,7 +54,7 @@ private struct BenchmarkCase {
             guard parts.count == 2, count > 1 else { throw DriverError.unknownCase(name) }
             position = .first
         } else {
-            guard parts.count == 3, let position = Position(rawValue: String(parts[1])),
+            guard count != 2, parts.count == 3, let position = Position(rawValue: String(parts[1])),
                   operation != .prune || position == .first || position == .missing
             else { throw DriverError.unknownCase(name) }
             self.position = position

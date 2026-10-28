@@ -141,8 +141,7 @@ struct BitmapSubtitleTimeline: Sendable {
     }
 
     func composition(at seconds: Double) -> (start: Double, value: NativeBitmapSubtitleComposition)? {
-        guard seconds.isFinite, let index = lastEntryIndex(atOrBefore: seconds) else { return nil }
-        let entry = entries[index]
+        guard seconds.isFinite, let entry = entries.last(where: { $0.start <= seconds }) else { return nil }
         if let duration = entry.composition.duration, seconds >= entry.start + duration { return nil }
         return (entry.start, entry.composition)
     }
@@ -150,29 +149,11 @@ struct BitmapSubtitleTimeline: Sendable {
     mutating func prune(before seconds: Double) {
         // Keep the final set preceding the cutoff: an indefinite PGS display
         // can span an arbitrarily long silent interval before its clear event.
-        guard let lastPastIndex = lastEntryIndex(atOrBefore: seconds), lastPastIndex > 0 else { return }
+        // Removal requires a second event at or before the cutoff. Skip
+        // the reverse scan when the retained window is already correct.
+        guard entries.count > 1, entries[1].start <= seconds else { return }
+        guard let lastPastIndex = entries.lastIndex(where: { $0.start <= seconds }), lastPastIndex > 0 else { return }
         for entry in entries[..<lastPastIndex] { retainedBytes -= entry.composition.byteCount }
         entries.removeFirst(lastPastIndex)
-    }
-
-    private func lastEntryIndex(atOrBefore seconds: Double) -> Int? {
-        guard !entries.isEmpty else { return nil }
-        let lastIndex = entries.count - 1
-        // Preserve constant-time selection of the latest event, including the
-        // common one-entry timeline, before searching queued future events.
-        if entries[lastIndex].start <= seconds { return lastIndex }
-        // The last entry already failed <=. Find the first such entry,
-        // then return its predecessor.
-        var lower = 0
-        var upper = lastIndex
-        while lower < upper {
-            let middle = lower + (upper - lower) / 2
-            if entries[middle].start <= seconds {
-                lower = middle + 1
-            } else {
-                upper = middle
-            }
-        }
-        return lower > 0 ? lower - 1 : nil
     }
 }

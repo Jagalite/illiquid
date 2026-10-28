@@ -1,20 +1,26 @@
 # Bitmap subtitle lookup and pruning
 
-`BitmapSubtitleTimeline` stores sorted, distinct finite event timestamps, but
-`composition(at:)` and the cutoff selection in `prune(before:)` reverse-scanned
-the array. A queued future display set is visited on every lookup until the
-current display is found, even when the resulting subtitle image has not changed.
+`BitmapSubtitleTimeline.prune(before:)` must retain the final display set at
+or before the cutoff. If the timeline has fewer than two entries, or its second
+entry is still after the cutoff, there is nothing to remove. Previously even
+these no-op calls reverse-scanned the entire queue of future events.
 
-The candidate shares an upper-bound search between those operations. It checks
-the newest entry first to preserve constant-time selection of the latest display
-and the common one-entry timeline. The remaining search is logarithmic. Removing
-old entries and updating retained-byte accounting still take linear work when
-pruning actually removes entries; this change only reduces the cutoff search.
+The candidate checks that necessary removal condition first. No-op pruning is
+constant time. Calls that remove entries retain the existing reverse search,
+byte accounting and array mutation. Lookup is unchanged, as are generation,
+revision, memory limits, leases and copy-on-write behavior.
 
-No new index, cache or mutable state is introduced. Selection still happens
-before expiration checking, so an expired display or an empty clear event cannot
-resurrect an older caption. Generation, revision, byte limits, memory leases and
-copy-on-write behavior are unchanged.
+## Experiment selection
+
+An initial shared binary search for lookup and pruning passed all correctness
+tests, but its small-window and near-tail controls regressed. At 128 entries,
+first-event lookup improved from 69.30 to 32.41 ns, while penultimate lookup rose
+from 11.76 to 31.68 ns. Latest-event lookup also regressed by roughly 1–2 ns.
+The broader candidate was rejected; this PR retains only the no-op pruning
+optimization. Timing, calibration, environment and test records for that run
+are retained in [evidence/exploratory-binary](evidence/exploratory-binary).
+Its candidate source and driver are pinned by commit
+`6f9d096153d9085d7cc2b64ecd1ced145f3dda68` and the recorded SHA-256 hashes.
 
 ## Production context
 
@@ -57,9 +63,9 @@ the benchmark driver, so its implementation cannot specialize to fixture values.
 
 ## Protocol and validation
 
-Twenty-seven workloads cover first, middle, penultimate, latest and missing
+Twenty-eight workloads cover first, middle, penultimate, latest and missing
 lookups at 1/8/32/128 entries; repeated no-op pruning before or within the first
-event; and rolling prune/insert/query streams at 8/32/128 entries. Static lookup
+event; and rolling prune/insert/query streams at 2/8/32/128 entries. Static lookup
 and prune cases perform 32 operations per iteration. Stream results are per
 transition, including one prune, insertion and lookup. The receipt records those
 operation counts explicitly. Timestamp spacing is 30 seconds divided by window

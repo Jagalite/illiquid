@@ -52,6 +52,7 @@ CASES = [
     "prune-first-128",
     "prune-missing-32",
     "prune-missing-128",
+    "stream-2",
     "stream-8",
     "stream-32",
     "stream-128"
