@@ -1,0 +1,76 @@
+name: Local file identity portable
+
+on:
+  push:
+    branches: ['perf/ascii-file-identity']
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Tests/IlliquidCoreTests/*Identity*Tests.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/*Playlist*Tests.swift'
+      - 'Benchmarks/LocalFileIdentity/Harness.swift'
+      - 'Benchmarks/LocalFileIdentity/run.py'
+      - '.github/workflows/local-file-identity-portable.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Tests/IlliquidCoreTests/*Identity*Tests.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/*Playlist*Tests.swift'
+      - 'Benchmarks/LocalFileIdentity/Harness.swift'
+      - 'Benchmarks/LocalFileIdentity/run.py'
+      - '.github/workflows/local-file-identity-portable.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: local-file-identity-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          sparse-checkout: |
+            Sources/IlliquidCore
+            Tests/IlliquidCoreTests
+            Benchmarks/LocalFileIdentity
+            .github/workflows
+      - name: Install the official Swift 6.3.2 toolchain
+        run: |
+          curl --fail --location --retry 2 \
+            https://download.swift.org/swift-6.3.2-release/ubuntu2404/swift-6.3.2-RELEASE/swift-6.3.2-RELEASE-ubuntu24.04.tar.gz \
+            --output "$RUNNER_TEMP/swift.tar.gz"
+          mkdir -p "$RUNNER_TEMP/swift"
+          tar -xzf "$RUNNER_TEMP/swift.tar.gz" --strip-components=1 -C "$RUNNER_TEMP/swift"
+          echo "$RUNNER_TEMP/swift/usr/bin" >> "$GITHUB_PATH"
+      - name: Verify portable behavior and measure component performance
+        run: |
+          echo "Kyoto is unavailable on this Linux runner; using serialized, isolated direct Swift builds."
+          python3 Benchmarks/LocalFileIdentity/run.py \
+            --pairs 8 --target-ms 60 --output "$RUNNER_TEMP/local-file-identity"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: local-file-identity-linux
+          path: |
+            ${{ runner.temp }}/local-file-identity/*.json
+            ${{ runner.temp }}/local-file-identity/*.jsonl
+            ${{ runner.temp }}/local-file-identity/logs/
+            ${{ runner.temp }}/local-file-identity/sources/
+          retention-days: 30
