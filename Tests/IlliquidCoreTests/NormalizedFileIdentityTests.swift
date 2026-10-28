@@ -70,6 +70,22 @@ struct NormalizedFileIdentityTests {
         }
     }
 
+    @Test func decodedSegmentsAndPathParametersKeepTheLegacyInterpretation() throws {
+        let cases = [
+            "file:///Movies/%2e%2e/Feature.mkv", "file:///Movies/%2E/Feature.mkv",
+            "file:///Movies/%2E%2E/Season/%2E%2E/Feature.mkv",
+            "file:///Movies%2FSeason%2F..%2FFeature.mkv",
+            "file:///Movies/%2F///Feature.mkv//", "file:///%2FMovies/Feature.mkv",
+            "file:///Movies/Feature.mkv;version=1",
+            "file:///Movies/Feature.mkv%3Bversion=1?query=ignored#fragment",
+            "file:///Movies/Feature%00tail.mkv", "file:///Movies/%EF%BB%BFFeature.mkv",
+            "file:///Movies/Feature%7F.mkv", "file:///Movies/Feature%FF.mkv",
+        ]
+        for input in cases {
+            if let url = URL(string: input) { try assertLegacyParity(url) }
+        }
+    }
+
     @Test func fileURLConstructorsPreserveOddPaths() throws {
         let paths = [
             "/", "//", "///", "//Movies//Feature.mkv", "/Movies//Season///Feature.mkv/",

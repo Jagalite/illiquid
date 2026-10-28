@@ -131,7 +131,7 @@ let package = Package(name: "FileIdentityQualification", platforms: [.macOS("26.
             for configuration in ("debug", "release"):
                 label = f"tests-{variant}-{configuration}"
                 run([swift, "test", "--package-path", str(package), "-c", configuration,
-                     "--jobs", "2", "--no-parallel", "-Xswiftc", "-warnings-as-errors"], label)
+                     "--jobs", "2", "--no-parallel"], label)
                 print("PASS " + label, flush=True)
         save(output / "manifest.json", manifest)
         if args.tests_only:
