@@ -13,13 +13,24 @@ public final class MediaSidecarReader {
         let show: URL
         let plex: URL
     }
-    private struct AncestorPathPlan {
+    // A reference keeps cache-hit snapshots cheap while preserving one coherent
+    // set of paths and hints across cancellation callbacks.
+    private final class AncestorPathPlan {
         let root: String
         let parent: String
         // Discovery visits parent first; sidecar reads visit root first.
         let folders: [URL]
         let sidecars: [FolderSidecarPaths]
         let hints: MediaMetadataHints
+
+        init(root: String, parent: String, folders: [URL],
+             sidecars: [FolderSidecarPaths], hints: MediaMetadataHints) {
+            self.root = root
+            self.parent = parent
+            self.folders = folders
+            self.sidecars = sidecars
+            self.hints = hints
+        }
     }
     private var cache: [String: Sidecar] = [:]
     // A missing or unusable sidecar needs only its path. Keeping those entries
