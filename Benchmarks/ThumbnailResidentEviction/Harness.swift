@@ -87,11 +87,11 @@ private struct Driver {
         return image
     }
 
-    static func key(_ index: Int, source: Int = 0) -> NativeThumbnailCache.Key {
+    static func key(_ index: Int, source: Int = 0, width: Int = 368, height: Int = 208) -> NativeThumbnailCache.Key {
         .init(
             path: "/benchmark/Media Library/Season 01/Example Video \(source).mkv",
             version: "file-identity:104857600:2026.123456789:2025.987654321",
-            halfSecond: index, width: 2048, height: 2048
+            halfSecond: index, width: width, height: height
         )
     }
 
@@ -138,7 +138,7 @@ private struct Driver {
     static func measure(_ workload: Workload, iterations: Int) async throws -> Measurement {
         let images = try (0..<96).map { _ in try makeImage() }
         let warmup = workload == .shrink ? 2 : 64
-        let count = workload == .shrink ? 96 : 96 + warmup + iterations
+        let count = workload == .shrink || workload.isControl ? 96 : 96 + warmup + iterations
         let keys = (0..<count).map { key($0) }
         if workload == .shrink {
             var elapsed: UInt64 = 0
@@ -200,7 +200,7 @@ private struct Driver {
             makeImage(), makeImage(width: 512, height: 512),
             makeImage(width: 1024, height: 1024), makeImage(width: 1536, height: 1536)
         ]
-        let keys = (0..<128).map { key($0, source: $0 / 64) }
+        let keys = (0..<128).map { key($0, source: $0 / 64, width: 2048, height: 2048) }
         var traces: [Trace] = []
         for seed in [UInt64(1), 7, 42, 20261028] {
             var random = RNG(state: seed)
