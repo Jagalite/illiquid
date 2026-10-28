@@ -16,13 +16,14 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 SCENARIOS = [
-    ("seek", "ready-playing", 4, "disabled"),
-    ("eof-drain", "playing-av", 4, "disabled"),
-    ("recovery", "playing-hardware", 4, "disabled"),
-    ("track-subtitles", "automatic", 4, "disabled"),
-    ("stop-shutdown", "opening", 4, "disabled"),
-    ("preroll-buffering", "partial-av", 4, "disabled"),
-    ("stop-shutdown", "opening", 3, "validation"),
+    ("seek", "ready-playing", 4, "disabled", "validation"),
+    ("eof-drain", "playing-av", 4, "disabled", "validation"),
+    ("recovery", "playing-hardware", 4, "disabled", "validation"),
+    ("track-subtitles", "automatic", 4, "disabled", "validation"),
+    ("stop-shutdown", "opening", 4, "disabled", "validation"),
+    ("preroll-buffering", "partial-av", 4, "disabled", "validation"),
+    ("stop-shutdown", "opening", 3, "validation", "validation"),
+    ("track-subtitles", "external-subtitle", 12, "disabled", "pr"),
 ]
 
 
@@ -63,8 +64,11 @@ def stage(output, variant, baseline):
     paths = ["Sources/IlliquidCore/Player/MediaTrack.swift"]
     for folder in ["Sources/IlliquidPlaybackCore", "Sources/IlliquidPlaybackStateSpace",
                    "Tests/IlliquidPlaybackCoreTests", "Tests/IlliquidPlaybackStateSpaceTests"]:
-        paths.extend(p for p in git("ls-tree", "-r", "--name-only", baseline, "--", folder)
-                     .decode().splitlines() if p.endswith(".swift"))
+        if variant == "baseline" and folder.startswith("Sources/"):
+            paths.extend(p for p in git("ls-tree", "-r", "--name-only", baseline, "--", folder)
+                         .decode().splitlines() if p.endswith(".swift"))
+        else:
+            paths.extend(str(p.relative_to(ROOT)) for p in sorted((ROOT / folder).rglob("*.swift")))
     for relative in paths:
         # Both variants use exactly the same current test suite.
         data = (git("show", f"{baseline}:{relative}")
@@ -133,7 +137,8 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     if any(args.output.iterdir()):
         parser.error("--output must be empty")
-    baseline = git("rev-parse", f"{args.baseline}^{{commit}}").decode().strip()
+    baseline = (None if args.tests_only else
+                git("rev-parse", f"{args.baseline}^{{commit}}").decode().strip())
     manifest = {
         "baseline_commit": baseline,
         "candidate_head": git("rev-parse", "HEAD").decode().strip(),
@@ -143,13 +148,15 @@ def main():
         "machine": platform.machine(),
         "method": "balanced AB/BA; fresh processes; release Swift 6; identical complete search graphs",
         "scope": "bounded verification throughput; no decoding or playback measurements",
-        "pairs": args.pairs,
+        "pairs": 0 if args.tests_only else args.pairs,
+        "tests_only": args.tests_only,
         "source_hashes": {},
         "harness_sha256": {name: sha256((HERE / name).read_bytes())
                            for name in ["Driver.swift", "run.py"]},
     }
     binaries = {}
-    for variant in ["baseline", "candidate"]:
+    variants = ["candidate"] if args.tests_only else ["baseline", "candidate"]
+    for variant in variants:
         print(f"Build {variant}", flush=True)
         manifest["source_hashes"][variant] = stage(args.output, variant, baseline)
         save(args.output / "manifest.json", manifest)
@@ -160,21 +167,28 @@ def main():
         binaries[variant] = Path(binary_dir) / "StateSpaceBenchmark"
     manifest["binary_sha256"] = {name: sha256(binary.read_bytes()) for name, binary in binaries.items()}
     save(args.output / "manifest.json", manifest)
-    for variant, configuration in [("baseline", "release"), ("candidate", "debug"), ("candidate", "release")]:
+    tests = [("candidate", "debug"), ("candidate", "release")]
+    if not args.tests_only:
+        tests.insert(0, ("baseline", "release"))
+    for variant, configuration in tests:
         print(f"Test {variant} {configuration}", flush=True)
         command(swift_command(args, variant, "test", configuration), args.output,
                 f"{variant}-{configuration}-tests.log")
 
+    if args.tests_only:
+        save(args.output / "verification.json", {"mode": "candidate-regression-only", "benchmark_ran": False})
+        print("Candidate debug/release regression suites passed; no historical graph comparison requested.", flush=True)
+        return
+
     observations = []
     verification = []
-    for model, seed, depth, por in SCENARIOS:
-        print(f"Compare {model}/{seed}, depth={depth}, por={por}", flush=True)
+    for model, seed, depth, por, profile in SCENARIOS:
+        print(f"Compare {model}/{seed}, depth={depth}, por={por}, profile={profile}", flush=True)
         reference = None
-        pairs = 2 if args.tests_only else args.pairs
-        for pair in range(pairs):
+        for pair in range(args.pairs):
             order = ["baseline", "candidate"] if pair % 2 == 0 else ["candidate", "baseline"]
             for variant in order:
-                observed = json.loads(command([binaries[variant], model, seed, depth, por], args.output))
+                observed = json.loads(command([binaries[variant], model, seed, depth, por, profile], args.output))
                 semantics = compact(observed)
                 if reference is None:
                     reference = semantics
@@ -182,19 +196,19 @@ def main():
                     save(args.output / "semantic-mismatch.json",
                          {"reference": reference, "actual": semantics})
                     raise ValueError(f"Search semantics differ: {model}/{seed}/{por}")
-                observed.update(variant=variant, pair=pair, model=model, seed=seed, depth=depth, por=por)
+                observed.update(variant=variant, pair=pair, model=model, seed=seed, depth=depth, por=por, profile=profile)
                 observations.append(observed)
                 save(args.output / "observations.json", observations)
-        verification.append({"model": model, "seed": seed, "depth": depth, "por": por,
+        verification.append({"model": model, "seed": seed, "depth": depth, "por": por, "profile": profile,
                              "states": reference["summary"]["stateCount"],
                              "edges": reference["summary"]["edgeCount"],
                              "canonical_digest": reference["summary"]["canonicalDigest"],
                              "semantics_equal": True})
     save(args.output / "verification.json", verification)
     summary = []
-    for model, seed, depth, por in SCENARIOS:
+    for model, seed, depth, por, profile in SCENARIOS:
         rows = [row for row in observations if
-                (row["model"], row["seed"], row["depth"], row["por"]) == (model, seed, depth, por)]
+                (row["model"], row["seed"], row["depth"], row["por"], row["profile"]) == (model, seed, depth, por, profile)]
         metrics = {}
         for metric in ["wallNanoseconds", "cpuNanoseconds"]:
             values = {variant: [row[metric] for row in rows if row["variant"] == variant]
@@ -207,7 +221,7 @@ def main():
                 "baseline_range": [min(values["baseline"]), max(values["baseline"])],
                 "candidate_range": [min(values["candidate"]), max(values["candidate"])],
             }
-        summary.append({"model": model, "seed": seed, "depth": depth, "por": por, "metrics": metrics})
+        summary.append({"model": model, "seed": seed, "depth": depth, "por": por, "profile": profile, "metrics": metrics})
     save(args.output / "summary.json", summary)
     print(json.dumps({"verification": verification, "summary": summary}, indent=2), flush=True)
 

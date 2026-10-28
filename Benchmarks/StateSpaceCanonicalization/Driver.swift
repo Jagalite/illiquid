@@ -44,15 +44,23 @@ private func digest<T: Encodable>(_ value: T) throws -> String {
 struct StateSpaceBenchmark {
   static func main() throws {
     let arguments = Array(CommandLine.arguments.dropFirst())
-    precondition(arguments.count == 4, "Usage: benchmark MODEL SEED DEPTH POR")
+    precondition(arguments.count == 5, "Usage: benchmark MODEL SEED DEPTH POR PROFILE")
     guard let model = PlaybackSearchModel(rawValue: arguments[0]),
       let depth = Int(arguments[2]),
       let por = PlaybackSearchPORMode(rawValue: arguments[3])
     else { preconditionFailure("Invalid benchmark arguments") }
     // Time limits would change the explored work when a variant runs faster.
     // Keep identical finite bounds and require both variants to complete them.
-    let configuration = PlaybackSearchConfiguration.validation(depthLimit: depth, porMode: por)
-      .withTimeLimitSeconds(nil)
+    let configuration: PlaybackSearchConfiguration
+    switch arguments[4] {
+    case "validation":
+      configuration = .validation(depthLimit: depth, porMode: por).withTimeLimitSeconds(nil)
+    case "pr":
+      precondition(depth == PlaybackSearchConfiguration.pr.depthLimit)
+      configuration = PlaybackSearchConfiguration.pr.withPORMode(por).withTimeLimitSeconds(nil)
+    default:
+      preconditionFailure("Unknown benchmark profile")
+    }
     let wallStart = DispatchTime.now().uptimeNanoseconds
     let cpuStart = cpuNanoseconds()
     let result = try PlaybackStateSpaceExplorer().run(

@@ -63,7 +63,7 @@ jobs:
           import os
           from pathlib import Path
           root = Path(os.environ['RUNNER_TEMP']) / 'state-space-canonicalization'
-          for name in ['manifest.json', 'verification.json', 'summary.json']:
+          for name in ['manifest.json', 'verification.json', 'observations.json', 'summary.json']:
               path = root / name
               if path.exists():
                   print(f'::group::{name}')
