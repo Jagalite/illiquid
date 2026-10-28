@@ -1,0 +1,743 @@
+{
+  "schema_version": 1,
+  "status": "Portable component target reproduced; draft stacked PR; native qualification pending",
+  "baseline_pr": 132,
+  "base_revision": "8637a8d2c6a628699d5a552a55061b4e0bfc6f10",
+  "candidate_revision": "9acae3a8a5a4330067233b53ab011ee0b36faed2",
+  "evaluation_policy": {
+    "written_utc": "2026-10-28 06:05:02 UTC",
+    "target": "1/front",
+    "target_minimum_paired_reduction_percent": 10,
+    "target_minimum_faster_pairs": 7,
+    "control_confirmation_trigger": {
+      "median_paired_slowdown_percent": 5,
+      "absolute_median_slowdown_ns": 10,
+      "both_required": true
+    },
+    "confirmation": "If the final candidate crosses a control threshold, run one complete fixed confirmation cohort. Do not pool versions or retain only favorable workloads. Do not ship with a repeated material control slowdown.",
+    "note": "Engineering review criteria, not statistical significance tests."
+  },
+  "policy_timing_note": "The policy was recorded before inspecting V2 results, after the first V2 CI run had completed. It is an engineering review rule, not a statistical significance test or a pre-run registration.",
+  "analysis_method": "Each displayed time is the median of eight variant observations. Paired percent is the median across eight paired (candidate / baseline - 1) * 100 values; it is not calculated by dividing the displayed medians. Cohorts and versions remain separate.",
+  "decision": "Retain V2 as a draft follow-up to #132. The singleton target passes in both cohorts. The V2 first-cohort 2/front slowdown does not repeat in the one complete fixed confirmation, and no confirmation control crosses both review thresholds. The first slowdown remains unexplained; control results do not prove universal absence of regressions.",
+  "scope": "Synchronous helper construction and destruction on Linux. Both variants already bound results to at most nine URLs and nine distances. No allocator, RSS, UI, decoding, playback, energy, or native macOS benefit is established.",
+  "cohorts": [
+    {
+      "id": "v1-before-search",
+      "label": "V1 (discarded)",
+      "run_id": 40640558185,
+      "run_attempt": 1,
+      "job_id": 122657450523,
+      "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40640558185/job/122657450523",
+      "created_utc": "2026-10-28T05:55:42.273422+00:00",
+      "provenance": {
+        "baseline_helper_sha256": "63eacf728ec2dc1e048dad0a1fbec804d81603fa16b2cfe789ac9cc956997e77",
+        "baseline_revision": "8637a8d2c6a628699d5a552a55061b4e0bfc6f10",
+        "baseline_scheduler_sha256": "656a81c6b07c3ba36d732b845bf86d61762f70464ea02a686deb984ea9400da0",
+        "candidate_helper_sha256": "c9f9b175a23905c57d4aed8bf4d69e32a9e54802a0b6c270ba021e6aa06b7ff6",
+        "candidate_revision": "56f9267db6b9fc3660addfc6c9a932e6d0522185",
+        "candidate_scheduler_sha256": "656a81c6b07c3ba36d732b845bf86d61762f70464ea02a686deb984ea9400da0",
+        "driver_sha256": "1db77f6d886be4a5b4efe573393ef0bda4af2f550e99b4d4f721b34e74ade1b9",
+        "relevant_status": "",
+        "runner_sha256": "56f67f0be72393ddc9939afb9ec3e380a0fab35eeac63fe467a1a6e9e29fa40e",
+        "support_sha256": {
+          "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+          "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+          "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+        }
+      },
+      "observations": 352,
+      "workloads": 22,
+      "pairs_per_workload": 8,
+      "elapsed_interval_range_ms": [
+        39.629306,
+        65.509375
+      ],
+      "tests": {
+        "distinct_functions": 7,
+        "configurations": 4,
+        "executions": 28,
+        "result": "passed"
+      },
+      "all_exact_receipts_equal": true,
+      "results": [
+        {
+          "case": "1/nil",
+          "baseline_ns": 21.24438822274003,
+          "candidate_ns": 20.005638729346977,
+          "paired_change_percent": -7.556635905603764,
+          "faster_pairs": 8,
+          "absolute_change_ns": -1.2387494933930547,
+          "flag": false
+        },
+        {
+          "case": "1/front",
+          "baseline_ns": 292.1499217408571,
+          "candidate_ns": 216.9359031882871,
+          "paired_change_percent": -26.199349196274348,
+          "faster_pairs": 8,
+          "absolute_change_ns": -75.21401855257,
+          "flag": false
+        },
+        {
+          "case": "1/absent",
+          "baseline_ns": 76.69880628309011,
+          "candidate_ns": 70.75247011022498,
+          "paired_change_percent": -7.733520200397914,
+          "faster_pairs": 8,
+          "absolute_change_ns": -5.946336172865131,
+          "flag": false
+        },
+        {
+          "case": "2/nil",
+          "baseline_ns": 21.268058847659635,
+          "candidate_ns": 19.68974218464909,
+          "paired_change_percent": -6.832250395948652,
+          "faster_pairs": 8,
+          "absolute_change_ns": -1.5783166630105434,
+          "flag": false
+        },
+        {
+          "case": "2/front",
+          "baseline_ns": 373.3445787277323,
+          "candidate_ns": 369.6029655813953,
+          "paired_change_percent": -0.41365176313949426,
+          "faster_pairs": 5,
+          "absolute_change_ns": -3.741613146336988,
+          "flag": false
+        },
+        {
+          "case": "2/last",
+          "baseline_ns": 412.883533938842,
+          "candidate_ns": 418.81298412326635,
+          "paired_change_percent": 0.5009680955332496,
+          "faster_pairs": 3,
+          "absolute_change_ns": 5.929450184424354,
+          "flag": false
+        },
+        {
+          "case": "2/absent",
+          "baseline_ns": 111.03243550790904,
+          "candidate_ns": 111.24703526768516,
+          "paired_change_percent": 0.7514340585623058,
+          "faster_pairs": 2,
+          "absolute_change_ns": 0.2145997597761209,
+          "flag": false
+        },
+        {
+          "case": "8/nil",
+          "baseline_ns": 21.26255883972152,
+          "candidate_ns": 19.816618459770144,
+          "paired_change_percent": -6.932976188105594,
+          "faster_pairs": 8,
+          "absolute_change_ns": -1.4459403799513773,
+          "flag": false
+        },
+        {
+          "case": "8/front",
+          "baseline_ns": 615.0039137142776,
+          "candidate_ns": 659.4039906933245,
+          "paired_change_percent": 8.003424803909864,
+          "faster_pairs": 2,
+          "absolute_change_ns": 44.40007697904696,
+          "flag": true
+        },
+        {
+          "case": "8/middle",
+          "baseline_ns": 984.9623972708947,
+          "candidate_ns": 1000.061506411553,
+          "paired_change_percent": 2.3209440411972926,
+          "faster_pairs": 4,
+          "absolute_change_ns": 15.099109140658243,
+          "flag": false
+        },
+        {
+          "case": "8/last",
+          "baseline_ns": 850.4462084453478,
+          "candidate_ns": 890.9086838817159,
+          "paired_change_percent": 5.447566038489848,
+          "faster_pairs": 2,
+          "absolute_change_ns": 40.462475436368095,
+          "flag": true
+        },
+        {
+          "case": "8/absent",
+          "baseline_ns": 327.9329180061677,
+          "candidate_ns": 322.38141717653843,
+          "paired_change_percent": 0.032658618198566636,
+          "faster_pairs": 4,
+          "absolute_change_ns": -5.551500829629276,
+          "flag": false
+        },
+        {
+          "case": "32/nil",
+          "baseline_ns": 21.16775536435609,
+          "candidate_ns": 19.99295300111855,
+          "paired_change_percent": -6.789171016592888,
+          "faster_pairs": 8,
+          "absolute_change_ns": -1.1748023632375393,
+          "flag": false
+        },
+        {
+          "case": "32/front",
+          "baseline_ns": 625.0610149585857,
+          "candidate_ns": 626.9708322482236,
+          "paired_change_percent": -1.8627827094073846,
+          "faster_pairs": 5,
+          "absolute_change_ns": 1.9098172896378856,
+          "flag": false
+        },
+        {
+          "case": "32/middle",
+          "baseline_ns": 1461.695382555025,
+          "candidate_ns": 1432.0585234978478,
+          "paired_change_percent": -1.131046792797502,
+          "faster_pairs": 4,
+          "absolute_change_ns": -29.636859057177162,
+          "flag": false
+        },
+        {
+          "case": "32/last",
+          "baseline_ns": 1619.571592586518,
+          "candidate_ns": 1652.8119218578174,
+          "paired_change_percent": 2.2850798713820675,
+          "faster_pairs": 2,
+          "absolute_change_ns": 33.240329271299515,
+          "flag": false
+        },
+        {
+          "case": "32/absent",
+          "baseline_ns": 1063.2785754443628,
+          "candidate_ns": 1078.8687464561435,
+          "paired_change_percent": 0.7863962780966793,
+          "faster_pairs": 2,
+          "absolute_change_ns": 15.59017101178074,
+          "flag": false
+        },
+        {
+          "case": "10000/nil",
+          "baseline_ns": 20.94112361573091,
+          "candidate_ns": 19.309663210379785,
+          "paired_change_percent": -8.07997010200488,
+          "faster_pairs": 8,
+          "absolute_change_ns": -1.631460405351124,
+          "flag": false
+        },
+        {
+          "case": "10000/front",
+          "baseline_ns": 651.7253601448017,
+          "candidate_ns": 605.894893376753,
+          "paired_change_percent": -5.425061619728244,
+          "faster_pairs": 8,
+          "absolute_change_ns": -45.83046676804872,
+          "flag": false
+        },
+        {
+          "case": "10000/middle",
+          "baseline_ns": 169843.37788778878,
+          "candidate_ns": 166983.2654109589,
+          "paired_change_percent": -1.184210593741436,
+          "faster_pairs": 5,
+          "absolute_change_ns": -2860.112476829876,
+          "flag": false
+        },
+        {
+          "case": "10000/last",
+          "baseline_ns": 332211.07194244605,
+          "candidate_ns": 336211.1642857143,
+          "paired_change_percent": 1.682479132822734,
+          "faster_pairs": 1,
+          "absolute_change_ns": 4000.0923432682175,
+          "flag": false
+        },
+        {
+          "case": "10000/absent",
+          "baseline_ns": 304796.78437500005,
+          "candidate_ns": 304335.3710691824,
+          "paired_change_percent": 0.5919971981762806,
+          "faster_pairs": 4,
+          "absolute_change_ns": -461.4133058176376,
+          "flag": false
+        }
+      ]
+    },
+    {
+      "id": "v2-first",
+      "label": "V2 first",
+      "run_id": 40641048888,
+      "run_attempt": 1,
+      "job_id": 122659022272,
+      "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40641048888/job/122659022272",
+      "created_utc": "2026-10-28T06:03:37.237824+00:00",
+      "provenance": {
+        "baseline_helper_sha256": "63eacf728ec2dc1e048dad0a1fbec804d81603fa16b2cfe789ac9cc956997e77",
+        "baseline_revision": "8637a8d2c6a628699d5a552a55061b4e0bfc6f10",
+        "baseline_scheduler_sha256": "656a81c6b07c3ba36d732b845bf86d61762f70464ea02a686deb984ea9400da0",
+        "candidate_helper_sha256": "1ce29bcd4c39ec7dbf1424a4d6913a634255b668ff01f4d57352a19e8ccfc90d",
+        "candidate_revision": "9acae3a8a5a4330067233b53ab011ee0b36faed2",
+        "candidate_scheduler_sha256": "656a81c6b07c3ba36d732b845bf86d61762f70464ea02a686deb984ea9400da0",
+        "driver_sha256": "1db77f6d886be4a5b4efe573393ef0bda4af2f550e99b4d4f721b34e74ade1b9",
+        "relevant_status": "",
+        "runner_sha256": "56f67f0be72393ddc9939afb9ec3e380a0fab35eeac63fe467a1a6e9e29fa40e",
+        "support_sha256": {
+          "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+          "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+          "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+        }
+      },
+      "observations": 352,
+      "workloads": 22,
+      "pairs_per_workload": 8,
+      "elapsed_interval_range_ms": [
+        41.306781,
+        66.250704
+      ],
+      "tests": {
+        "distinct_functions": 7,
+        "configurations": 4,
+        "executions": 28,
+        "result": "passed"
+      },
+      "all_exact_receipts_equal": true,
+      "results": [
+        {
+          "case": "1/nil",
+          "baseline_ns": 21.54183105215833,
+          "candidate_ns": 21.22325675145327,
+          "paired_change_percent": -0.6711631168451193,
+          "faster_pairs": 5,
+          "absolute_change_ns": -0.318574300705059,
+          "flag": false
+        },
+        {
+          "case": "1/front",
+          "baseline_ns": 295.29100860326605,
+          "candidate_ns": 247.1007129072656,
+          "paired_change_percent": -17.04032591675969,
+          "faster_pairs": 8,
+          "absolute_change_ns": -48.19029569600045,
+          "flag": false
+        },
+        {
+          "case": "1/absent",
+          "baseline_ns": 77.22812104173747,
+          "candidate_ns": 77.64228185018885,
+          "paired_change_percent": 0.25850141758428924,
+          "faster_pairs": 3,
+          "absolute_change_ns": 0.4141608084513848,
+          "flag": false
+        },
+        {
+          "case": "2/nil",
+          "baseline_ns": 21.826172987149768,
+          "candidate_ns": 21.56293535964076,
+          "paired_change_percent": -1.220824381943414,
+          "faster_pairs": 5,
+          "absolute_change_ns": -0.2632376275090067,
+          "flag": false
+        },
+        {
+          "case": "2/front",
+          "baseline_ns": 368.07273277698346,
+          "candidate_ns": 407.5254402414369,
+          "paired_change_percent": 9.61015936627888,
+          "faster_pairs": 1,
+          "absolute_change_ns": 39.452707464453454,
+          "flag": true
+        },
+        {
+          "case": "2/last",
+          "baseline_ns": 424.89126812764584,
+          "candidate_ns": 419.72016171188636,
+          "paired_change_percent": -2.2386220356316766,
+          "faster_pairs": 5,
+          "absolute_change_ns": -5.171106415759482,
+          "flag": false
+        },
+        {
+          "case": "2/absent",
+          "baseline_ns": 113.25443601019451,
+          "candidate_ns": 111.08022103080859,
+          "paired_change_percent": -0.9887187257621943,
+          "faster_pairs": 6,
+          "absolute_change_ns": -2.1742149793859227,
+          "flag": false
+        },
+        {
+          "case": "8/nil",
+          "baseline_ns": 21.56876098477106,
+          "candidate_ns": 21.380369136987074,
+          "paired_change_percent": -0.16817664866980442,
+          "faster_pairs": 5,
+          "absolute_change_ns": -0.18839184778398632,
+          "flag": false
+        },
+        {
+          "case": "8/front",
+          "baseline_ns": 630.1706965602425,
+          "candidate_ns": 631.5596773622535,
+          "paired_change_percent": -0.49570083721655056,
+          "faster_pairs": 5,
+          "absolute_change_ns": 1.3889808020110195,
+          "flag": false
+        },
+        {
+          "case": "8/middle",
+          "baseline_ns": 990.3045179202422,
+          "candidate_ns": 1007.5452955820754,
+          "paired_change_percent": 1.7418367649413624,
+          "faster_pairs": 3,
+          "absolute_change_ns": 17.240777661833135,
+          "flag": false
+        },
+        {
+          "case": "8/last",
+          "baseline_ns": 859.1001903035794,
+          "candidate_ns": 859.4255888383258,
+          "paired_change_percent": -0.184912053512315,
+          "faster_pairs": 5,
+          "absolute_change_ns": 0.3253985347463413,
+          "flag": false
+        },
+        {
+          "case": "8/absent",
+          "baseline_ns": 327.36380759865847,
+          "candidate_ns": 319.1428298468127,
+          "paired_change_percent": -1.3832654793057286,
+          "faster_pairs": 5,
+          "absolute_change_ns": -8.220977751845794,
+          "flag": false
+        },
+        {
+          "case": "32/nil",
+          "baseline_ns": 21.454379999664592,
+          "candidate_ns": 21.294272259100264,
+          "paired_change_percent": 0.1494459043513363,
+          "faster_pairs": 4,
+          "absolute_change_ns": -0.16010774056432808,
+          "flag": false
+        },
+        {
+          "case": "32/front",
+          "baseline_ns": 636.6391030628847,
+          "candidate_ns": 625.7780025498257,
+          "paired_change_percent": -0.0550891720794644,
+          "faster_pairs": 4,
+          "absolute_change_ns": -10.861100513059,
+          "flag": false
+        },
+        {
+          "case": "32/middle",
+          "baseline_ns": 1495.87499286896,
+          "candidate_ns": 1441.5773162306036,
+          "paired_change_percent": -2.3581904723371294,
+          "faster_pairs": 8,
+          "absolute_change_ns": -54.29767663835628,
+          "flag": false
+        },
+        {
+          "case": "32/last",
+          "baseline_ns": 1660.4136344213262,
+          "candidate_ns": 1677.4256900931414,
+          "paired_change_percent": 1.0199837847537196,
+          "faster_pairs": 3,
+          "absolute_change_ns": 17.012055671815233,
+          "flag": false
+        },
+        {
+          "case": "32/absent",
+          "baseline_ns": 1083.9554950805946,
+          "candidate_ns": 1083.9049067358615,
+          "paired_change_percent": -0.2514768807251988,
+          "faster_pairs": 4,
+          "absolute_change_ns": -0.050588344733114354,
+          "flag": false
+        },
+        {
+          "case": "10000/nil",
+          "baseline_ns": 21.319700291243123,
+          "candidate_ns": 21.014481119293713,
+          "paired_change_percent": -1.6561671986691728,
+          "faster_pairs": 5,
+          "absolute_change_ns": -0.3052191719494104,
+          "flag": false
+        },
+        {
+          "case": "10000/front",
+          "baseline_ns": 627.778117132362,
+          "candidate_ns": 632.8725787239948,
+          "paired_change_percent": 2.7113132219438896,
+          "faster_pairs": 4,
+          "absolute_change_ns": 5.0944615916328075,
+          "flag": false
+        },
+        {
+          "case": "10000/middle",
+          "baseline_ns": 165838.53721682847,
+          "candidate_ns": 168792.55423728813,
+          "paired_change_percent": 1.6972816410735003,
+          "faster_pairs": 3,
+          "absolute_change_ns": 2954.017020459665,
+          "flag": false
+        },
+        {
+          "case": "10000/last",
+          "baseline_ns": 336726.53716216213,
+          "candidate_ns": 335660.4130434783,
+          "paired_change_percent": -0.9635252233450131,
+          "faster_pairs": 6,
+          "absolute_change_ns": -1066.1241186838597,
+          "flag": false
+        },
+        {
+          "case": "10000/absent",
+          "baseline_ns": 303309.6280487805,
+          "candidate_ns": 304906.10778443114,
+          "paired_change_percent": -0.00507059237810914,
+          "faster_pairs": 4,
+          "absolute_change_ns": 1596.479735650646,
+          "flag": false
+        }
+      ]
+    },
+    {
+      "id": "v2-confirmation",
+      "label": "V2 confirmation",
+      "run_id": 40641048888,
+      "run_attempt": 2,
+      "job_id": 122661904725,
+      "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40641048888/job/122661904725",
+      "created_utc": "2026-10-28T06:10:02.134872+00:00",
+      "provenance": {
+        "baseline_helper_sha256": "63eacf728ec2dc1e048dad0a1fbec804d81603fa16b2cfe789ac9cc956997e77",
+        "baseline_revision": "8637a8d2c6a628699d5a552a55061b4e0bfc6f10",
+        "baseline_scheduler_sha256": "656a81c6b07c3ba36d732b845bf86d61762f70464ea02a686deb984ea9400da0",
+        "candidate_helper_sha256": "1ce29bcd4c39ec7dbf1424a4d6913a634255b668ff01f4d57352a19e8ccfc90d",
+        "candidate_revision": "9acae3a8a5a4330067233b53ab011ee0b36faed2",
+        "candidate_scheduler_sha256": "656a81c6b07c3ba36d732b845bf86d61762f70464ea02a686deb984ea9400da0",
+        "driver_sha256": "1db77f6d886be4a5b4efe573393ef0bda4af2f550e99b4d4f721b34e74ade1b9",
+        "relevant_status": "",
+        "runner_sha256": "56f67f0be72393ddc9939afb9ec3e380a0fab35eeac63fe467a1a6e9e29fa40e",
+        "support_sha256": {
+          "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+          "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+          "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+        }
+      },
+      "observations": 352,
+      "workloads": 22,
+      "pairs_per_workload": 8,
+      "elapsed_interval_range_ms": [
+        38.077581,
+        63.940939
+      ],
+      "tests": {
+        "distinct_functions": 7,
+        "configurations": 4,
+        "executions": 28,
+        "result": "passed"
+      },
+      "all_exact_receipts_equal": true,
+      "results": [
+        {
+          "case": "1/nil",
+          "baseline_ns": 21.15272028524975,
+          "candidate_ns": 21.537715454967692,
+          "paired_change_percent": 0.42944832306233693,
+          "faster_pairs": 4,
+          "absolute_change_ns": 0.3849951697179428,
+          "flag": false
+        },
+        {
+          "case": "1/front",
+          "baseline_ns": 294.8576602360257,
+          "candidate_ns": 246.54135280667543,
+          "paired_change_percent": -16.082536045286815,
+          "faster_pairs": 8,
+          "absolute_change_ns": -48.316307429350275,
+          "flag": false
+        },
+        {
+          "case": "1/absent",
+          "baseline_ns": 76.96784864738447,
+          "candidate_ns": 78.92353860227027,
+          "paired_change_percent": 2.1059516227512565,
+          "faster_pairs": 3,
+          "absolute_change_ns": 1.9556899548857984,
+          "flag": false
+        },
+        {
+          "case": "2/nil",
+          "baseline_ns": 21.856140698854524,
+          "candidate_ns": 21.35478994407291,
+          "paired_change_percent": -1.4950681560300438,
+          "faster_pairs": 7,
+          "absolute_change_ns": -0.5013507547816154,
+          "flag": false
+        },
+        {
+          "case": "2/front",
+          "baseline_ns": 367.8831282125534,
+          "candidate_ns": 366.85959050769367,
+          "paired_change_percent": -0.12540822165834076,
+          "faster_pairs": 5,
+          "absolute_change_ns": -1.0235377048597343,
+          "flag": false
+        },
+        {
+          "case": "2/last",
+          "baseline_ns": 413.0834452392045,
+          "candidate_ns": 415.0477626927354,
+          "paired_change_percent": 0.9633779555070388,
+          "faster_pairs": 3,
+          "absolute_change_ns": 1.9643174535308958,
+          "flag": false
+        },
+        {
+          "case": "2/absent",
+          "baseline_ns": 112.23492310407978,
+          "candidate_ns": 113.19262697206591,
+          "paired_change_percent": 0.26288529500416713,
+          "faster_pairs": 3,
+          "absolute_change_ns": 0.9577038679861261,
+          "flag": false
+        },
+        {
+          "case": "8/nil",
+          "baseline_ns": 21.48287846169906,
+          "candidate_ns": 21.523019744624538,
+          "paired_change_percent": 0.17757615627953527,
+          "faster_pairs": 3,
+          "absolute_change_ns": 0.040141282925478805,
+          "flag": false
+        },
+        {
+          "case": "8/front",
+          "baseline_ns": 614.9002705271624,
+          "candidate_ns": 616.645334206042,
+          "paired_change_percent": -0.6707575292701995,
+          "faster_pairs": 5,
+          "absolute_change_ns": 1.7450636788795464,
+          "flag": false
+        },
+        {
+          "case": "8/middle",
+          "baseline_ns": 999.5627829511576,
+          "candidate_ns": 949.9122975038207,
+          "paired_change_percent": -4.707124674328044,
+          "faster_pairs": 7,
+          "absolute_change_ns": -49.650485447336905,
+          "flag": false
+        },
+        {
+          "case": "8/last",
+          "baseline_ns": 869.8962326878791,
+          "candidate_ns": 848.2807732659134,
+          "paired_change_percent": -0.8323206273332995,
+          "faster_pairs": 6,
+          "absolute_change_ns": -21.61545942196574,
+          "flag": false
+        },
+        {
+          "case": "8/absent",
+          "baseline_ns": 325.77664153220724,
+          "candidate_ns": 316.366419599226,
+          "paired_change_percent": -2.241524540407036,
+          "faster_pairs": 7,
+          "absolute_change_ns": -9.410221932981244,
+          "flag": false
+        },
+        {
+          "case": "32/nil",
+          "baseline_ns": 21.42400592191926,
+          "candidate_ns": 21.28370311630835,
+          "paired_change_percent": -0.5573113070799107,
+          "faster_pairs": 4,
+          "absolute_change_ns": -0.14030280561091146,
+          "flag": false
+        },
+        {
+          "case": "32/front",
+          "baseline_ns": 623.7152356235888,
+          "candidate_ns": 631.4905720588847,
+          "paired_change_percent": 4.13033453658781,
+          "faster_pairs": 2,
+          "absolute_change_ns": 7.7753364352959125,
+          "flag": false
+        },
+        {
+          "case": "32/middle",
+          "baseline_ns": 1430.3469594209505,
+          "candidate_ns": 1434.7046636039413,
+          "paired_change_percent": 0.13911063466943707,
+          "faster_pairs": 3,
+          "absolute_change_ns": 4.357704182990801,
+          "flag": false
+        },
+        {
+          "case": "32/last",
+          "baseline_ns": 1663.4312952883429,
+          "candidate_ns": 1636.041496248108,
+          "paired_change_percent": -1.7470763877014683,
+          "faster_pairs": 5,
+          "absolute_change_ns": -27.389799040234948,
+          "flag": false
+        },
+        {
+          "case": "32/absent",
+          "baseline_ns": 1085.8570191970548,
+          "candidate_ns": 1073.9191776489192,
+          "paired_change_percent": -0.06997426147097308,
+          "faster_pairs": 4,
+          "absolute_change_ns": -11.937841548135566,
+          "flag": false
+        },
+        {
+          "case": "10000/nil",
+          "baseline_ns": 21.15644187550686,
+          "candidate_ns": 20.83659653049851,
+          "paired_change_percent": -1.3034786277666799,
+          "faster_pairs": 4,
+          "absolute_change_ns": -0.3198453450083498,
+          "flag": false
+        },
+        {
+          "case": "10000/front",
+          "baseline_ns": 624.9653448710409,
+          "candidate_ns": 602.2453670344516,
+          "paired_change_percent": -0.4714748786408929,
+          "faster_pairs": 4,
+          "absolute_change_ns": -22.719977836589237,
+          "flag": false
+        },
+        {
+          "case": "10000/middle",
+          "baseline_ns": 163745.5588235294,
+          "candidate_ns": 165955.25778546714,
+          "paired_change_percent": 0.9140019039524327,
+          "faster_pairs": 3,
+          "absolute_change_ns": 2209.698961937742,
+          "flag": false
+        },
+        {
+          "case": "10000/last",
+          "baseline_ns": 333468.8660130719,
+          "candidate_ns": 334489.2070063694,
+          "paired_change_percent": 1.9491251749151228,
+          "faster_pairs": 3,
+          "absolute_change_ns": 1020.3409932975192,
+          "flag": false
+        },
+        {
+          "case": "10000/absent",
+          "baseline_ns": 305266.43023255817,
+          "candidate_ns": 304821.33939393936,
+          "paired_change_percent": -0.22853357017777465,
+          "faster_pairs": 4,
+          "absolute_change_ns": -445.09083861880936,
+          "flag": false
+        }
+      ]
+    }
+  ]
+}
