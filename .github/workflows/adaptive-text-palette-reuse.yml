@@ -1,0 +1,96 @@
+name: Adaptive text palette context reuse
+
+on:
+  push:
+    branches: ['perf/adaptive-text-context-reuse-20261028']
+    paths:
+      - 'Sources/IlliquidApp/UI/PlayerTheme.swift'
+      - 'Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift'
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackVideoColorStore.swift'
+      - 'Tests/IlliquidAppTests/AdaptiveTextPaletteReuseTests.swift'
+      - 'Benchmarks/AdaptiveTextPaletteReuse/**'
+      - '.github/workflows/adaptive-text-palette-reuse.yml'
+      - '!Benchmarks/AdaptiveTextPaletteReuse/*.md'
+      - '!Benchmarks/AdaptiveTextPaletteReuse/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: adaptive-text-palette-reuse-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-palette:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify real SwiftUI output, measure palette calls, and run app regressions
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = ['bash', 'Benchmarks/AdaptiveTextPaletteReuse/qualify-native.sh',
+                     str(Path(os.environ['RUNNER_TEMP']) / 'adaptive-text-palette-reuse')]
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Kyoto is unavailable on this hosted runner; builds run serially in this isolated checkout.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit compact review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'adaptive-text-palette-reuse'
+          files = {}
+          for path in sorted(root.rglob('*')):
+              if not path.is_file():
+                  continue
+              relative = path.relative_to(root)
+              if any(part in {'build', '.build', 'cache', 'module-cache', 'sources', 'package-cache'}
+                     for part in relative.parts):
+                  continue
+              if path.suffix not in {'.json', '.jsonl', '.log', '.txt'}:
+                  continue
+              if 'receipt' in path.name or path.name.startswith(('baseline-verify', 'candidate-verify')):
+                  continue
+              if path.stat().st_size > 2 * 1024 * 1024:
+                  continue
+              files[str(relative)] = path.read_text()
+          for name, content in files.items():
+              if name.endswith(('summary.json', 'verification.json', 'tests.json')):
+                  print(name + '\n' + content)
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log limit; retrieve the complete uploaded artifact.')
+          print('PALETTE_REUSE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('PALETTE_REUSE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: adaptive-text-palette-reuse-native
+          path: |
+            ${{ runner.temp }}/adaptive-text-palette-reuse/**
+            !${{ runner.temp }}/adaptive-text-palette-reuse/**/.build/**
+            !${{ runner.temp }}/adaptive-text-palette-reuse/**/build/**
+            !${{ runner.temp }}/adaptive-text-palette-reuse/**/module-cache/**
+          retention-days: 14
