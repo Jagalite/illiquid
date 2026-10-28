@@ -55,10 +55,13 @@ jobs:
             apt-get update
             apt-get install -y python3
           fi
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
       - name: Verify portable checkpoint semantics and measure paired runs
+        id: qualification
         shell: bash
         run: |
+          echo "output=$RUNNER_TEMP/checkpoint-construction-portable" >> "$GITHUB_OUTPUT"
           echo 'Kyoto is unavailable on this ephemeral Linux runner; building serially in isolated packages.'
           mode=()
           if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
@@ -84,12 +87,12 @@ jobs:
                   print('CHECKPOINT_FILE_END ' + name)
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
+        if: always() && steps.qualification.outputs.output != ''
         with:
           name: checkpoint-construction-portable
           path: |
-            ${{ runner.temp }}/checkpoint-construction-portable/
-            !${{ runner.temp }}/checkpoint-construction-portable/packages/**/build/**
-            !${{ runner.temp }}/checkpoint-construction-portable/module-cache/**
-            !${{ runner.temp }}/checkpoint-construction-portable/cache/**
+            ${{ steps.qualification.outputs.output }}/*.json
+            ${{ steps.qualification.outputs.output }}/*.jsonl
+            ${{ steps.qualification.outputs.output }}/runner.snapshot.py
+            ${{ steps.qualification.outputs.output }}/logs/
           retention-days: 14
