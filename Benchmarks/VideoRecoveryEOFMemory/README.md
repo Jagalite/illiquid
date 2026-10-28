@@ -1,5 +1,7 @@
 # Independent validation of video recovery packet lifetime at EOF
 
+**[Measured results and qualification status](RESULTS.md)** · [Raw evidence](evidence/linux)
+
 This study builds on [PR #172](https://github.com/Jagalite/illiquid/pull/172).
 It contributes independent control-flow and native-buffer evidence, plus decoded-output
 ownership tests. There are no additional production changes relative to that PR.
