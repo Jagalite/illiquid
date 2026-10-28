@@ -90,6 +90,8 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Register the checkout in the job container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Ensure Python is available
         run: |
           if ! command -v python3 >/dev/null 2>&1; then
