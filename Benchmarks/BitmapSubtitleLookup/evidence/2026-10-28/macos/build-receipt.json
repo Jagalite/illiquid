@@ -1,0 +1,179 @@
+{
+  "adaptation": "Complete timeline/budget; exact ASSRenderedRegion declaration with Foundation/CoreGraphics imports.",
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binaries": {
+    "baseline": "54236a3640e80f9f514c97f2e42619355fd0a9135c6b7ecf95199c328e0d7901",
+    "candidate": "be1eb075fde0da3488cdea93ff7b626d1b9aa039843efa7c0964633762baa567"
+  },
+  "candidate_revision": "1e0979032bba0857d15d79391249e1ccbbd639bf",
+  "candidate_status": "",
+  "compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "driver_flags": [
+    "-swift-version",
+    "6",
+    "-O",
+    "-warnings-as-errors",
+    "-parse-as-library"
+  ],
+  "driver_sha256": "8830cd9d5c0c7235a9cf16c307c06a818f4c790ab69291acca249d2a5c3d4ab2",
+  "hardware": "Apple M1 (Virtual)",
+  "libraries": {
+    "baseline": {
+      "dylib_sha256": "9395cb96934ed8857d28e1aa994469700b72149dc5215cb771f52f074b834298",
+      "swiftmodule_sha256": "e699976ad42d5b8503dc6bae1b3d71b17d06c9a2cf1a3a29a6f425647ab23f58"
+    },
+    "candidate": {
+      "dylib_sha256": "5ad02d6ad7afec1cb01200ed1703ef47a7efa3271063c8f4fadc1f3d5f95b9e5",
+      "swiftmodule_sha256": "e699976ad42d5b8503dc6bae1b3d71b17d06c9a2cf1a3a29a6f425647ab23f58"
+    }
+  },
+  "linked_dependencies": {
+    "baseline": {
+      "driver": "/Users/runner/work/_temp/bitmap-subtitle-lookup/baseline/benchmark:\n\t/Users/runner/work/_temp/bitmap-subtitle-lookup/baseline/libIlliquidNativePlayback.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0, weak)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 1542.100.32)\n\t/usr/lib/swift/libswiftIOKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 951.7.0, weak)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 128.120.2, weak)\n\t/usr/lib/swift/libswift_Builtin_float.dylib (compatibility version 0.0.0, current version 0.0.0, weak)\n",
+      "module": "/Users/runner/work/_temp/bitmap-subtitle-lookup/baseline/libIlliquidNativePlayback.dylib:\n\t/Users/runner/work/_temp/bitmap-subtitle-lookup/baseline/libIlliquidNativePlayback.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n\t/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 1542.100.32, weak)\n\t/usr/lib/swift/libswiftIOKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 951.7.0, weak)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 128.120.2, weak)\n\t/usr/lib/swift/libswift_Builtin_float.dylib (compatibility version 0.0.0, current version 0.0.0, weak)\n"
+    },
+    "candidate": {
+      "driver": "/Users/runner/work/_temp/bitmap-subtitle-lookup/candidate/benchmark:\n\t/Users/runner/work/_temp/bitmap-subtitle-lookup/candidate/libIlliquidNativePlayback.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0, weak)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 1542.100.32)\n\t/usr/lib/swift/libswiftIOKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 951.7.0, weak)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 128.120.2, weak)\n\t/usr/lib/swift/libswift_Builtin_float.dylib (compatibility version 0.0.0, current version 0.0.0, weak)\n",
+      "module": "/Users/runner/work/_temp/bitmap-subtitle-lookup/candidate/libIlliquidNativePlayback.dylib:\n\t/Users/runner/work/_temp/bitmap-subtitle-lookup/candidate/libIlliquidNativePlayback.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n\t/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics (compatibility version 64.0.0, current version 1965.5.1)\n\t/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation (compatibility version 300.0.0, current version 5026.5.4)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0)\n\t/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 1542.100.32, weak)\n\t/usr/lib/swift/libswiftIOKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)\n\t/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 951.7.0, weak)\n\t/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 128.120.2, weak)\n\t/usr/lib/swift/libswift_Builtin_float.dylib (compatibility version 0.0.0, current version 0.0.0, weak)\n"
+    }
+  },
+  "lookup_sha256": {
+    "baseline": "5acae0dd4f26acf219a7329e425e5faaf03e4c5c5cd24eaca7cd36db2ab26f57",
+    "candidate": "09f6412acb2f0f5d9205cedb06db9ebf447b21e7d92f219f3bdaf3a82a827ff6"
+  },
+  "machine": "arm64",
+  "mode": "native-production-timeline-lookup",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "production_flags": [
+    "-swift-version",
+    "6",
+    "-O",
+    "-whole-module-optimization",
+    "-enable-testing",
+    "-warnings-as-errors",
+    "-emit-library",
+    "-emit-module"
+  ],
+  "queries_per_cycle": 16,
+  "region_extraction": {
+    "baseline": {
+      "compiled_source_sha256": "353f37177ca3235616eb358b6096929cc6ba9c5d2ba99d568f388899a3933138",
+      "declaration_sha256": "151d4b7cc666ab3781fe423f0cfa263b0e57ac08949e8862ee23ad7d655fe7ab",
+      "end_byte_exclusive": 1168,
+      "original_sha256": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "start_byte_inclusive": 71
+    },
+    "candidate": {
+      "compiled_source_sha256": "353f37177ca3235616eb358b6096929cc6ba9c5d2ba99d568f388899a3933138",
+      "declaration_sha256": "151d4b7cc666ab3781fe423f0cfa263b0e57ac08949e8862ee23ad7d655fe7ab",
+      "end_byte_exclusive": 1168,
+      "original_sha256": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "start_byte_inclusive": 71
+    }
+  },
+  "runner_sha256": "6cbc0559b64bcfcc1bb142747dc8b65ed128437f13f58b370e60322f9c72bc2d",
+  "sdk_version": "26.5",
+  "sources": {
+    "baseline:Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift": {
+      "bytes": 6794,
+      "sha256": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f",
+      "staged_path": "sources/baseline/Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift"
+    },
+    "baseline:Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": {
+      "bytes": 14650,
+      "sha256": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "staged_path": "sources/baseline/Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift"
+    },
+    "baseline:Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": {
+      "bytes": 6390,
+      "sha256": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+      "staged_path": "sources/baseline/Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift"
+    },
+    "baseline:Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift": {
+      "bytes": 24629,
+      "sha256": "583701a03466dfc760230cb0d487f2cf2165ee56ad11062ae5a42354afd0f577",
+      "staged_path": "sources/baseline/Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift"
+    },
+    "baseline:Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift": {
+      "bytes": 21339,
+      "sha256": "b3d872737944344704762b2097d5734998825a6bae336ab14bda93f78d67ef6b",
+      "staged_path": "sources/baseline/Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift"
+    },
+    "candidate:Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift": {
+      "bytes": 8063,
+      "sha256": "fd3a2b92cc31b8b5ed1f6f28ec383b113acf2e60545c606c6031899a074ed3e0",
+      "staged_path": "sources/candidate/Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift"
+    },
+    "candidate:Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": {
+      "bytes": 14650,
+      "sha256": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "staged_path": "sources/candidate/Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift"
+    },
+    "candidate:Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": {
+      "bytes": 6390,
+      "sha256": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+      "staged_path": "sources/candidate/Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift"
+    },
+    "candidate:Tests/IlliquidNativePlaybackTests/BitmapSubtitleLookupTests.swift": {
+      "bytes": 12122,
+      "sha256": "79990c98c72538c1c82ebfd290646c333199dd64a6bee0cd9bb32eb50ab48ad7",
+      "staged_path": "sources/candidate/Tests/IlliquidNativePlaybackTests/BitmapSubtitleLookupTests.swift"
+    },
+    "candidate:Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift": {
+      "bytes": 24629,
+      "sha256": "583701a03466dfc760230cb0d487f2cf2165ee56ad11062ae5a42354afd0f577",
+      "staged_path": "sources/candidate/Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift"
+    },
+    "candidate:Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift": {
+      "bytes": 21339,
+      "sha256": "b3d872737944344704762b2097d5734998825a6bae336ab14bda93f78d67ef6b",
+      "staged_path": "sources/candidate/Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift"
+    }
+  },
+  "started_utc": "2026-10-28T14:00:56.843149+00:00",
+  "swift_test_compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "test_binaries": {
+    "baseline": {
+      "tests-baseline/.build/arm64-apple-macosx/debug/BitmapSubtitleLookupRegressionTestsPackageTests.xctest/Contents/MacOS/BitmapSubtitleLookupRegressionTestsPackageTests": "5ff3137bfa8a99eeff2d05d4cd23e99da01b7ab66e494193b990d1000358aecb",
+      "tests-baseline/.build/arm64-apple-macosx/release/BitmapSubtitleLookupRegressionTestsPackageTests.xctest/Contents/MacOS/BitmapSubtitleLookupRegressionTestsPackageTests": "f89c70ac0d28124e2d538c25beefe1c7249dcacf432d185f2fd20bb105852c4d"
+    },
+    "candidate": {
+      "tests-candidate/.build/arm64-apple-macosx/debug/BitmapSubtitleLookupRegressionTestsPackageTests.xctest/Contents/MacOS/BitmapSubtitleLookupRegressionTestsPackageTests": "2c0d932cb6ac9615823ada9a9ab37ca13d467c4439a7bc16e4b91abca6bd6f97",
+      "tests-candidate/.build/arm64-apple-macosx/release/BitmapSubtitleLookupRegressionTestsPackageTests.xctest/Contents/MacOS/BitmapSubtitleLookupRegressionTestsPackageTests": "b01516cb2b3a12dac053d3b102af6ef2e4a551a6c1a4f88179bcc7a54dd82d4e"
+    }
+  },
+  "test_package_sha256": "02a59d32cbcd60ad70bdb62c8f2b1c7910205b7cbf651de7d92d81b6bcca2e4a",
+  "tests": {
+    "baseline:debug": {
+      "log_path": "baseline-debug-tests.txt",
+      "log_sha256": "08a23fec0798008e12ccfe5f88caf14bce4ff0969ff11b658d20a1c6374d3a1c",
+      "passed": true,
+      "reported_test_count": 28
+    },
+    "baseline:release": {
+      "log_path": "baseline-release-tests.txt",
+      "log_sha256": "b55e5a311f41037cce950c72824dddf01ba995b18ba2a67651a9aa51a9aa9417",
+      "passed": true,
+      "reported_test_count": 28
+    },
+    "candidate:debug": {
+      "log_path": "candidate-debug-tests.txt",
+      "log_sha256": "ac4a0f437637efc3ec8a3624d5b037f3153a27944be455659b789be7cedb4160",
+      "passed": true,
+      "reported_test_count": 28
+    },
+    "candidate:release": {
+      "log_path": "candidate-release-tests.txt",
+      "log_sha256": "b73cdcbc6bca3b03a5dca3e8659e2f7e2a77da8b676c26f4b508ac77f0d921e4",
+      "passed": true,
+      "reported_test_count": 28
+    }
+  },
+  "timing_protocol": {
+    "minimum_ms": 60,
+    "order": "alternating AB/BA",
+    "pairs": 8,
+    "processes": "fresh process for every pilot and observation",
+    "target_ms": 240.0
+  }
+}

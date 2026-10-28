@@ -2,9 +2,12 @@
 
 ## Status
 
-Qualification is in progress. This branch does not yet establish a performance
-improvement. The native macOS and explicit portable Linux runs are separate
-experiments, and their results must be reported separately.
+**Qualification complete — REJECTED.** Debug/release tests and 3,050 complete-output
+comparisons passed on both platforms, but the native macOS benchmark found
+material regressions (including +15.80% for a 32-entry buffered-window query
+and +18.39% at the 128-entry near-tail crossover). Do not open a performance
+PR for this hybrid. See [audited results](evidence/2026-10-28/RESULTS.md).
+The macOS and explicit portable Linux runs remain separate experiments.
 
 - Native experiment: [run 40639454368](https://github.com/Jagalite/illiquid/actions/runs/40639454368)
   at commit `1e0979032bba0857d15d79391249e1ccbbd639bf`.
