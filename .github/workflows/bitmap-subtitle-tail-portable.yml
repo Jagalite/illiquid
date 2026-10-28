@@ -1,0 +1,125 @@
+name: Bitmap subtitle tail lookup portable
+
+on:
+  push:
+    branches: ['perf/bitmap-subtitle-tail-search-20261028-3825']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimeline*Tests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift'
+      - 'Benchmarks/BitmapSubtitleTailLookup/**'
+      - 'Benchmarks/BitmapSubtitleTailPortable/**'
+      - '.github/workflows/bitmap-subtitle-tail-portable.yml'
+      - '!Benchmarks/BitmapSubtitleTailLookup/*.md'
+      - '!Benchmarks/BitmapSubtitleTailLookup/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-tail-portable-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  portable-components:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    container:
+      image: swift:6.2.4-noble@sha256:d6f8f6112e9a63da0a4a151d6b93acd16699d35c0b82531ac1a245f5af210197
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Ensure Python is available
+        shell: bash
+        run: |
+          if ! command -v python3 >/dev/null 2>&1; then
+            apt-get update
+            apt-get install --no-install-recommends -y python3
+          fi
+      - name: Check the patch and qualify portable lookup
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'bitmap-subtitle-tail-portable'
+          commands = [
+              [sys.executable, 'Benchmarks/BitmapSubtitleTailPortable/run.py',
+               '--tests-only', '--output', str(root / 'tests')],
+          ]
+          # PRs retain the behavioral gate. Research pushes and manual runs
+          # additionally collect the longer before/after timing cohort.
+          if os.environ['EVENT_NAME'] != 'pull_request':
+              commands.append([
+                  sys.executable, 'Benchmarks/BitmapSubtitleTailPortable/run.py',
+                  '--pairs', '8', '--target-ms', '100', '--max-sample-ms', '1500',
+                  '--output', str(root / 'timing'),
+              ])
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if not queue.is_file():
+              print('The shared Kyoto queue is unavailable on this hosted runner; '
+                    'running isolated portable component builds directly and serially.', flush=True)
+          for command in commands:
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = str(json.loads(submitted)['id'])
+                  subprocess.run([*cli, 'show', job_id], check=True)
+                  result = subprocess.run([*cli, 'wait', job_id])
+                  subprocess.run([*cli, 'logs', job_id], check=True)
+                  if result.returncode:
+                      raise SystemExit(result.returncode)
+              else:
+                  subprocess.run(command, check=True)
+          PY
+      - name: Emit complete review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'bitmap-subtitle-tail-portable'
+          files = {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if path.is_file() and 'build' not in relative.parts:
+                  files[str(relative)] = path.read_text()
+          review = {name: value for name, value in files.items()
+                    if len(Path(name).parts) == 2 and name.endswith(('.json', '.jsonl', '.txt'))}
+          print('TAIL_PORTABLE_REVIEW_JSON ' + json.dumps(review, sort_keys=True))
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log-bundle limit; use the uploaded artifact')
+          print('TAIL_PORTABLE_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('TAIL_PORTABLE_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-tail-portable-linux
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/tests/*.json
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/tests/*.jsonl
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/tests/*.txt
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/tests/originals
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/tests/sources
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/tests/tests
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/tests/harness
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/tests/logs
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/timing/*.json
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/timing/*.jsonl
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/timing/originals
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/timing/sources
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/timing/tests
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/timing/harness
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/timing/logs
+            ${{ runner.temp }}/bitmap-subtitle-tail-portable/timing/receipts
+          retention-days: 14
