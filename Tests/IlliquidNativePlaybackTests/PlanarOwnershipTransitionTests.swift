@@ -184,6 +184,90 @@ struct PlanarOwnershipTransitionTests {
         withExtendedLifetime((buffers, tokens, attachments)) {}
     }
 
+    @Test func rendererOnlyOwnersAndReuseGrowIndependentPeaks() throws {
+        let ledger = PlanarBufferOwnershipLedger()
+        let buffers = try (0..<4).map { _ in try makeBuffer() }
+        var attachments: [PlanarRendererSampleLifetimeAttachment] = []
+        var checkoutIDs: [UInt64] = []
+
+        // Keep renderer owners after dropping each application owner. The
+        // application peak stays at one while renderer and buffer peaks grow.
+        for index in 0..<3 {
+            var token: PlanarFrameOwnershipToken? = ledger.checkout(
+                generation: 1, pixelBuffer: buffers[index]
+            )
+            let checkoutID = try #require(token).checkoutID
+            checkoutIDs.append(checkoutID)
+            attachments.append(try #require(
+                ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+            ))
+            withExtendedLifetime(token) {}
+            token = nil
+
+            let snapshot = ledger.snapshot(activeGeneration: 2)
+            #expect(snapshot.applicationFrames == 0)
+            #expect(snapshot.rendererSampleAttachments == index + 1)
+            #expect(snapshot.knownOutstandingBuffers == index + 1)
+            #expect(snapshot.peakApplicationFrames == 1)
+            #expect(snapshot.peakRendererSampleAttachments == index + 1)
+            #expect(snapshot.peakKnownOutstandingBuffers == index + 1)
+            #expect(ledger.makeRendererSampleAttachment(checkoutID: checkoutID) == nil)
+            #expect(ledger.snapshot(activeGeneration: 2) == snapshot)
+        }
+
+        var reused: PlanarFrameOwnershipToken? = ledger.checkout(
+            generation: 2, pixelBuffer: buffers[0]
+        )
+        let reusedID = try #require(reused).checkoutID
+        checkoutIDs.append(reusedID)
+        var snapshot = ledger.snapshot(activeGeneration: 2)
+        #expect(snapshot.applicationFrames == 1)
+        #expect(snapshot.rendererSampleAttachments == 3)
+        #expect(snapshot.knownOutstandingBuffers == 3)
+        #expect(snapshot.peakApplicationFrames == 1)
+        #expect(snapshot.peakRendererSampleAttachments == 3)
+        #expect(snapshot.peakKnownOutstandingBuffers == 3)
+
+        attachments.append(try #require(
+            ledger.makeRendererSampleAttachment(checkoutID: reusedID)
+        ))
+        snapshot = ledger.snapshot(activeGeneration: 2)
+        #expect(snapshot.applicationFrames == 1)
+        #expect(snapshot.rendererSampleAttachments == 4)
+        #expect(snapshot.knownOutstandingBuffers == 3)
+        #expect(snapshot.peakApplicationFrames == 1)
+        #expect(snapshot.peakRendererSampleAttachments == 4)
+        #expect(snapshot.peakKnownOutstandingBuffers == 3)
+
+        var distinct: PlanarFrameOwnershipToken? = ledger.checkout(
+            generation: 2, pixelBuffer: buffers[3]
+        )
+        snapshot = ledger.snapshot(activeGeneration: 2)
+        #expect(snapshot.applicationFrames == 2)
+        #expect(snapshot.rendererSampleAttachments == 4)
+        #expect(snapshot.knownOutstandingBuffers == 4)
+        #expect(snapshot.peakApplicationFrames == 2)
+        #expect(snapshot.peakRendererSampleAttachments == 4)
+        #expect(snapshot.peakKnownOutstandingBuffers == 4)
+
+        withExtendedLifetime((reused, distinct, attachments)) {}
+        reused = nil
+        distinct = nil
+        attachments.removeAll()
+        let drained = ledger.snapshot(activeGeneration: 2)
+        #expect(drained.applicationFrames == 0)
+        #expect(drained.rendererSampleAttachments == 0)
+        #expect(drained.knownOutstandingBuffers == 0)
+        #expect(drained.peakApplicationFrames == 2)
+        #expect(drained.peakRendererSampleAttachments == 4)
+        #expect(drained.peakKnownOutstandingBuffers == 4)
+        for checkoutID in checkoutIDs {
+            #expect(ledger.makeRendererSampleAttachment(checkoutID: checkoutID) == nil)
+        }
+        #expect(ledger.snapshot(activeGeneration: 2) == drained)
+        withExtendedLifetime(buffers) {}
+    }
+
     private func phaseCounts(_ snapshot: PlanarBufferOwnershipSnapshot) -> [Int] {
         [snapshot.decodedFrames, snapshot.framesWaitingForQueue, snapshot.queuedFrames,
          snapshot.presentingFrames, snapshot.submittedApplicationFrames]

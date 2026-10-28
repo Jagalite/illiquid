@@ -40,6 +40,8 @@ class Runner:
         self.output = Path(args.output).resolve() if args.output else Path(
             tempfile.mkdtemp(prefix="illiquid-planar-ownership-")
         )
+        if self.output.exists() and any(self.output.iterdir()):
+            raise RuntimeError("Output must be new or empty; existing evidence is never overwritten")
         self.build = self.output / "build"
         self.build.mkdir(parents=True, exist_ok=True)
         self.commands = []
@@ -51,7 +53,7 @@ class Runner:
         self.swiftc = str(Path(self.swiftc).absolute())
         self.native = platform.system() == "Darwin"
         self.manifest = {
-            "baseline_commit": PIN, "baseline_blob_sha1": BLOB,
+            "baseline_ref": args.baseline_ref, "baseline_blob_sha1": args.baseline_blob,
             "source_path": SOURCE, "platform": platform.platform(),
             "machine": platform.machine(), "python": platform.python_version(),
             "clock": "DispatchTime.now().uptimeNanoseconds",
@@ -94,10 +96,17 @@ class Runner:
         return result.stdout
 
     def prepare(self):
-        baseline = self.run(["git", "show", f"{PIN}:{SOURCE}"])
-        actual_blob = self.run(["git", "rev-parse", f"{PIN}:{SOURCE}"]).decode().strip()
-        if actual_blob != BLOB:
-            raise RuntimeError(f"Pinned baseline blob mismatch: {actual_blob}")
+        baseline_commit = self.run([
+            "git", "rev-parse", "--verify", f"{self.args.baseline_ref}^{{commit}}"
+        ]).decode().strip()
+        baseline = self.run(["git", "show", f"{baseline_commit}:{SOURCE}"])
+        actual_blob = self.run(["git", "rev-parse", f"{baseline_commit}:{SOURCE}"]).decode().strip()
+        if actual_blob != self.args.baseline_blob:
+            raise RuntimeError(
+                f"Pinned baseline blob mismatch: expected {self.args.baseline_blob}, got {actual_blob}"
+            )
+        self.manifest["baseline_commit"] = baseline_commit
+        self.manifest["baseline_blob_sha1"] = actual_blob
         candidate = (ROOT / SOURCE).read_bytes()
         self.manifest["compiler"] = self.run([self.swiftc, "--version"]).decode().strip()
         self.manifest["checkout_head"] = self.run(["git", "rev-parse", "HEAD"]).decode().strip()
@@ -276,6 +285,10 @@ let package = Package(name: "PlanarOwnershipNativeTests", platforms: [.macOS(.v1
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--swiftc")
+    parser.add_argument("--baseline-ref", default=PIN,
+                        help="Baseline commit/ref (defaults to the original phase-transition study)")
+    parser.add_argument("--baseline-blob", default=BLOB,
+                        help="Expected baseline source Git blob; must match --baseline-ref")
     parser.add_argument("--output")
     parser.add_argument("--build-only", action="store_true")
     parser.add_argument("--tests-only", action="store_true")

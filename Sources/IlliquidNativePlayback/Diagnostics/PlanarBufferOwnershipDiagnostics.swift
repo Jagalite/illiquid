@@ -119,7 +119,8 @@ final class PlanarBufferOwnershipLedger: @unchecked Sendable {
                 bufferIdentity: identity,
                 phase: .decoded
             )
-            updatePeaksLocked()
+            // New checkouts start without a renderer attachment.
+            updateCheckoutPeaksLocked()
             return checkoutID
         }
         return PlanarFrameOwnershipToken(checkoutID: checkoutID, ledger: self)
@@ -149,7 +150,10 @@ final class PlanarBufferOwnershipLedger: @unchecked Sendable {
             checkout.rendererSampleAttachmentAlive = true
             checkout.rendererSampleAttachedUptime = ProcessInfo.processInfo.systemUptime
             checkouts[checkoutID] = checkout
-            updatePeaksLocked()
+            // A successful attachment already has an application owner: entries
+            // with neither lifetime are removed, and duplicate attachments fail.
+            // Only the renderer-sample peak can increase here.
+            updateRendererSamplePeakLocked()
             return true
         }
         return attached
@@ -310,23 +314,26 @@ final class PlanarBufferOwnershipLedger: @unchecked Sendable {
         )
     }
 
-    private func updatePeaksLocked() {
+    private func updateCheckoutPeaksLocked() {
         let applicationFrames = checkouts.values.reduce(0) {
             $0 + ($1.applicationFrameAlive ? 1 : 0)
-        }
-        let rendererSamples = checkouts.values.reduce(0) {
-            $0 + ($1.rendererSampleAttachmentAlive ? 1 : 0)
         }
         let knownBuffers = Set(checkouts.values.compactMap { checkout in
             checkout.applicationFrameAlive || checkout.rendererSampleAttachmentAlive
                 ? checkout.bufferIdentity : nil
         }).count
         peakApplicationFrames = max(peakApplicationFrames, applicationFrames)
+        peakKnownOutstandingBuffers = max(peakKnownOutstandingBuffers, knownBuffers)
+    }
+
+    private func updateRendererSamplePeakLocked() {
+        let rendererSamples = checkouts.values.reduce(0) {
+            $0 + ($1.rendererSampleAttachmentAlive ? 1 : 0)
+        }
         peakRendererSampleAttachments = max(
             peakRendererSampleAttachments,
             rendererSamples
         )
-        peakKnownOutstandingBuffers = max(peakKnownOutstandingBuffers, knownBuffers)
     }
 
     private func oldGenerationKnownBufferCountLocked(activeGeneration: Int) -> Int {

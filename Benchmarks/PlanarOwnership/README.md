@@ -1,4 +1,4 @@
-# Planar ownership transition research
+# Planar ownership performance research
 
 This harness compares the actual `PlanarBufferOwnershipLedger` from pinned main
 `8c3cc3d4008d5d1b8d436bcf2d51d891382b6548` with the current working source. It checks
@@ -6,10 +6,11 @@ the baseline Git blob, records SHA-256 hashes for source/harness/binaries, and
 uses identical compiler flags. Production sources are copied into the output's
 temporary build directory; no methods are reimplemented in the harness.
 
-The proposed production change removes the `updatePeaksLocked()` call from
-`transition(_:to:)`. A phase change cannot change which checkouts or ownership
-references are alive. Peak scans remain at checkout and renderer attachment,
-where the corresponding counts can increase.
+The original study removed peak recalculation from `transition(_:to:)`.
+The follow-up splits checkout and renderer-attachment peak updates: checkout
+can only grow application and distinct-buffer peaks, while attachment can only
+grow the renderer peak. Use the explicit baseline below to isolate that follow-up
+from earlier phase-transition and history-storage optimizations.
 
 ## Scope
 
@@ -79,6 +80,33 @@ python3 Benchmarks/PlanarOwnership/run.py --tests-only --output /tmp/planar-test
 python3 Benchmarks/PlanarOwnership/run.py --output /tmp/planar-timing
 python3 Benchmarks/PlanarOwnership/run.py --allocations --rounds 4 --output /tmp/planar-allocations
 ```
+
+For the checkout/attachment peak study, use current pre-change main and its
+verified source blob for **both** correctness and timing runs:
+
+```sh
+python3 Benchmarks/PlanarOwnership/run.py --tests-only \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --baseline-blob e110a666400aa680a2d7b86ed4852c4fe05f08cc \
+  --output /tmp/planar-peak-tests
+python3 Benchmarks/PlanarOwnership/run.py \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --baseline-blob e110a666400aa680a2d7b86ed4852c4fe05f08cc \
+  --workloads pipeline,lifecycle-mixed,phase --output /tmp/planar-peak-timing
+```
+
+The original pinned baseline remains the default for historical reproduction.
+Changing a baseline ref without its expected source blob fails before compilation.
+The manifest records the requested ref and the resolved commit. Nonempty output
+directories are rejected so evidence from separate runs cannot be mixed.
+
+The macOS workflow uses the follow-up baseline. Pull requests run native tests
+and debug/release differential checks; manual dispatches and pushes to
+`perf/planar-ownership-*` also run timings. The unchanged `phase` workload is a
+negative control for the peak split, not an improvement target.
+
+Follow the repository's build coordination rule: use Kyoto when available; on
+a hosted CI runner without Kyoto, the workflow invokes the compiler directly.
 
 Normal timing uses `-O -whole-module-optimization` fresh processes in alternating AB/BA order for
 each case, eight rounds, 10,000 warmup services, and 100,000 timed services.
