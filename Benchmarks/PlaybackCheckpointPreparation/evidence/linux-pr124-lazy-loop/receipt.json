@@ -1,0 +1,75 @@
+{
+  "archive": {
+    "bytes": 137752,
+    "deterministic_headers": true,
+    "file": "evidence.tar.xz",
+    "logical_files": 442,
+    "reconstruction_verified": true,
+    "sha256": "05a604ad5b359e9adfdf2024aa36ab50f97829870d0c0cba06308e340276e090",
+    "unique_blobs": 213
+  },
+  "baseline_commit": "9f21c84bbe097984642c8fc08b7c8c1fd31a6c41",
+  "baseline_pull_request": "https://github.com/Jagalite/illiquid/pull/124",
+  "classification": "Completed direct component comparison of the initial lazy-loop candidate against PR #124. Later candidate experiments remain separate.",
+  "cohorts": {
+    "pr124": {
+      "balanced_pairs_per_workload": 6,
+      "calibration_observations": 52,
+      "complete_output_cases": 58,
+      "complete_output_sha256": "11a41445581b578df9ba1a1642fdef72f04ab05ef56502a6e65948c6177e783e",
+      "measurement_observations": 120,
+      "nonbuild_bytes": 4704851,
+      "nonbuild_files": 442,
+      "source_directory": "/workspace/scratch/4ea7c7e34e86/checkpoint-vs-pr124",
+      "source_guards_passed": true,
+      "status": "passed",
+      "test_results": [
+        {
+          "combined_output_sha256": "7dbd4337803fc3cbc98f02e375be3d6c0e2a56441c7b3ef71945cb6ac833c388",
+          "configuration": "debug",
+          "passed": true,
+          "tests_reported": 37,
+          "variant": "baseline"
+        },
+        {
+          "combined_output_sha256": "60e664aec4d7522ddcc5aa5f4ba69668bdd3ba47ce82f3b0a501455ef970dcd0",
+          "configuration": "release",
+          "passed": true,
+          "tests_reported": 37,
+          "variant": "baseline"
+        },
+        {
+          "combined_output_sha256": "2cc029fca3368ca8d42718b9a188c4965e5d3c794060389e54626464d0446ead",
+          "configuration": "debug",
+          "passed": true,
+          "tests_reported": 37,
+          "variant": "candidate"
+        },
+        {
+          "combined_output_sha256": "515a141edca7710814d12d9dca3beef87501d9d09ac2cf389168a88c27fea4cb",
+          "configuration": "release",
+          "passed": true,
+          "tests_reported": 37,
+          "variant": "candidate"
+        }
+      ],
+      "verified_commands": 198,
+      "verified_nonbuild_artifact_receipts": 39,
+      "workload_count": 10
+    }
+  },
+  "format": "illiquid-checkpoint-pr124-evidence-v1",
+  "omitted": "Build directories, compiler caches, modules, libraries and executables. Their original hashes remain in the raw manifest and explicit archive INDEX omission map.",
+  "publication": {
+    "measured_local_commit": "5d532aa4b877e47db23b9ba59972aa3f30f71def",
+    "published_commit": "b0416ee6b1c07af2424230b281b59f22743fc5df",
+    "published_tree": "64915e0f2a25c11d38250671ce39c6e7e9cace20",
+    "published_tree_source": "Verified directly from the fetched published Git commit; its tree equals the measured local commit tree.",
+    "remote_object_verified": true,
+    "verified_local_tree": "64915e0f2a25c11d38250671ce39c6e7e9cace20",
+    "verified_published_tree": "64915e0f2a25c11d38250671ce39c6e7e9cace20",
+    "verified_source_scope": "Candidate production/harness/runner/test snapshots were verified directly against both the measured local commit and the fetched published commit; baseline production snapshots were previously verified against the pinned PR #124 commit."
+  },
+  "scope": "Linux Swift component timings and semantic checks. No macOS, full-application, UI, frame-rate, energy or end-to-end playback qualification is implied.",
+  "source_identity_checks": "All included artifact and command stdout/stderr hashes, final runner source/binary guard receipt, complete verification output equality, paired semantic fields and AB/BA order, and every reconstructed logical path were checked."
+}

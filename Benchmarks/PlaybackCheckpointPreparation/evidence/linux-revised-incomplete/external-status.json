@@ -1,0 +1,89 @@
+{
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate_tree": "e84619f1c33deb8bb24764e8c88e63ccf4a5112e",
+  "complete_command_ledger_records": 743,
+  "completed_workload_summaries": 41,
+  "coverage_limit": "The all-unsupported-item timed cases were not reached; these partial observations cannot qualify the revised unsupported-item fix.",
+  "excluded": "All build directories, compiler caches, libraries, modules and executable files. The lost final binary hash manifest is not reconstructed.",
+  "exit_status_source": "Parent agent observed the owning exec session terminate with exit code 1.",
+  "external_run_log": {
+    "bytes": 58779,
+    "logical_path": "external/checkpoint-linux-revised.log",
+    "sha256": "e012921f62f241bcddbb30161bf11c3e501e9fc9cba9ee732154aade758843d2"
+  },
+  "failure": "OSError [Errno 28] No space left on device during command-ledger append; final manifest saving also failed.",
+  "final_input_guard_pass": false,
+  "final_provenance": "Lost: the final manifest is empty. No completed final source/binary guard receipt exists.",
+  "measured_candidate_revision": "3d01b46eced987a6e32285f9ac5425c76feb24eb",
+  "observed_process_exit_code": 1,
+  "owning_exec_session": 27940,
+  "packaging_source_check_scope": "Archived candidate and shared source snapshots match the stated commit. This is a packaging-time check and does not reconstruct the missing end-of-run binary/source guard.",
+  "qualification_role": "Secondary historical comparison against original main; not an accepted final performance cohort and not the incremental PR #124 comparison.",
+  "raw_calibration_observations": 225,
+  "raw_manifest_bytes": 0,
+  "raw_observations": 492,
+  "raw_summary_status": "running (stale after process failure)",
+  "shared_snapshot_sha256_at_packaging": {
+    "Benchmarks/PlaybackCheckpointPreparation/Bridge.swift": "3875cbef1a63e69069ab790ae85ee829daf359691e9caa77d5d24e949b3bd2e2",
+    "Benchmarks/PlaybackCheckpointPreparation/Driver.swift": "da328d410699eab5937cb1bbd3e83c12122aab11b8dc2cb0d7aedbf61535173a",
+    "Benchmarks/PlaybackCheckpointPreparation/run.py": "3b55fc9302158f8da55249a567d3ff26e38d22d3d5179ae395c8d083c6beeef0",
+    "Tests/IlliquidCoreTests/FolderPlaylistTests.swift": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d",
+    "Tests/IlliquidCoreTests/PlaylistMutationTests.swift": "08b3ea822f18722007b7c32e5316911949a4198767e6bade300c8f88b2d0147f",
+    "Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift": "79a1d9de1abef31e1168ce0b2cb49775c8c653b9a8d298fc3894846efd129045",
+    "Tests/IlliquidCoreTests/PlaylistSessionRecordTests.swift": "d7a495c2ee4284918780e87fb1a66fe4b71623e2bb9824155983c0295121d806",
+    "Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift": "59f468a57fc2d69c6a995d315452df470d0324af4c1659df3387d6664a1159d9"
+  },
+  "snapshot_sha256_at_packaging": {
+    "Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift": "4318a57a49833f22c3b1181c53694fc31e3a74535ee1644d82bce3134c54228f",
+    "Sources/IlliquidCore/Player/MediaSource.swift": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254",
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8",
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift": "ab7a6e5e0c56b0dc4335fd048a19a5ceaed7f77613fd32c09ac46b242d8f68f2"
+  },
+  "status": "incomplete",
+  "test_results_as_previously_recorded": [
+    {
+      "combined_output_sha256": "b0f3f0b65f3b6c669c71ad8803f90b26b07c205f028b823d63a913efdebd27ac",
+      "configuration": "debug",
+      "passed": true,
+      "tests_reported": 27,
+      "variant": "baseline"
+    },
+    {
+      "combined_output_sha256": "34620c6ce7709d2870390960cefbe89137b2a37d03d93ad4edd046da75fb695c",
+      "configuration": "release",
+      "passed": true,
+      "tests_reported": 27,
+      "variant": "baseline"
+    },
+    {
+      "combined_output_sha256": "46b051ba3c3b4a806baf8e3fa8112a7144e7bbd5ec19f2dbcde7ee993f2f22da",
+      "configuration": "debug",
+      "passed": true,
+      "tests_reported": 27,
+      "variant": "candidate"
+    },
+    {
+      "combined_output_sha256": "a125206493138a4c372679cc0dec264b1c5e023a94e6c5c7956433a81352230d",
+      "configuration": "release",
+      "passed": true,
+      "tests_reported": 27,
+      "variant": "candidate"
+    }
+  ],
+  "truncated_command_ledger_records": [
+    {
+      "bytes": 263,
+      "line": 744,
+      "parse_error": "Expecting value: line 1 column 264 (char 263)",
+      "sha256": "be63b5e2cafdb0352a0768a6b24e240835b2c8a3645f943e90b6401ed5a3580e"
+    }
+  ],
+  "verification_outputs": {
+    "byte_identical_at_packaging": true,
+    "cases": 58,
+    "sha256": "11a41445581b578df9ba1a1642fdef72f04ab05ef56502a6e65948c6177e783e"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "archive": {
+    "bytes": 320072,
+    "deterministic_headers": true,
+    "file": "evidence.tar.xz",
+    "logical_files": 3114,
+    "reconstruction_index": "INDEX.json",
+    "reconstruction_verified": true,
+    "sha256": "fe06b6975321d1f18fdcf06d993d5a4794f75340a9ff280d2cfd7ab4b0cb1b9b",
+    "unique_blobs": 1512,
+    "unique_uncompressed_bytes": 3526491
+  },
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate_checkpoint_sha256": "0d28c61fa2087757d0c10f29fe84b2e5e476715be616a99b174127d152dc08c3",
+  "candidate_tree": "b8c23c18cbef8d5e4f23542c52b78057a973682b",
+  "classification": "Superseded eager-source candidate; preserve adverse controls; do not pool with revised lazy-source cohort.",
+  "cohorts": {
+    "full": {
+      "calibration_observations": 308,
+      "complete_output_cases": 58,
+      "complete_output_sha256": "11a41445581b578df9ba1a1642fdef72f04ab05ef56502a6e65948c6177e783e",
+      "measurement_observations": 696,
+      "nonbuild_bytes": 5880712,
+      "nonbuild_files": 2097,
+      "source_directory": "/workspace/scratch/4ea7c7e34e86/checkpoint-linux-final",
+      "source_guards_passed": true,
+      "status": "passed",
+      "tests": [],
+      "verified_commands": 1026,
+      "verified_nonbuild_artifact_receipts": 38,
+      "workload_count": 58
+    },
+    "smoke-tests": {
+      "calibration_observations": 260,
+      "complete_output_cases": 58,
+      "complete_output_sha256": "11a41445581b578df9ba1a1642fdef72f04ab05ef56502a6e65948c6177e783e",
+      "measurement_observations": 200,
+      "nonbuild_bytes": 5146508,
+      "nonbuild_files": 1017,
+      "source_directory": "/workspace/scratch/4ea7c7e34e86/checkpoint-smoke-nativeprocess",
+      "source_guards_passed": true,
+      "status": "passed",
+      "tests": [
+        {
+          "combined_output_sha256": "a5dad9948bc49a0a75e08ca8154a192ecc8bbbf9511c43c02d86a7ec9e8ba271",
+          "configuration": "debug",
+          "passed": true,
+          "tests_reported": 27,
+          "variant": "baseline"
+        },
+        {
+          "combined_output_sha256": "e01d8446b87cf21c2e8b9d67e6cea8e8bb8bbf852bac457cdae46d321f9a3194",
+          "configuration": "release",
+          "passed": true,
+          "tests_reported": 27,
+          "variant": "baseline"
+        },
+        {
+          "combined_output_sha256": "cc4b4bdf34fddee81e770ded9f571d1998b54f5895c6f9e9db709f9321a7f22e",
+          "configuration": "debug",
+          "passed": true,
+          "tests_reported": 27,
+          "variant": "candidate"
+        },
+        {
+          "combined_output_sha256": "803f4ea1986442c94e8f9bacfe59853ac7787bb3ff2e57c26e993477bf522029",
+          "configuration": "release",
+          "passed": true,
+          "tests_reported": 27,
+          "variant": "candidate"
+        }
+      ],
+      "verified_commands": 486,
+      "verified_nonbuild_artifact_receipts": 38,
+      "workload_count": 50
+    }
+  },
+  "equivalent_local_commit": "305731d97a14668ba40b496dc9995ec2b18c9822",
+  "excluded_failed_attempt": {
+    "archive": "sandbox-build-failure.tar.xz",
+    "benchmark_observations": 0,
+    "bytes": 5464,
+    "completed_tests": 0,
+    "failure": "Command failed (1); inspect /workspace/scratch/4ea7c7e34e86/checkpoint-smoke/logs/0011-tests-baseline-debug.stdout and /workspace/scratch/4ea7c7e34e86/checkpoint-smoke/logs/0011-tests-baseline-debug.stderr",
+    "observed_diagnostic": "Swift compiler received signal 4 during baseline debug test compilation; this receipt does not establish the crash cause.",
+    "sha256": "ccb3e10e175702397544a8937f15ec56acd958c47e3fc7cf0284bb29dfc8be46",
+    "source_directory": "/workspace/scratch/4ea7c7e34e86/checkpoint-smoke"
+  },
+  "format": "illiquid-checkpoint-eager-evidence-v1",
+  "measured_candidate_commit": "0a49d55a79b2163e5a2c8fc730ab17a809da72cc",
+  "omitted": "Build directories, executables, libraries, compiled modules, compiler/module caches. Their original hashes remain in raw manifests and the archive INDEX omission map.",
+  "provenance_note": "Original manifests record the precommit baseline HEAD and a dirty worktree; every measured candidate production, harness, runner and test source was subsequently verified against the candidate commit listed here.",
+  "source_identity_checks": "All full/smoke production and shared-input receipts are identical. All included artifact and command stdout/stderr hashes, verification outputs and reconstructed logical paths were checked."
+}
