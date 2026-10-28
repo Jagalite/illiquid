@@ -200,9 +200,11 @@ private func staleGeneration() throws -> CaseReport {
     report.snapshots["afterStaleEOF"] = fixture.snapshot()
     var replay = fixture.buffer.takeReplayPackets(generation: 8)
     report.replay = describe(replay)
-    report.snapshots["afterTake"] = fixture.snapshot()
-    fixture.buffer.reset()
-    report.snapshots["afterResetWhileReplayHeld"] = fixture.snapshot()
+    withExtendedLifetime(replay) {
+        report.snapshots["afterTake"] = fixture.snapshot()
+        fixture.buffer.reset()
+        report.snapshots["afterResetWhileReplayHeld"] = fixture.snapshot()
+    }
     replay.removeAll(keepingCapacity: false)
     report.snapshots["afterReplayRelease"] = fixture.snapshot()
     return report
@@ -214,11 +216,13 @@ private func preEOFRecovery() throws -> CaseReport {
     var report = CaseReport(name: "pre_eof_recovery", snapshots: ["recorded": fixture.snapshot()])
     var replay = fixture.buffer.takeReplayPackets(generation: 7)
     report.replay = describe(replay)
-    report.snapshots["afterTake"] = fixture.snapshot()
-    completeSuccessfulDrain(fixture.buffer, active: 7)
-    report.snapshots["afterEOFWhileReplayHeld"] = fixture.snapshot()
-    fixture.buffer.reset()
-    report.snapshots["afterResetWhileReplayHeld"] = fixture.snapshot()
+    withExtendedLifetime(replay) {
+        report.snapshots["afterTake"] = fixture.snapshot()
+        completeSuccessfulDrain(fixture.buffer, active: 7)
+        report.snapshots["afterEOFWhileReplayHeld"] = fixture.snapshot()
+        fixture.buffer.reset()
+        report.snapshots["afterResetWhileReplayHeld"] = fixture.snapshot()
+    }
     replay.removeAll(keepingCapacity: false)
     report.snapshots["afterReplayRelease"] = fixture.snapshot()
     return report

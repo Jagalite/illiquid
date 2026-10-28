@@ -64,6 +64,8 @@ jobs:
           path: |
             ${{ runner.temp }}/video-recovery-eof/
             !${{ runner.temp }}/video-recovery-eof/**/build/
+            !${{ runner.temp }}/video-recovery-eof/**/bin/
+            !${{ runner.temp }}/video-recovery-eof/**/module-cache/
           retention-days: 14
 
   native-lifetime:
@@ -175,5 +177,7 @@ jobs:
           path: |
             ${{ runner.temp }}/video-recovery-eof/
             !${{ runner.temp }}/video-recovery-eof/**/build/
+            !${{ runner.temp }}/video-recovery-eof/**/bin/
+            !${{ runner.temp }}/video-recovery-eof/**/module-cache/
             !${{ runner.temp }}/video-recovery-eof/fixtures/
           retention-days: 14
