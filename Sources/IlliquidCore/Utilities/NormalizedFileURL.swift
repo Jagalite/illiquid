@@ -32,7 +32,26 @@ public enum NormalizedFileURL {
         return host.isEmpty || host.lowercased() == "localhost"
     }
 
-    public static func persistenceKey(for url: URL) -> String? { normalize(url)?.path }
+    public static func persistenceKey(for url: URL) -> String? {
+        guard isSupportedLocalFileURL(url) else { return nil }
+        let lexical = url.absoluteURL.standardized
+        let path = lexical.path
+        // Ordinary ASCII paths already have the bytes produced by the URL
+        // round trip. Avoid both Unicode normalization and rebuilding a URL
+        // just to read its path. Do not materialize bridged UTF-8 storage here.
+        // Keep the constructor for Unicode (which can change filesystem bytes
+        // on macOS), file references, and unusual slash or NUL representations.
+        if path.hasPrefix("/"),
+           path.utf8.withContiguousStorageIfAvailable({ bytes in
+               bytes.allSatisfy { $0 > 0 && $0 < 128 }
+           }) == true,
+           !path.hasPrefix("//"), !path.hasPrefix("/.file/id="),
+           path == "/" || !path.hasSuffix("/") {
+            return path
+        }
+        return URL(fileURLWithPath: path.precomposedStringWithCanonicalMapping,
+                   isDirectory: lexical.hasDirectoryPath).path
+    }
 
     /// Prepared aliases compare by canonical path; raw URLs compare lexically.
     public static func representsSameFile(_ lhs: URL, _ rhs: URL) -> Bool {
