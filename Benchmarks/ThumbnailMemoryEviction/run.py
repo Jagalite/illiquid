@@ -129,8 +129,13 @@ class Experiment:
 
     def prepare(self) -> None:
         self.manifest["compiler"] = self.command([self.swiftc, "--version"]).decode().strip()
-        self.manifest["checkout_revision"] = self.command(["git", "rev-parse", "HEAD"]).decode().strip()
-        baseline = self.command(["git", "show", f"{BASELINE_REVISION}:{SOURCE}"])
+        if self.args.baseline_file:
+            self.manifest["checkout_revision"] = "unavailable (standalone source snapshot)"
+            self.manifest["baseline_file"] = str(self.args.baseline_file.resolve())
+            baseline = self.args.baseline_file.read_bytes()
+        else:
+            self.manifest["checkout_revision"] = self.command(["git", "-c", f"safe.directory={ROOT}", "rev-parse", "HEAD"]).decode().strip()
+            baseline = self.command(["git", "-c", f"safe.directory={ROOT}", "show", f"{BASELINE_REVISION}:{SOURCE}"])
         if git_blob(baseline) != BASELINE_BLOB:
             raise ValueError("Baseline cache does not match the pinned Git blob")
         candidate = (ROOT / SOURCE).read_bytes()
@@ -171,6 +176,7 @@ class Experiment:
         ]
         self.command([
             self.swiftc, *FLAGS, *self.manifest["configuration_flags"][configuration],
+            "-module-cache-path", str(self.output / "module-cache"),
             *(str(path) for path in sources), "-o", str(executable),
         ])
         self.manifest["binary_sha256"][f"{configuration}/{variant}"] = sha256(executable.read_bytes())
@@ -266,6 +272,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--swiftc", default="swiftc")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--baseline-file", type=Path,
+                        help="Pinned original cache source for a source-only checkout; blob is verified")
     parser.add_argument("--pairs", type=pair_count, default=8)
     parser.add_argument("--tests-only", action="store_true")
     parser.add_argument("--skip-debug", action="store_true")

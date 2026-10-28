@@ -81,6 +81,7 @@ jobs:
           path: |
             ${{ runner.temp }}/thumbnail-memory/
             !${{ runner.temp }}/thumbnail-memory/results/build/**
+            !${{ runner.temp }}/thumbnail-memory/results/module-cache/**
           retention-days: 14
 
   native-regressions:

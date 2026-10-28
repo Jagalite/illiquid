@@ -22,7 +22,7 @@ concurrency:
 jobs:
   portable-component:
     runs-on: ubuntu-24.04
-    container: swift:6.3.2-noble
+    container: swift:6.3.2-noble@sha256:c4336909a71b2e69b884f4078cdf98c0cd081911632cb349ef72abc4cbed69fc
     timeout-minutes: 20
     steps:
       - name: Prepare runner utilities
@@ -80,4 +80,5 @@ jobs:
           path: |
             ${{ runner.temp }}/thumbnail-memory-portable/
             !${{ runner.temp }}/thumbnail-memory-portable/results/build/**
+            !${{ runner.temp }}/thumbnail-memory-portable/results/module-cache/**
           retention-days: 14
