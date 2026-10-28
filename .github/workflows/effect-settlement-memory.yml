@@ -1,0 +1,172 @@
+name: Effect settlement memory
+
+on:
+  push:
+    branches: ['perf/effect-settlement-memory-20261028']
+    paths:
+      - 'Sources/IlliquidPlaybackCore/PlaybackCore.swift'
+      - 'Tests/IlliquidPlaybackCoreTests/EffectSettlementTests.swift'
+      - 'Benchmarks/EffectSettlement/**'
+      - '.github/workflows/effect-settlement-memory.yml'
+      - '!Benchmarks/EffectSettlement/*.md'
+      - '!Benchmarks/EffectSettlement/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlaybackCore/PlaybackCore.swift'
+      - 'Tests/IlliquidPlaybackCoreTests/EffectSettlementTests.swift'
+      - 'Benchmarks/EffectSettlement/**'
+      - '.github/workflows/effect-settlement-memory.yml'
+      - '!Benchmarks/EffectSettlement/*.md'
+      - '!Benchmarks/EffectSettlement/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: effect-settlement-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  linux-components:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    container:
+      # Official Swift 6.3.3 Ubuntu 24.04 image, pinned to its manifest digest.
+      image: swift:6.3.3-noble@sha256:1038d54c80063f5cdfabc4560990c30af64b5de8ebf28161deb22ca4ad5db866
+    steps:
+      - name: Install Python and Git for the benchmark runner
+        run: apt-get update && apt-get install -y --no-install-recommends python3 git
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Trust this isolated container checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Test settlement semantics and compare complete reducer allocations and timings
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo '::error::Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this hosted runner; compiling serially in isolated component packages.'
+          python3 Benchmarks/EffectSettlement/run.py \
+            --output "$RUNNER_TEMP/effect-settlement-linux" \
+            --pairs 6 --target-ms 240
+      - name: Emit compact review evidence
+        if: always()
+        run: |
+          python3 - <<'PYTHON'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'effect-settlement-linux'
+          excluded = {'build', '.build', 'cache', 'module-cache', 'tmp', 'clang-cache', 'swift-cache'}
+          files, compressed = {}, {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if not path.is_file() or any(part in excluded for part in relative.parts):
+                  continue
+              if path.suffix in {'.json', '.jsonl', '.log', '.txt'}:
+                  files[str(relative)] = path.read_text()
+              elif path.name.endswith('.json.gz'):
+                  compressed[str(relative)] = base64.b64encode(path.read_bytes()).decode()
+          for name, value in files.items():
+              if name.endswith(('summary.json', 'parity.json')):
+                  print(name + '\n' + value)
+          bundle = {'platform': 'linux', 'text_files': files, 'compressed_json_base64': compressed}
+          packed = gzip.compress(json.dumps(bundle, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log bundle limit; use the uploaded artifact')
+          print('EFFECT_SETTLEMENT_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('EFFECT_SETTLEMENT_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PYTHON
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: effect-settlement-linux
+          path: |
+            ${{ runner.temp }}/effect-settlement-linux/**/*.json
+            ${{ runner.temp }}/effect-settlement-linux/**/*.jsonl
+            ${{ runner.temp }}/effect-settlement-linux/**/*.json.gz
+            ${{ runner.temp }}/effect-settlement-linux/**/*.log
+            ${{ runner.temp }}/effect-settlement-linux/**/*.txt
+            ${{ runner.temp }}/effect-settlement-linux/**/*.swift
+            ${{ runner.temp }}/effect-settlement-linux/**/*.c
+            ${{ runner.temp }}/effect-settlement-linux/**/*.h
+            ${{ runner.temp }}/effect-settlement-linux/**/*.py
+            !${{ runner.temp }}/effect-settlement-linux/**/build/**
+            !${{ runner.temp }}/effect-settlement-linux/**/.build/**
+            !${{ runner.temp }}/effect-settlement-linux/**/cache/**
+            !${{ runner.temp }}/effect-settlement-linux/**/module-cache/**
+          retention-days: 14
+
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test settlement semantics and compare complete reducer timings
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo '::error::Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this hosted runner; compiling serially in isolated component packages.'
+          python3 Benchmarks/EffectSettlement/run.py \
+            --output "$RUNNER_TEMP/effect-settlement-macos" \
+            --pairs 6 --target-ms 240
+      - name: Emit compact review evidence
+        if: always()
+        run: |
+          python3 - <<'PYTHON'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'effect-settlement-macos'
+          excluded = {'build', '.build', 'cache', 'module-cache', 'tmp', 'clang-cache', 'swift-cache'}
+          files, compressed = {}, {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if not path.is_file() or any(part in excluded for part in relative.parts):
+                  continue
+              if path.suffix in {'.json', '.jsonl', '.log', '.txt'}:
+                  files[str(relative)] = path.read_text()
+              elif path.name.endswith('.json.gz'):
+                  compressed[str(relative)] = base64.b64encode(path.read_bytes()).decode()
+          for name, value in files.items():
+              if name.endswith(('summary.json', 'parity.json')):
+                  print(name + '\n' + value)
+          bundle = {'platform': 'macos', 'text_files': files, 'compressed_json_base64': compressed}
+          packed = gzip.compress(json.dumps(bundle, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log bundle limit; use the uploaded artifact')
+          print('EFFECT_SETTLEMENT_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('EFFECT_SETTLEMENT_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PYTHON
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: effect-settlement-macos
+          path: |
+            ${{ runner.temp }}/effect-settlement-macos/**/*.json
+            ${{ runner.temp }}/effect-settlement-macos/**/*.jsonl
+            ${{ runner.temp }}/effect-settlement-macos/**/*.json.gz
+            ${{ runner.temp }}/effect-settlement-macos/**/*.log
+            ${{ runner.temp }}/effect-settlement-macos/**/*.txt
+            ${{ runner.temp }}/effect-settlement-macos/**/*.swift
+            ${{ runner.temp }}/effect-settlement-macos/**/*.c
+            ${{ runner.temp }}/effect-settlement-macos/**/*.h
+            ${{ runner.temp }}/effect-settlement-macos/**/*.py
+            !${{ runner.temp }}/effect-settlement-macos/**/build/**
+            !${{ runner.temp }}/effect-settlement-macos/**/.build/**
+            !${{ runner.temp }}/effect-settlement-macos/**/cache/**
+            !${{ runner.temp }}/effect-settlement-macos/**/module-cache/**
+          retention-days: 14
