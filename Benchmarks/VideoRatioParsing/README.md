@@ -1,8 +1,9 @@
 # Video aspect/crop ratio parsing experiment
 
 This study compares `VideoPresentationGeometry.ratio` before and after replacing
-the temporary `String.split` result array with borrowed substring fields. It
+the temporary `String.split` result array on ASCII input with borrowed substring fields. It
 measures the parser directly and the complete geometry initializer that uses it.
+Non-ASCII input retains the original Character-based splitting behavior.
 It does not measure whole-player CPU, rendering latency, heap allocations, peak
 memory, or RSS. Removing an explicit temporary array is a source-level change;
 the measured outcomes here are elapsed time and process CPU time.
@@ -50,7 +51,9 @@ The trace corpus includes scalar and colon forms, signs, decimal/exponent/hex
 spellings accepted or rejected by Swift's `Double`, overflow/underflow, zero,
 whitespace, Unicode digits and colon lookalikes, combining characters, NULs,
 extra fields, boundary-adjacent floating point values, and every Character-boundary
-truncation of the ordinary spellings. Separate 4 KiB rejection probes are included
+truncation of the ordinary spellings. Another 2,048 seeded mixed strings exercise
+the ASCII/Unicode boundary without changing the timed input distribution.
+Separate 4 KiB rejection probes are included
 without a quadratic collection of their prefixes. Geometry comparisons exercise
 both overrides independently and together, nil/fit/fill scale modes, and zero,
 negative, nonfinite, subnormal, and extreme finite dimensions. Authored expectations

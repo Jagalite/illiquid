@@ -91,7 +91,23 @@ func ratioCorpus() -> [String?] {
         }
     }
     var seen = Set<String>()
-    return values.filter { value in value.map { seen.insert($0).inserted } ?? true }
+    var result = values.filter { value in value.map { seen.insert($0).inserted } ?? true }
+    // Match the seeded mixed-string unit-test corpus. These verification-only
+    // cases qualify ASCII/Unicode delimiter handling without changing timings.
+    let tokens = ["0", "1", "2", "9", ".", ":", "e", "E", "x", "p", "+", "-",
+                  " ", "\t", "\n", "\u{0}", "\u{0301}", "\u{FE0F}", "\u{200D}", "１", "😀"]
+    var state: UInt64 = 0x9E37_79B9_7F4A_7C15
+    func next() -> UInt64 {
+        state = state &* 6_364_136_223_846_793_005 &+ 1
+        return state
+    }
+    for _ in 0..<2_048 {
+        let count = Int(next() % 24)
+        var text = ""
+        for _ in 0..<count { text += tokens[Int(next() % UInt64(tokens.count))] }
+        result.append(text)
+    }
+    return result
 }
 
 func verify() -> [String: Any] {

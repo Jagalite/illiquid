@@ -70,5 +70,6 @@ and compiled artifacts are checked for changes before completion.
 
 Results describe the recorded host and Swift toolchain's parser subset only.
 They do not establish native macOS geometry performance, frame rate, whole-player
-CPU savings, allocation counts, or RSS. The temporary split-result array removed
-from source is a qualitative allocation change; this runner measures time.
+CPU savings, allocation counts, or RSS. Removing the temporary split-result array
+from the ASCII path is a qualitative allocation change; non-ASCII input keeps
+the original splitting behavior. This runner measures time.
