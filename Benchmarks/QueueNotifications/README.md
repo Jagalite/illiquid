@@ -131,6 +131,13 @@ separated fast and slow scheduling regimes. This cell is retained below.
 
 ## Validation status and retained evidence
 
+The source review and initial measurement audit support proposing this change.
+The PR remains a draft pending execution of the corrected regression gates.
+The [Apple Silicon confirmation](https://github.com/Jagalite/illiquid/actions/runs/40635790679)
+and [additional Intel macOS validation](https://github.com/Jagalite/illiquid/actions/runs/40636096026)
+were queued at publication. No Intel performance result is claimed.
+
+
 The initial benchmark compiled both optimized variants and all 480 measurement
 receipts passed. Independent recomputation checked every receipt, all 240 AB/BA
 pairs, and all 30 summary cells.
@@ -152,3 +159,12 @@ receipt audit and the explicit test-qualification limitation.
 
 These component timings do not measure full playback CPU, FPS, seeking,
 decoding, rendering, energy use, or physical-device presentation quality.
+
+The complete [initial summary](evidence/initial-summary.json) is available without
+unpacking the archive. [provenance.json](evidence/provenance.json) records source
+identities, the original run, and the pending corrected validation runs.
+
+PR CI runs the focused debug/release/baseline checks with failure propagation.
+The full 30-workload benchmark remains available through explicit workflow
+dispatch and the command above; the temporary research-push trigger is removed.
+The repository's existing native integration gates are unchanged.
