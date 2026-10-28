@@ -141,7 +141,8 @@ struct BitmapSubtitleTimeline: Sendable {
     }
 
     func composition(at seconds: Double) -> (start: Double, value: NativeBitmapSubtitleComposition)? {
-        guard seconds.isFinite, let entry = entries.last(where: { $0.start <= seconds }) else { return nil }
+        guard seconds.isFinite, let index = lastEntryIndex(atOrBefore: seconds) else { return nil }
+        let entry = entries[index]
         if let duration = entry.composition.duration, seconds >= entry.start + duration { return nil }
         return (entry.start, entry.composition)
     }
@@ -149,8 +150,29 @@ struct BitmapSubtitleTimeline: Sendable {
     mutating func prune(before seconds: Double) {
         // Keep the final set preceding the cutoff: an indefinite PGS display
         // can span an arbitrarily long silent interval before its clear event.
-        guard let lastPastIndex = entries.lastIndex(where: { $0.start <= seconds }), lastPastIndex > 0 else { return }
+        guard let lastPastIndex = lastEntryIndex(atOrBefore: seconds), lastPastIndex > 0 else { return }
         for entry in entries[..<lastPastIndex] { retainedBytes -= entry.composition.byteCount }
         entries.removeFirst(lastPastIndex)
+    }
+
+    /// Read-ahead leaves future events after the currently displayed set.
+    /// Find its predecessor without scanning that future window on every tick.
+    private func lastEntryIndex(atOrBefore seconds: Double) -> Int? {
+        guard !entries.isEmpty else { return nil }
+        let last = entries.count - 1
+        // Preserve constant-time lookup when the clock reaches the newest set.
+        if entries[last].start <= seconds { return last }
+
+        var lower = 0
+        var upper = last
+        while lower < upper {
+            let middle = lower + (upper - lower) / 2
+            if entries[middle].start <= seconds {
+                lower = middle + 1
+            } else {
+                upper = middle
+            }
+        }
+        return lower > 0 ? lower - 1 : nil
     }
 }
