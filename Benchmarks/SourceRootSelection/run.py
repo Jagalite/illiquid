@@ -40,13 +40,20 @@ OLD = b"""    private func matchingRootPath(for normalizedPath: String) -> Strin
             .max { $0.count < $1.count }
     }"""
 NEW = b"""    private func matchingRootPath(for normalizedPath: String) -> String? {
-        // Select the longest match without allocating an intermediate array for
-        // each row and ancestor. Keep max's comparison and root-order semantics.
-        rootPaths.lazy
-            .filter { rootPath in
-                SourceTreeIdentity.contains(normalizedPath, within: rootPath)
+        // Select the first longest match without materializing a matching-root
+        // array for every row and ancestor. Count characters only when comparing
+        // two matches, preserving the common single-root path and Unicode rules.
+        var longestMatch: String?
+        for rootPath in rootPaths where SourceTreeIdentity.contains(normalizedPath, within: rootPath) {
+            if let current = longestMatch {
+                if current.count < rootPath.count {
+                    longestMatch = rootPath
+                }
+            } else {
+                longestMatch = rootPath
             }
-            .max { $0.count < $1.count }
+        }
+        return longestMatch
     }"""
 
 
@@ -141,7 +148,7 @@ class Study:
             for path in before:
                 if path == FOCAL:
                     if before[path].count(OLD) != 1 or after[path] != before[path].replace(OLD, NEW, 1):
-                        raise ValueError("Focal changes exceed the declared lazy-filter experiment")
+                        raise ValueError("Focal changes exceed the declared single-pass experiment")
                 elif before[path] != after[path]:
                     raise ValueError(f"Unrelated production support changed: {path}")
             variants = [("baseline", before, before_records), ("candidate", after, after_records)]

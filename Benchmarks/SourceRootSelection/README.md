@@ -2,8 +2,9 @@
 
 This study compares the source browser's production relative-path lookup and
 visibility projection with the eager matching-root array removed. The candidate
-adds `.lazy` before the existing filter/max chain; containment, longest-root
-comparison, input order, Unicode behavior, and ancestor boundaries stay intact.
+uses one explicit pass to retain the first longest match; containment,
+character-count comparison, input order, Unicode behavior, and ancestor
+boundaries stay intact.
 
 The baseline is commit `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`.
 The runner reuses the guarded production-source extraction in
@@ -67,7 +68,21 @@ POSIX import in MediaSidecarReader and adds FoundationXML to NFOMetadataHints;
 both variants receive identical adaptations, recorded with compiled hashes.
 Linux measurements do not establish native macOS performance.
 
-## Results
+## First experiment: lazy filtering (not retained)
 
-Measurements are pending the first native CI run. No speedup, allocation-byte,
-whole-player memory, frame-rate, or battery claim is established yet.
+The initial `.lazy.filter(...).max(...)` candidate at
+`44f9166eac3e22777224590677b04352703dabcc` completed portable validation in
+[Actions run 40637901870](https://github.com/Jagalite/illiquid/actions/runs/40637901870/job/122649025893).
+All 31 tests passed in baseline release and candidate debug/release; all 39
+differential fixtures matched. Eight paired fresh-process samples per workload
+used Swift 6.4.1 on Linux x86_64 / AMD EPYC 7763.
+
+The single-root lookup improved by a median paired 13.42%, but the 64-root lookup
+regressed by 6.51% (all eight pairs), and the 1,000-row 64-root tree visibility
+projection regressed by 4.90% (all eight pairs). This candidate was rejected.
+All 208 observations and source/host receipts are retained in
+[evidence/linux-lazy-44f9166.json](evidence/linux-lazy-44f9166.json).
+
+The explicit-loop follow-up is pending measurement against the same baseline
+and workload matrix. Native macOS performance remains unqualified. No measured
+allocation-byte, whole-player memory, frame-rate, or battery claim is made.

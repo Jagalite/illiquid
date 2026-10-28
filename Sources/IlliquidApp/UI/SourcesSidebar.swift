@@ -2225,13 +2225,20 @@ struct SourceVisibilityMatcher {
     }
 
     private func matchingRootPath(for normalizedPath: String) -> String? {
-        // Select the longest match without allocating an intermediate array for
-        // each row and ancestor. Keep max's comparison and root-order semantics.
-        rootPaths.lazy
-            .filter { rootPath in
-                SourceTreeIdentity.contains(normalizedPath, within: rootPath)
+        // Select the first longest match without materializing a matching-root
+        // array for every row and ancestor. Count characters only when comparing
+        // two matches, preserving the common single-root path and Unicode rules.
+        var longestMatch: String?
+        for rootPath in rootPaths where SourceTreeIdentity.contains(normalizedPath, within: rootPath) {
+            if let current = longestMatch {
+                if current.count < rootPath.count {
+                    longestMatch = rootPath
+                }
+            } else {
+                longestMatch = rootPath
             }
-            .max { $0.count < $1.count }
+        }
+        return longestMatch
     }
 }
 
