@@ -2,7 +2,7 @@
 
 The main Metal subtitle renderer used to build an Array containing six
 vertices per quad, then copy that array into its pooled shared Metal buffer.
-Each changed caption repeated that array construction and explicit copy.
+Each vertex upload repeated that array construction and explicit copy.
 
 The candidate writes the same vertex fields directly into the checked-out
 Metal buffer. It also reads the texture's dimensions and calculates the
@@ -10,9 +10,16 @@ frame-constant coordinate offsets once per upload. The resource pool, buffer
 growth policy, vertex descriptor, triangle/quad order, shaders and completion
 handlers are unchanged.
 
+## Research results
+
+See [RESULTS.md](RESULTS.md) for the measured portable CPU results and the
+explicit native qualification status. Portable timings do not establish a
+native Metal or whole-player speedup.
+
 ## Memory scope
 
-Each vertex has two Float2 fields and one UInt8x4 color. The regression tests check a 20-byte field layout with a 24-byte stride. At 256 quads, the removed
+Each vertex has two Float2 fields and one UInt8x4 color. The regression tests check a 20-byte field layout with a 24-byte stride.
+At 256 quads, the removed
 array's element storage and explicit copy each span 36,864 bytes (36 KiB).
 This is source-level staging payload accounting, not a measured malloc count
 or resident-memory reduction. Swift may optimize small array literals; no
@@ -59,7 +66,7 @@ A thin adapter supplies a real Metal device, configuration and persistent
 resources, calls those methods and reads logical vertex fields. Each variant
 is compiled as a separate production module, then linked to the same driver.
 The adapter does not substitute a fake texture, buffer or allocation API.
-Extracted source, source hashes, compiler commands, binaries and host identity
+Extracted source, source hashes, compiler commands, binary hashes and host identity
 are recorded with every run.
 
 The driver compares every vertex position, texture coordinate and RGBA value
