@@ -151,3 +151,68 @@ and measurement workflow are unchanged. The failed attempt is retained.
 was queued for this repaired test; **no performance result is claimed** until
 its app receipt, component receipts, source/binary integrity, full output parity,
 and every raw measured sample independently satisfy the predeclared criteria.
+
+### Native attempt 2 — paired performance favorable, duration floor not met
+
+[Run 40642915320](https://github.com/Jagalite/illiquid/actions/runs/40642915320),
+[job 122664979786](https://github.com/Jagalite/illiquid/actions/runs/40642915320/job/122664979786),
+on test-fixture repair revision `ec9e2fed6d66662dc866d4253085887c908236f8`
+completed on 2026-10-28 using **macOS 26.6.2, arm64 Apple M1 virtual,
+Xcode 26.6, Apple Swift 6.3.3**, Python 3.15.0. The GitHub Actions
+workflow concluded green, but **nativeQualificationSuccess=false**.
+The full release app dependency graph compiled and its **34 focused tests
+passed**. The component's **24 tests passed in all four baseline/candidate
+debug/release configurations (96 test executions)**; before/after
+verification produced exactly matching four-way complete traversal receipts.
+Recorded source and binary integrity checks passed, as did output/checksum
+parity in all **48 measured pairs (96 samples)**.
+
+These independent raw-sample recalculations use the **median of eight paired
+percentage changes**, not a ratio of separately measured medians. The scan
+time columns show separately measured per-traversal medians for context.
+
+| Workload | Wall baseline → candidate (ms/scan) | Paired wall reduction | CPU baseline → candidate (ms/scan) | Paired CPU reduction | Favorable wall / CPU pairs |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `flat_media_4096` | 83.394 → 35.375 | 53.33% | 79.479 → 35.356 | 53.38% | 8/8, 8/8 |
+| `flat_nonmedia_4096` | 83.836 → 35.183 | 54.86% | 75.766 → 34.867 | 54.35% | 8/8, 8/8 |
+| `nested_mixed_4096` | 88.348 → 39.964 | 53.39% | 87.051 → 39.584 | 52.02% | 8/8, 8/8 |
+| `directory_only_512` | 20.619 → 17.117 | 11.89% | 18.275 → 17.021 | 3.30% | 8/8, 8/8 |
+| `cached_repair` | 1.368 → 1.283 | 0.07% | 1.231 → 1.254 | 0.03% | 4/8, 4/8 |
+| `small_32` | 0.672 → 0.306 | 52.48% | 0.601 → 0.302 | 51.78% | 8/8, 8/8 |
+
+All three primary workloads independently exceed the predeclared 15%
+paired-median wall/CPU savings with at least 7/8 favorable pairs, and all
+three controls remain within the 5% median regression ceiling. **Nevertheless,
+two candidate `small_32` observations fell below the 250 ms measured-sample
+minimum**: pair 4 at **237.800042 ms** and pair 5 at **249.418125 ms**,
+with a cohort-wide minimum of 237.800042 ms. Both are included in the retained
+96-row dataset; neither was discarded or remeasured in that cohort. The
+calibration pilot passed but underestimated per-process variation. The native
+timing floor is mandatory even for a control, so this run **cannot qualify
+the optimization**. Do not combine it with later cohorts or use its favorable
+performance numbers to justify a PR.
+
+[Permanent compressed attempt-2 receipts](evidence/macos/attempt-2-short-samples.json)
+contain all top-level machine-readable receipts, every raw measurement,
+checksum and calibration, plus the app test log. They reproduce the
+[original artifact 12856366334](https://github.com/Jagalite/illiquid/actions/runs/40642915320/artifacts/12856366334)
+and use a SHA-256-marked gzip/base64 JSON filename-to-content mapping.
+
+### Native attempt 3 — calibration margin correction
+
+Only the research runner's warmup/pilot iteration-count safety multiplier
+was increased from **1.5× to 3.0×** in
+[commit `6867da97`](https://github.com/Jagalite/illiquid/commit/6867da970f633a9a73611cbcb38e487789c2ac64),
+to reduce the chance that an ordinary faster-process fluctuation produces
+a measured sample shorter than 250 ms. **The 250 ms acceptance floor, 15%
+primary improvement thresholds, 7/8 favorable-pair requirement, 5% control
+regression ceiling, six workloads, eight fresh-process pairs, production
+scanner, app regression and component tests are unchanged.** The original
+short samples remain retained. The
+[new independent native run 40780859398](https://github.com/Jagalite/illiquid/actions/runs/40780859398)
+is pending qualification; no successful result or PR is claimed from it
+until all required receipts and raw samples pass.
+
+Across both attempts, the measured operation remains **warm local real-filesystem
+cursor traversal with result accumulation and temporary-object cleanup**,
+not whole-player CPU, UI latency, cold I/O, or energy consumption.
