@@ -4,6 +4,9 @@ This experiment compares complete production sources against frozen main commit
 `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`. Only `MediaNameRecognition.swift`
 differs. The shared `MediaMetadataHints.swift` must match its pinned bytes.
 The baseline manifest records the commit, Git blob IDs, and SHA-256 hashes.
+The current candidate is the exact production implementation from
+[PR #141](https://github.com/Jagalite/illiquid/pull/141); its qualification
+follow-up adds no further production-source changes.
 
 ```sh
 python3 Benchmarks/MediaDisplayName/run.py \
@@ -36,9 +39,13 @@ timed operation. These are distinct boundaries, not whole-application timings.
 | `recognize-ranges` | Complete filename recognition and range label |
 | `recognize-mixed` | Complete recognition and labels for mixed media |
 
-The unbounded case is a compatibility/fallback workload, not an unchanged code
-path: range-prefix construction differs. Dated, movie, and unknown cases are
-the unchanged-path controls. Preserve their observations even if they fluctuate.
+The unbounded case is a fallback control. Every cyclic triple of unusual season,
+episode, and range-endpoint values includes a negative value or one above
+`Int32.max`. PR #141 therefore selects the complete original Foundation
+formatting expression for every record, including the original range prefix.
+The candidate's range guard remains part of the measured operation. Dated,
+movie, and unknown cases exercise other unchanged formatting paths. Preserve
+all control observations even if they fluctuate.
 
 Fixture creation, preflight, warmup, JSON encoding, and verification are outside
 the timers. The loop includes label construction, a small byte-count observation,
@@ -49,12 +56,15 @@ loop is subtracted. Wall time uses `DispatchTime`; process CPU uses
 
 ## Correctness and sampling
 
-The runner tests baseline and candidate in debug and release with the existing
-recognition suites and `MediaDisplayNameTests`. These currently comprise 47 tests;
+The runner tests baseline and candidate in debug and release with the three
+existing recognition suites, PR #141's `EpisodeDisplayNameTests`, and the
+follow-up's `MediaDisplayNameTests`. These comprise 47 tests in five suites;
 the actual nonzero completed count is required and recorded for each invocation.
-The new regression oracle retains the original Foundation formatting expression,
-including all 10,000 bounded values, signed C conversion boundaries, nil values,
-air-date precedence, exact Unicode, non-episode kinds, and public hint application.
+The display-formatting oracles retain the original Foundation expression. They
+exhaust all values from 0 through 9,999 in each numeric role, a subset of the
+nonnegative `Int32` fast path, and include 4,096 deterministic positive-`Int32`
+samples. Other cases cover signed C conversion boundaries, nil values, air-date
+precedence, exact Unicode, non-episode kinds, and public hint application.
 
 Both variants emit complete differential records before timing. The runner
 compares all input and stored/derived fields, and retains both compressed outputs.

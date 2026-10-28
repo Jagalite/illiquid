@@ -1,246 +1,267 @@
-> Requalification in progress: this follow-up now uses the exact implementation
-> from [PR #141](https://github.com/Jagalite/illiquid/pull/141). The retained results
-> below describe the earlier independent candidate at `99bb8f9`; fresh tests and
-> measurements for the adopted implementation are being collected before handoff.
+# Qualification of PR #141's episode display-name formatting
 
-# Episode display-name formatting research
+## Result and scope of this follow-up
 
-## Result and qualification
+This study qualifies the exact production implementation in
+[PR #141](https://github.com/Jagalite/illiquid/pull/141). The stacked
+[follow-up #233](https://github.com/Jagalite/illiquid/pull/233) has **zero changes
+under `Sources/` relative to #141**. Its contributions are additional compatibility
+tests, fresh independent measurements with complete receipts, surrounding-row
+controls, and repair of the historical recognition verifier described below.
 
-Replacing Foundation format-string calls for ordinary numbered episode labels
-reduces their median paired construction time by **86.96–91.97% on the measured
-Linux host**. The candidate is faster in all ten pairs for each of the four
-targeted label workloads. Process CPU measurements closely agree with wall time.
-This supports the small formatting change as a component optimization.
+On the measured Linux host, #141's implementation reduces median paired time
+for four numbered-episode label workloads by **86.49%–91.94%**.
+The candidate is faster in all **40 of 40** targeted pairs; even the least
+favorable targeted pair reduces time by **81.33%**. The tables report
+wall and process CPU measurements separately. The supported conclusion is lower
+label-construction cost on this host. It is not a whole-player speedup claim.
 
-**Native macOS qualification is pending.** The native benchmark and application
-build/test jobs were queued without an assigned runner at publication. This work
-is proposed as a draft PR until those checks complete. Linux measurements do not
-establish macOS, SwiftUI, playback, or whole-player latency improvements.
+**Native macOS qualification remains pending.** The follow-up stays a draft until
+the native benchmark, intact historical comparison, and application build/tests
+complete. Linux timings do not establish macOS, SwiftUI, playback, or interactive
+latency improvements. Complete row results remain exploratory, with all controls
+and adverse observations disclosed.
 
-The surrounding media-row experiment has favorable episode-heavy medians, but
-also adverse unchanged-path controls and large individual deviations. Treat those
-numbers as exploratory observations, not a reliable whole-row speedup claim.
-All completed observations, including slowdowns, are retained.
-
-The primary evidence is the [component summary](../Benchmarks/MediaDisplayName/evidence/linux/component-summary.json),
+The current [component summary](../Benchmarks/MediaDisplayName/evidence/linux/component-summary.json),
 [row summary](../Benchmarks/MediaDisplayName/evidence/linux/projection-summary.json),
-and [complete evidence archive and provenance](../Benchmarks/MediaDisplayName/evidence/linux/README.md).
-Independent audits reproduce both summaries from the raw observations.
+and [archive/provenance guide](../Benchmarks/MediaDisplayName/evidence/linux/README.md)
+contain this fresh cohort. Independent audits reproduce both summaries from raw observations and verify the retained source and process-log receipts.
 
-## Production change and actual call site
+## Why the historical verifier needs this follow-up
 
-[`RecognizedMediaName.displayName`](../Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift)
-previously constructed the numeric label with `String(format: "S%02dE%02d", ...)`
-and an optional second formatter for the final episode. It now constructs decimal
-strings directly for values from 0 through 9,999, adding a leading zero below ten.
-It retains the original combined Foundation formatter when either season or
-episode is outside that range, and an equivalent Foundation fallback for a range
-endpoint outside it. This preserves signed C-integer conversion of arbitrary
-metadata-hint values, including values beyond `Int32`.
+The historical runner in #141 shares the candidate's `RecognizedMediaName` type
+with its frozen parser. It therefore requires that type's entire declaration to
+remain byte-identical to the frozen declaration. Changing `displayName` violates
+that requirement: the native workflow's existing **Compare exact metadata on pull
+requests** step would reject staging with `RecognizedMediaName changed; the
+shared-type oracle requires review`, before any comparison executes.
 
-The public property and returned bytes are unchanged. Nil numeric fields still
-become zero; air dates (including an empty nonnil date) still bypass numeric
-formatting; range and title separators, Unicode, empty titles, and non-episode
-labels retain their existing behavior. The change introduces no cache or mutable
-shared state.
+This follow-up preserves the complete frozen source and mechanically renames
+both its result type and parser. The harness serializes each version's stored
+fields and its own derived `seriesTitle`, `displayName`, and `section` values.
+Baseline formatting is therefore evaluated independently. Simply dropping the
+old declaration check while sharing today's result type would apply the new
+formatter to both sides and could mask a regression.
 
-The real application path is
-[`SourcesSidebar.synchronizeRecursiveMediaScan`](../Sources/IlliquidApp/UI/SourcesSidebar.swift)
-→ `SourceRecursiveMediaLoader` →
-[`MediaSidecarReader.recognize`](../Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift)
-→ `refreshVisibleRows` →
-[`SourceBrowserFilter.project`](../Sources/IlliquidApp/UI/SourceBrowserFilter.swift)
-→ [`SourceTreeProjectionInput.rows` / `makeFlatFileRows`](../Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift).
-Normal media scans provide already recognized metadata, but the row builder still
-computes each episode's display string. Rows store the resulting string.
+The frozen historical file, manifest hash, and corpus remain unchanged. Receipts
+record identifier-renaming counts and exact compiled inputs. This repairs the
+gate's ability to validate #141; it does not declare that the native gate has
+already passed. See the [verifier guide](../Benchmarks/MediaNameRecognition/README.md).
 
-The expected benefit therefore applies when media-view rows are rebuilt after a
-scan or relevant source/sort/view changes. Search and visibility edits that reuse
-`cachedRows` already reuse those strings; they should not gain from this formatter.
-Filesystem discovery, sidecar I/O, UI presentation, and playback are outside the
-changed work and outside these measurements.
+## Adopted implementation and application call site
 
-## Baseline, environment, and method
+PR #141's [`RecognizedMediaName.displayName`](../Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift)
+uses direct decimal strings when season, episode, and any range endpoint are
+all between zero and **`Int32.max` (2,147,483,647)**. Values below ten receive a
+leading zero. If any component is negative or wider, it evaluates the **complete
+original Foundation expression**, including the original optional range formatter.
+This preserves signed C `%d` conversion rather than changing unusual metadata
+hints to unrestricted Swift integer formatting.
 
-- Frozen baseline: `ea2ff568237e2667f7b1aeee67b11a44ebe95b72` (integrated main).
-- Measured candidate: `99bb8f974e5bfd5ac553f72cab748cd579b691b4`.
-- Candidate production SHA-256: `23f7087e073215e7fd1d803cf25a2aeb96fc702a4707adf13ac4f6d21b4261ef`.
-- Environment: shared Ubuntu 24.04.3 x86_64 host, Linux 6.18.55, Swift 6.3.3 release.
-  The host reports an AMD EPYC 9V74 processor; nine logical CPUs were available.
-  Every final process inherited affinity to CPU 8. This is not an isolated physical
-  machine, and that affinity does not eliminate shared-host noise.
-- Kyoto was unavailable, so builds ran serially in isolated output directories.
-  Final runs executed outside the sandbox after the baseline runtime failure
-  described below. Neither benchmark overlaps the other in time.
-- Separate optimized production libraries and independently compiled drivers use
-  `-O -whole-module-optimization`, without cross-module optimization. Static `nm`
-  and disassembly receipts confirm the timed label loop calls the external
-  production getter/recognizer rather than a folded fixture result.
-- Each workload uses ten fresh-process pairs, five AB and five BA, with identical
-  iteration counts per variant. Calibration targets at least 100 ms for the faster
-  variant. Pilots remain separate from final measurements. Label workload order
-  rotates between pairs. No observations or outliers were removed.
-- Fixture setup, warmup, complete JSON serialization, and validation are outside
-  the timers. Wall time uses `DispatchTime`; CPU time uses
-  `CLOCK_PROCESS_CPUTIME_ID`. No empty-loop timing is subtracted.
+Nil numeric fields still become zero. A nonnil air date, including an empty
+string, bypasses numeric formatting. Range/title separators, empty titles,
+Unicode bytes, and movie/extra/unknown labels retain their behavior. The adopted
+implementation adds no cache or mutable shared state.
 
-There are **220 final label/recognition observations** and **200 final row
-observations**. Positive paired reductions mean less time. The primary statistic
-is the median of each pair's `100 × (1 − candidate / baseline)`; absolute medians
-are calculated independently and therefore need not produce the same percentage.
-This report does not attach statistical-significance or population-wide claims
-to those medians.
+The real path starts in
+[`SourcesSidebar.synchronizeRecursiveMediaScan`](../Sources/IlliquidApp/UI/SourcesSidebar.swift):
+`SourceRecursiveMediaLoader` obtains recognized metadata through
+[`MediaSidecarReader`](../Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift),
+then `refreshVisibleRows` invokes the
+[`SourceBrowserFilter`](../Sources/IlliquidApp/UI/SourceBrowserFilter.swift) actor.
+When its tree input changes,
+[`SourceTreeProjectionInput.rows` / `makeFlatFileRows`](../Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift)
+constructs each label and stores it in the row.
 
-## Label and recognition observations
+Normal metadata scans already supply recognition, so formatting remains real
+work during the later reconstruction. Search or visibility edits that reuse
+`cachedRows` reuse those strings. Filesystem discovery, sidecar I/O, drawing, and
+playback are outside the changed operation and the measured intervals.
 
-Times below are nanoseconds per operation. Each batch has 128 inputs. `cached-*`
-means already recognized metadata, not a cached formatted string. `recognize-*`
-includes full filename recognition before constructing the label.
+## Baseline, provenance, and measurement
+
+| Item | Recorded value |
+| --- | --- |
+| Frozen main baseline | `ea2ff568237e2667f7b1aeee67b11a44ebe95b72` |
+| Measured follow-up commit | `c15703fcab7d7ccca3642eac626dad4923fb4fd9` |
+| Adopted #141 production commit | `5166cb73475b24dfb29f7115a5fa109e74379ba3` |
+| Recognition source SHA-256 | `cc3c1ac628498798384c3e93973ffa0dcd6f21036b1f1de779cd54c82cc944d1` |
+| Runtime | Swift 6.3.3 release, Ubuntu 24.04.3 x86_64, Linux 6.18.55 |
+| Host/affinity | Reported AMD EPYC 9V74, nine logical CPUs available, inherited CPU affinity `[8]` |
+
+The host is shared; affinity does not create an isolated physical machine.
+Kyoto was unavailable. Builds ran serially in isolated output directories, and
+the fresh cohort ran outside the sandbox from its first invocation. The component
+and row measurements did not overlap. The toolchain archive has verified release
+signature and digest provenance in the evidence.
+
+Each variant is an optimized production shared library called by a separately
+compiled common driver, using `-O -whole-module-optimization` without cross-module
+optimization. This prevents fixture specialization across the module boundary;
+the exact application's optimizer context can still differ. Fixtures, warmup,
+full JSON encoding, and validation occur outside timing. Label intervals include
+small byte-count and bounded result-array handling; no empty loop is subtracted.
+
+Each case uses ten fresh-process pairs, five AB and five BA, with equal iteration
+counts for both variants. Calibration targets at least 100 ms for the faster
+variant, and label workload order rotates between pairs. Pilots are retained
+separately. All **220 label/recognition observations** and **200 row observations**
+are included, without outlier removal. Wall time uses `DispatchTime`; process CPU
+uses `CLOCK_PROCESS_CPUTIME_ID`.
+
+Positive percentages below mean less time. They are medians of the ten paired
+`100 × (1 − candidate / baseline)` reductions. Absolute medians are calculated
+independently, so their ratio need not reproduce the paired percentage. These
+descriptive medians are not population-level confidence or significance claims.
+
+## Label and recognition results
+
+Times are nanoseconds per operation, with 128 inputs per batch. `cached-*` means
+already recognized metadata, not a previously formatted label. `recognize-*`
+includes complete filename recognition before display formatting.
 
 | Workload | Baseline ns | Candidate ns | Paired wall reduction | Paired CPU reduction | Faster pairs |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `cached-numbered` | 1,943.37 | 258.03 | 87.02% | 87.02% | 10/10 |
-| `cached-ranges` | 3,443.05 | 278.17 | 91.97% | 91.96% | 10/10 |
-| `cached-wide-numbers` | 1,760.70 | 148.55 | 91.54% | 91.54% | 10/10 |
-| `cached-unicode-titles` | 2,031.50 | 250.80 | 86.96% | 86.96% | 10/10 |
-| `cached-dated-control` | 127.94 | 132.95 | -1.79% | -1.79% | 5/10 |
-| `cached-movie-control` | 166.32 | 158.15 | 4.79% | 4.81% | 7/10 |
-| `cached-unknown-control` | 118.74 | 117.65 | 2.15% | 2.14% | 6/10 |
-| `cached-unbounded-control` | 3,513.58 | 3,106.79 | 10.80% | 10.80% | 7/10 |
-| `recognize-numbered` | 45,615.84 | 43,763.97 | 5.64% | 5.66% | 6/10 |
-| `recognize-ranges` | 37,322.84 | 35,935.45 | 9.08% | 9.08% | 8/10 |
-| `recognize-mixed` | 38,830.04 | 37,780.37 | 3.92% | 3.93% | 7/10 |
+| `cached-numbered` | 1,958.04 | 270.29 | 86.49% | 86.49% | 10/10 |
+| `cached-ranges` | 3,555.98 | 290.36 | 91.94% | 91.93% | 10/10 |
+| `cached-wide-numbers` | 1,779.72 | 158.07 | 91.05% | 91.04% | 10/10 |
+| `cached-unicode-titles` | 1,970.03 | 263.68 | 86.58% | 86.58% | 10/10 |
+| `cached-dated-control` | 132.65 | 131.57 | 0.92% | 0.90% | 7/10 |
+| `cached-movie-control` | 156.39 | 160.11 | -1.60% | -1.60% | 4/10 |
+| `cached-unknown-control` | 111.81 | 114.46 | -3.74% | -3.75% | 2/10 |
+| `cached-unbounded-control` | 3,568.36 | 3,561.88 | 0.62% | 0.62% | 6/10 |
+| `recognize-numbered` | 45,239.89 | 43,519.79 | 4.40% | 4.41% | 9/10 |
+| `recognize-ranges` | 40,275.18 | 35,479.60 | 11.95% | 11.95% | 10/10 |
+| `recognize-mixed` | 44,671.94 | 40,487.38 | 7.00% | 7.00% | 8/10 |
 
-The four bounded-number label cases are the defensible result: all 40 paired
-comparisons favor the candidate, and even their least favorable pair reduces time
-by 82.54%. Dated, movie, and unknown labels are unchanged-path controls; their
-paired medians range from −1.79% to +4.79%, with individual deviations in both
-directions. The unbounded case is a compatibility workload, not an unchanged
-control, because range-prefix construction changes even when numeric formatting
-falls back to Foundation.
+The consistent reduction belongs to the four ordinary numbered-label cases.
+Dated, movie, and unknown controls retain their formatting paths; their paired
+wall medians range from **-3.74% to 0.92%**.
+The `cached-unbounded-control` fixture uses cyclic unusual integer triples.
+Every triple contains a negative or above-`Int32.max` component, so the adopted
+candidate takes the complete original Foundation expression on every record.
+The new bounds guard is still included in its measured cost.
 
-The recognition-inclusive results are not a firm broader speedup claim. For
-example, `recognize-ranges` contains a pair that is **64.09% slower** in the
-candidate. That observation remains in the summary and raw data. The large,
-consistent targeted reduction is much clearer than these surrounding differences.
+Recognition-inclusive timings are a broader operation and support a less direct
+conclusion than isolated label construction. The least favorable recognition-inclusive pair is `recognize-mixed` at **1.50% slower** in the candidate.
+Every observation remains in the receipts. The current report confines its
+primary performance claim to the targeted label workloads.
 
-## Complete media-row observations
+## Complete media-row results
 
-The row experiment compiles twelve real production files or guarded verbatim
-model declarations; only the focal recognition file differs. It uses production
-default sorting (creation date descending, name and type sorting off). It measures
-complete `input.rows()` calls, including path handling, date sorting, context
-labels, display strings, and row allocation. The previous result remains alive
-until its replacement returns. It excludes directory enumeration, sidecar reads,
-file opening, SwiftUI work, and playback.
+The row study compiles twelve real production files or guarded verbatim model
+declarations. Only the focal recognition file differs between baseline and
+candidate. It measures complete `input.rows()` calls with production default
+sorting: creation date descending, name/type sorting off. Timed work includes
+path processing, sorting, context labels, display strings, and row allocation.
+The previous result stays alive until its replacement returns. Directory
+enumeration, sidecar reads, file opening, SwiftUI, and playback are excluded.
 
-Times are milliseconds per complete reconstruction or cached actor projection
-for the stated number of input files.
+Times are milliseconds per reconstruction or cached actor projection for the
+stated number of input files.
 
-| Workload | Files | Baseline ms | Candidate ms | Paired wall reduction | Faster pairs |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `precomputed_episodes` | 100 | 1.928 | 1.634 | 12.54% | 9/10 |
-| `precomputed_episodes` | 1,000 | 18.245 | 17.388 | 8.34% | 8/10 |
-| `unprepared_episodes` | 100 | 5.976 | 5.740 | 4.74% | 9/10 |
-| `unprepared_episodes` | 1,000 | 63.032 | 58.801 | 10.16% | 10/10 |
-| `mixed_library` | 100 | 1.664 | 1.558 | 6.34% | 8/10 |
-| `mixed_library` | 1,000 | 17.400 | 15.919 | 4.43% | 7/10 |
-| `movies_control` | 100 | 1.295 | 1.262 | 1.97% | 8/10 |
-| `movies_control` | 1,000 | 13.597 | 15.062 | -9.72% | 2/10 |
-| `cached_projection_control` | 100 | 0.705 | 0.669 | 1.19% | 5/10 |
-| `cached_projection_control` | 1,000 | 6.717 | 7.246 | -3.62% | 2/10 |
+| Workload | Files | Baseline ms | Candidate ms | Paired wall reduction | Paired CPU reduction | Faster pairs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `precomputed_episodes` | 100 | 2.153 | 1.906 | 13.05% | 13.07% | 9/10 |
+| `precomputed_episodes` | 1,000 | 18.142 | 15.955 | 11.37% | 11.38% | 9/10 |
+| `unprepared_episodes` | 100 | 6.503 | 6.213 | 5.69% | 5.64% | 9/10 |
+| `unprepared_episodes` | 1,000 | 71.623 | 67.967 | 5.33% | 5.36% | 8/10 |
+| `mixed_library` | 100 | 1.705 | 1.610 | 7.71% | 7.72% | 8/10 |
+| `mixed_library` | 1,000 | 16.216 | 15.834 | 2.90% | 2.94% | 8/10 |
+| `movies_control` | 100 | 1.217 | 1.204 | 1.64% | 1.64% | 7/10 |
+| `movies_control` | 1,000 | 13.260 | 13.213 | -0.20% | -0.25% | 5/10 |
+| `cached_projection_control` | 100 | 0.609 | 0.620 | -1.17% | -1.15% | 4/10 |
+| `cached_projection_control` | 1,000 | 7.006 | 7.095 | -1.94% | -1.96% | 5/10 |
 
-CPU paired medians closely track these wall-time results. Episode reconstruction
-has favorable medians, but the 1,000-file movie control is **9.72% slower**, and
-the cached-projection control is **3.62% slower**. The precomputed 1,000-episode
-case also has a single pair that is **61.27% slower**. These observations limit the
-strength of a surrounding-row claim; they are not discarded or explained away.
+The precomputed-episode cases have favorable wall medians: 13.05% at 100 files (9/10 favorable pairs); 11.37% at 1,000 files (9/10 favorable pairs).
 
-The cache control uses the real `SourceBrowserFilter` actor. Its tree and
-visibility build counters stay at one throughout repeated unchanged-input
-projections, confirming that the optimized formatter is not re-executed there.
-Native or live-app measurements are needed before assigning a user-visible
-latency benefit.
+The movie and cached-projection control medians span **-1.94% to 1.64%**; their individual pairs vary in both directions. These small control changes do not establish a systematic improvement or regression. The least favorable individual row pair is `unprepared_episodes` at 1,000 files, **55.11% slower**.
 
-## Correctness, failures, and pending checks
+The row results support a benefit in these synthetic reconstruction cases, with
+variation that limits broader predictions. They do not establish a generally
+faster media browser. The cache control uses a real `SourceBrowserFilter` actor; its
+tree and visibility build counters remain at one through repeated unchanged-input
+projections. That confirms labels are reused on this path. Native and live-app
+measurements remain necessary before assigning a user-visible latency benefit.
 
-The focused baseline and candidate each pass **28 tests in three suites in debug
-and release**, for four completed invocations. The seven new tests exhaust all
-10,000 fast-path numbers in each numeric role and cover nils, signed/overflow
-boundaries, public metadata hints, date precedence, non-episode kinds, and exact
-Unicode/title bytes. See
-[`MediaDisplayNameTests.swift`](../Tests/IlliquidCoreTests/MediaDisplayNameTests.swift).
+## Correctness and qualification status
+
+Baseline and candidate each pass **47 tests in five suites in debug and release**,
+for four completed invocations. The suites combine the three existing recognition
+suites, #141's eight episode-formatting tests, and seven follow-up tests. They
+exhaust all values from zero through 9,999 in each numeric role—a subset of the
+nonnegative `Int32` fast path—and include 4,096 deterministic positive-`Int32`
+samples, signed/overflow boundaries, nils, date precedence, exact title bytes,
+non-episode kinds, and public metadata-hint application.
 
 Both variants produce **5,767 byte-identical complete differential records**.
-All ten complete row/projection trace pairs match, including every field,
-recognized metadata, UTF-8 bytes, IDs, ordering, visibility, and cache outputs.
-Every timed process checks its complete final output outside the clock.
+All ten complete row/projection trace pairs match, including metadata, UTF-8
+bytes, IDs, order, visibility, and projection outputs. Every timed process checks
+its complete final result outside the clock.
 
-The initial baseline release test attempt crashed in libdispatch's worker-pool
-monitor after failure to open `/proc/<thread-id>/stat`, before the relevant test
-body. The identical already-built binary passed all 28 tests outside the sandbox,
-and a fresh complete four-invocation qualification then passed there. Static
-symbol/disassembly analysis identifies the failing runtime operation; whether
-sandbox process visibility or a thread-lifecycle race caused the missing entry
-is not established. The failed log, successful retry, and analysis are retained.
-No timing observations came from that failed attempt.
+The intact historical comparison was rerun for the adopted candidate and
+remains **failed on Linux**. Its second input is bare `"."`, which traps in this
+Linux Foundation runtime's `NSString.deletingLastPathComponent` before recognition
+returns. Focused probes retained with this cohort reproduce the same trap in a
+Foundation-only executable, the frozen baseline, and the adopted #141 candidate.
+The probes bind the result to the current compiled module and preserve their
+commands, hashes, and raw failure logs. This is a recorded runtime limitation,
+not a passed equivalence check. No input or frozen source was removed to conceal
+it.
 
-The older historical recognition verifier remains **failed on Linux**. Its
-unchanged corpus includes bare `"."`, which traps in Linux Foundation's
-`NSString.deletingLastPathComponent` before recognition returns. A Foundation-only
-probe with no application module, the frozen baseline, and the candidate all
-reproduce the same failure. Empty string, `/`, and `..` succeed in all three.
-The oracle and corpus were not weakened or patched. The complete historical
-comparison remains a native macOS gate; the new portable CI job checks the
-focused label and complete-row comparisons.
-
-| Qualification | Status at publication |
+| Qualification | Current status |
 | --- | --- |
-| Focused Linux debug/release baseline and candidate tests | Passed: 28 tests per invocation |
-| Focused complete label differential | Passed: 5,767 records |
-| Complete row/projection differential | Passed: 10 cases and all final timed outputs |
-| Raw measurement/source/log audits | Passed for both experiments |
-| Historical recognition oracle on Linux | Failed on pre-existing Foundation bare-dot path trap |
-| Native macOS benchmark and intact historical oracle | Pending runner/execution |
-| Native application graph build and affected tests | Pending runner/execution |
+| Focused Linux tests | Passed: four invocations, 47 tests each, five suites |
+| Focused label differential | Passed: 5,767 complete records |
+| Row/projection differential | Passed: ten cases and all final timed outputs |
+| Portable GitHub correctness on the measured commit | Passed |
+| Independent receipt audits | Passed for both experiments |
+| Historical Linux comparison | Failed on the pre-existing Foundation bare-dot path trap |
+| Native macOS measurements and intact historical comparison | Pending |
+| Native application graph build and affected tests | Pending |
 | Live UI or playback qualification | Not performed |
 
-The [workflow](../.github/workflows/media-display-name.yml) provides a pinned
-Swift 6.3.3 portable correctness job, native macOS measurements and the intact
-historical verifier, plus a separate native application graph build and affected
-media/browser tests. The initial native
-[qualification run](https://github.com/Jagalite/illiquid/actions/runs/40751950302)
-was queued; the PR workflow supersedes that preliminary run. Check the PR's
-current checks for native status rather than treating queued work as a pass.
+The [portable correctness job](https://github.com/Jagalite/illiquid/actions/runs/40756021516/job/123055027201)
+passed on the measured commit, including the focused tests and complete label/row
+comparisons. The [workflow](../.github/workflows/media-display-name.yml) provides pinned Swift
+6.3.3 portable correctness, native macOS measurements with the intact historical
+corpus, and a separate native application build/test job. Consult the draft PR's
+current checks; queued jobs are not completed qualification.
 
-An earlier exploratory Linux screen lost its raw receipts during a session reset.
-Its numbers are excluded from this report. All reported values come from the
-fresh retained cohort above. The final evidence/documentation/workflow commit
-leaves the measured production, test, and benchmark source bytes unchanged.
+## Earlier candidate and reproduction
 
-## Reproduction and evidence
+An independent formatter was researched before reconciling this work with #141.
+Its [report](https://github.com/Jagalite/illiquid/blob/46f5384474e08bd04d6b20b5ab7a13adacdb01bf/Documentation/MEDIA_DISPLAY_NAME_PERFORMANCE.md)
+and [complete evidence](https://github.com/Jagalite/illiquid/tree/46f5384474e08bd04d6b20b5ab7a13adacdb01bf/Benchmarks/MediaDisplayName/evidence/linux)
+remain available at the immutable earlier commit. That candidate used different
+production bytes and a narrower fast path. Adopting #141 therefore required the
+fresh tests and measurements reported here; **none of the earlier candidate's
+timings enters these tables**.
 
-Use a fresh output directory for each command and follow `AGENTS.md` to submit
-builds through Kyoto when available. Select the desired Swift toolchain through
-`PATH` (or the runners' documented overrides).
+The earlier investigation's sandbox/libdispatch test failure and successful
+retry belong to that earlier cohort, not this clean outside-sandbox rerun. An
+even earlier exploratory screen lost its raw receipts during a session reset;
+its numbers are used in neither retained result set.
+
+Use fresh output directories and follow `AGENTS.md` to submit builds through
+Kyoto when available. Select a Swift toolchain through `PATH` or the runners'
+documented overrides:
 
 ```sh
 python3 Benchmarks/MediaDisplayName/run.py \
   --pairs 10 --target-ms 100 --output /tmp/media-display-name-new
 python3 Benchmarks/MediaDisplayNameProjection/run.py \
   --pairs 10 --target-ms 100 --output /tmp/media-display-projection-new
-# Native macOS: preserve the complete historical filename corpus.
+# Native macOS: retain the complete historical filename corpus.
 python3 Benchmarks/MediaNameRecognition/run.py \
   --verify-only --output /tmp/media-display-historical-new
 ```
 
-The [label runner](../Benchmarks/MediaDisplayName/README.md) and
-[row runner](../Benchmarks/MediaDisplayNameProjection/README.md) document exact
-boundaries and output formats. The retained archive contains raw observations,
-pilots, commands, source snapshots, full output traces, test/build logs, source and
-binary hashes, environment/toolchain provenance, failure diagnostics, and both
-independent audits. Compiled products and caches are omitted; their hashes and
-build commands remain. The [evidence receipt](../Benchmarks/MediaDisplayName/evidence/linux/receipt.json)
-records the archive digest and verifies measured input bytes against the final
-source tree.
+The [label](../Benchmarks/MediaDisplayName/README.md) and
+[row](../Benchmarks/MediaDisplayNameProjection/README.md) guides define measurement
+boundaries and outputs. The retained archive contains raw observations, pilots,
+commands, source snapshots, full traces, test/build logs, environment/toolchain
+provenance, and audits. Compiled products and caches are omitted; binary hashes
+and build commands remain. The [evidence receipt](../Benchmarks/MediaDisplayName/evidence/linux/receipt.json)
+records the archive digest and source match. Final narrative/evidence edits do
+not change the measured production, tests, or benchmark executables' inputs.
