@@ -127,7 +127,66 @@ Complete query receipts are also in that run's CI artifact (14-day retention).
 
 ### Revised candidate: bounded backward search
 
-Validation is pending. The new search preserves direct newest and penultimate
-probes and finds a smaller bracket before binary search. The same full workload
-matrix and correctness suite will decide whether it is worth proposing.
+[Portable run 40640675998](https://github.com/Jagalite/illiquid/actions/runs/40640675998)
+tested commit `882be3d8ec4415079b4ed64e093d320f968c7c72` on Swift 6.4,
+x86_64 Linux, with four hosted vCPUs reporting AMD EPYC 9V74. The complete
+hardware description is retained in the manifest. Both variants passed the
+same 25 tests in three suites in debug and release. All 464 measured samples
+again had identical result receipts and checksums.
 
+The new search checks the newest two events directly, expands backward in
+bounded blocks, and searches only the resulting bracket. Large-window active
+queries improved by 36-58% in this cohort. Most small-window and tail controls
+changed by less than half a nanosecond, but `newest-128` regressed by 1.24 ns
+(8.8%), with the candidate slower in seven of eight pairs. This result is
+retained and is not being dismissed as noise.
+
+| Workload | Baseline median ns/query | Revised median ns/query | Reduction | Candidate faster pairs |
+| --- | ---: | ---: | ---: | ---: |
+| `empty` | 3.58 | 3.58 | 0.0% | 5/8 |
+| `first-8` | 17.05 | 16.92 | 0.7% | 5/8 |
+| `first-32` | 24.92 | 19.66 | 21.1% | 8/8 |
+| `first-128` | 59.46 | 24.98 | 58.0% | 8/8 |
+| `middle-8` | 15.98 | 16.11 | -0.8% | 2/8 |
+| `middle-32` | 19.93 | 18.11 | 9.1% | 8/8 |
+| `middle-128` | 35.48 | 22.61 | 36.3% | 8/8 |
+| `newest-1` | 15.14 | 15.09 | 0.3% | 4/8 |
+| `newest-8` | 15.04 | 14.90 | 1.0% | 4/8 |
+| `newest-32` | 15.05 | 15.05 | 0.0% | 5/8 |
+| `newest-128` | 14.09 | 15.33 | -8.8% | 1/8 |
+| `after-newest-1` | 15.04 | 15.09 | -0.3% | 4/8 |
+| `after-newest-8` | 15.04 | 15.03 | 0.1% | 3/8 |
+| `after-newest-32` | 15.06 | 15.01 | 0.3% | 5/8 |
+| `after-newest-128` | 15.06 | 15.32 | -1.7% | 2/8 |
+| `before-first-1` | 3.86 | 3.58 | 7.1% | 8/8 |
+| `before-first-8` | 5.81 | 4.55 | 21.7% | 8/8 |
+| `before-first-32` | 16.00 | 6.63 | 58.6% | 8/8 |
+| `before-first-128` | 49.05 | 9.78 | 80.1% | 8/8 |
+| `penultimate-2` | 15.50 | 15.68 | -1.2% | 1/8 |
+| `penultimate-8` | 15.33 | 15.43 | -0.6% | 3/8 |
+| `penultimate-32` | 15.30 | 15.41 | -0.7% | 4/8 |
+| `penultimate-128` | 15.31 | 15.74 | -2.8% | 4/8 |
+| `mixed-forward-8` | 14.06 | 14.21 | -1.1% | 0/8 |
+| `mixed-forward-32` | 19.06 | 17.86 | 6.3% | 8/8 |
+| `mixed-forward-128` | 39.04 | 23.60 | 39.5% | 8/8 |
+| `mixed-shuffled-8` | 14.39 | 14.38 | 0.1% | 3/8 |
+| `mixed-shuffled-32` | 18.99 | 18.41 | 3.1% | 8/8 |
+| `mixed-shuffled-128` | 36.97 | 23.56 | 36.3% | 8/8 |
+
+The full records are under [revised-candidate evidence](evidence/20261028-linux-galloping).
+Compare baseline and candidate within each cohort. Absolute nanoseconds from
+the initial and revised runs must not be pooled or compared as if they were
+collected on the same host. The first run did not collect a CPU model; the
+revised run records it explicitly.
+
+### Predeclared stability check
+
+The source, driver and tests remain unchanged. A separate check repeats only
+`newest-128`, `newest-32` and `after-newest-128` with 16 balanced pairs,
+a 250 ms calibration target and a 1,500 ms estimated slow-sample cap. All
+observations from both cohorts will be kept separately. The question is whether
+the newest-at-128 regression reproduces; there is no source tuning in this check.
+
+[Stability run 40642038057](https://github.com/Jagalite/illiquid/actions/runs/40642038057)
+is pending. Native macOS qualification of the revised production source is also
+pending. The research is not yet a claim of improved whole-player performance.
