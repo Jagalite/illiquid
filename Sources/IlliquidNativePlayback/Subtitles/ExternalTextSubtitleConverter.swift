@@ -89,9 +89,13 @@ enum ExternalTextSubtitleConverter {
                   let end = parseTimestamp(timing[1], format: format, allowsSettings: true),
                   end.milliseconds > start.milliseconds
             else { continue }
-            let text = lines.dropFirst(timingIndex + 1).map(escapeASSPayload)
-                .joined(separator: "\\N")
-            output += "\nDialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
+            output += "\nDialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,"
+            // Append into the final result without retaining every escaped line
+            // and a second, joined payload. Empty lines still contribute separators.
+            for (offset, line) in lines.dropFirst(timingIndex + 1).enumerated() {
+                if offset > 0 { output += "\\N" }
+                output += escapeASSPayload(line)
+            }
             hasEvents = true
         }
         guard hasEvents else { throw ConversionError.noValidCues(format) }

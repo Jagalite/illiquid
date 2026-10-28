@@ -364,6 +364,79 @@ struct ExternalTextSubtitleConverterTests {
         }
     }
 
+    @Test func emptyAndWhitespaceCuesDoNotLeakPayloadAcrossEvents() throws {
+        let body = """
+        empty-before
+        00:00:01.000 --> 00:00:02.000
+
+        one-line
+        00:00:03.000 --> 00:00:04.000
+        Caption
+
+        rejected
+        invalid --> invalid
+        This payload must not appear
+
+        whitespace
+        00:00:05.000 --> 00:00:06.000
+         \t
+
+        empty-after
+        00:00:07.000 --> 00:00:08.000
+        """
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,"
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Caption"
+            + "\nDialogue: 0,0:00:05.00,0:00:06.00,Default,,0,0,0,, \t"
+            + "\nDialogue: 0,0:00:07.00,0:00:08.00,Default,,0,0,0,,"
+        for format in [Converter.Format.srt, .webVTT] {
+            for trailingLine in ["", "\n"] {
+                let source = (format == .webVTT ? "WEBVTT\n\n" : "") + body + trailingLine
+                #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+            }
+        }
+    }
+
+    @Test func multilineUnicodeEscapesRetainLineLocalMatchingAndTrailingBreak() throws {
+        // These combining marks remain attached to literal metacharacters,
+        // whereas the joiner permits Foundation's existing brace escaping.
+        // Literal "\N", inserted line breaks, and the final empty line differ.
+        let payload = #"literal\N{plain}"# + "\n"
+            + "\\\u{0301}{\u{0308}}\u{0327}\n"
+            + "{\u{200D}joiner\n"
+            + " \t\n"
+            + "Cafe\u{0301}\n"
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,"
+            + #"literal\\N\{plain\}\N"#
+            + "\\\u{0301}{\u{0308}}\u{0327}\\N"
+            + "\\{\u{200D}joiner\\N \t\\NCafe\u{0301}\\N"
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                + "00:00:01.000 --> 00:00:02.000\n" + payload
+            #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+        }
+    }
+
+    @Test(arguments: [0, 1, 2, 64, 4_096])
+    func manyPayloadLinesPreserveEveryLiteralEscapeAndSeparator(repeatedLines: Int) throws {
+        // The expected record repeats a fixed, independently specified escaped
+        // line. Even thousands of lines remain one cue, with one separator per LF.
+        let payload = String(repeating: #"Line\N{literal}"# + "\n", count: repeatedLines) + "Final"
+        let expectedPayload = String(repeating: #"Line\\N\{literal\}\N"#, count: repeatedLines) + "Final"
+        for format in [Converter.Format.srt, .webVTT] {
+            for hasFinalLineBreak in [false, true] {
+                let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                    + "00:00:01.000 --> 00:00:02.000\n" + payload
+                    + (hasFinalLineBreak ? "\n" : "")
+                let expected = Converter.defaultASSHeader
+                    + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,"
+                    + expectedPayload + (hasFinalLineBreak ? #"\N"# : "")
+                #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+            }
+        }
+    }
+
     private func assertRejectedTimestamp(_ timestamp: String, format: Converter.Format) {
         let separator = format == .srt ? "," : "."
         let intervals = [

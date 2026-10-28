@@ -1,0 +1,205 @@
+name: Subtitle payload assembly performance
+
+on:
+  push:
+    branches: ['perf/subtitle-payload-assembly-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift'
+      - 'Benchmarks/SubtitlePayloadAssembly/**'
+      - '.github/workflows/subtitle-payload-assembly.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/External*Subtitle*Tests.swift'
+      - 'Benchmarks/SubtitlePayloadAssembly/**'
+      - 'Benchmarks/ExternalSubtitleConversion/run.py'
+      - '.github/workflows/subtitle-payload-assembly.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-payload-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  linux-component:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.2-noble
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; use its shared build queue for this qualification.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds are serialized in isolated temporary packages.'
+          swift --version
+      - name: Test both converters in debug and release
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/payload-tests"
+          baseline="$RUNNER_TEMP/payload-baseline"
+          mkdir -p "$baseline/Scripts" "$baseline/Sources/IlliquidNativePlayback/Subtitles" "$baseline/Tests/IlliquidNativePlaybackTests"
+          cp Scripts/test-external-subtitle-regressions.sh "$baseline/Scripts/"
+          cp Benchmarks/SubtitlePayloadAssembly/baseline/ExternalTextSubtitleConverter.swift "$baseline/Sources/IlliquidNativePlayback/Subtitles/"
+          cp Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift "$baseline/Tests/IlliquidNativePlaybackTests/"
+          for configuration in debug release; do
+            bash "$baseline/Scripts/test-external-subtitle-regressions.sh" -c "$configuration" --jobs 2 --no-parallel -Xswiftc -warnings-as-errors 2>&1 | tee "$RUNNER_TEMP/payload-tests/baseline-$configuration.log"
+            bash Scripts/test-external-subtitle-regressions.sh -c "$configuration" --jobs 2 --no-parallel -Xswiftc -warnings-as-errors 2>&1 | tee "$RUNNER_TEMP/payload-tests/candidate-$configuration.log"
+          done
+      - name: Verify complete outputs and measure paired conversions
+        shell: bash
+        run: >-
+          python3 Benchmarks/SubtitlePayloadAssembly/run.py benchmark
+          --rounds 8 --target-ms 150
+          --output "$RUNNER_TEMP/subtitle-payload-assembly"
+          --case srt-1-plain
+          --case vtt-1-plain
+          --case srt-2000-plain
+          --case vtt-2000-plain
+          --case srt-2000-multilingual
+          --case vtt-2000-multilingual
+          --case srt-2000-escaped
+          --case vtt-2000-escaped
+          --case srt-2000-single-line-plain
+          --case vtt-2000-single-line-plain
+          --case srt-100-payload-32-lines-plain
+          --case vtt-100-payload-32-lines-plain
+          --case srt-100-payload-256-lines-escaped
+          --case vtt-100-payload-256-lines-escaped
+          --case srt-empty
+          --case vtt-missing-signature
+      - name: Print evidence summary
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-payload-assembly"
+          for name in ["manifest.json", "benchmark.json", "summary.json"]:
+              path = root / name
+              if path.exists():
+                  print("EVIDENCE_BEGIN " + name)
+                  print(path.read_text())
+                  print("EVIDENCE_END " + name)
+          path = root / "verification.json"
+          if path.exists():
+              print("VERIFICATION " + json.dumps({
+                  "cases": len(json.loads(path.read_text())),
+                  "sha256": hashlib.sha256(path.read_bytes()).hexdigest()
+              }))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-payload-linux
+          path: |
+            ${{ runner.temp }}/payload-tests/*.log
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.json
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.jsonl
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.gz
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.log
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.swift
+            ${{ runner.temp }}/subtitle-payload-assembly/runner.snapshot.py
+          retention-days: 14
+
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; use its shared build queue for this qualification.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds are serialized in isolated temporary packages.'
+          swift --version
+      - name: Test both converters in debug and release
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/payload-tests"
+          baseline="$RUNNER_TEMP/payload-baseline"
+          mkdir -p "$baseline/Scripts" "$baseline/Sources/IlliquidNativePlayback/Subtitles" "$baseline/Tests/IlliquidNativePlaybackTests"
+          cp Scripts/test-external-subtitle-regressions.sh "$baseline/Scripts/"
+          cp Benchmarks/SubtitlePayloadAssembly/baseline/ExternalTextSubtitleConverter.swift "$baseline/Sources/IlliquidNativePlayback/Subtitles/"
+          cp Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift "$baseline/Tests/IlliquidNativePlaybackTests/"
+          for configuration in debug release; do
+            bash "$baseline/Scripts/test-external-subtitle-regressions.sh" -c "$configuration" --jobs 2 --no-parallel -Xswiftc -warnings-as-errors 2>&1 | tee "$RUNNER_TEMP/payload-tests/baseline-$configuration.log"
+            bash Scripts/test-external-subtitle-regressions.sh -c "$configuration" --jobs 2 --no-parallel -Xswiftc -warnings-as-errors 2>&1 | tee "$RUNNER_TEMP/payload-tests/candidate-$configuration.log"
+          done
+      - name: Verify complete outputs and measure paired conversions
+        shell: bash
+        run: >-
+          python3 Benchmarks/SubtitlePayloadAssembly/run.py benchmark
+          --rounds 8 --target-ms 150
+          --output "$RUNNER_TEMP/subtitle-payload-assembly"
+          --case srt-1-plain
+          --case vtt-1-plain
+          --case srt-2000-plain
+          --case vtt-2000-plain
+          --case srt-2000-multilingual
+          --case vtt-2000-multilingual
+          --case srt-2000-escaped
+          --case vtt-2000-escaped
+          --case srt-2000-single-line-plain
+          --case vtt-2000-single-line-plain
+          --case srt-100-payload-32-lines-plain
+          --case vtt-100-payload-32-lines-plain
+          --case srt-100-payload-256-lines-escaped
+          --case vtt-100-payload-256-lines-escaped
+          --case srt-empty
+          --case vtt-missing-signature
+      - name: Print evidence summary
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-payload-assembly"
+          for name in ["manifest.json", "benchmark.json", "summary.json"]:
+              path = root / name
+              if path.exists():
+                  print("EVIDENCE_BEGIN " + name)
+                  print(path.read_text())
+                  print("EVIDENCE_END " + name)
+          path = root / "verification.json"
+          if path.exists():
+              print("VERIFICATION " + json.dumps({
+                  "cases": len(json.loads(path.read_text())),
+                  "sha256": hashlib.sha256(path.read_bytes()).hexdigest()
+              }))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-payload-macos
+          path: |
+            ${{ runner.temp }}/payload-tests/*.log
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.json
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.jsonl
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.gz
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.log
+            ${{ runner.temp }}/subtitle-payload-assembly/**/*.swift
+            ${{ runner.temp }}/subtitle-payload-assembly/runner.snapshot.py
+          retention-days: 14
