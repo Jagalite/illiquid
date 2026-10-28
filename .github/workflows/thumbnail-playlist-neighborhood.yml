@@ -7,6 +7,10 @@ on:
       - Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift
       - Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift
       - Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift
+      - Tests/IlliquidAppTests/ThumbnailSingletonNeighborhoodTests.swift
+      - Benchmarks/ThumbnailSingleton/**
+      - '!Benchmarks/ThumbnailSingleton/evidence/**'
+      - Scripts/test-thumbnail-singleton.sh
       - Benchmarks/ThumbnailPlaylistNeighborhood/**
       - .github/workflows/thumbnail-playlist-neighborhood.yml
   pull_request:
@@ -17,6 +21,10 @@ on:
       - Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift
       - Sources/IlliquidCore/Utilities/NormalizedFileURL.swift
       - Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift
+      - Tests/IlliquidAppTests/ThumbnailSingletonNeighborhoodTests.swift
+      - Benchmarks/ThumbnailSingleton/**
+      - '!Benchmarks/ThumbnailSingleton/evidence/**'
+      - Scripts/test-thumbnail-singleton.sh
       - Benchmarks/ThumbnailPlaylistNeighborhood/**
       - .github/workflows/thumbnail-playlist-neighborhood.yml
   workflow_dispatch:
@@ -45,6 +53,11 @@ jobs:
           echo "Kyoto is unavailable on this hosted runner; all component builds run serially."
           python3 Benchmarks/ThumbnailPlaylistNeighborhood/run.py \
             --output "$RUNNER_TEMP/thumbnail-neighborhood" --pairs 8 --target-ms 30
+      - name: Compare singleton preparation with the bounded baseline
+        run: |
+          python3 Benchmarks/ThumbnailSingleton/run.py \
+            --rounds 8 --target-ms 50 --counts 1,2,8,32,10000 \
+            --output "$RUNNER_TEMP/thumbnail-neighborhood/singleton-results.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -79,7 +92,7 @@ jobs:
         run: |
           set -o pipefail
           swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
-            --filter 'ThumbnailPlaylistNeighborhoodTests|ThumbnailBackgroundSchedulerTests|ThumbnailLifecycleRegressionTests' \
+            --filter 'ThumbnailPlaylistNeighborhoodTests|ThumbnailSingletonNeighborhoodTests|ThumbnailBackgroundSchedulerTests|ThumbnailLifecycleRegressionTests' \
             2>&1 | tee "$RUNNER_TEMP/thumbnail-neighborhood-app-tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

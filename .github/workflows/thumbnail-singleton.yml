@@ -1,0 +1,86 @@
+name: Thumbnail singleton preparation
+
+on:
+  push:
+    branches: ['perf/thumbnail-singleton-fast-path-c998']
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailSingletonNeighborhoodTests.swift'
+      - 'Scripts/test-thumbnail-singleton.sh'
+      - 'Benchmarks/ThumbnailSingleton/**'
+      - '!Benchmarks/ThumbnailSingleton/evidence/**'
+      - '.github/workflows/thumbnail-singleton.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailSingletonNeighborhoodTests.swift'
+      - 'Scripts/test-thumbnail-singleton.sh'
+      - 'Benchmarks/ThumbnailSingleton/**'
+      - '!Benchmarks/ThumbnailSingleton/evidence/**'
+      - '.github/workflows/thumbnail-singleton.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-singleton-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.3-noble@sha256:1038d54c80063f5cdfabc4560990c30af64b5de8ebf28161deb22ca4ad5db866
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare the isolated Linux toolchain
+        run: |
+          if ! command -v python3 >/dev/null; then
+            apt-get update
+            apt-get install -y --no-install-recommends python3
+          fi
+          swift --version
+          python3 --version
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral Linux runner; compiling serially in an isolated checkout.'
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git -C "$GITHUB_WORKSPACE" cat-file -e 8637a8d2c6a628699d5a552a55061b4e0bfc6f10^{commit}
+          git -C "$GITHUB_WORKSPACE" diff --check 8637a8d2c6a628699d5a552a55061b4e0bfc6f10 HEAD
+      - name: Baseline and candidate debug and release regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-singleton"
+          set -o pipefail
+          ILLIQUID_SINGLETON_HELPER_REF=8637a8d2c6a628699d5a552a55061b4e0bfc6f10 \
+            bash Scripts/test-thumbnail-singleton.sh --jobs 2 --no-parallel \
+            2>&1 | tee "$RUNNER_TEMP/thumbnail-singleton/baseline-tests.log"
+          bash Scripts/test-thumbnail-singleton.sh --jobs 2 --no-parallel \
+            2>&1 | tee "$RUNNER_TEMP/thumbnail-singleton/candidate-tests.log"
+      - name: Paired helper measurements with exact output parity
+        run: |
+          python3 Benchmarks/ThumbnailSingleton/run.py \
+            --rounds 8 --target-ms 50 --counts 1,2,8,32,10000 \
+            --output "$RUNNER_TEMP/thumbnail-singleton/results.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-singleton-portable
+          path: ${{ runner.temp }}/thumbnail-singleton/
+          retention-days: 14
