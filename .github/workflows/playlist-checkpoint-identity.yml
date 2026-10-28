@@ -1,0 +1,185 @@
+name: Playlist checkpoint identity performance
+
+on:
+  push:
+    branches: ['perf/shuffled-checkpoint-identities-20261028-bd49659']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistCheckpointIdentityTests.swift'
+      - 'Scripts/test-playlist-restoration.sh'
+      - 'Benchmarks/PlaylistCheckpointIdentity/**'
+      - '.github/workflows/playlist-checkpoint-identity.yml'
+      - '!Benchmarks/PlaylistCheckpointIdentity/*.md'
+      - '!Benchmarks/PlaylistCheckpointIdentity/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistCheckpointIdentityTests.swift'
+      - 'Scripts/test-playlist-restoration.sh'
+      - 'Benchmarks/PlaylistCheckpointIdentity/**'
+      - '.github/workflows/playlist-checkpoint-identity.yml'
+      - '!Benchmarks/PlaylistCheckpointIdentity/*.md'
+      - '!Benchmarks/PlaylistCheckpointIdentity/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playlist-checkpoint-identity-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check runner build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+      - name: Record installed Linux toolchain and host
+        run: |
+          mkdir -p "$RUNNER_TEMP/playlist-checkpoint-identity-linux"
+          uname -a > "$RUNNER_TEMP/playlist-checkpoint-identity-linux/host.txt"
+          lscpu >> "$RUNNER_TEMP/playlist-checkpoint-identity-linux/host.txt"
+          swift --version >> "$RUNNER_TEMP/playlist-checkpoint-identity-linux/host.txt"
+          python3 --version >> "$RUNNER_TEMP/playlist-checkpoint-identity-linux/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/playlist-checkpoint-identity-linux/host.txt"
+          printf 'ImageOS=%s\nImageVersion=%s\n' "$ImageOS" "$ImageVersion" >> "$RUNNER_TEMP/playlist-checkpoint-identity-linux/host.txt"
+      - name: Test production playlist behavior in debug and release
+        run: |
+          set -o pipefail
+          for configuration in debug release; do
+            bash Scripts/test-playlist-restoration.sh -c "$configuration" --jobs 2 \
+              2>&1 | tee "$RUNNER_TEMP/playlist-checkpoint-identity-linux/tests-$configuration.log"
+          done
+      - name: Verify checkpoint identity parity and measure wall and CPU time
+        run: |
+          set -o pipefail
+          python3 Benchmarks/PlaylistCheckpointIdentity/run.py \
+            --pairs 8 --target-ms 150 \
+            --output "$RUNNER_TEMP/playlist-checkpoint-identity-linux/benchmark" \
+            2>&1 | tee "$RUNNER_TEMP/playlist-checkpoint-identity-linux/benchmark.log"
+      - name: Print compact measurement receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'playlist-checkpoint-identity-linux'
+          for name in ('summary.json', 'parity.json', 'completion.json'):
+              path = root / 'benchmark' / name
+              if path.is_file():
+                  data = path.read_bytes()
+                  print(f'::group::{path.relative_to(root)}')
+                  print('SHA256 ' + hashlib.sha256(data).hexdigest())
+                  print(json.dumps(json.loads(data), sort_keys=True, separators=(',', ':')))
+                  print('::endgroup::')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-checkpoint-identity-linux
+          path: |
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.json
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.jsonl
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.log
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.stdout
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.stderr
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.txt
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.md
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.swift
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.py
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.c
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.h
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.modulemap
+            ${{ runner.temp }}/playlist-checkpoint-identity-linux/**/*.gz
+          retention-days: 14
+
+  native-checkpoint:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check runner build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+      - name: Verify checkpoint identity parity and measure wall and CPU time
+        run: |
+          mkdir -p "$RUNNER_TEMP/playlist-checkpoint-identity"
+          sw_vers > "$RUNNER_TEMP/playlist-checkpoint-identity/host.txt"
+          uname -a >> "$RUNNER_TEMP/playlist-checkpoint-identity/host.txt"
+          swift --version >> "$RUNNER_TEMP/playlist-checkpoint-identity/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/playlist-checkpoint-identity/host.txt"
+          set -o pipefail
+          python3 Benchmarks/PlaylistCheckpointIdentity/run.py \
+            --pairs 8 --target-ms 150 \
+            --output "$RUNNER_TEMP/playlist-checkpoint-identity/benchmark" \
+            2>&1 | tee "$RUNNER_TEMP/playlist-checkpoint-identity/benchmark.log"
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and qualify checkpoint and playlist behavior
+        run: |
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+            'PlaylistCheckpointIdentityTests|PlaylistOrderRestorationTests|PlaylistIdentityLookupTests|PlaylistSessionRecordTests|PlaybackCoordinatorTests' \
+            2>&1 | tee "$RUNNER_TEMP/playlist-checkpoint-identity/native-tests.log"
+      - name: Print compact measurement receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'playlist-checkpoint-identity'
+          for name in ('summary.json', 'parity.json', 'completion.json'):
+              path = root / 'benchmark' / name
+              if path.is_file():
+                  data = path.read_bytes()
+                  print(f'::group::{path.relative_to(root)}')
+                  print('SHA256 ' + hashlib.sha256(data).hexdigest())
+                  print(json.dumps(json.loads(data), sort_keys=True, separators=(',', ':')))
+                  print('::endgroup::')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-checkpoint-identity-native
+          path: |
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.json
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.jsonl
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.log
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.stdout
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.stderr
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.txt
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.md
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.swift
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.py
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.c
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.h
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.modulemap
+            ${{ runner.temp }}/playlist-checkpoint-identity/**/*.gz
+          retention-days: 14

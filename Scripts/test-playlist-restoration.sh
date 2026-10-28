@@ -9,7 +9,7 @@ for path in Playlist/FolderPlaylist.swift Playlist/PlaylistMutation.swift \
     Utilities/NormalizedFileURL.swift Utilities/NaturalFilenameOrdering.swift; do
     cp "$ROOT/Sources/IlliquidCore/$path" "$WORK/Sources/IlliquidCore/"
 done
-for name in PlaylistMutationTests PlaylistOrderRestorationTests \
+for name in PlaylistMutationTests PlaylistOrderRestorationTests PlaylistCheckpointIdentityTests \
     NaturalFilenameOrderingTests FolderPlaylistTests; do
     cp "$ROOT/Tests/IlliquidCoreTests/$name.swift" "$WORK/Tests/IlliquidCoreTests/"
 done
