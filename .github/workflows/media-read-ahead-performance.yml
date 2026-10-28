@@ -1,0 +1,150 @@
+name: Media read-ahead wakeup performance
+
+on:
+  push:
+    branches: ['perf/requalify-media-read-ahead-20261028-9a2715']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift'
+      - 'Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift'
+      - 'Benchmarks/MediaReadAheadGate/**'
+      - '.github/workflows/media-read-ahead-performance.yml'
+      - '!Benchmarks/MediaReadAheadGate/*.md'
+      - '!Benchmarks/MediaReadAheadGate/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift'
+      - 'Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift'
+      - 'Benchmarks/MediaReadAheadGate/**'
+      - '.github/workflows/media-read-ahead-performance.yml'
+      - '!Benchmarks/MediaReadAheadGate/*.md'
+      - '!Benchmarks/MediaReadAheadGate/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-read-ahead-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    name: Component (${{ matrix.label }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            label: linux
+          - os: macos-26
+            label: macos
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Select the native compiler
+        if: runner.os == 'macOS'
+        run: echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
+      - name: Qualify both variants and measure paced reader threads
+        run: |
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          python3 -m py_compile Benchmarks/MediaReadAheadGate/run.py
+          python3 Benchmarks/MediaReadAheadGate/run.py all --pairs 6 \
+            --updates 240 --interval-us 8333 \
+            --output "$RUNNER_TEMP/media-read-ahead/120hz"
+          python3 Benchmarks/MediaReadAheadGate/run.py benchmark --pairs 6 \
+            --updates 120 --interval-us 16667 \
+            --output "$RUNNER_TEMP/media-read-ahead/60hz"
+          python3 Benchmarks/MediaReadAheadGate/run.py benchmark --pairs 6 \
+            --updates 60 --interval-us 33333 \
+            --output "$RUNNER_TEMP/media-read-ahead/30hz"
+      - name: Emit complete review receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "media-read-ahead"
+          for cadence in ("120hz", "60hz", "30hz"):
+              folder = root / cadence
+              paths = set(folder.glob("*.json")) | set(folder.glob("*.jsonl")) | set(folder.glob("*.log"))
+              for path in sorted(paths):
+                  data = path.read_bytes()
+                  print("GATE_EVIDENCE_FILE " + json.dumps({
+                      "path": str(path.relative_to(root)),
+                      "sha256": hashlib.sha256(data).hexdigest(),
+                      "content": data.decode("utf-8"),
+                  }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-read-ahead-${{ matrix.label }}
+          path: |
+            ${{ runner.temp }}/media-read-ahead/*/*.json
+            ${{ runner.temp }}/media-read-ahead/*/*.jsonl
+            ${{ runner.temp }}/media-read-ahead/*/*.log
+          retention-days: 14
+
+  native-integration:
+    name: Native app integration
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the release app graph and run gate regressions
+        run: |
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          mkdir -p "$RUNNER_TEMP/media-read-ahead-integration"
+          sw_vers > "$RUNNER_TEMP/media-read-ahead-integration/host.txt"
+          swift --version >> "$RUNNER_TEMP/media-read-ahead-integration/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/media-read-ahead-integration/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'MediaReadAheadGateTests|subtitleReaderWaitsForProgressAndSeekInvalidatesOldRead|closingReadAheadWakesBlockedInput' \
+            2>&1 | tee "$RUNNER_TEMP/media-read-ahead-integration/tests.log"
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "media-read-ahead-integration"
+          log = (root / "tests.log").read_text()
+          completions = re.findall(r"Test run with (\d+) tests? passed", log)
+          expected = len(re.findall(r"@Test\b", Path("Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift").read_text())) + 2
+          if completions != [str(expected)]:
+              raise SystemExit(f"Expected {expected} passing tests, got {completions}")
+          (root / "completion.json").write_text(json.dumps({"passed": True, "tests": expected}) + "\n")
+          PY
+      - name: Emit integration receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "media-read-ahead-integration"
+          for path in sorted(root.glob("*")):
+              if path.is_file():
+                  data = path.read_bytes()
+                  print("GATE_EVIDENCE_FILE " + json.dumps({
+                      "path": path.name, "sha256": hashlib.sha256(data).hexdigest(),
+                      "content": data.decode("utf-8"),
+                  }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-read-ahead-integration
+          path: ${{ runner.temp }}/media-read-ahead-integration/
+          retention-days: 14
