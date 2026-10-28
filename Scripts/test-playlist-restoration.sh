@@ -10,6 +10,7 @@ for path in Playlist/FolderPlaylist.swift Playlist/PlaylistMutation.swift \
     cp "$ROOT/Sources/IlliquidCore/$path" "$WORK/Sources/IlliquidCore/"
 done
 for name in PlaylistMutationTests PlaylistOrderRestorationTests \
+    PlaylistCheckpointIdentityTests \
     NaturalFilenameOrderingTests FolderPlaylistTests; do
     cp "$ROOT/Tests/IlliquidCoreTests/$name.swift" "$WORK/Tests/IlliquidCoreTests/"
 done

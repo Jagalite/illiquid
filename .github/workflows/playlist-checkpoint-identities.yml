@@ -1,0 +1,99 @@
+name: Playlist checkpoint identity projection
+
+on:
+  push:
+    branches: ['perf/shuffle-checkpoint-identities']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCoordinatorTests.swift'
+      - 'Scripts/test-playlist-restoration.sh'
+      - 'Benchmarks/PlaylistCheckpointIDs/Harness.swift'
+      - 'Benchmarks/PlaylistCheckpointIDs/run.py'
+      - '.github/workflows/playlist-checkpoint-identities.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCoordinatorTests.swift'
+      - 'Scripts/test-playlist-restoration.sh'
+      - 'Benchmarks/PlaylistCheckpointIDs/Harness.swift'
+      - 'Benchmarks/PlaylistCheckpointIDs/run.py'
+      - '.github/workflows/playlist-checkpoint-identities.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playlist-checkpoint-identities-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Explain build coordination
+        run: echo "Kyoto is unavailable on this isolated hosted runner; builds run directly and serially within each job."
+      - name: Test playlist behavior in debug and release
+        run: |
+          mkdir -p "$RUNNER_TEMP/playlist-checkpoint-tests"
+          set -o pipefail
+          bash Scripts/test-playlist-restoration.sh 2>&1 | tee "$RUNNER_TEMP/playlist-checkpoint-tests/debug.log"
+          bash Scripts/test-playlist-restoration.sh -c release 2>&1 | tee "$RUNNER_TEMP/playlist-checkpoint-tests/release.log"
+      - name: Compare checkpoint projection and retain raw receipts
+        run: |
+          python3 Benchmarks/PlaylistCheckpointIDs/run.py \
+            --output "$RUNNER_TEMP/playlist-checkpoint-ids"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-checkpoint-component
+          path: |
+            ${{ runner.temp }}/playlist-checkpoint-tests/
+            ${{ runner.temp }}/playlist-checkpoint-ids/
+          retention-days: 30
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          echo "Kyoto is unavailable on this isolated hosted runner; the native build runs directly."
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build native graph and exercise session persistence
+        run: |
+          mkdir -p "$RUNNER_TEMP/playlist-checkpoint-integration"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --no-parallel \
+            --filter 'PlaybackCoordinatorTests|PlaylistSessionRecordTests' \
+            2>&1 | tee "$RUNNER_TEMP/playlist-checkpoint-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-checkpoint-native-integration
+          path: ${{ runner.temp }}/playlist-checkpoint-integration/
+          retention-days: 30
