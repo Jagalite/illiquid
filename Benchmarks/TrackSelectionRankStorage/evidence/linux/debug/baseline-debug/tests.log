@@ -1,0 +1,55 @@
+["/usr/local/bin/swift", "test", "--package-path", "/home/runner/work/_temp/track-rank-storage/debug/baseline-debug", "--configuration", "debug", "--scratch-path", "/home/runner/work/_temp/track-rank-storage/debug/baseline-debug/build", "--no-parallel", "--jobs", "2", "--cache-path", "/home/runner/work/_temp/track-rank-storage/debug/cache/packages", "--config-path", "/home/runner/work/_temp/track-rank-storage/debug/cache/config", "--security-path", "/home/runner/work/_temp/track-rank-storage/debug/cache/security", "-Xswiftc", "-warnings-as-errors", "-Xswiftc", "-module-cache-path", "-Xswiftc", "/home/runner/work/_temp/track-rank-storage/debug/cache/modules", "--use-integrated-swift-driver"]
+
+Test Suite 'All tests' started at 2026-10-28 05:22:09.895
+Test Suite 'Debug-linux-x86_64.xctest' started at 2026-10-28 05:22:10.008
+Test Suite 'Debug-linux-x86_64.xctest' passed at 2026-10-28 05:22:10.008
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-28 05:22:10.008
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.4 (efd8d65801f569d)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Track selection ranking semantics" started.
+◇ Test orderedLanguagePreferenceOutranksEveryOtherAudioPreference() started.
+✔ Test orderedLanguagePreferenceOutranksEveryOtherAudioPreference() passed after 0.001 seconds.
+◇ Test everyLanguagePriorityOutranksAllSixLowerPrioritiesAtThe32LanguageBound() started.
+✔ Test everyLanguagePriorityOutranksAllSixLowerPrioritiesAtThe32LanguageBound() passed after 0.012 seconds.
+◇ Test commentaryAvoidancePrecedesAccessibilityDefaultAndFallback() started.
+✔ Test commentaryAvoidancePrecedesAccessibilityDefaultAndFallback() passed after 0.001 seconds.
+◇ Test accessibilityMatchesThePolicyBeforeConsideringDefaultOrFallback() started.
+✔ Test accessibilityMatchesThePolicyBeforeConsideringDefaultOrFallback() passed after 0.001 seconds.
+◇ Test forcedOnlyPrefersDedicatedTracksAfterAccessibilityBeforeDefault() started.
+✔ Test forcedOnlyPrefersDedicatedTracksAfterAccessibilityBeforeDefault() passed after 0.001 seconds.
+◇ Test defaultSubtitlePrecedesForcedFlagAndFallbackInAlwaysMode() started.
+✔ Test defaultSubtitlePrecedesForcedFlagAndFallbackInAlwaysMode() passed after 0.001 seconds.
+◇ Test forcedFlagPrecedesFallbackForSubtitlesAndDoesNotRankAudio() started.
+✔ Test forcedFlagPrecedesFallbackForSubtitlesAndDoesNotRankAudio() passed after 0.001 seconds.
+◇ Test fallbackWinsAnEqualRankThenLowestSignedIDBreaksTies() started.
+✔ Test fallbackWinsAnEqualRankThenLowestSignedIDBreaksTies() passed after 0.001 seconds.
+◇ Test duplicateIDsDoNotDiscardCandidatesWithDifferentMetadata() started.
+✔ Test duplicateIDsDoNotDiscardCandidatesWithDifferentMetadata() passed after 0.001 seconds.
+◇ Test emptyAndSingletonCatalogsRetainEligibilityAndPolicySemantics() started.
+✔ Test emptyAndSingletonCatalogsRetainEligibilityAndPolicySemantics() passed after 0.001 seconds.
+◇ Test automaticWithoutLanguageOrAccessibilityPolicyUsesOnlyEligibleFallback() started.
+✔ Test automaticWithoutLanguageOrAccessibilityPolicyUsesOnlyEligibleFallback() passed after 0.001 seconds.
+◇ Test forcedLanguageFilterUsesExplicitPolicyThenNormalizedAudioLanguage() started.
+✔ Test forcedLanguageFilterUsesExplicitPolicyThenNormalizedAudioLanguage() passed after 0.001 seconds.
+◇ Test mutatedAndDecodedPreferencesNormalizeAliasesWithinFirst32Inputs() started.
+✔ Test mutatedAndDecodedPreferencesNormalizeAliasesWithinFirst32Inputs() passed after 0.001 seconds.
+✔ Suite "Track selection ranking semantics" passed after 0.022 seconds.
+✔ Test run with 13 tests in 1 suite passed after 0.028 seconds.
+Building for debugging...
+[Constructing description]
+[Pre-planning 1 / 95]
+[Planning 21 / 95]
+[Planning deferred tasks]
+[Constructing 1 / 202]
+[30 / 52] IlliquidCore
+[40 / 57] IlliquidCoreTests-product
+[46 / 57] IlliquidCoreTests-product
+[50 / 58] IlliquidCoreTests-product
+[51 / 58] IlliquidCoreTests-test-runner
+[54 / 61] IlliquidCoreTests-test-runner
+[58 / 62] IlliquidCoreTests-test-runner
+[62 / 62] IlliquidCoreTests-test-runner
+Build complete! (17.74 secs)

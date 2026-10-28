@@ -1,0 +1,156 @@
+{
+  "allocations": {
+    "all_per_workload_variant_request_and_byte_counts_deterministic": true,
+    "audio_32_none": {
+      "allocation_requests": {
+        "baseline_median": 37.0,
+        "candidate_lower_pairs": 4,
+        "candidate_median": 6.0,
+        "median_paired_reduction_percent": 83.78378378378379,
+        "minimum_pair_reduction_percent": 83.78378378378379,
+        "pairs": 4
+      },
+      "requested_bytes": {
+        "baseline_median": 8968.0,
+        "candidate_lower_pairs": 4,
+        "candidate_median": 6240.0,
+        "median_paired_reduction_percent": 30.419268510258696,
+        "minimum_pair_reduction_percent": 30.419268510258696,
+        "pairs": 4
+      },
+      "workload": "audio-32-none"
+    },
+    "observations": 128,
+    "pairs_per_workload": 4,
+    "unchanged_controls": [
+      "audio-0-none",
+      "audio-0-languages",
+      "audio-1-none",
+      "audio-1-languages",
+      "subtitle-automatic",
+      "subtitle-off"
+    ]
+  },
+  "archive_files_verified": 667,
+  "archive_sha256": "d810060697025352a71426880c6988c8fef1f19ff2537f19dd76bda74801b0b5",
+  "artifact_id": 12794022129,
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "build_product_hashes_recorded_not_recomputed": [
+    {
+      "cohort": "timing",
+      "executable_sha256_recorded": "e60937c68fd05154276c6d3871d22a4715d2666328f88cebcca18e3a98128a11",
+      "library_sha256_recorded": "623b60ca54b0919aaeb73c1290f3dacbf0e7070cd2f6c751c17780a9c2399bfe",
+      "variant": "baseline"
+    },
+    {
+      "cohort": "timing",
+      "executable_sha256_recorded": "3b8b7944a50ed737e8cd4902cbafbfdac50793258b1cc612bca0ba31b6e4f79a",
+      "library_sha256_recorded": "47bcd080f6f5fd798b6be2b42167d4487a49d195360345d144cf65c674da8b87",
+      "variant": "candidate"
+    },
+    {
+      "cohort": "allocations",
+      "executable_sha256_recorded": "a31c95af9284d5a13b661c9600a4f009a09e3a14e5575ca91163e73b2052ffcf",
+      "library_sha256_recorded": "88d3c274514a8aa45e20405ab06ab907c7cb186a05ea492d810ed0560e201892",
+      "variant": "baseline"
+    },
+    {
+      "cohort": "allocations",
+      "executable_sha256_recorded": "59e17ed28fb8b5493bd170ba226dd0ee40f84dc0b38b555ca78b30346118a37b",
+      "library_sha256_recorded": "2e85d2be64a3b02845ec502f64768e2e1bbbab2c5118605c5031e9f258809f65",
+      "variant": "candidate"
+    }
+  ],
+  "candidate_commit": "e59dd2cf8d539efcd6ec00102b1945230cead5c9",
+  "full_differential": {
+    "cohorts": [
+      "timing",
+      "allocations"
+    ],
+    "complete_receipts_equal": true,
+    "selections_per_cohort": 55296,
+    "verification_json_sha256": "8442619a73725b4aa5082898b8e5a896e56782315adc441bfcdfe958f91dd982"
+  },
+  "github_run_id": 40637503011,
+  "independent_audit_passed": true,
+  "limitations": [
+    "Linux x86_64 Swift 6.4 component evidence; this audit does not qualify macOS, the full application, or UI.",
+    "Counts are successful intercepted malloc/calloc/realloc requests and requested bytes, not live heap, RSS, or every allocator API.",
+    "The measured audio-32 allocation reduction is 31 requests and 2728 bytes per selection. This audit does not establish why the optimized baseline allocation count differs from a source-level array count.",
+    "Language-policy timing differences are below one percent in paired medians and some pairs show large swings; no reliable benefit is claimed for these paths or unchanged controls.",
+    "Compiled binaries and Swift modules are absent from the artifact. Their recorded hashes and build receipts are retained but actual binary hashes cannot be independently recomputed from this archive."
+  ],
+  "negative_median_paired_timing_results": [
+    {
+      "cpu_ns": {
+        "baseline_median": 7719.8522766175965,
+        "candidate_lower_pairs": 2,
+        "candidate_median": 7736.873188405797,
+        "median_paired_reduction_percent": -0.6913545713550184,
+        "minimum_pair_reduction_percent": -23.69833308806333,
+        "pairs": 10
+      },
+      "elapsed_ns": {
+        "baseline_median": 7719.719730685838,
+        "candidate_lower_pairs": 2,
+        "candidate_median": 7737.076457834075,
+        "median_paired_reduction_percent": -0.7065142367056927,
+        "minimum_pair_reduction_percent": -23.71337775167244,
+        "pairs": 10
+      },
+      "workload": "audio-1-languages"
+    }
+  ],
+  "recorded_utc": "2026-10-28T05:37:48.098494+00:00",
+  "schema_version": 1,
+  "source_checks": {
+    "all_recorded_commands_exited_zero": true,
+    "command_receipts_and_log_hashes_verified": 538,
+    "harness_adapter_reconstructed_exactly": true,
+    "recorded_git_sources_and_current_candidate_match": true,
+    "staged_file_hashes_verified": 48
+  },
+  "test_executions_passed_total": 52,
+  "tests": [
+    {
+      "configuration": "debug",
+      "passed_tests": 13,
+      "suite_count": 1,
+      "test_log_sha256": "f06427696bfee71aa591d550e9d66b68b5a2febbccc71fedea8d922bd96a5508",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "passed_tests": 13,
+      "suite_count": 1,
+      "test_log_sha256": "c5ec8d61aa4c17a7ef644be4f3225f021317d53f15c4072883dd920f51be3a85",
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "passed_tests": 13,
+      "suite_count": 1,
+      "test_log_sha256": "c32dea3fa1fdcbde4e9285287b6bc86e43684f96b0fddf923d55222ac9b24ec3",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "passed_tests": 13,
+      "suite_count": 1,
+      "test_log_sha256": "dfe2c7700196850b641c88ca6f5247da81afa7758428f971566d34444c92fc0c",
+      "variant": "candidate"
+    }
+  ],
+  "timing": {
+    "calibration_observations": 68,
+    "minimum_observed_cpu_ns": 89641245,
+    "minimum_observed_wall_ns": 89628021,
+    "minimum_wall_and_cpu_interval_ns": 60000000,
+    "observations": 320,
+    "qualified": true,
+    "rows_excluded": 0,
+    "rule": "Every final wall and process CPU interval must reach the minimum; all short observations remain in the raw data and summaries.",
+    "short_observation_count": 0,
+    "short_observations": []
+  }
+}

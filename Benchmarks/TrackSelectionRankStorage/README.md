@@ -16,6 +16,88 @@ fields, then appends [Measurement.swift](Measurement.swift). It does not copy
 or replace the production selection algorithm. The historical benchmark and
 its frozen baseline remain unchanged.
 
+## Measured result (Linux)
+
+The change removes transient rank storage while preserving selected track IDs. On the
+Linux x86_64 Swift 6.4 / glibc 2.39 runner, the 2-, 8-, and 32-track audio cases
+without a language policy improved in all ten timing pairs. Their median paired wall
+reductions were **11.55%, 20.20%, and 23.60%**. Subtitle Always with eight tracks
+improved **19.46%**, also in all ten pairs. CPU-time reductions closely matched wall time.
+
+The actual 32-track allocation saving is **31 successful allocation requests and
+2,728 requested bytes per selection**, including with a language policy. The measured
+counts differ from a literal source-level count of rank arrays; this report uses the
+observed counts and does not infer how the compiler lowered rank storage.
+These are transient requested bytes, not a reduction in retained heap or process RSS.
+
+Linux correctness passed **13 tests in each baseline/candidate debug/release run**
+(52 executions), plus exact parity for all **55,296 selected-ID cases** in both the
+timing and allocation cohorts. Every one of the 320 final timing observations exceeded
+the 60 ms wall/CPU floor (minimum wall 89.628 ms; CPU 89.641 ms). All 128 allocation
+observations were retained, and their per-selection counters were identical across
+each workload/variant's four observations.
+
+Native macOS qualification is **pending**: the macOS 26 job in the same run is queued.
+The supported success claim is the Linux portable-component allocation and timing
+improvement. Full-app and native performance claims require their own evidence.
+
+### All workloads
+
+Values below are per selection. Time columns are medians of the individual arms;
+the percentage column is the median of paired reductions, so it need not equal the
+ratio of the two time medians. Positive percentages mean less time.
+
+| Workload | Wall ns, baseline → candidate | Paired wall reduction | Faster pairs | Allocation requests, baseline → candidate | Requested bytes saved |
+|---|---:|---:|---:|---:|---:|
+| `audio-0-none` | 74.290 → 74.263 | 0.045% | 7/10 | 0 → 0 | 0 |
+| `audio-0-languages` | 7,653.409 → 7,625.803 | 0.296% | 7/10 | 29 → 29 | 0 |
+| `audio-1-none` | 137.094 → 135.768 | 0.846% | 8/10 | 1 → 1 | 0 |
+| `audio-1-languages` | 7,719.720 → 7,737.076 | -0.707% | 2/10 | 30 → 30 | 0 |
+| `audio-2-none` | 297.770 → 263.208 | 11.553% | 10/10 | 3 → 2 | 88 |
+| `audio-2-languages` | 13,621.598 → 13,504.347 | 0.900% | 8/10 | 46 → 45 | 88 |
+| `audio-8-none` | 881.662 → 703.462 | 20.196% | 10/10 | 11 → 4 | 616 |
+| `audio-8-languages` | 29,020.938 → 28,857.572 | 0.572% | 8/10 | 89 → 82 | 616 |
+| `audio-32-none` | 3,045.380 → 2,325.559 | 23.600% | 10/10 | 37 → 6 | 2728 |
+| `audio-32-languages` | 90,412.689 → 90,054.405 | 0.334% | 6/10 | 255 → 224 | 2728 |
+| `subtitle-automatic` | 484.970 → 484.124 | 0.252% | 6/10 | 4 → 4 | 0 |
+| `subtitle-off` | 2,352.047 → 2,345.576 | 0.468% | 7/10 | 10 → 10 | 0 |
+| `subtitle-always` | 910.093 → 732.363 | 19.464% | 10/10 | 11 → 4 | 616 |
+| `subtitle-forced-languages` | 31,804.328 → 31,786.385 | 0.269% | 6/10 | 85 → 83 | 176 |
+| `subtitle-forced-audio-fallback` | 19,890.041 → 19,818.423 | 0.463% | 6/10 | 49 → 48.5 | 44 |
+| `mutable-preferences` | 37,856.505 → 37,824.011 | 0.372% | 6/10 | 98.5 → 93 | 484 |
+
+All six unchanged-path allocation controls stayed unchanged. Language-policy timing
+changes are below 1% in paired medians and include large individual-pair swings;
+they do not support a reliable speedup claim. The singleton language-policy control
+is **0.707% slower** by paired wall median and **0.691% slower** by CPU median, with
+unchanged allocations. It is retained in the table and raw observations.
+
+### Retained evidence
+
+- [Workflow run 40637503011](https://github.com/Jagalite/illiquid/actions/runs/40637503011), Linux job `122647743642`, tested commit `e59dd2cf8d539efcd6ec00102b1945230cead5c9`.
+- [Artifact receipt](evidence/linux/artifact-receipt.json) records the original ZIP digest and the hashes of the retained files.
+- [Independent audit](evidence/linux/audit.json) checked all 667 archive members, source provenance, command/log hashes, complete selected-ID receipts, all observations, and every summary statistic.
+- [Timing summary](evidence/linux/timing/summary.json), [raw timing rows](evidence/linux/timing/measurements.jsonl.gz), [allocation summary](evidence/linux/allocations/summary.json), and [raw allocation rows](evidence/linux/allocations/measurements.jsonl.gz) retain the complete workload matrix.
+- [Full selected-ID receipt](evidence/linux/verification.json.gz), debug/release test logs, manifests, command receipts, and calibration observations are preserved alongside them. Gzip files decompress to the exact original bytes; hashes are recorded in the artifact receipt.
+
+The CI upload intentionally excludes compiled binaries and Swift module files. Their
+build hashes are recorded, but the independent audit could not recompute those binary
+hashes. Exact source bytes, staged inputs, command receipts, test output, and raw
+measurements were checked. The benchmark remains reproducible from this commit and
+its frozen baseline.
+
+## Why the scalar order is equivalent
+
+The six Boolean preferences keep their original priority order in bits 5 through 0:
+commentary avoidance, accessibility, dedicated forced subtitle, default flag, subtitle
+forced flag, and fallback ID. Language rank occupies the higher bits. Sanitization
+bounds language rank to 0…32, so the complete value stays in 0…2111. All lower
+priorities together are at most 63 and cannot outweigh one language-rank step.
+Equal values still use the unchanged direct signed-ID comparison. An independent
+enumeration of all 2,112 abstract rank tuples confirmed the order; the 32-language
+regression additionally checks actual selection against opponents favored by every
+lower-priority flag and by the signed-ID tie-break.
+
 ## Reproduce
 
 Requirements: matching Swift 6.1+ `swift` and `swiftc` tools, Python
