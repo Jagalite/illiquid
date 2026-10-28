@@ -15,7 +15,7 @@ struct Workload: Codable, Sendable {
 
 let workloads = [
     Workload(id: "keys-ascii", operation: "keys", count: 256),
-    Workload(id: "keys-unicode", operation: "keys", count: 256),
+    Workload(id: "keys-unicode-fallback", operation: "keys", count: 256),
     Workload(id: "keys-escaped", operation: "keys", count: 256),
     Workload(id: "keys-invalid-control", operation: "keys", count: 256),
     Workload(id: "lookup-last-100", operation: "lookup", count: 100),
@@ -37,7 +37,7 @@ struct Fixture {
         let root = URL(fileURLWithPath: "/Volumes/Media/Series", isDirectory: true)
         urls = (0..<workload.count).map { index in
             switch workload.id {
-            case "keys-unicode":
+            case "keys-unicode-fallback":
                 return URL(fileURLWithPath:
                     "/Volumes/Me\u{0301}dia/字幕/Cafe\u{0301}/E\u{0301}pisode \(index) 👩🏽‍🚀.mkv",
                     isDirectory: false)

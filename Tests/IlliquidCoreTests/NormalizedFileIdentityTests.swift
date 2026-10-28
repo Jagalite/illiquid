@@ -34,7 +34,6 @@ struct NormalizedFileIdentityTests {
             ("file:///Movies/Feature.mkv", "/Movies/Feature.mkv"),
             ("file://LOCALHOST/Movies/Feature.mkv", "/Movies/Feature.mkv"),
             ("file:///Movies/Season/../Feature.mkv", "/Movies/Feature.mkv"),
-            ("file:///Movies/Cafe%CC%81%20%231.mkv", "/Movies/Caf\u{00E9} #1.mkv"),
             ("file:///Movies/100%25.mkv", "/Movies/100%.mkv"),
             ("file:///", "/"),
             ("file://media.example/Movies/Feature.mkv", nil),

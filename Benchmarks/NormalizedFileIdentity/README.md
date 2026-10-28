@@ -8,8 +8,10 @@ against main at `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`.
 `NormalizedFileURL.persistenceKey(for:)` currently calls `normalize(url)?.path`.
 After validation, lexical standardization and Unicode NFC conversion, that
 constructs an intermediate file URL and reads its path back. The candidate
-returns the canonical path directly while retaining the existing local-authority
-validation. URL-valued normalization and explicit filesystem resolution are
+returns simple printable ASCII paths directly while retaining the existing
+local-authority validation. Unicode, control bytes, repeated slashes, dot-prefixed
+components and non-root trailing slashes retain the original URL reconstruction.
+This preserves Foundation's filesystem-representation behavior in those cases. URL-valued normalization and explicit filesystem resolution are
 unchanged.
 
 This is an experiment until the native compatibility and measurement gates
@@ -40,7 +42,7 @@ local-source, utility and playlist regression suites against both variants in
 debug and release configurations. Complete fixture/output comparisons precede
 timing; key strings are compared as UTF-8 bytes.
 
-Nine synthetic workloads cover ordinary paths, decomposed Unicode, escaped
+Nine synthetic workloads cover ordinary paths, decomposed-Unicode fallback controls, escaped
 localhost URLs, rejected-source controls, tail and missing playlist lookups, and
 unique/repeated playlist deduplication. Key workloads report time per key.
 Lookup and deduplication workloads report time per complete operation at the

@@ -32,11 +32,29 @@ public enum NormalizedFileURL {
         return host.isEmpty || host.lowercased() == "localhost"
     }
 
-    /// Return the canonical path directly: identity lookups do not need the
-    /// intermediate file URL that `normalize` constructs for URL-valued callers.
+    /// Ordinary ASCII identities do not need an intermediate file URL. Preserve
+    /// Foundation's filesystem representation for Unicode and unusual path forms.
     public static func persistenceKey(for url: URL) -> String? {
         guard isSupportedLocalFileURL(url) else { return nil }
-        return url.absoluteURL.standardized.path.precomposedStringWithCanonicalMapping
+        let lexical = url.absoluteURL.standardized
+        let path = lexical.path.precomposedStringWithCanonicalMapping
+        if isSimpleASCIIPath(path) { return path }
+        return URL(fileURLWithPath: path, isDirectory: lexical.hasDirectoryPath).path
+    }
+
+    private static func isSimpleASCIIPath(_ path: String) -> Bool {
+        guard path.utf8.first == 0x2F else { return false }
+        var previous: UInt8 = 0
+        for byte in path.utf8 {
+            // Foundation can decompose Unicode and truncate at NUL during the
+            // file-URL round trip. Keep it for control bytes and path forms
+            // that can acquire new meaning after percent decoding as well.
+            guard byte >= 0x20, byte < 0x7F,
+                  !(previous == 0x2F && (byte == 0x2F || byte == 0x2E))
+            else { return false }
+            previous = byte
+        }
+        return previous != 0x2F || path == "/"
     }
 
     /// Prepared aliases compare by canonical path; raw URLs compare lexically.
