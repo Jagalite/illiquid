@@ -240,4 +240,42 @@ struct TrackSelectionRankingTests {
         let subtitles = [candidate(1, kind: .subtitle, language: "ja", isDefault: true)]
         #expect(preferences.select(in: subtitles, kind: .subtitle, fallbackID: nil) == nil)
     }
+
+    @Test func everyLanguagePositionOutranksAllLowerPrioritiesAtThe32LanguageLimit() {
+        let languages = [
+            "en", "ja", "fr", "de", "es", "it", "pt", "nl",
+            "sv", "no", "da", "fi", "pl", "cs", "sk", "hu",
+            "ro", "bg", "ru", "uk", "el", "tr", "ar", "he",
+            "hi", "th", "vi", "id", "ms", "ko", "zh", "fa",
+        ]
+        for kind in MediaTrackKind.allCases {
+            for mode in [AutomaticSubtitleSelection.always, .forcedOnly] {
+                let preferences = TrackSelectionPreferences(
+                    audioLanguages: languages, subtitleLanguages: languages,
+                    subtitles: mode, prefersAccessibleTracks: true
+                )
+                #expect(preferences.audioLanguages == languages)
+                #expect(preferences.subtitleLanguages == languages)
+                // Every adjacent preference, then the last versus an unlisted
+                // language, must beat all competing non-language priorities.
+                for index in languages.indices {
+                    let nextLanguage = index + 1 < languages.count ? languages[index + 1] : "sw"
+                    let preferred = candidate(
+                        .max, kind: kind, language: languages[index],
+                        commentary: true, filtersForcedEvents: true
+                    )
+                    let otherwisePreferred = candidate(
+                        .min, kind: kind, language: nextLanguage,
+                        isDefault: true, isForced: true, accessible: true
+                    )
+                    for order in [[preferred, otherwisePreferred], [otherwisePreferred, preferred]] {
+                        #expect(preferences.select(
+                            in: order, kind: kind, fallbackID: Int64.min
+                        ) == Int64.max)
+                    }
+                }
+            }
+        }
+    }
+
 }

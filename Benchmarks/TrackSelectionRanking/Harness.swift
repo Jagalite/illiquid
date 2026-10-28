@@ -1,5 +1,10 @@
 import Foundation
 import IlliquidCore
+#if canImport(Darwin)
+import Darwin
+#else
+import Glibc
+#endif
 
 // Each driver links a separately optimized production module. Inputs and
 // warm-up are outside timing; every selection contributes to emitted results.
@@ -253,12 +258,16 @@ private struct TrackSelectionRankingHarness {
         let batch = name == "mutable-preferences" ? mutableBatch : selectBatch
         let warmupIterations = min(iterations, 1_000)
         let warmup = batch(values, warmupIterations)
+        let cpuStart = clock()
         let start = DispatchTime.now().uptimeNanoseconds
         let result = batch(values, iterations)
         let elapsed = DispatchTime.now().uptimeNanoseconds - start
+        let cpuTicks = clock() - cpuStart
         emit(["schema_version": 1, "mode": "benchmark", "workload": name,
               "iterations": iterations, "operations": iterations * values.count,
-              "elapsed_ns": elapsed, "checksum": String(result.checksum),
+              "elapsed_ns": elapsed,
+              "cpu_ns": Double(cpuTicks) * 1_000_000_000 / Double(CLOCKS_PER_SEC),
+              "checksum": String(result.checksum),
               "selected_count": result.selectedCount, "warmup_iterations": warmupIterations,
               "warmup_checksum": String(warmup.checksum), "warmup_selected_count": warmup.selectedCount])
     }

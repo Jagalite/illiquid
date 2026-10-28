@@ -115,3 +115,31 @@ visible playback. The zero/one-track and subtitle automatic/off controls
 expose unchanged paths alongside ranking improvements. Native CI publishes
 its independent measurements as `track-selection-ranking-native`; timings
 are evidence, not a noisy percentage-based CI pass/fail threshold.
+
+## Isolating rank storage from the earlier normalization change
+
+The frozen default baseline remains the original normalization study.
+To compare only the later rank representation change, fetch the immediately
+preceding main revision and pass it explicitly to both test and benchmark modes:
+
+```sh
+git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+python3 Benchmarks/TrackSelectionRanking/run.py test --configuration debug \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 --output /tmp/track-rank-debug
+python3 Benchmarks/TrackSelectionRanking/run.py test --configuration release \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 --output /tmp/track-rank-release
+python3 Benchmarks/TrackSelectionRanking/run.py benchmark --rounds 10 --target-ms 100 \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 --output /tmp/track-rank-benchmark
+```
+
+An explicit baseline is resolved once to a commit. Its exact source and blob/SHA-256
+identities are captured with the candidate; the shared `MediaTrack.swift` must
+match. The harness now records process CPU nanoseconds as well as elapsed
+nanoseconds, and calibration targets CPU time for the faster implementation.
+The summary retains the original elapsed-time fields and adds a separate `cpu`
+section. Fixture generation, warmup, serialization and the full differential
+verification remain outside the timed region.
+
+The focused workflow runs this current-main comparison on macOS. On machines
+where Kyoto is available, submit the Python command through the shared queue as
+required by `AGENTS.md`. Hosted GitHub runners use isolated serial builds.
