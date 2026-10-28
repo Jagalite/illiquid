@@ -257,9 +257,14 @@ def verify_and_build(directory: Path, prefix: Path, output: Path, jobs: int) -> 
         run(["swift", "test", "--package-path", str(directory), "--jobs", str(jobs),
              "--no-parallel", "-c", configuration], output, timeout=900)
         log = sorted((output / "logs").glob("*.txt"))[-1].read_text()
-        counts = re.findall(r"Test run with ([1-9][0-9]*) tests? passed", log)
+        counts = re.findall(
+            r"Test run with ([1-9][0-9]*) tests?(?: in [1-9][0-9]* suites?)? passed", log)
         if not counts or "libass position-only mask reuse" not in log:
-            raise RuntimeError("Expected nonempty candidate/legacy Swift Testing suites")
+            raise RuntimeError(
+                "Expected nonempty candidate/legacy Swift Testing suites\n" + log[-16000:])
+        for line in log.splitlines():
+            if "Test run with " in line:
+                print(line, flush=True)
         configurations[configuration] = {
             "status": "passed", "total_tests": int(counts[-1]),
             "targets": [
