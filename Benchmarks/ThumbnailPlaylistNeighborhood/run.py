@@ -185,7 +185,11 @@ def main() -> None:
         wrapper, extraction = extract_baseline(baseline)
         integration = check_integration(baseline, candidate_scheduler)
         helper = (ROOT / HELPER).read_text()
-        core = sorted((ROOT / "Sources/IlliquidCore").rglob("*.swift"))
+        core = [ROOT / path for path in (
+            "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+            "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+            "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+        )]
         sources = runner.output / "sources"
         sources.mkdir()
         (sources / "baseline-scheduler.swift").write_text(baseline)
@@ -236,7 +240,10 @@ def main() -> None:
                 package = Path(temporary) / variant
                 app = package / "Sources/IlliquidApp"
                 app.mkdir(parents=True)
-                shutil.copytree(ROOT / "Sources/IlliquidCore", package / "Sources/IlliquidCore")
+                core_target = package / "Sources/IlliquidCore"
+                core_target.mkdir()
+                for path in core:
+                    shutil.copyfile(path, core_target / path.name)
                 (package / "Package.swift").write_text(PACKAGE)
                 (app / "ThumbnailPlaylistNeighborhood.swift").write_text(wrapper if variant == "baseline" else helper)
                 shutil.copyfile(HERE / "Harness.swift", app / "Harness.swift")

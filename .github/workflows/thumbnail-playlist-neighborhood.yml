@@ -2,7 +2,7 @@ name: Thumbnail playlist neighborhood
 
 on:
   push:
-    branches: ['perf/thumbnail-playlist-neighborhood-20261028']
+    branches: ['perf/thumbnail-neighborhood-validation-25bf6887']
     paths:
       - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
       - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift'
@@ -60,6 +60,38 @@ jobs:
         if: always()
         with:
           name: thumbnail-playlist-neighborhood-component
+          path: |
+            ${{ runner.temp }}/thumbnail-neighborhood/**/*.json
+            ${{ runner.temp }}/thumbnail-neighborhood/**/*.jsonl
+            ${{ runner.temp }}/thumbnail-neighborhood/**/*.log
+            ${{ runner.temp }}/thumbnail-neighborhood/**/*.txt
+            !${{ runner.temp }}/thumbnail-neighborhood/**/.build/**
+            !${{ runner.temp }}/thumbnail-neighborhood/**/module-cache/**
+          retention-days: 14
+
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+      - name: Verify neighborhood equivalence and measure preparation
+        run: |
+          python3 Benchmarks/ThumbnailPlaylistNeighborhood/run.py \
+            --output "$RUNNER_TEMP/thumbnail-neighborhood"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-playlist-neighborhood-portable
           path: |
             ${{ runner.temp }}/thumbnail-neighborhood/**/*.json
             ${{ runner.temp }}/thumbnail-neighborhood/**/*.jsonl

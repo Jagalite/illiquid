@@ -99,7 +99,10 @@ private func writeJSON<T: Encodable>(_ value: T) throws {
 @main
 private enum NeighborhoodBenchmark {
     static func main() throws {
-        let workloads = [32, 2_048, 100_000].flatMap { count in
+        let workloads = [
+            Workload(id: "n0-nil", count: 0, anchor: "nil"),
+            Workload(id: "n1-first", count: 1, anchor: "first"),
+        ] + [32, 2_048, 100_000].flatMap { count in
             ["nil", "first", "middle", "last", "missing"].map { anchor in
                 Workload(id: "n\(count)-\(anchor)", count: count, anchor: anchor)
             }
@@ -144,6 +147,9 @@ private enum NeighborhoodBenchmark {
         }
         let elapsed = DispatchTime.now().uptimeNanoseconds - start
         let cpuElapsed = cpuNanoseconds() - cpuStart
+        // Keep the complete input alive until both clocks have stopped.
+        // Its final release must not be charged to a measurement batch.
+        withExtendedLifetime(fixture) {}
         let expectedChecksum = consumedValue &* UInt64(iterations)
             &+ (UInt64(iterations) &* UInt64(iterations - 1) / 2)
         precondition(checksum == expectedChecksum)
