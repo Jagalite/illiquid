@@ -1,0 +1,68 @@
+name: Supplementary Linux acquisition probe
+
+on:
+  push:
+    branches: ['validation/bitmap-subtitle-acquisition-linux-20261028']
+    paths:
+      - 'Validation/BitmapSubtitleAcquisitionPortable/run.py'
+      - '.github/workflows/bitmap-subtitle-acquisition-portable.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: acquisition-linux-probe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  supplementary-linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: swift:6.2.4-noble@sha256:d6f8f6112e9a63da0a4a151d6b93acd16699d35c0b82531ac1a245f5af210197
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install actual Linux FFmpeg development dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 pkg-config libavcodec-dev libavutil-dev
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Qualify selected production declarations with real Swift and FFmpeg
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo '::error::Kyoto is available; submit these builds through its shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this hosted Linux runner; builds run directly and sequentially.'
+          echo 'Supplement only: unused Apple declarations are omitted; macOS validation remains separate.'
+          python3 Validation/BitmapSubtitleAcquisitionPortable/run.py \
+            --repository "$GITHUB_WORKSPACE" --pairs 8 --target-ms 240 \
+            --output "$RUNNER_TEMP/acquisition-linux-probe"
+      - name: Emit reviewable supplemental receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'acquisition-linux-probe'
+          files = {str(p.relative_to(root)): p.read_text() for p in root.rglob('*')
+                   if p.is_file() and p.suffix in {'.json', '.jsonl', '.log'}
+                   and not any(part in {'.build', 'module-cache'} for part in p.relative_to(root).parts)}
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print('ACQUISITION_LINUX_REVIEW_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('ACQUISITION_LINUX_REVIEW_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: supplementary-acquisition-linux
+          path: |
+            ${{ runner.temp }}/acquisition-linux-probe/
+            !${{ runner.temp }}/acquisition-linux-probe/tests/.build/**
+            !${{ runner.temp }}/acquisition-linux-probe/module-cache/**
+            !${{ runner.temp }}/acquisition-linux-probe/*/benchmark
+          retention-days: 14
