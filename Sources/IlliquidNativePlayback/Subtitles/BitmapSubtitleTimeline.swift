@@ -142,22 +142,40 @@ struct BitmapSubtitleTimeline: Sendable {
 
     func composition(at seconds: Double) -> (start: Double, value: NativeBitmapSubtitleComposition)? {
         guard seconds.isFinite, !entries.isEmpty else { return nil }
-        // Preserve constant-time lookup when the newest set is current. With
-        // future events buffered, find the final start <= seconds by upper bound.
+        // Keep the newest set and its immediate predecessor cheap to select.
         var index = entries.count - 1
         if entries[index].start > seconds {
-            var lower = 0
-            var upper = index // The newest entry is already known to be too late.
-            while lower < upper {
-                let middle = lower + (upper - lower) / 2
-                if entries[middle].start <= seconds {
-                    lower = middle + 1
-                } else {
-                    upper = middle
+            guard index > 0 else { return nil }
+            index -= 1
+            if entries[index].start > seconds {
+                guard index > 0 else { return nil }
+                // Search backward in blocks of 2, 4, 8, ... entries. Each
+                // upper bound is known to start after the requested time.
+                var upper = index
+                var step = 2
+                while true {
+                    let probe = upper - min(step, upper)
+                    if entries[probe].start <= seconds {
+                        // The predecessor lies between this eligible probe
+                        // and the known-too-late upper bound.
+                        var lower = probe + 1
+                        while lower < upper {
+                            let middle = lower + (upper - lower) / 2
+                            if entries[middle].start <= seconds {
+                                lower = middle + 1
+                            } else {
+                                upper = middle
+                            }
+                        }
+                        index = lower - 1
+                        break
+                    }
+                    guard probe > 0 else { return nil }
+                    upper = probe
+                    // Saturate before multiplying, including custom capacities.
+                    step = step > upper / 2 ? upper : step * 2
                 }
             }
-            guard lower > 0 else { return nil }
-            index = lower - 1
         }
         let entry = entries[index]
         if let duration = entry.composition.duration, seconds >= entry.start + duration { return nil }

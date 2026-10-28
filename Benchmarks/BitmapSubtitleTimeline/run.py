@@ -317,6 +317,8 @@ def main() -> None:
     }
     if sys.platform == "darwin":
         manifest["hardware"] = run(["sysctl", "hw.model", "machdep.cpu.brand_string"], output).strip()
+    elif sys.platform == "linux":
+        manifest["hardware"] = run(["lscpu"], output).strip()
     write_json(output / "manifest.json", manifest)
     try:
         if args.tests_only:
