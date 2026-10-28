@@ -21,8 +21,9 @@ For playlists with a folder, the scan normalized the same source URL for each
 supported item visited.
 
 The change skips the membership scan for absent folders and empty playlists.
-When a scan is needed, it prepares the valid source identity once and compares
-each visited item's identity with that key. A missing identity never matches
+When a scan is needed, it prepares the valid source identity once, after the
+first supported playlist item, and compares visited item identities with that
+key. Unsupported-only playlists never normalize the source. A missing identity never matches
 another missing identity. Source URL validation, the original supplied folder,
 item order and metadata, saved index, shuffle IDs, schema, position sanitization,
 and timestamp construction retain their existing contracts.
@@ -128,8 +129,10 @@ decoding, UI layout, and playback rendering. They do not establish a whole-playe
 CPU, frame-rate, energy, memory, shutdown-latency, or storage-throughput gain.
 
 First-item matches, empty playlists, and remote sources have little or no
-membership work to remove. An all-unsupported playlist can incur one additional
-source normalization in the candidate. Those controls remain in the evidence.
+membership work to remove. The first experiment eagerly prepared the source
+key, which added unnecessary work for an all-unsupported playlist. Its retained
+adverse observations motivated the final lazy preparation. Those controls remain
+in the unchanged fixture matrix for both experiments.
 Native app integration is checked separately by the repository's existing
 restoration/native lifecycle workflow when a PR is opened.
 

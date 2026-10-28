@@ -25,17 +25,22 @@ struct PlaybackCheckpoint: Sendable {
     let unshuffledPlaylistIDs: [FolderPlaylistItem.ID]?
 
     func record() -> PlaybackSessionRecord {
-        // A standalone playlist cannot retain a collection folder. When there
-        // is a folder, prepare the invariant source identity once for the scan.
-        let collectionFolder: URL?
-        if let folder, !playlist.isEmpty, source.url.isFileURL,
-           let sourceKey = NormalizedFileURL.persistenceKey(for: source.url),
-           playlist.contains(where: {
-               NormalizedFileURL.persistenceKey(for: $0.url) == sourceKey
-           }) {
-            collectionFolder = folder
-        } else {
-            collectionFolder = nil
+        // A standalone playlist cannot retain a collection folder. Otherwise,
+        // normalize the source once, only after a supported item needs it.
+        var collectionFolder: URL? = nil
+        if let folder, source.url.isFileURL {
+            var sourceKey: String?
+            for item in playlist {
+                guard let itemKey = NormalizedFileURL.persistenceKey(for: item.url) else { continue }
+                if sourceKey == nil {
+                    sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
+                }
+                guard let sourceKey else { break }
+                if itemKey == sourceKey {
+                    collectionFolder = folder
+                    break
+                }
+            }
         }
         return PlaybackSessionRecord(
             source: source,
