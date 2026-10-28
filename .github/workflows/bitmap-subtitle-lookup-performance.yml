@@ -1,0 +1,123 @@
+name: Bitmap subtitle lookup performance
+
+on:
+  push:
+    branches:
+      - codex/bitmap-subtitle-lookup
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift
+      - Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift
+      - Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineLookupTests.swift
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift
+      - Benchmarks/BitmapSubtitleLookup/**
+      - Benchmarks/BitmapSubtitleTimeline/run.py
+      - .github/workflows/bitmap-subtitle-lookup-performance.yml
+      - '!Benchmarks/BitmapSubtitleLookup/README.md'
+      - '!Benchmarks/BitmapSubtitleLookup/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift
+      - Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift
+      - Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineLookupTests.swift
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift
+      - Benchmarks/BitmapSubtitleLookup/**
+      - Benchmarks/BitmapSubtitleTimeline/run.py
+      - .github/workflows/bitmap-subtitle-lookup-performance.yml
+      - '!Benchmarks/BitmapSubtitleLookup/README.md'
+      - '!Benchmarks/BitmapSubtitleLookup/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-lookup-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify native regressions, then measure paired queries
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
+
+          output = Path(os.environ["RUNNER_TEMP"]) / "bitmap-subtitle-lookup"
+          runner = [sys.executable, "Benchmarks/BitmapSubtitleTimeline/run.py",
+                    "--suite", "lookup"]
+          commands = [
+              [*runner, "--tests-only", "--output", str(output / "tests")],
+              [*runner, "--pairs", "8", "--target-ms", "80",
+               "--max-sample-ms", "1500", "--output", str(output / "timing")],
+          ]
+          queue = Path("/Volumes/seed1/Projects/kyoto/kyoto.py")
+          if not queue.is_file():
+              print("Shared Kyoto queue is unavailable on this hosted runner; "
+                    "running standalone native component builds and measurements "
+                    "directly, in sequence.", flush=True)
+          for command in commands:
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  environment = ["env", *[
+                      f"{name}={os.environ[name]}"
+                      for name in ("DEVELOPER_DIR", "PATH", "PYTHONDONTWRITEBYTECODE")
+                  ]]
+                  submitted = subprocess.check_output(
+                      [*cli, "submit", "--", *environment, *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = json.loads(submitted)["id"]
+                  shown = subprocess.run([*cli, "show", job_id])
+                  waited = subprocess.run([*cli, "wait", job_id])
+                  logged = subprocess.run([*cli, "logs", job_id])
+                  shown.check_returncode()
+                  waited.check_returncode()
+                  logged.check_returncode()
+              else:
+                  subprocess.run(command, check=True)
+          PY
+      - name: Emit compact review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "bitmap-subtitle-lookup"
+          names = ("manifest.json", "tests.json", "summary.json",
+                   "verification.json", "failure.json")
+          for phase in ("tests", "timing"):
+              for name in names:
+                  path = root / phase / name
+                  if path.is_file():
+                      # Keep the original file text so remote reviewers can
+                      # inspect exact records without local archive extraction.
+                      print("LOOKUP_REVIEW_JSON " + json.dumps({
+                          "path": str(path.relative_to(root)),
+                          "content": path.read_text(),
+                      }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-lookup-macos
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-lookup
+            !${{ runner.temp }}/bitmap-subtitle-lookup/**/build/**
+          retention-days: 14
