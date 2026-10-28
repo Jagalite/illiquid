@@ -1,0 +1,119 @@
+name: Audio PCM presentation ownership
+
+on:
+  push:
+    branches: ['perf/audio-pcm-presentation-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/AudioPCMBlockBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/SampleBufferAudioPresenter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AudioPCMBlockBufferTests.swift'
+      - 'Benchmarks/AudioPresentationMemory/*.swift'
+      - 'Benchmarks/AudioPresentationMemory/*.py'
+      - '.github/workflows/audio-pcm-presentation.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/AudioPCMBlockBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/SampleBufferAudioPresenter.swift'
+      - 'Sources/IlliquidNativePlayback/Media/AudioDecoder.swift'
+      - 'Tests/IlliquidNativePlaybackTests/AudioPCMBlockBufferTests.swift'
+      - 'Benchmarks/AudioPresentationMemory/**'
+      - '.github/workflows/audio-pcm-presentation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audio-pcm-presentation-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify exact PCM and measure native storage sharing
+        run: |
+          python3 Benchmarks/AudioPresentationMemory/run.py \
+            --pairs 6 --target-ms 80 \
+            --output "$RUNNER_TEMP/audio-pcm-component"
+      - name: Print result receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "audio-pcm-component"
+          for name in ["environment.json", "summary.json", "memory.json", "completion.json"]:
+              path = root / name
+              if path.is_file():
+                  print(f"::group::{name}")
+                  print(path.read_text())
+                  print("::endgroup::")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: audio-pcm-component
+          path: |
+            ${{ runner.temp }}/audio-pcm-component/
+            !${{ runner.temp }}/audio-pcm-component/module-cache/**
+            !${{ runner.temp }}/audio-pcm-component/**/pcm-debug
+            !${{ runner.temp }}/audio-pcm-component/**/pcm-release
+          retention-days: 14
+
+  native-audio:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Generate required audio playback fixtures
+        run: |
+          mkdir -p "$RUNNER_TEMP/audio-pcm-native/fixtures"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'testsrc2=size=640x360:rate=30' \
+            -f lavfi -i 'sine=frequency=440:sample_rate=48000' \
+            -t 3 -shortest -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac \
+            "$RUNNER_TEMP/audio-pcm-native/fixtures/h264-aac.mp4"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i 'anullsrc=r=48000:cl=7.1' -t 2 -c:a flac \
+            "$RUNNER_TEMP/audio-pcm-native/fixtures/audio-7.1.flac"
+          test -s "$RUNNER_TEMP/audio-pcm-native/fixtures/h264-aac.mp4"
+          test -s "$RUNNER_TEMP/audio-pcm-native/fixtures/audio-7.1.flac"
+      - name: Compile the app graph and qualify audio ownership and playback
+        run: |
+          export ILLIQUID_NATIVE_FIXTURE_DIR="$RUNNER_TEMP/audio-pcm-native/fixtures"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'AudioPCMBlockBufferTests|AudioDelayTests|AudioDelayMemoryTests|AudioResamplerDrainTests|MultichannelAudioTests' \
+            2>&1 | tee "$RUNNER_TEMP/audio-pcm-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: audio-pcm-native
+          path: ${{ runner.temp }}/audio-pcm-native/tests.log
+          retention-days: 14
