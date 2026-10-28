@@ -54,6 +54,8 @@ The 12 workloads use synthetic in-memory URLs and values. Input construction is
 outside timing. No directory enumeration, sidecar read or media decode occurs.
 Entries are generated in natural filename order; the production sorter still
 runs, but these fixtures do not characterize shuffled-input sorting costs.
+Setup and small-projection controls use short ASCII roots; long Unicode roots
+are covered by the separate 1,024-entry projection.
 "Cold projection" means a fresh browser-filter actor with empty projection
 caches; it does not mean a cold disk or filesystem cache.
 
@@ -110,7 +112,7 @@ python3 Benchmarks/SourceVisibilityRootLookup/run.py \
 Use a new output directory. The runner preserves source and executable hashes,
 compiler/host metadata, test receipts, exact output comparisons, calibration,
 the predetermined run order, raw measurements and paired summaries. Native
-results and qualification status will be recorded after execution.
+results and qualification status are recorded below as they become available.
 
 ## Related research
 
@@ -120,3 +122,87 @@ source-presence traversal candidate from this investigation was stopped before
 measurement when an independently published concurrent branch was found to
 contain the same change. No result from that abandoned candidate is attributed
 to this optimization.
+
+## Linux component result
+
+The Linux run at `defc68eb90aa1e6086daf4de7a03df5841d4a399` passed all
+42 component tests in each of baseline/candidate debug/release (168 executions),
+full output parity for all four builds, and the final source identity audit.
+The host exposed four logical CPUs of an AMD EPYC 7763, using Swift 6.3.2,
+Ubuntu 24.04/glibc 2.39, and Linux 6.17.0-1022-azure. These results are
+portable component evidence; native macOS qualification remains pending.
+
+Both primary workloads cleared the predeclared CPU criteria with 10/10 faster
+pairs. No common control reached the material-regression threshold. The setup
+control cost 7.064 microseconds more per matcher (median paired CPU difference).
+Empty and one-row no-rule projections cost 7.139 and 6.333 microseconds more.
+
+All twelve cases are retained below. Times are medians per complete projection,
+per 1,024-query lookup batch, or per matcher initialization as labelled.
+Percentages are medians of paired reductions, so a negative value is a slowdown;
+they need not equal the reduction computed from the two displayed medians.
+
+| Case | Baseline wall ms/op | Candidate wall ms/op | Paired wall reduction | Paired CPU reduction | CPU faster pairs |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `projection-files-8-roots-1024` | 34.9438 | 31.0415 | 11.33% | 11.32% | 10/10 |
+| `projection-files-32-roots-1024` | 46.0082 | 33.8003 | 26.72% | 26.75% | 10/10 |
+| `projection-files-unicode-32-roots-1024` | 538.5640 | 402.7192 | 25.24% | 25.26% | 10/10 |
+| `matcher-one-root-1024` | 0.4708 | 0.2572 | 45.38% | 45.38% | 10/10 |
+| `matcher-nested-broad-first-1024` | 27.3077 | 2.3522 | 91.39% | 91.39% | 10/10 |
+| `matcher-nested-deep-first-1024` | 35.3880 | 1.1208 | 96.83% | 96.83% | 10/10 |
+| `matcher-no-match-32-roots-1024` | 4.5203 | 1.9210 | 57.63% | 57.63% | 10/10 |
+| `matcher-init-only-32-roots` | 0.2273 | 0.2338 | -3.12% | -3.12% | 1/10 |
+| `projection-no-rules-empty-32-roots` | 0.2807 | 0.2883 | -2.47% | -2.58% | 1/10 |
+| `projection-no-rules-one-row-32-roots` | 0.3077 | 0.3132 | -2.13% | -2.11% | 1/10 |
+| `projection-files-one-row-32-roots` | 0.6218 | 0.6245 | -0.05% | 0.02% | 5/10 |
+| `projection-files-one-root-1024` | 31.5442 | 30.1380 | 4.39% | 4.38% | 10/10 |
+
+[Linux job and logs](https://github.com/Jagalite/illiquid/actions/runs/40637278046/job/122647040407)
+and [complete CI artifact](https://github.com/Jagalite/illiquid/actions/runs/40637278046/artifacts/12794705224).
+Committed evidence includes [the summary](evidence/linux-summary.json),
+[the independent numeric audit](evidence/linux-audit.json), and
+[the complete numeric receipt bundle](evidence/linux-numeric.json.gz).
+The bundle SHA256 is
+`37d76095500f56f8707314e0e3b7b18e7028bf6c18972d85c323c8c4b058e03a`.
+
+### Retained evidence
+
+The gzip bundle is a JSON object mapping filenames to their exact text. It
+contains the source manifest, test and parity receipts, calibration pilots,
+predetermined schedule, all 240 observations, summaries, command log, source
+audit, and completion receipt. It can be expanded without executing any code
+from the archive:
+
+```sh
+python3 - <<'PY'
+import gzip, json
+from pathlib import Path
+source = Path('Benchmarks/SourceVisibilityRootLookup/evidence/linux-numeric.json.gz')
+target = Path('/tmp/illiquid-root-lookup-retained-linux')
+files = json.loads(gzip.decompress(source.read_bytes()))
+assert not target.exists()
+assert all(Path(name).name == name for name in files)
+assert all(isinstance(value, str) for value in files.values())
+if files:
+    target.mkdir()
+    for name, value in files.items():
+        (target / name).write_text(value)
+PY
+```
+
+The independent numeric audit rechecked all 240 observations, balanced pair
+order, calibration, summary arithmetic, scalar output equality, source receipts
+and local input hashes. Full output JSON, raw XML, and staged source snapshots
+were checked by the CI runner and retained in the complete artifact; they were
+not re-downloaded for that separate numeric audit.
+
+### Attempt history
+
+The first [root-lookup run](https://github.com/Jagalite/illiquid/actions/runs/40637004286)
+at `85641e12afe71358765ccc85614fb26e84ba7308` stopped before compilation because
+Git rejected the container checkout ownership during metadata collection.
+The follow-up confines `safe.directory` to that checkout for two read-only Git
+commands. It also pins the observed official Swift image digest and excludes
+build caches from evidence uploads. The production change, tests, workload
+driver, and acceptance criteria were unchanged. There are no measurements from
+the failed attempt to omit.
