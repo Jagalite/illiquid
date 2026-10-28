@@ -23,9 +23,12 @@ memory-reduction claim.
 
 ## Reproduce
 
-Use native macOS, Swift 6.1+ and Python 3.10+. The workflow pins Xcode 26.6 on
-macOS 26. Follow the repository's Kyoto queue coordination when that queue is
-available. Hosted CI checks that the shared queue is absent before direct builds.
+Use macOS or Linux with Swift 6.1+ and Python 3.10+. The workflow pins
+Xcode 26.6 on macOS 26 and the official `swift:6.3.3-noble` container on
+Ubuntu 24.04. The Linux job tests and measures the platform-independent helper;
+the macOS jobs separately measure native behavior and compile the application.
+Follow the repository's Kyoto queue coordination when that queue is available.
+Hosted CI checks that the shared queue is absent before direct builds.
 
 ```sh
 python3 Benchmarks/VideoFrameIdentityHistory/run.py --tests-only \
@@ -93,7 +96,8 @@ graph and runs the history, presentation-time observation and frame-step tests.
 
 ## Results and interpretation
 
-Results will be recorded after the native branch run completes. Measurements
+Results will be recorded after the branch runs complete, with Linux and macOS
+evidence labeled separately. Measurements
 cover warm history operations and exclude the presenter lock, pixel-buffer
 identity extraction, sample construction, decoding and rendering. They do not
 establish a whole-player CPU, frame-rate, visible latency or energy improvement.

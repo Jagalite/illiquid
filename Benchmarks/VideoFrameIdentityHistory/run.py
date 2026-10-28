@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Compare bounded video frame-identity histories on native macOS."""
+"""Compare bounded video frame-identity histories with the actual Swift runtime."""
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
 import math
+import os
 import platform
 import shutil
 import statistics
@@ -110,8 +111,11 @@ def tests(variant: str, work: Path, output: Path) -> None:
         '.target(name: "IlliquidNativePlayback"),'
         '.testTarget(name: "IlliquidNativePlaybackTests", dependencies: ["IlliquidNativePlayback"])])\n')
     for configuration in ("debug", "release"):
-        command(["swift", "test", "--package-path", package, "--jobs", "2", "--no-parallel",
-                 "-c", configuration, "-Xswiftc", "-warnings-as-errors"], output,
+        args = ["swift", "test", "--package-path", package, "--jobs", "2", "--no-parallel",
+                "-c", configuration, "-Xswiftc", "-warnings-as-errors"]
+        if sys.platform == "linux":
+            args.append("--use-integrated-swift-driver")
+        command(args, output,
                 log=f"{variant}-{configuration}-tests.txt")
         print(f"{variant} {configuration} tests passed", flush=True)
 
@@ -119,7 +123,8 @@ def tests(variant: str, work: Path, output: Path) -> None:
 def build(variant: str, work: Path, output: Path) -> Path:
     directory = work / variant
     source = stage(variant, directory / "sources")
-    library = directory / "libIlliquidNativePlayback.dylib"
+    library = directory / ("libIlliquidNativePlayback.dylib" if sys.platform == "darwin"
+                           else "libIlliquidNativePlayback.so")
     flags = ["-swift-version", "6", "-O", "-warnings-as-errors"]
     command(["swiftc", *flags, "-whole-module-optimization", "-enable-testing",
              "-emit-library", "-emit-module", "-module-name", "IlliquidNativePlayback",
@@ -184,8 +189,8 @@ def main() -> None:
     parser.add_argument("--tests-only", action="store_true")
     args = parser.parse_args()
     cases = args.cases.split(",")
-    if sys.platform != "darwin":
-        parser.error("Use native macOS with Swift 6.1+")
+    if sys.platform not in ("darwin", "linux"):
+        parser.error("Use macOS or Linux with Swift 6.1+")
     if (args.pairs < 2 or args.pairs % 2 or args.target_ms <= 0 or
             args.max_sample_ms < args.target_ms or len(cases) != len(set(cases)) or
             any(case not in CASES for case in cases)):
@@ -206,9 +211,11 @@ def main() -> None:
         "collected_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "platform": platform.platform(), "machine": platform.machine(),
         "swift": command(["swiftc", "--version"], output).strip(),
-        "macos": command(["sw_vers"], output).strip(),
-        "hardware": command(["sysctl", "hw.model", "machdep.cpu.brand_string"], output).strip(),
-        "sdk": command(["xcrun", "--show-sdk-version"], output).strip(),
+        "macos": command(["sw_vers"], output).strip() if sys.platform == "darwin" else None,
+        "hardware": (command(["sysctl", "hw.model", "machdep.cpu.brand_string"], output).strip()
+                     if sys.platform == "darwin" else command(["lscpu"], output).strip()),
+        "logical_cpus": os.cpu_count(),
+        "sdk": command(["xcrun", "--show-sdk-version"], output).strip() if sys.platform == "darwin" else None,
         "git_head": command(["git", "-C", ROOT, "rev-parse", "HEAD"], output).strip(),
         "git_status": command(["git", "-C", ROOT, "status", "--porcelain"], output).strip(),
         "arguments": {**vars(args), "output": str(output)}, "baseline": baseline,
@@ -231,7 +238,7 @@ def main() -> None:
         binaries = {variant: build(variant, work, output) for variant in ("baseline", "candidate")}
         manifest["binary_sha256"] = {
             variant: {p.name: digest(p.read_bytes()) for p in binary.parent.iterdir()
-                      if p.is_file() and (p.name == "benchmark" or p.suffix == ".dylib")}
+                      if p.is_file() and (p.name == "benchmark" or p.suffix in (".dylib", ".so"))}
             for variant, binary in binaries.items()}
         save(output / "manifest.json", manifest)
         rows = []

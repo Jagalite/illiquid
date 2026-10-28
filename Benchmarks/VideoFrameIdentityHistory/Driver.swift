@@ -1,6 +1,10 @@
 import Foundation
 import Dispatch
+#if canImport(Darwin)
 import Darwin
+#else
+import Glibc
+#endif
 @testable import IlliquidNativePlayback
 
 private typealias Frame = VideoFrameIdentityHistory.FrameIdentity

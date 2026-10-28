@@ -30,6 +30,60 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  linux-component:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.3-noble
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare component test tools
+        run: |
+          if ! command -v python3 || ! command -v git || ! command -v lscpu; then
+            apt-get update
+            apt-get install -y --no-install-recommends python3 git util-linux
+          fi
+      - name: Check isolated build environment
+        run: |
+          test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
+          echo "Kyoto is unavailable on this hosted runner; component builds run serially."
+      - name: Compare original and circular histories in debug and release
+        run: |
+          python3 Benchmarks/VideoFrameIdentityHistory/run.py --tests-only \
+            --output "$RUNNER_TEMP/frame-identity-history-linux/tests"
+      - name: Measure balanced Linux before-and-after samples
+        run: |
+          python3 Benchmarks/VideoFrameIdentityHistory/run.py \
+            --pairs 8 --target-ms 150 --max-sample-ms 2000 \
+            --output "$RUNNER_TEMP/frame-identity-history-linux/timing"
+      - name: Emit reproducibility evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "frame-identity-history-linux"
+          files = {str(p.relative_to(root)): p.read_text()
+                   for p in sorted(root.rglob("*"))
+                   if p.is_file() and "build" not in p.parts and "receipts" not in p.parts}
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print("FRAME_HISTORY_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          encoded = base64.b64encode(packed).decode()
+          chunks = [encoded[i:i + 16000] for i in range(0, len(encoded), 16000)]
+          for index, chunk in enumerate(chunks):
+              print(f"FRAME_HISTORY_BUNDLE_PART {index + 1}/{len(chunks)} {chunk}")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-frame-identity-history-linux
+          path: |
+            ${{ runner.temp }}/frame-identity-history-linux/**/*.json
+            ${{ runner.temp }}/frame-identity-history-linux/**/*.jsonl
+            ${{ runner.temp }}/frame-identity-history-linux/**/*.txt
+          retention-days: 14
+
   native-component:
     runs-on: macos-26
     timeout-minutes: 20
