@@ -74,8 +74,8 @@ its CPU and eventual physical I/O are outside process CPU measurements.
 
 Every submit also schedules the existing 100 ms drain. Immediate flushes leave
 those future no-op drains queued. Their unchanged work is included when they
-occur during the batch. This measures sequential checkpoint service time,
-not steady-state coalescing.
+occur during the batch. This measures synchronous mutation-plus-flush component service time,
+not the playback controller's asynchronous flush path or steady-state coalescing.
 
 ## Correctness and measurement gates
 

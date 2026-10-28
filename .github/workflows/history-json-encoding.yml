@@ -6,13 +6,15 @@ on:
     paths:
       - Sources/IlliquidCore/**
       - Tests/IlliquidCoreTests/**
-      - Benchmarks/HistoryJSONEncoding/**
+      - Benchmarks/HistoryJSONEncoding/*.swift
+      - Benchmarks/HistoryJSONEncoding/*.py
       - .github/workflows/history-json-encoding.yml
   pull_request:
     paths:
       - Sources/IlliquidCore/Persistence/**
       - Tests/IlliquidCoreTests/HistoryJSONEncodingTests.swift
-      - Benchmarks/HistoryJSONEncoding/**
+      - Benchmarks/HistoryJSONEncoding/*.swift
+      - Benchmarks/HistoryJSONEncoding/*.py
       - .github/workflows/history-json-encoding.yml
   workflow_dispatch:
 

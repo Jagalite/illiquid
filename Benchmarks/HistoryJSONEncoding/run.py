@@ -6,6 +6,7 @@ import json
 import os
 import pathlib
 import platform
+import re
 import shutil
 import statistics
 import subprocess
@@ -301,6 +302,8 @@ def main():
                       "-c", configuration, "--jobs", "2",
                       "-Xswiftc", "-warnings-as-errors"], configuration + "-tests", timeout=600)
         output = (evidence / "logs" / (configuration + "-tests.log")).read_text()
+        if not re.search(r"Test run with [1-9][0-9]* tests? passed", output):
+            raise RuntimeError("Swift Testing did not report a nonempty successful run")
         lines = [line for line in output.splitlines()
                  if "Executed " in line or "Test run with " in line]
         tests.append({"configuration": configuration, "result": "passed", "summary": lines})
@@ -310,6 +313,11 @@ def main():
          "--filter", "readsAndRewritesBothLegacySlashForms|roundTripsCompleteHistoryWithDifficultPathsAndMetadata"],
         "baseline-compatibility-tests", timeout=600)
     baseline_test_output = (evidence / "logs" / "baseline-compatibility-tests.log").read_text()
+    required_methods = ("readsAndRewritesBothLegacySlashForms",
+                        "roundTripsCompleteHistoryWithDifficultPathsAndMetadata")
+    if (not re.search(r"Test run with [1-9][0-9]* tests? passed", baseline_test_output)
+            or any(name not in baseline_test_output for name in required_methods)):
+        raise RuntimeError("Baseline compatibility filter did not execute the required tests")
     baseline_test_lines = [line for line in baseline_test_output.splitlines()
                            if "Executed " in line or "Test run with " in line]
     tests.append({"configuration": "baseline-release-compatibility", "result": "passed",
