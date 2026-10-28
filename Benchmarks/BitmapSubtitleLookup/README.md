@@ -1,7 +1,7 @@
 # Independent bitmap subtitle pruning validation
 
 This study independently validates the production change in
-[PR #157](https://github.com/Jagalite/illiquid/pull/157). The follow-up PR adds
+[PR #157](https://github.com/Jagalite/illiquid/pull/157). The [follow-up PR #189](https://github.com/Jagalite/illiquid/pull/189) adds
 benchmark tooling and evidence only; the production implementation and regression
 tests are inherited unchanged from that PR.
 
@@ -19,6 +19,12 @@ Its timeline blob is `3871aa14a9443ba8b6eda67b31b4170d59b32645` and SHA-256 is
 `e9664552e9b8d7dc5ea5200fec94a4fd7a2744be361df757688bfbeca01f0800`. Evidence below explicitly identifies which candidate
 was measured; the earlier no-op-only results must not be attributed to this
 combined zero/one-entry implementation.
+
+The independent twelve-pair Linux run reproduced the intended benefit:
+128-entry no-op pruning took 93.38% less time and a 128-entry one-retirement
+rolling stream took 13.71% less time by paired median. Both improved in all
+twelve pairs; the two-entry stream was essentially flat. These are component
+measurements, not a measured playback speedup.
 
 ## Experiment selection
 
@@ -144,6 +150,51 @@ PR #157's native workflow provides the separate macOS qualification.
 
 ## Results and limits
 
+### Combined candidate: successful independent longer run
+
+[Run 40640508556](https://github.com/Jagalite/illiquid/actions/runs/40640508556)
+passed at `a2e39e141a073688e058f354a15093d2dd98ae31`, compiling the exact
+PR #157 production bytes with the independent 28-case driver. Twelve balanced
+pairs used a 250 ms target and fixed CPU affinity (CPU 0) on an AMD EPYC 9V74
+hosted runner, Linux x86_64 and Swift 6.4.1.
+
+| Independent workload | Baseline median ns/op | Candidate median ns/op | Paired median reduction | Faster pairs |
+| --- | ---: | ---: | ---: | ---: |
+| No-op prune, 1 event | 3.309 | 2.763 | 16.50% | 12/12 |
+| No-op prune, 8 events | 5.350 | 2.827 | 47.02% | 12/12 |
+| No-op prune, 32 events | 14.757 | 2.826 | 80.96% | 12/12 |
+| No-op prune, 128 events | 42.406 | 2.802 | 93.38% | 12/12 |
+| No-op before first event, 32 entries | 14.280 | 2.840 | 80.15% | 12/12 |
+| No-op before first event, 128 entries | 39.964 | 2.776 | 92.97% | 12/12 |
+| One-entry retirement + insert + lookup, 2 entries | 110.968 | 111.155 | -0.21% | 5/12 |
+| One-entry retirement + insert + lookup, 8 entries | 118.986 | 117.022 | 1.36% | 10/12 |
+| One-entry retirement + insert + lookup, 32 entries | 146.658 | 134.847 | 7.88% | 12/12 |
+| One-entry retirement + insert + lookup, 128 entries | 276.357 | 238.707 | 13.71% | 12/12 |
+
+Positive reductions mean less time; the negative stream-2 result means more
+time. Percentages are medians of within-pair ratios, not ratios of displayed
+medians. Every no-op case and the 32- and 128-entry rolling streams improved in
+all twelve pairs. The two-entry stream was essentially flat: 0.21% more time by
+paired median and about 0.19 ns more by the difference of medians. The 8-entry
+stream improved in ten of twelve pairs. These controls remain in the report
+rather than implying every operation became faster.
+
+Lookup source is unchanged. Its paired medians ranged from 1.35% more time to
+0.41% less time; those small changes are reported as controls, not attributed
+lookup improvements.
+
+All 24 test declarations in two suites passed for baseline and candidate in both
+debug and release, with warnings as errors. The independent audit verified all
+672 observations and 336 complete pairs, six baseline-first and six
+candidate-first pairs per case, exact UInt64 checksums and full-state receipt
+hashes, all medians/ranges, original and import-only staged source hashes, every
+measurement's command order, and all 798 recorded command exit statuses.
+
+[Durable independent evidence](evidence/bounded-independent) includes all raw
+measurements, calibration, source/test/compiler manifests, test logs, commands,
+CPU/affinity details, summaries and provenance. Later report/evidence commits do
+not change the measured production code, tests, runner or driver.
+
 ### Combined candidate: existing PR #157 run, independently audited
 
 The [successful upstream Linux job](https://github.com/Jagalite/illiquid/actions/runs/40637503390/job/122647747237)
@@ -174,14 +225,6 @@ and its fixtures. Do not pool its absolute times with the separate
 `BitmapSubtitleLookup` cohorts: the drivers, workloads, compiler versions and
 hosted runner instances differ. Percentages are medians of within-pair ratios,
 not ratios of the displayed medians.
-
-### Combined candidate: independent longer run
-
-[Run 40640508556](https://github.com/Jagalite/illiquid/actions/runs/40640508556)
-is executing the exact same production bytes with the independent 28-case
-driver at `a2e39e141a073688e058f354a15093d2dd98ae31`. It uses twelve balanced
-pairs, a 250 ms target and fixed CPU affinity. Its completed results will be
-recorded separately; no performance claim above depends on that pending run.
 
 ### Exploratory Linux run: no-op-only guard
 
@@ -215,7 +258,8 @@ Positive mutation-control changes mean more time. Percentages are medians of
 within-pair ratios, so they need not equal ratios of the displayed medians.
 The 128-entry stream was about 3.2 ns slower by the difference of medians and
 1.53% slower by paired median; six of eight pairs were slower. A large outlier
-is retained, and does not by itself explain the median. The longer confirmation below did not reproduce this small slowdown.
+is retained, and does not by itself explain the median. The longer confirmation
+below did not reproduce this small slowdown.
 The initial observation is retained rather than being discarded or explained
 away by the outlier; it is not established as a reproducible regression.
 Lookup implementation is unchanged; its small before/after movements are
