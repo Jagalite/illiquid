@@ -1,0 +1,81 @@
+name: Packet queue ring codegen experiment
+
+on:
+  push:
+    branches: ['codex/perf-ring-buffer-wrap-20261028']
+    paths: ['.github/workflows/packet-queue-ring-codegen.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-wrap-forms:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Compare optimized machine code before another timing campaign
+        run: |
+          echo "Kyoto is unavailable on this isolated GitHub runner; using serial direct builds."
+          python3 - <<'PY'
+          import difflib, hashlib, json, os, shutil, subprocess
+          from pathlib import Path
+          root = Path.cwd()
+          out = Path(os.environ["RUNNER_TEMP"]) / "queue-ring-codegen"
+          out.mkdir()
+          ring = root / "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift"
+          queue = root / "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift"
+          harness = root / "Benchmarks/PacketQueueRing/Harness.swift"
+          candidate = ring.read_text()
+          old = "        head += 1\n        if head == slots.count { head = 0 }"
+          new = "        let next = head + 1\n        head = next == slots.count ? 0 : next"
+          assert candidate.count(old) == 1
+          sources = {
+              "baseline": (root / "Benchmarks/PacketQueueRing/baseline/FixedRingBuffer.swift").read_text(),
+              "candidate": candidate,
+              "single-assignment": candidate.replace(old, new),
+          }
+          compiler = shutil.which("swiftc")
+          assert compiler
+          flags = ["-swift-version", "6", "-O", "-whole-module-optimization",
+                   "-warnings-as-errors", "-parse-as-library",
+                   "-module-name", "PacketQueueRingProbe",
+                   "-module-cache-path", str(out / "module-cache")]
+          receipt = {"compiler": subprocess.check_output([compiler, "--version"], text=True),
+                     "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+                     "source_sha256": {}, "assembly_sha256": {}, "commands": {}}
+          assembly = {}
+          for name, source in sources.items():
+              folder = out / name
+              folder.mkdir()
+              source_path = folder / "FixedRingBuffer.swift"
+              source_path.write_text(source)
+              output = folder / "queue.s"
+              argv = [compiler, *flags, "-emit-assembly", str(source_path), str(queue), str(harness), "-o", str(output)]
+              subprocess.run(argv, check=True)
+              assembly[name] = output.read_text()
+              receipt["source_sha256"][name] = hashlib.sha256(source_path.read_bytes()).hexdigest()
+              receipt["assembly_sha256"][name] = hashlib.sha256(output.read_bytes()).hexdigest()
+              receipt["commands"][name] = argv
+          receipt["candidate_and_single_assignment_identical"] = assembly["candidate"] == assembly["single-assignment"]
+          diff = "".join(difflib.unified_diff(assembly["candidate"].splitlines(True),
+                                            assembly["single-assignment"].splitlines(True),
+                                            fromfile="candidate", tofile="single-assignment"))
+          (out / "single-assignment.diff").write_text(diff)
+          (out / "manifest.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
+          print("RING_CODEGEN_JSON " + json.dumps(receipt, sort_keys=True))
+          print("RING_CODEGEN_DIFF " + json.dumps(diff))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: packet-queue-ring-codegen
+          path: |
+            ${{ runner.temp }}/queue-ring-codegen/manifest.json
+            ${{ runner.temp }}/queue-ring-codegen/*.diff
+            ${{ runner.temp }}/queue-ring-codegen/*/*.s
+            ${{ runner.temp }}/queue-ring-codegen/*/*.swift
+          retention-days: 14
