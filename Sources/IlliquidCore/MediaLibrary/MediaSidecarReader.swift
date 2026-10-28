@@ -19,6 +19,7 @@ public final class MediaSidecarReader {
         // Discovery visits parent first; sidecar reads visit root first.
         let folders: [URL]
         let sidecars: [FolderSidecarPaths]
+        let hints: MediaMetadataHints
     }
     private var cache: [String: Sidecar] = [:]
     // A missing or unusable sidecar needs only its path. Keeping those entries
@@ -73,7 +74,7 @@ public final class MediaSidecarReader {
         }
         var plannedSidecars: [FolderSidecarPaths] = []
         if cachedPlan == nil { plannedSidecars.reserveCapacity(folders.count) }
-        var hints = MediaMetadataHints()
+        var hints = cachedPlan?.hints ?? MediaMetadataHints()
         var foundSeriesPlex = false
         var mappedEpisode: MediaMetadataHints?
         for (offset, folder) in folders.reversed().enumerated() {
@@ -81,7 +82,7 @@ public final class MediaSidecarReader {
             let cachedPaths = cachedPlan?.sidecars[offset]
             let showURL = cachedPaths?.show ?? folder.appendingPathComponent("tvshow.nfo")
             if case let .nfo(nfo) = read(showURL), nfo.content == .show {
-                hints = nfo.overriding(hints)
+                if cachedPlan == nil { hints = nfo.overriding(hints) }
             }
             let plexURL = cachedPaths?.plex ?? folder.appendingPathComponent(".plexmatch")
             if case let .plex(plex) = read(plexURL) {
@@ -89,7 +90,7 @@ public final class MediaSidecarReader {
                    let mapping = plex.episodeHint(for: relative, inheritsDescendantMappings: !foundSeriesPlex) {
                     mappedEpisode = mapping
                 }
-                hints = plex.metadata.overriding(hints)
+                if cachedPlan == nil { hints = plex.metadata.overriding(hints) }
                 foundSeriesPlex = true
             }
             if cachedPaths == nil {
@@ -99,8 +100,11 @@ public final class MediaSidecarReader {
         if cachedPlan == nil {
             // Publish only after all ancestor reads. Later calls still perform
             // those reads, preserving negative caching and byte/entry budgets.
+            // Cached sidecars do not change during this reader's lifetime, so
+            // siblings can reuse their merged metadata. Per-file mappings and
+            // NFO overrides must remain outside this ancestor-only snapshot.
             ancestorPathPlan = AncestorPathPlan(root: rootKey, parent: parentKey,
-                folders: folders, sidecars: plannedSidecars)
+                folders: folders, sidecars: plannedSidecars, hints: hints)
         }
         if var mapping = mappedEpisode {
             mapping.season = mapping.season ?? hints.season ?? directorySeason(parent.lastPathComponent) ?? 1
