@@ -86,12 +86,19 @@ Two explicitly labeled ownership conditions are tested:
 - **Shared:** another owner retains the initial result dictionary, as a
   projection or cursor can do. Private summaries and revision maps remain
   unique. The first result mutation may still copy O(n) dictionary storage.
+  Later calls in a burst generally own the replacement table uniquely; this
+  does not model a new UI snapshot retained after every intermediate change.
 
 The workloads span 32, 1,000, 10,000, and 100,000 cached folders, individual
 events, batched changes, bursts, Unicode, and subtree/full-root/no-op controls.
 They are synthetic warm-cache component workloads, not measurements of the
 prevalence or size of real user libraries. No live Observation subscriber is
 installed in timed cases; notification semantics are checked separately.
+The 16-call bursts revisit four directories, so later calls include already
+invalidated paths. Their per-call averages should not be mistaken for first-event
+latency. The queued-burst worker has not begun traversal; no I/O contention is
+measured. Fixed fixture seed 41 and deterministic hashing keep paired inputs
+reproducible rather than sampling a population of library shapes.
 
 Every timed observation runs in a fresh process. Baseline-first and
 candidate-first pairs alternate, and workload order rotates between rounds.
