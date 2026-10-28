@@ -102,8 +102,8 @@ five warmup calls, the baseline oracle, result sorting, and full equality
 checks are outside the timed interval. The result count is consumed each
 iteration, and the final complete set is checked after timing.
 
-The driver calibrates a shared iteration count for each baseline/candidate
-pair (targeting 100 ms for the slower variant and at least 20 ms for the faster
+The driver calibrates one shared iteration count per workload for both
+variants and all six pairs (targeting 100 ms for the slower variant and at least 20 ms for the faster
 variant, capped at 500,000 iterations), then launches six pairs of fresh processes in alternating AB/BA order.
 Single-call calibration includes clock overhead, so observed windows can be
 shorter than the target, especially for nanosecond controls. Actual durations
