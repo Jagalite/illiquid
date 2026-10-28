@@ -149,6 +149,8 @@ def main():
         records = [item for item in observations if item["case"] == case]
         baseline = [item for item in records if item["variant"] == "baseline"]
         candidate = [item for item in records if item["variant"] == "candidate"]
+        semantic_results = {json.dumps(item["semantic"], sort_keys=True) for item in records}
+        assert len(semantic_results) == 1, f"Cross-variant semantic parity failed: {case}"
         paired = [
             next(item["held_delta_bytes"] for item in baseline if item["pair"] == pair)
             - next(item["held_delta_bytes"] for item in candidate if item["pair"] == pair)

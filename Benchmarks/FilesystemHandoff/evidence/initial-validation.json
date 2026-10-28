@@ -1,0 +1,9 @@
+{
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40634300332",
+  "job_id": 122637587805,
+  "commit": "669364146698901dc8a6d95e8f23d7ca9fa62e98",
+  "status": "failed_before_test_execution",
+  "reason": "Warnings-as-errors rejected immutable local weak var in SourceFilesystemHandoffTests.swift; production monitor and mailbox compiled.",
+  "diagnostic": "weak variable 'weakMonitor' was never mutated; consider changing to 'let' constant [#WeakMutability]",
+  "resolution": "Use weak let for the test's immutable weak reference. Validation rerun on the corrected commit."
+}

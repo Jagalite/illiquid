@@ -127,7 +127,7 @@ struct SourceFilesystemHandoffTests {
         let callback = Callback(), queue = DispatchQueue(label: "test.handoff.deinit")
         let sink = Sink()
         var monitor: SourceFilesystemMonitor? = await start(callback: callback, queue: queue, sink: sink)
-        weak var weakMonitor = monitor
+        weak let weakMonitor = monitor
         queue.sync {
             callback.emit([.init(path: "/media/first/old.mkv", flags: [.created])])
         }

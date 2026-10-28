@@ -72,8 +72,10 @@ callback. These are synthetic backlogs, not measured user activity rates.
 The primary metric is signed live allocator growth from a warmed pre-burst sample
 to the sample while the main actor is still occupied:
 `malloc_zone_statistics(NULL).size_in_use` across all malloc zones. It is
-**not RSS, physical footprint, or peak process memory**. Allocator/runtime caches
-may contribute to the delta. After-delivery and after-stop readings retain the
+**not RSS, physical footprint, or peak process memory**. The mailbox's fixed
+startup allocation is already present in the pre-burst sample and is excluded
+from this growth metric; small-burst deltas are not the complete per-monitor
+footprint. Allocator/runtime caches may contribute to the delta. After-delivery and after-stop readings retain the
 same downstream buffer in both variants and therefore need not return to the
 pre-burst value.
 
