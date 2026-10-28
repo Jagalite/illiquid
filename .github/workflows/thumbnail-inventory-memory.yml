@@ -1,0 +1,127 @@
+name: Thumbnail inventory memory
+
+on:
+  push:
+    branches: ['perf/thumbnail-inventory-memory-*']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ThumbnailDiskPathTests.swift'
+      - 'Benchmarks/ThumbnailInventoryMemory/**'
+      - '.github/workflows/thumbnail-inventory-memory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-inventory-memory-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify paths and measure retained native inventory memory
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/ThumbnailInventoryMemory/run.py',
+                     '--pairs', '6', '--output', os.environ['RUNNER_TEMP'] + '/thumbnail-inventory-memory']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output(
+                  [*cli, 'submit', '--', 'env', 'ILLIQUID_THUMBNAIL_INVENTORY_QUEUED=1', *command], text=True)
+              print(submitted, flush=True)
+              job = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job], check=True)
+              result = subprocess.run([*cli, 'wait', job])
+              subprocess.run([*cli, 'logs', job], check=True)
+              sys.exit(result.returncode)
+          print('Kyoto is unavailable on this ephemeral runner; compiling the isolated component serially.',
+                flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Publish raw measurements and provenance in logs
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-inventory-memory'
+          for name in ['environment.json', 'sources.json', 'binaries.json', 'tests.json',
+                       'fixtures.json', 'observations.jsonl', 'summary.json', 'qualification.json']:
+              path = root / name
+              if path.is_file():
+                  print('THUMBNAIL_INVENTORY_EVIDENCE ' + json.dumps(
+                      {'path': name, 'content': path.read_text()}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-inventory-memory
+          path: |
+            ${{ runner.temp }}/thumbnail-inventory-memory/*.json
+            ${{ runner.temp }}/thumbnail-inventory-memory/*.jsonl
+            ${{ runner.temp }}/thumbnail-inventory-memory/logs/
+            ${{ runner.temp }}/thumbnail-inventory-memory/sources/
+            ${{ runner.temp }}/thumbnail-inventory-memory/driver/
+          retention-days: 14
+
+  native-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the complete app graph and run cache regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-inventory-native"
+          set -o pipefail
+          python3 - <<'PY' 2>&1 | tee "$RUNNER_TEMP/thumbnail-inventory-native/tests.log"
+          import json, subprocess, sys
+          from pathlib import Path
+          command = ['swift', 'test', '--force-resolved-versions', '--configuration', 'release',
+                     '--jobs', '2', '--no-parallel', '--filter',
+                     'ThumbnailDiskPathTests|ThumbnailDiskEviction|NativeThumbnailCacheTests|'
+                     'ThumbnailPhysicalEntryTests|ThumbnailInventoryRegressionTests|'
+                     'ThumbnailPromotionMailboxTests|QueuedThumbnailPromotionTests|ThumbnailImageLifetimeTests']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job], check=True)
+              result = subprocess.run([*cli, 'wait', job])
+              subprocess.run([*cli, 'logs', job], check=True)
+              sys.exit(result.returncode)
+          print('Kyoto is unavailable on this ephemeral runner; building serially in an isolated checkout.',
+                flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-inventory-native
+          path: ${{ runner.temp }}/thumbnail-inventory-native/tests.log
+          retention-days: 14
