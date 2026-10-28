@@ -381,6 +381,24 @@ struct ExternalTextSubtitleConverterTests {
         }
     }
 
+    @Test(arguments: ["\r\u{0301}", "\r\u{FE0F}", "\r\u{200D}"])
+    func unicodeNewlineMatchingPreservesFoundationBehavior(boundary: String) throws {
+        let payload = "Caption" + boundary + "Tail"
+        // Only normalize the payload once; running the entire converter on a
+        // normalized reference could apply Foundation's behavior a second time.
+        let normalizedPayload = payload.replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+        let expectedText = normalizedPayload.split(separator: "\n", omittingEmptySubsequences: false)
+            .joined(separator: "\\N")
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,," + expectedText
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                + "00:00:01.000 --> 00:00:02.000\n" + payload
+            #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+        }
+    }
+
     private func assertRejectedTimestamp(_ timestamp: String, format: Converter.Format) {
         let separator = format == .srt ? "," : "."
         let intervals = [

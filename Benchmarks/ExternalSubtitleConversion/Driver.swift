@@ -108,6 +108,19 @@ private func fixtures(selected: String? = nil) -> [Fixture] {
                 cues: 2000, expectedError: nil, timed: true))
         }
     }
+    // Force the ASCII eligibility scan to reach the end before falling back.
+    // This bounds the added work for almost-ASCII multilingual files.
+    for format in [Converter.Format.srt, .webVTT] {
+        let prefix = format == .srt ? "srt" : "vtt"
+        for count in [2000, 10000] {
+            let name = "\(prefix)-\(count)-late-unicode-crlf"
+            guard wanted(name) else { continue }
+            result.append(Fixture(name: name, format: format,
+                source: (makeSource(count, format: format, payload: payloads[0].1) + " é")
+                    .replacingOccurrences(of: "\n", with: "\r\n"),
+                cues: count, expectedError: nil, timed: true))
+        }
+    }
     if wanted("vtt-100-escaped-bom") {
         result.append(Fixture(name: "vtt-100-escaped-bom", format: .webVTT,
             source: "\u{FEFF}" + makeSource(100, format: .webVTT, payload: payloads[2].1),

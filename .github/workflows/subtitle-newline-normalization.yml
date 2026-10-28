@@ -118,7 +118,7 @@ jobs:
               for line in path.read_text().splitlines():
                   print("NEWLINE_OBSERVATION " + line)
           for path in sorted(root.glob("*.log")):
-              counts = re.findall(r"Test run with (\d+) tests? passed", path.read_text())
+              counts = re.findall(r"Test run with (\d+) tests?\b[^\n]*\bpassed", path.read_text())
               print("NEWLINE_TEST " + json.dumps({"path": path.name, "passed_test_counts": counts,
                   "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}, sort_keys=True))
           PY
