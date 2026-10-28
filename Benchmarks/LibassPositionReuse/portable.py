@@ -153,6 +153,10 @@ def package(output: Path) -> tuple[Path, dict]:
         module = "IlliquidNativePlayback" + suffix
         source_directory = destination / "Sources" / module
         files, hashes = native.prepare(variant, source_directory, output)
+        support_files, support_hashes = native.prepare_test_dependencies(
+            variant, source_directory, output)
+        files.extend(support_files)
+        hashes.update(support_hashes)
         adapted = {}
         for path in files:
             original = path.read_bytes()

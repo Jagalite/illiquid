@@ -31,6 +31,7 @@ SOURCE_PATHS = [
     NATIVE + "Subtitles/FontAttachmentStore.swift",
 ]
 ERROR_PATH = NATIVE + "Presentation/SampleBufferVideoPresenter.swift"
+PACKER_PATH = NATIVE + "Subtitles/MetalASSSubtitleCompositor.swift"
 HEADER_PATHS = ["Sources/CLibass/module.modulemap", "Sources/CLibass/include/libass_shim.h"]
 EXISTING_TESTS = ["ASSBitmapCopyTests.swift"]
 NEW_TEST = "LibassPositionReuseTests.swift"
@@ -97,6 +98,32 @@ def prepare(variant: str, destination: Path, output: Path) -> tuple[list[Path], 
     return paths, hashes
 
 
+def prepare_test_dependencies(variant: str, destination: Path, output: Path) -> tuple[list[Path], dict]:
+    # The existing bitmap-copy tests exercise both real CPU packer routes.
+    # Keep their complete production declarations; exclude only the Metal API
+    # renderer, which these component tests never call.
+    original = source(variant, PACKER_PATH, output).decode()
+    declarations = []
+    for begin, end in (
+        ("enum SubtitleCompositionStrategy:", "\nenum MetalASSFailureReason:"),
+        ("struct ASSAtlasQuad:", "\n@MainActor\nfinal class MetalASSSubtitleRenderer"),
+    ):
+        if original.count(begin) != 1 or original.count(end) != 1:
+            raise RuntimeError("CPU subtitle packer extraction boundaries changed")
+        start, stop = original.index(begin), original.index(end)
+        if start >= stop:
+            raise RuntimeError("CPU subtitle packer declarations moved")
+        declarations.append(original[start:stop])
+    declaration = ("import CoreGraphics\nimport Foundation\nimport Synchronization\n\n"
+                   + "\n".join(declarations) + "\n")
+    target = destination / "ASSSubtitleFramePacker.swift"
+    target.write_text(declaration)
+    return [target], {
+        PACKER_PATH: sha(original.encode()),
+        "extracted/ASSSubtitleFramePacker.swift": sha(declaration.encode()),
+    }
+
+
 def native_flags(prefix: Path) -> list[str]:
     return ["-Xcc", f"-I{prefix / 'include'}", "-L", str(prefix / "lib"),
             "-Xlinker", "-rpath", "-Xlinker", str(prefix / "lib")]
@@ -126,6 +153,9 @@ def build(variant: str, output: Path, prefix: Path) -> tuple[Path, dict]:
 def test(variant: str, output: Path, prefix: Path) -> dict:
     package = output / "build" / f"tests-{variant}"
     _, hashes = prepare(variant, package / "Sources/IlliquidNativePlayback", output)
+    _, support_hashes = prepare_test_dependencies(
+        variant, package / "Sources/IlliquidNativePlayback", output)
+    hashes.update(support_hashes)
     shutil.copytree(ROOT / "Sources/CLibass", package / "Sources/CLibass")
     directory = package / "Tests/IlliquidNativePlaybackTests"
     directory.mkdir(parents=True)
@@ -136,7 +166,7 @@ def test(variant: str, output: Path, prefix: Path) -> dict:
 import PackageDescription
 let package = Package(
     name: "LibassPositionReuseRegressionTests",
-    platforms: [.macOS(.v14)],
+    platforms: [.macOS(.v15)],
     targets: [
         .systemLibrary(name: "CLibass", pkgConfig: "libass"),
         .target(name: "IlliquidNativePlayback", dependencies: ["CLibass"]),
@@ -255,7 +285,8 @@ def main() -> None:
                         for name in EXISTING_TESTS + [NEW_TEST]},
         "arguments": {**vars(args), "output": str(output), "libass_prefix": str(prefix)},
         "extraction": "Four complete production Swift files; exact PresentationError declaration "
-                      "from SampleBufferVideoPresenter.swift with only a Foundation import added.",
+                      "from SampleBufferVideoPresenter.swift with only a Foundation import added. "
+                      "Tests also retain exact CPU packer declarations from MetalASSSubtitleCompositor.swift.",
         "method": "Separately compiled optimized production modules; actual libass 0.17.5; "
                   "same-work fresh-process pairs alternating AB/BA; full visual parity outside "
                   "timing; calibration excluded; all measured samples retained.",
