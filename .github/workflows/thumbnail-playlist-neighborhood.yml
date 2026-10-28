@@ -1,0 +1,136 @@
+name: Thumbnail playlist neighborhood
+
+on:
+  push:
+    branches: ['perf/thumbnail-neighborhood-f7d6ad21289a']
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
+      - 'Benchmarks/ThumbnailPlaylistNeighborhood/**'
+      - '.github/workflows/thumbnail-playlist-neighborhood.yml'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/*.md'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailBackgroundSchedulerTests.swift'
+      - 'Benchmarks/ThumbnailPlaylistNeighborhood/**'
+      - 'Benchmarks/PlaylistDeduplication/MemoryProbe.c'
+      - '.github/workflows/thumbnail-playlist-neighborhood.yml'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/*.md'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-playlist-neighborhood-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify behavior and compare allocation and CPU cost
+        run: |
+          python3 Benchmarks/ThumbnailPlaylistNeighborhood/run.py \
+            --pairs 8 --target-ms 40 \
+            --output "$RUNNER_TEMP/thumbnail-playlist-neighborhood"
+      - name: Publish reviewable results
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-playlist-neighborhood'
+          for name in ('manifest.json', 'summary.json'):
+              path = root / name
+              if path.is_file():
+                  print('NEIGHBORHOOD_' + name.upper().replace('.', '_') + ' ' + path.read_text())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-playlist-neighborhood-component
+          path: |
+            ${{ runner.temp }}/thumbnail-playlist-neighborhood/*.json
+            ${{ runner.temp }}/thumbnail-playlist-neighborhood/*.jsonl
+            ${{ runner.temp }}/thumbnail-playlist-neighborhood/logs/
+            ${{ runner.temp }}/thumbnail-playlist-neighborhood/packages/*/Sources/
+            ${{ runner.temp }}/thumbnail-playlist-neighborhood/packages/*/Tests/
+            ${{ runner.temp }}/thumbnail-playlist-neighborhood/packages/*/Package.swift
+          retention-days: 14
+
+  native-regressions:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the application graph and run scheduling regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-neighborhood-native"
+          python3 - <<'PY'
+          import json, os, re, subprocess, sys
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-neighborhood-native'
+          command = ['swift', 'test', '--force-resolved-versions', '-c', 'release', '--jobs', '2',
+                     '--no-parallel', '--filter',
+                     'ThumbnailPlaylistNeighborhoodTests|ThumbnailBackgroundSchedulerTests|'
+                     'ThumbnailPolicyTests|ThumbnailSchedulingPolicyRegressionTests']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = str(json.loads(submitted)['id'])
+              subprocess.run([*cli, 'show', job_id], check=True)
+              waited = subprocess.run([*cli, 'wait', job_id])
+              result = subprocess.run([*cli, 'logs', job_id], capture_output=True, text=True, check=True)
+              text, code = result.stdout + result.stderr, waited.returncode
+          else:
+              print('Kyoto is unavailable on this hosted runner; building the isolated app graph serially.', flush=True)
+              result = subprocess.run(command, capture_output=True, text=True)
+              text, code = result.stdout + result.stderr, result.returncode
+          (root / 'tests.log').write_text(text)
+          print(text, flush=True)
+          counts = re.findall(r'Test run with (\d+) tests? .*passed', text)
+          receipt = {'exit_code': code, 'tests': int(counts[-1]) if counts else 0,
+                     'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+                     'scope': 'Release application graph and deterministic scheduling/policy tests. '
+                              'Optional media-fixture tests do not qualify playback or live UI without their inputs.'}
+          (root / 'completion.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          if code or receipt['tests'] == 0:
+              raise SystemExit(code or 1)
+          print('THUMBNAIL_NEIGHBORHOOD_NATIVE_PASS ' + json.dumps(receipt, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-playlist-neighborhood-native
+          path: ${{ runner.temp }}/thumbnail-neighborhood-native/
+          retention-days: 14
