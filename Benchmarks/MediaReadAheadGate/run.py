@@ -124,7 +124,7 @@ let package = Package(name: "ReadAheadGateQualification", platforms: [.macOS("26
             log_path = self.output / f"{variant}-{configuration}-tests.log"
             self.command(args, log_path)
             log = log_path.read_text()
-            completions = re.findall(r"Test run with (\d+) tests? passed", log)
+            completions = re.findall(r"Test run with (\d+) tests?(?: in \d+ suites?)? passed", log)
             expected_count = len(re.findall(r"@Test\b", (ROOT / TEST).read_text()))
             if len(completions) != 1 or int(completions[0]) != expected_count or expected_count == 0:
                 raise RuntimeError(f"Missing complete regression receipt: {variant}/{configuration}")

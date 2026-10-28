@@ -121,7 +121,7 @@ jobs:
           from pathlib import Path
           root = Path(os.environ["RUNNER_TEMP"]) / "media-read-ahead-integration"
           log = (root / "tests.log").read_text()
-          completions = re.findall(r"Test run with (\d+) tests? passed", log)
+          completions = re.findall(r"Test run with (\d+) tests?(?: in \d+ suites?)? passed", log)
           expected = len(re.findall(r"@Test\b", Path("Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift").read_text())) + 2
           if completions != [str(expected)]:
               raise SystemExit(f"Expected {expected} passing tests, got {completions}")
