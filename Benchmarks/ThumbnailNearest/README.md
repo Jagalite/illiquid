@@ -118,6 +118,41 @@ There is no timing threshold in CI and no removal of inconvenient samples.
 The manifest, calibration, commands, complete source snapshots, logs,
 verification receipts, and raw timings are available in the workflow artifact.
 
+## Supplementary portable planning probe
+
+The Linux probe compiles the candidate-collection and sorting statements
+extracted directly from each complete `nearest` method. It verifies the pinned
+baseline blob, identical code outside that method, identical key field
+declarations, and an identical asynchronous attempt tail before generating its
+two modules.
+
+The generated adapter returns the planned keys before image lookup. It stores
+membership in `Dictionary<Key, UInt8>`, so its value layout differs from the
+real resident cache. Its measurements cover candidate planning and result
+consumption. Actor scheduling, `CGImage` ownership, foreground recency
+accounting, asynchronous image attempts, and disk I/O require the native run.
+Portable percentages must be reported separately from complete-cache or hover
+latency results.
+
+```sh
+python3 Benchmarks/ThumbnailNearest/portable.py \
+  --output /tmp/illiquid-thumbnail-nearest-portable --pairs 8 --target-ms 100
+```
+
+The same Kyoto build-coordination policy applies. The dedicated Linux workflow
+uses an official Swift container and records its actual compiler and host
+metadata. It runs for the research branch and explicit dispatches.
+
+The portable driver compares 247 full ordered-key receipts, preserving path and
+version UTF-8 bytes, signed bucket values, dimensions, and renderer identity.
+The Python runner compares the complete results before measuring and retains
+per-fixture SHA-256 receipts. Ten timing cases use the same query definitions
+as the native harness. Calibration confirms that the faster pilot reaches the
+target duration before fixing equal work counts for eight alternating pairs.
+All final samples remain in the evidence, including shorter or noisy ones.
+Generated module sources, extraction hashes, raw verification outputs,
+calibration, commands, and measurements are retained by the workflow.
+
 ## Scope
 
 These synthetic component measurements establish the cost of choosing and
@@ -126,4 +161,4 @@ video decoding, filesystem latency, end-to-end hover latency, frame rate,
 energy use, or live UI responsiveness. The macOS 26 player build and live
 playback path require their own qualification.
 
-Performance results will be recorded after native execution succeeds.
+Results are recorded only after the respective workflow executes successfully.
