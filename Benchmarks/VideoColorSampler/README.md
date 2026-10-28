@@ -66,4 +66,7 @@ is optional. Absolute microseconds saved per accepted call matter more than
 the relative percentage. These measurements do not qualify live playback,
 frame rate, whole-player CPU, UI latency, power, or process memory footprint.
 
-Results and the exact native run will be recorded after qualification.
+This exploratory variant was not pursued after concurrent PR #133 supplied
+native qualification for the same optimization. No performance result is
+claimed for this branch. Its workflow is disabled to release its queued run;
+the distinct portable follow-up research is on perf/por-diamond-reuse.

@@ -12,16 +12,6 @@ on:
       - Benchmarks/VideoColorSampler/Harness.swift
       - Benchmarks/VideoColorSampler/run.py
       - .github/workflows/video-color-sampler-performance.yml
-  pull_request:
-    paths:
-      - Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift
-      - Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift
-      - Sources/IlliquidCore/Player/VideoColorSample.swift
-      - Tests/IlliquidNativePlaybackTests/VideoFrameColorSampler*.swift
-      - Tests/IlliquidNativePlaybackTests/PiPVideoMappingTests.swift
-      - Benchmarks/VideoColorSampler/Harness.swift
-      - Benchmarks/VideoColorSampler/run.py
-      - .github/workflows/video-color-sampler-performance.yml
   workflow_dispatch:
 
 permissions:
@@ -33,6 +23,7 @@ concurrency:
 
 jobs:
   native-component:
+    if: false # Superseded by independently qualified PR 133; do not consume a runner.
     runs-on: macos-26
     timeout-minutes: 25
     env:
@@ -68,7 +59,7 @@ jobs:
         if: always()
         run: |
           python3 - <<'PY'
-          import hashlib, json, math, os
+          import base64, hashlib, json, math, os
           from pathlib import Path
           root = Path(os.environ['RUNNER_TEMP']) / 'video-color-sampler'
           for path in sorted(root.glob('*.json')):
@@ -79,6 +70,17 @@ jobs:
                       'name': path.name, 'part': part, 'parts': parts,
                       'sha256': hashlib.sha256(content.encode()).hexdigest(),
                       'content': content[part * 16000:(part + 1) * 16000],
+                  }, sort_keys=True))
+          reference = root / 'traces/baseline-release.json.gz'
+          if reference.is_file():
+              data = reference.read_bytes()
+              encoded = base64.b64encode(data).decode()
+              parts = math.ceil(len(encoded) / 16000)
+              for part in range(parts):
+                  print('COLOR_SAMPLER_REFERENCE ' + json.dumps({
+                      'name': 'reference-trace.json.gz', 'part': part, 'parts': parts,
+                      'sha256': hashlib.sha256(data).hexdigest(),
+                      'base64': encoded[part * 16000:(part + 1) * 16000],
                   }, sort_keys=True))
           for path in sorted(root.glob('tests-*.log')):
               print('COLOR_SAMPLER_TEST_LOG ' + path.name)
