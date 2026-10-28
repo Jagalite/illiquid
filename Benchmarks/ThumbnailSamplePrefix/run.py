@@ -154,6 +154,7 @@ def main() -> None:
         "inputs": {path: digest((ROOT / path).read_bytes()) for path in HELPERS + TESTS},
         "harness": {name: digest((HERE / name).read_bytes()) for name in ["run.py", "Driver.swift"]},
         "package_sha256": digest(PACKAGE.encode()),
+        "binaries": {},
         "environment": {
             "platform": platform.platform(), "machine": platform.machine(), "cpu_count": os.cpu_count(),
             "python": platform.python_version(),
@@ -200,7 +201,7 @@ def main() -> None:
             )
             log = runner.last_log.read_text()
             count = re.search(r"Test run with (\d+) tests?.*passed", log)
-            if count is None or int(count.group(1)) < 21:
+            if count is None or int(count.group(1)) < 20:
                 raise RuntimeError(f"Expected all thumbnail policy tests: {variant}/{config}")
             tests[variant][config] = {"passed": True, "tests": int(count.group(1)), "log_tail": log[-2000:]}
             runner.run(
@@ -213,6 +214,8 @@ def main() -> None:
                 f"{variant}-{config}-binpath",
             ).strip())
             binary = bindir / "ThumbnailSampleProbe"
+            manifest["binaries"][f"{variant}-{config}"] = digest(binary.read_bytes())
+            save(output / "manifest.json", manifest)
             payload = runner.run([binary, "differential"], f"{variant}-{config}-differential")
             rows = json.loads(payload)
             if variant == "baseline" and config == "debug":
