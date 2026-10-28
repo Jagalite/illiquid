@@ -31,6 +31,8 @@ def main():
     parser.add_argument("--target-ms", type=float, default=60)
     parser.add_argument("--allocations", action="store_true",
                         help="Separate Linux/glibc malloc-family request measurements")
+    parser.add_argument("--kyoto-job", action="store_true",
+                        help="The entire runner was submitted as a shared Kyoto job")
     args = parser.parse_args()
     sizes = [int(value) for value in args.sizes.split(",")]
     if not sizes or any(value < 0 for value in sizes) or args.pairs < 2 or args.pairs % 2:
@@ -39,7 +41,11 @@ def main():
         parser.error("--target-ms must be finite and positive")
     if args.allocations and platform.system() != "Linux":
         parser.error("--allocations requires Linux/glibc")
-    if not Path("/Volumes/seed1/Projects/kyoto/kyoto.py").is_file():
+    kyoto = Path("/Volumes/seed1/Projects/kyoto/kyoto.py")
+    if kyoto.is_file() and not args.kyoto_job:
+        parser.error("Kyoto is available. Submit this complete runner through "
+                     f"'python3 {kyoto} submit --' and add --kyoto-job to the queued command.")
+    if not kyoto.is_file():
         print("Kyoto is unavailable on this host; building serially in a new isolated directory.",
               flush=True)
     output = args.output.resolve()
@@ -80,12 +86,18 @@ def main():
     if baseline.count(declaration) != 1:
         raise RuntimeError("Pinned baseline declaration changed")
     baseline_source = sources / "BaselinePlaylistMutation.swift"
-    baseline_source.write_text(baseline.replace(declaration, "enum BaselinePlaylistMutation {", 1))
+    # Share the unchanged model enums from the production file; copying its
+    # whole preamble would redeclare PlaylistOpenMode/PlaylistSortOrder/PlaybackRepeatMode.
+    baseline_enum = baseline[baseline.index(declaration):]
+    baseline_source.write_text("import Foundation\n\n" + baseline_enum.replace(
+        declaration, "enum BaselinePlaylistMutation {", 1))
+
     compile_sources.append(baseline_source)
     driver = sources / "Driver.swift"
     shutil.copyfile(HERE / "Driver.swift", driver)
     compile_sources.append(driver)
     hashes["baseline/PlaylistMutation.swift"] = hashlib.sha256(baseline.encode()).hexdigest()
+    hashes["compiled/BaselinePlaylistMutation.swift"] = hashlib.sha256(baseline_source.read_bytes()).hexdigest()
     hashes["Benchmarks/ShuffleCheckpointIdentity/Driver.swift"] = hashlib.sha256(driver.read_bytes()).hexdigest()
     hashes["Benchmarks/ShuffleCheckpointIdentity/run.py"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     shutil.copyfile(__file__, output / "runner.snapshot.py")

@@ -16,7 +16,7 @@ The native integration job compiles the complete application graph and runs the 
 
 ## Reproduce
 
-Follow `AGENTS.md`: submit builds through `/Volumes/seed1/Projects/kyoto/kyoto.py` when available. For example, submit the complete benchmark runner as one Kyoto job and inspect its completion/logs. The workflow checks for Kyoto before direct compilation; its ephemeral runners build serially in isolated directories when the queue is unavailable.
+Follow `AGENTS.md`: submit builds through `/Volumes/seed1/Projects/kyoto/kyoto.py` when available. Submit the complete benchmark runner as one Kyoto job, include `--kyoto-job` in that queued command, and inspect its completion/logs. The flag asserts that the whole runner is executing inside the queue; it is not a direct-build override. The workflow checks for Kyoto before direct compilation; its ephemeral runners build serially in isolated directories when the queue is unavailable.
 
 From a full checkout containing the pinned base commit, with Swift 6.1+ and Python 3:
 
@@ -30,7 +30,7 @@ python3 Benchmarks/ShuffleCheckpointIdentity/run.py \
   --output /tmp/illiquid-shuffle-checkpoint-linux --allocations
 ```
 
-Output directories must be new. The runner preserves source hashes, compiler/platform metadata, exact commands, source snapshots, calibration, every observation and paired summaries. The base implementation is read from the pinned Git commit and renamed only for coexistence with the production candidate in the same executable. The four production model/utility sources are compiled as actual source files, without model stubs.
+Output directories must be new. The runner preserves source hashes, compiler/platform metadata, exact commands, source snapshots, calibration, every observation and paired summaries. The baseline `PlaylistMutation` enum is extracted from the pinned Git commit and renamed only for coexistence with the production candidate in the same executable. Both use the unchanged shared playlist model enums; the manifest hashes both the original baseline file and the extracted compiled enum. The four production model/utility sources are compiled as actual source files, without model stubs.
 
 Timing uses optimized Swift, fresh processes and six alternating baseline/candidate and candidate/baseline pairs per workload. Both variants use the same calibrated iteration count. Fixtures, full byte-level parity, and warmup are outside the measured interval. Each macOS call drains its autorelease pool. The timed loop consumes output counts and endpoint byte lengths, and validates a checksum. All observations are retained; there is no speedup assertion in CI.
 
