@@ -53,13 +53,9 @@ jobs:
       - name: Test both parsers and measure complete parse calls
         shell: bash
         run: |
-          mode=()
-          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
-            mode+=(--tests-only)
-          fi
           python3 Benchmarks/NFODeclarationPreflight/run.py \
             --pairs 8 --target-ms 100 \
-            --output "$RUNNER_TEMP/nfo-declaration-preflight" "${mode[@]}"
+            --output "$RUNNER_TEMP/nfo-declaration-preflight"
       - name: Emit reviewable results and raw observations
         if: always()
         shell: bash
