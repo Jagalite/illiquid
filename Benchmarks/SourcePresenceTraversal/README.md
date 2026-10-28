@@ -105,7 +105,24 @@ runs this component study. It can run on a research-branch push before a PR.
 This change targets per-entry path construction inside
 `SourceMediaPresenceCursor.nextBatch`, which remains in the pinned baseline.
 
+An independent, concurrent investigation published the same production change
+on `research/source-presence-traversal-20261028` at
+`2c3109a9ea8330799cfe15565e941a445f99dcf2`. Its filenames, output consumption,
+cleanup boundary, and acceptance thresholds differ. Keep the two measurement
+cohorts separate and land the production change once. This overlap was discovered
+after both research branches had been published and native qualification queued.
+
 ## Results
 
-Qualification is in progress. No performance result is claimed until the
-native evidence has been collected and reviewed.
+Local correctness passed: 23 tests in each of the baseline/candidate debug and
+release runs, with complete four-way output equality before and after the
+exploratory measurements. The two-pair Linux timings were mixed and do not
+qualify the change. The [complete Linux evidence](evidence/linux-exploration/README.md)
+retains every sample and the initial test-fixture correction.
+
+Native [qualification run 40634880691](https://github.com/Jagalite/illiquid/actions/runs/40634880691)
+tests immutable research commit `a641d4eed92315eae3c966295df1c5e2b9512185`.
+It remained queued during the initial investigation because of the repository's
+CI backlog. The later evidence/documentation commits do not change the source,
+tests, harness, or workflow under qualification. No successful performance
+result or implementation PR is claimed while that native evidence is pending.
