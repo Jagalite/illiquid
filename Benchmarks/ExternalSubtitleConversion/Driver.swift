@@ -204,6 +204,55 @@ private func fixtures(selected: String? = nil) -> [Fixture] {
             }
         }
     }
+    result += preprocessingFixtures(selected: selected)
+    return result
+}
+
+private func preprocessingFixtures(selected: String?) -> [Fixture] {
+    guard selected == nil || selected!.hasPrefix("preprocess-") else { return [] }
+    func wanted(_ name: String) -> Bool { selected == nil || selected == name }
+    var result: [Fixture] = []
+    for format in [Converter.Format.srt, .webVTT] {
+        let label = format == .srt ? "srt" : "vtt"
+        let canonical = format == .srt ? "00:12:34,567" : "00:12:34.567"
+        let spaces = [" ", "\t", " \t ", "\u{000B}", "\u{000C}", "\u{00A0}", "\u{2003}",
+                      "\u{200B}", "\u{3000}", "\u{2028}", "\u{2029}", "\u{0085}",
+                      " \u{0301}", "\t\u{034F}"]
+        for (index, space) in spaces.enumerated() {
+            let values = [space + canonical, canonical + space, space + canonical + space,
+                          canonical + space + "align:start", canonical + space + "label:日本語"]
+            for (position, value) in values.enumerated() {
+                for endpoint in 0...1 {
+                    let name = "preprocess-diff-\(label)-\(index)-\(position)-\(endpoint)"
+                    guard wanted(name) else { continue }
+                    let start = endpoint == 0 ? value : "00:00:00.000"
+                    let end = endpoint == 0 ? "100:00:00.000" : value
+                    let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                        + start + " --> " + end + "\nProbe\n\n"
+                        + "00:00:03.000 --> 00:00:04.000\nSentinel"
+                    // As with the existing timestamp mutations, full output and
+                    // errors are checked against the immutable production baseline.
+                    result.append(Fixture(name: name, format: format, source: source,
+                                          cues: -1, expectedError: nil, timed: false))
+                }
+            }
+        }
+        for kind in ["malformed", "unicode-settings"] {
+            if kind == "unicode-settings" && format == .srt { continue }
+            let name = "preprocess-control-\(label)-2000-\(kind)"
+            guard wanted(name) else { continue }
+            var source = makeSource(2000, format: format, payload: "Caption")
+            if kind == "unicode-settings" {
+                source = source.replacingOccurrences(of: "align:start", with: "align:日本語")
+            } else {
+                source = source.replacingOccurrences(of: #"(?m)^\d{2}:\d{2}:\d{2}[.,]\d{3} -->"#,
+                    with: "00:60:00.000 -->", options: .regularExpression)
+            }
+            let error = kind == "malformed" ? "noValidCues." + (format == .srt ? "srt" : "webVTT") : nil
+            result.append(Fixture(name: name, format: format, source: source,
+                cues: kind == "malformed" ? 0 : 2000, expectedError: error, timed: true))
+        }
+    }
     return result
 }
 

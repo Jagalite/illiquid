@@ -168,6 +168,9 @@ enum ExternalTextSubtitleConverter {
     private static func parseTimestamp(
         _ value: String, format: Format, allowsSettings: Bool = false
     ) -> Timestamp? {
+        if let timestamp = commonASCIITimestamp(value, format: format, allowsSettings: allowsSettings) {
+            return timestamp
+        }
         let trimmed = value.trimmingCharacters(in: .whitespaces)
         let timestamp: Substring
         if format == .webVTT, allowsSettings {
@@ -236,6 +239,31 @@ enum ExternalTextSubtitleConverter {
         // value too, so the ASS parser never receives an overflowing hour field.
         guard centiseconds / 360_000 <= maximumASSHours else { return nil }
         return Timestamp(milliseconds: milliseconds, centiseconds: centiseconds)
+    }
+
+    /// Bypass Foundation preprocessing for the usual ASCII spelling, including
+    /// its surrounding spaces/tabs and WebVTT end settings. Inspect the complete
+    /// value first: a combining mark can change a space's Character boundary.
+    /// All other input keeps the general parser's trimming/splitting behavior.
+    private static func commonASCIITimestamp(
+        _ value: String, format: Format, allowsSettings: Bool
+    ) -> Timestamp? {
+        value.utf8.withContiguousStorageIfAvailable { bytes -> Timestamp? in
+            guard bytes.allSatisfy({ $0 < 0x80 }) else { return nil }
+            var start = 0
+            var end = bytes.count
+            while start < end, bytes[start] == 0x20 || bytes[start] == 0x09 { start += 1 }
+            while start < end, bytes[end - 1] == 0x20 || bytes[end - 1] == 0x09 { end -= 1 }
+            if format == .webVTT, allowsSettings {
+                var tokenEnd = start
+                while tokenEnd < end, bytes[tokenEnd] != 0x20, bytes[tokenEnd] != 0x09 {
+                    tokenEnd += 1
+                }
+                end = tokenEnd
+            }
+            return parseFixedWidthTimestamp(
+                UnsafeBufferPointer(rebasing: bytes[start..<end]), format: format)
+        } ?? nil
     }
 
     /// Most cues use HH:MM:SS,mmm / HH:MM:SS.mmm, or WebVTT's MM:SS.mmm.

@@ -429,6 +429,57 @@ struct ExternalTextSubtitleConverterTests {
         }
     }
 
+    @Test(arguments: [" \t ", "\u{00A0}\u{2009}", "\t\u{2007} "])
+    func timestampEdgeWhitespacePreservesFoundationTrimming(whitespace: String) throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(
+                start: whitespace + "00:00:01.005" + whitespace,
+                end: whitespace + "00:00:02.015" + whitespace,
+                format: format
+            )
+            #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                "Dialogue: 0,0:00:01.01,0:00:02.02,Default,,0,0,0,,Caption",
+            ])
+        }
+    }
+
+    @Test func webVTTSettingsKeepCharacterBoundarySemantics() throws {
+        for end in [
+            "00:02.000 align:start",
+            "00:02.000\tline:90%",
+            "00:02.000 \tlabel:Cafe\u{0301}",
+            "00:02.000\tlabel:日本語",
+        ] {
+            let source = cue(start: "00:01.000", end: end, format: .webVTT)
+            #expect(dialogueLines(try Converter.convert(source, format: .webVTT)) == [
+                "Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,Caption",
+            ])
+        }
+        for end in [
+            "00:02.000\u{00A0}align:start",
+            "00:02.000\u{2009}align:start",
+            "00:02.000 \u{0301}align:start",
+            "00:02.000\u{0301} align:start",
+        ] {
+            // Edge trimming and internal Character-based settings separators
+            // have different semantics, including spaces with combining marks.
+            assertRejectedTimestamp(end, format: .webVTT)
+        }
+    }
+
+    @Test func positiveMillisecondIntervalsSurviveCentisecondRounding() throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(
+                start: "00:00:01.001", end: "00:00:01.002", format: format
+            )
+            // Validation uses milliseconds even when both emitted ASS
+            // endpoints round to the same centisecond.
+            #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                "Dialogue: 0,0:00:01.00,0:00:01.00,Default,,0,0,0,,Caption",
+            ])
+        }
+    }
+
     private func assertRejectedTimestamp(_ timestamp: String, format: Converter.Format) {
         let separator = format == .srt ? "," : "."
         let intervals = [

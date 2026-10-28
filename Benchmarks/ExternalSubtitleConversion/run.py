@@ -74,7 +74,8 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
     selected = shutil.which(args.swiftc) or args.swiftc
     compiler = os.path.abspath(selected)
     version = command([compiler, "--version"], output / "compiler.log", output).strip()
-    flags = ["-O", "-whole-module-optimization", "-swift-version", "6", "-warnings-as-errors",
+    optimization = ["-Onone", "-g"] if args.configuration == "debug" else ["-O", "-whole-module-optimization"]
+    flags = [*optimization, "-swift-version", "6", "-warnings-as-errors",
              "-module-cache-path", str(output / "module-cache")]
     if platform.system() == "Darwin":
         flags += ["-target", f"{platform.machine()}-apple-macosx26.0"]
@@ -87,7 +88,7 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
         "flags": flags, "runner_sha256": sha(Path(__file__).read_bytes()),
         "driver_sha256": sha((HERE / "Driver.swift").read_bytes()),
         "affinity": sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else None,
-        "baseline": pinned, "variants": {},
+        "baseline": pinned, "variants": {}, "configuration": args.configuration,
     }
     shutil.copyfile(__file__, output / "runner.snapshot.py")
     shutil.copyfile(HERE / "Driver.swift", output / "Driver.swift")
@@ -265,6 +266,7 @@ def main() -> None:
     parser.add_argument("--swiftc", default=os.environ.get("SWIFTC", "swiftc"))
     parser.add_argument("--baseline-ref", help="Git revision for the exact baseline converter; defaults to the frozen baseline")
     parser.add_argument("--rounds", type=int, default=10)
+    parser.add_argument("--configuration", choices=("debug", "release"), default="release")
     parser.add_argument("--target-ms", type=float, default=100)
     parser.add_argument("--case", action="append", help="Exact case name; repeat to select multiple cases")
     args = parser.parse_args()
@@ -272,6 +274,8 @@ def main() -> None:
     if args.mode == "summarize":
         summarize(output)
         return
+    if args.mode == "benchmark" and args.configuration != "release":
+        parser.error("Timing requires release optimization; use verify for debug parity")
     if args.rounds < 2 or args.rounds % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("--rounds must be positive, even, and at least two; --target-ms must be finite and positive")
     if output.exists() and any(output.iterdir()):
