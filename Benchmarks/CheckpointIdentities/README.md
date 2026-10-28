@@ -9,8 +9,10 @@ expression with a dedicated ID-only helper, using exact production source from
 baseline ea2ff568237e2667f7b1aeee67b11a44ebe95b72 and the checked-out candidate.
 
 The helper preserves first-occurrence identity bytes, surviving saved order and
-the current order of additions. It avoids the full-item dictionary/result and
-repeated normalization of surviving IDs. A Set and ID arrays remain; both paths
+the current order of additions. With a saved order, it avoids the full-item
+dictionary/result and repeated normalization of surviving IDs. The empty-base
+path also avoids a second normalization pass, except for the baseline's existing
+empty/singleton fast paths. A Set and ID arrays remain; both paths
 have expected O(N + S) time and O(U) auxiliary storage. Empty and singleton paths
 are included as controls. This is a transient-work optimization, not a claim of
 measured retained-memory, RSS, playback FPS or complete checkpoint/UI latency.
@@ -56,7 +58,7 @@ independent expected result before and after timing.
 
 Each case uses 12 fresh-process baseline/candidate pairs with balanced AB/BA
 order and a common iteration count calibrated toward 150 ms of process CPU
-time. CPU and monotonic wall times include the complete expression, result
+time for the slower variant. CPU and monotonic wall times include the complete expression, result
 destruction and a small identical rotating result consumption. Full checksums
 are outside timing. No timing samples are discarded.
 

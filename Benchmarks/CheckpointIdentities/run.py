@@ -276,14 +276,16 @@ let package = Package(
                     self.binaries[variant] = binary
         write_json(self.output / "test-receipts.json", self.tests)
 
-    def sample(self, variant: str, size: int, workload: str, iterations: int) -> dict:
+    def sample(self, variant: str, size: int, workload: str, iterations: int,
+               *, calibration: bool = False) -> dict:
         result = json.loads(self.capture(
             [self.binaries[variant], "bench", size, workload, iterations]
         ))
         if not (result["exact_output_verified"]
                 and result["measured_checksum"] == result["expected_measured_checksum"]
                 and result["iterations"] == iterations
-                and result["cpu_ns"] > 0 and result["wall_ns"] > 0):
+                and result["cpu_ns"] >= 0 and result["wall_ns"] >= 0
+                and (calibration or (result["cpu_ns"] > 0 and result["wall_ns"] > 0))):
             raise AssertionError(f"Invalid timing record: {result}")
         return result
 
@@ -292,7 +294,7 @@ let package = Package(
         for variant in VARIANTS:
             iterations = 8
             while True:
-                sample = self.sample(variant, size, workload, iterations)
+                sample = self.sample(variant, size, workload, iterations, calibration=True)
                 record = {"variant": variant, **sample}
                 self.calibration.append(record)
                 receipt("CALIBRATION", record)
@@ -301,8 +303,11 @@ let package = Package(
                     break
                 iterations = min(2_000_000, max(iterations + 1,
                     math.ceil(iterations * 5_000_000 / max(1, sample["cpu_ns"]))))
+        slower_ns = max(per_iteration)
+        if slower_ns <= 0:
+            raise RuntimeError("Process CPU timer did not advance during calibration")
         return max(1, min(2_000_000, math.ceil(
-            self.args.target_ms * 1_000_000 / max(per_iteration)
+            self.args.target_ms * 1_000_000 / slower_ns
         )))
 
     def measure(self) -> None:
