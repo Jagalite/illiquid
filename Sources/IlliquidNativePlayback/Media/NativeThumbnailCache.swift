@@ -255,7 +255,11 @@ actor NativeThumbnailCache {
     private func trimMemory(incoming: Int, background: Bool) {
         let limit = preferences.memoryMiB * 1024 * 1024
         guard memoryBytes + incoming > limit || (incoming > 0 && images.count >= maximumResidentImages) else { return }
-        if incoming > 0, incoming <= limit {
+        // Avoid a speculative scan when byte pressure suggests a bulk trim.
+        // This heuristic only chooses the unchanged sorted fallback below.
+        let bytesToFree = memoryBytes + incoming - limit
+        if incoming > 0, incoming <= limit, !images.isEmpty,
+           bytesToFree <= 0 || bytesToFree <= memoryBytes / images.count {
             // An insertion usually needs just one victim. Select it without
             // sorting or retaining every candidate image. Bulk trims keep the
             // existing sort below instead of repeatedly scanning the cache.

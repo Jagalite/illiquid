@@ -43,7 +43,7 @@ jobs:
           import json, os, subprocess, sys
           from pathlib import Path
           command = [sys.executable, 'Benchmarks/ThumbnailMemoryEviction/run.py',
-                     '--pairs', '8', '--bulk-iterations', '1000',
+                     '--pairs', '16', '--bulk-iterations', '1000',
                      '--output', os.environ['RUNNER_TEMP'] + '/thumbnail-memory-portable/results']
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
