@@ -1,0 +1,80 @@
+name: Thumbnail ranking portable qualification
+
+on:
+  push:
+    branches: ['perf/thumbnail-ranking-context-portable-20261028']
+    paths:
+      - 'Sources/IlliquidCore/Player/Thumbnail*.swift'
+      - 'Tests/IlliquidCoreTests/Thumbnail*.swift'
+      - 'Benchmarks/ThumbnailRankingContext/**'
+      - '.github/workflows/thumbnail-ranking-portable.yml'
+      - '!Benchmarks/ThumbnailRankingContext/*.md'
+      - '!Benchmarks/ThumbnailRankingContext/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/Thumbnail*.swift'
+      - 'Tests/IlliquidCoreTests/Thumbnail*.swift'
+      - 'Benchmarks/ThumbnailRankingContext/**'
+      - '.github/workflows/thumbnail-ranking-portable.yml'
+      - '!Benchmarks/ThumbnailRankingContext/*.md'
+      - '!Benchmarks/ThumbnailRankingContext/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-ranking-portable-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify ranking semantics and measure optional folder context
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available: submit this benchmark through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this isolated runner; builds run serially.'
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/ThumbnailRankingContext/run.py \
+            --output "$RUNNER_TEMP/thumbnail-ranking-portable" \
+            --pairs 6 "${mode[@]}"
+      - name: Emit durable research receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-ranking-portable'
+          for name in ['manifest.json', 'tests.json', 'verification.json',
+                       'calibration.json', 'measurements.json', 'summary.json']:
+              path = root / name
+              if path.is_file():
+                  print('THUMBNAIL_RANKING_RECEIPT ' + json.dumps({
+                      'file': name, 'data': json.loads(path.read_text())
+                  }, sort_keys=True))
+          for path in sorted(root.glob('*-tests.log')):
+              print('::group::' + path.name)
+              print(path.read_text()[-16000:])
+              print('::endgroup::')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-ranking-portable
+          path: |
+            ${{ runner.temp }}/thumbnail-ranking-portable/*.json
+            ${{ runner.temp }}/thumbnail-ranking-portable/*.jsonl
+            ${{ runner.temp }}/thumbnail-ranking-portable/*.log
+          retention-days: 14

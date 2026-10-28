@@ -1,4 +1,6 @@
+#if canImport(CryptoKit)
 import CryptoKit
+#endif
 import Foundation
 import IlliquidCore
 
@@ -95,7 +97,28 @@ private enum ThumbnailRankingBenchmark {
 
     private static func digest<Value: Encodable>(_ value: Value) throws -> String {
         let data = try encoder().encode(value)
+        #if canImport(CryptoKit)
         return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        #else
+        // Portable CI has Foundation but not CryptoKit. Hashing stays outside
+        // the timed region and uses the same SHA-256 over the encoded bytes.
+        let process = Process()
+        let input = Pipe()
+        let output = Pipe()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/sha256sum")
+        process.standardInput = input
+        process.standardOutput = output
+        try process.run()
+        try input.fileHandleForWriting.write(contentsOf: data)
+        try input.fileHandleForWriting.close()
+        let text = String(decoding: output.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+        process.waitUntilExit()
+        guard process.terminationStatus == 0,
+              let hash = text.split(separator: " ").first, hash.count == 64,
+              hash.allSatisfy({ "0123456789abcdef".contains($0) })
+        else { throw BenchmarkError("Portable SHA-256 calculation failed.") }
+        return String(hash)
+        #endif
     }
 
     private static func signature(_ urls: [URL]) throws -> OutputSignature {
