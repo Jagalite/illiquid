@@ -1,0 +1,78 @@
+name: Folder discovery classification portable check
+
+on:
+  push:
+    branches: ['perf/folder-discovery-classification-31c0bcbc']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift'
+      - 'Tests/IlliquidCoreTests/FolderDiscoveryClassificationTests.swift'
+      - 'Benchmarks/FolderDiscoveryClassification/**'
+      - '.github/workflows/folder-discovery-classification-portable.yml'
+      - '!Benchmarks/FolderDiscoveryClassification/*.md'
+      - '!Benchmarks/FolderDiscoveryClassification/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: folder-discovery-classification-portable-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.2-noble
+    timeout-minutes: 25
+    env:
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - name: Prepare the ephemeral research container
+        run: |
+          apt-get update -qq
+          apt-get install -y --no-install-recommends python3 git gcc
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Fetch the pinned research baseline
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Compile actual sources and verify portable discovery behavior
+        run: |
+          echo 'The shared Kyoto queue is unavailable in this hosted Linux container; running isolated component builds directly and serially.'
+          python3 Benchmarks/FolderDiscoveryClassification/run.py \
+            --pairs 2 --output "$RUNNER_TEMP/folder-discovery-classification-linux"
+      - name: Emit portable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'folder-discovery-classification-linux'
+          records = {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if (path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}
+                      and not any(part in {'build', '.build', 'cache', 'module-cache'}
+                                  for part in relative.parts)):
+                  records[str(relative)] = path.read_text()
+          for name in ['summary.json', 'verification.json']:
+              if name in records:
+                  print(name + '\n' + records[name])
+          packed = gzip.compress(json.dumps(records, sort_keys=True).encode(), mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log bundle limit; use uploaded artifact')
+          print('FOLDER_CLASSIFICATION_LINUX_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('FOLDER_CLASSIFICATION_LINUX_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: folder-discovery-classification-linux
+          path: |
+            ${{ runner.temp }}/folder-discovery-classification-linux/*.json
+            ${{ runner.temp }}/folder-discovery-classification-linux/*.jsonl
+            ${{ runner.temp }}/folder-discovery-classification-linux/logs/
+            ${{ runner.temp }}/folder-discovery-classification-linux/receipts/
+            ${{ runner.temp }}/folder-discovery-classification-linux/sources/
+          retention-days: 14
