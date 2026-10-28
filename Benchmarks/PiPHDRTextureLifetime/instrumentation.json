@@ -1,0 +1,18 @@
+{
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "path": "Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift",
+  "edits": [
+    {
+      "old": "    private var workerActive = false\n",
+      "new": "    private var workerActive = false\n    // One-shot test barrier on Metal's callback queue, before owner delivery.\n    private var nextCompositionCompletionHookForTesting: (@Sendable () -> Void)?\n"
+    },
+    {
+      "old": "    func composedPixelBufferForTesting(\n",
+      "new": "    /// Synchronous inspection without transferring resource ownership to a test.\n    func inspectHDRTextureForTesting(\n        _ inspect: (Bool, Bool, (any MTLTexture)?) -> Void\n    ) {\n        workQueue.sync {\n            let state = stateLock.withLock { (active, workerActive) }\n            inspect(state.0, state.1, hdrLinearTexture)\n        }\n    }\n\n    func setNextCompositionCompletionHookForTesting(\n        _ hook: (@Sendable () -> Void)?\n    ) {\n        stateLock.withLock { nextCompositionCompletionHookForTesting = hook }\n    }\n\n    func composedPixelBufferForTesting(\n"
+    },
+    {
+      "old": "        stateLock.withLock {\n            metrics.compositionCPUTimeNanoseconds &+= cpuNanoseconds\n        }\n        commandBuffer.addCompletedHandler { commandBuffer in\n",
+      "new": "        let completionHook = stateLock.withLock { () -> (@Sendable () -> Void)? in\n            metrics.compositionCPUTimeNanoseconds &+= cpuNanoseconds\n            let hook = nextCompositionCompletionHookForTesting\n            nextCompositionCompletionHookForTesting = nil\n            return hook\n        }\n        commandBuffer.addCompletedHandler { commandBuffer in\n            completionHook?()\n"
+    }
+  ]
+}

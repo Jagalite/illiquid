@@ -347,6 +347,8 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
 
     private var active = false
     private var workerActive = false
+    // One-shot test barrier on Metal's callback queue, before owner delivery.
+    private var nextCompositionCompletionHookForTesting: (@Sendable () -> Void)?
     private var videoAdjustments = VideoAdjustmentState.standard
     private var latestFrame: NativeDecodedVideoFrame?
     private var pendingFrame: NativeDecodedVideoFrame?
@@ -626,6 +628,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         workQueue.async { [weak self] in
             guard let self else { return }
             presenter.flush(removeDisplayedImage: true)
+            retireHDRTextureIfStoppedAndIdle()
             emitMetrics()
         }
     }
@@ -666,6 +669,22 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         stateLock.withLock { metrics }
     }
 
+    /// Synchronous inspection without transferring resource ownership to a test.
+    func inspectHDRTextureForTesting(
+        _ inspect: (Bool, Bool, (any MTLTexture)?) -> Void
+    ) {
+        workQueue.sync {
+            let state = stateLock.withLock { (active, workerActive) }
+            inspect(state.0, state.1, hdrLinearTexture)
+        }
+    }
+
+    func setNextCompositionCompletionHookForTesting(
+        _ hook: (@Sendable () -> Void)?
+    ) {
+        stateLock.withLock { nextCompositionCompletionHookForTesting = hook }
+    }
+
     func composedPixelBufferForTesting(
         _ frame: NativeDecodedVideoFrame
     ) async throws -> CVPixelBuffer {
@@ -691,6 +710,13 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         return box.pixelBuffer
     }
 
+    /// Work-queue confined. Keep the working texture until the last submitted
+    /// composition returns, and preserve reuse if PiP has already restarted.
+    private func retireHDRTextureIfStoppedAndIdle() {
+        guard stateLock.withLock({ !active && !workerActive }) else { return }
+        hdrLinearTexture = nil
+    }
+
     private func consumePendingFrame() {
         let work: (
             frame: NativeDecodedVideoFrame,
@@ -711,7 +737,10 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             }
             return frame.map { ($0, displayImmediately, compositionFence.revision) }
         }
-        guard let work else { return }
+        guard let work else {
+            retireHDRTextureIfStoppedAndIdle()
+            return
+        }
 
         do {
             try compose(work.frame) { [weak self] result in
@@ -736,6 +765,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
                 }
                 workerActive = false
             }
+            retireHDRTextureIfStoppedAndIdle()
         } catch {
             reportCompositionFailure(
                 error,
@@ -1140,10 +1170,14 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             retainedCVTextures: sourceTextures + outputTextures
         )
         let cpuNanoseconds = DispatchTime.now().uptimeNanoseconds - cpuStart
-        stateLock.withLock {
+        let completionHook = stateLock.withLock { () -> (@Sendable () -> Void)? in
             metrics.compositionCPUTimeNanoseconds &+= cpuNanoseconds
+            let hook = nextCompositionCompletionHookForTesting
+            nextCompositionCompletionHookForTesting = nil
+            return hook
         }
         commandBuffer.addCompletedHandler { commandBuffer in
+            completionHook?()
             // Metal's callback runs on an external queue. Rejoin the resource
             // owner's queue before reading the retained resources or completing
             // the frame, with an explicit synchronization boundary.

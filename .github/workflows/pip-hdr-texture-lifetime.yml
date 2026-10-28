@@ -1,0 +1,67 @@
+name: PiP HDR texture lifetime
+
+on:
+  push:
+    branches: ['perf/pip-hdr-texture-stop-*']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPHDRTextureLifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPHDRTextureLifetimeMeasurements.swift'
+      - 'Benchmarks/PiPHDRTextureLifetime/run.py'
+      - 'Benchmarks/PiPHDRTextureLifetime/instrumentation.json'
+      - '.github/workflows/pip-hdr-texture-lifetime.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPHDRTextureLifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPHDRTextureLifetimeMeasurements.swift'
+      - 'Benchmarks/PiPHDRTextureLifetime/run.py'
+      - 'Benchmarks/PiPHDRTextureLifetime/instrumentation.json'
+      - '.github/workflows/pip-hdr-texture-lifetime.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pip-hdr-lifetime-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-lifetime:
+    runs-on: macos-26
+    timeout-minutes: 55
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds will run serially.'
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Verify native retirement, races, HDR pixels, and baseline ownership
+        run: |
+          python3 Benchmarks/PiPHDRTextureLifetime/run.py \
+            --pairs 3 --output "$RUNNER_TEMP/pip-hdr-lifetime"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pip-hdr-texture-lifetime
+          path: |
+            ${{ runner.temp }}/pip-hdr-lifetime/*.json
+            ${{ runner.temp }}/pip-hdr-lifetime/*.jsonl
+            ${{ runner.temp }}/pip-hdr-lifetime/*.log
+            ${{ runner.temp }}/pip-hdr-lifetime/*.diff
+            ${{ runner.temp }}/pip-hdr-lifetime/sources/
+          retention-days: 14
