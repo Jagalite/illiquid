@@ -25,9 +25,9 @@ struct PlaybackCheckpoint: Sendable {
     let unshuffledPlaylistIDs: [FolderPlaylistItem.ID]?
 
     func record() -> PlaybackSessionRecord {
-        return PlaybackSessionRecord(
+        PlaybackSessionRecord(
             source: source,
-            collectionFolder: folderContainingSource(),
+            collectionFolder: matchingCollectionFolder(),
             playlistItems: playlist,
             playlistIndex: index,
             position: position,
@@ -36,22 +36,33 @@ struct PlaybackCheckpoint: Sendable {
         )
     }
 
-    private func folderContainingSource() -> URL? {
-        guard let folder, !playlist.isEmpty,
-              let sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
-        else { return nil }
+    private func matchingCollectionFolder() -> URL? {
+        guard let folder, !playlist.isEmpty, source.url.isFileURL else { return nil }
+        var sourceKey: String?
+        var probedIndex: Int?
 
-        // The captured index is only a hint: restored or changed playlists can
-        // disagree with it. Verify identity before using the shortcut.
-        if let index, playlist.indices.contains(index),
-           NormalizedFileURL.persistenceKey(for: playlist[index].url) == sourceKey {
-            return folder
+        // The captured index is a hint, not proof of membership. A singleton
+        // already has a one-item scan and needs no separate probe.
+        if playlist.count > 1, let index, playlist.indices.contains(index) {
+            probedIndex = index
+            if let itemKey = NormalizedFileURL.persistenceKey(for: playlist[index].url) {
+                guard let key = NormalizedFileURL.persistenceKey(for: source.url) else { return nil }
+                sourceKey = key
+                if itemKey == key { return folder }
+            }
         }
 
-        // Normalize the invariant source once even when the hint is absent or
-        // stale. Decoded playlist items still require their own normalization.
-        return playlist.contains {
-            NormalizedFileURL.persistenceKey(for: $0.url) == sourceKey
-        } ? folder : nil
+        // Skip an already probed item. Resolve the source only after a supported
+        // item is found, so all-unsupported playlists avoid that work entirely.
+        for candidateIndex in playlist.indices where candidateIndex != probedIndex {
+            guard let itemKey = NormalizedFileURL.persistenceKey(for: playlist[candidateIndex].url)
+            else { continue }
+            if sourceKey == nil {
+                sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
+            }
+            guard let sourceKey else { return nil }
+            if itemKey == sourceKey { return folder }
+        }
+        return nil
     }
 }
