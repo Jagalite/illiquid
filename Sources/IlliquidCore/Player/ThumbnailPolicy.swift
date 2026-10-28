@@ -191,6 +191,7 @@ public enum ThumbnailPolicy {
     /// Half-second quantization matches foreground hover requests.
     public static func samples(duration: Double, focus: Double, count: Int) -> [Double] {
         guard duration.isFinite, duration > 0 else { return [] }
+        let limit = min(max(count, 1), 64)
         let last = max(0, floor((duration - 0.5) * 2) / 2)
         var result: [Double] = []
         func add(_ value: Double) {
@@ -198,15 +199,19 @@ public enum ThumbnailPolicy {
             if !result.contains(time) { result.append(time) }
         }
         add(focus.isFinite ? focus : 0)
+        if result.count == limit { return result }
         add(0)
         var divisions = 2
-        while result.count < min(max(count, 1), 64), divisions <= 128 {
+        while result.count < limit, divisions <= 128 {
             for numerator in stride(from: 1, to: divisions, by: 2) {
                 add(duration * Double(numerator) / Double(divisions))
+                // Later samples only append; stop once the requested prefix is
+                // complete instead of filling and discarding the rest of this level.
+                if result.count == limit { return result }
             }
             divisions *= 2
         }
-        return Array(result.prefix(min(max(count, 1), 64)))
+        return result
     }
 }
 
