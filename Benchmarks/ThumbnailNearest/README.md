@@ -153,6 +153,63 @@ All final samples remain in the evidence, including shorter or noisy ones.
 Generated module sources, extraction hashes, raw verification outputs,
 calibration, commands, and measurements are retained by the workflow.
 
+## Recorded portable results — 2026-10-28
+
+[Run 40641694743](https://github.com/Jagalite/illiquid/actions/runs/40641694743)
+successfully measured commit
+`378a1160f2777cdd673ec3bcc0fb77385af98821` with Swift 6.3.2 on a
+four-vCPU x86_64 Linux runner (AMD EPYC 9V74, glibc 2.35).
+
+The complete ordered-key results matched for all **247 fixtures**. All **80
+baseline/candidate pairs** favored the candidate. The figures below measure
+the extracted planning stage with the lightweight dictionary adapter described
+above. They are separate from complete native-cache lookup or UI latency.
+
+| Workload | Baseline µs/plan | Candidate µs/plan | Median paired reduction | Faster pairs |
+|---|---:|---:|---:|---:|
+| Empty | 0.200 | 0.174 | 13.35% | 8/8 |
+| One resident | 0.470 | 0.338 | 27.33% | 8/8 |
+| 24 residents | 4.891 | 2.136 | 55.98% | 8/8 |
+| 96 residents | 21.735 | 11.385 | 48.81% | 8/8 |
+| 96 mixed identities | 5.151 | 2.443 | 52.77% | 8/8 |
+| 96 residents, long path (stress) | 64.554 | 11.410 | 82.09% | 8/8 |
+| 24 residents, duplicate fallbacks | 7.216 | 2.433 | 66.25% | 8/8 |
+| Missing fallbacks | 5.879 | 2.193 | 62.77% | 8/8 |
+| 96 residents, three-second radius | 1.169 | 0.840 | 27.75% | 8/8 |
+| 24 residents plus storyboard | 12.148 | 5.620 | 53.75% | 8/8 |
+
+Times are medians of each variant's eight process observations. The percentage
+column is the median of the eight within-pair reductions; it can differ from a
+percentage calculated from the two displayed time medians. The long-path case
+is a stress workload. The 24-resident and storyboard cases provide more useful
+lead examples for the ordinary candidate-planning cost.
+
+All 160 final samples were retained. Seven fell below the 100 ms calibration
+target after calibration: one 96-resident sample and six long-path samples.
+The shortest was 87.944695 ms; none was shorter than 50 ms. These samples remain
+in the results. An independent audit recomputed every pair, checked balanced
+AB/BA ordering, compared all operation/checksum/candidate-count receipts,
+recomputed summaries, and verified executed source hashes. It found no
+planning correctness or measurement blocker.
+
+Permanent evidence is in
+[evidence/linux-20261028](evidence/linux-20261028/): raw final measurements,
+summaries, compiler/source/container provenance, per-fixture verification
+hashes, command records, and the audit. The
+[workflow artifact](https://github.com/Jagalite/illiquid/actions/runs/40641694743/artifacts/12796062620)
+also contains the complete ordered-key JSON, generated Swift sources,
+calibration measurements, and process logs; its retention is 14 days.
+
+### Native qualification status
+
+At 2026-10-28 06:12 UTC,
+[native run 40639609155](https://github.com/Jagalite/illiquid/actions/runs/40639609155)
+was still queued for a macOS runner. Its ten dedicated regression tests,
+both-variant debug/release checks, 59 complete-cache selection receipts, and
+native timing campaign had **not executed**. The production Swift source, native harness, native runner, regression tests,
+and native workflow in that queued commit are identical to their counterparts
+in the measured portable commit. Consult the run for its current status.
+
 ## Scope
 
 These synthetic component measurements establish the cost of choosing and
@@ -161,4 +218,3 @@ video decoding, filesystem latency, end-to-end hover latency, frame rate,
 energy use, or live UI responsiveness. The macOS 26 player build and live
 playback path require their own qualification.
 
-Results are recorded only after the respective workflow executes successfully.
