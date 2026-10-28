@@ -2225,11 +2225,54 @@ struct SourceVisibilityMatcher {
     }
 
     private func matchingRootPath(for normalizedPath: String) -> String? {
-        rootPaths
-            .filter { rootPath in
-                SourceTreeIdentity.contains(normalizedPath, within: rootPath)
+        // A short scan avoids hashing each ancestor for small libraries. Larger
+        // libraries can reuse the root-evaluation keys as a membership index.
+        guard rootPaths.count > 4 else {
+            return matchingRootPathByScanning(normalizedPath)
+        }
+
+        let scalars = normalizedPath.unicodeScalars
+        var end = scalars.endIndex
+        var match: String?
+        var matchLength = -1
+        while end != scalars.startIndex {
+            if let index = rootEvaluations.index(forKey: String(scalars[..<end])) {
+                let rootPath = rootEvaluations[index].key
+                // Scalar boundaries can split an extended grapheme. Preserve
+                // the existing String prefix policy and the stored root bytes.
+                if SourceTreeIdentity.contains(normalizedPath, within: rootPath) {
+                    let length = rootPath.count
+                    if length == matchLength {
+                        // Unusual Unicode components can make nested roots tie
+                        // in Character count. The original root order wins ties.
+                        return matchingRootPathByScanning(normalizedPath)
+                    }
+                    if length > matchLength {
+                        match = rootPath
+                        matchLength = length
+                    }
+                }
             }
-            .max { $0.count < $1.count }
+
+            guard let slash = scalars[..<end].lastIndex(of: "/") else { break }
+            let nextEnd = slash == scalars.startIndex ? scalars.index(after: slash) : slash
+            guard nextEnd != end else { break }
+            end = nextEnd
+        }
+        return match
+    }
+
+    private func matchingRootPathByScanning(_ normalizedPath: String) -> String? {
+        var match: String?
+        var matchLength = -1
+        for rootPath in rootPaths where SourceTreeIdentity.contains(normalizedPath, within: rootPath) {
+            let length = rootPath.count
+            if length > matchLength {
+                match = rootPath
+                matchLength = length
+            }
+        }
+        return match
     }
 }
 

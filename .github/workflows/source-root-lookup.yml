@@ -1,0 +1,91 @@
+name: Source visibility root lookup
+
+on:
+  push:
+    branches: ['perf/source-root-lookup-f307b7a']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityRootLookupTests.swift'
+      - 'Benchmarks/SourceRootLookup/**'
+      - '.github/workflows/source-root-lookup.yml'
+      - '!Benchmarks/SourceRootLookup/**/*.md'
+      - '!Benchmarks/SourceRootLookup/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityRootLookupTests.swift'
+      - 'Benchmarks/SourceRootLookup/**'
+      - '.github/workflows/source-root-lookup.yml'
+      - '!Benchmarks/SourceRootLookup/**/*.md'
+      - '!Benchmarks/SourceRootLookup/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-root-lookup-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Select the native toolchain
+        if: runner.os == 'macOS'
+        run: echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
+      - name: Verify root selection and measure paired workloads
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated packages.'
+          python3 Benchmarks/SourceRootLookup/run.py \
+            --output "$RUNNER_TEMP/source-root-lookup" --pairs 2 --smoke
+      - name: Retain host and reproducibility evidence
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/source-root-lookup"
+          uname -a > "$RUNNER_TEMP/source-root-lookup/host.txt"
+          swift --version >> "$RUNNER_TEMP/source-root-lookup/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/source-root-lookup/host.txt"
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-root-lookup'
+          files = {path.name: path.read_text() for path in sorted(root.iterdir())
+                   if path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}}
+          if 'summary.json' in files:
+              print('::group::summary.json')
+              print(files['summary.json'])
+              print('::endgroup::')
+          packed = gzip.compress(json.dumps(files, sort_keys=True, separators=(',', ':')).encode(),
+                                 compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log bundle limit; retrieve the uploaded artifact')
+          print('SOURCE_ROOT_LOOKUP_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('SOURCE_ROOT_LOOKUP_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-root-lookup-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/source-root-lookup/
+            !${{ runner.temp }}/source-root-lookup/**/.build/**
+            !${{ runner.temp }}/source-root-lookup/**/build/**
+            !${{ runner.temp }}/source-root-lookup/**/cache/**
+            !${{ runner.temp }}/source-root-lookup/**/module-cache/**
+          retention-days: 14
