@@ -15,7 +15,8 @@ from pathlib import Path
 
 BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 SOURCE = "Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift"
-CASES = ("srt-short", "vtt-short", "srt-multiline", "srt-dense",
+CASES = ("srt-short", "vtt-short", "srt-crlf", "vtt-crlf",
+         "srt-multiline", "srt-dense",
          "srt-long-line", "invalid-preamble")
 TESTS = ("ExternalTextSubtitleConverterTests.swift",
          "ExternalSubtitleEscapingTests.swift", "SubtitleCueStreamingTests.swift")
@@ -168,7 +169,7 @@ let package = Package(
                     "--configuration", configuration, "--jobs", "2", "--no-parallel",
                 ])
                 test_log = (output / f"tests-{variant}-{configuration}.log").read_text()
-                counts_found = re.findall(r"Test run with (\d+) tests? passed", test_log)
+                counts_found = re.findall(r"Test run with (\d+) tests?(?: in \d+ suites?)? passed", test_log)
                 if not counts_found or int(counts_found[-1]) == 0:
                     raise RuntimeError("Swift Testing did not report executed regression tests")
                 test_results.append({"variant": variant, "configuration": configuration,

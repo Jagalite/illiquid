@@ -124,7 +124,7 @@ struct SubtitleCueStreamingTests {
             let body = timing(for: format) + "\nAlpha\nBeta\n\n"
                 + timing(for: format) + "\nGamma\n"
             let normalized = document(body, format: format)
-            let separators = ["\r\n", "\r", "\n"]
+            let separators = ["\r\n", "\n", "\r"]
             var mixed = ""
             for (index, line) in normalized.components(separatedBy: "\n").enumerated() {
                 if index > 0 { mixed += separators[(index - 1) % separators.count] }

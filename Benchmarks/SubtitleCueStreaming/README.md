@@ -32,7 +32,7 @@ Timing uses eight balanced AB/BA pairs in fresh processes. Each variant is
 independently calibrated to at least 150 ms of CPU and wall time; every final
 sample must exceed 60 ms. Times are normalized per complete conversion, and
 fixture/output receipts and consumed checksums must match. The workloads cover
-ordinary SRT and WebVTT cues, multiline cues, dense line counts, a long single
+ordinary SRT and WebVTT cues with LF and CRLF newlines, multiline cues, dense line counts, a long single
 line, and invalid preambles. Input construction and warmup are outside timing.
 
 Dedicated fresh-process runs measure peak resident memory for dense and

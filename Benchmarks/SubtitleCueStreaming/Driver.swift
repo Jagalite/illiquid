@@ -133,6 +133,10 @@ private func makeFixture(_ name: String) throws -> Fixture {
                 + "\nThe first subtitle line for cue \(cue)."
                 + "\nThe second line has café and 東京."
         }
+    case "srt-crlf", "vtt-crlf":
+        let original = try makeFixture(name == "srt-crlf" ? "srt-short" : "vtt-short")
+        format = original.format
+        source = original.source.replacingOccurrences(of: "\n", with: "\r\n")
     case "srt-multiline":
         format = .srt
         source.reserveCapacity(150_000)
@@ -328,7 +332,8 @@ private func verificationFixtures() throws -> [Fixture] {
             changeLineEndings(source, mode: index / 11))
     }
     try require(fixtures.count == 256, "Expected 256 compatibility inputs")
-    for name in ["srt-short", "vtt-short", "srt-multiline", "srt-dense",
+    for name in ["srt-short", "vtt-short", "srt-crlf", "vtt-crlf",
+                 "srt-multiline", "srt-dense",
                  "srt-long-line", "invalid-preamble"] {
         fixtures.append(try makeFixture(name))
     }
