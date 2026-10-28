@@ -1,0 +1,61 @@
+name: Video frame color sampling performance
+
+on:
+  push:
+    branches: ['perf/video-frame-color-sampling']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift'
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameColorSampler*Tests.swift'
+      - 'Benchmarks/VideoFrameColorSampling/**'
+      - '.github/workflows/video-frame-color-sampling.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-frame-color-sampling-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test exact sources and compare paired native timings
+        run: |
+          python3 Benchmarks/VideoFrameColorSampling/run.py \
+            --pairs 8 --target-ms 150 \
+            --output "$RUNNER_TEMP/video-frame-color-sampling"
+      - name: Publish compact research receipt
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "video-frame-color-sampling"
+          for name in ("manifest.json", "verification.json", "summary.json", "observations.json"):
+              path = root / name
+              if path.exists():
+                  value = json.loads(path.read_text())
+                  if name == "manifest.json":
+                      value = {k: v for k, v in value.items() if k not in ("commands", "files")}
+                  print("RESEARCH_RECEIPT " + name + " " + json.dumps(value, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-frame-color-sampling-native
+          path: |
+            ${{ runner.temp }}/video-frame-color-sampling/*.json
+            ${{ runner.temp }}/video-frame-color-sampling/logs/**
+            ${{ runner.temp }}/video-frame-color-sampling/sources/**
+          retention-days: 30
