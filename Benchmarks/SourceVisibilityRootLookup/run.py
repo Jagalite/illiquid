@@ -246,8 +246,8 @@ let package = Package(
             "platform": platform.platform(), "machine": platform.machine(),
             "python": platform.python_version(), "logical_cpus": os.cpu_count(),
             "compiler": self.run([self.args.swift, "--version"]).strip(),
-            "git_head": self.run(["git", "rev-parse", "HEAD"]).strip(),
-            "git_status": self.run(["git", "status", "--short"]),
+            "git_head": self.run(["git", "-c", f"safe.directory={ROOT}", "rev-parse", "HEAD"]).strip(),
+            "git_status": self.run(["git", "-c", f"safe.directory={ROOT}", "status", "--short"]),
             "baseline": baseline,
             "arguments": {key: str(value) if isinstance(value, Path) else value
                           for key, value in vars(self.args).items()},

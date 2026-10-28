@@ -26,7 +26,7 @@ defaults:
 jobs:
   linux-component:
     runs-on: ubuntu-24.04
-    container: swift:6.3.2-noble
+    container: swift:6.3.2-noble@sha256:c4336909a71b2e69b884f4078cdf98c0cd081911632cb349ef72abc4cbed69fc
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -86,8 +86,11 @@ jobs:
         with:
           name: source-visibility-root-lookup-linux
           path: |
-            ${{ runner.temp }}/source-visibility-root-lookup/
-            !${{ runner.temp }}/source-visibility-root-lookup/build/**
+            ${{ runner.temp }}/source-visibility-root-lookup/*.json
+            ${{ runner.temp }}/source-visibility-root-lookup/*.jsonl
+            ${{ runner.temp }}/source-visibility-root-lookup/*.log
+            ${{ runner.temp }}/source-visibility-root-lookup/*.xml
+            ${{ runner.temp }}/source-visibility-root-lookup/sources/**
           retention-days: 14
 
   native-component:
@@ -147,8 +150,11 @@ jobs:
         with:
           name: source-visibility-root-lookup-macos
           path: |
-            ${{ runner.temp }}/source-visibility-root-lookup/
-            !${{ runner.temp }}/source-visibility-root-lookup/build/**
+            ${{ runner.temp }}/source-visibility-root-lookup/*.json
+            ${{ runner.temp }}/source-visibility-root-lookup/*.jsonl
+            ${{ runner.temp }}/source-visibility-root-lookup/*.log
+            ${{ runner.temp }}/source-visibility-root-lookup/*.xml
+            ${{ runner.temp }}/source-visibility-root-lookup/sources/**
           retention-days: 14
 
   native-app-regressions:
