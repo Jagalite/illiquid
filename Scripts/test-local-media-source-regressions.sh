@@ -9,6 +9,7 @@ mkdir -p "$work/Sources/IlliquidCore" "$work/Tests/IlliquidCoreTests"
 cp "$root/Sources/IlliquidCore/Utilities/NormalizedFileURL.swift" "$work/Sources/IlliquidCore/"
 cp "$root/Sources/IlliquidCore/Player/MediaSource.swift" "$work/Sources/IlliquidCore/"
 cp "$root/Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift" "$work/Tests/IlliquidCoreTests/"
+cp "$root/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift" "$work/Tests/IlliquidCoreTests/"
 
 # Compile unchanged production files and repository tests without the app's
 # native dependencies. The toolchain's bundled Testing module is sufficient.

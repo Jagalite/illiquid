@@ -1,0 +1,67 @@
+name: File identity path performance
+on:
+  push:
+    branches: ['perf/file-identity-paths']
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Benchmarks/FileIdentityPaths/**'
+      - '.github/workflows/file-identity-paths.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Benchmarks/FileIdentityPaths/**'
+      - '.github/workflows/file-identity-paths.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: file-identity-paths-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Explain build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo "Kyoto is available; submit this qualification through the shared queue."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; isolated builds run serially."
+      - name: Test both variants and measure native file identity paths
+        run: >-
+          python3 Benchmarks/FileIdentityPaths/run.py --mode all
+          --pairs 10 --output "$RUNNER_TEMP/file-identity-paths"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: file-identity-paths-native
+          path: |
+            ${{ runner.temp }}/file-identity-paths/*.json
+            ${{ runner.temp }}/file-identity-paths/*.jsonl
+            ${{ runner.temp }}/file-identity-paths/logs/*.log
+            ${{ runner.temp }}/file-identity-paths/sources/**/*.swift
+            ${{ runner.temp }}/file-identity-paths/sources/**/*.py
+          retention-days: 14

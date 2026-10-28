@@ -32,7 +32,43 @@ public enum NormalizedFileURL {
         return host.isEmpty || host.lowercased() == "localhost"
     }
 
-    public static func persistenceKey(for url: URL) -> String? { normalize(url)?.path }
+    public static func persistenceKey(for url: URL) -> String? {
+        guard isSupportedLocalFileURL(url) else { return nil }
+        let lexical = url.absoluteURL.standardized
+        let path = lexical.path
+        if canUsePathIdentityDirectly(path) { return path }
+
+        // Preserve normalize()'s URL round trip for Unicode and unusual paths.
+        // On Darwin it can change Unicode bytes or interpret file references.
+        return URL(fileURLWithPath: path.precomposedStringWithCanonicalMapping,
+                   isDirectory: lexical.hasDirectoryPath).path
+    }
+
+    /// Ordinary ASCII components need neither Unicode mapping nor a new URL.
+    /// Keep ambiguous separators, decoded dot segments and file references on
+    /// Foundation's existing path so persisted identities remain byte-compatible.
+    private static func canUsePathIdentityDirectly(_ path: String) -> Bool {
+        guard path.hasPrefix("/"), !path.hasPrefix("/.file/") else { return false }
+        var previous: UInt8 = 0
+        var componentLength = 0
+        var dots = 0
+        for byte in path.utf8 {
+            guard byte >= 0x20, byte < 0x7f else { return false }
+            if byte == 0x2f {
+                guard previous != 0x2f,
+                      componentLength == 0 || dots != componentLength || componentLength > 2
+                else { return false }
+                componentLength = 0
+                dots = 0
+            } else {
+                componentLength += 1
+                if byte == 0x2e { dots += 1 }
+            }
+            previous = byte
+        }
+        if previous == 0x2f { return path == "/" }
+        return dots != componentLength || componentLength > 2
+    }
 
     /// Prepared aliases compare by canonical path; raw URLs compare lexically.
     public static func representsSameFile(_ lhs: URL, _ rhs: URL) -> Bool {
