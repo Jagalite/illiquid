@@ -1,5 +1,14 @@
 name: Track selection ranking performance
 on:
+  push:
+    branches: ['perf/compact-track-selection-rank']
+    paths:
+      - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Tests/IlliquidCoreTests/TrackSelection*Tests.swift'
+      - 'Benchmarks/TrackSelectionRanking/run.py'
+      - 'Benchmarks/TrackSelectionRanking/Harness.swift'
+      - '.github/workflows/track-selection-ranking.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
@@ -19,24 +28,70 @@ jobs:
     timeout-minutes: 20
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      TRACK_RANK_BASELINE: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - name: Record native environment
+      - name: Record native environment and fetch the exact comparison baseline
         run: |
           mkdir -p "$RUNNER_TEMP/track-selection-ranking"
           sw_vers > "$RUNNER_TEMP/track-selection-ranking/system.txt"
           xcrun swiftc --version >> "$RUNNER_TEMP/track-selection-ranking/system.txt"
           git rev-parse HEAD > "$RUNNER_TEMP/track-selection-ranking/revision.txt"
+          git fetch --no-tags --depth=1 origin "$TRACK_RANK_BASELINE"
+          git diff --check
       - name: Check baseline and candidate in debug and release
         run: |
-          python3 Benchmarks/TrackSelectionRanking/run.py test --configuration debug --output "$RUNNER_TEMP/track-selection-ranking/debug"
-          python3 Benchmarks/TrackSelectionRanking/run.py test --configuration release --output "$RUNNER_TEMP/track-selection-ranking/release"
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-ref "$TRACK_RANK_BASELINE" --configuration debug --output "$RUNNER_TEMP/track-selection-ranking/debug"
+          python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-ref "$TRACK_RANK_BASELINE" --configuration release --output "$RUNNER_TEMP/track-selection-ranking/release"
       - name: Compare complete selected-ID receipts and native paired timings
         run: |
-          python3 Benchmarks/TrackSelectionRanking/run.py benchmark --rounds 10 --output "$RUNNER_TEMP/track-selection-ranking/benchmark"
+          python3 Benchmarks/TrackSelectionRanking/run.py benchmark --baseline-ref "$TRACK_RANK_BASELINE" --rounds 10 --target-ms 50 --output "$RUNNER_TEMP/track-selection-ranking/benchmark"
           cat "$RUNNER_TEMP/track-selection-ranking/benchmark/summary.json"
+      - name: Publish compact research receipt
+        if: success()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "track-selection-ranking"
+          bench = root / "benchmark"
+          receipt = {
+              "schema_version": 1,
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "head_sha": os.environ["GITHUB_SHA"],
+              "system": (root / "system.txt").read_text(),
+              "manifest": json.loads((bench / "manifest.json").read_text()),
+              "summary": json.loads((bench / "summary.json").read_text()),
+              "measurements": [json.loads(row) for row in (bench / "measurements.jsonl").read_text().splitlines()],
+              "calibration": [json.loads(row) for row in (bench / "calibration.jsonl").read_text().splitlines()],
+              "iteration_counts": json.loads((bench / "iteration-counts.json").read_text()),
+              "verification": {
+                  "comparisons": json.loads((bench / "verification.json").read_text())["comparisons"],
+                  "receipt_sha256": hashlib.sha256((bench / "verification.json").read_bytes()).hexdigest(),
+              },
+              "builds": {variant: json.loads((bench / "build" / variant / "manifest.json").read_text())
+                         for variant in ("baseline", "candidate")},
+              "tests": {
+                  f"{configuration}/{variant}": {
+                      "manifest": json.loads((root / configuration / f"{variant}-{configuration}" / "manifest.json").read_text()),
+                      "log": (root / configuration / f"{variant}-{configuration}" / "tests.log").read_text(),
+                  } for configuration in ("debug", "release") for variant in ("baseline", "candidate")
+              },
+          }
+          payload = json.dumps(receipt, sort_keys=True, separators=(",", ":"))
+          (root / "research-receipt.json").write_text(payload + "\n")
+          print("TRACK_RANK_RECEIPT_BEGIN")
+          print(payload)
+          print("TRACK_RANK_RECEIPT_END")
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -46,4 +101,4 @@ jobs:
             ${{ runner.temp }}/track-selection-ranking/**/*.jsonl
             ${{ runner.temp }}/track-selection-ranking/**/*.log
             ${{ runner.temp }}/track-selection-ranking/**/*.txt
-          retention-days: 14
+          retention-days: 30

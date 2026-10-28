@@ -212,6 +212,53 @@ struct TrackSelectionRankingTests {
         #expect(forced.select(in: bitmap, kind: .subtitle, fallbackID: 1, audioLanguage: "ja") == nil)
     }
 
+    @Test func fullLanguageListPreservesPriorityAndSignedIDOrder() {
+        let languages = [
+            "en", "ja", "fr", "de", "es", "it", "pt", "nl",
+            "sv", "da", "fi", "pl", "cs", "sk", "hu", "ro",
+            "bg", "el", "tr", "ru", "uk", "ar", "he", "fa",
+            "hi", "bn", "ta", "te", "ko", "zh", "vi", "id",
+        ]
+        var preferences = TrackSelectionPreferences(
+            subtitles: .always, prefersAccessibleTracks: true
+        )
+        preferences.audioLanguages = languages + ["ms"]
+        preferences.subtitleLanguages = languages + ["ms"]
+        #expect(preferences.sanitized().audioLanguages == languages)
+        #expect(preferences.sanitized().subtitleLanguages == languages)
+
+        for kind in MediaTrackKind.allCases {
+            // A language advantage wins despite all conflicting lower priorities,
+            // fallback status, and a lower signed ID. The 33rd input is ignored.
+            for (preferred, lowerPriority) in [("en", "ja"), ("id", "ms")] {
+                let tracks = [
+                    candidate(.max, kind: kind, language: preferred, commentary: true),
+                    candidate(.min, kind: kind, language: lowerPriority,
+                              isDefault: true, isForced: true, accessible: true),
+                ]
+                for order in permutations(tracks) {
+                    #expect(preferences.select(
+                        in: order, kind: kind, fallbackID: Int64.min
+                    ) == Int64.max)
+                }
+            }
+
+            let tied = [
+                candidate(.min, kind: kind, language: "en"),
+                candidate(0, kind: kind, language: "en"),
+                candidate(.max, kind: kind, language: "en"),
+            ]
+            for order in permutations(tied) {
+                #expect(preferences.select(
+                    in: order, kind: kind, fallbackID: nil
+                ) == Int64.min)
+                #expect(preferences.select(
+                    in: order, kind: kind, fallbackID: Int64.max
+                ) == Int64.max)
+            }
+        }
+    }
+
     @Test func mutatedAndDecodedPreferencesNormalizeAliasesWithinFirst32Inputs() throws {
         let tracks = [
             candidate(1, language: "jpn"),

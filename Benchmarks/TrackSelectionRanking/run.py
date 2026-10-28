@@ -58,10 +58,55 @@ def command(args: list[str], log: Path, cache: Path) -> str:
     return result.stdout
 
 
-def snapshot(out: Path, include_tests: bool) -> dict[str, object]:
-    pinned = json.loads((HERE / "baseline/manifest.json").read_text())
-    baseline = (HERE / "baseline/TrackSelectionPreferences.swift").read_bytes()
+def snapshot(
+    out: Path,
+    include_tests: bool,
+    baseline_ref: str | None = None,
+) -> dict[str, object]:
+    manifest_bytes = (HERE / "baseline/manifest.json").read_bytes()
+    pinned = json.loads(manifest_bytes)
     media = (ROOT / pinned["media_track"]["path"]).read_bytes()
+    git_commands = []
+
+    def git_read(*arguments: str) -> bytes:
+        args = ["git", "-C", str(ROOT), *arguments]
+        result = subprocess.run(args, capture_output=True)
+        git_commands.append({"command": args, "returncode": result.returncode,
+                             "stdout_sha256": digest(result.stdout)})
+        if result.returncode:
+            raise RuntimeError(
+                f"Cannot read baseline from Git: {args}\n"
+                f"{result.stderr.decode('utf-8', errors='replace')}"
+            )
+        return result.stdout
+
+    if baseline_ref is None:
+        baseline = (HERE / "baseline/TrackSelectionPreferences.swift").read_bytes()
+    else:
+        # Resolve once, then read both files from the same immutable commit.
+        commit = git_read("rev-parse", "--verify", "--end-of-options",
+                          f"{baseline_ref}^{{commit}}").decode("ascii").strip()
+        selection_path = pinned["selection"]["path"]
+        media_path = pinned["media_track"]["path"]
+        baseline = git_read("show", f"{commit}:{selection_path}")
+        baseline_media = git_read("show", f"{commit}:{media_path}")
+        if baseline_media != media:
+            raise RuntimeError(
+                "Baseline MediaTrack.swift differs from the working tree; "
+                "the shared-module comparison requires identical supporting source"
+            )
+        pinned = {"schema_version": 1, "commit": commit}
+        for label, source_path, data in (
+            ("selection", selection_path, baseline),
+            ("media_track", media_path, baseline_media),
+        ):
+            pinned[label] = {
+                "path": source_path,
+                "git_blob": git_read("rev-parse", f"{commit}:{source_path}").decode("ascii").strip(),
+                "sha256": digest(data),
+            }
+        manifest_bytes = (json.dumps(pinned, indent=2, sort_keys=True) + "\n").encode()
+
     for label, data in (("selection", baseline), ("media_track", media)):
         blob = hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest()
         if digest(data) != pinned[label]["sha256"] or blob != pinned[label]["git_blob"]:
@@ -72,7 +117,7 @@ def snapshot(out: Path, include_tests: bool) -> dict[str, object]:
         "MediaTrack.swift": media,
         "Harness.swift": (HERE / "Harness.swift").read_bytes(),
         "run.py": Path(__file__).read_bytes(),
-        "baseline-manifest.json": (HERE / "baseline/manifest.json").read_bytes(),
+        "baseline-manifest.json": manifest_bytes,
     }
     if include_tests:
         inputs[TEST.name] = (ROOT / TEST).read_bytes()
@@ -82,7 +127,8 @@ def snapshot(out: Path, include_tests: bool) -> dict[str, object]:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(data)
         hashes[name] = digest(destination.read_bytes())
-    return {"baseline_commit": pinned["commit"], "input_sha256": hashes}
+    return {"baseline_commit": pinned["commit"], "baseline_requested_ref": baseline_ref,
+            "baseline_git_commands": git_commands, "input_sha256": hashes}
 
 
 def executable(value: str | None, name: str) -> str:
@@ -298,6 +344,7 @@ def main() -> None:
     parser.add_argument("--rounds", type=int, default=10)
     parser.add_argument("--iterations", type=int, help="Fixed iterations per workload; otherwise calibrate both variants")
     parser.add_argument("--target-ms", type=float, default=20.0, help="Calibration target for the faster variant")
+    parser.add_argument("--baseline-ref", help="Compare with this local Git commit/ref; leave unset for the historical pinned baseline")
     parser.add_argument("--swiftc")
     parser.add_argument("--swift")
     args = parser.parse_args()
@@ -310,7 +357,7 @@ def main() -> None:
     if args.mode == "summarize":
         write_json(out / "summary.json", summarize([json.loads(line) for line in (out / "measurements.jsonl").read_text().splitlines()]))
         return
-    receipt = snapshot(out, args.mode == "test")
+    receipt = snapshot(out, args.mode == "test", args.baseline_ref)
     compiler = toolchain(args, out)
     receipt.update({"recorded_utc": datetime.now(timezone.utc).isoformat(), "platform": platform.platform(),
                     "machine": platform.machine(), "cpu_count": os.cpu_count(), "python": sys.version,

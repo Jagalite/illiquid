@@ -77,17 +77,28 @@ public struct TrackSelectionPreferences: Codable, Equatable, Sendable {
         }
         // A lone eligible track needs no ranking, including language normalization.
         guard eligible.count > 1 else { return eligible.first?.track.id }
-        func rank(_ candidate: TrackSelectionCandidate) -> [Int] {
+        func rank(_ candidate: TrackSelectionCandidate) -> Int {
             let languageRank = languages.isEmpty ? 0 : languages.firstIndex(of:
                 Self.normalizedLanguage(candidate.track.languageCode) ?? "")
                 .map { languages.count - $0 } ?? 0
-            return [languageRank,
-                    preferences.avoidsCommentary && candidate.isCommentary ? 0 : 1,
-                    candidate.isAccessible == preferences.prefersAccessibleTracks ? 1 : 0,
-                    kind == .subtitle && preferences.subtitles == .forcedOnly && candidate.track.isForced ? 1 : 0,
-                    candidate.track.isDefault ? 1 : 0,
-                    kind == .subtitle && candidate.track.isForced ? 1 : 0,
-                    candidate.track.id == fallbackID ? 1 : 0]
+            // Six Boolean priorities fit below the language rank. Each bit
+            // outweighs every lower priority, preserving lexicographic order
+            // without allocating a rank array for each eligible track.
+            // Sanitization bounds languageRank to 0...32 (the full rank is <= 2_111).
+            var value = languageRank << 6
+            if !preferences.avoidsCommentary || !candidate.isCommentary {
+                value |= 1 << 5
+            }
+            if candidate.isAccessible == preferences.prefersAccessibleTracks {
+                value |= 1 << 4
+            }
+            if kind == .subtitle && preferences.subtitles == .forcedOnly && candidate.track.isForced {
+                value |= 1 << 3
+            }
+            if candidate.track.isDefault { value |= 1 << 2 }
+            if kind == .subtitle && candidate.track.isForced { value |= 1 << 1 }
+            if candidate.track.id == fallbackID { value |= 1 }
+            return value
         }
         // Retain the incumbent's rank instead of normalizing it again for every comparison.
         var best = eligible[0]
@@ -95,7 +106,7 @@ public struct TrackSelectionPreferences: Codable, Equatable, Sendable {
         for candidate in eligible.dropFirst() {
             let candidateRank = rank(candidate)
             if bestRank == candidateRank ? best.track.id > candidate.track.id
-                : bestRank.lexicographicallyPrecedes(candidateRank) {
+                : bestRank < candidateRank {
                 best = candidate
                 bestRank = candidateRank
             }

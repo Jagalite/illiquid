@@ -22,6 +22,28 @@ python3 Benchmarks/TrackSelectionRanking/run.py test --configuration release --o
 python3 Benchmarks/TrackSelectionRanking/run.py benchmark --output /tmp/track-ranking-benchmark
 ```
 
+### Comparing a later optimization
+
+Pass `--baseline-ref COMMIT` to both test commands and the benchmark to compare
+against another local Git revision. The runner resolves it once, snapshots the
+exact baseline source bytes, and records the resolved commit, Git reads, blob
+IDs, and source hashes. The baseline and working-tree `MediaTrack.swift` must be
+identical because the harness shares that supporting source. The original
+frozen baseline and historical evidence remain unchanged.
+
+For the scalar-rank follow-up, use the pre-change main commit:
+
+```sh
+BASELINE=ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+git fetch --no-tags --depth=1 origin "$BASELINE"
+python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-ref "$BASELINE" --configuration debug --output /tmp/track-rank-storage-debug
+python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-ref "$BASELINE" --configuration release --output /tmp/track-rank-storage-release
+python3 Benchmarks/TrackSelectionRanking/run.py benchmark --baseline-ref "$BASELINE" --rounds 10 --target-ms 50 --output /tmp/track-rank-storage-benchmark
+```
+
+The [scalar-rank research note](../../Documentation/TRACK_SELECTION_RANK_STORAGE_PERFORMANCE.md)
+records this follow-up separately from the earlier normalization improvement.
+
 Tests default to both baseline and candidate; `--variant baseline` or
 `--variant candidate` selects one. The isolated package runs
 `Tests/IlliquidCoreTests/TrackSelectionRankingTests.swift` using the toolchain's
