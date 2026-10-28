@@ -1,0 +1,85 @@
+name: Bitmap subtitle hybrid lookup
+
+on:
+  push:
+    branches: ['perf/bitmap-lookup-hybrid-20261028-413a']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleLookupTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift'
+      - 'Benchmarks/BitmapSubtitleLookup/**'
+      - '.github/workflows/bitmap-subtitle-hybrid-lookup.yml'
+      - '!Benchmarks/BitmapSubtitleLookup/README.md'
+      - '!Benchmarks/BitmapSubtitleLookup/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleLookupTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift'
+      - 'Benchmarks/BitmapSubtitleLookup/**'
+      - '.github/workflows/bitmap-subtitle-hybrid-lookup.yml'
+      - '!Benchmarks/BitmapSubtitleLookup/README.md'
+      - '!Benchmarks/BitmapSubtitleLookup/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-hybrid-lookup-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-lookup:
+    runs-on: macos-26
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify lookup behavior and measure both implementations
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          python3 -m py_compile Benchmarks/BitmapSubtitleLookup/run.py
+          python3 Benchmarks/BitmapSubtitleLookup/run.py \
+            --pairs 8 --target-ms 240 \
+            --output "$RUNNER_TEMP/bitmap-subtitle-lookup"
+      - name: Emit reviewable measurement receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'bitmap-subtitle-lookup'
+          for name in ('summary.json', 'parity.json', 'tests.json', 'completion.json',
+                       'build-receipt.json', 'measurements.jsonl', 'calibration.json'):
+              path = root / name
+              if path.is_file():
+                  print('LOOKUP_FILE ' + json.dumps({'path': name, 'content': path.read_text()}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-hybrid-lookup-native
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-lookup/**
+            !${{ runner.temp }}/bitmap-subtitle-lookup/**/.build/**
+            !${{ runner.temp }}/bitmap-subtitle-lookup/**/module-cache/**
+            !${{ runner.temp }}/bitmap-subtitle-lookup/baseline/benchmark
+            !${{ runner.temp }}/bitmap-subtitle-lookup/candidate/benchmark
+            !${{ runner.temp }}/bitmap-subtitle-lookup/**/*.dylib
+            !${{ runner.temp }}/bitmap-subtitle-lookup/**/*.swiftmodule
+          retention-days: 14

@@ -141,7 +141,39 @@ struct BitmapSubtitleTimeline: Sendable {
     }
 
     func composition(at seconds: Double) -> (start: Double, value: NativeBitmapSubtitleComposition)? {
-        guard seconds.isFinite, let entry = entries.last(where: { $0.start <= seconds }) else { return nil }
+        guard seconds.isFinite else { return nil }
+        let entry: Entry
+        if entries.count <= 8 {
+            guard let match = entries.last(where: { $0.start <= seconds }) else { return nil }
+            entry = match
+        } else {
+            // Recent events need only a short reverse scan. Search the earlier
+            // prefix only when at least four buffered events are still ahead.
+            let suffixStart = entries.count - 4
+            var selectedIndex: Int?
+            for index in (suffixStart..<entries.count).reversed() {
+                if entries[index].start <= seconds {
+                    selectedIndex = index
+                    break
+                }
+            }
+            if selectedIndex == nil {
+                var lower = 0
+                var upper = suffixStart
+                while lower < upper {
+                    let middle = lower + (upper - lower) / 2
+                    if entries[middle].start <= seconds {
+                        lower = middle + 1
+                    } else {
+                        upper = middle
+                    }
+                }
+                if lower > 0 { selectedIndex = lower - 1 }
+            }
+            guard let selectedIndex else { return nil }
+            entry = entries[selectedIndex]
+        }
+        // An expired latest set must not resurrect an older caption.
         if let duration = entry.composition.duration, seconds >= entry.start + duration { return nil }
         return (entry.start, entry.composition)
     }
