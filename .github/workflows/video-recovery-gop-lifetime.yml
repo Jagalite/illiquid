@@ -7,6 +7,7 @@ on:
       - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
       - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
       - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketSessionLifetimeTests.swift'
       - 'Benchmarks/VideoRecoveryPacketLifetime/**'
       - '.github/workflows/video-recovery-gop-lifetime.yml'
       - '!Benchmarks/VideoRecoveryPacketLifetime/*.md'
@@ -17,6 +18,7 @@ on:
       - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
       - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
       - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketSessionLifetimeTests.swift'
       - 'Benchmarks/VideoRecoveryPacketLifetime/**'
       - '.github/workflows/video-recovery-gop-lifetime.yml'
       - '!Benchmarks/VideoRecoveryPacketLifetime/*.md'
@@ -84,6 +86,8 @@ jobs:
     timeout-minutes: 40
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      ILLIQUID_NATIVE_FIXTURE_DIR: ${{ runner.temp }}/recovery-native/fixtures
+      ILLIQUID_RECOVERY_PACKET_REQUIRE_FIXTURE: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -96,6 +100,10 @@ jobs:
           fi
           python3 Scripts/verify-corresponding-source.py DependencySources
           python3 Scripts/install-ci-native-sdk.py
+      - name: Generate and verify the native B-frame EOF fixture
+        run: |
+          python3 Benchmarks/FrameStepTimestamps/generate-fixtures.py \
+            --output "$ILLIQUID_NATIVE_FIXTURE_DIR"
       - name: Build the application graph and test packet recovery lifetime
         run: |
           mkdir -p "$RUNNER_TEMP/recovery-native"
@@ -104,7 +112,7 @@ jobs:
           git rev-parse HEAD >> "$RUNNER_TEMP/recovery-native/host.txt"
           set -o pipefail
           swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
-            --filter 'VideoRecoveryPacketLifetimeTests|PlaybackBufferRegressionTests|PacketOwnershipTests' \
+            --filter 'VideoRecoveryPacketLifetimeTests|VideoRecoveryPacketSessionLifetimeTests|PlaybackBufferRegressionTests|PacketOwnershipTests' \
             2>&1 | tee "$RUNNER_TEMP/recovery-native/tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

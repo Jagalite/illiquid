@@ -23,6 +23,7 @@ REVISION = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 SOURCE = "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift"
 SHIM = "Sources/CFFmpeg/include/ffmpeg_shim.h"
 SUPPORT = "Benchmarks/PlaybackPipeline/PacketProbeSupport.swift"
+TEST = "Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift"
 HELPERS = ("illiquid_averror_nomem", "illiquid_nopts_value",
            "illiquid_packet_is_corrupt", "illiquid_packet_is_keyframe")
 CASES = {"4KiB-final-GOP": (4, 4_096), "1MiB-final-GOP": (16, 1_048_576),
@@ -189,7 +190,56 @@ static inline unsigned probe_avutil_header_version(void) { return LIBAVUTIL_VERS
             "baseline": stage("baseline/FFmpegPacket.swift", baseline),
             "candidate": stage("candidate/FFmpegPacket.swift", candidate),
         }
+        # Compile and execute the repository's regression suite unchanged.
+        # Bundled Swift Testing needs no package downloads or root app graph.
+        test_data = (ROOT / TEST).read_bytes()
+        test_count = len(re.findall(rb"(?m)^\s*@Test\b", test_data))
+        if test_count != 10:
+            raise ValueError("Review changed regression coverage before staging")
+        package = sources / "candidate-tests"
+        package_files = {
+            "Sources/IlliquidNativePlayback/FFmpegPacket.swift": candidate,
+            "Sources/IlliquidNativePlayback/PacketProbeSupport.swift": support.read_bytes(),
+            "Sources/CFFmpeg/packet_api.h": header.encode(),
+            "Sources/CFFmpeg/module.modulemap": (sources / "CFFmpeg/module.modulemap").read_bytes(),
+            "Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift": test_data,
+            "Package.swift": b'''// swift-tools-version: 6.1
+import PackageDescription
+let package = Package(name: "VideoRecoveryPacketLifetimeQualification", targets: [
+    .systemLibrary(name: "CFFmpeg"),
+    .target(name: "IlliquidNativePlayback", dependencies: ["CFFmpeg"]),
+    .testTarget(name: "IlliquidNativePlaybackTests", dependencies: ["CFFmpeg", "IlliquidNativePlayback"]),
+])
+''',
+        }
+        for relative, data in package_files.items():
+            stage("candidate-tests/" + relative, data)
+        manifest["candidate_tests"] = {
+            "source": TEST, "sha256": digest(test_data), "test_functions": test_count,
+            "parameterized_cases": 3, "total_cases": 12, "passed_configurations": [],
+        }
         save(output / "manifest.json", manifest)
+        swift = str(Path(swiftc).with_name("swift"))
+        for configuration in ("debug", "release"):
+            argv = [swift, "test", "--package-path", package, "--scratch-path", builds / "tests",
+                    "--cache-path", builds / "tests-cache", "--config-path", builds / "tests-config",
+                    "--security-path", builds / "tests-security", "--jobs", "2", "-c", configuration,
+                    "-Xswiftc", "-warnings-as-errors", "--filter", "VideoRecoveryPacketLifetimeTests"]
+            for flag in ccflags:
+                argv += ["-Xcc", flag]
+            for flag in ldflags:
+                argv += ["-Xlinker", "-lpthread" if flag == "-pthread" else flag]
+            print(f"Test exact candidate regression suite {configuration}", flush=True)
+            label = "candidate-" + configuration + "-tests"
+            command(argv, label)
+            transcript = (logs / (label + ".log")).read_text()
+            completed = re.search(r"Test run with (\d+) tests?\b[^\n]* passed", transcript)
+            if not completed or int(completed.group(1)) != test_count:
+                raise ValueError("Regression suite did not execute all tests")
+            if not re.search(r"releasesPayloadsThroughTheInclusiveByteLimit\(bytes:\) with 3 test cases passed", transcript):
+                raise ValueError("Regression suite did not execute all payload-size cases")
+            manifest["candidate_tests"]["passed_configurations"].append(configuration)
+            save(output / "manifest.json", manifest)
         records = {}
         for configuration, optimization in (("debug", "-Onone"), ("release", "-O")):
             for variant in ("baseline", "candidate"):
@@ -225,6 +275,8 @@ static inline unsigned probe_avutil_header_version(void) { return LIBAVUTIL_VERS
                 raise ValueError("Native libraries differ between variants")
         if digest((ROOT / SOURCE).read_bytes()) != manifest["candidate_source_sha256"]:
             raise ValueError("Production source changed during validation")
+        if digest((ROOT / TEST).read_bytes()) != manifest["candidate_tests"]["sha256"]:
+            raise ValueError("Regression source changed during validation")
         summary = {
             "status": "passed", "scope": manifest["scope"], "timing_claim": None,
             "configurations": ["debug", "release"], "controls": sorted(CONTROLS),
@@ -237,6 +289,7 @@ static inline unsigned probe_avutil_header_version(void) { return LIBAVUTIL_VERS
                 for left, right in zip(before["success"], after["success"])
             ],
             "all_tracked_allocations_released_exactly_once": True,
+            "candidate_regression_tests": manifest["candidate_tests"],
             "limitations": manifest["limitations"],
         }
         save(output / "summary.json", summary)

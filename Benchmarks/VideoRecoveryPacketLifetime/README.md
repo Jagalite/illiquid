@@ -37,6 +37,16 @@ reference, allocation, and release operations use the real FFmpeg libraries.
 Four C helpers are extracted unchanged from the production shim. Header and
 runtime library versions must agree.
 
+Before the ownership probes, the runner stages an isolated Swift package and
+executes the exact, unchanged `VideoRecoveryPacketLifetimeTests.swift` in debug
+and release: ten test functions, including three payload-size arguments, give
+twelve cases per configuration. The package contains the same candidate owner,
+support declarations, and real FFmpeg header module. It uses the compiler's
+bundled Swift Testing library with no external dependencies, and keeps all
+SwiftPM build/cache files under the result directory's `build/`. The runner
+requires the completion markers for all functions and all three size arguments
+and records the test source hash and full test logs.
+
 The new production method wraps a synthetic drain closure in this probe. The
 baseline executes the same closure without EOF retirement, matching its old
 boundary behavior. Neither variant's production owner is rewritten or modeled.
@@ -78,9 +88,9 @@ receipts, all commands/logs, raw observations, and a compact summary.
 This proves a component ownership boundary. The probe does not run
 `MediaSession`, decode media, or qualify end-to-end macOS EOF/recovery behavior.
 The cancellation control covers throwing cancellation; it does not simulate a
-decoder that returns normally after cancellation. Run the native
-`VideoRecoveryPacketLifetimeTests` and existing playback/recovery suites on
-the supported macOS SDK as the integration gate.
+decoder that returns normally after cancellation. Although the exact packet
+lifetime regression suite also runs here, the existing playback/recovery suites
+still need the supported macOS SDK as the integration gate.
 
 Reported bytes are the requested tracked payload and padded backing allocations.
 They exclude allocator overhead, decoder reference pictures, renderer storage,

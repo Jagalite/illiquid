@@ -150,7 +150,9 @@ struct VideoRecoveryPacketLifetimeTests {
         #expect(packet.value == nil)
         let retained = try #require(external)
         #expect(av_buffer_get_ref_count(retained) == 1)
-        #expect(retained.pointee.size == 64)
+        // av_new_packet includes FFmpeg's required input padding in its
+        // backing allocation; the packet's advertised payload is 64 bytes.
+        #expect(retained.pointee.size >= 64)
         #expect(retained.pointee.data[0] == 19)
         #expect(retained.pointee.data[63] == 23)
         withExtendedLifetime(buffer) {}
