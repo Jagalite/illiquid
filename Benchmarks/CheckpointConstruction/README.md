@@ -120,4 +120,16 @@ Flat-playlist construction remains linear for larger playlists because record
 deduplication is unchanged. First-item controls and empty/small playlists are
 included to expose overhead as well as wins.
 
-Results and native validation receipts will be recorded here after qualification.
+## Qualification status
+
+The [supplementary Linux study](evidence/linux/README.md) passed all 448 paired
+observations, and both revisions passed 22 component tests in debug and release.
+At 1,000 and 10,000 items with the last item selected, flat playlists used about
+65% less checkpoint-construction CPU; folder playlists used about 30% less.
+The evidence retains all controls, including slower observations on the shared
+Linux host. These are component measurements, not native macOS or whole-player
+performance claims.
+
+Native macOS qualification is pending in
+[the research workflow](https://github.com/Jagalite/illiquid/actions/runs/40634906801).
+Native results and receipts will be added when that run completes.
