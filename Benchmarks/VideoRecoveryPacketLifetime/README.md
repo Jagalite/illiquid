@@ -36,7 +36,7 @@ releases native data only after the last reference disappears.
 
 ## Measured ownership results
 
-The [portable CI experiment](https://github.com/Jagalite/illiquid/actions/runs/40639152416)
+The [portable CI experiment](https://github.com/Jagalite/illiquid/actions/runs/40639152416/job/122652965238)
 passed using Swift 6.4.1 on Ubuntu 24.04 and the repository's verified FFmpeg
 8.1.2 source. The exact baseline and candidate owners each passed 48 checks in
 debug and release; observations agreed between build configurations.
@@ -55,6 +55,10 @@ can legitimately extend the payload lifetime after retirement.
 [Raw observations, commands, provenance, and logs](evidence/ubuntu/) are
 committed with the study. This is a reduction in retained recovery-buffer
 ownership, not a measurement of total player RSS or an asserted CPU speedup.
+The retained run covers the ownership probe at commit `9da2b2ed`; the production
+owner has the same source hash in the subsequent test additions. The exact-suite
+and real-session gates added afterward have their own CI results and must not
+be inferred to have passed from this earlier receipt.
 
 ## Reproduce the portable ownership experiment
 

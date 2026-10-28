@@ -29,7 +29,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: video-recovery-gop-lifetime-${{ github.head_ref || github.ref }}
+  group: video-recovery-gop-lifetime-${{ github.head_ref && format('refs/heads/{0}', github.head_ref) || github.ref }}
   cancel-in-progress: true
 
 jobs:
