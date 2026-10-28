@@ -1,0 +1,57 @@
+name: Saved track matching portable qualification
+
+on:
+  push:
+    branches: ['perf/saved-track-matching']
+    paths:
+      - '.github/workflows/track-preference-matching-linux.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Tests/IlliquidCoreTests/TrackPreferenceMatchingTests.swift'
+      - 'Tests/IlliquidCoreTests/TrackRestorationRegressionTests.swift'
+      - 'Benchmarks/TrackPreferenceMatching/**'
+      - '!Benchmarks/TrackPreferenceMatching/evidence/**'
+      - '!Benchmarks/TrackPreferenceMatching/README.md'
+      - '.github/workflows/track-preference-matching-linux.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: track-preference-matching-linux-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test and measure the portable Swift component
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this isolated Linux runner; compiling serially.'
+          python3 Benchmarks/TrackPreferenceMatching/run.py test --configuration debug --output "$RUNNER_TEMP/track-matching/debug"
+          python3 Benchmarks/TrackPreferenceMatching/run.py test --configuration release --output "$RUNNER_TEMP/track-matching/release"
+          python3 Benchmarks/TrackPreferenceMatching/run.py benchmark --rounds 10 --target-ms 30 --output "$RUNNER_TEMP/track-matching/benchmark"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: track-preference-matching-linux
+          path: |
+            ${{ runner.temp }}/track-matching/**/inputs/**
+            ${{ runner.temp }}/track-matching/**/manifest.json
+            ${{ runner.temp }}/track-matching/**/summary.json
+            ${{ runner.temp }}/track-matching/**/verification.json
+            ${{ runner.temp }}/track-matching/**/iteration-counts.json
+            ${{ runner.temp }}/track-matching/**/*.jsonl
+            ${{ runner.temp }}/track-matching/**/*.log
+          retention-days: 14
