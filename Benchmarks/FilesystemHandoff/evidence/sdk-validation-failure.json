@@ -1,0 +1,28 @@
+{
+  "workflow": "Filesystem handoff memory",
+  "run_id": 40634770813,
+  "job_id": 122639083500,
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40634770813",
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40634770813/job/122639083500",
+  "tested_revision": "118bb0b85d43bf9d39e27d876722e466b14aa7a7",
+  "conclusion": "failure",
+  "completed_at_utc": "2026-10-28T05:50:50Z",
+  "tests": {
+    "debug": {
+      "passed": 80,
+      "suites": 11
+    },
+    "release": {
+      "passed": 80,
+      "suites": 11
+    }
+  },
+  "measurements": {
+    "attempted": false,
+    "observations": 0,
+    "reason": "Direct Swift compiler failed before building baseline IlliquidCore"
+  },
+  "error": "<unknown>:0: error: unable to load standard library for target 'arm64-apple-macosx26.0'",
+  "failing_command": "Swift 6 -O -parse-as-library -emit-library -emit-module IlliquidCore, without an explicit macOS SDK",
+  "correction": "Pass -sdk using xcrun --sdk macosx --show-sdk-path to direct Swift compiler invocations; hosted runner uses Xcode_26.6."
+}

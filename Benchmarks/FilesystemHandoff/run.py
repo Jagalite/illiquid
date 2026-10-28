@@ -75,11 +75,13 @@ def main():
 
     swift = run(["xcrun", "--find", "swiftc"]).strip()
     clang = run(["xcrun", "--find", "clang"]).strip()
+    sdk = run(["xcrun", "--sdk", "macosx", "--show-sdk-path"]).strip()
     environment = {
         "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "platform": platform.platform(), "architecture": platform.machine(),
         "swift": run([swift, "--version"]), "macos": run(["sw_vers"]),
         "developer_dir": os.environ.get("DEVELOPER_DIR"),
+        "macos_sdk": sdk,
         "github_run_id": os.environ.get("GITHUB_RUN_ID"),
         "github_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
     }
@@ -108,7 +110,7 @@ def main():
                         if variant == "baseline" else (root / name).read_text())
             destination.write_text(contents)
             manifest["source_sha256"][str(destination.relative_to(output))] = digest(destination)
-        flags = ["-swift-version", "6", "-warnings-as-errors", "-O", "-parse-as-library",
+        flags = ["-sdk", sdk, "-swift-version", "6", "-warnings-as-errors", "-O", "-parse-as-library",
                  "-module-cache-path", str(build / "module-cache")]
         library = build / "libIlliquidCore.dylib"
         run([swift, *flags, "-emit-library", "-emit-module", "-module-name", "IlliquidCore",
