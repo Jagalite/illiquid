@@ -10,6 +10,8 @@ on:
       - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
       - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
       - 'Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift'
+      - 'Scripts/test-playlist-restoration.sh'
+      - 'Benchmarks/NonDecodePerformance/allocmeter.c'
       - 'Benchmarks/ShuffleCheckpointIdentity/**'
       - '.github/workflows/shuffle-checkpoint-identity.yml'
       - '!Benchmarks/ShuffleCheckpointIdentity/*.md'
@@ -22,6 +24,8 @@ on:
       - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
       - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
       - 'Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift'
+      - 'Scripts/test-playlist-restoration.sh'
+      - 'Benchmarks/NonDecodePerformance/allocmeter.c'
       - 'Benchmarks/ShuffleCheckpointIdentity/**'
       - '.github/workflows/shuffle-checkpoint-identity.yml'
       - '!Benchmarks/ShuffleCheckpointIdentity/*.md'
@@ -82,6 +86,14 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Check container checkout and build coordination
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable in this ephemeral container; builds run serially in isolated directories.'
       - name: Qualify portable Foundation behavior
         run: |
           swift --version
@@ -90,20 +102,21 @@ jobs:
       - name: Measure Linux timing and separate malloc-family requests
         run: |
           python3 Benchmarks/ShuffleCheckpointIdentity/run.py \
-            --output "$RUNNER_TEMP/shuffle-checkpoint-linux" --allocations
+            --output /tmp/shuffle-checkpoint-linux --allocations
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: shuffle-checkpoint-linux
           path: |
-            ${{ runner.temp }}/shuffle-checkpoint-linux/*.json
-            ${{ runner.temp }}/shuffle-checkpoint-linux/*.jsonl
-            ${{ runner.temp }}/shuffle-checkpoint-linux/*.py
-            ${{ runner.temp }}/shuffle-checkpoint-linux/logs/
-            ${{ runner.temp }}/shuffle-checkpoint-linux/sources/
+            /tmp/shuffle-checkpoint-linux/*.json
+            /tmp/shuffle-checkpoint-linux/*.jsonl
+            /tmp/shuffle-checkpoint-linux/*.py
+            /tmp/shuffle-checkpoint-linux/logs/
+            /tmp/shuffle-checkpoint-linux/sources/
           retention-days: 14
 
   native-integration:
+    needs: [native-foundation, allocation-requests]
     runs-on: macos-26
     timeout-minutes: 40
     env:

@@ -110,11 +110,16 @@ struct PlaylistOrderRestorationTests {
         let saved = "/Media/Cafe\u{301}.mkv"
         #expect(composed.id == saved)
         #expect(Array(composed.id.utf8) != Array(saved.utf8))
-        for ids in [[], [saved], [saved, composed.id, "/removed"]] {
-            let expected = PlaylistMutation.restoringOrder([composed], ids: ids).map(\.id)
-            let actual = PlaylistMutation.restoringIDs([composed], ids: ids)
-            #expect(actual.map { Array($0.utf8) } == expected.map { Array($0.utf8) })
-            #expect(try JSONEncoder().encode(actual) == JSONEncoder().encode(expected))
+        let other = item(1)
+        // Include multiple items so this exercises Set.remove, not just the
+        // singleton fast path; equal Strings need not have identical bytes.
+        for items in [[composed], [other, composed], [composed, other, composed]] {
+            for ids in [[], [saved], [saved, composed.id, "/removed"], [other.id, saved]] {
+                let expected = PlaylistMutation.restoringOrder(items, ids: ids).map(\.id)
+                let actual = PlaylistMutation.restoringIDs(items, ids: ids)
+                #expect(actual.map { Array($0.utf8) } == expected.map { Array($0.utf8) })
+                #expect(try JSONEncoder().encode(actual) == JSONEncoder().encode(expected))
+            }
         }
     }
 

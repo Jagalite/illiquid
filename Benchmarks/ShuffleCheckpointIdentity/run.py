@@ -172,7 +172,8 @@ def main():
     (output / "summary.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print("SHUFFLE_CHECKPOINT_SUMMARY " + json.dumps(report, sort_keys=True), flush=True)
     # Keep full raw rows retrievable through ordinary Actions text logs as well as artifacts.
-    print("SHUFFLE_CHECKPOINT_OBSERVATIONS " + json.dumps(observations, sort_keys=True), flush=True)
+    for row in observations:
+        print("SHUFFLE_CHECKPOINT_OBSERVATION " + json.dumps(row, sort_keys=True), flush=True)
 
 
 if __name__ == "__main__":
