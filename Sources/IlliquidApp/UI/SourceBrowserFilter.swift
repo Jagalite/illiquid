@@ -259,19 +259,19 @@ actor SourceBrowserFilter {
         guard !query.isEmpty else { return rows }
         // Matching rows remain in the immutable input. Keep only their indices
         // while collecting identities, avoiding a second array of full metadata.
-        let matchingIndices = rows.indices.filter { index in
-            guard !Task.isCancelled else { return false }
-            let row = rows[index]
+        let matchingIndices = rows.enumerated().compactMap { index, row -> Int? in
+            guard !Task.isCancelled else { return nil }
             switch row.kind {
             case .folder, .media:
-                if row.displayName.localizedCaseInsensitiveContains(query) { return true }
-                guard let media = row.recognizedMedia else { return false }
-                return row.url.lastPathComponent.localizedCaseInsensitiveContains(query)
+                if row.displayName.localizedCaseInsensitiveContains(query) { return index }
+                guard let media = row.recognizedMedia else { return nil }
+                let matches = row.url.lastPathComponent.localizedCaseInsensitiveContains(query)
                     || media.section.localizedCaseInsensitiveContains(query)
                     || media.catalogIDs.contains { $0.localizedCaseInsensitiveContains(query) }
                     || (row.contextLabel?.localizedCaseInsensitiveContains(query) ?? false)
+                return matches ? index : nil
             case .message, .mediaSection:
-                return false
+                return nil
             }
         }
         var visibleIDs = Set<String>(minimumCapacity: matchingIndices.count)
