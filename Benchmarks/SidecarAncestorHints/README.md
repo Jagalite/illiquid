@@ -104,3 +104,39 @@ four test configurations. `--rounds` is an alias for `--pairs`. Outputs must be 
 or empty so a later run cannot overwrite prior evidence. Linux hosts using a
 separate toolchain dependency directory should pass it through `LD_LIBRARY_PATH`;
 the runner preserves and records that environment setting.
+
+## Retained research and final candidate
+
+The [research report](../../Documentation/SIDECAR_ANCESTOR_HINTS_PERFORMANCE.md)
+explains why the first two representations were rejected and proposes candidate C
+as a research draft pending native qualification. Its 20 added / 3 removed
+production lines preserve the original path-plan value and retain nonempty
+ancestor hints in a separate immutable snapshot captured before callbacks.
+
+The [evidence index](evidence/README.md) separates all five completed timing
+cohorts (1,800 observations) and the three candidates' test receipts. Raw samples
+and logs are in `evidence/raw-receipts.zip`; complete differential outputs are
+in the shared `evidence/verification-outputs.json.gz`. Hash manifests and exact
+source-commit mappings accompany them. These publication copies deduplicate
+identical outputs; a normal runner invocation still retains all original files.
+
+To reproduce C's full Linux matrix, use the recorded Swift 6.3.2 toolchain and
+`--pairs 10 --target-ms 300`, with CPU affinity 0 as recorded in its context.
+Choose an allowed CPU on another host and record that difference. Its final
+unchanged-source diagnostic uses:
+
+```sh
+taskset -c 0 python3 Benchmarks/SidecarAncestorHints/run.py \
+  --output /tmp/sidecar-ancestor-hints-followup \
+  --pairs 20 --target-ms 1000 \
+  --case rich-depth4-1000-cold \
+  --case missing-depth4-1000-cold \
+  --case missing-depth4-1000-warm \
+  --case nfo-depth4-1000-cold
+```
+
+This diagnostic addresses the original matrix's approximately 4% missing-sidecar
+control result. It is not a replacement for that matrix or proof of equivalence.
+The primed no-sidecar case still leaves a possible modest overhead. No additional
+local tuning or timing cohorts followed it; the next qualification is native
+macOS through the included workflow.

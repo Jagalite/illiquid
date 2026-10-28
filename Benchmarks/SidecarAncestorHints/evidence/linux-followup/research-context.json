@@ -1,0 +1,20 @@
+{
+  "affinity_method": "taskset -c 0 inherited by runner and sample processes",
+  "candidate": "C, unchanged final implementation",
+  "cases": [
+    "rich-depth4-1000-cold",
+    "missing-depth4-1000-cold",
+    "missing-depth4-1000-warm",
+    "nfo-depth4-1000-cold"
+  ],
+  "cpu_affinity": [
+    0
+  ],
+  "pairs": 20,
+  "reason": "Independent audit of the complete matrix found both no-sidecar medians about4% slower, but wide paired variation; rich-depth4-cold also differed by process order. Resolve this concrete remaining control risk before publication decision.",
+  "recorded_utc": "2026-10-28T05:42:45.733549+00:00",
+  "selection": "Exactly these four cases selected before any follow-up output; unchanged source, driver, runner and optimization flags. Fresh rebuilt modules retain source/binary receipts.",
+  "source_commit": "0712ea3e420b0e07fd0d1dc3f9a808e9a05c2a6c",
+  "stopping_rule": "No further implementation candidates or measurement-driven tuning. Retain all original C observations. If common-control slowdown reproduces or remains materially unresolved, no general success or ready-to-merge claim; await native evidence or report the optimization as unqualified.",
+  "target_ms": 1000
+}
