@@ -1,0 +1,104 @@
+name: Read-ahead EOF performance
+
+on:
+  push:
+    branches: [codex/perf-subtitle-eof-wakeups]
+    paths:
+      - Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift
+      - Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift
+      - Benchmarks/ReadAheadEOF/**
+      - .github/workflows/read-ahead-eof-performance.yml
+      - '!Benchmarks/ReadAheadEOF/README.md'
+      - '!Benchmarks/ReadAheadEOF/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift
+      - Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift
+      - Benchmarks/ReadAheadEOF/**
+      - .github/workflows/read-ahead-eof-performance.yml
+      - '!Benchmarks/ReadAheadEOF/README.md'
+      - '!Benchmarks/ReadAheadEOF/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: read-ahead-eof-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test both variants and measure paired components
+        run: |
+          # Hosted runners do not have the local Kyoto queue. The runner builds
+          # isolated packages serially and does not touch the product .build.
+          python3 Benchmarks/ReadAheadEOF/run.py --pairs 6 --duration 3 \
+            --output "$RUNNER_TEMP/read-ahead-eof"
+      - name: Emit auditable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "read-ahead-eof"
+          records = {p.name: p.read_text() for p in sorted(root.glob("*"))
+                     if p.is_file() and p.suffix in {".json", ".jsonl"}}
+          records["test_logs"] = {p.name: p.read_text()
+                                 for p in sorted((root / "logs").glob("*tests.log"))}
+          print("READ_AHEAD_EVIDENCE " + json.dumps(records, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: read-ahead-eof-macos
+          path: |
+            ${{ runner.temp }}/read-ahead-eof/*.json
+            ${{ runner.temp }}/read-ahead-eof/*.jsonl
+            ${{ runner.temp }}/read-ahead-eof/logs/*.log
+          retention-days: 14
+
+  linux:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.2-noble
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test both variants and measure paired components
+        run: |
+          # Hosted runners do not have the local Kyoto queue. The runner builds
+          # isolated packages serially and does not touch the product .build.
+          python3 Benchmarks/ReadAheadEOF/run.py --pairs 6 --duration 3 \
+            --output "$RUNNER_TEMP/read-ahead-eof"
+      - name: Emit auditable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "read-ahead-eof"
+          records = {p.name: p.read_text() for p in sorted(root.glob("*"))
+                     if p.is_file() and p.suffix in {".json", ".jsonl"}}
+          records["test_logs"] = {p.name: p.read_text()
+                                 for p in sorted((root / "logs").glob("*tests.log"))}
+          print("READ_AHEAD_EVIDENCE " + json.dumps(records, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: read-ahead-eof-linux
+          path: |
+            ${{ runner.temp }}/read-ahead-eof/*.json
+            ${{ runner.temp }}/read-ahead-eof/*.jsonl
+            ${{ runner.temp }}/read-ahead-eof/logs/*.log
+          retention-days: 14

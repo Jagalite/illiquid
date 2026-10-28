@@ -9,6 +9,7 @@ final class MediaReadAheadGate: @unchecked Sendable {
     private var position: TimeInterval = 0
     private var closed = false
     private var waitingReaders = 0
+    private var waitingTimestampedReaders = 0
 
     init(lookahead: TimeInterval = 30) { self.lookahead = max(0, lookahead) }
 
@@ -17,7 +18,9 @@ final class MediaReadAheadGate: @unchecked Sendable {
         condition.lock()
         if position > self.position {
             self.position = position
-            condition.broadcast()
+            // EOF readers wait for reset or close, not clock advancement.
+            // Keep recording progress even when nobody can use a notification.
+            if waitingTimestampedReaders > 0 { condition.broadcast() }
         }
         condition.unlock()
     }
@@ -43,8 +46,10 @@ final class MediaReadAheadGate: @unchecked Sendable {
         while !closed, self.generation == generation,
               timestamp == nil || timestamp! > position + lookahead {
             waitingReaders += 1
+            if timestamp != nil { waitingTimestampedReaders += 1 }
             condition.broadcast()
             condition.wait()
+            if timestamp != nil { waitingTimestampedReaders -= 1 }
             waitingReaders -= 1
         }
         return !closed && self.generation == generation
