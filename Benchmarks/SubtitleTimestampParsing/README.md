@@ -107,9 +107,53 @@ equivalent String equality is not used as a substitute for byte equality.
 
 ## Results
 
-Native qualification and the final retained result table are pending.
-The initial Linux screen supported this candidate; final conclusions will use
-the complete native cohort and application test receipts.
+Native qualification and the final result table are pending in
+[run 40636743957](https://github.com/Jagalite/illiquid/actions/runs/40636743957),
+for source commit `b9a0004d1a3a66ec6efc66c275583d43230001b1`.
+The first attempt remained unassigned for about 20 minutes; updating CI to
+record Xcode's selected compiler replaced that attempt without changing the
+production source or benchmark inputs. No native pass or speedup is claimed
+while those jobs are queued.
+
+### Linux development evidence
+
+All **248 timed observations** from three development cohorts are retained:
+
+| Cohort | Observations | Purpose and outcome |
+| --- | ---: | --- |
+| [Initial screen](evidence/linux-initial-screen/) | 28 | Two pairs over seven cases; noisy and potentially overlapped another exploratory task. |
+| [Isolated screen](evidence/linux-isolated-screen/) | 84 | Six pairs over seven cases; complete SRT conversions improved about 20–27%, with weaker WebVTT results. |
+| [Expanded development run](evidence/linux-development/) | 136 | Four pairs over all 17 selected cases; mixed timings, including regressions in some controls. |
+
+These are separate cohorts, with their original sources, iteration counts and
+raw pair ordering recorded in their manifests and receipts. They are not pooled
+into a favorable headline or treated as native qualification. The expanded
+run's paired CPU changes include −19.7% for 100-cue plain SRT and −20.0% for
+10,000-cue plain SRT, but +11.7% for 2,000-cue multilingual SRT, +13.7% for the
+irregular SRT control, and +16.8% for the unchanged missing-signature control.
+The complete results remain in each `summary.json`; no timed observations were
+discarded. The shortest expanded sample used 116.4 ms of process CPU.
+
+Correctness passed in the expanded run: 40 reported tests in each of four
+baseline/candidate × debug/release configurations, all 1,702 complete-converter
+comparisons, and all 21,605 timestamp comparisons with 11,101 independent
+expectations. The measured candidate source SHA-256 is
+`98f898002175a58e33dad643b12fb40b4a08f714e7084947f2cca871bf6f8731`.
+
+The [independent auditor](evidence/audit_evidence.py) reconstructs the statistics
+and checks the complete cohort, equal work, checksums, baseline/source hashes,
+and available full outputs and regression logs. Its
+[development audit](evidence/linux-audit.json) distinguishes the complete local
+run from the compact retained archives. Its
+[18 malformed-evidence checks](evidence/auditor-mutation-checks.json) all fail
+as intended. Compact archives keep the complete raw timings and timed receipt
+subset; their full verification-file hash is recorded, and the committed
+drivers regenerate the larger output corpus.
+
+```sh
+python3 Benchmarks/SubtitleTimestampParsing/evidence/audit_evidence.py \
+  Benchmarks/SubtitleTimestampParsing/evidence/linux-development
+```
 
 Filename-extension normalization was also screened during selection. Although
 its isolated classification loop improved, complete folder discovery did not

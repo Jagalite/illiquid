@@ -1,0 +1,209 @@
+["/workspace/scratch/ad1014220f8c/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift", "test", "--package-path", "/workspace/scratch/2129784da96c/subtitle-timestamp-linux/tests/baseline", "--cache-path", "/workspace/scratch/2129784da96c/subtitle-timestamp-linux/swiftpm-cache", "--config-path", "/workspace/scratch/2129784da96c/subtitle-timestamp-linux/swiftpm-config", "--security-path", "/workspace/scratch/2129784da96c/subtitle-timestamp-linux/swiftpm-security", "--disable-sandbox", "--jobs", "2", "-c", "debug", "--disable-xctest", "--enable-swift-testing", "--no-parallel", "-Xswiftc", "-warnings-as-errors", "--use-integrated-swift-driver"]
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for debugging...
+[0/19] Write swift-version--1B3D8DC5B0C4EEBA.txt
+[1/19] Emitting module for IlliquidNativePlayback
+[2/19] Emitting module for IlliquidNativePlaybackTests
+[3/19] Compiling IlliquidNativePlayback ExternalTextSubtitleConverter.swift
+[4/19] Wrapping AST for IlliquidNativePlaybackTests for debugging
+[5/19] Compiling IlliquidNativePlaybackTests ExternalTextSubtitleConverterTests.swift
+[6/19] Wrapping AST for IlliquidNativePlayback for debugging
+[7/19] Compiling IlliquidNativePlaybackTests ExternalSubtitleEscapingTests.swift
+[8/19] /workspace/scratch/2129784da96c/subtitle-timestamp-linux/tests/baseline/.build/x86_64-unknown-linux-gnu/debug/SubtitleTimestampRegressionsPackageDiscoveredTests.derived/all-discovered-tests.swift
+[9/19] Compiling SubtitleTimestampRegressionsPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+[10/19] Emitting module for SubtitleTimestampRegressionsPackageDiscoveredTests
+[11/19] /workspace/scratch/2129784da96c/subtitle-timestamp-linux/tests/baseline/.build/x86_64-unknown-linux-gnu/debug/SubtitleTimestampRegressionsPackageTests.derived/runner.swift
+[12/19] Wrapping AST for SubtitleTimestampRegressionsPackageDiscoveredTests for debugging
+[13/19] Compiling SubtitleTimestampRegressionsPackageDiscoveredTests all-discovered-tests.swift
+[14/19] Emitting module for SubtitleTimestampRegressionsPackageTests
+[15/19] Wrapping AST for SubtitleTimestampRegressionsPackageTests for debugging
+[16/19] Compiling SubtitleTimestampRegressionsPackageTests runner.swift
+[17/19] Write Objects.LinkFileList
+[18/19] Linking SubtitleTimestampRegressionsPackageTests.xctest
+Build complete! (12.82s)
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "External subtitle payload escaping" started.
+◇ Test plainUnicodePayloadPreservesExactUTF8() started.
+✔ Test plainUnicodePayloadPreservesExactUTF8() passed after 0.001 seconds.
+◇ Test adjacentEscapesAreInsertedOnceWithoutReescapingNewBackslashes() started.
+✔ Test adjacentEscapesAreInsertedOnceWithoutReescapingNewBackslashes() passed after 0.001 seconds.
+◇ Test unicodeEscapeBoundariesPreserveFoundationMatchingSemantics() started.
+✔ Test unicodeEscapeBoundariesPreserveFoundationMatchingSemantics() passed after 0.001 seconds.
+◇ Test multilinePayloadSeparatorsRemainDistinctFromLiteralASSCommands() started.
+✔ Test multilinePayloadSeparatorsRemainDistinctFromLiteralASSCommands() passed after 0.001 seconds.
+◇ Test missingEmptyAndTrailingPayloadLinesRetainTheirExistingShape() started.
+✔ Test missingEmptyAndTrailingPayloadLinesRetainTheirExistingShape() passed after 0.001 seconds.
+◇ Test whitespaceAndNonLFLineSeparatorsArePayloadNotParserWhitespace() started.
+✔ Test whitespaceAndNonLFLineSeparatorsArePayloadNotParserWhitespace() passed after 0.001 seconds.
+◇ Test longMultilingualLineWithSparseEscapesKeepsItsEntirePayload() started.
+✔ Test longMultilingualLineWithSparseEscapesKeepsItsEntirePayload() passed after 0.118 seconds.
+◇ Test longDenseEscapesAreNotDroppedOrDuplicatedAtBufferBoundaries() started.
+✔ Test longDenseEscapesAreNotDroppedOrDuplicatedAtBufferBoundaries() passed after 0.020 seconds.
+✔ Suite "External subtitle payload escaping" passed after 0.142 seconds.
+◇ Suite "External subtitle fixed-width timestamps" started.
+◇ Test everyMillisecondFractionRoundsBothEndpoints() started.
+✔ Test everyMillisecondFractionRoundsBothEndpoints() passed after 0.114 seconds.
+◇ Test fixedWidthClocksCarryBeyondTheirInputHourAndMinuteFields() started.
+✔ Test fixedWidthClocksCarryBeyondTheirInputHourAndMinuteFields() passed after 0.001 seconds.
+◇ Test fixedWidthFieldBoundsAndSeparatorsRemainFormatSpecific() started.
+✔ Test fixedWidthFieldBoundsAndSeparatorsRemainFormatSpecific() passed after 0.016 seconds.
+◇ Test nondigitControlAndUnicodeReplacementsAreRejectedAtEveryPosition() started.
+✔ Test nondigitControlAndUnicodeReplacementsAreRejectedAtEveryPosition() passed after 0.027 seconds.
+◇ Test whitespaceAndWebVTTSettingsAreNormalizedBeforeParsing() started.
+✔ Test whitespaceAndWebVTTSettingsAreNormalizedBeforeParsing() passed after 0.001 seconds.
+◇ Test irregularSubRipFieldsStillUseTheGeneralParser() started.
+✔ Test irregularSubRipFieldsStillUseTheGeneralParser() passed after 0.001 seconds.
+◇ Test foundationBridgedSourcesPreserveExactOutputBytes() started.
+✔ Test foundationBridgedSourcesPreserveExactOutputBytes() passed after 0.001 seconds.
+✔ Suite "External subtitle fixed-width timestamps" passed after 0.163 seconds.
+◇ Suite "External text subtitle conversion" started.
+◇ Test subRipAndWebVTTKeepEquivalentTimingAndPlainText() started.
+✔ Test subRipAndWebVTTKeepEquivalentTimingAndPlainText() passed after 0.001 seconds.
+◇ Test lineEndingConventionsPreserveMultilineCues(newline:) started.
+◇ Test case passing 1 argument newline → "
+" to lineEndingConventionsPreserveMultilineCues(newline:) started.
+◇ Test case passing 1 argument newline → "
+" to lineEndingConventionsPreserveMultilineCues(newline:) started.
+◇ Test case passing 1 argument newline → "
+" to lineEndingConventionsPreserveMultilineCues(newline:) started.
+✔ Test lineEndingConventionsPreserveMultilineCues(newline:) with 3 test cases passed after 0.001 seconds.
+◇ Test unescapedPayloadPreservesExactUnicodeAndControlBytes() started.
+✔ Test unescapedPayloadPreservesExactUnicodeAndControlBytes() passed after 0.001 seconds.
+◇ Test mixedPayloadLinesEscapeOriginalASSMetacharactersExactlyOnce() started.
+✔ Test mixedPayloadLinesEscapeOriginalASSMetacharactersExactlyOnce() passed after 0.001 seconds.
+◇ Test legacySubRipFractionVariantsRemainSupported() started.
+✔ Test legacySubRipFractionVariantsRemainSupported() passed after 0.001 seconds.
+◇ Test acceptsLargeHoursWithoutNarrowingOrLosingCentiseconds() started.
+✔ Test acceptsLargeHoursWithoutNarrowingOrLosingCentiseconds() passed after 0.001 seconds.
+◇ Test nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "nan" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "NaN" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "inf" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "Infinity" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "-inf" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "-1" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "-0" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "+1" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "1e309" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "1e3" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "-1e309" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "0x1p2" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "1.5" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "wat" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "１２" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "١" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+◇ Test case passing 1 argument component → "0_0" to nonDecimalComponentsAreRejectedInEitherEndpoint(component:) started.
+✔ Test nonDecimalComponentsAreRejectedInEitherEndpoint(component:) with 18 test cases passed after 0.022 seconds.
+◇ Test malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:60:00,000" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:60,000" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:99:00,000" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:99,000" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00::01,000" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → ":00:00:01,000" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01,000:" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01,000,001" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01,nan" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01,inf" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01,-1" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01,12x" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "2147483648:00:00,000" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "2147483647:59:59,995" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "9223372036854775807:00:00,000" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "1e308:00:00,000" to malformedSubRipTimestampsAreRejected(timestamp:) started.
+✔ Test malformedSubRipTimestampsAreRejected(timestamp:) with 16 test cases passed after 0.009 seconds.
+◇ Test malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:60:00.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:60.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "60:00.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:60.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00::01.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → ":00:01.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01.000:" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01.000.001" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:01" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:01.0" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:01.00" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:01.0000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "0:01.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:1.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01.nan" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01.inf" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01.-01" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "00:00:01.12x" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "2147483648:00:00.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "2147483647:59:59.995" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "9223372036854775807:00:00.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+◇ Test case passing 1 argument timestamp → "1e308:00:00.000" to malformedWebVTTTimestampsAreRejected(timestamp:) started.
+✔ Test malformedWebVTTTimestampsAreRejected(timestamp:) with 22 test cases passed after 0.009 seconds.
+◇ Test oversizedDecimalFieldsAreRejectedWithoutArithmeticOverflow() started.
+✔ Test oversizedDecimalFieldsAreRejectedWithoutArithmeticOverflow() passed after 0.131 seconds.
+◇ Test malformedCuesDoNotPreventLaterValidCuesFromLoading() started.
+✔ Test malformedCuesDoNotPreventLaterValidCuesFromLoading() passed after 0.001 seconds.
+◇ Test zeroLengthAndReversedCuesAreNotImported() started.
+✔ Test zeroLengthAndReversedCuesAreNotImported() passed after 0.001 seconds.
+◇ Test optionalUTF8ByteOrderMarkIsAccepted(signature:) started.
+◇ Test case passing 1 argument signature → "WEBVTT" to optionalUTF8ByteOrderMarkIsAccepted(signature:) started.
+◇ Test case passing 1 argument signature → "WEBVTT - bilingual captions" to optionalUTF8ByteOrderMarkIsAccepted(signature:) started.
+◇ Test case passing 1 argument signature → "WEBVTT	header" to optionalUTF8ByteOrderMarkIsAccepted(signature:) started.
+✔ Test optionalUTF8ByteOrderMarkIsAccepted(signature:) with 3 test cases passed after 0.001 seconds.
+◇ Test anExactWebVTTSignatureIsRequired(signature:) started.
+◇ Test case passing 1 argument signature → "" to anExactWebVTTSignatureIsRequired(signature:) started.
+◇ Test case passing 1 argument signature → "WEBVTTgarbage" to anExactWebVTTSignatureIsRequired(signature:) started.
+◇ Test case passing 1 argument signature → "WEBVTT2" to anExactWebVTTSignatureIsRequired(signature:) started.
+◇ Test case passing 1 argument signature → "webvtt" to anExactWebVTTSignatureIsRequired(signature:) started.
+◇ Test case passing 1 argument signature → "NOT WEBVTT" to anExactWebVTTSignatureIsRequired(signature:) started.
+✔ Test anExactWebVTTSignatureIsRequired(signature:) with 5 test cases passed after 0.001 seconds.
+◇ Test webVTTCommentAndMetadataBlocksCannotBecomeVisibleCues() started.
+✔ Test webVTTCommentAndMetadataBlocksCannotBecomeVisibleCues() passed after 0.001 seconds.
+◇ Test metadataWordsCanBeCueIdentifiers(identifier:) started.
+◇ Test case passing 1 argument identifier → "STYLE" to metadataWordsCanBeCueIdentifiers(identifier:) started.
+◇ Test case passing 1 argument identifier → "REGION" to metadataWordsCanBeCueIdentifiers(identifier:) started.
+◇ Test case passing 1 argument identifier → " STYLE" to metadataWordsCanBeCueIdentifiers(identifier:) started.
+◇ Test case passing 1 argument identifier → "REGION " to metadataWordsCanBeCueIdentifiers(identifier:) started.
+◇ Test case passing 1 argument identifier → "	REGION" to metadataWordsCanBeCueIdentifiers(identifier:) started.
+✔ Test metadataWordsCanBeCueIdentifiers(identifier:) with 5 test cases passed after 0.001 seconds.
+◇ Test commentsOnlyAndUntimedTextReportNoValidCues() started.
+✔ Test commentsOnlyAndUntimedTextReportNoValidCues() passed after 0.001 seconds.
+◇ Test newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count:) started.
+◇ Test case passing 1 argument count → 1 to newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count:) started.
+◇ Test case passing 1 argument count → 2 to newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count:) started.
+◇ Test case passing 1 argument count → 3 to newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count:) started.
+◇ Test case passing 1 argument count → 4 to newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count:) started.
+◇ Test case passing 1 argument count → 5 to newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count:) started.
+◇ Test case passing 1 argument count → 6 to newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count:) started.
+◇ Test case passing 1 argument count → 7 to newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count:) started.
+✔ Test newlineRunsSeparateCuesOnlyAfterAnEmptyLine(count:) with 7 test cases passed after 0.005 seconds.
+◇ Test trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count:) started.
+◇ Test case passing 1 argument count → 1 to trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count:) started.
+◇ Test case passing 1 argument count → 2 to trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count:) started.
+◇ Test case passing 1 argument count → 3 to trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count:) started.
+◇ Test case passing 1 argument count → 4 to trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count:) started.
+◇ Test case passing 1 argument count → 5 to trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count:) started.
+◇ Test case passing 1 argument count → 6 to trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count:) started.
+◇ Test case passing 1 argument count → 7 to trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count:) started.
+✔ Test trailingNewlineRunsKeepPayloadAndBlockEndDistinct(count:) with 7 test cases passed after 0.004 seconds.
+◇ Test leadingEmptyBlocksDoNotHideTheNextCue(count:) started.
+◇ Test case passing 1 argument count → 1 to leadingEmptyBlocksDoNotHideTheNextCue(count:) started.
+◇ Test case passing 1 argument count → 2 to leadingEmptyBlocksDoNotHideTheNextCue(count:) started.
+◇ Test case passing 1 argument count → 3 to leadingEmptyBlocksDoNotHideTheNextCue(count:) started.
+◇ Test case passing 1 argument count → 4 to leadingEmptyBlocksDoNotHideTheNextCue(count:) started.
+◇ Test case passing 1 argument count → 5 to leadingEmptyBlocksDoNotHideTheNextCue(count:) started.
+◇ Test case passing 1 argument count → 6 to leadingEmptyBlocksDoNotHideTheNextCue(count:) started.
+◇ Test case passing 1 argument count → 7 to leadingEmptyBlocksDoNotHideTheNextCue(count:) started.
+✔ Test leadingEmptyBlocksDoNotHideTheNextCue(count:) with 7 test cases passed after 0.001 seconds.
+◇ Test whitespaceOnlyLinesAndUnicodeSeparatorsRemainInsideThePayload() started.
+✔ Test whitespaceOnlyLinesAndUnicodeSeparatorsRemainInsideThePayload() passed after 0.001 seconds.
+◇ Test webVTTDiscardsItsEntireFirstBlockEvenWhenItContainsTimings() started.
+✔ Test webVTTDiscardsItsEntireFirstBlockEvenWhenItContainsTimings() passed after 0.001 seconds.
+◇ Test invalidFirstTimingDoesNotPromoteLaterTimingsInTheSameBlock() started.
+✔ Test invalidFirstTimingDoesNotPromoteLaterTimingsInTheSameBlock() passed after 0.001 seconds.
+◇ Test onlySubRipMayScanPastMultipleIdentifiersForATimingLine() started.
+✔ Test onlySubRipMayScanPastMultipleIdentifiersForATimingLine() passed after 0.001 seconds.
+◇ Test blockBoundariesPreserveExactUnicodeAndControlPayloadBytes() started.
+✔ Test blockBoundariesPreserveExactUnicodeAndControlPayloadBytes() passed after 0.001 seconds.
+✔ Suite "External text subtitle conversion" passed after 0.195 seconds.
+✔ Test run with 40 tests in 3 suites passed after 0.501 seconds.
