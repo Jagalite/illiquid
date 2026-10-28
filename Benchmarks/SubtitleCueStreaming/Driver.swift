@@ -1,8 +1,12 @@
+#if canImport(Darwin)
 import Darwin
+#else
+import Glibc
+#endif
 import Foundation
 
 // Compile with the complete production converter for each variant. Inputs,
-// warmup, and JSON encoding are outside the timed loop. Darwin ru_maxrss is bytes.
+// warmup, and JSON encoding are outside the timed loop. RSS is normalized to bytes.
 private let maximumInputBytes = 4 * 1_024 * 1_024
 private let maximumIterations = 1_000_000
 
@@ -39,9 +43,17 @@ private func stamp(_ output: String) -> OutputStamp {
     return OutputStamp(byteCount: bytes.count, lastByte: bytes.last ?? 0)
 }
 
+private func conversionPool<T>(_ body: () throws -> T) rethrows -> T {
+    #if canImport(Darwin)
+    return try autoreleasepool(invoking: body)
+    #else
+    return try body()
+    #endif
+}
+
 @inline(never)
 private func consumeConversion(_ fixture: Fixture) throws -> OutputStamp {
-    try autoreleasepool {
+    try conversionPool {
         let output = try fixture.format.convert(fixture.source)
         return stamp(output)
     }
@@ -55,9 +67,16 @@ private func nanoseconds(_ clock: clockid_t) throws -> UInt64 {
 
 private func peakRSSBytes() throws -> UInt64 {
     var usage = rusage()
-    try require(getrusage(RUSAGE_SELF, &usage) == 0, "getrusage failed")
+    #if canImport(Darwin)
+    let status = getrusage(RUSAGE_SELF, &usage)
+    let multiplier: UInt64 = 1
+    #else
+    let status = getrusage(Int32(RUSAGE_SELF.rawValue), &usage)
+    let multiplier: UInt64 = 1_024
+    #endif
+    try require(status == 0, "getrusage failed")
     try require(usage.ru_maxrss >= 0, "getrusage returned a negative peak RSS")
-    return UInt64(usage.ru_maxrss)
+    return UInt64(usage.ru_maxrss) * multiplier
 }
 
 // Deterministic fixture identity, not a cryptographic integrity claim.
@@ -391,7 +410,7 @@ private func memory(_ name: String) throws -> [String: Any] {
         "peak_rss_before_fixture_bytes": beforeFixture,
         "peak_rss_before_conversion_bytes": before,
         "peak_rss_growth_bytes": peak - before,
-        "rss_source": "Darwin getrusage(RUSAGE_SELF).ru_maxrss", "rss_unit": "bytes",
+        "rss_source": "getrusage(RUSAGE_SELF).ru_maxrss normalized to bytes", "rss_unit": "bytes",
     ]
 }
 

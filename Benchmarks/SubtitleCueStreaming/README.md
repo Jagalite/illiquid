@@ -8,7 +8,7 @@ timestamp parsing, escaping, and the emitted format retain their existing rules.
 
 ## Reproduce
 
-On macOS with Swift 6.1 or newer:
+On macOS or Linux with Swift 6.1 or newer:
 
     python3 Benchmarks/SubtitleCueStreaming/run.py \
       --pairs 8 --target-ms 150 --output /tmp/subtitle-cue-streaming
@@ -39,7 +39,8 @@ Dedicated fresh-process runs measure peak resident memory for dense and
 long-line inputs. These are whole-process high-water marks, not allocation
 counts or retained-memory claims. Raw measurements, compiler and machine
 information, source and binary hashes, exact source snapshots, test logs, and
-full correctness traces are retained in the CI artifact.
+full correctness traces are retained in separate CI artifacts for each platform. Linux results are preliminary
+component evidence; they do not qualify macOS Foundation performance.
 
-Results will be recorded after native qualification. These component
+Results will be recorded after qualification, with the platform identified. These component
 measurements do not establish playback frame-rate or end-to-end file-open gains.

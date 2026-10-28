@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare real subtitle converters on native macOS; retain reproducible evidence."""
+"""Compare real subtitle converters and retain platform-specific evidence."""
 import argparse
 import hashlib
 import json
@@ -33,8 +33,11 @@ def main():
     parser.add_argument("--target-ms", type=float, default=150)
     parser.add_argument("--tests-only", action="store_true")
     args = parser.parse_args()
-    if platform.system() != "Darwin":
-        parser.error("Requires native macOS Foundation and process RSS units.")
+    if platform.system() not in ("Darwin", "Linux"):
+        parser.error("Requires macOS or Linux with Swift 6.1 or newer.")
+    native = platform.system() == "Darwin"
+    swiftc = ["xcrun", "swiftc"] if native else ["swiftc"]
+    swift = ["xcrun", "swift"] if native else ["swift"]
     if args.pairs < 6 or args.pairs > 20 or args.pairs % 2:
         parser.error("--pairs must be even and between 6 and 20")
     if not 100 <= args.target_ms <= 2000:
@@ -98,9 +101,9 @@ def main():
             "baseline_commit": BASELINE,
             "candidate_commit": execute("head", ["git", "rev-parse", "HEAD"]).strip(),
             "platform": platform.platform(), "machine": platform.machine(),
-            "swift": execute("swift-version", ["xcrun", "swiftc", "--version"]).strip(),
-            "xcode": execute("xcode-version", ["xcodebuild", "-version"]).strip(),
-            "hardware": execute("hardware", ["sysctl", "hw.model", "hw.memsize", "hw.ncpu"]).strip(),
+            "swift": execute("swift-version", [*swiftc, "--version"]).strip(),
+            "xcode": execute("xcode-version", ["xcodebuild", "-version"]).strip() if native else None,
+            "hardware": execute("hardware", ["sysctl", "hw.model", "hw.memsize", "hw.ncpu"] if native else ["lscpu"]).strip(),
             "source_path": SOURCE,
             "baseline_sha256": digest(baseline.encode()),
             "candidate_sha256": digest(candidate.encode()),
@@ -119,7 +122,7 @@ def main():
                 label = f"{variant}-{configuration}"
                 binary = output / label
                 compile_command(f"build-{label}", [
-                    "xcrun", "swiftc", "-swift-version", "6", "-parse-as-library",
+                    *swiftc, "-swift-version", "6", "-parse-as-library",
                     *flags, snapshots / f"{variant}.swift",
                     snapshots / "Driver.swift", "-o", binary,
                 ])
@@ -161,7 +164,7 @@ let package = Package(
                 shutil.copy2(source_test, package / "Tests/IlliquidNativePlaybackTests" / name)
             for configuration in ("debug", "release"):
                 compile_command(f"tests-{variant}-{configuration}", [
-                    "xcrun", "swift", "test", "--package-path", package,
+                    *swift, "test", "--package-path", package,
                     "--configuration", configuration, "--jobs", "2", "--no-parallel",
                 ])
                 test_log = (output / f"tests-{variant}-{configuration}.log").read_text()
@@ -234,6 +237,24 @@ let package = Package(
                     row = json.loads(execute(f"memory-{case}-{pair}-{variant}", [
                         binaries[(variant, "release")], "memory", case
                     ]))
+                    reference = next(r for r in rows
+                                     if r["case"] == case and r["variant"] == variant)
+                    if row.get("mode") != "memory" or row.get("case") != case:
+                        raise RuntimeError("Memory receipt has the wrong workload")
+                    for key in ("fixture_count", "fixture_checksum", "input_bytes",
+                                "output_bytes", "cycle_checksum"):
+                        if row[key] != reference[key]:
+                            raise RuntimeError(f"Memory fixture mismatch: {key}")
+                    if not (row["checksum"] == row["expected_checksum"]
+                            == row["cycle_checksum"]):
+                        raise RuntimeError("Memory checksum differs")
+                    if not (row["peak_rss_bytes"] >= row["peak_rss_before_conversion_bytes"]
+                            >= row["peak_rss_before_fixture_bytes"]):
+                        raise RuntimeError("Memory high-water marks are inconsistent")
+                    if row["peak_rss_growth_bytes"] != (
+                        row["peak_rss_bytes"] - row["peak_rss_before_conversion_bytes"]
+                    ):
+                        raise RuntimeError("Memory growth receipt differs")
                     row.update(variant=variant, pair=pair, ordinal=len(memory_rows))
                     memory_rows.append(row)
                     with (output / "memory.jsonl").open("a") as stream:
