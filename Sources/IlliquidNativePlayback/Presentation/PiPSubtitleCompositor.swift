@@ -373,6 +373,8 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
     // Work-queue confined. The revision prevents a new pipeline from reusing
     // a prepared frame produced by the preceding source.
     private var preparedSubtitlePipelineRevision: UInt64?
+    // Geometry-only values; compose() accesses this exclusively on workQueue.
+    private var videoTextureCoordinates = PiPVideoMapping.TextureCoordinateCache()
 
     init(
         subtitles: SubtitlePipeline? = nil,
@@ -1057,7 +1059,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             throw PiPSubtitleCompositorError.commandEncoding
         }
         videoEncoder.setRenderPipelineState(videoPipeline)
-        let coordinates = PiPVideoMapping.textureCoordinates(
+        let coordinates = videoTextureCoordinates.coordinates(
             codedSize: CGSize(width: sourceWidth, height: sourceHeight),
             cleanAperture: frame.cleanAperture,
             rotationDegrees: frame.rotationDegrees,
@@ -1113,8 +1115,8 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             let chroma = try makeCVTexture(pixelBuffer: output, pixelFormat: .rg16Unorm,
                 width: CVPixelBufferGetWidthOfPlane(output, 1), height: CVPixelBufferGetHeightOfPlane(output, 1), plane: 1)
             outputTextures.append(chroma)
-            let identity = PiPVideoMapping.textureCoordinates(codedSize: CGSize(width: width, height: height),
-                cleanAperture: nil, rotationDegrees: 0, mirrored: false)
+            // width and height were admitted at a minimum of two pixels above.
+            let identity = PiPVideoMapping.identityTextureCoordinates
             for (texture, pipeline) in zip(outputTextures, [hdrPipelines.luma, hdrPipelines.chroma]) {
                 let pass = MTLRenderPassDescriptor()
                 pass.colorAttachments[0].texture = CVMetalTextureGetTexture(texture)

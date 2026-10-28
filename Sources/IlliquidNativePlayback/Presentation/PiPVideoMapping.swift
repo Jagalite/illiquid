@@ -3,6 +3,69 @@ import Foundation
 
 /// Source interpretation shared by the PiP encoder and its reference tests.
 enum PiPVideoMapping {
+    /// Single-entry geometry cache. No pixel buffer or other frame owner is retained.
+    struct TextureCoordinateCache {
+        private struct RectBits: Equatable {
+            let x: UInt64
+            let y: UInt64
+            let width: UInt64
+            let height: UInt64
+
+            init(_ rect: CGRect) {
+                x = Double(rect.origin.x).bitPattern
+                y = Double(rect.origin.y).bitPattern
+                width = Double(rect.size.width).bitPattern
+                height = Double(rect.size.height).bitPattern
+            }
+        }
+
+        private struct Key: Equatable {
+            let width: UInt64
+            let height: UInt64
+            let cleanAperture: RectBits?
+            let rotationDegrees: UInt64
+            let mirrored: Bool
+            let displayCrop: RectBits
+        }
+
+        private struct Entry {
+            let key: Key
+            let coordinates: [SIMD2<Float>]
+        }
+
+        private var entry: Entry?
+
+        mutating func coordinates(
+            codedSize: CGSize, cleanAperture: CGRect?, rotationDegrees: Double,
+            mirrored: Bool, displayCrop: CGRect = CGRect(x: 0, y: 0, width: 1, height: 1)
+        ) -> [SIMD2<Float>] {
+            // Preserve raw components rather than CGRect's geometric equality,
+            // including signed zero and non-finite representations.
+            let key = Key(
+                width: Double(codedSize.width).bitPattern,
+                height: Double(codedSize.height).bitPattern,
+                cleanAperture: cleanAperture.map(RectBits.init),
+                rotationDegrees: rotationDegrees.bitPattern,
+                mirrored: mirrored,
+                displayCrop: RectBits(displayCrop)
+            )
+            if let entry, entry.key == key { return entry.coordinates }
+            let coordinates = PiPVideoMapping.textureCoordinates(
+                codedSize: codedSize, cleanAperture: cleanAperture,
+                rotationDegrees: rotationDegrees, mirrored: mirrored,
+                displayCrop: displayCrop
+            )
+            entry = Entry(key: key, coordinates: coordinates)
+            return coordinates
+        }
+    }
+
+    /// Uncropped, unrotated UVs for the already-validated positive-size HDR target.
+    static let identityTextureCoordinates: [SIMD2<Float>] = [
+        SIMD2(0, 0), SIMD2(0, 1), SIMD2(1, 0),
+        SIMD2(1, 0), SIMD2(0, 1), SIMD2(1, 1),
+    ]
+
     static func colorCoefficients(matrix: Int32?) -> SIMD4<Float> {
         let weights: (Float, Float)
         switch matrix {

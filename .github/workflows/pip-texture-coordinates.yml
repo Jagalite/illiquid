@@ -1,0 +1,89 @@
+name: PiP texture coordinate qualification
+
+on:
+  push:
+    branches: ['perf/pip-texture-coordinate-cache-20261028-6a8fb']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPVideoMappingTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPTextureCoordinateCacheTests.swift'
+      - 'Benchmarks/PiPTextureCoordinates/**'
+      - '!Benchmarks/PiPTextureCoordinates/README.md'
+      - '!Benchmarks/PiPTextureCoordinates/evidence/**'
+      - '.github/workflows/pip-texture-coordinates.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPVideoMappingTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPTextureCoordinateCacheTests.swift'
+      - 'Benchmarks/PiPTextureCoordinates/**'
+      - '!Benchmarks/PiPTextureCoordinates/README.md'
+      - '!Benchmarks/PiPTextureCoordinates/evidence/**'
+      - '.github/workflows/pip-texture-coordinates.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pip-texture-coordinates-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coordinates:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test both variants and measure paired native coordinate preparation
+        run: >-
+          python3 Benchmarks/PiPTextureCoordinates/run.py
+          --output "$RUNNER_TEMP/pip-texture-coordinates" --pairs 10 --target-ms 120
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pip-texture-coordinates
+          path: |
+            ${{ runner.temp }}/pip-texture-coordinates/*.json
+            ${{ runner.temp }}/pip-texture-coordinates/*.jsonl
+            ${{ runner.temp }}/pip-texture-coordinates/logs/
+            ${{ runner.temp }}/pip-texture-coordinates/sources/
+            ${{ runner.temp }}/pip-texture-coordinates/qualification/
+          retention-days: 14
+
+  native-pip-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build app graph and run native PiP regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/pip-coordinate-native"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --no-parallel --filter \
+            'PiPTextureCoordinateCacheTests|PiPVideoMappingTests|PiPSubtitlePipelineTests|PiPSubtitleCompositionPolicyTests|PiPSubtitleUploadReuseTests' \
+            2>&1 | tee "$RUNNER_TEMP/pip-coordinate-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pip-coordinate-native-regressions
+          path: ${{ runner.temp }}/pip-coordinate-native/
+          retention-days: 14
