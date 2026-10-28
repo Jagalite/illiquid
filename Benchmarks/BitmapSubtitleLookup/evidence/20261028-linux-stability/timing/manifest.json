@@ -1,0 +1,72 @@
+{
+  "arguments": {
+    "cases": "newest-128,newest-32,after-newest-128",
+    "max_sample_ms": 1500.0,
+    "output": "/home/runner/work/_temp/bitmap-subtitle-lookup-stability/timing",
+    "pairs": 16,
+    "portable": true,
+    "suite": "lookup",
+    "target_ms": 250.0,
+    "tests_only": false
+  },
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "git_blob_sha1": "cd3482a721c63fc9742195f91ce67ae37a0301b7",
+    "path": "Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift",
+    "repository": "Jagalite/illiquid",
+    "sha256": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f"
+  },
+  "binary_sha256": {
+    "baseline": {
+      "benchmark": "dea2bf5e93e28fd2fc3e981ab4274043880ce5058a357c1f1e61a52d6c197c85",
+      "libIlliquidNativePlayback.so": "a11de63bab18d742c099d38dbc8e393ac70edc269d4c8c152800974a2c6dc2f4"
+    },
+    "candidate": {
+      "benchmark": "4aa33662e7fcef1b9ea56e4e66421d686fc3c9c2e4221a19713b27a2690b9713",
+      "libIlliquidNativePlayback.so": "b1d8433365e80baef2517901d060b1a86a0100647767ccd58b435ff7f28e9165"
+    }
+  },
+  "collected_at_utc": "2026-10-28T06:12:41Z",
+  "driver_sha256": "b5870155fffa024a276fea6b617100aacf47380364e94b7d7be0b15caef2828e",
+  "execution_scope": "portable Linux component; Foundation geometry; not macOS qualification",
+  "extraction": "Complete ASSRenderedRegion declaration from LibassContext.swift; only Foundation/CoreGraphics imports added. Timeline and budget copied whole. Standalone CoreGraphics imports in staged sources and driver are conditionalized for this explicit portable run; no declarations or operations are substituted.",
+  "git_head": "96d261bfbeee488bb5a3242fad43c056a3f67abc",
+  "git_status": "",
+  "hardware": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 9V45 96-Core Processor\nCPU family:                              26\nModel:                                   2\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                5192.19\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               96 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                2 MiB (2 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Vulnerable: Safe RET, no microcode\nVulnerability Spec store bypass:         Vulnerable\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected",
+  "machine": "x86_64",
+  "method": "Separate optimized production module; same-iteration fresh-process pairs; alternating AB/BA order; deterministic per-pair fixture shuffle; warm in-memory work; calibration excluded; no discarded timing samples or control subtraction.",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "region_declaration_sha256": "353f37177ca3235616eb358b6096929cc6ba9c5d2ba99d568f388899a3933138",
+  "runner_sha256": "2ea4f8c3c86f7fc83a3730ef1f8874d04663d431bfedf0585259a74f68c52577",
+  "source_sha256": {
+    "baseline": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    },
+    "candidate": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "12ba0265de8b945c8afcabba056962803e4eb3db856163f28814064d448f857c",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  },
+  "staged_driver_sha256": "a3508dbe809ab7a6cdadd9c2882b42a6dc07417e1c5054029f3fc0deb2acde81",
+  "staged_source_sha256": {
+    "baseline": {
+      "ASSRenderedRegion.swift": "34ab288c1a92756eac3a6c479502ae0a0560c131fe452985665765c57a580331",
+      "BitmapSubtitleTimeline.swift": "96bc0d56b20102465ac171e8c0c119dca7e7d3afc0c87f24f52d4d2d315d5d85",
+      "SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    },
+    "candidate": {
+      "ASSRenderedRegion.swift": "34ab288c1a92756eac3a6c479502ae0a0560c131fe452985665765c57a580331",
+      "BitmapSubtitleTimeline.swift": "28f7936da48db10ff2c402c45b0cead539368ebc317f68500d2305285fb5f5b5",
+      "SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  },
+  "swift": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "test_sha256": {
+    "BitmapSubtitleTimelineLookupTests.swift": "05b20d7f62db714855a4a290684e819a99ced148540cfb9295e116f4cc1d3ce2",
+    "BitmapSubtitleTimelineOrderingTests.swift": "583701a03466dfc760230cb0d487f2cf2165ee56ad11062ae5a42354afd0f577",
+    "SubtitleMemoryBudgetAccountingTests.swift": "b3d872737944344704762b2097d5734998825a6bae336ab14bda93f78d67ef6b"
+  }
+}

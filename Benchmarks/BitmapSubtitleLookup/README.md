@@ -188,5 +188,47 @@ observations from both cohorts will be kept separately. The question is whether
 the newest-at-128 regression reproduces; there is no source tuning in this check.
 
 [Stability run 40642038057](https://github.com/Jagalite/illiquid/actions/runs/40642038057)
-is pending. Native macOS qualification of the revised production source is also
-pending. The research is not yet a claim of improved whole-player performance.
+completed successfully on Swift 6.4, x86_64 Linux, with four hosted vCPUs
+reporting AMD EPYC 9V45. Candidate, driver, and compiled-input hashes match the
+revised full-matrix run. All 96 measured observations had matching receipts and
+checksums. This timing-only check did not repeat the unchanged correctness suite.
+
+| Control | Baseline median ns/query | Revised median ns/query | Added ns/query | Added time | Candidate faster pairs |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `newest-128` | 13.284 | 13.534 | 0.250 | 1.88% | 1/16 |
+| `newest-32` | 13.293 | 13.564 | 0.270 | 2.03% | 1/16 |
+| `after-newest-128` | 13.302 | 13.527 | 0.225 | 1.69% | 2/16 |
+
+The approximately 8.8% newest-at-128 result did not reproduce at that magnitude.
+A smaller, consistent tail-path cost of about 0.22-0.27 ns (1.7-2.0%) did.
+Treat that cost as real: the candidate was slower in 14 or 15 of 16 pairs in
+these controls. The earlier observation remains in its original cohort; no
+samples were removed and the two hosts' absolute times are not pooled.
+
+Full records are under [stability evidence](evidence/20261028-linux-stability).
+The fixed check can be reproduced with:
+
+```sh
+python3 Benchmarks/BitmapSubtitleTimeline/run.py --suite lookup --portable \
+  --cases newest-128,newest-32,after-newest-128 \
+  --pairs 16 --target-ms 250 --max-sample-ms 1500 \
+  --output /tmp/illiquid-bitmap-lookup-stability
+```
+
+## Research decision and remaining qualification
+
+The bounded backward search is proposed for review as a component optimization
+with a measured tradeoff: dense-window lookups were consistently faster in the
+Linux full-matrix cohort, while the separate stability check confirmed a small
+tail-path overhead. A draft PR preserves that distinction.
+
+Native macOS qualification of the revised production source remains pending
+at the time of this report (2026-10-28). The native workflow must validate the
+revised source before the PR is marked ready; a run for the earlier binary
+candidate cannot qualify this change.
+
+The tests establish component behavior, and the timings establish the named
+warm lookup workloads. Actual subtitle occupancy/query-position distributions
+and whole-player CPU, frame rate, energy and responsiveness remain unmeasured.
+The absolute improvements are nanoseconds per lookup, so a perceptible playback
+improvement is not established.
