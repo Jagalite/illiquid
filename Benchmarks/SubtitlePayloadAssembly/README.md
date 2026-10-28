@@ -29,7 +29,7 @@ qualification is available.
 The external SRT/WebVTT converter currently maps every accepted cue's payload
 lines to escaped strings, joins them into a second string, and interpolates the
 joined payload into the final ASS output. The candidate appends the existing
-escaped lines directly to that final output, with the same literal `\\N`
+escaped lines directly to that final output, with the same ASS line-break
 separator between lines.
 
 This removes the per-cue escaped-line array and joined-payload temporary. It
