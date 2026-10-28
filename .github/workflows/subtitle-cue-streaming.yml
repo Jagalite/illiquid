@@ -73,6 +73,20 @@ jobs:
               for path in failure_logs[-6:]:
                   print(f"\nDIAGNOSTIC {path.name}", flush=True)
                   print(path.read_text()[-16000:], flush=True)
+          # Keep the complete differential traces and command/test logs
+          # recoverable even when this chat has no local command environment.
+          import base64, gzip, hashlib, json
+          if root.is_dir():
+              files = {
+                  path.name: path.read_text()
+                  for path in sorted(root.iterdir())
+                  if path.is_file() and path.suffix in {".json", ".jsonl", ".log"}
+              }
+              packed = gzip.compress(
+                  json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0
+              )
+              print("CUE_EVIDENCE_SHA256 " + hashlib.sha256(packed).hexdigest(), flush=True)
+              print("CUE_EVIDENCE_BASE64 " + base64.b64encode(packed).decode(), flush=True)
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
