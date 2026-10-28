@@ -1,0 +1,127 @@
+name: Source search index storage
+
+on:
+  push:
+    branches: ['perf/source-search-index-storage-20261028']
+    paths:
+      - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
+      - Tests/IlliquidAppTests/SourceBrowserSearchTests.swift
+      - Scripts/test-source-browser-search.py
+      - Benchmarks/SourceBrowserSearch/Harness.swift
+      - Benchmarks/SourceBrowserSearch/run.py
+      - .github/workflows/source-search-index-storage.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-search-index-storage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, macos-26]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      SEARCH_BASELINE: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Select native toolchain and verify build isolation
+        shell: bash
+        run: |
+          if test "$RUNNER_OS" = macOS; then
+            echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
+          fi
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds run serially in isolated temporary packages.'
+      - name: Record host and compiler
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/search-index-storage"
+          {
+            uname -a
+            swift --version
+            python3 --version
+            git rev-parse HEAD
+            if test "$RUNNER_OS" = macOS; then
+              sw_vers
+              sysctl -n machdep.cpu.brand_string
+            else
+              lscpu
+            fi
+          } > "$RUNNER_TEMP/search-index-storage/host.txt"
+      - name: Verify baseline and candidate search behavior
+        shell: bash
+        run: |
+          for configuration in debug release; do
+            python3 Scripts/test-source-browser-search.py \
+              --configuration "$configuration" --baseline-ref "$SEARCH_BASELINE" \
+              --output "$RUNNER_TEMP/search-index-storage/baseline-$configuration"
+            python3 Scripts/test-source-browser-search.py \
+              --configuration "$configuration" \
+              --output "$RUNNER_TEMP/search-index-storage/candidate-$configuration"
+          done
+      - name: Measure complete search and cached projection
+        shell: bash
+        run: |
+          affinity=()
+          if test "$RUNNER_OS" = Linux; then
+            search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
+            affinity=(--cpu "$search_cpu")
+          fi
+          python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SEARCH_BASELINE" --pairs 6 --target-ms 120 \
+            "${affinity[@]}" --output "$RUNNER_TEMP/search-index-storage/timing"
+      - name: Measure allocation requests independently
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
+          python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SEARCH_BASELINE" --allocations --pairs 2 \
+            --cpu "$search_cpu" --output "$RUNNER_TEMP/search-index-storage/allocations"
+      - name: Emit reviewable evidence
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'search-index-storage'
+          paths = [root / 'host.txt']
+          for directory in ('baseline-debug', 'candidate-debug', 'baseline-release', 'candidate-release'):
+              paths.extend(root.joinpath(directory).glob('*.json'))
+              paths.extend(root.joinpath(directory).glob('*.log'))
+          for directory in ('timing', 'allocations'):
+              paths.extend(root.joinpath(directory).glob('*.json'))
+              paths.extend(root.joinpath(directory).glob('measurements.jsonl'))
+              paths.extend(root.joinpath(directory).glob('*/source-receipt.json'))
+          for path in sorted(set(paths)):
+              if path.is_file():
+                  data = path.read_bytes()
+                  record = {'path': str(path.relative_to(root)),
+                            'sha256': hashlib.sha256(data).hexdigest(),
+                            'content': data.decode('utf-8')}
+                  print('SEARCH_INDEX_STORAGE_EVIDENCE ' + json.dumps(record, separators=(',', ':')))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-search-index-storage-${{ matrix.runner }}
+          path: |
+            ${{ runner.temp }}/search-index-storage/
+            !${{ runner.temp }}/search-index-storage/**/.build/**
+            !${{ runner.temp }}/search-index-storage/**/cache/**
+            !${{ runner.temp }}/search-index-storage/**/module-cache/**
+          retention-days: 30

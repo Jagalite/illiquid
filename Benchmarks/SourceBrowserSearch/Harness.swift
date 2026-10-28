@@ -164,6 +164,8 @@ struct SourceSearchBenchmark {
         var result: [String: Any] = [
             "operation": operation, "media_count": count, "depth": depth, "kind": kind,
             "input_rows": rows.count, "output_rows": finalRows.count,
+            "row_stride": MemoryLayout<SourceTreeDisplayRow>.stride,
+            "index_stride": MemoryLayout<Int>.stride,
             "iterations": iterations, "warmup": warmup,
             "elapsed_ns": elapsed, "cpu_ns": cpu, "checksum": checksum,
             "fingerprint": fingerprint(finalRows), "oracle_equal": true,

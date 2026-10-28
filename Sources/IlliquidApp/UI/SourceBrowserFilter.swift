@@ -257,22 +257,26 @@ actor SourceBrowserFilter {
     static func search(_ rows: [SourceTreeDisplayRow], query: String) -> [SourceTreeDisplayRow] {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return rows }
-        let matchingRows = rows.filter {
+        // Matching rows remain in the immutable input. Keep only their indices
+        // while collecting identities, avoiding a second array of full metadata.
+        let matchingIndices = rows.indices.filter { index in
             guard !Task.isCancelled else { return false }
-            switch $0.kind {
+            let row = rows[index]
+            switch row.kind {
             case .folder, .media:
-                if $0.displayName.localizedCaseInsensitiveContains(query) { return true }
-                guard let media = $0.recognizedMedia else { return false }
-                return $0.url.lastPathComponent.localizedCaseInsensitiveContains(query)
+                if row.displayName.localizedCaseInsensitiveContains(query) { return true }
+                guard let media = row.recognizedMedia else { return false }
+                return row.url.lastPathComponent.localizedCaseInsensitiveContains(query)
                     || media.section.localizedCaseInsensitiveContains(query)
                     || media.catalogIDs.contains { $0.localizedCaseInsensitiveContains(query) }
-                    || ($0.contextLabel?.localizedCaseInsensitiveContains(query) ?? false)
+                    || (row.contextLabel?.localizedCaseInsensitiveContains(query) ?? false)
             case .message, .mediaSection:
                 return false
             }
         }
-        var visibleIDs = Set<String>(minimumCapacity: matchingRows.count)
-        for row in matchingRows {
+        var visibleIDs = Set<String>(minimumCapacity: matchingIndices.count)
+        for index in matchingIndices {
+            let row = rows[index]
             visibleIDs.insert(row.id)
             visibleIDs.formUnion(row.ancestorIDs)
         }
