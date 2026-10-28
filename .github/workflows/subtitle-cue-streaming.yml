@@ -1,0 +1,88 @@
+name: Subtitle cue streaming performance
+
+on:
+  push:
+    branches:
+      - perf/subtitle-cue-streaming-20261028-8d19a6
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift
+      - Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift
+      - Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleCueStreamingTests.swift
+      - Benchmarks/SubtitleCueStreaming/**
+      - .github/workflows/subtitle-cue-streaming.yml
+      - '!Benchmarks/SubtitleCueStreaming/README.md'
+      - '!Benchmarks/SubtitleCueStreaming/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift
+      - Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift
+      - Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleCueStreamingTests.swift
+      - Benchmarks/SubtitleCueStreaming/**
+      - .github/workflows/subtitle-cue-streaming.yml
+      - '!Benchmarks/SubtitleCueStreaming/README.md'
+      - '!Benchmarks/SubtitleCueStreaming/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-cue-streaming-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify conversion output and measure native cue streaming
+        run: >-
+          python3 Benchmarks/SubtitleCueStreaming/run.py
+          --pairs 8 --target-ms 150
+          --output "$RUNNER_TEMP/subtitle-cue-streaming"
+      - name: Emit reviewable measurements and qualification receipts
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-cue-streaming"
+          names = [
+              "provenance.json", "parity.json", "tests.json", "completion.json",
+              "calibration.json", "measurements.jsonl", "memory.jsonl", "summary.json",
+          ]
+          for name in names:
+              path = root / name
+              if path.is_file():
+                  print(f"\nBEGIN {name}", flush=True)
+                  content = path.read_text()
+                  print(content, end="" if content.endswith("\n") else "\n", flush=True)
+                  print(f"END {name}", flush=True)
+          failure_logs = sorted(root.glob("*.log")) if root.is_dir() else []
+          if not (root / "summary.json").is_file():
+              for path in failure_logs[-6:]:
+                  print(f"\nDIAGNOSTIC {path.name}", flush=True)
+                  print(path.read_text()[-16000:], flush=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-cue-streaming-native
+          path: |
+            ${{ runner.temp }}/subtitle-cue-streaming/**/*.json
+            ${{ runner.temp }}/subtitle-cue-streaming/**/*.jsonl
+            ${{ runner.temp }}/subtitle-cue-streaming/**/*.log
+            ${{ runner.temp }}/subtitle-cue-streaming/**/*.swift
+            ${{ runner.temp }}/subtitle-cue-streaming/**/*.py
+            !${{ runner.temp }}/subtitle-cue-streaming/**/.build/**
+          retention-days: 14

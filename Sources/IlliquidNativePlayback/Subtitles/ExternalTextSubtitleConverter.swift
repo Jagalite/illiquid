@@ -62,10 +62,11 @@ enum ExternalTextSubtitleConverter {
         var hasEvents = false
         // The WebVTT header and any header metadata never contain cue payloads.
         for block in Blocks(normalized).dropFirst(format == .webVTT ? 1 : 0) {
-            let lines = Array(block.split(separator: "\n", omittingEmptySubsequences: false)
-                .drop(while: { $0.isEmpty }))
-            guard let first = lines.first else { continue }
-            let timingIndex: Int?
+            var lines = Lines(block)
+            var first = lines.next()
+            while first?.isEmpty == true { first = lines.next() }
+            guard let first else { continue }
+            let timingLine: Substring?
             if format == .webVTT {
                 // NOTE is a block marker, whereas NOTEworthy is a cue identifier.
                 // Ignore the entire comment even if malformed content resembles
@@ -76,22 +77,32 @@ enum ExternalTextSubtitleConverter {
                 // A cue has at most one identifier before its timing line.
                 // This also skips untimed STYLE/REGION metadata while preserving
                 // those words when used as identifiers with immediate timings.
-                timingIndex = first.contains("-->") ? 0
-                    : (lines.count > 1 && lines[1].contains("-->") ? 1 : nil)
+                timingLine = first.contains("-->") ? first
+                    : lines.next().flatMap { $0.contains("-->") ? $0 : nil }
             } else {
                 // Preserve SRT's tolerant handling of optional cue numbers.
-                timingIndex = lines.firstIndex(where: { $0.contains("-->") })
+                // The first arrow-containing line wins, even if it is invalid.
+                var candidate: Substring? = first
+                while let line = candidate, !line.contains("-->") {
+                    candidate = lines.next()
+                }
+                timingLine = candidate
             }
-            guard let timingIndex else { continue }
-            let timing = lines[timingIndex].components(separatedBy: "-->")
+            guard let timingLine else { continue }
+            let timing = timingLine.components(separatedBy: "-->")
             guard timing.count == 2,
                   let start = parseTimestamp(timing[0], format: format),
                   let end = parseTimestamp(timing[1], format: format, allowsSettings: true),
                   end.milliseconds > start.milliseconds
             else { continue }
-            let text = lines.dropFirst(timingIndex + 1).map(escapeASSPayload)
-                .joined(separator: "\\N")
-            output += "\nDialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
+            output += "\nDialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,"
+            if let line = lines.next() {
+                output += escapeASSPayload(line)
+                while let line = lines.next() {
+                    output += "\\N"
+                    output += escapeASSPayload(line)
+                }
+            }
             hasEvents = true
         }
         guard hasEvents else { throw ConversionError.noValidCues(format) }
@@ -123,6 +134,30 @@ enum ExternalTextSubtitleConverter {
                     return source[start..<newline]
                 }
                 cursor = afterNewline
+            }
+            nextStart = nil
+            return source[start...]
+        }
+    }
+
+    /// Split one cue without retaining an array of all of its lines. Like
+    /// split(omittingEmptySubsequences: false), a final LF yields an empty line;
+    /// that empty payload field must still contribute its ASS line separator.
+    private struct Lines: IteratorProtocol {
+        private let source: Substring
+        private var nextStart: String.Index?
+
+        init(_ source: Substring) {
+            self.source = source
+            nextStart = source.startIndex
+        }
+
+        mutating func next() -> Substring? {
+            guard let start = nextStart else { return nil }
+            let bytes = source.utf8
+            if let newline = bytes[start...].firstIndex(of: 0x0A) {
+                nextStart = bytes.index(after: newline)
+                return source[start..<newline]
             }
             nextStart = nil
             return source[start...]

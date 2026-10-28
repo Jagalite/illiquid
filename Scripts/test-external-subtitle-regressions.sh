@@ -10,6 +10,7 @@ cp "$root/Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter
     "$work/Sources/IlliquidNativePlayback/"
 cp "$root/Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift" \
     "$root/Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift" \
+    "$root/Tests/IlliquidNativePlaybackTests/SubtitleCueStreamingTests.swift" \
     "$work/Tests/IlliquidNativePlaybackTests/"
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1
