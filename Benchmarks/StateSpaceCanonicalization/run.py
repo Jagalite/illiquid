@@ -46,7 +46,13 @@ def command(arguments: list, review: Path, name: str, *, extra_env: dict | None 
     before_cpu = resource.getrusage(resource.RUSAGE_CHILDREN)
     started_unix = time.time()
     start = time.perf_counter()
-    result = subprocess.run(arguments, capture_output=True, env=env, timeout=timeout)
+    timed_out = False
+    try:
+        result = subprocess.run(arguments, capture_output=True, env=env, timeout=timeout)
+    except subprocess.TimeoutExpired as error:
+        timed_out = True
+        result = subprocess.CompletedProcess(
+            arguments, 124, error.stdout or b"", error.stderr or b"")
     wall = time.perf_counter() - start
     after_cpu = resource.getrusage(resource.RUSAGE_CHILDREN)
     cpu = ((after_cpu.ru_utime - before_cpu.ru_utime)
@@ -57,6 +63,7 @@ def command(arguments: list, review: Path, name: str, *, extra_env: dict | None 
     log.write_text(stdout + stderr)
     receipt = {"command": arguments, "started_unix": started_unix,
                "wall_seconds": wall, "cpu_seconds": cpu, "returncode": result.returncode,
+               "timeout_seconds": timeout, "timed_out": timed_out,
                "log": str(log.relative_to(review)), "log_sha256": sha256(log.read_bytes())}
     with (review / "commands.jsonl").open("a") as stream:
         stream.write(json.dumps(receipt, sort_keys=True) + "\n")
@@ -146,9 +153,11 @@ def main() -> None:
     review.mkdir()
     baseline = git("rev-parse", f"{args.baseline}^{{commit}}").decode().strip()
     candidate = git("rev-parse", "HEAD").decode().strip()
+    candidate_dirty = bool(git("status", "--porcelain").strip())
     compiler, _ = command([args.swift, "--version"], review, "compiler")
     manifest = {"baseline_commit": baseline, "candidate_commit": candidate,
-                "candidate_sources": "current worktree", "compiler": compiler.strip(),
+                "candidate_sources": "current worktree", "candidate_dirty": candidate_dirty,
+                "compiler": compiler.strip(),
                 "platform": platform.platform(), "machine": platform.machine(),
                 "method": "unchanged release CLI; full PR seed inventory; balanced AB/BA; fresh serial processes",
                 "pairs": args.pairs, "scope": "state-space qualification, not media playback",
@@ -161,20 +170,11 @@ def main() -> None:
     parity_binaries = {}
     tests = []
     for variant in ["baseline", "candidate"]:
-        print(f"Build {variant}", flush=True)
+        print(f"Stage {variant}", flush=True)
         manifest["source_hashes"][variant] = stage(args.output, variant, baseline)
         save(review / "manifest.json", manifest)
         package_args = ["--package-path", args.output / variant, "--jobs", "2",
                         "-Xswiftc", "-warnings-as-errors"]
-        for product in ["IlliquidStateSpaceExplorer", "StateSpaceParity"]:
-            command([args.swift, "build", *package_args, "-c", "release", "--product", product],
-                    review, f"{variant}-build-{product}")
-        bin_path, _ = command([args.swift, "build", *package_args, "-c", "release", "--show-bin-path"],
-                              review, f"{variant}-bin-path")
-        binaries[variant] = Path(bin_path.strip()) / "IlliquidStateSpaceExplorer"
-        parity_binaries[variant] = Path(bin_path.strip()) / "StateSpaceParity"
-        manifest["binary_hashes"][variant] = sha256(binaries[variant].read_bytes())
-        save(review / "manifest.json", manifest)
         for configuration in ["debug", "release"]:
             print(f"Test {variant} {configuration}", flush=True)
             _, receipt = command([args.swift, "test", *package_args, "-c", configuration, "--no-parallel"],
@@ -186,6 +186,16 @@ def main() -> None:
             tests.append({"variant": variant, "configuration": configuration,
                           "passed_tests": int(matches[-1]), **receipt})
             save(review / "tests.json", tests)
+        # Restore ordinary release products after test builds, then hash the executed bytes.
+        for product in ["IlliquidStateSpaceExplorer", "StateSpaceParity"]:
+            command([args.swift, "build", *package_args, "-c", "release", "--product", product],
+                    review, f"{variant}-build-{product}")
+        bin_path, _ = command([args.swift, "build", *package_args, "-c", "release", "--show-bin-path"],
+                              review, f"{variant}-bin-path")
+        binaries[variant] = Path(bin_path.strip()) / "IlliquidStateSpaceExplorer"
+        parity_binaries[variant] = Path(bin_path.strip()) / "StateSpaceParity"
+        manifest["binary_hashes"][variant] = sha256(binaries[variant].read_bytes())
+        save(review / "manifest.json", manifest)
 
     parity = {}
     for variant in ["baseline", "candidate"]:
@@ -215,7 +225,7 @@ def main() -> None:
                 [binaries[variant], "--profile", "pr", "--all-seeds", "--output", directory],
                 review, f"pair-{pair}-{variant}",
                 extra_env={"ILLIQUID_SOURCE_REVISION": baseline if variant == "baseline" else candidate,
-                           "ILLIQUID_SOURCE_DIRTY": "0"})
+                           "ILLIQUID_SOURCE_DIRTY": "1" if variant == "candidate" and candidate_dirty else "0"})
             records = normalized_records(directory)
             observed_seeds = {(r["summary"]["model"], r["summary"]["seedProfile"]) for r in records}
             if observed_seeds != expected_seeds or len(records) != len(expected_seeds):
