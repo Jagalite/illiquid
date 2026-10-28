@@ -1529,6 +1529,10 @@ final class MediaSession: @unchecked Sendable {
                             guard self.pushVideoFrame(frame) else { return }
                             self.recordVideoDecodeDiagnostics(videoDecoder)
                         }
+                        // A normal drain return is the existing EOF boundary.
+                        // Keep replay on thrown errors; release it before an EOS
+                        // queue push can wait on presentation.
+                        videoRecoveryPackets.reset(generation: active)
                         _ = videoFrames.push(.endOfStream(generation: active))
                     case let .flush(active):
                         videoDecoder.flush()
