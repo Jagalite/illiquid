@@ -51,12 +51,34 @@ public enum PlaybackProgressAnalyzer {
         classifications[$0] == .terminal || classifications[$0] == .stableIntentionalWait
           || classifications[$0] == .declaredExternalWait
       })
+    let transactionIndices = classifications.indices.filter {
+      classifications[$0] == .transactionProgress
+    }
     var canSettle = settled
-    var changed = true
-    while changed {
-      changed = false
+    // Reachability is used only to count settled transactions. Empty targets
+    // or an empty seed set cannot contribute to that count.
+    if !transactionIndices.isEmpty, !settled.isEmpty {
+      // Keep the first scan for graphs that settle without needing a
+      // predecessor index for further propagation.
+      var changed = false
       for edge in result.graph.edges where edge.isFairProgress && canSettle.contains(edge.to) {
         if canSettle.insert(edge.from).inserted { changed = true }
+      }
+      if changed, transactionIndices.contains(where: { !canSettle.contains($0) }) {
+        var predecessors: [Int: [Int]] = [:]
+        for edge in result.graph.edges
+          where edge.isFairProgress && !canSettle.contains(edge.from)
+        {
+          predecessors[edge.to, default: []].append(edge.from)
+        }
+        // Already reachable sources need no revisit. Seed only destinations with
+        // unresolved predecessors, then visit each newly reachable state once.
+        var pending = predecessors.keys.filter { canSettle.contains($0) }
+        while let destination = pending.popLast() {
+          for predecessor in predecessors[destination, default: []] {
+            if canSettle.insert(predecessor).inserted { pending.append(predecessor) }
+          }
+        }
       }
     }
 
@@ -75,9 +97,6 @@ public enum PlaybackProgressAnalyzer {
         $0.isFairProgress && ranks[$0.to] < ranks[$0.from]
       }
       return !hasExit && !hasFairDecrease
-    }
-    let transactionIndices = classifications.indices.filter {
-      classifications[$0] == .transactionProgress
     }
     return PlaybackProgressReport(
       terminalStates: classifications.count(where: { $0 == .terminal }),
