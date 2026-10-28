@@ -10,6 +10,7 @@ on:
       - 'Tests/IlliquidCoreTests/ExternalSubtitle*Tests.swift'
       - 'Benchmarks/SubtitleFuzzyScoring/Driver.swift'
       - 'Benchmarks/SubtitleFuzzyScoring/run.py'
+      - 'Benchmarks/SubtitleFuzzyScoring/aa-control.py'
       - '.github/workflows/subtitle-fuzzy-scoring-performance.yml'
   pull_request:
     paths:
@@ -19,6 +20,7 @@ on:
       - 'Tests/IlliquidCoreTests/ExternalSubtitle*Tests.swift'
       - 'Benchmarks/SubtitleFuzzyScoring/Driver.swift'
       - 'Benchmarks/SubtitleFuzzyScoring/run.py'
+      - 'Benchmarks/SubtitleFuzzyScoring/aa-control.py'
       - '.github/workflows/subtitle-fuzzy-scoring-performance.yml'
   workflow_dispatch:
 
@@ -49,8 +51,14 @@ jobs:
           fi
           echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated packages.'
           python3 Benchmarks/SubtitleFuzzyScoring/run.py \
-            --pairs 6 --target-ms 250 --output "$RUNNER_TEMP/subtitle-fuzzy-scoring" \
+            --pairs 6 --target-ms 1000 --cases long_256,winner_256,exact_256,unrelated_256 \
+            --output "$RUNNER_TEMP/subtitle-fuzzy-scoring" \
             2>&1 | tee "$RUNNER_TEMP/subtitle-fuzzy-scoring.log"
+      - name: Measure an identical-binary exact-match control
+        run: |
+          python3 Benchmarks/SubtitleFuzzyScoring/aa-control.py \
+            --source "$RUNNER_TEMP/subtitle-fuzzy-scoring" \
+            --output "$RUNNER_TEMP/subtitle-fuzzy-scoring/aa-control" --pairs 6
       - name: Print source receipts and raw observations for review
         run: |
           python3 - <<'PY'

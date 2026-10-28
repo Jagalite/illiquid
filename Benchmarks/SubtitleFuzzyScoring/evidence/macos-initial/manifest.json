@@ -1,0 +1,120 @@
+{
+  "baselineCommit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binaries": {
+    "baseline": {
+      "path": "/Users/runner/work/_temp/subtitle-fuzzy-scoring/baseline/.build/arm64-apple-macosx/release/SubtitleFuzzyScoring",
+      "sha256": "aaf6fbc75be2a66f808bd9a1de89ecce0cdd62f5080b7415c569108fb3e8e207"
+    },
+    "candidate": {
+      "path": "/Users/runner/work/_temp/subtitle-fuzzy-scoring/candidate/.build/arm64-apple-macosx/release/SubtitleFuzzyScoring",
+      "sha256": "9258a736dcd0cfea18bf42df898ce2579652b20bc85959d58c4e230c8acfd57e"
+    }
+  },
+  "candidateCommit": "0187585a4193ccba412bb745d52759ace4409e1a",
+  "compiler": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "driverSHA256": "9f07411469866b856c43280867c4795e4b49802195aa9345cafb36d5878ed5a0",
+  "hashing": "SWIFT_DETERMINISTIC_HASHING=1",
+  "machine": "arm64",
+  "measuredCases": [
+    "ambiguous_16",
+    "ambiguous_256",
+    "ambiguous_1024",
+    "long_256",
+    "long_1024",
+    "winner_256",
+    "ancestor_256",
+    "unicode_256",
+    "exact_256",
+    "unrelated_256"
+  ],
+  "minimumIterations": 5,
+  "packageHashes": {
+    "baseline": {
+      "Package.swift": "0502af0665d7310d81cff14a36fb78219792d797785e72dd2d34f68cc2a517d2",
+      "Sources/IlliquidCore/ExternalSubtitleMatcher.swift": "d4b15dc5a8f62d043f187f4a39820cbab2c8d6e7388d8769309516ab18f79f1a",
+      "Sources/IlliquidCore/MediaFileSupport.swift": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+      "Sources/IlliquidCore/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+      "Sources/SubtitleFuzzyScoring/Driver.swift": "9f07411469866b856c43280867c4795e4b49802195aa9345cafb36d5878ed5a0",
+      "Tests/IlliquidCoreTests/ExternalSubtitleCandidateTraversalTests.swift": "09cbe51e493ee7e7d976eac3d22bdd1d7ebd790ea237818669351e5711abcdff",
+      "Tests/IlliquidCoreTests/ExternalSubtitleMatcherEmptyTests.swift": "335fd5ed2057a0399663cd7d650b3755515479b2899cb1a9ac159953451a873d",
+      "Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift": "8e87e9870e636aa622ce977fdc3e36814e77607b250987fa1592484a3aa0c370",
+      "Tests/IlliquidCoreTests/ExternalSubtitleQualifierStorageTests.swift": "94f5b16bcdf7f5960fd10a19293ddab00ab2814b29730899aa11574c49610437",
+      "Tests/IlliquidCoreTests/ExternalSubtitleTokenizationTests.swift": "30cc9f50ad8a5123f9aefd403111bf2126006e088d2aba18eff6ac0d41aa9ab4"
+    },
+    "candidate": {
+      "Package.swift": "0502af0665d7310d81cff14a36fb78219792d797785e72dd2d34f68cc2a517d2",
+      "Sources/IlliquidCore/ExternalSubtitleMatcher.swift": "94656822499f695e46c9accb43d364f54b828779959dcccf6d46d3aefcdf6e34",
+      "Sources/IlliquidCore/MediaFileSupport.swift": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+      "Sources/IlliquidCore/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+      "Sources/SubtitleFuzzyScoring/Driver.swift": "9f07411469866b856c43280867c4795e4b49802195aa9345cafb36d5878ed5a0",
+      "Tests/IlliquidCoreTests/ExternalSubtitleCandidateTraversalTests.swift": "09cbe51e493ee7e7d976eac3d22bdd1d7ebd790ea237818669351e5711abcdff",
+      "Tests/IlliquidCoreTests/ExternalSubtitleMatcherEmptyTests.swift": "335fd5ed2057a0399663cd7d650b3755515479b2899cb1a9ac159953451a873d",
+      "Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift": "8e87e9870e636aa622ce977fdc3e36814e77607b250987fa1592484a3aa0c370",
+      "Tests/IlliquidCoreTests/ExternalSubtitleQualifierStorageTests.swift": "94f5b16bcdf7f5960fd10a19293ddab00ab2814b29730899aa11574c49610437",
+      "Tests/IlliquidCoreTests/ExternalSubtitleTokenizationTests.swift": "30cc9f50ad8a5123f9aefd403111bf2126006e088d2aba18eff6ac0d41aa9ab4"
+    }
+  },
+  "pairs": 6,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "protocol": "fresh processes; balanced AB/BA; complete association and count consumption; fixtures and oracle outside timing",
+  "runnerSHA256": "710fe974379e20a0635624e3b0f6b65044de8edb1232abd621a1d3bb16a6ccbe",
+  "sources": {
+    "baseline:Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift": {
+      "gitBlob": "41863f4d972b900ea21b5de8fbd6e0865cd1efeb",
+      "sha256": "d4b15dc5a8f62d043f187f4a39820cbab2c8d6e7388d8769309516ab18f79f1a"
+    },
+    "baseline:Sources/IlliquidCore/Utilities/MediaFileSupport.swift": {
+      "gitBlob": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+      "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+    },
+    "baseline:Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+      "gitBlob": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+      "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    },
+    "candidate:Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift": {
+      "gitBlob": "a30534e22e8cb4a4b0cae8acc6fcced83edb4ac0",
+      "sha256": "94656822499f695e46c9accb43d364f54b828779959dcccf6d46d3aefcdf6e34"
+    },
+    "candidate:Sources/IlliquidCore/Utilities/MediaFileSupport.swift": {
+      "gitBlob": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+      "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+    },
+    "candidate:Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+      "gitBlob": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+      "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    }
+  },
+  "startedUTC": "2026-10-28T04:45:32.284968+00:00",
+  "targetCPUms": 250,
+  "tests": {
+    "baseline-debug": {
+      "log": "baseline-debug-tests.log",
+      "status": "passed",
+      "summaries": [
+        "Test run with 43 tests in 5 suites passed after 0.406 seconds."
+      ]
+    },
+    "baseline-release": {
+      "log": "baseline-release-tests.log",
+      "status": "passed",
+      "summaries": [
+        "Test run with 43 tests in 5 suites passed after 0.205 seconds."
+      ]
+    },
+    "candidate-debug": {
+      "log": "candidate-debug-tests.log",
+      "status": "passed",
+      "summaries": [
+        "Test run with 43 tests in 5 suites passed after 0.373 seconds."
+      ]
+    },
+    "candidate-release": {
+      "log": "candidate-release-tests.log",
+      "status": "passed",
+      "summaries": [
+        "Test run with 43 tests in 5 suites passed after 0.342 seconds."
+      ]
+    }
+  },
+  "worktreeStatus": ""
+}
