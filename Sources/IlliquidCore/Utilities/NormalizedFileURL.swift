@@ -39,8 +39,8 @@ public enum NormalizedFileURL {
         // Ordinary printable ASCII paths survive the file-URL round trip unchanged.
         // Preserve Foundation's filesystem representation and file-reference
         // behavior for Unicode, NULs, and unusual path forms.
-        if path.hasPrefix("/"),
-           path.utf8.allSatisfy({ $0 >= 32 && $0 < 127 }),
+        if path.utf8.allSatisfy({ $0 >= 32 && $0 < 127 }),
+           path.hasPrefix("/"),
            !path.contains("//"),
            path == "/" || !path.hasSuffix("/"),
            !path.hasPrefix("/.file/id=") {
