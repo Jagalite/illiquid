@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""Qualify and measure the exact production ring-buffer implementation on macOS.
+"""Qualify the exact production ring buffer on the explicitly selected platform.
 
+macOS is the default. --platform linux provides a separate portability gate;
+Linux results must not be reported as native macOS performance evidence.
 No third-party Python or Swift package dependencies are required. Component
 packages and all evidence are written to a fresh --output directory.
 """
@@ -139,8 +141,12 @@ def stage(output: Path, report: dict):
     baseline = originals[str(baseline_path.relative_to(ROOT))]
     if git_blob(baseline) != BASELINE_RING_BLOB:
         raise RuntimeError("Frozen FixedRingBuffer baseline does not match the pinned Git blob")
-    if git_blob(originals[QUEUE]) != COMMON_QUEUE_BLOB:
-        raise RuntimeError("Shared PacketQueue.swift differs from the qualified baseline; requalify this experiment")
+    report["shared_queue"] = {
+        "path": QUEUE, "initial_git_blob_sha1": COMMON_QUEUE_BLOB,
+        "current_git_blob_sha1": git_blob(originals[QUEUE]),
+        "matches_initial_queue_blob": git_blob(originals[QUEUE]) == COMMON_QUEUE_BLOB,
+        "contract": "Use the exact current PacketQueue.swift for both baseline and candidate; freeze only the ring-buffer baseline.",
+    }
     report["sources"] = {path: source_record(data) for path, data in originals.items()}
     report["baseline"] = {
         "commit": BASELINE, "path": RING, "git_blob_sha1": BASELINE_RING_BLOB,
@@ -315,6 +321,7 @@ def summarize(rows: list[dict], cases: list[dict], pairs: int) -> list[dict]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--platform", choices=("macos", "linux"), default="macos")
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=80.0)
     parser.add_argument("--max-sample-ms", type=float, default=1000.0)
@@ -332,8 +339,16 @@ def main() -> None:
         "arguments": {
             "pairs": args.pairs, "target_ms": args.target_ms,
             "max_sample_ms": args.max_sample_ms, "output": str(output),
+            "platform": args.platform,
+        },
+        "qualification_platform": {
+            "requested": args.platform,
+            "actual_system": platform.system(),
+            "native_macos": args.platform == "macos" and platform.system() == "Darwin",
         },
         "scope": {
+            "platform": "Native macOS components." if args.platform == "macos"
+                else "Linux component qualification and paired measurements; not native macOS qualification.",
             "production": "Exact FixedRingBuffer.swift and PacketQueue.swift, no source extraction or platform adapters.",
             "compilation": "Swift 6, -O -whole-module-optimization; benchmark and production files compiled together.",
             "measurements": "Warm synthetic component operations, fresh process for each observation.",
@@ -348,8 +363,13 @@ def main() -> None:
     save(output / "results.json", report)
     runner = Runner(output, report)
     try:
-        if platform.system() != "Darwin":
-            raise RuntimeError("This qualification requires native macOS; do not label another platform native evidence")
+        expected_system = {"macos": "Darwin", "linux": "Linux"}[args.platform]
+        if platform.system() != expected_system:
+            raise RuntimeError(
+                f"--platform {args.platform} requires {expected_system}, observed {platform.system()}; "
+                "results must retain their actual platform"
+            )
+        print(report["scope"]["platform"], flush=True)
         kyoto = Path("/Volumes/seed1/Projects/kyoto/kyoto.py")
         report["build_coordination"] = {
             "kyoto_available": kyoto.is_file(),
@@ -373,12 +393,27 @@ def main() -> None:
                 ) if name in os.environ
             },
             "swift": runner.run([swiftc, "--version"], "swift-version").strip(),
-            "macos": runner.run(["sw_vers"], "macos-version").strip(),
-            "hardware": runner.run(["sysctl", "hw.model", "machdep.cpu.brand_string"], "hardware").strip(),
-            "xcode": runner.run(["xcodebuild", "-version"], "xcode-version").strip(),
+            "uname": runner.run(["uname", "-a"], "uname").strip(),
             "git_head": runner.run(["git", "rev-parse", "HEAD"], "git-head").strip(),
             "git_status": runner.run(["git", "status", "--porcelain"], "git-status").strip(),
         }
+        if args.platform == "macos":
+            report["environment"].update({
+                "macos": runner.run(["sw_vers"], "macos-version").strip(),
+                "hardware": runner.run(["sysctl", "hw.model", "machdep.cpu.brand_string"], "hardware").strip(),
+                "xcode": runner.run(["xcodebuild", "-version"], "xcode-version").strip(),
+            })
+        else:
+            os_release = Path("/etc/os-release")
+            cpu_info = Path("/proc/cpuinfo")
+            report["environment"].update({
+                "linux_os_release": os_release.read_text() if os_release.is_file() else None,
+                "cpu_models": sorted({
+                    line.split(":", 1)[1].strip() for line in cpu_info.read_text().splitlines()
+                    if line.startswith(("model name", "Hardware")) and ":" in line
+                }) if cpu_info.is_file() else [],
+                "cpu_affinity": sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else None,
+            })
         originals, staged, packages, benchmark_sources = stage(output, report)
         save(output / "results.json", report)
         for variant in ("baseline", "candidate"):

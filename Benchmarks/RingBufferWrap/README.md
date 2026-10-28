@@ -46,10 +46,23 @@ on the ephemeral GitHub runner.
 The frozen baseline is the complete production file at commit
 `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`,
 Git blob `f381657f22d07f49941b05afbd0c2549a2d98b1e`.
-Both implementations use the same complete `PacketQueue.swift`
-(blob `ed52718d3bd42d1ebbd157343334be2bc6b6cc91`).
-The runner verifies these identities and records SHA-256 hashes of all source,
+Both implementations use the same complete current `PacketQueue.swift`.
+The initial qualification uses blob
+`ed52718d3bd42d1ebbd157343334be2bc6b6cc91`; later queue changes are shared by
+both variants and recorded rather than rejected. Only the ring baseline is
+frozen. The runner verifies its identity and records SHA-256 hashes of all source,
 test, harness, package, and executable inputs.
+
+Linux can run the same source and validation as a separate portability check:
+
+```sh
+python3 Benchmarks/RingBufferWrap/run.py --platform linux \
+  --pairs 8 --target-ms 80 --output /tmp/illiquid-ring-wrap-linux
+```
+
+The runner verifies the selected platform and records its actual environment.
+Linux measurements are separate component evidence and must not be reported as
+native macOS results.
 
 ## Validation and measurement
 
