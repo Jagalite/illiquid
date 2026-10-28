@@ -1,0 +1,85 @@
+name: State-space canonicalization performance
+
+on:
+  push:
+    branches: ['perf/state-space-canonicalization-20261028-e488']
+    paths:
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Sources/IlliquidPlaybackStateSpace/**'
+      - 'Tests/IlliquidPlaybackCoreTests/**'
+      - 'Tests/IlliquidPlaybackStateSpaceTests/**'
+      - 'Benchmarks/StateSpaceCanonicalization/**'
+      - '.github/workflows/state-space-canonicalization-performance.yml'
+      - '!Benchmarks/StateSpaceCanonicalization/*.md'
+      - '!Benchmarks/StateSpaceCanonicalization/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Sources/IlliquidPlaybackStateSpace/**'
+      - 'Tests/IlliquidPlaybackCoreTests/**'
+      - 'Tests/IlliquidPlaybackStateSpaceTests/**'
+      - 'Benchmarks/StateSpaceCanonicalization/**'
+      - '.github/workflows/state-space-canonicalization-performance.yml'
+      - '!Benchmarks/StateSpaceCanonicalization/*.md'
+      - '!Benchmarks/StateSpaceCanonicalization/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: state-space-canonicalization-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compare complete production searches and regression tests
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'This hosted benchmark expects an isolated runner without the shared Kyoto queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this hosted runner; builds run serially in isolated packages.'
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/StateSpaceCanonicalization/run.py \
+            --output "$RUNNER_TEMP/state-space-canonicalization" \
+            --pairs 6 "${mode[@]}"
+      - name: Print benchmark evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'state-space-canonicalization'
+          for name in ['manifest.json', 'verification.json', 'summary.json']:
+              path = root / name
+              if path.exists():
+                  print(f'::group::{name}')
+                  print(path.read_text())
+                  print('::endgroup::')
+          for path in sorted(root.glob('*-tests.log')):
+              print(f'::group::{path.name}')
+              print(path.read_text()[-12000:])
+              print('::endgroup::')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: state-space-canonicalization-evidence
+          path: |
+            ${{ runner.temp }}/state-space-canonicalization/*.json
+            ${{ runner.temp }}/state-space-canonicalization/*.jsonl
+            ${{ runner.temp }}/state-space-canonicalization/*.log
+          retention-days: 14
