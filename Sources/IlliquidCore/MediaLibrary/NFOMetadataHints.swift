@@ -4,10 +4,12 @@ import Foundation
 public enum NFOMetadataHints {
     public static func parse(_ data: Data) -> MediaMetadataHints? {
         guard data.count <= 128 * 1024,
-              let text = String(data: data, encoding: .utf8) else { return nil }
+              var text = String(data: data, encoding: .utf8) else { return nil }
         // ASCII without an exclamation mark cannot contain either declaration.
         // Keep all Unicode and markup candidates on the original localized path.
-        let needsDeclarationSearch = text.utf8.contains { $0 == 0x21 || $0 >= 0x80 }
+        let needsDeclarationSearch = text.withUTF8 { bytes in
+            bytes.contains { $0 == 0x21 || $0 >= 0x80 }
+        }
         if needsDeclarationSearch {
             guard !text.localizedCaseInsensitiveContains("<!DOCTYPE"),
                   !text.localizedCaseInsensitiveContains("<!ENTITY") else { return nil }
