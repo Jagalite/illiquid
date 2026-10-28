@@ -23,11 +23,15 @@ python3 Benchmarks/PiPIdleMemory/run.py \
   --output /tmp/illiquid-pip-idle-memory --pairs 6 --iterations 6
 ```
 
-The output directory must be new or empty. Run builds through the shared Kyoto
-queue when it is available, as required by [AGENTS.md](../../AGENTS.md).
-The harness refuses direct compilation if that queue is present. On the
-isolated hosted runner, it reports the queue's absence and builds serially in
-separate worktrees.
+The output directory must be new or empty. This automated runner targets an
+isolated macOS host without the shared Kyoto installation. It refuses to build
+if that installation is present. On the hosted runner, it reports Kyoto's
+absence and builds serially in separate worktrees.
+
+For work on a shared local host, coordinate build commands through Kyoto and
+inspect their job status and logs as required by [AGENTS.md](../../AGENTS.md).
+The workflow below is the supported automated reproduction route for this
+study; the standalone runner does not implement Kyoto job orchestration.
 
 The [workflow](../../.github/workflows/pip-idle-memory.yml) performs the same
 experiment using the repository's hash-verified native dependencies. Its PR
@@ -128,10 +132,14 @@ tags across variants and processes.
 
 ### Repeated production sessions
 
-A prior unmerged [PiP resource study](https://github.com/Jagalite/illiquid/blob/perf/pip-idle-resources-20261023/Documentation/PIP_IDLE_RESOURCE_MEMORY.md)
+A prior unmerged [PiP resource study](https://github.com/Jagalite/illiquid/blob/428c511b324b1e5388f64f5470aafa06107cec16/Documentation/PIP_IDLE_RESOURCE_MEMORY.md)
 observed growing Metal allocation counters despite cleared compositor fields.
 That result motivates an additional lifetime check here; it is not used as a
-measurement of this candidate.
+measurement of this candidate. Its [later follow-up](https://github.com/Jagalite/illiquid/actions/runs/40014008137/job/120621291116)
+found that the growth settled and that retirement-only and `.workItem`
+variants reached the same allocation plateau. The queue setting gives this
+candidate an explicit temporary-object lifetime boundary; this two-arm study
+does not claim an independently measured benefit from that setting.
 
 Before any companion readbacks, every measurement process performs eight real
 `receive`/`start`/first-sample/`stop` cycles for 1080p BGRA and 4K HDR PQ.
@@ -164,10 +172,11 @@ observations, pixel/tag parity, and summary. Logs emit exact UTF-8 evidence text
 and SHA-256 digests prefixed with `PIP_IDLE_EVIDENCE_JSON`; the workflow also
 uploads the evidence and staged source files as an artifact.
 
-The final research report records the accepted run, observed memory ownership,
-restart tradeoff, and any limits of the hosted Metal environment. No process
-RSS or total-player-memory reduction should be inferred from the resource
-measurements alone.
+The [research report](../../Documentation/PIP_IDLE_OUTPUT_MEMORY.md) records
+qualification status and the evidence required before accepting the candidate.
+Once available, results must report observed memory ownership, restart cost,
+and the limits of the hosted Metal environment. No process RSS or total-player
+memory reduction should be inferred from resource measurements alone.
 
 ## Framework contracts
 
