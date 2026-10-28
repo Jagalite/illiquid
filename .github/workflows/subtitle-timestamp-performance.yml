@@ -1,0 +1,96 @@
+name: Subtitle timestamp parsing performance
+
+on:
+  push:
+    branches: ['perf/subtitle-timestamp-fast-path']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/Driver.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/run.py'
+      - 'Benchmarks/SubtitleTimestampParsing/run.py'
+      - '.github/workflows/subtitle-timestamp-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/Driver.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/run.py'
+      - 'Benchmarks/SubtitleTimestampParsing/run.py'
+      - '.github/workflows/subtitle-timestamp-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-timestamp-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify semantics and measure complete subtitle conversion
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/SubtitleTimestampParsing/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'subtitle-timestamp'),
+                     '--pairs', '10', '--target-ms', '350']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = str(json.loads(submitted)['id'])
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'running serial component builds in this isolated checkout.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit compact evidence for review
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'subtitle-timestamp'
+          names = ['environment.json', 'tests.json', 'completion.json', 'commands.json',
+                   'release/manifest.json', 'release/summary.json', 'release/benchmark.json',
+                   'release/calibration.json', 'release/measurements.jsonl']
+          for name in names:
+              path = root / name
+              if path.is_file():
+                  text = path.read_text()
+                  print('TIMESTAMP_EVIDENCE ' + json.dumps({
+                      'path': name, 'sha256': hashlib.sha256(text.encode()).hexdigest(),
+                      'content': text}, sort_keys=True), flush=True)
+          for path in sorted(root.glob('tests-*.log')):
+              print(path.name + '\n' + path.read_text()[-3500:], flush=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-timestamp-native
+          path: |
+            ${{ runner.temp }}/subtitle-timestamp/
+            !${{ runner.temp }}/subtitle-timestamp/**/.build/**
+            !${{ runner.temp }}/subtitle-timestamp/**/module-cache/**
+            !${{ runner.temp }}/subtitle-timestamp/**/converter-benchmark
+            !${{ runner.temp }}/subtitle-timestamp/**/*.dylib
+            !${{ runner.temp }}/subtitle-timestamp/**/*.swiftmodule
+          retention-days: 14

@@ -168,6 +168,9 @@ enum ExternalTextSubtitleConverter {
     private static func parseTimestamp(
         _ value: String, format: Format, allowsSettings: Bool = false
     ) -> Timestamp? {
+        if let timestamp = commonASCIITimestamp(value, format: format, allowsSettings: allowsSettings) {
+            return timestamp
+        }
         let trimmed = value.trimmingCharacters(in: .whitespaces)
         let timestamp: Substring
         if format == .webVTT, allowsSettings {
@@ -231,6 +234,59 @@ enum ExternalTextSubtitleConverter {
         // value too, so the ASS parser never receives an overflowing hour field.
         guard centiseconds / 360_000 <= maximumASSHours else { return nil }
         return Timestamp(milliseconds: milliseconds, centiseconds: centiseconds)
+    }
+
+    /// Common authored timestamps are fixed-width ASCII. Parse those directly
+    /// from contiguous UTF-8 storage without allocating component arrays.
+    /// Unusual widths, Unicode whitespace/settings, and malformed values keep
+    /// the general parser's existing Foundation and Character semantics.
+    private static func commonASCIITimestamp(
+        _ value: String, format: Format, allowsSettings: Bool
+    ) -> Timestamp? {
+        value.utf8.withContiguousStorageIfAvailable { bytes -> Timestamp? in
+            guard bytes.allSatisfy({ $0 < 0x80 }) else { return nil }
+            var start = 0
+            var end = bytes.count
+            while start < end, bytes[start] == 0x20 || bytes[start] == 0x09 { start += 1 }
+            while start < end, bytes[end - 1] == 0x20 || bytes[end - 1] == 0x09 { end -= 1 }
+            if format == .webVTT, allowsSettings {
+                var tokenEnd = start
+                while tokenEnd < end, bytes[tokenEnd] != 0x20, bytes[tokenEnd] != 0x09 {
+                    tokenEnd += 1
+                }
+                end = tokenEnd
+            }
+
+            let hasHours = end - start == 12
+            guard hasHours || (format == .webVTT && end - start == 9) else { return nil }
+            let minuteIndex = start + (hasHours ? 3 : 0)
+            let secondIndex = minuteIndex + 3
+            let fractionIndex = secondIndex + 3
+            guard !hasHours || bytes[start + 2] == 0x3A,
+                  bytes[minuteIndex + 2] == 0x3A,
+                  bytes[secondIndex + 2] == 0x2E
+                    || (format == .srt && bytes[secondIndex + 2] == 0x2C)
+            else { return nil }
+
+            func digit(_ index: Int) -> Int64? {
+                let byte = bytes[index]
+                return (0x30...0x39).contains(byte) ? Int64(byte - 0x30) : nil
+            }
+            func pair(_ index: Int) -> Int64? {
+                guard let tens = digit(index), let ones = digit(index + 1) else { return nil }
+                return tens * 10 + ones
+            }
+            guard let hours = hasHours ? pair(start) : 0,
+                  let minutes = pair(minuteIndex), minutes < 60,
+                  let seconds = pair(secondIndex), seconds < 60,
+                  let fractionPrefix = pair(fractionIndex),
+                  let fractionLast = digit(fractionIndex + 2)
+            else { return nil }
+            // At most 99 hours enter this path, including a rounding carry.
+            let milliseconds = ((hours * 60 + minutes) * 60 + seconds) * 1_000
+                + fractionPrefix * 10 + fractionLast
+            return Timestamp(milliseconds: milliseconds, centiseconds: (milliseconds + 5) / 10)
+        } ?? nil
     }
 
     private static func decimalInteger(_ value: Substring, maximum: Int64) -> Int64? {

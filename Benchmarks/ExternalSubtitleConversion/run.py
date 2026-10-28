@@ -51,15 +51,25 @@ def command(args: list[str], log: Path, output: Path) -> str:
 
 
 def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict]:
-    pinned = json.loads((HERE / "baseline/manifest.json").read_text())
-    baseline = (HERE / "baseline/ExternalTextSubtitleConverter.swift").read_bytes()
-    blob = hashlib.sha1(b"blob " + str(len(baseline)).encode() + b"\0" + baseline).hexdigest()
-    if sha(baseline) != pinned["sha256"] or blob != pinned["git_blob"]:
-        raise ValueError("Frozen baseline differs from its source manifest")
+    if args.baseline_ref:
+        revision = command(["git", "rev-parse", "--verify", args.baseline_ref + "^{commit}"],
+                           output / "baseline-ref.log", output).strip()
+        relative = str(SOURCE.relative_to(ROOT))
+        baseline = subprocess.check_output(["git", "show", revision + ":" + relative], cwd=ROOT)
+        pinned = {"revision": revision, "source_path": relative, "sha256": sha(baseline),
+                  "git_blob": hashlib.sha1(
+                      b"blob " + str(len(baseline)).encode() + b"\0" + baseline).hexdigest()}
+    else:
+        pinned = json.loads((HERE / "baseline/manifest.json").read_text())
+        baseline = (HERE / "baseline/ExternalTextSubtitleConverter.swift").read_bytes()
+        blob = hashlib.sha1(b"blob " + str(len(baseline)).encode() + b"\0" + baseline).hexdigest()
+        if sha(baseline) != pinned["sha256"] or blob != pinned["git_blob"]:
+            raise ValueError("Frozen baseline differs from its source manifest")
     selected = shutil.which(args.swiftc) or args.swiftc
     compiler = os.path.abspath(selected)
     version = command([compiler, "--version"], output / "compiler.log", output).strip()
-    flags = ["-O", "-whole-module-optimization", "-swift-version", "6", "-warnings-as-errors",
+    optimization = ["-Onone", "-g"] if args.configuration == "debug" else ["-O", "-whole-module-optimization"]
+    flags = [*optimization, "-swift-version", "6", "-warnings-as-errors",
              "-module-cache-path", str(output / "module-cache")]
     if platform.system() == "Darwin":
         flags += ["-target", f"{platform.machine()}-apple-macosx26.0"]
@@ -71,7 +81,9 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
         "flags": flags, "runner_sha256": sha(Path(__file__).read_bytes()),
         "driver_sha256": sha((HERE / "Driver.swift").read_bytes()),
         "affinity": sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else None,
-        "baseline": pinned, "variants": {},
+        "baseline": pinned, "variants": {}, "configuration": args.configuration,
+        "candidate_revision": command(["git", "rev-parse", "HEAD"], output / "candidate-ref.log", output).strip(),
+        "working_tree_status": command(["git", "status", "--short"], output / "git-status.log", output),
     }
     shutil.copyfile(__file__, output / "runner.snapshot.py")
     shutil.copyfile(HERE / "Driver.swift", output / "Driver.swift")
@@ -79,9 +91,10 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
     for variant in VARIANTS:
         folder = output / variant
         folder.mkdir()
-        original = HERE / "baseline/ExternalTextSubtitleConverter.swift" if variant == "baseline" else SOURCE
         source = folder / "ExternalTextSubtitleConverter.swift"
-        shutil.copyfile(original, source)
+        source.write_bytes(baseline if variant == "baseline" else SOURCE.read_bytes())
+        source_path = (pinned.get("revision", str(HERE / "baseline")) + ":" + str(SOURCE.relative_to(ROOT))
+                       if variant == "baseline" else str(SOURCE.relative_to(ROOT)))
         extension = "dylib" if platform.system() == "Darwin" else "so"
         library = folder / f"libIlliquidNativePlayback.{extension}"
         module = folder / "IlliquidNativePlayback.swiftmodule"
@@ -95,7 +108,7 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
                           str(output / "Driver.swift"), "-o", str(binary)]
         command(driver_command, folder / "build-driver.log", output)
         manifest["variants"][variant] = {
-            "source_sha256": sha(source.read_bytes()), "source_path": str(original.relative_to(ROOT)),
+            "source_sha256": sha(source.read_bytes()), "source_path": source_path,
             "module_sha256": sha(module.read_bytes()), "library_sha256": sha(library.read_bytes()),
             "binary_sha256": sha(binary.read_bytes()), "module_command": module_command,
             "driver_command": driver_command,
@@ -243,6 +256,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--swiftc", default=os.environ.get("SWIFTC", "swiftc"))
     parser.add_argument("--rounds", type=int, default=10)
+    parser.add_argument("--baseline-ref", help="Compare against this exact Git commit/ref instead of the frozen baseline")
+    parser.add_argument("--configuration", choices=("debug", "release"), default="release")
     parser.add_argument("--target-ms", type=float, default=100)
     parser.add_argument("--case", action="append", help="Exact case name; repeat to select multiple cases")
     args = parser.parse_args()
@@ -250,6 +265,8 @@ def main() -> None:
     if args.mode == "summarize":
         summarize(output)
         return
+    if args.mode == "benchmark" and args.configuration != "release":
+        parser.error("Timing requires --configuration release; use verify for debug parity")
     if args.rounds < 2 or args.rounds % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("--rounds must be positive, even, and at least two; --target-ms must be finite and positive")
     if output.exists() and any(output.iterdir()):

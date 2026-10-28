@@ -364,6 +364,96 @@ struct ExternalTextSubtitleConverterTests {
         }
     }
 
+    @Test(arguments: [" \t ", "\u{00A0}\u{2009}", "\t\u{2007} "])
+    func timestampEdgeWhitespacePreservesFoundationTrimming(whitespace: String) throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(
+                start: whitespace + "00:00:01.005" + whitespace,
+                end: whitespace + "00:00:02.015" + whitespace,
+                format: format
+            )
+            #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                "Dialogue: 0,0:00:01.01,0:00:02.02,Default,,0,0,0,,Caption",
+            ])
+        }
+    }
+
+    @Test func webVTTSettingsKeepCharacterBoundarySemantics() throws {
+        for end in [
+            "00:02.000 align:start",
+            "00:02.000\tline:90%",
+            "00:02.000 \tlabel:Cafe\u{0301}",
+            "00:02.000\tlabel:日本語",
+        ] {
+            let source = cue(start: "00:01.000", end: end, format: .webVTT)
+            #expect(dialogueLines(try Converter.convert(source, format: .webVTT)) == [
+                "Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,Caption",
+            ])
+        }
+        for end in [
+            "00:02.000\u{00A0}align:start",
+            "00:02.000\u{2009}align:start",
+            "00:02.000 \u{0301}align:start",
+            "00:02.000\u{0301} align:start",
+        ] {
+            // Edge trimming and internal Character-based settings separators
+            // have different semantics, including spaces with combining marks.
+            assertRejectedTimestamp(end, format: .webVTT)
+        }
+    }
+
+    @Test func timestampWidthsRetainLegacyFallbackAndHourCarry() throws {
+        let cases: [(Converter.Format, String, String, String, String)] = [
+            (.srt, "99:59:59,995", "100:00:00,005",
+             "100:00:00.00", "100:00:00.01"),
+            (.webVTT, "99:59:59.995", "100:00:00.005",
+             "100:00:00.00", "100:00:00.01"),
+            (.webVTT, "59:59.995", "01:00:00.005",
+             "1:00:00.00", "1:00:00.01"),
+            (.srt, "1:2:3,0049", "1:2:4,0159",
+             "1:02:03.00", "1:02:04.02"),
+            (.srt, "01:02:03.0049", "01:02:04.0159",
+             "1:02:03.00", "1:02:04.02"),
+        ]
+        for (format, start, end, expectedStart, expectedEnd) in cases {
+            let source = cue(start: start, end: end, format: format)
+            #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                "Dialogue: 0,\(expectedStart),\(expectedEnd),Default,,0,0,0,,Caption",
+            ])
+        }
+    }
+
+    @Test(arguments: [
+        "00:00:01.000\u{0301}",
+        "\u{FEFF}00:00:01.000",
+        "00:00:01.\u{0301}000",
+        "00:\u{0301}00:01.000",
+        "00:00:01.000\u{0000}",
+    ])
+    func timestampFastPathDoesNotDiscardUnexpectedScalars(timestamp: String) {
+        for format in [Converter.Format.srt, .webVTT] {
+            assertRejectedTimestamp(timestamp, format: format)
+        }
+    }
+
+    @Test func positiveMillisecondIntervalsSurviveCentisecondRounding() throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(
+                start: "00:00:01.001", end: "00:00:01.002", format: format
+            )
+            // Validation uses milliseconds even when both emitted ASS
+            // endpoints round to the same centisecond.
+            #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                "Dialogue: 0,0:00:01.00,0:00:01.00,Default,,0,0,0,,Caption",
+            ])
+        }
+    }
+
+    @Test func webVTTDoesNotAdoptSubRipCommaFractions() {
+        assertRejectedTimestamp("00:00:01,000", format: .webVTT)
+        assertRejectedTimestamp("00:01,000", format: .webVTT)
+    }
+
     private func assertRejectedTimestamp(_ timestamp: String, format: Converter.Format) {
         let separator = format == .srt ? "," : "."
         let intervals = [

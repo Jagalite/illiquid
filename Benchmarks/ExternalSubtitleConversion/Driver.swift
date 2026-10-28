@@ -16,6 +16,7 @@ private struct Fixture {
     let cues: Int
     let expectedError: String?
     let timed: Bool
+    var timestampDifferential = false
 }
 
 private struct Result {
@@ -154,6 +155,80 @@ private func fixtures(selected: String? = nil) -> [Fixture] {
             if length < 3 { level = level.flatMap { prefix in alphabet.map { prefix + $0 } } }
         }
     }
+    result += timestampFixtures(selected: selected)
+    return result
+}
+
+private func timestampFixtures(selected: String?) -> [Fixture] {
+    guard selected == nil || selected!.hasPrefix("timestamp-") else { return [] }
+    func wanted(_ name: String) -> Bool { selected == nil || selected == name }
+    var result: [Fixture] = []
+    for format in [Converter.Format.srt, .webVTT] {
+        let label = format == .srt ? "srt" : "vtt"
+        let separator = format == .srt ? "," : "."
+        let canonical = "00:12:34\(separator)567"
+        if selected == nil || selected!.hasPrefix("timestamp-diff-") {
+            var values = ["00:00:00\(separator)000", "00:59:59\(separator)995", "99:59:59\(separator)999",
+                "000:01:02\(separator)003", "0:1:2\(separator)003", "00:01\(separator)000",
+                "2147483647:59:59\(separator)994", "2147483647:59:59\(separator)995",
+                "2147483648:00:00\(separator)000", String(repeating: "0", count: 256) + ":01:02\(separator)003",
+                String(repeating: "9", count: 256) + ":00:00\(separator)000"]
+            for fraction in ["", "0", "00", "000", "001", "004", "005", "006", "009", "010", "050",
+                             "500", "994", "995", "999", "0000", "005999", "12x", "١٠٠", "１２３"] {
+                values.append("00:12:34\(separator)" + fraction)
+            }
+            for space in [" ", "\t", "\u{000B}", "\u{000C}", "\u{00A0}", "\u{2003}", "\u{200B}",
+                          "\u{3000}", "\u{2028}", "\u{2029}", "\u{0085}", " \u{0301}", "\t\u{034F}"] {
+                values += [space + canonical, canonical + space, space + canonical + space,
+                           canonical + space + "align:start", canonical + space + "align:日本語"]
+            }
+            values += [canonical + "\u{0301}", canonical + "\0", canonical + " \0",
+                       canonical + " align:日本語", "\u{0600}" + canonical,
+                       canonical.replacingOccurrences(of: ":", with: ":\u{0301}")]
+            let templates = format == .srt ? ["00:12:34,567", "00:12:34.567"]
+                                           : ["00:12:34.567", "12:34.567"]
+            for template in templates {
+                let original = Array(template.utf8)
+                for index in original.indices {
+                    for ascii in 0...127 where ascii != 10 && ascii != 13 {
+                        var bytes = original; bytes[index] = UInt8(ascii)
+                        values.append(String(decoding: bytes, as: UTF8.self))
+                    }
+                }
+            }
+            for (index, value) in values.enumerated() {
+                for endpoint in 0...1 {
+                    let name = "timestamp-diff-\(label)-\(index)-\(endpoint)"
+                    guard wanted(name) else { continue }
+                    let start = endpoint == 0 ? value : "00:00:00\(separator)000"
+                    let end = endpoint == 0 ? "2147483647:59:59\(separator)994" : value
+                    let source = (format == .webVTT ? "WEBVTT\n\n" : "1\n")
+                        + start + " --> " + end + "\nProbe\n\n"
+                        + "00:00:03.000 --> 00:00:04.000\nTIMESTAMP-SENTINEL"
+                    result.append(Fixture(name: name, format: format, source: source, cues: -1,
+                        expectedError: nil, timed: false, timestampDifferential: true))
+                }
+            }
+        }
+        for kind in ["wide-hours", "unicode-settings", "malformed"] {
+            if kind == "unicode-settings" && format == .srt { continue }
+            let name = "timestamp-control-\(label)-2000-\(kind)"
+            guard wanted(name) else { continue }
+            var source = makeSource(2000, format: format, payload: "Caption")
+            if kind == "wide-hours" {
+                source = source.replacingOccurrences(of: #"(\d{2}:\d{2}:\d{2}[.,]\d{3})"#,
+                    with: "0$1", options: .regularExpression)
+            } else if kind == "unicode-settings" {
+                source = source.replacingOccurrences(of: "align:start", with: "align:日本語")
+            } else {
+                source = source.replacingOccurrences(of: #"(?m)^\d{2}:\d{2}:\d{2}[.,]\d{3} -->"#,
+                    with: "00:60:00.000 -->", options: .regularExpression)
+            }
+            let error = kind == "malformed" ? "noValidCues." + (format == .srt ? "srt" : "webVTT") : nil
+            result.append(Fixture(name: name, format: format, source: source,
+                cues: kind == "malformed" ? 0 : 2000, expectedError: error, timed: true))
+        }
+    }
     return result
 }
 
@@ -177,6 +252,14 @@ private func fnv(_ text: String) -> String {
 }
 
 private func check(_ result: Result, fixture: Fixture) {
+    if fixture.timestampDifferential {
+        // Probe acceptance is deliberately left to exact baseline/candidate
+        // output comparison. The independent valid cue must always survive.
+        precondition(result.error == nil)
+        precondition(result.output?.hasSuffix(
+            "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,TIMESTAMP-SENTINEL") == true)
+        return
+    }
     precondition(result.error == fixture.expectedError, "Unexpected error for \(fixture.name)")
     if let output = result.output {
         let count = output.components(separatedBy: "\n").filter { $0.hasPrefix("Dialogue: ") }.count
