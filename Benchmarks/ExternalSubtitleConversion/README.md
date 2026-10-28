@@ -115,3 +115,8 @@ These measurements concern in-memory subtitle conversion during loading and
 track changes. They exclude file I/O, text decoding, libass installation,
 rendering, visible UI latency, playback frame rate, peak memory, and energy.
 See [the research report](../../Documentation/EXTERNAL_SUBTITLE_CONVERSION_PERFORMANCE.md).
+
+The incremental fixed-width timestamp experiment uses current main as its
+baseline; see [the timestamp report](../../Documentation/SUBTITLE_TIMESTAMP_PERFORMANCE.md).
+The portable timestamp workflow also runs the complete component tests and
+paired benchmark on Ubuntu, with Linux and macOS results reported separately.
