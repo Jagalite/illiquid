@@ -1,0 +1,119 @@
+{
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_target_blob": "ed360be504b966541b75ccda98486cbe788dfd92",
+  "candidate_revision": "1009de80f7d3b2e569747677241319c6c1d58664",
+  "candidate_status": "",
+  "compiled_outputs": {
+    "build/baseline/discovery-memory": "9b49758c90f78eac9dbf35e0d5cc0272ee439dfeb98d942d1db755e276cb20ee",
+    "build/baseline/discovery-timing": "6bc928b9acfeb4be047d6ee84f93db0c764e37b56878cde16aa03c2179e04a57",
+    "build/baseline/libIlliquidCore.so": "047f486f693374921222af7234eed0d7b6c41921dd3f4694ed11368ae4c9f72c",
+    "build/candidate/discovery-memory": "bd4d019e13a81311ac708e6fb6af378b8d91a039df83278a55d0c6409957f78a",
+    "build/candidate/discovery-timing": "e0d638fb02e80ba659b53d33eca7cb78e95d03dca0d6ab09c91d8ee39db8c51d",
+    "build/candidate/libIlliquidCore.so": "6a8edf7fc32ae824a17242f962205b05b82dd06d93cd6e23d52fffc433ea0695",
+    "build/probe-memory/libDiscoveryProbe.so": "5df59bd5850b172d51c1fa10403f44b681ccffd90e31dc8e98ce8e160bc894d4",
+    "build/probe-timing/libDiscoveryProbe.so": "970ebd8dc3ac3489ba92668a5d402783ea25d71e82ae4eba3cd60db64b9d5828"
+  },
+  "created_utc": "2026-10-28T06:09:42.413329+00:00",
+  "environment": {
+    "cc": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+    "cpu_count": 4,
+    "machine": "x86_64",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+    "swiftc": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+    "variables": {
+      "DEVELOPER_DIR": null,
+      "LANG": null,
+      "LC_ALL": null,
+      "LC_COLLATE": null,
+      "SWIFT_DETERMINISTIC_HASHING": null
+    }
+  },
+  "harness_sources": {
+    "Driver.swift": "b21392964031b15b3593a0bbe5dfffc387af468df89a50f9816922628190b36c",
+    "MemoryProbe.c": "83b0ecdff86886507abd770958cf1575d106050e9e3e74bea36f18efe41bf8fc",
+    "run.py": "1f5ff45e1a506d15454898e4b09fd3ac21073e1604e2f981bd0f97c6ceefa5d1"
+  },
+  "method": {
+    "allocation": "Separate instrumented processes count successful covered malloc-family requests and requested sizes on the discover caller thread. Typed and zone entry points covered on macOS; malloc/calloc/realloc on glibc. Nested macOS entry points counted once. Realloc counts the full requested size. Not live bytes, peak memory, RSS, or total process allocations.",
+    "iterations_per_process": 1,
+    "pairs": 2,
+    "sampling": "Each observation is a fresh process with one untimed discovery and complete receipt serialization, then one measured discovery. Workload order rotates; pairs alternate AB/BA. All observations retained.",
+    "scope": "Warm real local directory discovery: listing, symlink resolution, resource queries, classification, sorting, metadata and subtitle matching; no UI/decode/playback measurement.",
+    "source_boundary": "Seven complete unmodified production files; only FolderPlaylistDiscovery.swift differs; separate optimized Swift modules without cross-module optimization.",
+    "timing": "Uninstrumented binary; monotonic wall and process CPU clocks. Fixture creation and output serialization excluded; returned model retained until both clocks stop. No empty-loop subtraction or timing gate.",
+    "verification": "Exact sorted-key Codable playlist and URL-representation bytes match warmup vs measured output and every baseline/candidate process. Identical receipts are retained once per fixture, with SHA-256 recorded for every observation."
+  },
+  "production_sources": {
+    "baseline": {
+      "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift": {
+        "git_blob": "41863f4d972b900ea21b5de8fbd6e0865cd1efeb",
+        "sha256": "d4b15dc5a8f62d043f187f4a39820cbab2c8d6e7388d8769309516ab18f79f1a"
+      },
+      "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": {
+        "git_blob": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      "Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift": {
+        "git_blob": "ed360be504b966541b75ccda98486cbe788dfd92",
+        "sha256": "3748bf70b9c26c7e4a812733d81f4e1df3719c783d4b2a389b8163024d2bded3"
+      },
+      "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": {
+        "git_blob": "ff86a4830377c695df8ac700cd0fdff194b4f778",
+        "sha256": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8"
+      },
+      "Sources/IlliquidCore/Utilities/MediaFileSupport.swift": {
+        "git_blob": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+      },
+      "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+        "git_blob": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": {
+        "git_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      }
+    },
+    "candidate": {
+      "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift": {
+        "git_blob": "41863f4d972b900ea21b5de8fbd6e0865cd1efeb",
+        "sha256": "d4b15dc5a8f62d043f187f4a39820cbab2c8d6e7388d8769309516ab18f79f1a"
+      },
+      "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": {
+        "git_blob": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      "Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift": {
+        "git_blob": "b313aca3f3c344101232f135b37a5a76e34b35de",
+        "sha256": "2f565ae1c6ca230c0df7dd2ec7451cd626822025bb2ff8fe24c5a8a95a9ae24f"
+      },
+      "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": {
+        "git_blob": "ff86a4830377c695df8ac700cd0fdff194b4f778",
+        "sha256": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8"
+      },
+      "Sources/IlliquidCore/Utilities/MediaFileSupport.swift": {
+        "git_blob": "7826ec75f3febc25b3e901ce5955a79771ef4082",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00"
+      },
+      "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+        "git_blob": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": {
+        "git_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      }
+    }
+  },
+  "schema_version": 1,
+  "test_package_sha256": "aa62a21e41b44f73733ac7ae66e07f43a6076e2ec55091e7582cad65e284d245",
+  "test_sources": {
+    "FolderDiscoveryClassificationTests.swift": "00ca74bcb14e740d6380ed33f5d7a8669aa79a20b3d79ab4ffe67ee1a0fc67b5",
+    "FolderDiscoveryFilesystemRegressionTests.swift": "4b208361b6414eede0026861b9ef63c13df1828d786dbf60e3573cdf91137964",
+    "FolderPlaylistDiscoveryTests.swift": "2114e058b5b4d491214627509b0f1e6ea608b38f668390785bfdd795771415ea",
+    "FolderPlaylistTests.swift": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d",
+    "PreparedPlaylistConstructionTests.swift": "a7a9a28b5b02bda8163338436ab0b85053948e9837c05dc64fd9682d7f7878f8",
+    "TestSupport/TemporaryDirectory.swift": "594fb60baced7f9b7618a4b31b9c8bf8eb47165962086282460bb014397bac24"
+  }
+}

@@ -10,19 +10,6 @@ on:
       - '.github/workflows/folder-discovery-classification.yml'
       - '!Benchmarks/FolderDiscoveryClassification/*.md'
       - '!Benchmarks/FolderDiscoveryClassification/evidence/**'
-  pull_request:
-    paths:
-      - 'Sources/IlliquidCore/Playlist/**'
-      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
-      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
-      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
-      - 'Tests/IlliquidCoreTests/Folder*Tests.swift'
-      - 'Tests/IlliquidCoreTests/TestSupport/TemporaryDirectory.swift'
-      - 'Scripts/test-folder-discovery-regressions.sh'
-      - 'Benchmarks/FolderDiscoveryClassification/**'
-      - '.github/workflows/folder-discovery-classification.yml'
-      - '!Benchmarks/FolderDiscoveryClassification/*.md'
-      - '!Benchmarks/FolderDiscoveryClassification/evidence/**'
   workflow_dispatch:
 
 permissions:
@@ -30,7 +17,7 @@ permissions:
 
 concurrency:
   group: folder-discovery-classification-${{ github.head_ref || github.ref_name }}
-  # Preserve an in-flight research campaign when a portable test is corrected.
+  # Preserve a queued research campaign when a follow-up commit arrives.
   cancel-in-progress: false
 
 jobs:
