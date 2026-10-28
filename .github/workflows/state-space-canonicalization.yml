@@ -1,0 +1,55 @@
+name: State-space canonicalization performance
+
+on:
+  push:
+    branches:
+      - codex/perf-state-space-canonicalization
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/Player/MediaTrack.swift
+      - Sources/IlliquidPlaybackCore/**
+      - Sources/IlliquidPlaybackStateSpace/**
+      - Tests/IlliquidPlaybackCoreTests/**
+      - Tests/IlliquidPlaybackStateSpaceTests/**
+      - Validation/IlliquidStateSpaceExplorer/**
+      - Benchmarks/StateSpaceCanonicalization/**
+      - .github/workflows/state-space-canonicalization.yml
+      - '!Benchmarks/StateSpaceCanonicalization/README.md'
+      - '!Benchmarks/StateSpaceCanonicalization/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: state-space-canonicalization-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  paired-search:
+    runs-on: macos-26
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Explain build coordination
+        run: |
+          if [ -e /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo "Kyoto is available; run this cohort through the shared queue."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this isolated runner; builds run directly and serially."
+      - name: Verify and measure unchanged PR search inventory
+        run: |
+          python3 Benchmarks/StateSpaceCanonicalization/run.py \
+            --pairs 4 --output "$RUNNER_TEMP/state-space-canonicalization"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: state-space-canonicalization-macos
+          path: ${{ runner.temp }}/state-space-canonicalization/review
+          retention-days: 30

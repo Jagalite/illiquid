@@ -482,6 +482,82 @@ struct PlaybackStateSpaceTests {
     #expect(promoted.steps.allSatisfy { $0.effectContextPreserved })
   }
 
+  @Test(arguments: [false, true])
+  func staleGenerationResultsRetireWithoutChangingPlayback(
+    retained: Bool
+  ) throws {
+    var input = makeNode(session: 4, operation: 9, effect: 12)
+    let effect = try #require(input.coreState.outstandingEffects.values.first?.effect)
+    let effectID = effect.context.effectID
+    let result = PlaybackEffectResult(
+      context: effect.context,
+      token: EffectResultToken(kind: .succeeded)
+    )
+    // The result belongs to a retired generation of the current session.
+    input.coreState.activeSession?.generation = PlaybackGenerationID(rawValue: 8)
+    input.lateResults = [RetainedEffectResult(effect: effect, result: result)]
+    input.depth = 7
+
+    let action: SearchAction = retained
+      ? .lateResult(index: 0)
+      : .result(effectID: effectID, outcome: .succeeded, mutation: .none)
+    let applied = apply(
+      action: action,
+      to: input,
+      configuration: .validation(depthLimit: 8)
+    )
+
+    #expect(applied.calledProductionCore)
+    #expect(!applied.gateRejected)
+    #expect(applied.transition?.disposition == .stale(reason: .generationMismatch))
+    #expect(applied.transition?.effects.isEmpty == true)
+    #expect(applied.violations.isEmpty)
+    #expect(applied.node.coreState.activeSession == input.coreState.activeSession)
+    #expect(applied.node.coreState.outstandingEffects[effectID] == nil)
+    #expect(applied.node.coreState.completedEffectIDs.contains(effectID))
+    #expect(applied.node.coreState.rejectedEventCount == input.coreState.rejectedEventCount + 1)
+    #expect(applied.node.lateResults.count == 1)
+    #expect(applied.node.lateResults[0].deliveries == (retained ? 2 : 1))
+    #expect(applied.node.depth == 8)
+
+    // Applying an outgoing edge must not mutate its BFS predecessor.
+    #expect(input.coreState.outstandingEffects[effectID]?.effect == effect)
+    #expect(input.coreState.completedEffectIDs.isEmpty)
+    #expect(input.coreState.rejectedEventCount == 0)
+    #expect(input.lateResults[0].deliveries == 1)
+    #expect(input.depth == 7)
+  }
+
+  @Test
+  func staleOverlayChangesOnlyRejectionBookkeeping() throws {
+    var input = makeNode(session: 4, operation: 9, effect: 12)
+    input.coreState.outstandingEffects.removeAll()
+    input.coreState.activeSession?.subtitles.overlayRevision = OverlayRevisionID(rawValue: 4)
+    input.coreState.activeSession?.subtitles.lastAcceptedOverlayRevision =
+      OverlayRevisionID(rawValue: 4)
+    input.coreState.activeSession?.subtitles.rejectedOverlayCommitCount = 7
+    let originalSession = try #require(input.coreState.activeSession)
+
+    let applied = apply(
+      action: .runtimeFact(.oldOverlayCommit, ingress: .current),
+      to: input,
+      configuration: .validation(depthLimit: 1)
+    )
+
+    var expectedSession = originalSession
+    expectedSession.subtitles.rejectedOverlayCommitCount += 1
+    #expect(applied.calledProductionCore)
+    #expect(applied.transition?.disposition == .stale(reason: .authorityMismatch))
+    #expect(applied.transition?.effects.isEmpty == true)
+    #expect(applied.violations.isEmpty)
+    #expect(applied.node.coreState.activeSession == expectedSession)
+    #expect(applied.node.coreState.rejectedEventCount == 1)
+    #expect(applied.node.depth == 1)
+    #expect(input.coreState.activeSession == originalSession)
+    #expect(input.coreState.rejectedEventCount == 0)
+    #expect(input.depth == 0)
+  }
+
   private func makeNode(
     session: UInt64,
     operation: UInt64,

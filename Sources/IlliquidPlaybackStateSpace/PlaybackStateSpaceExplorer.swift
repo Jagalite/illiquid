@@ -169,7 +169,6 @@ func apply(
   node.depth += 1
   let preSession = node.coreState.activeSession?.id
   let preGeneration = node.coreState.activeSession?.generation
-  let preKey = PlaybackSearchCanonicalizer.key(for: node)
   var event: PlaybackEvent?
   var gateRejected = false
   var fairProgress = false
@@ -345,6 +344,9 @@ func apply(
       ))
   }
   if case .stale = transition.disposition {
+    // Only depth changed before dispatch, and it is not part of the key.
+    // Keep the original input for this check without normalizing every edge.
+    let preKey = PlaybackSearchCanonicalizer.key(for: input)
     let postKey = PlaybackSearchCanonicalizer.key(for: node)
     if preKey.lifecycle != postKey.lifecycle || preKey.externalWait != postKey.externalWait
       || preKey.session != postKey.session || preKey.leases != postKey.leases
