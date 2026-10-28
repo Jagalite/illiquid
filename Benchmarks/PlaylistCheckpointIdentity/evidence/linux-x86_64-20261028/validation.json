@@ -1,0 +1,33 @@
+{
+  "commit": "3e4967f09b29e25db3a5b3a4f475b18e0304fc98",
+  "compiler": "Swift 6.3.3 (swift-6.3.3-RELEASE), x86_64-unknown-linux-gnu",
+  "provenance_note": "Recorded after the test runs. The parent shell used set -euo pipefail and ran debug, release, and the benchmark sequentially. Both tests completed before benchmarking began. These source and script bytes were unchanged throughout the run and are byte-identical to the stated commit. Temporary SwiftPM packages were removed by the existing test script.",
+  "source_sha256": {
+    "Scripts/test-playlist-restoration.sh": "af5bf158cc1bc520370cae7c2b997401ebfb5b29b24abac03064500c5d53b2cb",
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": "d8708633b5be359f1c90adda0e7213ad61d2c692125f2b8e861fe228786aa6cf",
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "Tests/IlliquidCoreTests/FolderPlaylistTests.swift": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d",
+    "Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift": "ba6e040919bdae7f7d4748d95ab6bc39da3547d0add10020dd2261908810f776",
+    "Tests/IlliquidCoreTests/PlaylistCheckpointIdentityTests.swift": "f5af31bea8d20e6e51836495b56fb8e9422f389172f7b96848f387ba49b49973",
+    "Tests/IlliquidCoreTests/PlaylistMutationTests.swift": "08b3ea822f18722007b7c32e5316911949a4198767e6bade300c8f88b2d0147f",
+    "Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift": "79a1d9de1abef31e1168ce0b2cb49775c8c653b9a8d298fc3894846efd129045"
+  },
+  "tests": {
+    "debug": {
+      "command": "bash Scripts/test-playlist-restoration.sh --jobs 2",
+      "exit_code": 0,
+      "log_sha256": "b92343fec9a4e99fcf855155f03eb37a5a86a2baf8595d334cff27cf7d5c02c0",
+      "suite_count": 5,
+      "test_count": 30
+    },
+    "release": {
+      "command": "bash Scripts/test-playlist-restoration.sh -c release --jobs 2",
+      "exit_code": 0,
+      "log_sha256": "64eacdaa9de359eaefd7269e824886556afd7390c4f0c5c4c97bf62e73ed79a6",
+      "suite_count": 5,
+      "test_count": 30
+    }
+  }
+}

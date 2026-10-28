@@ -1,0 +1,266 @@
+{
+  "audit_utc": "2026-10-28T06:00:43.924165+00:00",
+  "auditor": "independent audit_native_costs agent",
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate_revision": "3e4967f09b29e25db3a5b3a4f475b18e0304fc98",
+  "input_sha256": {
+    "calibration-observations.jsonl": "fb042b5c3bd1ca11df9cda6ad6f96dc515332df2c8b901507c34ca6b01810965",
+    "calibration.json": "e8b6f207eb537e6aad82609bcbdd19177d53fc6c00ada6f3664ca15c0fa39827",
+    "commands.jsonl": "54e87046354338a4fac930f776170e13ffd18a38a4efce1b5f5e98dacafba309",
+    "completion.json": "cfe1f0679148fc807bbfc050c41df73d76ecab4c3ecf6855e0f2e9ffc10dcb8f",
+    "manifest.json": "ed71aedfa6f06e4841c6ae6b8074a74b55b86e516c378a83069b4210d3b4046c",
+    "measurements.jsonl": "9e44911c8cab3556dd495511f79983b5e10812054552829db918a2edb5c98ff6",
+    "parity.json": "df52804586e1c1b21389c0cafd56861643de59539c5dfc242513744729741334",
+    "report.md": "02dedbf51efe10346f08d5f5bb5d1788577b85c205a6e1d98712b504b7cc59e1",
+    "summary.json": "2956a234b8c4a900dcb15dc2fdc0d90b6cfb883c93a9ceecd4a3add4c4fbd6d1",
+    "verification-baseline.json": "be0afcec26d3e54f91381d0680dcfb1b8b175437d3ee921d6fb9f6f104c70fe7",
+    "verification-candidate.json": "be0afcec26d3e54f91381d0680dcfb1b8b175437d3ee921d6fb9f6f104c70fe7"
+  },
+  "interpretation": {
+    "all_unique_workloads_faster_in_all_eight_pairs": true,
+    "concurrent_pr152": "PR152 changes item-valued restoration dictionary to indices, retains item output and second identity pass, and leaves checkpoint caller unchanged. Current results are versus ea2ff568, not a measured incremental comparison to PR152.",
+    "controls": "Singleton without saved IDs is approximately unchanged. The unchanged restoration control is slower in this cohort; the empty control is a nanosecond-scale measurement. Do not claim a universal absence of regression.",
+    "scope": "Linux Swift 6.3.3 component wall/CPU timing includes checksum consumption and result release. No allocator/RSS or end-to-end player/UI measurement. Test source provenance was recorded after execution, not an independently retained compilation-time package snapshot.",
+    "unique_workload_cpu_reduction_percent_range": [
+      47.20032263757067,
+      50.606020230622306
+    ],
+    "unique_workload_wall_reduction_percent_range": [
+      47.17828641135803,
+      50.70540136866561
+    ]
+  },
+  "measurements": {
+    "ab_ba_matrix_and_common_iterations_verified": true,
+    "all_cycle_and_timed_checksums_recomputed": true,
+    "all_summary_medians_ranges_pair_ratios_and_report_rows_recomputed": true,
+    "calibration_samples": 47,
+    "completed_command_receipts_and_log_hashes_verified": 269,
+    "minimum_cpu_ms": 170.364774,
+    "minimum_wall_ms": 170.356913,
+    "pairs_per_workload": 8,
+    "raw_samples": 208,
+    "required_minimum_ms": 60,
+    "unique_worker_processes": 255,
+    "workloads": 13
+  },
+  "parity": {
+    "additional_differential_fixtures": 2644,
+    "all_receipts_reconstructed_independently_with_integer_labels_and_utf8_fingerprints": true,
+    "full_utf8_equality_performed_by_both_binaries": true,
+    "timed_fixtures": 52,
+    "total_fixtures": 2696
+  },
+  "results": [
+    {
+      "cpu_baseline_ns_per_call": 41.737312226021665,
+      "cpu_candidate_ns_per_call": 37.068305957459344,
+      "cpu_change_percent": -11.186648156158386,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -10.477407537050198,
+      "wall_baseline_ns_per_call": 41.94267235833732,
+      "wall_candidate_ns_per_call": 37.18745146281955,
+      "wall_change_percent": -11.33742946775429,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -10.553822401346459,
+      "workload": "empty"
+    },
+    {
+      "cpu_baseline_ns_per_call": 4369.705077387693,
+      "cpu_candidate_ns_per_call": 4385.861350981502,
+      "cpu_change_percent": 0.3697337304848114,
+      "cpu_faster_pairs": 5,
+      "cpu_median_paired_change_percent": -3.4423972639257228,
+      "wall_baseline_ns_per_call": 4386.285367119668,
+      "wall_candidate_ns_per_call": 4386.75149820687,
+      "wall_change_percent": 0.010627012339314845,
+      "wall_faster_pairs": 5,
+      "wall_median_paired_change_percent": -3.4679670567283383,
+      "workload": "singleton_no_base"
+    },
+    {
+      "cpu_baseline_ns_per_call": 9119.58912177986,
+      "cpu_candidate_ns_per_call": 4429.454929742389,
+      "cpu_change_percent": -51.42922701239091,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -49.32956061163816,
+      "wall_baseline_ns_per_call": 9121.496920374708,
+      "wall_candidate_ns_per_call": 4432.535960187353,
+      "wall_change_percent": -51.40560810488915,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -49.3242050919872,
+      "workload": "singleton_saved"
+    },
+    {
+      "cpu_baseline_ns_per_call": 106702.60144927536,
+      "cpu_candidate_ns_per_call": 56338.62930253623,
+      "cpu_change_percent": -47.20032263757067,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -45.90591336754875,
+      "wall_baseline_ns_per_call": 106750.45267210146,
+      "wall_candidate_ns_per_call": 56387.41836503623,
+      "wall_change_percent": -47.17828641135803,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -45.88657174882864,
+      "workload": "unique_10"
+    },
+    {
+      "cpu_baseline_ns_per_call": 945474.1845794392,
+      "cpu_candidate_ns_per_call": 472251.9404205608,
+      "cpu_change_percent": -50.05131307412425,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -50.37321021123624,
+      "wall_baseline_ns_per_call": 945736.3422897196,
+      "wall_candidate_ns_per_call": 472232.2429906542,
+      "wall_change_percent": -50.06724159004675,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -50.38433443504397,
+      "workload": "unique_100"
+    },
+    {
+      "cpu_baseline_ns_per_call": 9924667.738636363,
+      "cpu_candidate_ns_per_call": 4902188.375,
+      "cpu_change_percent": -50.606020230622306,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -48.41891384980652,
+      "wall_baseline_ns_per_call": 9958965.102272727,
+      "wall_candidate_ns_per_call": 4909231.875,
+      "wall_change_percent": -50.70540136866561,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -48.47237785534767,
+      "workload": "unique_1000"
+    },
+    {
+      "cpu_baseline_ns_per_call": 100266635.75,
+      "cpu_candidate_ns_per_call": 51701347.25,
+      "cpu_change_percent": -48.4361404336836,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -49.240664541179434,
+      "wall_baseline_ns_per_call": 100680335.625,
+      "wall_candidate_ns_per_call": 51698814.25,
+      "wall_change_percent": -48.65053445733386,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -49.316246200221755,
+      "workload": "unique_10000"
+    },
+    {
+      "cpu_baseline_ns_per_call": 109604027.5,
+      "cpu_candidate_ns_per_call": 57535872.375,
+      "cpu_change_percent": -47.505695103220546,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -46.58728210559777,
+      "wall_baseline_ns_per_call": 109601127.625,
+      "wall_candidate_ns_per_call": 57532195.125,
+      "wall_change_percent": -47.507661306326824,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -46.632524978926845,
+      "workload": "edited_10000"
+    },
+    {
+      "cpu_baseline_ns_per_call": 59450151.25,
+      "cpu_candidate_ns_per_call": 45405680.875,
+      "cpu_change_percent": -23.623943891984634,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -21.766250349156557,
+      "wall_baseline_ns_per_call": 59657315.25,
+      "wall_candidate_ns_per_call": 45402745.5,
+      "wall_change_percent": -23.894085227041796,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -21.875191672707285,
+      "workload": "duplicates_10000"
+    },
+    {
+      "cpu_baseline_ns_per_call": 102016104.0,
+      "cpu_candidate_ns_per_call": 53327035.75,
+      "cpu_change_percent": -47.72684541060301,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -46.351437500354265,
+      "wall_baseline_ns_per_call": 102013672.125,
+      "wall_candidate_ns_per_call": 53310221.25,
+      "wall_change_percent": -47.742081880282086,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -46.37305147168982,
+      "workload": "no_base_10000"
+    },
+    {
+      "cpu_baseline_ns_per_call": 735138.6497252746,
+      "cpu_candidate_ns_per_call": 532076.5027472527,
+      "cpu_change_percent": -27.622292346335943,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -24.849028539156993,
+      "wall_baseline_ns_per_call": 735148.021978022,
+      "wall_candidate_ns_per_call": 532057.9107142857,
+      "wall_change_percent": -27.625744093997962,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -24.84734323975244,
+      "workload": "remote_1000"
+    },
+    {
+      "cpu_baseline_ns_per_call": 13625271.875,
+      "cpu_candidate_ns_per_call": 7550530.160714285,
+      "cpu_change_percent": -44.58437064607721,
+      "cpu_faster_pairs": 8,
+      "cpu_median_paired_change_percent": -44.9188668550861,
+      "wall_baseline_ns_per_call": 13627518.285714285,
+      "wall_candidate_ns_per_call": 7556122.125,
+      "wall_change_percent": -44.552471208781455,
+      "wall_faster_pairs": 8,
+      "wall_median_paired_change_percent": -44.929802418734646,
+      "workload": "unicode_1000"
+    },
+    {
+      "cpu_baseline_ns_per_call": 8936245.729166668,
+      "cpu_candidate_ns_per_call": 9277898.1875,
+      "cpu_change_percent": 3.823221391710674,
+      "cpu_faster_pairs": 3,
+      "cpu_median_paired_change_percent": 1.653589846162573,
+      "wall_baseline_ns_per_call": 8939840.979166668,
+      "wall_candidate_ns_per_call": 9351229.333333332,
+      "wall_change_percent": 4.601741296353712,
+      "wall_faster_pairs": 3,
+      "wall_median_paired_change_percent": 1.7273732086643623,
+      "workload": "restoration_control_1000"
+    }
+  ],
+  "schema_version": 1,
+  "source_checks": {
+    "all_git_and_snapshot_hashes_match": true,
+    "binary_sha256": {
+      "baseline": "0a3a4164a1aeefe6bd5f58c1aa1569faab09e2495e747251c8112af6d49f8e61",
+      "candidate": "a98f6dc9a91290575b8d50ec1a0ef4b0312423b3a14fe8fd596542afc54d29c0"
+    },
+    "captured_caller": "Sources/IlliquidPlayer/Player/PlaybackController.swift",
+    "compiler_version": "Swift version 6.3.3 (swift-6.3.3-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+    "complete_production_core_files": [
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+      "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+      "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+      "Sources/IlliquidCore/Playlist/PlaylistMutation.swift"
+    ],
+    "frozen_legacy_methods_and_original_checkpoint_chain_verified": true,
+    "identical_optimization_flags_except_intended_baseline_selector": true,
+    "shared_dependencies_identical": true,
+    "singleton_fast_path_semantics_reviewed": true,
+    "source_snapshot_count": 14
+  },
+  "status": "passed",
+  "tests": {
+    "debug": {
+      "command": "bash Scripts/test-playlist-restoration.sh --jobs 2",
+      "exit_code": 0,
+      "log_sha256": "b92343fec9a4e99fcf855155f03eb37a5a86a2baf8595d334cff27cf7d5c02c0",
+      "suite_count": 5,
+      "test_count": 30
+    },
+    "provenance_note": "Recorded after the test runs. The parent shell used set -euo pipefail and ran debug, release, and the benchmark sequentially. Both tests completed before benchmarking began. These source and script bytes were unchanged throughout the run and are byte-identical to the stated commit. Temporary SwiftPM packages were removed by the existing test script.",
+    "release": {
+      "command": "bash Scripts/test-playlist-restoration.sh -c release --jobs 2",
+      "exit_code": 0,
+      "log_sha256": "64eacdaa9de359eaefd7269e824886556afd7390c4f0c5c4c97bf62e73ed79a6",
+      "suite_count": 5,
+      "test_count": 30
+    },
+    "ten_postrun_source_hashes_match_candidate_commit": true
+  },
+  "validation_receipt_sha256": "73797ceef8bcb064ca206628760d821d9e36e15af1f9ecc6196750acd0a3718b"
+}
