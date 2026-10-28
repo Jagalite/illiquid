@@ -1,0 +1,60 @@
+name: Persistence key qualification
+
+on:
+  push:
+    branches: ['codex/perf-persistence-key']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
+      - 'Scripts/test-persistence-key.sh'
+      - 'Benchmarks/PersistenceKey/**'
+      - '.github/workflows/persistence-key-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: persistence-key-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  persistence-key:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Native byte-exact differential qualification
+        shell: bash
+        run: |
+          echo "Kyoto is unavailable on this isolated GitHub-hosted runner; compiling the standalone qualification directly."
+          mkdir -p "$RUNNER_TEMP/persistence-key"
+          swiftc --version
+          sw_vers
+          result=0
+          for mode in debug release; do
+            directory="$RUNNER_TEMP/persistence-key/$mode"
+            mkdir -p "$directory"
+            optimization=-Onone
+            if [[ "$mode" == release ]]; then optimization=-O; fi
+            swiftc -swift-version 6 "$optimization" -whole-module-optimization -parse-as-library \
+              -emit-module -emit-object -module-name IlliquidCore \
+              -emit-module-path "$directory/IlliquidCore.swiftmodule" \
+              Sources/IlliquidCore/Utilities/NormalizedFileURL.swift -o "$directory/IlliquidCore.o"
+            swiftc -swift-version 6 "$optimization" -parse-as-library -I "$directory" \
+              Benchmarks/PersistenceKey/Parity.swift "$directory/IlliquidCore.o" -o "$directory/parity"
+            "$directory/parity" > "$RUNNER_TEMP/persistence-key/parity-$mode.json" || result=1
+            cat "$RUNNER_TEMP/persistence-key/parity-$mode.json"
+          done
+          exit "$result"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistence-key
+          path: ${{ runner.temp }}/persistence-key/*.json
+          retention-days: 7
