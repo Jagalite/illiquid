@@ -21,6 +21,11 @@ jobs:
           persist-credentials: false
       - name: Record portable environment and fetch the exact comparison baseline
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if ! command -v python3 >/dev/null; then
+            apt-get update
+            apt-get install -y --no-install-recommends python3
+          fi
           mkdir -p "$RUNNER_TEMP/track-selection-ranking"
           uname -a > "$RUNNER_TEMP/track-selection-ranking/system.txt"
           swiftc --version >> "$RUNNER_TEMP/track-selection-ranking/system.txt"
@@ -75,17 +80,27 @@ jobs:
           payload = json.dumps(receipt, sort_keys=True, separators=(",", ":"))
           (root / "research-receipt.json").write_text(payload + "\n")
           print("TRACK_RANK_RECEIPT_BEGIN")
-          print(payload)
+          for offset in range(0, len(payload), 16000):
+              print(payload[offset:offset + 16000])
           print("TRACK_RANK_RECEIPT_END")
+          PY
+      - name: Collect portable source and result receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os, shutil
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "track-selection-ranking"
+          destination = root.parent / "track-rank-portable-receipts"
+          for path in root.rglob('*'):
+              if path.is_file() and (path.suffix in {".json", ".jsonl", ".log", ".txt"} or "inputs" in path.parts):
+                  target = destination / path.relative_to(root)
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copyfile(path, target)
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: track-selection-ranking-portable
-          path: |
-            ${{ runner.temp }}/track-selection-ranking/**/*.json
-            ${{ runner.temp }}/track-selection-ranking/**/*.jsonl
-            ${{ runner.temp }}/track-selection-ranking/**/*.log
-            ${{ runner.temp }}/track-selection-ranking/**/*.txt
-            ${{ runner.temp }}/track-selection-ranking/**/inputs/**
+          path: ${{ runner.temp }}/track-rank-portable-receipts/
           retention-days: 30
