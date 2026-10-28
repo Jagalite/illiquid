@@ -72,8 +72,16 @@ struct NormalizedFileURLPersistenceKeyTests {
                     "%2FMedia/A.mkv", "A%00B.mkv", "A.mkv/", "?query", "#fragment",
                     "//localhost/Media/A.mkv", "//archive.invalid/Media/A.mkv",
                 ] {
-                    let url = try #require(URL(string: spelling, relativeTo: base))
-                    expectOriginalKey(for: url)
+                    // Foundation versions differ on an empty URI reference.
+                    // Keep every nonempty reference mandatory.
+                    if spelling.isEmpty {
+                        if let url = URL(string: spelling, relativeTo: base) {
+                            expectOriginalKey(for: url)
+                        }
+                    } else {
+                        let url = try #require(URL(string: spelling, relativeTo: base))
+                        expectOriginalKey(for: url)
+                    }
                 }
                 base = try #require(URL(string: "Child/../Nested/", relativeTo: base))
             }
