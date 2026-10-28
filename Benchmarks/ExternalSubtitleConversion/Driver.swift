@@ -85,6 +85,28 @@ private func fixtures(selected: String? = nil) -> [Fixture] {
             source: makeSource(100, format: format, payload: payload).replacingOccurrences(of: "\n", with: ending),
             cues: 100, expectedError: nil, timed: true))
     }
+    // Loading-sized CRLF cases isolate normalization from the unchanged
+    // parsing/escaping/output work; existing LF cases remain controls.
+    for format in [Converter.Format.srt, .webVTT] {
+        let prefix = format == .srt ? "srt" : "vtt"
+        for count in [2000, 10000] {
+            for (kind, payload) in payloads.prefix(2) {
+                let name = "\(prefix)-\(count)-\(kind)-crlf"
+                guard wanted(name) else { continue }
+                result.append(Fixture(name: name, format: format,
+                    source: makeSource(count, format: format, payload: payload)
+                        .replacingOccurrences(of: "\n", with: "\r\n"),
+                    cues: count, expectedError: nil, timed: true))
+            }
+        }
+        let name = "\(prefix)-2000-plain-cr"
+        if wanted(name) {
+            result.append(Fixture(name: name, format: format,
+                source: makeSource(2000, format: format, payload: payloads[0].1)
+                    .replacingOccurrences(of: "\n", with: "\r"),
+                cues: 2000, expectedError: nil, timed: true))
+        }
+    }
     if wanted("vtt-100-escaped-bom") {
         result.append(Fixture(name: "vtt-100-escaped-bom", format: .webVTT,
             source: "\u{FEFF}" + makeSource(100, format: .webVTT, payload: payloads[2].1),
