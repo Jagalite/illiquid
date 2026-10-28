@@ -172,7 +172,6 @@ def main() -> None:
     if changed != [ANALYZER]:
         raise ValueError(f"Expected only the progress analyzer to differ; observed {changed}")
     manifest["changed_source_paths"] = changed
-    manifest["binary_hashes"] = {name: digest(path.read_bytes()) for name, path in binaries.items()}
     save(args.output / "manifest.json", manifest)
 
     tests = []
@@ -183,6 +182,11 @@ def main() -> None:
         tests.append({"variant": variant, "configuration": configuration, "passed": True,
                       "stdout": f"{name}.stdout", "stderr": f"{name}.stderr"})
         save(args.output / "tests.json", tests)
+
+    # SwiftPM test builds may relink a release executable. Record the exact
+    # binaries used below after all test compilation has completed.
+    manifest["binary_hashes"] = {name: digest(path.read_bytes()) for name, path in binaries.items()}
+    save(args.output / "manifest.json", manifest)
 
     listings = {variant: json.loads(command([binary, "list"], args.output, f"{variant}-list"))
                 for variant, binary in binaries.items()}
@@ -223,7 +227,7 @@ def main() -> None:
         # Keep extreme scaling controls from spending minutes in one baseline
         # sample. Record actual durations; the fast variant may then be shorter
         # than the calibration target.
-        iterations = max(1, min(128, math.ceil(args.min_seconds / fastest_seconds),
+        iterations = max(1, min(1_000_000, math.ceil(args.min_seconds / fastest_seconds),
                                 math.floor(2.0 / slowest_seconds)))
         calibration[workload] = {"iterations": iterations, "observations": observed}
         save(args.output / "calibration.json", calibration)
