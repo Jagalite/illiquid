@@ -25,12 +25,26 @@ struct PlaybackCheckpoint: Sendable {
     let unshuffledPlaylistIDs: [FolderPlaylistItem.ID]?
 
     func record() -> PlaybackSessionRecord {
-        let belongsToFolder = source.url.isFileURL && playlist.contains {
-            NormalizedFileURL.representsSameFile($0.url, source.url)
+        // Folderless checkpoints need no membership check. Resolve the source
+        // only after a valid item, then reuse its identity throughout the scan.
+        var collectionFolder: URL?
+        if let folder, source.url.isFileURL {
+            var sourceKey: String?
+            for item in playlist {
+                guard let itemKey = NormalizedFileURL.persistenceKey(for: item.url) else { continue }
+                if sourceKey == nil {
+                    sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
+                }
+                guard let sourceKey else { break }
+                if itemKey == sourceKey {
+                    collectionFolder = folder
+                    break
+                }
+            }
         }
         return PlaybackSessionRecord(
             source: source,
-            collectionFolder: belongsToFolder ? folder : nil,
+            collectionFolder: collectionFolder,
             playlistItems: playlist,
             playlistIndex: index,
             position: position,
