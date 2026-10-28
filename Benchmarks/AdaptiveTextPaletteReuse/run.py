@@ -144,6 +144,10 @@ def main() -> None:
         env = dict(os.environ)
         env["CLANG_MODULE_CACHE_PATH"] = str(build / "clang-module-cache")
         env["SWIFTPM_MODULECACHE_OVERRIDE"] = str(build / "swift-module-cache")
+        # Match hash-table collision layouts across the two fresh processes.
+        # This is a benchmark-only setting, as in Swift's benchmark driver;
+        # production keeps the runtime's normal randomized hashing.
+        env["SWIFT_DETERMINISTIC_HASHING"] = "1"
 
         def run(command: list[str], *, stdout: Path | None = None, cpu: int | None = None) -> str:
             command_index = len(commands)
@@ -210,6 +214,7 @@ def main() -> None:
                             "cpu_model": cpu_model,
                             "allowed_cpus": sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else None,
                             "timed_cpu_affinity": args.cpu,
+                            "swift_deterministic_hashing": env["SWIFT_DETERMINISTIC_HASHING"],
                             "thermal_or_frequency_controlled": False},
             "clocks": {"wall": "driver monotonic elapsed nanoseconds",
                        "cpu": "driver process CPU elapsed nanoseconds",

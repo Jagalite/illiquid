@@ -212,6 +212,11 @@ private func timing(_ fixture: Fixture, kernel: String, iterations: Int, warmup:
 // checks the production call graph rather than a second handwritten algorithm.
 @MainActor
 private func verify() throws {
+    // Matching these values across fresh processes verifies that the runtime
+    // honored the benchmark's deterministic hash setting for the actual keys.
+    try emit(["cache_key_hashes": fixtures().flatMap { fixture in
+        PlayerRainbowPalette.allCases.map { String(fixture.key($0).hashValue) }
+    }])
     for fixture in fixtures() {
         let store = PlaybackVideoColorStore()
         for cycle in 0..<3 {
