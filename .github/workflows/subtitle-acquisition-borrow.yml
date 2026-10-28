@@ -1,0 +1,119 @@
+name: Subtitle acquisition packet borrowing
+
+on:
+  push:
+    branches: ['perf/subtitle-acquisition-borrow-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleAcquisitionBorrowTests.swift'
+      - 'Benchmarks/SubtitleAcquisitionBorrow/**'
+      - '.github/workflows/subtitle-acquisition-borrow.yml'
+      - '!Benchmarks/SubtitleAcquisitionBorrow/README.md'
+      - '!Benchmarks/SubtitleAcquisitionBorrow/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleAcquisitionBorrowTests.swift'
+      - 'Benchmarks/SubtitleAcquisitionBorrow/**'
+      - '.github/workflows/subtitle-acquisition-borrow.yml'
+      - '!Benchmarks/SubtitleAcquisitionBorrow/README.md'
+      - '!Benchmarks/SubtitleAcquisitionBorrow/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-acquisition-borrow-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-qualification:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Measure acquisition checks and qualify native subtitle reconstruction
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'subtitle-acquisition'
+          root.mkdir(parents=True)
+          fixture = root / 'fixtures'
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if not queue.is_file():
+              print('Shared Kyoto queue is unavailable on this hosted runner; '
+                    'compiling and testing serially in this isolated checkout.', flush=True)
+          def execute(command, log, *, environment=None, build=False):
+              env = os.environ.copy()
+              env.update(environment or {})
+              with log.open('w') as stream:
+                  if build and queue.is_file():
+                      cli = [sys.executable, str(queue)]
+                      submitted = subprocess.check_output([*cli, 'submit', '--resource', str(Path.cwd() / '.build'), '--', *command], text=True, env=env)
+                      print(submitted, flush=True)
+                      stream.write(submitted)
+                      job = json.loads(submitted)['id']
+                      subprocess.run([*cli, 'show', job], check=True)
+                      completed = subprocess.run([*cli, 'wait', job])
+                      subprocess.run([*cli, 'logs', job], stdout=stream, stderr=subprocess.STDOUT, check=True)
+                      completed.check_returncode()
+                  else:
+                      completed = subprocess.run(command, env=env, stdout=stream, stderr=subprocess.STDOUT)
+                      print(log.read_text(), flush=True)
+                      completed.check_returncode()
+          execute([sys.executable, 'Benchmarks/SubtitleAcquisitionBorrow/run.py',
+                   '--pairs', '6', '--target-ms', '120', '--output', str(root / 'component')],
+                  root / 'component.log', build=True)
+          execute([sys.executable, 'Scripts/generate-bitmap-subtitle-fixtures.py', str(fixture), '--skip-vobsub'],
+                  root / 'fixtures.log')
+          for name in ['generated-pgs.mkv', 'generated-dvd.mkv', 'generated-dvb.mkv']:
+              assert (fixture / name).stat().st_size > 0, name
+          temporary = root / 'native-receipts'
+          temporary.mkdir()
+          execute(['bash', 'Scripts/tests/run-native-swift-tests.sh', '--build', '--jobs', '2', '--filter',
+                   'BitmapSubtitleAcquisitionBorrowTests|PGSSubtitlePacketBorrowTests|PGSSubtitleCropTests|BitmapSubtitleTests|PacketOwnershipTests'],
+                  root / 'native-tests.log', build=True, environment={
+                      'ILLIQUID_BITMAP_FIXTURE_DIR': str(fixture),
+                      'ILLIQUID_PACKET_OWNERSHIP_FIXTURE': str(fixture / 'generated-pgs.mkv'),
+                      'TMPDIR': str(temporary),
+                  })
+          PY
+      - name: Print compact results
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'subtitle-acquisition'
+          for name in ['component/completion.json', 'component/summary.json', 'native-tests.log']:
+              path = root / name
+              if path.is_file():
+                  print(name)
+                  print(path.read_text()[-40000:])
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-acquisition-borrow-macos
+          path: |
+            ${{ runner.temp }}/subtitle-acquisition/*.log
+            ${{ runner.temp }}/subtitle-acquisition/component/*.json
+            ${{ runner.temp }}/subtitle-acquisition/component/*.jsonl
+            ${{ runner.temp }}/subtitle-acquisition/component/logs/
+            ${{ runner.temp }}/subtitle-acquisition/component/sources/
+            ${{ runner.temp }}/subtitle-acquisition/native-receipts/**/results.xml
+          retention-days: 14

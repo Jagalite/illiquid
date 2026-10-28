@@ -273,10 +273,9 @@ final class FFmpegDemuxer {
                         continue
                     }
                 } else if !isBitmap { continue }
-                let acquisition = needsAcquisition && packet.data.map { data in
-                    isPGS ? PGSSubtitlePacket.isAcquisition(data)
-                        : DVBSubtitlePacket.isAcquisition(data, compositionPageID: compositionPageID)
-                } == true
+                let acquisition = needsAcquisition && Self.isSubtitleAcquisition(
+                    packet, isPGS: isPGS, compositionPageID: compositionPageID
+                )
                 if acquisition {
                     active.removeAll()
                     foundAcquisition = true
@@ -304,6 +303,28 @@ final class FFmpegDemuxer {
             searchTime = max(beginning, seconds - 30 * pow(2, Double(attempt)))
         }
         throw PresentationError("Bitmap subtitle seek could not reconstruct a complete display set within its bounded search")
+    }
+
+    /// Acquisition detection only inspects packet headers synchronously. Borrow
+    /// the payload for the existing Data parsers instead of copying all object
+    /// bytes. FFmpeg remains its owner; no borrowed Data leaves this scope.
+    static func isSubtitleAcquisition(
+        _ packet: FFmpegPacket,
+        isPGS: Bool,
+        compositionPageID: UInt16?
+    ) -> Bool {
+        guard let pointer = packet.pointer,
+              let bytes = pointer.pointee.data,
+              pointer.pointee.size > 0 else { return false }
+        return withExtendedLifetime(packet) {
+            let data = Data(
+                bytesNoCopy: UnsafeMutableRawPointer(bytes),
+                count: Int(pointer.pointee.size),
+                deallocator: .none
+            )
+            return isPGS ? PGSSubtitlePacket.isAcquisition(data)
+                : DVBSubtitlePacket.isAcquisition(data, compositionPageID: compositionPageID)
+        }
     }
 
     /// AVIO retains AVERROR_EXIT after the interrupt token has ended. A new
