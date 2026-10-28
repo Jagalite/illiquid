@@ -1,0 +1,79 @@
+name: Thumbnail refinement performance
+
+on:
+  push:
+    branches: [perf/thumbnail-refinement-storage-20261028-045b6631]
+    paths:
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Sources/IlliquidCore/Player/ThumbnailPassCursor.swift
+      - Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift
+      - Tests/IlliquidCoreTests/Thumbnail*Tests.swift
+      - Benchmarks/ThumbnailRefinement/Driver.swift
+      - Benchmarks/ThumbnailRefinement/run.py
+      - .github/workflows/thumbnail-refinement-performance.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Sources/IlliquidCore/Player/ThumbnailPassCursor.swift
+      - Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift
+      - Tests/IlliquidCoreTests/Thumbnail*Tests.swift
+      - Benchmarks/ThumbnailRefinement/Driver.swift
+      - Benchmarks/ThumbnailRefinement/run.py
+      - .github/workflows/thumbnail-refinement-performance.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-refinement-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test and measure pinned baseline and candidate
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in an isolated checkout.'
+          python3 Benchmarks/ThumbnailRefinement/run.py \
+            --pairs 10 --target-ms 150 --max-sample-ms 1500 \
+            --output "$RUNNER_TEMP/thumbnail-refinement"
+      - name: Emit review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "thumbnail-refinement"
+          names = ["manifest.json", "tests.json", "parity.json", "verification.json",
+                   "summary.json", "measurements.jsonl", "calibration.jsonl",
+                   "failure.json", "failure.txt"]
+          for name in names:
+              path = root / name
+              if path.exists():
+                  print("THUMBNAIL_REFINEMENT_FILE " + json.dumps(
+                      {"name": name, "content": path.read_text()}, sort_keys=True))
+          for path in sorted(root.glob("*-tests.txt")):
+              lines = [line for line in path.read_text().splitlines()
+                       if "Test run with" in line or "error:" in line]
+              print("THUMBNAIL_REFINEMENT_TEST " + json.dumps(
+                  {"name": path.name, "summary": lines}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-refinement-macos
+          path: ${{ runner.temp }}/thumbnail-refinement
+          retention-days: 14
