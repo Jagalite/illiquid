@@ -1,0 +1,96 @@
+name: Natural filename sort storage
+
+on:
+  push:
+    branches: ['perf/natural-filename-sort-storage-20261028']
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift'
+      - 'Benchmarks/NaturalFilenameSortStorage/**'
+      - '.github/workflows/natural-filename-sort-storage.yml'
+      - '!Benchmarks/NaturalFilenameSortStorage/*.md'
+      - '!Benchmarks/NaturalFilenameSortStorage/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Benchmarks/NaturalFilenameSortStorage/**'
+      - '.github/workflows/natural-filename-sort-storage.yml'
+      - '!Benchmarks/NaturalFilenameSortStorage/*.md'
+      - '!Benchmarks/NaturalFilenameSortStorage/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: natural-filename-sort-storage-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            platform: linux
+            developer_dir: ''
+          - runner: macos-26
+            platform: macos
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test exact sources and compare complete sort operations
+        shell: bash
+        run: |
+          # Kyoto is not installed on these ephemeral hosted runners. Builds
+          # within each isolated package are serialized by the Python runner.
+          mode=(--pairs 6 --sizes 1000,10000)
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode=(--quick --pairs 2)
+          fi
+          python3 Benchmarks/NaturalFilenameSortStorage/run.py \
+            --output "$RUNNER_TEMP/natural-filename-sort-storage" "${mode[@]}"
+      - name: Retain component evidence in logs
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'natural-filename-sort-storage'
+          paths = list(root.glob('*.json')) + list(root.glob('*.jsonl')) + list(root.glob('logs/*.txt'))
+          files = {str(p.relative_to(root)): p.read_text() for p in sorted(paths) if p.is_file()}
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log limit; use artifact')
+          print('SORT_STORAGE_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('SORT_STORAGE_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PYCODE
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: natural-filename-sort-storage-${{ matrix.platform }}
+          path: |
+            ${{ runner.temp }}/natural-filename-sort-storage/*.json
+            ${{ runner.temp }}/natural-filename-sort-storage/*.jsonl
+            ${{ runner.temp }}/natural-filename-sort-storage/logs/
+            ${{ runner.temp }}/natural-filename-sort-storage/drivers/*.py
+            ${{ runner.temp }}/natural-filename-sort-storage/drivers/*.swift
+            ${{ runner.temp }}/natural-filename-sort-storage/drivers/*.c
+            ${{ runner.temp }}/natural-filename-sort-storage/baseline/Sources/
+            ${{ runner.temp }}/natural-filename-sort-storage/candidate/Sources/
+            ${{ runner.temp }}/natural-filename-sort-storage/baseline/Tests/
+            ${{ runner.temp }}/natural-filename-sort-storage/candidate/Tests/
+          retention-days: 14
