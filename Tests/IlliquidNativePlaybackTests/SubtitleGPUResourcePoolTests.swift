@@ -19,15 +19,15 @@ struct SubtitleGPUResourcePoolTests {
     @Test func returnedResourcesAreReusedWithinTheSameSource() throws {
         let pool = Pool()
         var borrowed: Resource? = pool.acquire()
-        weak var original = borrowed
+        let original = WeakResource(try #require(borrowed))
 
         pool.release(try #require(borrowed))
         borrowed = nil
-        #expect(original != nil)
+        #expect(original.value != nil)
         #expect(pool.snapshotForTesting().idleResourceCount == 1)
 
         let reused = pool.acquire()
-        #expect(reused === original)
+        #expect(reused === original.value)
         #expect(pool.snapshotForTesting().idleResourceCount == 0)
         pool.release(reused)
         #expect(pool.snapshotForTesting().idleResourceCount == 1)
@@ -55,27 +55,27 @@ struct SubtitleGPUResourcePoolTests {
     @Test func retirementPreservesBorrowedLifetimeButRejectsItsReturn() throws {
         let pool = Pool()
         var borrowed: Resource? = pool.acquire()
-        weak var original = borrowed
+        let original = WeakResource(try #require(borrowed))
 
         pool.retireSource()
 
         // A command-buffer completion owns this reference in production.
         // Retirement must leave that owner's resource alive and untouched.
-        #expect(original != nil)
+        #expect(original.value != nil)
         #expect(pool.snapshotForTesting().idleResourceCount == 0)
 
         pool.release(try #require(borrowed))
         #expect(pool.snapshotForTesting().idleResourceCount == 0)
-        #expect(original != nil)
+        #expect(original.value != nil)
 
         borrowed = nil
-        #expect(original == nil)
+        #expect(original.value == nil)
     }
 
     @Test func delayedOldReturnCannotDisplaceCurrentSourceResources() throws {
         let pool = Pool()
         var old: Resource? = pool.acquire()
-        weak var oldWitness = old
+        let oldWitness = WeakResource(try #require(old))
 
         pool.retireSource()
         let current = pool.acquire()
@@ -86,7 +86,7 @@ struct SubtitleGPUResourcePoolTests {
         pool.release(try #require(old))
         old = nil
 
-        #expect(oldWitness == nil)
+        #expect(oldWitness.value == nil)
         #expect(pool.snapshotForTesting().idleResourceCount == 1)
         #expect(pool.acquire() === current)
     }
@@ -95,23 +95,23 @@ struct SubtitleGPUResourcePoolTests {
         let pool = Pool()
         var firstEarly: Resource? = pool.acquire()
         var firstLate: Resource? = pool.acquire()
-        weak var firstEarlyWitness = firstEarly
-        weak var firstLateWitness = firstLate
+        let firstEarlyWitness = WeakResource(try #require(firstEarly))
+        let firstLateWitness = WeakResource(try #require(firstLate))
 
         pool.retireSource()
         var secondLate: Resource? = pool.acquire()
-        weak var secondLateWitness = secondLate
+        let secondLateWitness = WeakResource(try #require(secondLate))
         let secondIdleWitnesses = populateIdleResources(in: pool, count: 3)
 
         pool.release(try #require(firstEarly))
         firstEarly = nil
-        #expect(firstEarlyWitness == nil)
+        #expect(firstEarlyWitness.value == nil)
         #expect(pool.snapshotForTesting().idleResourceCount == 3)
 
         pool.retireSource()
         #expect(secondIdleWitnesses.allSatisfy { $0.value == nil })
-        #expect(firstLateWitness != nil)
-        #expect(secondLateWitness != nil)
+        #expect(firstLateWitness.value != nil)
+        #expect(secondLateWitness.value != nil)
 
         let current = pool.acquire()
         pool.release(current)
@@ -120,8 +120,8 @@ struct SubtitleGPUResourcePoolTests {
         pool.release(try #require(firstLate))
         firstLate = nil
 
-        #expect(secondLateWitness == nil)
-        #expect(firstLateWitness == nil)
+        #expect(secondLateWitness.value == nil)
+        #expect(firstLateWitness.value == nil)
         #expect(pool.snapshotForTesting().idleResourceCount == 1)
         #expect(pool.acquire() === current)
     }
