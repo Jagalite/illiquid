@@ -30,7 +30,8 @@ permissions:
 
 concurrency:
   group: folder-discovery-classification-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  # Preserve an in-flight research campaign when a portable test is corrected.
+  cancel-in-progress: false
 
 jobs:
   native-research:

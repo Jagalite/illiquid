@@ -6,8 +6,16 @@ import Testing
 struct FolderDiscoveryClassificationTests {
     @Test func mixedListingsPreserveTargetTypesDuplicatesAndMetadata() throws {
         let fixture = try ClassificationFixture()
-        for listing in [fixture.entries, Array(fixture.entries.reversed())] {
-            let fileManager = ClassificationListingFileManager(entries: listing)
+        let fileManagers: [FileManager]
+        #if canImport(Darwin)
+        fileManagers = [ClassificationListingFileManager(entries: fixture.entries),
+                        ClassificationListingFileManager(entries: Array(fixture.entries.reversed()))]
+        #else
+        // Corelibs Foundation cannot override this listing method. Exercise
+        // the real directory once; explicit order injection is native-only.
+        fileManagers = [FileManager.default]
+        #endif
+        for fileManager in fileManagers {
             let actual = try FolderPlaylistDiscovery.discover(in: fixture.folder, fileManager: fileManager)
             let expected = try originalDiscover(in: fixture.folder, fileManager: fileManager)
             #expect(actual == expected)
@@ -32,7 +40,7 @@ struct FolderDiscoveryClassificationTests {
         for suffix in MediaFileSupport.subtitleFileExtensions.sorted() {
             entries.append(try directory.createFile("Feature 0.en.\(suffix.uppercased())"))
         }
-        let fileManager = ClassificationListingFileManager(entries: entries)
+        let fileManager = classificationFileManager(entries: entries)
         let probe = ClassificationCancellationProbe()
         let actual = try FolderPlaylistDiscovery.discover(in: directory.url,
             fileManager: fileManager, checkCancellation: { try probe.check() })
@@ -45,7 +53,7 @@ struct FolderDiscoveryClassificationTests {
 
     @Test func cancellationPreservesEveryOriginalCheckpoint() throws {
         let fixture = try ClassificationFixture()
-        let fileManager = ClassificationListingFileManager(entries: fixture.entries)
+        let fileManager = classificationFileManager(entries: fixture.entries)
         // Two initial checks, two final checks, and entry checks: unsupported
         // ordinary file/folder entries have one; the other eleven have two.
         let expectedChecks = 4 + 2 + 11 * 2
@@ -79,7 +87,7 @@ struct FolderDiscoveryClassificationTests {
         let entries = try ["readme.txt", "movie.nfo", "poster.JPG", "captions.zip"].map {
             try directory.createFile($0)
         }
-        let fileManager = ClassificationListingFileManager(entries: entries)
+        let fileManager = classificationFileManager(entries: entries)
         let probe = ClassificationCancellationProbe()
         let actual = try FolderPlaylistDiscovery.discover(in: directory.url, fileManager: fileManager,
             checkCancellation: { try probe.check() })
@@ -131,6 +139,17 @@ struct FolderDiscoveryClassificationTests {
     }
 }
 
+private func classificationFileManager(entries: [URL]) -> FileManager {
+    #if canImport(Darwin)
+    return ClassificationListingFileManager(entries: entries)
+    #else
+    // Every entry belongs to the real fixture directory on both platforms.
+    // Linux keeps output and checkpoint coverage using its actual enumeration.
+    return FileManager.default
+    #endif
+}
+
+#if canImport(Darwin)
 private final class ClassificationListingFileManager: FileManager, @unchecked Sendable {
     let entries: [URL]
     init(entries: [URL]) {
@@ -143,6 +162,7 @@ private final class ClassificationListingFileManager: FileManager, @unchecked Se
         entries
     }
 }
+#endif
 
 private enum ClassificationCancellation: Error, Equatable { case stop }
 
