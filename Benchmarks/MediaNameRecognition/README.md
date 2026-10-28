@@ -34,10 +34,12 @@ network requests and does not require the player's native dependency SDK.
 
 ## Correctness before timing
 
-An optimized verifier compiles the candidate and a mechanically renamed baseline
-enum together, sharing the unchanged `RecognizedMediaName` result declaration.
-It rejects a changed shared declaration or a mismatched baseline source hash.
-The baseline algorithm is otherwise copied verbatim.
+An optimized verifier compiles the candidate and the complete frozen baseline
+source together. It mechanically renames both the baseline parser and its result
+type, preserving the baseline's original derived display properties. The two
+result types are serialized independently, so today's formatting cannot mask a
+baseline/candidate difference. The runner records identifier-renaming counts and
+rejects a mismatched baseline source hash; the frozen file is never edited.
 
 Before any timing, it compares every stored field and the derived `seriesTitle`,
 `displayName`, and `section`. String fields, optional strings, and string arrays

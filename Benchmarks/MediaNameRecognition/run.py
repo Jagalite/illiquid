@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import statistics
 import subprocess
@@ -73,11 +74,17 @@ def stage(out: Path) -> dict[str, object]:
     current = candidate.decode()
     if original.count(DECLARATION) != 1 or current.count(DECLARATION) != 1:
         raise RuntimeError("Recognizer extraction anchor changed; review the verifier")
-    original_type, original_enum = original.split(DECLARATION)
-    current_type, _ = current.split(DECLARATION)
-    if original_type != current_type:
-        raise RuntimeError("RecognizedMediaName changed; the shared-type oracle requires review")
-    oracle = ("import Foundation\n\npublic enum BaselineMediaNameRecognition {" + original_enum).encode()
+    # Keep the frozen result type's derived properties as well as its parser.
+    # Sharing today's type would mask a displayName/section regression, and
+    # rejecting all type changes prevents legitimate formatting improvements.
+    renamed = original
+    renames = {}
+    for name in ("RecognizedMediaName", "MediaNameRecognition"):
+        renamed, count = re.subn(r"\b" + name + r"\b", "Baseline" + name, renamed)
+        if count == 0:
+            raise RuntimeError(f"Frozen baseline is missing {name}")
+        renames[name] = count
+    oracle = renamed.encode()
     sources = {
         "baseline.swift": baseline, "candidate.swift": candidate, "oracle.swift": oracle,
         "Harness.swift": (HERE / "Harness.swift").read_bytes(),
@@ -88,7 +95,8 @@ def stage(out: Path) -> dict[str, object]:
     return {
         "baseline_revision": BASELINE_REVISION, "production_path": str(SOURCE),
         "source_sha256": {name: sha256(data) for name, data in sources.items()},
-        "oracle_transform": "Remove unchanged result type; rename baseline enum declaration only",
+        "oracle_transform": "Keep the complete frozen source; rename baseline result type and parser identifiers only",
+        "oracle_identifier_renames": renames,
     }
 
 

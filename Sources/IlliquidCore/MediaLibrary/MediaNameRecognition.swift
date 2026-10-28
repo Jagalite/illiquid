@@ -22,9 +22,23 @@ public struct RecognizedMediaName: Equatable, Sendable {
 
     public var displayName: String {
         guard kind == .episode else { return seriesTitle }
-        let number = airDate ?? String(format: "S%02dE%02d", season ?? 0, episode ?? 0)
-            + (lastEpisode.map { String(format: "–E%02d", $0) } ?? "")
+        let number = airDate ?? Self.episodeIdentifier(season: season ?? 0, episode: episode ?? 0)
+            + (lastEpisode.map { "–E\(Self.formattedEpisodeNumber($0))" } ?? "")
         return number + (episodeTitle.map { " · \($0)" } ?? "")
+    }
+
+    private static func episodeIdentifier(season: Int, episode: Int) -> String {
+        guard (0...9999).contains(season), (0...9999).contains(episode) else {
+            return String(format: "S%02dE%02d", season, episode)
+        }
+        return "S\(formattedEpisodeNumber(season))E\(formattedEpisodeNumber(episode))"
+    }
+
+    private static func formattedEpisodeNumber(_ value: Int) -> String {
+        // Recognized episode numbers fit this range. Keep Foundation's signed
+        // C integer formatting for arbitrary values supplied through hints.
+        guard (0...9999).contains(value) else { return String(format: "%02d", value) }
+        return value < 10 ? "0\(value)" : String(value)
     }
 
     public var section: String {
