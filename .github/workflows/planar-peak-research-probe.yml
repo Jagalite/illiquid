@@ -1,0 +1,69 @@
+name: Planar peak accounting research probe
+
+on:
+  push:
+    branches: ['perf/planar-peak-probe-20261028']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: planar-peak-probe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-26-intel
+            tag: macos-intel
+          - runner: ubuntu-24.04
+            tag: linux
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    env:
+      PLANAR_BASELINE_REF: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      PLANAR_BASELINE_BLOB: e110a666400aa680a2d7b86ed4852c4fe05f08cc
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Select native compiler
+        if: matrix.tag == 'macos-intel'
+        run: echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
+      - name: Verify and measure actual production ledger
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
+          if sys.platform == "linux":
+              os.sched_setaffinity(0, {min(os.sched_getaffinity(0))})
+          root = Path(os.environ["RUNNER_TEMP"]) / "planar-peak-probe"
+          common = [sys.executable, "Benchmarks/PlanarOwnership/run.py",
+                    "--baseline-ref", os.environ["PLANAR_BASELINE_REF"],
+                    "--baseline-blob", os.environ["PLANAR_BASELINE_BLOB"]]
+          subprocess.run(common + ["--tests-only", "--output", str(root / "tests")], check=True)
+          subprocess.run(common + ["--rounds", "8", "--iterations", "100000",
+                         "--warmup", "10000", "--workloads", "pipeline,lifecycle-mixed,phase",
+                         "--output", str(root / "timing")], check=True)
+          for relative in ["tests/native-tests.json", "tests/differential-debug.json",
+                           "tests/differential-release.json", "timing/manifest.json",
+                           "timing/summary.json"]:
+              print(relative, flush=True)
+              print((root / relative).read_text(), flush=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: planar-peak-probe-${{ matrix.tag }}
+          path: |
+            ${{ runner.temp }}/planar-peak-probe/**/*.json
+            ${{ runner.temp }}/planar-peak-probe/**/*.jsonl
+            ${{ runner.temp }}/planar-peak-probe/**/*.txt
+          retention-days: 14
