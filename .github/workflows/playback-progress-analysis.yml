@@ -58,3 +58,34 @@ jobs:
             ${{ runner.temp }}/playback-progress-analysis/*.log
             ${{ runner.temp }}/progress-analysis-host/
           retention-days: 14
+
+  linux-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record portable environment
+        run: |
+          mkdir -p "$RUNNER_TEMP/progress-analysis-host"
+          uname -a > "$RUNNER_TEMP/progress-analysis-host/system.txt"
+          lscpu >> "$RUNNER_TEMP/progress-analysis-host/system.txt"
+          swift --version >> "$RUNNER_TEMP/progress-analysis-host/system.txt"
+      - name: Test and measure actual progress analysis
+        run: |
+          echo "Kyoto is unavailable on this hosted runner; using isolated direct builds."
+          python3 Benchmarks/PlaybackProgressAnalysis/run.py \
+            --pairs 8 --target-ms 150 \
+            --output "$RUNNER_TEMP/playback-progress-analysis"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playback-progress-analysis-linux
+          path: |
+            ${{ runner.temp }}/playback-progress-analysis/*.json
+            ${{ runner.temp }}/playback-progress-analysis/*.jsonl
+            ${{ runner.temp }}/playback-progress-analysis/*.log
+            ${{ runner.temp }}/progress-analysis-host/
+          retention-days: 14

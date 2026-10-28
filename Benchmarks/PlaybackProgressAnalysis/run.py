@@ -171,6 +171,8 @@ def main() -> None:
         parser.error("--pairs must be even and in 2...20")
     if not 1 <= args.target_ms <= 1000:
         parser.error("--target-ms must be in 1...1000")
+    if args.case and len(args.case) != len(set(args.case)):
+        parser.error("--case values must be unique")
     output = args.output.resolve()
     if output.exists():
         parser.error("Output directory must be new; prior evidence is never overwritten")
