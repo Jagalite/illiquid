@@ -206,9 +206,9 @@ def main() -> None:
                         argv.append("--use-integrated-swift-driver")
                     log = f"{variant}-{configuration}-tests.log"
                     result = command(argv, log=log)
-                    counts = re.findall(r"Test run with (\d+) tests? passed", result)
+                    counts = re.findall(r"Test run with (\d+) tests?(?: in \d+ suites?)? passed", result)
                     if not counts or int(counts[-1]) <= 0:
-                        raise RuntimeError("Swift Testing did not report a nonempty passing run: " + log)
+                        raise RuntimeError("Swift Testing did not report a nonempty passing run: " + log + "\n" + result[-12000:])
                     test_results.append(dict(variant=variant, configuration=configuration,
                                              passed=int(counts[-1]), log=log, sha256=digest(output / log)))
                     write_json(output / "tests.json", test_results)
