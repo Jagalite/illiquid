@@ -110,3 +110,16 @@ source index. This allows its source, calibration, and statistical checks to
 be repeated without relying on the original research host's paths. Native
 compiled products are excluded from the workflow artifact, so that audit
 cannot independently inspect their bytes or generated machine code.
+
+After downloading and extracting the native workflow artifact, run its
+independent audit from a checkout that contains the recorded baseline commit:
+
+```sh
+python3 Benchmarks/FileIdentityKeys/audit_native.py \
+  /tmp/file-identity-keys-macos/benchmark
+```
+
+`--repo`, `--source-index`, and `--tests-root` can override those locations.
+The supplied source index pins the native qualification commit
+`925940f398ead7206c24c616ea02c448629a8360`. The audit script is prepared; a
+successful native audit is not claimed while that workflow remains queued.

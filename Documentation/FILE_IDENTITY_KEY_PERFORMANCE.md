@@ -1,5 +1,9 @@
 # ASCII file identity keys and playlist lookup
 
+**Qualification status:** Linux measurement and correctness work is complete.
+Native macOS qualification remains queued, so this is a research draft with
+an outstanding application-platform gate.
+
 ## Change and compatibility boundary
 
 The research baseline is main commit
