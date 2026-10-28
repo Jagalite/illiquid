@@ -87,15 +87,16 @@ def execute(argv: list[str | Path], out: Path, env: dict[str, str], timeout: int
     return result.stdout
 
 
-def build(out: Path, variant: str, swift: str, env: dict[str, str], meter: bool) -> Path:
+def build(out: Path, variant: str, swift: str, env: dict[str, str], meter: bool,
+          baseline_ref: str = BASELINE) -> Path:
     spec = importlib.util.spec_from_file_location(
         "search_tests", ROOT / "Scripts/test-source-browser-search.py")
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
-    package = module.prepare_package(out / variant, BASELINE if variant == "baseline" else None,
+    package = module.prepare_package(out / variant, baseline_ref if variant == "baseline" else None,
                                      include_tests=False)
-    source = execute(["git", "show", f"{BASELINE}:{FILTER}"], out, env)
+    source = execute(["git", "show", f"{baseline_ref}:{FILTER}"], out, env)
     marker = "    static func search(_ rows: [SourceTreeDisplayRow], query: String)"
     if source.count(marker) != 1 or not source.endswith("    }\n}\n"):
         raise ValueError("Search declaration moved; review the exact-source oracle extraction")
@@ -123,6 +124,7 @@ def build(out: Path, variant: str, swift: str, env: dict[str, str], meter: bool)
                           "--show-bin-path", "-c", "release"], out, env).strip()
     binary = Path(binary_dir) / "SearchBenchmark"
     save(out / f"{variant}-build.json", {
+        "baseline_ref": baseline_ref,
         "binary_sha256": digest(binary),
         "source_receipt_sha256": digest(package / "source-receipt.json"),
         "benchmark_manifest_sha256": digest(package / "Package.swift"),
@@ -172,6 +174,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--swift", default=shutil.which("swift"))
+    parser.add_argument("--baseline-ref", default=BASELINE,
+                        help="Git ref for the baseline Filter and exact-source oracle; defaults to the historical pinned revision")
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--target-ms", type=float, default=120)
     parser.add_argument("--cpu", type=int)
@@ -207,10 +211,13 @@ def main() -> None:
     env["CLANG_MODULE_CACHE_PATH"] = str(out / "module-cache")
     env["LC_ALL"] = "en_US.UTF-8" if platform.system() == "Darwin" else "C.UTF-8"
     swift = os.path.abspath(args.swift)
+    baseline_ref = execute(["git", "rev-parse", "--verify", "--end-of-options",
+                            args.baseline_ref + "^{commit}"], out, env).strip()
     save(out / "environment.json", {
         "started_utc": datetime.now(timezone.utc).isoformat(), "platform": platform.platform(),
         "compiler": execute([swift, "--version"], out, env).strip(),
-        "baseline_ref": BASELINE, "git_head": execute(["git", "rev-parse", "HEAD"], out, env).strip(),
+        "baseline_ref": baseline_ref, "requested_baseline_ref": args.baseline_ref,
+        "git_head": execute(["git", "rev-parse", "HEAD"], out, env).strip(),
         "cpu_affinity": sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else None,
         "cpu_description": (Path("/proc/cpuinfo").read_text().split("\n\n")[0]
                             if Path("/proc/cpuinfo").exists() else execute(["sysctl", "-n", "machdep.cpu.brand_string"], out, env).strip()),
@@ -220,7 +227,7 @@ def main() -> None:
             [HERE / "run.py", HERE / "Harness.swift", ROOT / FILTER,
              ROOT / "Scripts/test-source-browser-search.py"]},
     })
-    binaries = {variant: build(out, variant, swift, env, args.allocations)
+    binaries = {variant: build(out, variant, swift, env, args.allocations, baseline_ref)
                 for variant in ("baseline", "candidate")}
     receipts = {variant: json.loads((out / f"{variant}-build.json").read_text())
                 for variant in binaries}
@@ -230,8 +237,12 @@ def main() -> None:
     changed = [path for path in receipts["baseline"]["compiled_sources"]
                if receipts["baseline"]["compiled_sources"][path]
                != receipts["candidate"]["compiled_sources"].get(path)]
-    if changed != ["Sources/IlliquidApp/SourceBrowserFilter.swift"]:
-        raise RuntimeError(f"Expected only the production Filter to differ: {changed}")
+    if changed not in ([], ["Sources/IlliquidApp/SourceBrowserFilter.swift"]):
+        raise RuntimeError(f"Only the production Filter may differ: {changed}")
+    save(out / "source-comparison.json", {
+        "differing_compiled_sources": changed,
+        "identical_sources": not changed,
+    })
     rows = []
     for name, case in cases:
         calibration = [json.loads(execute([binary, *map(str, case), "1", "1"], out, env))

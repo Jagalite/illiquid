@@ -167,6 +167,8 @@ struct SourceSearchBenchmark {
             "iterations": iterations, "warmup": warmup,
             "elapsed_ns": elapsed, "cpu_ns": cpu, "checksum": checksum,
             "fingerprint": fingerprint(finalRows), "oracle_equal": true,
+            "row_stride_bytes": MemoryLayout<SourceTreeDisplayRow>.stride,
+            "index_stride_bytes": MemoryLayout<Int>.stride,
         ]
         #if ALLOCATION_METER
         result["allocation_requests"] = meter_requests()

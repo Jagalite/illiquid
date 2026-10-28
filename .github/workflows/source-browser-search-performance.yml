@@ -1,6 +1,17 @@
 name: Source browser search performance
 
 on:
+  push:
+    branches: ['perf/source-search-row-storage-20261028']
+    paths:
+      - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
+      - Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift
+      - Sources/IlliquidApp/UI/SourcesSidebar.swift
+      - Tests/IlliquidAppTests/SourceBrowserSearchTests.swift
+      - Scripts/test-source-browser-search.py
+      - Benchmarks/SourceBrowserSearch/Harness.swift
+      - Benchmarks/SourceBrowserSearch/run.py
+      - .github/workflows/source-browser-search-performance.yml
   pull_request:
     paths:
       - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
@@ -12,9 +23,20 @@ on:
       - Benchmarks/SourceBrowserSearch/run.py
       - .github/workflows/source-browser-search-performance.yml
   workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: Git ref for the baseline Filter and exact-source oracle
+        required: true
+        default: '68274d1b09dcc866296321a5a8858efc297c4f19'
+        type: string
 
 permissions:
   contents: read
+
+env:
+  # PRs isolate their changes from the current base; manual runs retain the
+  # historical default, while the research branch uses its starting revision.
+  SEARCH_BASELINE_REF: ${{ github.event.pull_request.base.sha || inputs.baseline_ref || 'ea2ff568237e2667f7b1aeee67b11a44ebe95b72' }}
 
 concurrency:
   group: source-browser-search-${{ github.ref }}
@@ -41,7 +63,7 @@ jobs:
         run: |
           for configuration in debug release; do
             python3 Scripts/test-source-browser-search.py \
-              --configuration "$configuration" --baseline-ref \
+              --configuration "$configuration" --baseline-ref "$SEARCH_BASELINE_REF" \
               --output "$RUNNER_TEMP/source-search/baseline-$configuration"
             python3 Scripts/test-source-browser-search.py \
               --configuration "$configuration" \
@@ -51,12 +73,14 @@ jobs:
         run: |
           search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
           python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SEARCH_BASELINE_REF" \
             --pairs 6 --target-ms 120 --cpu "$search_cpu" \
             --output "$RUNNER_TEMP/source-search/timing"
       - name: Measure allocation requests separately from timing
         run: |
           search_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
           python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SEARCH_BASELINE_REF" \
             --allocations --pairs 2 --cpu "$search_cpu" \
             --output "$RUNNER_TEMP/source-search/allocations"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -91,7 +115,7 @@ jobs:
         run: |
           for configuration in debug release; do
             python3 Scripts/test-source-browser-search.py \
-              --configuration "$configuration" --baseline-ref \
+              --configuration "$configuration" --baseline-ref "$SEARCH_BASELINE_REF" \
               --output "$RUNNER_TEMP/source-search/baseline-$configuration"
             python3 Scripts/test-source-browser-search.py \
               --configuration "$configuration" \
@@ -100,6 +124,7 @@ jobs:
       - name: Measure complete search and cached projection workloads
         run: |
           python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref "$SEARCH_BASELINE_REF" \
             --pairs 6 --target-ms 120 \
             --output "$RUNNER_TEMP/source-search/timing"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
