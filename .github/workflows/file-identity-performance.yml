@@ -6,13 +6,17 @@ on:
     paths:
       - 'Sources/IlliquidCore/**'
       - 'Tests/IlliquidCoreTests/**'
-      - 'Benchmarks/FileIdentity/**'
+      - 'Benchmarks/FileIdentity/Harness.swift'
+      - 'Benchmarks/FileIdentity/run.py'
+      - 'Benchmarks/FileIdentity/baseline/**'
       - '.github/workflows/file-identity-performance.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
       - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
-      - 'Benchmarks/FileIdentity/**'
+      - 'Benchmarks/FileIdentity/Harness.swift'
+      - 'Benchmarks/FileIdentity/run.py'
+      - 'Benchmarks/FileIdentity/baseline/**'
       - '.github/workflows/file-identity-performance.yml'
   workflow_dispatch:
 
@@ -40,7 +44,7 @@ jobs:
             exit 1
           fi
           echo 'Kyoto is unavailable on this hosted runner; compiling isolated component packages directly.'
-          python3 Benchmarks/FileIdentity/run.py --mode all --pairs 8 --target-ms 75 --output "$RUNNER_TEMP/file-identity"
+          python3 Benchmarks/FileIdentity/run.py --mode all --pairs 12 --target-ms 250 --output "$RUNNER_TEMP/file-identity"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

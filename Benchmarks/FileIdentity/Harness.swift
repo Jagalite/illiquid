@@ -8,7 +8,7 @@ import Glibc
 #endif
 
 private let caseNames = [
-    "key-ascii", "key-unicode", "key-relative", "key-escaped", "key-long",
+    "key-ascii", "key-unicode", "key-relative", "key-escaped", "key-long", "key-long-ascii",
     "key-rejected", "same-file", "lookup-100", "lookup-1000", "lookup-10000",
     "deduplicate-1000", "deduplicate-10000", "normalize-control",
 ]
@@ -54,6 +54,9 @@ private struct Workload {
                 return URL(string: "../Season%2001/Episode%20\(index).mkv", relativeTo: base)!
             case "key-escaped":
                 return URL(string: "file:///Volumes/Media/100%25/A%252FB/Episode%20\(index)%20%23%3F.mkv")!
+            case "key-long-ascii":
+                let prefix = String(repeating: "Archive Collection Season/", count: 12)
+                return URL(fileURLWithPath: "/Volumes/Media/\(prefix)Episode \(index).mkv", isDirectory: false)
             case "key-long":
                 let prefix = String(repeating: "Archive Cafe\u{0301} 日本語/", count: 12)
                 return URL(fileURLWithPath: "/Volumes/Media/\(prefix)Episode \(index).mkv", isDirectory: false)
