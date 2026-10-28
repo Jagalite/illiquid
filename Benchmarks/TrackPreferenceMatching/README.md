@@ -8,9 +8,10 @@ scores, rejects zero-score candidates, and takes the maximum using the existing
 saved-ID and lower-ID tie breakers.
 
 The baseline eagerly materializes three intermediate arrays. The candidate
-adds `.lazy` to the same pipeline so the maximum consumes scored candidates as
-they are produced. The scoring weights, order, nil behavior, matching rules,
-and comparator are unchanged. There is no new cache or state.
+scores eligible tracks in one pass and keeps only the current winner. The
+scoring weights, traversal order, nil behavior, metadata matching, and tie
+breaking rules are preserved. A complete tie still retains the first whole
+track, including non-ranking flags. There is no new cache or state.
 
 ## Reproduce
 
@@ -65,3 +66,14 @@ as `track-preference-matching-native`.
 This measures the cost of matching one saved track preference. It does not
 measure whole-file open latency, decoding, frame pacing, or visible playback.
 Large catalogs are stress cases; empty and small catalogs are controls.
+
+## Rejected lazy pipeline
+
+The first experiment added `.lazy` to the existing chain. On Linux x86_64
+with Swift 6.4, it passed the tests and all 1,801 differential comparisons and
+improved populated catalogs. However, it regressed empty inputs from about
+15 ns to 113–119 ns and wrong-kind inputs from about 229 ns to 339–342 ns.
+That candidate was rejected in favor of the direct loop above. The original
+[run and logs](https://github.com/Jagalite/illiquid/actions/runs/40636220419)
+are kept distinct from the final experiment; no samples are discarded or
+combined across implementations.

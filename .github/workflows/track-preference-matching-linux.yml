@@ -4,6 +4,13 @@ on:
   push:
     branches: ['perf/saved-track-matching']
     paths:
+      - 'Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Tests/IlliquidCoreTests/TrackPreferenceMatchingTests.swift'
+      - 'Tests/IlliquidCoreTests/TrackRestorationRegressionTests.swift'
+      - 'Benchmarks/TrackPreferenceMatching/**'
+      - '!Benchmarks/TrackPreferenceMatching/evidence/**'
+      - '!Benchmarks/TrackPreferenceMatching/README.md'
       - '.github/workflows/track-preference-matching-linux.yml'
   pull_request:
     paths:

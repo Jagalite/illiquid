@@ -22,34 +22,38 @@ public struct MediaTrackPreference: Codable, Equatable, Sendable {
     }
 
     public func bestMatch(in tracks: [MediaTrack]) -> MediaTrack? {
-        // Stream the scores into max without allocating intermediate arrays.
-        tracks.lazy
-            .filter { $0.kind == kind }
-            .map { track in
-                var score = 0
-                if isExternal == track.isExternal { score += 2 }
-                if let externalFilename,
-                   externalFilename == track.externalFilename
-                {
-                    score += 16
-                }
-                if let title, title == track.title { score += 8 }
-                if let languageCode, languageCode == track.languageCode { score += 4 }
-                if let codec, codec == track.codec { score += 2 }
-                return (track, score)
+        var best: MediaTrack?
+        var bestScore = 0
+        for track in tracks where track.kind == kind {
+            var score = 0
+            if isExternal == track.isExternal { score += 2 }
+            if let externalFilename,
+               externalFilename == track.externalFilename
+            {
+                score += 16
             }
-            .filter { $0.1 > 0 }
-            .max { lhs, rhs in
-                if lhs.1 != rhs.1 { return lhs.1 < rhs.1 }
-                // Distinctive metadata still wins when stream IDs change.
-                // For otherwise indistinguishable tracks, preserve the saved ID
-                // instead of always selecting the lowest ID.
-                if let trackID, (lhs.0.id == trackID) != (rhs.0.id == trackID) {
-                    return rhs.0.id == trackID
+            if let title, title == track.title { score += 8 }
+            if let languageCode, languageCode == track.languageCode { score += 4 }
+            if let codec, codec == track.codec { score += 2 }
+            guard score > 0 else { continue }
+
+            if let current = best {
+                if score < bestScore { continue }
+                if score == bestScore {
+                    // Metadata wins first, then the saved ID, then the lowest
+                    // ID. A complete tie keeps the first track, including its
+                    // non-ranking fields such as default and forced flags.
+                    if let trackID, (current.id == trackID) != (track.id == trackID) {
+                        if track.id != trackID { continue }
+                    } else if track.id >= current.id {
+                        continue
+                    }
                 }
-                return lhs.0.id > rhs.0.id
-            }?
-            .0
+            }
+            best = track
+            bestScore = score
+        }
+        return best
     }
 }
 
