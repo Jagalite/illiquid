@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "experiment": "linux-lazy-rejected",
+  "conclusion": "Rejected: empty and wrong-kind controls regressed.",
+  "workflow_run_url": "https://github.com/Jagalite/illiquid/actions/runs/40636220419",
+  "workflow_job_id": 122643688624,
+  "source": "Verbatim JSON records from GitHub Actions stdout; only timestamp and marker prefixes removed from JSONL. No samples discarded.",
+  "measurements": 640,
+  "calibration_observations": 122,
+  "workload_count": 32,
+  "paired_rounds_per_workload": 10,
+  "arithmetic_validation": "All medians and pair ratios independently recomputed; paired counts and checksums agree.",
+  "environments": [
+    {
+      "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "input_sha256": {
+        "baseline/MediaPlaybackSettings.swift": "29828b13da06fa30ace37200604dd259c77435896dbbe4d5f8310b996b5c9e81",
+        "candidate/MediaPlaybackSettings.swift": "c06dbf7c72d7dd8c49460edb17d66e6283b50085127fcd0a371e1d7bbcda0664",
+        "MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+        "Harness.swift": "6ba322bbd25ddcfdffdd744b316a1ead1f7daecf86073be9c6482b9602fac969",
+        "run.py": "8479f450ab0dae0477ac8d08d88d5fb6ea4e680e35464561f5b548e4cce4257d",
+        "baseline-manifest.json": "12f7c1923410632b7ee776d7e43a4f5d82a368d9bb9c8414e473be52d478b7d1",
+        "TrackPreferenceMatchingTests.swift": "6ca209a1728f4bf4589e0aa8eb23579e9d32fae320baa1576e0d9b7175234634",
+        "TrackRestorationRegressionTests.swift": "bbebaa7c8c1acdbb3d143d2068f8e169a2be6b589f70f87458f5ff384cec632a"
+      },
+      "recorded_utc": "2026-10-28T05:08:42.957867+00:00",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "cpu_count": 4,
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "compiler": {
+        "swiftc": "/usr/local/bin/swiftc",
+        "swift": "/usr/local/bin/swift",
+        "version": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+        "swiftc_binary_sha256": "4690a97853800af2be38acd4517991dc251017da4f8dbfc35aadadadd225f9a9",
+        "swift_binary_sha256": "4690a97853800af2be38acd4517991dc251017da4f8dbfc35aadadadd225f9a9"
+      },
+      "macos_target": null,
+      "arguments": {
+        "mode": "test",
+        "output": "/home/runner/work/_temp/track-matching/debug",
+        "configuration": "debug",
+        "variant": "both",
+        "rounds": 10,
+        "iterations": null,
+        "target_ms": 20,
+        "swiftc": null,
+        "swift": null
+      },
+      "method": "Unmodified actual sources; separate optimized shared modules; fresh-process serial balanced AB/BA pairs; full selected-track parity before timing.",
+      "candidate_commit": "e7ba125bc8640e10992fa566c554c25d49f5c69a",
+      "candidate_status": ""
+    },
+    {
+      "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "input_sha256": {
+        "baseline/MediaPlaybackSettings.swift": "29828b13da06fa30ace37200604dd259c77435896dbbe4d5f8310b996b5c9e81",
+        "candidate/MediaPlaybackSettings.swift": "c06dbf7c72d7dd8c49460edb17d66e6283b50085127fcd0a371e1d7bbcda0664",
+        "MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+        "Harness.swift": "6ba322bbd25ddcfdffdd744b316a1ead1f7daecf86073be9c6482b9602fac969",
+        "run.py": "8479f450ab0dae0477ac8d08d88d5fb6ea4e680e35464561f5b548e4cce4257d",
+        "baseline-manifest.json": "12f7c1923410632b7ee776d7e43a4f5d82a368d9bb9c8414e473be52d478b7d1",
+        "TrackPreferenceMatchingTests.swift": "6ca209a1728f4bf4589e0aa8eb23579e9d32fae320baa1576e0d9b7175234634",
+        "TrackRestorationRegressionTests.swift": "bbebaa7c8c1acdbb3d143d2068f8e169a2be6b589f70f87458f5ff384cec632a"
+      },
+      "recorded_utc": "2026-10-28T05:09:25.359233+00:00",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "cpu_count": 4,
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "compiler": {
+        "swiftc": "/usr/local/bin/swiftc",
+        "swift": "/usr/local/bin/swift",
+        "version": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+        "swiftc_binary_sha256": "4690a97853800af2be38acd4517991dc251017da4f8dbfc35aadadadd225f9a9",
+        "swift_binary_sha256": "4690a97853800af2be38acd4517991dc251017da4f8dbfc35aadadadd225f9a9"
+      },
+      "macos_target": null,
+      "arguments": {
+        "mode": "test",
+        "output": "/home/runner/work/_temp/track-matching/release",
+        "configuration": "release",
+        "variant": "both",
+        "rounds": 10,
+        "iterations": null,
+        "target_ms": 20,
+        "swiftc": null,
+        "swift": null
+      },
+      "method": "Unmodified actual sources; separate optimized shared modules; fresh-process serial balanced AB/BA pairs; full selected-track parity before timing.",
+      "candidate_commit": "e7ba125bc8640e10992fa566c554c25d49f5c69a",
+      "candidate_status": ""
+    },
+    {
+      "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "input_sha256": {
+        "baseline/MediaPlaybackSettings.swift": "29828b13da06fa30ace37200604dd259c77435896dbbe4d5f8310b996b5c9e81",
+        "candidate/MediaPlaybackSettings.swift": "c06dbf7c72d7dd8c49460edb17d66e6283b50085127fcd0a371e1d7bbcda0664",
+        "MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+        "Harness.swift": "6ba322bbd25ddcfdffdd744b316a1ead1f7daecf86073be9c6482b9602fac969",
+        "run.py": "8479f450ab0dae0477ac8d08d88d5fb6ea4e680e35464561f5b548e4cce4257d",
+        "baseline-manifest.json": "12f7c1923410632b7ee776d7e43a4f5d82a368d9bb9c8414e473be52d478b7d1"
+      },
+      "recorded_utc": "2026-10-28T05:09:48.829770+00:00",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "cpu_count": 4,
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "compiler": {
+        "swiftc": "/usr/local/bin/swiftc",
+        "swift": "/usr/local/bin/swift",
+        "version": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+        "swiftc_binary_sha256": "4690a97853800af2be38acd4517991dc251017da4f8dbfc35aadadadd225f9a9",
+        "swift_binary_sha256": "4690a97853800af2be38acd4517991dc251017da4f8dbfc35aadadadd225f9a9"
+      },
+      "macos_target": null,
+      "arguments": {
+        "mode": "benchmark",
+        "output": "/home/runner/work/_temp/track-matching/benchmark",
+        "configuration": "debug",
+        "variant": "both",
+        "rounds": 10,
+        "iterations": null,
+        "target_ms": 30,
+        "swiftc": null,
+        "swift": null
+      },
+      "method": "Unmodified actual sources; separate optimized shared modules; fresh-process serial balanced AB/BA pairs; full selected-track parity before timing.",
+      "candidate_commit": "e7ba125bc8640e10992fa566c554c25d49f5c69a",
+      "candidate_status": ""
+    }
+  ],
+  "test_receipts": [
+    {
+      "variant": "baseline",
+      "configuration": "debug",
+      "test_log_sha256": "78f7d685b527911b682dd84af1c675dad2c3390dfe4454222c3d14b22427e419",
+      "passed": true
+    },
+    {
+      "variant": "candidate",
+      "configuration": "debug",
+      "test_log_sha256": "d991831e393f5ed01b7bf1ae9c398335e1fbd27362cdd26f3eb65b7b02454d2c",
+      "passed": true
+    },
+    {
+      "variant": "baseline",
+      "configuration": "release",
+      "test_log_sha256": "5aa97d09b07e56dbf3636aadeb4331eef0ed311b4dc536ae4d7e03c02377a87f",
+      "passed": true
+    },
+    {
+      "variant": "candidate",
+      "configuration": "release",
+      "test_log_sha256": "304e3555933d18fdcc0c9d2afdfdf993fda40be9c09b8d74e14d6f62a8080d4b",
+      "passed": true
+    }
+  ],
+  "verification_receipts": [
+    {
+      "comparisons": 1801,
+      "sha256": "ecdb856a1b02e6430e005ecb08eae950d55bbed04bf6dc08c36120b814549055"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 12793613143,
+      "name": "track-preference-matching-linux",
+      "size_in_bytes": 516922,
+      "url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12793613143",
+      "archive_download_url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12793613143/zip",
+      "expired": false,
+      "created_at": "2026-10-28T05:11:41Z",
+      "expires_at": "2026-11-11T05:11:39Z",
+      "updated_at": "2026-10-28T05:11:41Z",
+      "digest": "sha256:487a99c0d84663e60e73ef62bbe52d2211100f38e59fe665e32c5d49359b58a1",
+      "workflow_run": {
+        "id": 40636220419,
+        "repository_id": 1402467213,
+        "head_repository_id": 1402467213,
+        "head_branch": "perf/saved-track-matching",
+        "head_sha": "e7ba125bc8640e10992fa566c554c25d49f5c69a"
+      }
+    }
+  ]
+}

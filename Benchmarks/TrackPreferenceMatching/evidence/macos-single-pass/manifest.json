@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "experiment": "macos-single-pass",
+  "conclusion": "Accepted native component experiment; whole-player performance remains unmeasured.",
+  "workflow_run_url": "https://github.com/Jagalite/illiquid/actions/runs/40637102083",
+  "workflow_job_id": 122646479120,
+  "source": "Verbatim JSON records from GitHub Actions stdout; only timestamp and marker prefixes removed from JSONL. No samples discarded.",
+  "measurements": 640,
+  "calibration_observations": 122,
+  "workload_count": 32,
+  "paired_rounds_per_workload": 10,
+  "arithmetic_validation": "All medians and pair ratios independently recomputed; paired counts and checksums agree.",
+  "environments": [
+    {
+      "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "input_sha256": {
+        "baseline/MediaPlaybackSettings.swift": "29828b13da06fa30ace37200604dd259c77435896dbbe4d5f8310b996b5c9e81",
+        "candidate/MediaPlaybackSettings.swift": "ebbb3656e92dae0a9a61b30126b4d5e67d9d3858829c6f5629a32b4d495bb38e",
+        "MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+        "Harness.swift": "6ba322bbd25ddcfdffdd744b316a1ead1f7daecf86073be9c6482b9602fac969",
+        "run.py": "8479f450ab0dae0477ac8d08d88d5fb6ea4e680e35464561f5b548e4cce4257d",
+        "baseline-manifest.json": "12f7c1923410632b7ee776d7e43a4f5d82a368d9bb9c8414e473be52d478b7d1",
+        "TrackPreferenceMatchingTests.swift": "6ca209a1728f4bf4589e0aa8eb23579e9d32fae320baa1576e0d9b7175234634",
+        "TrackRestorationRegressionTests.swift": "bbebaa7c8c1acdbb3d143d2068f8e169a2be6b589f70f87458f5ff384cec632a"
+      },
+      "recorded_utc": "2026-10-28T08:36:02.215175+00:00",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "machine": "arm64",
+      "cpu_count": 3,
+      "python": "3.15.0 (main, Oct  9 2026, 11:16:41) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "compiler": {
+        "swiftc": "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+        "swift": "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift",
+        "version": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+        "swiftc_binary_sha256": "8a63cc031d970b57f03741ae83becbfb26f2b913565ac212b81b80bdcb35600f",
+        "swift_binary_sha256": "8a63cc031d970b57f03741ae83becbfb26f2b913565ac212b81b80bdcb35600f",
+        "swift_frontend": "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend",
+        "swift_frontend_sha256": "8a63cc031d970b57f03741ae83becbfb26f2b913565ac212b81b80bdcb35600f",
+        "macos_sdk_path": "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "macos_sdk_version": "26.5"
+      },
+      "macos_target": "26.0",
+      "arguments": {
+        "mode": "test",
+        "output": "/Users/runner/work/_temp/track-matching/debug",
+        "configuration": "debug",
+        "variant": "both",
+        "rounds": 10,
+        "iterations": null,
+        "target_ms": 20,
+        "swiftc": null,
+        "swift": null
+      },
+      "method": "Unmodified actual sources; separate optimized shared modules; fresh-process serial balanced AB/BA pairs; full selected-track parity before timing.",
+      "candidate_commit": "ecb8ceab7b3e2ca9b034afbe862a44f77dc4514a",
+      "candidate_status": ""
+    },
+    {
+      "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "input_sha256": {
+        "baseline/MediaPlaybackSettings.swift": "29828b13da06fa30ace37200604dd259c77435896dbbe4d5f8310b996b5c9e81",
+        "candidate/MediaPlaybackSettings.swift": "ebbb3656e92dae0a9a61b30126b4d5e67d9d3858829c6f5629a32b4d495bb38e",
+        "MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+        "Harness.swift": "6ba322bbd25ddcfdffdd744b316a1ead1f7daecf86073be9c6482b9602fac969",
+        "run.py": "8479f450ab0dae0477ac8d08d88d5fb6ea4e680e35464561f5b548e4cce4257d",
+        "baseline-manifest.json": "12f7c1923410632b7ee776d7e43a4f5d82a368d9bb9c8414e473be52d478b7d1",
+        "TrackPreferenceMatchingTests.swift": "6ca209a1728f4bf4589e0aa8eb23579e9d32fae320baa1576e0d9b7175234634",
+        "TrackRestorationRegressionTests.swift": "bbebaa7c8c1acdbb3d143d2068f8e169a2be6b589f70f87458f5ff384cec632a"
+      },
+      "recorded_utc": "2026-10-28T08:36:28.889006+00:00",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "machine": "arm64",
+      "cpu_count": 3,
+      "python": "3.15.0 (main, Oct  9 2026, 11:16:41) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "compiler": {
+        "swiftc": "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+        "swift": "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift",
+        "version": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+        "swiftc_binary_sha256": "8a63cc031d970b57f03741ae83becbfb26f2b913565ac212b81b80bdcb35600f",
+        "swift_binary_sha256": "8a63cc031d970b57f03741ae83becbfb26f2b913565ac212b81b80bdcb35600f",
+        "swift_frontend": "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend",
+        "swift_frontend_sha256": "8a63cc031d970b57f03741ae83becbfb26f2b913565ac212b81b80bdcb35600f",
+        "macos_sdk_path": "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "macos_sdk_version": "26.5"
+      },
+      "macos_target": "26.0",
+      "arguments": {
+        "mode": "test",
+        "output": "/Users/runner/work/_temp/track-matching/release",
+        "configuration": "release",
+        "variant": "both",
+        "rounds": 10,
+        "iterations": null,
+        "target_ms": 20,
+        "swiftc": null,
+        "swift": null
+      },
+      "method": "Unmodified actual sources; separate optimized shared modules; fresh-process serial balanced AB/BA pairs; full selected-track parity before timing.",
+      "candidate_commit": "ecb8ceab7b3e2ca9b034afbe862a44f77dc4514a",
+      "candidate_status": ""
+    },
+    {
+      "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "input_sha256": {
+        "baseline/MediaPlaybackSettings.swift": "29828b13da06fa30ace37200604dd259c77435896dbbe4d5f8310b996b5c9e81",
+        "candidate/MediaPlaybackSettings.swift": "ebbb3656e92dae0a9a61b30126b4d5e67d9d3858829c6f5629a32b4d495bb38e",
+        "MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+        "Harness.swift": "6ba322bbd25ddcfdffdd744b316a1ead1f7daecf86073be9c6482b9602fac969",
+        "run.py": "8479f450ab0dae0477ac8d08d88d5fb6ea4e680e35464561f5b548e4cce4257d",
+        "baseline-manifest.json": "12f7c1923410632b7ee776d7e43a4f5d82a368d9bb9c8414e473be52d478b7d1"
+      },
+      "recorded_utc": "2026-10-28T08:36:44.565306+00:00",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "machine": "arm64",
+      "cpu_count": 3,
+      "python": "3.15.0 (main, Oct  9 2026, 11:16:41) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "compiler": {
+        "swiftc": "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+        "swift": "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift",
+        "version": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+        "swiftc_binary_sha256": "8a63cc031d970b57f03741ae83becbfb26f2b913565ac212b81b80bdcb35600f",
+        "swift_binary_sha256": "8a63cc031d970b57f03741ae83becbfb26f2b913565ac212b81b80bdcb35600f",
+        "swift_frontend": "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend",
+        "swift_frontend_sha256": "8a63cc031d970b57f03741ae83becbfb26f2b913565ac212b81b80bdcb35600f",
+        "macos_sdk_path": "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "macos_sdk_version": "26.5"
+      },
+      "macos_target": "26.0",
+      "arguments": {
+        "mode": "benchmark",
+        "output": "/Users/runner/work/_temp/track-matching/benchmark",
+        "configuration": "debug",
+        "variant": "both",
+        "rounds": 10,
+        "iterations": null,
+        "target_ms": 30,
+        "swiftc": null,
+        "swift": null
+      },
+      "method": "Unmodified actual sources; separate optimized shared modules; fresh-process serial balanced AB/BA pairs; full selected-track parity before timing.",
+      "candidate_commit": "ecb8ceab7b3e2ca9b034afbe862a44f77dc4514a",
+      "candidate_status": ""
+    }
+  ],
+  "test_receipts": [
+    {
+      "variant": "baseline",
+      "configuration": "debug",
+      "test_log_sha256": "841e4c8a21df577caf84e05d2bfc6f35c0f099e0dedf77acf6608314ef8bec75",
+      "passed": true
+    },
+    {
+      "variant": "candidate",
+      "configuration": "debug",
+      "test_log_sha256": "61f26081164638079153b3ceff8945927142dad19d29c14a74b9d987797cd8fe",
+      "passed": true
+    },
+    {
+      "variant": "baseline",
+      "configuration": "release",
+      "test_log_sha256": "78201c85df79443c80cc6b14eae45880779adeaecd27e8096ea9eb5a8ea2e008",
+      "passed": true
+    },
+    {
+      "variant": "candidate",
+      "configuration": "release",
+      "test_log_sha256": "e960b39418e2f4f3e679c9c7cee685e8558454296a7ba8d529a70e9c20277cd3",
+      "passed": true
+    }
+  ],
+  "verification_receipts": [
+    {
+      "comparisons": 1801,
+      "sha256": "ecdb856a1b02e6430e005ecb08eae950d55bbed04bf6dc08c36120b814549055"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 12803435233,
+      "name": "track-preference-matching-native",
+      "size_in_bytes": 482196,
+      "url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12803435233",
+      "archive_download_url": "https://api.github.com/repos/Jagalite/illiquid/actions/artifacts/12803435233/zip",
+      "expired": false,
+      "created_at": "2026-10-28T08:38:23Z",
+      "expires_at": "2026-11-11T08:38:21Z",
+      "updated_at": "2026-10-28T08:38:23Z",
+      "digest": "sha256:9d6c441a5fe7670c6c2b71f08882144f317c28379280a5c36b7014465655f7b4",
+      "workflow_run": {
+        "id": 40637102083,
+        "repository_id": 1402467213,
+        "head_repository_id": 1402467213,
+        "head_branch": "perf/saved-track-matching",
+        "head_sha": "ecb8ceab7b3e2ca9b034afbe862a44f77dc4514a"
+      }
+    }
+  ]
+}
