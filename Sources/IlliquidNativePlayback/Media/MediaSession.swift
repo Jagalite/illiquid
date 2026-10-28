@@ -1529,6 +1529,11 @@ final class MediaSession: @unchecked Sendable {
                             guard self.pushVideoFrame(frame) else { return }
                             self.recordVideoDecodeDiagnostics(videoDecoder)
                         }
+                        // Thrown drain errors still need the GOP for decoder recovery.
+                        // Only release the completed generation's compressed replay.
+                        if isRunning && generation.accepts(active) {
+                            videoRecoveryPackets.finish(generation: active)
+                        }
                         _ = videoFrames.push(.endOfStream(generation: active))
                     case let .flush(active):
                         videoDecoder.flush()

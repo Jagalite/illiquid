@@ -1,0 +1,103 @@
+name: Video recovery EOF memory
+
+on:
+  push:
+    branches: ['perf/video-recovery-eof-memory-20261028-c8bc']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift'
+      - 'Benchmarks/VideoRecoveryEOFMemory/**'
+      - '.github/workflows/video-recovery-eof-memory.yml'
+      - '!Benchmarks/VideoRecoveryEOFMemory/*.md'
+      - '!Benchmarks/VideoRecoveryEOFMemory/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaTime.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegError.swift'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/PacketOwnershipTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift'
+      - 'Benchmarks/VideoRecoveryEOFMemory/**'
+      - '.github/workflows/video-recovery-eof-memory.yml'
+      - '!Benchmarks/VideoRecoveryEOFMemory/*.md'
+      - '!Benchmarks/VideoRecoveryEOFMemory/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-recovery-eof-memory-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  native-lifetime:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination and research scripts
+        run: |
+          set -euo pipefail
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          python3 -m py_compile Benchmarks/VideoRecoveryEOFMemory/measure.py Benchmarks/VideoRecoveryEOFMemory/run_native.py
+      - name: Prepare pinned native dependencies
+        run: |
+          set -euo pipefail
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Measure real native packet allocation release
+        run: |
+          set -euo pipefail
+          python3 Benchmarks/VideoRecoveryEOFMemory/measure.py \
+            --pairs 2 --output "$RUNNER_TEMP/video-recovery-eof/component"
+      - name: Qualify production ownership and real session EOF and seek
+        run: |
+          set -euo pipefail
+          python3 Benchmarks/VideoRecoveryEOFMemory/run_native.py \
+            --output "$RUNNER_TEMP/video-recovery-eof/native"
+      - name: Print qualification summaries
+        if: always()
+        run: |
+          for scope in component native; do
+            summary="$RUNNER_TEMP/video-recovery-eof/$scope/summary.json"
+            if test -f "$summary"; then
+              cat "$summary"
+            fi
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-recovery-eof-native-evidence
+          path: |
+            ${{ runner.temp }}/video-recovery-eof/component/*.json
+            ${{ runner.temp }}/video-recovery-eof/component/*.jsonl
+            ${{ runner.temp }}/video-recovery-eof/component/logs/**
+            ${{ runner.temp }}/video-recovery-eof/component/sources/**
+            ${{ runner.temp }}/video-recovery-eof/native/*.json
+            ${{ runner.temp }}/video-recovery-eof/native/logs/**
+            ${{ runner.temp }}/video-recovery-eof/native/sources/**
+            ${{ runner.temp }}/video-recovery-eof/native/fixtures/**
+          retention-days: 14

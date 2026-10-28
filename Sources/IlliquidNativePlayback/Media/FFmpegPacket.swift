@@ -152,6 +152,15 @@ final class VideoRecoveryPacketBuffer: @unchecked Sendable {
         }
     }
 
+    /// Releases replay ownership after this generation's session drain succeeds.
+    /// A stale completion must not discard a newer generation's recovery GOP.
+    func finish(generation expectedGeneration: Int) {
+        lock.withLock {
+            guard generation == expectedGeneration else { return }
+            resetLocked(generation: expectedGeneration)
+        }
+    }
+
     func reset(generation newGeneration: Int? = nil) {
         lock.withLock { resetLocked(generation: newGeneration) }
     }
