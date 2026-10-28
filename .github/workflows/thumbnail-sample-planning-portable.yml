@@ -1,0 +1,61 @@
+name: Thumbnail sample planning portable
+
+on:
+  push:
+    branches:
+      - 'codex/perf-thumbnail-samples-20261028'
+    paths:
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Tests/IlliquidCoreTests/ThumbnailSamplePlanningTests.swift'
+      - 'Benchmarks/ThumbnailSamplePlanning/Harness.swift'
+      - 'Benchmarks/ThumbnailSamplePlanning/run.py'
+      - '.github/workflows/thumbnail-sample-planning-portable.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPassCursor.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift'
+      - 'Tests/IlliquidCoreTests/Thumbnail*Tests.swift'
+      - 'Benchmarks/ThumbnailSamplePlanning/Harness.swift'
+      - 'Benchmarks/ThumbnailSamplePlanning/run.py'
+      - '.github/workflows/thumbnail-sample-planning-portable.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-sample-planning-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test exact sample parity and measure paired native runs
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo "Shared Kyoto queue found; submit this campaign through Kyoto before running."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; isolated builds run serially."
+          python3 Benchmarks/ThumbnailSamplePlanning/run.py \
+            --pairs 8 --target-ms 80 \
+            --output "$RUNNER_TEMP/thumbnail-sample-planning"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-sample-planning-linux
+          path: |
+            ${{ runner.temp }}/thumbnail-sample-planning/
+            !${{ runner.temp }}/thumbnail-sample-planning/module-cache/**
+            !${{ runner.temp }}/thumbnail-sample-planning/*-package/build/**
+            !${{ runner.temp }}/thumbnail-sample-planning/*-package/cache/**
+            !${{ runner.temp }}/thumbnail-sample-planning/*-package/config/**
+            !${{ runner.temp }}/thumbnail-sample-planning/*-package/security/**
+          retention-days: 14
