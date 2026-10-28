@@ -1,0 +1,118 @@
+name: Video format description performance
+
+on:
+  push:
+    branches: ['perf/video-format-description-cache-20261028']
+    paths:
+      - Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift
+      - Sources/IlliquidNativePlayback/Presentation/VideoFormatDescriptionCache.swift
+      - Tests/IlliquidNativePlaybackTests/VideoFormatDescriptionCacheTests.swift
+      - Benchmarks/VideoFormatDescription/**
+      - .github/workflows/video-format-description-performance.yml
+      - '!Benchmarks/VideoFormatDescription/README.md'
+      - '!Benchmarks/VideoFormatDescription/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift
+      - Sources/IlliquidNativePlayback/Presentation/VideoFormatDescriptionCache.swift
+      - Tests/IlliquidNativePlaybackTests/VideoFormatDescriptionCacheTests.swift
+      - Benchmarks/VideoFormatDescription/**
+      - .github/workflows/video-format-description-performance.yml
+      - '!Benchmarks/VideoFormatDescription/README.md'
+      - '!Benchmarks/VideoFormatDescription/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-format-description-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Check build coordination and patch whitespace
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo "Kyoto is available; this hosted-runner job requires queue coordination."
+            exit 1
+          fi
+          echo "Kyoto unavailable on this hosted runner; direct builds are serialized."
+          git diff --check HEAD^ HEAD
+      - name: Test native cache and measure paired release components
+        run: |
+          python3 Benchmarks/VideoFormatDescription/run.py --mode all --pairs 10 --target-ms 100 \
+            --output "$RUNNER_TEMP/video-format-description"
+      - name: Emit review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "video-format-description"
+          names = ["manifest.json", "summary.json", "observations.jsonl",
+                   "commands.jsonl", "workloads.json"]
+          names += [str(p.relative_to(root)) for p in sorted(root.glob("logs/tests-*.log"))]
+          for name in names:
+              path = root / name
+              if path.is_file():
+                  print("VIDEO_FORMAT_EVIDENCE " + json.dumps(
+                      {"path": name, "content": path.read_text()}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-format-description-components
+          path: |
+            ${{ runner.temp }}/video-format-description/*.json
+            ${{ runner.temp }}/video-format-description/*.jsonl
+            ${{ runner.temp }}/video-format-description/logs
+            ${{ runner.temp }}/video-format-description/sources
+          retention-days: 14
+
+  native-app:
+    needs: native-components
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo "Kyoto is available; this hosted-runner job requires queue coordination."
+            exit 1
+          fi
+          echo "Kyoto unavailable on this hosted runner; direct builds are serialized."
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run native format regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/video-format-description-app"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'VideoFormatDescriptionCacheTests|VideoGeometryMetadataCacheTests|VideoFrameColorSamplerTests' \
+            2>&1 | tee "$RUNNER_TEMP/video-format-description-app/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-format-description-app
+          path: ${{ runner.temp }}/video-format-description-app/
+          retention-days: 14
