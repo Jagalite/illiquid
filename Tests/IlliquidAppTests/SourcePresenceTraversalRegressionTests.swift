@@ -82,7 +82,13 @@ struct SourcePresenceTraversalRegressionTests {
     @Test func temporaryDirectoryAliasKeepsTheCallersCacheNamespace() throws {
         let root = try makeRoot(in: URL(fileURLWithPath: "/tmp", isDirectory: true))
         defer { try? FileManager.default.removeItem(at: root) }
-        let physicalRoot = root.resolvingSymlinksInPath()
+        // The runner's /tmp can be a real directory rather than a symlink to
+        // /private/tmp. Use the alternate spelling when it actually refers to
+        // this fixture; otherwise exercise the resolved path available here.
+        let privateRoot = URL(fileURLWithPath: "/private/tmp", isDirectory: true)
+            .appendingPathComponent(root.lastPathComponent, isDirectory: true)
+        let physicalRoot = FileManager.default.fileExists(atPath: privateRoot.path)
+            ? privateRoot : root.resolvingSymlinksInPath()
         let child = try makeDirectory(root.appendingPathComponent("Cached #1%"))
         let nested = try makeDirectory(child.appendingPathComponent("Nested"))
         try Data().write(to: nested.appendingPathComponent("video.mkv"))
@@ -93,7 +99,7 @@ struct SourcePresenceTraversalRegressionTests {
         let physicalChildID = SourceTreeIdentity.folderID(
             for: physicalRoot.appendingPathComponent(child.lastPathComponent))
         #expect(aliasRootID.hasPrefix("/tmp/"))
-        #expect(physicalRootID.hasPrefix("/private/tmp/"))
+        #expect(physicalRootID.hasPrefix("/private/tmp/") || physicalRootID == aliasRootID)
 
         for (selectedRoot, rootID, childID) in [
             (root, aliasRootID, aliasChildID),
