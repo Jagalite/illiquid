@@ -222,6 +222,52 @@ struct EffectRetirementTests {
     #expect(!driver.core.state.completedEffectIDs.contains(checkpoint.context.effectID))
   }
 
+  @Test
+  func everySixRecordAuthoritySubsetRetiresExactlyItsSelectedIDs() throws {
+    for mask in 0..<64 {
+      let pending = session(id: 1)
+      var effects: [PlaybackEffect] = []
+      var records: [PlaybackEffectID: OutstandingEffectRecord] = [:]
+      var survivors: [PlaybackEffectID: OutstandingEffectRecord] = [:]
+      var retired: Set<PlaybackEffectID> = []
+      for offset in 0..<6 {
+        let shouldRetire = (mask & (1 << offset)) != 0
+        let authority: PlaybackAuthority = shouldRetire
+          ? pending.authority : .application(.init(rawValue: 1))
+        let checkpoint = effect(id: UInt64(offset + 1), authority: authority)
+        let id = checkpoint.context.effectID
+        let record = OutstandingEffectRecord(effect: checkpoint)
+        effects.append(checkpoint)
+        records[id] = record
+        if shouldRetire { retired.insert(id) } else { survivors[id] = record }
+      }
+      var driver = Driver(state: PlaybackCoreState(
+        pendingSession: pending, outstandingEffects: records,
+        allocator: .init(nextSession: 2, nextOperation: 100, nextEffect: 1_000)
+      ))
+      let newOpen = try onlyEffect(driver.send(.command(.load(
+        source: .init(rawValue: "fixture/subset-\(mask).mkv"), autoplay: false
+      ))))
+      survivors[newOpen.context.effectID] = OutstandingEffectRecord(effect: newOpen)
+      #expect(driver.core.state.outstandingEffects == survivors)
+      #expect(driver.core.state.completedEffectIDs == retired)
+      #expect(driver.core.state.pendingSession?.source.rawValue == "fixture/subset-\(mask).mkv")
+      for effect in effects {
+        let id = effect.context.effectID
+        let expected: EventDisposition = retired.contains(id)
+          ? .duplicate(effectID: id) : .accepted
+        let completion = driver.complete(effect)
+        #expect(completion.disposition == expected)
+        #expect(completion.effects.isEmpty)
+        #expect(completion.invariantViolations.isEmpty)
+      }
+      #expect(driver.core.state.completedEffectIDs == Set(effects.map { $0.context.effectID }))
+      #expect(driver.core.state.outstandingEffects == [
+        newOpen.context.effectID: OutstandingEffectRecord(effect: newOpen),
+      ])
+    }
+  }
+
   private func session(id: UInt64) -> ActivePlaybackSession {
     ActivePlaybackSession(
       id: .init(rawValue: id),

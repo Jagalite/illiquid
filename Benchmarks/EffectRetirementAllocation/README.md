@@ -5,9 +5,11 @@ This study targets the partial-match temporary dictionary built by
 baseline filters outstanding-effect records, then maps the filtered dictionary
 to IDs. Swift 6.1.3 shares the original dictionary when every record matches and
 returns an empty dictionary when none match; only partial matches construct a
-new full-record table. The candidate counts matches by index, preserves empty
-and all-match paths, and collects only IDs for partial matches before running
-the existing removal/completion loop.
+new full-record table. The candidate examines each authority once by index, preserves empty and
+all-match paths, and collects only IDs for partial matches before running the
+existing removal/completion loop. It defers collecting a matching prefix until
+the first nonmatch proves the selection is partial; only that prefix's keys
+are revisited, without checking those authorities again.
 
 The baseline is `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`. This is a separate
 investigation from checkpoint folder-membership construction.
@@ -31,7 +33,9 @@ The new regression suite drives the real reducer through source replacement,
 pending-load supersession, stop, and successful/failed cancellation. It covers
 exact authority equality across sessions, generations and revisions, survival
 of application effects, late duplicate/unknown callbacks, state-copy isolation,
-and Codable round trips. Both baseline and candidate run the complete Core and
+and Codable round trips. It also checks all 64 assignments of six records to
+the retiring versus application authority, including their later callbacks.
+Both baseline and candidate run the complete Core and
 StateSpace test suites in debug and release.
 
 The eager ID collection must finish before removals begin. A lazy dictionary
@@ -58,8 +62,9 @@ destruction are outside that event's window. Setup owners are released before
 the timed update so they do not keep an extra copy of its dictionary.
 
 The revised cohort also includes a sparse case with only the first seeded
-record matching, for 24 workloads in total. Its ID array reserves the number of
-actual matches, not the total outstanding population.
+record matching, for 24 workloads in total. The single-pass revision reserves
+only the known matching prefix and then grows the partial ID array as needed.
+It never reserves the total outstanding population for a sparse selection.
 
 Six baseline/candidate pairs alternate AB/BA in fresh processes. Timing targets
 50 ms of summed event time, with a cap on excessive setup work. Every timed event
@@ -109,10 +114,19 @@ With all effects matching, median requested bytes increased from 166,664 to
 265,136 (+59.1% paired change). Partial-match requested bytes fell substantially,
 but those regressions made the simple rewrite unsuitable.
 
-The revision uses indexed authority projections, preserves the all/none cases,
-and reserves exactly the matching ID count. Sparse cases were added to guard
-against over-reserving a large ID array for one match. Original observations are
-retained separately from the revised experiment.
+## Rejected counted-selection implementation
+
+The second experiment counted matching authorities, reserved exactly that many
+IDs, and scanned again to collect them. It passed the same 113 tests in all four
+configurations. Mixed/4,096 requested bytes fell from 1,427,728 to 83,664 (94.1%)
+and paired elapsed time fell 30.9%. However, the added sparse cases caught the
+second scan's cost: sparse/512 elapsed time increased 36.8% and sparse/4,096
+increased 58.2%, with all six pairs slower in both cases. This version was also
+rejected.
+
+The single-pass revision checks each authority once, retaining the indexed
+projection and efficient all/none cases. All earlier observations are retained
+as rejected cohorts; their improvements are not presented as final results.
 
 The relevant standard-library fast paths are in
 [Swift 6.1.3 NativeDictionary.swift](https://github.com/swiftlang/swift/blob/swift-6.1.3-RELEASE/stdlib/public/core/NativeDictionary.swift).

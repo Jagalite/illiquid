@@ -1683,31 +1683,34 @@ public struct PlaybackCore: Sendable {
   }
 
   private func effectIDs(matching authority: PlaybackAuthority) -> [PlaybackEffectID] {
-    // Count by index so the scan only needs the authority projection, without
-    // passing complete effect records through a generic element transform.
-    var matchingCount = 0
+    let keys = state.outstandingEffects.keys
     var index = state.outstandingEffects.startIndex
     let endIndex = state.outstandingEffects.endIndex
-    while index != endIndex {
-      if state.outstandingEffects[index].value.effect.context.authority == authority {
-        matchingCount += 1
-      }
+    var matchingPrefixCount = 0
+    // An all-matching prefix needs no scratch array until a miss proves
+    // the selection partial. The all-matching case can copy keys directly.
+    while index != endIndex,
+      state.outstandingEffects[index].value.effect.context.authority == authority
+    {
+      matchingPrefixCount += 1
       state.outstandingEffects.formIndex(after: &index)
     }
-    guard matchingCount > 0 else { return [] }
-    if matchingCount == state.outstandingEffects.count {
-      return Array(state.outstandingEffects.keys)
-    }
+    guard index != endIndex else { return Array(keys) }
 
-    // Partial matches need only an exactly reserved ID array. All collection
-    // views and scans finish in this helper before retirement mutates the table.
     var result: [PlaybackEffectID] = []
-    result.reserveCapacity(matchingCount)
-    index = state.outstandingEffects.startIndex
+    if matchingPrefixCount > 0 {
+      result.reserveCapacity(matchingPrefixCount)
+      var prefixIndex = keys.startIndex
+      while prefixIndex != index {
+        result.append(keys[prefixIndex])
+        keys.formIndex(after: &prefixIndex)
+      }
+    }
+    // Skip the first nonmatching entry already tested above.
+    state.outstandingEffects.formIndex(after: &index)
     while index != endIndex {
       if state.outstandingEffects[index].value.effect.context.authority == authority {
-        result.append(state.outstandingEffects[index].key)
-        if result.count == matchingCount { break }
+        result.append(keys[index])
       }
       state.outstandingEffects.formIndex(after: &index)
     }
