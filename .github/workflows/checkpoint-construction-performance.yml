@@ -1,0 +1,87 @@
+name: Checkpoint construction performance
+
+on:
+  push:
+    branches: ['codex/perf-checkpoint-construction']
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Benchmarks/CheckpointConstruction/**'
+      - '.github/workflows/checkpoint-construction-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidCoreTests/PlaybackSessionStoreTests.swift'
+      - 'Benchmarks/CheckpointConstruction/**'
+      - '.github/workflows/checkpoint-construction-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-construction-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify records and measure complete construction
+        run: >-
+          python3 Benchmarks/CheckpointConstruction/run.py
+          --pairs 8 --target-ms 40
+          --output "$RUNNER_TEMP/checkpoint-construction"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-construction-macos
+          path: |
+            ${{ runner.temp }}/checkpoint-construction/
+            !${{ runner.temp }}/checkpoint-construction/packages/**/.build/**
+          retention-days: 14
+
+  native-integration:
+    needs: component
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and verify checkpoint integration
+        run: |
+          mkdir -p "$RUNNER_TEMP/checkpoint-native"
+          set -o pipefail
+          swift test --force-resolved-versions --no-parallel --filter \
+            'PlaybackCheckpointTests|PlaylistSessionRecordTests|PlaybackSessionStoreTests|failedCheckpointDoesNotAdvanceThePlaylist|shutdownJoinsBlockedSaveWithoutBlockingMainActorOrLosingLatestProgress|quittingAfterStopKeepsTheLastPlaybackCheckpoint|shutdownFlushesLatestProgressWithoutDependingOnDebouncedTask|restoresDirectPlaylistIndexPausedStateAndExactPosition|shuffleRestoresBaseOrderAcrossRelaunch' \
+            2>&1 | tee "$RUNNER_TEMP/checkpoint-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-construction-native
+          path: ${{ runner.temp }}/checkpoint-native/
+          retention-days: 14
