@@ -1,0 +1,77 @@
+name: Source search match indices research
+
+on:
+  push:
+    branches: [perf/source-search-match-indices]
+    paths:
+      - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
+      - Benchmarks/SourceBrowserSearch/run.py
+      - .github/workflows/source-search-match-indices.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/UI/SourceBrowserFilter.swift
+      - Benchmarks/SourceBrowserSearch/run.py
+      - .github/workflows/source-search-match-indices.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-search-match-indices-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this hosted runner; compiling serially in an isolated checkout.'
+      - name: Verify baseline and candidate in debug and release
+        run: |
+          for configuration in debug release; do
+            python3 Scripts/test-source-browser-search.py \
+              --configuration "$configuration" --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+              --output "$RUNNER_TEMP/search-indices/baseline-$configuration"
+            python3 Scripts/test-source-browser-search.py \
+              --configuration "$configuration" \
+              --output "$RUNNER_TEMP/search-indices/candidate-$configuration"
+          done
+      - name: Measure native paired search and projection workloads
+        run: |
+          python3 Benchmarks/SourceBrowserSearch/run.py \
+            --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+            --pairs 10 --target-ms 250 \
+            --output "$RUNNER_TEMP/search-indices/timing"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          output = Path(os.environ["RUNNER_TEMP"]) / "search-indices"
+          for path in sorted(output.rglob("*.json")):
+              if path.name in {"summary.json", "environment.json", "completion.json", "receipt.json",
+                                "baseline-build.json", "candidate-build.json"}:
+                  print("RESEARCH_JSON " + json.dumps({"path": str(path.relative_to(output)),
+                        "data": json.loads(path.read_text())}, separators=(",", ":")))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-search-match-indices-macos
+          path: |
+            ${{ runner.temp }}/search-indices/
+            !${{ runner.temp }}/search-indices/**/.build/**
+            !${{ runner.temp }}/search-indices/**/cache/**
+            !${{ runner.temp }}/search-indices/**/module-cache/**
+          retention-days: 14
