@@ -1,5 +1,7 @@
 # Video aspect/crop ratio parsing experiment
 
+[Research findings and qualification status](../../Documentation/VIDEO_RATIO_PARSING_PERFORMANCE.md).
+
 This study compares `VideoPresentationGeometry.ratio` before and after replacing
 the temporary `String.split` result array on ASCII input with borrowed substring fields. It
 measures the parser directly and the complete geometry initializer that uses it.
@@ -25,6 +27,11 @@ isolated packages directly and serially.
 
 `--prepare-only` works without macOS and stages the exact source/test packages
 without claiming compilation, execution, or correctness qualification.
+
+The CI workflow runs only on this study's `perf/video-ratio-parsing-*` branches
+or manual dispatch. This is a frozen-baseline experiment, not a general PR gate:
+future intentional changes to the pinned production sources require a reviewed
+rebaseline before this experiment can compare them.
 
 ## Source and correctness controls
 

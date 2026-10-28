@@ -1,5 +1,11 @@
 # Portable video-ratio parser qualification
 
+[Research findings and retained evidence](../../Documentation/VIDEO_RATIO_PARSING_PERFORMANCE.md).
+
+The workflow runs on the study's `perf/video-ratio-parsing-*` branches or manual
+dispatch. Its frozen source checks are specific to this experiment, so it is not
+a gate for unrelated future pull requests.
+
 This companion experiment measures only the production
 `VideoPresentationGeometry.ratio` function on a host with Swift 6. It provides
 parser evidence while native macOS runners are unavailable. It does not replace
