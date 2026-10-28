@@ -12,6 +12,50 @@ baseline is `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`. Its complete
 `FFmpegPacket.swift`, including `VideoRecoveryPacketBuffer`, is frozen under
 `baseline/`; the runner checks both its Git blob identity and SHA-256 hash.
 
+## Finding and change
+
+`MediaSession.decodeVideoPacket` records compressed input in this recovery
+buffer. The final GOP used to remain referenced after the video worker drained
+the decoder and queued EOS, until a later seek, stop, or session destruction.
+The worker and session can remain alive while playback sits at the end.
+
+The candidate wraps the existing decoder-drain call in
+`retireAfterSuccessfulDrain`. A normal return releases the buffer's packet
+references and array capacity. A throwing failure or cancellation keeps the
+complete GOP available to the existing recovery path. Draining happens outside
+the buffer lock; the retirement checks the generation under that lock so a
+finishing old drain cannot discard packets belonging to a newer seek.
+
+“Successful” here means normal return from the player's existing drain-to-EOS
+boundary. The patch does not change the decoder's handling of EOF, EAGAIN, or
+tolerated software errors. It also does not change packet admission bounds,
+decoding, frame delivery, or the ordinary seek/replay path. Independent packet
+and frame owners retain their own storage. FFmpeg's
+[reference-counted buffer contract](https://www.ffmpeg.org/doxygen/8.1/group__lavu__buffer.html)
+releases native data only after the last reference disappears.
+
+## Measured ownership results
+
+The [portable CI experiment](https://github.com/Jagalite/illiquid/actions/runs/40639152416)
+passed using Swift 6.4.1 on Ubuntu 24.04 and the repository's verified FFmpeg
+8.1.2 source. The exact baseline and candidate owners each passed 48 checks in
+debug and release; observations agreed between build configurations.
+
+| Final GOP | Payload still owned after drain, baseline | Candidate |
+| --- | ---: | ---: |
+| 4 packets, 4 KiB | 4,096 bytes | 0 bytes |
+| 16 packets, 1 MiB | 1,048,576 bytes | 0 bytes |
+| 512 packets, 32 MiB | 33,554,432 bytes | 0 bytes |
+
+These fixtures make the recovery buffer the only packet owner. No tracked
+payload was freed during the drain, and every allocation eventually released
+exactly once. The separate native-clone control proves that another real owner
+can legitimately extend the payload lifetime after retirement.
+
+[Raw observations, commands, provenance, and logs](evidence/ubuntu/) are
+committed with the study. This is a reduction in retained recovery-buffer
+ownership, not a measurement of total player RSS or an asserted CPU speedup.
+
 ## Reproduce the portable ownership experiment
 
 Requires Linux, Swift 6.1 or newer, Python 3, a C compiler, make, and pkg-config.
@@ -91,6 +135,14 @@ The cancellation control covers throwing cancellation; it does not simulate a
 decoder that returns normally after cancellation. Although the exact packet
 lifetime regression suite also runs here, the existing playback/recovery suites
 still need the supported macOS SDK as the integration gate.
+
+The workflow also builds the complete macOS application graph and runs
+`VideoRecoveryPacketSessionLifetimeTests` with a required synthetic H.264
+fixture. That test observes real session packet owners through decoder drain
+and frame submission, before stopping the session. It fails if the fixture is
+missing. A queued job is not executed integration evidence; consult the CI run
+for its status. No live UI, visible-frame, or physical-device performance claim
+is made by this study.
 
 Reported bytes are the requested tracked payload and padded backing allocations.
 They exclude allocator overhead, decoder reference pictures, renderer storage,

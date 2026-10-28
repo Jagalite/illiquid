@@ -109,6 +109,10 @@ struct VideoRecoveryPacketSessionLifetimeTests {
             presentation.terminate()
         }
 
+        // This fixture has no audio. Remove the unfed audio renderer so the
+        // synchronizer can advance, and adopt the membership change's fence.
+        let fence = presentation.configureMembership(hasVideo: true, hasAudio: false)
+        session.adoptPresentationFence(fence)
         session.start(rate: 1)
         #expect(session.requestTransport(playing: true))
         let deadline = ContinuousClock.now + .seconds(15)

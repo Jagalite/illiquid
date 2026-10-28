@@ -86,7 +86,6 @@ jobs:
     timeout-minutes: 40
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      ILLIQUID_NATIVE_FIXTURE_DIR: ${{ runner.temp }}/recovery-native/fixtures
       ILLIQUID_RECOVERY_PACKET_REQUIRE_FIXTURE: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -103,8 +102,10 @@ jobs:
       - name: Generate and verify the native B-frame EOF fixture
         run: |
           python3 Benchmarks/FrameStepTimestamps/generate-fixtures.py \
-            --output "$ILLIQUID_NATIVE_FIXTURE_DIR"
+            --output "$RUNNER_TEMP/recovery-native/fixtures"
       - name: Build the application graph and test packet recovery lifetime
+        env:
+          ILLIQUID_NATIVE_FIXTURE_DIR: ${{ runner.temp }}/recovery-native/fixtures
         run: |
           mkdir -p "$RUNNER_TEMP/recovery-native"
           sw_vers > "$RUNNER_TEMP/recovery-native/host.txt"
