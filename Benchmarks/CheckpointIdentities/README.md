@@ -27,7 +27,7 @@ Use the shared Kyoto queue when available, preserving the command/environment:
 
 Inspect Kyoto show/logs/wait before reporting a result. Where the shared queue
 is unavailable, explain that limitation first, then run the same Python command
-directly. The hosted macOS workflow checks and records its absence. Each build
+directly. The hosted component workflows check and record its absence. Each build
 uses its own scratch directory, and all builds within the component job are
 serialized.
 
@@ -70,5 +70,7 @@ guarantees. Output directories must be new or empty to preserve earlier attempts
 
 ## Results
 
-Measurements are pending the initial native CI run. No performance result is
-claimed by this initial research commit.
+Measurements are pending CI. A separate Ubuntu component workflow runs the same
+source, tests and experiment while macOS runner capacity is unavailable. Linux
+and macOS measurements must be reported separately; the native coordinator job
+still requires macOS. No performance result is claimed by this research commit.
