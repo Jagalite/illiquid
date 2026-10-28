@@ -1,15 +1,6 @@
 name: Video color region averaging
 
 on:
-  push:
-    branches: ['perf/video-color-region-average-20261028-a1db02']
-    paths:
-      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
-      - 'Tests/IlliquidCoreTests/VideoColorSampleAverageTests.swift'
-      - 'Benchmarks/VideoColorRegionAverage/**'
-      - '.github/workflows/video-color-region-average.yml'
-      - '!Benchmarks/VideoColorRegionAverage/README.md'
-      - '!Benchmarks/VideoColorRegionAverage/evidence/**'
   pull_request:
     paths:
       - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
