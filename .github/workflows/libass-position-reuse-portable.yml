@@ -5,6 +5,17 @@ on:
     branches:
       - perf/libass-position-mask-reuse-5ae1d4b5
     paths:
+      - Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift
+      - Sources/IlliquidNativePlayback/Subtitles/ASSBitmapCopy.swift
+      - Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift
+      - Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift
+      - Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift
+      - Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift
+      - Sources/CLibass/**
+      - Tests/IlliquidNativePlaybackTests/ASSBitmapCopyTests.swift
+      - Tests/IlliquidNativePlaybackTests/LibassPositionReuseTests.swift
+      - Benchmarks/LibassPositionReuse/Driver.swift
+      - Benchmarks/LibassPositionReuse/run.py
       - Benchmarks/LibassPositionReuse/portable.py
       - .github/workflows/libass-position-reuse-portable.yml
   workflow_dispatch:

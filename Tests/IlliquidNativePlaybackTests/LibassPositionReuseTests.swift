@@ -64,7 +64,10 @@ struct LibassPositionReuseTests {
         switch kind {
         case "foreign":
             let other = try makePositionContext()
-            previous = try #require(other.render(at: 0.5).reusableSnapshot)
+            let foreign: ASSReusableRenderSnapshot = try #require(
+                other.render(at: 0.5).reusableSnapshot
+            )
+            previous = foreign
             seconds = 1.0
         case "stale":
             _ = context.render(at: 1.0, copyIfUnchanged: false, reusing: initial)
@@ -217,7 +220,8 @@ struct LibassPositionReuseTests {
 
     @Test func retainedSnapshotsOwnMasksWithoutKeepingTheNativeContextAlive() throws {
         var context: LibassContext? = try makePositionContext()
-        weak var releasedContext = context
+        weak var releasedContext: LibassContext? = nil
+        releasedContext = context
         let snapshot = try #require(context!.render(at: 0.5).reusableSnapshot)
         #expect(!snapshot.regions.isEmpty)
         let hashes = snapshot.regions.map { Array(SHA256.hash(data: $0.bitmap)) }
