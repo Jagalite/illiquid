@@ -1,0 +1,44 @@
+{
+  "reason": "Resolve slower timing cases in the full allocation study; retain all original results",
+  "pairs": 12,
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "harness_sha256": "1763eedaf90414393a951d4017dd3abdc16a056ee0843cf1d82a6096bddc637a",
+  "source_cohort_manifest_sha256": "1465085e14cf03c9eb1c2e74148482e0a0a0019fbe192320048e40b05849aa2d",
+  "binaries": {
+    "baseline": "cda0b3ed1aa18f2e867349d79aa39908374b0e9820c5ef8afd21197119d48501",
+    "baseline_library": "75086ad33a450e62af383001d1e9e33adeca8e5f7fc69b99c273569ed4683f9d",
+    "candidate": "9b73e3069b35d45027830aa3681c781f4175db9dcc23094086e0bcd8c20ab565",
+    "candidate_library": "dde077c97e725d30941c45c09767dcd6ef58dc707b30ddda19e9feae8810f001"
+  },
+  "cases": [
+    [
+      "playlist",
+      "shuffled",
+      10000,
+      4
+    ],
+    [
+      "urls",
+      "shuffled",
+      1000,
+      40
+    ],
+    [
+      "urls",
+      "ties",
+      1000,
+      20
+    ]
+  ],
+  "measurement_cpu": 0
+}
