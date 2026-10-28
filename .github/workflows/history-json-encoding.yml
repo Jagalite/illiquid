@@ -1,0 +1,49 @@
+name: History JSON encoding performance
+
+on:
+  push:
+    branches: [perf/history-json-encoding-20261028]
+    paths:
+      - Sources/IlliquidCore/**
+      - Tests/IlliquidCoreTests/**
+      - Benchmarks/HistoryJSONEncoding/**
+      - .github/workflows/history-json-encoding.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/Persistence/**
+      - Tests/IlliquidCoreTests/HistoryJSONEncodingTests.swift
+      - Benchmarks/HistoryJSONEncoding/**
+      - .github/workflows/history-json-encoding.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: history-json-encoding-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-comparison:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch frozen baseline
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Compare history encoding and run debug/release regressions
+        run: |
+          # Kyoto is not installed on this isolated hosted runner. All builds,
+          # measurements and tests execute serially within this job.
+          python3 Benchmarks/HistoryJSONEncoding/run.py \
+            --pairs 8 --output "$RUNNER_TEMP/history-json-encoding"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: history-json-encoding-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/history-json-encoding/evidence/
+          retention-days: 30

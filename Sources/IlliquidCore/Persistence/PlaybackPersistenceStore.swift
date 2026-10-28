@@ -164,7 +164,13 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         let preferencesStatus = preferencesWriteStatus
         historyWriter = CoalescingPersistenceWriter(label: "com.illiquid.history-writer") { snapshot in
             try historyStatus.perform {
-                let data = try NonDecodePerformance.measure("HistoryEncode") { try JSONEncoder().encode(snapshot) }
+                let data = try NonDecodePerformance.measure("HistoryEncode") {
+                    let encoder = JSONEncoder()
+                    // History repeats file paths. Optional slash escapes add work
+                    // and bytes without changing what existing JSON readers load.
+                    encoder.outputFormatting = [.withoutEscapingSlashes]
+                    return try encoder.encode(snapshot)
+                }
                 NonDecodePerformance.historyPayload(bytes: data.count)
                 NonDecodePerformance.measure("HistoryDefaultsSet") {
                     destination.defaults.set(data, forKey: historyKey)
