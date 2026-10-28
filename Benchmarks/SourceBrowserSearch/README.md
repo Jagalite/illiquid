@@ -1,18 +1,18 @@
 # Source-browser search performance
 
-See the [research report](../../Documentation/SOURCE_BROWSER_SEARCH_PERFORMANCE.md)
-for the measured results and the [evidence index](evidence/README.md) for retained
-raw records, test logs, and exact qualification archives.
+See the [original ID-set research report](../../Documentation/SOURCE_BROWSER_SEARCH_PERFORMANCE.md)
+and its [evidence index](evidence/README.md) for that investigation's results.
+The [row-storage follow-up](../../Documentation/SOURCE_BROWSER_SEARCH_ROW_STORAGE.md)
+isolates the later change from full matching rows to matching indices.
 
-This benchmark compares the complete `SourceBrowserFilter.search` method at
-main revision `68274d1b09dcc866296321a5a8858efc297c4f19` with the working-tree
+By default, this benchmark compares the complete `SourceBrowserFilter.search`
+method at main revision `68274d1b09dcc866296321a5a8858efc297c4f19` with the working-tree
 implementation. It also measures cached actor `project` calls, which include
 result projection, standardized media paths, and thumbnail-candidate collection.
 
-The production change replaces the temporary flattened ID array with a reserved
-set populated by direct insertion and union. Matching, cancellation checks, URL
-normalization, visibility evaluation, media grouping, and final row ordering are
-the existing production code.
+The original production change replaced the temporary flattened ID array with a
+reserved set populated by direct insertion and union. That change retained the matching predicates, cancellation checks, URL
+normalization, visibility evaluation, media grouping, and final row ordering.
 
 ## Reproduce
 
@@ -40,6 +40,22 @@ python3 Benchmarks/SourceBrowserSearch/run.py \
   --pairs 6 --target-ms 120 --output /tmp/source-search-timing
 ```
 
+To isolate a later change, pass `--baseline-ref COMMIT_OR_REF`. The runner resolves
+the ref once and records that commit for the baseline source, exact-source oracle,
+and environment/build receipts. The historical default above remains unchanged.
+For the [row-storage investigation](../../Documentation/SOURCE_BROWSER_SEARCH_ROW_STORAGE.md), use:
+
+```sh
+python3 Benchmarks/SourceBrowserSearch/run.py \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --pairs 6 --target-ms 120 --output /tmp/source-search-row-storage
+```
+
+The workflow uses a pull request's base commit for new comparisons. Manual runs
+accept a baseline ref and default to the original investigation above. An
+identical-source control is allowed and labeled in `source-comparison.json`;
+otherwise, only the production Filter may differ between paired builds.
+
 The output directory must be new or empty. `--swift /path/to/swift` selects a
 toolchain; on Linux, `--cpu N` pins the runner and its children to an available
 CPU. `--case search/100000/2/broad` selects one exact case; repeat that option to
@@ -57,6 +73,9 @@ counts successful intercepted `malloc`, `calloc`, and `realloc` requests and
 requested bytes during each operation. It does not measure live heap, peak
 memory, resident memory, or every allocator API. Instrumented wall times are
 not used as the performance timing cohort.
+
+Each observation also reports the compiled row and index strides. These describe
+element storage on that toolchain, not a measurement of live or peak memory.
 
 ## What is measured
 
@@ -94,8 +113,8 @@ algorithm, including duplicate identities and cancellation.
 and portable core files, plus verbatim portable declarations from the larger
 AppModel/Sidebar files. There are no replacement model types or changed source
 algorithms. A separate executable target calls the production module, preserving
-the normal compilation boundary. Only the Filter file differs between variants;
-the runner verifies the compiled source, harness, oracle, and manifest hashes.
+the normal compilation boundary. Only the Filter file may differ between variants; identical-source controls are
+labeled explicitly. The runner verifies the compiled source, harness, oracle, and manifest hashes.
 
 The output retains environment and toolchain details, commands and build logs,
 source and executable hashes, the exact staged source files, calibration data,
