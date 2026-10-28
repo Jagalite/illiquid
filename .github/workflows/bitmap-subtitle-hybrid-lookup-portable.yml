@@ -1,0 +1,73 @@
+name: Bitmap subtitle hybrid lookup portable
+
+on:
+  push:
+    branches: ['perf/bitmap-lookup-hybrid-portable-413a']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleLookupTests.swift'
+      - 'Benchmarks/BitmapSubtitleLookup/**'
+      - '.github/workflows/bitmap-subtitle-hybrid-lookup-portable.yml'
+      - '!Benchmarks/BitmapSubtitleLookup/README.md'
+      - '!Benchmarks/BitmapSubtitleLookup/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-hybrid-lookup-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-lookup:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.2-noble
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare Python runner
+        run: |
+          if ! command -v python3; then
+            apt-get update
+            apt-get install -y --no-install-recommends python3
+          fi
+          swift --version
+      - name: Test both implementations and measure portable lookup
+        run: |
+          echo 'Kyoto is unavailable on this isolated Linux runner; native macOS qualification remains separate.'
+          python3 -m py_compile Benchmarks/BitmapSubtitleLookup/run.py
+          python3 Benchmarks/BitmapSubtitleLookup/run.py \
+            --portable-linux --pairs 8 --target-ms 240 \
+            --output "$RUNNER_TEMP/bitmap-subtitle-lookup-portable"
+      - name: Emit reviewable measurement receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'bitmap-subtitle-lookup-portable'
+          for name in ('summary.json', 'parity.json', 'tests.json', 'completion.json',
+                       'build-receipt.json', 'measurements.jsonl', 'calibration.json'):
+              path = root / name
+              if path.is_file():
+                  print('LOOKUP_FILE ' + json.dumps({'path': name, 'content': path.read_text()}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-hybrid-lookup-portable
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-lookup-portable/**
+            !${{ runner.temp }}/bitmap-subtitle-lookup-portable/**/.build/**
+            !${{ runner.temp }}/bitmap-subtitle-lookup-portable/**/module-cache/**
+            !${{ runner.temp }}/bitmap-subtitle-lookup-portable/baseline/benchmark
+            !${{ runner.temp }}/bitmap-subtitle-lookup-portable/candidate/benchmark
+            !${{ runner.temp }}/bitmap-subtitle-lookup-portable/**/*.so
+            !${{ runner.temp }}/bitmap-subtitle-lookup-portable/**/*.swiftmodule
+          retention-days: 14

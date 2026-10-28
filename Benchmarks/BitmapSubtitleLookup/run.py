@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Compare native bitmap-subtitle timeline lookups using exact production sources.
+"""Compare bitmap-subtitle timeline lookups using production sources.
+
+Default mode requires native macOS Foundation/CoreGraphics. Explicit
+--portable-linux mode uses the official Swift toolchain's real Foundation
+geometry types and only removes unconditional, exact CoreGraphics import lines
+from compile copies. It does not supply geometry or platform stubs.
 
 Compile the timeline and budget whole, plus the exact ASSRenderedRegion
-declaration, against native Foundation/CoreGraphics. The benchmark driver is
-compiled separately from the optimized production module. No FFmpeg, libass,
-platform stubs, or production-source substitutions are needed. These are warm
-in-memory component measurements, not renderer or whole-player measurements.
+declaration. Compile the benchmark driver separately from the optimized
+production module. These are warm in-memory component measurements, not
+renderer or whole-player measurements. Portable results do not qualify macOS.
 """
 from __future__ import annotations
 
@@ -76,8 +80,14 @@ def region_declaration(source: bytes) -> tuple[bytes, dict]:
 
 class Runner:
     def __init__(self, args):
-        if platform.system() != "Darwin":
-            raise ValueError("Native macOS is required; no platform stubs are used")
+        self.portable_linux = args.portable_linux
+        system = platform.system()
+        if self.portable_linux:
+            if system != "Linux":
+                raise ValueError("--portable-linux requires Linux; omit it for native macOS")
+        elif system != "Darwin":
+            raise ValueError("Default mode requires native macOS; explicitly select --portable-linux on Linux")
+        self.platform_mode = "portable-linux-foundation" if self.portable_linux else "native-macos"
         self.args = args
         self.output = args.output.resolve()
         if self.output.exists() and any(self.output.iterdir()):
@@ -98,8 +108,15 @@ class Runner:
             "machine": platform.machine(),
             "sources": {},
             "binaries": {},
-            "mode": "native-production-timeline-lookup",
-            "adaptation": "Complete timeline/budget; exact ASSRenderedRegion declaration with Foundation/CoreGraphics imports.",
+            "mode": ("portable-linux-foundation-timeline-lookup" if self.portable_linux else
+                     "native-production-timeline-lookup"),
+            "platform_mode": self.platform_mode,
+            "adaptation": ("Complete timeline/budget and exact ASSRenderedRegion declaration; "
+                           "only unconditional exact import CoreGraphics lines removed from compile copies; "
+                           "real Swift Foundation geometry, no substitute types."
+                           if self.portable_linux else
+                           "Complete timeline/budget; exact ASSRenderedRegion declaration with Foundation/CoreGraphics imports."),
+            "compile_copies": {},
             "queries_per_cycle": QUERIES_PER_CYCLE,
             "timing_protocol": {
                 "pairs": args.pairs, "target_ms": args.target_ms,
@@ -109,9 +126,20 @@ class Runner:
         }
         self.receipt["candidate_revision"] = self.command(["git", "rev-parse", "HEAD"]).strip()
         self.receipt["compiler"] = self.command([self.swiftc, "--version"]).strip()
-        self.receipt["hardware"] = self.command(["sysctl", "-n", "machdep.cpu.brand_string"]).strip()
         self.receipt["swift_test_compiler"] = self.command([self.swift, "--version"]).strip()
-        self.receipt["sdk_version"] = self.command(["xcrun", "--show-sdk-version"]).strip()
+        if self.portable_linux:
+            self.receipt["hardware"] = platform.processor() or platform.machine()
+            self.receipt["libc"] = list(platform.libc_ver())
+            self.receipt["sdk_version"] = None
+            cpuinfo = Path("/proc/cpuinfo")
+            if cpuinfo.is_file():
+                for line in cpuinfo.read_text().splitlines():
+                    if line.startswith(("model name", "Hardware")) and ":" in line:
+                        self.receipt["hardware"] = line.split(":", 1)[1].strip()
+                        break
+        else:
+            self.receipt["hardware"] = self.command(["sysctl", "-n", "machdep.cpu.brand_string"]).strip()
+            self.receipt["sdk_version"] = self.command(["xcrun", "--show-sdk-version"]).strip()
 
     def command_bytes(self, argv, *, log: Path | None = None) -> bytes:
         argv = [str(item) for item in argv]
@@ -161,6 +189,33 @@ class Runner:
         }
         return value
 
+    def compile_copy(self, label: str, source: bytes) -> bytes:
+        """Remove only exact unconditional CoreGraphics imports, retaining native bytes."""
+        removed_lines = []
+        compiled = source
+        if self.portable_linux:
+            lines = source.splitlines(keepends=True)
+            kept = []
+            for index, line in enumerate(lines):
+                # An existing guarded import already compiles on Linux unchanged.
+                guarded = (index > 0 and index + 1 < len(lines) and
+                           lines[index - 1] == b"#if canImport(CoreGraphics)\n" and
+                           lines[index + 1] == b"#endif\n")
+                if line == b"import CoreGraphics\n" and not guarded:
+                    removed_lines.append(index + 1)
+                else:
+                    kept.append(line)
+            compiled = b"".join(kept)
+        self.receipt["compile_copies"][label] = {
+            "original_sha256": sha(source), "compiled_sha256": sha(compiled),
+            "original_bytes": len(source), "compiled_bytes": len(compiled),
+            "removed_exact_line": "import CoreGraphics\n" if removed_lines else None,
+            "removed_one_based_line_numbers": removed_lines,
+            "removed_line_count": len(removed_lines),
+            "transformation": "remove-exact-unconditional-CoreGraphics-imports" if removed_lines else "none",
+        }
+        return compiled
+
     def prepare(self):
         self.command(["git", "merge-base", "--is-ancestor", BASELINE, "HEAD"])
         self.receipt["candidate_status"] = self.command([
@@ -191,10 +246,10 @@ class Runner:
             staged[variant] = []
             for path in (TIMELINE, BUDGET):
                 destination = directory / Path(path).name
-                destination.write_bytes(sources[variant][path])
+                destination.write_bytes(self.compile_copy(f"{variant}:{path}", sources[variant][path]))
                 staged[variant].append(destination)
             region = directory / "ASSRenderedRegion.swift"
-            region.write_bytes(regions[variant][0])
+            region.write_bytes(self.compile_copy(f"{variant}:ASSRenderedRegion.swift", regions[variant][0]))
             staged[variant].append(region)
         test_sources = {}
         for index, name in enumerate(TESTS):
@@ -234,10 +289,10 @@ let package = Package(
             for source in sources[variant]:
                 shutil.copyfile(source, source_dir / source.name)
             for name, value in tests.items():
-                (test_dir / name).write_bytes(value)
+                (test_dir / name).write_bytes(self.compile_copy(f"{variant}:test:{name}", value))
             (package / "Package.swift").write_text(manifest)
             for configuration in ("debug", "release"):
-                print(f"Testing {variant} {configuration} against native CoreGraphics", flush=True)
+                print(f"Testing {variant} {configuration} ({self.platform_mode})", flush=True)
                 log = self.output / f"{variant}-{configuration}-tests.txt"
                 self.command([
                     self.swift, "test", "--package-path", package, "--jobs", "2",
@@ -251,9 +306,11 @@ let package = Package(
                     "log_sha256": sha(log.read_bytes()), "log_path": log.name,
                 }
                 write_json(self.output / "tests.json", self.receipt["tests"])
+            products = (package.glob(".build/**/*.xctest") if self.portable_linux else
+                        package.glob(".build/**/Contents/MacOS/*"))
             self.receipt.setdefault("test_binaries", {})[variant] = {
                 str(path.relative_to(self.output)): sha(path.read_bytes())
-                for path in sorted(package.glob(".build/**/Contents/MacOS/*")) if path.is_file()
+                for path in sorted(products) if path.is_file()
             }
 
     def build(self, sources, driver):
@@ -269,7 +326,8 @@ let package = Package(
         for variant in VARIANTS:
             directory = self.output / variant
             directory.mkdir()
-            library = directory / "libIlliquidNativePlayback.dylib"
+            library = directory / ("libIlliquidNativePlayback.so" if self.portable_linux else
+                                   "libIlliquidNativePlayback.dylib")
             module = directory / "IlliquidNativePlayback.swiftmodule"
             print(f"Building separate {variant} production module and driver", flush=True)
             self.command([
@@ -284,13 +342,16 @@ let package = Package(
                 "-Xlinker", "-rpath", "-Xlinker", directory, driver, "-o", binary,
             ], log=directory / "driver-compile.log")
             self.receipt["binaries"][variant] = sha(binary.read_bytes())
+            library_hash_field = "shared_object_sha256" if self.portable_linux else "dylib_sha256"
             self.receipt["libraries"][variant] = {
-                "dylib_sha256": sha(library.read_bytes()),
+                library_hash_field: sha(library.read_bytes()),
                 "swiftmodule_sha256": sha(module.read_bytes()),
+                "library_path": str(library.relative_to(self.output)),
             }
+            linker_tool = ["ldd"] if self.portable_linux else ["otool", "-L"]
             self.receipt["linked_dependencies"][variant] = {
-                "driver": self.command(["otool", "-L", binary]),
-                "module": self.command(["otool", "-L", library]),
+                "driver": self.command([*linker_tool, binary]),
+                "module": self.command([*linker_tool, library]),
             }
         write_json(self.output / "build-receipt.json", self.receipt)
 
@@ -472,6 +533,8 @@ def main():
     parser.add_argument("--swiftc")
     parser.add_argument("--swift", help="Swift package/test tool from the same toolchain as swiftc")
     parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--portable-linux", action="store_true",
+                        help="Explicit real-Foundation Linux qualification; does not qualify native macOS")
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=240)
     parser.add_argument("--minimum-ms", type=float, default=60)
@@ -490,6 +553,7 @@ def main():
         observations = 0 if args.tests_only else runner.measure()
         write_json(runner.output / "completion.json", {
             "complete": True, "tests_only": args.tests_only,
+            "platform_mode": runner.platform_mode,
             "minimum_observation_duration_met": None if args.tests_only else True,
             "minimum_ms": args.minimum_ms, "target_ms": args.target_ms,
             "pairs": args.pairs, "observations": observations,
@@ -499,7 +563,8 @@ def main():
     except BaseException as error:
         if runner:
             write_json(runner.output / "completion.json", {
-                "complete": False, "error_type": type(error).__name__, "error": str(error),
+                "complete": False, "platform_mode": runner.platform_mode,
+                "error_type": type(error).__name__, "error": str(error),
                 "failed_utc": datetime.now(timezone.utc).isoformat(),
             })
         raise

@@ -1,5 +1,11 @@
+#if canImport(CoreGraphics)
 import CoreGraphics
+#endif
+#if canImport(Darwin)
 import Darwin
+#else
+import Glibc
+#endif
 import Dispatch
 import Foundation
 @testable import IlliquidNativePlayback
