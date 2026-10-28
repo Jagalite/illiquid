@@ -241,6 +241,8 @@ let package = Package(name: "SourcePresenceInvalidation", platforms: [.macOS("26
             raise RuntimeError("Timing receipt does not match requested workload")
         if row["wallNanoseconds"] <= 0 or row["cpuNanoseconds"] <= 0 or row["operations"] <= 0:
             raise RuntimeError("Invalid timing receipt")
+        if row["operations"] != iterations * row["eventCount"]:
+            raise RuntimeError("Operation count does not match the event sequence")
         return row
 
     def measure(self, catalog: dict) -> None:
@@ -253,26 +255,36 @@ let package = Package(name: "SourcePresenceInvalidation", platforms: [.macOS("26
         groups = [(case, owner) for case in cases for owner in ownerships]
         iteration_counts = {}
         calibration_decisions = {}
+        cycle_checksums = {}
         for case, owner in groups:
-            suggested = []
+            suggested = {}
+            pilots = {}
             input_entries = 0
             for variant in ("baseline", "candidate"):
                 row = self.sample(variant, case, owner, 1, 41)
+                pilots[variant] = row
                 append(self.output / "calibration.jsonl", {"variant": variant, **row})
-                suggested.append(max(1, math.ceil(self.args.target_ms * 1e6 / min(row["wallNanoseconds"], row["cpuNanoseconds"]))))
+                suggested[variant] = max(1, math.ceil(self.args.target_ms * 1e6 / min(row["wallNanoseconds"], row["cpuNanoseconds"])))
                 input_entries = max(input_entries, row["inputResults"], row["inputSummaries"])
-            requested = max(suggested)
+            outputs = lambda row: {k: v for k, v in row.items() if k not in {"wallNanoseconds", "cpuNanoseconds"}}
+            if outputs(pilots["baseline"]) != outputs(pilots["candidate"]):
+                raise RuntimeError(f"Calibration output mismatch: {case} / {owner}")
+            cycle_checksums[(case, owner)] = pilots["baseline"]["checksum"]
             # Rebuilding a large uniquely-owned fixture is deliberately outside
             # timing, but must not turn a microsecond candidate into hours of
             # setup. Bound that work explicitly and retain short-sample flags.
             entry_cap = max(1, self.args.maximum_restored_entries // max(1, input_entries))
             iteration_cap = min(self.args.maximum_iterations, entry_cap)
-            iteration_counts[(case, owner)] = min(iteration_cap, requested)
-            calibration_decisions[case + "/" + owner] = {"requestedIterations": requested,
-                "selectedIterations": iteration_counts[(case, owner)],
+            # Each iteration restores the same fixture and executes the same
+            # complete event sequence. Calibrate counts separately so a large
+            # speedup does not require minutes of redundant baseline work.
+            counts = {variant: min(iteration_cap, suggested[variant]) for variant in suggested}
+            iteration_counts[(case, owner)] = counts
+            calibration_decisions[case + "/" + owner] = {"requestedIterations": suggested,
+                "selectedIterations": counts,
                 "iterationCap": iteration_cap, "inputEntries": input_entries,
                 "maximumRestoredEntries": self.args.maximum_restored_entries,
-                "capped": requested > iteration_cap}
+                "capped": {variant: suggested[variant] > iteration_cap for variant in suggested}}
         save(self.output / "calibration-decisions.json", calibration_decisions)
         records = []
         for pair in range(self.args.pairs):
@@ -281,12 +293,16 @@ let package = Package(name: "SourcePresenceInvalidation", platforms: [.macOS("26
                 pair_rows = {}
                 order = ("baseline", "candidate") if pair % 2 == 0 else ("candidate", "baseline")
                 for position, variant in enumerate(order):
-                    row = self.sample(variant, case, owner, iteration_counts[(case, owner)], 41)
+                    iterations = iteration_counts[(case, owner)][variant]
+                    row = self.sample(variant, case, owner, iterations, 41)
+                    if row["checksum"] != (cycle_checksums[(case, owner)] * iterations) % (1 << 64):
+                        raise RuntimeError(f"Repeated-cycle checksum mismatch: {case} / {owner} / {variant}")
                     pair_rows[variant] = row
                     record = {"variant": variant, "pair": pair, "processOrder": position, **row}
                     records.append(record)
                     append(self.output / "measurements.jsonl", record)
-                comparable = lambda row: {k: v for k, v in row.items() if k not in {"wallNanoseconds", "cpuNanoseconds"}}
+                comparable = lambda row: {k: v for k, v in row.items() if k not in {
+                    "wallNanoseconds", "cpuNanoseconds", "iterations", "operations", "checksum"}}
                 if comparable(pair_rows["baseline"]) != comparable(pair_rows["candidate"]):
                     raise RuntimeError(f"Timed state/output mismatch: {case} / {owner} / {pair}")
             print(f"Measured balanced round {pair + 1}/{self.args.pairs}", flush=True)
@@ -297,7 +313,8 @@ let package = Package(name: "SourcePresenceInvalidation", platforms: [.macOS("26
         for case, owner in groups:
             rows = [r for r in records if (r["case"], r["ownership"]) == (case, owner)]
             group = {"case": case, "ownership": owner, "iterations": iteration_counts[(case, owner)],
-                     "operationsPerSample": rows[0]["operations"], "pairs": self.args.pairs}
+                     "operationsPerSample": {v: next(r["operations"] for r in rows if r["variant"] == v)
+                                             for v in ("baseline", "candidate")}, "pairs": self.args.pairs}
             for variant in ("baseline", "candidate"):
                 selected = [r for r in rows if r["variant"] == variant]
                 group[variant] = {}
@@ -308,7 +325,7 @@ let package = Package(name: "SourcePresenceInvalidation", platforms: [.macOS("26
             for field in ("wallNanoseconds", "cpuNanoseconds"):
                 ratios = []
                 for pair in range(self.args.pairs):
-                    values = {r["variant"]: r[field] for r in rows if r["pair"] == pair}
+                    values = {r["variant"]: r[field] / r["operations"] for r in rows if r["pair"] == pair}
                     ratios.append(values["candidate"] / values["baseline"])
                 group[field] = {"pairedRatios": ratios, "medianReductionPercent": 100 * (1 - statistics.median(ratios)),
                                 "fasterPairs": sum(value < 1 for value in ratios),

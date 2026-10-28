@@ -95,9 +95,14 @@ installed in timed cases; notification semantics are checked separately.
 
 Every timed observation runs in a fresh process. Baseline-first and
 candidate-first pairs alternate, and workload order rotates between rounds.
-Both variants use identical inputs and operation counts. Process CPU and
-monotonic wall time are retained, including clock-read overhead; no overhead
-is subtracted and no samples are discarded. Calibration targets the requested
+Both variants restore the same fixture and execute the same complete event
+sequence per iteration. Iteration counts are calibrated independently and
+reported explicitly; times and paired ratios are normalized per invalidation.
+This avoids repeating a much slower baseline for minutes to obtain a useful
+candidate interval. Every sample's checksum must equal its verified single-cycle
+checksum multiplied by its iteration count, with identical final-state receipts.
+Process CPU and monotonic wall time are retained, including clock-read overhead;
+no overhead is subtracted and no samples are discarded. Calibration targets the requested
 duration but caps restoration work at 1,000 iterations and five million input
 entries per dictionary per sample (excluding warmup). The 100,000-folder case
 therefore caps at 50 iterations. `--maximum-iterations` and
