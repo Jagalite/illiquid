@@ -1,21 +1,6 @@
 name: State-space canonicalization performance
 
 on:
-  push:
-    branches:
-      - codex/perf-state-space-canonicalization
-  pull_request:
-    paths:
-      - Sources/IlliquidCore/Player/MediaTrack.swift
-      - Sources/IlliquidPlaybackCore/**
-      - Sources/IlliquidPlaybackStateSpace/**
-      - Tests/IlliquidPlaybackCoreTests/**
-      - Tests/IlliquidPlaybackStateSpaceTests/**
-      - Validation/IlliquidStateSpaceExplorer/**
-      - Benchmarks/StateSpaceCanonicalization/**
-      - .github/workflows/state-space-canonicalization.yml
-      - '!Benchmarks/StateSpaceCanonicalization/README.md'
-      - '!Benchmarks/StateSpaceCanonicalization/evidence/**'
   workflow_dispatch:
 
 permissions:
