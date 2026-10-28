@@ -17,6 +17,10 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 concurrency:
   group: queue-notifications-${{ github.ref }}
   cancel-in-progress: true
