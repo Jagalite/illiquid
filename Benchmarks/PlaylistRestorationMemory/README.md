@@ -51,7 +51,7 @@ retains source/binary hashes, compiler/platform metadata, build commands, all
 raw observations, and summaries. Source hashes are checked again after execution.
 
 Each pair uses fresh processes with alternating baseline/candidate order.
-Fixtures and warm-up results are constructed and released before measurement.
+Fixture-construction temporaries and warm-up results are released before measurement.
 All returned items, including subtitles and dates, must equal independently
 constructed expected arrays. The fixture and expected arrays stay alive across
 the two memory samples.
@@ -81,5 +81,89 @@ from every production and timing source.
 
 ## Results
 
-Native validation is pending. The isolated branch workflow will record measured
-results before this research is proposed as a successful optimization.
+### Portable production-source validation
+
+[Linux run 40637410006](https://github.com/Jagalite/illiquid/actions/runs/40637410006)
+passed on Ubuntu 24.04, x86_64, with Swift 6.4 (`swift-6.4-RELEASE`).
+The production code is identical to the primary candidate commit
+`1d358535eaba91ac342794c2219129df3f027e17`. A separate validation commit
+[a2237e438ce68e85c6c522b746ec57c27703105b](https://github.com/Jagalite/illiquid/commit/a2237e438ce68e85c6c522b746ec57c27703105b)
+adds only benchmark portability support and its workflow: a Linux autorelease-pool
+no-op, glibc allocator probe, and platform-aware compiler/receipt commands.
+This preserved the queued macOS job while obtaining feedback from another runner.
+
+- **22 tests in 4 suites passed** for candidate debug, candidate release, and
+  frozen-baseline release, including the 41,261-case independent oracle.
+- **168 fresh-process observations**, six alternating pairs per case, all
+  passed complete-item equality checks. Timing processes measured three calls.
+- The target source and dependencies remained byte-identical throughout the run.
+  The working tree was clean. Source and binary hashes are retained.
+- On this toolchain, `FolderPlaylistItem` has a 40-byte stride and `Int` has an
+  8-byte stride. This describes the map value representation, not the total
+  dictionary allocation.
+
+#### Temporary allocator storage
+
+These Linux numbers use `mallinfo2().uordblks + hblkhd`, which can include
+allocator caches. They measure the populated-map delta from the warmed pre-call
+baseline. They are not macOS live-heap, peak, RSS, or whole-player measurements.
+
+| Distinct items | Scenario | Baseline bytes | Candidate bytes | Saved bytes | Reduction |
+|---:|---|---:|---:|---:|---:|
+| 100 | unchanged | 27,312 | 19,248 | 8,064 | 29.53% |
+| 100 | edited | 27,184 | 19,120 | 8,064 | 29.66% |
+| 100 | duplicates | 27,296 | 19,232 | 8,064 | 29.54% |
+| 10,000 | unchanged | 2,301,264 | 1,776,976 | 524,288 | 22.78% |
+| 10,000 | edited | 2,301,152 | 1,776,864 | 524,288 | 22.78% |
+| 10,000 | duplicates | 2,301,504 | 1,777,088 | 524,416 | 22.79% |
+
+All six repetitions of each memory case reported the same delta and matching
+map/current-order capacities. At 10,000 distinct items the map change saved
+512 KiB (512.125 KiB with duplicates), about 22.8% of this checkpoint delta.
+The duplicate case has 20,000 input items and retains the first occurrence's
+original subtitles and date.
+
+#### Uninstrumented timing
+
+| Distinct items | Scenario | Baseline ms | Candidate ms | Median change |
+|---:|---|---:|---:|---:|
+| 100 | unchanged | 0.487 | 0.470 | 3.36% lower |
+| 100 | edited | 0.475 | 0.476 | 0.15% higher |
+| 100 | duplicates | 0.906 | 0.906 | 0.05% higher |
+| 100 | no-base | 0.447 | 0.445 | 0.46% lower |
+| 10,000 | unchanged | 51.204 | 51.109 | 0.19% lower |
+| 10,000 | edited | 51.186 | 51.367 | 0.35% higher |
+| 10,000 | duplicates | 97.172 | 96.030 | 1.18% lower |
+| 10,000 | no-base | 46.913 | 46.422 | 1.05% lower |
+
+The timing differences are small and paired ranges overlap zero in every case.
+The unchanged no-base control also varies. This evidence supports a temporary
+memory reduction; it does not establish a runtime speedup or statistical
+equivalence. Every raw value and the full ranges are retained.
+
+#### Native macOS qualification
+
+[macOS run 40636026411](https://github.com/Jagalite/illiquid/actions/runs/40636026411)
+was queued when the portable evidence was recorded. No successful macOS result
+is included in this dataset. Its dedicated workflow uses the native all-zone
+probe, eight pairs, and sizes through 100,000 distinct items. Check that run and
+the PR checks before interpreting the result as native qualification.
+
+No full-player build, live playback, UI latency, decoder throughput, or total
+process memory result is claimed by this component study.
+
+### Retained evidence and reproduction
+
+The [Linux evidence](evidence/linux/) contains raw JSONL, summary JSON, exact
+compiler/source/binary receipts, and test result excerpts extracted from the
+completed job log. The portable harness can be reproduced from validation commit
+`a2237e438ce68e85c6c522b746ec57c27703105b` using:
+
+```sh
+python3 Benchmarks/PlaylistRestorationMemory/run.py \
+  --output /tmp/playlist-restoration-memory-linux \
+  --pairs 6 --rounds 3 --sizes 100 10000
+```
+
+The primary branch's runner remains the native macOS implementation. The
+production optimization itself has no platform conditions.
