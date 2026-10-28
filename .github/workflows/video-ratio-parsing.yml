@@ -1,0 +1,85 @@
+name: Video ratio parsing performance
+
+on:
+  push:
+    branches: ['perf/video-ratio-parsing-*']
+    paths:
+      - 'Sources/IlliquidCore/Player/VideoPresentationGeometry.swift'
+      - 'Tests/IlliquidCoreTests/VideoRatioParsingTests.swift'
+      - 'Benchmarks/VideoRatioParsing/**'
+      - '.github/workflows/video-ratio-parsing.yml'
+      - '!Benchmarks/VideoRatioParsing/README.md'
+      - '!Benchmarks/VideoRatioParsing/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/VideoPresentationGeometry.swift'
+      - 'Sources/IlliquidCore/Player/PlaybackModels.swift'
+      - 'Tests/IlliquidCoreTests/VideoRatioParsingTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaybackToolsTests.swift'
+      - 'Benchmarks/VideoRatioParsing/**'
+      - '.github/workflows/video-ratio-parsing.yml'
+      - '!Benchmarks/VideoRatioParsing/README.md'
+      - '!Benchmarks/VideoRatioParsing/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-ratio-parsing-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-geometry:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          sparse-checkout: |
+            Sources/IlliquidCore
+            Tests/IlliquidCoreTests
+            Benchmarks/VideoRatioParsing
+      - name: Run geometry regressions and paired release measurements
+        run: |
+          python3 Benchmarks/VideoRatioParsing/run.py \
+            --pairs 6 --target-ms 150 --minimum-ms 60 \
+            --output "$RUNNER_TEMP/video-ratio-parsing"
+      - name: Emit reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'video-ratio-parsing'
+          files = {}
+          for path in sorted(root.rglob('*')):
+              if (path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt', '.stdout', '.stderr'}
+                      and not any(part in {'module-cache', '.build'} for part in path.relative_to(root).parts)):
+                  files[str(path.relative_to(root))] = path.read_text()
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log bundle limit; use uploaded artifact')
+          print('VIDEO_RATIO_REVIEW_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('VIDEO_RATIO_REVIEW_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-ratio-parsing-native
+          path: |
+            ${{ runner.temp }}/video-ratio-parsing/**/*.json
+            ${{ runner.temp }}/video-ratio-parsing/**/*.jsonl
+            ${{ runner.temp }}/video-ratio-parsing/**/*.log
+            ${{ runner.temp }}/video-ratio-parsing/**/*.txt
+            ${{ runner.temp }}/video-ratio-parsing/**/*.stdout
+            ${{ runner.temp }}/video-ratio-parsing/**/*.stderr
+            ${{ runner.temp }}/video-ratio-parsing/**/*.swift
+            ${{ runner.temp }}/video-ratio-parsing/**/*.py
+            !${{ runner.temp }}/video-ratio-parsing/**/module-cache/**
+            !${{ runner.temp }}/video-ratio-parsing/**/.build/**
+          retention-days: 14

@@ -13,9 +13,21 @@ public struct VideoPresentationGeometry: Equatable, Sendable {
 
     public static func ratio(_ text: String?) -> Double? {
         guard let text else { return nil }
-        let parts = text.split(separator: ":", omittingEmptySubsequences: false)
-        guard (1...2).contains(parts.count), let a = Double(parts[0]), a.isFinite, a > 0 else { return nil }
-        let b = parts.count == 2 ? Double(parts[1]) : 1
+        // Geometry is recomputed during subtitle/PiP presentation. Borrow the
+        // numeric fields directly instead of allocating a split-result array.
+        let colon = text.firstIndex(of: ":")
+        let numerator = colon.map { text[..<$0] } ?? text[...]
+        guard let a = Double(numerator), a.isFinite, a > 0 else { return nil }
+        let b: Double?
+        if let colon {
+            let denominator = text[text.index(after: colon)...]
+            // Keep the one/two-field grammar separate from Double's numeric
+            // grammar, including for malformed strings containing NULs.
+            guard !denominator.contains(":") else { return nil }
+            b = Double(denominator)
+        } else {
+            b = 1
+        }
         guard let b, b.isFinite, b > 0 else { return nil }
         let ratio = a / b
         return (0.1...10).contains(ratio) ? ratio : nil
