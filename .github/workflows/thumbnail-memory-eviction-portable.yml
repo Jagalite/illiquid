@@ -1,0 +1,83 @@
+name: Thumbnail memory eviction portable
+
+on:
+  push:
+    branches: ['perf/thumbnail-memory-eviction-*']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift'
+      - 'Benchmarks/ThumbnailMemoryEviction/**'
+      - '.github/workflows/thumbnail-memory-eviction-portable.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-memory-eviction-portable-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.2-noble
+    timeout-minutes: 20
+    steps:
+      - name: Prepare runner utilities
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 git
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compare and measure portable cache bookkeeping
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-memory-portable"
+          uname -a > "$RUNNER_TEMP/thumbnail-memory-portable/host.txt"
+          cat /proc/cpuinfo >> "$RUNNER_TEMP/thumbnail-memory-portable/host.txt"
+          swift --version >> "$RUNNER_TEMP/thumbnail-memory-portable/host.txt"
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/ThumbnailMemoryEviction/run.py',
+                     '--pairs', '8', '--bulk-iterations', '1000',
+                     '--output', os.environ['RUNNER_TEMP'] + '/thumbnail-memory-portable/results']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Shared Kyoto queue is unavailable; building isolated portable '
+                'cache components directly and serially. Images are test doubles.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Publish compact reproducibility receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-memory-portable'
+          names = ['host.txt', 'results/manifest.json', 'results/verification.json',
+                   'results/summary.json', 'results/measurements.jsonl', 'results/commands.jsonl']
+          records = {name: (root / name).read_text() for name in names if (root / name).is_file()}
+          bundle = gzip.compress(json.dumps(records, sort_keys=True).encode(), mtime=0)
+          print('THUMBNAIL_MEMORY_BUNDLE_SHA256', hashlib.sha256(bundle).hexdigest())
+          print('THUMBNAIL_MEMORY_BUNDLE_BASE64', base64.b64encode(bundle).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-memory-eviction-portable
+          path: |
+            ${{ runner.temp }}/thumbnail-memory-portable/
+            !${{ runner.temp }}/thumbnail-memory-portable/results/build/**
+          retention-days: 14
