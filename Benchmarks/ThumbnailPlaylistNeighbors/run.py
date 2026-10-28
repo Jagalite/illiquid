@@ -231,11 +231,15 @@ def main() -> None:
                 print(f"Test {variant} {configuration}", flush=True)
                 log = f"tests-{variant}-{configuration}.log"
                 text = execute([swift, "test", *flags, "-c", configuration], log=log)
-                counts = re.findall(r"Test run with (\d+) tests? .*passed", text)
-                if not counts or int(counts[-1]) == 0:
-                    raise ValueError(f"No successful Swift Testing result in {log}")
+                counts = [int(value) for value in
+                          re.findall(r"Test run with (\d+) tests? .*passed", text)]
+                suites = ("Thumbnail playlist neighbors", "Thumbnail scheduling policy",
+                          "Thumbnail scheduling policy regressions")
+                if (not counts or not all(counts)
+                        or any(f'Suite "{suite}" passed' not in text for suite in suites)):
+                    raise ValueError(f"Missing successful Swift Testing suites in {log}")
                 manifest["tests"].append({"variant": variant, "configuration": configuration,
-                                          "passed": int(counts[-1]), "log": log})
+                                          "passed": sum(counts), "passed_by_process": counts, "log": log})
                 save(out / "manifest.json", manifest)
         if not args.tests_only:
             print(f"Build {variant} release benchmark", flush=True)

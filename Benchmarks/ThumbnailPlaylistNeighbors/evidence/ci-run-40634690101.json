@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "measured_commit": "e4a31ce145f69f117ece6b7d16799f302d573460",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "run": {
+    "id": 40634690101,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40634690101",
+    "conclusion": "success"
+  },
+  "jobs": [
+    {
+      "platform": "Linux x86_64",
+      "job_id": 122638825144,
+      "conclusion": "success",
+      "summaries": [
+        "linux-ci/allocations-summary.json",
+        "linux-ci/timing-summary.json"
+      ]
+    },
+    {
+      "platform": "macOS arm64",
+      "job_id": 122638824903,
+      "conclusion": "success",
+      "summaries": [
+        "macos-ci/timing-summary.json"
+      ]
+    }
+  ],
+  "summary_provenance": "Extracted complete JSON from the published CI job log groups named allocations and timing. Only the log timestamp prefix and enclosing workflow group markers were removed; numeric values were not changed.",
+  "artifacts": [
+    {
+      "id": 12793595213,
+      "name": "thumbnail-playlist-neighbors-ubuntu-24.04",
+      "size_in_bytes": 66795,
+      "digest": "sha256:fc25c6e3cdbf4e3e086e8f039829b9403b0e586dc3ab1a437fc1c3e26a7cd8a3",
+      "created_at": "2026-10-28T04:54:15Z",
+      "expires_at": "2026-11-11T04:54:14Z",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/40634690101/artifacts/12793595213"
+    },
+    {
+      "id": 12793141532,
+      "name": "thumbnail-playlist-neighbors-macos-26",
+      "size_in_bytes": 50557,
+      "digest": "sha256:b52cba43d2c3ec66a9338048d845cddaf65d5e2123aa0462074fb868f21d8650",
+      "created_at": "2026-10-28T04:56:55Z",
+      "expires_at": "2026-11-11T04:56:54Z",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/40634690101/artifacts/12793141532"
+    }
+  ],
+  "qualification": {
+    "cases": 22,
+    "timing_pairs": 6,
+    "timing_observations_per_platform": 264,
+    "linux_allocation_pairs": 2,
+    "linux_allocation_observations": 88,
+    "tests_per_configuration": 19,
+    "test_configurations": [
+      "baseline/debug",
+      "baseline/release",
+      "candidate/debug",
+      "candidate/release"
+    ]
+  },
+  "test_reporting_note": "The original runner records only the final Swift Testing process count in manifest.tests[].passed. Swift 6.4 emits separate 13-test core and 6-test app results. Both suites passed (19 total) in each configuration. The follow-up runner sums process counts and requires each named suite; historical artifact manifests are unmodified.",
+  "limits": [
+    "Component qualification, not a full app build or live UI qualification.",
+    "Requested allocation traffic is not live or peak memory, RSS, or macOS physical footprint.",
+    "Complete original per-process observations, test logs, calibration and source hashes remain in the linked GitHub artifacts, subject to their expiration dates.",
+    "An earlier local Linux Swift 6.3.2 timing run had a noisy 100000/miss counterexample (median paired CPU change +5.51%, 3 of 6 pairs faster); its uncommitted raw local receipts became unavailable after workspace interruption and are not reproduced here."
+  ]
+}

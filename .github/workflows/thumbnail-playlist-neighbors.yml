@@ -44,7 +44,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: thumbnail-playlist-neighbors-${{ github.head_ref || github.ref }}
+  group: thumbnail-playlist-neighbors-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
