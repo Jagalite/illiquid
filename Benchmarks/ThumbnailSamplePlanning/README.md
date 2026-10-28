@@ -110,4 +110,62 @@ Four additional count-64 controls use durations 1.4, 2.1, 7.9, and 30 seconds
 with varied focus positions. They extend the control gate using the same 10%
 regression limit; every earlier workload and both primary thresholds remain.
 This tests the general underfilled-plan case instead of only the original
-0.1-second fixture. Native and revised portable results are pending.
+0.1-second fixture.
+
+## Final portable result: performance gate passed
+
+[Run 40640869019](https://github.com/Jagalite/illiquid/actions/runs/40640869019)
+tested the final source at `7886cda021bfc14e98616d0dc2cb8b582cdccd49`
+on x86_64 Linux with Swift 6.4.1. It passed the original primary criteria and
+the expanded control gate. Both primary workloads improved in all ten pairs.
+
+| Workload | Baseline CPU µs/call | Candidate CPU µs/call | Median paired CPU reduction | Faster CPU pairs |
+| --- | ---: | ---: | ---: | ---: |
+| storyboard-24 | 0.852 | 0.603 | 29.7% | 10/10 |
+| economical-6 | 0.289 | 0.210 | 27.3% | 10/10 |
+| balanced-12 | 0.450 | 0.330 | 26.3% | 10/10 |
+| extensive-24 | 0.885 | 0.604 | 31.5% | 10/10 |
+| maximum-64 | 2.466 | 2.381 | 3.5% | 10/10 |
+| boundary-33 | 2.382 | 0.904 | 62.1% | 10/10 |
+| exact-level-32 | 0.830 | 0.860 | -3.6% | 0/10 |
+| exact-level-64 | 2.351 | 2.387 | -1.5% | 1/10 |
+| one-sample | 0.140 | 0.057 | 59.0% | 10/10 |
+| short-duration | 0.746 | 0.058 | 92.2% | 10/10 |
+| short-1.4 | 0.794 | 0.104 | 86.9% | 10/10 |
+| short-2.1 | 0.981 | 0.183 | 81.3% | 10/10 |
+| short-7.9 | 1.642 | 0.392 | 76.2% | 10/10 |
+| short-30 | 4.207 | 2.208 | 47.6% | 10/10 |
+
+Positive reductions mean faster; negative values mean slower. Per-variant
+timings are marginal medians, while reductions are medians of paired percentage
+changes. The two summaries need not be identical ratios. All raw observations,
+ranges, calibration data, compiler details, source hashes, and exact output
+receipts are in [the final receipt](results/linux-final.json).
+
+The exact-level controls retain small costs: approximately 30 ns/call at 32
+samples and 36 ns/call at 64 samples. These are 3.6% and 1.5% median paired CPU
+regressions, respectively, within the predeclared 10% ceiling. The result is
+therefore a tradeoff, not a claim that every workload is faster.
+
+Validation passed:
+
+- 53,075 bitwise differential cases in each of debug and release.
+- Three selected-source unit suites in both configurations, including the
+  existing policy/scheduling coverage and the new sample-planning cases.
+- All 448 timing-corpus outputs matched exactly (14 workloads × 32 inputs).
+- All paired checksums matched across 280 timing observations.
+
+The two earlier failed experiments remain above with their full receipts.
+No observations were dropped or pooled across compiler/runner environments.
+
+### Native status and limits
+
+The macOS 26 workflow was submitted but remained queued when these results were
+recorded. This supports a draft PR based on successful portable component
+research; native performance confirmation is still pending. The workflow is
+[defined here](../../.github/workflows/thumbnail-sample-planning.yml).
+
+These measurements concern an optimized, warmed planner benchmark, including
+the common result consumer. The normal storyboard saving was about 0.25 µs per
+call on this runner. This is not a measured improvement in hover latency,
+decoding, playback smoothness, startup, energy use, or the complete macOS app.
