@@ -1683,9 +1683,9 @@ public struct PlaybackCore: Sendable {
   }
 
   private mutating func settleEffects(for authority: PlaybackAuthority) {
-    let settled = state.outstandingEffects
-      .filter { $0.value.effect.context.authority == authority }
-      .map(\.key)
+    let settled = state.outstandingEffects.compactMap { effectID, record in
+      record.effect.context.authority == authority ? effectID : nil
+    }
     for effectID in settled {
       state.outstandingEffects.removeValue(forKey: effectID)
       state.recordCompletedEffect(effectID)

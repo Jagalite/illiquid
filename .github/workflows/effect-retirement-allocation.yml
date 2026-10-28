@@ -1,0 +1,106 @@
+name: Effect retirement allocation
+
+on:
+  push:
+    branches: ['codex/effect-retirement-allocation']
+    paths:
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Sources/IlliquidPlaybackStateSpace/**'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Tests/IlliquidPlaybackCoreTests/**'
+      - 'Tests/IlliquidPlaybackStateSpaceTests/**'
+      - 'Benchmarks/EffectRetirementAllocation/**'
+      - '!Benchmarks/EffectRetirementAllocation/*.md'
+      - '!Benchmarks/EffectRetirementAllocation/evidence/**'
+      - '.github/workflows/effect-retirement-allocation.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Sources/IlliquidPlaybackStateSpace/**'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Tests/IlliquidPlaybackCoreTests/**'
+      - 'Tests/IlliquidPlaybackStateSpaceTests/**'
+      - 'Benchmarks/EffectRetirementAllocation/**'
+      - '!Benchmarks/EffectRetirementAllocation/*.md'
+      - '!Benchmarks/EffectRetirementAllocation/evidence/**'
+      - '.github/workflows/effect-retirement-allocation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: effect-retirement-allocation-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  portable-core:
+    runs-on: ubuntu-24.04
+    container: swift:6.1.3-noble
+    timeout-minutes: 20
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Ensure Python is available
+        run: |
+          if ! command -v python3 >/dev/null; then
+            apt-get update
+            apt-get install -y --no-install-recommends python3
+          fi
+      - name: Qualify real reducer semantics and measure retirement
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated packages.'
+          python3 Benchmarks/EffectRetirementAllocation/run.py \
+            --pairs 6 --target-ms 50 \
+            --output "$RUNNER_TEMP/effect-retirement-linux"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: effect-retirement-linux
+          path: |
+            ${{ runner.temp }}/effect-retirement-linux/*.json
+            ${{ runner.temp }}/effect-retirement-linux/*.jsonl
+            ${{ runner.temp }}/effect-retirement-linux/logs/
+            ${{ runner.temp }}/effect-retirement-linux/sources/
+            ${{ runner.temp }}/effect-retirement-linux/semantics/
+          retention-days: 14
+
+  native-core:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify real reducer semantics and measure retirement
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated packages.'
+          python3 Benchmarks/EffectRetirementAllocation/run.py \
+            --pairs 6 --target-ms 50 \
+            --output "$RUNNER_TEMP/effect-retirement-macos"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: effect-retirement-macos
+          path: |
+            ${{ runner.temp }}/effect-retirement-macos/*.json
+            ${{ runner.temp }}/effect-retirement-macos/*.jsonl
+            ${{ runner.temp }}/effect-retirement-macos/logs/
+            ${{ runner.temp }}/effect-retirement-macos/sources/
+            ${{ runner.temp }}/effect-retirement-macos/semantics/
+          retention-days: 14
