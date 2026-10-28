@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Compare production bitmap-subtitle lookup and pruning on macOS.
 
-Requires Swift 6.1+ and Python 3.10+. Complete timeline and budget sources are
+Requires Swift 6.1+ and Python 3.10+. Explicit --portable runs adapt only
+CoreGraphics imports and do not qualify macOS performance. Complete timeline and budget sources are
 compiled with the exact ASSRenderedRegion declaration, without FFmpeg/libass.
 Geometry and leases use their real native types. This is a component benchmark; no whole-player performance is inferred.
 """
@@ -98,8 +99,21 @@ def region_source() -> str:
     end = "struct ASSRenderResult: Sendable {"
     if original.count(start) != 1 or original.count(end) != 1:
         raise RuntimeError("ASSRenderedRegion extraction boundaries changed")
-    return "import Foundation\nimport CoreGraphics\n\n" + original[
+    return "import Foundation\n#if canImport(CoreGraphics)\nimport CoreGraphics\n#endif\n\n" + original[
         original.index(start):original.index(end)]
+
+
+def portable_imports(source: str) -> str:
+    if sys.platform != "darwin":
+        # Foundation supplies CGRect/CGSize on Linux. Preserve every production
+        # declaration and operation; adapt only the unavailable module import.
+        source = source.replace("import CoreGraphics\n",
+                                "#if canImport(CoreGraphics)\nimport CoreGraphics\n#endif\n")
+    return source
+
+
+def staged_source(variant: str, relative: str) -> str:
+    return portable_imports(source_path(variant, relative).read_text())
 
 
 def prepare_sources(variant: str, destination: Path) -> list[Path]:
@@ -107,7 +121,7 @@ def prepare_sources(variant: str, destination: Path) -> list[Path]:
     paths = []
     for relative in (TIMELINE, BUDGET):
         path = destination / Path(relative).name
-        shutil.copyfile(source_path(variant, relative), path)
+        path.write_text(staged_source(variant, relative))
         paths.append(path)
     support = destination / "ASSRenderedRegion.swift"
     support.write_text(region_source())
@@ -126,9 +140,11 @@ def build(variant: str, work: Path, output: Path) -> Path:
          "-module-name", "IlliquidNativePlayback", "-emit-module-path",
          str(destination / "IlliquidNativePlayback.swiftmodule"), *paths, "-o", str(library)], output)
     executable = destination / "benchmark"
+    driver = destination / "Driver.swift"
+    driver.write_text(portable_imports((HERE / "Driver.swift").read_text()))
     run(["swiftc", "-swift-version", "6", "-O", "-warnings-as-errors", "-parse-as-library", "-I",
          str(destination), "-L", str(destination), "-lIlliquidNativePlayback", "-Xlinker", "-rpath",
-         "-Xlinker", str(destination), str(HERE / "Driver.swift"), "-o", str(executable)], output)
+         "-Xlinker", str(destination), str(driver), "-o", str(executable)], output)
     return executable
 
 
@@ -222,10 +238,12 @@ def main() -> None:
     parser.add_argument("--max-sample-ms", type=float, default=1500)
     parser.add_argument("--cases", default=",".join(CASES))
     parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--portable", action="store_true",
+                        help="Allow non-macOS component runs using Foundation geometry; not native qualification")
     args = parser.parse_args()
     cases = args.cases.split(",")
-    if sys.platform != "darwin":
-        parser.error("This native component harness requires macOS CoreGraphics")
+    if sys.platform != "darwin" and not args.portable:
+        parser.error("Use macOS for native qualification, or explicitly select --portable")
     if (args.pairs < 2 or args.pairs % 2 or args.target_ms <= 0 or
             args.max_sample_ms < args.target_ms or len(set(cases)) != len(cases) or
             any(case not in CASES for case in cases)):
@@ -248,10 +266,19 @@ def main() -> None:
         "baseline": baseline, "arguments": {**vars(args), "output": str(output)},
         "source_sha256": {variant: {path: digest(source_path(variant, path).read_bytes())
                                     for path in SOURCES} for variant in ("baseline", "candidate")},
+        "execution_scope": ("native macOS component" if sys.platform == "darwin" else
+                            "portable component; Foundation geometry; not macOS qualification"),
+        "staged_source_sha256": {
+            variant: {path: digest(staged_source(variant, path).encode())
+                      for path in (TIMELINE, BUDGET)}
+            for variant in ("baseline", "candidate")
+        },
         "region_declaration_sha256": digest(region_source().encode()),
         "extraction": "Complete ASSRenderedRegion declaration from LibassContext.swift; "
-                      "only Foundation/CoreGraphics imports added. Timeline and budget copied whole.",
+                      "only Foundation/conditional CoreGraphics imports added. Timeline and budget declarations copied whole; "
+                      "CoreGraphics import made conditional for explicitly selected portable runs.",
         "driver_sha256": digest((HERE / "Driver.swift").read_bytes()),
+        "staged_driver_sha256": digest(portable_imports((HERE / "Driver.swift").read_text()).encode()),
         "runner_sha256": digest(Path(__file__).read_bytes()),
         "test_sha256": {path: digest((ROOT / "Tests/IlliquidNativePlaybackTests" / path).read_bytes())
                         for path in TESTS},

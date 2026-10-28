@@ -98,6 +98,29 @@ pruning from pristine value copies; finite, indefinite and clear events. Existin
 tests cover independent randomized oracle comparisons, signed zero, out-of-order
 delivery, replacement, capacity, stale generations and real lease lifetimes.
 
+## Portable validation
+
+The same component suite and benchmark can run on Linux with an explicit flag:
+
+```sh
+python3 Benchmarks/BitmapSubtitleLookup/run.py --portable --tests-only \
+  --output /tmp/illiquid-bitmap-prune-portable-tests
+python3 Benchmarks/BitmapSubtitleLookup/run.py --portable \
+  --pairs 8 --target-ms 80 --max-sample-ms 1500 \
+  --output /tmp/illiquid-bitmap-prune-portable-timing
+```
+
+Portable staging makes only the unavailable CoreGraphics imports conditional in
+the complete timeline, extracted region support, and driver. Foundation supplies
+the geometry types; the timeline and memory-budget algorithms are unchanged.
+The manifest retains original and staged source hashes, the compiler and host,
+and an explicit execution-scope label. The optimized production module remains
+separate from the driver. Baseline and candidate receive identical adaptations.
+
+Linux results validate this scalar pruning change on that platform. They do not
+qualify macOS timing, application integration, renderer behavior, or memory use.
+The existing native workflow continues to provide macOS qualification.
+
 ## Results and limits
 
 Native results will be recorded after branch qualification completes.
