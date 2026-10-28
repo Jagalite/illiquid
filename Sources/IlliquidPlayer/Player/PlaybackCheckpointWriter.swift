@@ -37,23 +37,22 @@ struct PlaybackCheckpoint: Sendable {
     }
 
     private var belongsToFolder: Bool {
-        guard folder != nil, !playlist.isEmpty,
-              let sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
-        else { return false }
+        guard folder != nil, source.url.isFileURL, !playlist.isEmpty else { return false }
 
         // The captured index is a hint, not an identity guarantee: restored or
         // edited playlists can leave it stale. Validate the selected item first
         // so ordinary progress checkpoints do not scan the entire playlist.
         if let index, playlist.indices.contains(index),
-           NormalizedFileURL.persistenceKey(for: playlist[index].url) == sourceKey {
+           NormalizedFileURL.representsSameFile(playlist[index].url, source.url) {
             return true
         }
 
         // Missing or stale indices retain the same membership behavior. The
         // source identity is invariant, so compute it only once for this scan.
+        guard let sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
+        else { return false }
         return playlist.contains {
             NormalizedFileURL.persistenceKey(for: $0.url) == sourceKey
         }
     }
 }
-

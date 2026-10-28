@@ -270,9 +270,9 @@ def measure(run: Run, binaries: dict, verified: dict, args: argparse.Namespace) 
             row = json.loads(run.command([binaries["baseline"], "measure", case, count], f"calibrate-{case}-{attempt}"))
             validate(row, verified[case], count)
             calibration.append(row)
-            if row["elapsed_ns"] >= args.target_ms * 500_000 or count >= 100_000:
+            if row["elapsed_ns"] >= args.target_ms * 500_000 or count >= 1_000_000:
                 break
-            count = min(100_000, max(count + 1, math.ceil(count * args.target_ms * 1_000_000 / row["elapsed_ns"])))
+            count = min(1_000_000, max(count + 1, math.ceil(count * args.target_ms * 1_000_000 / row["elapsed_ns"])))
         counts[case] = count
     save(run.output / "calibration.json", calibration)
     save(run.output / "benchmark.json", {"cases": cases, "pairs": args.pairs, "iterations": counts,
@@ -300,8 +300,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--mode", choices=("all", "tests", "benchmark", "summarize"), default="all")
-    parser.add_argument("--pairs", type=int, default=8)
-    parser.add_argument("--target-ms", type=float, default=80)
+    parser.add_argument("--pairs", type=int, default=16)
+    parser.add_argument("--target-ms", type=float, default=200)
     parser.add_argument("--case", action="append")
     args = parser.parse_args()
     output = args.output.resolve()

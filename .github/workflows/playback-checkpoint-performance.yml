@@ -44,7 +44,7 @@ jobs:
         run: |
           echo "Kyoto is unavailable on this hosted runner; using serial isolated component builds."
           python3 Benchmarks/PlaybackCheckpoint/run.py \
-            --pairs 8 --target-ms 80 \
+            --pairs 16 --target-ms 200 \
             --output "$RUNNER_TEMP/playback-checkpoint"
       - name: Emit review evidence
         if: always()

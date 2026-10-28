@@ -14,7 +14,7 @@ network downloads, app launch, or user-preference changes are required.
 
 ```sh
 python3 Benchmarks/PlaybackCheckpoint/run.py \
-  --pairs 8 --target-ms 80 --output /tmp/playback-checkpoint
+  --pairs 16 --target-ms 200 --output /tmp/playback-checkpoint
 python3 Benchmarks/PlaybackCheckpoint/run.py \
   --mode summarize --output /tmp/playback-checkpoint
 ```
