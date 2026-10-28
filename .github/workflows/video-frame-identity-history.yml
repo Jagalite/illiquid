@@ -15,7 +15,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: video-frame-identity-history-${{ github.ref }}
+  # Push and PR events for the same branch share one qualification run.
+  group: video-frame-identity-history-refs/heads/${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
   linux:
