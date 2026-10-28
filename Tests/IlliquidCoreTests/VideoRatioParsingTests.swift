@@ -126,8 +126,8 @@ struct VideoRatioParsingTests {
             #expect(rectBits(geometry.imageRect) == rectBits(item.image))
             #expect(rectBits(geometry.clipRect) == rectBits(item.clip))
         }
-        for invalidSource in [CGSize.zero, CGSize(width: .infinity, height: 100),
-                              CGSize(width: 100, height: .nan)] {
+        for invalidSource in [CGSize.zero, CGSize(width: CGFloat.infinity, height: 100),
+                              CGSize(width: 100, height: CGFloat.nan)] {
             let geometry = VideoPresentationGeometry(sourceSize: invalidSource, bounds: bounds,
                                                        adjustments: .init(aspectRatio: "16:9", crop: "1:1"))
             #expect(rectBits(geometry.imageRect) == rectBits(.zero))
