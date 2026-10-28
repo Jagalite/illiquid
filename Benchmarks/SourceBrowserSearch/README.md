@@ -4,13 +4,20 @@ See the [research report](../../Documentation/SOURCE_BROWSER_SEARCH_PERFORMANCE.
 for the measured results and the [evidence index](evidence/README.md) for retained
 raw records, test logs, and exact qualification archives.
 
-This benchmark compares the complete `SourceBrowserFilter.search` method at
-main revision `68274d1b09dcc866296321a5a8858efc297c4f19` with the working-tree
-implementation. It also measures cached actor `project` calls, which include
+By default, this benchmark compares the complete `SourceBrowserFilter.search`
+method at the original research baseline
+`68274d1b09dcc866296321a5a8858efc297c4f19` with the working-tree implementation.
+Use `--baseline-ref <revision>` to select another baseline; it is resolved once
+to a full commit SHA and used for source staging, the oracle, and provenance.
+The harness also measures cached actor `project` calls, which include
 result projection, standardized media paths, and thumbnail-candidate collection.
 
-The production change replaces the temporary flattened ID array with a reserved
-set populated by direct insertion and union. Matching, cancellation checks, URL
+The original investigation replaced the temporary flattened ID array with a
+reserved set populated by direct insertion and union. The
+[matching-index follow-up](../../Documentation/SOURCE_BROWSER_SEARCH_SCRATCH_STORAGE.md)
+compares against `ea2ff568237e2667f7b1aeee67b11a44ebe95b72` to isolate the
+subsequent removal of complete matching rows from scratch storage.
+Matching, cancellation checks, URL
 normalization, visibility evaluation, media grouping, and final row ordering are
 the existing production code.
 
@@ -39,6 +46,12 @@ Run six balanced AB/BA measurement pairs:
 python3 Benchmarks/SourceBrowserSearch/run.py \
   --pairs 6 --target-ms 120 --output /tmp/source-search-timing
 ```
+
+To reproduce the matching-index follow-up, pass
+`--baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72` to both benchmark
+commands and to each baseline test command. Candidate test commands still use
+the working-tree sources. The focused CI workflow selects this newer baseline;
+the runner's historical default remains available for the original experiment.
 
 The output directory must be new or empty. `--swift /path/to/swift` selects a
 toolchain; on Linux, `--cpu N` pins the runner and its children to an available
