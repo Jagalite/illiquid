@@ -145,7 +145,8 @@ public enum ThumbnailPolicy {
             // Preserve first-occurrence semantics even if it is not eligible.
             guard seen.insert(item.url).inserted else { continue }
             let isCurrent = item.url == current
-            let isLocal = item.url.deletingLastPathComponent().path == folderPath
+            // Without a folder, locality is false without constructing a parent URL.
+            let isLocal = folderPath.map { item.url.deletingLastPathComponent().path == $0 } ?? false
             guard isCurrent || item.isVisible || item.neighborDistance != nil || isLocal
                     || item.lastUsed.map({ now.timeIntervalSince($0) <= horizon }) == true else { continue }
             let score: Double
