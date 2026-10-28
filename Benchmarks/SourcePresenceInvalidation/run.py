@@ -255,15 +255,24 @@ let package = Package(name: "SourcePresenceInvalidation", platforms: [.macOS("26
         calibration_decisions = {}
         for case, owner in groups:
             suggested = []
+            input_entries = 0
             for variant in ("baseline", "candidate"):
                 row = self.sample(variant, case, owner, 1, 41)
                 append(self.output / "calibration.jsonl", {"variant": variant, **row})
                 suggested.append(max(1, math.ceil(self.args.target_ms * 1e6 / min(row["wallNanoseconds"], row["cpuNanoseconds"]))))
+                input_entries = max(input_entries, row["inputResults"], row["inputSummaries"])
             requested = max(suggested)
-            iteration_counts[(case, owner)] = min(self.args.maximum_iterations, requested)
+            # Rebuilding a large uniquely-owned fixture is deliberately outside
+            # timing, but must not turn a microsecond candidate into hours of
+            # setup. Bound that work explicitly and retain short-sample flags.
+            entry_cap = max(1, self.args.maximum_restored_entries // max(1, input_entries))
+            iteration_cap = min(self.args.maximum_iterations, entry_cap)
+            iteration_counts[(case, owner)] = min(iteration_cap, requested)
             calibration_decisions[case + "/" + owner] = {"requestedIterations": requested,
                 "selectedIterations": iteration_counts[(case, owner)],
-                "capped": requested > self.args.maximum_iterations}
+                "iterationCap": iteration_cap, "inputEntries": input_entries,
+                "maximumRestoredEntries": self.args.maximum_restored_entries,
+                "capped": requested > iteration_cap}
         save(self.output / "calibration-decisions.json", calibration_decisions)
         records = []
         for pair in range(self.args.pairs):
@@ -329,12 +338,15 @@ def main() -> None:
     parser.add_argument("--pairs", type=int, default=10)
     parser.add_argument("--target-ms", type=float, default=100)
     parser.add_argument("--maximum-iterations", type=int, default=1000)
+    parser.add_argument("--maximum-restored-entries", type=int, default=5_000_000,
+                        help="Bound timed-iteration fixture restoration; short samples are reported")
     parser.add_argument("--cases", help="Comma-separated timing subset; complete verification still runs")
     parser.add_argument("--ownerships", default="unique,shared")
     parser.add_argument("--tests-only", action="store_true")
     parser.add_argument("--skip-tests", action="store_true", help="Exploration only; full state parity still runs")
     args = parser.parse_args()
-    if args.pairs < 2 or args.pairs % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0 or args.maximum_iterations < 1:
+    if (args.pairs < 2 or args.pairs % 2 or not math.isfinite(args.target_ms)
+            or args.target_ms <= 0 or args.maximum_iterations < 1 or args.maximum_restored_entries < 1):
         parser.error("Use even pairs >= 2 and positive finite timing/iteration limits")
     print("Builds use isolated, serial package directories; submit this runner through Kyoto where available.", flush=True)
     experiment = Experiment(args)

@@ -98,8 +98,11 @@ candidate-first pairs alternate, and workload order rotates between rounds.
 Both variants use identical inputs and operation counts. Process CPU and
 monotonic wall time are retained, including clock-read overhead; no overhead
 is subtracted and no samples are discarded. Calibration targets the requested
-duration but caps restoration work. Requested/capped iteration counts and
-short samples are explicitly recorded; short controls require caution.
+duration but caps restoration work at 1,000 iterations and five million input
+entries per dictionary per sample (excluding warmup). The 100,000-folder case
+therefore caps at 50 iterations. `--maximum-iterations` and
+`--maximum-restored-entries` adjust those limits. Requested/capped counts and
+actual short samples are explicitly recorded; short controls require caution.
 
 ## Evidence and scope
 
