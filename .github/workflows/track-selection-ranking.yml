@@ -1,14 +1,5 @@
 name: Track selection ranking performance
 on:
-  push:
-    branches: ['perf/compact-track-selection-rank']
-    paths:
-      - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
-      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
-      - 'Tests/IlliquidCoreTests/TrackSelection*Tests.swift'
-      - 'Benchmarks/TrackSelectionRanking/run.py'
-      - 'Benchmarks/TrackSelectionRanking/Harness.swift'
-      - '.github/workflows/track-selection-ranking.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
@@ -89,7 +80,8 @@ jobs:
           payload = json.dumps(receipt, sort_keys=True, separators=(",", ":"))
           (root / "research-receipt.json").write_text(payload + "\n")
           print("TRACK_RANK_RECEIPT_BEGIN")
-          print(payload)
+          for offset in range(0, len(payload), 16000):
+              print(payload[offset:offset + 16000])
           print("TRACK_RANK_RECEIPT_END")
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
