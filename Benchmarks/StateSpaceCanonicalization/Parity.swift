@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 import IlliquidPlaybackStateSpace
 
@@ -6,25 +5,24 @@ private enum VerificationError: Error {
   case failed(String)
 }
 
-private func digest<T: Encodable>(_ value: T) throws -> String {
+private func encodedReceipt<T: Encodable>(_ value: T) throws -> String {
   let encoder = JSONEncoder()
   encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-  return SHA256.hash(data: try encoder.encode(value))
-    .map { String(format: "%02x", $0) }.joined()
+  return try encoder.encode(value).base64EncodedString()
 }
 
 private struct SearchReceipt: Encodable {
   let summary: PlaybackSearchSummary
   let progress: PlaybackProgressReport
-  let graphSHA256: String
-  let predecessorsSHA256: String
-  let orderedStateDigestsSHA256: String
+  let graphJSONBase64: String
+  let predecessorsJSONBase64: String
+  let orderedStateDigestsJSONBase64: String
 }
 
 private struct ArtifactReceipt: Encodable {
   let model: PlaybackSearchModel
   let actionClass: String
-  let artifactSHA256: String
+  let artifactJSONBase64: String
   let originalSteps: Int
   let minimizedSteps: Int
   let replayTransitions: Int
@@ -62,9 +60,9 @@ struct StateSpaceParity {
           SearchReceipt(
             summary: result.summary,
             progress: PlaybackProgressAnalyzer.analyze(result),
-            graphSHA256: try digest(result.graph),
-            predecessorsSHA256: try digest(result.predecessors),
-            orderedStateDigestsSHA256: try digest(result.nodes.map {
+            graphJSONBase64: try encodedReceipt(result.graph),
+            predecessorsJSONBase64: try encodedReceipt(result.predecessors),
+            orderedStateDigestsJSONBase64: try encodedReceipt(result.nodes.map {
               PlaybackSearchCanonicalizer.digest(PlaybackSearchCanonicalizer.key(for: $0))
             })
           ))
@@ -97,7 +95,7 @@ struct StateSpaceParity {
       artifacts.append(
         ArtifactReceipt(
           model: model, actionClass: actionClass,
-          artifactSHA256: try digest(artifact),
+          artifactJSONBase64: try encodedReceipt(artifact),
           originalSteps: artifact.originalTrace.count,
           minimizedSteps: artifact.minimizedTrace.count,
           replayTransitions: replay.productionTransitionCount,

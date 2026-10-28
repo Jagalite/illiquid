@@ -1,11 +1,11 @@
 # State-space pre-transition canonicalization
 
 This experiment measures the complete release-build PR seed inventory through
-the unchanged IlliquidStateSpaceExplorer CLI. It compares the pinned main
+the IlliquidStateSpaceExplorer CLI. It compares the pinned main
 commit with the current worktree. The candidate defers the pre-transition key
 until a stale transition actually needs it.
 
-On a Mac with Swift 6.1 or later:
+On macOS or Linux with Swift 6.1 or later and Python 3:
 
 ```sh
 python3 Benchmarks/StateSpaceCanonicalization/run.py \
@@ -18,14 +18,17 @@ AGENTS.md. On isolated CI where Kyoto is unavailable, builds run serially in
 separate baseline and candidate scratch packages.
 
 The runner copies byte-identical production source files into dependency-free
-Swift packages: the playback core's actual MediaTrack dependency, all playback
-core and state-space sources, and the actual CLI. There are no source rewrites
-or model stubs. Both variants use the same current tests and parity driver.
+Swift packages: the playback core's actual MediaTrack dependency and all playback
+core and state-space sources. The CLI is byte-identical on macOS. On Linux only
+its Darwin import is adapted to Glibc and an immutable stderr alias; that exact
+transformation and both file hashes are recorded. There are no model stubs.
+Both variants use the same current tests and parity driver.
 
 Validation includes debug and release core/state-space tests on both variants,
 18 small searches across all six models with POR off/on/validation, complete
 graph and predecessor hashes, ordered state-key hashes, and three injected
-failure artifacts with minimization and replay. The full timing runs compare
+failure artifacts with minimization and replay. Python hashes exact serialized
+Swift receipts outside the timing interval. The full timing runs compare
 every summary, progress report, inventory entry, and canonical digest exactly.
 
 Primary measurements use four balanced AB/BA pairs of fresh, serial processes
@@ -41,6 +44,6 @@ The shallow parity driver disables the wall-clock limit on both sides.
 
 The review directory retains source/binary hashes, all commands and logs, raw
 timings, complete per-run qualification records, a canonical output record,
-parity receipts and summary statistics. Native playback, rendering, memory,
-power use and wall-clock-limited nightly search coverage are outside this
+parity receipts and summary statistics. Platform results apply to the recorded toolchain and host. Native playback,
+rendering, memory, power use and wall-clock-limited nightly search coverage are outside this
 experiment's claims. The source change is confined to the qualification tool.

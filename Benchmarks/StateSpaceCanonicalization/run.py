@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Compare exact state-space CLI sources in balanced, fresh macOS processes."""
+"""Compare exact state-space sources in balanced, fresh CLI processes."""
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -87,12 +88,22 @@ def stage(output: Path, variant: str, baseline: str) -> dict:
             continue
         data = (git("show", f"{baseline}:{relative}") if variant == "baseline"
                 else (ROOT / relative).read_bytes())
+        repository_hash = sha256(data)
+        transformation = "none"
+        if relative == "Validation/IlliquidStateSpaceExplorer/main.swift" and platform.system() == "Linux":
+            if not data.startswith(b"import Darwin\n"):
+                raise ValueError("Unexpected CLI import; inspect the portability adapter")
+            data = data.replace(
+                b"import Darwin\n",
+                b"import Glibc\nnonisolated(unsafe) let stderr = Glibc.stderr\n", 1)
+            transformation = "Darwin import -> Glibc and immutable stderr alias; CLI logic unchanged"
         destination = (Path("Sources/IlliquidStateSpaceExplorer/main.swift")
                        if relative.startswith("Validation/") else Path(relative))
         target = package / destination
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(data)
-        hashes[relative] = {"sha256": sha256(data), "transformation": "none"}
+        hashes[relative] = {"sha256": sha256(data), "repository_sha256": repository_hash,
+                            "transformation": transformation}
     # Identical current tests exercise both versions, including new regressions.
     for folder in ["Tests/IlliquidPlaybackCoreTests", "Tests/IlliquidPlaybackStateSpaceTests"]:
         for path in sorted((ROOT / folder).rglob("*.swift")):
@@ -121,6 +132,22 @@ def stage(output: Path, variant: str, baseline: str) -> dict:
     return hashes
 
 
+def compact_parity(value: object) -> object:
+    """Hash exact serialized receipts outside Swift; the probe needs no crypto dependency."""
+    if isinstance(value, list):
+        return [compact_parity(item) for item in value]
+    if isinstance(value, dict):
+        result = {}
+        for key, item in value.items():
+            if key.endswith("JSONBase64"):
+                result[key.removesuffix("JSONBase64") + "SHA256"] = sha256(
+                    base64.b64decode(item, validate=True))
+            else:
+                result[key] = compact_parity(item)
+        return result
+    return value
+
+
 def normalized_records(directory: Path) -> list:
     records = json.loads((directory / "manifest-shard-0-of-1.json").read_text())
     for record in records:
@@ -141,8 +168,8 @@ def main() -> None:
     parser.add_argument("--swift", default=shutil.which("swift") or "swift")
     parser.add_argument("--pairs", type=int, default=4)
     args = parser.parse_args()
-    if platform.system() != "Darwin":
-        raise ValueError("Use macOS: this runner compiles the unchanged Darwin CLI")
+    if platform.system() not in {"Darwin", "Linux"}:
+        raise ValueError("Use macOS or Linux with Swift 6.1 or later")
     if args.pairs < 2 or args.pairs % 2:
         raise ValueError("Use a positive even pair count for balanced AB/BA ordering")
     args.output = args.output.resolve()
@@ -159,7 +186,7 @@ def main() -> None:
                 "candidate_sources": "current worktree", "candidate_dirty": candidate_dirty,
                 "compiler": compiler.strip(),
                 "platform": platform.platform(), "machine": platform.machine(),
-                "method": "unchanged release CLI; full PR seed inventory; balanced AB/BA; fresh serial processes",
+                "method": "release CLI; exact core/explorer; full PR seed inventory; balanced AB/BA; fresh serial processes",
                 "pairs": args.pairs, "scope": "state-space qualification, not media playback",
                 "source_hashes": {}, "binary_hashes": {},
                 "harness_hashes": {p.name: sha256(p.read_bytes()) for p in sorted(HERE.glob("*"))
@@ -175,6 +202,8 @@ def main() -> None:
         save(review / "manifest.json", manifest)
         package_args = ["--package-path", args.output / variant, "--jobs", "2",
                         "-Xswiftc", "-warnings-as-errors"]
+        if platform.system() == "Linux":
+            package_args.append("--use-integrated-swift-driver")
         for configuration in ["debug", "release"]:
             print(f"Test {variant} {configuration}", flush=True)
             _, receipt = command([args.swift, "test", *package_args, "-c", configuration, "--no-parallel"],
@@ -200,7 +229,7 @@ def main() -> None:
     parity = {}
     for variant in ["baseline", "candidate"]:
         output, _ = command([parity_binaries[variant]], review, f"{variant}-parity")
-        parity[variant] = json.loads(output)
+        parity[variant] = compact_parity(json.loads(output))
     save(review / "parity.json", parity)
     if parity["baseline"] != parity["candidate"]:
         raise ValueError("Graph, predecessor, POR, or counterexample replay receipts differ")
