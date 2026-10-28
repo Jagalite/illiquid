@@ -1,0 +1,60 @@
+name: Subtitle acquisition portable qualification
+
+on:
+  push:
+    branches: ['perf/subtitle-acquisition-borrow-20261028']
+    paths:
+      - '.github/workflows/subtitle-acquisition-portable.yml'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleAcquisitionBorrowTests.swift'
+      - 'Benchmarks/SubtitleAcquisitionBorrow/**'
+      - '!Benchmarks/SubtitleAcquisitionBorrow/README.md'
+      - '!Benchmarks/SubtitleAcquisitionBorrow/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-acquisition-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Build real pinned FFmpeg and qualify the component
+        run: |
+          echo 'Shared Kyoto queue is unavailable on this hosted runner; building serially in this isolated checkout.'
+          bash Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh "$RUNNER_TEMP/acquisition-ffmpeg"
+          python3 Benchmarks/SubtitleAcquisitionBorrow/run.py \
+            --ffmpeg-prefix "$RUNNER_TEMP/acquisition-ffmpeg" \
+            --pairs 6 --target-ms 120 --output "$RUNNER_TEMP/acquisition-portable"
+      - name: Print compact results
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'acquisition-portable'
+          for name in ['completion.json', 'summary.json']:
+              path = root / name
+              if path.is_file():
+                  print(name)
+                  print(path.read_text())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-acquisition-borrow-linux
+          path: |
+            ${{ runner.temp }}/acquisition-portable/*.json
+            ${{ runner.temp }}/acquisition-portable/*.jsonl
+            ${{ runner.temp }}/acquisition-portable/logs/
+            ${{ runner.temp }}/acquisition-portable/sources/
+          retention-days: 14
