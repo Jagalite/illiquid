@@ -1,0 +1,66 @@
+name: Checkpoint construction performance
+
+on:
+  push:
+    branches: ['codex/perf-checkpoint-folder-membership']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Sources/IlliquidCore/Persistence/LegacyPreferencesMigration.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/LifecyclePerformance.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaybackSessionStoreTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistMutationTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Tests/IlliquidCoreTests/UtilitiesTests.swift'
+      - 'Benchmarks/CheckpointConstruction/**'
+      - '.github/workflows/checkpoint-construction-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-construction-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checkpoint-construction:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch the pinned baseline
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Test complete sources and measure checkpoint construction
+        shell: bash
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; building serially in isolated packages.'
+          python3 Benchmarks/CheckpointConstruction/run.py \
+            --pairs 8 --target-ms 150 \
+            --output "$RUNNER_TEMP/checkpoint-construction"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-construction
+          path: |
+            ${{ runner.temp }}/checkpoint-construction/
+            !${{ runner.temp }}/checkpoint-construction/packages/**/build/**
+            !${{ runner.temp }}/checkpoint-construction/module-cache/**
+            !${{ runner.temp }}/checkpoint-construction/cache/**
+          retention-days: 14
