@@ -1,0 +1,95 @@
+name: Video color sampler performance
+
+on:
+  push:
+    branches: [perf/video-color-sampler-layout]
+    paths:
+      - Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift
+      - Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift
+      - Sources/IlliquidCore/Player/VideoColorSample.swift
+      - Tests/IlliquidNativePlaybackTests/VideoFrameColorSampler*.swift
+      - Tests/IlliquidNativePlaybackTests/PiPVideoMappingTests.swift
+      - Benchmarks/VideoColorSampler/Harness.swift
+      - Benchmarks/VideoColorSampler/run.py
+      - .github/workflows/video-color-sampler-performance.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift
+      - Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift
+      - Sources/IlliquidCore/Player/VideoColorSample.swift
+      - Tests/IlliquidNativePlaybackTests/VideoFrameColorSampler*.swift
+      - Tests/IlliquidNativePlaybackTests/PiPVideoMappingTests.swift
+      - Benchmarks/VideoColorSampler/Harness.swift
+      - Benchmarks/VideoColorSampler/run.py
+      - .github/workflows/video-color-sampler-performance.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-color-sampler-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify output and measure native sampling
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/VideoColorSampler/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'video-color-sampler'),
+                     '--pairs', '10', '--target-ms', '250']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'running isolated native component builds directly.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, math, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'video-color-sampler'
+          for path in sorted(root.glob('*.json')):
+              content = path.read_text()
+              parts = max(1, math.ceil(len(content) / 16000))
+              for part in range(parts):
+                  print('COLOR_SAMPLER_FILE ' + json.dumps({
+                      'name': path.name, 'part': part, 'parts': parts,
+                      'sha256': hashlib.sha256(content.encode()).hexdigest(),
+                      'content': content[part * 16000:(part + 1) * 16000],
+                  }, sort_keys=True))
+          for path in sorted(root.glob('tests-*.log')):
+              print('COLOR_SAMPLER_TEST_LOG ' + path.name)
+              print(path.read_text())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-color-sampler-macos
+          path: |
+            ${{ runner.temp }}/video-color-sampler/*.json
+            ${{ runner.temp }}/video-color-sampler/*.log
+            ${{ runner.temp }}/video-color-sampler/traces/*.json.gz
+          retention-days: 14
