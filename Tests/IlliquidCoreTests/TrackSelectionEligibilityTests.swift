@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import IlliquidCore
 
-@Suite("Streaming track eligibility")
+@Suite("Track selection eligibility and automatic fallback")
 struct TrackSelectionEligibilityTests {
     private func candidate(_ id: Int64, kind: MediaTrackKind, language: String? = nil,
                            isDefault: Bool = false, forced: Bool = false,

@@ -14,7 +14,7 @@ private let workloadNames = [
     "audio-32-none", "audio-32-languages", "subtitle-automatic", "subtitle-off",
     "subtitle-always", "subtitle-forced-languages", "subtitle-forced-audio-fallback",
     "mutable-preferences", "subtitle-automatic-first", "subtitle-automatic-last",
-    "single-audio-in-subtitles",
+    "single-audio-in-subtitles", "subtitle-automatic-missing", "subtitle-automatic-no-subtitles",
 ]
 
 private struct Input {
@@ -79,6 +79,17 @@ private func inputs(for name: String) -> [Input] {
     }
     let subtitles = tracks(8, kind: .subtitle)
     let mixed = tracks(2, kind: .audio) + subtitles
+    if name == "subtitle-automatic-no-subtitles" {
+        return [
+            Input(preferences: .init(), tracks: [], kind: .subtitle, fallbackID: 1, audioLanguage: nil),
+            Input(preferences: .init(), tracks: tracks(8, kind: .audio), kind: .subtitle,
+                  fallbackID: 1, audioLanguage: nil),
+        ]
+    }
+    if name == "subtitle-automatic-missing" {
+        return [Input(preferences: .init(), tracks: mixed, kind: .subtitle,
+                      fallbackID: 123_456, audioLanguage: nil)]
+    }
     if name == "subtitle-automatic-first" || name == "subtitle-automatic-last" {
         return [
             Input(preferences: .init(), tracks: mixed, kind: .subtitle,
