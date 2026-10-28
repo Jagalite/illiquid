@@ -1,0 +1,152 @@
+name: Source presence traversal performance
+
+on:
+  push:
+    branches: ['research/source-presence-traversal-20261028']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaPresenceTraversalTests.swift'
+      - 'Benchmarks/SourcePresenceTraversal/**'
+      - '.github/workflows/source-presence-traversal.yml'
+      - '!Benchmarks/SourcePresenceTraversal/README.md'
+      - '!Benchmarks/SourcePresenceTraversal/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceMediaPresence*.swift'
+      - 'Sources/IlliquidApp/App/SourceRootPruning.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaPresence*Tests.swift'
+      - 'Tests/IlliquidAppTests/SourceEmptyFolderVisibilityTests.swift'
+      - 'Benchmarks/SourcePresenceTraversal/**'
+      - '.github/workflows/source-presence-traversal.yml'
+      - '!Benchmarks/SourcePresenceTraversal/README.md'
+      - '!Benchmarks/SourcePresenceTraversal/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-presence-traversal-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Qualify complete scanner outputs and measure real fixture traversal
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through its shared default queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated component packages.'
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--correctness-only)
+          fi
+          python3 Benchmarks/SourcePresenceTraversal/run.py \
+            --output "$RUNNER_TEMP/source-presence-traversal" \
+            --pairs 10 --target-ms 350 "${mode[@]}"
+      - name: Emit numeric evidence and source receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-presence-traversal'
+          names = ['baseline-pin.json', 'manifest.json', 'tests.json', 'parity.json',
+                   'cases.json', 'preparation.json', 'source-verification.json', 'completion.json',
+                   'schedule.json', 'calibration.jsonl', 'measurements.jsonl', 'summary.json', 'commands.jsonl']
+          files = {name: (root / name).read_text() for name in names if (root / name).is_file()}
+          if 'summary.json' in files:
+              summary = json.loads(files['summary.json'])
+              print('SOURCE_PRESENCE_TRAVERSAL_SUMMARY ' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
+              lines = ['## Source-presence cursor traversal', '',
+                       'Complete scans of warmed generated filesystem trees. No whole-player or cold-storage claim.', '',
+                       '| Case | Baseline ms/scan | Candidate ms/scan | Paired wall reduction | Paired CPU reduction |',
+                       '| --- | ---: | ---: | ---: | ---: |']
+              for case in summary['cases']:
+                  wall = case['metrics']['elapsed_ns']
+                  cpu = case['metrics']['cpu_ns']
+                  lines.append(f"| {case['case']} | {wall['median_ns_per_scan']['baseline'] / 1e6:.4f} | "
+                               f"{wall['median_ns_per_scan']['candidate'] / 1e6:.4f} | "
+                               f"{wall['median_paired_reduction_percent']:.2f}% | {cpu['median_paired_reduction_percent']:.2f}% |")
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+                  stream.write('\n'.join(lines) + '\n')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Numeric evidence exceeds the log bundle limit; use the full artifact')
+          print('SOURCE_PRESENCE_TRAVERSAL_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('SOURCE_PRESENCE_TRAVERSAL_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-presence-traversal-component
+          path: |
+            ${{ runner.temp }}/source-presence-traversal/
+            !${{ runner.temp }}/source-presence-traversal/build/**
+            !${{ runner.temp }}/source-presence-traversal/fixtures/**
+          retention-days: 14
+
+  native-app-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run scanner and folder-visibility regressions
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through its shared default queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          mkdir -p "$RUNNER_TEMP/source-presence-traversal-native"
+          sw_vers > "$RUNNER_TEMP/source-presence-traversal-native/environment.txt"
+          swift --version >> "$RUNNER_TEMP/source-presence-traversal-native/environment.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/source-presence-traversal-native/environment.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --disable-xctest --enable-swift-testing \
+            --xunit-output "$RUNNER_TEMP/source-presence-traversal-native/results.xml" \
+            --filter 'SourceMediaPresenceScannerTests|SourceMediaPresenceReuseTests|SourceMediaPresenceRecomputationTests|SourceMediaPresenceTraversalTests|SourceEmptyFolderVisibilityTests|SourcePreparationExecutorTests|SourceItemPreparationTests' \
+            2>&1 | tee "$RUNNER_TEMP/source-presence-traversal-native/tests.log"
+          python3 - <<'PY'
+          import json, os, xml.etree.ElementTree as ET
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-presence-traversal-native'
+          report = ET.parse(root / 'results.xml').getroot()
+          cases = report.findall('.//testcase')
+          executed = [case for case in cases if case.find('skipped') is None and 'time' in case.attrib]
+          failures = report.findall('.//failure') + report.findall('.//error')
+          receipt = {'matched': len(cases), 'executed': len(executed), 'failures': len(failures),
+                     'tests': [case.attrib for case in executed]}
+          (root / 'tests.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          print(json.dumps(receipt, sort_keys=True))
+          if not executed or failures:
+              raise SystemExit('Require at least one completed native test and no failures')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-presence-traversal-native
+          path: ${{ runner.temp }}/source-presence-traversal-native/
+          retention-days: 14
