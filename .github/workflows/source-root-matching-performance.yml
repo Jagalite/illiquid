@@ -1,0 +1,75 @@
+name: Source root matching performance
+
+on:
+  push:
+    branches:
+      - perf/source-root-matching-20261028
+    paths:
+      - Sources/IlliquidApp/UI/SourcesSidebar.swift
+      - Tests/IlliquidAppTests/SourceRootMatchingTests.swift
+      - Benchmarks/SourceRootMatching/Harness.swift
+      - Benchmarks/SourceRootMatching/run.py
+      - .github/workflows/source-root-matching-performance.yml
+  pull_request:
+    paths:
+      - Tests/IlliquidAppTests/SourceRootMatchingTests.swift
+      - Benchmarks/SourceRootMatching/Harness.swift
+      - Benchmarks/SourceRootMatching/run.py
+      - .github/workflows/source-root-matching-performance.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-root-matching-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify behavior and measure source root matching
+        run: |
+          python3 Benchmarks/SourceRootMatching/run.py \
+            --output "$RUNNER_TEMP/source-root-matching" \
+            --pairs 8 --target-ms 150
+      - name: Print machine-readable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          output = Path(os.environ["RUNNER_TEMP"]) / "source-root-matching"
+          for name in ["environment.json", "sources.json", "binaries.json",
+                       "tests.json", "parity.json", "cases.json", "calibration.json",
+                       "summary.json", "completion.json"]:
+              path = output / name
+              if path.is_file():
+                  print("EVIDENCE " + name + " " + json.dumps(json.loads(path.read_text()), sort_keys=True))
+          measurements = output / "measurements.jsonl"
+          if measurements.is_file():
+              for line in measurements.read_text().splitlines():
+                  print("MEASUREMENT " + line)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-root-matching-macos
+          path: |
+            ${{ runner.temp }}/source-root-matching/
+            !${{ runner.temp }}/source-root-matching/build/**
+            !${{ runner.temp }}/source-root-matching/module-cache/**
+            !${{ runner.temp }}/source-root-matching/swiftpm-cache/**
+            !${{ runner.temp }}/source-root-matching/swiftpm-config/**
+            !${{ runner.temp }}/source-root-matching/swiftpm-security/**
+          retention-days: 30

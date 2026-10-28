@@ -2036,13 +2036,20 @@ struct SourceRowVisibility: Equatable, Sendable {
 }
 
 struct SourceVisibilityMatcher {
+    private struct PreparedRoot {
+        let path: String
+        let prefix: String
+        let characterCount: Int
+        let originalIndex: Int
+    }
+
     private struct CompiledRule {
         let match: SourceVisibilityRegexMatch
         let expression: NSRegularExpression
     }
 
     private let configuration: SourceVisibilityConfiguration
-    private let rootPaths: [String]
+    private let preparedRoots: [PreparedRoot]
     private let compiledRules: [CompiledRule]
     private let rootEvaluations: [String: SourceVisibilityEvaluation]
 
@@ -2067,7 +2074,21 @@ struct SourceVisibilityMatcher {
                 expression: expression
             )
         }
-        self.rootPaths = rootPaths
+        // Reuse containment prefixes and longest-root ordering for every row.
+        // Preserve the first root on equal lengths, as max(by:) did.
+        preparedRoots = rootPaths.enumerated().map { index, path in
+            PreparedRoot(
+                path: path,
+                prefix: path == "/" ? "/" : path + "/",
+                characterCount: path.count,
+                originalIndex: index
+            )
+        }.sorted {
+            if $0.characterCount != $1.characterCount {
+                return $0.characterCount > $1.characterCount
+            }
+            return $0.originalIndex < $1.originalIndex
+        }
         self.compiledRules = compiledRules
         rootEvaluations = Dictionary(uniqueKeysWithValues: rootPaths.map { path in
             (
@@ -2225,11 +2246,9 @@ struct SourceVisibilityMatcher {
     }
 
     private func matchingRootPath(for normalizedPath: String) -> String? {
-        rootPaths
-            .filter { rootPath in
-                SourceTreeIdentity.contains(normalizedPath, within: rootPath)
-            }
-            .max { $0.count < $1.count }
+        preparedRoots.first { root in
+            normalizedPath == root.path || normalizedPath.hasPrefix(root.prefix)
+        }?.path
     }
 }
 
