@@ -43,6 +43,16 @@ CORE_TESTS = [
     "NaturalFilenameOrderingTests.swift",
 ]
 PLAYER_TESTS = ["PlaybackCheckpointMembershipTests.swift"]
+COMPONENT_TEST_SUITES = (
+    "Playback checkpoint records",
+    "Folder playlist",
+    "Natural filename ordering parity",
+    "Playlist deduplication",
+    "Playlist mutation",
+    "Playlist order restoration",
+    "Playlist session record semantics",
+)
+COMPONENT_TEST_COUNTS = (43, 7)
 QUICK_CASES = [
     "valid-32-last", "valid-1000-last", "nil-index-1000",
     "no-folder-1000", "remote-1000", "single-valid",
@@ -64,6 +74,47 @@ def commit_sha(value: str) -> str:
     if re.fullmatch(r"[0-9a-fA-F]{40}", value) is None:
         raise argparse.ArgumentTypeError("baseline-ref must be an exact 40-character hexadecimal commit SHA")
     return value.lower()
+
+
+def swift_testing_receipt(raw: bytes | str, *, required_suites: tuple[str, ...],
+                          expected_counts: tuple[int, int] | None = None) -> dict:
+    """Count combined (Swift 6.3) or per-module (Swift 6.4) successful runs.
+
+    The frozen qualification selects named suites. Require their success lines
+    and reconcile the reported suite total so a missing or duplicated module
+    summary cannot silently become a complete test receipt.
+    """
+    text = raw.decode("utf-8") if isinstance(raw, bytes) else raw
+    summary_lines = [line.split("Test run with ", 1)[1].strip()
+                     for line in text.splitlines() if "Test run with " in line]
+    if not summary_lines:
+        raise ValueError("Swift Testing did not report a successful test run")
+    summaries = []
+    for line in summary_lines:
+        match = re.fullmatch(
+            r"(\d+) tests?(?: in (\d+) suites?)? passed(?: after .+)?", line)
+        if match is None:
+            raise ValueError(f"Malformed or unsuccessful Swift Testing summary: {line}")
+        tests = int(match.group(1))
+        suites = int(match.group(2) or "0")
+        if tests == 0 and suites != 0:
+            raise ValueError("A zero-test Swift Testing run cannot qualify a selected suite")
+        summaries.append({"test_count": tests, "suite_count": suites})
+    test_count = sum(row["test_count"] for row in summaries)
+    suite_count = sum(row["suite_count"] for row in summaries)
+    if test_count <= 0 or suite_count <= 0:
+        raise ValueError("No Swift Testing tests or suites executed")
+    passed_suites = re.findall(r'\bSuite "([^"\r\n]+)" passed(?: after [^\r\n]+)?', text)
+    missing = set(required_suites).difference(passed_suites)
+    if missing:
+        raise ValueError(f"Required Swift Testing suites did not report success: {sorted(missing)}")
+    if len(passed_suites) != len(set(passed_suites)) or suite_count != len(passed_suites):
+        raise ValueError("Swift Testing summaries do not account for the unique successful named suites")
+    if expected_counts is not None and (test_count, suite_count) != expected_counts:
+        raise ValueError(f"Expected {expected_counts[0]} tests in {expected_counts[1]} suites; "
+                         f"received {test_count} tests in {suite_count} suites")
+    return {"test_count": test_count, "suite_count": suite_count,
+            "run_summaries": summaries, "passed_suites": sorted(passed_suites)}
 
 
 def session_api(raw: bytes) -> bytes:
@@ -342,16 +393,13 @@ let package = Package(name: "CheckpointMembershipQualification",
                 ], f"tests-{variant}-{configuration}", timeout=1200, combined_output=True)
                 # A zero-exit build without executing the selected tests is not
                 # qualification. Swift Testing may put its summary on stderr.
-                matches = re.findall(rb"Test run with (\d+) tests? in (\d+) suites? passed", raw)
-                if not matches:
-                    raise RuntimeError("Swift Testing did not report a successful nonempty test run")
-                test_count, suite_count = [int(x) for x in matches[-1]]
-                if test_count <= 0 or suite_count <= 0:
-                    raise RuntimeError("No Swift Testing tests or suites executed")
+                receipt = swift_testing_receipt(raw, required_suites=COMPONENT_TEST_SUITES,
+                                                expected_counts=COMPONENT_TEST_COUNTS)
+                test_count, suite_count = receipt["test_count"], receipt["suite_count"]
                 if results and (test_count, suite_count) != (results[0]["test_count"], results[0]["suite_count"]):
                     raise RuntimeError("Different test or suite counts across production variants/configurations")
                 results.append({"variant": variant, "configuration": configuration, "passed": True,
-                                "test_count": test_count, "suite_count": suite_count})
+                                **receipt})
                 save(self.evidence / "tests.json", {"runs": results})
                 print(f"Passed {variant}/{configuration} repository tests", flush=True)
         save(self.evidence / "manifest.json", self.manifest)

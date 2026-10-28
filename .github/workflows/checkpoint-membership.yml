@@ -210,6 +210,8 @@ jobs:
           python3 - <<'PY'
           import hashlib, json, os, re, subprocess, sys
           from pathlib import Path
+          sys.path.insert(0, str(Path('Benchmarks/CheckpointMembership').resolve()))
+          from run import COMPONENT_TEST_SUITES, swift_testing_receipt
           root = Path(os.environ['RUNNER_TEMP']) / 'checkpoint-app-integration'
           root.mkdir(parents=True)
           environment = {name: subprocess.check_output(command, text=True).strip() for name, command in (
@@ -254,10 +256,9 @@ jobs:
                       if process.wait():
                           sys.exit(process.returncode)
           def test_receipt(text):
-              swift = re.findall(r'Test run with (\d+) tests? in (\d+) suites? passed', text)
-              if not swift or any(int(value) <= 0 for value in swift[-1]):
-                  raise SystemExit('Swift Testing did not report a nonempty successful integration run')
-              swift_tests, swift_suites = map(int, swift[-1])
+              swift = swift_testing_receipt(text, required_suites=(
+                  *COMPONENT_TEST_SUITES, 'Playback checkpoint construction', 'Playback coordinator'))
+              swift_tests, swift_suites = swift['test_count'], swift['suite_count']
               # Apple XCTest prints a suite result followed immediately by its
               # executed/failed summary. Do not count only the Swift Testing run:
               # the inherited index-hint regressions are six XCTest methods.
@@ -272,6 +273,8 @@ jobs:
               return {'app_build_passed': True, 'tests_passed': True,
                   'test_count': swift_tests + xctest_tests, 'suite_count': swift_suites + 1,
                   'swift_testing_test_count': swift_tests, 'swift_testing_suite_count': swift_suites,
+                  'swift_testing_run_summaries': swift['run_summaries'],
+                  'swift_testing_passed_suites': swift['passed_suites'],
                   'xctest_suite': 'PlaybackCheckpointIndexHintTests', 'xctest_test_count': xctest_tests,
                   'xctest_failure_count': failures, 'xctest_unexpected_failure_count': unexpected}
           receipt = test_receipt((root / 'tests.log').read_text())
