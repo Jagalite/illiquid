@@ -109,7 +109,7 @@ struct PiPIdleResourceLifetimeTests {
     }
 
     @Test @MainActor
-    func queuedStopDoesNotFlushOrRetireRestartedSession() async throws {
+    func queuedStopDoesNotRetireRestartedSession() async throws {
         let compositor = try PiPSubtitleCompositor()
         defer { compositor.stop() }
         compositor.receive(decodedFrame(try pixelBuffer(hdr: false)))
@@ -126,6 +126,7 @@ struct PiPIdleResourceLifetimeTests {
         gate.open()
 
         try #require(await waitUntil { restarted.snapshot.calls == 1 })
+        #expect(!gate.timedOut)
         #expect(old.snapshot.calls == 0 && old.snapshot.failures == 0)
         #expect(restarted.snapshot.successes == 1 && restarted.snapshot.failures == 0)
         #expect(compositor.metricsSnapshot().composedFrames == 1)
@@ -325,10 +326,14 @@ struct PiPIdleResourceLifetimeTests {
         private let lock = NSLock()
         private let release = DispatchSemaphore(value: 0)
         private var didEnter = false
+        private var didTimeOut = false
         var entered: Bool { lock.withLock { didEnter } }
+        var timedOut: Bool { lock.withLock { didTimeOut } }
         func block() {
             lock.withLock { didEnter = true }
-            _ = release.wait(timeout: .now() + 10)
+            if release.wait(timeout: .now() + 10) == .timedOut {
+                lock.withLock { didTimeOut = true }
+            }
         }
         func open() { release.signal() }
     }

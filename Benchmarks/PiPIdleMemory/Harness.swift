@@ -161,7 +161,9 @@ struct PiPIdleResourceResearchTests {
         let first = try #require(outputs.first)
         let reference = try fingerprint(first)
         let probes = outputs.map { WeakProbe($0, bytes: CVPixelBufferGetDataSize($0)) }
-        #expect(probes.allSatisfy { $0.object != nil })
+        withExtendedLifetime(outputs) {
+            #expect(probes.allSatisfy { $0.object != nil })
+        }
         return (reference, probes)
     }
 
