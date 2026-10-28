@@ -62,17 +62,23 @@ enum ExternalTextSubtitleConverter {
         var hasEvents = false
         // The WebVTT header and any header metadata never contain cue payloads.
         for block in Blocks(normalized).dropFirst(format == .webVTT ? 1 : 0) {
+            if format == .webVTT,
+               block.utf8.first == 0x4E || block.utf8.first == 0x0A {
+                // Only a leading N (or an empty first line) can begin NOTE.
+                // Recognize it before allocating a Substring for every line
+                // in an ignored comment. Match the first nonempty line only;
+                // NOTEworthy remains a cue identifier, and payload is untouched.
+                let content = block.drop(while: { $0 == "\n" })
+                if content == "NOTE" || content.hasPrefix("NOTE\n")
+                    || content.hasPrefix("NOTE ") || content.hasPrefix("NOTE\t") {
+                    continue
+                }
+            }
             let lines = Array(block.split(separator: "\n", omittingEmptySubsequences: false)
                 .drop(while: { $0.isEmpty }))
             guard let first = lines.first else { continue }
             let timingIndex: Int?
             if format == .webVTT {
-                // NOTE is a block marker, whereas NOTEworthy is a cue identifier.
-                // Ignore the entire comment even if malformed content resembles
-                // a cue.
-                if first == "NOTE" || first.hasPrefix("NOTE ") || first.hasPrefix("NOTE\t") {
-                    continue
-                }
                 // A cue has at most one identifier before its timing line.
                 // This also skips untimed STYLE/REGION metadata while preserving
                 // those words when used as identifiers with immediate timings.
