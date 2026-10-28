@@ -1,15 +1,6 @@
 name: Thumbnail sample planning portable
 
 on:
-  push:
-    branches:
-      - 'codex/perf-thumbnail-samples-20261028'
-    paths:
-      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
-      - 'Tests/IlliquidCoreTests/ThumbnailSamplePlanningTests.swift'
-      - 'Benchmarks/ThumbnailSamplePlanning/Harness.swift'
-      - 'Benchmarks/ThumbnailSamplePlanning/run.py'
-      - '.github/workflows/thumbnail-sample-planning-portable.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
@@ -37,7 +28,7 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Test exact sample parity and measure paired native runs
+      - name: Test exact sample parity and measure paired portable runs
         run: |
           if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
             echo "Shared Kyoto queue found; submit this campaign through Kyoto before running."
