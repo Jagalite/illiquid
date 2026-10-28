@@ -28,7 +28,7 @@ cp "$root/Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.s
 cat > "$work/Package.swift" <<'SWIFT'
 // swift-tools-version: 6.1
 import PackageDescription
-let package = Package(name: "IlliquidExternalSubtitleRegressions", targets: [
+let package = Package(name: "IlliquidExternalSubtitleRegressions", platforms: [.macOS("26.0")], targets: [
     .target(name: "IlliquidNativePlayback"),
     .testTarget(name: "IlliquidNativePlaybackTests", dependencies: ["IlliquidNativePlayback"])
 ])

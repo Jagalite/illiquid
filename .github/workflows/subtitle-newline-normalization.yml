@@ -64,6 +64,22 @@ jobs:
           (Path(os.environ["RUNNER_TEMP"]) / "subtitle-newlines" / "source-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
           print(json.dumps(receipt, sort_keys=True))
           PY
+      - name: Record Foundation normalization edge cases
+        run: |
+          cat > "$RUNNER_TEMP/subtitle-newlines/normalization-probe.swift" <<'SWIFT'
+          import Foundation
+          let cases = ["\r\u{0301}", "\r\u{FE0F}", "\r\u{200D}", "x\0\r\rend", "\r\n\n", "\r\r\n",
+                       "First Cafe\u{0301}\rSecond\r\nThird\nFourth\u{0000}\r\rnext"]
+          let rows = cases.map { source -> [String: Any] in
+              let normalized = source.replacingOccurrences(of: "\r\n", with: "\n")
+                  .replacingOccurrences(of: "\r", with: "\n")
+              let bytes = Array(normalized.utf8)
+              return ["input": Array(source.utf8), "normalized": bytes, "remainingCR": bytes.contains(13)]
+          }
+          print(String(decoding: try JSONSerialization.data(withJSONObject: rows, options: [.sortedKeys]), as: UTF8.self))
+          SWIFT
+          swift "$RUNNER_TEMP/subtitle-newlines/normalization-probe.swift" \
+            | tee "$RUNNER_TEMP/subtitle-newlines/normalization-probe.json"
       - name: Test both sources in debug and release
         run: |
           set -o pipefail
@@ -87,7 +103,7 @@ jobs:
           import hashlib, json, os, re
           from pathlib import Path
           root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-newlines"
-          for name in ["source-receipt.json", "timing/manifest.json", "timing/benchmark.json", "timing/summary.json"]:
+          for name in ["source-receipt.json", "normalization-probe.json", "timing/manifest.json", "timing/benchmark.json", "timing/summary.json"]:
               path = root / name
               if path.exists():
                   print("NEWLINE_EVIDENCE " + json.dumps({"path": name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),

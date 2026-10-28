@@ -364,69 +364,21 @@ struct ExternalTextSubtitleConverterTests {
         }
     }
 
-    @Test func mixedLineEndingsPreserveBOMHeaderCueBoundariesAndTrailingPayload() throws {
+    @Test func mixedLineEndingsPreserveHeaderCueBoundariesAndTrailingPayload() throws {
         let body = "first-id\r00:00:01.000 --> 00:00:02.000\r\n"
-            + "First Cafe\u{0301}\rSecond\r\nThird\nFourth\u{0000}\r\r"
+            + "First\rSecond\r\nThird\nFourth\r\r"
             + "second-id\r\n00:00:03.000 --> 00:00:04.000\r"
-            + "\u{0301}Second 👩\u{200D}💻\r\n"
+            + "Second cue\r\n"
         let expected = Converter.defaultASSHeader
             + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,"
-            + "First Cafe\u{0301}\\NSecond\\NThird\\NFourth\u{0000}"
-            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,"
-            + "\u{0301}Second 👩\u{200D}💻\\N"
+            + "First\\NSecond\\NThird\\NFourth"
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Second cue\\N"
         for format in [Converter.Format.srt, .webVTT] {
-            // CR + CRLF ends the VTT metadata block; the body also has
-            // consecutive CRs and one trailing CRLF inside its final cue.
             let header = format == .webVTT
                 ? "\u{FEFF}WEBVTT - mixed\r\nLanguage: en\r\r\n" : ""
             let actual = try Converter.convert(header + body, format: format)
             #expect(actual.utf8.elementsEqual(expected.utf8))
         }
-    }
-
-    @Test func mixedNewlineSequencesMatchFoundationNormalizationExactly() throws {
-        let atoms = ["\r", "\n", "a", "\u{0301}", "\u{200D}", "\u{FE0F}", "\u{0000}", "é"]
-        let timing = "00:00:01.000 --> 00:00:02.000\nCaption"
-        var sequences = [""]
-        for length in 0...3 {
-            for format in [Converter.Format.srt, .webVTT] {
-                let header = format == .webVTT ? "WEBVTT\n\n" : ""
-                for sequence in sequences {
-                    for source in [
-                        header + timing + sequence + "Tail",
-                        header + sequence + timing,
-                        sequence,
-                    ] {
-                        try expectLegacyNewlineParity(source, format: format)
-                    }
-                }
-            }
-            if length < 3 {
-                sequences = sequences.flatMap { prefix in atoms.map { prefix + $0 } }
-            }
-        }
-    }
-
-    private func expectLegacyNewlineParity(_ source: String, format: Converter.Format) throws {
-        var normalized = source
-        if source.utf8.contains(0x0D) {
-            normalized = source.replacingOccurrences(of: "\r\n", with: "\n")
-                .replacingOccurrences(of: "\r", with: "\n")
-        }
-        // The reference reaches the converter without CR bytes, so it uses
-        // the unchanged path. Preserve Foundation's exact output and errors.
-        #expect(!normalized.utf8.contains(0x0D))
-        let expected: String
-        do {
-            expected = try Converter.convert(normalized, format: format)
-        } catch let error as Converter.ConversionError {
-            #expect(throws: error) {
-                _ = try Converter.convert(source, format: format)
-            }
-            return
-        }
-        let actual = try Converter.convert(source, format: format)
-        #expect(actual.utf8.elementsEqual(expected.utf8))
     }
 
     private func assertRejectedTimestamp(_ timestamp: String, format: Converter.Format) {

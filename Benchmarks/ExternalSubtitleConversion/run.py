@@ -107,7 +107,7 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
             "source_sha256": sha(source.read_bytes()),
             "source_path": (pinned["path"] if variant == "baseline" and args.baseline_ref is not None
                             else str(original.relative_to(ROOT))),
-            "source_ref": pinned.get("commit") if variant == "baseline" else "working-tree",
+            "source_ref": pinned.get("commit", pinned.get("revision")) if variant == "baseline" else "working-tree",
             "module_sha256": sha(module.read_bytes()), "library_sha256": sha(library.read_bytes()),
             "binary_sha256": sha(binary.read_bytes()), "module_command": module_command,
             "driver_command": driver_command,
