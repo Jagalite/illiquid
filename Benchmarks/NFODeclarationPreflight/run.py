@@ -161,11 +161,15 @@ def main() -> None:
                 label = f"tests-{variant}-{configuration}"
                 text = run(["swift", "test", "--package-path", str(package),
                             "-c", configuration, "--no-parallel", "--jobs", "2"], label)
-                counts = re.findall(r"Test run with (\d+) tests? passed", text)
-                if not counts or int(counts[-1]) == 0 or "NFO declaration preflight" not in text:
+                summaries = [line for line in text.splitlines() if "Test run with " in line]
+                count = (re.search(r"Test run with ([1-9][0-9]*) tests?\b.*\bpassed\b", summaries[-1])
+                         if summaries else None)
+                if count is None or "NFO declaration preflight" not in text:
+                    print(text[-25000:], flush=True)
                     raise RuntimeError(f"missing nonempty test receipt: {label}")
                 state["tests"].append({"variant": variant, "configuration": configuration,
-                                       "passed": True, "count": int(counts[-1]), "log": "logs/" + label + ".log"})
+                                       "passed": True, "count": int(count.group(1)),
+                                       "summary": summaries[-1], "log": "logs/" + label + ".log"})
                 print("TEST_PASS " + json.dumps(state["tests"][-1]), flush=True)
                 save()
 
