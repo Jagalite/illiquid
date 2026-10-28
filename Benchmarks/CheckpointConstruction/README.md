@@ -120,16 +120,43 @@ Flat-playlist construction remains linear for larger playlists because record
 deduplication is unchanged. First-item controls and empty/small playlists are
 included to expose overhead as well as wins.
 
-## Qualification status
+## Native results
 
-The [supplementary Linux study](evidence/linux/README.md) passed all 448 paired
-observations, and both revisions passed 22 component tests in debug and release.
-At 1,000 and 10,000 items with the last item selected, flat playlists used about
-65% less checkpoint-construction CPU; folder playlists used about 30% less.
-The evidence retains all controls, including slower observations on the shared
-Linux host. These are component measurements, not native macOS or whole-player
-performance claims.
+[Native macOS qualification](https://github.com/Jagalite/illiquid/actions/runs/40634906801)
+passed on an Apple M1 virtual machine running macOS 26.6.2 and Apple Swift 6.3.3
+through Xcode 26.6. Both revisions passed 22 component tests in three suites in
+debug and release. All 448 observations (224 baseline/candidate pairs) passed
+complete output parity, checksums, and minimum-duration qualification. The
+shortest native CPU observation was 72.370 ms, above the 25 ms floor.
 
-Native macOS qualification is pending in
-[the research workflow](https://github.com/Jagalite/illiquid/actions/runs/40634906801).
-Native results and receipts will be added when that run completes.
+| Last-item workload | Baseline CPU per record | Candidate CPU per record | Median paired CPU change |
+| --- | ---: | ---: | ---: |
+| No folder, 1,000 items | 12.49 ms | 4.26 ms | -65.8% |
+| No folder, 10,000 items | 132.81 ms | 42.42 ms | -66.5% |
+| Folder, 1,000 items | 13.16 ms | 8.66 ms | -32.5% |
+| Folder, 10,000 items | 113.38 ms | 74.86 ms | -34.3% |
+
+All 32 pairs in these four workloads used less candidate CPU. Wall-time paired
+reductions were 65.8–66.1% for flat playlists and 32.5–33.0% for folder playlists.
+The absolute columns are separate medians; the percentage is the median of paired
+ratios and need not equal the ratio of those displayed medians.
+
+First-match folder controls changed by +0.7%, +1.3%, and +3.3% paired CPU at
+32, 1,000, and 10,000 items. The remote-source control changed by +2.7%. No
+improvement or tight performance-equivalence claim is made for those controls.
+The singleton folder case changed by +5.6% (9.44 to 10.03 microseconds in separate
+CPU medians), and the empty folder case by +14.9% (0.460 to 0.540 microseconds).
+These results are retained alongside the substantial large-scan reductions.
+
+The [complete native results and receipts](evidence/macos/README.md) include all
+28 workloads, raw observations, source hashes, compilation/test logs, and the
+exact review archive emitted by the successful job. The measured production and
+harness bytes are unchanged by the later evidence/documentation commits. An
+independent audit recomputed the statistics and verified output parity receipts,
+sample ordering, duration flags, and source/log hashes.
+
+The [supplementary Linux study](evidence/linux/README.md) independently passed
+the same 448 observations and four test configurations. It showed about 65% less
+CPU for long flat-playlist scans and about 30% less for folder scans, with more
+timing variance. These are checkpoint-construction results; full application
+integration and visible playback remain separate qualification scopes.
