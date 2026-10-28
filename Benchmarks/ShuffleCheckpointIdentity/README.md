@@ -12,7 +12,7 @@ Original playlist entries and their subtitle metadata still belong to the contro
 
 `PlaylistOrderRestorationTests` applies its independent integer-label model to both full-item restoration and the new ID projection across 41,261 current-queue/saved-order combinations. Additional tests cover successive edits, decoded raw URL aliases, unsupported file authorities, distinct remote query strings, and exact UTF-8/JSON parity for canonically equivalent Unicode IDs. The set's removed stored member is emitted, preserving the current item's spelling rather than copying a possibly different saved spelling.
 
-The native integration job compiles the complete application graph and runs the existing persisted-shuffle/relaunch controller regression alongside the focused playlist tests. The experiment does not qualify live UI frame timing, decoder throughput, energy use, or full-app peak memory.
+The native integration job compiles the complete application graph and runs the existing persisted-shuffle/relaunch controller regression alongside the focused playlist tests. The recurring-checkpoint regression removes and appends entries while shuffled, advances playback past the normal checkpoint threshold, and reads the actual atomic session store before shutdown to verify the saved base order, complete playlist, selected item, position and pause state. Native execution of this added regression remains pending until the integration job passes. The experiment does not qualify live UI frame timing, decoder throughput, energy use, or full-app peak memory.
 
 ## Reproduce
 

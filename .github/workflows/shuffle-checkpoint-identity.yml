@@ -10,6 +10,7 @@ on:
       - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
       - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
       - 'Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCoordinatorTests.swift'
       - 'Scripts/test-playlist-restoration.sh'
       - 'Benchmarks/NonDecodePerformance/allocmeter.c'
       - 'Benchmarks/ShuffleCheckpointIdentity/**'
@@ -24,6 +25,7 @@ on:
       - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
       - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
       - 'Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCoordinatorTests.swift'
       - 'Scripts/test-playlist-restoration.sh'
       - 'Benchmarks/NonDecodePerformance/allocmeter.c'
       - 'Benchmarks/ShuffleCheckpointIdentity/**'
@@ -144,7 +146,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/shuffle-checkpoint-integration"
           set -o pipefail
           swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
-            --filter 'PlaylistOrderRestorationTests|PlaylistMutationTests|shuffleRestoresBaseOrderAcrossRelaunch|unshuffleRetainsAdditionsAndOmitsRemovedEntries' \
+            --filter 'PlaylistOrderRestorationTests|PlaylistMutationTests|shuffleRestoresBaseOrderAcrossRelaunch|unshuffleRetainsAdditionsAndOmitsRemovedEntries|shuffledProgressCheckpointReconcilesEditedPlaylistIdentities' \
             2>&1 | tee "$RUNNER_TEMP/shuffle-checkpoint-integration/tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

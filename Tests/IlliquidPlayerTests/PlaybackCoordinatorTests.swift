@@ -1531,6 +1531,72 @@ struct PlaybackCoordinatorTests {
         await fixture.coordinator.shutdown()
     }
 
+    @Test func shuffledProgressCheckpointReconcilesEditedPlaylistIdentities() async throws {
+        let fixture = try CoordinatorFixture()
+        do {
+            let files = try [
+                "checkpoint-1.mkv",
+                "checkpoint-2.mkv",
+                "checkpoint-3.mkv",
+            ].map { try fixture.createFile($0) }
+
+            fixture.coordinator.open(urls: files)
+            try await waitForPreparation(fixture.coordinator)
+            let load = try #require(fixture.runtime.loads.last)
+            fixture.runtime.emit(.loaded, identity: load.identity)
+            fixture.runtime.emit(.pauseChanged(false), identity: load.identity)
+            fixture.runtime.emit(.durationChanged(300), identity: load.identity)
+
+            fixture.coordinator.sortPlaylist(by: .name, ascending: true)
+            let originalIDs = fixture.coordinator.state.playlist.map(\.id)
+            let currentURL = try #require(fixture.coordinator.state.currentURL)
+
+            fixture.coordinator.setShuffleEnabled(true)
+            let removed = try #require(
+                fixture.coordinator.state.playlist.first { $0.url != currentURL }
+            )
+            fixture.coordinator.removePlaylistItem(id: removed.id)
+
+            let addedURL = try fixture.createFile("checkpoint-4.mkv")
+            fixture.coordinator.open(urls: [addedURL], mode: .append)
+            try await waitForPreparation(fixture.coordinator)
+
+            let editedPlaylist = fixture.coordinator.state.playlist
+            let editedIndex = try #require(
+                fixture.coordinator.state.currentPlaylistIndex
+            )
+            let expectedIDs = originalIDs.filter { $0 != removed.id }
+                + [FolderPlaylistItem(url: addedURL).id]
+            #expect(fixture.coordinator.state.isShuffleEnabled)
+            #expect(editedPlaylist[editedIndex].url == currentURL)
+            #expect(fixture.runtime.loads.count == 1)
+
+            // Observe the normal ten-second checkpoint path before shutdown
+            // can hide a missed recurring write by saving one final snapshot.
+            fixture.runtime.emit(.positionChanged(42), identity: load.identity)
+            let deadline = ContinuousClock.now.advanced(by: .seconds(5))
+            var saved = try fixture.sessionStore.load()
+            while saved?.position != 42, ContinuousClock.now < deadline {
+                try await Task.sleep(for: .milliseconds(5))
+                saved = try fixture.sessionStore.load()
+            }
+            let checkpoint = try #require(saved)
+
+            #expect(checkpoint.position == 42)
+            #expect(checkpoint.source == .localFile(currentURL))
+            #expect(checkpoint.playlistItems == editedPlaylist)
+            #expect(checkpoint.playlistIndex == editedIndex)
+            #expect(checkpoint.unshuffledPlaylistIDs == expectedIDs)
+            #expect(!checkpoint.wasPaused)
+
+            await fixture.coordinator.shutdown()
+            #expect(fixture.coordinator.shutdownPersistenceError == nil)
+        } catch {
+            await fixture.coordinator.shutdown()
+            throw error
+        }
+    }
+
     @Test func shuffleRestoresBaseOrderAcrossRelaunch() async throws {
         let fixture = try CoordinatorFixture()
         let files = try ["episode-1.mkv", "episode-2.mkv", "episode-3.mkv"].map {
