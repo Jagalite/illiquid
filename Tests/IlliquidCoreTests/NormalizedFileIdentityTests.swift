@@ -117,7 +117,13 @@ struct NormalizedFileIdentityTests {
         for baseText in bases {
             let base = try #require(URL(string: baseText))
             for reference in references {
-                try assertLegacyParity(try #require(URL(string: reference, relativeTo: base)))
+                let url = URL(string: reference, relativeTo: base)
+                // Foundation versions may reject an empty relative reference before identity code runs.
+                if reference.isEmpty && url == nil { continue }
+                try assertLegacyParity(try #require(
+                    url,
+                    "Foundation rejected a nonempty relative fixture: base=\(baseText), reference=\(reference)"
+                ))
             }
         }
         for authority in ["127.0.0.1", "[::1]", "localhost.example", "user:password@localhost",
