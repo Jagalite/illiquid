@@ -1502,32 +1502,36 @@ final class MediaSession: @unchecked Sendable {
                         } else {
                             reserveSoftwareOutput = nil
                         }
-                        try videoDecoder.drain(
-                            generation: active,
-                            while: {
-                                self.isRunning && self.generation.accepts(active)
-                            },
-                            reserveSoftwareOutput: reserveSoftwareOutput
-                        ) { decodedFrame in
-                            let frame = decodedFrame
-                            self.stateLock.withLock {
-                                if videoDecoder.hardwareWasConfigured {
-                                    self.consecutiveHardwareDecodeFailures = 0
-                                }
-                                self.metrics.temporaryDecodedVideoFrames = 1
-                                self.metrics.peakTemporaryDecodedVideoFrames = max(
-                                    self.metrics.peakTemporaryDecodedVideoFrames,
-                                    1
-                                )
-                            }
-                            defer {
+                        // Keep replay available for drain failures, then release
+                        // the final compressed GOP before waiting at EOF.
+                        try videoRecoveryPackets.retireAfterSuccessfulDrain(generation: active) {
+                            try videoDecoder.drain(
+                                generation: active,
+                                while: {
+                                    self.isRunning && self.generation.accepts(active)
+                                },
+                                reserveSoftwareOutput: reserveSoftwareOutput
+                            ) { decodedFrame in
+                                let frame = decodedFrame
                                 self.stateLock.withLock {
-                                    self.metrics.temporaryDecodedVideoFrames = 0
+                                    if videoDecoder.hardwareWasConfigured {
+                                        self.consecutiveHardwareDecodeFailures = 0
+                                    }
+                                    self.metrics.temporaryDecodedVideoFrames = 1
+                                    self.metrics.peakTemporaryDecodedVideoFrames = max(
+                                        self.metrics.peakTemporaryDecodedVideoFrames,
+                                        1
+                                    )
                                 }
+                                defer {
+                                    self.stateLock.withLock {
+                                        self.metrics.temporaryDecodedVideoFrames = 0
+                                    }
+                                }
+                                guard self.accepts(frame) else { return }
+                                guard self.pushVideoFrame(frame) else { return }
+                                self.recordVideoDecodeDiagnostics(videoDecoder)
                             }
-                            guard self.accepts(frame) else { return }
-                            guard self.pushVideoFrame(frame) else { return }
-                            self.recordVideoDecodeDiagnostics(videoDecoder)
                         }
                         _ = videoFrames.push(.endOfStream(generation: active))
                     case let .flush(active):

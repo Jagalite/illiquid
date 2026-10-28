@@ -156,6 +156,25 @@ final class VideoRecoveryPacketBuffer: @unchecked Sendable {
         lock.withLock { resetLocked(generation: newGeneration) }
     }
 
+    /// Retires replay ownership on normal return from the session's existing
+    /// drain-to-EOS boundary. This does not interpret FFmpeg's drain status;
+    /// throwing failures keep replay available. Emitted frames own their
+    /// buffers, and later seeks rebuild their own GOP.
+    func retireAfterSuccessfulDrain(
+        generation expectedGeneration: Int,
+        _ drain: () throws -> Void
+    ) rethrows {
+        // Draining may block, throw, or overlap a seek. Never hold this lock
+        // across it, and preserve replay packets if it throws or is cancelled.
+        try drain()
+        lock.withLock {
+            // A seek may already have installed a newer generation while the
+            // old drain finished. Its packets and identity must remain intact.
+            guard generation == expectedGeneration else { return }
+            resetLocked(generation: expectedGeneration)
+        }
+    }
+
     private func resetLocked(generation newGeneration: Int?) {
         generation = newGeneration
         packets.removeAll(keepingCapacity: false)
