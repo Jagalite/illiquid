@@ -25,9 +25,6 @@ struct PlaybackCheckpoint: Sendable {
     let unshuffledPlaylistIDs: [FolderPlaylistItem.ID]?
 
     func record() -> PlaybackSessionRecord {
-        let belongsToFolder = source.url.isFileURL && playlist.contains {
-            NormalizedFileURL.representsSameFile($0.url, source.url)
-        }
         return PlaybackSessionRecord(
             source: source,
             collectionFolder: belongsToFolder ? folder : nil,
@@ -38,4 +35,25 @@ struct PlaybackCheckpoint: Sendable {
             unshuffledPlaylistIDs: unshuffledPlaylistIDs
         )
     }
+
+    private var belongsToFolder: Bool {
+        guard folder != nil, !playlist.isEmpty,
+              let sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
+        else { return false }
+
+        // The captured index is a hint, not an identity guarantee: restored or
+        // edited playlists can leave it stale. Validate the selected item first
+        // so ordinary progress checkpoints do not scan the entire playlist.
+        if let index, playlist.indices.contains(index),
+           NormalizedFileURL.persistenceKey(for: playlist[index].url) == sourceKey {
+            return true
+        }
+
+        // Missing or stale indices retain the same membership behavior. The
+        // source identity is invariant, so compute it only once for this scan.
+        return playlist.contains {
+            NormalizedFileURL.persistenceKey(for: $0.url) == sourceKey
+        }
+    }
 }
+

@@ -1,0 +1,78 @@
+name: Playback checkpoint performance
+
+on:
+  push:
+    branches:
+      - perf/playback-checkpoint-membership-20261028
+  pull_request:
+    paths:
+      - Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift
+      - Sources/IlliquidCore/Player/MediaSource.swift
+      - Sources/IlliquidCore/Playlist/FolderPlaylist.swift
+      - Sources/IlliquidCore/Playlist/PlaylistMutation.swift
+      - Sources/IlliquidCore/Utilities/NormalizedFileURL.swift
+      - Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift
+      - Sources/IlliquidCore/Utilities/LifecyclePerformance.swift
+      - Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift
+      - Sources/IlliquidCore/Persistence/LegacyPreferencesMigration.swift
+      - Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift
+      - Tests/IlliquidCoreTests/PlaylistSessionRecordTests.swift
+      - Benchmarks/PlaybackCheckpoint/**
+      - .github/workflows/playback-checkpoint-performance.yml
+      - '!Benchmarks/PlaybackCheckpoint/README.md'
+      - '!Benchmarks/PlaybackCheckpoint/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playback-checkpoint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify and measure native checkpoint components
+        run: |
+          echo "Kyoto is unavailable on this hosted runner; using serial isolated component builds."
+          python3 Benchmarks/PlaybackCheckpoint/run.py \
+            --pairs 8 --target-ms 80 \
+            --output "$RUNNER_TEMP/playback-checkpoint"
+      - name: Emit review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "playback-checkpoint"
+          names = ["manifest.json", "summary.json", "timing-summary.json", "benchmark.json",
+                   "verification.json", "calibration.json", "measurements.jsonl", "commands.jsonl"]
+          files = {name: (root / name).read_text() for name in names if (root / name).is_file()}
+          for path in sorted((root / "logs").glob("*tests*.log")):
+              files[str(path.relative_to(root))] = path.read_text()
+          for name in ["summary.json", "timing-summary.json"]:
+              if name in files:
+                  print("CHECKPOINT_REVIEW " + name + " " + files[name])
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print("CHECKPOINT_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          print("CHECKPOINT_BUNDLE_BASE64 " + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playback-checkpoint-macos
+          path: |
+            ${{ runner.temp }}/playback-checkpoint/*.json
+            ${{ runner.temp }}/playback-checkpoint/*.jsonl
+            ${{ runner.temp }}/playback-checkpoint/*.gz
+            ${{ runner.temp }}/playback-checkpoint/logs/
+            ${{ runner.temp }}/playback-checkpoint/sources/
+          retention-days: 14
