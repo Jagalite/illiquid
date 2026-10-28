@@ -1,6 +1,9 @@
 import Foundation
 import IlliquidCore
 @testable import IlliquidApp
+#if ALLOCATION_METER
+import CAllocationMeter
+#endif
 
 // The isolated library contains verbatim production declarations. This driver
 // calls their public/internal entry points; it does not reproduce root lookup.
@@ -11,21 +14,31 @@ private struct Fixture {
     let input: SourceTreeProjectionInput
 
     init(rootCount: Int, scenario: String, rows: Int, depth: Int) {
-        let rootPaths: [String]
+        let hasDeepOutlier = scenario.hasPrefix("relative-outlier-")
+        precondition(!hasDeepOutlier || rootCount >= 2)
+        var rootPaths: [String]
         if scenario == "relative-nested" {
             let nested = ["/root-lookup/Library", "/root-lookup/Library/Shows",
                           "/root-lookup/Library/Shows/Season 01"]
             rootPaths = Array(nested.prefix(rootCount))
                 + (0..<max(0, rootCount - nested.count)).map { "/unrelated/Collection \($0)" }
         } else {
-            rootPaths = (0..<rootCount).map { "/root-lookup/Collection \($0) Café" }
+            let suffix = scenario.hasSuffix("-ascii") ? "" : " Café"
+            rootPaths = (0..<rootCount).map { "/root-lookup/Collection \($0)" + suffix }
+        }
+        if hasDeepOutlier {
+            // An unrelated 48-component root must not make ordinary shallow
+            // roots expensive to find when the query itself is deeply nested.
+            rootPaths[rootPaths.count - 1] = "/unrelated/"
+                + (0..<47).map { "Deep \($0)" }.joined(separator: "/")
         }
         roots = rootPaths.map { URL(fileURLWithPath: $0, isDirectory: true) }
+        let queryRootPaths = hasDeepOutlier ? Array(rootPaths.dropLast()) : rootPaths
         let middle = (0..<depth).map { "Directory \($0)" }.joined(separator: "/")
         paths = (0..<(scenario == "cold-single" ? 1 : 64)).map { index in
-            let root = rootPaths[(index * 17) % rootPaths.count]
+            let root = queryRootPaths[(index * 17) % queryRootPaths.count]
             switch scenario {
-            case "relative-miss":
+            case "relative-miss", "relative-outlier-miss":
                 // A lexical prefix alone must never establish containment.
                 return root + "-sibling/" + middle + "/Episode \(index).mkv"
             case "relative-nested":
@@ -40,7 +53,7 @@ private struct Fixture {
                     : root + "/" + middle + "/Episode \(index).mkv"
             case "cold-single":
                 return rootPaths.last! + "/" + middle + "/Episode \(index).mkv"
-            case "relative-hit":
+            case "relative-hit", "relative-ascii", "relative-outlier-hit":
                 return root + "/" + middle + "/Episode \(index).mkv"
             default:
                 return root + "/Season \(index % 4)/Hidden/Episode \(index).mkv"
@@ -48,7 +61,7 @@ private struct Fixture {
         }
         var visibility = SourceVisibilityConfiguration.default
         visibility.viewMode = .filesOnly
-        if scenario == "ancestry" || scenario == "flat-projection" {
+        if scenario == "ancestry" || scenario == "flat-projection" || scenario == "flat-ascii" {
             visibility.manuallyHiddenPaths = Set(rootPaths.map { $0 + "/Season 1" })
             visibility.regexRules = [
                 .init(id: "hidden", pattern: "Hidden", colorIndex: 2, isEnabled: true),
@@ -59,7 +72,7 @@ private struct Fixture {
         }
         configuration = visibility
         let entries = (0..<rows).map { index -> SourceTreeEntry in
-            let root = rootPaths[(index * 17) % rootPaths.count]
+            let root = queryRootPaths[(index * 17) % queryRootPaths.count]
             let path = root + "/Season \(index % 4)/"
                 + (index % 3 == 0 ? "Hidden/" : "") + "Episode \(index).mkv"
             return SourceTreeEntry(url: URL(fileURLWithPath: path, isDirectory: false),
@@ -191,6 +204,55 @@ private struct Measurement: Codable {
     let elapsed_ns: UInt64
     let durations_ns: [UInt64]
     let checksum: String
+    let allocation_instrumented: Bool
+    let allocation_requests: UInt64?
+    let allocation_requested_bytes: UInt64?
+    let allocation_control: AllocationControlReceipt?
+}
+
+private struct AllocationControlReceipt: Codable {
+    let expected_requested_bytes: UInt64
+    let requests: UInt64
+    let requested_bytes: UInt64
+}
+
+/// Successful intercepted malloc/calloc/realloc requests, not live or peak
+/// heap. Counting is process-wide, including runtime work across actor hops.
+/// In ordinary timing builds these methods compile to no-ops.
+private struct OperationAllocationMeter {
+    private(set) var requests: UInt64 = 0
+    private(set) var requestedBytes: UInt64 = 0
+    let control: AllocationControlReceipt?
+    var isEnabled: Bool { control != nil }
+
+    init() {
+        #if ALLOCATION_METER
+        meter_begin()
+        let succeeded = root_lookup_allocation_probe(4096)
+        meter_end()
+        let observed = AllocationControlReceipt(expected_requested_bytes: 4096,
+            requests: meter_requests(), requested_bytes: meter_bytes())
+        precondition(succeeded == 1 && observed.requests >= 1 && observed.requested_bytes >= 4096,
+                     "Allocation meter failed its known-allocation positive control")
+        control = observed
+        #else
+        control = nil
+        #endif
+    }
+
+    func begin() {
+        #if ALLOCATION_METER
+        meter_begin()
+        #endif
+    }
+
+    mutating func end() {
+        #if ALLOCATION_METER
+        meter_end()
+        requests += meter_requests()
+        requestedBytes += meter_bytes()
+        #endif
+    }
 }
 
 private enum HarnessFailure: Error { case arguments }
@@ -198,7 +260,8 @@ private enum HarnessFailure: Error { case arguments }
 @main
 private struct SourceRootBenchmark {
     static let cases = ["relative-hit", "relative-miss", "relative-nested", "cold-relative", "cold-single",
-                        "ancestry", "flat-projection"]
+                        "ancestry", "flat-projection", "relative-ascii", "flat-ascii",
+                        "relative-outlier-hit", "relative-outlier-miss"]
 
     static func encoder() -> JSONEncoder {
         let encoder = JSONEncoder()
@@ -247,39 +310,52 @@ private struct SourceRootBenchmark {
         durations.reserveCapacity(iterations)
         var hash = StableDigest()
         let receiptEncoder = encoder()
+        var allocationMeter = OperationAllocationMeter()
         for _ in 0..<iterations {
             switch scenario {
-            case "flat-projection":
+            case "flat-projection", "flat-ascii":
                 let filter = SourceBrowserFilter()
+                allocationMeter.begin()
                 let started = DispatchTime.now().uptimeNanoseconds
                 let projection = await filter.project(input: fixture.input, revealsRulePreview: false, query: "")
                 let elapsed = DispatchTime.now().uptimeNanoseconds - started
+                allocationMeter.end()
                 guard let projection else { throw CancellationError() }
                 durations.append(elapsed)
                 hash.add(try receiptEncoder.encode(ProjectionReceipt(projection)))
                 withExtendedLifetime(filter) {}
             case "ancestry":
+                allocationMeter.begin()
                 let started = DispatchTime.now().uptimeNanoseconds
                 for index in fixture.paths.indices {
                     evaluations[index] = matcher.evaluateIncludingAncestors(normalizedPath: fixture.paths[index])
                 }
-                durations.append(DispatchTime.now().uptimeNanoseconds - started)
+                let elapsed = DispatchTime.now().uptimeNanoseconds - started
+                allocationMeter.end()
+                durations.append(elapsed)
                 hash.add(try receiptEncoder.encode(evaluations.map(EvaluationReceipt.init)))
             default:
+                allocationMeter.begin()
                 let started = DispatchTime.now().uptimeNanoseconds
                 let active = scenario.hasPrefix("cold-")
                     ? SourceVisibilityMatcher(configuration: fixture.configuration, roots: fixture.roots) : matcher
                 for index in fixture.paths.indices {
                     strings[index] = active.relativePath(normalizedPath: fixture.paths[index])
                 }
-                durations.append(DispatchTime.now().uptimeNanoseconds - started)
+                let elapsed = DispatchTime.now().uptimeNanoseconds - started
+                allocationMeter.end()
+                durations.append(elapsed)
                 hash.add(try receiptEncoder.encode(strings))
                 withExtendedLifetime(active) {}
             }
         }
         try printJSON(Measurement(scenario: scenario, root_count: count, row_count: rows, depth: depth,
             query_count: fixture.paths.count, iterations: iterations, elapsed_ns: durations.reduce(0, +),
-            durations_ns: durations, checksum: String(hash.value, radix: 16)))
+            durations_ns: durations, checksum: String(hash.value, radix: 16),
+            allocation_instrumented: allocationMeter.isEnabled,
+            allocation_requests: allocationMeter.isEnabled ? allocationMeter.requests : nil,
+            allocation_requested_bytes: allocationMeter.isEnabled ? allocationMeter.requestedBytes : nil,
+            allocation_control: allocationMeter.control))
     }
 
     static func edgeReceipts() -> [EdgeReceipt] {
@@ -294,7 +370,9 @@ private struct SourceRootBenchmark {
         ]
         var result: [EdgeReceipt] = []
         for original in sets {
-            for padding in [0, 8] {
+            // The larger padding must exercise indexed lookup even when the
+            // implementation chooses a short scan for deeper small root sets.
+            for padding in [0, 64] {
                 for reversed in [false, true] {
                     let paths = ["", "/", "/outside/Movie.mkv", "/library-extra/Movie.mkv",
                                  "/library/Cafe\u{301}", "/library/Cafe\u{301}/e\u{301}pisode.mkv"]

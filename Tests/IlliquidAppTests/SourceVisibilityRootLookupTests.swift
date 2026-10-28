@@ -4,12 +4,12 @@ import Testing
 
 @Suite("Source visibility root lookup")
 struct SourceVisibilityRootLookupTests {
-    @Test(arguments: [0, 1, 2, 3, 4, 5, 32])
+    @Test(arguments: [0, 1, 2, 3, 4, 5, 8, 16, 64])
     func smallAndLargeLibrariesMatchOriginalSelection(rootCount: Int) {
         let candidates = [
             "/library", "/library/Shows", "/library/Shows/Season 01",
             "/library/Shows Extra", "/"
-        ] + (0..<27).map { "/other/\($0)" }
+        ] + (0..<59).map { "/other/\($0)" }
         let roots = urls(Array(candidates.prefix(rootCount)))
         let paths = [
             "/", "/library", "/library/Shows", "/library/Shows/Season 01",
@@ -22,7 +22,7 @@ struct SourceVisibilityRootLookupTests {
         expectOriginalResults(roots: Array(roots.reversed()), paths: paths)
     }
 
-    @Test(arguments: [0, 8])
+    @Test(arguments: [0, 64])
     func mostSpecificRootPreservesExactRootAndOutsideRootBehavior(padding: Int) {
         let roots = urls([
             "/library", "/library/Shows", "/library/Shows/Season 01"
@@ -40,7 +40,7 @@ struct SourceVisibilityRootLookupTests {
             "/library-extra/Outside/Movie.mkv") == "Movie.mkv")
     }
 
-    @Test(arguments: [0, 8])
+    @Test(arguments: [0, 64])
     func canonicalRootLookupPreservesReturnedPathBytes(padding: Int) throws {
         let root = "/library/Caf\u{e9}"
         let decomposedRoot = "/library/Cafe\u{301}"
@@ -62,7 +62,7 @@ struct SourceVisibilityRootLookupTests {
         ])
     }
 
-    @Test(arguments: [0, 8])
+    @Test(arguments: [0, 64])
     func scalarSeparatorBoundariesAndCharacterCountTiesMatchOriginal(padding: Int) {
         // A slash can share a Character with combining/Prepend scalars. Walking
         // Character "/" values would miss some lexical ancestor candidates.
@@ -105,7 +105,38 @@ struct SourceVisibilityRootLookupTests {
         }
     }
 
-    @Test(arguments: [0, 8])
+    @Test(arguments: [5, 8, 16, 64])
+    func deepQueriesWithShallowRootsMatchOriginal(rootCount: Int) {
+        let roots = urls(["/library/Shows"] + unrelatedRoots(rootCount - 1))
+        let descendant = (0..<48).map { "Folder \($0)" }.joined(separator: "/")
+        let paths = [
+            "/library/Shows/" + descendant + "/Episode.mkv",
+            "/library/Shows/" + descendant,
+            "/library/Shows Extras/" + descendant + "/Episode.mkv",
+            "/outside/" + descendant + "/Episode.mkv",
+            "/library/Shows", "/"
+        ]
+        expectOriginalResults(roots: roots, paths: paths)
+        expectOriginalResults(roots: Array(roots.reversed()), paths: paths)
+    }
+
+    @Test(arguments: [8, 64, 256])
+    func deepRootOutliersPreserveShallowAndDeepMatches(rootCount: Int) {
+        let descendant = (0..<48).map { "Folder \($0)" }.joined(separator: "/")
+        let deepRoot = "/other/" + descendant
+        let roots = urls(["/library", deepRoot] + unrelatedRoots(rootCount - 2))
+        let paths = [
+            "/library/Shows/Episode.mkv",
+            "/library/" + descendant + "/Episode.mkv",
+            "/outside/" + descendant + "/Episode.mkv",
+            deepRoot, deepRoot + "/Episode.mkv",
+            deepRoot + " Extras/Episode.mkv"
+        ]
+        expectOriginalResults(roots: roots, paths: paths)
+        expectOriginalResults(roots: Array(roots.reversed()), paths: paths)
+    }
+
+    @Test(arguments: [0, 64])
     func ancestorVisibilityStopsAtTheSelectedRoot(padding: Int) {
         let season = "/library/Shows/Season 01"
         let file = season + "/Episode 01.mkv"
@@ -129,7 +160,7 @@ struct SourceVisibilityRootLookupTests {
             .evaluateIncludingAncestors(normalizedPath: file).hiddenMatches.isEmpty)
     }
 
-    @Test(arguments: [0, 8])
+    @Test(arguments: [0, 64])
     func relativeRegexCandidatesAndCachedRootEvaluationsKeepTheirOrder(padding: Int) {
         let season = "/library/Shows/Season 01"
         let file = season + "/Episode 01.mkv"
@@ -158,7 +189,7 @@ struct SourceVisibilityRootLookupTests {
     @Test func urlNormalizationAndNonFileRootsPreserveFallbacks() throws {
         let remote = try #require(URL(string: "https://example.invalid/library"))
         let file = URL(fileURLWithPath: "/library/Shows/../Café/Movie.mkv")
-        let roots = urls(["/library/Café"] + unrelatedRoots(8)) + [remote]
+        let roots = urls(["/library/Café"] + unrelatedRoots(64)) + [remote]
         let matcher = SourceVisibilityMatcher(configuration: .default, roots: roots)
         let normalized = try #require(SourceVisibilityPath.normalized(file))
         #expect(matcher.relativePath(for: file) == originalRelativePath(

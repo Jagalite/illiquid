@@ -2043,6 +2043,7 @@ struct SourceVisibilityMatcher {
 
     private let configuration: SourceVisibilityConfiguration
     private let rootPaths: [String]
+    private let maximumRootSeparatorCount: Int
     private let compiledRules: [CompiledRule]
     private let rootEvaluations: [String: SourceVisibilityEvaluation]
 
@@ -2068,6 +2069,7 @@ struct SourceVisibilityMatcher {
             )
         }
         self.rootPaths = rootPaths
+        maximumRootSeparatorCount = rootPaths.lazy.map { Self.separatorCount(in: $0) }.max() ?? 0
         self.compiledRules = compiledRules
         rootEvaluations = Dictionary(uniqueKeysWithValues: rootPaths.map { path in
             (
@@ -2225,18 +2227,26 @@ struct SourceVisibilityMatcher {
     }
 
     private func matchingRootPath(for normalizedPath: String) -> String? {
-        // A short scan avoids hashing each ancestor for small libraries. Larger
-        // libraries can reuse the root-evaluation keys as a membership index.
+        // A short scan avoids hashing each ancestor for small libraries.
         guard rootPaths.count > 4 else {
             return matchingRootPathByScanning(normalizedPath)
         }
+        var separators = Self.separatorCount(in: normalizedPath)
+        let possibleDepth = max(1, min(separators, maximumRootSeparatorCount))
+        guard rootPaths.count > 4 * possibleDepth else {
+            return matchingRootPathByScanning(normalizedPath)
+        }
 
+        // Reuse the root-evaluation keys as a membership index. Canonical
+        // Unicode equivalence cannot change the number of ASCII slashes, so
+        // prefixes deeper than every configured root need no allocation/hash.
         let scalars = normalizedPath.unicodeScalars
         var end = scalars.endIndex
         var match: String?
         var matchLength = -1
         while end != scalars.startIndex {
-            if let index = rootEvaluations.index(forKey: String(scalars[..<end])) {
+            if separators <= maximumRootSeparatorCount,
+               let index = rootEvaluations.index(forKey: String(scalars[..<end])) {
                 let rootPath = rootEvaluations[index].key
                 // Scalar boundaries can split an extended grapheme. Preserve
                 // the existing String prefix policy and the stored root bytes.
@@ -2257,22 +2267,24 @@ struct SourceVisibilityMatcher {
             guard let slash = scalars[..<end].lastIndex(of: "/") else { break }
             let nextEnd = slash == scalars.startIndex ? scalars.index(after: slash) : slash
             guard nextEnd != end else { break }
+            if slash != scalars.startIndex { separators -= 1 }
             end = nextEnd
         }
         return match
     }
 
     private func matchingRootPathByScanning(_ normalizedPath: String) -> String? {
-        var match: String?
-        var matchLength = -1
-        for rootPath in rootPaths where SourceTreeIdentity.contains(normalizedPath, within: rootPath) {
-            let length = rootPath.count
-            if length > matchLength {
-                match = rootPath
-                matchLength = length
+        rootPaths.lazy
+            .filter { SourceTreeIdentity.contains(normalizedPath, within: $0) }
+            .max { $0.count < $1.count }
+    }
+
+    private static func separatorCount(in path: String) -> Int {
+        path.utf8.reduce(into: 0) { count, byte in
+            if byte == 0x2f {
+                count += 1
             }
         }
-        return match
     }
 }
 

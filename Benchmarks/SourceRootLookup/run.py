@@ -5,6 +5,8 @@ No Swift package dependencies or network downloads are required. Source staging
 reuses the guarded declaration extraction from the source-tree qualification.
 Every timed observation is a fresh process; complete JSON outputs are compared
 before timing, including the exact Unicode spelling of strings.
+Linux/glibc allocation requests are an optional, separate fixed-iteration
+cohort. Instrumented durations are diagnostic only, never timing results.
 """
 from __future__ import annotations
 
@@ -28,8 +30,10 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 HELPER = ROOT / "Benchmarks/SourceTreeVisibility/run.py"
-CASES = ["relative-hit", "relative-miss", "relative-nested", "cold-relative", "cold-single",
-         "ancestry", "flat-projection"]
+ALLOCATION_METER = ROOT / "Benchmarks/NonDecodePerformance/allocmeter.c"
+DEFAULT_CASES = ["relative-hit", "relative-miss", "relative-nested", "cold-relative", "cold-single",
+                 "ancestry", "flat-projection"]
+CASES = DEFAULT_CASES + ["relative-ascii", "flat-ascii", "relative-outlier-hit", "relative-outlier-miss"]
 TESTS = ["SourceVisibilityRootLookupTests.swift", "SourceBrowserFilterTests.swift",
          "SourceMediaOrganizationTests.swift", "SourceTreeVisibilityCacheTests.swift",
          "FlatFileProjectionTests.swift"]
@@ -43,10 +47,36 @@ let package = Package(
         .target(name: "IlliquidCore"),
         .target(name: "IlliquidApp", dependencies: ["IlliquidCore"],
                 swiftSettings: [.unsafeFlags(["-enable-testing"])]),
-        .executableTarget(name: "SourceRootBenchmark", dependencies: ["IlliquidCore", "IlliquidApp"]),
+        ALLOCATION_TARGET
+        .executableTarget(name: "SourceRootBenchmark", dependencies: ["IlliquidCore", "IlliquidApp"ALLOCATION_DEPENDENCY]ALLOCATION_SETTINGS),
         .testTarget(name: "IlliquidAppTests", dependencies: ["IlliquidCore", "IlliquidApp"]),
     ]
 )
+'''
+
+ALLOCATION_HEADER = b'''#include <stddef.h>
+#include <stdint.h>
+void meter_begin(void);
+void meter_end(void);
+uint64_t meter_requests(void);
+uint64_t meter_bytes(void);
+int root_lookup_allocation_probe(size_t bytes);
+'''
+
+# Keep the shared meter unchanged. This separately staged positive control uses
+# volatile function pointers and memory so optimization cannot erase the known
+# allocation. The harness runs it outside every workload measurement.
+ALLOCATION_PROBE = b'''#include <stdlib.h>
+int root_lookup_allocation_probe(size_t bytes) {
+    void *(*volatile allocate)(size_t) = malloc;
+    void (*volatile release)(void *) = free;
+    void *memory = allocate(bytes);
+    if (!memory) return 0;
+    ((volatile unsigned char *)memory)[0] = 0x5a;
+    int intact = ((volatile unsigned char *)memory)[0] == 0x5a;
+    release(memory);
+    return intact;
+}
 '''
 
 
@@ -95,6 +125,8 @@ class Runner:
         self.env.update(SWIFTPM_MODULECACHE_OVERRIDE=str(cache), CLANG_MODULE_CACHE_PATH=str(cache))
         self.packages, self.manifests, self.binaries = {}, {}, {}
         self.driver_paths = [HERE / "run.py", HERE / "Harness.swift", HELPER]
+        if args.allocations:
+            self.driver_paths.append(ALLOCATION_METER)
         self.driver_hashes = {str(path.relative_to(ROOT)): digest(path.read_bytes()) for path in self.driver_paths}
         for path in self.driver_paths:
             destination = self.output / "driver" / path.relative_to(ROOT)
@@ -104,6 +136,12 @@ class Runner:
         if not args.no_threshold_controls:
             self.workloads += [(case, count, depth) for count in [4, 5, 8, 16]
                                for depth in [8, 32] for case in ["relative-hit", "relative-miss"]]
+            # Four ASCII controls and eight unrelated-deep-root controls add
+            # coverage without multiplying every main workload and root count.
+            self.workloads += [(case, count, 2) for count in [100, 1000]
+                               for case in ["relative-ascii", "flat-ascii"]]
+            self.workloads += [(case, count, 32) for count in [16, 32, 100, 1000]
+                               for case in ["relative-outlier-hit", "relative-outlier-miss"]]
         self.workloads = list(dict.fromkeys(self.workloads))
 
     def execute(self, command, label: str, timeout: int = 360) -> subprocess.CompletedProcess:
@@ -151,9 +189,20 @@ class Runner:
                                         ("candidate", candidate_files, candidate_records)]:
             package = self.output / "packages" / variant
             manifest = {"variant": variant, "baseline_revision": BASELINE, "candidate_ancestor": head,
-                        "production": records, "staged": {}, "adaptations": []}
+                        "production": records, "staged": {}, "adaptations": [],
+                        "allocation_instrumented": self.args.allocations}
             staging = dict(files)
-            staging["Package.swift"] = PACKAGE.encode()
+            package_manifest = PACKAGE.replace("ALLOCATION_TARGET",
+                '.target(name: "CAllocationMeter"),' if self.args.allocations else "")
+            package_manifest = package_manifest.replace("ALLOCATION_DEPENDENCY",
+                ', "CAllocationMeter"' if self.args.allocations else "")
+            package_manifest = package_manifest.replace("ALLOCATION_SETTINGS",
+                ', swiftSettings: [.define("ALLOCATION_METER")]' if self.args.allocations else "")
+            staging["Package.swift"] = package_manifest.encode()
+            if self.args.allocations:
+                staging["Sources/CAllocationMeter/allocmeter.c"] = ALLOCATION_METER.read_bytes()
+                staging["Sources/CAllocationMeter/probe.c"] = ALLOCATION_PROBE
+                staging["Sources/CAllocationMeter/include/AllocationMeter.h"] = ALLOCATION_HEADER
             staging["Sources/SourceRootBenchmark/Harness.swift"] = (HERE / "Harness.swift").read_bytes()
             for name in TESTS:
                 staging["Tests/IlliquidAppTests/" + name] = (ROOT / "Tests/IlliquidAppTests" / name).read_bytes()
@@ -194,12 +243,17 @@ class Runner:
             "worktree": self.execute(["git", "status", "--short"], "worktree").stdout,
             "workloads": [{"scenario": case, "roots": count, "depth": depth} for case, count, depth in self.workloads],
             "pairs": self.args.pairs, "exploratory": self.args.smoke,
+            "allocation_instrumented": self.args.allocations,
             "rows_per_projection": self.args.rows,
             "measurement": "DispatchTime nanoseconds around a batch of 64 lookups/ancestry evaluations, constructor plus 64/1 lookups, or a complete uncached files-only actor projection. Fixture construction, warmup, JSON receipts, hashing, and actor destruction are outside timing.",
-            "fixtures": "Synthetic lexical URLs; no filesystem I/O during measured operations. Flat projections include ancestry rules and annotations; sorting is off.",
+            "allocation_measurement": (
+                "Successful process-wide intercepted malloc/calloc/realloc requests and cumulatively requested bytes within each operation. Fixture construction, warmup, positive control, JSON receipts, hashing, and actor destruction are excluded. Realloc counts its whole requested size. This is not live/peak heap, RSS, or all allocation APIs; unrelated runtime activity can contribute. Instrumented durations are diagnostic only."
+                if self.args.allocations else None),
+            "fixtures": "Synthetic lexical URLs; no filesystem I/O during measured operations. Flat projections include ancestry rules and annotations; sorting is off. ASCII controls omit the Café suffix only. Outlier controls replace one root with an unrelated 48-component path and query only the remaining shallow roots.",
             "ordering": "Each group has alternating AB/BA pairs; every member is a fresh process.",
             "parity": "Full JSON object equality in Python, preserving Unicode spelling; plus complete edge-case outputs. Timing checksum equality is an additional gate, not the only one.",
-            "calibration": {"target_faster_ms": self.args.target_ms, "maximum_slower_ms": self.args.max_interval_ms},
+            "calibration": ({"fixed_iterations": self.args.iterations} if self.args.allocations
+                else {"target_faster_ms": self.args.target_ms, "maximum_slower_ms": self.args.max_interval_ms}),
         })
         self.check_sources()
 
@@ -266,6 +320,19 @@ class Runner:
                 raise ValueError("Invalid duration observations")
             if data["elapsed_ns"] != sum(durations):
                 raise ValueError("Inconsistent total duration")
+            if data.get("allocation_instrumented") is not self.args.allocations:
+                raise ValueError("Allocation instrumentation mode does not match the executable")
+            allocation_fields = ["allocation_requests", "allocation_requested_bytes"]
+            if self.args.allocations:
+                if any(type(data.get(field)) is not int or data[field] < 0 for field in allocation_fields):
+                    raise ValueError("Invalid allocation counters")
+                control = data.get("allocation_control")
+                if (not isinstance(control, dict) or control.get("expected_requested_bytes") != 4096
+                        or type(control.get("requests")) is not int or control["requests"] < 1
+                        or type(control.get("requested_bytes")) is not int or control["requested_bytes"] < 4096):
+                    raise ValueError("Allocation meter did not observe its known-allocation positive control")
+            elif any(data.get(field) is not None for field in allocation_fields + ["allocation_control"]):
+                raise ValueError("Uninstrumented executable reported allocation counters")
         return data
 
     def measure(self):
@@ -340,6 +407,26 @@ class Runner:
                     expected_position = (0 if variant == "baseline" else 1) ^ (row["pair"] % 2)
                     if row["process_order"] != expected_position:
                         raise ValueError("Execution order was not alternating AB/BA")
+            if self.args.allocations:
+                metrics = {}
+                for metric in ["allocation_requests", "allocation_requested_bytes"]:
+                    values = {variant: [row[metric] / row["iterations"] for row in group]
+                              for variant, group in groups.items()}
+                    reductions = [100 * (1 - candidate / baseline) if baseline else None
+                                  for baseline, candidate in zip(values["baseline"], values["candidate"])]
+                    comparable = [value for value in reductions if value is not None]
+                    metrics[metric] = {
+                        "per_iteration": {variant: {"median": statistics.median(samples),
+                            "min": min(samples), "max": max(samples)} for variant, samples in values.items()},
+                        "paired_reduction_percent": reductions,
+                        "median_paired_reduction_percent": statistics.median(comparable) if comparable else None,
+                    }
+                summaries.append({"scenario": case, "roots": count, "depth": depth,
+                    "rows": self.args.rows, "queries_per_iteration": rows[0]["query_count"],
+                    "pairs": self.args.pairs, "iterations": rows[0]["iterations"],
+                    "allocation_instrumented": True, "allocation_metrics": metrics,
+                    "timing_interpretation": "Instrumented durations are diagnostic only; use the separate uninstrumented cohort for timing."})
+                continue
             values = {variant: [row["elapsed_ns"] / row["iterations"] for row in group]
                       for variant, group in groups.items()}
             ratios = [candidate / baseline for baseline, candidate in zip(values["baseline"], values["candidate"])]
@@ -381,21 +468,31 @@ def main():
     parser.add_argument("--depth", type=int, default=2)
     parser.add_argument("--rows", type=int, default=256)
     parser.add_argument("--iterations", type=int)
+    parser.add_argument("--allocations", action="store_true",
+                        help="Linux/glibc allocation requests; requires --mode benchmark and fixed --iterations")
     parser.add_argument("--target-ms", type=float, default=20)
     parser.add_argument("--max-interval-ms", type=float, default=150)
-    parser.add_argument("--no-threshold-controls", action="store_true")
+    parser.add_argument("--no-threshold-controls", action="store_true",
+                        help="Skip the additional threshold, ASCII, and deep-root outlier control groups")
     parser.add_argument("--test-filter")
     parser.add_argument("--smoke", action="store_true", help="Allow fewer paired observations; all timings are exploratory")
     args = parser.parse_args()
-    args.cases = args.cases or CASES
+    args.cases = args.cases or DEFAULT_CASES
     if args.tests_only:
         args.mode = "test"
     if args.jobs < 1 or args.pairs < 1 or (not args.smoke and (args.pairs < 6 or args.pairs % 2)):
         parser.error("Use positive jobs and at least six even pairs; --smoke permits fewer")
     if any(count < 1 for count in args.sizes) or args.rows < 1 or args.depth < 0:
         parser.error("Root/row counts must be positive and depth nonnegative")
+    if any(case.startswith("relative-outlier-") for case in args.cases) and min(args.sizes) < 2:
+        parser.error("Deep-root outlier cases require at least two configured roots")
     if args.iterations is not None and args.iterations < 1:
         parser.error("Iterations must be positive")
+    if args.allocations:
+        if platform.system() != "Linux" or platform.libc_ver()[0] != "glibc":
+            parser.error("Allocation instrumentation requires Linux/glibc")
+        if args.mode != "benchmark" or args.iterations is None:
+            parser.error("Use --allocations only in a separate --mode benchmark run with fixed --iterations")
     if args.target_ms <= 0 or args.max_interval_ms <= 0:
         parser.error("Calibration intervals must be positive")
     runner = Runner(args)
