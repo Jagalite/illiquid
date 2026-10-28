@@ -1,0 +1,122 @@
+name: Video color sampler layout research
+
+on:
+  push:
+    branches: ['perf/video-color-layout-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift'
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameColorSampler*.swift'
+      - 'Benchmarks/VideoColorSamplerLayout/**'
+      - '.github/workflows/video-color-sampler-layout.yml'
+      - '!Benchmarks/VideoColorSamplerLayout/*.md'
+      - '!Benchmarks/VideoColorSamplerLayout/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift'
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameColorSampler*.swift'
+      - 'Benchmarks/VideoColorSamplerLayout/**'
+      - '.github/workflows/video-color-sampler-layout.yml'
+      - '!Benchmarks/VideoColorSamplerLayout/*.md'
+      - '!Benchmarks/VideoColorSamplerLayout/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-color-sampler-layout-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds are serialized in this isolated checkout.'
+      - name: Verify exact outputs and benchmark native sampler
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/VideoColorSamplerLayout/run.py \
+            --output "$RUNNER_TEMP/video-color-layout" \
+            --pairs 12 --target-ms 250 "${mode[@]}"
+      - name: Emit auditable research receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'video-color-layout'
+          names = ['manifest.json', 'parity.json', 'tests.json', 'calibration.json',
+                   'observations.json', 'summary.json', 'completion.json', 'failure.json',
+                   'commands.json']
+          names += [p.name for p in sorted(root.glob('tests-*.log'))]
+          for name in names:
+              path = root / name
+              if path.exists():
+                  value = json.loads(path.read_text()) if path.suffix == '.json' else path.read_text()
+                  print('SAMPLER_EVIDENCE ' + name + ' ' + json.dumps(value, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-color-sampler-layout-component
+          path: |
+            ${{ runner.temp }}/video-color-layout/*.json
+            ${{ runner.temp }}/video-color-layout/*.log
+            ${{ runner.temp }}/video-color-layout/work/*/*/*.swift
+          retention-days: 14
+
+  native-app-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds are serialized in this isolated checkout.'
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compile the app graph and run sampler regressions
+        run: |
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'VideoFrameColorSamplerTests|VideoFrameColorSamplerLayoutTests|PiPVideoMappingTests' \
+            2>&1 | tee "$RUNNER_TEMP/video-color-layout-app-tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-color-sampler-layout-app-regressions
+          path: ${{ runner.temp }}/video-color-layout-app-tests.log
+          retention-days: 14
