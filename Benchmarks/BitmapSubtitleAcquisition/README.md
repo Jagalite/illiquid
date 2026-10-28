@@ -1,3 +1,7 @@
+# Retired experiment
+
+This research branch was prepared before concurrent PRs #128 and #137 were discovered. Those PRs cover the same acquisition-copy removal. This branch is not proposed for integration, and no performance result is claimed. Its queued qualification was superseded to avoid duplicating that work. The original experimental sources remain at commit ba613af82ee82deb20073a2f8a6535897e556493.
+
 # Bitmap subtitle acquisition during seeks
 
 This experiment compares acquisition checks in `FFmpegDemuxer.activeSubtitlePackets`.
