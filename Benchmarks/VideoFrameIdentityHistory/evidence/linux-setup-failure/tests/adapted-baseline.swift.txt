@@ -1,0 +1,35 @@
+import Foundation
+
+struct VideoFrameIdentityHistory: Sendable {
+    struct FrameIdentity: Sendable {
+        let surfaceID: UInt32?
+        let bufferID: UInt
+        let time: Double
+        let generation: Int
+    }
+    private var frameIdentities: [FrameIdentity] = []
+
+    func adjacentTime(to frame: FrameIdentity, direction: Int) -> Double? {
+        let times = frameIdentities.lazy.filter { $0.generation == frame.generation }.map(\.time)
+        return direction > 0
+            ? times.filter { $0 > frame.time + 0.000001 }.min()
+            : times.filter { $0 < frame.time - 0.000001 }.max()
+    }
+
+    func identity(surfaceID: UInt32?, bufferID: UInt) -> FrameIdentity? {
+        let surface = surfaceID
+        return frameIdentities.last {
+            if let surface { return $0.surfaceID == surface }
+            return $0.bufferID == bufferID
+        }
+    }
+
+    mutating func append(_ identity: FrameIdentity) {
+        if frameIdentities.count == 128 { frameIdentities.removeFirst() }
+        frameIdentities.append(identity)
+    }
+
+    mutating func removeAll() {
+        frameIdentities.removeAll(keepingCapacity: true)
+    }
+}

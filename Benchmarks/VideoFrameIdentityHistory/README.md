@@ -21,6 +21,17 @@ including positive and negative zero, retain their original first-value tie.
 The helper adds one integer cursor; it is a CPU/copying optimization, not a
 memory-reduction claim.
 
+At the pinned baseline, appends occur for each renderer enqueue. The history
+queries serve paused frame stepping, paused screenshot capture and an opt-in
+benchmark snapshot; they are not wired to ordinary playback polling. See the
+[runtime callers](https://github.com/Jagalite/illiquid/blob/ea2ff568237e2667f7b1aeee67b11a44ebe95b72/Sources/IlliquidNativePlayback/Production/NativePlaybackRuntime.swift#L1840-L1900)
+and the controller's
+[benchmark snapshot](https://github.com/Jagalite/illiquid/blob/ea2ff568237e2667f7b1aeee67b11a44ebe95b72/Sources/IlliquidPlayer/Player/PlaybackController.swift#L986-L1000)
+and [frame-step queue](https://github.com/Jagalite/illiquid/blob/ea2ff568237e2667f7b1aeee67b11a44ebe95b72/Sources/IlliquidPlayer/Player/PlaybackController.swift#L1079-L1107).
+This is source-level workload context, not measured invocation frequency.
+`append-lookup` is a conservative composite control rather than the steady-playback
+call pattern. Query costs still matter for preserving interaction performance.
+
 ## Reproduce
 
 Use macOS or Linux with Swift 6.1+ and Python 3.10+. The workflow pins

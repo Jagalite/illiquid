@@ -44,6 +44,7 @@ jobs:
             apt-get update
             apt-get install -y --no-install-recommends python3 git util-linux
           fi
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check isolated build environment
         run: |
           test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
