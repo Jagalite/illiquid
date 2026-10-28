@@ -77,10 +77,86 @@ python3 Benchmarks/PlanarOwnership/run.py --allocations \
   --output /tmp/planar-peak-allocations
 ```
 
-## Results
+## Measured results
 
-Qualification is pending on the research branch. No runtime improvement is
-claimed until the matched tests and measurements complete.
+[Research workflow 40636421757](https://github.com/Jagalite/illiquid/actions/runs/40636421757)
+tested implementation commit `823296f978a8bcc9e8fdab98137aeebcf610ee53`.
+The [Linux job](https://github.com/Jagalite/illiquid/actions/runs/40636421757/job/122644317046)
+passed on Ubuntu 24.04, runner image `20261023.334.3`, Swift 6.4, glibc 2.39,
+AMD EPYC 7763. Baseline and candidate use the same toolchain and flags.
 
-This experiment measures ownership bookkeeping. It does not measure decoding,
-rendering, pixel-buffer memory, player RSS, FPS, energy or responsiveness.
+At the source-motivated occupancy of 11, **both complete-lifecycle workloads
+reduce allocation requests from 12 to 4 per service (66.7%) and cumulative
+requested bytes from 1,072 to 448 per service (58.2%)**.
+
+| Workload | Occupancy | Baseline requests/service | Candidate requests/service | Fewer requests | Baseline requested bytes/service | Candidate requested bytes/service | Fewer requested bytes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| pipeline | 1 | 6 | 4 | 33.3% | 304 | 224 | 26.3% |
+| pipeline | 7 | 10 | 4 | 60.0% | 784 | 448 | 42.9% |
+| pipeline | 11 | 12 | 4 | 66.7% | 1,072 | 448 | 58.2% |
+| pipeline | 16 | 13 | 4 | 69.2% | 1,600 | 704 | 56.0% |
+| pipeline | 32 | 15 | 4 | 73.3% | 2,912 | 1,216 | 58.2% |
+| lifecycle-mixed | 1 | 6 | 4 | 33.3% | 304 | 224 | 26.3% |
+| lifecycle-mixed | 7 | 10 | 4 | 60.0% | 784 | 448 | 42.9% |
+| lifecycle-mixed | 11 | 12 | 4 | 66.7% | 1,072 | 448 | 58.2% |
+| lifecycle-mixed | 16 | 14 | 4 | 71.4% | 1,872 | 704 | 62.4% |
+| lifecycle-mixed | 32 | 16 | 4 | 75.0% | 3,440 | 1,216 | 64.7% |
+
+Values are the median counts divided by 100,000 timed services. All four
+observations for each variant/case had identical allocation counts and bytes.
+The reductions are `100 * (1 - candidate / baseline)`. All 80 raw observations
+(40 pairs across 10 cases) are retained; every pair ended in identical semantic
+snapshots. Initialization, warmup, snapshot serialization and teardown are
+outside the measured interval.
+
+These counters include the complete modeled ownership lifecycle, including
+token and attachment allocation. The candidate still needs a temporary set.
+The source change avoids the eager array and its growth, rather than eliminating
+all per-service allocations.
+
+### Correctness status
+
+- **Passed:** actual baseline/candidate ledger compilation and deterministic
+  differential checks in debug and release on Linux. Each configuration
+  compared 10,005 snapshots (five seeds, 2,001 snapshots each), for 20,010
+  snapshot comparisons in the dedicated correctness run.
+- **Passed:** untimed workload controls for pipeline, mixed lifecycle, and phase
+  behavior at all five occupancies, in debug and release.
+- **Passed:** all measured baseline/candidate pairs ended in the same ownership
+  state; an independent recalculation from raw rows matches the summaries.
+- **Pending:** the native macOS job is queued. The new mixed-owner regression,
+  existing CoreMedia/CoreVideo lifetime tests, and native timing have not yet
+  executed. Do not infer native timing success from the Linux result.
+
+The Linux harness substitutes only the CoreMedia/CoreVideo and signpost
+boundaries. The ledger, Swift collections, locking, tokens, attachment owners
+and ARC callbacks are actual production code. This is useful portable component
+evidence, but native qualification remains a separate gate.
+
+### Retained evidence
+
+The [evidence index](evidence/index.json) records the originating run, job and
+per-file SHA-256 values emitted by CI. The files are the unmodified text records
+exported by the job:
+
+- [Host and toolchain](evidence/linux/host.json).
+- [Allocation manifest](evidence/linux/allocations/manifest.json),
+  [raw observations](evidence/linux/allocations/measurements.jsonl), and
+  [summary](evidence/linux/allocations/summary.json).
+- [Debug differential receipts](evidence/linux/tests/differential-debug.json)
+  and [release differential receipts](evidence/linux/tests/differential-release.json).
+- [Compilation and test commands](evidence/linux/tests/commands.jsonl) and
+  [measurement commands](evidence/linux/allocations/commands.jsonl).
+
+The implementation and benchmark/test sources have not changed since the
+measured commit; the subsequent evidence commit adds documentation and receipts.
+
+### Limits
+
+This is a successful reduction in transient allocation traffic for the measured
+component workloads. It does not establish native elapsed-time improvement,
+retained heap reduction, player RSS, decoding or rendering performance,
+pixel-buffer/GPU memory, FPS, energy or responsiveness. The macOS job is
+configured to collect native timing in eight AB/BA rounds; those results must be
+reviewed before making a native speed claim. The runner reports percentage
+change in variant medians, not the median of per-pair changes.
