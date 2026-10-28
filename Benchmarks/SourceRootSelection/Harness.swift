@@ -40,7 +40,7 @@ private struct Fixture {
         paths = (0..<size).map { index in
             if scenario == "lookup-exact" { return rootPaths[0] }
             var root = rootPaths.isEmpty ? base : rootPaths[index % rootPaths.count]
-            if scenario == "lookup-miss" { root = base + "/Outside \(index % 8)" }
+            if scenario == "lookup-miss" || scenario == "lookup-single-miss" { root = base + "/Outside \(index % 8)" }
             if scenario == "lookup-unicode", index % 2 == 1 {
                 root = root.replacingOccurrences(of: "\u{00c9}", with: "E\u{0301}")
             }

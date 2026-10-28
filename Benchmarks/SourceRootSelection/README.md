@@ -2,9 +2,9 @@
 
 This study compares the source browser's production relative-path lookup and
 visibility projection with the eager matching-root array removed. The candidate
-uses one explicit pass to retain the first longest match; containment,
-character-count comparison, input order, Unicode behavior, and ancestor
-boundaries stay intact.
+returns the containment result directly when there is exactly one source root.
+Larger root sets use the existing filter/max selection. Input order, Unicode
+behavior, and ancestor boundaries stay intact.
 
 The baseline is commit `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`.
 The runner reuses the guarded production-source extraction in
@@ -41,7 +41,7 @@ not invalidate the frozen research baseline.
 - Golden cases cover nested roots in every order, exact roots, filesystem root,
   no matches, component boundaries, Unicode bytes, relative regexes, and the
   longest-root boundary for inherited visibility.
-- In a full research run, thirty-nine differential cases compare complete fixture outputs from production
+- In a full research run, forty-two differential cases compare complete fixture outputs from production
   relative lookup, direct/ancestor evaluation, and visibility projection.
 - Timings use fresh baseline/candidate processes in eight alternating AB/BA pairs.
   Each pair has the same iteration count; the faster calibration targets 120 ms.
@@ -83,6 +83,22 @@ projection regressed by 4.90% (all eight pairs). This candidate was rejected.
 All 208 observations and source/host receipts are retained in
 [evidence/linux-lazy-44f9166.json](evidence/linux-lazy-44f9166.json).
 
-The explicit-loop follow-up is pending measurement against the same baseline
-and workload matrix. Native macOS performance remains unqualified. No measured
-allocation-byte, whole-player memory, frame-rate, or battery claim is made.
+## Second experiment: general direct loop (not retained)
+
+The direct-loop candidate at `9d1fd4caed6df925ea81b74f14c17592bb6a1633`
+completed [portable validation](https://github.com/Jagalite/illiquid/actions/runs/40639290355/job/122653409035)
+with the same 31 tests in each of three configurations and 39 differential cases.
+Its own eight-pair cohort improved single-root lookup by 12.35% and nested-root
+lookup by 5.77%, but the 64-root tree projection still regressed by 2.08% in every
+pair, and the eight-root miss case regressed by 2.28% in every pair. The general
+loop was also rejected. See
+[evidence/linux-loop-9d1fd4c.json](evidence/linux-loop-9d1fd4c.json) for all 208
+observations and receipts. Do not mix its baseline timings with the first run.
+
+## Final candidate: single-root fast path
+
+The final candidate targets the root-count-one case directly. All original
+workloads are retained, and a single-root miss case is added to qualify both
+outcomes of the new branch (42 differential cases and 224 timed observations).
+Measurements are pending. Native macOS performance remains unqualified. No
+measured allocation-byte, whole-player memory, frame-rate, or battery claim is made.

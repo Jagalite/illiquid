@@ -23,7 +23,7 @@ HELPER = ROOT / "Benchmarks/SourceTreeVisibility/run.py"
 FOCAL = "Sources/IlliquidApp/SidebarValues.swift"
 CASES = [
     "lookup-empty", "lookup-single", "lookup-eight", "lookup-sixtyfour",
-    "lookup-nested", "lookup-unicode", "lookup-miss", "lookup-exact",
+    "lookup-nested", "lookup-unicode", "lookup-miss", "lookup-single-miss", "lookup-exact",
     "project-tree-one", "project-files-one", "project-tree-many",
     "project-files-many", "project-no-rules",
 ]
@@ -40,20 +40,17 @@ OLD = b"""    private func matchingRootPath(for normalizedPath: String) -> Strin
             .max { $0.count < $1.count }
     }"""
 NEW = b"""    private func matchingRootPath(for normalizedPath: String) -> String? {
-        // Select the first longest match without materializing a matching-root
-        // array for every row and ancestor. Count characters only when comparing
-        // two matches, preserving the common single-root path and Unicode rules.
-        var longestMatch: String?
-        for rootPath in rootPaths where SourceTreeIdentity.contains(normalizedPath, within: rootPath) {
-            if let current = longestMatch {
-                if current.count < rootPath.count {
-                    longestMatch = rootPath
-                }
-            } else {
-                longestMatch = rootPath
-            }
+        // A single source root needs only containment, with no temporary match
+        // array or longest-root reduction for every row and ancestor.
+        if rootPaths.count == 1 {
+            let rootPath = rootPaths[0]
+            return SourceTreeIdentity.contains(normalizedPath, within: rootPath) ? rootPath : nil
         }
-        return longestMatch
+        return rootPaths
+            .filter { rootPath in
+                SourceTreeIdentity.contains(normalizedPath, within: rootPath)
+            }
+            .max { $0.count < $1.count }
     }"""
 
 
@@ -148,7 +145,7 @@ class Study:
             for path in before:
                 if path == FOCAL:
                     if before[path].count(OLD) != 1 or after[path] != before[path].replace(OLD, NEW, 1):
-                        raise ValueError("Focal changes exceed the declared single-pass experiment")
+                        raise ValueError("Focal changes exceed the declared single-root experiment")
                 elif before[path] != after[path]:
                     raise ValueError(f"Unrelated production support changed: {path}")
             variants = [("baseline", before, before_records), ("candidate", after, after_records)]
