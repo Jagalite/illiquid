@@ -1,0 +1,63 @@
+name: PiP idle resource memory
+
+on:
+  push:
+    branches: ['perf/pip-idle-resource-retirement-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPIdleResourceLifetimeTests.swift'
+      - 'Benchmarks/PiPIdleMemory/**'
+      - '.github/workflows/pip-idle-memory.yml'
+      - '!Benchmarks/PiPIdleMemory/**/*.md'
+      - '!Benchmarks/PiPIdleMemory/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PiPIdleResourceLifetimeTests.swift'
+      - 'Benchmarks/PiPIdleMemory/**'
+      - '.github/workflows/pip-idle-memory.yml'
+      - '!Benchmarks/PiPIdleMemory/**/*.md'
+      - '!Benchmarks/PiPIdleMemory/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pip-idle-resource-memory-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-research:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Prepare reviewed native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Qualify native ownership and measure restart costs
+        run: |
+          python3 Benchmarks/PiPIdleMemory/run.py \
+            --output "$RUNNER_TEMP/pip-idle-memory" --pairs 6 --iterations 6
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pip-idle-memory
+          path: |
+            ${{ runner.temp }}/pip-idle-memory/*.json
+            ${{ runner.temp }}/pip-idle-memory/*.log
+            ${{ runner.temp }}/pip-idle-memory/worktrees/*/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift
+            ${{ runner.temp }}/pip-idle-memory/worktrees/*/Tests/IlliquidNativePlaybackTests/PiPIdleResourceLifetimeTests.swift
+            ${{ runner.temp }}/pip-idle-memory/worktrees/*/Tests/IlliquidNativePlaybackTests/PiPIdleResourceResearchTests.swift
+          retention-days: 14

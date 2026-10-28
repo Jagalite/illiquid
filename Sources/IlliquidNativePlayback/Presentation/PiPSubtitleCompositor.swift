@@ -344,6 +344,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         qos: .userInteractive
     )
     private let stateLock = NSLock()
+    private let beforeGPUCommitForTesting: (@Sendable (any MTLCommandBuffer) -> Void)?
 
     private var active = false
     private var workerActive = false
@@ -376,7 +377,8 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
 
     init(
         subtitles: SubtitlePipeline? = nil,
-        memoryBudget: SubtitleMemoryBudget? = nil
+        memoryBudget: SubtitleMemoryBudget? = nil,
+        beforeGPUCommitForTesting: (@Sendable (any MTLCommandBuffer) -> Void)? = nil
     ) throws {
         guard let device = MTLCreateSystemDefaultDevice(),
               let commandQueue = device.makeCommandQueue()
@@ -403,6 +405,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         subtitleUploadCache = PiPSubtitleUploadCache(device: device)
         self.device = device
         self.commandQueue = commandQueue
+        self.beforeGPUCommitForTesting = beforeGPUCommitForTesting
         textureCache = cache
 
         do {
@@ -625,9 +628,36 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         }
         workQueue.async { [weak self] in
             guard let self else { return }
+            // A later start may already own this presenter. New encoding is
+            // serialized behind this block if start races the state check.
+            guard stateLock.withLock({ !active }) else { return }
             presenter.flush(removeDisplayedImage: true)
+            retireOutputResourcesIfIdle()
             emitMetrics()
         }
+    }
+
+    /// Work-queue confined. Keep caption uploads and the latest decoded frame
+    /// warm, but retire output-sized storage once a stopped worker has drained.
+    private func retireOutputResourcesIfIdle() {
+        guard stateLock.withLock({ !active && !workerActive }) else { return }
+        // start() only publishes state and schedules work. If it races this
+        // check, its next encode runs after this work-queue operation returns.
+        if let outputPoolObserver {
+            NotificationCenter.default.removeObserver(outputPoolObserver)
+            self.outputPoolObserver = nil
+        }
+        hdrLinearTexture = nil
+        // Stop can be the last texture-cache operation for a long time. Flush
+        // unused wrappers explicitly instead of waiting for another frame.
+        CVMetalTextureCacheFlush(textureCache, 0)
+        if let outputPool {
+            CVPixelBufferPoolFlush(outputPool, .excessBuffers)
+        }
+        outputPool = nil
+        outputPoolSize = .zero
+        outputPoolPixelFormat = kCVPixelFormatType_32BGRA
+        observedOutputBuffers.removeAll(keepingCapacity: false)
     }
 
     func invalidatePendingFrames() {
@@ -666,6 +696,57 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
         stateLock.withLock { metrics }
     }
 
+    struct OutputResourceSnapshot: Sendable {
+        let hasPool: Bool
+        let hasPoolObserver: Bool
+        let poolSize: CGSize
+        let poolPixelFormat: OSType
+        let observedBufferCount: Int
+        /// Metal-reported allocation size, not process resident memory.
+        let hdrTextureBytes: Int
+        let workerActive: Bool
+        let active: Bool
+    }
+
+    /// A queue barrier returning no strong references to the measured resources.
+    func outputResourceSnapshotForTesting() async -> OutputResourceSnapshot {
+        await withCheckedContinuation { continuation in
+            workQueue.async {
+                let runState = self.stateLock.withLock {
+                    (active: self.active, workerActive: self.workerActive)
+                }
+                continuation.resume(returning: OutputResourceSnapshot(
+                    hasPool: self.outputPool != nil,
+                    hasPoolObserver: self.outputPoolObserver != nil,
+                    poolSize: self.outputPoolSize,
+                    poolPixelFormat: self.outputPoolPixelFormat,
+                    observedBufferCount: self.observedOutputBuffers.count,
+                    hdrTextureBytes: self.hdrLinearTexture?.allocatedSize ?? 0,
+                    workerActive: runState.workerActive,
+                    active: runState.active
+                ))
+            }
+        }
+    }
+
+    func withOutputResourcesForTesting<Value: Sendable>(
+        _ inspect: @escaping @Sendable (
+            CVPixelBufferPool?, (any MTLTexture)?
+        ) -> Value
+    ) async -> Value {
+        await withCheckedContinuation { continuation in
+            workQueue.async {
+                continuation.resume(returning: inspect(
+                    self.outputPool, self.hdrLinearTexture
+                ))
+            }
+        }
+    }
+
+    func enqueueWorkForTesting(_ work: @escaping @Sendable () -> Void) {
+        workQueue.async(execute: work)
+    }
+
     func composedPixelBufferForTesting(
         _ frame: NativeDecodedVideoFrame
     ) async throws -> CVPixelBuffer {
@@ -692,6 +773,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
     }
 
     private func consumePendingFrame() {
+        var stopped = false
         let work: (
             frame: NativeDecodedVideoFrame,
             displayImmediately: Bool,
@@ -700,6 +782,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             stateLock.withLock {
             guard active else {
                 workerActive = false
+                stopped = true
                 return nil
             }
             let frame = pendingFrame
@@ -711,7 +794,16 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
             }
             return frame.map { ($0, displayImmediately, compositionFence.revision) }
         }
-        guard let work else { return }
+        guard let work else {
+            if stopped {
+                // finishComposition still owns its result while draining. Let
+                // that work item release it before flushing the idle caches.
+                workQueue.async { [weak self] in
+                    self?.retireOutputResourcesIfIdle()
+                }
+            }
+            return
+        }
 
         do {
             try compose(work.frame) { [weak self] result in
@@ -1165,6 +1257,7 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
                 completion(.success((resources.outputPixelBuffer, gpuNanoseconds)))
             }
         }
+        beforeGPUCommitForTesting?(commandBuffer)
         commandBuffer.commit()
     }
 
