@@ -1041,6 +1041,109 @@ struct PlaybackCoordinatorTests {
         #expect(fixture.coordinator.state.currentURL == third)
     }
 
+    @Test(arguments: [PlaylistOpenMode.replace, .append], [0, 1, 2])
+    func batchOpenPreservesMatchingSelectionWithoutReload(
+        mode: PlaylistOpenMode,
+        currentIndex: Int
+    ) async throws {
+        let fixture = try CoordinatorFixture()
+        // Index zero is the singleton control. The other cases select the
+        // middle and final items of the actual prepared three-item playlist.
+        let count = currentIndex == 0 ? 1 : 3
+        let files = try (0..<count).map {
+            try fixture.createFile("preserved-selection-\($0).mkv")
+        }
+
+        fixture.coordinator.open(urls: files)
+        try await waitForPreparation(fixture.coordinator)
+        let initial = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: initial.identity)
+
+        if currentIndex != 0 {
+            fixture.coordinator.playItem(at: currentIndex)
+            let selected = try #require(fixture.runtime.loads.last)
+            fixture.runtime.emit(.loaded, identity: selected.identity)
+        }
+
+        let active = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.pauseChanged(false), identity: active.identity)
+        fixture.runtime.emit(.durationChanged(300), identity: active.identity)
+        fixture.runtime.emit(.positionChanged(43), identity: active.identity)
+
+        let orderedURLs = fixture.coordinator.state.playlist.map(\.url)
+        let currentURL = try #require(fixture.coordinator.state.currentURL)
+        try #require(orderedURLs.count == count)
+        try #require(fixture.coordinator.state.currentPlaylistIndex == currentIndex)
+        try #require(orderedURLs[currentIndex] == currentURL)
+        try #require(fixture.coordinator.state.position == 43)
+        let loadCount = fixture.runtime.loads.count
+
+        fixture.coordinator.open(
+            urls: Array(orderedURLs.reversed()),
+            mode: mode
+        )
+        try await waitForPreparation(fixture.coordinator)
+
+        #expect(fixture.runtime.loads.count == loadCount)
+        #expect(fixture.runtime.loads.last?.identity == active.identity)
+        #expect(fixture.coordinator.state.playlist.map(\.url) == orderedURLs)
+        #expect(fixture.coordinator.state.currentURL == currentURL)
+        #expect(fixture.coordinator.state.currentPlaylistIndex == currentIndex)
+        #expect(fixture.coordinator.state.position == 43)
+
+        // The retained playback session must still own incoming observations.
+        fixture.runtime.emit(.positionChanged(44), identity: active.identity)
+        #expect(fixture.coordinator.state.position == 44)
+        await fixture.coordinator.shutdown()
+    }
+
+    @Test
+    func batchReplacementWithoutCurrentIdentityLoadsFirstFallbackItem() async throws {
+        let fixture = try CoordinatorFixture()
+        let originalFile = try fixture.createFile("original-selection.mkv")
+        let replacements = try [
+            "replacement-selection-01.mkv",
+            "replacement-selection-02.mkv",
+        ].map { try fixture.createFile($0) }
+
+        fixture.coordinator.open(urls: [originalFile])
+        try await waitForPreparation(fixture.coordinator)
+        let original = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: original.identity)
+        fixture.runtime.emit(.pauseChanged(false), identity: original.identity)
+        fixture.runtime.emit(.durationChanged(300), identity: original.identity)
+        fixture.runtime.emit(.positionChanged(43), identity: original.identity)
+        try #require(fixture.coordinator.state.currentURL == originalFile)
+        try #require(fixture.coordinator.state.position == 43)
+        let loadCount = fixture.runtime.loads.count
+
+        fixture.coordinator.open(urls: replacements, mode: .replace)
+        try await waitForPreparation(fixture.coordinator)
+
+        try #require(fixture.runtime.loads.count == loadCount + 1)
+        let replacement = try #require(fixture.runtime.loads.last)
+        #expect(replacement.identity != original.identity)
+        #expect(replacements.contains(replacement.identity.source.url))
+
+        // Selection of a fallback creates a candidate load; it must not
+        // replace the committed source or playlist before that load succeeds.
+        #expect(fixture.coordinator.state.currentURL == originalFile)
+        #expect(fixture.coordinator.state.playlist.map(\.url) == [originalFile])
+        #expect(fixture.coordinator.state.currentPlaylistIndex == 0)
+        #expect(fixture.coordinator.state.position == 43)
+
+        fixture.runtime.emit(.loaded, identity: replacement.identity)
+
+        let committedURLs = fixture.coordinator.state.playlist.map(\.url)
+        try #require(committedURLs.count == 2)
+        #expect(Set(committedURLs) == Set(replacements))
+        #expect(fixture.coordinator.state.currentPlaylistIndex == 0)
+        #expect(committedURLs[0] == replacement.identity.source.url)
+        #expect(fixture.coordinator.state.currentURL == replacement.identity.source.url)
+        #expect(fixture.coordinator.state.position == 0)
+        await fixture.coordinator.shutdown()
+    }
+
     @Test
     func failedCandidateKeepsCommittedPlaylistSourceAndPersistenceAuthority() async throws {
         let fixture = try CoordinatorFixture()
