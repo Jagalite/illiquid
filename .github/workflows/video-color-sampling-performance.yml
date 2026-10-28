@@ -1,0 +1,98 @@
+name: Video color sampling performance
+
+on:
+  push:
+    branches: [perf/video-color-sampling-20261028]
+    paths:
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerLayoutTests.swift'
+      - 'Benchmarks/VideoColorSampling/Harness.swift'
+      - 'Benchmarks/VideoColorSampling/run.py'
+      - '.github/workflows/video-color-sampling-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameColorSampler.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/PiPVideoMapping.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerLayoutTests.swift'
+      - 'Benchmarks/VideoColorSampling/Harness.swift'
+      - 'Benchmarks/VideoColorSampling/run.py'
+      - '.github/workflows/video-color-sampling-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-color-sampling-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination and runner syntax
+        run: |
+          if [[ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]]; then
+            echo "::error::Kyoto is available. Submit the complete benchmark command through its shared queue, then inspect show/logs/wait receipts before reporting results."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; compiling sequentially in isolated build directories."
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          path = Path("Benchmarks/VideoColorSampling/run.py")
+          ast.parse(path.read_text(), filename=str(path))
+          PY
+      - name: Verify both implementations and measure balanced native pairs
+        run: |
+          python3 Benchmarks/VideoColorSampling/run.py \
+            --pairs 8 --target-ms 100 \
+            --output "$RUNNER_TEMP/video-color-sampling"
+      - name: Publish compact review receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "video-color-sampling"
+          for name in ("tests.json", "verification.json", "failure.json"):
+              path = root / name
+              if path.exists():
+                  print("VIDEO_COLOR_REVIEW " + json.dumps({
+                      "file": name, "value": json.loads(path.read_text()),
+                  }, sort_keys=True))
+          path = root / "summary.json"
+          if path.exists():
+              results = json.loads(path.read_text())
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+                  summary.write("## Video color sampling\n\n")
+                  summary.write("| Component case | Baseline ns/op | Candidate ns/op | Median paired reduction |\n")
+                  summary.write("|---|---:|---:|---:|\n")
+                  for name, result in results.items():
+                      summary.write(
+                          f"| {name} | {result['baseline']['median_ns']:.1f} "
+                          f"| {result['candidate']['median_ns']:.1f} "
+                          f"| {result['paired_reduction_percent']['median']:.1f}% |\n")
+                  summary.write("\nWarm native component measurements only. "
+                                "No whole-player CPU, FPS, or energy claim.\n")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-color-sampling-native
+          path: |
+            ${{ runner.temp }}/video-color-sampling/
+            !${{ runner.temp }}/video-color-sampling/build/**
+          retention-days: 14
