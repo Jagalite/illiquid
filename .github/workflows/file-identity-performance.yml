@@ -1,0 +1,57 @@
+name: File identity performance
+
+on:
+  push:
+    branches: ['perf/file-identity-path-20261028']
+    paths:
+      - 'Sources/IlliquidCore/**'
+      - 'Tests/IlliquidCoreTests/**'
+      - 'Benchmarks/FileIdentity/Harness.swift'
+      - 'Benchmarks/FileIdentity/run.py'
+      - 'Benchmarks/FileIdentity/baseline/**'
+      - '.github/workflows/file-identity-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Benchmarks/FileIdentity/Harness.swift'
+      - 'Benchmarks/FileIdentity/run.py'
+      - 'Benchmarks/FileIdentity/baseline/**'
+      - '.github/workflows/file-identity-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: file-identity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Qualify baseline and candidate, then run paired measurements
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Shared Kyoto queue detected; this hosted-runner job expects an isolated build host.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this hosted runner; compiling isolated component packages directly.'
+          python3 Benchmarks/FileIdentity/run.py --mode all --pairs 12 --target-ms 250 --output "$RUNNER_TEMP/file-identity"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: file-identity-native
+          path: |
+            ${{ runner.temp }}/file-identity/*.json
+            ${{ runner.temp }}/file-identity/*.jsonl
+            ${{ runner.temp }}/file-identity/logs/**
+            ${{ runner.temp }}/file-identity/sources/**
+          retention-days: 14

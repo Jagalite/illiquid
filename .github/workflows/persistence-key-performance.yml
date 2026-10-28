@@ -3,12 +3,24 @@ name: Persistence key qualification
 on:
   push:
     branches: ['codex/perf-persistence-key']
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
+      - 'Scripts/test-persistence-key.sh'
+      - 'Benchmarks/PersistenceKey/Parity.swift'
+      - 'Benchmarks/PersistenceKey/main.swift'
+      - 'Benchmarks/PersistenceKey/run.py'
+      - 'Benchmarks/PersistenceKey/check-parity.sh'
+      - '.github/workflows/persistence-key-performance.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
       - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
       - 'Scripts/test-persistence-key.sh'
-      - 'Benchmarks/PersistenceKey/**'
+      - 'Benchmarks/PersistenceKey/Parity.swift'
+      - 'Benchmarks/PersistenceKey/main.swift'
+      - 'Benchmarks/PersistenceKey/run.py'
+      - 'Benchmarks/PersistenceKey/check-parity.sh'
       - '.github/workflows/persistence-key-performance.yml'
   workflow_dispatch:
 
@@ -20,41 +32,101 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  persistence-key:
+  native:
     runs-on: macos-26
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - name: Native byte-exact differential qualification
+      - name: Fetch the pinned production baseline
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Native toolchain and exact byte parity
         shell: bash
         run: |
-          echo "Kyoto is unavailable on this isolated GitHub-hosted runner; compiling the standalone qualification directly."
           mkdir -p "$RUNNER_TEMP/persistence-key"
-          swiftc --version
-          sw_vers
-          result=0
-          for mode in debug release; do
-            directory="$RUNNER_TEMP/persistence-key/$mode"
-            mkdir -p "$directory"
-            optimization=-Onone
-            if [[ "$mode" == release ]]; then optimization=-O; fi
-            swiftc -swift-version 6 "$optimization" -whole-module-optimization -parse-as-library \
-              -emit-module -emit-object -module-name IlliquidCore \
-              -emit-module-path "$directory/IlliquidCore.swiftmodule" \
-              Sources/IlliquidCore/Utilities/NormalizedFileURL.swift -o "$directory/IlliquidCore.o"
-            swiftc -swift-version 6 "$optimization" -parse-as-library -I "$directory" \
-              Benchmarks/PersistenceKey/Parity.swift "$directory/IlliquidCore.o" -o "$directory/parity"
-            "$directory/parity" > "$RUNNER_TEMP/persistence-key/parity-$mode.json" || result=1
-            cat "$RUNNER_TEMP/persistence-key/parity-$mode.json"
-          done
-          exit "$result"
+          swiftc --version | tee "$RUNNER_TEMP/persistence-key/toolchain.txt"
+          sw_vers >> "$RUNNER_TEMP/persistence-key/toolchain.txt"
+          bash Benchmarks/PersistenceKey/check-parity.sh "$RUNNER_TEMP/persistence-key"
+      - name: Original-source debug and release identity regressions
+        shell: bash
+        run: |
+          ILLIQUID_KEY_SOURCE_REVISION=ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+            bash Scripts/test-persistence-key.sh --jobs 2 2>&1 | tee "$RUNNER_TEMP/persistence-key/tests-baseline.log"
+      - name: Candidate debug and release identity regressions
+        shell: bash
+        run: |
+          bash Scripts/test-persistence-key.sh --jobs 2 2>&1 | tee "$RUNNER_TEMP/persistence-key/tests-candidate.log"
+      - name: Paired production-source benchmark
+        shell: bash
+        run: |
+          python3 Benchmarks/PersistenceKey/run.py --rounds 12 --target-ms 200 \
+            --output "$RUNNER_TEMP/persistence-key/results.json" 2>&1 | tee "$RUNNER_TEMP/persistence-key/benchmark.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: persistence-key
-          path: ${{ runner.temp }}/persistence-key/*.json
-          retention-days: 7
+          name: persistence-key-native
+          path: ${{ runner.temp }}/persistence-key/
+          retention-days: 14
+
+  portable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: swift:6.2.4-noble@sha256:d6f8f6112e9a63da0a4a151d6b93acd16699d35c0b82531ac1a245f5af210197
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch the pinned production baseline
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Portable toolchain and exact byte parity
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/persistence-key-portable"
+          swiftc --version | tee "$RUNNER_TEMP/persistence-key-portable/toolchain.txt"
+          uname -a >> "$RUNNER_TEMP/persistence-key-portable/toolchain.txt"
+          bash Benchmarks/PersistenceKey/check-parity.sh "$RUNNER_TEMP/persistence-key-portable"
+      - name: Focused baseline and candidate identity regressions
+        shell: bash
+        run: |
+          echo "Kyoto is unavailable on this isolated runner; compiling focused regressions directly."
+          for variant in baseline candidate; do
+            package="$RUNNER_TEMP/persistence-key-portable/$variant-tests"
+            mkdir -p "$package/Sources/IlliquidCore" "$package/Tests/IlliquidCoreTests"
+            if [[ "$variant" == baseline ]]; then
+              git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:Sources/IlliquidCore/Utilities/NormalizedFileURL.swift > "$package/Sources/IlliquidCore/NormalizedFileURL.swift"
+            else
+              cp Sources/IlliquidCore/Utilities/NormalizedFileURL.swift "$package/Sources/IlliquidCore/"
+            fi
+            cp Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift "$package/Tests/IlliquidCoreTests/"
+            printf '%s\n' '// swift-tools-version: 6.1' 'import PackageDescription' 'let package = Package(name: "IdentityRegressions", targets: [.target(name: "IlliquidCore"), .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])])' > "$package/Package.swift"
+            for configuration in debug release; do
+              swift test --package-path "$package" --configuration "$configuration" --jobs 2 --no-parallel 2>&1 | tee "$RUNNER_TEMP/persistence-key-portable/tests-$variant-$configuration.log"
+            done
+            rm -rf "$package"
+          done
+      - name: Baseline and candidate folder lookup integration regressions
+        shell: bash
+        run: |
+          ILLIQUID_LOOKUP_SOURCE_REVISION=ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+            bash Scripts/test-folder-playlist-lookup.sh --jobs 2 --no-parallel 2>&1 | tee "$RUNNER_TEMP/persistence-key-portable/folder-baseline.log"
+          bash Scripts/test-folder-playlist-lookup.sh --jobs 2 --no-parallel 2>&1 | tee "$RUNNER_TEMP/persistence-key-portable/folder-candidate.log"
+      - name: Install benchmark Python
+        run: apt-get update -qq && apt-get install -y --no-install-recommends python3
+      - name: Paired production-source benchmark
+        shell: bash
+        run: |
+          python3 Benchmarks/PersistenceKey/run.py --rounds 12 --target-ms 200 \
+            --output "$RUNNER_TEMP/persistence-key-portable/results.json" 2>&1 | tee "$RUNNER_TEMP/persistence-key-portable/benchmark.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistence-key-portable-swift-6.2.4
+          path: ${{ runner.temp }}/persistence-key-portable/
+          retention-days: 14

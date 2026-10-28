@@ -110,7 +110,7 @@ struct NormalizedFileURLPersistenceKeyTests {
         for path in [
             "", ".", "..", "/", "//", "///", "/.", "/..",
             "/Media//A.mkv", "/Media/A.mkv/", "/Media/A\\B.mkv",
-            "/Media/A\u{0000}B.mkv", "/Media/A\tB.mkv", "/Media/A\nB.mkv",
+            "/Media/A\tB.mkv", "/Media/A\nB.mkv",
             "/Media/A\rB.mkv", "/Media/A#B?.mkv", "/Media/100%.mkv",
             "A.mkv", "../A.mkv", "~", "~/A.mkv", "/~user/A.mkv",
         ] {

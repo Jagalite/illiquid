@@ -159,4 +159,102 @@ struct LocalMediaSourceValidationTests {
         #expect(MediaLoadRequest(source: .localFile(alias), origin: .restoredSession)?.source.url == alias)
         #expect(NormalizedFileURL.resolveFilesystemIdentity(alias) == target)
     }
+
+    @Test("Persistence keys match normalized URL paths byte for byte across URL spellings")
+    func persistenceKeysPreserveRawURLSpellings() throws {
+        let paths = [
+            "/", "//", "///", "/.", "/..", "/A", "/A/", "/A//B", "/A///B//",
+            "/A/./B", "/A/../B", "/A/../../B", "/%2E/%2E%2E/B",
+            "/%2F", "/A%2FB", "/A%2fB/", "/A%2F..%2FB", "/A%5CB", "/A%255CB",
+            "/%00", "/A%00B", "/%01%09%0A%0D%7F", "/e%CC%81",
+            "/Caf%C3%A9", "/Cafe%CC%81", "/東京/", "/😀",
+            "/100%25%23%3F", "/%252F", "/A;B", "/A%3AB", "/A:",
+            "/~", "/../..", "/.file/id=123.456/", "/%EF%BC%8F",
+            "/%EF%BC%8E", "/A%20B", "/A%2EB", "/A.../B", "/A/.hidden",
+            "/A/%2e/B", "/A/%2e%2e/B", "/%E2%80%8B", "/%EF%BF%BD",
+        ]
+        let prefixes = [
+            "file:", "file://", "file://localhost", "file://LOCALHOST",
+            "file://media-server.example", "file://user@localhost",
+            "file://localhost:0", "https://example.invalid",
+        ]
+        var checked = 0
+        for prefix in prefixes {
+            for path in paths {
+                for suffix in ["", "?query=A%2FB#chapter", "#fragment"] {
+                    guard let url = URL(string: prefix + path + suffix) else { continue }
+                    expectSamePersistencePath(url)
+                    checked += 1
+                }
+            }
+        }
+        #expect(checked >= 1_000)
+    }
+
+    @Test("Persistence keys preserve Foundation's file-path initializer behavior")
+    func persistenceKeysPreserveConstructedPaths() {
+        let paths = [
+            "/", "//", "///", "/A/", "/A//B", "/A/../B", "/A/./B",
+            "/A\\B", "/A%2FB", "/A#B?C", "/A\nB", "/A\tB", "/A\u{0}B",
+            "/Cafe\u{0301}/Épisode.mkv", "/東京/🎞️.mkv", "/\u{1100}\u{1161}.mkv",
+            "/~/.hidden", "/A;B", "", ".", "..", "A/B", "../A//B/",
+        ]
+        let bases: [URL?] = [
+            nil,
+            URL(fileURLWithPath: "/Media/Season/", isDirectory: true),
+            URL(string: "file://localhost/Media/Season/")!,
+            URL(string: "file://media-server.example/Media/Season/")!,
+        ]
+        for path in paths {
+            for isDirectory in [false, true] {
+                for base in bases {
+                    let url = URL(fileURLWithPath: path, isDirectory: isDirectory, relativeTo: base)
+                    expectSamePersistencePath(url)
+                }
+            }
+        }
+    }
+
+    @Test("Persistence keys preserve relative references and inherited authorities")
+    func persistenceKeysPreserveRelativeReferences() {
+        let bases = [
+            "file:///Media/Season/", "file://localhost/Media/Season/",
+            "file://LOCALHOST/Media/Season/Episode.mkv",
+            "file://media-server.example/Media/Season/",
+            "file://user@localhost/Media/Season/", "https://example.invalid/Media/",
+        ]
+        let references = [
+            "", ".", "..", "../", "Episode.mkv", "../Season/Episode.mkv",
+            "Cafe%CC%81.mkv", "A%2FB.mkv", "A%00B", "/Absolute/../Episode.mkv",
+            "//other.example/Media/Episode.mkv", "?query=episode", "#chapter",
+        ]
+        for spelling in bases {
+            let base = URL(string: spelling)!
+            for reference in references {
+                if let url = URL(string: reference, relativeTo: base) {
+                    expectSamePersistencePath(url)
+                }
+            }
+        }
+    }
+
+    @Test("Canonical-equivalent names retain the existing persisted byte spelling")
+    func persistenceKeysKeepCanonicalByteSpelling() throws {
+        for spelling in ["file:///Media/Cafe%CC%81.mkv", "file://LOCALHOST/Media/Caf%C3%A9.mkv",
+                         "file:///Media/%E1%84%80%E1%85%A1.mkv"] {
+            let url = try #require(URL(string: spelling))
+            _ = try #require(NormalizedFileURL.persistenceKey(for: url))
+            expectSamePersistencePath(url)
+        }
+    }
+
+    private func expectSamePersistencePath(_ url: URL) {
+        // Keep the pre-optimization expression as the oracle. Comparing String
+        // values would hide a change between canonically equivalent UTF-8 bytes.
+        let expected = NormalizedFileURL.normalize(url)?.path
+        let actual = NormalizedFileURL.persistenceKey(for: url)
+        #expect(actual.map { Array($0.utf8) } == expected.map { Array($0.utf8) },
+                "Persistence key differs for \(url.absoluteString)")
+    }
+
 }
