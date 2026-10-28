@@ -33,11 +33,12 @@ and driver are pinned by commit `6f9d096153d9085d7cc2b64ecd1ced145f3dda68`
 and the recorded SHA-256 hashes.
 
 A narrower no-op-only guard then improved full-window no-op pruning by about
-94%, but its 128-entry rolling mutation control was 1.53% slower by paired
-median. Those observations remain in [evidence/portable](evidence/portable)
-and in the explicitly exploratory table below. A concurrent implementation in
-PR #157 extends the guard to a single retirement, addressing the extra-search
-cost on that control. This study adopts that implementation for independent
+94%, but one cohort's 128-entry rolling mutation control was 1.53% slower by
+paired median. A longer fixed-affinity confirmation did not reproduce that
+small slowdown; both cohorts remain visible below. The original observations
+are in [evidence/portable](evidence/portable). A concurrent implementation in
+PR #157 extends the guard to a single retirement, also eliminating the reverse
+search on that mutation path. This study adopts that implementation for independent
 qualification rather than proposing a duplicate production change.
 
 ## Production context
@@ -143,10 +144,44 @@ PR #157's native workflow provides the separate macOS qualification.
 
 ## Results and limits
 
-### Combined zero/one-entry candidate
+### Combined candidate: existing PR #157 run, independently audited
 
-The independent twelve-pair, fixed-affinity run for the exact PR #157 source is
-pending. Its results will be recorded separately from the exploratory candidate.
+The [successful upstream Linux job](https://github.com/Jagalite/illiquid/actions/runs/40637503390/job/122647747237)
+measured the exact combined implementation at
+`79d9c9091b5eb4bb94b532fc9f7da9740778532d`, against the pinned current-main
+baseline, on x86_64 with Swift 6.4. These are existing PR #157 measurements
+retrieved and independently audited, not a new independent execution.
+
+| Upstream workload | Baseline median ns/op | Candidate median ns/op | Paired median reduction | Faster pairs |
+| --- | ---: | ---: | ---: | ---: |
+| No-op prune, 128 events | 55.685 | 3.425 | 93.85% | 8/8 |
+| One-entry retirement + insert + lookup, 8 events | 134.360 | 131.064 | 1.85% | 8/8 |
+| One-entry retirement + insert + lookup, 32 events | 171.879 | 157.075 | 8.60% | 8/8 |
+| One-entry retirement + insert + lookup, 128 events | 397.086 | 329.812 | 17.22% | 8/8 |
+| Centered one-entry stream, 128 events | 352.124 | 292.160 | 17.19% | 8/8 |
+
+All 24 test declarations in two suites passed against baseline and candidate
+in both debug and release with warnings treated as errors. The audit reproduced
+the summaries for all 464 observations across 29 cases and eight pairs, checked
+balanced order, exact UInt64 checksums and complete-state receipt hashes, matched
+original and staged sources to the adopted production code, and checked all
+600 recorded command exit statuses.
+
+[Durable upstream evidence](evidence/bounded-upstream) includes raw measurements,
+calibration, original manifests, staged component sources, test logs, commands
+and provenance. This cohort uses the existing `BitmapSubtitleTimeline` driver
+and its fixtures. Do not pool its absolute times with the separate
+`BitmapSubtitleLookup` cohorts: the drivers, workloads, compiler versions and
+hosted runner instances differ. Percentages are medians of within-pair ratios,
+not ratios of the displayed medians.
+
+### Combined candidate: independent longer run
+
+[Run 40640508556](https://github.com/Jagalite/illiquid/actions/runs/40640508556)
+is executing the exact same production bytes with the independent 28-case
+driver at `a2e39e141a073688e058f354a15093d2dd98ae31`. It uses twelve balanced
+pairs, a 250 ms target and fixed CPU affinity. Its completed results will be
+recorded separately; no performance claim above depends on that pending run.
 
 ### Exploratory Linux run: no-op-only guard
 
@@ -180,8 +215,9 @@ Positive mutation-control changes mean more time. Percentages are medians of
 within-pair ratios, so they need not equal ratios of the displayed medians.
 The 128-entry stream was about 3.2 ns slower by the difference of medians and
 1.53% slower by paired median; six of eight pairs were slower. A large outlier
-is retained, and does not by itself explain the median. The guard adds work
-before real removals, so that tradeoff must not be hidden behind no-op gains.
+is retained, and does not by itself explain the median. The longer confirmation below did not reproduce this small slowdown.
+The initial observation is retained rather than being discarded or explained
+away by the outlier; it is not established as a reproducible regression.
 Lookup implementation is unchanged; its small before/after movements are
 controls, not improvements attributed to this patch.
 
@@ -195,13 +231,34 @@ Durable records: [manifests, tests, commands, calibration, raw observations and
 summary](evidence/portable). The workflow artifact also retains full per-case
 receipts for its configured retention period.
 
-### Additional exploratory confirmation
+### Exploratory no-op-only guard: longer confirmation
 
 [Run 40639637094](https://github.com/Jagalite/illiquid/actions/runs/40639637094)
-was queued for the old no-op-only candidate at this report's snapshot. It is
-not evidence for the combined candidate. The new twelve-pair full matrix
-qualifies the combined implementation separately and does not replace any
-earlier observations.
+completed successfully at `f90d8206300e015202e09fb5a98becaf53fee4d6`.
+It measured the old no-op-only candidate, not PR #157's combined fast path.
+Twelve balanced pairs used a 250 ms target and one allowed CPU on an AMD EPYC
+7763 hosted runner, with Swift 6.4.1. All 144 observations across six cases
+matched exact integer checksums and full receipt hashes.
+
+| Exploratory confirmation | Baseline median ns/op | Candidate median ns/op | Paired median reduction | Faster pairs |
+| --- | ---: | ---: | ---: | ---: |
+| lookup-latest-128 | 17.023 | 16.908 | 1.00% | 8/12 |
+| prune-first-128 | 55.430 | 3.769 | 93.20% | 12/12 |
+| stream-2 | 124.313 | 123.600 | 0.78% | 6/12 |
+| stream-8 | 140.019 | 140.301 | 0.14% | 7/12 |
+| stream-32 | 176.613 | 174.292 | 0.93% | 10/12 |
+| stream-128 | 393.983 | 391.334 | 0.61% | 12/12 |
+
+The large no-op improvement reproduced. The initial small stream-128 slowdown
+did not: this cohort was 0.61% faster by paired median. Small lookup movements
+are unchanged-code controls. These data do not establish a repeatable mutation
+penalty or benefit for the old guard. Both cohorts are retained, with no pooled
+statistics and no discarded observations. The confirmation did not rerun the
+regression tests already completed for those exact inputs.
+
+[Durable confirmation evidence](evidence/exploratory-noop-confirmation) includes
+CPU/affinity details, source hashes, raw measurements, calibration, commands,
+summary and audit provenance.
 
 ### Native qualification and scope
 
@@ -214,4 +271,6 @@ These are warm component measurements. They do not measure real no-op frequency,
 lock contention, decoding, GPU rendering, frame rate, whole-player CPU, memory
 footprint, or energy. Without real call-frequency data, the no-op saving and
 mutation-path cost cannot be converted into an aggregate playback speedup.
+All timed rolling mutations retire exactly one entry. Bulk-retirement latency
+was not measured, though its correctness is exercised by the regression suite.
 Successful pruning still shifts the retained array and releases removed owners.
