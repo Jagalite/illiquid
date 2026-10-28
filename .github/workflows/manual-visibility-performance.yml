@@ -1,0 +1,124 @@
+name: Manual visibility performance
+
+on:
+  push:
+    branches: ['perf/manual-visibility-20261028']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityMatcherTests.swift'
+      - 'Benchmarks/ManualVisibility/**'
+      - '.github/workflows/manual-visibility-performance.yml'
+      - '!Benchmarks/ManualVisibility/**/*.md'
+      - '!Benchmarks/ManualVisibility/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityMatcherTests.swift'
+      - 'Benchmarks/ManualVisibility/**'
+      - '.github/workflows/manual-visibility-performance.yml'
+      - '!Benchmarks/ManualVisibility/**/*.md'
+      - '!Benchmarks/ManualVisibility/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-visibility-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify exact production sources and measure paired projections
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo "Shared Kyoto queue is present; submit this qualification through Kyoto."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; isolated component builds run serially."
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/ManualVisibility/run.py \
+            --output "$RUNNER_TEMP/manual-visibility" \
+            --pairs 8 --sizes 100,1000,10000 --target-ms 80 "${mode[@]}"
+      - name: Emit retained evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'manual-visibility'
+          files = {}
+          for name in ['manifest.json', 'tests.json', 'verification.json',
+                       'calibrations.json', 'summary.json', 'failure.json']:
+              path = root / name
+              if path.exists():
+                  files[name] = json.loads(path.read_text())
+          path = root / 'measurements.jsonl'
+          if path.exists():
+              files[path.name] = [json.loads(line) for line in path.read_text().splitlines()]
+          payload = json.dumps(files, sort_keys=True, separators=(',', ':'))
+          if len(payload.encode()) > 4 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log limit; use the uploaded artifact')
+          print('MANUAL_VISIBILITY_EVIDENCE ' + payload)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: manual-visibility-component
+          path: |
+            ${{ runner.temp }}/manual-visibility/*.json
+            ${{ runner.temp }}/manual-visibility/*.jsonl
+            ${{ runner.temp }}/manual-visibility/*.log
+            ${{ runner.temp }}/manual-visibility/packages/**/*.swift
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo "Shared Kyoto queue is present; submit this qualification through Kyoto."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; native builds run directly."
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and test visibility behavior
+        run: |
+          mkdir -p "$RUNNER_TEMP/manual-visibility-native"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'SourceVisibilityMatcherTests|SourceBrowserFilterTests|SourceTreeVisibilityCacheTests|SourceVisibilityStorageTests|SourceBrowserSearchTests|SourceMediaOrganizationTests|SourceEmptyFolderVisibilityTests|visibilityMatcherCombinesManualRegexAndAlwaysShowRules|filesOnlyVisibilityInheritsHiddenFolderRules' \
+            2>&1 | tee "$RUNNER_TEMP/manual-visibility-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: manual-visibility-native-integration
+          path: ${{ runner.temp }}/manual-visibility-native/
+          retention-days: 14
