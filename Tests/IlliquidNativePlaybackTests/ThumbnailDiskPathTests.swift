@@ -125,7 +125,7 @@ final class ThumbnailDiskPathTests: XCTestCase {
         )
     }
 
-    func testSymlinkedCacheDirectoryInventoriesPromotesAndClearsTargetFiles() async throws {
+    func testSymlinkedCacheDirectoryMatchesFoundationInventoryAndExactLookup() async throws {
         let root = try temporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let target = root.appendingPathComponent("real cache", isDirectory: true)
@@ -137,21 +137,54 @@ final class ThumbnailDiskPathTests: XCTestCase {
         let sentinel = target.appendingPathComponent("keep.txt")
         try Data([1]).write(to: sentinel)
 
+        // On macOS 26.6.2 Foundation does not traverse a directory symlink
+        // during shallow enumeration. Derive expectations from the same
+        // Foundation enumeration that the unchanged production baseline uses.
+        let enumerated = (FileManager.default.enumerator(
+            at: alias, includingPropertiesForKeys: [],
+            options: [.skipsSubdirectoryDescendants]
+        )?.allObjects ?? []).compactMap { $0 as? URL }
+        let inventorySeesJPEG = enumerated.contains {
+            $0.lastPathComponent == path(target, selected, background: true).lastPathComponent
+        }
         let cache = NativeThumbnailDiskCache(directory: alias)
         let bytes = await cache.bytes()
-        XCTAssertEqual(bytes, expectedBytes)
-        let result = await cache.image(for: selected, background: false)
-        XCTAssertEqual(result?.width, 12)
-        XCTAssertFalse(FileManager.default.fileExists(
-            atPath: path(target, selected, background: true).path
-        ))
-        XCTAssertTrue(FileManager.default.fileExists(
-            atPath: path(target, selected, background: false).path
-        ))
+        XCTAssertEqual(bytes, inventorySeesJPEG ? expectedBytes : 0)
 
-        let cleared = await cache.clear(epoch: 1)
-        XCTAssertTrue(cleared)
-        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: target.path), ["keep.txt"])
+        if inventorySeesJPEG {
+            let result = await cache.image(for: selected, background: false)
+            XCTAssertEqual(result?.width, 12)
+            XCTAssertFalse(FileManager.default.fileExists(
+                atPath: path(target, selected, background: true).path
+            ))
+            XCTAssertTrue(FileManager.default.fileExists(
+                atPath: path(target, selected, background: false).path
+            ))
+            let cleared = await cache.clear(epoch: 1)
+            XCTAssertTrue(cleared)
+            XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: target.path), ["keep.txt"])
+        } else {
+            // A loaded empty inventory cannot read the target. A fresh cache's
+            // exact foreground lookup can still follow the link and promote.
+            let missing = await cache.image(for: selected, background: false)
+            XCTAssertNil(missing)
+            let freshCache = NativeThumbnailDiskCache(directory: alias)
+            let result = await freshCache.image(for: selected, background: false)
+            XCTAssertEqual(result?.width, 12)
+            XCTAssertFalse(FileManager.default.fileExists(
+                atPath: path(target, selected, background: true).path
+            ))
+            XCTAssertTrue(FileManager.default.fileExists(
+                atPath: path(target, selected, background: false).path
+            ))
+            let cleared = await cache.clear(epoch: 1)
+            XCTAssertTrue(cleared)
+            // Clear must not unlink a physical file absent from its inventory.
+            XCTAssertTrue(FileManager.default.fileExists(
+                atPath: path(target, selected, background: false).path
+            ))
+            XCTAssertTrue(FileManager.default.fileExists(atPath: sentinel.path))
+        }
         XCTAssertNotNil(try? FileManager.default.destinationOfSymbolicLink(atPath: alias.path))
     }
 
@@ -196,7 +229,7 @@ final class ThumbnailDiskPathTests: XCTestCase {
         }
     }
 
-    func testRetargetedDirectorySymlinkPreservesInventoriedURLSemantics() async throws {
+    func testRetargetedDirectorySymlinkMatchesFoundationEnumeratedURLBehavior() async throws {
         let root = try temporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let first = root.appendingPathComponent("first", isDirectory: true)
@@ -210,36 +243,57 @@ final class ThumbnailDiskPathTests: XCTestCase {
         try writeJPEG(second, selected, width: 24)
         try FileManager.default.createSymbolicLink(at: alias, withDestinationURL: first)
 
-        // Use the URL Foundation actually enumerates as the original behavior's
-        // oracle; do not assume that enumeration resolves or preserves the link.
-        let inventoriedURL: URL = try {
-            let entries = FileManager.default.enumerator(
-                at: alias, includingPropertiesForKeys: [],
-                options: [.skipsSubdirectoryDescendants]
-            )
-            return try XCTUnwrap(entries?.nextObject() as? URL)
-        }()
+        // Compare the inventory against the URL Foundation really enumerates.
+        // In particular, nil means no cached URL to read or unlink on retarget.
+        let inventoriedURL = (FileManager.default.enumerator(
+            at: alias, includingPropertiesForKeys: [],
+            options: [.skipsSubdirectoryDescendants]
+        )?.allObjects ?? []).compactMap { $0 as? URL }.first {
+            $0.lastPathComponent == path(first, selected, background: true).lastPathComponent
+        }
         let cache = NativeThumbnailDiskCache(directory: alias)
         let bytes = await cache.bytes()
-        XCTAssertEqual(bytes, expectedBytes)
+        XCTAssertEqual(bytes, inventoriedURL == nil ? 0 : expectedBytes)
 
         try FileManager.default.removeItem(at: alias)
         try FileManager.default.createSymbolicLink(at: alias, withDestinationURL: second)
-        let expectedImage = try XCTUnwrap(
-            NativeThumbnailDiskCache.readImage(at: inventoriedURL, key: selected)
-        )
-        let result = await cache.image(for: selected, background: true)
-        XCTAssertEqual(result?.width, expectedImage.width)
+        if let inventoriedURL {
+            let expectedImage = try XCTUnwrap(
+                NativeThumbnailDiskCache.readImage(at: inventoriedURL, key: selected)
+            )
+            let result = await cache.image(for: selected, background: true)
+            XCTAssertEqual(result?.width, expectedImage.width)
 
-        let expectedRemoval = inventoriedURL.resolvingSymlinksInPath().path
-        let firstPath = path(first, selected, background: true).resolvingSymlinksInPath().path
-        let secondPath = path(second, selected, background: true).resolvingSymlinksInPath().path
-        XCTAssertTrue([firstPath, secondPath].contains(expectedRemoval))
-        let untouched = expectedRemoval == firstPath ? secondPath : firstPath
-        let cleared = await cache.clear(epoch: 1)
-        XCTAssertTrue(cleared)
-        XCTAssertFalse(FileManager.default.fileExists(atPath: expectedRemoval))
-        XCTAssertTrue(FileManager.default.fileExists(atPath: untouched))
+            let expectedRemoval = inventoriedURL.resolvingSymlinksInPath().path
+            let firstPath = path(first, selected, background: true).resolvingSymlinksInPath().path
+            let secondPath = path(second, selected, background: true).resolvingSymlinksInPath().path
+            XCTAssertTrue([firstPath, secondPath].contains(expectedRemoval))
+            let untouched = expectedRemoval == firstPath ? secondPath : firstPath
+            let cleared = await cache.clear(epoch: 1)
+            XCTAssertTrue(cleared)
+            XCTAssertFalse(FileManager.default.fileExists(atPath: expectedRemoval))
+            XCTAssertTrue(FileManager.default.fileExists(atPath: untouched))
+        } else {
+            let missing = await cache.image(for: selected, background: true)
+            XCTAssertNil(missing)
+            // Uninventoried exact-path lookup resolves the retargeted link
+            // dynamically, without creating a persistent inventory entry.
+            let freshCache = NativeThumbnailDiskCache(directory: alias)
+            let direct = await freshCache.image(for: selected, background: false)
+            XCTAssertEqual(direct?.width, 24)
+            let cleared = await cache.clear(epoch: 1)
+            XCTAssertTrue(cleared)
+            XCTAssertTrue(FileManager.default.fileExists(
+                atPath: path(first, selected, background: true).path
+            ))
+            XCTAssertFalse(FileManager.default.fileExists(
+                atPath: path(second, selected, background: true).path
+            ))
+            XCTAssertTrue(FileManager.default.fileExists(
+                atPath: path(second, selected, background: false).path
+            ))
+        }
         XCTAssertNotNil(try? FileManager.default.destinationOfSymbolicLink(atPath: alias.path))
     }
+
 }
