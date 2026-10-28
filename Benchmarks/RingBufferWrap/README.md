@@ -24,6 +24,73 @@ This is component research. It does not measure playback frame rate, frame
 latency, decoding throughput, energy, or performance under producer/consumer
 contention.
 
+## Results: Linux component qualification
+
+[Successful Linux run](https://github.com/Jagalite/illiquid/actions/runs/40639921080)
+on commit `2b937583e431e2efadfc8a6b612339f5416cd222`.
+Target-platform macOS qualification is still outstanding; these results must not
+be extrapolated to native macOS performance.
+
+Host: x86_64 Ubuntu 24.04.5, Swift 6.3.3, runner-reported AMD EPYC 9V45 processor
+with four CPUs in its affinity mask. Eight balanced pairs per workload, 208
+timed observations and 78 retained calibration observations.
+
+| Workload | Baseline median ns/element | Candidate median ns/element | Paired wall reduction | Paired CPU reduction | Wall wins |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Scalar FIFO, capacity 1 / depth 1 | 4.113 | 1.098 | 73.14% | 73.14% | 8/8 |
+| Scalar FIFO, capacity 12 / depth 1 | 4.121 | 1.106 | 73.22% | 73.21% | 8/8 |
+| Scalar FIFO, capacity 12 / depth 6 | 4.090 | 1.060 | 74.09% | 74.09% | 8/8 |
+| Scalar FIFO, capacity 48 / depth 24 | 4.083 | 1.067 | 73.92% | 73.92% | 8/8 |
+| Scalar FIFO, capacity 96 / depth 48 | 4.101 | 1.068 | 73.90% | 73.90% | 8/8 |
+| Scalar FIFO, capacity 192 / depth 96 | 4.093 | 1.132 | 72.34% | 72.34% | 8/8 |
+| Scalar FIFO, capacity 256 / depth 128 | 4.086 | 1.118 | 72.69% | 72.69% | 8/8 |
+| Prepend/drain, capacity 96 | 5.555 | 1.454 | 73.82% | 73.81% | 8/8 |
+| Append/drain, capacity 96 | 4.137 | 1.517 | 63.46% | 63.45% | 8/8 |
+| Partial drain/clear, capacity 96 | 1.893 | 1.118 | 41.01% | 40.98% | 8/8 |
+| Reference FIFO, capacity 96 / depth 48 | 16.780 | 16.300 | 2.99% | 2.98% | 8/8 |
+| Complete queue, capacity 12 / depth 6 | 46.650 | 46.692 | -0.20% | -0.19% | 3/8 |
+| Complete queue, capacity 96 / depth 48 | 46.310 | 45.880 | 0.74% | 0.76% | 6/8 |
+
+For FIFO scenarios, one logical element means a pop-and-push cycle (two API
+operations). Prepend/drain and append/drain rows average one insertion and one
+removal per input element. The scalar clear row averages over admitted input
+elements, with bulk clearing; it does not measure object destruction. Reference
+FIFO uses preallocated objects whose fixture retains another owner, so
+allocation and final destruction are outside timing.
+
+Scalar FIFO improvements are consistent in all 56 pairs and save roughly
+3 ns/cycle. The reference scenario improves by about 3%, saving about
+0.5 ns/cycle. The complete queue controls show small mixed differences:
+capacity 12 has a -0.20% paired wall reduction (a slight slowdown), while
+capacity 96 has a +0.74% reduction. These results do not establish a material
+complete-queue or whole-player improvement. Both control rows and every
+individual observation are retained.
+
+The table's first two columns are independent medians. Paired reductions are
+medians of each pair's percentage change, so they need not equal the percentage
+computed from the two independent medians. Positive reduction means faster.
+
+Validation passed:
+
+- 15 test methods in each of four baseline/candidate debug/release configurations.
+- Exact baseline/candidate differential receipts across 15 capacities, 30,720
+  mixed-operation steps and 1,262 head offsets (210,412 checked wrap elements).
+- All measured checksums matched their independent integer expectations.
+- Source and binary hashes remained unchanged throughout qualification.
+- Independent review reproduced the complete Array-oracle corpus, every checksum,
+  paired observation order and all wall/CPU summary calculations.
+
+[Complete retained evidence](evidence/linux/review-evidence.json) contains every
+calibration and measured observation, source/binary hashes, command receipts,
+the exact differential outputs and host provenance.
+[Independent calculation audit](evidence/linux/audit.json) records the checks.
+
+The compact evidence file has SHA-256
+`d87ed9dba253d2b0fec63a59593aea9dc391cf671a857df47dd29999f991bbde`.
+Full command logs and staged sources are also attached to the run with 14-day
+artifact retention. The committed evidence and reproduction source remain
+available after that artifact expires.
+
 ## Reproduction
 
 Requirements: macOS, the native Swift 6.1+ toolchain, and Python 3.10+.
@@ -86,6 +153,6 @@ Monotonic wall time and process CPU time are both recorded. No samples are
 discarded and no empty-loop cost is subtracted. The primary unit is one logical
 element; the report also records API-operation counts.
 
-Native results and interpretation will be added after qualification. The
-workflow retains all command logs and staged sources as an artifact, and emits
-machine-readable evidence for independent review.
+The workflow retains all command logs and staged sources as an artifact, and
+emits machine-readable evidence for independent review. Native macOS results
+will be added when target-platform qualification is available.
