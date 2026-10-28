@@ -51,11 +51,26 @@ def command(args: list[str], log: Path, output: Path) -> str:
 
 
 def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict]:
-    pinned = json.loads((HERE / "baseline/manifest.json").read_text())
-    baseline = (HERE / "baseline/ExternalTextSubtitleConverter.swift").read_bytes()
+    if args.baseline_ref:
+        revision = command(
+            ["git", "rev-parse", "--verify", "--end-of-options", f"{args.baseline_ref}^{{commit}}"],
+            output / "baseline-revision.log", output,
+        ).strip()
+        source_path = str(SOURCE.relative_to(ROOT))
+        baseline = subprocess.check_output(["git", "show", f"{revision}:{source_path}"], cwd=ROOT)
+        pinned = {
+            "repository": "Jagalite/illiquid", "revision": revision, "path": source_path,
+            "git_blob": subprocess.check_output(
+                ["git", "rev-parse", f"{revision}:{source_path}"], cwd=ROOT, text=True,
+            ).strip(),
+            "sha256": sha(baseline),
+        }
+    else:
+        pinned = json.loads((HERE / "baseline/manifest.json").read_text())
+        baseline = (HERE / "baseline/ExternalTextSubtitleConverter.swift").read_bytes()
     blob = hashlib.sha1(b"blob " + str(len(baseline)).encode() + b"\0" + baseline).hexdigest()
     if sha(baseline) != pinned["sha256"] or blob != pinned["git_blob"]:
-        raise ValueError("Frozen baseline differs from its source manifest")
+        raise ValueError("Baseline differs from its source manifest")
     selected = shutil.which(args.swiftc) or args.swiftc
     compiler = os.path.abspath(selected)
     version = command([compiler, "--version"], output / "compiler.log", output).strip()
@@ -66,6 +81,7 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
     manifest = {
         "started_utc": datetime.now(timezone.utc).isoformat(),
         "platform": platform.platform(), "machine": platform.machine(),
+        "git_revision": command(["git", "rev-parse", "HEAD"], output / "git-revision.log", output).strip(),
         "python": platform.python_version(), "compiler": version,
         "compiler_path": compiler, "compiler_sha256": sha(Path(compiler).read_bytes()),
         "flags": flags, "runner_sha256": sha(Path(__file__).read_bytes()),
@@ -79,9 +95,14 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
     for variant in VARIANTS:
         folder = output / variant
         folder.mkdir()
-        original = HERE / "baseline/ExternalTextSubtitleConverter.swift" if variant == "baseline" else SOURCE
         source = folder / "ExternalTextSubtitleConverter.swift"
-        shutil.copyfile(original, source)
+        if variant == "baseline":
+            source.write_bytes(baseline)
+            source_path = (f"{pinned['revision']}:{pinned['path']}" if args.baseline_ref
+                           else str((HERE / "baseline/ExternalTextSubtitleConverter.swift").relative_to(ROOT)))
+        else:
+            shutil.copyfile(SOURCE, source)
+            source_path = str(SOURCE.relative_to(ROOT))
         extension = "dylib" if platform.system() == "Darwin" else "so"
         library = folder / f"libIlliquidNativePlayback.{extension}"
         module = folder / "IlliquidNativePlayback.swiftmodule"
@@ -95,7 +116,7 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
                           str(output / "Driver.swift"), "-o", str(binary)]
         command(driver_command, folder / "build-driver.log", output)
         manifest["variants"][variant] = {
-            "source_sha256": sha(source.read_bytes()), "source_path": str(original.relative_to(ROOT)),
+            "source_sha256": sha(source.read_bytes()), "source_path": source_path,
             "module_sha256": sha(module.read_bytes()), "library_sha256": sha(library.read_bytes()),
             "binary_sha256": sha(binary.read_bytes()), "module_command": module_command,
             "driver_command": driver_command,
@@ -242,6 +263,7 @@ def main() -> None:
     parser.add_argument("mode", choices=("verify", "benchmark", "summarize"))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--swiftc", default=os.environ.get("SWIFTC", "swiftc"))
+    parser.add_argument("--baseline-ref", help="Git revision for the exact baseline converter; defaults to the frozen baseline")
     parser.add_argument("--rounds", type=int, default=10)
     parser.add_argument("--target-ms", type=float, default=100)
     parser.add_argument("--case", action="append", help="Exact case name; repeat to select multiple cases")

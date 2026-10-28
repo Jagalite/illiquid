@@ -4,6 +4,11 @@ This benchmark measures complete SRT and WebVTT conversion through the real
 `ExternalTextSubtitleConverter`. It compares the production source with the
 frozen version from `main` at `68274d1b09dcc866296321a5a8858efc297c4f19`.
 The baseline manifest records its original path, Git blob, and SHA-256.
+Use `--baseline-ref REVISION` to compare an incremental change against a specific
+Git revision instead; the runner resolves it to an immutable commit and records
+the exact source blob, SHA-256, and source snapshot. The macOS workflow compares
+PRs with their base commit and uses `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`
+for the timestamp research branch and manual runs.
 
 ## Reproduce
 
@@ -15,7 +20,8 @@ bash Scripts/test-external-subtitle-regressions.sh -c debug -Xswiftc -warnings-a
 bash Scripts/test-external-subtitle-regressions.sh -c release -Xswiftc -warnings-as-errors
 python3 Benchmarks/ExternalSubtitleConversion/run.py verify --output /tmp/subtitle-verify
 python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark \
-  --rounds 10 --target-ms 100 --output /tmp/subtitle-benchmark
+  --rounds 10 --target-ms 100 --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --output /tmp/subtitle-benchmark
 python3 Benchmarks/ExternalSubtitleConversion/run.py summarize --output /tmp/subtitle-benchmark
 ```
 
@@ -38,18 +44,27 @@ python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark \
 
 ## Workloads and correctness
 
-The 36 timed cases cover both formats, 1/100/2,000/10,000 cues, plain ASCII,
+The original 36 timed cases cover both formats, 1/100/2,000/10,000 cues, plain ASCII,
 multilingual text, ASCII escapes, CRLF/CR/BOM handling, empty input, invalid
 cues, and Unicode-plus-escape fallback controls. All fixtures are synthetic;
 input construction is outside timing. A 2,000-cue fixture is useful for a
 dialogue-heavy title; the 10,000-cue case exercises longer material.
+Four additional timed cases cover short WebVTT timestamps, unpadded SRT hours,
+and large hours in both formats, bringing the current workload set to 40.
 
 Before timing, the runner compares full input/output UTF-8 bytes and exact
-typed conversion errors in 1,698 cases. These include every sequence of length
+typed conversion errors in 13,942 cases. These include every sequence of length
 zero through three over nine selected atoms in both formats, additional
 Unicode/normalization edges, compatibility punctuation, NUL, literal ASS
 commands, empty payloads, and trailing newlines. Swift String equality is not
 used for byte parity, since it accepts canonical equivalence.
+
+The timestamp corpus replaces every position in all four fixed-width spellings
+with all 128 ASCII values, seven Unicode atoms, or an empty string, testing both
+cue endpoints (12,240 mutations). The unchanged baseline supplies the expected
+output/error for this corpus; the harness does not duplicate timestamp parsing
+rules. Independent regression tests retain explicit expected outputs for
+rounding carries, whitespace, malformed inputs, and noncanonical SRT fallbacks.
 
 The standalone script also runs the existing timestamp/parser tests and eight
 independent escaping tests from the normal native test target. The tests cover
@@ -77,14 +92,14 @@ serialization are excluded. CPU time and monotonic elapsed time are recorded.
 A checked iteration checksum consumes every result; complete outputs are
 verified again after timing.
 
-Summary generation validates all 720 observations, exact pair order, operation
+Summary generation validates all 800 observations, exact pair order, operation
 counts, checksums, output fingerprints, and durations. It retains individual
 paired ratios and reports medians and ranges; shared-runner timings have no
 hard CI speed threshold.
 
 ## Evidence and limits
 
-The checked-in `evidence/linux` directory contains the final cohort, source and
+The checked-in `evidence/linux` directory contains the original 36-case cohort, source and
 compiler receipts, compressed full differential outputs, process command logs,
 and passing baseline/candidate test logs. The exploratory cohort records the
 initial version without the early exit from classification on Unicode fallback

@@ -364,6 +364,71 @@ struct ExternalTextSubtitleConverterTests {
         }
     }
 
+    @Test func fixedWidthTimestampsRoundAcrossSecondMinuteAndHourBoundaries() throws {
+        let cases = [
+            ("00:00:00.004", "0:00:00.00"),
+            ("00:00:00.005", "0:00:00.01"),
+            ("09:09:09.994", "9:09:09.99"),
+            ("09:09:59.995", "9:10:00.00"),
+            ("09:59:59.995", "10:00:00.00"),
+            ("99:59:59.999", "100:00:00.00"),
+        ]
+        for format in [Converter.Format.srt, .webVTT] {
+            for (timestamp, expectedStart) in cases {
+                // Exercise both SRT separators and the general parser for the
+                // three-digit end hour alongside the fixed-width start.
+                for separator in (format == .srt ? [",", "."] : ["."]) {
+                    let start = timestamp.replacingOccurrences(of: ".", with: separator)
+                    let source = cue(start: start, end: "100:00:01.000", format: format)
+                    #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                        "Dialogue: 0,\(expectedStart),100:00:01.00,Default,,0,0,0,,Caption",
+                    ])
+                }
+            }
+        }
+    }
+
+    @Test func shortWebVTTTimestampsKeepRoundingAndSettings() throws {
+        let cases = [
+            ("00:00.004", "0:00:00.00"),
+            ("00:00.005", "0:00:00.01"),
+            ("09:59.995", "0:10:00.00"),
+            ("59:59.999", "1:00:00.00"),
+        ]
+        for (start, expectedStart) in cases {
+            let source = cue(
+                start: start, end: "01:00:01.000 align:start line:90%", format: .webVTT
+            )
+            #expect(dialogueLines(try Converter.convert(source, format: .webVTT)) == [
+                "Dialogue: 0,\(expectedStart),1:00:01.00,Default,,0,0,0,,Caption",
+            ])
+        }
+    }
+
+    @Test func timestampFastPathPreservesTrimmedWhitespaceAndFallbackForms() throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(
+                start: "\u{00A0}\t00:00:01.005\u{00A0}",
+                end: "\t00:00:02.000\u{00A0}", format: format
+            )
+            #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                "Dialogue: 0,0:00:01.01,0:00:02.00,Default,,0,0,0,,Caption",
+            ])
+        }
+        for (start, expectedStart) in [
+            ("1:2:3,4", "1:02:03.00"),
+            ("0:00:00.0000", "0:00:00.00"),
+            ("000:00:00.00", "0:00:00.00"),
+            ("123:04:05,6", "123:04:05.01"),
+            ("00:00:01,005999", "0:00:01.01"),
+            ("000:00:01", "0:00:01.00"),
+        ] {
+            #expect(dialogueLines(try Converter.convert(
+                cue(start: start, end: "200:00:00,000", format: .srt), format: .srt
+            )) == ["Dialogue: 0,\(expectedStart),200:00:00.00,Default,,0,0,0,,Caption"])
+        }
+    }
+
     private func assertRejectedTimestamp(_ timestamp: String, format: Converter.Format) {
         let separator = format == .srt ? "," : "."
         let intervals = [

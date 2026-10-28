@@ -176,6 +176,11 @@ enum ExternalTextSubtitleConverter {
         } else {
             timestamp = trimmed[...]
         }
+        if let parsed = timestamp.utf8.withContiguousStorageIfAvailable({
+            parseFixedWidthTimestamp($0, format: format)
+        }) ?? nil {
+            return parsed
+        }
         let parts = timestamp.split(separator: ":", omittingEmptySubsequences: false)
         let hours: Int64
         let minutesIndex: Int
@@ -231,6 +236,43 @@ enum ExternalTextSubtitleConverter {
         // value too, so the ASS parser never receives an overflowing hour field.
         guard centiseconds / 360_000 <= maximumASSHours else { return nil }
         return Timestamp(milliseconds: milliseconds, centiseconds: centiseconds)
+    }
+
+    /// Most cues use HH:MM:SS,mmm / HH:MM:SS.mmm, or WebVTT's MM:SS.mmm.
+    /// Read those ASCII fields without allocating split arrays. Everything else
+    /// keeps the general parser's whitespace, large-hour, and legacy SRT rules.
+    private static func parseFixedWidthTimestamp(
+        _ bytes: UnsafeBufferPointer<UInt8>, format: Format
+    ) -> Timestamp? {
+        let hours: Int64
+        let offset: Int
+        if bytes.count == 12 {
+            guard bytes[2] == 58,
+                  let value = decimalPair(bytes[0], bytes[1]) else { return nil }
+            hours = value
+            offset = 3
+        } else if bytes.count == 9, format == .webVTT {
+            hours = 0
+            offset = 0
+        } else {
+            return nil
+        }
+        guard bytes[offset + 2] == 58,
+              bytes[offset + 5] == 46 || (format == .srt && bytes[offset + 5] == 44),
+              let minutes = decimalPair(bytes[offset], bytes[offset + 1]), minutes < 60,
+              let seconds = decimalPair(bytes[offset + 3], bytes[offset + 4]), seconds < 60,
+              let fractionPrefix = decimalPair(bytes[offset + 6], bytes[offset + 7]),
+              bytes[offset + 8] >= 48, bytes[offset + 8] <= 57 else { return nil }
+        let fraction = fractionPrefix * 10 + Int64(bytes[offset + 8] - 48)
+        // Two-digit hours and validated fields cannot approach the ASS hour
+        // bound, including a centisecond carry from 99:59:59.995 to 100:00:00.
+        let milliseconds = ((hours * 60 + minutes) * 60 + seconds) * 1_000 + fraction
+        return Timestamp(milliseconds: milliseconds, centiseconds: (milliseconds + 5) / 10)
+    }
+
+    private static func decimalPair(_ first: UInt8, _ second: UInt8) -> Int64? {
+        guard first >= 48, first <= 57, second >= 48, second <= 57 else { return nil }
+        return Int64(first - 48) * 10 + Int64(second - 48)
     }
 
     private static func decimalInteger(_ value: Substring, maximum: Int64) -> Int64? {
