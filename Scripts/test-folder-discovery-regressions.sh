@@ -18,6 +18,7 @@ done
 for file in \
     FolderPlaylistDiscoveryTests.swift \
     FolderDiscoveryFilesystemRegressionTests.swift \
+    FolderDiscoveryClassificationTests.swift \
     TestSupport/TemporaryDirectory.swift; do
     cp "$root/Tests/IlliquidCoreTests/$file" "$work/Tests/IlliquidCoreTests/"
 done

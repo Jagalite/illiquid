@@ -34,7 +34,9 @@ public enum FolderPlaylistDiscovery {
         )
 
         var metadataDates: [URL: Date] = [:]
-        let regularFiles = try directChildren.compactMap { originalURL -> URL? in
+        var mediaURLs: [URL] = []
+        var subtitleURLs: [URL] = []
+        for originalURL in directChildren {
             try checkCancellation()
             // Classify ordinary unsupported entries before resolving their paths.
             // Extensionless/misnamed symlinks can still lead to supported targets.
@@ -43,24 +45,31 @@ public enum FolderPlaylistDiscovery {
                !MediaFileSupport.isSupportedSubtitleFile(originalURL),
                (try? originalURL.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) == false
             {
-                return nil
+                continue
             }
             let url = NormalizedFileURL.resolveFilesystemIdentity(originalURL) ?? originalURL
             try checkCancellation()
             let isMedia = MediaFileSupport.isSupportedMediaFile(url)
-            guard isMedia || MediaFileSupport.isSupportedSubtitleFile(url) else { return nil }
+            guard isMedia || MediaFileSupport.isSupportedSubtitleFile(url) else { continue }
             let regular = (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true
             if regular, isMedia, let date = FolderPlaylistItem.metadataDate(for: url) {
                 metadataDates[NormalizedFileURL.normalize(url) ?? url] = date
             }
-            return regular ? url : nil
+            guard regular else { continue }
+            if isMedia { mediaURLs.append(url) }
+            // Non-media entries already passed the subtitle check above. Check
+            // media too so both classifications remain independent, without a
+            // combined regular-file array and two later filtering passes.
+            if !isMedia || MediaFileSupport.isSupportedSubtitleFile(url) {
+                subtitleURLs.append(url)
+            }
         }
 
         try checkCancellation()
         let playlist = makePlaylist(
             folderURL: folderURL,
-            mediaURLs: regularFiles.filter(MediaFileSupport.isSupportedMediaFile),
-            subtitleURLs: regularFiles.filter(MediaFileSupport.isSupportedSubtitleFile),
+            mediaURLs: mediaURLs,
+            subtitleURLs: subtitleURLs,
             metadataDates: metadataDates
         )
         try checkCancellation()

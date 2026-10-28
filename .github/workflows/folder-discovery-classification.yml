@@ -1,0 +1,104 @@
+name: Folder discovery classification
+
+on:
+  push:
+    branches: ['perf/folder-discovery-classification-31c0bcbc']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift'
+      - 'Tests/IlliquidCoreTests/FolderDiscoveryClassificationTests.swift'
+      - 'Benchmarks/FolderDiscoveryClassification/**'
+      - '.github/workflows/folder-discovery-classification.yml'
+      - '!Benchmarks/FolderDiscoveryClassification/*.md'
+      - '!Benchmarks/FolderDiscoveryClassification/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidCoreTests/Folder*Tests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/TemporaryDirectory.swift'
+      - 'Scripts/test-folder-discovery-regressions.sh'
+      - 'Benchmarks/FolderDiscoveryClassification/**'
+      - '.github/workflows/folder-discovery-classification.yml'
+      - '!Benchmarks/FolderDiscoveryClassification/*.md'
+      - '!Benchmarks/FolderDiscoveryClassification/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: folder-discovery-classification-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-research:
+    runs-on: macos-26
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Fetch the pinned research baseline
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Test discovery semantics and measure real folder scans
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/FolderDiscoveryClassification/run.py',
+                     '--pairs', '6',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'folder-discovery-classification')]
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'running isolated component builds directly and serially.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit reviewable native evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'folder-discovery-classification'
+          records = {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if (path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}
+                      and not any(part in {'build', '.build', 'cache', 'module-cache'}
+                                  for part in relative.parts)):
+                  records[str(relative)] = path.read_text()
+          for name in ['summary.json', 'verification.json']:
+              if name in records:
+                  print(name + '\n' + records[name])
+          packed = gzip.compress(json.dumps(records, sort_keys=True).encode(), mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log bundle limit; use uploaded artifact')
+          print('FOLDER_CLASSIFICATION_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('FOLDER_CLASSIFICATION_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: folder-discovery-classification-native
+          path: |
+            ${{ runner.temp }}/folder-discovery-classification/*.json
+            ${{ runner.temp }}/folder-discovery-classification/*.jsonl
+            ${{ runner.temp }}/folder-discovery-classification/logs/
+            ${{ runner.temp }}/folder-discovery-classification/receipts/
+            ${{ runner.temp }}/folder-discovery-classification/sources/
+          retention-days: 14
