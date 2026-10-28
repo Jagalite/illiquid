@@ -19,8 +19,41 @@ available. The parent is pinned to
 The initial independent implementation was measured at
 416f4d870ba67cce5579d241e6e456c0043caee5 and is preserved in this branch's
 merge ancestry. Its complete results remain under
-[evidence/initial-linux](evidence/initial-linux). Qualification of the exact
-adopted implementation and combined tests is pending.
+[evidence/initial-linux](evidence/initial-linux). The exact adopted implementation
+and combined tests are now qualified on Linux as documented below.
+
+## Portable result for the adopted implementation
+
+[Exact-source Linux qualification passed](https://github.com/Jagalite/illiquid/actions/runs/40641272101/job/122659740756)
+at 0231eecd560a6fcbd9caf1113b6eb121bbe6b7c4, using Swift 6.2.1 on
+x86_64 Linux/glibc 2.39. The production implementation is the unchanged
+PR #136 source pinned above; the candidate includes this companion's combined tests.
+
+All 26 focused tests passed in each of baseline/candidate × debug/release,
+including 41,261 unique integer-label ordering cases. The study retained
+48 verification, 76 calibration, and 288 measured observations.
+
+For unchanged nonempty saved order, the elapsed medians were:
+
+| Input items | Baseline | Adopted candidate | Median paired reduction |
+| ---: | ---: | ---: | ---: |
+| 1,000 | 17.58 ms | 9.37 ms | 46.9% |
+| 10,000 | 176.91 ms | 94.32 ms | 46.6% |
+| 100,000 | 1,816.99 ms | 981.33 ms | 46.1% |
+
+All twenty 32-to-100,000-item workloads were faster in all six pairs and
+met the duration floor. Unique-item cases reduced paired elapsed time by
+45.8–47.9%; duplicate-heavy cases by 31.0–32.0%.
+
+Workloads below the duration floor (0-empty, 0-stale-appended) are excluded from
+quantitative speed claims.
+These remain synthetic Linux component measurements, not native macOS or
+whole-player performance results.
+
+An independent replay reconstructed integer-label fixtures and UTF-8 fingerprints,
+checked exact UInt64 consumption checksums, and recalculated every timing summary
+from the retained observations. All 412 observations, 144 measured pairs, and
+48 elapsed/CPU summary groups agreed. Source and evidence SHA-256 receipts were also checked.
 
 ## Initial portable result
 
@@ -149,6 +182,12 @@ smoothness, energy use, or disk encoding/write latency.
 
 ## Evidence
 
+The exact adopted implementation's [manifest](evidence/adopted-linux/manifest.json),
+[all workload summaries](evidence/adopted-linux/summary.json),
+[raw observations](evidence/adopted-linux/observations.jsonl), commands, and test logs
+are retained verbatim with [source and recovery receipts](evidence/adopted-linux/provenance.json)
+and an [independent replay receipt](evidence/adopted-linux/independent-replay.json).
+
 The initial study's [manifest](evidence/initial-linux/manifest.json),
 [all workload summaries](evidence/initial-linux/summary.json),
 [raw observations](evidence/initial-linux/observations.jsonl), command receipts,
@@ -158,7 +197,7 @@ The initial container ownership setup failure occurred before compilation and
 produced no measurements; its [failure receipt](evidence/setup-failure/summary.json)
 and commands are also preserved.
 
-The exact adopted PR #136 implementation is being rerun with the combined tests.
+The exact adopted PR #136 implementation and combined tests passed portable qualification.
 The Darwin sampler and full macOS application graph remain pending. No measured
 native memory reduction or whole-player improvement is claimed.
 

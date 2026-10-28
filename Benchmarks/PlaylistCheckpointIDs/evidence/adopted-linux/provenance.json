@@ -1,0 +1,104 @@
+{
+  "study": "Exact adopted PR #136 production implementation with combined independent qualification tests",
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40641272101",
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40641272101/job/122659740756",
+  "commit": "0231eecd560a6fcbd9caf1113b6eb121bbe6b7c4",
+  "production_parent": "628bc2fcd24ecfd84cc445e10ba8cf996c94468c",
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "completed_job_conclusion": "success",
+  "recovery": "Verbatim files recovered from job log and verified against all exported SHA-256 digests.",
+  "file_sha256": {
+    "manifest.json": "e31d0965b9e18cf3f9d1bbbf671f5c80964d29e591ef8a2f8167cda15114b765",
+    "summary.json": "a98f43c2b92bdeb396608184afe412eae720526dc7e793f70c8be48dbbdbd792",
+    "workloads.json": "90b19821e95ef223f971fa3058585d4c5826b686237ebe7762a462de2b414a30",
+    "observations.jsonl": "09de6eefc273c538f4fff45e7770e9e43ae3b442a64d8da921ec2073f900181a",
+    "commands.jsonl": "89f599b1a1537b990916bb2cd33977a8055a617c1e8a9018fb302c0730ae8938",
+    "logs/tests-baseline-debug.stderr": "67bef6265cfbbb5ff53d680b6d9746344060b0bfa27ed0eef97eda2892e9c178",
+    "logs/tests-baseline-debug.stdout": "601d65c1a8c321ec32717e22d15c3bfef5ef9c15f06c97af38269df99729ff34",
+    "logs/tests-baseline-release.stderr": "c86b8ffd5910c592db782c839fac6911d88452ffbe7ec91511ca4ed48ae24ce6",
+    "logs/tests-baseline-release.stdout": "e71d465a95225b83d1a5c48be1fc366e3e854dff4973f7f237c7b43f7b745b06",
+    "logs/tests-candidate-debug.stderr": "dfb9652fc1b82c704a69083656178690f30dedb4d6845688dca2aedb863e63d3",
+    "logs/tests-candidate-debug.stdout": "62bc5bae530719d25c6c543289eebc36a450bb8a09f00c8a39fadd1d5c2ba7d5",
+    "logs/tests-candidate-release.stderr": "062df8d87eb8a13e8ad1793a690a0e274789ee4e01946a76080e35aaf7458295",
+    "logs/tests-candidate-release.stdout": "bd5f5989454e925fb2e248e7801ea8344b770619029779ca9169e485efecc408"
+  },
+  "observations": {
+    "verification": 48,
+    "calibration": 76,
+    "measurement": 288
+  },
+  "independent_replay": "independent-replay.json",
+  "source_verification": {
+    "status": "passed",
+    "source_commit": "0231eecd560a6fcbd9caf1113b6eb121bbe6b7c4",
+    "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "verified_sources": [
+      {
+        "source": "baseline/FolderPlaylist.swift",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      {
+        "source": "baseline/PlaylistMutation.swift",
+        "sha256": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8"
+      },
+      {
+        "source": "baseline/NormalizedFileURL.swift",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      },
+      {
+        "source": "baseline/NaturalFilenameOrdering.swift",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      {
+        "source": "candidate/FolderPlaylist.swift",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      {
+        "source": "candidate/PlaylistMutation.swift",
+        "sha256": "eb74c5cc24b8978f1c50facd0fcd8354dcdfd5b5ad851679441abac855f78f92"
+      },
+      {
+        "source": "candidate/NormalizedFileURL.swift",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      },
+      {
+        "source": "candidate/NaturalFilenameOrdering.swift",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      {
+        "source": "qualification/Harness.swift",
+        "sha256": "5e24887e964c7b0cbc262ea530a4b3b4a4988a7e2fd4e29aebf1340d7819c182"
+      },
+      {
+        "source": "qualification/MemoryProbe.c",
+        "sha256": "20227f552fb0d8196c62cc244238fda147df613230ff292327079f4c18f86e59"
+      },
+      {
+        "source": "qualification/MemoryProbe.h",
+        "sha256": "4828949db7bc9a5a5cc4bd9c1bda89ab0d4f682d727e7ef47f22cfce84c1e346"
+      },
+      {
+        "source": "qualification/run.py",
+        "sha256": "d31fb3a0c6594bf1ccf28c0bce8b2b3dfa0b59927125a3eb951358de76638476"
+      },
+      {
+        "source": "qualification/PlaylistMutationTests.swift",
+        "sha256": "08b3ea822f18722007b7c32e5316911949a4198767e6bade300c8f88b2d0147f"
+      },
+      {
+        "source": "qualification/PlaylistOrderRestorationTests.swift",
+        "sha256": "9454b6108ca3d290893033eddbd3e24c39674ca9eff726198e900d1b917f5974"
+      },
+      {
+        "source": "qualification/NaturalFilenameOrderingTests.swift",
+        "sha256": "ba6e040919bdae7f7d4748d95ab6bc39da3547d0add10020dd2261908810f776"
+      },
+      {
+        "source": "qualification/FolderPlaylistTests.swift",
+        "sha256": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d"
+      }
+    ],
+    "controller_sha256": "148d40e5fc2bf02d9a749efa9d502164cb96c5063c531c464848aa976afe3a11"
+  },
+  "native_status_at_review": "queued; no native measurements claimed"
+}
