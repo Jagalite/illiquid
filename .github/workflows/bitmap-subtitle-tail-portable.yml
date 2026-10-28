@@ -45,7 +45,9 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
         run: |
-          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+          cd "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git -C "$GITHUB_WORKSPACE" diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72
           python3 - <<'PY'
           import json, os, subprocess, sys
           from pathlib import Path
