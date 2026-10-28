@@ -1,0 +1,72 @@
+name: Normalized file identity performance
+
+on:
+  push:
+    branches: ['perf/normalized-file-identity-20261028']
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileIdentityTests.swift'
+      - 'Benchmarks/NormalizedFileIdentity/**'
+      - '.github/workflows/normalized-file-identity.yml'
+      - '!Benchmarks/NormalizedFileIdentity/*.md'
+      - '!Benchmarks/NormalizedFileIdentity/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileIdentityTests.swift'
+      - 'Benchmarks/NormalizedFileIdentity/**'
+      - '.github/workflows/normalized-file-identity.yml'
+      - '!Benchmarks/NormalizedFileIdentity/*.md'
+      - '!Benchmarks/NormalizedFileIdentity/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: normalized-file-identity-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test exact path compatibility and measure paired playlist operations
+        run: |
+          python3 Benchmarks/NormalizedFileIdentity/run.py \
+            --output "$RUNNER_TEMP/normalized-file-identity" --pairs 10 --target-ms 150
+      - name: Emit durable measurement receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'normalized-file-identity'
+          paths = sorted(root.glob('*.json')) + sorted(root.glob('*.jsonl'))
+          paths += sorted((root / 'logs').glob('tests-*.log'))
+          for path in paths:
+              value = path.read_text()
+              truncated = path.suffix == '.log' and len(value) > 20000
+              if truncated: value = value[-20000:]
+              print('FILE_IDENTITY_EVIDENCE ' + json.dumps({
+                  'path': str(path.relative_to(root)), 'text': value, 'truncated': truncated
+              }, separators=(',', ':')))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: normalized-file-identity-native
+          path: |
+            ${{ runner.temp }}/normalized-file-identity/*.json
+            ${{ runner.temp }}/normalized-file-identity/*.jsonl
+            ${{ runner.temp }}/normalized-file-identity/logs/
+            ${{ runner.temp }}/normalized-file-identity/*/Sources/
+            ${{ runner.temp }}/normalized-file-identity/*/Tests/
+          retention-days: 14
