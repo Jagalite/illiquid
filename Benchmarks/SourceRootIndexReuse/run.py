@@ -173,7 +173,8 @@ def main() -> None:
         package = packages[variant]
         for configuration in ("debug", "release"):
             command = [swift, "build", "--package-path", package, "-c", configuration,
-                       "--product", "RootIndexBenchmark", "--jobs", "2", "-Xswiftc", "-warnings-as-errors"]
+                       "--product", "RootIndexBenchmark", "--jobs", "2",
+                       "-Xswiftc", "-enable-testing", "-Xswiftc", "-warnings-as-errors"]
             build = execute(command, out, env)
             build.pop("stdout")
             location = execute([swift, "build", "--package-path", package, "-c", configuration,
@@ -189,12 +190,16 @@ def main() -> None:
                 binaries[variant] = binary
             if variant == "candidate":
                 result = execute([swift, "test", "--package-path", package, "-c", configuration,
-                                  "--jobs", "2", "--no-parallel", "-Xswiftc", "-warnings-as-errors"], out, env)
+                                  "--jobs", "2", "--no-parallel", "-Xswiftc", "-enable-testing",
+                                  "-Xswiftc", "-warnings-as-errors"], out, env)
                 counts = re.findall(r"Test run with (\d+) tests?\b", result["stdout"])
                 if not counts or int(counts[-1]) != 8:
                     raise RuntimeError("Expected all eight reuse regression tests to execute")
                 result.pop("stdout")
                 tests.append({**result, "configuration": configuration, "test_count": int(counts[-1])})
+                # swift test may relink the executable; receipt the actual binary
+                # used by later measurement processes, after tests have finished.
+                build["binary_sha256_after_tests"] = sha(binary)
     expected = verifications["baseline-release"]["receipts"]
     for name, value in verifications.items():
         if value["receipts"] != expected:
