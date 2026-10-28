@@ -1,0 +1,58 @@
+{
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_scheduler_sha256": "24bee22ce1bc8b670af7e6a45eb49f1a2eac6425c588128af8745ee9ce5f3c9e",
+  "binaries_sha256": {
+    "baseline": "0d8fb882d2127157da0f7285a1d9236749f7ef040d7f7e025ee0f91be98889d2",
+    "candidate": "204979b8107e16ca97c21f4b45526c2b4fdc641354c20cbb9041da44a30b4b7b"
+  },
+  "candidate_revision": "807ad376d0ebc115daf6280a6dcfa37203a31071",
+  "candidate_scheduler_sha256": "6e322753701a51a6cbe1137a5900629b15e69aa85de06ec7a8b80d4d7779352b",
+  "candidate_status": "",
+  "created_utc": "2026-10-28T04:59:29.104285+00:00",
+  "developer_dir": "/Applications/Xcode_26.6.app/Contents/Developer",
+  "inputs": {
+    "Driver.swift": "948d7220419464a0c867f69d68f33d7f5329b16947c17e867cbec7ede4bed1de",
+    "Package.swift": "9de5d7f753d46d6db0b7a182c9af26f0031c9dd05f3fd4510ba52c62d6a04e76",
+    "Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift": "a8d0ed7b936eb19fcaab1b1176392ee09722e11899ad70c5f5aae0f71eb439b9",
+    "Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift": "1d15415f651a97ca405171f8b9edce5cb4cce9f786e9dfd759abc745bb2c0f59",
+    "run.py": "ad4547795992105d1253a9d2bec1c84a5393ead3c72aec6e968c28262e35d2c5"
+  },
+  "machine": "arm64",
+  "method": {
+    "baseline": "Unchanged map/anchor/window/distance expressions extracted from the pinned scheduler; only the input and outer type are adapted.",
+    "calibration": "Independent per-variant iteration counts target the same duration; normalized per call.",
+    "candidate": "Complete, unmodified production helper with real FolderPlaylistItem and URL dependencies.",
+    "excluded": "Input construction, URL normalization, three warmups, exact output receipts and JSON serialization.",
+    "memory": "Source-level elimination of the full URL projection; no allocator, RSS, peak-memory, player FPS or energy measurement.",
+    "modules": "Separate SwiftPM IlliquidCore, IlliquidApp and driver modules; no cross-module optimization.",
+    "observability": "Checksum of every call through a non-inlined consumer; exact ordered URLs and distance dictionaries verified separately.",
+    "sampling": "Fresh process for each observation; balanced AB/BA pairs and rotated workload order.",
+    "scope": "Synchronous thumbnail playlist neighborhood selection only.",
+    "timing": "Release builds; monotonic wall and process CPU clocks; includes result consumption and loop overhead, no subtraction."
+  },
+  "pairs": 8,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "schema": 1,
+  "sources": {
+    "baseline": {
+      "Package.swift": "9de5d7f753d46d6db0b7a182c9af26f0031c9dd05f3fd4510ba52c62d6a04e76",
+      "Sources/IlliquidApp/ThumbnailPlaylistNeighborhood.swift": "02aa74d94dcef71c63893c07113376ac11ebec458ad68705698a984ba81dc33d",
+      "Sources/IlliquidCore/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+      "Sources/IlliquidCore/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+      "Sources/IlliquidCore/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+      "Sources/NeighborhoodProbe/Driver.swift": "948d7220419464a0c867f69d68f33d7f5329b16947c17e867cbec7ede4bed1de",
+      "Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift": "1d15415f651a97ca405171f8b9edce5cb4cce9f786e9dfd759abc745bb2c0f59"
+    },
+    "candidate": {
+      "Package.swift": "9de5d7f753d46d6db0b7a182c9af26f0031c9dd05f3fd4510ba52c62d6a04e76",
+      "Sources/IlliquidApp/ThumbnailPlaylistNeighborhood.swift": "a8d0ed7b936eb19fcaab1b1176392ee09722e11899ad70c5f5aae0f71eb439b9",
+      "Sources/IlliquidCore/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+      "Sources/IlliquidCore/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+      "Sources/IlliquidCore/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+      "Sources/NeighborhoodProbe/Driver.swift": "948d7220419464a0c867f69d68f33d7f5329b16947c17e867cbec7ede4bed1de",
+      "Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift": "1d15415f651a97ca405171f8b9edce5cb4cce9f786e9dfd759abc745bb2c0f59"
+    }
+  },
+  "swift_version": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "target_ms": 50
+}
