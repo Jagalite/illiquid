@@ -1,0 +1,66 @@
+name: Checkpoint zero-hint native performance
+
+on:
+  push:
+    branches: ['codex/perf-checkpoint-zero-hint-fdd5ab']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Sources/IlliquidCore/Persistence/LegacyPreferencesMigration.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/LifecyclePerformance.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointIndexHintTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaybackSessionStoreTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistMutationTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Tests/IlliquidCoreTests/UtilitiesTests.swift'
+      - 'Benchmarks/CheckpointHintControls/**'
+      - '.github/workflows/checkpoint-hint-controls.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-hint-controls-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checkpoint-hint-controls:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch the pinned baseline
+        run: git fetch --no-tags --depth=1 origin 2620d561d11c9a7d9396d3b455424a10a6dddcd7
+      - name: Test complete sources and measure checkpoint construction
+        shell: bash
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; building serially in isolated packages.'
+          python3 Benchmarks/CheckpointHintControls/run.py \
+            --pairs 8 --target-ms 250 \
+            --output "$RUNNER_TEMP/checkpoint-hint-controls"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-hint-controls
+          path: |
+            ${{ runner.temp }}/checkpoint-hint-controls/
+            !${{ runner.temp }}/checkpoint-hint-controls/packages/**/build/**
+            !${{ runner.temp }}/checkpoint-hint-controls/module-cache/**
+            !${{ runner.temp }}/checkpoint-hint-controls/cache/**
+          retention-days: 14

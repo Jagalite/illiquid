@@ -43,7 +43,9 @@ struct PlaybackCheckpoint: Sendable {
 
         // The captured index is only a hint: restored or changed playlists can
         // disagree with it. Verify identity before using the shortcut.
-        if let index, playlist.indices.contains(index),
+        // At zero the scan already checks this item first; avoid repeating
+        // that normalization when the hinted item does not match.
+        if let index, index > 0, playlist.indices.contains(index),
            NormalizedFileURL.persistenceKey(for: playlist[index].url) == sourceKey {
             return folder
         }
