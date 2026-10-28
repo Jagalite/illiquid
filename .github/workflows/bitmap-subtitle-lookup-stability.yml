@@ -1,0 +1,104 @@
+name: Bitmap subtitle lookup stability controls
+
+on:
+  push:
+    branches:
+      - codex/bitmap-subtitle-lookup-portable
+    paths:
+      - .github/workflows/bitmap-subtitle-lookup-stability.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-lookup-stability-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stability-controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Repeat predeclared locality controls with unchanged production source
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
+
+          output = Path(os.environ["RUNNER_TEMP"]) / "bitmap-subtitle-lookup-stability"
+          runner = [sys.executable, "Benchmarks/BitmapSubtitleTimeline/run.py",
+                    "--suite", "lookup", "--portable"]
+          # The source/tests already passed in run 40640675998. Repeat only
+          # the predeclared timing controls; retain both cohorts separately.
+          commands = [
+              [*runner, "--pairs", "16", "--target-ms", "250",
+               "--max-sample-ms", "1500",
+               "--cases", "newest-128,newest-32,after-newest-128",
+               "--output", str(output / "timing")],
+          ]
+          queue = Path("/Volumes/seed1/Projects/kyoto/kyoto.py")
+          if not queue.is_file():
+              print("Shared Kyoto queue is unavailable on this hosted Linux runner; "
+                    "running isolated portable component builds and measurements "
+                    "directly, in sequence. These results do not qualify macOS performance.",
+                    flush=True)
+          for command in commands:
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  environment = ["env", *[
+                      f"{name}={os.environ[name]}"
+                      for name in ("PATH", "PYTHONDONTWRITEBYTECODE")
+                  ]]
+                  submitted = subprocess.check_output(
+                      [*cli, "submit", "--", *environment, *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = json.loads(submitted)["id"]
+                  shown = subprocess.run([*cli, "show", job_id])
+                  waited = subprocess.run([*cli, "wait", job_id])
+                  logged = subprocess.run([*cli, "logs", job_id])
+                  shown.check_returncode()
+                  waited.check_returncode()
+                  logged.check_returncode()
+              else:
+                  subprocess.run(command, check=True)
+          PY
+      - name: Emit complete review records
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "bitmap-subtitle-lookup-stability"
+          for path in sorted(root.rglob("*")):
+              if not path.is_file():
+                  continue
+              relative = path.relative_to(root)
+              if "build" in relative.parts or "receipts" in relative.parts:
+                  continue
+              # Preserve raw measurements, calibration, commands, complete test
+              # logs, manifests, summaries, and failures for remote retrieval.
+              # Full per-query receipts remain in the uploaded artifact.
+              print("LOOKUP_REVIEW_JSON " + json.dumps({
+                  "path": str(relative),
+                  "content": path.read_text(),
+              }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-lookup-linux-portable
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-lookup-stability
+            !${{ runner.temp }}/bitmap-subtitle-lookup-stability/**/build/**
+          retention-days: 14
