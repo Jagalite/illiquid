@@ -93,7 +93,7 @@ def fixtures() -> dict:
         prefixes.extend([f"S{season}E", f"s{season}e"])
     numbers = ["", "0", "00", "0000", "00000", "1", "01", "2", "9998", "9999", "10000", "+1", "-1"]
     suffixes = ["", "-0", "-1", "-2", "-E2", "-e9999", "-S0E2", "-S00E2",
-                "-s1e2", "-S001E9999", "-S999E9999", "-S1000E2", "-SP2",
+                "-s1e2", "-S7E2", "-S001E9999", "-S999E9999", "-S1000E2", "-SP2",
                 "-E00002", "-", "--2", "-E2-E3", " ", "\t", "suffix"]
     tokens = {prefix + number + suffix
               for prefix, number, suffix in itertools.product(prefixes, numbers, suffixes)}
@@ -101,6 +101,7 @@ def fixtures() -> dict:
                    "０２", "E٠٢", "S０１E02", "S01E𝟎𝟐", "E1-E２",
                    "E1\u0000", "E1\u007f", "E1\r", "E1\n", "E1\r\n", "E1\v", "E1\f",
                    "E1\u0085", "E1\u2028", "E1\u2029", "E1\u00a0", "E1\u200b",
+                   "sP01-s000e0002", "S003e0004-s3E0005", "ſ03E04-ſ03E05", "ſP01-S00E02",
                    "E" + "0" * 3980])
     return {"workloads": workloads, "tokens": sorted(tokens)}
 

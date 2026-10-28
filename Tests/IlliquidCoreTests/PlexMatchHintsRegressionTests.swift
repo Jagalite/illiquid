@@ -35,6 +35,10 @@ struct PlexMatchHintsRegressionTests {
         .init(token: "ſP01", season: 0, episode: 1, lastEpisode: nil),
         .init(token: "ſ01E02", season: 1, episode: 2, lastEpisode: nil),
         .init(token: "S01E01-ſ01E02", season: 1, episode: 1, lastEpisode: 2),
+        .init(token: "sP01-s000e0002", season: 0, episode: 1, lastEpisode: 2),
+        .init(token: "S003e0004-s3E0005", season: 3, episode: 4, lastEpisode: 5),
+        .init(token: "ſ03E04-ſ03E05", season: 3, episode: 4, lastEpisode: 5),
+        .init(token: "ſP01-S00E02", season: 0, episode: 1, lastEpisode: 2),
     ]
 
     // Every numeric capture is covered, including partially ASCII fields and
@@ -234,7 +238,7 @@ struct PlexMatchHintsRegressionTests {
     }
 
     @Test(arguments: [
-        "E1-S0E2", "1-S00E2", "SP1-SP2", "E00000", "S1E1-S1E00002",
+        "E1-S0E2", "1-S00E2", "E1-S7E2", "SP1-SP2", "E00000", "S1E1-S1E00002",
         "S", "SP", "SE1", "S1", "S1E", "EE1", "SPE1", "P1", "E1-",
         "E1--E2", "E1-E", "E1-E2-E3", "E1 :extra", "E1\t", "E1\u{7f}",
     ])
