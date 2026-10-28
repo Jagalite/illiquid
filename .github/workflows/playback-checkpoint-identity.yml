@@ -1,0 +1,68 @@
+name: Playback checkpoint identity
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Benchmarks/PlaybackCheckpointIdentity/**'
+      - 'Benchmarks/ThumbnailReadAllocation/allocmeter.c'
+      - '.github/workflows/playback-checkpoint-identity.yml'
+permissions:
+  contents: read
+concurrency:
+  group: playback-checkpoint-identity-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Run component regressions, timings, and allocation probe
+        run: |
+          python3 Benchmarks/PlaybackCheckpointIdentity/run.py \
+            --output "$RUNNER_TEMP/playback-checkpoint-identity" \
+            --pairs 6 --target-ms 40
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playback-checkpoint-identity-linux
+          path: |
+            ${{ runner.temp }}/playback-checkpoint-identity/*.json
+            ${{ runner.temp }}/playback-checkpoint-identity/*.jsonl
+            ${{ runner.temp }}/playback-checkpoint-identity/logs/
+            ${{ runner.temp }}/playback-checkpoint-identity/sources/
+          retention-days: 7
+  macos-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Run component regressions and timings on macOS
+        run: |
+          python3 Benchmarks/PlaybackCheckpointIdentity/run.py \
+            --output "$RUNNER_TEMP/playback-checkpoint-identity" \
+            --pairs 6 --target-ms 40
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playback-checkpoint-identity-macos
+          path: |
+            ${{ runner.temp }}/playback-checkpoint-identity/*.json
+            ${{ runner.temp }}/playback-checkpoint-identity/*.jsonl
+            ${{ runner.temp }}/playback-checkpoint-identity/logs/
+            ${{ runner.temp }}/playback-checkpoint-identity/sources/
+          retention-days: 7
