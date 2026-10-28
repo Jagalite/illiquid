@@ -1,0 +1,576 @@
+{
+  "audit_method": "Independent Python recomputation and hash/log validation; nm/readelf static binary inspection only. No tested executables run and no compilation.",
+  "audited_utc": "2026-10-28T19:19:56.502131+00:00",
+  "balanced_orders": {
+    "cached-dated-control": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-movie-control": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-numbered": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-ranges": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-unbounded-control": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-unicode-titles": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-unknown-control": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "cached-wide-numbers": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "recognize-mixed": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "recognize-numbered": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    },
+    "recognize-ranges": {
+      "baseline,candidate": 5,
+      "candidate,baseline": 5
+    }
+  },
+  "checks": {
+    "all_268_raw_measurement_pilot_records_and_hashes_match": true,
+    "all_285_command_and_stdout_stderr_log_hashes_match": true,
+    "all_command_returncodes_zero": true,
+    "all_executable_library_swiftmodule_hashes_match": true,
+    "all_input_source_hashes_match": true,
+    "all_pilot_and_final_checksums_agree_for_common_iterations": true,
+    "baseline_driver_imports_external_displayName_getter": true,
+    "baseline_driver_imports_external_recognizer": true,
+    "baseline_driver_links_shared_IlliquidCore": true,
+    "baseline_timed_displayBatch_calls_external_getter_and_recognizer": true,
+    "both_differential_archive_hashes_match": true,
+    "calibration_final_pilots_reach_target_for_both_variants": true,
+    "candidate_driver_imports_external_displayName_getter": true,
+    "candidate_driver_imports_external_recognizer": true,
+    "candidate_driver_links_shared_IlliquidCore": true,
+    "candidate_timed_displayBatch_calls_external_getter_and_recognizer": true,
+    "command_log_names_unique": true,
+    "common_iterations_and_correct_operation_counts": true,
+    "compiler_driver_frontend_hashes_match": true,
+    "complete_paired_observations": true,
+    "differential_5767_complete_records_match": true,
+    "differential_raw_utf8_bytes_identical": true,
+    "each_case_has_five_ab_and_five_ba_pairs": true,
+    "eleven_cases_ten_pairs_220_samples": true,
+    "exact_rotated_case_order_and_balanced_ab_ba_sequence": true,
+    "four_debug_release_test_runs_each_complete_28_tests_three_suites": true,
+    "frozen_baseline_sha256_and_git_blob_hashes_match": true,
+    "independently_recomputed_summary_exactly_matches": true,
+    "manifest_matches_source_receipts": true,
+    "metadata_hints_identical_between_variants": true
+  },
+  "counts": {
+    "cases": 11,
+    "command_logs": 285,
+    "differential_records": 5767,
+    "final_samples": 220,
+    "pairs_per_case": 10,
+    "pilot_samples": 48,
+    "source_receipts": 11
+  },
+  "errors": [],
+  "final_process_elapsed_ms_ranges": {
+    "cached-dated-control": {
+      "baseline": {
+        "max_elapsed_ms": 165.510176,
+        "min_elapsed_ms": 108.194086
+      },
+      "candidate": {
+        "max_elapsed_ms": 163.755439,
+        "min_elapsed_ms": 105.415524
+      }
+    },
+    "cached-movie-control": {
+      "baseline": {
+        "max_elapsed_ms": 169.500006,
+        "min_elapsed_ms": 112.653408
+      },
+      "candidate": {
+        "max_elapsed_ms": 154.974961,
+        "min_elapsed_ms": 107.936191
+      }
+    },
+    "cached-numbered": {
+      "baseline": {
+        "max_elapsed_ms": 1141.746346,
+        "min_elapsed_ms": 875.200883
+      },
+      "candidate": {
+        "max_elapsed_ms": 199.338524,
+        "min_elapsed_ms": 111.259595
+      }
+    },
+    "cached-ranges": {
+      "baseline": {
+        "max_elapsed_ms": 1744.251132,
+        "min_elapsed_ms": 1403.069801
+      },
+      "candidate": {
+        "max_elapsed_ms": 136.70402,
+        "min_elapsed_ms": 106.397733
+      }
+    },
+    "cached-unbounded-control": {
+      "baseline": {
+        "max_elapsed_ms": 151.934299,
+        "min_elapsed_ms": 127.398565
+      },
+      "candidate": {
+        "max_elapsed_ms": 184.993288,
+        "min_elapsed_ms": 107.204167
+      }
+    },
+    "cached-unicode-titles": {
+      "baseline": {
+        "max_elapsed_ms": 1307.311927,
+        "min_elapsed_ms": 785.598171
+      },
+      "candidate": {
+        "max_elapsed_ms": 174.225392,
+        "min_elapsed_ms": 103.074614
+      }
+    },
+    "cached-unknown-control": {
+      "baseline": {
+        "max_elapsed_ms": 141.618997,
+        "min_elapsed_ms": 105.920148
+      },
+      "candidate": {
+        "max_elapsed_ms": 140.806172,
+        "min_elapsed_ms": 101.982459
+      }
+    },
+    "cached-wide-numbers": {
+      "baseline": {
+        "max_elapsed_ms": 1799.171645,
+        "min_elapsed_ms": 1253.024874
+      },
+      "candidate": {
+        "max_elapsed_ms": 153.95639,
+        "min_elapsed_ms": 110.461033
+      }
+    },
+    "recognize-mixed": {
+      "baseline": {
+        "max_elapsed_ms": 190.919784,
+        "min_elapsed_ms": 127.677975
+      },
+      "candidate": {
+        "max_elapsed_ms": 144.934813,
+        "min_elapsed_ms": 125.636637
+      }
+    },
+    "recognize-numbered": {
+      "baseline": {
+        "max_elapsed_ms": 194.867168,
+        "min_elapsed_ms": 121.506123
+      },
+      "candidate": {
+        "max_elapsed_ms": 168.968452,
+        "min_elapsed_ms": 113.930404
+      }
+    },
+    "recognize-ranges": {
+      "baseline": {
+        "max_elapsed_ms": 174.74722,
+        "min_elapsed_ms": 124.592852
+      },
+      "candidate": {
+        "max_elapsed_ms": 226.846983,
+        "min_elapsed_ms": 109.896411
+      }
+    }
+  },
+  "input_directory": "/tmp/media-display-name-qualification-20261028/component-final",
+  "limitations": [
+    "Linux x86_64 / Swift 6.3.3 / Foundation implementation; native macOS results are not established by this run.",
+    "Synthetic warmed repeated in-memory label workloads include array handling and UTF-8 byte-count observation. They do not measure UI latency, startup, playback, power, or allocation counts.",
+    "Separate shared modules deliberately prevent cross-module fixture specialization; exact app-build inlining and optimization context can differ.",
+    "Unchanged controls fluctuate in both directions; modest recognize-* and fallback improvements are inconclusive on this run.",
+    "Ten pairs per case on one environment are not population-level confidence intervals. No observations were removed.",
+    "A prior sandboxed baseline release attempt trapped in libdispatch after failing to open a worker /proc stat path; it is retained separately, followed by a passing outside-sandbox retry and this fresh complete run."
+  ],
+  "linkage": {
+    "baseline": {
+      "displayBatch_calls_external_getter": true,
+      "displayBatch_calls_external_recognizer": true,
+      "displayBatch_disassembly_file": "baseline-displayBatch-disassembly.txt",
+      "displayBatch_disassembly_sha256": "a6ae37488bf274909e86e58670a644ee9d964676f2571e83810d402bdd704c1e",
+      "executable_sha256": "359382c3b42bb88f66bed56c4f80a0ad4922fa2cc27c93dcc276e7dd0a1accec",
+      "getter_imports": [
+        "U $s12IlliquidCore19RecognizedMediaNameV07displayE0SSvg"
+      ],
+      "library_sha256": "73ac8b48320ad27724a1516a649435f39bd8632997e1e767de75c77baac9e743",
+      "recognizer_imports": [
+        "U $s12IlliquidCore20MediaNameRecognitionO9recognize12relativePathAA010RecognizedcD0VSS_tFZ"
+      ]
+    },
+    "candidate": {
+      "displayBatch_calls_external_getter": true,
+      "displayBatch_calls_external_recognizer": true,
+      "displayBatch_disassembly_file": "candidate-displayBatch-disassembly.txt",
+      "displayBatch_disassembly_sha256": "a6ae37488bf274909e86e58670a644ee9d964676f2571e83810d402bdd704c1e",
+      "executable_sha256": "26e9678cc835a87e52d90e3d88f8d69c46e7a7d2c357241bb9e2ecf660f66997",
+      "getter_imports": [
+        "U $s12IlliquidCore19RecognizedMediaNameV07displayE0SSvg"
+      ],
+      "library_sha256": "bb79c4c1324cee020f97ef22d1daa3f9b269a9419aa0dabbcf86027ab512b97b",
+      "recognizer_imports": [
+        "U $s12IlliquidCore20MediaNameRecognitionO9recognize12relativePathAA010RecognizedcD0VSS_tFZ"
+      ]
+    }
+  },
+  "metrics": [
+    {
+      "baseline_median_ns": 1943.3745153900377,
+      "candidate_faster_pairs": 10,
+      "candidate_median_ns": 258.03006994327336,
+      "case": "cached-numbered",
+      "paired_reduction_percent": {
+        "max": 88.14097870371246,
+        "median": 87.02191820284914,
+        "min": 82.54090983532694,
+        "values": [
+          82.54090983532694,
+          87.23986487155419,
+          86.11580377487977,
+          86.99347907307813,
+          86.26404868663815,
+          87.59697963743831,
+          87.05035733262014,
+          86.08239546424443,
+          87.05652569894878,
+          88.14097870371246
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 87.01984440226823
+    },
+    {
+      "baseline_median_ns": 3443.0496938217093,
+      "candidate_faster_pairs": 10,
+      "candidate_median_ns": 278.1744862432065,
+      "case": "cached-ranges",
+      "paired_reduction_percent": {
+        "max": 93.40686405546981,
+        "median": 91.96797934036223,
+        "min": 90.4224724455086,
+        "values": [
+          93.40686405546981,
+          92.86364424730097,
+          92.06220940476047,
+          92.31356428673539,
+          91.73183154023502,
+          91.8603080235619,
+          90.7975209852015,
+          92.05674841332178,
+          90.4224724455086,
+          91.87921026740267
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 91.96281377706478
+    },
+    {
+      "baseline_median_ns": 1760.7046431853992,
+      "candidate_faster_pairs": 10,
+      "candidate_median_ns": 148.55418059651745,
+      "case": "cached-wide-numbers",
+      "paired_reduction_percent": {
+        "max": 92.895063847699,
+        "median": 91.53635732166151,
+        "min": 88.91413969514996,
+        "values": [
+          92.895063847699,
+          91.42361446551915,
+          88.91413969514996,
+          92.23293319578502,
+          90.86648490673444,
+          92.15504410642265,
+          92.00945317218296,
+          91.1044959830542,
+          90.99113482562299,
+          91.64910017780389
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 91.53618654408055
+    },
+    {
+      "baseline_median_ns": 2031.4977273338836,
+      "candidate_faster_pairs": 10,
+      "candidate_median_ns": 250.79946832842995,
+      "case": "cached-unicode-titles",
+      "paired_reduction_percent": {
+        "max": 91.67995841286316,
+        "median": 86.95798951219189,
+        "min": 84.34328423379586,
+        "values": [
+          84.34328423379586,
+          86.37371960002844,
+          87.36503622494939,
+          88.95222568483624,
+          87.19243659037915,
+          91.67995841286316,
+          86.10477227834062,
+          86.8794737812596,
+          87.03650524312415,
+          86.10952250864854
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 86.95648016737871
+    },
+    {
+      "baseline_median_ns": 127.93999099027127,
+      "candidate_faster_pairs": 5,
+      "candidate_median_ns": 132.94658517966198,
+      "case": "cached-dated-control",
+      "paired_reduction_percent": {
+        "max": 9.331235540719796,
+        "median": -1.7922203103043877,
+        "min": -17.159712690671114,
+        "values": [
+          -10.178173980992034,
+          -14.835217452972094,
+          -4.335860492138366,
+          -17.159712690671114,
+          6.140094239851268,
+          1.0601988605220325,
+          -7.9539495341875766,
+          9.331235540719796,
+          0.7514198715295906,
+          1.5482361947214085
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": -1.7852732332818144
+    },
+    {
+      "baseline_median_ns": 166.31544039044337,
+      "candidate_faster_pairs": 7,
+      "candidate_median_ns": 158.14856009735138,
+      "case": "cached-movie-control",
+      "paired_reduction_percent": {
+        "max": 35.415217625420034,
+        "median": 4.785429818889369,
+        "min": -16.46240696921324,
+        "values": [
+          -0.7992552034006506,
+          12.04531821330116,
+          1.1707173147160965,
+          -16.46240696921324,
+          35.415217625420034,
+          17.79590991675407,
+          5.383487871804293,
+          10.804936484041395,
+          -10.85533365535063,
+          4.187371765974445
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 4.811666107760537
+    },
+    {
+      "baseline_median_ns": 118.74195618949585,
+      "candidate_faster_pairs": 6,
+      "candidate_median_ns": 117.65221262493714,
+      "case": "cached-unknown-control",
+      "paired_reduction_percent": {
+        "max": 14.457310397459889,
+        "median": 2.1457767216957024,
+        "min": -8.870783105013235,
+        "values": [
+          5.183530238071732,
+          0.5739519536351656,
+          -6.815511209712866,
+          -8.870783105013235,
+          -4.040884893801278,
+          14.457310397459889,
+          12.32864405950831,
+          -2.5347472958513473,
+          3.7176014897562393,
+          4.177569450233298
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 2.138644387009303
+    },
+    {
+      "baseline_median_ns": 3513.5772035921927,
+      "candidate_faster_pairs": 7,
+      "candidate_median_ns": 3106.7895037375415,
+      "case": "cached-unbounded-control",
+      "paired_reduction_percent": {
+        "max": 21.073194273826424,
+        "median": 10.799907441728397,
+        "min": -28.41407279587489,
+        "values": [
+          -28.41407279587489,
+          -21.758739940610774,
+          11.156884369489672,
+          21.073194273826424,
+          10.44293051396712,
+          12.059147124134162,
+          16.827504564469464,
+          7.4017408016933794,
+          -2.9277965645441384,
+          19.774624698841947
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 10.799906817332992
+    },
+    {
+      "baseline_median_ns": 45615.83797554347,
+      "candidate_faster_pairs": 6,
+      "candidate_median_ns": 43763.96501358696,
+      "case": "recognize-numbered",
+      "paired_reduction_percent": {
+        "max": 16.516098315611337,
+        "median": 5.64335557160714,
+        "min": -16.877350540323356,
+        "values": [
+          -16.877350540323356,
+          13.29044613610847,
+          16.516098315611337,
+          -2.1782800252731827,
+          5.051865677854462,
+          -9.505243420348863,
+          -1.1571046410474572,
+          10.63332116972765,
+          13.84801804733986,
+          6.234845465359817
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 5.655088641375084
+    },
+    {
+      "baseline_median_ns": 37322.837890625,
+      "candidate_faster_pairs": 8,
+      "candidate_median_ns": 35935.450474330355,
+      "case": "recognize-ranges",
+      "paired_reduction_percent": {
+        "max": 21.92373761367993,
+        "median": 9.075384744311815,
+        "min": -64.08907143786695,
+        "values": [
+          11.79557315214199,
+          21.92373761367993,
+          8.883671520689385,
+          5.895005712936763,
+          -0.25001666896184993,
+          4.076204486834911,
+          9.652869263672525,
+          -64.08907143786695,
+          11.762169509311814,
+          9.267097967934246
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 9.077612874191022
+    },
+    {
+      "baseline_median_ns": 38830.04185267857,
+      "candidate_faster_pairs": 7,
+      "candidate_median_ns": 37780.37095424107,
+      "case": "recognize-mixed",
+      "paired_reduction_percent": {
+        "max": 33.39152426445234,
+        "median": 3.9244915579563,
+        "min": -7.093236953419013,
+        "values": [
+          3.203150798665888,
+          33.39152426445234,
+          -5.943641491780793,
+          -7.093236953419013,
+          -1.310173504866441,
+          1.747473314984238,
+          12.056808355412695,
+          4.645832317246712,
+          4.702887946585543,
+          16.72688854019665
+        ]
+      },
+      "process_cpu_paired_median_reduction_percent": 3.9267505231469215
+    }
+  ],
+  "passed": true,
+  "primary_receipt_sha256": {
+    "build-receipts.json": "0ce31c5b10978c03160b62c1f6ed34976cea2f9f0839752d996353fd7f122bda",
+    "calibration.jsonl": "76240e19e94c7a95e2b43d76f8029c13d6ed8a86bdd77cac16b7d6c51fe50629",
+    "commands.jsonl": "b51bc30b88994a3a70941d7f1276be82b2341faafc7061b364b5a57b1d763d53",
+    "differential.json": "836b237c0077979e6d9d0425380fd7d8b9071834364084d04ee2b2e052daa6e3",
+    "manifest.json": "348a6654059a1c64fdf47e8ef71b5144e1a56388c6e84d24c487d219ecd5db3a",
+    "measurements.jsonl": "132f356e4d4b8baf674184ddde02383ff87b431dfeb12c152289e8c699d5b255",
+    "source-receipts.json": "4a1cdbaf6a815d5be91e48f9cc036c37b3a63bf93533c562536ea6c8b6fc2824",
+    "summary.json": "2d049386f8a6c683bd891c970d1be19b8f910f74da2e1996addf7ba4f7ba9126",
+    "tests.json": "455a9056bfa187053777d137d9271365d8361c8b7696ce4a2539d131fdeb3530"
+  },
+  "supportable_claim": "On this Linux toolchain, the four cached bounded-number episode-label workloads have 87\u201392% lower median paired elapsed time, with the candidate faster in all 10 pairs for each workload. Process CPU results agree closely. Native macOS and application-level benefits require separate evidence.",
+  "tests": [
+    {
+      "completed_test_counts": [
+        [
+          "28",
+          "3"
+        ]
+      ],
+      "configuration": "debug",
+      "log": "tests/baseline-debug.log",
+      "log_sha256": "93a950a390b49b522b664312e37054666cccdb11a5b7164f330190d711a29dd3",
+      "package_hashes_match": true,
+      "variant": "baseline"
+    },
+    {
+      "completed_test_counts": [
+        [
+          "28",
+          "3"
+        ]
+      ],
+      "configuration": "release",
+      "log": "tests/baseline-release.log",
+      "log_sha256": "ae7325b8bf1db5749fcd328381ced26b3288af571bd87555151f41513f6b1c8d",
+      "package_hashes_match": true,
+      "variant": "baseline"
+    },
+    {
+      "completed_test_counts": [
+        [
+          "28",
+          "3"
+        ]
+      ],
+      "configuration": "debug",
+      "log": "tests/candidate-debug.log",
+      "log_sha256": "c72f6e7b7d601f62ebfd2bc6dea77214b850c673e084f525e65be15d5a8bd759",
+      "package_hashes_match": true,
+      "variant": "candidate"
+    },
+    {
+      "completed_test_counts": [
+        [
+          "28",
+          "3"
+        ]
+      ],
+      "configuration": "release",
+      "log": "tests/candidate-release.log",
+      "log_sha256": "67ce3ef1066da04e442d419d52c8b7d6201cd27c7ea61a31add6e2fdb8d99052",
+      "package_hashes_match": true,
+      "variant": "candidate"
+    }
+  ]
+}
