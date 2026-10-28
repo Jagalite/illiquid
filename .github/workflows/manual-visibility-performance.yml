@@ -89,6 +89,9 @@ jobs:
           retention-days: 14
 
   native-integration:
+    # Qualify the full graph after component checks; PRs repeat the component suite.
+    if: github.event_name != 'pull_request'
+    needs: native-component
     runs-on: macos-26
     timeout-minutes: 40
     env:

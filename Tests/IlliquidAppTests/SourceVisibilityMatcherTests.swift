@@ -126,11 +126,14 @@ struct SourceVisibilityMatcherTests {
         var settings = SourceVisibilityConfiguration.default
         settings.regexRules = [
             .init(id: direct.id, pattern: "^映像\\.mkv$", colorIndex: direct.colorIndex, isEnabled: true),
-            .init(id: inherited.id, pattern: "^Café$", colorIndex: inherited.colorIndex, isEnabled: true),
+            // Keep the fixture independent of the path component's normalization form.
+            .init(id: inherited.id, pattern: "^Caf(?:\u{00E9}|e\u{0301})$",
+                  colorIndex: inherited.colorIndex, isEnabled: true),
         ]
 
         for roots in [[outer, inner], [inner, outer]] {
             let matcher = SourceVisibilityMatcher(configuration: settings, roots: roots)
+            #expect(matcher.evaluate(inner).regexMatches == [inherited])
             for url in [file, decomposed] {
                 #expect(matcher.relativePath(for: url) == "映像.mkv")
                 #expect(matcher.evaluate(url) == SourceVisibilityEvaluation(

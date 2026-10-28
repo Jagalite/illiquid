@@ -8,10 +8,11 @@ private struct Fixture {
     let inputs: [SourceTreeProjectionInput]
     let queries = ["", ""]
     let previews: [Bool]
-    let cold = false
 
     init(size: Int, scenario: String) {
-        let root = URL(fileURLWithPath: "/Volumes/Benchmark Library/Series α", isDirectory: true)
+        let rootPath = scenario.hasSuffix("_ascii")
+            ? "/Volumes/Benchmark Library/Series" : "/Volumes/Benchmark Library/Series α"
+        let root = URL(fileURLWithPath: rootPath, isDirectory: true)
         let nested = scenario.contains("nested")
         let rootID = SourceTreeIdentity.folderID(for: root)
         var directoryContents: [String: [SourceTreeEntry]] = [rootID: []]
@@ -76,7 +77,7 @@ private struct Fixture {
         let rule = SourceVisibilityRegexRule(id: "trailers", pattern: "Trailer",
                                             colorIndex: 2, isEnabled: true)
         switch scenario {
-        case "tree_manual", "tree_disabled_manual":
+        case "tree_manual", "tree_manual_ascii", "tree_disabled_manual":
             first.manuallyHiddenPaths = firstPaths
             second.manuallyHiddenPaths = secondPaths
             if scenario == "tree_disabled_manual" {
@@ -229,8 +230,8 @@ private struct Measurement: Codable {
     let elapsed_ns: UInt64
     let durations_ns: [UInt64]
     let receipts: [Receipt]
-    let tree_build_count: Int?
-    let visibility_build_count: Int?
+    let tree_build_count: Int
+    let visibility_build_count: Int
 }
 
 private enum HarnessFailure: Error { case invalidArguments }
@@ -245,9 +246,9 @@ private struct ManualVisibilityBenchmark {
         else { throw HarnessFailure.invalidArguments }
         let mode = args[1], scenario = args[2]
         let fixture = Fixture(size: size, scenario: scenario)
-        var filter = SourceBrowserFilter()
+        let filter = SourceBrowserFilter()
         // Initialize process-global Foundation paths and the actor cache before
-        // measuring a hot projection. Cold means an unpopulated actor only.
+        // measuring a hot projection.
         guard await filter.project(input: fixture.inputs[0], revealsRulePreview: fixture.previews[0],
                                    query: fixture.queries[0]) != nil
         else { throw CancellationError() }
@@ -260,10 +261,8 @@ private struct ManualVisibilityBenchmark {
         }
         var durations: [UInt64] = []
         var receipts: [Receipt] = []
-        var coldTreeCount = 0, coldVisibilityCount = 0
         for iteration in 0..<iterations {
             let step = (iteration + 1) % 2
-            if fixture.cold { filter = SourceBrowserFilter() }
             let start = mode == "measure" ? DispatchTime.now().uptimeNanoseconds : 0
             let projected = await filter.project(
                 input: fixture.inputs[step], revealsRulePreview: fixture.previews[step], query: fixture.queries[step])
@@ -273,19 +272,14 @@ private struct ManualVisibilityBenchmark {
             // This materializes observable output and catches stale projections.
             // It is deliberately after the timer and is identical in both builds.
             receipts.append(Receipt(projected))
-            if mode == "diagnose", fixture.cold {
-                coldTreeCount += await filter.treeBuildCount
-                coldVisibilityCount += await filter.visibilityBuildCount
-            }
         }
-        let treeCount: Int? = mode == "diagnose"
-            ? (fixture.cold ? coldTreeCount : await filter.treeBuildCount) : nil
-        let visibilityCount: Int? = mode == "diagnose"
-            ? (fixture.cold ? coldVisibilityCount : await filter.visibilityBuildCount) : nil
-        if mode == "diagnose" {
-            precondition(treeCount == 1, "Raw tree should be reused")
-            precondition(visibilityCount == iterations + 1, "Every iteration must rebuild visibility")
-        }
+        // Read counters after all timed calls so cache validation cannot affect durations.
+        let treeCount = await filter.treeBuildCount
+        let visibilityCount = await filter.visibilityBuildCount
+        precondition(treeCount == 1, "Raw tree should be reused")
+        let warmupCount = mode == "measure" ? 3 : 1
+        precondition(visibilityCount == iterations + warmupCount,
+                     "Every iteration must rebuild visibility")
         let record = Measurement(mode: mode, case: scenario, size: size, iterations: iterations,
                                  elapsed_ns: durations.reduce(0, +), durations_ns: durations, receipts: receipts,
                                  tree_build_count: treeCount, visibility_build_count: visibilityCount)

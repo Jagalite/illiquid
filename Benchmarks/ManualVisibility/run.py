@@ -26,7 +26,7 @@ ROOT = HERE.parents[1]
 BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 FOCAL = "Sources/IlliquidApp/SidebarValues.swift"
 CASES = [
-    "tree_manual", "tree_preview", "tree_always_show", "tree_disabled_manual",
+    "tree_manual", "tree_manual_ascii", "tree_preview", "tree_always_show", "tree_disabled_manual",
     "tree_invalid", "tree_nested_manual", "files_nested_manual", "media_nested_manual",
     "tree_default_control", "tree_disabled_control", "tree_regex_control",
     "files_nested_regex_control",
@@ -218,6 +218,9 @@ class Study:
             raise ValueError(f"Projection parity failed: {variant}/{case}/{size}")
         self.expected[key] = cycle
         result["receipt_cycle"] = cycle
+        warmups = 3 if mode == "measure" else 1
+        if result["tree_build_count"] != 1 or result["visibility_build_count"] != iterations + warmups:
+            raise ValueError("A timed or diagnostic call failed to rebuild visibility")
         if mode == "measure":
             if (len(result["durations_ns"]) != iterations
                     or any(value <= 0 for value in result["durations_ns"])
