@@ -123,9 +123,68 @@ The existing native workflow continues to provide macOS qualification.
 
 ## Results and limits
 
-Native results will be recorded after branch qualification completes.
+### Initial Linux component run
 
-These are warm component measurements. They do not measure subtitle traffic
-frequency, lock contention, decoding, GPU rendering, frame rate, whole-player CPU,
-memory footprint or energy. Absolute timings and newest/near-tail controls matter
-alongside percentage improvements in large queued windows.
+[Run 40638864454](https://github.com/Jagalite/illiquid/actions/runs/40638864454)
+passed on Ubuntu 24.04 / x86_64 with Swift 6.4.1. The measured commit is
+`df13d4df368d0e59a861d000e80a177a0e36bcad`; the following evidence/report
+commits do not change the measured production source, tests, or driver.
+
+| No-op pruning workload | Baseline median ns/call | Candidate median ns/call | Paired median reduction | Faster pairs |
+| --- | ---: | ---: | ---: | ---: |
+| prune-first-1 | 2.075 | 1.796 | 14.04% | 7/8 |
+| prune-first-8 | 3.575 | 1.803 | 48.84% | 8/8 |
+| prune-first-32 | 9.366 | 1.776 | 80.61% | 8/8 |
+| prune-first-128 | 31.915 | 1.792 | 94.43% | 8/8 |
+| prune-missing-32 | 8.812 | 1.764 | 79.97% | 8/8 |
+| prune-missing-128 | 32.591 | 1.827 | 94.42% | 8/8 |
+
+The 8-, 32-, and 128-entry no-op paths improved in every pair. At 128 entries
+the saving is about 30 ns per call. The singleton saving is much smaller and
+one of its eight pairs was slower.
+
+| Mutation control (prune + insert + lookup) | Baseline median ns/step | Candidate median ns/step | Paired median time change |
+| --- | ---: | ---: | ---: |
+| stream-2 | 80.179 | 80.590 | +0.05% |
+| stream-8 | 84.275 | 84.245 | -0.03% |
+| stream-32 | 110.752 | 110.321 | -0.46% |
+| stream-128 | 225.305 | 228.510 | +1.53% |
+
+Positive mutation-control changes mean more time. Percentages are medians of
+within-pair ratios, so they need not equal ratios of the displayed medians.
+The 128-entry stream was about 3.2 ns slower by the difference of medians and
+1.53% slower by paired median; six of eight pairs were slower. A large outlier
+is retained, and does not by itself explain the median. The guard adds work
+before real removals, so that tradeoff must not be hidden behind no-op gains.
+Lookup implementation is unchanged; its small before/after movements are
+controls, not improvements attributed to this patch.
+
+All 23 tests in two suites passed against baseline and candidate in both debug
+and release, with warnings treated as errors. All 448 observations across
+28 cases and eight pairs matched full receipt hashes and exact integer
+checksums. An independent recomputation checked all reported medians, balanced
+AB/BA order, successful command receipts, and production/test/runner hashes.
+
+Durable records: [manifests, tests, commands, calibration, raw observations and
+summary](evidence/portable). The workflow artifact also retains full per-case
+receipts for its configured retention period.
+
+### Focused confirmation
+
+[Run 40639637094](https://github.com/Jagalite/illiquid/actions/runs/40639637094)
+rechecks all four mutation windows, the 128-entry no-op path, and unchanged
+latest-entry lookup using twelve alternating pairs, a 250 ms target, and fixed
+CPU affinity. Its result is pending. The initial cohort will remain visible;
+the confirmation does not replace or discard any earlier samples.
+
+### Native qualification and scope
+
+[The native run for the narrowed production change](https://github.com/Jagalite/illiquid/actions/runs/40636025595)
+was still queued when this report was prepared. macOS timing and full-player
+integration are not established by the Linux run.
+
+These are warm component measurements. They do not measure real no-op frequency,
+lock contention, decoding, GPU rendering, frame rate, whole-player CPU, memory
+footprint, or energy. Without real call-frequency data, the no-op saving and
+mutation-path cost cannot be converted into an aggregate playback speedup.
+Successful pruning still shifts the retained array and releases removed owners.

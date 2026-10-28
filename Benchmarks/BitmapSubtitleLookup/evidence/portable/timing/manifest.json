@@ -1,0 +1,66 @@
+{
+  "arguments": {
+    "cases": "lookup-first-1,lookup-first-8,lookup-first-32,lookup-first-128,lookup-middle-8,lookup-middle-32,lookup-middle-128,lookup-penultimate-8,lookup-penultimate-32,lookup-penultimate-128,lookup-latest-1,lookup-latest-8,lookup-latest-32,lookup-latest-128,lookup-missing-1,lookup-missing-8,lookup-missing-32,lookup-missing-128,prune-first-1,prune-first-8,prune-first-32,prune-first-128,prune-missing-32,prune-missing-128,stream-2,stream-8,stream-32,stream-128",
+    "max_sample_ms": 1500.0,
+    "output": "/home/runner/work/_temp/bitmap-subtitle-prune/timing",
+    "pairs": 8,
+    "portable": true,
+    "target_ms": 80.0,
+    "tests_only": false
+  },
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "git_blob": "cd3482a721c63fc9742195f91ce67ae37a0301b7",
+    "path": "Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift",
+    "sha256": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f"
+  },
+  "binary_sha256": {
+    "baseline": {
+      "benchmark": "d2b81e4eeb7b391d7c70345a06dad036ed7ff91ee5b824fb40a320d46094288e",
+      "libIlliquidNativePlayback.so": "b21d5531c54199feba8805a939b04767731b35ffba9d15b9e67a6e0b650d92e8"
+    },
+    "candidate": {
+      "benchmark": "1f81ba33e1d9aff41f37b5027fa9fbd6afe803265d9e69fd61a1ef6b309cd862",
+      "libIlliquidNativePlayback.so": "dbdb8e13ca61a67b1c9fe36838fd993e07a3dc771be87a2bf2f7484af36d8d21"
+    }
+  },
+  "collected_at_utc": "2026-10-28T05:37:29Z",
+  "driver_sha256": "6c1823cf3b8c1f948b0c18ca00c5e6c65f1f2ee623439716a1fc9e99d2aed8b2",
+  "execution_scope": "portable component; Foundation geometry; not macOS qualification",
+  "extraction": "Complete ASSRenderedRegion declaration from LibassContext.swift; only Foundation/conditional CoreGraphics imports added. Timeline and budget declarations copied whole; CoreGraphics import made conditional for explicitly selected portable runs.",
+  "git_head": "df13d4df368d0e59a861d000e80a177a0e36bcad",
+  "git_status": "",
+  "machine": "x86_64",
+  "method": "Separate optimized production module; same-iteration fresh-process pairs; alternating AB/BA order; deterministic per-pair query offsets and payload markers; warm in-memory work; calibration excluded; no discarded timing samples or control subtraction.",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "region_declaration_sha256": "34ab288c1a92756eac3a6c479502ae0a0560c131fe452985665765c57a580331",
+  "runner_sha256": "46d24f1d5163891f90b747d5105c75df74e5fcba4919a45e02503cc2db3fad33",
+  "source_sha256": {
+    "baseline": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    },
+    "candidate": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "f4e0038b0c416b56565f999ee1ce255972fbefddae3c7867dbcb002cc7352c3c",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  },
+  "staged_driver_sha256": "9c567994f5720d5811ac7ce28c1eb0c932c7f855ed755409cc6bc2d8cc39f58c",
+  "staged_source_sha256": {
+    "baseline": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "96bc0d56b20102465ac171e8c0c119dca7e7d3afc0c87f24f52d4d2d315d5d85",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    },
+    "candidate": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "ed75d81a6a474a20dd848557efdb3d294f5fd30cf18f5e412e6bddadec8d1983",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  },
+  "swift": "Swift version 6.4.1 (swift-6.4.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "test_sha256": {
+    "BitmapSubtitleTimelineOrderingTests.swift": "0c11d1df5f5d5ec516ed3b700fc70c5b5f451734339512e0fef296c739760e4b",
+    "SubtitleMemoryBudgetAccountingTests.swift": "b3d872737944344704762b2097d5734998825a6bae336ab14bda93f78d67ef6b"
+  }
+}
