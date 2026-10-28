@@ -1,0 +1,67 @@
+name: PlexMatch parsing performance
+on:
+  push:
+    branches: ['perf/plexmatch-ascii-parser-20261028-36d399']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Benchmarks/PlexMatchParsing/**'
+      - '.github/workflows/plexmatch-parsing-performance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: plexmatch-parsing-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify both parsers and measure balanced native pairs
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; using isolated serial component builds.'
+          python3 Benchmarks/PlexMatchParsing/run.py \
+            --rounds 10 --target-ms 100 \
+            --output "$RUNNER_TEMP/plexmatch-parsing"
+      - name: Preserve compact evidence in the job log
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'plexmatch-parsing'
+          for name in ['manifest.json', 'tests.json', 'parity.json', 'summary.json', 'measurements.jsonl']:
+              path = root / name
+              if path.exists():
+                  print('PLEXMATCH_PARSE_BEGIN ' + name)
+                  print(path.read_text(), end='')
+                  print('PLEXMATCH_PARSE_END ' + name)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: plexmatch-parsing-native
+          path: |
+            ${{ runner.temp }}/plexmatch-parsing/*.json
+            ${{ runner.temp }}/plexmatch-parsing/*.jsonl
+            ${{ runner.temp }}/plexmatch-parsing/*.log
+            ${{ runner.temp }}/plexmatch-parsing/*.swift
+            ${{ runner.temp }}/plexmatch-parsing/*.py
+            ${{ runner.temp }}/plexmatch-parsing/processes/
+            ${{ runner.temp }}/plexmatch-parsing/packages/*/Sources/
+            ${{ runner.temp }}/plexmatch-parsing/packages/*/Tests/
+            ${{ runner.temp }}/plexmatch-parsing/packages/*/Package.swift
+          retention-days: 30

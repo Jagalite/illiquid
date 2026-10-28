@@ -26,6 +26,15 @@ struct PlexMatchHintsRegressionTests {
         .init(token: "sp01", season: 0, episode: 1, lastEpisode: nil),
         .init(token: "S000E0000", season: 0, episode: 0, lastEpisode: nil),
         .init(token: "S999E9998-S999E9999", season: 999, episode: 9998, lastEpisode: 9999),
+        .init(token: "E0", season: 7, episode: 0, lastEpisode: nil),
+        .init(token: "SP0", season: 0, episode: 0, lastEpisode: nil),
+        .init(token: "SP1-S0E2", season: 0, episode: 1, lastEpisode: 2),
+        .init(token: "S0E1-S00E2", season: 0, episode: 1, lastEpisode: 2),
+        .init(token: "s001e0001-S1e0002", season: 1, episode: 1, lastEpisode: 2),
+        // ICU's case-insensitive S also accepts Unicode long s.
+        .init(token: "ſP01", season: 0, episode: 1, lastEpisode: nil),
+        .init(token: "ſ01E02", season: 1, episode: 2, lastEpisode: nil),
+        .init(token: "S01E01-ſ01E02", season: 1, episode: 1, lastEpisode: 2),
     ]
 
     // Every numeric capture is covered, including partially ASCII fields and
@@ -222,5 +231,18 @@ struct PlexMatchHintsRegressionTests {
             }
         }
         #expect(checked == 64)
+    }
+
+    @Test(arguments: [
+        "E1-S0E2", "1-S00E2", "SP1-SP2", "E00000", "S1E1-S1E00002",
+        "S", "SP", "SE1", "S1", "S1E", "EE1", "SPE1", "P1", "E1-",
+        "E1--E2", "E1-E", "E1-E2-E3", "E1 :extra", "E1\t", "E1\u{7f}",
+    ])
+    func malformedASCIITokensDoNotEraseAnEarlierMapping(_ token: String) throws {
+        let text = "season: 7\nep: S04E06-E08: file.mkv"
+        let expected = try #require(PlexMatchHints.parse(text)).hints(for: "file.mkv")
+        let parsed = try #require(PlexMatchHints.parse(text + "\nep: \(token): file.mkv"))
+        #expect(parsed.hints(for: "file.mkv") == expected)
+        #expect(PlexMatchHints.parse("ep: \(token): file.mkv") == nil)
     }
 }
