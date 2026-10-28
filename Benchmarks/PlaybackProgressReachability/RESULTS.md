@@ -184,8 +184,10 @@ the two host/toolchain cohorts must not be combined into a new speedup.
 
 ## Remaining qualification and tradeoff
 
-Native macOS qualification is pending and is reported separately from the
-successful Linux component experiment. The final documentation/workflow
+Native macOS qualification is [queued in run 40734878357](https://github.com/Jagalite/illiquid/actions/runs/40734878357)
+at evidence commit `b292c1cfd3e95b18bc34084445f6872bd64d5984`. That revision
+has the same production, test, harness, and runner bytes as the measured
+candidate. A queued job is not a native test or performance result. The final documentation/workflow
 commits do not change the measured production, test, harness, or runner
 source. Full application and live playback testing were not performed.
 
