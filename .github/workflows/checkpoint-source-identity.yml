@@ -111,7 +111,7 @@ jobs:
         run: |
           set -o pipefail
           swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
-            --filter 'PlaybackCheckpointWriterTests|PlaybackCoordinatorTests' \
+            --filter 'PlaybackCheckpointWriterTests|PlaybackCheckpointTests|PlaybackCoordinatorTests' \
             2>&1 | tee "$RUNNER_TEMP/checkpoint-app-tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
