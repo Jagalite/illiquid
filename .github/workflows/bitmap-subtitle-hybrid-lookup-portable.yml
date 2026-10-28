@@ -37,6 +37,7 @@ jobs:
             apt-get update
             apt-get install -y --no-install-recommends python3
           fi
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           swift --version
       - name: Test both implementations and measure portable lookup
         run: |
