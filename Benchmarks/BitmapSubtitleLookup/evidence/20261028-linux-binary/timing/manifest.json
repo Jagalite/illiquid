@@ -1,0 +1,71 @@
+{
+  "arguments": {
+    "cases": null,
+    "max_sample_ms": 1500.0,
+    "output": "/home/runner/work/_temp/bitmap-subtitle-lookup-portable/timing",
+    "pairs": 8,
+    "portable": true,
+    "suite": "lookup",
+    "target_ms": 80.0,
+    "tests_only": false
+  },
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "git_blob_sha1": "cd3482a721c63fc9742195f91ce67ae37a0301b7",
+    "path": "Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift",
+    "repository": "Jagalite/illiquid",
+    "sha256": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f"
+  },
+  "binary_sha256": {
+    "baseline": {
+      "benchmark": "b4ea48f23699c33e37409c7a7b6458e26b7cfa04de44601c41122b31999fc44f",
+      "libIlliquidNativePlayback.so": "e4eb2bce83b0f5d30a234bb4219aa1174f171b1d7b8098daf7fdbd90dfc5a32c"
+    },
+    "candidate": {
+      "benchmark": "e48f491980c5181f61c6800888687d1042f3b7bc9a1166c7fd16f1ccd64ff0ae",
+      "libIlliquidNativePlayback.so": "b9a179742214e72c201a01145894546235559f8ac94d76f2a7e6dc6b9b6eb053"
+    }
+  },
+  "collected_at_utc": "2026-10-28T05:47:14Z",
+  "driver_sha256": "b5870155fffa024a276fea6b617100aacf47380364e94b7d7be0b15caef2828e",
+  "execution_scope": "portable Linux component; Foundation geometry; not macOS qualification",
+  "extraction": "Complete ASSRenderedRegion declaration from LibassContext.swift; only Foundation/CoreGraphics imports added. Timeline and budget copied whole. Standalone CoreGraphics imports in staged sources and driver are conditionalized for this explicit portable run; no declarations or operations are substituted.",
+  "git_head": "445c1eb28962a3ffb0145ea275dbdf4b0fe492f5",
+  "git_status": "",
+  "machine": "x86_64",
+  "method": "Separate optimized production module; same-iteration fresh-process pairs; alternating AB/BA order; deterministic per-pair fixture shuffle; warm in-memory work; calibration excluded; no discarded timing samples or control subtraction.",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "region_declaration_sha256": "353f37177ca3235616eb358b6096929cc6ba9c5d2ba99d568f388899a3933138",
+  "runner_sha256": "fee7e86e4da5666589d1f13c7985e9166ad57738abc5b1a92a6317262737280e",
+  "source_sha256": {
+    "baseline": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    },
+    "candidate": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "703237d1a4f5f49614f612994e8b2b01b8a168b3648543afd7a58d0493e722e0",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  },
+  "staged_driver_sha256": "a3508dbe809ab7a6cdadd9c2882b42a6dc07417e1c5054029f3fc0deb2acde81",
+  "staged_source_sha256": {
+    "baseline": {
+      "ASSRenderedRegion.swift": "34ab288c1a92756eac3a6c479502ae0a0560c131fe452985665765c57a580331",
+      "BitmapSubtitleTimeline.swift": "96bc0d56b20102465ac171e8c0c119dca7e7d3afc0c87f24f52d4d2d315d5d85",
+      "SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    },
+    "candidate": {
+      "ASSRenderedRegion.swift": "34ab288c1a92756eac3a6c479502ae0a0560c131fe452985665765c57a580331",
+      "BitmapSubtitleTimeline.swift": "91fa0f965a46611c6ce9a339f937eefd3d90ac8577311a78b0d83ac2d40618df",
+      "SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  },
+  "swift": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "test_sha256": {
+    "BitmapSubtitleTimelineLookupTests.swift": "05b20d7f62db714855a4a290684e819a99ced148540cfb9295e116f4cc1d3ce2",
+    "BitmapSubtitleTimelineOrderingTests.swift": "583701a03466dfc760230cb0d487f2cf2165ee56ad11062ae5a42354afd0f577",
+    "SubtitleMemoryBudgetAccountingTests.swift": "b3d872737944344704762b2097d5734998825a6bae336ab14bda93f78d67ef6b"
+  }
+}

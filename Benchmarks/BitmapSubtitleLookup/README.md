@@ -2,8 +2,9 @@
 
 `BitmapSubtitleTimeline` stores events in timestamp order. Lookup previously
 searched backward with `last(where:)`, visiting every future event until it
-reached the requested position. The candidate keeps a constant-time newest-event
-path and uses an upper-bound search when future events are buffered. Insertion,
+reached the requested position. The revised candidate checks the newest two events directly, expands backward
+in blocks of 2, 4, 8 and so on, then uses an upper-bound search only within the
+resulting bracket. Insertion,
 pruning, expiration, generation handling and memory ownership are unchanged.
 
 `SubtitlePipeline.renderedFrame` queries this timeline under its lock after
@@ -15,8 +16,8 @@ of past and future events. Actual event occupancy has not been profiled:
 
 ## Reproduce
 
-Requires macOS, Swift 6.1+ and Python 3.10+. Reuse the insertion suite's component
-runner with the lookup suite selected:
+Native validation requires macOS, Swift 6.1+ and Python 3.10+. Reuse the insertion
+suite's component runner with the lookup suite selected:
 
 ```sh
 python3 Benchmarks/BitmapSubtitleTimeline/run.py --suite lookup --tests-only \
@@ -25,6 +26,12 @@ python3 Benchmarks/BitmapSubtitleTimeline/run.py --suite lookup \
   --pairs 8 --target-ms 80 --max-sample-ms 1500 \
   --output /tmp/illiquid-bitmap-lookup-timing
 ```
+
+For explicitly portable Linux measurements, add `--portable` to either lookup
+command. This conditionalizes only standalone CoreGraphics imports in staged
+sources and the driver; Foundation supplies real geometry types. Original and
+compiled source hashes are retained. Portable measurements do not qualify macOS
+performance. The default insertion suite still requires macOS.
 
 Use a new empty output directory for each attempt and run one benchmark at a
 time. Follow `AGENTS.md`: submit builds through Kyoto when available; otherwise
@@ -90,4 +97,37 @@ occupancy or query frequency, lock contention, video decoding, bitmap expansion,
 GPU work, frame rate, whole-player CPU, memory footprint or energy. Small-window,
 newest and penultimate controls matter alongside the larger-window speedups.
 
-Native results will be recorded after branch validation completes.
+## Results
+
+### First candidate: global binary search (rejected)
+
+[Portable run 40639719722](https://github.com/Jagalite/illiquid/actions/runs/40639719722)
+used Swift 6.4 on x86_64 Linux (Ubuntu 24.04 runner). Both variants passed
+25 tests in three suites in debug and release. All 464 measured samples across
+29 workloads and eight pairs had matching receipts and checksums.
+
+This version checked the newest event, then searched the whole remaining prefix.
+It improved large-buffer queries but consistently regressed near-newest and
+small-window cases, so it was not selected for the PR.
+
+| Workload | Baseline median ns/query | Binary candidate median ns/query | Reduction |
+| --- | ---: | ---: | ---: |
+| First event, 128 entries | 76.01 | 25.41 | 66.6% |
+| Middle event, 128 entries | 45.92 | 25.23 | 45.0% |
+| Penultimate event, 128 entries | 19.90 | 25.67 | -29.0% |
+| Newest event, 128 entries | 19.74 | 20.27 | -2.7% |
+| Forward mixed queries, 8 entries | 18.09 | 18.96 | -4.8% |
+
+Positive reductions mean less time. Negative reductions are regressions.
+These values include lookup, loop and scalar checksum overhead; they are not
+player frame-time measurements. Original source/driver/test hashes, all raw
+measurements and calibration samples, commands, test logs and summaries are
+retained under [the first experiment's evidence](evidence/20261028-linux-binary).
+Complete query receipts are also in that run's CI artifact (14-day retention).
+
+### Revised candidate: bounded backward search
+
+Validation is pending. The new search preserves direct newest and penultimate
+probes and finds a smaller bracket before binary search. The same full workload
+matrix and correctness suite will decide whether it is worth proposing.
+
