@@ -34,6 +34,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Trust this disposable checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Test exact outputs and measure paired sample planning
         run: |
           python3 Benchmarks/ThumbnailSamplePrefix/run.py \
