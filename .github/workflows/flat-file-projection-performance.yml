@@ -1,12 +1,22 @@
 name: Flat file projection performance
 
 on:
+  push:
+    branches: [perf/flat-projection-index-storage-20261028-e02e]
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeSortingTests.swift'
+      - 'Benchmarks/FlatFileProjection/Harness.swift'
+      - 'Benchmarks/FlatFileProjection/run.py'
+      - '.github/workflows/flat-file-projection-performance.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
       - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
       - 'Sources/IlliquidApp/App/AppModel.swift'
       - 'Tests/IlliquidAppTests/FlatFileProjectionTests.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeSortingTests.swift'
       - 'Benchmarks/FlatFileProjection/**'
       - 'Benchmarks/SourceTreeVisibility/run.py'
       - '.github/workflows/flat-file-projection-performance.yml'
@@ -22,7 +32,7 @@ concurrency:
 jobs:
   native-component:
     runs-on: macos-26
-    timeout-minutes: 25
+    timeout-minutes: 40
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
@@ -30,6 +40,13 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated packages.'
       - name: Validate exact production sources and complete output parity
         if: github.event_name == 'pull_request'
         run: |
@@ -41,6 +58,30 @@ jobs:
           python3 Benchmarks/FlatFileProjection/run.py \
             --pairs 10 --target-ms 1000 \
             --output "$RUNNER_TEMP/flat-file-projection"
+      - name: Qualify direct projection from sorted indices
+        if: github.event_name == 'push'
+        run: |
+          python3 Benchmarks/FlatFileProjection/run.py \
+            --baseline ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+            --current-support --include-sorter --sizes 10000 --sorts name date off \
+            --pairs 6 --target-ms 120 \
+            --output "$RUNNER_TEMP/flat-file-projection"
+      - name: Emit reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "flat-file-projection"
+          for name in ("environment.json", "sources.json", "binaries.json", "tests.json",
+                       "parity.json", "calibration.json", "observations.json",
+                       "summary.json", "completion.json"):
+              path = root / name
+              if path.is_file():
+                  print("FLAT_PROJECTION_EVIDENCE " + json.dumps({
+                      "path": name, "data": json.loads(path.read_text())}, sort_keys=True))
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -52,4 +93,57 @@ jobs:
             !${{ runner.temp }}/flat-file-projection/**/.build/**
             !${{ runner.temp }}/flat-file-projection/**/module-cache/**
             !${{ runner.temp }}/flat-file-projection/**/cache/**
+          retention-days: 14
+
+  allocation-component:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated packages.'
+      - name: Measure requested allocation traffic separately
+        run: |
+          projection_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
+          taskset -c "$projection_cpu" python3 Benchmarks/FlatFileProjection/run.py \
+            --baseline ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+            --current-support --include-sorter --sizes 10000 --sorts name date off \
+            --mode benchmark --allocations --pairs 2 \
+            --output "$RUNNER_TEMP/flat-file-projection-allocations"
+      - name: Emit reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "flat-file-projection-allocations"
+          for name in ("environment.json", "sources.json", "binaries.json", "tests.json",
+                       "parity.json", "calibration.json", "observations.json",
+                       "summary.json", "completion.json"):
+              path = root / name
+              if path.is_file():
+                  print("FLAT_PROJECTION_EVIDENCE " + json.dumps({
+                      "path": name, "data": json.loads(path.read_text())}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: flat-file-projection-allocations-linux
+          path: |
+            ${{ runner.temp }}/flat-file-projection-allocations/
+            !${{ runner.temp }}/flat-file-projection-allocations/**/build/**
+            !${{ runner.temp }}/flat-file-projection-allocations/**/swiftpm-cache/**
+            !${{ runner.temp }}/flat-file-projection-allocations/**/.build/**
+            !${{ runner.temp }}/flat-file-projection-allocations/**/module-cache/**
+            !${{ runner.temp }}/flat-file-projection-allocations/**/cache/**
           retention-days: 14

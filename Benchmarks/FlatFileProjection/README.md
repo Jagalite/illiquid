@@ -153,3 +153,46 @@ source receipts, output comparisons, checksums, execution order and statistics.
 See the [complete results and raw evidence](evidence/README.md), the
 [initial native run](https://github.com/Jagalite/illiquid/actions/runs/39666994530),
 and the [targeted confirmation](https://github.com/Jagalite/illiquid/actions/runs/39669135880).
+
+## Sorted-entry storage follow-up
+
+The index-storage study uses baseline
+`ea2ff568237e2667f7b1aeee67b11a44ebe95b72` to isolate a later change:
+flat projection consumes the sorter's existing permutation directly instead of
+materializing a complete sorted entry array before building display rows.
+The ordinary `sorted` API and its comparator are preserved. With sorting disabled,
+or fewer than two entries, projection keeps the original direct iteration path.
+
+`--include-sorter` retains the baseline sorter as well as projection Input.
+The runner permits only the exact `SourceTreeSorting` declaration to differ
+inside the staged Sidebar values; all surrounding declarations must match.
+`SourceTreeSortingTests` joins the existing three regression suites.
+
+```sh
+python3 Benchmarks/FlatFileProjection/run.py \
+  --baseline ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --current-support --include-sorter --sizes 10000 --sorts name date off \
+  --pairs 6 --target-ms 120 --output /tmp/flat-projection-index-timing
+
+# Separate Linux/glibc cohort; these instrumented timings are not speed evidence.
+python3 Benchmarks/FlatFileProjection/run.py \
+  --baseline ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --current-support --include-sorter --sizes 10000 --sorts name date off \
+  --mode benchmark --allocations --pairs 2 \
+  --output /tmp/flat-projection-index-allocations
+```
+
+The six source/view scenarios run with ascending name order, descending creation
+date order, and all sorting disabled. Complete row traces are compared for each
+scenario and sort before measurement. Default CLI sort selection remains
+`name`, so earlier study commands retain their workload selection.
+
+The allocation cohort uses the existing `NonDecodePerformance/allocmeter.c`.
+It records successful intercepted malloc/calloc/realloc requests and requested
+bytes only during each complete production `rows()` call. It excludes fixture
+setup, result consumption, and returned-row destruction. It does not measure
+peak heap, live heap, all allocation APIs, or whole-player resident memory.
+Allocation measurements use one call per process after two warmups; native
+timings are collected separately without instrumentation. Every observation,
+source hash, full-row trace hash, compiler identity, and completion marker is
+retained.
