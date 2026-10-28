@@ -148,6 +148,34 @@ struct SubtitleCueStreamingTests {
         }
     }
 
+    @Test func largeEscapedUnicodeCueRetainsExactBytesAndFinalEmptyField() throws {
+        let samples = [
+            ("字幕 Cafe\u{0301} {text} \\N", "字幕 Cafe\u{0301} \\{text\\} \\\\N"),
+            ("👩🏽‍🚀 {\\an8} words", "👩🏽‍🚀 \\{\\\\an8\\} words"),
+            (" \t\u{00A0}", " \t\u{00A0}"),
+            ("left\u{2028}middle\u{2029}right", "left\u{2028}middle\u{2029}right"),
+        ]
+        let lines = (0..<4_096).map { "Line \($0): " + samples[$0 % samples.count].0 }
+        let escaped = (0..<4_096).map { "Line \($0): " + samples[$0 % samples.count].1 }
+        for format in [Format.srt, .webVTT] {
+            let body = timing(for: format) + "\n" + lines.joined(separator: "\n") + "\n"
+            let actual = try convert(document(body, format: format), format: format)
+            let wanted = expected([escaped.joined(separator: "\\N") + "\\N"])
+            #expect(actual.utf8.elementsEqual(wanted.utf8))
+        }
+    }
+
+    @Test func largeWebVTTNoteDiscardsAllLinesBeforeTheNextCue() throws {
+        let ignored = (0..<4_096).map {
+            $0 % 2 == 0 ? timing(for: .webVTT) : "Ignored 字幕 {\\an8} caption \($0)"
+        }.joined(separator: "\n")
+        for header in ["NOTE", "NOTE comment", "NOTE\tcomment"] {
+            let body = header + "\n" + ignored + "\n\n" + timing(for: .webVTT) + "\nRetained"
+            #expect(try convert(document(body, format: .webVTT), format: .webVTT)
+                    == expected(["Retained"]))
+        }
+    }
+
     private func timing(for format: Format) -> String {
         switch format {
         case .srt: "00:00:01,000 --> 00:00:02,000"

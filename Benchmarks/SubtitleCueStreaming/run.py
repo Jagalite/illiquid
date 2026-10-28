@@ -98,6 +98,10 @@ def main():
             (snapshots / f"{variant}.swift").write_text(source)
         (snapshots / "Driver.swift").write_text(driver)
         shutil.copy2(__file__, snapshots / "run.py")
+        for name in ("fresh_process.py", "test_memory_launcher.py"):
+            shutil.copy2(Path(__file__).with_name(name), snapshots / name)
+        execute("test-memory-launcher", [sys.executable,
+                                        snapshots / "test_memory_launcher.py"])
         provenance = {
             "baseline_commit": BASELINE,
             "candidate_commit": execute("head", ["git", "rev-parse", "HEAD"]).strip(),
@@ -110,6 +114,9 @@ def main():
             "candidate_sha256": digest(candidate.encode()),
             "driver_sha256": digest(driver.encode()),
             "runner_sha256": digest(Path(__file__).read_bytes()),
+            "memory_launcher_sha256": digest((snapshots / "fresh_process.py").read_bytes()),
+            "memory_launcher_test_sha256": digest((snapshots / "test_memory_launcher.py").read_bytes()),
+            "memory_launch": "Fresh isolated Python interpreter, explicit fork, then exec of one cold conversion.",
             "pairs": args.pairs, "target_ms": args.target_ms,
             "kyoto_available": KYOTO.is_file(),
             "scope": "Full text-to-ASS conversion; no file I/O, libass, playback, or UI timing.",
@@ -139,6 +146,14 @@ def main():
             "case_count": len(first_trace["cases"]),
             "comparison": "Exact JSON records of complete ASS output or typed error, not hashes alone.",
         })
+        memory_catalog = json.loads(execute("list-memory", [
+            binaries[("candidate", "release")], "list-memory"
+        ]))
+        memory_cases = memory_catalog["cases"]
+        if (memory_catalog.get("mode") != "list-memory" or not memory_cases
+                or len(memory_cases) != len(set(memory_cases))):
+            raise RuntimeError("Memory fixture catalog is empty or has duplicate names")
+        save("memory-cases.json", memory_catalog)
 
         # Compile the real converter and focused native-package tests without
         # importing FFmpeg, a renderer, or the full application dependency graph.
@@ -231,23 +246,32 @@ let package = Package(
                 for key in ("input_bytes", "output_bytes", "fixture_count", "fixture_checksum", "cycle_checksum"):
                     if pair_rows[0][key] != pair_rows[1][key]:
                         raise RuntimeError(f"Baseline/candidate fixture mismatch: {key}")
-        for case in ("srt-dense", "srt-long-line"):
-            for pair in range(4):
+        for case in memory_cases:
+            for pair in range(args.pairs):
                 order = ("baseline", "candidate") if pair % 2 == 0 else ("candidate", "baseline")
+                pair_rows = []
                 for variant in order:
                     row = json.loads(execute(f"memory-{case}-{pair}-{variant}", [
+                        sys.executable, "-I", snapshots / "fresh_process.py",
                         binaries[(variant, "release")], "memory", case
                     ]))
-                    reference = next(r for r in rows
-                                     if r["case"] == case and r["variant"] == variant)
+                    reference = next(r for r in first_trace["cases"]
+                                     if r["id"] == f"workload-{case}")
                     if row.get("mode") != "memory" or row.get("case") != case:
                         raise RuntimeError("Memory receipt has the wrong workload")
-                    for key in ("fixture_count", "fixture_checksum", "input_bytes",
-                                "output_bytes", "cycle_checksum"):
+                    for key in ("fixture_checksum", "input_bytes", "output_bytes"):
                         if row[key] != reference[key]:
                             raise RuntimeError(f"Memory fixture mismatch: {key}")
+                    if reference["status"] != "success" or row["fixture_count"] != 1:
+                        raise RuntimeError("Memory case was not successfully verified")
+                    if (row.get("conversion_count") != 1 or row.get("warmup_iterations") != 0
+                            or row.get("rss_unit") != "bytes"
+                            or row.get("expected_cue_count") != reference["expected_cue_count"]):
+                        raise RuntimeError("Memory scope or expected cue count differs")
+                    expected_bytes = reference["output"].encode("utf-8")
+                    expected_checksum = len(expected_bytes) + (expected_bytes[-1] if expected_bytes else 0)
                     if not (row["checksum"] == row["expected_checksum"]
-                            == row["cycle_checksum"]):
+                            == row["cycle_checksum"] == expected_checksum):
                         raise RuntimeError("Memory checksum differs")
                     if not (row["peak_rss_bytes"] >= row["peak_rss_before_conversion_bytes"]
                             >= row["peak_rss_before_fixture_bytes"]):
@@ -258,8 +282,44 @@ let package = Package(
                         raise RuntimeError("Memory growth receipt differs")
                     row.update(variant=variant, pair=pair, ordinal=len(memory_rows))
                     memory_rows.append(row)
+                    pair_rows.append(row)
                     with (output / "memory.jsonl").open("a") as stream:
                         stream.write(json.dumps(row, sort_keys=True) + "\n")
+                for key in ("fixture_checksum", "input_bytes", "output_bytes", "cycle_checksum"):
+                    if pair_rows[0][key] != pair_rows[1][key]:
+                        raise RuntimeError(f"Paired memory fixture mismatch: {key}")
+
+        memory_summary = []
+        for case in memory_cases:
+            item = {"case": case, "pairs": args.pairs, "rss_unit": "bytes"}
+            for variant in ("baseline", "candidate"):
+                subset = [r for r in memory_rows if r["case"] == case and r["variant"] == variant]
+                item[variant] = {
+                    metric: {"median": statistics.median(r[metric] for r in subset),
+                             "min": min(r[metric] for r in subset),
+                             "max": max(r[metric] for r in subset),
+                             "samples": [r[metric] for r in subset]}
+                    for metric in ("peak_rss_bytes", "peak_rss_before_fixture_bytes",
+                                   "peak_rss_before_conversion_bytes", "peak_rss_growth_bytes")
+                }
+                item[variant].update(input_bytes=subset[0]["input_bytes"],
+                                     output_bytes=subset[0]["output_bytes"])
+            changes = []
+            for pair in range(args.pairs):
+                baseline_row = next(r for r in memory_rows
+                                    if r["case"] == case and r["pair"] == pair
+                                    and r["variant"] == "baseline")
+                candidate_row = next(r for r in memory_rows
+                                     if r["case"] == case and r["pair"] == pair
+                                     and r["variant"] == "candidate")
+                changes.append(100 * (candidate_row["peak_rss_bytes"] /
+                                      baseline_row["peak_rss_bytes"] - 1))
+            item["paired_peak_rss_change_percent"] = {
+                "median": statistics.median(changes), "min": min(changes),
+                "max": max(changes), "samples": changes,
+            }
+            memory_summary.append(item)
+        save("memory-summary.json", memory_summary)
 
         summary = []
         for case in CASES:

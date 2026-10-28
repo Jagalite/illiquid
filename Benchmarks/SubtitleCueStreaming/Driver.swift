@@ -8,7 +8,15 @@ import Foundation
 // Compile with the complete production converter for each variant. Inputs,
 // warmup, and JSON encoding are outside the timed loop. RSS is normalized to bytes.
 private let maximumInputBytes = 4 * 1_024 * 1_024
+private let maximumMemoryInputBytes = 8 * 1_024 * 1_024
 private let maximumIterations = 1_000_000
+private let memoryFixtureNames = [
+    "srt-short", "vtt-short",
+    "srt-ordinary-2000", "vtt-ordinary-2000",
+    "srt-dense-64k", "vtt-dense-64k", "srt-dense-256k", "vtt-dense-256k",
+    "vtt-note-64k", "vtt-note-256k", "srt-long-line-4mib", "vtt-long-line-4mib",
+]
+private let memoryPayloadLine = "subtitle line 00"
 
 private struct DriverError: Error, CustomStringConvertible {
     let description: String
@@ -174,11 +182,103 @@ private func makeFixture(_ name: String) throws -> Fixture {
             source += "Unrelated preamble row \(line) without timing"
         }
         source += "\n\n1\n00:00:00,000 --> 00:00:02,000\nRetained final cue."
+    case "srt-ordinary-2000", "vtt-ordinary-2000":
+        format = name.hasPrefix("srt-") ? .srt : .webVTT
+        source = format == .webVTT ? "WEBVTT\n\n" : ""
+        source.reserveCapacity(300_000)
+        for cue in 0..<2_000 {
+            if cue > 0 { source += "\n\n" }
+            source += "\(cue + 1)\n" + timingLine(cue, format: format)
+                + "\nThe first ordinary subtitle for cue \(cue)."
+                + "\nThe second ordinary subtitle line."
+        }
+    case "srt-dense-64k", "vtt-dense-64k", "srt-dense-256k", "vtt-dense-256k":
+        format = name.hasPrefix("srt-") ? .srt : .webVTT
+        let count = name.hasSuffix("64k") ? 65_536 : 262_144
+        source = format == .srt
+            ? "1\n00:00:00,000 --> 00:00:02,000\n"
+            : "WEBVTT\n\n00:00:00.000 --> 00:00:02.000\n"
+        source.reserveCapacity(count * (memoryPayloadLine.utf8.count + 1) + 128)
+        for line in 0..<count {
+            if line > 0 { source += "\n" }
+            source += memoryPayloadLine
+        }
+    case "vtt-note-64k", "vtt-note-256k":
+        format = .webVTT
+        let count = name.hasSuffix("64k") ? 65_536 : 262_144
+        source = "WEBVTT\n\nNOTE memory fixture\n"
+        source.reserveCapacity(count * (memoryPayloadLine.utf8.count + 1) + 128)
+        for line in 0..<count {
+            if line > 0 { source += "\n" }
+            source += memoryPayloadLine
+        }
+        source += "\n\n00:00:03.000 --> 00:00:04.000\nRetained cue"
+    case "srt-long-line-4mib", "vtt-long-line-4mib":
+        format = name.hasPrefix("srt-") ? .srt : .webVTT
+        source = format == .srt
+            ? "1\n00:00:00,000 --> 00:00:02,000\n"
+            : "WEBVTT\n\n00:00:00.000 --> 00:00:02.000\n"
+        source.reserveCapacity(4 * 1_024 * 1_024 + 128)
+        // Fill the reserved input in small pieces; avoid a second four-MiB
+        // temporary raising the pre-conversion high-water mark.
+        for _ in 0..<(4 * 1_024 * 1_024 / 16) { source += "xxxxxxxxxxxxxxxx" }
     default:
         throw DriverError("Unknown case: \(name)")
     }
-    try require(source.utf8.count <= maximumInputBytes, "Fixture exceeds four MiB")
+    let maximum = memoryFixtureNames.contains(name) ? maximumMemoryInputBytes : maximumInputBytes
+    try require(source.utf8.count <= maximum, "Fixture exceeds input size bound")
     return Fixture(id: name, format: format, source: source)
+}
+
+// Independent expected outputs for the memory workloads. Construct these only
+// after the RSS sample, so validation storage cannot raise its high-water mark.
+private func expectedMemoryOutput(_ name: String) -> (output: String, cueCount: Int)? {
+    func event(_ start: String, _ end: String, _ payload: String) -> String {
+        "\nDialogue: 0,\(start),\(end),Default,,0,0,0,," + payload
+    }
+    func time(_ seconds: Int, _ fraction: String) -> String {
+        "\(seconds / 3_600):" + padded((seconds / 60) % 60, width: 2)
+            + ":" + padded(seconds % 60, width: 2) + "." + fraction
+    }
+    var output = ExternalTextSubtitleConverter.defaultASSHeader
+    switch name {
+    case "srt-short", "vtt-short":
+        for cue in 0..<128 {
+            let payload = name == "srt-short"
+                ? "A short subtitle for cue \(cue)."
+                : "The first subtitle line for cue \(cue).\\NThe second line has café and 東京."
+            output += event(time(cue * 3, "12"), time(cue * 3 + 2, "84"), payload)
+        }
+        return (output, 128)
+    case "srt-ordinary-2000", "vtt-ordinary-2000":
+        for cue in 0..<2_000 {
+            let payload = "The first ordinary subtitle for cue \(cue).\\NThe second ordinary subtitle line."
+            output += event(time(cue * 3, "12"), time(cue * 3 + 2, "84"), payload)
+        }
+        return (output, 2_000)
+    case "srt-dense-64k", "vtt-dense-64k", "srt-dense-256k", "vtt-dense-256k":
+        let count = name.hasSuffix("64k") ? 65_536 : 262_144
+        let payload = String(repeating: memoryPayloadLine + "\\N", count: count - 1)
+            + memoryPayloadLine
+        output += event("0:00:00.00", "0:00:02.00", payload)
+    case "vtt-note-64k", "vtt-note-256k":
+        output += event("0:00:03.00", "0:00:04.00", "Retained cue")
+    case "srt-long-line-4mib", "vtt-long-line-4mib":
+        output += event("0:00:00.00", "0:00:02.00", String(repeating: "x", count: 4 * 1_024 * 1_024))
+    default:
+        return nil
+    }
+    return (output, 1)
+}
+
+@discardableResult
+private func validateExpectedMemoryOutput(_ fixture: Fixture, _ output: String) throws -> Int? {
+    let name = fixture.id.hasPrefix("workload-") ? String(fixture.id.dropFirst(9)) : fixture.id
+    guard let expected = expectedMemoryOutput(name) else { return nil }
+    try require(output.utf8.elementsEqual(expected.output.utf8), "Unexpected memory workload output: \(name)")
+    let cueCount = output.components(separatedBy: "\nDialogue: ").count - 1
+    try require(cueCount == expected.cueCount, "Unexpected memory workload cue count: \(name)")
+    return cueCount
 }
 
 private func changeLineEndings(_ source: String, mode: Int) -> String {
@@ -332,9 +432,9 @@ private func verificationFixtures() throws -> [Fixture] {
             changeLineEndings(source, mode: index / 11))
     }
     try require(fixtures.count == 256, "Expected 256 compatibility inputs")
-    for name in ["srt-short", "vtt-short", "srt-crlf", "vtt-crlf",
-                 "srt-multiline", "srt-dense",
-                 "srt-long-line", "invalid-preamble"] {
+    let timingNames = ["srt-short", "vtt-short", "srt-crlf", "vtt-crlf",
+                       "srt-multiline", "srt-dense", "srt-long-line", "invalid-preamble"]
+    for name in timingNames + memoryFixtureNames.filter({ !timingNames.contains($0) }) {
         let fixture = try makeFixture(name)
         fixtures.append(Fixture(id: "workload-\(name)", format: fixture.format,
                                 source: fixture.source))
@@ -356,6 +456,9 @@ private func verify() throws -> [String: Any] {
             row["status"] = "success"
             row["output"] = output
             row["output_bytes"] = output.utf8.count
+            if let count = try validateExpectedMemoryOutput(fixture, output) {
+                row["expected_cue_count"] = count
+            }
         } catch let error as ExternalTextSubtitleConverter.ConversionError {
             row["status"] = "error"
             switch error {
@@ -403,12 +506,14 @@ private func measure(_ name: String, iterations: Int) throws -> [String: Any] {
 private func memory(_ name: String) throws -> [String: Any] {
     let beforeFixture = try peakRSSBytes()
     let fixture = try makeFixture(name)
-    let identity = fixtureChecksum(fixture)
     let before = try peakRSSBytes()
     let output = try fixture.format.convert(fixture.source)
-    let observed = stamp(output)
     let peak = try withExtendedLifetime((fixture, output)) { try peakRSSBytes() }
-    return [
+    // Hashing, metadata traversal, and independent validation follow the sample.
+    let identity = fixtureChecksum(fixture)
+    let observed = stamp(output)
+    let expectedCueCount = try validateExpectedMemoryOutput(fixture, output)
+    var result: [String: Any] = [
         "schema_version": 1, "mode": "memory", "case": name,
         "fixture_count": 1, "fixture_checksum": identity,
         "input_bytes": fixture.source.utf8.count, "output_bytes": observed.byteCount,
@@ -418,7 +523,10 @@ private func memory(_ name: String) throws -> [String: Any] {
         "peak_rss_before_conversion_bytes": before,
         "peak_rss_growth_bytes": peak - before,
         "rss_source": "getrusage(RUSAGE_SELF).ru_maxrss normalized to bytes", "rss_unit": "bytes",
+        "conversion_count": 1, "warmup_iterations": 0,
     ]
+    if let expectedCueCount { result["expected_cue_count"] = expectedCueCount }
+    return result
 }
 
 @main
@@ -429,12 +537,17 @@ private enum SubtitleCueStreamingDriver {
             let result: [String: Any]
             if args.count == 2, args[1] == "verify" {
                 result = try verify()
+            } else if args.count == 2, args[1] == "list-memory" {
+                result = [
+                    "schema_version": 1, "mode": "list-memory", "cases": memoryFixtureNames,
+                    "verification_ids": memoryFixtureNames.map { "workload-" + $0 },
+                ]
             } else if args.count == 4, args[1] == "measure", let count = Int(args[3]) {
                 result = try measure(args[2], iterations: count)
             } else if args.count == 3, args[1] == "memory" {
                 result = try memory(args[2])
             } else {
-                throw DriverError("Usage: Driver verify | measure CASE ITERATIONS | memory CASE")
+                throw DriverError("Usage: Driver verify | list-memory | measure CASE ITERATIONS | memory CASE")
             }
             let data = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys])
             print(String(decoding: data, as: UTF8.self))

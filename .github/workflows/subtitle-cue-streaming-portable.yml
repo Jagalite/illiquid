@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - perf/subtitle-cue-streaming-20261028-8d19a6
+      - perf/subtitle-rss-qualification-20261028
     paths:
       - Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift
       - Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift
@@ -59,6 +60,7 @@ jobs:
           names = [
               "provenance.json", "parity.json", "tests.json", "completion.json",
               "calibration.json", "measurements.jsonl", "memory.jsonl", "summary.json",
+              "memory-cases.json", "memory-summary.json",
           ]
           for name in names:
               path = root / name
