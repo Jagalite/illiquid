@@ -1,0 +1,148 @@
+name: Video format-description reuse
+
+on:
+  push:
+    branches: ['perf/video-format-description-reuse-20261028']
+    paths:
+      - Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift
+      - Sources/IlliquidNativePlayback/Presentation/VideoFormatDescriptionCache.swift
+      - Tests/IlliquidNativePlaybackTests/VideoFormatDescriptionCacheTests.swift
+      - Scripts/test-video-format-description-cache.sh
+      - Benchmarks/PlaybackPresentationNative/**
+      - .github/workflows/video-format-description-reuse.yml
+      - '!Benchmarks/PlaybackPresentationNative/*.md'
+      - '!Benchmarks/PlaybackPresentationNative/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift
+      - Sources/IlliquidNativePlayback/Presentation/VideoFormatDescriptionCache.swift
+      - Tests/IlliquidNativePlaybackTests/VideoFormatDescriptionCacheTests.swift
+      - Scripts/test-video-format-description-cache.sh
+      - Benchmarks/PlaybackPresentationNative/**
+      - .github/workflows/video-format-description-reuse.yml
+      - '!Benchmarks/PlaybackPresentationNative/*.md'
+      - '!Benchmarks/PlaybackPresentationNative/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-format-description-reuse-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record exact study sources
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+
+          files = [
+              "Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift",
+              "Sources/IlliquidNativePlayback/Presentation/VideoFormatDescriptionCache.swift",
+              "Tests/IlliquidNativePlaybackTests/VideoFormatDescriptionCacheTests.swift",
+              "Scripts/test-video-format-description-cache.sh",
+              "Benchmarks/PlaybackPresentationNative/FormatProbe.swift",
+              "Benchmarks/PlaybackPresentationNative/run.py",
+              ".github/workflows/video-format-description-reuse.yml",
+          ]
+          output = Path(os.environ["RUNNER_TEMP"]) / "video-format-description-tests"
+          output.mkdir(parents=True, exist_ok=True)
+          receipt = {
+              "revision": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "event": os.environ["GITHUB_EVENT_NAME"],
+              "sha256": {path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                         for path in files},
+              "scope": "Exact cache helper tests and native format/sample construction; no GUI or renderer timing.",
+          }
+          (output / "source-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
+          PY
+      - name: Qualify debug and release, then measure native format reuse
+        run: |
+          set -euo pipefail
+          qualification="$RUNNER_TEMP/video-format-description-qualify.sh"
+          evidence="$RUNNER_TEMP/video-format-description-tests"
+          cat > "$qualification" <<'SH'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          bash Scripts/test-video-format-description-cache.sh \
+            --configuration debug --jobs 2 -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/video-format-description-tests/debug.log"
+          bash Scripts/test-video-format-description-cache.sh \
+            --configuration release --jobs 2 -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/video-format-description-tests/release.log"
+          python3 Benchmarks/PlaybackPresentationNative/run.py \
+            --output "$RUNNER_TEMP/video-format-description-results" \
+            2>&1 | tee "$RUNNER_TEMP/video-format-description-tests/benchmark.log"
+          SH
+
+          kyoto=/Volumes/seed1/Projects/kyoto/kyoto.py
+          if test -f "$kyoto"; then
+            python3 "$kyoto" submit -- env \
+              "DEVELOPER_DIR=$DEVELOPER_DIR" "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" \
+              "RUNNER_TEMP=$RUNNER_TEMP" "PATH=$PATH" \
+              bash "$qualification" > "$evidence/kyoto-submit.json"
+            job_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["id"])' "$evidence/kyoto-submit.json")"
+            python3 "$kyoto" show "$job_id" > "$evidence/kyoto-before.json"
+            queue_status=0
+            python3 "$kyoto" wait "$job_id" > "$evidence/kyoto-wait.json" || queue_status=$?
+            python3 "$kyoto" logs "$job_id" | tee "$evidence/kyoto.log"
+            python3 "$kyoto" show "$job_id" > "$evidence/kyoto-after.json"
+            exit "$queue_status"
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated temporary packages.'
+          bash "$qualification"
+      - name: Print complete component receipts for remote review
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"])
+          files = {}
+          for directory, names in {
+              "video-format-description-tests": [
+                  "source-receipt.json", "debug.log", "release.log",
+                  "kyoto-submit.json", "kyoto-before.json", "kyoto-wait.json", "kyoto-after.json",
+              ],
+              "video-format-description-results": [
+                  "environment.json", "verification.json", "measurements.jsonl",
+                  "summary.json", "paired-summary.json", "validation.json", "commands.json",
+              ],
+          }.items():
+              for name in names:
+                  path = root / directory / name
+                  if path.is_file():
+                      files[f"{directory}/{name}"] = path.read_text()
+          if not files:
+              raise SystemExit("No study evidence was produced.")
+          payload = json.dumps(files, separators=(",", ":"), sort_keys=True)
+          chunks = [payload[index:index + 8000] for index in range(0, len(payload), 8000)]
+          for index, chunk in enumerate(chunks):
+              print("VIDEO_FORMAT_EVIDENCE_PART " + json.dumps({
+                  "index": index, "parts": len(chunks), "chunk": chunk
+              }))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-format-description-native
+          path: |
+            ${{ runner.temp }}/video-format-description-tests/
+            ${{ runner.temp }}/video-format-description-results/*.json
+            ${{ runner.temp }}/video-format-description-results/*.jsonl
+          retention-days: 14

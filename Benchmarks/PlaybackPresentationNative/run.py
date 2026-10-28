@@ -12,7 +12,7 @@ from pathlib import Path
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--output', type=Path, required=True)
-    p.add_argument('--rounds', type=int, default=7)
+    p.add_argument('--rounds', type=int, default=8)
     p.add_argument('--frames', type=int, default=10000)
     a = p.parse_args()
     if platform.system() != 'Darwin':
@@ -23,6 +23,9 @@ def main():
         p.error('Output must not already exist.')
     a.output.mkdir(parents=True)
     source = Path(__file__).with_name('FormatProbe.swift')
+    root = Path(__file__).resolve().parents[2]
+    helper = root / 'Sources/IlliquidNativePlayback/Presentation/VideoFormatDescriptionCache.swift'
+    presenter = root / 'Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift'
     binary = a.output / 'format-probe'
     commands = []
     def execute(command, timeout=120):
@@ -38,10 +41,14 @@ def main():
                    'swift': execute(['xcrun', 'swiftc', '--version']),
                    'xcode': execute(['xcodebuild', '-version']),
                    'hardware': execute(['sysctl', 'hw.model', 'hw.memsize', 'hw.ncpu']),
-                   'source_sha256': hashlib.sha256(source.read_bytes()).hexdigest()}
+                   'source_sha256': hashlib.sha256(source.read_bytes()).hexdigest(),
+                   'commit': execute(['git', '-C', str(root), 'rev-parse', 'HEAD']),
+                   'sources': {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+                               for path in [source.resolve(), helper, presenter, Path(__file__).resolve()]},
+                   'comparison': 'Fresh CoreMedia description per frame vs production locked one-entry cache; both create fresh sample buffers.'}
     (a.output/'environment.json').write_text(json.dumps(environment, indent=2)+'\n')
     execute(['xcrun', 'swiftc', '-O', '-swift-version', '6', '-warnings-as-errors',
-             '-parse-as-library', str(source), '-o', str(binary)])
+             '-parse-as-library', str(helper), str(source), '-o', str(binary)])
     verification = json.loads(execute([str(binary), 'verify']))
     (a.output/'verification.json').write_text(json.dumps(verification, indent=2)+'\n')
     rows = []
@@ -55,6 +62,12 @@ def main():
                 assert row['format_creations'] + row['format_hits'] == a.frames
                 if variant == 'fresh':
                     assert row['format_creations'] == a.frames
+                elif scenario in ['420v', 'bgra', 'hdr10']:
+                    assert row['format_creations'] == 1
+                elif scenario == 'alternating-color':
+                    assert row['format_creations'] == a.frames
+                elif scenario == 'reset90':
+                    assert row['format_creations'] == (a.frames + 89) // 90
                 row.update(round=round_number, variant=variant, ordinal=len(rows))
                 rows.append(row)
                 with (a.output/'measurements.jsonl').open('a') as f:
@@ -72,10 +85,21 @@ def main():
                 entry[metric] = {'median': statistics.median(values), 'min': min(values), 'max': max(values)}
             summary.append(entry)
     (a.output/'summary.json').write_text(json.dumps(summary, indent=2)+'\n')
+    paired = []
+    for scenario in cases:
+        fresh = {r['round']: r for r in rows if r['scenario'] == scenario and r['variant'] == 'fresh'}
+        reuse = {r['round']: r for r in rows if r['scenario'] == scenario and r['variant'] == 'reuse'}
+        result = {'scenario': scenario, 'pairs': a.rounds}
+        for metric in ['wall_ns', 'cpu_ns']:
+            reductions = [100 * (1 - reuse[r][metric] / fresh[r][metric]) for r in range(a.rounds)]
+            result[metric + '_reduction_percent'] = {
+                'median': statistics.median(reductions), 'min': min(reductions), 'max': max(reductions)}
+        paired.append(result)
+    (a.output/'paired-summary.json').write_text(json.dumps(paired, indent=2)+'\n')
     (a.output/'validation.json').write_text(json.dumps({
         'rows': len(rows), 'verified_order': True, 'verification': verification,
         'binary_sha256': hashlib.sha256(binary.read_bytes()).hexdigest(),
-        'scope': 'Native format/sample creation only. No enqueue, decode, GUI, footprint or energy measurement.'
+        'scope': 'Actual production cache plus native format/sample creation. No renderer enqueue, decode, GUI, footprint or energy measurement.'
     }, indent=2)+'\n')
     print(json.dumps({'verification': verification, 'summary': summary}, indent=2))
 

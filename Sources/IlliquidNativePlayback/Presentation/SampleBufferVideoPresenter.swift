@@ -13,6 +13,7 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
     }
     private let identityLock = NSLock()
     private var frameIdentities: [FrameIdentity] = []
+    private let formatDescriptionCache = VideoFormatDescriptionCache()
 
     func adjacentTime(to frame: FrameIdentity, direction: Int) -> Double? {
         identityLock.withLock {
@@ -79,19 +80,22 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
         if requiresFlushToResumeDecoding {
             throw PresentationRecoveryRequiredError.requiresFlushToResumeDecoding
         }
-        var formatDescription: CMVideoFormatDescription?
-        try withNativeVideoSignpost("VideoFormatDescriptionCreate") {
-            try checkOSStatus(
-                CMVideoFormatDescriptionCreateForImageBuffer(
-                    allocator: kCFAllocatorDefault,
-                    imageBuffer: frame.pixelBuffer,
-                    formatDescriptionOut: &formatDescription
-                ),
-                operation: "Create video format description"
-            )
-        }
-        guard let formatDescription else {
-            throw PresentationError("Video format description was not created")
+        let formatDescription = try formatDescriptionCache.resolve(for: frame.pixelBuffer) {
+            var formatDescription: CMVideoFormatDescription?
+            try withNativeVideoSignpost("VideoFormatDescriptionCreate") {
+                try checkOSStatus(
+                    CMVideoFormatDescriptionCreateForImageBuffer(
+                        allocator: kCFAllocatorDefault,
+                        imageBuffer: frame.pixelBuffer,
+                        formatDescriptionOut: &formatDescription
+                    ),
+                    operation: "Create video format description"
+                )
+            }
+            guard let formatDescription else {
+                throw PresentationError("Video format description was not created")
+            }
+            return formatDescription
         }
 
         var timing = CMSampleTimingInfo(
@@ -145,6 +149,7 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
         removeDisplayedImage: Bool = true,
         completion: (@Sendable () -> Void)? = nil
     ) {
+        formatDescriptionCache.reset()
         identityLock.withLock { frameIdentities.removeAll(keepingCapacity: true) }
         renderer.flush(
             removingDisplayedImage: removeDisplayedImage,

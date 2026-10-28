@@ -15,24 +15,27 @@ private func nanos(_ clock: clockid_t) throws -> UInt64 {
     try require(clock_gettime(clock, &t) == 0, "clock_gettime failed")
     return UInt64(t.tv_sec) * 1_000_000_000 + UInt64(t.tv_nsec)
 }
+// Instrument the actual production cache. The fresh path executes the original
+// Core Media creation operation on every frame; both paths create new samples.
 private final class FormatCache {
-    var value: CMVideoFormatDescription?
+    private let cache = VideoFormatDescriptionCache()
     var creations = 0
     var hits = 0
-    func reset() { value = nil }
+    func reset() { cache.reset() }
     func resolve(_ image: CVPixelBuffer, reuse: Bool) throws -> CMVideoFormatDescription {
-        if reuse, let value,
-           CMVideoFormatDescriptionMatchesImageBuffer(value, imageBuffer: image) {
-            hits += 1
-            return value
+        let create = { () throws -> CMVideoFormatDescription in
+            var next: CMVideoFormatDescription?
+            let status = CMVideoFormatDescriptionCreateForImageBuffer(
+                allocator: kCFAllocatorDefault, imageBuffer: image, formatDescriptionOut: &next)
+            try require(status == noErr && next != nil, "format creation failed: \(status)")
+            self.creations += 1
+            return next!
         }
-        var next: CMVideoFormatDescription?
-        let status = CMVideoFormatDescriptionCreateForImageBuffer(
-            allocator: kCFAllocatorDefault, imageBuffer: image, formatDescriptionOut: &next)
-        try require(status == noErr && next != nil, "format creation failed: \(status)")
-        value = next
-        creations += 1
-        return next!
+        guard reuse else { return try create() }
+        let before = creations
+        let result = try cache.resolve(for: image, create: create)
+        if creations == before { hits += 1 }
+        return result
     }
 }
 private func makeImage(_ width: Int, _ height: Int, _ format: OSType,
