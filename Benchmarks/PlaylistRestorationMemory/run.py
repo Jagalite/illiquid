@@ -63,8 +63,9 @@ def main() -> None:
     parser.add_argument("--pairs", type=positive, default=8)
     parser.add_argument("--rounds", type=positive, default=3)
     args = parser.parse_args()
-    if platform.system() != "Darwin":
-        raise SystemExit("This native malloc-zone experiment requires macOS.")
+    native = platform.system() == "Darwin"
+    if platform.system() not in ("Darwin", "Linux"):
+        raise SystemExit("This experiment supports macOS and glibc Linux.")
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     if (output / "receipts.json").exists():
@@ -86,7 +87,7 @@ def main() -> None:
         "git_status": git("status", "--porcelain").decode(),
         "platform": platform.platform(),
         "machine": platform.machine(),
-        "sw_vers": subprocess.check_output(["sw_vers"], text=True).strip(),
+        "sw_vers": subprocess.check_output(["sw_vers"], text=True).strip() if native else None,
         "swift": subprocess.check_output(["swiftc", "--version"], text=True).strip(),
         "compiler_flags": FLAGS,
         "environment": {key: os.environ.get(key) for key in ("DEVELOPER_DIR", "SWIFT_DETERMINISTIC_HASHING")},
@@ -94,7 +95,10 @@ def main() -> None:
         "pairs": args.pairs,
         "rounds": args.rounds,
         "timing": "Uninstrumented production sources; warm-up and full-item equality outside timing.",
-        "memory": "malloc_zone_statistics(NULL).size_in_use delta at populated map, before output allocation; not peak or RSS.",
+        "memory": (
+            "malloc_zone_statistics(NULL).size_in_use delta at populated map; not peak or RSS."
+            if native else "glibc mallinfo2 uordblks+hblkhd delta at populated map, including allocator caches; not macOS live heap or RSS."
+        ),
         "instrumentation": {"marker": MARKER, "inserted_before_marker": INJECTION},
         "input_sha256": start_hashes,
         "source_sha256": {},
@@ -113,7 +117,7 @@ def main() -> None:
             subprocess.run(arguments, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, check=True)
 
     probe = output / "MemoryProbe.o"
-    command(["xcrun", "clang", "-O2", "-Wall", "-Wextra", "-Werror",
+    command([*(["xcrun", "clang"] if native else ["clang"]), "-O2", "-Wall", "-Wextra", "-Werror",
              "-c", str(driver / "MemoryProbe.c"), "-o", str(probe)], "build-probe.log")
     executables = {}
     for variant, source in sources.items():
@@ -202,7 +206,10 @@ def main() -> None:
                 ]
                 summary = {
                     "mode": mode, "count": count, "scenario": scenario, "pairs": args.pairs,
-                    "metric": "populated_map_live_heap_delta_bytes" if mode == "memory" else "call_milliseconds",
+                    "metric": (
+                        ("populated_map_live_heap_delta_bytes" if native else "populated_map_glibc_allocator_delta_bytes")
+                        if mode == "memory" else "call_milliseconds"
+                    ),
                     "baseline_median": before, "candidate_median": after,
                     "median_saving": before - after,
                     "median_reduction_percent": 100 * (1 - after / before),

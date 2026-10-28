@@ -1,6 +1,13 @@
 import Dispatch
 import Foundation
 
+#if os(Linux)
+@inline(__always)
+private func autoreleasepool<Result>(_ body: () throws -> Result) rethrows -> Result {
+    try body()
+}
+#endif
+
 private struct Fixture {
     let items: [FolderPlaylistItem]
     let savedIDs: [FolderPlaylistItem.ID]

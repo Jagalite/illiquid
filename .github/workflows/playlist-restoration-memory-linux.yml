@@ -1,0 +1,80 @@
+name: Playlist restoration portable validation
+on:
+  push:
+    branches: ['perf/playlist-restoration-index-map-linux-20261028']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: playlist-restoration-memory-linux-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Build coordination and environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds run serially in isolated packages.'
+          mkdir -p "$RUNNER_TEMP/playlist-restoration-memory-linux"
+          swift --version
+          uname -a
+          git rev-parse HEAD
+      - name: Candidate debug and release tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash Scripts/test-playlist-restoration.sh 2>&1 |
+            tee "$RUNNER_TEMP/playlist-restoration-memory-linux/candidate-debug.log"
+          bash Scripts/test-playlist-restoration.sh -c release 2>&1 |
+            tee "$RUNNER_TEMP/playlist-restoration-memory-linux/candidate-release.log"
+      - name: Pinned baseline release tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          git worktree add --detach "$RUNNER_TEMP/playlist-restoration-baseline-linux" \
+            ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+          bash "$RUNNER_TEMP/playlist-restoration-baseline-linux/Scripts/test-playlist-restoration.sh" \
+            -c release 2>&1 |
+            tee "$RUNNER_TEMP/playlist-restoration-memory-linux/baseline-release.log"
+      - name: Portable paired experiment
+        run: >-
+          python3 Benchmarks/PlaylistRestorationMemory/run.py
+          --output "$RUNNER_TEMP/playlist-restoration-memory-linux/research"
+          --pairs 6 --rounds 3 --sizes 100 10000
+      - name: Print evidence
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "playlist-restoration-memory-linux" / "research"
+          for name in ("summary.json", "receipts.json", "samples.jsonl"):
+              path = root / name
+              if path.exists():
+                  print(f"::group::{name}")
+                  print(path.read_text())
+                  print("::endgroup::")
+          for path in sorted(root.glob("*.log")):
+              if path.stat().st_size:
+                  print(f"::group::{path.name}")
+                  print(path.read_text())
+                  print("::endgroup::")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-restoration-memory-linux
+          path: ${{ runner.temp }}/playlist-restoration-memory-linux/
+          retention-days: 14

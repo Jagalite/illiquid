@@ -1,15 +1,26 @@
 #include "MemoryProbe.h"
+#if defined(__APPLE__)
 #include <malloc/malloc.h>
+#elif defined(__GLIBC__)
+#include <malloc.h>
+#else
+#error "Unsupported allocator"
+#endif
 #include <stddef.h>
 
 /* Single-threaded benchmark only; the production target never links this probe. */
 static RestorationMemorySample sample;
 
 static uint64_t live_bytes(void) {
+#if defined(__APPLE__)
     malloc_statistics_t statistics = {0};
     /* NULL sums all malloc zones, including the nano allocator. */
     malloc_zone_statistics(NULL, &statistics);
     return (uint64_t)statistics.size_in_use;
+#else
+    struct mallinfo2 statistics = mallinfo2();
+    return (uint64_t)statistics.uordblks + (uint64_t)statistics.hblkhd;
+#endif
 }
 
 void restoration_memory_begin(void) {
