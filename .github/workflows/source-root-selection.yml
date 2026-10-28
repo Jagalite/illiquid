@@ -74,3 +74,44 @@ jobs:
             ${{ runner.temp }}/source-root-selection/*.log
             ${{ runner.temp }}/source-root-selection/packages/**/*.swift
           retention-days: 30
+
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify portable behavior and compare Swift performance
+        run: |
+          echo "Kyoto is unavailable on this isolated hosted runner; builds use private, serialized scratch paths."
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/SourceRootSelection/run.py \
+            --pairs 8 --target-ms 120 \
+            --output "$RUNNER_TEMP/source-root-selection" "${mode[@]}"
+      - name: Emit portable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-root-selection'
+          for name in ['manifest.json', 'tests.json', 'verification.json', 'summary.json']:
+              path = root / name
+              if path.is_file():
+                  print('ROOT_SELECTION_FILE ' + json.dumps({'name': name, 'content': path.read_text()}, separators=(',', ':')))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-root-selection-linux
+          path: |
+            ${{ runner.temp }}/source-root-selection/*.json
+            ${{ runner.temp }}/source-root-selection/*.jsonl
+            ${{ runner.temp }}/source-root-selection/*.log
+            ${{ runner.temp }}/source-root-selection/packages/**/*.swift
+          retention-days: 30

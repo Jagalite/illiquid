@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare exact production root selection and visibility projection on macOS."""
+"""Compare exact production root selection and visibility projection."""
 from __future__ import annotations
 
 import argparse
@@ -65,8 +65,8 @@ class Study:
         if self.output.exists() and any(self.output.iterdir()):
             raise ValueError("Output directory must be empty")
         self.output.mkdir(parents=True, exist_ok=True)
-        if platform.system() != "Darwin":
-            raise ValueError("This study requires native macOS Foundation and Darwin clocks")
+        if platform.system() not in ["Darwin", "Linux"]:
+            raise ValueError("This study supports macOS and Linux")
         self.swift = shutil.which("swift")
         if not self.swift:
             raise ValueError("Swift is unavailable")
@@ -78,7 +78,11 @@ class Study:
             "schema": 1, "baseline": BASELINE, "complete": False,
             "platform": platform.platform(), "machine": platform.machine(),
             "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "pairs": args.pairs, "target_ms": args.target_ms, "cases": CASES,
+            "pairs": 0 if args.tests_only else args.pairs,
+            "target_ms": None if args.tests_only else args.target_ms,
+            "cases": [] if args.tests_only else CASES,
+            "mode": "current-source-regressions" if args.tests_only else "pinned-baseline-performance-study",
+            "native_macos": platform.system() == "Darwin",
             "measurement": {
                 "lookup": "Production relativePath(normalizedPath:) plus consuming UTF-8 length; matcher construction excluded",
                 "projection": "Complete production project(rows:configuration:roots:revealsRulePreview:query:); alternating rules force visibility rebuilds",
@@ -114,24 +118,33 @@ class Study:
         self.manifest["head"] = self.command(["git", "rev-parse", "HEAD"], "head").strip()
         self.manifest["worktree"] = self.command(["git", "status", "--short"], "worktree")
         self.manifest["swift"] = self.command([self.swift, "--version"], "swift").strip()
-        self.manifest["cpu"] = self.command(["sysctl", "-n", "machdep.cpu.brand_string"], "cpu").strip()
-        self.manifest["macos"] = self.command(["sw_vers"], "macos").strip()
-        self.command(["git", "merge-base", "--is-ancestor", BASELINE, "HEAD"], "baseline-ancestry")
-        if HELPER.read_bytes() != self.historical(str(HELPER.relative_to(ROOT))):
-            raise ValueError("Shared extraction helper changed since the pinned baseline")
+        if platform.system() == "Darwin":
+            self.manifest["cpu"] = self.command(["sysctl", "-n", "machdep.cpu.brand_string"], "cpu").strip()
+            self.manifest["macos"] = self.command(["sw_vers"], "macos").strip()
+        elif Path("/proc/cpuinfo").is_file():
+            self.manifest["cpu"] = next((line.split(":", 1)[1].strip() for line in
+                Path("/proc/cpuinfo").read_text().splitlines() if line.startswith("model name")), "")
         spec = importlib.util.spec_from_file_location("root_selection_support", HELPER)
         support = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(support)
-        before, before_records = support.snapshot(self.historical)
         after, after_records = support.snapshot(lambda path: (ROOT / path).read_bytes())
-        if before.keys() != after.keys():
-            raise ValueError("Production source inventories differ")
-        for path in before:
-            if path == FOCAL:
-                if before[path].count(OLD) != 1 or after[path] != before[path].replace(OLD, NEW, 1):
-                    raise ValueError("Focal changes exceed the declared lazy-filter experiment")
-            elif before[path] != after[path]:
-                raise ValueError(f"Unrelated production support changed: {path}")
+        if self.args.tests_only:
+            self.manifest["baseline"] = None
+            variants = [("candidate", after, after_records)]
+        else:
+            self.command(["git", "merge-base", "--is-ancestor", BASELINE, "HEAD"], "baseline-ancestry")
+            if HELPER.read_bytes() != self.historical(str(HELPER.relative_to(ROOT))):
+                raise ValueError("Shared extraction helper changed since the pinned baseline")
+            before, before_records = support.snapshot(self.historical)
+            if before.keys() != after.keys():
+                raise ValueError("Production source inventories differ")
+            for path in before:
+                if path == FOCAL:
+                    if before[path].count(OLD) != 1 or after[path] != before[path].replace(OLD, NEW, 1):
+                        raise ValueError("Focal changes exceed the declared lazy-filter experiment")
+                elif before[path] != after[path]:
+                    raise ValueError(f"Unrelated production support changed: {path}")
+            variants = [("baseline", before, before_records), ("candidate", after, after_records)]
         package = support.PACKAGE.replace("SourceTreeVisibilityQualification", "SourceRootSelection")
         package = package.replace("SourceTreeBenchmark", "SourceRootBenchmark")
         harness = {
@@ -144,29 +157,49 @@ class Study:
         self.manifest["helper_sha256"] = digest(HELPER.read_bytes())
         self.manifest["runner_sha256"] = digest(Path(__file__).read_bytes())
         self.manifest["sources"] = {}
-        for variant, files, records in [("baseline", before, before_records), ("candidate", after, after_records)]:
+        self.manifest["platform_adaptations"] = {}
+        for variant, files, records in variants:
             folder = self.output / "packages" / variant
             self.packages[variant] = folder
             staged = dict(files, **harness)
             self.staged[variant] = {}
+            adaptations = []
             for path, data in staged.items():
+                if platform.system() == "Linux":
+                    if path.endswith("/MediaSidecarReader.swift"):
+                        if data.count(b"import Darwin\n") != 1:
+                            raise ValueError("POSIX import boundary changed")
+                        data = data.replace(b"import Darwin\n", b"import Glibc\n", 1)
+                        adaptations.append({"path": path, "change": "Darwin import -> Glibc"})
+                    elif path.endswith("/NFOMetadataHints.swift"):
+                        if data.count(b"import Foundation\n") != 1:
+                            raise ValueError("XML import boundary changed")
+                        data = data.replace(b"import Foundation\n", b"import Foundation\nimport FoundationXML\n", 1)
+                        adaptations.append({"path": path, "change": "add FoundationXML import"})
                 destination = folder / path
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 destination.write_bytes(data)
                 self.staged[variant][path] = digest(data)
             self.manifest["sources"][variant] = {"production": records, "staged": self.staged[variant]}
+            self.manifest["platform_adaptations"][variant] = adaptations
         save(self.output / "manifest.json", self.manifest)
 
     def swift_command(self, variant, action, configuration):
-        return [self.swift, action, "--package-path", self.packages[variant],
+        command = [self.swift, action, "--package-path", self.packages[variant],
                 "--scratch-path", self.output / "build" / variant,
                 "--cache-path", self.output / "cache", "--config-path", self.output / "config",
                 "--security-path", self.output / "security", "--jobs", "2", "-c", configuration,
                 "-Xswiftc", "-warnings-as-errors"]
+        if platform.system() == "Linux":
+            command.append("--use-integrated-swift-driver")
+        return command
 
     def test_and_build(self):
         tests = []
-        for variant, configuration in [("baseline", "release"), ("candidate", "debug"), ("candidate", "release")]:
+        variants = [("candidate", "debug"), ("candidate", "release")]
+        if not self.args.tests_only:
+            variants.insert(0, ("baseline", "release"))
+        for variant, configuration in variants:
             print(f"Testing {variant}/{configuration}", flush=True)
             log = self.command(self.swift_command(variant, "test", configuration) + ["--no-parallel"],
                                f"test-{variant}-{configuration}")
@@ -177,6 +210,8 @@ class Study:
                           "completed_tests": int(completed.group(1)),
                           "summary": [line for line in log.splitlines() if "tests passed" in line or "Test run with" in line]})
         save(self.output / "tests.json", tests)
+        if self.args.tests_only:
+            return
         self.manifest["binary_sha256"] = {}
         for variant in ["baseline", "candidate"]:
             command = self.swift_command(variant, "build", "release")
@@ -282,8 +317,8 @@ def main():
     study = Study(args)
     study.prepare()
     study.test_and_build()
-    study.verify()
     if not args.tests_only:
+        study.verify()
         study.measure()
     study.finish()
 
