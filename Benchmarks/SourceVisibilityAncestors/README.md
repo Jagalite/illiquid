@@ -1,5 +1,8 @@
 # Recursive source visibility: bounded ancestor reuse
 
+[Measured results and qualification](../../Documentation/SOURCE_VISIBILITY_ANCESTOR_PERFORMANCE.md)
+include the full workload matrix and permanently retained evidence.
+
 Recursive Files Only and Media projections evaluate each file and every parent
 up to its selected source root. Siblings repeatedly construct the same parent
 URLs and run the same regular expressions. The candidate retains one parent's
@@ -99,6 +102,8 @@ available in the uploaded evidence.
 Results measure background projection CPU and time for the stated synthetic
 directory/rule shapes. They exclude disk scanning, SwiftUI/AppKit layout, user
 typing latency, playback, energy, and whole-player memory. Cache-hit frequency
-depends on source sorting and directory layout; interleaved and unique-parent
-controls must be reported with grouped-sibling gains. Linux Foundation results
-must remain distinct from the queued macOS qualification.
+depends on source sorting and directory layout. The player defaults to descending
+creation-date sorting; this benchmark disables sorting and does not measure a
+default-library hit rate. Interleaved and unique-parent controls must be reported
+with grouped-sibling gains. Linux Foundation results
+must remain distinct from native macOS qualification.
