@@ -1,0 +1,84 @@
+name: Video color region averaging
+
+on:
+  push:
+    branches: ['perf/video-color-region-average-20261028-a1db02']
+    paths:
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Tests/IlliquidCoreTests/VideoColorSampleAverageTests.swift'
+      - 'Benchmarks/VideoColorRegionAverage/**'
+      - '.github/workflows/video-color-region-average.yml'
+      - '!Benchmarks/VideoColorRegionAverage/README.md'
+      - '!Benchmarks/VideoColorRegionAverage/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Tests/IlliquidCoreTests/VideoColorSampleAverageTests.swift'
+      - 'Benchmarks/VideoColorRegionAverage/**'
+      - '.github/workflows/video-color-region-average.yml'
+      - '!Benchmarks/VideoColorRegionAverage/README.md'
+      - '!Benchmarks/VideoColorRegionAverage/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-color-regions-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify exact results and measure paired implementations
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Shared Kyoto queue detected; submit this complete harness through Kyoto.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this isolated hosted runner; builds run directly and sequentially.'
+          if test "$RUNNER_OS" = 'macOS'; then
+            export DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer
+          fi
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/VideoColorRegionAverage/run.py \
+            --output "$RUNNER_TEMP/video-color-regions" \
+            --pairs 8 --target-ms 150 "${mode[@]}"
+      - name: Emit complete compact evidence for review
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "video-color-regions"
+          paths = sorted(root.glob("*.json")) + sorted(root.glob("*.jsonl"))
+          paths += sorted((root / "logs").glob("*tests.log"))
+          paths += sorted((root / "logs").glob("*build.log"))
+          for path in paths:
+              print("REGION_EVIDENCE " + json.dumps({
+                  "path": str(path.relative_to(root)), "content": path.read_text()
+              }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-color-regions-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/video-color-regions/*.json
+            ${{ runner.temp }}/video-color-regions/*.jsonl
+            ${{ runner.temp }}/video-color-regions/logs
+            ${{ runner.temp }}/video-color-regions/receipts
+            ${{ runner.temp }}/video-color-regions/sources
+          retention-days: 14
