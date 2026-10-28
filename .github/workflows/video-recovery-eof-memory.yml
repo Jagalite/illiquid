@@ -5,7 +5,7 @@ on:
     branches: ['perf/video-recovery-eof-lifetime-20261028']
     paths:
       - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
-      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryEOFLifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryDecodedOutputLifetimeTests.swift'
       - 'Benchmarks/VideoRecoveryEOFMemory/**'
       - '.github/workflows/video-recovery-eof-memory.yml'
       - '!Benchmarks/VideoRecoveryEOFMemory/*.md'
@@ -16,7 +16,7 @@ on:
       - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
       - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
       - 'Sources/CFFmpeg/**'
-      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryEOFLifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryDecodedOutputLifetimeTests.swift'
       - 'Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeTests.swift'
       - 'Benchmarks/VideoRecoveryEOFMemory/**'
       - '.github/workflows/video-recovery-eof-memory.yml'
@@ -112,7 +112,7 @@ jobs:
           from pathlib import Path
           command = ['swift', 'test', '--force-resolved-versions', '-c', 'release',
                      '--jobs', '2', '--no-parallel', '--filter',
-                     'VideoRecoveryEOFLifetimeTests|PacketOwnershipTests|VideoScratchFrameLifetimeTests']
+                     'VideoRecoveryDecodedOutputLifetimeTests|VideoRecoveryPacketLifetimeTests|PacketOwnershipTests|VideoScratchFrameLifetimeTests']
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
               cli = [sys.executable, str(queue)]

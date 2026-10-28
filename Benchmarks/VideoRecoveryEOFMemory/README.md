@@ -1,11 +1,18 @@
-# Video recovery packet lifetime at EOF
+# Independent validation of video recovery packet lifetime at EOF
+
+This study builds on [PR #172](https://github.com/Jagalite/illiquid/pull/172).
+It contributes independent control-flow and native-buffer evidence, plus decoded-output
+ownership tests. There are no additional production changes relative to that PR.
+The candidate packet-owner source includes its generation-checked
+`releaseAfterDrain(generation:)` method; the baseline owner and session methods
+come from the original main commit below.
 
 The video decode worker records a bounded compressed GOP for software decoder
 recovery. Before this change, normal EOF leaves the final GOP owned by
 `VideoRecoveryPacketBuffer` until seek, stop, or another reset. The configured
 limits are 512 packets and 32 MiB of compressed payload.
 
-The candidate resets this buffer immediately after `VideoDecoder.drain` returns
+The candidate releases this buffer immediately after `VideoDecoder.drain` returns
 normally and before the existing output EOS queue push. Thrown errors, including
 cooperative cancellation, skip the reset. The patch follows the existing EOS boundary; it does not introduce
 new native decoder completion guarantees or alter presentation recovery.
@@ -20,7 +27,7 @@ python3 Benchmarks/VideoRecoveryEOFMemory/run.py \
   --output /tmp/illiquid-recovery-eof --pairs 2
 
 swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
-  --filter 'VideoRecoveryEOFLifetimeTests|PacketOwnershipTests|VideoScratchFrameLifetimeTests'
+  --filter 'VideoRecoveryDecodedOutputLifetimeTests|VideoRecoveryPacketLifetimeTests|PacketOwnershipTests|VideoScratchFrameLifetimeTests'
 ```
 
 Linux can run the same ownership experiment against the same FFmpeg source:
@@ -50,7 +57,7 @@ and builds serially in isolated checkouts.
 ## What is measured
 
 The runner compiles complete, unchanged production packet/buffer/queue/generation
-sources. It extracts the exact `decodeVideoPacket`, pending-replay transfer,
+sources, using each variant's own complete FFmpegPacket source. It extracts the exact `decodeVideoPacket`, pending-replay transfer,
 and `videoDecodeLoop` methods from baseline and candidate MediaSession sources.
 Only surrounding decoding and presentation are controlled by the harness.
 
@@ -86,7 +93,7 @@ exit 73 and `EOF_RELEASE_REGRESSION`; a crash, compile failure, or arbitrary
 nonzero exit does not qualify as a negative control. The candidate must pass the
 same assertion.
 
-`VideoRecoveryEOFLifetimeTests` separately uses the actual software VideoDecoder
+`VideoRecoveryDecodedOutputLifetimeTests` separately uses the actual software VideoDecoder
 and valid raw BGRA packets. It verifies that recovery cleanup preserves decoded
 pixels and timestamps, respects an independent native packet clone, and leaves
 cancelled-drain input available for replay. It reuses the existing scratch-frame

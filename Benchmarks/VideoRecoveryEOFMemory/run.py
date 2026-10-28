@@ -28,7 +28,7 @@ SUPPORT = [
     "Sources/IlliquidNativePlayback/Playback/PlaybackGeneration.swift",
     "Sources/IlliquidNativePlayback/Runtime/VideoFrameCapacityGate.swift",
 ]
-NATIVE_TEST = "Tests/IlliquidNativePlaybackTests/VideoRecoveryEOFLifetimeTests.swift"
+NATIVE_TEST = "Tests/IlliquidNativePlaybackTests/VideoRecoveryDecodedOutputLifetimeTests.swift"
 SCENARIOS = ["empty", "small", "budget", "repeated-eof", "failed-drain",
              "cancelled-drain", "stale-eof", "held-owner", "new-generation"]
 BOUNDARIES = [
@@ -220,7 +220,8 @@ class Study:
                             + "\nenum MediaTime {\n" + seconds + "}\n").encode()
                     self.receipt["extractions"]["linux_time"] = {
                         "rational_sha256": sha(rational.encode()), "seconds_sha256": sha(seconds.encode())}
-                shared.append(self.stage("shared/" + Path(relative).name, data))
+                if not relative.endswith("/FFmpegPacket.swift"):
+                    shared.append(self.stage("shared/" + Path(relative).name, data))
         if self.linux:
             shim = (ROOT / "Sources/CFFmpeg/include/ffmpeg_shim.h").read_text()
             header = "\n".join("#include <" + name + ">" for name in [
@@ -256,6 +257,10 @@ class Study:
         baseline = self.command(["git", "show", f"{BASE}:{SESSION}"], "baseline-source").stdout
         self.stage("baseline/MediaSession.swift", baseline)
         self.receipt["baseline_source_sha256"] = sha(baseline.encode())
+        packet_path = "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift"
+        baseline_packet = self.command(["git", "show", f"{BASE}:{packet_path}"], "baseline-packet-source").stdout
+        self.receipt["baseline_packet_source_sha256"] = sha(baseline_packet.encode())
+        packet_sources = {"baseline": baseline_packet, "candidate": (ROOT / packet_path).read_text()}
         self.sources = {}
         for variant, source in [("baseline", baseline), ("candidate", (ROOT / SESSION).read_text())]:
             methods = extract(source)
@@ -263,7 +268,8 @@ class Study:
                 {"start": bounds[0], "end": bounds[1], "sha256": sha(method.encode())}
                 for bounds, method in zip(BOUNDARIES, methods)]
             harness = self.stage(f"{variant}/Harness.swift", template.replace(marker, "\n".join(methods)))
-            self.sources[variant] = [*shared, harness]
+            packet_source = self.stage(f"{variant}/FFmpegPacket.swift", packet_sources[variant])
+            self.sources[variant] = [*shared, packet_source, harness]
         self.checkpoint()
 
     def build(self):

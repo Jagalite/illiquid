@@ -152,6 +152,15 @@ final class VideoRecoveryPacketBuffer: @unchecked Sendable {
         }
     }
 
+    /// A successful drain needs no further compressed replay. Check under the
+    /// same lock as record/reset so an old EOF cannot discard a newer seek's GOP.
+    func releaseAfterDrain(generation completedGeneration: Int) {
+        lock.withLock {
+            guard generation == completedGeneration else { return }
+            resetLocked(generation: completedGeneration)
+        }
+    }
+
     func reset(generation newGeneration: Int? = nil) {
         lock.withLock { resetLocked(generation: newGeneration) }
     }
