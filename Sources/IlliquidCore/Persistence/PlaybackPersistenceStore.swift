@@ -480,10 +480,11 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
         mutatePreferences { $0.preferences = preferences.sanitized() }
     }
 
+    // Every preferences ingress is sanitized. Validate only the changed scalar
+    // here so control updates do not normalize unrelated track-language lists.
     public func setVolume(_ volume: Double) {
         mutatePreferences {
-            $0.preferences.volume = volume
-            $0.preferences = $0.preferences.sanitized()
+            $0.preferences.volume = PlaybackPreferences.validVolume(volume)
         }
     }
 
@@ -501,8 +502,7 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
 
     public func setPlaybackSpeed(_ playbackSpeed: Double) {
         mutatePreferences {
-            $0.preferences.playbackSpeed = playbackSpeed
-            $0.preferences = $0.preferences.sanitized()
+            $0.preferences.playbackSpeed = PlaybackPreferences.validPlaybackSpeed(playbackSpeed)
         }
     }
 
