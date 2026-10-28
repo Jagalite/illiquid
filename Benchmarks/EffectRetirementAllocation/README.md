@@ -14,6 +14,98 @@ are revisited, without checking those authorities again.
 The baseline is `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`. This is a separate
 investigation from checkpoint folder-membership construction.
 
+
+## Decision and tradeoffs
+
+Keep the single-pass revision as a reviewable optimization for partial-selection
+allocation traffic. At 4,096 records with half retiring, median requested bytes
+fell from **1,427,728 to 132,968** (90.7% paired reduction), while elapsed time
+fell from **1,061.95 to 607.57 microseconds** (42.6% paired reduction). All six
+pairs were faster in every nonempty mixed case. All-match/4,096 also ran 34.2%
+faster with the same median requested bytes.
+
+This is a conditional improvement. At 4,096 records, the no-match control's
+median event time rose from 97.20 to 104.47 microseconds (+13.8% paired change,
+four of six pairs slower); the one-match control rose from 95.57 to 110.37
+microseconds (+10.3% paired change, all six pairs slower). At 512 records, those
+controls rose 10.8% and 8.6%, respectively, with all pairs slower. These are
+recorded regressions, even though they are much smaller than the rejected
+versions' large control costs. Their impact depends on real authority-population
+frequencies, which this study does not estimate.
+
+Partial ID-array growth also makes more small requests: mixed/4,096 made a
+median **24 allocation requests versus 14** for the baseline, despite requesting
+90.7% fewer total bytes. The smaller mixed cases similarly increase request
+counts. The sparse case instead falls from two requests/768 bytes to one
+request/40 bytes. The intended memory benefit is reduced cumulative requested
+bytes, not a universal decrease in allocation count.
+
+Native qualification is pending. The evidence supports publishing a draft for
+review; it does not establish a merge-ready macOS or full-application result.
+
+## Single-pass qualification results
+
+Measured candidate: [`896038769f4e0710f207e8779edbc9c09176ed4c`](https://github.com/Jagalite/illiquid/commit/896038769f4e0710f207e8779edbc9c09176ed4c). The successful
+[Linux job](https://github.com/Jagalite/illiquid/actions/runs/40642978782/job/122665183998)
+used Swift 6.1.3, x86_64 Linux, glibc 2.39. Native macOS 26/Xcode 26.6 qualification is still queued as of 2026-10-28 06:26 UTC; the PR remains a draft.
+
+All four baseline/candidate debug/release test configurations passed with 114
+tests each. The final cohort contains **576 process observations**: 24 workloads,
+six paired executions, two variants, and separate timing/allocation modes. An
+[independent audit](evidence/v3-deferred-prefix/audit.json) recomputed checksums, paired statistics and
+medians, verified the complete observation grid and source provenance, and
+checked the allocation-probe self-test. No observations were discarded.
+
+| Population | Effects | Baseline µs | Candidate µs | Paired time change | Baseline requested bytes | Candidate requested bytes | Paired byte change | Requests, baseline → candidate | Faster pairs |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| all | 0 | 2.52 | 2.50 | -1.0% | 0 | 0 | — | 0.0 → 0.0 | 5/6 |
+| all | 1 | 2.91 | 2.72 | -6.0% | 40 | 40 | 0.0% | 1.0 → 1.0 | 6/6 |
+| all | 8 | 5.35 | 4.30 | -20.4% | 376 | 336 | 0.0% | 4.0 → 3.5 | 6/6 |
+| all | 32 | 13.73 | 9.87 | -28.4% | 1,556 | 1,680 | -9.5% | 15.0 → 7.0 | 6/6 |
+| all | 512 | 204.58 | 130.84 | -35.6% | 21,344 | 21,344 | 0.0% | 11.0 → 11.0 | 6/6 |
+| all | 4,096 | 1,708.98 | 1,120.76 | -34.2% | 166,664 | 166,664 | 0.0% | 14.0 → 14.0 | 6/6 |
+| mixed | 0 | 2.52 | 2.49 | -0.5% | 0 | 0 | — | 0.0 → 0.0 | 5/6 |
+| mixed | 1 | 2.91 | 2.75 | -5.5% | 40 | 40 | 0.0% | 1.0 → 1.0 | 6/6 |
+| mixed | 8 | 4.68 | 3.73 | -20.6% | 2,936 | 344 | -88.3% | 4.0 → 5.0 | 6/6 |
+| mixed | 32 | 9.62 | 6.69 | -30.8% | 11,544 | 1,400 | -87.9% | 7.0 → 10.0 | 6/6 |
+| mixed | 512 | 115.81 | 71.28 | -39.0% | 178,984 | 17,136 | -90.4% | 11.0 → 17.0 | 6/6 |
+| mixed | 4,096 | 1,061.95 | 607.57 | -42.6% | 1,427,728 | 132,968 | -90.7% | 14.0 → 24.0 | 6/6 |
+| none | 0 | 2.50 | 2.52 | +0.9% | 0 | 0 | — | 0.0 → 0.0 | 2/6 |
+| none | 1 | 2.56 | 2.56 | -0.5% | 0 | 0 | — | 0.0 → 0.0 | 5/6 |
+| none | 8 | 2.75 | 2.78 | +1.3% | 0 | 0 | — | 0.0 → 0.0 | 3/6 |
+| none | 32 | 3.23 | 3.34 | +3.3% | 0 | 0 | — | 0.0 → 0.0 | 0/6 |
+| none | 512 | 13.81 | 15.46 | +10.8% | 0 | 0 | — | 0.0 → 0.0 | 0/6 |
+| none | 4,096 | 97.20 | 104.47 | +13.8% | 0 | 0 | — | 0.0 → 0.0 | 2/6 |
+| sparse | 0 | 2.50 | 2.50 | -0.4% | 0 | 0 | — | 0.0 → 0.0 | 3/6 |
+| sparse | 1 | 2.93 | 2.68 | -8.5% | 40 | 40 | 0.0% | 1.0 → 1.0 | 6/6 |
+| sparse | 8 | 3.30 | 3.05 | -7.4% | 768 | 40 | -94.8% | 2.0 → 1.0 | 6/6 |
+| sparse | 32 | 3.81 | 3.56 | -5.4% | 768 | 40 | -94.8% | 2.0 → 1.0 | 5/6 |
+| sparse | 512 | 14.72 | 15.97 | +8.6% | 768 | 40 | -94.8% | 2.0 → 1.0 | 0/6 |
+| sparse | 4,096 | 95.57 | 110.37 | +10.3% | 768 | 40 | -94.8% | 2.0 → 1.0 | 0/6 |
+
+Times and byte counts are medians of six process observations per variant.
+Percentages are the median of six paired candidate/baseline ratios minus one;
+they need not equal the percentage change between the displayed medians. A dash
+means both variants requested zero bytes. Timing processes contain many summed
+reducer updates, not independent statistical repetitions. The shortest aggregate
+timing sample was 4.637 ms and the longest was
+60.906 ms. Treat small differences cautiously; six
+pairs do not establish universal or statistically significant speedups.
+
+The all/mixed/none/sparse populations retire all records, alternating records,
+no records, or exactly one record (when nonempty), respectively. These are
+synthetic controls and stress cases; their frequencies in live playback were
+not measured.
+
+The durable [evidence index](evidence/index.json) links all three measured commits
+and job URLs. Each cohort preserves every observation, numeric result, manifest,
+test receipt and independent audit recovered from the successful job log.
+Rejected cohorts remain separately identified. Full calibration files, command
+and test logs, source snapshots, binaries' hashes and semantic receipt files are
+also in the CI artifacts, retained for 14 days; not every artifact file is
+copied into this repository.
+
+
 ## Reproduce
 
 On a host with Swift 6.1 or later:
@@ -67,12 +159,16 @@ only the known matching prefix and then grows the partial ID array as needed.
 It never reserves the total outstanding population for a sparse selection.
 
 Six baseline/candidate pairs alternate AB/BA in fresh processes. Timing targets
-50 ms of summed event time, with a cap on excessive setup work. Every timed event
+50 ms of summed event time, with a cap on excessive setup work and 20,000
+iterations. This is a target, not a guaranteed minimum sample duration. Every timed event
 contributes to a noninlined checksum. A separate untimed fixture verifies exact
 outstanding records, completion membership, session state, allocator and event
-counters, invariants and Codable round trips. Each pair must produce the same
-production canonical digest; the otherwise-omitted pending-session field is
-explicitly checked absent.
+counters, invariants and Codable round trips. Every measured transition checks acceptance, invariants, and the cheap
+checksum. Each process also checks one fresh untimed fixture in detail. Paired
+processes must produce the same production canonical FNV-1a64 digest; the
+otherwise-omitted pending-session field is explicitly checked absent. The
+`semantic_sha256` field hashes that receipt string for archiving, not the full
+state representation.
 
 Linux additionally runs separate allocation processes. Their preload library
 counts successful `malloc`, `calloc` and `realloc` requests on the measured
@@ -99,9 +195,8 @@ summaries. Important records also appear as `EFFECT_TEST`,
 
 Linux component results do not establish macOS timing or allocation behavior.
 These tests do not build the full media-player application or exercise live
-playback, native renderer resources, UI latency, power or energy. Both versions
-still scan outstanding effects and allocate the ID array; the asymptotic cleanup
-complexity is unchanged.
+playback, native renderer resources, UI latency, power or energy. Both versions still scan outstanding effects and build an ID array when
+matches exist; the asymptotic selection complexity remains linear.
 
 
 ## Rejected first implementation

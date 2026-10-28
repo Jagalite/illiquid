@@ -1,0 +1,63 @@
+{
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "native_validation": "Queued as of 2026-10-28 06:26 UTC; no native results claimed",
+  "allocation_metric": "Successful malloc/calloc/realloc requested bytes on measured thread; cumulative request traffic, not peak/retained/RSS memory",
+  "timing_estimator": "median(candidate_i / baseline_i) - 1 across six pairs; displayed medians are separately computed per variant",
+  "archive_scope": "Complete numeric records and receipts from successful Linux job logs, plus independent audits; complete CI artifacts have a separate 14-day retention",
+  "cohorts": [
+    {
+      "directory": "v1-compact-map-rejected",
+      "status": "rejected",
+      "reason": "Large no-match time and all-match allocation-byte regressions",
+      "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "measured_commit": "579f48f8f5ea55fb8bd90ba578d1036e0f358bf4",
+      "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40640032102",
+      "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40640032102/job/122655784317",
+      "workloads": 18,
+      "process_observations": 432,
+      "test_configurations": 4,
+      "manifest": "v1-compact-map-rejected/manifest.json",
+      "observations": "v1-compact-map-rejected/observations.jsonl",
+      "results": "v1-compact-map-rejected/results.json",
+      "tests": "v1-compact-map-rejected/tests.json",
+      "audit": "v1-compact-map-rejected/audit.json",
+      "provenance": "v1-compact-map-rejected/provenance.json"
+    },
+    {
+      "directory": "v2-counted-selection-rejected",
+      "status": "rejected",
+      "reason": "Large sparse-selection elapsed-time regression",
+      "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "measured_commit": "8f4df86f96ce75eb52f942b9df1664bc6aadcd4e",
+      "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40641738479",
+      "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40641738479/job/122661210987",
+      "workloads": 24,
+      "process_observations": 576,
+      "test_configurations": 4,
+      "manifest": "v2-counted-selection-rejected/manifest.json",
+      "observations": "v2-counted-selection-rejected/observations.jsonl",
+      "results": "v2-counted-selection-rejected/results.json",
+      "tests": "v2-counted-selection-rejected/tests.json",
+      "audit": "v2-counted-selection-rejected/audit.json",
+      "provenance": "v2-counted-selection-rejected/provenance.json"
+    },
+    {
+      "directory": "v3-deferred-prefix",
+      "status": "candidate_for_review",
+      "reason": "Lower partial-selection requested bytes and time, with disclosed sparse/no-match CPU and request-count tradeoffs",
+      "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "measured_commit": "896038769f4e0710f207e8779edbc9c09176ed4c",
+      "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40642978782",
+      "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40642978782/job/122665183998",
+      "workloads": 24,
+      "process_observations": 576,
+      "test_configurations": 4,
+      "manifest": "v3-deferred-prefix/manifest.json",
+      "observations": "v3-deferred-prefix/observations.jsonl",
+      "results": "v3-deferred-prefix/results.json",
+      "tests": "v3-deferred-prefix/tests.json",
+      "audit": "v3-deferred-prefix/audit.json",
+      "provenance": "v3-deferred-prefix/provenance.json"
+    }
+  ]
+}
