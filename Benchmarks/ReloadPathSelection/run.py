@@ -247,7 +247,8 @@ def main() -> None:
             longest = max(row["elapsed_ns"] for row in calibration.values())
             shortest = min(max(1, row["elapsed_ns"]) for row in calibration.values())
             # Keep one shared count while allowing the faster implementation
-            # at least 20 ms of work when practical. Cheap controls hit the cap.
+            # at least 20 ms of work when practical. Clock overhead in single-call
+            # calibration can leave cheap controls below the target.
             iterations = max(1, min(500000, max(
                 math.ceil(args.target_ms * 1_000_000 / max(1, longest)),
                 math.ceil(20_000_000 / shortest),

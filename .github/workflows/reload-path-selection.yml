@@ -1,9 +1,6 @@
 name: Sidebar reload selection performance
 
 on:
-  push:
-    branches:
-      - perf/source-reload-path-selection-20261028-c50e
   pull_request:
     paths:
       - Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift
@@ -29,6 +26,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - os: ubuntu-24.04
+            developer_dir: ''
           - os: macos-26-intel
             developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
     runs-on: ${{ matrix.os }}
