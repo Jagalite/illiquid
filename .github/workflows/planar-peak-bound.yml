@@ -1,0 +1,132 @@
+name: Planar peak bound performance
+
+on:
+  push:
+    branches: ['perf/planar-peak-bound-20261028-df43']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift'
+      - 'Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift'
+      - 'Benchmarks/PlanarOwnership/**'
+      - 'Benchmarks/NonDecodePerformance/allocmeter.c'
+      - '.github/workflows/planar-peak-bound.yml'
+      - '!Benchmarks/PlanarOwnership/*.md'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift'
+      - 'Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift'
+      - 'Benchmarks/PlanarOwnership/**'
+      - 'Benchmarks/NonDecodePerformance/allocmeter.c'
+      - '.github/workflows/planar-peak-bound.yml'
+      - '!Benchmarks/PlanarOwnership/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: planar-peak-bound-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-26
+            label: macos
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+          - os: ubuntu-24.04
+            label: linux
+            developer_dir: ''
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check source whitespace and benchmark syntax
+        run: |
+          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72 HEAD
+          python3 -m py_compile Benchmarks/PlanarOwnership/run.py
+      - name: Verify both variants and run isolated paired measurements
+        run: |
+          python3 - <<'PY'
+          import json, os, platform, shutil, subprocess, sys
+          from pathlib import Path
+
+          if not shutil.which('swiftc'):
+              raise SystemExit('Swift compiler unavailable; qualification cannot be skipped')
+          root = Path(os.environ['RUNNER_TEMP']) / 'planar-peak-bound'
+          common = [
+              sys.executable, 'Benchmarks/PlanarOwnership/run.py',
+              '--baseline-commit', 'ea2ff568237e2667f7b1aeee67b11a44ebe95b72',
+              '--baseline-blob', 'e110a666400aa680a2d7b86ed4852c4fe05f08cc',
+          ]
+          commands = [
+              [*common, '--tests-only', '--output', str(root / 'tests')],
+          ]
+          if os.environ['GITHUB_EVENT_NAME'] != 'pull_request':
+              commands.append([
+                  *common, '--rounds', '8', '--iterations', '200000', '--warmup', '10000',
+                  '--occupancies', '1,7,11,16,32', '--workloads', 'pipeline,lifecycle-mixed',
+                  '--include-peak-controls', '--output', str(root / 'timing'),
+              ])
+              if platform.system() == 'Linux':
+                  commands.append([
+                      *common, '--allocations', '--rounds', '4',
+                      '--iterations', '20000', '--warmup', '2000',
+                      '--occupancies', '1,7,11,16,32', '--workloads', 'pipeline,lifecycle-mixed',
+                      '--include-peak-controls', '--output', str(root / 'allocations'),
+                  ])
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if not queue.is_file():
+              print('Shared Kyoto queue is unavailable on this hosted runner; '
+                    'compiling directly in isolated experiment directories.', flush=True)
+          for command in commands:
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = json.loads(submitted)['id']
+                  subprocess.run([*cli, 'show', job_id], check=True)
+                  result = subprocess.run([*cli, 'wait', job_id])
+                  subprocess.run([*cli, 'logs', job_id], check=True)
+                  result.check_returncode()
+              else:
+                  subprocess.run(command, check=True)
+          PY
+      - name: Emit summaries and complete text evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'planar-peak-bound'
+          paths = [p for p in sorted(root.glob('*/*'))
+                   if p.is_file() and p.suffix in {'.json', '.jsonl', '.txt'}]
+          for path in paths:
+              data = path.read_bytes()
+              if len(data) > 2 * 1024 * 1024:
+                  raise SystemExit('Evidence file exceeds log limit; use uploaded artifact')
+              print('PLANAR_PEAK_EVIDENCE ' + json.dumps({
+                  'path': str(path.relative_to(root)),
+                  'sha256': hashlib.sha256(data).hexdigest(),
+                  'content': data.decode(),
+              }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: planar-peak-bound-${{ matrix.label }}
+          path: |
+            ${{ runner.temp }}/planar-peak-bound/*/*.json
+            ${{ runner.temp }}/planar-peak-bound/*/*.jsonl
+            ${{ runner.temp }}/planar-peak-bound/*/*.txt
+          retention-days: 14

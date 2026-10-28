@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import statistics
 import subprocess
@@ -40,6 +41,10 @@ class Runner:
         self.output = Path(args.output).resolve() if args.output else Path(
             tempfile.mkdtemp(prefix="illiquid-planar-ownership-")
         )
+        if self.output.exists() and any(self.output.iterdir()):
+            raise RuntimeError("Use a fresh output directory; evidence must not mix runs")
+        self.pin = args.baseline_commit or PIN
+        self.blob = args.baseline_blob or BLOB
         self.build = self.output / "build"
         self.build.mkdir(parents=True, exist_ok=True)
         self.commands = []
@@ -51,7 +56,7 @@ class Runner:
         self.swiftc = str(Path(self.swiftc).absolute())
         self.native = platform.system() == "Darwin"
         self.manifest = {
-            "baseline_commit": PIN, "baseline_blob_sha1": BLOB,
+            "baseline_commit": self.pin, "baseline_blob_sha1": self.blob,
             "source_path": SOURCE, "platform": platform.platform(),
             "machine": platform.machine(), "python": platform.python_version(),
             "clock": "DispatchTime.now().uptimeNanoseconds",
@@ -94,9 +99,9 @@ class Runner:
         return result.stdout
 
     def prepare(self):
-        baseline = self.run(["git", "show", f"{PIN}:{SOURCE}"])
-        actual_blob = self.run(["git", "rev-parse", f"{PIN}:{SOURCE}"]).decode().strip()
-        if actual_blob != BLOB:
+        baseline = self.run(["git", "show", f"{self.pin}:{SOURCE}"])
+        actual_blob = self.run(["git", "rev-parse", f"{self.pin}:{SOURCE}"]).decode().strip()
+        if actual_blob != self.blob:
             raise RuntimeError(f"Pinned baseline blob mismatch: {actual_blob}")
         candidate = (ROOT / SOURCE).read_bytes()
         self.manifest["compiler"] = self.run([self.swiftc, "--version"]).decode().strip()
@@ -185,32 +190,34 @@ class Runner:
     def native_tests(self):
         if not self.native:
             return {"executed": False, "reason": "macOS CoreMedia/CoreVideo required"}
-        package = self.build / "native-tests"
-        sources = package / "Sources/IlliquidNativePlayback"
-        tests = package / "Tests/IlliquidNativePlaybackTests"
-        sources.mkdir(parents=True, exist_ok=True)
-        tests.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(ROOT / SOURCE, sources / Path(SOURCE).name)
-        shutil.copy2(
-            ROOT / "Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift",
-            sources / "NativePlaybackSignposts.swift",
-        )
-        shutil.copy2(ROOT / NATIVE_TEST, tests / Path(NATIVE_TEST).name)
-        (package / "Package.swift").write_text('''// swift-tools-version: 6.0
+        runs = []
+        for variant, source in self.sources.items():
+            package = self.build / f"native-tests-{variant}"
+            sources = package / "Sources/IlliquidNativePlayback"
+            tests = package / "Tests/IlliquidNativePlaybackTests"
+            sources.mkdir(parents=True, exist_ok=True)
+            tests.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, sources / Path(SOURCE).name)
+            shutil.copy2(
+                ROOT / "Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift",
+                sources / "NativePlaybackSignposts.swift",
+            )
+            shutil.copy2(ROOT / NATIVE_TEST, tests / Path(NATIVE_TEST).name)
+            (package / "Package.swift").write_text('''// swift-tools-version: 6.0
 import PackageDescription
 let package = Package(name: "PlanarOwnershipNativeTests", platforms: [.macOS(.v14)],
     targets: [.target(name: "IlliquidNativePlayback"),
         .testTarget(name: "IlliquidNativePlaybackTests", dependencies: ["IlliquidNativePlayback"])])
 ''')
-        swift = str(Path(self.swiftc).with_name("swift"))
-        runs = []
-        for configuration in ("debug", "release"):
-            output = self.run([
-                swift, "test", "--package-path", str(package), "--configuration", configuration,
-                "--scratch-path", str(self.build / "native-test-build"),
-            ])
-            (self.output / f"native-tests-{configuration}.txt").write_bytes(output)
-            runs.append({"configuration": configuration, "passed": True})
+            swift = str(Path(self.swiftc).with_name("swift"))
+            for configuration in ("debug", "release"):
+                output = self.run([
+                    swift, "test", "--package-path", str(package), "--configuration", configuration,
+                    "--scratch-path", str(self.build / f"native-test-build-{variant}"),
+                    "-Xswiftc", "-warnings-as-errors",
+                ])
+                (self.output / f"native-tests-{variant}-{configuration}.txt").write_bytes(output)
+                runs.append({"variant": variant, "configuration": configuration, "passed": True})
         return {"executed": True, "runs": runs, "test_sha256": sha((ROOT / NATIVE_TEST).read_bytes())}
 
     def benchmark(self):
@@ -229,6 +236,8 @@ let package = Package(name: "PlanarOwnershipNativeTests", platforms: [.macOS(.v1
         rows = []
         raw_path = self.output / "measurements.jsonl"
         cases = [(workload, size) for workload in self.args.workloads for size in self.args.occupancies]
+        if self.args.include_peak_controls:
+            cases = list(dict.fromkeys([*cases, ("phase", 11), ("aliased", 11)]))
         for round_index in range(self.args.rounds):
             for case_index, (workload, size) in enumerate(cases):
                 order = ("baseline", "candidate") if (round_index + case_index) % 2 == 0 else ("candidate", "baseline")
@@ -276,10 +285,16 @@ let package = Package(name: "PlanarOwnershipNativeTests", platforms: [.macOS(.v1
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--swiftc")
+    parser.add_argument("--baseline-commit",
+                        help="Override the historical baseline; requires --baseline-blob")
+    parser.add_argument("--baseline-blob",
+                        help="Expected full Git blob SHA for the overridden baseline source")
     parser.add_argument("--output")
     parser.add_argument("--build-only", action="store_true")
     parser.add_argument("--tests-only", action="store_true")
     parser.add_argument("--allocations", action="store_true")
+    parser.add_argument("--include-peak-controls", action="store_true",
+                        help="Also measure unchanged phase and duplicate-identity controls at 11 owners")
     parser.add_argument("--rounds", type=int, default=8)
     parser.add_argument("--iterations", type=int, default=100_000)
     parser.add_argument("--warmup", type=int, default=10_000)
@@ -290,6 +305,22 @@ def main():
     args = parser.parse_args()
     if args.rounds < 1 or args.iterations < 1 or args.warmup < 0 or args.steps < 0:
         parser.error("Invalid round/iteration/warmup/step count")
+    if bool(args.baseline_commit) != bool(args.baseline_blob):
+        parser.error("--baseline-commit and --baseline-blob must be supplied together")
+    if args.baseline_commit and not all(
+        re.fullmatch(r"[0-9a-f]{40}", value)
+        for value in (args.baseline_commit, args.baseline_blob)
+    ):
+        parser.error("Baseline commit and blob must be full lowercase 40-digit Git SHAs")
+    if not args.occupancies or any(value < 1 for value in args.occupancies):
+        parser.error("Occupancies must be positive")
+    if "aliased" in args.workloads and any(value < 4 for value in args.occupancies):
+        parser.error("The aliased fallback control requires occupancy >= 4")
+    if not args.workloads or any(
+        value not in {"pipeline", "lifecycle-mixed", "phase", "aliased"}
+        for value in args.workloads
+    ):
+        parser.error("Unknown or empty workload list")
     runner = Runner(args)
     try:
         runner.prepare()

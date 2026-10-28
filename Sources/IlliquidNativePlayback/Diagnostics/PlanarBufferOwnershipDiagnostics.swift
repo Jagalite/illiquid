@@ -317,16 +317,21 @@ final class PlanarBufferOwnershipLedger: @unchecked Sendable {
         let rendererSamples = checkouts.values.reduce(0) {
             $0 + ($1.rendererSampleAttachmentAlive ? 1 : 0)
         }
-        let knownBuffers = Set(checkouts.values.compactMap { checkout in
-            checkout.applicationFrameAlive || checkout.rendererSampleAttachmentAlive
-                ? checkout.bufferIdentity : nil
-        }).count
         peakApplicationFrames = max(peakApplicationFrames, applicationFrames)
         peakRendererSampleAttachments = max(
             peakRendererSampleAttachments,
             rendererSamples
         )
-        peakKnownOutstandingBuffers = max(peakKnownOutstandingBuffers, knownBuffers)
+        // Distinct live identities cannot outnumber checkout records. Once
+        // that upper bound is at or below the historical peak, rebuilding the
+        // temporary identity array and set cannot change the peak.
+        if checkouts.count > peakKnownOutstandingBuffers {
+            let knownBuffers = Set(checkouts.values.compactMap { checkout in
+                checkout.applicationFrameAlive || checkout.rendererSampleAttachmentAlive
+                    ? checkout.bufferIdentity : nil
+            }).count
+            peakKnownOutstandingBuffers = max(peakKnownOutstandingBuffers, knownBuffers)
+        }
     }
 
     private func oldGenerationKnownBufferCountLocked(activeGeneration: Int) -> Int {

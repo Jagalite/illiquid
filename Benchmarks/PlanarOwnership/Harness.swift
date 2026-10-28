@@ -318,6 +318,58 @@ private final class MixedLifetimeWorkload: Workload {
     }
 }
 
+// Deliberate diagnostic stress: several checkouts alias two identities.
+// The record-count bound exceeds the true identity peak, so the candidate
+// must retain its exact set calculation. This is not healthy pool reuse.
+private final class AliasedWorkload: Workload {
+    let ledger = PlanarBufferOwnershipLedger()
+    private let buffers: [CVPixelBuffer]
+    private var tokens: [PlanarFrameOwnershipToken?]
+    private var cursor = 0
+
+    init(occupancy: Int) {
+        precondition(occupancy >= 4)
+        buffers = (0..<2).map { _ in makePixelBuffer() }
+        tokens = Array(repeating: nil, count: occupancy)
+        for index in tokens.indices {
+            tokens[index] = queuedToken(ledger: ledger, buffer: buffers[index % 2])
+        }
+    }
+
+    var configuration: [String: Any] {
+        ["retained_application_owners": tokens.count,
+         "distinct_buffer_identities": 2,
+         "unit": "aliased checkout, attachment and renderer release; fallback control"]
+    }
+
+    func run(_ count: Int) {
+        for _ in 0..<count {
+            tokens[cursor] = nil
+            let token = queuedToken(ledger: ledger, buffer: buffers[cursor % 2])
+            var sample: PlanarRendererSampleLifetimeAttachment? = present(token, ledger: ledger)
+            withExtendedLifetime(sample) {}
+            sample = nil
+            tokens[cursor] = token
+            cursor = (cursor + 1) % tokens.count
+        }
+    }
+}
+
+private func validateWorkloadSnapshot(
+    _ snapshot: PlanarBufferOwnershipSnapshot, name: String, occupancy: Int
+) {
+    if name == "aliased" {
+        precondition(snapshot.applicationFrames == occupancy
+            && snapshot.rendererSampleAttachments == 0
+            && snapshot.knownOutstandingBuffers == 2
+            && snapshot.peakKnownOutstandingBuffers == 2
+            && snapshot.reuseWhileKnownOwned > 0)
+    } else {
+        precondition(snapshot.knownOutstandingBuffers == occupancy
+            && snapshot.reuseWhileKnownOwned == 0)
+    }
+}
+
 private final class PhaseWorkload: Workload {
     let ledger = PlanarBufferOwnershipLedger()
     private let buffers: [CVPixelBuffer]
@@ -348,6 +400,7 @@ private func makeWorkload(_ name: String, occupancy: Int) -> any Workload {
     case "pipeline": return PipelineWorkload(occupancy: occupancy)
     case "lifecycle-mixed": return MixedLifetimeWorkload(occupancy: occupancy)
     case "phase": return PhaseWorkload(occupancy: occupancy)
+    case "aliased": return AliasedWorkload(occupancy: occupancy)
     default: fatalError("Unknown workload: \(name)")
     }
 }
@@ -388,13 +441,12 @@ private struct AllocatorMeter {
             )
         } else if mode == "smoke" {
             var cases: [[String: Any]] = []
-            for name in ["pipeline", "lifecycle-mixed", "phase"] {
-                for occupancy in [1, 7, 11, 16, 32] {
+            for name in ["pipeline", "lifecycle-mixed", "phase", "aliased"] {
+                for occupancy in (name == "aliased" ? [11] : [1, 7, 11, 16, 32]) {
                     let workload = makeWorkload(name, occupancy: occupancy)
                     workload.run(1001)
                     let snapshot = workload.ledger.snapshot(activeGeneration: 1)
-                    precondition(snapshot.knownOutstandingBuffers == occupancy
-                        && snapshot.reuseWhileKnownOwned == 0)
+                    validateWorkloadSnapshot(snapshot, name: name, occupancy: occupancy)
                     if name == "pipeline" {
                         precondition(snapshot.applicationFrames == min(7, occupancy)
                             && snapshot.queuedFrames == min(7, occupancy)
@@ -422,8 +474,7 @@ private struct AllocatorMeter {
             let elapsed = DispatchTime.now().uptimeNanoseconds - start
             meter?.end()
             let snapshot = workload.ledger.snapshot(activeGeneration: 1)
-            precondition(snapshot.knownOutstandingBuffers == occupancy
-                && snapshot.reuseWhileKnownOwned == 0)
+            validateWorkloadSnapshot(snapshot, name: name, occupancy: occupancy)
             var row: [String: Any] = [
                 "workload": name, "occupancy": occupancy, "iterations": iterations,
                 "warmup": warmup, "configuration": workload.configuration,

@@ -104,3 +104,19 @@ The temporary `build/` folder need not be committed or included with the report.
 See [the research report](../../Documentation/PLANAR_OWNERSHIP_PERFORMANCE.md)
 for source rationale, the Linux timing/allocation results, qualification limits,
 and links to retained raw evidence.
+
+## Baseline overrides and peak-bound follow-up
+
+The historical defaults above remain unchanged. Supply both
+`--baseline-commit <full SHA>» and `--baseline-blob <full SHA>» to compare another
+reviewed baseline. The runner verifies the blob before compiling and rejects
+nonempty output directories so measurements from different runs cannot mix.
+
+`--include-peak-controls» adds unchanged phase transitions and an intentionally
+aliased two-identity/11-checkout workload. The latter keeps the known-buffer
+upper-bound guard on its exact-count fallback path. It is a diagnostic stress
+control, not an observed playback occupancy. Native tests now execute the same
+test source against both baseline and candidate in debug and release.
+
+See [the peak-bound experiment](../PlanarPeakBound/README.md) for the current-main
+baseline, workload interpretation, results, and limits.
