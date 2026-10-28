@@ -51,6 +51,35 @@ public enum PlaylistMutation {
         return restored
     }
 
+    /// The saved shuffle order needs only identities. Avoid retaining complete
+    /// items in a second dictionary/array and normalizing their URLs again.
+    public static func restoringIDs(
+        _ items: [FolderPlaylistItem],
+        ids: [FolderPlaylistItem.ID]
+    ) -> [FolderPlaylistItem.ID] {
+        guard !items.isEmpty else { return [] }
+        guard items.count > 1 else { return [items[0].id] }
+        var remaining: Set<FolderPlaylistItem.ID> = []
+        var currentOrder: [FolderPlaylistItem.ID] = []
+        for item in items {
+            let id = item.id
+            if remaining.insert(id).inserted { currentOrder.append(id) }
+        }
+        guard !ids.isEmpty else { return currentOrder }
+
+        var restored: [FolderPlaylistItem.ID] = []
+        restored.reserveCapacity(currentOrder.count)
+        for savedID in ids {
+            // Return the current item's spelling, including its UTF-8 bytes,
+            // when a saved String is equal only by Unicode canonical equivalence.
+            if let currentID = remaining.remove(savedID) { restored.append(currentID) }
+        }
+        for id in currentOrder {
+            if let currentID = remaining.remove(id) { restored.append(currentID) }
+        }
+        return restored
+    }
+
     public static func deduplicatedSubtitleURLs(_ urls: [URL]) -> [URL] {
         var seen: Set<String> = []
         return urls.filter { url in

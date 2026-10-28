@@ -1,0 +1,141 @@
+name: Shuffle checkpoint identity performance
+
+on:
+  push:
+    branches: ['perf/shuffle-checkpoint-identities-20261028']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift'
+      - 'Benchmarks/ShuffleCheckpointIdentity/**'
+      - '.github/workflows/shuffle-checkpoint-identity.yml'
+      - '!Benchmarks/ShuffleCheckpointIdentity/*.md'
+      - '!Benchmarks/ShuffleCheckpointIdentity/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift'
+      - 'Benchmarks/ShuffleCheckpointIdentity/**'
+      - '.github/workflows/shuffle-checkpoint-identity.yml'
+      - '!Benchmarks/ShuffleCheckpointIdentity/*.md'
+      - '!Benchmarks/ShuffleCheckpointIdentity/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shuffle-checkpoint-identity-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-foundation:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds run serially in isolated directories.'
+      - name: Debug and release playlist regressions
+        run: |
+          bash Scripts/test-playlist-restoration.sh
+          bash Scripts/test-playlist-restoration.sh -c release
+      - name: Measure native checkpoint projection with paired baseline and candidate processes
+        run: |
+          python3 Benchmarks/ShuffleCheckpointIdentity/run.py \
+            --output "$RUNNER_TEMP/shuffle-checkpoint-native"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: shuffle-checkpoint-native
+          path: |
+            ${{ runner.temp }}/shuffle-checkpoint-native/*.json
+            ${{ runner.temp }}/shuffle-checkpoint-native/*.jsonl
+            ${{ runner.temp }}/shuffle-checkpoint-native/*.py
+            ${{ runner.temp }}/shuffle-checkpoint-native/logs/
+            ${{ runner.temp }}/shuffle-checkpoint-native/sources/
+          retention-days: 14
+
+  allocation-requests:
+    runs-on: ubuntu-24.04
+    container: swift:6.2.1-jammy
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify portable Foundation behavior
+        run: |
+          swift --version
+          python3 --version
+          bash Scripts/test-playlist-restoration.sh -c release
+      - name: Measure Linux timing and separate malloc-family requests
+        run: |
+          python3 Benchmarks/ShuffleCheckpointIdentity/run.py \
+            --output "$RUNNER_TEMP/shuffle-checkpoint-linux" --allocations
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: shuffle-checkpoint-linux
+          path: |
+            ${{ runner.temp }}/shuffle-checkpoint-linux/*.json
+            ${{ runner.temp }}/shuffle-checkpoint-linux/*.jsonl
+            ${{ runner.temp }}/shuffle-checkpoint-linux/*.py
+            ${{ runner.temp }}/shuffle-checkpoint-linux/logs/
+            ${{ runner.temp }}/shuffle-checkpoint-linux/sources/
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compile the app graph and test persisted shuffle restoration
+        run: |
+          mkdir -p "$RUNNER_TEMP/shuffle-checkpoint-integration"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'PlaylistOrderRestorationTests|PlaylistMutationTests|shuffleRestoresBaseOrderAcrossRelaunch|unshuffleRetainsAdditionsAndOmitsRemovedEntries' \
+            2>&1 | tee "$RUNNER_TEMP/shuffle-checkpoint-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: shuffle-checkpoint-integration
+          path: ${{ runner.temp }}/shuffle-checkpoint-integration/
+          retention-days: 14

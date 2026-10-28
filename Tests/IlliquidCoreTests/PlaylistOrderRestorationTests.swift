@@ -96,10 +96,65 @@ struct PlaylistOrderRestorationTests {
                     expected.append(items[firstIndex])
                 }
                 #expect(PlaylistMutation.restoringOrder(items, ids: saved.ids) == expected)
+                #expect(PlaylistMutation.restoringIDs(items, ids: saved.ids) == expected.map(\.id))
                 checked += 1
             }
         }
         #expect(checked == 41_261)
+    }
+
+    @Test func identityProjectionPreservesCurrentUnicodeSpelling() throws {
+        let composed = FolderPlaylistItem(
+            url: URL(fileURLWithPath: "/Media/Caf\u{e9}.mkv")
+        )
+        let saved = "/Media/Cafe\u{301}.mkv"
+        #expect(composed.id == saved)
+        #expect(Array(composed.id.utf8) != Array(saved.utf8))
+        for ids in [[], [saved], [saved, composed.id, "/removed"]] {
+            let expected = PlaylistMutation.restoringOrder([composed], ids: ids).map(\.id)
+            let actual = PlaylistMutation.restoringIDs([composed], ids: ids)
+            #expect(actual.map { Array($0.utf8) } == expected.map { Array($0.utf8) })
+            #expect(try JSONEncoder().encode(actual) == JSONEncoder().encode(expected))
+        }
+    }
+
+    @Test func identityProjectionMatchesDecodedAliasesAndFallbackURLs() throws {
+        // Decoding bypasses the normalizing FolderPlaylistItem initializer.
+        let urls = [
+            "file:///Media/Season/../Cafe%CC%81.mkv",
+            "file:///Media/Caf%C3%A9.mkv",
+            "file://localhost/Media/Other.mkv",
+            "file://example.invalid/Media/Other.mkv",
+            "https://example.invalid/media?id=1",
+            "https://example.invalid/media?id=2",
+        ]
+        let items = try urls.enumerated().map { offset, url in
+            let data = try JSONSerialization.data(withJSONObject: [
+                "url": url, "externalSubtitleURLs": [String](),
+                "dateAdded": Double(offset),
+            ] as [String: Any])
+            return try JSONDecoder().decode(FolderPlaylistItem.self, from: data)
+        }
+        let savedCases = [
+            [String](),
+            Array(items.map(\.id).reversed()),
+            ["/removed", items[1].id, items[0].id, items[3].id, "/removed"],
+        ]
+        for ids in savedCases {
+            let expected = PlaylistMutation.restoringOrder(items, ids: ids).map(\.id)
+            let actual = PlaylistMutation.restoringIDs(items, ids: ids)
+            #expect(actual.map { Array($0.utf8) } == expected.map { Array($0.utf8) })
+            #expect(try JSONEncoder().encode(actual) == JSONEncoder().encode(expected))
+        }
+    }
+
+    @Test func checkpointIdentityOrderSurvivesSuccessiveEdits() {
+        let a = item(0), b = item(1), c = item(2), d = item(3), e = item(4)
+        let first = PlaylistMutation.restoringIDs([c, a, d, e], ids: [a.id, b.id, c.id])
+        #expect(first == [a.id, c.id, d.id, e.id])
+        let second = PlaylistMutation.restoringIDs([e, d, c], ids: first)
+        #expect(second == [c.id, d.id, e.id])
+        #expect(PlaylistMutation.restoringIDs([d, c, e], ids: second) == second)
     }
 
     private func item(_ number: Int, revision: Int = 0) -> FolderPlaylistItem {
