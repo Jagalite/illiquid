@@ -1,0 +1,89 @@
+name: Thumbnail eviction compatibility benchmark
+
+on:
+  push:
+    branches: [perf/thumbnail-resident-eviction-20261028]
+    paths:
+      - .github/workflows/thumbnail-resident-eviction-compatibility.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-resident-compatibility-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-components-macos15:
+    runs-on: macos-15
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare an explicitly scoped component compatibility run
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially.'
+          echo 'Component compatibility only: production app support remains macOS 26.'
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("Benchmarks/ThumbnailResidentEviction/run.py")
+          source = path.read_text()
+          for old, new in [
+              ('.macOS("26.0")', '.macOS("15.0")'),
+              ('-apple-macosx26.0', '-apple-macosx15.0'),
+          ]:
+              assert source.count(old) == 1, (old, source.count(old))
+              source = source.replace(old, new)
+          path.write_text(source)
+          PY
+          git diff -- Benchmarks/ThumbnailResidentEviction/run.py \
+            > "$RUNNER_TEMP/thumbnail-resident-compatibility-runner.patch"
+      - name: Test actual sources and measure cache maintenance
+        run: |
+          set -o pipefail
+          python3 -m py_compile Benchmarks/ThumbnailResidentEviction/run.py
+          python3 Benchmarks/ThumbnailResidentEviction/run.py \
+            --output "$RUNNER_TEMP/thumbnail-resident-compatibility" --pairs 10 --target-ms 150 \
+            2>&1 | awk '
+              /^EVIDENCE_JSON_BEGIN$/ { suppress = 1; next }
+              /^EVIDENCE_JSON_END$/ { suppress = 0; next }
+              !suppress { print; fflush() }
+            '
+      - name: Emit exact evidence in bounded log lines
+        run: |
+          python3 - <<'PY'
+          import base64
+          import hashlib
+          import os
+          from pathlib import Path
+          path = Path(os.environ["RUNNER_TEMP"]) / "thumbnail-resident-compatibility/evidence.json"
+          data = path.read_bytes()
+          blob = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+          print("COMPAT_EVIDENCE_GIT_BLOB " + blob)
+          print("COMPAT_EVIDENCE_SHA256 " + hashlib.sha256(data).hexdigest())
+          encoded = base64.b64encode(data).decode()
+          chunks = [encoded[i:i + 6000] for i in range(0, len(encoded), 6000)]
+          print("COMPAT_EVIDENCE_CHUNKS " + str(len(chunks)))
+          for index, chunk in enumerate(chunks):
+              print("COMPAT_EVIDENCE " + str(index) + " " + chunk)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-resident-eviction-macos15-compatibility
+          path: |
+            ${{ runner.temp }}/thumbnail-resident-compatibility/*.json
+            ${{ runner.temp }}/thumbnail-resident-compatibility/logs/
+            ${{ runner.temp }}/thumbnail-resident-compatibility/inputs/
+            ${{ runner.temp }}/thumbnail-resident-compatibility/build/*/hashes.json
+            ${{ runner.temp }}/thumbnail-resident-compatibility-runner.patch
+          retention-days: 14
