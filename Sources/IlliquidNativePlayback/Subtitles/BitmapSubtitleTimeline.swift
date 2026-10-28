@@ -141,7 +141,27 @@ struct BitmapSubtitleTimeline: Sendable {
     }
 
     func composition(at seconds: Double) -> (start: Double, value: NativeBitmapSubtitleComposition)? {
-        guard seconds.isFinite, let entry = entries.last(where: { $0.start <= seconds }) else { return nil }
+        guard seconds.isFinite else { return nil }
+        // Keep short reverse searches for recent displays. Once four future
+        // sets have been skipped, use the timestamp order to bound older work.
+        var upper = entries.count
+        let tailStart = max(0, upper - 4)
+        while upper > tailStart, entries[upper - 1].start > seconds {
+            upper -= 1
+        }
+        if upper == tailStart {
+            var lower = 0
+            while lower < upper {
+                let middle = lower + (upper - lower) / 2
+                if entries[middle].start <= seconds {
+                    lower = middle + 1
+                } else {
+                    upper = middle
+                }
+            }
+        }
+        guard upper > 0 else { return nil }
+        let entry = entries[upper - 1]
         if let duration = entry.composition.duration, seconds >= entry.start + duration { return nil }
         return (entry.start, entry.composition)
     }

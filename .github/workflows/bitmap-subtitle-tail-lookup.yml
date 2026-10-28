@@ -1,0 +1,126 @@
+name: Bitmap subtitle tail lookup
+
+on:
+  push:
+    branches: ['perf/bitmap-subtitle-tail-search-20261028-3825']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimeline*Tests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift'
+      - 'Benchmarks/BitmapSubtitleTailLookup/**'
+      - '.github/workflows/bitmap-subtitle-tail-lookup.yml'
+      - '!Benchmarks/BitmapSubtitleTailLookup/*.md'
+      - '!Benchmarks/BitmapSubtitleTailLookup/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimeline*Tests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift'
+      - 'Benchmarks/BitmapSubtitleTailLookup/**'
+      - '.github/workflows/bitmap-subtitle-tail-lookup.yml'
+      - '!Benchmarks/BitmapSubtitleTailLookup/*.md'
+      - '!Benchmarks/BitmapSubtitleTailLookup/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-tail-lookup-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check the patch and qualify native lookup
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'bitmap-subtitle-tail-lookup'
+          commands = [
+              [sys.executable, 'Benchmarks/BitmapSubtitleTailLookup/run.py',
+               '--tests-only', '--output', str(root / 'tests')],
+          ]
+          # PRs retain the behavioral gate. Research pushes and manual runs
+          # additionally collect the longer before/after timing cohort.
+          if os.environ['EVENT_NAME'] != 'pull_request':
+              commands.append([
+                  sys.executable, 'Benchmarks/BitmapSubtitleTailLookup/run.py',
+                  '--pairs', '8', '--target-ms', '100', '--max-sample-ms', '1500',
+                  '--output', str(root / 'timing'),
+              ])
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if not queue.is_file():
+              print('The shared Kyoto queue is unavailable on this hosted runner; '
+                    'running isolated native component builds directly and serially.', flush=True)
+          for command in commands:
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = str(json.loads(submitted)['id'])
+                  subprocess.run([*cli, 'show', job_id], check=True)
+                  result = subprocess.run([*cli, 'wait', job_id])
+                  subprocess.run([*cli, 'logs', job_id], check=True)
+                  if result.returncode:
+                      raise SystemExit(result.returncode)
+              else:
+                  subprocess.run(command, check=True)
+          PY
+      - name: Emit complete review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'bitmap-subtitle-tail-lookup'
+          files = {}
+          for path in sorted(root.rglob('*')):
+              relative = path.relative_to(root)
+              if path.is_file() and 'build' not in relative.parts:
+                  files[str(relative)] = path.read_text()
+          review = {name: value for name, value in files.items()
+                    if len(Path(name).parts) == 2 and name.endswith(('.json', '.jsonl', '.txt'))}
+          print('TAIL_LOOKUP_REVIEW_JSON ' + json.dumps(review, sort_keys=True))
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log-bundle limit; use the uploaded artifact')
+          print('TAIL_LOOKUP_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('TAIL_LOOKUP_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-tail-lookup-macos
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/tests/*.json
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/tests/*.jsonl
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/tests/*.txt
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/tests/sources
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/tests/tests
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/tests/harness
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/tests/logs
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/timing/*.json
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/timing/*.jsonl
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/timing/sources
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/timing/tests
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/timing/harness
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/timing/logs
+            ${{ runner.temp }}/bitmap-subtitle-tail-lookup/timing/receipts
+          retention-days: 14
