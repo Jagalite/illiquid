@@ -40,7 +40,7 @@ jobs:
           python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-dir Benchmarks/TrackSelectionRanking/baseline-compact-rank --configuration release --output "$RUNNER_TEMP/track-selection-ranking/release"
       - name: Compare complete selected-ID receipts and native paired timings
         run: |
-          python3 Benchmarks/TrackSelectionRanking/run.py benchmark --baseline-dir Benchmarks/TrackSelectionRanking/baseline-compact-rank --rounds 10 --target-ms 100 --output "$RUNNER_TEMP/track-selection-ranking/benchmark"
+          python3 Benchmarks/TrackSelectionRanking/run.py benchmark --baseline-dir Benchmarks/TrackSelectionRanking/baseline-compact-rank --rounds 20 --target-ms 250 --output "$RUNNER_TEMP/track-selection-ranking/benchmark"
           cat "$RUNNER_TEMP/track-selection-ranking/benchmark/summary.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
