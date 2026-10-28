@@ -13,24 +13,18 @@ public final class MediaSidecarReader {
         let show: URL
         let plex: URL
     }
-    // A reference keeps cache-hit snapshots cheap while preserving one coherent
-    // set of paths and hints across cancellation callbacks.
-    private final class AncestorPathPlan {
+    private struct AncestorPathPlan {
         let root: String
         let parent: String
         // Discovery visits parent first; sidecar reads visit root first.
         let folders: [URL]
         let sidecars: [FolderSidecarPaths]
+    }
+    // Keep metadata out of the small path-plan value; empty plans need no box.
+    private final class AncestorHints {
         let hints: MediaMetadataHints
 
-        init(root: String, parent: String, folders: [URL],
-             sidecars: [FolderSidecarPaths], hints: MediaMetadataHints) {
-            self.root = root
-            self.parent = parent
-            self.folders = folders
-            self.sidecars = sidecars
-            self.hints = hints
-        }
+        init(_ hints: MediaMetadataHints) { self.hints = hints }
     }
     private var cache: [String: Sidecar] = [:]
     // A missing or unusable sidecar needs only its path. Keeping those entries
@@ -40,6 +34,7 @@ public final class MediaSidecarReader {
     // A metadata pass normally visits sibling files consecutively. Retain only
     // their last validated path plan, bounded by the existing 64-folder limit.
     private var ancestorPathPlan: AncestorPathPlan?
+    private var ancestorHints: AncestorHints?
     private var remainingBytes = 16 * 1024 * 1024
     public private(set) var filesRead = 0
     public static let maximumFileBytes = 128 * 1024
@@ -56,14 +51,19 @@ public final class MediaSidecarReader {
         let rootKey = root.absoluteString
         let parentKey = parent.absoluteString
         let cachedPlan: AncestorPathPlan?
+        let cachedHints: AncestorHints?
         // Canonically equivalent Swift strings can name different URL paths.
         // Reuse only the exact representations that passed the root walk.
         if let plan = ancestorPathPlan,
            plan.root.utf8.elementsEqual(rootKey.utf8),
            plan.parent.utf8.elementsEqual(parentKey.utf8) {
             cachedPlan = plan
+            // Capture the pair before a cancellation callback can reenter
+            // recognition and publish a plan for another parent.
+            cachedHints = ancestorHints
         } else {
             cachedPlan = nil
+            cachedHints = nil
         }
         var folders: [URL] = []
         if let cachedPlan {
@@ -85,7 +85,7 @@ public final class MediaSidecarReader {
         }
         var plannedSidecars: [FolderSidecarPaths] = []
         if cachedPlan == nil { plannedSidecars.reserveCapacity(folders.count) }
-        var hints = cachedPlan?.hints ?? MediaMetadataHints()
+        var hints = cachedHints?.hints ?? MediaMetadataHints()
         var foundSeriesPlex = false
         var mappedEpisode: MediaMetadataHints?
         for (offset, folder) in folders.reversed().enumerated() {
@@ -114,8 +114,10 @@ public final class MediaSidecarReader {
             // Cached sidecars do not change during this reader's lifetime, so
             // siblings can reuse their merged metadata. Per-file mappings and
             // NFO overrides must remain outside this ancestor-only snapshot.
+            // Publish the paired fields without a cancellation callback between.
             ancestorPathPlan = AncestorPathPlan(root: rootKey, parent: parentKey,
-                folders: folders, sidecars: plannedSidecars, hints: hints)
+                folders: folders, sidecars: plannedSidecars)
+            ancestorHints = hints == MediaMetadataHints() ? nil : AncestorHints(hints)
         }
         if var mapping = mappedEpisode {
             mapping.season = mapping.season ?? hints.season ?? directorySeason(parent.lastPathComponent) ?? 1

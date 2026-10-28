@@ -153,6 +153,47 @@ struct MediaSidecarAncestorHintsTests {
         }
     }
 
+    @Test func reentrantRecognitionKeepsEachParentsMetadata() throws {
+        // Exercise replacing, clearing, and introducing ancestor metadata while
+        // the outer call is paused at its first cancellation checkpoint.
+        for (outerHasHints, nestedHasHints) in [(true, true), (true, false), (false, true)] {
+            try withFixture { root in
+                let outerParent = root.appendingPathComponent("left", isDirectory: true)
+                let nestedParent = root.appendingPathComponent("right", isDirectory: true)
+                for folder in [outerParent, nestedParent] {
+                    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+                }
+                if outerHasHints {
+                    try write("title: Left Series\nseason: 2\ntmdbid: 20", at: outerParent, name: ".plexmatch")
+                }
+                if nestedHasHints {
+                    try write("title: Right Series\nseason: 4\ntmdbid: 30", at: nestedParent, name: ".plexmatch")
+                }
+                let outerFile = outerParent.appendingPathComponent("Filename Left - S01E02.mkv")
+                let nestedFile = nestedParent.appendingPathComponent("Filename Right - S01E03.mkv")
+                let expectedOuter = try MediaSidecarReader().recognize(outerFile, within: root)
+                let expectedNested = try MediaSidecarReader().recognize(nestedFile, within: root)
+                let reader = MediaSidecarReader()
+                _ = try reader.recognize(outerFile, within: root)
+
+                var didReenter = false
+                var nestedResult: RecognizedMediaName?
+                let outerResult = try reader.recognize(outerFile, within: root) {
+                    if !didReenter {
+                        didReenter = true
+                        nestedResult = try reader.recognize(nestedFile, within: root)
+                    }
+                }
+                #expect(didReenter)
+                #expect(outerResult == expectedOuter)
+                #expect(nestedResult == expectedNested)
+                #expect(try reader.recognize(nestedFile, within: root) == expectedNested)
+                #expect(try reader.recognize(outerFile, within: root) == expectedOuter)
+                #expect(reader.filesRead == (outerHasHints ? 1 : 0) + (nestedHasHints ? 1 : 0))
+            }
+        }
+    }
+
     private func withFixture(_ body: (URL) throws -> Void) throws {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("sidecar-ancestor-hints-" + UUID().uuidString, isDirectory: true)
