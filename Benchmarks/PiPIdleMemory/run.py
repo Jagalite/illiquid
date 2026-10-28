@@ -112,6 +112,11 @@ class Study:
             "baseline_commit": BASELINE, "platform": platform.platform(),
             "machine": platform.machine(), "pairs": args.pairs,
             "iterations_per_process": args.iterations,
+            "production_cycles_per_case": 8,
+            "production_cycle_settle_requested_ns": 150_000_000,
+            "production_final_settle_requested_ns": 1_000_000_000,
+            "production_extended_settle_requested_ns": 5_000_000_000,
+            "production_extended_settle_pair": 0,
             "scope": "native output-resource ownership; component resource recreation latency through direct GPU-completed composition",
             "latency_excludes": [
                 "normal production worker scheduling", "presenter enqueue", "AVKit UI",
@@ -119,6 +124,8 @@ class Study:
             ],
             "limitations": [
                 "No process RSS, energy, physical display, or visible PiP startup measurement.",
+                "Metal device.currentAllocatedSize is a process/device allocation counter, not resident memory; raw repeated-cycle growth has no numeric pass threshold.",
+                "Production-cycle probes run before direct-composition readbacks and retain no output-buffer probes.",
                 "Weak output-buffer payloads exclude allocation overhead; they are observed live wrappers, not a total-player-memory estimate.",
                 "Metal allocatedSize is the actual owned HDR working-texture allocation; pool capacity is not inferred from configured limits.",
             ],
@@ -203,12 +210,13 @@ class Study:
         self.manifest["binaries"] = binaries
         save(self.output / "manifest.json", self.manifest)
 
-    def test(self, variant, filter_text, label, *, negative=False, receipt=None):
+    def test(self, variant, filter_text, label, *, negative=False, receipt=None, long_settle=False):
         environment = os.environ.copy()
         if receipt is not None:
             environment.update(ILLIQUID_PIP_IDLE_VARIANT=variant,
                                ILLIQUID_PIP_IDLE_RECEIPT=str(receipt),
-                               ILLIQUID_PIP_IDLE_ITERATIONS=str(self.args.iterations))
+                               ILLIQUID_PIP_IDLE_ITERATIONS=str(self.args.iterations),
+                               ILLIQUID_PIP_IDLE_LONG_SETTLE="1" if long_settle else "0")
         command = self.swift_args(variant, "test") + [
             "--skip-build", "--disable-xctest", "--enable-swift-testing",
             "--no-parallel", "--filter", filter_text]
@@ -239,10 +247,16 @@ class Study:
                 label = f"measure-{pair:02d}-{variant}"
                 print(label, flush=True)
                 receipt = self.output / (label + ".json")
-                self.test(variant, "PiPIdleResourceResearchTests", label, receipt=receipt)
+                self.test(variant, "PiPIdleResourceResearchTests", label,
+                          receipt=receipt, long_settle=(pair == 0))
                 value = json.loads(receipt.read_text())
-                if value["variant"] != variant or len(value["rows"]) != 8:
+                if value["variant"] != variant or len(value["rows"]) != 8 or len(value["production_cycles"]) != 2:
                     raise ValueError("Incomplete research receipt")
+                for row in value["production_cycles"]:
+                    if len(row["cycles"]) != 8 or any(item["composed_frames"] != 1 for item in row["cycles"]):
+                        raise ValueError("Production cycle did not complete eight real first-sample deliveries")
+                    if (pair == 0) != ("extended_settled_device_bytes" in row):
+                        raise ValueError("Extended settling schedule differs from the declared methodology")
                 device = value["metal_device"]
                 if not device.get("name") or not device.get("registry_id"):
                     raise ValueError("Measurement omitted the actual Metal device identity")
@@ -281,9 +295,48 @@ class Study:
         save(self.output / "parity.json", {
             "cases": references, "complete_logical_pixels_and_color_tags_equal": True,
             "fresh_processes": len(observations)})
+        production_cases = []
+        for name in [row["case"] for row in observations[0]["production_cycles"]]:
+            records = {}
+            process_summaries = []
+            for observation in observations:
+                row = next(item for item in observation["production_cycles"] if item["case"] == name)
+                cycles = row["cycles"]
+                stopped = [item["post_settle_device_bytes"] for item in cycles]
+                # First start is cold; summarize the seven true re-entries separately.
+                restart_ns = statistics.median(item["start_to_first_sample_ns"] for item in cycles[1:])
+                item = {
+                    "variant": observation["variant"], "pair": observation["pair"],
+                    "cold_start_to_first_sample_ns": cycles[0]["start_to_first_sample_ns"],
+                    "median_reentry_to_first_sample_ns": restart_ns,
+                    "stopped_cycle_1_device_bytes": stopped[0],
+                    "stopped_cycle_8_device_bytes": stopped[-1],
+                    "cycle_1_to_8_growth_bytes": stopped[-1] - stopped[0],
+                    "successive_stopped_device_deltas_bytes": [b - a for a, b in zip(stopped, stopped[1:])],
+                    "final_settled_device_bytes": row["final_settled_device_bytes"],
+                    "final_delta_from_before_initial_compose_bytes":
+                        row["final_settled_device_bytes"] - row["before_initial_compose_device_bytes"],
+                }
+                if "extended_settled_device_bytes" in row:
+                    item["extended_settled_device_bytes"] = row["extended_settled_device_bytes"]
+                process_summaries.append(item)
+                records[observation["pair"], observation["variant"]] = item
+            changes = [
+                100 * (records[pair, "candidate"]["median_reentry_to_first_sample_ns"] /
+                       records[pair, "baseline"]["median_reentry_to_first_sample_ns"] - 1)
+                for pair in range(self.args.pairs)
+            ]
+            production_cases.append({
+                "case": name,
+                "median_paired_reentry_change_percent": statistics.median(changes),
+                "paired_reentry_change_range_percent": [min(changes), max(changes)],
+                "processes": process_summaries,
+            })
         save(self.output / "summary.json", {
             "pairs": self.args.pairs, "iterations_per_process": self.args.iterations,
-            "positive_restart_change_means_slower": True, "cases": cases})
+            "positive_restart_change_means_slower": True, "cases": cases,
+            "production_cycle_cases": production_cases,
+            "production_cycle_allocation_policy": "Observe raw device-counter growth; no numeric pass threshold."})
         self.manifest["complete"] = True
         save(self.output / "manifest.json", self.manifest)
 

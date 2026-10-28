@@ -24,6 +24,24 @@ struct PiPIdleResourceResearchTests {
         let texture: WeakProbe?
     }
 
+    private final class FirstSampleGate: @unchecked Sendable {
+        private let lock = NSLock()
+        private var continuation: CheckedContinuation<UInt64, Error>?
+
+        init(_ continuation: CheckedContinuation<UInt64, Error>) {
+            self.continuation = continuation
+        }
+
+        func finish(_ result: Result<UInt64, Error>) {
+            let pending = lock.withLock {
+                let pending = continuation
+                continuation = nil
+                return pending
+            }
+            pending?.resume(with: result)
+        }
+    }
+
     @Test @MainActor
     func recordOwnershipAndRestartLatency() async throws {
         let environment = ProcessInfo.processInfo.environment
@@ -36,13 +54,22 @@ struct PiPIdleResourceResearchTests {
         else { throw ResearchError.invalidEnvironment }
 
         let metalDevice = try #require(MTLCreateSystemDefaultDevice())
+        let extendedSettle = environment["ILLIQUID_PIP_IDLE_LONG_SETTLE"] == "1"
+        // Run the production-worker probe before direct composition/readbacks so
+        // its per-cycle changes cannot be caused by the companion fingerprinting.
+        var productionRows: [[String: Any]] = []
+        for (width, height, hdr) in [(1920, 1080, false), (3840, 2160, true)] {
+            productionRows.append(try await productionCycles(
+                width: width, height: height, hdr: hdr, device: metalDevice,
+                variant: variant, extendedSettle: extendedSettle))
+        }
         var rows: [[String: Any]] = []
         for (width, height) in [(1920, 1080), (3840, 2160)] {
             for hdr in [false, true] {
                 for count in [1, 12] {
                     rows.append(try await measure(
                         width: width, height: height, hdr: hdr, count: count,
-                        iterations: iterations, variant: variant))
+                        iterations: iterations, variant: variant, device: metalDevice))
                 }
             }
         }
@@ -55,6 +82,7 @@ struct PiPIdleResourceResearchTests {
                 "registry_id": String(metalDevice.registryID),
             ],
             "rows": rows,
+            "production_cycles": productionRows,
         ]
         let data = try JSONSerialization.data(withJSONObject: result, options: [.prettyPrinted, .sortedKeys])
         try data.write(to: URL(fileURLWithPath: receipt), options: .atomic)
@@ -62,22 +90,14 @@ struct PiPIdleResourceResearchTests {
 
     @MainActor private func measure(
         width: Int, height: Int, hdr: Bool, count: Int,
-        iterations: Int, variant: String
+        iterations: Int, variant: String, device: any MTLDevice
     ) async throws -> [String: Any] {
+        let beforeSetupDeviceBytes = device.currentAllocatedSize
         let size = CGSize(width: width, height: height)
         let source = try makeSource(width: width, height: height, hdr: hdr)
-        let frame = NativeDecodedVideoFrame(
-            pixelBuffer: source, planarOwnershipToken: nil,
-            presentationTime: .zero, duration: CMTime(value: 1, timescale: 30),
-            generation: 0, codedSize: size, displaySize: size,
-            pixelAspectRatio: CGSize(width: 1, height: 1), rotationDegrees: 0,
-            colorPrimaries: hdr ? 9 : 1, transferCharacteristic: hdr ? 16 : 1,
-            matrixCoefficients: hdr ? 9 : nil, isFullRange: !hdr,
-            hasMasteringDisplayMetadata: false, hasContentLightMetadata: false,
-            sourceComponentDepth: hdr ? 10 : 8,
-            ffmpegPixelFormat: hdr ? "p010le" : "bgra",
-            isHardwareDecoded: false, isCopiedHardwarePath: false, isNearZeroCopy: false)
+        let frame = decodedFrame(source: source, size: size, hdr: hdr)
         let compositor = try PiPSubtitleCompositor()
+        let beforeComposeDeviceBytes = device.currentAllocatedSize
         compositor.start(onFirstSample: { _ in }, onFailure: { _ in })
 
         // This helper's scope drops every strong output owner before the idle
@@ -95,9 +115,11 @@ struct PiPIdleResourceResearchTests {
         if hdr { #expect(resources.texture?.object != nil) }
         let beforeBufferBytes = buffers.filter { $0.object != nil }.reduce(0) { $0 + $1.bytes }
         let beforeBufferCount = buffers.filter { $0.object != nil }.count
+        let populatedDeviceBytes = device.currentAllocatedSize
 
         let expectedRetained = variant == "baseline"
         compositor.stop()
+        let stopRequestedDeviceBytes = device.currentAllocatedSize
         let idle = try await stoppedSnapshot(compositor, poolRetained: expectedRetained)
         #expect(!idle.active && !idle.workerActive)
         #expect(idle.hasPool == expectedRetained)
@@ -107,14 +129,24 @@ struct PiPIdleResourceResearchTests {
         if hdr { #expect((resources.texture?.object != nil) == expectedRetained) }
         let afterBufferBytes = buffers.filter { $0.object != nil }.reduce(0) { $0 + $1.bytes }
         let afterBufferCount = buffers.filter { $0.object != nil }.count
+        let firstStoppedDeviceBytes = device.currentAllocatedSize
 
         var timings: [UInt64] = []
-        for _ in 0..<iterations {
+        var deviceSamples: [[String: Any]] = []
+        for iteration in 0..<iterations {
             let (elapsed, output) = try await restart(compositor, frame: frame)
             #expect(output == reference)
             timings.append(elapsed)
+            let afterCompose = device.currentAllocatedSize
             compositor.stop()
+            let afterStopRequest = device.currentAllocatedSize
             _ = try await stoppedSnapshot(compositor, poolRetained: expectedRetained)
+            deviceSamples.append([
+                "iteration": iteration + 1,
+                "after_compose_device_bytes": afterCompose,
+                "stop_requested_device_bytes": afterStopRequest,
+                "stopped_barrier_device_bytes": device.currentAllocatedSize,
+            ])
         }
         return [
             "case": "\(width)x\(height)-\(hdr ? "hdr-pq" : "bgra")-\(count)-outputs",
@@ -134,7 +166,105 @@ struct PiPIdleResourceResearchTests {
                 "weak_live_output_payload_bytes": afterBufferBytes,
             ],
             "restart_to_gpu_completion_ns": timings,
+            "device_allocations": [
+                "before_setup_bytes": beforeSetupDeviceBytes,
+                "before_initial_compose_bytes": beforeComposeDeviceBytes,
+                "populated_bytes": populatedDeviceBytes,
+                "first_stop_requested_bytes": stopRequestedDeviceBytes,
+                "first_stopped_barrier_bytes": firstStoppedDeviceBytes,
+                "restart_samples": deviceSamples,
+                "final_stopped_barrier_bytes": device.currentAllocatedSize,
+            ],
         ]
+    }
+
+    @MainActor private func productionCycles(
+        width: Int, height: Int, hdr: Bool, device: any MTLDevice,
+        variant: String, extendedSettle: Bool
+    ) async throws -> [String: Any] {
+        let beforeSetup = device.currentAllocatedSize
+        let size = CGSize(width: width, height: height)
+        let source = try makeSource(width: width, height: height, hdr: hdr)
+        let frame = decodedFrame(source: source, size: size, hdr: hdr)
+        let compositor = try PiPSubtitleCompositor()
+        let beforeCompose = device.currentAllocatedSize
+        var cycles: [[String: Any]] = []
+        for cycle in 1...8 {
+            // receive() runs while inactive; start() must consume the real cached
+            // frame, finish GPU work, and enqueue it through the presenter.
+            compositor.receive(frame)
+            let firstSampleNS = try await waitForFirstSample(compositor)
+            let afterFirstSample = device.currentAllocatedSize
+            let active = await compositor.outputResourceSnapshotForTesting()
+            let metrics = compositor.metricsSnapshot()
+            #expect(metrics.composedFrames == 1)
+            #expect(metrics.enqueueFailures == 0)
+            #expect(metrics.unsupportedFrames == 0)
+            #expect(active.active && active.hasPool)
+            compositor.stop()
+            let afterStopRequest = device.currentAllocatedSize
+            let stopped = try await stoppedSnapshot(compositor, poolRetained: variant == "baseline")
+            let afterDrain = device.currentAllocatedSize
+            let settleBegin = DispatchTime.now().uptimeNanoseconds
+            try await Task.sleep(nanoseconds: 150_000_000)
+            let settleElapsed = DispatchTime.now().uptimeNanoseconds - settleBegin
+            cycles.append([
+                "cycle": cycle,
+                "start_to_first_sample_ns": firstSampleNS,
+                "after_first_sample_device_bytes": afterFirstSample,
+                "stop_requested_device_bytes": afterStopRequest,
+                "stopped_barrier_device_bytes": afterDrain,
+                "post_settle_device_bytes": device.currentAllocatedSize,
+                "settle_requested_ns": 150_000_000,
+                "settle_elapsed_ns": settleElapsed,
+                "composed_frames": metrics.composedFrames,
+                "stopped_pool_owned": stopped.hasPool,
+                "stopped_observer_owned": stopped.hasPoolObserver,
+                "stopped_hdr_texture_allocated_bytes": stopped.hdrTextureBytes,
+            ])
+        }
+        let finalBegin = DispatchTime.now().uptimeNanoseconds
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        let finalElapsed = DispatchTime.now().uptimeNanoseconds - finalBegin
+        var result: [String: Any] = [
+            "case": "\(width)x\(height)-\(hdr ? "hdr-pq" : "bgra")-production-cycles",
+            "before_setup_device_bytes": beforeSetup,
+            "before_initial_compose_device_bytes": beforeCompose,
+            "cycles": cycles,
+            "final_settle_requested_ns": 1_000_000_000,
+            "final_settle_elapsed_ns": finalElapsed,
+            "final_settled_device_bytes": device.currentAllocatedSize,
+            "scope": "real receive/start/first-sample presenter callback/stop; no output pixel-buffer readbacks or retained output probes; device allocation counter is not RSS",
+        ]
+        if extendedSettle {
+            let extendedBegin = DispatchTime.now().uptimeNanoseconds
+            try await Task.sleep(nanoseconds: 5_000_000_000)
+            result["extended_settle_requested_ns"] = 5_000_000_000 as UInt64
+            result["extended_settle_elapsed_ns"] = DispatchTime.now().uptimeNanoseconds - extendedBegin
+            result["extended_settled_device_bytes"] = device.currentAllocatedSize
+        }
+        // Keep the stopped compositor alive across both settling intervals.
+        let finalState = await compositor.outputResourceSnapshotForTesting()
+        #expect(!finalState.active && !finalState.workerActive)
+        #expect(finalState.hasPool == (variant == "baseline"))
+        result["final_pool_owned"] = finalState.hasPool
+        result["final_hdr_texture_allocated_bytes"] = finalState.hdrTextureBytes
+        return result
+    }
+
+    @MainActor private func waitForFirstSample(_ compositor: PiPSubtitleCompositor) async throws -> UInt64 {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<UInt64, Error>) in
+            let gate = FirstSampleGate(continuation)
+            DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+                gate.finish(.failure(ResearchError.firstSampleTimeout))
+            }
+            let begin = DispatchTime.now().uptimeNanoseconds
+            compositor.start(
+                onFirstSample: { result in
+                    gate.finish(result.map { _ in DispatchTime.now().uptimeNanoseconds - begin })
+                },
+                onFailure: { gate.finish(.failure($0)) })
+        }
     }
 
     @MainActor private func stoppedSnapshot(
@@ -219,6 +349,20 @@ struct PiPIdleResourceResearchTests {
         return result
     }
 
+    private func decodedFrame(source: CVPixelBuffer, size: CGSize, hdr: Bool) -> NativeDecodedVideoFrame {
+        NativeDecodedVideoFrame(
+            pixelBuffer: source, planarOwnershipToken: nil,
+            presentationTime: .zero, duration: CMTime(value: 1, timescale: 30),
+            generation: 0, codedSize: size, displaySize: size,
+            pixelAspectRatio: CGSize(width: 1, height: 1), rotationDegrees: 0,
+            colorPrimaries: hdr ? 9 : 1, transferCharacteristic: hdr ? 16 : 1,
+            matrixCoefficients: hdr ? 9 : nil, isFullRange: !hdr,
+            hasMasteringDisplayMetadata: false, hasContentLightMetadata: false,
+            sourceComponentDepth: hdr ? 10 : 8,
+            ffmpegPixelFormat: hdr ? "p010le" : "bgra",
+            isHardwareDecoded: false, isCopiedHardwarePath: false, isNearZeroCopy: false)
+    }
+
     private func makeSource(width: Int, height: Int, hdr: Bool) throws -> CVPixelBuffer {
         var result: CVPixelBuffer?
         let status = CVPixelBufferCreate(
@@ -262,6 +406,7 @@ struct PiPIdleResourceResearchTests {
         case missingEnvironment
         case invalidEnvironment
         case stopDidNotDrain
+        case firstSampleTimeout
         case pixelBuffer(CVReturn)
     }
 }

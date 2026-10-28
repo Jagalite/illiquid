@@ -341,7 +341,10 @@ final class PiPSubtitleCompositor: @unchecked Sendable {
     private let subtitleUploadCache: PiPSubtitleUploadCache
     private let workQueue = DispatchQueue(
         label: "com.illiquid.pip-subtitles",
-        qos: .userInteractive
+        qos: .userInteractive,
+        // Metal command buffers and encoders are autoreleased. Drain their
+        // temporary ownership after each item, including completion cleanup.
+        autoreleaseFrequency: .workItem
     )
     private let stateLock = NSLock()
     private let beforeGPUCommitForTesting: (@Sendable (any MTLCommandBuffer) -> Void)?

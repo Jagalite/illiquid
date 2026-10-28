@@ -10,6 +10,8 @@ The change releases output storage after a stopped production worker has
 drained. It preserves the latest decoded video frame, subtitle pipeline,
 prepared caption, subtitle upload cache, device, and shader pipelines. A
 delayed stop callback checks the active state before flushing the presenter.
+The dedicated queue also drains an autorelease pool after every work item,
+including GPU completion processing.
 
 ## Reproduce
 
@@ -47,6 +49,12 @@ rejects it. When the stopped worker drains, retirement is queued after the
 completion-processing work item returns. This lets its result references leave
 scope before the caches are flushed. The retirement helper rechecks that PiP is
 still stopped and idle; an intervening restart keeps its current resources.
+
+Metal command buffers and encoders are autoreleased temporary objects.
+A later queue item alone is not an autorelease-pool boundary. The queue uses
+`.workItem` so temporary Objective-C ownership ends after each asynchronous
+operation, while explicit command-buffer and frame-resource ownership continues
+to protect submitted GPU work.
 
 Externally held output pixel buffers remain valid after compositor ownership
 ends. Re-entry creates a new pool with the existing twelve-buffer allocation
@@ -118,6 +126,36 @@ are retained; positive changes mean slower. Every process compares recreated
 pixels with its reference, and the runner compares full pixel hashes and color
 tags across variants and processes.
 
+### Repeated production sessions
+
+A prior unmerged [PiP resource study](https://github.com/Jagalite/illiquid/blob/perf/pip-idle-resources-20261023/Documentation/PIP_IDLE_RESOURCE_MEMORY.md)
+observed growing Metal allocation counters despite cleared compositor fields.
+That result motivates an additional lifetime check here; it is not used as a
+measurement of this candidate.
+
+Before any companion readbacks, every measurement process performs eight real
+`receive`/`start`/first-sample/`stop` cycles for 1080p BGRA and 4K HDR PQ.
+No output buffers or output probes are retained. The stopped compositor and
+its cached decoded input remain alive throughout the observations.
+
+The harness records `MTLDevice.currentAllocatedSize` after each first sample,
+after requesting stop, after the stopped-state queue barrier, and after a
+requested 150 ms settling interval. It also observes a final one-second
+settle. Both variants in the first pair receive an additional five-second
+settle. Requested and actual elapsed intervals are recorded.
+
+These device counters are separate from the owned HDR texture and buffer
+payload observations. They may include framework caches and other resources;
+they are not process RSS and must not be added to the resource byte counts.
+Inspect nonzero populated values, successive stopped-state deltas, and the
+cycle-one-to-eight trend before accepting a memory improvement. An automatic
+numeric threshold is deliberately avoided on a shared runner.
+
+Production re-entry timing ends inside the real first-sample callback, after
+GPU composition and presenter enqueue. The initial cold start is separate from
+the following seven re-entries. This still does not measure an AVKit window
+becoming visible.
+
 ## Evidence
 
 The output includes the source and binary hashes, compiler/Xcode/host/Metal
@@ -137,3 +175,8 @@ measurements alone.
 - [Core Video texture-cache flushing](https://developer.apple.com/documentation/corevideo/cvmetaltexturecacheflush%28_%3A_%3A%29)
 - [Core Video pool flushing](https://developer.apple.com/documentation/corevideo/cvpixelbufferpoolflush%28_%3A_%3A%29)
 - [Metal resource allocation size](https://developer.apple.com/documentation/metal/mtlresource/allocatedsize)
+
+The dedicated queue's [work-item autorelease behavior](https://developer.apple.com/documentation/dispatch/dispatchqueue/autoreleasefrequency/workitem)
+provides a release boundary for [Metal transient objects](https://developer.apple.com/library/archive/documentation/Miscellaneous/Conceptual/MetalProgrammingGuide/Cmd-Submiss/Cmd-Submiss.html).
+[Metal device allocation counters](https://developer.apple.com/documentation/metal/mtldevice/currentallocatedsize)
+remain distinct from process-memory measurements.
