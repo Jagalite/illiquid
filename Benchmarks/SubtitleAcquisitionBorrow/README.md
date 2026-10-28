@@ -79,6 +79,51 @@ seek/output coverage belongs to the native integration tests in the accompanying
 workflow. This experiment does not measure demux I/O, overall seek latency,
 decoder performance, display output, energy, or the player's resident memory.
 
+## Results
+
+### Linux component qualification
+
+The portable component passed on Ubuntu 24.04/x86-64 with Swift 6.4 and the
+verified FFmpeg 8.1.2 source build. This is supporting portability evidence; it is
+not a native-player latency or RSS measurement.
+
+- Eight regression tests executed successfully in both debug and release.
+- All 2,124 complete fixture outcomes matched between baseline and candidate.
+- Fourteen workloads, six alternating pairs, and 336 retained timing/allocation
+  observations completed. Timings and allocation instrumentation used separate
+  executables.
+
+| Workload | Median wall time per check | Time reduction | Intercepted requested bytes per check |
+| --- | ---: | ---: | ---: |
+| PGS · 4 KiB object | 83.5 → 33.3 ns | 60.2% | 4,164 → 65 B |
+| DVB · 4 KiB object | 82.5 → 33.9 ns | 58.9% | 4,167 → 65 B |
+| PGS · 64 KiB object | 797.2 → 33.5 ns | 95.8% | 65,603 → 65 B |
+| DVB · 64 KiB object | 791.2 → 33.5 ns | 95.8% | 65,606 → 65 B |
+| PGS · 256 KiB object | 3289.8 → 34.2 ns | 99.0% | 262,217 → 65 B |
+| DVB · 256 KiB object | 3314.0 → 34.6 ns | 99.0% | 262,229 → 65 B |
+
+PGS/DVB tiny-packet medians improved by 8.0%/9.0% on this platform. The disabled
+and empty controls differed by +0.005 ns and +0.082 ns respectively, with
+overlapping observed ranges; these are not evidence of a meaningful change.
+Every enabled workload with a nonempty payload still recorded one 65-byte allocation request.
+No zero-allocation or whole-player memory claim is made.
+
+The 4 KiB cases contain 4,096 object bytes, the 64 KiB cases contain 65,535,
+and the 256 KiB cases comprise four 65,535-byte objects. Each segment header
+adds 3 bytes for PGS or 6 for DVB.
+The timing result measures only acquisition checks on warmed, synthetic packet
+corpora, with result consumption and output-parity checks.
+
+[Run 40635598742](https://github.com/Jagalite/illiquid/actions/runs/40635598742)
+tested commit `c5ac134821099654f370a79d3bad0805732383b6`.
+[Receipt](evidence/linux-c5ac1348/receipt.json),
+[all medians and ranges](evidence/linux-c5ac1348/summary.json), and
+[compressed raw receipts](evidence/linux-c5ac1348/raw-receipts.json.gz) are
+retained in the repository. The gzip payload is a UTF-8 JSON object mapping
+relative output paths to verbatim file contents, including complete paired
+observations, calibration, parity, commands, source/binary hashes, and both test
+logs. `gzip -dc` reads it without extracting paths.
+
 ## References
 
 - [Apple Data no-copy initializer](https://developer.apple.com/documentation/foundation/data/init(bytesnocopy:count:deallocator:))
