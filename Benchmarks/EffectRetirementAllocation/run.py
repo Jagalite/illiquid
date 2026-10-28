@@ -62,7 +62,7 @@ def save(path, value):
 
 def workloads():
     return [dict(id=f"{scenario}/{count}", scenario=scenario, count=count)
-            for scenario in ("all", "mixed", "none")
+            for scenario in ("all", "mixed", "none", "sparse")
             for count in (0, 1, 8, 32, 512, 4096)]
 
 

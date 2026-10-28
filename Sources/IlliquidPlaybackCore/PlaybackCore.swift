@@ -1682,10 +1682,40 @@ public struct PlaybackCore: Sendable {
     }
   }
 
-  private mutating func settleEffects(for authority: PlaybackAuthority) {
-    let settled = state.outstandingEffects.compactMap { effectID, record in
-      record.effect.context.authority == authority ? effectID : nil
+  private func effectIDs(matching authority: PlaybackAuthority) -> [PlaybackEffectID] {
+    // Count by index so the scan only needs the authority projection, without
+    // passing complete effect records through a generic element transform.
+    var matchingCount = 0
+    var index = state.outstandingEffects.startIndex
+    let endIndex = state.outstandingEffects.endIndex
+    while index != endIndex {
+      if state.outstandingEffects[index].value.effect.context.authority == authority {
+        matchingCount += 1
+      }
+      state.outstandingEffects.formIndex(after: &index)
     }
+    guard matchingCount > 0 else { return [] }
+    if matchingCount == state.outstandingEffects.count {
+      return Array(state.outstandingEffects.keys)
+    }
+
+    // Partial matches need only an exactly reserved ID array. All collection
+    // views and scans finish in this helper before retirement mutates the table.
+    var result: [PlaybackEffectID] = []
+    result.reserveCapacity(matchingCount)
+    index = state.outstandingEffects.startIndex
+    while index != endIndex {
+      if state.outstandingEffects[index].value.effect.context.authority == authority {
+        result.append(state.outstandingEffects[index].key)
+        if result.count == matchingCount { break }
+      }
+      state.outstandingEffects.formIndex(after: &index)
+    }
+    return result
+  }
+
+  private mutating func settleEffects(for authority: PlaybackAuthority) {
+    let settled = effectIDs(matching: authority)
     for effectID in settled {
       state.outstandingEffects.removeValue(forKey: effectID)
       state.recordCompletedEffect(effectID)

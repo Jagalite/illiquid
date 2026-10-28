@@ -1,10 +1,13 @@
 # Effect retirement allocation research
 
-This study targets the temporary dictionary built by
+This study targets the partial-match temporary dictionary built by
 `PlaybackCore.settleEffects(for:)` when it retires a playback authority. The
-baseline filters complete outstanding-effect records into a new dictionary and
-then maps that dictionary to IDs. The candidate collects matching IDs eagerly
-with `compactMap`, then runs the existing removal/completion loop.
+baseline filters outstanding-effect records, then maps the filtered dictionary
+to IDs. Swift 6.1.3 shares the original dictionary when every record matches and
+returns an empty dictionary when none match; only partial matches construct a
+new full-record table. The candidate counts matches by index, preserves empty
+and all-match paths, and collects only IDs for partial matches before running
+the existing removal/completion loop.
 
 The baseline is `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`. This is a separate
 investigation from checkpoint folder-membership construction.
@@ -54,6 +57,10 @@ Fixture creation, result consumption, canonicalization, encoding, and state
 destruction are outside that event's window. Setup owners are released before
 the timed update so they do not keep an extra copy of its dictionary.
 
+The revised cohort also includes a sparse case with only the first seeded
+record matching, for 24 workloads in total. Its ID array reserves the number of
+actual matches, not the total outstanding population.
+
 Six baseline/candidate pairs alternate AB/BA in fresh processes. Timing targets
 50 ms of summed event time, with a cap on excessive setup work. Every timed event
 contributes to a noninlined checksum. A separate untimed fixture verifies exact
@@ -90,3 +97,22 @@ These tests do not build the full media-player application or exercise live
 playback, native renderer resources, UI latency, power or energy. Both versions
 still scan outstanding effects and allocate the ID array; the asymptotic cleanup
 complexity is unchanged.
+
+
+## Rejected first implementation
+
+The first experiment used eager `compactMap`. It passed all 113 Core/StateSpace
+tests in each baseline/candidate debug/release configuration, but its controls
+ruled it out. In the Linux 4,096-effect case with no matching authority, median
+elapsed time increased from 74.87 to 353.66 microseconds (+377.3% paired change).
+With all effects matching, median requested bytes increased from 166,664 to
+265,136 (+59.1% paired change). Partial-match requested bytes fell substantially,
+but those regressions made the simple rewrite unsuitable.
+
+The revision uses indexed authority projections, preserves the all/none cases,
+and reserves exactly the matching ID count. Sparse cases were added to guard
+against over-reserving a large ID array for one match. Original observations are
+retained separately from the revised experiment.
+
+The relevant standard-library fast paths are in
+[Swift 6.1.3 NativeDictionary.swift](https://github.com/swiftlang/swift/blob/swift-6.1.3-RELEASE/stdlib/public/core/NativeDictionary.swift).

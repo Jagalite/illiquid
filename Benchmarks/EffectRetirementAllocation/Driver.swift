@@ -13,12 +13,12 @@ struct EffectRetirementProbe {
     static func main() throws {
         let arguments = CommandLine.arguments
         guard arguments.count == 5,
-              ["all", "mixed", "none"].contains(arguments[1]),
+              ["all", "mixed", "none", "sparse"].contains(arguments[1]),
               let count = Int(arguments[2]), (0...100_000).contains(count),
               let iterations = Int(arguments[3]), (1...100_000).contains(iterations),
               ["timing", "allocations"].contains(arguments[4])
         else {
-            throw ProbeError("Usage: EffectRetirementProbe all|mixed|none COUNT ITERATIONS timing|allocations")
+            throw ProbeError("Usage: EffectRetirementProbe all|mixed|none|sparse COUNT ITERATIONS timing|allocations")
         }
         let scenario = arguments[1]
         let mode = arguments[4]
@@ -103,7 +103,7 @@ struct EffectRetirementProbe {
         var state = runtime.core.state
         let firstSeedID = state.allocator.nextEffect
         for index in 0..<count {
-            let matches = scenario == "all" || (scenario == "mixed" && index.isMultiple(of: 2))
+            let matches = scenario == "all" || (scenario == "mixed" && index.isMultiple(of: 2)) || (scenario == "sparse" && index == 0)
             let authority = matches ? active.authority : pending.authority
             guard state.allocator.nextEffect < UInt64.max,
                   state.allocator.nextOperation < UInt64.max
@@ -162,7 +162,7 @@ struct EffectRetirementProbe {
         expectedOutstanding.removeValue(forKey: prerollID)
         for index in 0..<count {
             let id = PlaybackEffectID(rawValue: fixture.firstSeedID + UInt64(index))
-            if scenario == "all" || (scenario == "mixed" && index.isMultiple(of: 2)) {
+            if scenario == "all" || (scenario == "mixed" && index.isMultiple(of: 2)) || (scenario == "sparse" && index == 0) {
                 expectedCompleted.insert(id)
                 expectedOutstanding.removeValue(forKey: id)
             }
