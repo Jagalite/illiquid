@@ -84,3 +84,11 @@ Baseline and candidate columns are independent medians of eight observations. Re
 - [qualification.json](evidence/macos-arm64-20261028/qualification.json): CI/job/artifact links, the independent consistency audit and scope limitations.
 
 The CI [`video-color-sampling-native` artifact](https://github.com/Jagalite/illiquid/actions/runs/40635423170/artifacts/12793522961) additionally contains the complete verification vectors, test logs and staged source files. Its scheduled expiry is 2026-11-11T05:07:53Z; the checked-in records above persist with this change. The verification JSON's SHA-256 is `8b6fd17b568b3748a8e36f94b3c4532c1ad0755b69632fea5911892086acd7a9`.
+
+## Independent audit
+
+An [independent validation report](INDEPENDENT_VALIDATION.md) checks the exact
+source provenance, every raw timing pair and summary, complete color bit patterns,
+calibration shortfalls, and the native regression receipts. The accompanying
+[durable audit evidence](evidence/independent-563b8/) also preserves the complete
+compressed verification trace, calibration and command records, and test logs.
