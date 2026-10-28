@@ -177,8 +177,7 @@ public enum ExternalSubtitleMatcher {
             return nil
         }
 
-        let sharedTokens = Array(mediaTokens.prefix(sharedCount))
-        let sharedWeight = tokenWeight(sharedTokens)
+        let sharedWeight = tokenWeight(mediaTokens.prefix(sharedCount))
         guard sharedWeight >= 4 else {
             return nil
         }
