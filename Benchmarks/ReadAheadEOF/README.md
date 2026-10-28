@@ -72,50 +72,74 @@ broadcast before entering each wait can also wake other readers; this change
 does not alter that separate multi-reader behavior. Reader CPU includes initial
 registration and final retirement as well as wake-and-repark work.
 
-## Initial Linux results
+## Results
 
-[Hosted Linux qualification](https://github.com/Jagalite/illiquid/actions/runs/40637896358/job/122649008784)
-completed on the exact source at `0de1f18fe46c1a24e7e45aca0ef2f21fc48404a8`.
-The host was Linux x86_64 with four allowed CPUs and Swift 6.3.2.
-All 12 tests passed for baseline and candidate in both debug and release.
+The [confirmation Linux job](https://github.com/Jagalite/illiquid/actions/runs/40639383250/job/122653701946)
+passed on `4b65a472b061d4fb48d846f95aa5c90af27c682c`, including all mandatory Git
+metadata probes, a clean worktree, and source-integrity checks. The host was
+Linux x86_64 with four allowed CPUs and Swift 6.3.2. All 12 tests passed for
+baseline and candidate in both debug and release.
 
 Median reader CPU time per three-second observation:
 
 | EOF clock updates | Baseline | Candidate | Reduction | Reader voluntary switches, baseline → candidate |
 | --- | ---: | ---: | ---: | ---: |
-| 24 Hz | 1.643 ms | 0.041 ms | 97.50% | 72 → 1 |
-| 60 Hz | 4.223 ms | 0.038 ms | 99.09% | 180 → 1 |
-| 120 Hz | 8.429 ms | 0.037 ms | 99.56% | 360 → 1 |
+| 24 Hz | 2.043 ms | 0.044 ms | 97.84% | 72 → 1 |
+| 60 Hz | 4.675 ms | 0.040 ms | 99.14% | 180 → 1 |
+| 120 Hz | 8.344 ms | 0.042 ms | 99.49% | 360 → 1 |
 
 The switch counts were identical across all six repetitions in each variant.
 All 60 observations passed semantic checks; none overslept by a full update
 interval. No sample was discarded.
 
 The idle control stayed at one reader voluntary switch in both versions.
-Its CPU medians were 0.0410 and 0.0422 ms, with overlapping ranges. The timed
+Its CPU medians were 0.0409 and 0.0405 ms, with overlapping ranges. The timed
 120 Hz control stayed at 360 switches and still admitted the reader on the final
-update; CPU medians were 8.023 and 7.970 ms, also with overlapping ranges.
+update. Its CPU median increased from 8.123 to 8.389 ms (+3.28%); baseline
+7.018–8.820 ms and candidate 7.572–8.678 ms ranges overlap. This does not establish
+zero timed-reader overhead or a statistically resolved timing regression.
 
-The absolute saving is modest: 8.39 ms of one reader's CPU over three seconds
-at 120 Hz. The large percentage describes this unnecessary worker activity,
-not a percentage improvement in total player CPU or battery life.
+The absolute EOF saving at 120 Hz is 8.30 ms of one reader's CPU over three
+seconds. The large percentage describes unnecessary worker activity, not a
+percentage improvement in total player CPU or battery life.
+
+### Earlier run
+
+The [initial Linux job](https://github.com/Jagalite/illiquid/actions/runs/40637896358/job/122649008784)
+tested the same production gate, baseline, C instrumentation, harness and tests
+at `0de1f18fe46c1a24e7e45aca0ef2f21fc48404a8`. Its 60 observations and all four
+debug/release test runs also passed:
+
+| EOF clock updates | Baseline reader CPU | Candidate reader CPU | Reduction |
+| --- | ---: | ---: | ---: |
+| 24 Hz | 1.643 ms | 0.041 ms | 97.50% |
+| 60 Hz | 4.223 ms | 0.038 ms | 99.09% |
+| 120 Hz | 8.429 ms | 0.037 ms | 99.56% |
+
+Its switch counts matched the confirmation run exactly: 72/180/360 → 1 for EOF,
+1 → 1 for idle, and 360 → 360 for the timed control. Idle CPU medians were
+0.0410 → 0.0422 ms; timed CPU was 8.023 → 7.970 ms (−0.67%), both with overlapping
+ranges. There were no full-interval oversleeps in either cohort.
 
 ### Evidence and provenance
 
-`evidence/linux-initial` preserves the raw observations, summaries, source/binary
-hashes, command receipts, completion record and all four test logs. Full command
-logs are also available in the workflow artifact.
+`evidence/linux-initial` and `evidence/linux-confirmation` preserve all 120 raw
+observations, summaries, source/binary hashes, command receipts, completion
+records and the eight test logs. Full command logs are also available in each
+workflow artifact.
 
 The initial container's optional Git metadata probes failed because Git saw
 different checkout ownership. Their error text and nonzero statuses remain in
-the evidence. The checkout log independently identifies the exact tested commit;
-`provenance.json` records that qualification. The runner now scopes Git trust to
-this one explicit checkout for each probe and requires those probes to succeed.
+the evidence. The checkout log independently identifies that tested commit;
+`provenance.json` records this qualification. The runner now scopes Git trust to
+this one explicit checkout for each probe and requires the probes to succeed.
+The confirmation run passed every command and records its exact commit and a
+clean working tree.
 
-The initial workflow attempt failed before compilation because the Swift
-container did not include Python. That setup issue was corrected before any of
-the reported measurements.
+The initial workflow setup attempt failed before compilation because the Swift
+container did not include Python. That dependency was installed before either
+reported measurement cohort.
 
-The macOS job remains queued. No macOS CPU, playback, or energy result is claimed.
-A follow-up run verifies the corrected provenance probes without changing the
-production gate or measurement protocol.
+The macOS job was still queued when this report was written. No macOS CPU,
+playback, or energy result is claimed. The source under test is unchanged by
+this report and evidence-only commit.
