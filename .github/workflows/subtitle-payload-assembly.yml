@@ -33,6 +33,12 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Install Python in the Linux Swift container
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3
       - name: Check build environment
         shell: bash
         run: |
@@ -87,7 +93,7 @@ jobs:
           import hashlib, json, os
           from pathlib import Path
           root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-payload-assembly"
-          for name in ["manifest.json", "benchmark.json", "summary.json"]:
+          for name in ["manifest.json", "benchmark.json", "calibration.json", "measurements.jsonl", "summary.json"]:
               path = root / name
               if path.exists():
                   print("EVIDENCE_BEGIN " + name)
@@ -123,6 +129,12 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Install Python in the Linux Swift container
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3
       - name: Check build environment
         shell: bash
         run: |
@@ -177,7 +189,7 @@ jobs:
           import hashlib, json, os
           from pathlib import Path
           root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-payload-assembly"
-          for name in ["manifest.json", "benchmark.json", "summary.json"]:
+          for name in ["manifest.json", "benchmark.json", "calibration.json", "measurements.jsonl", "summary.json"]:
               path = root / name
               if path.exists():
                   print("EVIDENCE_BEGIN " + name)
