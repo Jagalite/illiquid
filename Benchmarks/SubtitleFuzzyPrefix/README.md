@@ -130,3 +130,10 @@ compiler optimizations and slice-to-array storage reuse can vary by input and
 toolchain. No full-player startup, UI, decoding, playback, or live rendering
 performance claim follows from these component timings. Hardware was one hosted
 arm64 runner; other machines and Swift versions may differ.
+
+## Follow-up: normalized exact-check guard
+
+A separate incremental study uses this harness to skip a repeated exact-match
+predicate when media qualifier removal leaves the token sequence unchanged.
+See [EXACT_CHECK_RESEARCH.md](EXACT_CHECK_RESEARCH.md) for the pinned parent
+baseline, opt-in workloads, portable results, and pending native qualification.
