@@ -234,9 +234,12 @@ class Runner:
                 self.compile(self.swift_command(variant, "test", configuration) +
                              ["--disable-xctest", "--enable-swift-testing", "--no-parallel"], label)
                 log_path = self.output / (label + ("-logs" if self.queue.is_file() else "") + ".log")
-                match = re.search(r"Test run with (\d+) tests? passed", log_path.read_text())
-                if match is None or int(match.group(1)) == 0:
+                matches = [match for match in re.finditer(
+                    r"Test run with (\d+) tests?(?: in \d+ suites?)? passed", log_path.read_text())
+                           if int(match.group(1)) > 0]
+                if not matches:
                     raise ValueError("Missing nonempty Swift Testing success receipt: " + label)
+                match = matches[-1]
                 receipt = {"variant": variant, "configuration": configuration, "passed": True,
                            "tests_passed": int(match.group(1)), "summary": match.group(0)}
                 self.test_runs.append(receipt)
