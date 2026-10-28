@@ -5,33 +5,18 @@ import Foundation
 import IOSurface
 
 final class SampleBufferVideoPresenter: @unchecked Sendable {
-    struct FrameIdentity: Sendable {
-        let surfaceID: UInt32?
-        let bufferID: UInt
-        let time: Double
-        let generation: Int
-    }
+    typealias FrameIdentity = VideoFrameIdentityHistory.FrameIdentity
     private let identityLock = NSLock()
-    private var frameIdentities: [FrameIdentity] = []
+    private var frameIdentities = VideoFrameIdentityHistory()
 
     func adjacentTime(to frame: FrameIdentity, direction: Int) -> Double? {
-        identityLock.withLock {
-            let times = frameIdentities.lazy.filter { $0.generation == frame.generation }.map(\.time)
-            return direction > 0
-                ? times.filter { $0 > frame.time + 0.000001 }.min()
-                : times.filter { $0 < frame.time - 0.000001 }.max()
-        }
+        identityLock.withLock { frameIdentities.adjacentTime(to: frame, direction: direction) }
     }
 
     func identity(for buffer: CVPixelBuffer) -> FrameIdentity? {
         let surface = CVPixelBufferGetIOSurface(buffer).map { IOSurfaceGetID($0.takeUnretainedValue()) }
         let bufferID = UInt(bitPattern: Unmanaged.passUnretained(buffer).toOpaque())
-        return identityLock.withLock {
-            frameIdentities.last {
-                if let surface { return $0.surfaceID == surface }
-                return $0.bufferID == bufferID
-            }
-        }
+        return identityLock.withLock { frameIdentities.identity(surfaceID: surface, bufferID: bufferID) }
     }
 
     let displayLayer: AVSampleBufferDisplayLayer
@@ -129,7 +114,6 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
             bufferID: UInt(bitPattern: Unmanaged.passUnretained(frame.pixelBuffer).toOpaque()),
             time: frame.presentationTime.seconds, generation: frame.generation)
         identityLock.withLock {
-            if frameIdentities.count == 128 { frameIdentities.removeFirst() }
             frameIdentities.append(identity)
         }
         withNativeVideoSignpost("VideoRendererEnqueue") {
@@ -145,7 +129,7 @@ final class SampleBufferVideoPresenter: @unchecked Sendable {
         removeDisplayedImage: Bool = true,
         completion: (@Sendable () -> Void)? = nil
     ) {
-        identityLock.withLock { frameIdentities.removeAll(keepingCapacity: true) }
+        identityLock.withLock { frameIdentities.removeAll() }
         renderer.flush(
             removingDisplayedImage: removeDisplayedImage,
             completionHandler: completion

@@ -1,0 +1,115 @@
+name: Video frame identity history performance
+
+on:
+  push:
+    branches: ['perf/video-frame-identity-history-20261028-838b']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameIdentityHistory.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameIdentityHistoryTests.swift'
+      - 'Benchmarks/VideoFrameIdentityHistory/**'
+      - '.github/workflows/video-frame-identity-history.yml'
+      - '!Benchmarks/VideoFrameIdentityHistory/README.md'
+      - '!Benchmarks/VideoFrameIdentityHistory/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameIdentityHistory.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameIdentityHistoryTests.swift'
+      - 'Benchmarks/VideoFrameIdentityHistory/**'
+      - '.github/workflows/video-frame-identity-history.yml'
+      - '!Benchmarks/VideoFrameIdentityHistory/README.md'
+      - '!Benchmarks/VideoFrameIdentityHistory/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-frame-identity-history-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check isolated build environment
+        run: |
+          test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
+          echo "Kyoto is unavailable on this hosted runner; component builds run serially."
+      - name: Compare original and circular histories in debug and release
+        run: |
+          python3 Benchmarks/VideoFrameIdentityHistory/run.py --tests-only \
+            --output "$RUNNER_TEMP/frame-identity-history/tests"
+      - name: Measure balanced native before-and-after samples
+        run: |
+          python3 Benchmarks/VideoFrameIdentityHistory/run.py \
+            --pairs 8 --target-ms 150 --max-sample-ms 2000 \
+            --output "$RUNNER_TEMP/frame-identity-history/timing"
+      - name: Emit reproducibility evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "frame-identity-history"
+          files = {str(p.relative_to(root)): p.read_text()
+                   for p in sorted(root.rglob("*"))
+                   if p.is_file() and "build" not in p.parts and "receipts" not in p.parts}
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          print("FRAME_HISTORY_BUNDLE_SHA256 " + hashlib.sha256(packed).hexdigest())
+          encoded = base64.b64encode(packed).decode()
+          chunks = [encoded[i:i + 16000] for i in range(0, len(encoded), 16000)]
+          for index, chunk in enumerate(chunks):
+              print(f"FRAME_HISTORY_BUNDLE_PART {index + 1}/{len(chunks)} {chunk}")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-frame-identity-history-component
+          path: |
+            ${{ runner.temp }}/frame-identity-history/**/*.json
+            ${{ runner.temp }}/frame-identity-history/**/*.jsonl
+            ${{ runner.temp }}/frame-identity-history/**/*.txt
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
+          echo "Kyoto is unavailable on this hosted runner; the app build runs directly."
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compile the app graph and test frame identity and presentation
+        run: |
+          mkdir -p "$RUNNER_TEMP/frame-history-integration"
+          sw_vers > "$RUNNER_TEMP/frame-history-integration/host.txt"
+          swift --version >> "$RUNNER_TEMP/frame-history-integration/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/frame-history-integration/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'VideoFrameIdentityHistoryTests|PresentationTimeObservationTests|FrameStepPerformanceTests' \
+            2>&1 | tee "$RUNNER_TEMP/frame-history-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-frame-identity-history-integration
+          path: ${{ runner.temp }}/frame-history-integration/
+          retention-days: 14
