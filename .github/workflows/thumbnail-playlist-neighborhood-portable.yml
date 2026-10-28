@@ -1,0 +1,81 @@
+name: Thumbnail playlist neighborhood portable
+
+on:
+  push:
+    branches: ['perf/thumbnail-playlist-neighborhood']
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
+      - 'Scripts/test-thumbnail-playlist-neighborhood.sh'
+      - 'Benchmarks/ThumbnailPlaylistNeighborhood/**'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/evidence/**'
+      - '.github/workflows/thumbnail-playlist-neighborhood-portable.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
+      - 'Scripts/test-thumbnail-playlist-neighborhood.sh'
+      - 'Benchmarks/ThumbnailPlaylistNeighborhood/**'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/evidence/**'
+      - '.github/workflows/thumbnail-playlist-neighborhood-portable.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-playlist-neighborhood-portable-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.3-noble
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare the isolated Linux toolchain
+        run: |
+          if ! command -v python3 >/dev/null; then
+            apt-get update
+            apt-get install -y --no-install-recommends python3
+          fi
+          swift --version
+          python3 --version
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral Linux runner; compiling serially in an isolated checkout.'
+          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72 HEAD
+      - name: Debug and release neighborhood regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-neighborhood-portable"
+          set -o pipefail
+          bash Scripts/test-thumbnail-playlist-neighborhood.sh --jobs 2 --no-parallel \
+            2>&1 | tee "$RUNNER_TEMP/thumbnail-neighborhood-portable/tests.log"
+      - name: Paired Linux measurements with exact output parity
+        run: |
+          python3 Benchmarks/ThumbnailPlaylistNeighborhood/run.py \
+            --rounds 8 --target-ms 50 --counts 32,10000,100000 \
+            --output "$RUNNER_TEMP/thumbnail-neighborhood-portable/results.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-neighborhood-portable
+          path: ${{ runner.temp }}/thumbnail-neighborhood-portable/
+          retention-days: 14
