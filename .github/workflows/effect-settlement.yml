@@ -1,0 +1,95 @@
+name: Effect settlement portable performance
+
+on:
+  push:
+    branches: ['perf/effect-settlement-*']
+    paths:
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Tests/IlliquidPlaybackCoreTests/**'
+      - 'Benchmarks/EffectSettlement/**'
+      - '.github/workflows/effect-settlement.yml'
+      - '!Benchmarks/EffectSettlement/*.md'
+      - '!Benchmarks/EffectSettlement/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Tests/IlliquidPlaybackCoreTests/**'
+      - 'Benchmarks/EffectSettlement/**'
+      - '.github/workflows/effect-settlement.yml'
+      - '!Benchmarks/EffectSettlement/*.md'
+      - '!Benchmarks/EffectSettlement/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: effect-settlement-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-core:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    container:
+      image: swift:6.2.4-noble@sha256:d6f8f6112e9a63da0a4a151d6b93acd16699d35c0b82531ac1a245f5af210197
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare isolated portable validation
+        shell: bash
+        run: |
+          if ! command -v python3 >/dev/null; then
+            apt-get update
+            apt-get install --no-install-recommends --yes python3
+          fi
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Validate the whole core and measure paired transitions
+        shell: bash
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/EffectSettlement/run.py \
+            --output "$RUNNER_TEMP/effect-settlement" "${mode[@]}"
+      - name: Emit complete reviewable evidence
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'effect-settlement'
+          receipts = []
+          if root.exists():
+              paths = sorted(p for p in root.iterdir()
+                             if p.is_file() and p.suffix in {'.json', '.jsonl', '.log'})
+              for path in paths:
+                  data = path.read_bytes()
+                  value = data.decode()
+                  chunks = [value[i:i + 3000] for i in range(0, len(value), 3000)] or ['']
+                  receipts.append({'name': path.name, 'bytes': len(data),
+                                   'sha256': hashlib.sha256(data).hexdigest(), 'parts': len(chunks)})
+                  print('::group::' + path.name)
+                  for part, content in enumerate(chunks):
+                      line = 'EFFECT_SETTLEMENT_FILE ' + json.dumps(
+                          {'name': path.name, 'part': part, 'parts': len(chunks), 'content': content},
+                          ensure_ascii=False)
+                      if len(line.encode()) > 16000:
+                          raise SystemExit('Evidence log chunk exceeds 16KB')
+                      print(line)
+                  print('::endgroup::')
+          print('EFFECT_SETTLEMENT_RECEIPTS ' + json.dumps(receipts, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: effect-settlement-swift-6.2.4
+          path: |
+            ${{ runner.temp }}/effect-settlement/*.json
+            ${{ runner.temp }}/effect-settlement/*.jsonl
+            ${{ runner.temp }}/effect-settlement/*.log
+          retention-days: 14
