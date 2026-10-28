@@ -1,0 +1,60 @@
+name: Playback progress analysis performance
+
+on:
+  push:
+    branches:
+      - perf/progress-analysis-storage-20261028-14379ad
+  pull_request:
+    paths:
+      - Sources/IlliquidPlaybackStateSpace/**
+      - Sources/IlliquidPlaybackCore/**
+      - Tests/IlliquidPlaybackStateSpaceTests/**
+      - Benchmarks/PlaybackProgressAnalysis/**
+      - .github/workflows/playback-progress-analysis.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playback-progress-analysis-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record native environment
+        run: |
+          mkdir -p "$RUNNER_TEMP/progress-analysis-host"
+          sw_vers > "$RUNNER_TEMP/progress-analysis-host/system.txt"
+          uname -a >> "$RUNNER_TEMP/progress-analysis-host/system.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/progress-analysis-host/system.txt"
+          swift --version >> "$RUNNER_TEMP/progress-analysis-host/system.txt"
+      - name: Test and measure actual progress analysis
+        run: |
+          if [[ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]]; then
+            echo "Use the repository's coordinated runner on hosts providing Kyoto."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; using isolated direct builds."
+          python3 Benchmarks/PlaybackProgressAnalysis/run.py \
+            --pairs 8 --target-ms 150 \
+            --output "$RUNNER_TEMP/playback-progress-analysis"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playback-progress-analysis-macos
+          path: |
+            ${{ runner.temp }}/playback-progress-analysis/*.json
+            ${{ runner.temp }}/playback-progress-analysis/*.jsonl
+            ${{ runner.temp }}/playback-progress-analysis/*.log
+            ${{ runner.temp }}/progress-analysis-host/
+          retention-days: 14
