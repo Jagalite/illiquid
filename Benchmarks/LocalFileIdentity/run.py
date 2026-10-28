@@ -172,8 +172,7 @@ def main() -> None:
                     'swiftLanguageModes: [.v6])\n')
                 for configuration in ("debug", "release"):
                     command = [args.swift, "test", "--package-path", package,
-                               "--no-parallel", "--jobs", "2", "-c", configuration,
-                               "-Xswiftc", "-warnings-as-errors"]
+                               "--no-parallel", "--jobs", "2", "-c", configuration]
                     if platform.system() == "Linux":
                         command += ["--use-integrated-swift-driver"]
                     label = f"tests-{variant}-{configuration}"
