@@ -1,0 +1,552 @@
+{
+  "all_pairs_balanced": true,
+  "byte_parity": true,
+  "manifest": {
+    "allocation_scope": "successful malloc/calloc/realloc requested bytes; excludes aligned allocations, live/peak heap, RSS and native macOS allocations",
+    "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "candidate_commit": "b70bb638879a58a37ac8ffd9e02a27286c342fc6",
+    "compiler": "Swift version 6.2.1 (swift-6.2.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+    "machine": "x86_64",
+    "pairs": 6,
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.35",
+    "scenarios": [
+      "unchanged",
+      "edited",
+      "duplicates",
+      "no-base"
+    ],
+    "sizes": [
+      1,
+      32,
+      1000,
+      10000
+    ],
+    "sources_sha256": {
+      "Benchmarks/NonDecodePerformance/allocmeter.c": "b3ef266d628e2f8c2d474a804de16c090f7503d7f6fc72b4fef42a3998cb4acc",
+      "Benchmarks/ShuffleCheckpointIdentity/Driver.swift": "30b8bb24a0e2bcda3f9dbeff574857e589f104f44d388068feaf1d674c24d0f3",
+      "Benchmarks/ShuffleCheckpointIdentity/run.py": "eed706eb866bdcd09011c07c042742359ea68885b2b66209c3664d1869971171",
+      "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+      "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": "eb74c5cc24b8978f1c50facd0fcd8354dcdfd5b5ad851679441abac855f78f92",
+      "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+      "baseline/PlaylistMutation.swift": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8",
+      "compiled/BaselinePlaylistMutation.swift": "f50a7cf8c23c4c4f037af69bc7819759d4e5ae4270186f541ebbbefab8aac5ab"
+    },
+    "target_ms": 60
+  },
+  "observations": 256,
+  "results": [
+    {
+      "cpu_ns_per_call": {
+        "baseline": 15387.693631669536,
+        "candidate": 7157.271944922548,
+        "reduction_percent": 53.48703895304941
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "unchanged",
+      "size": 1,
+      "wall_ns_per_call": {
+        "baseline": 15392.75860585198,
+        "candidate": 7163.0116179001725,
+        "reduction_percent": 53.46505586609436
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 58,
+        "candidate": 28,
+        "reduction_percent": 51.72413793103448
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 4876,
+        "candidate": 2310,
+        "reduction_percent": 52.625102543068095
+      },
+      "scenario": "unchanged",
+      "size": 1
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 15537.411250682686,
+        "candidate": 7192.517749863462,
+        "reduction_percent": 53.7083904530915
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "edited",
+      "size": 1,
+      "wall_ns_per_call": {
+        "baseline": 15545.461496450027,
+        "candidate": 7202.330966684872,
+        "reduction_percent": 53.6692367201218
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 58,
+        "candidate": 28,
+        "reduction_percent": 51.72413793103448
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 4876,
+        "candidate": 2310,
+        "reduction_percent": 52.625102543068095
+      },
+      "scenario": "edited",
+      "size": 1
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 23057.015092230296,
+        "candidate": 15870.039128004471,
+        "reduction_percent": 31.17045261703314
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "duplicates",
+      "size": 1,
+      "wall_ns_per_call": {
+        "baseline": 23066.253773057575,
+        "candidate": 15878.469815539407,
+        "reduction_percent": 31.161470901329558
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 85,
+        "candidate": 57,
+        "reduction_percent": 32.94117647058824
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 7138,
+        "candidate": 4716,
+        "reduction_percent": 33.93107312972822
+      },
+      "scenario": "duplicates",
+      "size": 1
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 7160.1705237515225,
+        "candidate": 7132.917174177832,
+        "reduction_percent": 0.38062430892235044
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "no-base",
+      "size": 1,
+      "wall_ns_per_call": {
+        "baseline": 7163.203410475031,
+        "candidate": 7139.0459805115715,
+        "reduction_percent": 0.3372433892933069
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 28,
+        "candidate": 28,
+        "reduction_percent": 0
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 2310,
+        "candidate": 2310,
+        "reduction_percent": 0
+      },
+      "scenario": "no-base",
+      "size": 1
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 509336.2068965517,
+        "candidate": 267047.4137931034,
+        "reduction_percent": 47.56952084355907
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "unchanged",
+      "size": 32,
+      "wall_ns_per_call": {
+        "baseline": 509377.1637931034,
+        "candidate": 267160.6637931034,
+        "reduction_percent": 47.551503525663044
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 1742,
+        "candidate": 877,
+        "reduction_percent": 49.65556831228473
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 155584,
+        "candidate": 76664,
+        "reduction_percent": 50.72501028383382
+      },
+      "scenario": "unchanged",
+      "size": 32
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 511646.01769911504,
+        "candidate": 269853.9823008849,
+        "reduction_percent": 47.257679535076804
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "edited",
+      "size": 32,
+      "wall_ns_per_call": {
+        "baseline": 511819.55309734517,
+        "candidate": 269880.2743362832,
+        "reduction_percent": 47.27042515217204
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 1742,
+        "candidate": 877,
+        "reduction_percent": 49.65556831228473
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 155584,
+        "candidate": 76664,
+        "reduction_percent": 50.72501028383382
+      },
+      "scenario": "edited",
+      "size": 32
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 751006.4102564103,
+        "candidate": 517262.8205128205,
+        "reduction_percent": 31.124047218689455
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "duplicates",
+      "size": 32,
+      "wall_ns_per_call": {
+        "baseline": 751165.3076923077,
+        "candidate": 517227.782051282,
+        "reduction_percent": 31.143281411613223
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 2606,
+        "candidate": 1741,
+        "reduction_percent": 33.192632386799694
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 228104,
+        "candidate": 149184,
+        "reduction_percent": 34.5982534282608
+      },
+      "scenario": "duplicates",
+      "size": 32
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 481399.1596638656,
+        "candidate": 255962.18487394956,
+        "reduction_percent": 46.8295322632732
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "no-base",
+      "size": 32,
+      "wall_ns_per_call": {
+        "baseline": 481659.05462184874,
+        "candidate": 256041.25210084033,
+        "reduction_percent": 46.84180653432152
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 1735,
+        "candidate": 876,
+        "reduction_percent": 49.51008645533142
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 147984,
+        "candidate": 76120,
+        "reduction_percent": 48.56200670342739
+      },
+      "scenario": "no-base",
+      "size": 32
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 16475000,
+        "candidate": 8774250,
+        "reduction_percent": 46.74203338391503
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "unchanged",
+      "size": 1000,
+      "wall_ns_per_call": {
+        "baseline": 16478274.625,
+        "candidate": 8771594.125,
+        "reduction_percent": 46.768734442062375
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 54024,
+        "candidate": 27023,
+        "reduction_percent": 49.979638679105584
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 4956800,
+        "candidate": 2434360,
+        "reduction_percent": 50.88847643641059
+      },
+      "scenario": "unchanged",
+      "size": 1000
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 16401125,
+        "candidate": 8611500,
+        "reduction_percent": 47.494455410833105
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "edited",
+      "size": 1000,
+      "wall_ns_per_call": {
+        "baseline": 16407754.25,
+        "candidate": 8609112.125,
+        "reduction_percent": 47.530222638482044
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 54024,
+        "candidate": 27023,
+        "reduction_percent": 49.979638679105584
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 4999448,
+        "candidate": 2455684,
+        "reduction_percent": 50.88089725105651
+      },
+      "scenario": "edited",
+      "size": 1000
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 24422500,
+        "candidate": 16658166.666666668,
+        "reduction_percent": 31.791722114170675
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "duplicates",
+      "size": 1000,
+      "wall_ns_per_call": {
+        "baseline": 24421178.5,
+        "candidate": 16654913.833333334,
+        "reduction_percent": 31.80135089167243
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 81024,
+        "candidate": 54023,
+        "reduction_percent": 33.3246939178515
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 7275360,
+        "candidate": 4752920,
+        "reduction_percent": 34.670999098326405
+      },
+      "scenario": "duplicates",
+      "size": 1000
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 15370500,
+        "candidate": 8150875,
+        "reduction_percent": 46.97065807878729
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "no-base",
+      "size": 1000,
+      "wall_ns_per_call": {
+        "baseline": 15369949.875,
+        "candidate": 8146910.125,
+        "reduction_percent": 46.99455631764056
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 54012,
+        "candidate": 27022,
+        "reduction_percent": 49.97037695326965
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 4719816,
+        "candidate": 2418328,
+        "reduction_percent": 48.762239883927684
+      },
+      "scenario": "no-base",
+      "size": 1000
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 169525500,
+        "candidate": 89295500,
+        "reduction_percent": 47.326213460511845
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "unchanged",
+      "size": 10000,
+      "wall_ns_per_call": {
+        "baseline": 169527917,
+        "candidate": 89293057.5,
+        "reduction_percent": 47.328405208919065
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 540031,
+        "candidate": 270030,
+        "reduction_percent": 49.997314968955486
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 50827504,
+        "candidate": 25165336,
+        "reduction_percent": 50.488743259948386
+      },
+      "scenario": "unchanged",
+      "size": 10000
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 174028000,
+        "candidate": 93515500,
+        "reduction_percent": 46.26410692532236
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "edited",
+      "size": 10000,
+      "wall_ns_per_call": {
+        "baseline": 174036426,
+        "candidate": 93520797,
+        "reduction_percent": 46.263664941039416
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 540031,
+        "candidate": 270030,
+        "reduction_percent": 49.997314968955486
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 50890168,
+        "candidate": 25196668,
+        "reduction_percent": 50.48814144217406
+      },
+      "scenario": "edited",
+      "size": 10000
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 252239500,
+        "candidate": 172194000,
+        "reduction_percent": 31.733927477655165
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "duplicates",
+      "size": 10000,
+      "wall_ns_per_call": {
+        "baseline": 252278447,
+        "candidate": 172198218,
+        "reduction_percent": 31.74279450039582
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 810031,
+        "candidate": 540030,
+        "reduction_percent": 33.33218111405613
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 74778888,
+        "candidate": 49116720,
+        "reduction_percent": 34.3173971776633
+      },
+      "scenario": "duplicates",
+      "size": 10000
+    },
+    {
+      "cpu_ns_per_call": {
+        "baseline": 160731500,
+        "candidate": 84811000,
+        "reduction_percent": 47.23436289712969
+      },
+      "mode": "timing",
+      "pairs": 6,
+      "scenario": "no-base",
+      "size": 10000,
+      "wall_ns_per_call": {
+        "baseline": 160752115,
+        "candidate": 84819488.5,
+        "reduction_percent": 47.23584912086538
+      }
+    },
+    {
+      "allocation_requests_per_call": {
+        "baseline": 540015,
+        "candidate": 270029,
+        "reduction_percent": 49.99601862911215
+      },
+      "mode": "allocations",
+      "pairs": 2,
+      "requested_bytes_per_call": {
+        "baseline": 48591968,
+        "candidate": 25005304,
+        "reduction_percent": 48.5402525783685
+      },
+      "scenario": "no-base",
+      "size": 10000
+    }
+  ]
+}

@@ -40,4 +40,67 @@ Linux allocation observations use the existing `Benchmarks/NonDecodePerformance/
 
 ## Results
 
-Candidate validation is pending. The branch's workflow must complete before this change is proposed as a successful optimization. Measured results and stable CI links will be recorded here after qualification.
+### Linux component qualification
+
+Measured production candidate: `b70bb638879a58a37ac8ffd9e02a27286c342fc6`.
+[Successful Linux job](https://github.com/Jagalite/illiquid/actions/runs/40635553505/job/122641568130),
+Swift 6.2.1, x86_64 Linux/glibc 2.35. All 25 focused tests passed, including
+the independent 41,261-case ordering model and exact UTF-8/JSON tests.
+
+| Base items | Workload | Baseline ms/call | Candidate ms/call | Time reduction | Baseline requested bytes/call | Candidate requested bytes/call |
+|---:|---|---:|---:|---:|---:|---:|
+| 1 | unchanged | 0.0154 | 0.0072 | 53.5% | 4,876 | 2,310 |
+| 1 | edited | 0.0155 | 0.0072 | 53.7% | 4,876 | 2,310 |
+| 1 | duplicates | 0.0231 | 0.0159 | 31.2% | 7,138 | 4,716 |
+| 1 | no-base | 0.0072 | 0.0071 | 0.3% | 2,310 | 2,310 |
+| 32 | unchanged | 0.5094 | 0.2672 | 47.6% | 155,584 | 76,664 |
+| 32 | edited | 0.5118 | 0.2699 | 47.3% | 155,584 | 76,664 |
+| 32 | duplicates | 0.7512 | 0.5172 | 31.1% | 228,104 | 149,184 |
+| 32 | no-base | 0.4817 | 0.2560 | 46.8% | 147,984 | 76,120 |
+| 1,000 | unchanged | 16.4783 | 8.7716 | 46.8% | 4,956,800 | 2,434,360 |
+| 1,000 | edited | 16.4078 | 8.6091 | 47.5% | 4,999,448 | 2,455,684 |
+| 1,000 | duplicates | 24.4212 | 16.6549 | 31.8% | 7,275,360 | 4,752,920 |
+| 1,000 | no-base | 15.3699 | 8.1469 | 47.0% | 4,719,816 | 2,418,328 |
+| 10,000 | unchanged | 169.5279 | 89.2931 | 47.3% | 50,827,504 | 25,165,336 |
+| 10,000 | edited | 174.0364 | 93.5208 | 46.3% | 50,890,168 | 25,196,668 |
+| 10,000 | duplicates | 252.2784 | 172.1982 | 31.7% | 74,778,888 | 49,116,720 |
+| 10,000 | no-base | 160.7521 | 84.8195 | 47.2% | 48,591,968 | 25,005,304 |
+
+Timing and allocation columns come from separate processes. The duplicate
+workload contains twice the base item count. The singleton with an empty saved
+order is a control: both paths already evaluate exactly one identity, and its
+0.3% timing difference is treated as unchanged.
+
+For 10,000 unique items with a saved order, measured time fell from 169.53 ms
+to 89.29 ms (47.3%). Successful malloc-family requests fell from 540,031 to
+270,030, and requested bytes fell from 50,827,504 to 25,165,336 (50.5%).
+Those bytes are cumulative allocation traffic during a call, not memory
+retained by the player. The duplicate-heavy workload still normalizes every
+input item and improves less (31.7% time, 34.3% requested bytes).
+
+[`evidence/linux-summary.json`](evidence/linux-summary.json) and [`evidence/linux-observations.jsonl`](evidence/linux-observations.jsonl)
+retain every summary and raw observation from this successful run. The 256
+observations comprise 192 uninstrumented timing processes and 64 separate
+allocation processes. Summary medians were independently recomputed from the
+retrieved raw rows, and all groups contain the expected AB/BA pairs.
+
+### Native qualification
+
+The macOS Foundation timing/debug/release job and full application-graph
+integration are pending in [the same workflow run](https://github.com/Jagalite/illiquid/actions/runs/40635553505).
+No native timing, native allocation, live UI or whole-app footprint result is
+claimed from the Linux data.
+
+### Evidence provenance
+
+[`evidence/provenance.json`](evidence/provenance.json)
+records the exact commit, run, job, and artifact IDs. The Actions artifact also
+contains compiler/source receipts, command logs, source snapshots and calibration;
+the checked-in raw measurements and source hashes remain available after that
+temporary artifact expires. Initial setup attempts were corrected before the
+retained dataset; no timed observations were discarded from this successful run.
+
+The implementation was independently reviewed for ordering, current-ID spelling,
+normalization semantics, caller scope and measurement fairness. Review exposed a
+singleton-only Unicode test that did not reach the set path; the retained tests
+cover both singleton and multi-item inputs.
