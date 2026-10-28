@@ -44,9 +44,10 @@ jobs:
           python3 - <<'PY'
           import json, os, subprocess, sys
           from pathlib import Path
+          compiler = subprocess.check_output(['xcrun', '--find', 'swiftc'], text=True).strip()
           command = [sys.executable, 'Benchmarks/SubtitleTimestampParsing/run.py', 'benchmark',
                      '--output', str(Path(os.environ['RUNNER_TEMP']) / 'subtitle-timestamps'),
-                     '--run-tests', '--rounds', '10', '--target-ms', '250']
+                     '--swiftc', compiler, '--run-tests', '--rounds', '10', '--target-ms', '250']
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
               cli = [sys.executable, str(queue)]
