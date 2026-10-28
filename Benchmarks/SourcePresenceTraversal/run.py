@@ -299,7 +299,7 @@ def experiment(args: argparse.Namespace, runner: Runner) -> None:
             "tests": "Same complete reuse, recomputation, and traversal regression suites in baseline/candidate, debug/release; complete filesystem oracle receipts compared across all four executables.",
             "sampling": "Fresh processes, same iteration count for both variants, balanced AB/BA pairs, rotating workload order; every sample retained.",
             "timing": "Harness monotonic wall and process CPU clocks; fixture creation and receipt verification outside timing; no empty-loop subtraction.",
-            "calibration": "Both variants warm up, then matched pilots select one count with a 1.5x duration margin targeting at least target-ms in the faster variant; verification pilots retained. Observed samples below target are retained, never retried or discarded.",
+            "calibration": "Both variants warm up, then matched pilots select one count with a 3x warmup duration margin targeting at least target-ms in the faster variant; verification pilots retained. Observed samples below target are retained, never retried or discarded.",
             "acceptance": "Each of three primary cases: >=15% paired median wall and CPU reduction and >=7/8 favorable pairs; each of three controls: <=5% paired median regression. Final native claim requires all six cases, >=8 pairs, and every observed sample >=250ms.",
         },
     }
@@ -360,7 +360,7 @@ def experiment(args: argparse.Namespace, runner: Runner) -> None:
         paired_parity(warmup, f"warmup-{case}")
         append(args.output / "warmup.jsonl", {"workload": case, "samples": warmup})
         fastest = min(row["wallNanosecondsPerScan"] for row in warmup.values())
-        count = max(1, min(MAX_ITERATIONS, math.ceil(args.target_ms * 1_000_000 * 1.5 / fastest)))
+        count = max(1, min(MAX_ITERATIONS, math.ceil(args.target_ms * 1_000_000 * 3.0 / fastest)))
         for attempt in range(4):
             pilots = {variant: runner.measure(binary, case, count,
                                               f"calibrate-{case}-{attempt}-{variant}")
@@ -373,7 +373,7 @@ def experiment(args: argparse.Namespace, runner: Runner) -> None:
             if duration >= args.target_ms * 1_000_000:
                 break
             count = min(MAX_ITERATIONS, max(count + 1,
-                        math.ceil(count * args.target_ms * 1_000_000 * 1.5 / duration)))
+                        math.ceil(count * args.target_ms * 1_000_000 * 3.0 / duration)))
         else:
             raise RuntimeError(f"Could not calibrate {case} to the requested duration")
         counts[case] = count
