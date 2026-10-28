@@ -1,14 +1,24 @@
-# Bitmap subtitle lookup and pruning
+# Independent bitmap subtitle pruning validation
+
+This study independently validates the production change in
+[PR #157](https://github.com/Jagalite/illiquid/pull/157). The follow-up PR adds
+benchmark tooling and evidence only; the production implementation and regression
+tests are inherited unchanged from that PR.
+
+## Current candidate
 
 `BitmapSubtitleTimeline.prune(before:)` must retain the final display set at
-or before the cutoff. If the timeline has fewer than two entries, or its second
-entry is still after the cutoff, there is nothing to remove. Previously even
-these no-op calls reverse-scanned the entire queue of future events.
+or before the cutoff. The candidate uses the first few timestamps to detect
+zero or one removable entry without searching backward through future events.
+Larger retirements retain the original reverse search. Array removal, byte
+accounting, lookup, generation, revision, memory limits, leases and copy-on-write
+behavior are preserved.
 
-The candidate checks that necessary removal condition first. No-op pruning is
-constant time. Calls that remove entries retain the existing reverse search,
-byte accounting and array mutation. Lookup is unchanged, as are generation,
-revision, memory limits, leases and copy-on-write behavior.
+The adopted production commit is `79d9c9091b5eb4bb94b532fc9f7da9740778532d`.
+Its timeline blob is `3871aa14a9443ba8b6eda67b31b4170d59b32645` and SHA-256 is
+`e9664552e9b8d7dc5ea5200fec94a4fd7a2744be361df757688bfbeca01f0800`. Evidence below explicitly identifies which candidate
+was measured; the earlier no-op-only results must not be attributed to this
+combined zero/one-entry implementation.
 
 ## Experiment selection
 
@@ -16,11 +26,19 @@ An initial shared binary search for lookup and pruning passed all correctness
 tests, but its small-window and near-tail controls regressed. At 128 entries,
 first-event lookup improved from 69.30 to 32.41 ns, while penultimate lookup rose
 from 11.76 to 31.68 ns. Latest-event lookup also regressed by roughly 1–2 ns.
-The broader candidate was rejected; this PR retains only the no-op pruning
-optimization. Timing, calibration, environment and test records for that run
-are retained in [evidence/exploratory-binary](evidence/exploratory-binary).
-Its candidate source and driver are pinned by commit
-`6f9d096153d9085d7cc2b64ecd1ced145f3dda68` and the recorded SHA-256 hashes.
+The broader candidate was rejected. Timing, calibration, environment and test
+records for that run are retained in
+[evidence/exploratory-binary](evidence/exploratory-binary). Its candidate source
+and driver are pinned by commit `6f9d096153d9085d7cc2b64ecd1ced145f3dda68`
+and the recorded SHA-256 hashes.
+
+A narrower no-op-only guard then improved full-window no-op pruning by about
+94%, but its 128-entry rolling mutation control was 1.53% slower by paired
+median. Those observations remain in [evidence/portable](evidence/portable)
+and in the explicitly exploratory table below. A concurrent implementation in
+PR #157 extends the guard to a single retirement, addressing the extra-search
+cost on that control. This study adopts that implementation for independent
+qualification rather than proposing a duplicate production change.
 
 ## Production context
 
@@ -80,19 +98,21 @@ checks complete timeline receipts, including timestamp bit patterns, payloads,
 generation, revision and retained bytes. Baseline and candidate receipts and
 checksums must agree for every pair.
 
-Eight fresh-process pairs alternate baseline/candidate order. Each pair uses
-the same iteration count and fixture seed. Calibration targets 80 ms on the
-faster variant, bounded by an estimated 1.5 seconds on the slower variant.
-Every actual timing sample is retained. No control time is subtracted.
+The runner defaults to eight fresh-process pairs alternating baseline/candidate
+order. Each pair uses the same iteration count and fixture seed. Calibration
+defaults to 80 ms on the faster variant, bounded by an estimated 1.5 seconds on
+the slower variant. The independent combined-candidate workflow uses twelve
+pairs, a 250 ms target, and one allowed CPU via taskset. Every actual timing
+sample is retained. No control time is subtracted.
 
 The output includes raw measurements, calibration records, test logs, source and
 binary hashes, compiler commands, and host details. The workflow also uploads
-the complete output as an artifact and emits an exact compressed bundle in the
-job log for durable review capture.
+the complete output as an artifact and emits the review files as exact JSON
+strings in the job log for durable review capture.
 
 The same ordering and memory-budget tests run against both sources in debug and
 release with compiler warnings treated as errors. Added boundary tests cover
-empty and 1/2/3/8/32/127/128-entry windows; every event's immediately preceding,
+empty and 1/2/3/7/8/31/32/127/128-entry windows; every event's immediately preceding,
 exact, and immediately following representable timestamps; NaN and infinities;
 pruning from pristine value copies; finite, indefinite and clear events. Existing
 tests cover independent randomized oracle comparisons, signed zero, out-of-order
@@ -119,16 +139,22 @@ separate from the driver. Baseline and candidate receive identical adaptations.
 
 Linux results validate this scalar pruning change on that platform. They do not
 qualify macOS timing, application integration, renderer behavior, or memory use.
-The existing native workflow continues to provide macOS qualification.
+PR #157's native workflow provides the separate macOS qualification.
 
 ## Results and limits
 
-### Initial Linux component run
+### Combined zero/one-entry candidate
+
+The independent twelve-pair, fixed-affinity run for the exact PR #157 source is
+pending. Its results will be recorded separately from the exploratory candidate.
+
+### Exploratory Linux run: no-op-only guard
 
 [Run 40638864454](https://github.com/Jagalite/illiquid/actions/runs/40638864454)
 passed on Ubuntu 24.04 / x86_64 with Swift 6.4.1. The measured commit is
-`df13d4df368d0e59a861d000e80a177a0e36bcad`; the following evidence/report
-commits do not change the measured production source, tests, or driver.
+`df13d4df368d0e59a861d000e80a177a0e36bcad`; this cohort measured the no-op-only guard, not the combined production
+implementation now inherited from PR #157. The later merge deliberately changes
+the production candidate and ordering tests, while preserving this cohort.
 
 | No-op pruning workload | Baseline median ns/call | Candidate median ns/call | Paired median reduction | Faster pairs |
 | --- | ---: | ---: | ---: | ---: |
@@ -169,19 +195,20 @@ Durable records: [manifests, tests, commands, calibration, raw observations and
 summary](evidence/portable). The workflow artifact also retains full per-case
 receipts for its configured retention period.
 
-### Focused confirmation
+### Additional exploratory confirmation
 
 [Run 40639637094](https://github.com/Jagalite/illiquid/actions/runs/40639637094)
-rechecks all four mutation windows, the 128-entry no-op path, and unchanged
-latest-entry lookup using twelve alternating pairs, a 250 ms target, and fixed
-CPU affinity. Its result is pending. The initial cohort will remain visible;
-the confirmation does not replace or discard any earlier samples.
+was queued for the old no-op-only candidate at this report's snapshot. It is
+not evidence for the combined candidate. The new twelve-pair full matrix
+qualifies the combined implementation separately and does not replace any
+earlier observations.
 
 ### Native qualification and scope
 
-[The native run for the narrowed production change](https://github.com/Jagalite/illiquid/actions/runs/40636025595)
-was still queued when this report was prepared. macOS timing and full-player
-integration are not established by the Linux run.
+[PR #157's qualification run](https://github.com/Jagalite/illiquid/actions/runs/40637503390)
+has a successful Linux component job; its native macOS job was still queued
+when this report was prepared. macOS timing and full-player integration are
+not established by the portable runs.
 
 These are warm component measurements. They do not measure real no-op frequency,
 lock contention, decoding, GPU rendering, frame rate, whole-player CPU, memory

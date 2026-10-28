@@ -7,6 +7,60 @@ import Testing
 
 @Suite("Bitmap subtitle timeline ordering")
 struct BitmapSubtitleTimelineOrderingTests {
+    @Test(arguments: [0, 1, 2, 3, 7, 8, 31, 32, 127, 128])
+    func everyLookupAndPruneBoundaryMatchesOracle(count: Int) throws {
+        var timeline = BitmapSubtitleTimeline(maximumEntries: max(1, count), maximumBytes: max(1, count * 16))
+        var oracle = TimelineSortedArrayOracle(maximumEntries: max(1, count), maximumBytes: max(1, count * 16))
+        let starts = (0..<count).map { index -> Double in
+            index == count / 2 ? -0.0 : Double(index - count / 2)
+        }
+        for (index, start) in starts.enumerated() {
+            let display = timelineDisplay(UInt8(index), bytes: index.isMultiple(of: 5) ? 0 : 4 * (index % 3 + 1),
+                                          duration: index.isMultiple(of: 3) ? 0.25 : nil)
+            let inserted = timeline.insert(display, at: start, generation: 0)
+            let expected = oracle.insert(display, at: start, generation: 0)
+            try #require(inserted && expected)
+        }
+        let cutoffs = [-Double.greatestFiniteMagnitude, Double.greatestFiniteMagnitude]
+            + starts.flatMap { [$0.nextDown, $0, $0.nextUp] }
+        try assertTimeline(timeline, matches: oracle, at: cutoffs + [-0.0, 0.0, .nan, -.infinity, .infinity])
+        for cutoff in cutoffs {
+            var pruned = timeline
+            var expected = oracle
+            pruned.prune(before: cutoff)
+            expected.prune(before: cutoff)
+            try assertTimeline(pruned, matches: expected,
+                               at: [cutoff.nextDown, cutoff, cutoff.nextUp, -0.0, 0.0,
+                                    -Double.greatestFiniteMagnitude, Double.greatestFiniteMagnitude],
+                               context: "count \(count), cutoff \(cutoff)")
+        }
+    }
+
+    @Test func nonfinitePruneKeepsItsExistingComparisonSemantics() throws {
+        var timeline = BitmapSubtitleTimeline(maximumEntries: 3, maximumBytes: 24)
+        var oracle = TimelineSortedArrayOracle(maximumEntries: 3, maximumBytes: 24)
+        for (index, start) in [-1.0, -0.0, 1.0].enumerated() {
+            let display = timelineDisplay(UInt8(index + 1), bytes: 4 * (index + 1))
+            let inserted = timeline.insert(display, at: start, generation: 0)
+            let expected = oracle.insert(display, at: start, generation: 0)
+            try #require(inserted && expected)
+        }
+        let queries: [Double] = [-2, -1, -0.0, 0.0, 1, 2, .nan, -.infinity, .infinity]
+        for cutoff in [Double.nan, -.infinity, .infinity] {
+            var pruned = timeline
+            var expected = oracle
+            pruned.prune(before: cutoff)
+            expected.prune(before: cutoff)
+            try assertTimeline(pruned, matches: expected, at: queries)
+            #expect(pruned.revision == timeline.revision)
+            #expect(pruned.retainedBytes == (cutoff == .infinity ? 12 : 24))
+            if cutoff == .infinity {
+                #expect(pruned.composition(at: 0) == nil)
+                #expect(pruned.composition(at: 1)?.value.regions.first?.pixels.first == 3)
+            }
+        }
+    }
+
     @Test(arguments: [127, 128])
     func productionSizedWindowsPreserveEveryPosition(capacity: Int) throws {
         for ordering in 0..<3 {
@@ -49,49 +103,6 @@ struct BitmapSubtitleTimelineOrderingTests {
             #expect(!overflowInserted)
             try assertTimeline(timeline, matches: oracle, at: queries)
         }
-    }
-
-    @Test(arguments: [0, 1, 2, 3, 8, 32, 127, 128])
-    func lookupAndPruneBoundariesMatchIndependentOracle(count: Int) throws {
-        let capacity = max(1, count)
-        var timeline = BitmapSubtitleTimeline(maximumEntries: capacity, maximumBytes: capacity * 8)
-        var oracle = TimelineSortedArrayOracle(maximumEntries: capacity, maximumBytes: capacity * 8)
-        let starts = (0..<count).map { Double($0) * 2 - 2 }
-        for index in starts.indices.reversed() {
-            let display = timelineDisplay(
-                UInt8(index), bytes: index.isMultiple(of: 5) ? 0 : 4,
-                duration: index.isMultiple(of: 3) ? 0.5 : nil
-            )
-            let inserted = timeline.insert(display, at: starts[index], generation: 0)
-            let expected = oracle.insert(display, at: starts[index], generation: 0)
-            try #require(inserted)
-            try #require(expected)
-        }
-        // Adjacent representable times catch off-by-one selection at every
-        // position. Nonfinite cutoffs deliberately exercise prune's existing
-        // behavior, which differs from composition's finite-query requirement.
-        let special: [Double] = [
-            .nan, -.infinity, .infinity, -.greatestFiniteMagnitude,
-            .greatestFiniteMagnitude, -0.0, 0.0,
-        ]
-        let boundaries = starts.flatMap { [$0.nextDown, $0, $0.nextUp] }
-        let queries = special + boundaries + starts.map { $0 + 0.5 }
-        try assertTimeline(timeline, matches: oracle, at: queries)
-
-        for cutoff in special + boundaries {
-            // Start each prune from the same value; sequential pruning would
-            // hide earlier positions and empty/small-window edge cases.
-            var pruned = timeline
-            var expected = oracle
-            pruned.prune(before: cutoff)
-            expected.prune(before: cutoff)
-            let probes = special + starts + [cutoff.nextDown, cutoff, cutoff.nextUp]
-            try assertTimeline(pruned, matches: expected, at: probes,
-                               context: "count \(count), cutoff \(cutoff)")
-            #expect(pruned.revision == timeline.revision)
-        }
-        // Pruning value copies must leave the original timeline and owners intact.
-        try assertTimeline(timeline, matches: oracle, at: queries)
     }
 
     @Test func insertionPermutationsAndReplacementsMatchSortedArrayOracle() throws {

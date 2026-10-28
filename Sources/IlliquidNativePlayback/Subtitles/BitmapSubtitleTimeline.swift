@@ -149,10 +149,14 @@ struct BitmapSubtitleTimeline: Sendable {
     mutating func prune(before seconds: Double) {
         // Keep the final set preceding the cutoff: an indefinite PGS display
         // can span an arbitrarily long silent interval before its clear event.
-        // Removal requires a second event at or before the cutoff. Skip
-        // the reverse scan when the retained window is already correct.
+        // Nothing can retire until the second event reaches the cutoff. A
+        // steady read-ahead window commonly retires just its oldest event.
         guard entries.count > 1, entries[1].start <= seconds else { return }
-        guard let lastPastIndex = entries.lastIndex(where: { $0.start <= seconds }), lastPastIndex > 0 else { return }
+        var lastPastIndex = 1
+        if entries.count > 2, entries[2].start <= seconds,
+           let bulkIndex = entries.lastIndex(where: { $0.start <= seconds }) {
+            lastPastIndex = bulkIndex
+        }
         for entry in entries[..<lastPastIndex] { retainedBytes -= entry.composition.byteCount }
         entries.removeFirst(lastPastIndex)
     }

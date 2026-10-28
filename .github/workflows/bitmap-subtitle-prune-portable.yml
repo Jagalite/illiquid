@@ -1,4 +1,4 @@
-name: Bitmap subtitle pruning portable validation
+name: Independent bitmap subtitle pruning validation
 
 on:
   push:
@@ -51,9 +51,12 @@ jobs:
             --output "$RUNNER_TEMP/bitmap-subtitle-prune/tests"
       - name: Measure portable components
         run: |
-          python3 Benchmarks/BitmapSubtitleLookup/run.py --portable \
-            --pairs 8 --target-ms 80 --max-sample-ms 1500 \
+          benchmark_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
+          taskset -c "$benchmark_cpu" python3 Benchmarks/BitmapSubtitleLookup/run.py --portable \
+            --pairs 12 --target-ms 250 --max-sample-ms 1500 \
             --output "$RUNNER_TEMP/bitmap-subtitle-prune/timing"
+          printf '%s\n' "$benchmark_cpu" > "$RUNNER_TEMP/bitmap-subtitle-prune/timing/cpu-affinity.txt"
+          lscpu > "$RUNNER_TEMP/bitmap-subtitle-prune/timing/cpu.txt"
       - name: Emit review evidence
         if: always()
         run: |
