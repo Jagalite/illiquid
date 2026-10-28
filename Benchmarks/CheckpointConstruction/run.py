@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare complete production checkpoint construction on macOS."""
+"""Compare production checkpoint construction, with explicit Linux component mode."""
 from __future__ import annotations
 
 import argparse
@@ -93,14 +93,15 @@ class Run:
         return result.stdout
 
 
-def stage(run, manifest):
-    """Copy complete files; never rewrite or extract production declarations."""
+def stage(run, manifest, portable):
+    """Copy complete files; Linux retains the exact record/protocol prefix."""
     originals = {}
     for path in [*["Sources/IlliquidCore/" + name for name in CORE], CHECKPOINT]:
         originals[path] = run.command(["git", "show", f"{BASELINE}:{path}"], "baseline-source")
         if path != CHECKPOINT and originals[path] != (ROOT / path).read_bytes():
             raise RuntimeError("Shared production dependency changed; requalify the baseline: " + path)
     sources = manifest["sources"] = {}
+    compiled_sources = manifest["compiled_sources"] = {}
     for variant in ["baseline", "candidate"]:
         package = run.output / "packages" / variant
         for name in ["Sources/IlliquidCore", "Sources/IlliquidPlayer", "Sources/CheckpointDriver",
@@ -109,10 +110,21 @@ def stage(run, manifest):
         (package / "Package.swift").write_text(PACKAGE)
         for path, original in originals.items():
             raw = original if variant == "baseline" else (ROOT / path).read_bytes()
-            module = "IlliquidPlayer" if path == CHECKPOINT else "IlliquidCore"
-            (package / "Sources" / module / Path(path).name).write_bytes(raw)
             sources[variant + ":" + path] = digest(raw)
+            if portable and path.endswith(("LegacyPreferencesMigration.swift", "LifecyclePerformance.swift")):
+                continue
+            compiled = raw
+            if portable and path.endswith("PlaybackSessionStore.swift"):
+                marker = b"\n/// A versioned, atomic Application Support document"
+                if raw.count(marker) != 1:
+                    raise RuntimeError("Record/protocol extraction boundary changed")
+                compiled = raw.split(marker)[0] + b"\n"
+            module = "IlliquidPlayer" if path == CHECKPOINT else "IlliquidCore"
+            (package / "Sources" / module / Path(path).name).write_bytes(compiled)
+            compiled_sources[variant + ":" + path] = digest(compiled)
         for name in CORE_TESTS:
+            if portable and name == "PlaybackSessionStoreTests.swift":
+                continue
             source = ROOT / "Tests/IlliquidCoreTests" / name
             shutil.copyfile(source, package / "Tests/IlliquidCoreTests" / name)
             sources[str(source.relative_to(ROOT))] = digest(source.read_bytes())
@@ -235,9 +247,13 @@ def main():
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=150)
     parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--portable", action="store_true",
+                        help="Linux component mode: exact record/protocol prefix, no atomic-store tests")
     args = parser.parse_args()
-    if platform.system() != "Darwin":
-        parser.error("macOS is required: complete production sources import os.signpost")
+    if platform.system() not in ["Darwin", "Linux"]:
+        parser.error("macOS or Linux is required")
+    if platform.system() == "Linux" and not args.portable:
+        parser.error("Linux requires --portable; complete atomic-store sources import os.signpost")
     if args.pairs < 2 or args.pairs % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("pairs must be even and >= 2; target-ms must be finite and positive")
     swift = shutil.which("swift")
@@ -252,16 +268,26 @@ def main():
         "pairs": args.pairs, "target_cpu_ms": args.target_ms,
         "warmup_iterations_per_process": 4, "hashing": "SWIFT_DETERMINISTIC_HASHING=1",
         "protocol": "complete production record; fresh process; balanced AB/BA; rotated workload order",
+        "portable_component": args.portable,
+        "qualification_scope": "record/protocol prefix; atomic-store tests omitted" if args.portable else "complete macOS sources",
+        "container_image": os.environ.get("CHECKPOINT_SWIFT_IMAGE"),
     }
     summary = dict(status="running", tests=[], workloads=[])
     try:
         manifest["candidate_commit"] = run.command(["git", "rev-parse", "HEAD"], "revision").decode().strip()
         manifest["worktree_status"] = run.command(["git", "status", "--porcelain=v1"], "status").decode()
         manifest["compiler"] = run.command([swift, "--version"], "swift-version").decode().strip()
-        manifest["xcode"] = run.command(["xcodebuild", "-version"], "xcode-version").decode().strip()
-        manifest["cpu"] = run.command(["sysctl", "-n", "machdep.cpu.brand_string"], "cpu").decode().strip()
-        manifest["memory_bytes"] = run.command(["sysctl", "-n", "hw.memsize"], "memory").decode().strip()
-        stage(run, manifest)
+        if platform.system() == "Darwin":
+            manifest["xcode"] = run.command(["xcodebuild", "-version"], "xcode-version").decode().strip()
+            manifest["cpu"] = run.command(["sysctl", "-n", "machdep.cpu.brand_string"], "cpu").decode().strip()
+            manifest["memory_bytes"] = run.command(["sysctl", "-n", "hw.memsize"], "memory").decode().strip()
+        else:
+            manifest["cpu"] = next((line.split(":", 1)[1].strip()
+                for line in Path("/proc/cpuinfo").read_text().splitlines()
+                if line.startswith("model name")), platform.processor())
+            manifest["memory_bytes"] = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+            manifest["os_release"] = Path("/etc/os-release").read_text()
+        stage(run, manifest, args.portable)
         save(args.output / "manifest.json", manifest)
         binaries = build_and_verify(run, swift, manifest, summary)
         if not args.tests_only:

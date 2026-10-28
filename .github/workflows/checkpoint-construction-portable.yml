@@ -1,0 +1,95 @@
+name: Checkpoint construction portable performance
+
+on:
+  push:
+    branches: ['codex/perf-checkpoint-folder-membership']
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Benchmarks/CheckpointConstruction/Driver.swift'
+      - 'Benchmarks/CheckpointConstruction/run.py'
+      - '.github/workflows/checkpoint-construction-portable.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistMutationTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Tests/IlliquidCoreTests/UtilitiesTests.swift'
+      - 'Benchmarks/CheckpointConstruction/Driver.swift'
+      - 'Benchmarks/CheckpointConstruction/run.py'
+      - '.github/workflows/checkpoint-construction-portable.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-construction-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+# Supplemental component evidence; the macOS workflow qualifies the app platform.
+jobs:
+  checkpoint-construction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    container:
+      image: swift:6.3.2-noble@sha256:c4336909a71b2e69b884f4078cdf98c0cd081911632cb349ef72abc4cbed69fc
+    env:
+      CHECKPOINT_SWIFT_IMAGE: swift:6.3.2-noble@sha256:c4336909a71b2e69b884f4078cdf98c0cd081911632cb349ef72abc4cbed69fc
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare Python and fetch the pinned baseline
+        shell: bash
+        run: |
+          if ! command -v python3 >/dev/null; then
+            apt-get update
+            apt-get install -y python3
+          fi
+          git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Verify portable checkpoint semantics and measure paired runs
+        shell: bash
+        run: |
+          echo 'Kyoto is unavailable on this ephemeral Linux runner; building serially in isolated packages.'
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/CheckpointConstruction/run.py \
+            --portable --pairs 8 --target-ms 150 \
+            --output "$RUNNER_TEMP/checkpoint-construction-portable" "${mode[@]}"
+      - name: Publish reproducibility receipts in the job log
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'checkpoint-construction-portable'
+          for name in ['summary.json', 'manifest.json', 'calibration.json',
+                       'observations.jsonl', 'commands.jsonl']:
+              path = root / name
+              if path.is_file():
+                  print('CHECKPOINT_FILE_BEGIN ' + name)
+                  print(path.read_text())
+                  print('CHECKPOINT_FILE_END ' + name)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-construction-portable
+          path: |
+            ${{ runner.temp }}/checkpoint-construction-portable/
+            !${{ runner.temp }}/checkpoint-construction-portable/packages/**/build/**
+            !${{ runner.temp }}/checkpoint-construction-portable/module-cache/**
+            !${{ runner.temp }}/checkpoint-construction-portable/cache/**
+          retention-days: 14

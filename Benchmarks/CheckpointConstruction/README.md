@@ -22,7 +22,8 @@ persistence schema are unchanged.
 
 ## Reproduction
 
-Requires macOS 26 and Swift 6.1 or newer. The workflow uses Xcode 26.6.
+The native mode requires macOS 26 and Swift 6.1 or newer and uses Xcode 26.6
+in CI. An explicit Linux component mode uses the official Swift 6.3.2 image.
 From the repository root:
 
 ```sh
@@ -30,6 +31,14 @@ git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
 python3 Benchmarks/CheckpointConstruction/run.py \
   --pairs 8 --target-ms 150 --output /tmp/illiquid-checkpoint-study
 ```
+
+On Linux, add `--portable`. This stages the unchanged complete
+PlaybackSessionRecord type and PlaybackSessionStoring protocol up to the checked
+atomic-store declaration boundary. The unrelated atomic file-store class,
+its lifecycle/migration dependencies and its test suite are omitted. The
+checkpoint writer itself remains a complete, byte-for-byte production file.
+The manifest records both full-file and actually compiled source hashes.
+This mode qualifies the component on Linux, not native macOS behavior.
 
 Use a new output directory. Add `--tests-only` to run debug/release
 regressions and complete-record differential verification without timings.
@@ -41,15 +50,17 @@ the queue and otherwise builds its isolated packages serially.
 ## Method
 
 The runner stages separate Swift packages with complete, byte-for-byte production
-files from the pinned baseline and candidate checkout. It does not extract or
-rewrite production declarations. Nine shared Core sources must be unchanged,
+files from the pinned baseline and candidate checkout. Native mode does not
+extract or rewrite declarations; Linux uses only the record/protocol boundary
+described above, without modifying either declaration. Nine shared Core sources must be unchanged,
 and both packages use the same driver and tests with no external dependencies.
 The complete checkpoint writer is compiled in an IlliquidPlayer module.
 Release builds use SwiftPM's optimization settings; testability is enabled so
 the separate driver can exercise the internal checkpoint value.
 
 Both variants run the existing session-store, playlist-mutation, folder-playlist,
-and core-utility tests, plus the checkpoint regression suite, in debug and release.
+and core-utility tests, plus the checkpoint regression suite, in debug and release. Linux omits the
+atomic session-store suite; all checkpoint regressions remain enabled.
 The driver then checks 1,155 cases against the original membership predicate
 and initializer. Only updatedAt is normalized for comparison. Every complete
 encoded record is compared across binaries, not only a checksum. Coverage
@@ -88,7 +99,8 @@ No timing threshold gates CI and no observations are discarded.
 
 The runner writes compiler/host/source/binary receipts, commands, all test logs,
 complete verification outputs, calibration, every timed observation, and the
-summary. The workflow retains these as an Actions artifact. Results and their
+summary. The workflows retain these as Actions artifacts. The portable PR job runs
+tests and complete-record parity; push/manual research runs also collect timings. Results and their
 interpretation are recorded after qualification in
 [the study report](../../Documentation/CHECKPOINT_CONSTRUCTION_PERFORMANCE.md).
 
