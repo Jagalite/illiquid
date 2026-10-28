@@ -47,23 +47,27 @@ jobs:
         if: always()
         run: |
           python3 - <<'PY'
-          import json, os
+          import json, os, shutil
           from pathlib import Path
           root = Path(os.environ["RUNNER_TEMP"]) / "read-ahead-eof"
           records = {p.name: p.read_text() for p in sorted(root.glob("*"))
                      if p.is_file() and p.suffix in {".json", ".jsonl"}}
           records["test_logs"] = {p.name: p.read_text()
                                  for p in sorted((root / "logs").glob("*tests.log"))}
+          review = root.with_name("read-ahead-eof-review")
+          review.mkdir(parents=True, exist_ok=True)
+          for source in sorted(root.glob("*")):
+              if source.is_file() and source.suffix in {".json", ".jsonl"}:
+                  shutil.copy2(source, review / source.name)
+          if (root / "logs").exists():
+              shutil.copytree(root / "logs", review / "logs")
           print("READ_AHEAD_EVIDENCE " + json.dumps(records, sort_keys=True))
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: read-ahead-eof-macos
-          path: |
-            ${{ runner.temp }}/read-ahead-eof/*.json
-            ${{ runner.temp }}/read-ahead-eof/*.jsonl
-            ${{ runner.temp }}/read-ahead-eof/logs/*.log
+          path: ${{ runner.temp }}/read-ahead-eof-review
           retention-days: 14
 
   linux:
@@ -74,6 +78,10 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Install Python for the benchmark runner
+        run: |
+          apt-get update
+          apt-get install --no-install-recommends -y python3
       - name: Test both variants and measure paired components
         run: |
           # Hosted runners do not have the local Kyoto queue. The runner builds
@@ -84,21 +92,25 @@ jobs:
         if: always()
         run: |
           python3 - <<'PY'
-          import json, os
+          import json, os, shutil
           from pathlib import Path
           root = Path(os.environ["RUNNER_TEMP"]) / "read-ahead-eof"
           records = {p.name: p.read_text() for p in sorted(root.glob("*"))
                      if p.is_file() and p.suffix in {".json", ".jsonl"}}
           records["test_logs"] = {p.name: p.read_text()
                                  for p in sorted((root / "logs").glob("*tests.log"))}
+          review = root.with_name("read-ahead-eof-review")
+          review.mkdir(parents=True, exist_ok=True)
+          for source in sorted(root.glob("*")):
+              if source.is_file() and source.suffix in {".json", ".jsonl"}:
+                  shutil.copy2(source, review / source.name)
+          if (root / "logs").exists():
+              shutil.copytree(root / "logs", review / "logs")
           print("READ_AHEAD_EVIDENCE " + json.dumps(records, sort_keys=True))
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: read-ahead-eof-linux
-          path: |
-            ${{ runner.temp }}/read-ahead-eof/*.json
-            ${{ runner.temp }}/read-ahead-eof/*.jsonl
-            ${{ runner.temp }}/read-ahead-eof/logs/*.log
+          path: ${{ runner.temp }}/read-ahead-eof-review
           retention-days: 14

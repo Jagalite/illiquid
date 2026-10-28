@@ -129,8 +129,10 @@ struct MediaReadAheadGateTests {
         #expect(eof.completed() == false)
 
         gate.update(position: 50)
-        let current = reader(gate, until: 50, generation: 5)
+        let current = reader(gate, until: 60, generation: 5)
         defer { finish(gate, [current]) }
+        try #require(gate.waitForBlockedReader(timeout: 5))
+        gate.update(position: 60)
         #expect(current.completed() == true)
     }
 
