@@ -185,9 +185,16 @@ private struct Driver {
                 let state = SourceTreeDirectoryState.benchmarkSeeded(
                     contents: fixture.contents, errors: fixture.errors)
                 var expanded = Set(fixture.expansion)
+                let retainedContents = scenario.retainedSnapshots ? state.directoryContents : nil
+                let retainedErrors = scenario.retainedSnapshots ? state.directoryErrors : nil
                 state.invalidateCachedTree(beneath: fixture.rootURL,
                     preserveExpansion: scenario.preserveExpansion, expandedFolderIDs: &expanded)
+                withExtendedLifetime((retainedContents, retainedErrors)) {}
                 fixture.verify(state, expanded: expanded)
+                if let retainedContents, let retainedErrors {
+                    precondition(retainedContents == Dictionary(uniqueKeysWithValues: fixture.contents))
+                    precondition(retainedErrors == Dictionary(uniqueKeysWithValues: fixture.errors))
+                }
                 receipts[scenario.id] = snapshot(state, expanded: expanded)
             }
             let data = try JSONSerialization.data(withJSONObject: receipts, options: [.sortedKeys])
