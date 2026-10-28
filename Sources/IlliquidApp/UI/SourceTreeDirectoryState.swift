@@ -136,8 +136,13 @@ final class SourceTreeDirectoryState {
     ) -> Set<String> {
         let activeRootPaths = Set(activeRoots.map(SourceTreeIdentity.folderID))
         return Set(plan.directoriesToReload.union(plan.rootsToRescan).filter { path in
-            activeRoots.contains { SourceTreeIdentity.isFolderID(path, inside: $0) }
-                && (activeRootPaths.contains(path) || expandedFolderIDs.contains(path))
+            // Exact roots are already visible. Collapsed descendants cannot
+            // reload, so only expanded paths need a containment scan.
+            if activeRootPaths.contains(path) { return true }
+            guard expandedFolderIDs.contains(path) else { return false }
+            // Reuse the normalized roots instead of normalizing every URL
+            // again for each directory in the filesystem event batch.
+            return activeRootPaths.contains { SourceTreeIdentity.contains(path, within: $0) }
         })
     }
 }

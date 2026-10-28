@@ -1,0 +1,59 @@
+name: Sidebar reload selection performance
+
+on:
+  push:
+    branches:
+      - perf/source-reload-path-selection-20261028-c50e
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift
+      - Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift
+      - Sources/IlliquidApp/UI/SourcesSidebar.swift
+      - Sources/IlliquidCore/Utilities/NormalizedFileURL.swift
+      - Tests/IlliquidAppTests/SourceTreeDirectoryStateTests.swift
+      - Scripts/test-source-browser-search.py
+      - Benchmarks/ReloadPathSelection/**
+      - .github/workflows/reload-path-selection.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reload-path-selection-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            developer_dir: ''
+          - os: macos-26
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Fetch the pinned comparison source
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Test and measure the complete directory consumer
+        run: |
+          python3 Benchmarks/ReloadPathSelection/run.py \
+            --output "$RUNNER_TEMP/reload-path-selection" --pairs 6 --target-ms 100
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: reload-path-selection-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/reload-path-selection/
+            !${{ runner.temp }}/reload-path-selection/**/.build/**
+            !${{ runner.temp }}/reload-path-selection/**/module-cache/**
+          retention-days: 14
