@@ -10,8 +10,10 @@ regression suite, condition wrapper, and threaded driver are reused from that
 earlier experiment. This branch updates provenance, requires complete test
 receipts, and repeats validation with the current app graph.
 
-Validation results for this requalification are pending. The earlier experiment
-is not substituted for measurements of this branch.
+[RESULTS.md](RESULTS.md) records the successful fresh Linux qualification,
+all paired measurements and controls, and separately labeled historical native
+evidence. Current macOS component and app integration checks remain pending;
+the earlier native run is not a current-head integration result.
 
 ## Reproduce
 

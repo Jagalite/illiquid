@@ -1,15 +1,6 @@
 name: Media read-ahead wakeup performance
 
 on:
-  push:
-    branches: ['perf/requalify-media-read-ahead-20261028-9a2715']
-    paths:
-      - 'Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift'
-      - 'Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift'
-      - 'Benchmarks/MediaReadAheadGate/**'
-      - '.github/workflows/media-read-ahead-performance.yml'
-      - '!Benchmarks/MediaReadAheadGate/*.md'
-      - '!Benchmarks/MediaReadAheadGate/evidence/**'
   pull_request:
     paths:
       - 'Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift'
@@ -24,7 +15,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: media-read-ahead-${{ github.head_ref || github.ref }}
+  group: media-read-ahead-refs/heads/${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
