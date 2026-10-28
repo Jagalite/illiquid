@@ -1,0 +1,64 @@
+name: Playback checkpoint preparation
+
+on:
+  push:
+    branches: ['perf/checkpoint-preparation-20261028-4ea7']
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Benchmarks/PlaybackCheckpointPreparation/*.swift'
+      - 'Benchmarks/PlaybackCheckpointPreparation/run.py'
+      - '.github/workflows/playback-checkpoint-preparation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playback-checkpoint-preparation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compare saved records and measure complete checkpoint preparation
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/PlaybackCheckpointPreparation/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'checkpoint-preparation'),
+                     '--pairs', '6', '--target-ms', '250']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('Kyoto is unavailable on this hosted runner; building the isolated component packages serially.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playback-checkpoint-preparation-macos
+          path: |
+            ${{ runner.temp }}/checkpoint-preparation/*.json
+            ${{ runner.temp }}/checkpoint-preparation/*.jsonl
+            ${{ runner.temp }}/checkpoint-preparation/logs/
+            ${{ runner.temp }}/checkpoint-preparation/sources/
+            ${{ runner.temp }}/checkpoint-preparation/production-sources/
+            ${{ runner.temp }}/checkpoint-preparation/verification/
+          retention-days: 14
