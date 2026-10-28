@@ -120,9 +120,34 @@ exploratory measurements. The two-pair Linux timings were mixed and do not
 qualify the change. The [complete Linux evidence](evidence/linux-exploration/README.md)
 retains every sample and the initial test-fixture correction.
 
-Native [qualification run 40634880691](https://github.com/Jagalite/illiquid/actions/runs/40634880691)
-tests immutable research commit `a641d4eed92315eae3c966295df1c5e2b9512185`.
-It remained queued during the initial investigation because of the repository's
-CI backlog. The later evidence/documentation commits do not change the source,
-tests, harness, or workflow under qualification. No successful performance
-result or implementation PR is claimed while that native evidence is pending.
+### Native attempt 1 — app-test fixture failed before measurement
+
+[Run 40634880691](https://github.com/Jagalite/illiquid/actions/runs/40634880691),
+[job 122639438086](https://github.com/Jagalite/illiquid/actions/runs/40634880691/job/122639438086),
+on the immutable production/test/harness/workflow revision
+`a641d4eed92315eae3c966295df1c5e2b9512185`, completed **unsuccessfully**
+on 2026-10-28 on a macOS 26 runner using Xcode 26.6.
+The complete release application graph compiled, and **33 of 34 focused tests
+passed**. The newly introduced `temporaryDirectoryAliasKeepsTheCallersCacheNamespace`
+assumed `/tmp` always resolves to `/private/tmp`; this runner retained a
+`/tmp` spelling. That environment-specific assertion failed, stopping the app
+step. The component step was **skipped**; no native timing samples were taken.
+This is not a scanner correctness failure or a successful qualification.
+
+The [retained, SHA-256-marked gzip evidence bundle](evidence/macos/attempt-1-failure.json)
+contains the complete application test log and available machine-readable
+receipts, not just the workflow conclusion. The original
+[uploaded artifact](https://github.com/Jagalite/illiquid/actions/runs/40634880691/artifacts/12794621057)
+provides a second copy. Decode the JSON's `gzipBase64` field as base64 then
+gunzip; verify the compressed bytes against its `gzipSha256` field.
+
+The only follow-up code change
+([fix `ec9e2fed`](https://github.com/Jagalite/illiquid/commit/ec9e2fed6d66662dc866d4253085887c908236f8))
+repairs the test fixture to use the `/private/tmp` spelling only when that
+fixture is actually accessible there, otherwise using native resolved spelling.
+The production scanner, component harness, workload definitions, thresholds,
+and measurement workflow are unchanged. The failed attempt is retained.
+[Native requalification run 40642915320](https://github.com/Jagalite/illiquid/actions/runs/40642915320)
+was queued for this repaired test; **no performance result is claimed** until
+its app receipt, component receipts, source/binary integrity, full output parity,
+and every raw measured sample independently satisfy the predeclared criteria.
