@@ -1,0 +1,74 @@
+name: Local file identity performance
+
+on:
+  push:
+    branches: ['perf/ascii-file-identity']
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileIdentityTests.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/*Playlist*Tests.swift'
+      - 'Benchmarks/LocalFileIdentity/Harness.swift'
+      - 'Benchmarks/LocalFileIdentity/run.py'
+      - '.github/workflows/local-file-identity-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileIdentityTests.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/*Playlist*Tests.swift'
+      - 'Benchmarks/LocalFileIdentity/Harness.swift'
+      - 'Benchmarks/LocalFileIdentity/run.py'
+      - '.github/workflows/local-file-identity-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: local-file-identity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          sparse-checkout: |
+            Sources/IlliquidCore
+            Tests/IlliquidCoreTests
+            Benchmarks/LocalFileIdentity
+            .github/workflows
+      - name: Verify bytes and measure native component performance
+        run: |
+          if [[ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]]; then
+            echo "::error::This runner has Kyoto; submit the benchmark through its shared build queue."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; using serialized, isolated direct Swift builds."
+          python3 Benchmarks/LocalFileIdentity/run.py \
+            --pairs 8 --target-ms 60 --output "$RUNNER_TEMP/local-file-identity"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: local-file-identity-macos
+          path: |
+            ${{ runner.temp }}/local-file-identity/*.json
+            ${{ runner.temp }}/local-file-identity/*.jsonl
+            ${{ runner.temp }}/local-file-identity/logs/
+            ${{ runner.temp }}/local-file-identity/sources/
+          retention-days: 30
