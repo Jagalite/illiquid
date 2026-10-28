@@ -1,0 +1,42 @@
+{
+  "baseline_extracted_helper_sha256": "52180d3d9c7c11286e1c7aa05f79cf8586e2b74b03d06e48abab173005bf61d5",
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_scheduler_sha256": "24bee22ce1bc8b670af7e6a45eb49f1a2eac6425c588128af8745ee9ce5f3c9e",
+  "candidate_revision": "0206a3d73b96ca8948a32961a31670ad6a1446c4",
+  "created_utc": "2026-10-28T05:19:47.136030+00:00",
+  "environment": {
+    "DEVELOPER_DIR": null,
+    "SWIFT_DETERMINISTIC_HASHING": null,
+    "cpu": "x86_64",
+    "cpu_count": 4,
+    "machine": "x86_64",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "swift": "Swift version 6.4.1 (swift-6.4.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+  },
+  "inputs": {
+    "Harness.swift": "c4b0608e975f12bdd733959b85a4418de630632c45c70044f1b2e795078304f8",
+    "Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift": "1b9b1e447f5f108667d63fe5b93a472fc26725ce15a3a12b9b7929e082ab0446",
+    "Sources/IlliquidApp/App/ThumbnailPlaylistNeighbors.swift": "b9448f184b5e924a8e5c9c50c4fec9f98b901be79e31892e505bfa3ccc89d6a0",
+    "Sources/IlliquidCore/Player/ThumbnailPolicy.swift": "1c68b9d4819cc9e9d4a8f3dfe2e6e723e69dd0330e7fa63e389eb76c107986d3",
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "Tests/IlliquidAppTests/ThumbnailPlaylistNeighborsTests.swift": "ad9c94ded8685f51f193c865b01e20691b35067b26088eaad8123a49b9e23f7c",
+    "run.py": "0bf475e45ac39a0c3ebc868992b79da513d076fee6808668a63b9afba6ab3e66"
+  },
+  "method": {
+    "baseline": "Exact pinned runPass map/anchor/window/distance blocks, wrapped in the helper API",
+    "candidate": "Unmodified production helper",
+    "excluded": "Fixture creation, independent query construction, warmup, receipts, and JSON output",
+    "memory": "URL value stride and eliminated full-array element count are structural evidence, not allocator/RSS measurements",
+    "modules": "Separate IlliquidCore and IlliquidApp modules; no cross-module optimization",
+    "pairs": 6,
+    "sampling": "Fresh processes; alternating AB/BA order; rotated workloads; no empty-loop subtraction",
+    "scope": "Synchronous neighborhood construction; not whole scheduling, playback, UI, or RSS",
+    "target_ms": 30,
+    "timing": "Monotonic wall and process CPU time including loop, result retention, and checksum"
+  },
+  "relevant_status": "",
+  "schema_version": 1
+}

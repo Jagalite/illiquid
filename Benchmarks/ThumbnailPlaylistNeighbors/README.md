@@ -17,10 +17,20 @@ The production change is limited to:
 - `Sources/IlliquidApp/App/ThumbnailPlaylistNeighbors.swift`
 - The preparation block in `ThumbnailBackgroundScheduler.runPass`
 
+## Results and platform qualification
+
+[The research report](RESULTS.md) records a successful Linux component run,
+including exact raw measurements and source, executable, and test receipts. These results establish the portable algorithm comparison. They do not
+establish a macOS application build or macOS performance. The dedicated native
+workflow supplies those separate checks; consult the report and workflow status
+for their current qualification.
+
 ## Reproduce
 
 Use a complete checkout, Python 3, and the repository's native macOS/Swift
-toolchain. The baseline commit must be available in Git history.
+toolchain for target-platform evidence. The standalone component runner also
+supports Linux with Swift; its results must be labeled with that platform.
+The baseline commit must be available in Git history.
 
 ```sh
 python3 Benchmarks/ThumbnailPlaylistNeighbors/run.py \
@@ -58,7 +68,7 @@ cases, and downstream ranked-candidate equivalence.
 
 ## Measurement method
 
-The native probe measures synchronous helper construction for 10, 10,000, and
+The probe measures synchronous helper construction for 10, 10,000, and
 100,000 playlist entries, with current nil, first, middle, last, or missing.
 Fixture and independent query construction, warmup, result serialization, and
 JSON output are excluded from timing. The timed loop includes result ownership
@@ -70,7 +80,7 @@ order, and execute each sample in a fresh process. Exact URL and distance
 receipts and per-call checksums must agree across variants. Raw measurements and
 paired wall/CPU summaries are retained.
 
-The native `MemoryLayout<URL>.stride` supports a structural description of
+The recorded platform's `MemoryLayout<URL>.stride` supports a structural description of
 the eliminated array: the old full projection holds `playlist.count` URL
 values, while the new output holds at most nine. Multiplying count by stride
 describes element storage only. It excludes array headers, allocator rounding,
