@@ -1,0 +1,29 @@
+{
+  "workflow": "Filesystem handoff memory",
+  "run_id": 40642036115,
+  "job_id": 122662143630,
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40642036115",
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40642036115/job/122662143630",
+  "artifact_url": "https://github.com/Jagalite/illiquid/actions/runs/40642036115/artifacts/12850539313",
+  "tested_revision": "63b8a639fdfade81c77f51161f76b2fe909a55d9",
+  "conclusion": "failure",
+  "completed_at_utc": "2026-10-28T20:55:27Z",
+  "tests": {
+    "debug": {
+      "passed": 80,
+      "suites": 11
+    },
+    "release": {
+      "passed": 80,
+      "suites": 11
+    }
+  },
+  "measurements": {
+    "attempted": true,
+    "observations": 0,
+    "reason": "The benchmark's direct clang invocation failed while building baseline Heap.c before any driver ran"
+  },
+  "error": "Benchmarks/FilesystemHandoff/Heap.c:1:10: fatal error: 'malloc/malloc.h' file not found",
+  "failing_command": "clang -O2 -Wall -Wextra -Werror -c Benchmarks/FilesystemHandoff/Heap.c, without an explicit macOS sysroot",
+  "correction": "Pass -isysroot with the same macOS SDK resolved by xcrun --sdk macosx --show-sdk-path to the direct clang benchmark compile."
+}

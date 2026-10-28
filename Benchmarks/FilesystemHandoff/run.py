@@ -117,7 +117,7 @@ def main():
              "-emit-module-path", build / "IlliquidCore.swiftmodule",
              staged / CORE, "-o", library])
         object_file = build / "Heap.o"
-        run([clang, "-O2", "-Wall", "-Wextra", "-Werror", "-c",
+        run([clang, "-isysroot", sdk, "-O2", "-Wall", "-Wextra", "-Werror", "-c",
              root / "Benchmarks/FilesystemHandoff/Heap.c", "-o", object_file])
         binary = build / "FilesystemHandoff"
         run([swift, *flags, "-module-name", "FilesystemHandoffBenchmark",
