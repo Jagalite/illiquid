@@ -1,0 +1,722 @@
+{
+  "arguments": {
+    "case": null,
+    "jobs": 2,
+    "output": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-12pair",
+    "pairs": 12,
+    "swift": "swift",
+    "target_ms": 80.0,
+    "tests_only": false,
+    "verify_only": false
+  },
+  "baseline_provenance": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "frozen_prefix": {
+      "bytes": 879,
+      "end_byte": 14288,
+      "end_marker": "        let source = current, location = folder, now = Date()",
+      "first_line": 274,
+      "git_blob": "ce4fbee1c2788c155ec14150aa14b3b1232fb9e7",
+      "sha256": "798fbcdec0445416a65befcefdc027cb7f21b60aad4c8ea3b0c6d6fa6e6bea9f",
+      "snapshot": "runPass-prefix.swift",
+      "start_byte": 13409,
+      "start_marker": "    private func runPass(settings: ThumbnailPreferences, id: UUID) async {\n"
+    },
+    "git_history_verified": true,
+    "history_note": "The frozen prefix/common hashes also support shallow checkouts without the base object",
+    "original_scheduler": {
+      "bytes": 16833,
+      "git_blob": "61d34cb7e6fc7ed7da2d7bc65dd791d615a5355f",
+      "path": "Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift",
+      "sha256": "24bee22ce1bc8b670af7e6a45eb49f1a2eac6425c588128af8745ee9ce5f3c9e"
+    }
+  },
+  "candidate_head": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate_worktree": " M Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift\n?? .github/workflows/thumbnail-playlist-neighborhood.yml\n?? Benchmarks/ThumbnailPlaylistNeighborhood/\n?? Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift\n?? Tests/IlliquidAppTests/ThumbnailCandidatePlanningTests.swift\n",
+  "complete": true,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "cpu_count": 9,
+  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "environment": {
+    "DEVELOPER_DIR": null,
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "LC_COLLATE": null,
+    "LC_CTYPE": "C.UTF-8",
+    "LD_LIBRARY_PATH": "/workspace/scratch/355e15c67b63/tools/swift-deps/root/usr/lib/x86_64-linux-gnu",
+    "SDKROOT": null,
+    "SWIFT_DETERMINISTIC_HASHING": null,
+    "TZ": "Europe/Berlin"
+  },
+  "finished_utc": "2026-10-28T04:45:04Z",
+  "generated_sources": {
+    "baseline": {
+      "Package.swift": {
+        "bytes": 706,
+        "git_blob": "99db5620b3098e1de372100b95e5eada646fd9aa",
+        "sha256": "baa4d61b9c45348f2f963ac9381501ec7c4dddfccc9076c795c6602f98fcd548"
+      },
+      "Sources/IlliquidApp/ThumbnailNeighborhoodProbe.swift": {
+        "bytes": 2003,
+        "git_blob": "75a4a7c97443eda80516fb20f8405e10531042ee",
+        "sha256": "49134deff276679eca6ced1bb623834c49ee31ea2db298c75015daef1ec3046f"
+      },
+      "Sources/IlliquidApp/ThumbnailPlaylistNeighborhood.swift": {
+        "bytes": 979,
+        "git_blob": "5014ff70a277d5f165330b936cbd33458e53df7e",
+        "sha256": "a71dac90add0d234efb2c9678a33b777816d9df14c968a5f69d792c98a910762"
+      },
+      "Sources/IlliquidCore/FolderPlaylist.swift": {
+        "bytes": 3589,
+        "git_blob": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      "Sources/IlliquidCore/NaturalFilenameOrdering.swift": {
+        "bytes": 2180,
+        "git_blob": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      "Sources/IlliquidCore/NormalizedFileURL.swift": {
+        "bytes": 2191,
+        "git_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      },
+      "Sources/IlliquidCore/ThumbnailPassCursor.swift": {
+        "bytes": 1111,
+        "git_blob": "ed805a4172a5db1b686200026e7401b08d8d9b55",
+        "sha256": "cc92ee68ca438b975daede867ebd40d8bf8e6ce33ce12d9b1b411135b9feb0ee"
+      },
+      "Sources/IlliquidCore/ThumbnailPolicy.swift": {
+        "bytes": 10722,
+        "git_blob": "cf3b96706f34ba5c43041d650f4c9f6217e340cc",
+        "sha256": "1c68b9d4819cc9e9d4a8f3dfe2e6e723e69dd0330e7fa63e389eb76c107986d3"
+      },
+      "Sources/IlliquidCore/ThumbnailVisibilityPolicy.swift": {
+        "bytes": 586,
+        "git_blob": "27d4e4fdf1ca289014683d3e9becdc495ed4a1d9",
+        "sha256": "1bc3396f3a2b3b5c77c46a8d0dd8d8d524a898de7278019031c78ac503e75734"
+      },
+      "Sources/ThumbnailNeighborhoodDriver/Driver.swift": {
+        "bytes": 12883,
+        "git_blob": "085c96bf0f9909ba6cf35dbe021dda16593966dd",
+        "sha256": "5ae0694d952c7815f1bf8b053fc84e1915eefdf68c377b11209f1484453b8a04"
+      },
+      "Tests/IlliquidAppTests/ThumbnailCandidatePlanningTests.swift": {
+        "bytes": 6674,
+        "git_blob": "8b455c25533bfe1becb2945d2c548494f7a09677",
+        "sha256": "e3cee75cc70683251887b36c2321ba1f2d8cc0a1848ab934cd54bf982eab3718"
+      },
+      "Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift": {
+        "bytes": 6665,
+        "git_blob": "32a95397de4ed9711f5ebe2818769b42c9ec2476",
+        "sha256": "b5edb262a66f37cbf0fce2dadff4d1ec571171e3067682a3cc39b165d73a85da"
+      },
+      "Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift": {
+        "bytes": 3559,
+        "git_blob": "28a1ab77c42b2f5a59c5f818f77fa0bf68f1b397",
+        "sha256": "f22752c572760f5def7c1cdfb2c2611e99b6197cb8814fabb0e54f6d638d70a3"
+      }
+    },
+    "candidate": {
+      "Package.swift": {
+        "bytes": 706,
+        "git_blob": "99db5620b3098e1de372100b95e5eada646fd9aa",
+        "sha256": "baa4d61b9c45348f2f963ac9381501ec7c4dddfccc9076c795c6602f98fcd548"
+      },
+      "Sources/IlliquidApp/ThumbnailNeighborhoodProbe.swift": {
+        "bytes": 1634,
+        "git_blob": "c269d02ee5783b5c7a96ff5e424e8b5f4a34892e",
+        "sha256": "bf7aaddeb7659ae2ee77e604ddb4b38b4fb142786c95691ccb882f1927994c7e"
+      },
+      "Sources/IlliquidApp/ThumbnailPlaylistNeighborhood.swift": {
+        "bytes": 1287,
+        "git_blob": "09510414a37c95b0bb6cdac0c49253ebc4fb9b76",
+        "sha256": "4d83ac436daedbe768083593c521205e5db83af7ea895468f6359db23ae8fd38"
+      },
+      "Sources/IlliquidCore/FolderPlaylist.swift": {
+        "bytes": 3589,
+        "git_blob": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+        "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+      },
+      "Sources/IlliquidCore/NaturalFilenameOrdering.swift": {
+        "bytes": 2180,
+        "git_blob": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+        "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+      },
+      "Sources/IlliquidCore/NormalizedFileURL.swift": {
+        "bytes": 2191,
+        "git_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+      },
+      "Sources/IlliquidCore/ThumbnailPassCursor.swift": {
+        "bytes": 1111,
+        "git_blob": "ed805a4172a5db1b686200026e7401b08d8d9b55",
+        "sha256": "cc92ee68ca438b975daede867ebd40d8bf8e6ce33ce12d9b1b411135b9feb0ee"
+      },
+      "Sources/IlliquidCore/ThumbnailPolicy.swift": {
+        "bytes": 10722,
+        "git_blob": "cf3b96706f34ba5c43041d650f4c9f6217e340cc",
+        "sha256": "1c68b9d4819cc9e9d4a8f3dfe2e6e723e69dd0330e7fa63e389eb76c107986d3"
+      },
+      "Sources/IlliquidCore/ThumbnailVisibilityPolicy.swift": {
+        "bytes": 586,
+        "git_blob": "27d4e4fdf1ca289014683d3e9becdc495ed4a1d9",
+        "sha256": "1bc3396f3a2b3b5c77c46a8d0dd8d8d524a898de7278019031c78ac503e75734"
+      },
+      "Sources/ThumbnailNeighborhoodDriver/Driver.swift": {
+        "bytes": 12883,
+        "git_blob": "085c96bf0f9909ba6cf35dbe021dda16593966dd",
+        "sha256": "5ae0694d952c7815f1bf8b053fc84e1915eefdf68c377b11209f1484453b8a04"
+      },
+      "Tests/IlliquidAppTests/ThumbnailCandidatePlanningTests.swift": {
+        "bytes": 6674,
+        "git_blob": "8b455c25533bfe1becb2945d2c548494f7a09677",
+        "sha256": "e3cee75cc70683251887b36c2321ba1f2d8cc0a1848ab934cd54bf982eab3718"
+      },
+      "Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift": {
+        "bytes": 6665,
+        "git_blob": "32a95397de4ed9711f5ebe2818769b42c9ec2476",
+        "sha256": "b5edb262a66f37cbf0fce2dadff4d1ec571171e3067682a3cc39b165d73a85da"
+      },
+      "Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift": {
+        "bytes": 3559,
+        "git_blob": "28a1ab77c42b2f5a59c5f818f77fa0bf68f1b397",
+        "sha256": "f22752c572760f5def7c1cdfb2c2611e99b6197cb8814fabb0e54f6d638d70a3"
+      }
+    }
+  },
+  "input_sources": {
+    "Driver.swift": {
+      "bytes": 12883,
+      "git_blob": "085c96bf0f9909ba6cf35dbe021dda16593966dd",
+      "sha256": "5ae0694d952c7815f1bf8b053fc84e1915eefdf68c377b11209f1484453b8a04"
+    },
+    "Sources/IlliquidCore/Player/ThumbnailPassCursor.swift": {
+      "bytes": 1111,
+      "git_blob": "ed805a4172a5db1b686200026e7401b08d8d9b55",
+      "sha256": "cc92ee68ca438b975daede867ebd40d8bf8e6ce33ce12d9b1b411135b9feb0ee"
+    },
+    "Sources/IlliquidCore/Player/ThumbnailPolicy.swift": {
+      "bytes": 10722,
+      "git_blob": "cf3b96706f34ba5c43041d650f4c9f6217e340cc",
+      "sha256": "1c68b9d4819cc9e9d4a8f3dfe2e6e723e69dd0330e7fa63e389eb76c107986d3"
+    },
+    "Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift": {
+      "bytes": 586,
+      "git_blob": "27d4e4fdf1ca289014683d3e9becdc495ed4a1d9",
+      "sha256": "1bc3396f3a2b3b5c77c46a8d0dd8d8d524a898de7278019031c78ac503e75734"
+    },
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": {
+      "bytes": 3589,
+      "git_blob": "3ff5f3c2abccf3a26bcc170a7806aa857f45b37f",
+      "sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe"
+    },
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+      "bytes": 2180,
+      "git_blob": "d116171a69648d2bd6ce5ea5fb00b7fc6a2cb12a",
+      "sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7"
+    },
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": {
+      "bytes": 2191,
+      "git_blob": "d90e4fc199eabfa4e554c3c8d01a1ed48277ae20",
+      "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "Tests/IlliquidAppTests/ThumbnailCandidatePlanningTests.swift": {
+      "bytes": 6674,
+      "git_blob": "8b455c25533bfe1becb2945d2c548494f7a09677",
+      "sha256": "e3cee75cc70683251887b36c2321ba1f2d8cc0a1848ab934cd54bf982eab3718"
+    },
+    "Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift": {
+      "bytes": 6665,
+      "git_blob": "32a95397de4ed9711f5ebe2818769b42c9ec2476",
+      "sha256": "b5edb262a66f37cbf0fce2dadff4d1ec571171e3067682a3cc39b165d73a85da"
+    },
+    "Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift": {
+      "bytes": 3559,
+      "git_blob": "28a1ab77c42b2f5a59c5f818f77fa0bf68f1b397",
+      "sha256": "f22752c572760f5def7c1cdfb2c2611e99b6197cb8814fabb0e54f6d638d70a3"
+    },
+    "baseline/manifest.json": {
+      "bytes": 2252,
+      "git_blob": "419144b308f0a464ecdd6c36cc85a46f78c3c991",
+      "sha256": "4de31778f55eda334223042eb4945cb25f7d1e024342c14dd41107177f293bc1"
+    },
+    "baseline/runPass-prefix.swift": {
+      "bytes": 879,
+      "git_blob": "ce4fbee1c2788c155ec14150aa14b3b1232fb9e7",
+      "sha256": "798fbcdec0445416a65befcefdc027cb7f21b60aad4c8ea3b0c6d6fa6e6bea9f"
+    },
+    "candidate/ThumbnailBackgroundScheduler.swift": {
+      "bytes": 16464,
+      "git_blob": "4bf652dcfac0dd20827c28661224f673e2456cc4",
+      "sha256": "26fd9f3a8b6eed208e7818fd915524134dba739b1260698512e024c0f3b195c8"
+    },
+    "candidate/ThumbnailPlaylistNeighborhood.swift": {
+      "bytes": 1287,
+      "git_blob": "09510414a37c95b0bb6cdac0c49253ebc4fb9b76",
+      "sha256": "4d83ac436daedbe768083593c521205e5db83af7ea895468f6359db23ae8fd38"
+    },
+    "candidate/runPass-prefix.swift": {
+      "bytes": 510,
+      "git_blob": "f010271c1c59a937ea57162466a995cde9ee2f19",
+      "sha256": "22a03487e493b3c08227293f71228bb0e7f6db9aa3bb3af55591d07c15b8856c"
+    },
+    "run.py": {
+      "bytes": 31746,
+      "git_blob": "04f4538aae8dd0451bfac808dfb863573b2718f8",
+      "sha256": "9b5657f90d1c7273c8e44b2cb625dcf4b84e230fc533bcad3ccaededfb891aeb"
+    }
+  },
+  "load_average_end": [
+    2.87109375,
+    5.384765625,
+    4.3330078125
+  ],
+  "load_average_start": [
+    8.45458984375,
+    8.04443359375,
+    4.40673828125
+  ],
+  "measurement_boundary": {
+    "calibration": "Each variant independently targets process CPU time; per-op normalization",
+    "candidates": "Exact runPass statements before its source/location/clock snapshot",
+    "excluded": [
+      "fixture construction",
+      "startup",
+      "ranking",
+      "decoding",
+      "filesystem I/O",
+      "AppKit/Observation",
+      "async scheduler lifetime",
+      "whole-player performance"
+    ],
+    "included": "Repeated call, returned-value consumption, and per-call temporary-object cleanup",
+    "max_iterations": 10000000,
+    "neighborhood": "Synchronous playlist URL neighborhood and distance construction",
+    "order": "Even AB/BA pairs; rotate case order each pair and starting variant by case and pair",
+    "process_policy": "Fresh process for every calibration and timed observation"
+  },
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "schema": 1,
+  "selected_cases": [
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-0-nil-empty",
+      "playlist_size": 0,
+      "position": "nil",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-1-first-empty",
+      "playlist_size": 1,
+      "position": "first",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-8-middle-empty",
+      "playlist_size": 8,
+      "position": "middle",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-32-first-empty",
+      "playlist_size": 32,
+      "position": "first",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-32-middle-empty",
+      "playlist_size": 32,
+      "position": "middle",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-32-last-empty",
+      "playlist_size": 32,
+      "position": "last",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-32-missing-empty",
+      "playlist_size": 32,
+      "position": "missing",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-32-nil-empty",
+      "playlist_size": 32,
+      "position": "nil",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-1000-first-empty",
+      "playlist_size": 1000,
+      "position": "first",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-1000-middle-empty",
+      "playlist_size": 1000,
+      "position": "middle",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-1000-last-empty",
+      "playlist_size": 1000,
+      "position": "last",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-1000-missing-empty",
+      "playlist_size": 1000,
+      "position": "missing",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-1000-nil-empty",
+      "playlist_size": 1000,
+      "position": "nil",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-10000-first-empty",
+      "playlist_size": 10000,
+      "position": "first",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-10000-middle-empty",
+      "playlist_size": 10000,
+      "position": "middle",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-10000-last-empty",
+      "playlist_size": 10000,
+      "position": "last",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-10000-missing-empty",
+      "playlist_size": 10000,
+      "position": "missing",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-10000-nil-empty",
+      "playlist_size": 10000,
+      "position": "nil",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-50000-first-empty",
+      "playlist_size": 50000,
+      "position": "first",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-50000-last-empty",
+      "playlist_size": 50000,
+      "position": "last",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-50000-missing-empty",
+      "playlist_size": 50000,
+      "position": "missing",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "neighborhood",
+      "name": "neighborhood-50000-nil-empty",
+      "playlist_size": 50000,
+      "position": "nil",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-0-nil-empty",
+      "playlist_size": 0,
+      "position": "nil",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-1-first-empty",
+      "playlist_size": 1,
+      "position": "first",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-8-middle-empty",
+      "playlist_size": 8,
+      "position": "middle",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-1000-first-empty",
+      "playlist_size": 1000,
+      "position": "first",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-1000-middle-empty",
+      "playlist_size": 1000,
+      "position": "middle",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-1000-last-empty",
+      "playlist_size": 1000,
+      "position": "last",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-1000-missing-empty",
+      "playlist_size": 1000,
+      "position": "missing",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-1000-nil-empty",
+      "playlist_size": 1000,
+      "position": "nil",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-10000-first-empty",
+      "playlist_size": 10000,
+      "position": "first",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-10000-middle-empty",
+      "playlist_size": 10000,
+      "position": "middle",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-10000-last-empty",
+      "playlist_size": 10000,
+      "position": "last",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-10000-missing-empty",
+      "playlist_size": 10000,
+      "position": "missing",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 0,
+      "mode": "candidates",
+      "name": "candidates-10000-nil-empty",
+      "playlist_size": 10000,
+      "position": "nil",
+      "recent_count": 0,
+      "visible_count": 0
+    },
+    {
+      "discovered_count": 256,
+      "mode": "candidates",
+      "name": "candidates-10000-first-browser",
+      "playlist_size": 10000,
+      "position": "first",
+      "recent_count": 16,
+      "visible_count": 24
+    },
+    {
+      "discovered_count": 256,
+      "mode": "candidates",
+      "name": "candidates-10000-last-browser",
+      "playlist_size": 10000,
+      "position": "last",
+      "recent_count": 16,
+      "visible_count": 24
+    },
+    {
+      "discovered_count": 256,
+      "mode": "candidates",
+      "name": "candidates-10000-nil-browser",
+      "playlist_size": 10000,
+      "position": "nil",
+      "recent_count": 16,
+      "visible_count": 24
+    },
+    {
+      "discovered_count": 2048,
+      "mode": "candidates",
+      "name": "candidates-10000-first-full",
+      "playlist_size": 10000,
+      "position": "first",
+      "recent_count": 128,
+      "visible_count": 48
+    },
+    {
+      "discovered_count": 2048,
+      "mode": "candidates",
+      "name": "candidates-10000-last-full",
+      "playlist_size": 10000,
+      "position": "last",
+      "recent_count": 128,
+      "visible_count": 48
+    },
+    {
+      "discovered_count": 2048,
+      "mode": "candidates",
+      "name": "candidates-10000-nil-full",
+      "playlist_size": 10000,
+      "position": "nil",
+      "recent_count": 128,
+      "visible_count": 48
+    }
+  ],
+  "source_adaptations": {
+    "baseline_helper": "Original statements before var urls, plus var distances through before let candidates",
+    "candidate_construction": "Exact extracted baseline/live runPass prefixes inside the same public wrapper",
+    "candidate_helper": "Exact live ThumbnailPlaylistNeighborhood.swift bytes",
+    "common_sources": "Byte-for-byte unchanged and identical for both variants; no Linux rewrites",
+    "module_boundary": "Driver, IlliquidApp, and IlliquidCore are separate targets; no cross-module optimization",
+    "value_containers": "ProbePlayer/ProbeViewStore model synchronous playlist access"
+  },
+  "started_utc": "2026-10-28T04:40:12Z",
+  "statistics": {
+    "bootstrap": "Percentile 95% interval for median of paired reductions",
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20261028,
+    "multiple_comparisons": "Intervals are descriptive and not family-wise adjusted",
+    "paired_reduction": "100 * (1 - candidate_ns_per_op / baseline_ns_per_op)",
+    "reduction_sign": "Positive percentages mean less time per operation"
+  },
+  "status": "measured",
+  "swift": {
+    "executable_sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de",
+    "frontend": {
+      "path": "/tmp/illiquid-swift/usr/bin/swift-frontend",
+      "sha256": "81a8f92138bb9b2544abb5446eeb554fc37c5b5bf9bef2569f70232578ec15b6"
+    },
+    "path": "/tmp/illiquid-swift/usr/bin/swift",
+    "swiftc": {
+      "path": "/tmp/illiquid-swift/usr/bin/swiftc",
+      "sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de"
+    },
+    "version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+  },
+  "uname": {
+    "machine": "x86_64",
+    "node": "35e2d0fffda8",
+    "processor": "x86_64",
+    "release": "6.18.55",
+    "system": "Linux",
+    "version": "#1 SMP Wed Oct 14 19:45:18 UTC 2026"
+  }
+}

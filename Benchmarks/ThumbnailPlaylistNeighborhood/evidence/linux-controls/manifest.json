@@ -1,0 +1,212 @@
+{
+  "arguments": {
+    "evidence": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-12pair",
+    "output": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-controls-16pair",
+    "pairs": 16,
+    "target_ms": 400.0
+  },
+  "binary_hashes": {
+    "baseline": {
+      "path": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-12pair/work/build/baseline/x86_64-unknown-linux-gnu/release/ThumbnailNeighborhoodProbe",
+      "sha256": "7f4b5afe87ca9587de8b44bc3eb5f41d55c57aa5ff4e9bf81c49ffdffd2d7e5b"
+    },
+    "candidate": {
+      "path": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-12pair/work/build/candidate/x86_64-unknown-linux-gnu/release/ThumbnailNeighborhoodProbe",
+      "sha256": "b13d7c344ba0a704563591c9f3a8ab53ecc3bebf1429787275192388ded3e915"
+    }
+  },
+  "complete": true,
+  "conditions": [
+    {
+      "case": "candidates-10000-first-full",
+      "kind": "baseline_candidate",
+      "name": "AB-first-full",
+      "sides": {
+        "A": "baseline",
+        "B": "candidate"
+      }
+    },
+    {
+      "case": "candidates-10000-last-full",
+      "kind": "baseline_candidate",
+      "name": "AB-last-full",
+      "sides": {
+        "A": "baseline",
+        "B": "candidate"
+      }
+    },
+    {
+      "case": "candidates-10000-nil-full",
+      "kind": "baseline_candidate",
+      "name": "AB-nil-full",
+      "sides": {
+        "A": "baseline",
+        "B": "candidate"
+      }
+    },
+    {
+      "case": "candidates-10000-last-full",
+      "kind": "baseline_repeat",
+      "name": "AA-last-full",
+      "sides": {
+        "A": "baseline",
+        "B": "baseline"
+      }
+    }
+  ],
+  "controls_sha256": "f2d2acc17a337f1bf52fa13461b8ff2ef390f94e225675ec897f7f30fbc3390c",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "design": {
+    "AA_control": "A and B both execute the same baseline binary for the last-full fixture",
+    "compile_flags": "Original executables reused byte-for-byte; no rebuild or tests",
+    "hash_randomness": "Original environment preserved; no deterministic hashing added",
+    "inference_limit": "Post hoc focused study; original adverse result remains part of the evidence",
+    "iterations": "Equal A/B work fixed from the slower original median CPU ns/op; no new calibration",
+    "measurement_flags": "Same --measure CASE ITERATIONS interface; only iteration count changes",
+    "purpose": "Focused follow-up of noisy/adverse full-pool cases in the original study",
+    "retention": "Every observation retained; no trimming or exclusion",
+    "sampling": "Fresh process per observation, balanced AB/BA labels, rotating condition order"
+  },
+  "environment": {
+    "DEVELOPER_DIR": null,
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "LC_COLLATE": null,
+    "LC_CTYPE": "C.UTF-8",
+    "LD_LIBRARY_PATH": "/workspace/scratch/355e15c67b63/tools/swift-deps/root/usr/lib/x86_64-linux-gnu",
+    "SDKROOT": null,
+    "SWIFT_DETERMINISTIC_HASHING": null,
+    "TZ": "Europe/Berlin"
+  },
+  "finished_utc": "2026-10-28T04:49:55Z",
+  "fixed_iterations": {
+    "candidates-10000-first-full": {
+      "estimated_cpu_ms": {
+        "baseline": 405.84045675,
+        "candidate": 399.3868785625
+      },
+      "iterations_both_sides": 67,
+      "original_cpu_medians_ns_per_op": {
+        "baseline": 6057320.25,
+        "candidate": 5960998.1875
+      }
+    },
+    "candidates-10000-last-full": {
+      "estimated_cpu_ms": {
+        "baseline": 359.3374645,
+        "candidate": 402.9889769230769
+      },
+      "iterations_both_sides": 56,
+      "original_cpu_medians_ns_per_op": {
+        "baseline": 6416740.4375,
+        "candidate": 7196231.730769231
+      }
+    },
+    "candidates-10000-nil-full": {
+      "estimated_cpu_ms": {
+        "baseline": 403.04922974999994,
+        "candidate": 388.11317264999997
+      },
+      "iterations_both_sides": 63,
+      "original_cpu_medians_ns_per_op": {
+        "baseline": 6397606.821428571,
+        "candidate": 6160526.55
+      }
+    }
+  },
+  "load_average_end": [
+    2.02099609375,
+    3.34375,
+    3.7392578125
+  ],
+  "load_average_start": [
+    1.63671875,
+    3.7353515625,
+    3.89306640625
+  ],
+  "observations": 128,
+  "original_evidence": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-12pair",
+  "original_files": {
+    "binaries.json": {
+      "bytes": 535,
+      "git_blob": "72f6f7e55cdd33c38505e203430ca2cee98f1132",
+      "sha256": "d14eac28b3d590d591ea337dd170c1f9b1ff748883ee21efea0299abce7f6361"
+    },
+    "cases.json": {
+      "bytes": 8413,
+      "git_blob": "19777b885732e14560ecc0c18e15b34ae1f44121",
+      "sha256": "dd93f1e78b5db7a1dc0b02bfdce82610fbe6515a3e3ec4d4a7d7967974853c63"
+    },
+    "commands.jsonl": {
+      "bytes": 1007375,
+      "git_blob": "37519a470032a26ab0ea0415ef0e421902fcadfe",
+      "sha256": "8e44c93f8627a6cce68bf4159ab2087c41c9e5138f57309add12dbc205b27304"
+    },
+    "manifest.json": {
+      "bytes": 24409,
+      "git_blob": "80381d1a936adcafb94a7f96afb6f3de0ee91896",
+      "sha256": "ae8c55ae16cd2a46cab668d92578ece32164848729969ac92def21bf6087f5e0"
+    },
+    "observations.jsonl": {
+      "bytes": 384236,
+      "git_blob": "5f646998d5f8ab42b42dc758a8b89820f459a2cb",
+      "sha256": "5501a75e22ed92f06891e7ebe3a2bd6b1eb1bdd65dc7a08f8c45c5e329e285f4"
+    },
+    "parity.json": {
+      "bytes": 4384,
+      "git_blob": "71155ca15b92155f172d933eb06642442dca018e",
+      "sha256": "1f1ce48d3ba2b0c4189bb361c9402fde61ae7feedf4eb2dadc6a3080739c9eb9"
+    },
+    "summary.json": {
+      "bytes": 100149,
+      "git_blob": "e5f6060f6ebac9b9d6022fa824f1dd0ad5c25547",
+      "sha256": "597d98360ac5b9dfeb6f5d1849a16d8dc5d5473987ce0df5b06a3f27089c6649"
+    },
+    "tests.json": {
+      "bytes": 417,
+      "git_blob": "b34a2a52829369bcf5bf503b849d44c042192a3c",
+      "sha256": "36d6533a36f5d7bebf9dd731636e8565527eb0ca3a77a51fe52e7cb821191dee"
+    }
+  },
+  "pairs_per_condition": 16,
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "runner_environment_overrides": {
+    "CLANG_MODULE_CACHE_PATH": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-12pair/work/cache/clang",
+    "NO_COLOR": "1",
+    "SWIFTPM_MODULECACHE_OVERRIDE": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-12pair/work/cache/swift",
+    "TERM": "dumb",
+    "TMPDIR": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-12pair/work/tmp",
+    "XDG_CACHE_HOME": "/workspace/scratch/355e15c67b63/thumbnail-neighborhood-linux-12pair/work/cache/xdg"
+  },
+  "schema": 1,
+  "source_and_binary_postflight_verified": true,
+  "started_utc": "2026-10-28T04:48:32Z",
+  "statistics": {
+    "AA_sign": "Positive means baseline invocation B faster than baseline invocation A",
+    "bootstrap": "Percentile 95% interval for median of paired reductions",
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20261028,
+    "multiple_comparisons": "Intervals are descriptive and not family-wise adjusted",
+    "paired_reduction": "100 * (1 - side_B_ns_per_op / side_A_ns_per_op)",
+    "reduction_sign": "Positive percentages mean less time per operation"
+  },
+  "status": "measured",
+  "uname": {
+    "machine": "x86_64",
+    "node": "35e2d0fffda8",
+    "processor": "x86_64",
+    "release": "6.18.55",
+    "system": "Linux",
+    "version": "#1 SMP Wed Oct 14 19:45:18 UTC 2026"
+  }
+}

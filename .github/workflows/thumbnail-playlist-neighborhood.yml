@@ -1,0 +1,224 @@
+name: Thumbnail playlist neighborhood performance
+
+on:
+  push:
+    branches:
+      - perf/thumbnail-playlist-neighborhood-20261028
+    paths:
+      - Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift
+      - Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift
+      - Sources/IlliquidCore/Playlist/FolderPlaylist.swift
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Sources/IlliquidCore/Player/ThumbnailPassCursor.swift
+      - Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift
+      - Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift
+      - Sources/IlliquidCore/Utilities/NormalizedFileURL.swift
+      - Tests/IlliquidAppTests/ThumbnailCandidatePlanningTests.swift
+      - Tests/IlliquidAppTests/ThumbnailBackgroundSchedulerTests.swift
+      - Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift
+      - Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift
+      - Benchmarks/ThumbnailPlaylistNeighborhood/**
+      - .github/workflows/thumbnail-playlist-neighborhood.yml
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/README.md'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift
+      - Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift
+      - Sources/IlliquidCore/Playlist/FolderPlaylist.swift
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Sources/IlliquidCore/Player/ThumbnailPassCursor.swift
+      - Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift
+      - Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift
+      - Sources/IlliquidCore/Utilities/NormalizedFileURL.swift
+      - Tests/IlliquidAppTests/ThumbnailCandidatePlanningTests.swift
+      - Tests/IlliquidAppTests/ThumbnailBackgroundSchedulerTests.swift
+      - Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift
+      - Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift
+      - Benchmarks/ThumbnailPlaylistNeighborhood/**
+      - .github/workflows/thumbnail-playlist-neighborhood.yml
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/README.md'
+      - '!Benchmarks/ThumbnailPlaylistNeighborhood/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-playlist-neighborhood-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Confirm isolated build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo '::error::Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral hosted runner. Component builds will run serially in this job’s isolated output directory.'
+      - name: Test production planning and measure paired native workloads
+        run: |
+          python3 Benchmarks/ThumbnailPlaylistNeighborhood/run.py \
+            --output "$RUNNER_TEMP/thumbnail-playlist-neighborhood" \
+            --pairs 12 --target-ms 80
+      - name: Check large candidate pools with equal work and an identical-binary control
+        run: |
+          python3 Benchmarks/ThumbnailPlaylistNeighborhood/controls.py \
+            --evidence "$RUNNER_TEMP/thumbnail-playlist-neighborhood" \
+            --output "$RUNNER_TEMP/thumbnail-playlist-neighborhood/controls" \
+            --pairs 16 --target-ms 400
+      - name: Publish reproducible component evidence
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-playlist-neighborhood"
+          sw_vers > "$RUNNER_TEMP/thumbnail-playlist-neighborhood/host.txt"
+          uname -a >> "$RUNNER_TEMP/thumbnail-playlist-neighborhood/host.txt"
+          sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/thumbnail-playlist-neighborhood/host.txt"
+          swift --version >> "$RUNNER_TEMP/thumbnail-playlist-neighborhood/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/thumbnail-playlist-neighborhood/host.txt"
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-playlist-neighborhood'
+          paths = {path for pattern in ('*.json', '*.jsonl', '*.log', '*.txt', 'logs/*.log',
+                                       'controls/*.json', 'controls/*.jsonl', 'controls/logs/*.log')
+                   for path in root.glob(pattern) if path.is_file()}
+          files = {str(path.relative_to(root)): path.read_text() for path in sorted(paths)}
+          compressed = {str(path.relative_to(root)): base64.b64encode(path.read_bytes()).decode()
+                        for pattern in ('*.gz', 'controls/*.gz')
+                        for path in sorted(root.glob(pattern)) if path.is_file()}
+          bundle = {
+              'text_files': files,
+              'compressed_files_base64': compressed,
+              'github_run': {
+                  'id': os.environ['GITHUB_RUN_ID'],
+                  'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+                  'sha': os.environ['GITHUB_SHA'],
+                  'event': os.environ['GITHUB_EVENT_NAME'],
+                  'url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              },
+          }
+          if 'summary.json' in files:
+              print('::group::summary.json')
+              print(files['summary.json'])
+              print('::endgroup::')
+          packed = gzip.compress(json.dumps(bundle, sort_keys=True, separators=(',', ':')).encode(),
+                                 compresslevel=9, mtime=0)
+          (root / 'native-log-bundle.json.gz').write_bytes(packed)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the 2 MiB log bundle limit; use the uploaded artifact')
+          print('THUMBNAIL_PLAYLIST_NEIGHBORHOOD_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('THUMBNAIL_PLAYLIST_NEIGHBORHOOD_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+              out.write('## Thumbnail playlist neighborhood component\n\n')
+              out.write('Raw measurements, source receipts, and available test logs are retained in the artifact and compressed log bundle.\n\n')
+              out.write('These measurements concern in-memory planning for opt-in idle thumbnail preparation. Live UI, decoding, and whole-player performance are outside this job.\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-playlist-neighborhood-component
+          path: |
+            ${{ runner.temp }}/thumbnail-playlist-neighborhood/
+            !${{ runner.temp }}/thumbnail-playlist-neighborhood/work/**
+            !${{ runner.temp }}/thumbnail-playlist-neighborhood/**/.build/**
+            !${{ runner.temp }}/thumbnail-playlist-neighborhood/**/module-cache/**
+            !${{ runner.temp }}/thumbnail-playlist-neighborhood/**/modulecache/**
+            !${{ runner.temp }}/thumbnail-playlist-neighborhood/**/ModuleCache/**
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Confirm isolated build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo '::error::Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral hosted runner. The release app/test graph will compile directly in this job’s isolated checkout.'
+      - name: Prepare the pinned native SDK
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-playlist-neighborhood-integration"
+          set -o pipefail
+          {
+            if ! xcrun -sdk macosx metal --version; then
+              xcodebuild -downloadComponent MetalToolchain
+            fi
+            python3 Scripts/verify-corresponding-source.py DependencySources
+            python3 Scripts/install-ci-native-sdk.py
+          } 2>&1 | tee "$RUNNER_TEMP/thumbnail-playlist-neighborhood-integration/sdk.log"
+      - name: Build the release app graph and run planning and scheduler regressions
+        run: |
+          sw_vers > "$RUNNER_TEMP/thumbnail-playlist-neighborhood-integration/host.txt"
+          uname -a >> "$RUNNER_TEMP/thumbnail-playlist-neighborhood-integration/host.txt"
+          swift --version >> "$RUNNER_TEMP/thumbnail-playlist-neighborhood-integration/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/thumbnail-playlist-neighborhood-integration/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            -Xswiftc -enable-testing \
+            --filter 'ThumbnailCandidatePlanningTests|ThumbnailPolicyTests|ThumbnailSchedulingPolicyRegressionTests|ThumbnailBackgroundSchedulerTests/(supersededCompletionCannotMarkNewSourcePrepared|automaticCurrentCoverageSurvivesHoverAndStopsForRecovery|currentVideoPreparationSharesIdleBudgetWithLibraryWork|memoryPressureCancelsBackgroundWorkUntilNormalAndExclusionsPreventProbes)' \
+            2>&1 | tee "$RUNNER_TEMP/thumbnail-playlist-neighborhood-integration/tests.log"
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-playlist-neighborhood-integration'
+          log = (root / 'tests.log').read_text()
+          counts = [int(value) for value in re.findall(
+              r'Test run with (\d+) tests?(?: in \d+ suites?)? passed', log)]
+          if not counts or counts[-1] <= 0:
+              raise SystemExit('Expected a successful Swift Testing run with a nonzero test count')
+          receipt = {'swift_testing_test_count': counts[-1], 'configuration': 'release',
+                     'sha': os.environ['GITHUB_SHA'], 'live_ui_qualified': False,
+                     'optional_media_fixture_tests_run': False}
+          (root / 'test-summary.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+              out.write('## Native app integration\n\n')
+              out.write(f"Release app/test graph compiled; {counts[-1]} selected Swift Testing tests passed.\n\n")
+              out.write('Optional media-fixture tests and live UI qualification are excluded.\n')
+          PY
+      - name: Publish native integration evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-playlist-neighborhood-integration'
+          root.mkdir(parents=True, exist_ok=True)
+          paths = {path for pattern in ('*.json', '*.jsonl', '*.log', '*.txt')
+                   for path in root.glob(pattern) if path.is_file()}
+          files = {path.name: path.read_text() for path in sorted(paths)}
+          bundle = {'text_files': files, 'github_run': {
+              'id': os.environ['GITHUB_RUN_ID'], 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'sha': os.environ['GITHUB_SHA'], 'event': os.environ['GITHUB_EVENT_NAME'],
+          }}
+          packed = gzip.compress(json.dumps(bundle, sort_keys=True, separators=(',', ':')).encode(),
+                                 compresslevel=9, mtime=0)
+          (root / 'native-log-bundle.json.gz').write_bytes(packed)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the 2 MiB log bundle limit; use the uploaded artifact')
+          print('THUMBNAIL_PLAYLIST_NEIGHBORHOOD_INTEGRATION_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('THUMBNAIL_PLAYLIST_NEIGHBORHOOD_INTEGRATION_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-playlist-neighborhood-integration
+          path: ${{ runner.temp }}/thumbnail-playlist-neighborhood-integration/
+          retention-days: 14
