@@ -80,3 +80,63 @@ jobs:
             ${{ runner.temp }}/playlist-checkpoint-ids/logs/
             ${{ runner.temp }}/playlist-checkpoint-ids/sources/
           retention-days: 14
+
+  portable-foundation:
+    runs-on: ubuntu-24.04
+    container: swift:6.2.1-noble
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Ensure Python is available
+        run: |
+          if ! command -v python3 >/dev/null 2>&1; then
+            apt-get update
+            apt-get install -y --no-install-recommends python3
+          fi
+      - name: Test both revisions and measure portable checkpoint ID projection
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          python3 Benchmarks/PlaylistCheckpointIDs/run.py \
+            --pairs 6 --memory-pairs 4 --target-ms 100 \
+            --output "$RUNNER_TEMP/playlist-checkpoint-ids"
+      - name: Retain textual review receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'playlist-checkpoint-ids'
+          paths = [root / name for name in [
+              'manifest.json', 'summary.json', 'workloads.json',
+              'observations.jsonl', 'commands.jsonl',
+          ]]
+          paths += sorted((root / 'logs').glob('tests-*.*'))
+          for path in paths:
+              if not path.is_file():
+                  continue
+              content = path.read_text()
+              chunks = [content[i:i + 4000] for i in range(0, len(content), 4000)] or ['']
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              for part, chunk in enumerate(chunks):
+                  print('CHECKPOINT_IDS_EVIDENCE ' + json.dumps({
+                      'file': str(path.relative_to(root)), 'sha256': digest,
+                      'part': part, 'parts': len(chunks), 'text': chunk,
+                  }, ensure_ascii=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: playlist-checkpoint-ids-linux
+          path: |
+            ${{ runner.temp }}/playlist-checkpoint-ids/*.json
+            ${{ runner.temp }}/playlist-checkpoint-ids/*.jsonl
+            ${{ runner.temp }}/playlist-checkpoint-ids/logs/
+            ${{ runner.temp }}/playlist-checkpoint-ids/sources/
+          retention-days: 14
