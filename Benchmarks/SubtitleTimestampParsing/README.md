@@ -107,13 +107,39 @@ equivalent String equality is not used as a substitute for byte equality.
 
 ## Results
 
-Native qualification and the final result table are pending in
+### Research decision
+
+This branch is retained as independent research and is **not being submitted as
+a separate production PR**. During qualification, concurrent
+[PR #134](https://github.com/Jagalite/illiquid/pull/134) appeared with the same
+fixed-width timestamp optimization, against the same main baseline. Independent
+source review found the same accepted timestamp forms, input normalization,
+complete digit/delimiter checks, field bounds, integer rounding, contiguous
+storage access, and fallback behavior. Helper factoring and digit-check spelling
+differ; neither establishes a distinct improvement worth a competing PR.
+
+The broader Linux campaign below also has mixed results, so it does not establish
+an additional performance benefit. The candidate, regression coverage, raw
+measurements, and independent auditor remain available for review and
+reproduction. The two implementations should not be integrated as separate
+optimizations. Results from the other PR use different hosts, compilers, and
+workloads and are not pooled with this evidence.
+
+### Native qualification status
+
+As of October 28, 2026, 05:25 UTC, this branch's native qualification is queued in
 [run 40636743957](https://github.com/Jagalite/illiquid/actions/runs/40636743957),
 for source commit `b9a0004d1a3a66ec6efc66c275583d43230001b1`.
 The first attempt remained unassigned for about 20 minutes; updating CI to
 record Xcode's selected compiler replaced that attempt without changing the
 production source or benchmark inputs. No native pass or speedup is claimed
 while those jobs are queued.
+
+The other PR's [native run](https://github.com/Jagalite/illiquid/actions/runs/40634454540)
+has passed its converter-test and complete-conversion timing steps but is still
+running a separate historical-baseline memory step. A successful timing step
+alone is not evidence of a speedup, and that run does not qualify this branch's
+exact source. No complete application or live-player result is claimed here.
 
 ### Linux development evidence
 
