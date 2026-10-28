@@ -43,6 +43,47 @@ struct ASSRenderedRegion: Sendable {
     }
 }
 
+/// Identity belongs to the render stream, not the native context's lifetime.
+/// A caller-held snapshot must not retain libass or allow a recycled object
+/// address to make a snapshot from a destroyed context current again.
+fileprivate final class ASSRenderIdentity: Sendable {}
+
+/// Swift-owned masks from one render. The token and admission limits can only
+/// be created by this file; callers may translate geometry without replacing
+/// the masks associated with that token.
+struct ASSReusableRenderSnapshot: Sendable {
+    fileprivate let identity: ASSRenderIdentity
+    fileprivate let sequence: UInt64
+    fileprivate let maximumImageCount: Int
+    fileprivate let maximumBitmapBytes: Int
+    let regions: [ASSRenderedRegion]
+
+    fileprivate init(
+        identity: ASSRenderIdentity,
+        sequence: UInt64,
+        maximumImageCount: Int,
+        maximumBitmapBytes: Int,
+        regions: [ASSRenderedRegion]
+    ) {
+        self.identity = identity
+        self.sequence = sequence
+        self.maximumImageCount = maximumImageCount
+        self.maximumBitmapBytes = maximumBitmapBytes
+        self.regions = regions
+    }
+
+    func offsetBy(dx: CGFloat, dy: CGFloat) -> Self {
+        guard dx != 0 || dy != 0 else { return self }
+        return Self(
+            identity: identity,
+            sequence: sequence,
+            maximumImageCount: maximumImageCount,
+            maximumBitmapBytes: maximumBitmapBytes,
+            regions: regions.map { $0.offsetBy(dx: dx, dy: dy) }
+        )
+    }
+}
+
 struct ASSRenderResult: Sendable {
     let regions: [ASSRenderedRegion]?
     let change: Int32
@@ -52,6 +93,29 @@ struct ASSRenderResult: Sendable {
     let resourceLimitExceeded: Bool
     let renderNanoseconds: UInt64
     let copyNanoseconds: UInt64
+    let reusableSnapshot: ASSReusableRenderSnapshot?
+
+    init(
+        regions: [ASSRenderedRegion]?,
+        change: Int32,
+        bitmapCopies: Int,
+        imageCount: Int,
+        maskBytes: Int,
+        resourceLimitExceeded: Bool,
+        renderNanoseconds: UInt64,
+        copyNanoseconds: UInt64,
+        reusableSnapshot: ASSReusableRenderSnapshot? = nil
+    ) {
+        self.regions = regions
+        self.change = change
+        self.bitmapCopies = bitmapCopies
+        self.imageCount = imageCount
+        self.maskBytes = maskBytes
+        self.resourceLimitExceeded = resourceLimitExceeded
+        self.renderNanoseconds = renderNanoseconds
+        self.copyNanoseconds = copyNanoseconds
+        self.reusableSnapshot = reusableSnapshot
+    }
 }
 
 final class LibassContext {
@@ -68,6 +132,9 @@ final class LibassContext {
     private var registeredFontIdentities: Set<FontIdentity> = []
     private var configuredFrameSize: CGSize?
     private var configuredStorageSize: CGSize?
+    // Only token metadata lives here. Masks remain owned by render callers.
+    private var renderIdentity = ASSRenderIdentity()
+    private var renderSequence: UInt64 = 0
 
     var configuredGeometry: (frame: CGSize?, storage: CGSize?) {
         (configuredFrameSize, configuredStorageSize)
@@ -130,6 +197,7 @@ final class LibassContext {
     }
 
     func reset() throws {
+        advanceRenderSequence()
         if let track { ass_free_track(track) }
         guard let library, let replacement = ass_new_track(library) else {
             track = nil
@@ -149,6 +217,7 @@ final class LibassContext {
         guard configuredFrameSize != frameSize || configuredStorageSize != storageSize else {
             return false
         }
+        advanceRenderSequence()
         ass_set_frame_size(renderer, frameWidth, frameHeight)
         ass_set_storage_size(renderer, storageWidth, storageHeight)
         configuredFrameSize = frameSize
@@ -214,6 +283,7 @@ final class LibassContext {
 
     func loadExternal(data: Data, codePage: String? = nil) throws {
         guard let library else { return }
+        advanceRenderSequence()
         let loaded: UnsafeMutablePointer<ASS_Track>? = data.withUnsafeBytes { bytes in
             guard let base = bytes.bindMemory(to: CChar.self).baseAddress else { return nil }
             return ass_read_memory(
@@ -234,7 +304,8 @@ final class LibassContext {
         at seconds: Double,
         copyIfUnchanged: Bool = true,
         maximumImageCount: Int = 256,
-        maximumBitmapBytes: Int = 64 * 1_024 * 1_024
+        maximumBitmapBytes: Int = 64 * 1_024 * 1_024,
+        reusing previous: ASSReusableRenderSnapshot? = nil
     ) -> ASSRenderResult {
         guard let renderer,
               let track,
@@ -242,6 +313,7 @@ final class LibassContext {
               seconds >= Double(Int64.min) / 1_000,
               seconds <= Double(Int64.max) / 1_000
         else {
+            advanceRenderSequence()
             return ASSRenderResult(
                 regions: [],
                 change: 0,
@@ -253,6 +325,19 @@ final class LibassContext {
                 copyNanoseconds: 0
             )
         }
+        let boundedImageCount = max(0, maximumImageCount)
+        let boundedBitmapBytes = max(0, maximumBitmapBytes)
+        let reusablePrevious: ASSReusableRenderSnapshot?
+        if let previous,
+           previous.identity === renderIdentity,
+           previous.sequence == renderSequence,
+           previous.maximumImageCount == boundedImageCount,
+           previous.maximumBitmapBytes == boundedBitmapBytes {
+            reusablePrevious = previous
+        } else {
+            reusablePrevious = nil
+        }
+        advanceRenderSequence()
         var changed: Int32 = 0
         let renderStart = DispatchTime.now().uptimeNanoseconds
         var image = ass_render_frame(
@@ -275,11 +360,24 @@ final class LibassContext {
                 maskBytes: 0,
                 resourceLimitExceeded: false,
                 renderNanoseconds: renderNanoseconds,
-                copyNanoseconds: 0
+                copyNanoseconds: 0,
+                reusableSnapshot: reusablePrevious.map {
+                    ASSReusableRenderSnapshot(
+                        identity: renderIdentity,
+                        sequence: renderSequence,
+                        maximumImageCount: boundedImageCount,
+                        maximumBitmapBytes: boundedBitmapBytes,
+                        regions: $0.regions
+                    )
+                }
             )
         }
-        let boundedImageCount = max(0, maximumImageCount)
-        let boundedBitmapBytes = max(0, maximumBitmapBytes)
+        // libass reports 1 only when positions may have changed; bitmap
+        // content, colors, dimensions and list order still match its preceding
+        // render. A caller token proves that its owned masks are that output.
+        // The full validation pass also checks the admitted subset before any
+        // masks can be shared.
+        var canReuseMasks = changed == 1 && reusablePrevious != nil
         var inspectedImage = image
         var retainedImageCount = 0
         var retainedMaskBytes = 0
@@ -315,6 +413,17 @@ final class LibassContext {
                    nextImageCount <= boundedImageCount,
                    nextMaskBytes <= boundedBitmapBytes
                 {
+                    if canReuseMasks, let previous = reusablePrevious {
+                        if retainedImageCount < previous.regions.count {
+                            let prior = previous.regions[retainedImageCount]
+                            canReuseMasks = prior.frame.size == CGSize(width: width, height: height)
+                                && prior.color == value.color
+                                && prior.stride == width
+                                && prior.bitmap.count == layout.byteCount
+                        } else {
+                            canReuseMasks = false
+                        }
+                    }
                     retainedImageCount = nextImageCount
                     retainedMaskBytes = nextMaskBytes
                 } else {
@@ -325,6 +434,9 @@ final class LibassContext {
                 }
             }
             inspectedImage = value.next
+        }
+        if let previous = reusablePrevious, retainedImageCount != previous.regions.count {
+            canReuseMasks = false
         }
         let copyStart = DispatchTime.now().uptimeNanoseconds
         var output: [ASSRenderedRegion] = []
@@ -361,14 +473,19 @@ final class LibassContext {
                 )
                 // Preserve top-to-bottom row order without retaining padding
                 // or reading past libass's potentially unpadded final row.
-                let bytes = layout.copy(from: bitmap)
+                let bytes: Data
+                if canReuseMasks, let previous = reusablePrevious {
+                    bytes = previous.regions[output.count].bitmap
+                } else {
+                    bytes = layout.copy(from: bitmap)
+                    bitmapCopies += 1
+                }
                 output.append(ASSRenderedRegion(
                     bitmap: bytes,
                     color: value.color,
                     frame: frame,
                     stride: width
                 ))
-                bitmapCopies += 1
                 maskBytes = nextMaskBytes
             }
             image = value.next
@@ -381,8 +498,26 @@ final class LibassContext {
             maskBytes: maskBytes,
             resourceLimitExceeded: resourceLimitExceeded,
             renderNanoseconds: renderNanoseconds,
-            copyNanoseconds: DispatchTime.now().uptimeNanoseconds - copyStart
+            copyNanoseconds: DispatchTime.now().uptimeNanoseconds - copyStart,
+            reusableSnapshot: ASSReusableRenderSnapshot(
+                identity: renderIdentity,
+                sequence: renderSequence,
+                maximumImageCount: boundedImageCount,
+                maximumBitmapBytes: boundedBitmapBytes,
+                regions: output
+            )
         )
+    }
+
+    private func advanceRenderSequence() {
+        if renderSequence == UInt64.max {
+            // A new identity keeps every outstanding token unambiguous even
+            // if this context exhausts its sequence space.
+            renderIdentity = ASSRenderIdentity()
+            renderSequence = 0
+        } else {
+            renderSequence += 1
+        }
     }
 
     private static func validatedDimension(_ value: CGFloat) -> Int32? {

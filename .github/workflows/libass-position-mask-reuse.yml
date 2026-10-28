@@ -1,0 +1,113 @@
+name: Libass position mask reuse
+
+on:
+  push:
+    branches:
+      - perf/libass-position-mask-reuse-5ae1d4b5
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift'
+      - 'Tests/IlliquidNativePlaybackTests/LibassPositionReuseTests.swift'
+      - 'Benchmarks/LibassPositionReuse/Driver.swift'
+      - 'Benchmarks/LibassPositionReuse/run.py'
+      - '.github/workflows/libass-position-mask-reuse.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift'
+      - 'Tests/IlliquidNativePlaybackTests/LibassPositionReuseTests.swift'
+      - 'Benchmarks/LibassPositionReuse/Driver.swift'
+      - 'Benchmarks/LibassPositionReuse/run.py'
+      - '.github/workflows/libass-position-mask-reuse.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: libass-position-mask-reuse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare reviewed libass SDK
+        run: |
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Verify exact native sources and measure alternating pairs
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo "Kyoto is available; this isolated-runner workflow must be submitted through the shared queue."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this ephemeral runner; using isolated, serialized builds."
+          python3 Benchmarks/LibassPositionReuse/run.py --mode all \
+            --pairs 8 --target-ms 100 --max-sample-ms 1500 \
+            --output "$RUNNER_TEMP/libass-position-reuse"
+      - name: Emit complete review records
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "libass-position-reuse"
+          for name in ("manifest.json", "tests.json", "summary.json", "qualification.json",
+                       "failure.json", "calibration.jsonl", "measurements.jsonl", "commands.jsonl"):
+              path = root / name
+              if path.is_file():
+                  print("LIBASS_REUSE_RECORD " + json.dumps({
+                      "path": name, "content": path.read_text()
+                  }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: libass-position-reuse-component
+          path: |
+            ${{ runner.temp }}/libass-position-reuse/
+            !${{ runner.temp }}/libass-position-reuse/build/**
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare native SDK and Metal compiler
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build app graph and verify subtitle integration
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo "Kyoto is available; this isolated-runner workflow must be submitted through the shared queue."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this ephemeral runner; using isolated, serialized builds."
+          mkdir -p "$RUNNER_TEMP/libass-position-native"
+          set -o pipefail
+          swift test --force-resolved-versions --no-parallel --filter \
+            'LibassPositionReuseTests|ASSBitmapCopyTests|SubtitleMemoryBudgetAccountingTests|SubtitleResultLifetimeTests|SubtitleStagingReuseTests|SubtitleSeekRegressionTests' \
+            2>&1 | tee "$RUNNER_TEMP/libass-position-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: libass-position-reuse-native
+          path: ${{ runner.temp }}/libass-position-native/
+          retention-days: 14
