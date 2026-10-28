@@ -152,7 +152,7 @@ struct FixedRingBufferTests {
 
             var returned: Payload? = ring.removeFirst()
             #expect(returned?.value == 1)
-            #expect(popped.isAlive)
+            withExtendedLifetime(returned) { #expect(popped.isAlive) }
             returned = nil
             #expect(!popped.isAlive)
 
