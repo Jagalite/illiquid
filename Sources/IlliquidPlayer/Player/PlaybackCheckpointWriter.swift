@@ -25,17 +25,30 @@ struct PlaybackCheckpoint: Sendable {
     let unshuffledPlaylistIDs: [FolderPlaylistItem.ID]?
 
     func record() -> PlaybackSessionRecord {
-        let belongsToFolder = source.url.isFileURL && playlist.contains {
-            NormalizedFileURL.representsSameFile($0.url, source.url)
-        }
-        return PlaybackSessionRecord(
+        PlaybackSessionRecord(
             source: source,
-            collectionFolder: belongsToFolder ? folder : nil,
+            collectionFolder: matchingCollectionFolder(),
             playlistItems: playlist,
             playlistIndex: index,
             position: position,
             wasPaused: wasPaused,
             unshuffledPlaylistIDs: unshuffledPlaylistIDs
         )
+    }
+
+    private func matchingCollectionFolder() -> URL? {
+        guard let folder, !playlist.isEmpty, source.url.isFileURL,
+              let sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
+        else { return nil }
+
+        // The captured index normally identifies the source, but can be stale.
+        // Validate it before skipping the membership scan; any match suffices.
+        if let index, playlist.indices.contains(index),
+           NormalizedFileURL.persistenceKey(for: playlist[index].url) == sourceKey {
+            return folder
+        }
+        return playlist.contains {
+            NormalizedFileURL.persistenceKey(for: $0.url) == sourceKey
+        } ? folder : nil
     }
 }
