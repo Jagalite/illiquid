@@ -1,5 +1,9 @@
 # Playback checkpoint membership
 
+The [research report](../../Documentation/PLAYBACK_CHECKPOINT_PERFORMANCE.md)
+distinguishes the measured first candidate from the revised candidate awaiting
+its final native qualification. The PR remains a draft while that run is queued.
+
 This experiment measures the complete production `PlaybackCheckpoint.record()`
 and the same operation followed by sorted-key JSON encoding. The checkpoint
 already captures a playlist index; a validated hit avoids scanning preceding
