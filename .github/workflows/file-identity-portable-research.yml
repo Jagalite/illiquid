@@ -1,0 +1,43 @@
+name: File identity portable research
+
+on:
+  push:
+    branches: ['perf/file-identity-keys']
+    paths:
+      - '.github/workflows/file-identity-portable-research.yml'
+      - 'Benchmarks/FileIdentityKeys/Driver.swift'
+      - 'Benchmarks/FileIdentityKeys/run.py'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: file-identity-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate the portable harness while native qualification is queued
+        run: |
+          echo 'Kyoto unavailable on this ephemeral runner; compiling serially in an isolated checkout.'
+          python3 Benchmarks/FileIdentityKeys/run.py --mode all --pairs 10 \
+            --output "$RUNNER_TEMP/file-identity-portable"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: file-identity-portable
+          path: |
+            ${{ runner.temp }}/file-identity-portable/*.json
+            ${{ runner.temp }}/file-identity-portable/*.jsonl
+            ${{ runner.temp }}/file-identity-portable/logs/*.log
+            ${{ runner.temp }}/file-identity-portable/sources/**
+          retention-days: 14
