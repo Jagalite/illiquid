@@ -23,7 +23,7 @@ BASELINE_BLOB = "cf3b96706f34ba5c43041d650f4c9f6217e340cc"
 WORKLOADS = [
     "storyboard-24", "economical-6", "balanced-12", "extensive-24",
     "maximum-64", "boundary-33", "exact-level-32", "exact-level-64",
-    "one-sample", "short-duration",
+    "one-sample", "short-duration", "short-1.4", "short-2.1", "short-7.9", "short-30",
 ]
 
 
@@ -64,7 +64,10 @@ def main() -> None:
             raise RuntimeError(f"{label} failed ({process.returncode}); see {log}")
         return process.stdout
 
-    print("Kyoto is unavailable on this isolated runner; building serially in a private output directory.", flush=True)
+    if not Path("/Volumes/seed1/Projects/kyoto/kyoto.py").is_file():
+        print("Kyoto is unavailable; building serially in a private output directory.", flush=True)
+    else:
+        print("Kyoto is available; submit this harness through its shared queue as documented.", flush=True)
     baseline = run(["git", "show", f"{BASELINE}:{POLICY}"], "baseline-source")
     raw_baseline = baseline.encode()
     actual_blob = hashlib.sha1(f"blob {len(raw_baseline)}\0".encode() + raw_baseline).hexdigest()
@@ -230,7 +233,8 @@ let package = Package(
 
     by_name = {item["workload"]: item for item in summary}
     primary = ("storyboard-24", "balanced-12")
-    controls = ("exact-level-32", "exact-level-64", "one-sample", "short-duration")
+    controls = ("exact-level-32", "exact-level-64", "one-sample", "short-duration",
+                "short-1.4", "short-2.1", "short-7.9", "short-30")
     gate = {
         "rule": "Both primary workloads: >=15% median paired CPU reduction and >=90% winning pairs; "
                 "each control: <=10% median paired CPU regression. This is a practical consistency "

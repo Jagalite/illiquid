@@ -191,8 +191,14 @@ public enum ThumbnailPolicy {
     /// Half-second quantization matches foreground hover requests.
     public static func samples(duration: Double, focus: Double, count: Int) -> [Double] {
         guard duration.isFinite, duration > 0 else { return [] }
-        let limit = min(max(count, 1), 64)
+        var limit = min(max(count, 1), 64)
         let last = max(0, floor((duration - 0.5) * 2) / 2)
+        // Every emitted time is a half-second slot in 0...last. For short clips,
+        // stop once all possible slots are present. The comparison also keeps
+        // the integer conversion bounded even for enormous finite durations.
+        if last < Double(limit) / 2 {
+            limit = min(limit, Int(last * 2) + 1)
+        }
         var result: [Double] = []
         func add(_ value: Double) {
             let time = min(last, max(0, (value * 2).rounded() / 2))

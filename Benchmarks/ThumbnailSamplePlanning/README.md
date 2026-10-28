@@ -45,7 +45,8 @@ its absence before compiling directly.
 - Compare every timestamp in the 32-input timing corpus for each workload.
   Time the real storyboard entry point and sample requests at preset budgets
   6, 12, and 24, plus maximum and subdivision-boundary workloads.
-- Retain exact-level 32/64, one-sample, and too-short-to-fill controls. Inputs
+- Retain exact-level 32/64, one-sample, and too-short-to-fill controls. The final
+  revision adds four more short-clip controls after the initial findings. Inputs
   are constructed before timing. The result consumer reads every timestamp.
   These synthetic workloads are not a measured user-duration distribution.
 - Use ten fresh-process pairs, alternate baseline/candidate order, and rotate
@@ -84,5 +85,29 @@ overshoot. If quantized duplicates leave room, the next chunk continues the
 same subdivision sequence. This avoids a completion branch inside each sample
 iteration. The baseline, workload matrix, and acceptance rule remain unchanged.
 
-Revised portable and native measurements are pending. No production performance
-claim is made from the rejected initial candidate.
+## Chunked portable result: one remaining control regression
+
+[Run 40640044957](https://github.com/Jagalite/illiquid/actions/runs/40640044957)
+tested the chunked candidate at `7d8d0dec73d75c80695b2fc0ecaad10bb5a30644`
+on x86_64 Linux with Swift 6.4. All correctness checks passed again.
+Storyboards improved by 25.9%, balanced-12 by 27.0%, and extensive-24 by 31.9%
+in median paired CPU. Exact-level-32 regressed by 1.5%; exact-level-64 improved
+by 0.6%; maximum-64 improved by 4.2%. The 0.1-second control regressed by
+10.14%, so this candidate also failed the unchanged 10% control limit.
+All 200 observations are in [the chunked receipt](results/linux-chunked.json).
+
+These two runs used different Swift versions and runner kernels. Their samples
+are not pooled, and absolute timings are not compared across hosts. Within each
+run, baseline and candidate used the same compiler, flags, and input corpus.
+
+The next revision bounds the target by the number of available half-second
+slots when that number is smaller than the requested budget. Once those slots
+are present, further attempts can only deduplicate. The conversion to an integer
+is guarded by `last < Double(limit) / 2`, which keeps it within 0...63 even
+for very large durations. It retains the first-occurrence timestamp bits.
+
+Four additional count-64 controls use durations 1.4, 2.1, 7.9, and 30 seconds
+with varied focus positions. They extend the control gate using the same 10%
+regression limit; every earlier workload and both primary thresholds remain.
+This tests the general underfilled-plan case instead of only the original
+0.1-second fixture. Native and revised portable results are pending.

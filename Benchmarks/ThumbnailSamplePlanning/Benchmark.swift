@@ -27,6 +27,10 @@ private func inputs(for workload: String) -> [Input] {
         case "exact-level-64": return Input(duration: duration, focus: 0, count: 64)
         case "one-sample": return Input(duration: duration, focus: focus, count: 1)
         case "short-duration": return Input(duration: 0.1, focus: focus, count: 64)
+        case "short-1.4": return Input(duration: 1.4, focus: 1.4 * Double(index % 9) / 8, count: 64)
+        case "short-2.1": return Input(duration: 2.1, focus: 2.1 * Double(index % 9) / 8, count: 64)
+        case "short-7.9": return Input(duration: 7.9, focus: 7.9 * Double(index % 9) / 8, count: 64)
+        case "short-30": return Input(duration: 30, focus: 30 * Double(index % 9) / 8, count: 64)
         default: fatalError("Unknown workload: \(workload)")
         }
     }

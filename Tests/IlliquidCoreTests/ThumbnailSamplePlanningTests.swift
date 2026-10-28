@@ -39,6 +39,8 @@ struct ThumbnailSamplePlanningTests {
 
     @Test func quantizedDuplicatesDoNotConsumeTheBudget() {
         #expect(ThumbnailPolicy.samples(duration: 0.1, focus: 99, count: 64) == [0])
+        #expect(ThumbnailPolicy.samples(duration: Double(1).nextDown, focus: 99, count: 64) == [0])
+        #expect(ThumbnailPolicy.samples(duration: 1, focus: 99, count: 64) == [0.5, 0])
         #expect(ThumbnailPolicy.samples(duration: 1.4, focus: 0.51, count: 64) == [0.5, 0])
         #expect(ThumbnailPolicy.samples(duration: 2.1, focus: 0.51, count: 3) == [0.5, 0, 1])
         #expect(ThumbnailPolicy.samples(duration: 2.1, focus: 0.51, count: 64) == [0.5, 0, 1, 1.5])
