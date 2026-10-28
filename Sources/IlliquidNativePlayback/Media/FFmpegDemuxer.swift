@@ -41,6 +41,31 @@ struct FFmpegDemuxReadRetryPolicy {
     }
 }
 
+// Keep native packet ownership at the demux boundary. The classifiers borrow
+// bytes only for their synchronous header scan and retain no payload storage.
+extension PGSSubtitlePacket {
+    static func isAcquisition(_ packet: FFmpegPacket) -> Bool {
+        guard let pointer = packet.pointer,
+              let bytes = pointer.pointee.data,
+              pointer.pointee.size > 0 else { return false }
+        return withExtendedLifetime(packet) {
+            isAcquisition(UnsafeBufferPointer(start: bytes, count: Int(pointer.pointee.size)))
+        }
+    }
+}
+
+extension DVBSubtitlePacket {
+    static func isAcquisition(_ packet: FFmpegPacket, compositionPageID: UInt16?) -> Bool {
+        guard let pointer = packet.pointer,
+              let bytes = pointer.pointee.data,
+              pointer.pointee.size > 0 else { return false }
+        return withExtendedLifetime(packet) {
+            isAcquisition(UnsafeBufferPointer(start: bytes, count: Int(pointer.pointee.size)),
+                          compositionPageID: compositionPageID)
+        }
+    }
+}
+
 final class FFmpegDemuxer {
     private var terminalPacketWasCorrupt = false
     private var context: UnsafeMutablePointer<AVFormatContext>?
@@ -273,10 +298,9 @@ final class FFmpegDemuxer {
                         continue
                     }
                 } else if !isBitmap { continue }
-                let acquisition = needsAcquisition && packet.data.map { data in
-                    isPGS ? PGSSubtitlePacket.isAcquisition(data)
-                        : DVBSubtitlePacket.isAcquisition(data, compositionPageID: compositionPageID)
-                } == true
+                let acquisition = needsAcquisition && (isPGS
+                    ? PGSSubtitlePacket.isAcquisition(packet)
+                    : DVBSubtitlePacket.isAcquisition(packet, compositionPageID: compositionPageID))
                 if acquisition {
                     active.removeAll()
                     foundAcquisition = true
