@@ -150,11 +150,19 @@ struct BitmapSubtitleAcquisitionBorrowTests {
         for isPGS in [true, false] {
             let bytes = isPGS ? pgsComposition(state: 0x80) : dvbSegment(0x10, [2, 4], pageID: 1)
             var owner: FFmpegPacket? = try packet(bytes)
-            weak var released = owner
+            let released = WeakPacketReference(owner)
             let detected = try inspectAndVerifyUnchanged(try #require(owner), bytes: bytes, isPGS: isPGS)
             owner = nil
-            #expect(released == nil)
+            #expect(released.value == nil)
             #expect(detected)
+        }
+    }
+
+    private final class WeakPacketReference {
+        weak var value: FFmpegPacket?
+
+        init(_ value: FFmpegPacket?) {
+            self.value = value
         }
     }
 
