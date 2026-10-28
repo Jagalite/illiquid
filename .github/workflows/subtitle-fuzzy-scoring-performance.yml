@@ -1,0 +1,75 @@
+name: Subtitle fuzzy scoring performance
+
+on:
+  push:
+    branches: ['perf/subtitle-fuzzy-scoring-20261028']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitle*Tests.swift'
+      - 'Benchmarks/SubtitleFuzzyScoring/Driver.swift'
+      - 'Benchmarks/SubtitleFuzzyScoring/run.py'
+      - '.github/workflows/subtitle-fuzzy-scoring-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitle*Tests.swift'
+      - 'Benchmarks/SubtitleFuzzyScoring/Driver.swift'
+      - 'Benchmarks/SubtitleFuzzyScoring/run.py'
+      - '.github/workflows/subtitle-fuzzy-scoring-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-fuzzy-scoring-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test production matchers and measure complete associations
+        run: |
+          set -o pipefail
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated packages.'
+          python3 Benchmarks/SubtitleFuzzyScoring/run.py \
+            --pairs 6 --target-ms 250 --output "$RUNNER_TEMP/subtitle-fuzzy-scoring" \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-fuzzy-scoring.log"
+      - name: Print source receipts and raw observations for review
+        run: |
+          python3 - <<'PY'
+          import json, os, pathlib
+          root = pathlib.Path(os.environ["RUNNER_TEMP"]) / "subtitle-fuzzy-scoring"
+          for name in ["manifest.json", "parity.json", "summary.json", "calibrations.json"]:
+              print("FUZZY_EVIDENCE " + json.dumps({"file": name, "value": json.loads((root / name).read_text())}, sort_keys=True))
+          for line in (root / "observations.jsonl").read_text().splitlines():
+              print("FUZZY_EVIDENCE " + json.dumps({"file": "observations.jsonl", "value": json.loads(line)}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-fuzzy-scoring-native
+          path: |
+            ${{ runner.temp }}/subtitle-fuzzy-scoring/
+            ${{ runner.temp }}/subtitle-fuzzy-scoring.log
+            !${{ runner.temp }}/subtitle-fuzzy-scoring/**/.build/**
+            !${{ runner.temp }}/subtitle-fuzzy-scoring/cache/**
+            !${{ runner.temp }}/subtitle-fuzzy-scoring/config/**
+            !${{ runner.temp }}/subtitle-fuzzy-scoring/security/**
+          retention-days: 14
