@@ -40,7 +40,7 @@ jobs:
           xcrun swiftc --version >> "$RUNNER_TEMP/track-selection-ranking/system.txt"
           git rev-parse HEAD > "$RUNNER_TEMP/track-selection-ranking/revision.txt"
           git fetch --no-tags --depth=1 origin "$TRACK_RANK_BASELINE"
-          git diff --check
+          git diff --check "$TRACK_RANK_BASELINE" HEAD --
       - name: Check baseline and candidate in debug and release
         run: |
           if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
@@ -101,4 +101,5 @@ jobs:
             ${{ runner.temp }}/track-selection-ranking/**/*.jsonl
             ${{ runner.temp }}/track-selection-ranking/**/*.log
             ${{ runner.temp }}/track-selection-ranking/**/*.txt
+            ${{ runner.temp }}/track-selection-ranking/**/inputs/**
           retention-days: 30
