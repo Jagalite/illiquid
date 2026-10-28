@@ -1,0 +1,70 @@
+name: Subtitle packet identity memory
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ProcessedSubtitlePacketKey.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift'
+      - 'Sources/IlliquidNativePlayback/Media/SubtitleDecoder.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ProcessedSubtitlePacketKeyTests.swift'
+      - 'Benchmarks/SubtitlePacketIdentity/**'
+      - '.github/workflows/subtitle-packet-identity.yml'
+      - '!Benchmarks/SubtitlePacketIdentity/evidence/**'
+      - '!Benchmarks/SubtitlePacketIdentity/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-packet-identity-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      ILLIQUID_BUILD_COORDINATION: 'Kyoto unavailable on isolated GitHub-hosted runner; direct serial component builds.'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Qualify ownership and measure native Foundation storage
+        run: |
+          echo "$ILLIQUID_BUILD_COORDINATION"
+          python3 Benchmarks/SubtitlePacketIdentity/run.py \
+            --output "$RUNNER_TEMP/subtitle-packet-identity" \
+            --pairs 6 --count 1024 --iterations 10
+      - name: Emit compact reviewable results
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'subtitle-packet-identity'
+          files = {p.name: p.read_text() for p in sorted(root.glob('*.json'))}
+          for path in root.glob('*.jsonl'):
+              files[path.name] = path.read_text()
+          for path in (root / 'logs').glob('*tests*.log'):
+              files['logs/' + path.name] = path.read_text()
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log bundle limit; use uploaded artifact')
+          print('SUBTITLE_KEY_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('SUBTITLE_KEY_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          if 'summary.json' in files:
+              print(files['summary.json'])
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-packet-identity-component
+          path: |
+            ${{ runner.temp }}/subtitle-packet-identity/*.json
+            ${{ runner.temp }}/subtitle-packet-identity/*.jsonl
+            ${{ runner.temp }}/subtitle-packet-identity/logs/
+            ${{ runner.temp }}/subtitle-packet-identity/sources/
+          retention-days: 14

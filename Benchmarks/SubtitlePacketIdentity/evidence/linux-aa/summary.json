@@ -1,0 +1,840 @@
+{
+  "aa_control": true,
+  "all_semantic_pairs_match": true,
+  "difference_direction": "candidate minus baseline; negative means smaller",
+  "groups": [
+    {
+      "count": 1024,
+      "iterations": 1,
+      "metrics": {
+        "released_allocator_delta_bytes": {
+          "baseline_median": -7984.0,
+          "baseline_range": [
+            -8080,
+            -7888
+          ],
+          "candidate_higher_pairs": 3,
+          "candidate_median": -7952.0,
+          "candidate_range": [
+            -8080,
+            -7888
+          ],
+          "median_paired_change_percent": null,
+          "median_paired_difference": 48.0,
+          "paired_change_percent_range": null,
+          "paired_differences": [
+            96,
+            96,
+            160,
+            0,
+            -192,
+            -96
+          ],
+          "pairs_with_positive_baseline": 0,
+          "ratio_of_medians_change_percent": null
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 187984.0,
+          "baseline_range": [
+            187968,
+            188000
+          ],
+          "candidate_higher_pairs": 3,
+          "candidate_median": 187992.0,
+          "candidate_range": [
+            187968,
+            188016
+          ],
+          "median_paired_change_percent": 0.004255681334581667,
+          "median_paired_difference": 8.0,
+          "paired_change_percent_range": [
+            -0.01702127659574468,
+            0.017024174327545116
+          ],
+          "paired_differences": [
+            32,
+            16,
+            32,
+            0,
+            -32,
+            -16
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.004255681334581667
+        }
+      },
+      "mode": "retain",
+      "pairs": 6,
+      "payload_checksum": "4050846478174380032",
+      "pipelines": 1,
+      "scenario": "tiny",
+      "unique_keys": 1024
+    },
+    {
+      "count": 1024,
+      "iterations": 50,
+      "metrics": {
+        "cpu_nanoseconds": {
+          "baseline_median": 44876390.5,
+          "baseline_range": [
+            36905342,
+            58361076
+          ],
+          "candidate_higher_pairs": 3,
+          "candidate_median": 48042524.5,
+          "candidate_range": [
+            37587154,
+            58512130
+          ],
+          "median_paired_change_percent": 10.243895373174047,
+          "median_paired_difference": 4906289.0,
+          "paired_change_percent_range": [
+            -35.595508897060085,
+            58.54650527286808
+          ],
+          "paired_differences": [
+            -1519617,
+            -20773922,
+            15327945,
+            11332195,
+            -11066084,
+            21606788
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 7.055233196618164
+        },
+        "wall_nanoseconds": {
+          "baseline_median": 44869622.5,
+          "baseline_range": [
+            36915022,
+            58354297
+          ],
+          "candidate_higher_pairs": 3,
+          "candidate_median": 48256081.0,
+          "candidate_range": [
+            37994966,
+            58821896
+          ],
+          "median_paired_change_percent": 10.888739914485033,
+          "median_paired_difference": 5160950.0,
+          "paired_change_percent_range": [
+            -34.88917191479489,
+            58.489682059514955
+          ],
+          "paired_differences": [
+            -1009619,
+            -20359331,
+            15663747,
+            11331519,
+            -11086581,
+            21591479
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 7.547330044954133
+        }
+      },
+      "mode": "time",
+      "pairs": 6,
+      "payload_checksum": "4050846478174380032",
+      "pipelines": 1,
+      "scenario": "tiny",
+      "unique_keys": 1024
+    },
+    {
+      "count": 1024,
+      "iterations": 1,
+      "metrics": {
+        "allocation_requests": {
+          "baseline_median": 2059.0,
+          "baseline_range": [
+            2059,
+            2059
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": 2059.0,
+          "candidate_range": [
+            2059,
+            2059
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            0.0,
+            0.0
+          ],
+          "paired_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.0
+        },
+        "requested_bytes": {
+          "baseline_median": 231496.0,
+          "baseline_range": [
+            231496,
+            231496
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": 231496.0,
+          "candidate_range": [
+            231496,
+            231496
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            0.0,
+            0.0
+          ],
+          "paired_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.0
+        }
+      },
+      "mode": "allocation",
+      "pairs": 6,
+      "payload_checksum": "4050846478174380032",
+      "pipelines": 1,
+      "scenario": "tiny",
+      "unique_keys": 1024
+    },
+    {
+      "count": 1024,
+      "iterations": 1,
+      "metrics": {
+        "released_allocator_delta_bytes": {
+          "baseline_median": -7952.0,
+          "baseline_range": [
+            -8048,
+            -7792
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": -8016.0,
+          "candidate_range": [
+            -8144,
+            -7952
+          ],
+          "median_paired_change_percent": null,
+          "median_paired_difference": -80.0,
+          "paired_change_percent_range": null,
+          "paired_differences": [
+            -96,
+            -64,
+            -256,
+            0,
+            -96,
+            0
+          ],
+          "pairs_with_positive_baseline": 0,
+          "ratio_of_medians_change_percent": null
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 384880.0,
+          "baseline_range": [
+            384864,
+            384912
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": 384872.0,
+          "candidate_range": [
+            384848,
+            384880
+          ],
+          "median_paired_change_percent": -0.004157053482288987,
+          "median_paired_difference": -16.0,
+          "paired_change_percent_range": [
+            -0.01247038284075321,
+            0.0
+          ],
+          "paired_differences": [
+            -16,
+            -16,
+            -48,
+            0,
+            -16,
+            0
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": -0.0020785699438786117
+        }
+      },
+      "mode": "retain",
+      "pairs": 6,
+      "payload_checksum": "8101692956348760064",
+      "pipelines": 2,
+      "scenario": "tiny",
+      "unique_keys": 2048
+    },
+    {
+      "count": 1024,
+      "iterations": 50,
+      "metrics": {
+        "cpu_nanoseconds": {
+          "baseline_median": 64439922.0,
+          "baseline_range": [
+            58824834,
+            96975548
+          ],
+          "candidate_higher_pairs": 4,
+          "candidate_median": 76151216.5,
+          "candidate_range": [
+            60489090,
+            87000099
+          ],
+          "median_paired_change_percent": 10.870416970683436,
+          "median_paired_difference": 6689760.5,
+          "paired_change_percent_range": [
+            -10.286561103011246,
+            33.07016338131071
+          ],
+          "paired_differences": [
+            1664256,
+            -6693871,
+            14040097,
+            -9975449,
+            11715265,
+            19543322
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 18.173973736343132
+        },
+        "wall_nanoseconds": {
+          "baseline_median": 67618181.5,
+          "baseline_range": [
+            59088078,
+            96967744
+          ],
+          "candidate_higher_pairs": 4,
+          "candidate_median": 76154128.0,
+          "candidate_range": [
+            60889775,
+            87201974
+          ],
+          "median_paired_change_percent": 7.67423076278711,
+          "median_paired_difference": 5673814.5,
+          "paired_change_percent_range": [
+            -10.07115314552435,
+            33.05412767287338
+          ],
+          "paired_differences": [
+            1801697,
+            -6593993,
+            9545932,
+            -9765770,
+            11724048,
+            19536898
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 12.62374454716739
+        }
+      },
+      "mode": "time",
+      "pairs": 6,
+      "payload_checksum": "8101692956348760064",
+      "pipelines": 2,
+      "scenario": "tiny",
+      "unique_keys": 2048
+    },
+    {
+      "count": 1024,
+      "iterations": 1,
+      "metrics": {
+        "allocation_requests": {
+          "baseline_median": 4118.0,
+          "baseline_range": [
+            4118,
+            4118
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": 4118.0,
+          "candidate_range": [
+            4118,
+            4118
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            0.0,
+            0.0
+          ],
+          "paired_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.0
+        },
+        "requested_bytes": {
+          "baseline_median": 462992.0,
+          "baseline_range": [
+            462992,
+            462992
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": 462992.0,
+          "candidate_range": [
+            462992,
+            462992
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            0.0,
+            0.0
+          ],
+          "paired_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.0
+        }
+      },
+      "mode": "allocation",
+      "pairs": 6,
+      "payload_checksum": "8101692956348760064",
+      "pipelines": 2,
+      "scenario": "tiny",
+      "unique_keys": 2048
+    },
+    {
+      "count": 1024,
+      "iterations": 1,
+      "metrics": {
+        "released_allocator_delta_bytes": {
+          "baseline_median": -12000.0,
+          "baseline_range": [
+            -12096,
+            -12000
+          ],
+          "candidate_higher_pairs": 1,
+          "candidate_median": -12048.0,
+          "candidate_range": [
+            -12192,
+            -11904
+          ],
+          "median_paired_change_percent": null,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": null,
+          "paired_differences": [
+            -96,
+            -96,
+            0,
+            0,
+            0,
+            96
+          ],
+          "pairs_with_positive_baseline": 0,
+          "ratio_of_medians_change_percent": null
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 4345584.0,
+          "baseline_range": [
+            4345568,
+            4345584
+          ],
+          "candidate_higher_pairs": 1,
+          "candidate_median": 4345576.0,
+          "candidate_range": [
+            4345552,
+            4345600
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            -0.00036819122379398966,
+            0.0003681898681512082
+          ],
+          "paired_differences": [
+            -16,
+            -16,
+            0,
+            0,
+            0,
+            16
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": -0.0001840949340756041
+        }
+      },
+      "mode": "retain",
+      "pairs": 6,
+      "payload_checksum": "11656317635761315840",
+      "pipelines": 1,
+      "scenario": "dense",
+      "unique_keys": 1024
+    },
+    {
+      "count": 1024,
+      "iterations": 50,
+      "metrics": {
+        "cpu_nanoseconds": {
+          "baseline_median": 70316827.5,
+          "baseline_range": [
+            66980569,
+            77829094
+          ],
+          "candidate_higher_pairs": 3,
+          "candidate_median": 68891104.5,
+          "candidate_range": [
+            63030847,
+            78769162
+          ],
+          "median_paired_change_percent": 0.3788018011771084,
+          "median_paired_difference": 194675.5,
+          "paired_change_percent_range": [
+            -19.01377266449999,
+            6.70715160374278
+          ],
+          "paired_differences": [
+            3983472,
+            -14798247,
+            4951090,
+            -3594121,
+            -5325206,
+            4010763
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": -2.02757014314959
+        },
+        "wall_nanoseconds": {
+          "baseline_median": 70952180.5,
+          "baseline_range": [
+            67021585,
+            77900689
+          ],
+          "candidate_higher_pairs": 3,
+          "candidate_median": 68896024.0,
+          "candidate_range": [
+            63023902,
+            80872519
+          ],
+          "median_paired_change_percent": 0.34588214878610346,
+          "median_paired_difference": 164007.0,
+          "paired_change_percent_range": [
+            -19.09711864037557,
+            8.220439949556154
+          ],
+          "paired_differences": [
+            3987630,
+            -14876787,
+            6143088,
+            -3646437,
+            -6544250,
+            3974451
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": -2.8979468784613323
+        }
+      },
+      "mode": "time",
+      "pairs": 6,
+      "payload_checksum": "11656317635761315840",
+      "pipelines": 1,
+      "scenario": "dense",
+      "unique_keys": 1024
+    },
+    {
+      "count": 1024,
+      "iterations": 1,
+      "metrics": {
+        "allocation_requests": {
+          "baseline_median": 2059.0,
+          "baseline_range": [
+            2059,
+            2059
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": 2059.0,
+          "candidate_range": [
+            2059,
+            2059
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            0.0,
+            0.0
+          ],
+          "paired_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.0
+        },
+        "requested_bytes": {
+          "baseline_median": 4393032.0,
+          "baseline_range": [
+            4393032,
+            4393032
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": 4393032.0,
+          "candidate_range": [
+            4393032,
+            4393032
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            0.0,
+            0.0
+          ],
+          "paired_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.0
+        }
+      },
+      "mode": "allocation",
+      "pairs": 6,
+      "payload_checksum": "11656317635761315840",
+      "pipelines": 1,
+      "scenario": "dense",
+      "unique_keys": 1024
+    },
+    {
+      "count": 1024,
+      "iterations": 1,
+      "metrics": {
+        "released_allocator_delta_bytes": {
+          "baseline_median": -12192.0,
+          "baseline_range": [
+            -12480,
+            -12096
+          ],
+          "candidate_higher_pairs": 2,
+          "candidate_median": -12192.0,
+          "candidate_range": [
+            -12288,
+            -12096
+          ],
+          "median_paired_change_percent": null,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": null,
+          "paired_differences": [
+            288,
+            0,
+            -96,
+            0,
+            96,
+            -96
+          ],
+          "pairs_with_positive_baseline": 0,
+          "ratio_of_medians_change_percent": null
+        },
+        "retained_allocator_delta_bytes": {
+          "baseline_median": 8704016.0,
+          "baseline_range": [
+            8703968,
+            8704032
+          ],
+          "candidate_higher_pairs": 2,
+          "candidate_median": 8704016.0,
+          "candidate_range": [
+            8704000,
+            8704032
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            -0.00018382319150148622,
+            0.0005514726157081459
+          ],
+          "paired_differences": [
+            48,
+            0,
+            -16,
+            0,
+            16,
+            -16
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.0
+        }
+      },
+      "mode": "retain",
+      "pairs": 6,
+      "payload_checksum": "4865891197813080064",
+      "pipelines": 2,
+      "scenario": "dense",
+      "unique_keys": 2048
+    },
+    {
+      "count": 1024,
+      "iterations": 50,
+      "metrics": {
+        "cpu_nanoseconds": {
+          "baseline_median": 113175069.0,
+          "baseline_range": [
+            109216915,
+            149833539
+          ],
+          "candidate_higher_pairs": 4,
+          "candidate_median": 119896100.5,
+          "candidate_range": [
+            112318104,
+            129643299
+          ],
+          "median_paired_change_percent": 8.765415601396818,
+          "median_paired_difference": 9886762.5,
+          "paired_change_percent_range": [
+            -25.038075754187453,
+            18.221531444914316
+          ],
+          "paired_differences": [
+            19981973,
+            11041885,
+            -37515435,
+            9410880,
+            10362645,
+            -4553711
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 5.9386148905285845
+        },
+        "wall_nanoseconds": {
+          "baseline_median": 113189275.0,
+          "baseline_range": [
+            109220107,
+            149783525
+          ],
+          "candidate_higher_pairs": 4,
+          "candidate_median": 119889370.0,
+          "candidate_range": [
+            112499052,
+            129757731
+          ],
+          "median_paired_change_percent": 8.756525362353784,
+          "median_paired_difference": 9877380.5,
+          "paired_change_percent_range": [
+            -24.892238982892145,
+            18.260280829149213
+          ],
+          "paired_differences": [
+            20035574,
+            11025808,
+            -37284473,
+            9411929,
+            10342832,
+            -12941678
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 5.919372661411605
+        }
+      },
+      "mode": "time",
+      "pairs": 6,
+      "payload_checksum": "4865891197813080064",
+      "pipelines": 2,
+      "scenario": "dense",
+      "unique_keys": 2048
+    },
+    {
+      "count": 1024,
+      "iterations": 1,
+      "metrics": {
+        "allocation_requests": {
+          "baseline_median": 4118.0,
+          "baseline_range": [
+            4118,
+            4118
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": 4118.0,
+          "candidate_range": [
+            4118,
+            4118
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            0.0,
+            0.0
+          ],
+          "paired_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.0
+        },
+        "requested_bytes": {
+          "baseline_median": 8786064.0,
+          "baseline_range": [
+            8786064,
+            8786064
+          ],
+          "candidate_higher_pairs": 0,
+          "candidate_median": 8786064.0,
+          "candidate_range": [
+            8786064,
+            8786064
+          ],
+          "median_paired_change_percent": 0.0,
+          "median_paired_difference": 0.0,
+          "paired_change_percent_range": [
+            0.0,
+            0.0
+          ],
+          "paired_differences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "pairs_with_positive_baseline": 6,
+          "ratio_of_medians_change_percent": 0.0
+        }
+      },
+      "mode": "allocation",
+      "pairs": 6,
+      "payload_checksum": "4865891197813080064",
+      "pipelines": 2,
+      "scenario": "dense",
+      "unique_keys": 2048
+    }
+  ],
+  "normalization": "Raw metrics per invocation; count and iterations are recorded per group",
+  "rows": 144,
+  "schema": 1,
+  "status": "complete",
+  "verified_pairs": 72
+}

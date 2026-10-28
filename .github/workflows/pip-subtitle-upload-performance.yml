@@ -7,8 +7,11 @@ on:
       - 'Sources/IlliquidNativePlayback/Presentation/PiPSubtitleUploadCache.swift'
       - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
       - 'Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/ProcessedSubtitlePacketKey.swift'
       - 'Sources/IlliquidNativePlayback/Resources/NativePlaybackShaders.metal'
       - 'Tests/IlliquidNativePlaybackTests/PiPSubtitleUploadReuseTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/ProcessedSubtitlePacketKeyTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift'
       - 'Benchmarks/PiPSubtitleUpload/**'
       - '.github/workflows/pip-subtitle-upload-performance.yml'
   workflow_dispatch:
@@ -68,7 +71,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/pip-subtitle-regressions"
           set -o pipefail
           swift test --force-resolved-versions -c release --no-parallel --filter \
-            'PiPSubtitleUploadReuseTests|PiPSubtitlePipelineTests|PiPVideoMappingTests|PiPSubtitleCompositionPolicyTests|MetalASSSubtitleCompositorTests' \
+            'PiPSubtitleUploadReuseTests|PiPSubtitlePipelineTests|PiPVideoMappingTests|PiPSubtitleCompositionPolicyTests|MetalASSSubtitleCompositorTests|ProcessedSubtitlePacketKeyTests|PlaybackPerformanceRegressionTests' \
             2>&1 | tee "$RUNNER_TEMP/pip-subtitle-regressions/tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

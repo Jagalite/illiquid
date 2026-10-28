@@ -133,6 +133,38 @@ struct PlaybackPerformanceRegressionTests {
         semaphore.wait(timeout: .now() + 2) == .success
     }
 
+    @Test @MainActor func embeddedCueDeduplicationIgnoresReadOrderAndPreservesOtherIdentity() throws {
+        let pipeline = try SubtitlePipeline(
+            overlay: SubtitleOverlayView(), presentsOverlay: false, deduplicatesPackets: true
+        )
+        defer { pipeline.terminate() }
+        let size = CGSize(width: 640, height: 360)
+        _ = try pipeline.configure(codecPrivate: nil, codecName: "subrip", attachments: [],
+                                   frameSize: size, storageSize: size)
+        let body = "0,Default,,0,0,0,," + String(repeating: "A sufficiently long caption. ", count: 4)
+        func process(_ readOrder: Int, body: String, start: Double = 0, duration: Double = 1) {
+            #expect(pipeline.process(event: NativeDecodedSubtitleEvent(
+                assData: Data("\(readOrder),\(body)".utf8),
+                presentationSeconds: start, durationSeconds: duration, generation: 0
+            )))
+        }
+
+        process(1, body: body)
+        process(999, body: body)
+        #expect(pipeline.eventCount == 1)
+        process(1_000, body: body + "Changed text")
+        process(1_001, body: body, start: 2)
+        process(1_002, body: body, start: 2, duration: 2)
+        process(1_003, body: body, start: 100)
+        #expect(pipeline.eventCount == 5)
+
+        pipeline.pruneEmbeddedEvents(before: 50)
+        process(2_000, body: body, start: 100)
+        #expect(pipeline.eventCount == 5, "A retained future cue is still a duplicate")
+        process(2_001, body: body)
+        #expect(pipeline.eventCount == 6, "A pruned cue can be decoded again after a backward seek")
+    }
+
     @Test @MainActor func prunedEmbeddedCuesCanBeDecodedAgainAfterSeekingBackward() throws {
         let pipeline = try SubtitlePipeline(
             overlay: SubtitleOverlayView(), presentsOverlay: false, deduplicatesPackets: true

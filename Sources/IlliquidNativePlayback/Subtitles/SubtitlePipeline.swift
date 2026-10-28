@@ -39,12 +39,6 @@ struct SubtitlePresentationLedger: Equatable, Sendable {
 /// call is serialized by `lock`; the unchecked conformance is limited to that
 /// explicitly enforced synchronization boundary.
 final class SubtitlePipeline: @unchecked Sendable {
-    private struct ProcessedPacketKey: Hashable {
-        let presentationMilliseconds: Int64
-        let durationMilliseconds: Int64
-        let data: Data
-    }
-
     struct PictureInPictureSubtitleSnapshot: Sendable {
         let regions: [ASSRenderedRegion]
         let changed: Bool
@@ -150,7 +144,7 @@ final class SubtitlePipeline: @unchecked Sendable {
     private var storedEventCount = 0
     private var lastEventPruneTime: Double = 0
     private var hasExternalEvents = false
-    private var processedPacketKeys: Set<ProcessedPacketKey> = []
+    private var processedPacketKeys: Set<ProcessedSubtitlePacketKey> = []
     private var storedDelay: Double = 0
     private var enabled = true
     private var presentationAuthorityEnabled = true
@@ -339,16 +333,10 @@ final class SubtitlePipeline: @unchecked Sendable {
                 guard abs(start) <= Double(Int64.max) / 1_000,
                       duration <= Double(Int64.max) / 1_000
                 else { return }
-                let key = ProcessedPacketKey(
+                let key = ProcessedSubtitlePacketKey(
                     presentationMilliseconds: Int64((start * 1_000).rounded()),
                     durationMilliseconds: Int64((duration * 1_000).rounded()),
-                    // FFmpeg assigns a monotonically increasing ReadOrder as
-                    // the first ASS field. It can change when the same cue is
-                    // decoded again during a seek, so it is not part of the
-                    // semantic identity used by the dual-pipeline deduper.
-                    data: data.firstIndex(of: UInt8(ascii: ",")).map {
-                        Data(data[data.index(after: $0)...])
-                    } ?? data
+                    packetData: data
                 )
                 guard processedPacketKeys.insert(key).inserted else { return }
             }

@@ -1,0 +1,43 @@
+{
+  "tests": {
+    "configurations": {
+      "debug": {
+        "executed_tests": 8
+      },
+      "release": {
+        "executed_tests": 8
+      }
+    },
+    "package_sha256": "d07774951496ef2b435ef9cc992d010eec5af31dacf6cd6fb242adf16006f6ef",
+    "status": "passed",
+    "test_build_products_removed_after_success": true
+  },
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "sources": {
+    "baseline": {
+      "original_git_blob": "47b598a0f8067eafdf947992ef20d280e8d983bb",
+      "original_path": "Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift",
+      "original_sha256": "56018872aa4305690cd4bd14dd76ec9ec46e09a1a84cbb06bbc7cbffb7f7eef5",
+      "staged_path": "sources/baseline/ProcessedSubtitlePacketKey.swift",
+      "staged_sha256": "087c6a424268158493b2efd46c8241af11c38a14afaee809a23a3516e1f08cf9",
+      "transformation": "Extract the unique original nested ProcessedPacketKey fields; remove private and outer type nesting; rename to ProcessedSubtitlePacketKey. Extract its exact firstIndex/map normalization expression, rename its input data to packetData, and wrap it in an initializer with unchanged millisecond fields. No payload policy is changed."
+    },
+    "candidate": {
+      "aa_control": false,
+      "original_path": "Sources/IlliquidNativePlayback/Subtitles/ProcessedSubtitlePacketKey.swift",
+      "original_sha256": "31d9357f2632eae475ef12a28dbe26d6942fa9fe460fd5b64a52e288b056cb2b",
+      "staged_path": "sources/candidate/ProcessedSubtitlePacketKey.swift",
+      "staged_sha256": "31d9357f2632eae475ef12a28dbe26d6942fa9fe460fd5b64a52e288b056cb2b",
+      "transformation": "none; exact current production helper"
+    },
+    "current_helper_sha256": "31d9357f2632eae475ef12a28dbe26d6942fa9fe460fd5b64a52e288b056cb2b",
+    "runner_sha256": "640fbd828d5309b60f57fd64d346f85e0f02c7d5e864cd2a2cb7c40c1f057234",
+    "test": {
+      "original_path": "Tests/IlliquidNativePlaybackTests/ProcessedSubtitlePacketKeyTests.swift",
+      "sha256": "6ce6c1650c5543964429afaff82c3beed930033a21fadd460faa74262763291e",
+      "transformation": "none; exact current XCTest file"
+    }
+  },
+  "measurement_attempt_status": "failed: disk full; no measurement claims from this attempt"
+}

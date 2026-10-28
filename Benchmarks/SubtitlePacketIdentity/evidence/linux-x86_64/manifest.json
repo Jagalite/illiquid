@@ -1,0 +1,86 @@
+{
+  "aa_control": false,
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "build": {
+    "AllocationMeter.c": "b65b8f303e144e01164681b8a3441ca5cfb8fd37e0ce9bc157c41481245fc9b1",
+    "Harness.swift": "783d7ee4c653e4e9a32cfa7e7dfd9d883b59c71b3184625c74159cc8cadc1d38",
+    "HeapMetrics.c": "343b2b99146bc3ee50fb68c0f7c8b89ed7ba9915ba104b522d6c3acd4e36854b",
+    "c_compiler_version": "cc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+    "compiled_sha256": {
+      "build/HeapMetrics.o": "5888f3144b5b4d8ab56609293f98c2c6e3d6aa4af6922f31ef484ef8dd6926bc",
+      "build/baseline/allocation": "79b2934580146beb52ad20a5a893246861cf99eabc9db1b59ed5b44258352d53",
+      "build/baseline/plain": "b58683722ce74782187faaa8a4abb5134c956481c516c9d0bf006740ef6fd9a2",
+      "build/candidate/allocation": "c7756af0c1793be7d2515af6b5b5e566780d41f5c03afac06c9ac266115565d3",
+      "build/candidate/plain": "26b084ecdf76afe00687939b2737216a4b77172da2130af46094e4da69e3a032",
+      "libAllocationMeter.so": "6cbb7e49bc863c8ab206881c32501868bbdb1d3b0a13ebdd342d9d7a6fb5fe92"
+    }
+  },
+  "build_coordination": "Kyoto unavailable in this Linux workspace; direct serial isolated builds; passing debug/release receipts retained separately.",
+  "candidate_checkout_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate_worktree_status": " M .github/workflows/pip-subtitle-upload-performance.yml\n M Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift\n M Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift\n?? .github/workflows/subtitle-packet-identity.yml\n?? Benchmarks/SubtitlePacketIdentity/\n?? Sources/IlliquidNativePlayback/Subtitles/ProcessedSubtitlePacketKey.swift\n?? Tests/IlliquidNativePlaybackTests/ProcessedSubtitlePacketKeyTests.swift\n",
+  "cases": [
+    "tiny",
+    "text",
+    "dense",
+    "drawing",
+    "duplicate",
+    "long-prefix",
+    "offset-input",
+    "no-comma",
+    "overallocated"
+  ],
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "completed_utc": "2026-10-28T05:44:04.151477+00:00",
+  "count": 1024,
+  "created_utc": "2026-10-28T05:39:48.465673+00:00",
+  "iterations": 50,
+  "machine": "x86_64",
+  "pairs": 6,
+  "pipelines": [
+    1,
+    2
+  ],
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "protocol": {
+    "allocation": "Linux-only separate ALLOCATION_METER binary with explicit LD_PRELOAD; not live memory",
+    "memory": "Allocator deltas while keys are held and after release; not player RSS or GPU memory",
+    "ordering": "AB for even pairs, BA for odd pairs; fresh process for every observation",
+    "scope": "Exact ASS semantic-key source plus synthetic corpus; excludes libass, rendering and playback",
+    "tests": "Exact production helper and XCTest source in a dependency-free temporary package",
+    "timing": "Optimized plain binary; allocation interposer absent"
+  },
+  "schema": 1,
+  "sources": {
+    "baseline": {
+      "original_git_blob": "47b598a0f8067eafdf947992ef20d280e8d983bb",
+      "original_path": "Sources/IlliquidNativePlayback/Subtitles/SubtitlePipeline.swift",
+      "original_sha256": "56018872aa4305690cd4bd14dd76ec9ec46e09a1a84cbb06bbc7cbffb7f7eef5",
+      "staged_path": "sources/baseline/ProcessedSubtitlePacketKey.swift",
+      "staged_sha256": "087c6a424268158493b2efd46c8241af11c38a14afaee809a23a3516e1f08cf9",
+      "transformation": "Extract the unique original nested ProcessedPacketKey fields; remove private and outer type nesting; rename to ProcessedSubtitlePacketKey. Extract its exact firstIndex/map normalization expression, rename its input data to packetData, and wrap it in an initializer with unchanged millisecond fields. No payload policy is changed."
+    },
+    "candidate": {
+      "aa_control": false,
+      "original_path": "Sources/IlliquidNativePlayback/Subtitles/ProcessedSubtitlePacketKey.swift",
+      "original_sha256": "31d9357f2632eae475ef12a28dbe26d6942fa9fe460fd5b64a52e288b056cb2b",
+      "staged_path": "sources/candidate/ProcessedSubtitlePacketKey.swift",
+      "staged_sha256": "31d9357f2632eae475ef12a28dbe26d6942fa9fe460fd5b64a52e288b056cb2b",
+      "transformation": "none; exact current production helper"
+    },
+    "current_helper_sha256": "31d9357f2632eae475ef12a28dbe26d6942fa9fe460fd5b64a52e288b056cb2b",
+    "runner_sha256": "44bf81a988848e27c48241e6d7617427180356649b76d94cdab8a2e6f0653dea",
+    "test": {
+      "original_path": "Tests/IlliquidNativePlaybackTests/ProcessedSubtitlePacketKeyTests.swift",
+      "sha256": "6ce6c1650c5543964429afaff82c3beed930033a21fadd460faa74262763291e",
+      "transformation": "none; exact current XCTest file"
+    }
+  },
+  "status": "complete",
+  "swift": "/tmp/illiquid-perf-45562498d016/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+  "swiftc": "/tmp/illiquid-perf-45562498d016/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+  "tests": {
+    "reason": "Explicit --skip-tests; this run alone does not establish correctness",
+    "status": "skipped"
+  },
+  "tests_only": false
+}
