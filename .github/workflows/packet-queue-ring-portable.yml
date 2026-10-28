@@ -1,0 +1,92 @@
+name: Packet queue ring arithmetic portable
+
+on:
+  push:
+    branches:
+      - 'codex/perf-ring-buffer-wrap-20261028'
+    paths:
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Tests/IlliquidNativePlaybackTests/FixedRingBufferTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift'
+      - 'Benchmarks/PacketQueueRing/**'
+      - '.github/workflows/packet-queue-ring-portable.yml'
+      - '!Benchmarks/PacketQueueRing/README.md'
+      - '!Benchmarks/PacketQueueRing/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Tests/IlliquidNativePlaybackTests/FixedRingBufferTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift'
+      - 'Benchmarks/PacketQueueRing/**'
+      - '.github/workflows/packet-queue-ring-portable.yml'
+      - '!Benchmarks/PacketQueueRing/README.md'
+      - '!Benchmarks/PacketQueueRing/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: packet-queue-ring-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-components:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record portable host
+        run: |
+          mkdir -p "$RUNNER_TEMP/packet-queue-ring"
+          uname -a > "$RUNNER_TEMP/packet-queue-ring/host.txt"
+          lscpu >> "$RUNNER_TEMP/packet-queue-ring/host.txt"
+          swiftc --version >> "$RUNNER_TEMP/packet-queue-ring/host.txt"
+      - name: Test queue contracts and measure paired portable components
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo "This runner has Kyoto; submit this command through its shared queue."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this isolated GitHub runner; using serial direct builds."
+          python3 Benchmarks/PacketQueueRing/run.py \
+            --pairs 8 --target-ms 100 \
+            --output "$RUNNER_TEMP/packet-queue-ring/results"
+      - name: Emit exact review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "packet-queue-ring"
+          names = [
+              "host.txt", "results/manifest.json", "results/completion.json",
+              "results/summary.json", "results/measurements.jsonl",
+              "results/calibration.json", "results/build/baseline/manifest.json",
+              "results/build/candidate/manifest.json",
+              "results/tests-baseline-debug.log", "results/tests-baseline-release.log",
+              "results/tests-candidate-debug.log", "results/tests-candidate-release.log",
+          ]
+          for name in names:
+              path = root / name
+              if path.exists():
+                  print("RING_FILE_JSON " + json.dumps({"path": name, "content": path.read_text()}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: packet-queue-ring-portable
+          path: |
+            ${{ runner.temp }}/packet-queue-ring/host.txt
+            ${{ runner.temp }}/packet-queue-ring/results/*.json
+            ${{ runner.temp }}/packet-queue-ring/results/*.jsonl
+            ${{ runner.temp }}/packet-queue-ring/results/*.log
+            ${{ runner.temp }}/packet-queue-ring/results/inputs/**
+            ${{ runner.temp }}/packet-queue-ring/results/build/*/*.json
+            ${{ runner.temp }}/packet-queue-ring/results/build/*/*.log
+            ${{ runner.temp }}/packet-queue-ring/results/processes/*.log
+          retention-days: 14
