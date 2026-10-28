@@ -32,6 +32,73 @@ has platform-specific byte behavior. Swift String equality can hide differences
 between canonically equivalent Unicode spellings; the new regression tests
 compare optional UTF-8 arrays against the unchanged `normalize(url)?.path` oracle.
 
+## Qualified portable result
+
+The [successful Linux run](https://github.com/Jagalite/illiquid/actions/runs/40640423378)
+tested commit `5715179b655f35c2b97f6816ab3ef122ad20873f` on a GitHub Ubuntu 24.04
+x86_64 runner with Swift 6.3.2. The recorded CPU model is AMD EPYC 9V45.
+Production code is exactly the parent PR's version. Later report/evidence changes
+do not alter the measured production, harness or tests.
+
+All **47 tests in seven suites passed for both variants in debug and release**:
+four configurations and 188 test executions, including parameterized/generated
+fixtures. The driver also verified complete semantic receipts for every workload
+before measuring.
+
+The run retained **400 observations across 20 workloads and ten balanced pairs**.
+The shortest retained timed loop was 141.25 ms. Every ASCII target workload
+improved in all ten pairs. ASCII selection-preservation operations were
+40.18–41.69% lower in wall time by median paired reduction; deduplication took
+38.97–39.09% less time under these fixtures.
+
+The table includes every workload. Percentage reductions are the median of the
+ten `100 × (1 − candidate / baseline)` paired observations; they are not computed
+from the two displayed marginal medians. Negative values mean slower.
+
+| Workload | Baseline median | Candidate median | Median paired time reduction | Faster pairs |
+| --- | ---: | ---: | ---: | ---: |
+| Key: short ASCII | 3.251 µs | 1.951 µs | 40.09% | 10/10 |
+| Key: long ASCII | 23.595 µs | 11.873 µs | 49.89% | 10/10 |
+| Key: escaped ASCII | 4.970 µs | 2.832 µs | 43.83% | 10/10 |
+| Key: dot-segment/localhost alias | 3.745 µs | 2.424 µs | 35.28% | 10/10 |
+| Key: relative reference | 5.157 µs | 3.803 µs | 25.85% | 10/10 |
+| Key: composed Unicode (NFC) | 3.870 µs | 3.919 µs | -2.03% | 2/10 |
+| Key: decomposed Unicode (NFD) | 3.942 µs | 3.748 µs | 2.64% | 5/10 |
+| Rejected HTTPS | 60.10 ns | 60.40 ns | -0.43% | 4/10 |
+| Rejected remote-file authority | 397.35 ns | 399.23 ns | -0.63% | 3/10 |
+| Same-file comparison: ASCII | 6.608 µs | 3.987 µs | 40.06% | 10/10 |
+| Same-file comparison: Unicode | 8.034 µs | 8.011 µs | -1.25% | 3/10 |
+| Selection: 32 items, last hit | 107.967 µs | 64.645 µs | 40.18% | 10/10 |
+| Selection: 1,000 items, first hit | 6.458 µs | 3.856 µs | 40.90% | 10/10 |
+| Selection: 1,000 items, middle hit | 1.663 ms | 969.441 µs | 41.66% | 10/10 |
+| Selection: 1,000 items, last hit | 3.308 ms | 1.957 ms | 40.60% | 10/10 |
+| Selection: 1,000 items, missing target | 3.285 ms | 1.930 ms | 41.20% | 10/10 |
+| Selection: 10,000 items, last hit | 33.471 ms | 19.310 ms | 41.69% | 10/10 |
+| Selection: 1,000 Unicode items, last hit | 3.411 ms | 3.439 ms | -0.80% | 4/10 |
+| Deduplicate: 1,000 unique inputs | 3.425 ms | 2.097 ms | 39.09% | 10/10 |
+| Deduplicate: 4,000 inputs, 1,000 identities | 13.357 ms | 8.159 ms | 38.97% | 10/10 |
+
+### Controls, limits and native gate
+
+The composed-Unicode key control was **2.03% slower by median paired reduction**
+(eight of ten pairs slower). Its difference of marginal medians is about 49 ns/key.
+Unicode comparison and Unicode playlist selection also had small negative paired
+medians. The decomposed-Unicode and rejected-source cases varied across pairs;
+they do not establish fallback gains. Some control pairs contain substantial
+host noise; the unfiltered ranges and every observation are retained.
+
+These are warmed component wall-time measurements on one Linux runner. The study
+does not establish macOS performance, allocator totals, startup time, UI latency,
+frame rate, energy use or a whole-player gain. The parent PR has its own native
+evidence; [this broader native qualification](https://github.com/Jagalite/illiquid/actions/runs/40640423501)
+was still queued when this report was prepared. Keep the companion PR in draft
+until the native byte tests and workload matrix complete.
+
+All 20 summaries were recomputed from raw measurement rows, all pair/checksum
+receipts were checked, and 19 source/qualification hash entries were matched
+against exact committed files. See the [retained evidence](evidence/linux-x86_64-20261028/)
+and its [audit](evidence/linux-x86_64-20261028/audit.json).
+
 ## Reproduce
 
 Use a checkout containing baseline commit
@@ -94,8 +161,9 @@ selection uses 64 preconstructed target aliases at the specified hit position.
 The missing-target case verifies the existing fallback to index zero. Playlist
 construction, sorting, expected-result calculation and warm-up happen before
 the clock starts. The prepared closures and their input arrays remain alive through
-both clock reads using `withExtendedLifetime`. Deduplication verifies complete
-first-item metadata and order.
+both clock reads using `withExtendedLifetime`. The benchmark verifies complete
+deduplicated output contents and order. The existing empty-base order-restoration
+test separately verifies first-occurrence metadata through the deduplication path.
 
 Both variants are calibrated toward a 150 ms timed loop; the larger resulting
 iteration count is shared by both variants and all retained pairs. Every
