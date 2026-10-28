@@ -86,7 +86,13 @@ struct NormalizedFileIdentityTests {
         ]
         for base in bases {
             for reference in references {
-                expectOriginalBytes(try #require(URL(string: reference, relativeTo: base)))
+                // Foundation versions differ on accepting an empty relative
+                // reference. Compare every URL that can actually be constructed.
+                if let url = URL(string: reference, relativeTo: base) {
+                    expectOriginalBytes(url)
+                } else {
+                    #expect(reference.isEmpty)
+                }
                 if let bridged = NSURL(string: reference, relativeTo: base) {
                     expectOriginalBytes(bridged as URL)
                 }
