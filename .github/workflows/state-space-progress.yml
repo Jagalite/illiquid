@@ -30,11 +30,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  native-swift:
-    runs-on: macos-26
+  component-swift:
+    name: Swift progress analysis (${{ matrix.label }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: macos
+            runner: macos-26
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+          - label: linux
+            runner: ubuntu-24.04
+            developer_dir: ''
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 25
     env:
-      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -70,7 +81,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: state-space-progress-evidence
+          name: state-space-progress-evidence-${{ matrix.label }}
           path: |
             ${{ runner.temp }}/state-space-progress/*.json
             ${{ runner.temp }}/state-space-progress/*.jsonl
