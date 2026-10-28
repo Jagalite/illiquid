@@ -22,7 +22,8 @@ public struct MediaTrackPreference: Codable, Equatable, Sendable {
     }
 
     public func bestMatch(in tracks: [MediaTrack]) -> MediaTrack? {
-        tracks
+        // Stream the scores into max without allocating intermediate arrays.
+        tracks.lazy
             .filter { $0.kind == kind }
             .map { track in
                 var score = 0
