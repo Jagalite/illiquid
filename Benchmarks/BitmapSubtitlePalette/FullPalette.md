@@ -43,9 +43,7 @@ The destination must be separate from the rectangle and its input buffers;
 From a full checkout with the pinned native SDK:
 
 ```sh
-python3 Benchmarks/BitmapSubtitlePalette/run.py \\
-  --baseline checked-palette --pairs 12 --target-ms 100 \\
-  --output /tmp/illiquid-full-palette
+python3 Benchmarks/BitmapSubtitlePalette/run.py --baseline checked-palette --pairs 12 --target-ms 100 --output /tmp/illiquid-full-palette
 ```
 
 Use the shared Kyoto build queue when available, as required by `AGENTS.md`.
