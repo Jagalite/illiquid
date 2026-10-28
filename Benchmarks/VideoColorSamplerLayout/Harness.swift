@@ -18,12 +18,17 @@ private struct Failure: Error, CustomStringConvertible {
 }
 
 private func makeBuffer(_ format: OSType, width: Int, height: Int,
-                        alignment: Int, seed: Int) throws -> CVPixelBuffer {
+                        alignment: Int, seed: Int, iosurface: Bool = false) throws -> CVPixelBuffer {
     var result: CVPixelBuffer?
+    var attributes: [String: Any] = [kCVPixelBufferBytesPerRowAlignmentKey as String: alignment]
+    if iosurface { attributes[kCVPixelBufferIOSurfacePropertiesKey as String] = [:] as [String: Any] }
     let status = CVPixelBufferCreate(kCFAllocatorDefault, width, height, format,
-        [kCVPixelBufferBytesPerRowAlignmentKey: alignment] as CFDictionary, &result)
+        attributes as CFDictionary, &result)
     guard status == kCVReturnSuccess, let buffer = result else {
         throw Failure("CVPixelBufferCreate failed: \(status), format=\(format), \(width)x\(height)")
+    }
+    if iosurface, CVPixelBufferGetIOSurface(buffer) == nil {
+        throw Failure("Requested IOSurface backing was not provided")
     }
     guard CVPixelBufferLockBaseAddress(buffer, []) == kCVReturnSuccess else {
         throw Failure("Fixture lock failed")
@@ -96,7 +101,7 @@ private func layout(_ buffer: CVPixelBuffer) -> [String: Any] {
     return [
         "format": CVPixelBufferGetPixelFormatType(buffer),
         "width": CVPixelBufferGetWidth(buffer), "height": CVPixelBufferGetHeight(buffer),
-        "planes": planes,
+        "planes": planes, "iosurface": CVPixelBufferGetIOSurface(buffer) != nil,
         "strides": planes == 0 ? [CVPixelBufferGetBytesPerRow(buffer)]
             : (0..<planes).map { CVPixelBufferGetBytesPerRowOfPlane(buffer, $0) },
     ]
@@ -131,6 +136,17 @@ private func verify() throws -> [String: Any] {
             }
         }
     }
+    for index in [1, 3] {
+        let format = formats[index]
+        let buffer = try makeBuffer(format.1, width: 1920, height: 1080,
+            alignment: 256, seed: 91 + index, iosurface: true)
+        buffers.append(buffer)
+        for name in ["none", "601", "709", "2020", "unknown", "601", "none"] {
+            matrix(name, on: buffer)
+            traces.append(["case": "\(format.0)-iosurface-\(name)",
+                "layout": layout(buffer), "sample": receipt(VideoFrameColorSampler.sample(buffer))])
+        }
+    }
     let unsupported = try makeBuffer(kCVPixelFormatType_OneComponent8,
         width: 26, height: 18, alignment: 128, seed: 0)
     traces.append(["case": "unsupported", "sample": receipt(VideoFrameColorSampler.sample(unsupported))])
@@ -148,8 +164,8 @@ private func verify() throws -> [String: Any] {
         }
         if cycle % 3 == 0 { sampler.reset() }
     }
-    // Include repeated identical samples and gradual changes with persistent
-    // smoothing state. Existing unit tests also assert their expected semantics.
+    // Include repeated identical samples across different buffers with persistent
+    // smoothing state. Existing unit tests also assert the expected semantics.
     sampler.reset()
     for index in 0..<40 {
         let buffer = buffers[(index / 10) * 4]
@@ -202,7 +218,8 @@ private func measure(_ name: String, iterations: Int, seed: Int) throws -> [Stri
         let count = name == "steady-nv12" || name == "throttled" || name == "unsupported" ? 1 : 2
         for index in 0..<count {
             buffers.append(try makeBuffer(format, width: width, height: height,
-                alignment: index == 0 ? 128 : 256, seed: seed + index * 29))
+                alignment: index == 0 ? 128 : 256, seed: seed + index * 29,
+                iosurface: name.hasSuffix("-iosurface")))
         }
     }
     for (index, buffer) in buffers.enumerated() {

@@ -45,9 +45,11 @@ variants while omitting timing. The workflow uses this mode for PR checks.
 - Each case calibrates both variants to at least 250 ms, then runs 12 balanced
   AB/BA pairs in fresh processes with identical iteration counts and fixtures.
   Per-pair seeds vary. Raw wall and process CPU observations, losing pairs,
-  checksums, publication counts, and actual row strides are retained.
+  checksums, publication counts, and actual row strides are retained. The completion
+  receipt records the minimum measured duration and all observations below the
+  calibration target; no short or unfavorable observation is discarded.
 - Cases include BGRA/NV12/P010, video/full ranges, 1080p and 4K, alternating
-  layouts, admitted/steady stateful sampling, and throttled/unsupported controls.
+  layouts, confirmed IOSurface-backed NV12/P010, admitted/steady stateful sampling, and throttled/unsupported controls.
   Results are per sampler call, not per decoded video frame.
 
 Native integration separately compiles the complete application graph with the

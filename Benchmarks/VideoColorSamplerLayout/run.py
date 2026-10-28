@@ -30,6 +30,7 @@ TESTS = ["VideoFrameColorSamplerTests.swift", "VideoFrameColorSamplerLayoutTests
 CASES = [
     "bgra-1080", "nv12-video-1080", "nv12-full-1080", "p010-video-1080", "p010-full-1080",
     "bgra-4k", "nv12-video-4k", "p010-video-4k", "mixed-layouts",
+    "nv12-video-iosurface", "p010-video-iosurface",
     "admitted-nv12", "steady-nv12", "throttled", "unsupported",
 ]
 
@@ -285,6 +286,12 @@ def main():
             "candidate_sampler_sha256": runner.manifest["source_sha256"]["candidate_sampler"],
             "cases": [] if args.tests_only else CASES,
             "observations": len(runner.observations),
+            "minimum_observed_wall_ns": min((row["wall_ns"] for row in runner.observations), default=None),
+            "observations_under_target": [
+                {"case": row["case"], "pair": row["pair"], "variant": row["variant"],
+                 "wall_ns": row["wall_ns"]}
+                for row in runner.observations if row["wall_ns"] < args.target_ms * 1_000_000
+            ],
         })
     except Exception as error:
         runner.write("failure.json", {"error": str(error)})
