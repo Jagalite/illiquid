@@ -114,6 +114,16 @@ the two independently calculated timing medians. No timing outliers are
 discarded. CPU affinity does not eliminate shared-host scheduling, frequency,
 thermal, or allocator variability.
 
+The current runner sets `SWIFT_DETERMINISTIC_HASHING=1` only in its child
+processes, following [Swift's benchmark guidance](https://github.com/swiftlang/swift/blob/main/benchmark/README.md#deterministic-hashing-requirement).
+This gives separately launched variants matching cache-key hashes and table
+collision layouts. An untimed receipt records all 144 case/palette key hashes
+and must match between executables. Production hashing is unchanged. The two
+earlier randomized-hash cohorts remain in the evidence; their variable cache
+controls motivated this correction. Fixed hashing controls one test layout and
+does not establish performance for every production hash seed or eliminate
+shared-host variability.
+
 Before the final cohort, the intended acceptance criterion is a repeatable
 reduction in the ordinary miss/revision paths, with exact output equivalence
 and no demonstrated material regression in the controls. Small differences in
