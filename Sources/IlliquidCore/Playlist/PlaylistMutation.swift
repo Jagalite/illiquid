@@ -51,6 +51,43 @@ public enum PlaylistMutation {
         return restored
     }
 
+    /// Returns the surviving saved identities followed by new identities in
+    /// current order, without constructing an ordered array of complete items.
+    /// Each input identity is computed once, including decoded raw URLs.
+    public static func restoringIDs(
+        _ items: [FolderPlaylistItem],
+        ids: [FolderPlaylistItem.ID]
+    ) -> [FolderPlaylistItem.ID] {
+        guard !items.isEmpty else { return [] }
+        guard items.count > 1 else { return [items[0].id] }
+
+        var remaining: Set<FolderPlaylistItem.ID> = []
+        var currentOrder: [FolderPlaylistItem.ID] = []
+        for item in items {
+            let id = item.id
+            if remaining.insert(id).inserted {
+                currentOrder.append(id)
+            }
+        }
+        guard !ids.isEmpty else { return currentOrder }
+
+        var restored: [FolderPlaylistItem.ID] = []
+        restored.reserveCapacity(remaining.count)
+        for id in ids {
+            // Return the current item's spelling, as restoringOrder followed
+            // by map(\.id) does, rather than an equal saved Unicode spelling.
+            if let currentID = remaining.remove(id) {
+                restored.append(currentID)
+            }
+        }
+        for id in currentOrder {
+            if let currentID = remaining.remove(id) {
+                restored.append(currentID)
+            }
+        }
+        return restored
+    }
+
     public static func deduplicatedSubtitleURLs(_ urls: [URL]) -> [URL] {
         var seen: Set<String> = []
         return urls.filter { url in
