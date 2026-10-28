@@ -58,7 +58,7 @@ jobs:
           # within each isolated package are serialized by the Python runner.
           mode=(--pairs 6 --sizes 1000,10000)
           if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
-            mode=(--quick --pairs 2)
+            mode=(--quick --pairs 2 --current-support)
           fi
           python3 Benchmarks/NaturalFilenameSortStorage/run.py \
             --output "$RUNNER_TEMP/natural-filename-sort-storage" "${mode[@]}"

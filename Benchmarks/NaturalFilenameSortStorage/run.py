@@ -55,6 +55,8 @@ def main():
     parser.add_argument("--jobs", type=int, default=2, help="Maximum concurrent Swift compiler jobs")
     parser.add_argument("--sizes", default="1000,10000", help="Comma-separated nonnegative counts")
     parser.add_argument("--quick", action="store_true", help="Use 100-element workloads plus tiny controls")
+    parser.add_argument("--current-support", action="store_true",
+                        help="Use current support files with both sorters for integration checks (hybrid baseline)")
     parser.add_argument("--skip-tests", action="store_true", help="Exploration only; recorded in manifest")
     parser.add_argument("--tests-only", action="store_true")
     args = parser.parse_args()
@@ -114,6 +116,7 @@ def main():
         return stdout_data
 
     manifest = {"baseline": BASELINE, "created_at_utc": datetime.now(timezone.utc).isoformat(),
+                "baseline_support_mode": "current" if args.current_support else "frozen",
                 "host": {"system": platform.system(), "release": platform.release(),
                          "machine": platform.machine(), "libc": platform.libc_ver(),
                          "python": platform.python_version()},
@@ -127,6 +130,10 @@ def main():
                           "Only the two focused test files; not a full player/macOS qualification.",
                           "Allocation requests are cumulative, not live heap, peak memory, or RSS.",
                           "No timing threshold; per-pair percentage changes retain negative/positive signs."]}
+    if args.current_support:
+        manifest["notes"].append(
+            "Hybrid baseline for integration: both variants use current FolderPlaylist.swift and "
+            "NormalizedFileURL.swift; the baseline sorter remains verbatim from " + BASELINE + ".")
     try:
         manifest["compiler"] = run([swift, "--version"], "swift-version").decode().strip()
         manifest["head"] = run(["git", "rev-parse", "HEAD"], "git-head").decode().strip()
@@ -144,8 +151,9 @@ def main():
             (package / "Package.swift").write_text(PACKAGE)
             manifest["sources"][variant] = {}
             for path in SOURCES:
+                frozen = variant == "baseline" and (path == SOURCES[0] or not args.current_support)
                 data = (run(["git", "show", f"{BASELINE}:{path}"], "baseline-" + Path(path).stem)
-                        if variant == "baseline" else current_sources[path])
+                        if frozen else current_sources[path])
                 (source_dir / Path(path).name).write_bytes(data)
                 manifest["sources"][variant][path] = digest(data)
             for path, data in current_tests.items():
