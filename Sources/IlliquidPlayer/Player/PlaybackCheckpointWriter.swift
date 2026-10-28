@@ -43,7 +43,9 @@ struct PlaybackCheckpoint: Sendable {
 
         // The captured index normally identifies the source, but can be stale.
         // Validate it before skipping the membership scan; any match suffices.
-        if let index, playlist.indices.contains(index),
+        // A singleton already has a one-item scan; probing its hint first would
+        // repeat that normalization when the source is absent.
+        if playlist.count > 1, let index, playlist.indices.contains(index),
            NormalizedFileURL.persistenceKey(for: playlist[index].url) == sourceKey {
             return folder
         }

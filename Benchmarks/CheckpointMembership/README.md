@@ -16,6 +16,8 @@ the membership question.
 The candidate skips the membership check when the folder or playlist is absent,
 normalizes the source once, and verifies the item at a valid captured index.
 A mismatching, missing, or out-of-range index falls back to a playlist scan.
+Singletons go directly to their one-item scan, avoiding a repeated comparison
+when the hinted item does not match.
 The index is only a hint: it never independently proves membership, and the
 saved index is not changed. No persistent cache or new ownership is introduced.
 
@@ -80,7 +82,44 @@ Component tests, app integration, and live UI/playback qualification are distinc
 No FPS, energy, whole-player responsiveness, or storage-I/O claim follows from
 this benchmark.
 
+## Reproduce
+
+Use the repository's Kyoto queue when available, as specified in `AGENTS.md`.
+With an isolated toolchain/runner where that queue is unavailable:
+
+```sh
+python3 Benchmarks/CheckpointMembership/test_harness.py
+python3 Benchmarks/CheckpointMembership/run.py \
+  --pairs 8 --target-ms 100 --output /tmp/checkpoint-membership
+```
+
+The output directory must be new or empty. The pinned baseline must be present
+in local Git history. Swift 6.1 or newer with bundled Swift Testing and Python
+3.9 or newer are required. On macOS the runner records and explicitly selects
+the active Xcode SDK. CI uses macOS 26 and Xcode 26.6.
+
+`--quick` retains every semantic test and complete-record comparison but measures
+six workloads with two pairs and a 20 ms target; it is a mechanics check, not the
+confirmatory study. `--tests-only` skips timings. Production sources, tests, driver,
+compiler flags, toolchain information, binary hashes, command output, calibration,
+every observation, and summaries are retained under `OUTPUT/evidence/`.
+
+The native workflow runs the full experiment on the research branch and manual
+invocation. PR runs use the short timing cohort and repeat semantic qualification.
+A separate job builds the full release app and tests checkpoint, coordinator,
+playlist, and session behavior.
+
 ## Results
 
-Measurement and native qualification are in progress. Results and reproduction
-commands will be added after the experiment completes.
+The first complete Linux cohort compared the baseline with `3e0af482` using
+320 observations across 20 workloads. All primary indexed middle/last groups
+improved in all eight CPU and wall pairs, but the `single-absent` control crossed
+the predeclared regression investigation gate: median paired increases were
+63.33% / 11.30 microseconds wall and 48.68% / 6.71 microseconds CPU. Its valid but
+nonmatching index caused a second normalization of the only playlist item during
+fallback. The candidate was revised so singletons go directly to one comparison.
+The adverse cohort is retained as exploratory evidence, and a fresh complete
+cohort is required for the revised production source.
+
+The revised measurements and native qualification are in progress. No macOS
+performance or application-validation result is claimed while its jobs are queued.
