@@ -46,41 +46,29 @@ public enum PlaybackProgressAnalyzer {
       }
     }
 
-    let settled = Set(
+    let transactionIndices = classifications.indices.filter {
+      classifications[$0] == .transactionProgress
+    }
+    var canSettle = Set(
       classifications.indices.filter {
         classifications[$0] == .terminal || classifications[$0] == .stableIntentionalWait
           || classifications[$0] == .declaredExternalWait
       })
-    let transactionIndices = classifications.indices.filter {
-      classifications[$0] == .transactionProgress
-    }
-    var canSettle = settled
-    // Reachability is used only to count settled transactions. Empty targets
-    // or an empty seed set cannot contribute to that count.
-    if !transactionIndices.isEmpty, !settled.isEmpty {
-      // Keep the first scan for graphs that settle without needing a
-      // predecessor index for further propagation.
-      var changed = false
-      for edge in result.graph.edges where edge.isFairProgress && canSettle.contains(edge.to) {
-        if canSettle.insert(edge.from).inserted { changed = true }
+    // Reachability is used only to count settled transactions. With no
+    // transactions or no settled seeds, that count is already known.
+    if !transactionIndices.isEmpty && !canSettle.isEmpty {
+      var predecessors = Array(repeating: [Int](), count: result.nodes.count)
+      for edge in result.graph.edges where edge.isFairProgress {
+        predecessors[edge.to].append(edge.from)
       }
-      if changed, transactionIndices.contains(where: { !canSettle.contains($0) }),
-        result.graph.edges.contains(where: {
-          $0.isFairProgress && canSettle.contains($0.to) && !canSettle.contains($0.from)
-        })
-      {
-        var predecessors: [Int: [Int]] = [:]
-        for edge in result.graph.edges
-          where edge.isFairProgress && !canSettle.contains(edge.from)
-        {
-          predecessors[edge.to, default: []].append(edge.from)
-        }
-        // Already reachable sources need no revisit. Seed only destinations with
-        // unresolved predecessors, then visit each newly reachable state once.
-        var pending = predecessors.keys.filter { canSettle.contains($0) }
-        while let destination = pending.popLast() {
-          for predecessor in predecessors[destination, default: []] {
-            if canSettle.insert(predecessor).inserted { pending.append(predecessor) }
+
+      // Visit each reachable vertex once, following fair edges backwards.
+      // Cutoff nodes may carry a path even though they are not settled seeds.
+      var worklist = Array(canSettle)
+      while let destination = worklist.popLast() {
+        for predecessor in predecessors[destination] {
+          if canSettle.insert(predecessor).inserted {
+            worklist.append(predecessor)
           }
         }
       }

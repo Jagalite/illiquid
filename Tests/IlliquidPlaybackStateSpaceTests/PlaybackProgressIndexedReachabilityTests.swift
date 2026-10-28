@@ -4,7 +4,7 @@ import Testing
 @testable import IlliquidPlaybackStateSpace
 
 @Suite("Playback progress fair reachability")
-struct PlaybackProgressWorklistGuardTests {
+struct PlaybackProgressIndexedReachabilityTests {
   @Test
   func emptyAndAlreadySettledGraphsHaveNoTransactionWork() {
     let empty = PlaybackProgressAnalyzer.analyze(makeResult(states: [], edges: []))
