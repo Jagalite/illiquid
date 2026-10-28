@@ -44,15 +44,22 @@ enum Driver {
                 playlist: playlist, current: current)) == expectedChecksum)
         }
 
-        var total = 0
-        let cpuStart = cpuNanoseconds()
-        let wallStart = DispatchTime.now().uptimeNanoseconds
-        for _ in 0..<iterations {
-            let result = ThumbnailPlaylistNeighborhood(playlist: playlist, current: current)
-            total &+= checksum(result)
+        // Fixture destruction is not part of neighborhood selection. Preserve
+        // both roots through the final timestamp reads, including calibration.
+        let measured = withExtendedLifetime((playlist, current)) {
+            () -> (wall: UInt64, cpu: UInt64, total: Int) in
+            var total = 0
+            let cpuStart = cpuNanoseconds()
+            let wallStart = DispatchTime.now().uptimeNanoseconds
+            for _ in 0..<iterations {
+                let result = ThumbnailPlaylistNeighborhood(playlist: playlist, current: current)
+                total &+= checksum(result)
+            }
+            let wall = DispatchTime.now().uptimeNanoseconds - wallStart
+            let cpu = cpuNanoseconds() - cpuStart
+            return (wall, cpu, total)
         }
-        let wall = DispatchTime.now().uptimeNanoseconds - wallStart
-        let cpu = cpuNanoseconds() - cpuStart
+        let (wall, cpu, total) = measured
         precondition(total == expectedChecksum * iterations)
         let receipt: [String: Any] = [
             "urls": expected.urls.map(\.absoluteString),

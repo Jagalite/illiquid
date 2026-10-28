@@ -114,6 +114,14 @@ jobs:
                 'compiling the app graph and running tests directly in this isolated checkout.', flush=True)
           subprocess.run(command, check=True)
           PY
+          python3 - "$RUNNER_TEMP/thumbnail-neighborhood-native/tests.log" <<'PY'
+          import re, sys
+          from pathlib import Path
+          counts = re.findall(r'Test run with (\d+) tests? .*passed', Path(sys.argv[1]).read_text())
+          if not counts or int(counts[-1]) == 0:
+              raise SystemExit('Missing positive native Swift Testing receipt')
+          print('Native thumbnail regressions: ' + counts[-1] + ' tests passed.')
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

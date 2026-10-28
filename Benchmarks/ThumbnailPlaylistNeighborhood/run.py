@@ -165,12 +165,14 @@ def main() -> None:
             "candidate": "Complete, unmodified production helper with real FolderPlaylistItem and URL dependencies.",
             "sampling": "Fresh process for each observation; balanced AB/BA pairs and rotated workload order.",
             "timing": "Release builds; monotonic wall and process CPU clocks; includes result consumption and loop overhead, no subtraction.",
-            "excluded": "Input construction, URL normalization, three warmups, exact output receipts and JSON serialization.",
+            "excluded": "Input construction, URL normalization, fixture destruction, three warmups, exact output receipts and JSON serialization.",
+            "input_lifetime": "withExtendedLifetime((playlist, current)) spans the timed loop and both terminal clock reads.",
             "observability": "Checksum of every call through a non-inlined consumer; exact ordered URLs and distance dictionaries verified separately.",
             "memory": "Source-level elimination of the full URL projection; no allocator, RSS, peak-memory, player FPS or energy measurement.",
             "calibration": "Independent per-variant iteration counts target the same duration; normalized per call.",
         },
     }
+    save(output / "manifest.json", manifest)
     binaries, tests, source_receipts = {}, {}, {}
     for variant, helper in (("baseline", before), ("candidate", after)):
         package = output / "packages" / variant
