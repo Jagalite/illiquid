@@ -88,6 +88,70 @@ public struct PlexMatchHints: Sendable {
         pattern: #"(?i)^(?:S([0-9]{1,3})E|SP|E)?([0-9]{1,4})(?:-(?:S([0-9]{1,3})E|E)?([0-9]{1,4}))?$"#)
 
     private static func episodeNumber(_ text: String) -> EpisodeMapping? {
+        var contiguous = text
+        return contiguous.withUTF8 { bytes in
+            if bytes.count <= 19, bytes.allSatisfy({ $0 >= 0x20 && $0 < 0x7f }) {
+                return asciiEpisodeNumber(bytes)
+            }
+            // Valid ASCII directives fit in 19 bytes. Preserve ICU's case folding
+            // and anchor behavior for non-ASCII, controls and unusual inputs.
+            return regexEpisodeNumber(text)
+        }
+    }
+
+    private static func asciiEpisodeNumber(_ bytes: UnsafeBufferPointer<UInt8>) -> EpisodeMapping? {
+        let end = bytes.count
+        guard end > 0 else { return nil }
+        var offset = 0
+
+        func isLetter(_ lowercase: UInt8) -> Bool {
+            offset < end && bytes[offset] | 0x20 == lowercase
+        }
+
+        func number(maximumDigits: Int) -> Int? {
+            let start = offset
+            var value = 0
+            while offset < end, offset - start < maximumDigits,
+                  bytes[offset] >= 48, bytes[offset] <= 57 {
+                value = value * 10 + Int(bytes[offset] - 48)
+                offset += 1
+            }
+            return offset == start ? nil : value
+        }
+
+        var season: Int?
+        if isLetter(0x73) { // S
+            offset += 1
+            if isLetter(0x70) { // SP
+                season = 0
+                offset += 1
+            } else {
+                guard let value = number(maximumDigits: 3), isLetter(0x65) else { return nil }
+                season = value
+                offset += 1
+            }
+        } else if isLetter(0x65) { // E
+            offset += 1
+        }
+        guard let first = number(maximumDigits: 4) else { return nil }
+        if offset == end {
+            return EpisodeMapping(season: season, episode: first, lastEpisode: nil)
+        }
+        guard bytes[offset] == 0x2D else { return nil } // -
+        offset += 1
+        if isLetter(0x73) {
+            offset += 1
+            guard let endSeason = number(maximumDigits: 3), endSeason == season,
+                  isLetter(0x65) else { return nil }
+            offset += 1
+        } else if isLetter(0x65) {
+            offset += 1
+        }
+        guard let last = number(maximumDigits: 4), offset == end, last > first else { return nil }
+        return EpisodeMapping(season: season, episode: first, lastEpisode: last)
+    }
+
+    private static func regexEpisodeNumber(_ text: String) -> EpisodeMapping? {
         guard let match = episodePattern.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) else { return nil }
         func number(_ index: Int) -> Int? {
             Range(match.range(at: index), in: text).flatMap { Int(text[$0]) }

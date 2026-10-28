@@ -1,0 +1,108 @@
+name: PlexMatch parsing performance
+
+on:
+  push:
+    branches: ['perf/plexmatch-ascii-parsing-20261028']
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Benchmarks/PlexMatchParsing/**'
+      - '!Benchmarks/PlexMatchParsing/evidence/**'
+      - '!Benchmarks/PlexMatchParsing/README.md'
+      - '.github/workflows/plexmatch-parsing.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Benchmarks/PlexMatchParsing/**'
+      - '!Benchmarks/PlexMatchParsing/evidence/**'
+      - '!Benchmarks/PlexMatchParsing/README.md'
+      - '.github/workflows/plexmatch-parsing.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plexmatch-parsing-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify the pinned baseline against its original Git blob
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import base64, hashlib, json, os, urllib.request
+          from pathlib import Path
+          root = Path('Benchmarks/PlexMatchParsing/baseline')
+          manifest = json.loads((root / 'manifest.json').read_text())
+          url = 'https://api.github.com/repos/' + os.environ['GITHUB_REPOSITORY'] + '/git/blobs/' + manifest['gitBlob']
+          request = urllib.request.Request(url, headers={
+              'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
+              'Accept': 'application/vnd.github+json',
+          })
+          with urllib.request.urlopen(request) as response:
+              blob = json.load(response)
+          data = base64.b64decode(blob['content'])
+          assert data == (root / 'PlexMatchHints.swift').read_bytes()
+          assert hashlib.sha256(data).hexdigest() == manifest['sha256']
+          print('Pinned baseline matches Git blob ' + manifest['gitBlob'])
+          PY
+      - name: Run native parser and reader regressions and paired measurements
+        run: |
+          mkdir -p "$RUNNER_TEMP/plexmatch-parsing"
+          git rev-parse HEAD > "$RUNNER_TEMP/plexmatch-parsing/revision.txt"
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo 'Kyoto is available; submit this qualification through the shared queue and inspect its completed job.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; using isolated direct builds.'
+          python3 Benchmarks/PlexMatchParsing/run.py --pairs 12 --target-ms 150 \
+            --output "$RUNNER_TEMP/plexmatch-parsing/results"
+      - name: Preserve compact evidence in the job log
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'plexmatch-parsing'
+          evidence = root / 'results/evidence'
+          paths = [root / 'revision.txt', *sorted(evidence.rglob('*'))]
+          files = {}
+          for path in paths:
+              if not path.is_file():
+                  continue
+              # Full differential payloads are retained in the artifact below.
+              # The log bundle keeps their hashes, exact inputs and pass receipt.
+              if path.name.startswith('verify-') and path.name.endswith('.stdout.log'):
+                  continue
+              files[str(path.relative_to(root))] = base64.b64encode(path.read_bytes()).decode()
+          payload = gzip.compress(json.dumps({'files': files}, sort_keys=True).encode(), mtime=0)
+          if len(payload) > 2_000_000:
+              raise SystemExit('Compact evidence exceeds the log size bound; use the artifact')
+          encoded = base64.b64encode(payload).decode()
+          print('PLEXMATCH_PARSING_EVIDENCE_BEGIN ' + hashlib.sha256(payload).hexdigest())
+          for offset in range(0, len(encoded), 4000):
+              print(encoded[offset:offset + 4000])
+          print('PLEXMATCH_PARSING_EVIDENCE_END')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: plexmatch-parsing-native
+          path: |
+            ${{ runner.temp }}/plexmatch-parsing/revision.txt
+            ${{ runner.temp }}/plexmatch-parsing/results/evidence/
+          retention-days: 30

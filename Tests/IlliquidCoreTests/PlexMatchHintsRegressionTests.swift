@@ -24,6 +24,9 @@ struct PlexMatchHintsRegressionTests {
         .init(token: "SP01-S00E02", season: 0, episode: 1, lastEpisode: 2),
         .init(token: "s03e04-e05", season: 3, episode: 4, lastEpisode: 5),
         .init(token: "sp01", season: 0, episode: 1, lastEpisode: nil),
+        .init(token: "0000", season: 7, episode: 0, lastEpisode: nil),
+        .init(token: "e0000-e0001", season: 7, episode: 0, lastEpisode: 1),
+        .init(token: "sP0-s000E0001", season: 0, episode: 0, lastEpisode: 1),
         .init(token: "S000E0000", season: 0, episode: 0, lastEpisode: nil),
         .init(token: "S999E9998-S999E9999", season: 999, episode: 9998, lastEpisode: 9999),
     ]
@@ -77,6 +80,98 @@ struct PlexMatchHintsRegressionTests {
     ])
     func invalidASCIIMappingsRemainRejected(_ token: String) {
         #expect(PlexMatchHints.parse("ep: \(token): file.mkv") == nil)
+    }
+
+    @Test(arguments: [
+        ("ſ03E04", 3, 4, nil),
+        ("ſp01", 0, 1, nil),
+        ("ſP01-ſ00e02", 0, 1, 2),
+        ("S003E0004-ſ3e0005", 3, 4, 5),
+    ] as [(String, Int, Int, Int?)])
+    func unicodeCaseFoldedPrefixesKeepTheirEpisodeIdentity(
+        _ example: (String, Int, Int, Int?)
+    ) throws {
+        // ICU's case-insensitive S also accepts U+017F LATIN SMALL LETTER LONG S.
+        // ASCII-only numeric fields do not make the entire grammar ASCII-only.
+        let (token, season, episode, lastEpisode) = example
+        let plex = try #require(PlexMatchHints.parse("season: 7\nep: \(token): file.mkv"))
+        let raw = try #require(plex.episodeHint(for: "file.mkv", inheritsDescendantMappings: true))
+        #expect(raw.season == season)
+        #expect(raw.episode == episode)
+        #expect(raw.lastEpisode == lastEpisode)
+        #expect(plex.hints(for: "file.mkv", defaultSeason: 9).season == season)
+    }
+
+    @Test(arguments: [
+        "SP01-SP02", "S00E00-SP01", "1-E", "S1E1-S1E",
+        "S0000E0001", "00001", "S01E01-S0010E02", "S01E01-E00002",
+        "S01E01-E02-E03", "S01E01-E02suffix",
+        "E01\u{0000}", "E01\u{001f}", "E01\u{007f}",
+        "S01\tE02", "S01E01-E02 ", "S01E01 -E02",
+    ])
+    func partialOrMalformedMappingsDoNotReplaceEarlierIdentity(_ token: String) throws {
+        #expect(PlexMatchHints.parse("ep: \(token): file.mkv") == nil)
+        let plex = try #require(PlexMatchHints.parse("""
+            title: Show
+            ep: S02E03-E05: file.mkv
+            ep: \(token): file.mkv
+            """))
+        let raw = try #require(plex.episodeHint(for: "file.mkv", inheritsDescendantMappings: true))
+        #expect(raw.season == 2)
+        #expect(raw.episode == 3)
+        #expect(raw.lastEpisode == 5)
+        #expect(plex.hints(for: "file.mkv").title == "Show")
+    }
+
+    @Test(arguments: ["01-S01E02", "E01-S01E02", "E01-S00E02"])
+    func metadataCannotSupplyMissingStartSeasonForExplicitRange(_ token: String) throws {
+        // Range validity uses the token's explicit season, before inheritance.
+        for season in [0, 1] {
+            let plex = try #require(PlexMatchHints.parse("season: \(season)\nep: \(token): file.mkv"))
+            #expect(plex.episodeHint(for: "file.mkv", inheritsDescendantMappings: true) == nil)
+            #expect(plex.hints(for: "file.mkv", defaultSeason: season).episode == nil)
+        }
+    }
+
+    @Test func whitespaceAroundDirectivesDoesNotAllowWhitespaceInsideEpisodeTokens() throws {
+        let plex = try #require(PlexMatchHints.parse("\t episode \t:\t s003e0004-E0005:\t Season 3/file.mkv \t"))
+        let hints = plex.hints(for: "Season 3/file.mkv")
+        #expect(hints.season == 3)
+        #expect(hints.episode == 4)
+        #expect(hints.lastEpisode == 5)
+        for token in ["S03E04 \t", "S03 E04", "S03E04-\tE05"] {
+            #expect(PlexMatchHints.parse("ep: \(token): file.mkv") == nil)
+        }
+    }
+
+    @Test(arguments: ["\n", "\r", "\r\n", "\u{000b}", "\u{000c}", "\u{0085}", "\u{2028}", "\u{2029}"])
+    func documentLineBreaksCannotCompleteAnEpisodeDirective(_ separator: String) throws {
+        #expect(PlexMatchHints.parse("ep: E01\(separator): file.mkv") == nil)
+        let plex = try #require(PlexMatchHints.parse("season: 7\(separator)ep: E00-E01: file.mkv\(separator)"))
+        let hints = plex.hints(for: "file.mkv")
+        #expect(hints.season == 7)
+        #expect(hints.episode == 0)
+        #expect(hints.lastEpisode == 1)
+    }
+
+    @Test func canonicallyEquivalentPathsKeepLastMappingReplacement() throws {
+        let composed = "café/épisode.mkv"
+        let decomposed = "cafe\u{301}/e\u{301}pisode.mkv"
+        let plex = try #require(PlexMatchHints.parse("""
+            title: Show
+            ep: S03E04-E06: \(composed)
+            ep: E02: \(decomposed)
+            """))
+        for path in [composed, decomposed] {
+            let raw = try #require(plex.episodeHint(for: path, inheritsDescendantMappings: true))
+            #expect(raw.season == nil)
+            #expect(raw.episode == 2)
+            #expect(raw.lastEpisode == nil)
+            let hints = plex.hints(for: path, defaultSeason: 5)
+            #expect(hints.title == "Show")
+            #expect(hints.season == 5)
+            #expect(plex.episodeHint(for: path, inheritsDescendantMappings: false) == nil)
+        }
     }
 
     @Test func laterValidMappingStillReplacesAnEarlierMapping() throws {
