@@ -2,8 +2,9 @@
 
 This is an independent Linux component study of three alternative implementations
 of the same PGS/DVB acquisition check. It changes no application source or
-application test target. Results are pending execution; source preparation alone
-does not establish compilation, correctness, or a speedup.
+application test target. The common three-arm run completed successfully on
+Linux with Swift 6.3.2. Direct raw-buffer borrowing was faster than both other
+arms in every paired CPU and wall comparison; macOS qualification remains separate.
 
 | Arm | Pinned production revision | Strategy |
 | --- | --- | --- |
@@ -14,6 +15,46 @@ does not establish compilation, correctness, or a speedup.
 The two proposals remove the same explicit whole-payload copying getter at the
 same seek-reconstruction call site. They are alternatives, not additive fixes.
 Measurements from their earlier studies are not pooled into this experiment.
+
+## Qualified result
+
+[Run 40641092782](https://github.com/Jagalite/illiquid/actions/runs/40641092782)
+qualified study code `fd50b1822cd388ecf587fb72ce6f6c893019cc2d` on an x86_64
+Ubuntu 24.04 environment with Swift 6.3.2 and FFmpeg `6.1.1-3ubuntu5`.
+The table shows median CPU nanoseconds per check; lower is faster. Complete
+ranges, wall measurements, and paired ratios are retained in
+[`summary.json`](evidence/linux-40641092782/summary.json).
+
+| Workload | Original copying | Raw buffer (#128) | `Data(bytesNoCopy:)` (#137) |
+| --- | ---: | ---: | ---: |
+| PGS tiny | 28.8 | 12.1 | 162.5 |
+| DVB tiny | 29.1 | 11.9 | 156.0 |
+| PGS ~4 KiB | 163.2 | 12.2 | 155.8 |
+| DVB ~4 KiB | 166.0 | 12.6 | 157.7 |
+| PGS ~64 KiB | 1,498.5 | 12.5 | 156.9 |
+| DVB ~64 KiB | 1,485.6 | 13.1 | 144.5 |
+| PGS ~256 KiB | 6,006.3 | 13.7 | 145.3 |
+| DVB ~256 KiB | 6,012.2 | 17.8 | 146.4 |
+
+Raw-buffer borrowing improved all 48 paired CPU and all 48 paired wall
+comparisons against each comparator. The `Data(bytesNoCopy:)` arm improved every
+larger-packet pair but took **5.4–5.6 times the original CPU time on tiny controls**
+(median paired ratios: 5.42 for DVB, 5.57 for PGS). That regression is specific to
+this measured configuration; this study does not attribute it to an allocation
+count or infer the same outcome for Apple Foundation.
+
+All three arms matched across **605 cases**, including **221 authored expected
+outcomes**. The **15 unchanged release tests** passed: seven from #128 and eight
+from #137. All **144 timed observations** met both duration gates; the shortest
+CPU and wall observations were 253.573954 ms and 253.635124 ms, above the 60 ms
+floor. A separate audit recomputed the numerical summaries and verified source,
+test, log, command-output, and checksum identities from this same run.
+
+The [evidence index](evidence/linux-40641092782/README.md) preserves all raw
+observations, 49 calibration trials, complete parity traces, test/build logs,
+source receipts, and the exact compressed workflow bundle. These results favor
+the direct buffer strategy for this Linux component; they do not qualify the
+macOS application or establish allocator/RSS savings.
 
 ## Source identity and Linux boundary
 
