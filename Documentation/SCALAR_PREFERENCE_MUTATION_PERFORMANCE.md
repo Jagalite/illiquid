@@ -5,8 +5,9 @@
 The candidate removes repeated whole-preference sanitation from the synchronous
 volume and playback-speed persistence setters. The Linux component campaign
 passed behavioral verification and showed a repeatable caller-cost improvement
-when audio/subtitle language preferences are populated. Native macOS qualification
-is delegated to the accompanying PR workflow and is not yet recorded here.
+when audio/subtitle language preferences are populated. A concurrent native macOS
+campaign independently corroborates the same executable production change, as
+documented below. This PR's own expanded macOS matrix remains pending.
 
 Baseline: `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`.
 Only `PlaybackPersistenceStore.swift` and `PlaybackPreferences.swift` differ
@@ -65,10 +66,10 @@ list** means two or six language normalizations in the baseline. These synthetic
 fixtures do not represent the user's actual preferences.
 
 Empty language lists provide a useful control. Their caller costs are much
-smaller, and scheduling/write overhead dominates short bursts or per-update
-flushes. Retained results include regressions and outliers: for example, the
-empty-list speed control that flushes every update has a +25.1% median paired
-complete-operation time, and some short-burst pairs have large scheduling
+smaller; short bursts and per-update flushes are correspondingly sensitive to
+scheduling and write overhead. Retained results include regressions and outliers:
+for example, the empty-list speed control that flushes every update has a +25.1%
+median paired complete-operation time, and some short-burst pairs have large timing
 outliers. This campaign supports eliminating redundant scalar-setter work; it
 does not establish a universal end-to-end latency improvement.
 
@@ -111,6 +112,57 @@ Their differential check matched 200 reload receipts across 10,000 operations pe
 variant. Both historical timing harnesses compiled each variant successfully;
 their old timing campaigns were not rerun. See the
 [integration receipt](../Benchmarks/ScalarPreferenceMutation/evidence/linux/integration.json).
+
+The existing component regression job also
+[passed on macOS](https://github.com/Jagalite/illiquid/actions/runs/40634872451/job/122639411392)
+with the candidate production sources: macOS 26.6.2 arm64 and Xcode 26.6, PR merge
+commit `ad6eafa34a5082b6389db5cc6046c4305238a376`. Its logs confirm the 12- and
+26-test persistence suites and 200 matching reload receipts after 10,000 mixed
+operations per variant. This integration result is separate from the new
+four-configuration test matrix and paired performance campaign, whose macOS
+qualification remains pending.
+
+## Independent native corroboration
+
+While this PR's native job was queued, a concurrent branch was found with the
+same executable production change:
+[`b1ffc3c4d13db5ec7c7f5945aa446c829f6ea2c3`](https://github.com/Jagalite/illiquid/commit/b1ffc3c4d13db5ec7c7f5945aa446c829f6ea2c3).
+Its `PlaybackPreferences.swift` is byte-identical to this candidate. Its store
+differs only in the invariant comment's wording and placement. The production
+edits should be integrated once; the two benchmark campaigns provide complementary
+evidence, not two distinct optimizations.
+
+That branch's [native run](https://github.com/Jagalite/illiquid/actions/runs/40634269244)
+passed on macOS 26.6.2 arm64, Apple M1 (Virtual), Apple Swift 6.3.3. Its separate
+harness completed 41 tests in each of four baseline/candidate debug/release
+configurations and 432 observations: 24 cells, nine alternating process pairs
+each. The source hashes and four test-log hashes match its manifest, and all 24
+summary cells independently recompute from the retained observations.
+
+For ordinary 32-update changing-value bursts with **four language codes in each
+list**, that independent campaign reports:
+
+| Field | Baseline median µs/update | Candidate median µs/update | Median paired speedup |
+| --- | ---: | ---: | ---: |
+| Volume | 30.389 | 1.993 | 18.50x |
+| Speed | 21.355 | 1.155 | 16.79x |
+
+All nine pairs improved in these two populated-list cases. Its empty-list normal
+bursts include individual regressions. All of its fixtures, including empty-list
+controls, use a nondefault output device and other nondefault settings. It uses
+a different driver, fixture sizes and calibration from the Linux campaign, so
+these numbers must not be treated as a matched cross-platform comparison.
+Its writer-gated cases calibrate the iteration count separately for each variant;
+their per-update results measure throughput rather than equal-length traces.
+Its ordinary bursts use the fixed 32 updates shown above and flush afterward,
+outside the timed interval.
+
+The original [artifact ZIP](../Benchmarks/ScalarPreferenceMutation/evidence/independent-macos/run-40634269244.zip)
+is retained with [source comparison and provenance](../Benchmarks/ScalarPreferenceMutation/evidence/independent-macos/provenance.json).
+Its SHA-256 matches the GitHub artifact digest. This corroborates the production
+algorithm on macOS; it does not execute this PR's exact source tree, new tests,
+compatibility adapters or `ScalarPreferenceMutation` harness. The accompanying
+native workflow qualifies those separately.
 
 ## Reproduction and limits
 
