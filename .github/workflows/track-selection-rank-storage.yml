@@ -1,0 +1,130 @@
+name: Track selection rank storage
+
+on:
+  push:
+    branches: ['codex/track-selection-rank-storage']
+    paths:
+      - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Tests/IlliquidCoreTests/TrackSelectionRankingTests.swift'
+      - 'Benchmarks/TrackSelectionRankStorage/**'
+      - 'Benchmarks/TrackSelectionRanking/Harness.swift'
+      - 'Benchmarks/TrackSelectionRanking/run.py'
+      - 'Benchmarks/StandardCompletionContract/CCompletionHeap/**'
+      - '.github/workflows/track-selection-rank-storage.yml'
+      - '!Benchmarks/TrackSelectionRankStorage/*.md'
+      - '!Benchmarks/TrackSelectionRankStorage/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/TrackSelectionPreferences.swift'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Tests/IlliquidCoreTests/TrackSelectionRankingTests.swift'
+      - 'Benchmarks/TrackSelectionRankStorage/**'
+      - 'Benchmarks/TrackSelectionRanking/Harness.swift'
+      - 'Benchmarks/TrackSelectionRanking/run.py'
+      - 'Benchmarks/StandardCompletionContract/CCompletionHeap/**'
+      - '.github/workflows/track-selection-rank-storage.yml'
+      - '!Benchmarks/TrackSelectionRankStorage/*.md'
+      - '!Benchmarks/TrackSelectionRankStorage/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: track-selection-rank-storage-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            label: linux
+            developer_dir: ''
+          - os: macos-26
+            label: native
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record host
+        run: |
+          mkdir -p "$RUNNER_TEMP/track-rank-storage"
+          uname -a > "$RUNNER_TEMP/track-rank-storage/system.txt"
+          swift --version >> "$RUNNER_TEMP/track-rank-storage/system.txt"
+          python3 --version >> "$RUNNER_TEMP/track-rank-storage/system.txt"
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            sw_vers >> "$RUNNER_TEMP/track-rank-storage/system.txt"
+            sysctl -n machdep.cpu.brand_string >> "$RUNNER_TEMP/track-rank-storage/system.txt"
+          else
+            lscpu >> "$RUNNER_TEMP/track-rank-storage/system.txt"
+          fi
+      - name: Qualify behavior and collect separate paired cohorts
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'track-rank-storage'
+          runner = [sys.executable, 'Benchmarks/TrackSelectionRankStorage/run.py']
+          cases = [
+              ('debug', ['test', '--configuration', 'debug']),
+              ('release', ['test', '--configuration', 'release']),
+              ('timing', ['benchmark', '--rounds', '10', '--target-ms', '100']),
+          ]
+          if sys.platform == 'linux':
+              cases.append(('allocations', ['benchmark', '--allocations',
+                  '--rounds', '4', '--iterations', '1000']))
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if not queue.is_file():
+              print('The shared Kyoto queue is unavailable on this hosted runner; '
+                    'running isolated component builds directly and serially.', flush=True)
+          unqualified = []
+          for label, arguments in cases:
+              output = root / label
+              command = [*runner, *arguments, '--output', str(output)]
+              if sys.platform == 'linux' and arguments[0] == 'benchmark':
+                  command += ['--cpu', str(min(os.sched_getaffinity(0)))]
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+                  print(submitted, flush=True)
+                  job = json.loads(submitted)['id']
+                  subprocess.run([*cli, 'show', job], check=True)
+                  result = subprocess.run([*cli, 'wait', job])
+                  subprocess.run([*cli, 'logs', job], check=True)
+                  if result.returncode:
+                      sys.exit(result.returncode)
+              else:
+                  subprocess.run(command, check=True)
+              receipt = json.loads((output / 'completion.json').read_text())
+              if receipt.get('completed') is not True:
+                  raise SystemExit(f'Incomplete qualification: {label}')
+              summary = output / 'summary.json'
+              if summary.is_file():
+                  print(label + '\n' + summary.read_text(), flush=True)
+                  if label == 'timing' and json.loads(summary.read_text())['timing_qualification']['qualified'] is not True:
+                      unqualified.append('Timing cohort is unqualified: a final wall or CPU interval was below 60 ms; '
+                                         'all observations and the qualification receipt are retained.')
+          if unqualified:
+              raise SystemExit('\n'.join(unqualified))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: track-selection-rank-storage-${{ matrix.label }}
+          path: |
+            ${{ runner.temp }}/track-rank-storage/**/*.json
+            ${{ runner.temp }}/track-rank-storage/**/*.jsonl
+            ${{ runner.temp }}/track-rank-storage/**/*.log
+            ${{ runner.temp }}/track-rank-storage/**/*.txt
+            ${{ runner.temp }}/track-rank-storage/**/inputs/**
+            !${{ runner.temp }}/track-rank-storage/**/cache/**
+          retention-days: 14

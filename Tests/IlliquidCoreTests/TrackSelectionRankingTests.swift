@@ -50,6 +50,38 @@ struct TrackSelectionRankingTests {
         }
     }
 
+    @Test func everyLanguagePriorityOutranksAllSixLowerPrioritiesAtThe32LanguageBound() {
+        let languages = [
+            "en", "ja", "fr", "de", "es", "it", "pt", "nl",
+            "sv", "da", "fi", "pl", "cs", "sk", "hu", "ro",
+            "bg", "el", "tr", "ru", "uk", "ar", "he", "fa",
+            "hi", "bn", "ta", "te", "ko", "zh", "vi", "id",
+        ]
+        let preferences = TrackSelectionPreferences(
+            subtitleLanguages: languages, subtitles: .forcedOnly,
+            prefersAccessibleTracks: true
+        )
+        #expect(preferences.subtitleLanguages == languages)
+        for (preferred, next) in zip(languages, languages.dropFirst()) {
+            // A filterable track is eligible but loses every non-language
+            // priority. Its next-language opponent wins all six, including
+            // fallback, and also has the smaller signed ID.
+            let higher = candidate(
+                .max, kind: .subtitle, language: preferred,
+                commentary: true, filtersForcedEvents: true
+            )
+            let lower = candidate(
+                .min, kind: .subtitle, language: next,
+                isDefault: true, isForced: true, accessible: true
+            )
+            for order in [[higher, lower], [lower, higher]] {
+                #expect(preferences.select(
+                    in: order, kind: .subtitle, fallbackID: Int64.min
+                ) == Int64.max)
+            }
+        }
+    }
+
     @Test func commentaryAvoidancePrecedesAccessibilityDefaultAndFallback() {
         let tracks = [
             candidate(20),
