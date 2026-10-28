@@ -1,0 +1,106 @@
+name: Thumbnail nil-folder ranking performance
+
+on:
+  push:
+    branches: ['perf/thumbnail-nil-folder-20261028']
+    paths:
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Benchmarks/ThumbnailNilFolder/**'
+      - '.github/workflows/thumbnail-nil-folder-performance.yml'
+      - '!Benchmarks/ThumbnailNilFolder/*.md'
+      - '!Benchmarks/ThumbnailNilFolder/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift'
+      - 'Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift'
+      - 'Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift'
+      - 'Tests/IlliquidAppTests/ThumbnailBackgroundSchedulerTests.swift'
+      - 'Benchmarks/ThumbnailNilFolder/**'
+      - '.github/workflows/thumbnail-nil-folder-performance.yml'
+      - '!Benchmarks/ThumbnailNilFolder/*.md'
+      - '!Benchmarks/ThumbnailNilFolder/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-nil-folder-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test exact production sources and measure native ranking
+        run: |
+          echo "Kyoto is unavailable on this ephemeral GitHub-hosted runner; builds run directly and sequentially."
+          mode=''
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode='--tests-only'
+          fi
+          python3 Benchmarks/ThumbnailNilFolder/run.py \
+            --output "$RUNNER_TEMP/thumbnail-nil-folder" \
+            --pairs 8 --target-ms 200 $mode
+      - name: Emit evidence for independent review
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-nil-folder'
+          for path in sorted(root.glob('*')):
+              if path.is_file() and path.suffix in {'.json', '.jsonl'}:
+                  print('THUMBNAIL_RANKING_EVIDENCE ' + json.dumps({
+                      'name': path.name, 'content': path.read_text()
+                  }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-nil-folder-component
+          path: |
+            ${{ runner.temp }}/thumbnail-nil-folder/*.json
+            ${{ runner.temp }}/thumbnail-nil-folder/*.jsonl
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          echo "Kyoto is unavailable on this ephemeral GitHub-hosted runner; builds run directly and sequentially."
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and test thumbnail scheduling
+        run: |
+          mkdir -p "$RUNNER_TEMP/thumbnail-nil-folder-integration"
+          sw_vers > "$RUNNER_TEMP/thumbnail-nil-folder-integration/host.txt"
+          swift --version >> "$RUNNER_TEMP/thumbnail-nil-folder-integration/host.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/thumbnail-nil-folder-integration/host.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'ThumbnailPolicyTests|ThumbnailSchedulingPolicyRegressionTests|ThumbnailBackgroundSchedulerTests' \
+            2>&1 | tee "$RUNNER_TEMP/thumbnail-nil-folder-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-nil-folder-integration
+          path: ${{ runner.temp }}/thumbnail-nil-folder-integration/
+          retention-days: 14
