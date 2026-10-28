@@ -1,0 +1,129 @@
+name: Fixed ring buffer portable performance
+
+on:
+  push:
+    branches: ['perf/fixed-ring-buffer-wrap-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Tests/IlliquidNativePlaybackTests/FixedRingBufferTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift'
+      - 'Benchmarks/FixedRingBuffer/**'
+      - '.github/workflows/fixed-ring-buffer-portable.yml'
+      - '!Benchmarks/FixedRingBuffer/**/*.md'
+      - '!Benchmarks/FixedRingBuffer/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Tests/IlliquidNativePlaybackTests/FixedRingBufferTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift'
+      - 'Benchmarks/FixedRingBuffer/**'
+      - '.github/workflows/fixed-ring-buffer-portable.yml'
+      - '!Benchmarks/FixedRingBuffer/**/*.md'
+      - '!Benchmarks/FixedRingBuffer/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fixed-ring-buffer-portable-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Record host CPU
+        run: lscpu
+      - name: Fetch the exact benchmark baseline
+        run: git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      - name: Qualify exact sources and measure paired release processes
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [
+              sys.executable, 'Benchmarks/FixedRingBuffer/run.py',
+              '--output', str(Path(os.environ['RUNNER_TEMP']) / 'fixed-ring-buffer'),
+              '--pairs', '10', '--target-ms', '100',
+              '--capacities', '3,12,48,64,96,192',
+          ]
+          if os.environ['GITHUB_EVENT_NAME'] == 'pull_request':
+              command.append('--tests-only')
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = str(json.loads(submitted)['id'])
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'running isolated component builds serially in this checkout.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit reviewable results and raw receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'fixed-ring-buffer'
+          paths = {path for pattern in ('*.json', '*.jsonl', 'logs/*.log')
+                   for path in root.glob(pattern) if path.is_file()}
+          files = {str(path.relative_to(root)): path.read_text() for path in sorted(paths)}
+          summary = root / 'summary.json'
+          if summary.is_file():
+              report = json.loads(summary.read_text())
+              print('::group::summary.json')
+              print(summary.read_text())
+              print('::endgroup::')
+              lines = ['## Fixed ring buffer qualification', '',
+                       'Exact production-source component checks; no live playback claim.', '']
+              if report.get('timing_run') is False:
+                  lines += ['Baseline and candidate passed identical debug/release tests.',
+                            'This PR run is a correctness gate; branch-push runs retain timings.', '']
+              else:
+                  lines += [
+                      '| Case | Capacity | Baseline ns/cycle | Candidate ns/cycle | Paired reduction |',
+                      '| --- | ---: | ---: | ---: | ---: |',
+                  ]
+                  for row in report.get('workloads', []):
+                      timing = row['nanoseconds_per_cycle']
+                      lines.append(
+                          f"| {row['case']} | {row['capacity']} | "
+                          f"{timing['baseline']['median']:.2f} | "
+                          f"{timing['candidate']['median']:.2f} | "
+                          f"{row['median_paired_reduction_percent']:.1f}% |"
+                      )
+                  lines += ['', 'Each cycle is one enqueue and one dequeue. '
+                            'Raw samples and ranges are retained; no timing threshold gates CI.', '']
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+                  stream.write('\n'.join(lines))
+          bundle = json.dumps(files, sort_keys=True, separators=(',', ':'))
+          if len(bundle.encode()) > 750_000:
+              raise SystemExit('Review evidence exceeds the 750 kB log limit; use the full artifact')
+          print('FIXED_RING_EVIDENCE_JSON ' + bundle)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: fixed-ring-buffer-portable
+          path: |
+            ${{ runner.temp }}/fixed-ring-buffer/*.json
+            ${{ runner.temp }}/fixed-ring-buffer/*.jsonl
+            ${{ runner.temp }}/fixed-ring-buffer/logs/
+            ${{ runner.temp }}/fixed-ring-buffer/build/*/Sources/
+            ${{ runner.temp }}/fixed-ring-buffer/build/*/Tests/
+            ${{ runner.temp }}/fixed-ring-buffer/build/*/Package.swift
+            ${{ runner.temp }}/fixed-ring-buffer/build/*/Driver.swift
+          retention-days: 14
