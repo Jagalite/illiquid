@@ -1,0 +1,100 @@
+name: Filesystem handoff memory
+
+on:
+  push:
+    branches:
+      - 'perf/bounded-filesystem-handoff-20261028'
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceFilesystem*.swift'
+      - 'Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift'
+      - 'Sources/IlliquidCore/Utilities/LifecyclePerformance.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystem*.swift'
+      - 'Tests/IlliquidAppTests/SourceVolumeChangePolicyTests.swift'
+      - 'Scripts/test-filesystem-handoff.sh'
+      - 'Benchmarks/FilesystemHandoff/Driver.swift'
+      - 'Benchmarks/FilesystemHandoff/Heap.c'
+      - 'Benchmarks/FilesystemHandoff/run.py'
+      - '.github/workflows/filesystem-handoff-memory.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceFilesystem*.swift'
+      - 'Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift'
+      - 'Sources/IlliquidCore/Utilities/LifecyclePerformance.swift'
+      - 'Tests/IlliquidAppTests/SourceFilesystem*.swift'
+      - 'Tests/IlliquidAppTests/SourceVolumeChangePolicyTests.swift'
+      - 'Scripts/test-filesystem-handoff.sh'
+      - 'Benchmarks/FilesystemHandoff/Driver.swift'
+      - 'Benchmarks/FilesystemHandoff/Heap.c'
+      - 'Benchmarks/FilesystemHandoff/run.py'
+      - '.github/workflows/filesystem-handoff-memory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: filesystem-handoff-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test the complete monitor and measure pending handoff memory
+        env:
+          EVIDENCE_ROOT: ${{ runner.temp }}/filesystem-handoff
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          output = Path(os.environ['EVIDENCE_ROOT'])
+          output.mkdir(parents=True, exist_ok=True)
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          commands = [
+              ('tests-debug', ['bash', 'Scripts/test-filesystem-handoff.sh', '--configuration', 'debug',
+                               '--jobs', '2', '-Xswiftc', '-warnings-as-errors', '-Xswiftc', '-swift-version', '-Xswiftc', '6']),
+              ('tests-release', ['bash', 'Scripts/test-filesystem-handoff.sh', '--configuration', 'release',
+                                 '--jobs', '2', '-Xswiftc', '-warnings-as-errors', '-Xswiftc', '-swift-version', '-Xswiftc', '6']),
+              ('measurements', [sys.executable, 'Benchmarks/FilesystemHandoff/run.py', '--pairs', '6',
+                                '--output', str(output / 'results')]),
+          ]
+          if not queue.is_file():
+              print('Shared Kyoto queue is unavailable on this hosted runner; '
+                    'compiling the isolated monitor and tests directly and serially.', flush=True)
+          receipts = []
+          for label, command in commands:
+              print('::group::' + label, flush=True)
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = json.loads(submitted)['id']
+                  subprocess.run([*cli, 'show', job_id], check=True)
+                  result = subprocess.run([*cli, 'wait', job_id])
+                  log = subprocess.check_output([*cli, 'logs', job_id], text=True)
+              else:
+                  result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                  log = result.stdout
+              (output / (label + '.log')).write_text(log)
+              print(log, end='', flush=True)
+              receipts.append({'label': label, 'argv': command, 'returncode': result.returncode})
+              (output / 'receipts.json').write_text(json.dumps(receipts, indent=2) + '\n')
+              print('::endgroup::', flush=True)
+              if result.returncode:
+                  sys.exit(result.returncode)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: filesystem-handoff-evidence
+          path: |
+            ${{ runner.temp }}/filesystem-handoff/
+            !${{ runner.temp }}/filesystem-handoff/results/build/**
+          retention-days: 14

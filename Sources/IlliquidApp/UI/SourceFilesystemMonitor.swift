@@ -13,6 +13,7 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
     private var volumeObservers: [NSObjectProtocol] = []
     private var watchedRoots: [URL] = []
     private var generation: UInt64 = 0
+    private var eventMailbox: SourceFilesystemEventMailbox?
 
     @MainActor init(worker: SourceFilesystemStreamWorker = .init(), handler: @escaping Handler) {
         self.handler = handler
@@ -21,6 +22,7 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
     }
 
     deinit {
+        eventMailbox?.stop()
         worker.stop()
         for observer in volumeObservers { notifications.removeObserver(observer) }
     }
@@ -40,9 +42,15 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
                 MainActor.assumeIsolated { self?.volumeChanged(path: volume.standardizedFileURL.path) }
             })
         }
-        worker.start(paths: paths, latency: latency) { [weak self] events in
-            Task { @MainActor [weak self] in
+        let mailbox = SourceFilesystemEventMailbox()
+        eventMailbox = mailbox
+        worker.start(paths: paths, latency: latency) { [weak self, mailbox] events in
+            guard mailbox.enqueue(events) else { return }
+            // The task owns only the bounded mailbox, never a callback's array.
+            Task { @MainActor [weak self, mailbox] in
                 guard let self, self.generation == revision else { return }
+                let events = mailbox.take()
+                guard !events.isEmpty else { return }
                 self.handler(events)
             }
         }
@@ -60,6 +68,8 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
 
     @MainActor func stop() {
         generation &+= 1
+        eventMailbox?.stop()
+        eventMailbox = nil
         for observer in volumeObservers { notifications.removeObserver(observer) }
         volumeObservers.removeAll()
         watchedRoots.removeAll()
