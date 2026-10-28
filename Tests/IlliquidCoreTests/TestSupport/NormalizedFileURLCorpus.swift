@@ -198,6 +198,33 @@ enum NormalizedFileURLCorpus {
             }
         }
 
+        // File-path constructors can treat embedded and trailing controls
+        // differently from URL-string parsing. Retain both spellings.
+        let controlSpellings = [
+            ("\u{0}", "%00"), ("\u{1}", "%01"), ("\t", "%09"),
+            ("\n", "%0A"), ("\r", "%0D"), ("\u{1F}", "%1F"),
+            ("\u{7F}", "%7F"),
+        ]
+        for (literal, encoded) in controlSpellings {
+            filePaths("/Movies/a" + literal + "b.mkv")
+            filePaths("/Movies/Feature.mkv" + literal)
+            strings("file:///Movies/a" + encoded + "b.mkv")
+            strings("file:///Movies/Feature.mkv" + encoded)
+        }
+        filePaths("/Movies/Feature.mkv\u{0}\u{0}")
+        for input in [
+            "file:///Movies/%2E%2E/Season/%2E%2E/Feature.mkv",
+            "file:///Movies%2FSeason%2F..%2FFeature.mkv",
+            "file:///Movies/%2F///Feature.mkv//",
+            "file:///%2FMovies/Feature.mkv",
+            "file:///Movies/.hidden/Feature.mkv",
+            "file:///Movies/%2Ehidden/Feature.mkv",
+            "file:///Movies/Feature.mkv;version=1",
+            "file:///Movies/Feature.mkv%3Bversion=1?query=ignored#fragment",
+        ] {
+            strings(input)
+        }
+
         return result
     }
 }

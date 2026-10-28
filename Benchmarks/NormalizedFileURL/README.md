@@ -11,9 +11,9 @@ The frozen implementation comes from main commit
 path, composes Unicode, reconstructs a file URL and immediately reads its path.
 
 The candidate returns the standardized path directly only when it is absolute
-ASCII and outside Foundation's `/.file/id=` namespace. ASCII needs no
+printable ASCII and outside Foundation's `/.file/id=` namespace. ASCII needs no
 Unicode composition. The fallback retains the original file-URL reconstruction
-for Unicode and special file references. It changes no caller, cache, stored
+for Unicode, controls and special file references. It changes no caller, cache, stored
 schema, validation policy, symlink-resolution boundary or public API.
 
 ## Reproduce

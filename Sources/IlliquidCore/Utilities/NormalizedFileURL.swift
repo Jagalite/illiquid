@@ -36,11 +36,11 @@ public enum NormalizedFileURL {
         guard isSupportedLocalFileURL(url) else { return nil }
         let lexical = url.absoluteURL.standardized
         let path = lexical.path
-        // ASCII is already canonically composed. Avoid reconstructing a URL
+        // Printable ASCII is already canonically composed. Avoid reconstructing a URL
         // only to extract its path again, but preserve Foundation's special
-        // file-reference interpretation and Unicode filesystem representation.
+        // file-reference interpretation, controls and Unicode representation.
         if path.hasPrefix("/"), !path.hasPrefix("/.file/id="),
-           path.utf8.allSatisfy({ $0 < 0x80 }) {
+           path.utf8.allSatisfy({ $0 >= 0x20 && $0 < 0x7F }) {
             return path
         }
         return URL(fileURLWithPath: path.precomposedStringWithCanonicalMapping,
