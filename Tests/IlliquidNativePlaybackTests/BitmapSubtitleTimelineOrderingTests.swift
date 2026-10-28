@@ -51,6 +51,49 @@ struct BitmapSubtitleTimelineOrderingTests {
         }
     }
 
+    @Test(arguments: [0, 1, 2, 3, 8, 32, 127, 128])
+    func lookupAndPruneBoundariesMatchIndependentOracle(count: Int) throws {
+        let capacity = max(1, count)
+        var timeline = BitmapSubtitleTimeline(maximumEntries: capacity, maximumBytes: capacity * 8)
+        var oracle = TimelineSortedArrayOracle(maximumEntries: capacity, maximumBytes: capacity * 8)
+        let starts = (0..<count).map { Double($0) * 2 - 2 }
+        for index in starts.indices.reversed() {
+            let display = timelineDisplay(
+                UInt8(index), bytes: index.isMultiple(of: 5) ? 0 : 4,
+                duration: index.isMultiple(of: 3) ? 0.5 : nil
+            )
+            let inserted = timeline.insert(display, at: starts[index], generation: 0)
+            let expected = oracle.insert(display, at: starts[index], generation: 0)
+            try #require(inserted)
+            try #require(expected)
+        }
+        // Adjacent representable times catch off-by-one selection at every
+        // position. Nonfinite cutoffs deliberately exercise prune's existing
+        // behavior, which differs from composition's finite-query requirement.
+        let special: [Double] = [
+            .nan, -.infinity, .infinity, -.greatestFiniteMagnitude,
+            .greatestFiniteMagnitude, -0.0, 0.0,
+        ]
+        let boundaries = starts.flatMap { [$0.nextDown, $0, $0.nextUp] }
+        let queries = special + boundaries + starts.map { $0 + 0.5 }
+        try assertTimeline(timeline, matches: oracle, at: queries)
+
+        for cutoff in special + boundaries {
+            // Start each prune from the same value; sequential pruning would
+            // hide earlier positions and empty/small-window edge cases.
+            var pruned = timeline
+            var expected = oracle
+            pruned.prune(before: cutoff)
+            expected.prune(before: cutoff)
+            let probes = special + starts + [cutoff.nextDown, cutoff, cutoff.nextUp]
+            try assertTimeline(pruned, matches: expected, at: probes,
+                               context: "count \(count), cutoff \(cutoff)")
+            #expect(pruned.revision == timeline.revision)
+        }
+        // Pruning value copies must leave the original timeline and owners intact.
+        try assertTimeline(timeline, matches: oracle, at: queries)
+    }
+
     @Test func insertionPermutationsAndReplacementsMatchSortedArrayOracle() throws {
         let starts: [Double] = [-3, -0.0, 1, 2, 5]
         let queries: [Double] = [-4, -3, -2, -0.0, 0, 0.25, 1, 1.5, 2, 4, 5, 6, 100]
