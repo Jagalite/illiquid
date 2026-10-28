@@ -6,6 +6,7 @@ on:
     paths:
       - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
       - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointIdentityTests.swift'
       - 'Benchmarks/PlaybackCheckpointPreparation/*.swift'
       - 'Benchmarks/PlaybackCheckpointPreparation/run.py'
       - '.github/workflows/playback-checkpoint-preparation.yml'
@@ -36,7 +37,8 @@ jobs:
           from pathlib import Path
           command = [sys.executable, 'Benchmarks/PlaybackCheckpointPreparation/run.py',
                      '--output', str(Path(os.environ['RUNNER_TEMP']) / 'checkpoint-preparation'),
-                     '--pairs', '6', '--target-ms', '250']
+                     '--pairs', '6', '--target-ms', '250',
+                     '--baseline', 'pr124', '--profile', 'incremental']
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
               cli = [sys.executable, str(queue)]

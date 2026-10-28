@@ -1,11 +1,27 @@
-# Playback checkpoint preparation
+# Lazy checkpoint identities: follow-up to PR #124
 
-This study measures complete `PlaybackCheckpoint.record()` calls. It compares
-the production checkpoint writer at `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`
-with a focused change to that file. Results and retained receipts are added
-after qualification; the existence of this runner is not a performance result.
+This follow-up targets [PR #124](https://github.com/Jagalite/illiquid/pull/124),
+which was opened concurrently during this investigation. That PR already skips
+membership scans for folder-free playlists and reuses the current source key.
+Those large-playlist savings overlap with this study's original work.
 
-## Why this work occurs
+The incremental change defers source normalization until the first supported
+playlist item. An entirely unsupported playlist needs no source identity, so
+preparing it eagerly adds avoidable work. The revised loop also stops safely
+when the source itself is unsupported, and still prepares a supported source
+at most once. It preserves the parent PR's folder-free fast path.
+
+The primary comparison uses the actual parent PR commit
+`9f21c84bbe097984642c8fc08b7c8c1fd31a6c41`. Its ten-case profile includes the
+three all-unsupported-item cases plus first/late matches, large playlists,
+remote sources, and unsupported sources. Results are added after the complete
+comparison and evidence audit; native macOS qualification remains separate.
+
+The earlier main-based experiments are retained as research history. Their
+broad playlist savings are shared with PR #124 and are not incremental gains
+from this follow-up.
+
+## Checkpoint context
 
 `PlaybackController` captures a checkpoint when playback position moves at
 least ten seconds from the last checkpoint, and on operations including pause,
@@ -20,7 +36,7 @@ answer could not affect the saved folder because the supplied folder was nil.
 For playlists with a folder, the scan normalized the same source URL for each
 supported item visited.
 
-The change skips the membership scan for absent folders and empty playlists.
+The parent optimization skips membership scans for absent folders and empty playlists.
 When a scan is needed, it prepares the valid source identity once, after the
 first supported playlist item, and compares visited item identities with that
 key. Unsupported-only playlists never normalize the source. A missing identity never matches
@@ -42,18 +58,21 @@ queue check on its hosted runner.
 
 ```sh
 python3 Benchmarks/PlaybackCheckpointPreparation/run.py \
-  --output /tmp/checkpoint-preparation-results --pairs 6 --target-ms 250
+  --output /tmp/checkpoint-identity-followup --pairs 6 --target-ms 250 \
+  --baseline pr124 --profile incremental
 ```
 
 The output directory must be new or empty. Dependencies are included in the
 repository; these component packages need neither FFmpeg nor the full app.
-For a mechanics check, add `--quick --pairs 2 --target-ms 25`. This excludes
-10,000-item timing cells and uses shorter observations; it is not the final
-measurement protocol. `--tests-only` and `--skip-tests` select a phase.
+Use `--baseline main --profile full` to reproduce the broader historical
+comparison. That full profile also accepts `--quick --pairs 2 --target-ms 25`
+for a shorter mechanics check. `--tests-only` and `--skip-tests` select a phase.
+The incremental profile always uses its exact ten predefined workload IDs.
 
 ## Source isolation and correctness
 
-The runner pins full-file SHA-256 hashes for seven baseline production files.
+The runner pins both supported baseline commits and full-file SHA-256 hashes
+for seven baseline production files.
 Only `PlaybackCheckpointWriter.swift` changes between the two arms. Both use
 the same current core sources, regression tests, bridge, and driver. A changed
 unrelated dependency is rejected, rather than silently broadening the study.
@@ -65,8 +84,8 @@ declarations**. Its unused disk-store class and macOS signposting dependencies
 are outside this experiment. The full checkpoint source is compiled unchanged;
 no replacement production declarations are used.
 
-Identical tests run against baseline and candidate in debug and release. The
-checkpoint suite exercises raw and relative URLs, encoded dot segments,
+Identical tests run against baseline and candidate in debug and release. The parent checkpoint suite is retained unchanged. The added identity
+suite exercises raw and relative URLs, encoded dot segments,
 localhost and rejected authorities, NFC/NFD Unicode, duplicate metadata, nil
 folders, malformed source enum cases, and stale saved indices. It includes
 1,190 small-playlist comparisons of every record field and sorted-key JSON
@@ -75,7 +94,7 @@ as well. Each constructor samples its own clock; only `updatedAt` is aligned
 for byte comparisons, and a separate test bounds it by the call's start/end.
 
 Before timing, separate executables emit complete canonical records for all
-58 workload fixtures. The runner requires byte-identical output. Every timed
+58 workload fixtures. The runner requires byte-identical output, including when only ten cells are timed. Every timed
 process independently checks the complete fixture before and after measurement,
 normalizing only the sampled timestamp. Unicode fixtures must retain distinct
 raw source/item URL spellings with equal normalized identities.
@@ -89,7 +108,15 @@ No cross-module optimization is enabled. Variant-specific loader paths prefer
 the recorded libraries over inherited research paths; dependency and command
 receipts retain the resolution setup.
 
-There are 58 workload cells:
+All 58 fixture cells are still checked for complete output equality. The
+primary incremental timing profile selects exactly these ten cells:
+
+- Unsupported playlist items at 1, 32, and 1,000 items.
+- Folder first match at 1 and 32 items.
+- Folder last match at 1,000 and 10,000 items.
+- No-folder last match, remote source, and unsupported source at 1,000 items.
+
+The broader main-based timing profile contains these 58 cells:
 
 | Fixtures | Playlist sizes |
 | --- | --- |
@@ -134,7 +161,8 @@ key, which added unnecessary work for an all-unsupported playlist. Its retained
 adverse observations motivated the final lazy preparation. Those controls remain
 in the unchanged fixture matrix for both experiments.
 Native app integration is checked separately by the repository's existing
-restoration/native lifecycle workflow when a PR is opened.
+restoration/native lifecycle workflow when a PR is opened. This follow-up
+remains a draft while native qualification is pending.
 
 ## Evidence layout
 

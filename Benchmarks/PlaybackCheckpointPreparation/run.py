@@ -26,7 +26,10 @@ import time
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
-BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
+BASELINES = {
+    "main": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "pr124": "9f21c84bbe097984642c8fc08b7c8c1fd31a6c41",
+}
 PLAYER_SOURCE = "Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift"
 SESSION_SOURCE = "Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift"
 CORE_SOURCES = [
@@ -46,6 +49,10 @@ BASELINE_SHA256 = {
     SESSION_SOURCE: "4318a57a49833f22c3b1181c53694fc31e3a74535ee1644d82bce3134c54228f",
     PLAYER_SOURCE: "72e1b32e382d18736c54ae2222b91c7093bb0c9577c8197c630e74fd8405d591",
 }
+BASELINE_PLAYER_SHA256 = {
+    "main": BASELINE_SHA256[PLAYER_SOURCE],
+    "pr124": "01406f739a3574dc47bfba3cd94f3f7c743ed098e16ef887d6c767893903982b",
+}
 SESSION_BOUNDARY = (
     b"\n/// A versioned, atomic Application Support document for crash-safe playback"
 )
@@ -56,7 +63,13 @@ CORE_TESTS = [
     "PlaylistOrderRestorationTests.swift",
     "FolderPlaylistTests.swift",
 ]
-PLAYER_TESTS = ["PlaybackCheckpointTests.swift"]
+PLAYER_TESTS = ["PlaybackCheckpointTests.swift", "PlaybackCheckpointIdentityTests.swift"]
+INCREMENTAL_WORKLOAD_IDS = (
+    "invalid_items/1", "invalid_items/32", "invalid_items/1000",
+    "folder_first/1", "folder_first/32",
+    "folder_last/1000", "folder_last/10000",
+    "standalone_last/1000", "remote/1000", "invalid_source/1000",
+)
 VARIANTS = ("baseline", "candidate")
 MAX_ITERATIONS = 1_000_000
 SEMANTIC_FIELDS = (
@@ -165,7 +178,10 @@ class Run:
                 raise RuntimeError(f"Qualification input changed during the run: {relative}")
 
 
-def snapshots(run, manifest):
+def snapshots(run, manifest, baseline_name):
+    baseline = BASELINES[baseline_name]
+    baseline_hashes = BASELINE_SHA256 | {PLAYER_SOURCE: BASELINE_PLAYER_SHA256[baseline_name]}
+    manifest["baseline_source_sha256"] = baseline_hashes
     sources = {}
     manifest["production_sources"] = {}
     for variant in VARIANTS:
@@ -173,9 +189,9 @@ def snapshots(run, manifest):
         manifest["production_sources"][variant] = {}
         for relative in [*CORE_SOURCES, PLAYER_SOURCE]:
             if variant == "baseline":
-                raw = run.command(["git", "show", f"{BASELINE}:{relative}"],
+                raw = run.command(["git", "show", f"{baseline}:{relative}"],
                                   label=f"baseline-{Path(relative).stem}")
-                if digest(raw) != BASELINE_SHA256[relative]:
+                if digest(raw) != baseline_hashes[relative]:
                     raise RuntimeError(f"Pinned baseline source hash changed: {relative}")
             else:
                 raw = (ROOT / relative).read_bytes()
@@ -252,8 +268,12 @@ let package = Package(name: "PlaybackCheckpointPreparationQualification",
             passed = re.search(rb"Test run with (\d+) tests?(?: in \d+ suites?)? passed", stdout)
             if not passed or int(passed.group(1)) <= 0:
                 raise RuntimeError(f"No successful nonempty Swift Testing summary for {variant}/{configuration}")
-            if b"Playback checkpoint preparation" not in stdout:
-                raise RuntimeError(f"The checkpoint regression suite did not execute for {variant}/{configuration}")
+            for suite in [b"Playback checkpoint construction", b"Playback checkpoint identity preparation"]:
+                if suite not in stdout:
+                    raise RuntimeError(
+                        f"Required checkpoint regression suite {suite.decode()!r} did not execute "
+                        f"for {variant}/{configuration}"
+                    )
             summary["tests"].append(dict(variant=variant, configuration=configuration,
                                          passed=True, tests_reported=int(passed.group(1)),
                                          combined_output_sha256=digest(stdout)))
@@ -397,7 +417,18 @@ def measure(run, binaries, args, summary):
             raise RuntimeError(f"Invalid or duplicate workload: {case!r}")
         seen.add(case["id"])
     save(run.output / "all-workloads.json", workloads)
-    if args.quick:
+    if args.profile == "incremental":
+        expected = set(INCREMENTAL_WORKLOAD_IDS)
+        by_id = {case["id"]: case for case in workloads}
+        if len(expected) != len(INCREMENTAL_WORKLOAD_IDS) or not expected.issubset(by_id):
+            raise RuntimeError(
+                "Incremental workload list changed; missing IDs: "
+                + repr(sorted(expected.difference(by_id)))
+            )
+        workloads = [by_id[identifier] for identifier in INCREMENTAL_WORKLOAD_IDS]
+        if any(case["id"] != f"{case['pattern']}/{case['count']}" for case in workloads):
+            raise RuntimeError("Incremental workload IDs no longer match their exact pattern/count pairs")
+    elif args.quick:
         workloads = [case for case in workloads if case["count"] <= 1000]
     if not workloads:
         raise RuntimeError("The requested workload filter selected no cases")
@@ -453,6 +484,10 @@ def measure(run, binaries, args, summary):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--baseline", choices=tuple(BASELINES), default="main",
+                        help="Pinned baseline: original main or PR #124 checkpoint construction")
+    parser.add_argument("--profile", choices=("full", "incremental"), default="full",
+                        help="Full matrix or the exact ten-case PR #124 follow-up matrix")
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--target-ms", type=float, default=250)
     parser.add_argument("--quick", action="store_true", help="Measure only workloads with at most 1,000 items")
@@ -462,13 +497,16 @@ def main():
     args = parser.parse_args()
     if args.pairs < 2 or args.pairs % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("Use an even pair count >= 2 and a positive finite target duration")
+    if args.profile == "incremental" and args.quick:
+        parser.error("--quick cannot be combined with --profile incremental")
+    baseline = BASELINES[args.baseline]
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     if any(output.iterdir()):
         parser.error("Output must be new or empty; existing evidence is never overwritten")
     run = Run(output)
     manifest = dict(
-        baseline=BASELINE, platform=platform.platform(), machine=platform.machine(),
+        baseline=baseline, baseline_name=args.baseline, platform=platform.platform(), machine=platform.machine(),
         python_version=platform.python_version(), cpu_count=os.cpu_count(), started_utc=utc_now(),
         arguments=vars(args) | {"output": str(output)},
         source_policy="Only PlaybackCheckpointWriter.swift differs; exact complete record/protocol prefix; no stubs",
@@ -478,7 +516,8 @@ def main():
         exclusions="Calibration excluded from measured summaries; no measured observations excluded",
         environment={key: os.environ[key] for key in ["LANG", "LC_ALL", "SWIFT_DETERMINISTIC_HASHING"] if key in os.environ},
     )
-    summary = dict(status="running", baseline=BASELINE, tests=[], verification={}, workloads=[])
+    summary = dict(status="running", baseline=baseline, baseline_name=args.baseline,
+                   profile=args.profile, tests=[], verification={}, workloads=[])
     try:
         swift = shutil.which("swift")
         swiftc = shutil.which("swiftc")
@@ -489,7 +528,7 @@ def main():
         manifest["swift_version"] = run.command([swift, "--version"], label="swift-version").decode().strip()
         manifest["head"] = run.command(["git", "rev-parse", "HEAD"], label="head").decode().strip()
         manifest["worktree_status"] = run.command(["git", "status", "--short"], label="status").decode().strip()
-        sources = snapshots(run, manifest)
+        sources = snapshots(run, manifest, args.baseline)
         save(output / "manifest.json", manifest)
         if not args.skip_tests:
             test(run, sources, swift, summary)
