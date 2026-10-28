@@ -1,0 +1,46 @@
+name: Subtitle GPU pool portable ownership
+on:
+  push:
+    branches: ['validation/subtitle-gpu-pool-20261028']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleGPUResourcePoolTests.swift'
+      - 'Benchmarks/SubtitleGPUResourceLifetime/check_pool.py'
+      - '.github/workflows/subtitle-gpu-pool-portable.yml'
+permissions:
+  contents: read
+concurrency:
+  group: subtitle-gpu-pool-portable-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  ownership:
+    runs-on: ubuntu-24.04
+    container: swift:6.2
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check actual pool ownership in debug and release
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this check through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable in this isolated Linux container; builds run serially with two compiler jobs.'
+          echo 'This check has no Metal implementation and does not replace native macOS qualification.'
+          python3 Benchmarks/SubtitleGPUResourceLifetime/check_pool.py --output "$RUNNER_TEMP/subtitle-gpu-pool-portable"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-gpu-pool-portable
+          path: |
+            ${{ runner.temp }}/subtitle-gpu-pool-portable/*.json
+            ${{ runner.temp }}/subtitle-gpu-pool-portable/*.log
+            ${{ runner.temp }}/subtitle-gpu-pool-portable/*.txt
+            ${{ runner.temp }}/subtitle-gpu-pool-portable/inputs/*.swift
+            ${{ runner.temp }}/subtitle-gpu-pool-portable/package/Package.swift
+            ${{ runner.temp }}/subtitle-gpu-pool-portable/package/Sources/**/*.swift
+            ${{ runner.temp }}/subtitle-gpu-pool-portable/package/Tests/**/*.swift
+          retention-days: 14
