@@ -51,15 +51,16 @@ def fixtures():
         cases.append(dict(name=name, media=media, subtitles=subtitles, expected=expected,
                           timed=timed, expected_fuzzy_scores=fuzzy_scores))
 
-    def fuzzy(name, count, languages, prefix="Example.Series", unique=False):
+    def fuzzy(name, count, languages, prefix="Example.Series", unique=False, qualified=True, timed=True):
         stems = [f"{prefix}.Episode.{i:06d}" for i in range(count)]
         if unique:
             stems[1:] = [f"{prefix}.Episode.Season.{i:06d}" for i in range(1, count)]
-        media = [stem + ".1080p.WEB-DL.x265.mkv" for stem in stems]
+        suffix = ".1080p.WEB-DL.x265" if qualified else ""
+        media = [stem + suffix + ".mkv" for stem in stems]
         subtitles = [prefix + "." + lang + ".srt" for lang in languages]
         assignments = {media[0]: subtitles} if unique or count == 1 else {}
         add(name, media, list(reversed(subtitles)), assignments,
-            fuzzy_scores=count * len(languages))
+            fuzzy_scores=count * len(languages), timed=timed)
 
     fuzzy("fuzzy_1_1", 1, ["en"])
     fuzzy("fuzzy_16_1", 16, ["en"])
@@ -80,6 +81,36 @@ def fixtures():
     media = [f"Example.Series.Episode.{i:06d}.mkv" for i in range(256)]
     add("unrelated_256", media, [f"Unrelated.{i:06d}.en.srt" for i in range(256)])
     add("empty_256", media, [])
+
+    # Follow-up cases are opt-in for timing, but always included in full
+    # independent output verification. Preserve the original default cohort.
+    fuzzy("plain_prefix_256_8", 256, LANGUAGES, qualified=False, timed=False)
+
+    def ancestor(name, count, languages, prefix="Example.Series", qualified=False):
+        stems = [f"{prefix}.Episode.{i:06d}" for i in range(count)]
+        suffix = ".1080p.WEB-DL.x265" if qualified else ""
+        media = [stem + suffix + ".mkv" for stem in stems]
+        assignments = {
+            media[i]: [stem + ".Extended." + language + ".srt" for language in languages]
+            for i, stem in enumerate(stems)
+        }
+        subtitles = [subtitle for values in assignments.values() for subtitle in values]
+        add(name, media, list(reversed(subtitles)), assignments, timed=False,
+            fuzzy_scores=count * len(languages))
+
+    for count in [1, 16, 256, 4096]:
+        ancestor(f"ancestor_plain_{count}_1", count, ["en"])
+    ancestor("ancestor_plain_256_8", 256, LANGUAGES)
+    ancestor("ancestor_long_plain_256_8", 256, LANGUAGES,
+             prefix="ExtraordinaryChronicles.of.the.Northern.Realms")
+    ancestor("ancestor_unicode_plain_256_8", 256, LANGUAGES, prefix="Café.東京.Épisode")
+    ancestor("ancestor_qualified_256_8", 256, LANGUAGES, qualified=True)
+    ancestor("ancestor_long_qualified_256_8", 256, LANGUAGES,
+             prefix="ExtraordinaryChronicles.of.the.Northern.Realms", qualified=True)
+    plain_media = [f"Example.Series.Episode.{i:06d}.mkv" for i in range(256)]
+    plain_subtitles = [name.removesuffix(".mkv") + ".en.srt" for name in plain_media]
+    add("exact_plain_256", plain_media, list(reversed(plain_subtitles)),
+        {media: [subtitle] for media, subtitle in zip(plain_media, plain_subtitles)}, timed=False)
 
     # Independent behavior oracles outside timing complement the unchanged
     # regression suites, including both directions of fuzzy prefix matching.
@@ -116,6 +147,10 @@ def main():
     parser.add_argument("--pairs", type=int, default=16)
     parser.add_argument("--target-ms", type=int, default=250)
     parser.add_argument("--skip-tests", action="store_true")
+    parser.add_argument("--baseline-ref", default=BASELINE,
+                        help="Baseline commit; defaults to the original prefix-copy study")
+    parser.add_argument("--case", action="append", dest="selected_cases",
+                        help="Time this case (repeatable); all output fixtures are still verified")
     args = parser.parse_args()
     if args.pairs < 4 or args.pairs % 2 or args.target_ms <= 0:
         parser.error("pairs must be even and >= 4; target-ms must be positive")
@@ -142,9 +177,11 @@ def main():
             raise RuntimeError(f"Command failed: {argv}\n{result.stdout[-3000:]}\n{result.stderr[-9000:]}")
         return result.stdout
 
+    baseline_commit = command(["git", "rev-parse", "--verify",
+                               args.baseline_ref + "^{commit}"]).strip()
     manifest = {
         "started_utc": datetime.now(timezone.utc).isoformat(),
-        "baseline_commit": BASELINE,
+        "baseline_commit": baseline_commit,
         "candidate_commit": command(["git", "rev-parse", "HEAD"]).strip(),
         "candidate_status": command(["git", "status", "--porcelain=v1"]),
         "platform": platform.platform(), "machine": platform.machine(),
@@ -159,7 +196,7 @@ def main():
     }
     source_data = {}
     for path in SOURCES:
-        baseline = command(["git", "show", f"{BASELINE}:{path}"]).encode()
+        baseline = command(["git", "show", f"{baseline_commit}:{path}"]).encode()
         candidate = (ROOT / path).read_bytes()
         source_data[path] = {"baseline": baseline, "candidate": candidate}
         manifest["sources"][path] = {
@@ -177,6 +214,16 @@ def main():
     for path in TESTS:
         manifest["tests"][path] = digest((ROOT / path).read_bytes())
     cases = fixtures()
+    by_name = {case["name"]: case for case in cases}
+    if args.selected_cases:
+        if len(set(args.selected_cases)) != len(args.selected_cases):
+            parser.error("--case names must be unique")
+        if any(name not in by_name for name in args.selected_cases):
+            parser.error("Unknown --case; available cases: " + ", ".join(by_name))
+        timed_specs = [by_name[name] for name in args.selected_cases]
+    else:
+        timed_specs = [case for case in cases if case["timed"]]
+    manifest["timed_cases"] = [case["name"] for case in timed_specs]
     cases_path = output / "cases.json"
     write_json(cases_path, cases)
     manifest["cases_sha256"] = digest(cases_path.read_bytes())
@@ -240,9 +287,7 @@ let package = Package(name: "SubtitleFuzzyPrefix", platforms: [.macOS("26.0")], 
 
     observations = []
     calibrations = []
-    for spec in cases:
-        if not spec["timed"]:
-            continue
+    for spec in timed_specs:
         case = spec["name"]
         pilot = {variant: timed(variant, case, 1) for variant in binaries}
         slowest = max(row["cpuNsPerAssociation"] for row in pilot.values())
@@ -260,9 +305,7 @@ let package = Package(name: "SubtitleFuzzyPrefix", platforms: [.macOS("26.0")], 
                     stream.write(json.dumps(row, sort_keys=True) + "\n")
 
     summary = {"pairs": args.pairs, "cases": []}
-    for spec in cases:
-        if not spec["timed"]:
-            continue
+    for spec in timed_specs:
         case = spec["name"]
         rows = {variant: [r for r in observations if r["name"] == case and r["variant"] == variant]
                 for variant in binaries}
