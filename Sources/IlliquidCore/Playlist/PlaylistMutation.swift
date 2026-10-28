@@ -29,24 +29,26 @@ public enum PlaylistMutation {
         // Compute each identity once, keeping the first item's complete metadata.
         // Re-reading item.id in separate deduplication, indexing and filtering
         // passes repeats URL normalization on the main-actor shuffle path.
-        var byID: [FolderPlaylistItem.ID: FolderPlaylistItem] = [:]
+        // The input already owns each complete item. Keep only its index in
+        // the temporary map to avoid retaining item-sized values in every bucket.
+        var byID: [FolderPlaylistItem.ID: Int] = [:]
         var currentOrder: [FolderPlaylistItem.ID] = []
-        for item in items {
-            let id = item.id
+        for index in items.indices {
+            let id = items[index].id
             guard byID[id] == nil else { continue }
-            byID[id] = item
+            byID[id] = index
             currentOrder.append(id)
         }
 
         var restored: [FolderPlaylistItem] = []
         restored.reserveCapacity(byID.count)
         for id in ids {
-            if let item = byID.removeValue(forKey: id) { restored.append(item) }
+            if let index = byID.removeValue(forKey: id) { restored.append(items[index]) }
         }
         // Taking entries out of the map also deduplicates saved IDs. Remaining
         // entries are new additions and must retain their current relative order.
         for id in currentOrder {
-            if let item = byID.removeValue(forKey: id) { restored.append(item) }
+            if let index = byID.removeValue(forKey: id) { restored.append(items[index]) }
         }
         return restored
     }
