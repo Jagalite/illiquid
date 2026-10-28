@@ -78,5 +78,29 @@ separate from the microbenchmark and does not constitute a live PiP UI session.
 
 The runner records compiler and platform details, commit IDs, source and binary
 hashes, test outcomes, raw observations, complete coordinate receipts, and
-summaries. CI also preserves logs and exact source snapshots. Measured results
-will be recorded below after qualification completes.
+summaries. CI also preserves logs and exact source snapshots.
+
+## Qualification status
+
+As of 2026-10-28 05:48:46 UTC, both jobs in
+[run 40639073635](https://github.com/Jagalite/illiquid/actions/runs/40639073635)
+were still queued. The local execution environment also failed to connect.
+No compilation, test-pass, or performance result is claimed for this experiment.
+
+The source submitted to CI is commit bb13fdb605cd2658334e06ab01dd487b4a20f839.
+This status-only update does not change the submitted source. The pending
+receipt in evidence/pending.json records the job identities and observation time.
+The queued workflow may finish after this status was recorded; consult its
+results before making a PR decision.
+
+No pull request was opened because success has not yet been demonstrated.
+Acceptance requires preserved coordinate semantics, a repeatable CPU reduction
+in stable and mostly stable geometry, an explicit accounting of all-miss cost,
+and a successful native build/regression gate. The performance claim must stay
+within coordinate preparation even if those gates succeed.
+
+The native suite includes a media-session test that returns early unless
+ILLIQUID_PIP_FOLLOWUP_FIXTURE or ILLIQUID_NATIVE_FIXTURE_DIR is provided. This
+workflow supplies neither; that real-media seek/fanout case is not qualified.
+The pixel-buffer geometry, HDR, and subtitle-composition cases use generated
+in-memory inputs and do not depend on that fixture.
