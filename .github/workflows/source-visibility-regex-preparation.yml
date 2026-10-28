@@ -1,0 +1,154 @@
+name: Source visibility regex preparation
+
+on:
+  push:
+    branches: ['perf/source-visibility-regex-preparation-20261028']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityMatcherTests.swift'
+      - 'Benchmarks/SourceVisibilityRegexPreparation/**'
+      - '.github/workflows/source-visibility-regex-preparation.yml'
+      - '!Benchmarks/SourceVisibilityRegexPreparation/*.md'
+      - '!Benchmarks/SourceVisibilityRegexPreparation/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityMatcherTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserFilterTests.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeVisibilityCacheTests.swift'
+      - 'Tests/IlliquidAppTests/SourceEmptyFolderVisibilityTests.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityStorageTests.swift'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - 'Benchmarks/SourceVisibilityRegexPreparation/**'
+      - '.github/workflows/source-visibility-regex-preparation.yml'
+      - '!Benchmarks/SourceVisibilityRegexPreparation/*.md'
+      - '!Benchmarks/SourceVisibilityRegexPreparation/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-visibility-regex-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify exact sources and compare native projections
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/SourceVisibilityRegexPreparation/run.py \
+            --output "$RUNNER_TEMP/visibility-regex" \
+            --pairs 10 --sizes 100 1000 10000 --target-ms 100 "${mode[@]}"
+      - name: Emit plaintext review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "visibility-regex"
+          for name in ("manifest.json", "tests.json", "verification.json", "summary.json", "failure.json"):
+              path = root / name
+              if path.is_file():
+                  print("VISIBILITY_REGEX_JSON " + json.dumps(
+                      {"file": name, "value": json.loads(path.read_text())}, sort_keys=True))
+          for name in ("calibration.jsonl", "measurements.jsonl"):
+              path = root / name
+              if path.is_file():
+                  for line in path.read_text().splitlines():
+                      # Preserve raw process totals/checksums in review logs;
+                      # complete per-call arrays remain in the uploaded JSONL.
+                      row = json.loads(line)
+                      row.pop("wall_samples_ns", None)
+                      row.pop("cpu_samples_ns", None)
+                      print("VISIBILITY_REGEX_ROW " + json.dumps(
+                          {"file": name, "value": row}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-visibility-regex-component
+          path: |
+            ${{ runner.temp }}/visibility-regex/*.json
+            ${{ runner.temp }}/visibility-regex/*.jsonl
+            ${{ runner.temp }}/visibility-regex/*.log
+            ${{ runner.temp }}/visibility-regex/receipts/
+            ${{ runner.temp }}/visibility-regex/packages/
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and test visibility behavior
+        run: |
+          evidence="$RUNNER_TEMP/visibility-regex-integration"
+          mkdir -p "$evidence"
+          sw_vers > "$evidence/host.txt"
+          swift --version >> "$evidence/host.txt"
+          git rev-parse HEAD >> "$evidence/host.txt"
+          filter='SourceVisibilityMatcherTests|SourceBrowserFilterTests|SourceTreeVisibilityCacheTests|SourceEmptyFolderVisibilityTests|SourceVisibilityStorageTests'
+          kyoto=/Volumes/seed1/Projects/kyoto/kyoto.py
+          if test -f "$kyoto"; then
+            python3 "$kyoto" submit -- env DEVELOPER_DIR="$DEVELOPER_DIR" \
+              swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+              --filter "$filter" > "$evidence/kyoto-submit.json"
+            job=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["id"])' "$evidence/kyoto-submit.json")
+            python3 "$kyoto" show "$job" > "$evidence/kyoto-show.json"
+            build_status=0
+            python3 "$kyoto" wait "$job" > "$evidence/kyoto-wait.json" || build_status=$?
+            python3 "$kyoto" logs "$job" > "$evidence/tests.log"
+            cat "$evidence/tests.log"
+            test "$build_status" -eq 0
+          else
+            echo 'Shared Kyoto unavailable on this isolated hosted runner; building directly.'
+            set -o pipefail
+            swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+              --filter "$filter" 2>&1 | tee "$evidence/tests.log"
+          fi
+          python3 - "$evidence" <<'PY'
+          import json, re, sys
+          from pathlib import Path
+          root = Path(sys.argv[1])
+          text = (root / "tests.log").read_text()
+          match = re.search(r"Test run with (\d+) tests?(?: in \d+ suites?)? passed", text)
+          if not match or int(match.group(1)) == 0:
+              raise SystemExit("Native integration did not report completed Swift tests")
+          receipt = {"passed": True, "tests": int(match.group(1)),
+                     "scope": "release application graph and focused visibility regression suites"}
+          (root / "result.json").write_text(json.dumps(receipt, sort_keys=True, indent=2) + "\n")
+          print("VISIBILITY_REGEX_INTEGRATION " + json.dumps(receipt, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-visibility-regex-integration
+          path: ${{ runner.temp }}/visibility-regex-integration/
+          retention-days: 14

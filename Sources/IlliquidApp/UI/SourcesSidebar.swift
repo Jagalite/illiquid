@@ -2106,19 +2106,28 @@ struct SourceVisibilityMatcher {
 
     private static func evaluate(
         normalizedPath: String,
-        candidate: String,
+        candidate: @autoclosure () -> String,
         configuration: SourceVisibilityConfiguration,
         compiledRules: [CompiledRule]
     ) -> SourceVisibilityEvaluation {
-        let range = NSRange(candidate.startIndex..., in: candidate)
-        let regexMatches = compiledRules.compactMap { rule in
-            var matched = false
-            rule.expression.enumerateMatches(in: candidate, options: [.reportProgress], range: range) {
-                result, _, stop in
-                if result != nil { matched = true }
-                if matched || Task.isCancelled { stop.pointee = true }
+        // Manual visibility rules need only the normalized path. Defer root
+        // lookup, relative-path construction and UTF-16 range conversion until
+        // there is an enabled, valid regex that can use them.
+        let regexMatches: [SourceVisibilityRegexMatch]
+        if compiledRules.isEmpty {
+            regexMatches = []
+        } else {
+            let candidate = candidate()
+            let range = NSRange(candidate.startIndex..., in: candidate)
+            regexMatches = compiledRules.compactMap { rule in
+                var matched = false
+                rule.expression.enumerateMatches(in: candidate, options: [.reportProgress], range: range) {
+                    result, _, stop in
+                    if result != nil { matched = true }
+                    if matched || Task.isCancelled { stop.pointee = true }
+                }
+                return matched ? rule.match : nil
             }
-            return matched ? rule.match : nil
         }
 
         if configuration.manuallyHiddenPaths.contains(normalizedPath) {
