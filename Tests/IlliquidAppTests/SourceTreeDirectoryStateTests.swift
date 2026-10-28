@@ -208,6 +208,107 @@ struct SourceTreeDirectoryStateTests {
             expandedFolderIDs: ["/Movies"]).isEmpty)
     }
 
+    @Test func reloadSelectionReusesAliasedAndOverlappingRootsWithoutRequiringExpansion() throws {
+        let alias = try #require(URL(string: "file://localhost/Library/Incoming/../Movies/"))
+        let roots = [alias, url("/Library/Movies"), url("/Library/Movies/Season"), alias]
+        let plan = SourceFilesystemInvalidationPlan(directoriesToReload: [
+            "/Library/Movies", "/Library/Movies/Season", "/Library/Movies/Season/Expanded",
+            "/Library/Movies/Collapsed", "/Inactive/Expanded",
+        ])
+        let expanded: Set<String> = ["/Library/Movies/Season/Expanded", "/Inactive/Expanded"]
+
+        for ordering in [roots, Array(roots.reversed())] {
+            #expect(SourceTreeDirectoryState.reloadPaths(for: plan, activeRoots: ordering,
+                expandedFolderIDs: expanded)
+                == ["/Library/Movies", "/Library/Movies/Season", "/Library/Movies/Season/Expanded"])
+        }
+        // The alias must independently supply the root identity, without the
+        // already-normalized duplicate making a missed normalization invisible.
+        #expect(SourceTreeDirectoryState.reloadPaths(for: plan, activeRoots: [alias],
+            expandedFolderIDs: expanded) == ["/Library/Movies", "/Library/Movies/Season/Expanded"])
+    }
+
+    @Test func reloadSelectionCombinesReloadsAndRescansButNotInvalidatedTrees() {
+        let plan = SourceFilesystemInvalidationPlan(
+            directoriesToReload: ["/Movies", "/Movies/Shared", "/Movies/Reloaded"],
+            treesToInvalidate: ["/Movies/Removed", "/Movies/Removed/Expanded"],
+            rootsToRescan: ["/Movies/Shared", "/Movies/Rescanned", "/Other"]
+        )
+        let expanded: Set<String> = [
+            "/Movies/Shared", "/Movies/Reloaded", "/Movies/Rescanned",
+            "/Movies/Removed", "/Movies/Removed/Expanded", "/Other",
+        ]
+
+        #expect(SourceTreeDirectoryState.reloadPaths(for: plan, activeRoots: [url("/Movies")],
+            expandedFolderIDs: expanded)
+            == ["/Movies", "/Movies/Shared", "/Movies/Reloaded", "/Movies/Rescanned"])
+    }
+
+    @Test func reloadSelectionUnderFilesystemRootStillRequiresExpandedDescendants() {
+        let plan = SourceFilesystemInvalidationPlan(
+            directoriesToReload: ["/", "/Movies", "/Movies/Expanded", "/Collapsed", "relative/Expanded"],
+            rootsToRescan: ["/Other/Expanded"]
+        )
+        let expanded: Set<String> = ["/Movies/Expanded", "/Other/Expanded", "relative/Expanded"]
+
+        #expect(SourceTreeDirectoryState.reloadPaths(for: plan, activeRoots: [url("/")],
+            expandedFolderIDs: expanded) == ["/", "/Movies/Expanded", "/Other/Expanded"])
+    }
+
+    @Test(arguments: [false, true])
+    func reloadSelectionPreservesCanonicalIdentityAndOriginalPathSpelling(_ decomposedRoot: Bool) throws {
+        let composed = "/Library/Caf\u{e9}"
+        let decomposed = "/Library/Cafe\u{301}"
+        let root = decomposedRoot ? decomposed : composed
+        let plannedRoot = decomposedRoot ? composed : decomposed
+        let child = plannedRoot + "/Season \u{e9}"
+        let equivalentExpansion = root + "/Season e\u{301}"
+        let sibling = plannedRoot + "2/Season \u{e9}"
+        let plan = SourceFilesystemInvalidationPlan(directoriesToReload: [
+            plannedRoot, child, sibling, plannedRoot + "/Collapsed",
+        ])
+
+        let reloads = SourceTreeDirectoryState.reloadPaths(for: plan, activeRoots: [url(root)],
+            expandedFolderIDs: [equivalentExpansion, sibling])
+
+        #expect(reloads == [plannedRoot, child])
+        let actualRoot = try #require(reloads.first { $0 == plannedRoot })
+        let actualChild = try #require(reloads.first { $0 == child })
+        #expect(actualRoot.utf8.elementsEqual(plannedRoot.utf8))
+        #expect(actualChild.utf8.elementsEqual(child.utf8))
+    }
+
+    @Test func reloadSelectionPreservesUnsupportedURLFallbackPaths() throws {
+        let plan = SourceFilesystemInvalidationPlan(directoriesToReload: [
+            "", "/Movies", "/Movies/Expanded", "/Movies2/Expanded", "relative/Expanded",
+        ])
+        let expanded: Set<String> = ["/Movies/Expanded", "/Movies2/Expanded", "relative/Expanded"]
+        for source in ["https://example.test/Movies", "file://server/Movies"] {
+            let root = try #require(URL(string: source))
+            #expect(SourceTreeDirectoryState.reloadPaths(for: plan, activeRoots: [root],
+                expandedFolderIDs: expanded) == ["/Movies", "/Movies/Expanded"])
+        }
+
+        // SourceTreeIdentity falls back to the URL path even when that path is
+        // empty. Preserve its existing lexical identity/containment behavior.
+        let emptyPathRoot = try #require(URL(string: "https://example.test"))
+        #expect(SourceTreeDirectoryState.reloadPaths(for: plan, activeRoots: [emptyPathRoot],
+            expandedFolderIDs: expanded) == ["", "/Movies/Expanded", "/Movies2/Expanded"])
+    }
+
+    @Test func reloadSelectionDoesNotNormalizeAffectedOrExpandedPaths() {
+        let lexicalChild = "/Movies/../Other/Expanded"
+        let dottedChild = "/Movies/./Expanded"
+        let outsideAlias = "/Other/../Movies/Expanded"
+        let plan = SourceFilesystemInvalidationPlan(directoriesToReload: [
+            "/Movies", lexicalChild, dottedChild, outsideAlias, "/Movies/Expanded/",
+        ])
+
+        #expect(SourceTreeDirectoryState.reloadPaths(for: plan, activeRoots: [url("/Movies")],
+            expandedFolderIDs: [lexicalChild, dottedChild, outsideAlias, "/Movies/Expanded"])
+            == ["/Movies", lexicalChild, dottedChild])
+    }
+
     @Test func repeatedLoadsAndExpansionChangesRetainExistingLoadPolicy() async throws {
         let consumer = DirectoryConsumerFixture()
         defer { consumer.stop() }
