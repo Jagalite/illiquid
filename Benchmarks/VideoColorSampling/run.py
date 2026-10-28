@@ -32,8 +32,9 @@ TESTS = (
     "Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerTests.swift",
     "Tests/IlliquidNativePlaybackTests/VideoFrameColorSamplerLayoutTests.swift",
 )
+# Keep the benchmark call boundary opaque even with Swift\'s default CMO.
 FLAGS = ["-swift-version", "6", "-O", "-whole-module-optimization",
-         "-warnings-as-errors", "-parse-as-library"]
+         "-disable-cmo", "-warnings-as-errors", "-parse-as-library"]
 
 
 def digest(value: bytes) -> str:
