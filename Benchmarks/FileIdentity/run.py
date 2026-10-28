@@ -146,7 +146,7 @@ def main() -> None:
                         shutil.copyfile(support / (test + ".swift"), tests / (test + ".swift"))
                     (work / "Package.swift").write_text(
                         '// swift-tools-version: 6.1\nimport PackageDescription\n'
-                        'let package = Package(name: "FileIdentityQualification", targets: [\n'
+                        'let package = Package(name: "FileIdentityQualification", platforms: [.macOS("26.0")], targets: [\n'
                         '    .target(name: "IlliquidCore"),\n'
                         '    .testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"]),\n'
                         '])\n'
