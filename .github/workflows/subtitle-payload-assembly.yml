@@ -90,7 +90,7 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import hashlib, json, os
+          import hashlib, json, os, shutil
           from pathlib import Path
           root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-payload-assembly"
           for name in ["manifest.json", "benchmark.json", "calibration.json", "measurements.jsonl", "summary.json"]:
@@ -105,19 +105,35 @@ jobs:
                   "cases": len(json.loads(path.read_text())),
                   "sha256": hashlib.sha256(path.read_bytes()).hexdigest()
               }))
+          # Use a workspace-relative staging directory: runner.temp can be
+          # a host path while RUNNER_TEMP is the container-mounted path.
+          archive = Path("subtitle-payload-evidence")
+          archive.mkdir(exist_ok=True)
+          if root.exists():
+              for path in root.rglob("*"):
+                  if path.is_file() and (path.suffix in {".json", ".jsonl", ".gz", ".log", ".swift"} or path.name == "runner.snapshot.py"):
+                      target = archive / "benchmark" / path.relative_to(root)
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      shutil.copyfile(path, target)
+          tests = Path(os.environ["RUNNER_TEMP"]) / "payload-tests"
+          for path in tests.glob("*.log"):
+              target = archive / "tests" / path.name
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(path, target)
+          (archive / "workflow-receipt.json").write_text(json.dumps({
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "revision": os.environ["GITHUB_SHA"],
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "job": os.environ["GITHUB_JOB"],
+          }, indent=2, sort_keys=True) + "\n")
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: subtitle-payload-linux
-          path: |
-            ${{ runner.temp }}/payload-tests/*.log
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.json
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.jsonl
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.gz
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.log
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.swift
-            ${{ runner.temp }}/subtitle-payload-assembly/runner.snapshot.py
+          path: subtitle-payload-evidence/
+          if-no-files-found: error
           retention-days: 14
 
   native-component:
@@ -186,7 +202,7 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import hashlib, json, os
+          import hashlib, json, os, shutil
           from pathlib import Path
           root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-payload-assembly"
           for name in ["manifest.json", "benchmark.json", "calibration.json", "measurements.jsonl", "summary.json"]:
@@ -201,17 +217,33 @@ jobs:
                   "cases": len(json.loads(path.read_text())),
                   "sha256": hashlib.sha256(path.read_bytes()).hexdigest()
               }))
+          # Use a workspace-relative staging directory: runner.temp can be
+          # a host path while RUNNER_TEMP is the container-mounted path.
+          archive = Path("subtitle-payload-evidence")
+          archive.mkdir(exist_ok=True)
+          if root.exists():
+              for path in root.rglob("*"):
+                  if path.is_file() and (path.suffix in {".json", ".jsonl", ".gz", ".log", ".swift"} or path.name == "runner.snapshot.py"):
+                      target = archive / "benchmark" / path.relative_to(root)
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      shutil.copyfile(path, target)
+          tests = Path(os.environ["RUNNER_TEMP"]) / "payload-tests"
+          for path in tests.glob("*.log"):
+              target = archive / "tests" / path.name
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(path, target)
+          (archive / "workflow-receipt.json").write_text(json.dumps({
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "revision": os.environ["GITHUB_SHA"],
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "job": os.environ["GITHUB_JOB"],
+          }, indent=2, sort_keys=True) + "\n")
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: subtitle-payload-macos
-          path: |
-            ${{ runner.temp }}/payload-tests/*.log
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.json
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.jsonl
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.gz
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.log
-            ${{ runner.temp }}/subtitle-payload-assembly/**/*.swift
-            ${{ runner.temp }}/subtitle-payload-assembly/runner.snapshot.py
+          path: subtitle-payload-evidence/
+          if-no-files-found: error
           retention-days: 14
