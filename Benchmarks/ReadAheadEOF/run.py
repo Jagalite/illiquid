@@ -202,8 +202,10 @@ def main() -> int:
             "path": str(swift), "sha256": checks[swift],
             "version": execute([str(swift), "--version"], "swift-version").strip(),
         }
-        manifest["git_head"] = execute(["git", "rev-parse", "HEAD"], "git-head", check=False).strip()
-        manifest["git_status"] = execute(["git", "status", "--short"], "git-status", check=False)
+        # Trust only this explicitly selected checkout, without changing global Git policy.
+        git_command = ["git", "-c", f"safe.directory={ROOT}"]
+        manifest["git_head"] = execute([*git_command, "rev-parse", "HEAD"], "git-head").strip()
+        manifest["git_status"] = execute([*git_command, "status", "--short"], "git-status")
         common = {
             "Sources/ReadAheadBenchmark/Harness.swift": HERE / "Harness.swift",
             "Sources/CReadAheadMetrics/CReadAheadMetrics.c":

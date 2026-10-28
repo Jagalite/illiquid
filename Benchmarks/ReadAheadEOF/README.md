@@ -72,4 +72,50 @@ broadcast before entering each wait can also wake other readers; this change
 does not alter that separate multi-reader behavior. Reader CPU includes initial
 registration and final retirement as well as wake-and-repark work.
 
-Hosted results will be recorded here after qualification completes.
+## Initial Linux results
+
+[Hosted Linux qualification](https://github.com/Jagalite/illiquid/actions/runs/40637896358/job/122649008784)
+completed on the exact source at `0de1f18fe46c1a24e7e45aca0ef2f21fc48404a8`.
+The host was Linux x86_64 with four allowed CPUs and Swift 6.3.2.
+All 12 tests passed for baseline and candidate in both debug and release.
+
+Median reader CPU time per three-second observation:
+
+| EOF clock updates | Baseline | Candidate | Reduction | Reader voluntary switches, baseline → candidate |
+| --- | ---: | ---: | ---: | ---: |
+| 24 Hz | 1.643 ms | 0.041 ms | 97.50% | 72 → 1 |
+| 60 Hz | 4.223 ms | 0.038 ms | 99.09% | 180 → 1 |
+| 120 Hz | 8.429 ms | 0.037 ms | 99.56% | 360 → 1 |
+
+The switch counts were identical across all six repetitions in each variant.
+All 60 observations passed semantic checks; none overslept by a full update
+interval. No sample was discarded.
+
+The idle control stayed at one reader voluntary switch in both versions.
+Its CPU medians were 0.0410 and 0.0422 ms, with overlapping ranges. The timed
+120 Hz control stayed at 360 switches and still admitted the reader on the final
+update; CPU medians were 8.023 and 7.970 ms, also with overlapping ranges.
+
+The absolute saving is modest: 8.39 ms of one reader's CPU over three seconds
+at 120 Hz. The large percentage describes this unnecessary worker activity,
+not a percentage improvement in total player CPU or battery life.
+
+### Evidence and provenance
+
+`evidence/linux-initial` preserves the raw observations, summaries, source/binary
+hashes, command receipts, completion record and all four test logs. Full command
+logs are also available in the workflow artifact.
+
+The initial container's optional Git metadata probes failed because Git saw
+different checkout ownership. Their error text and nonzero statuses remain in
+the evidence. The checkout log independently identifies the exact tested commit;
+`provenance.json` records that qualification. The runner now scopes Git trust to
+this one explicit checkout for each probe and requires those probes to succeed.
+
+The initial workflow attempt failed before compilation because the Swift
+container did not include Python. That setup issue was corrected before any of
+the reported measurements.
+
+The macOS job remains queued. No macOS CPU, playback, or energy result is claimed.
+A follow-up run verifies the corrected provenance probes without changing the
+production gate or measurement protocol.
