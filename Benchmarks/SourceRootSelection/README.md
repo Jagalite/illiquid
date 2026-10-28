@@ -1,7 +1,7 @@
 # Source visibility root selection
 
 This study compares the source browser's production relative-path lookup and
-visibility projection with the eager matching-root array removed. The candidate
+visibility projection with the single-root matching array removed. The candidate
 returns the containment result directly when there is exactly one source root.
 Larger root sets use the existing filter/max selection. Input order, Unicode
 behavior, and ancestor boundaries stay intact.
@@ -100,5 +100,78 @@ observations and receipts. Do not mix its baseline timings with the first run.
 The final candidate targets the root-count-one case directly. All original
 workloads are retained, and a single-root miss case is added to qualify both
 outcomes of the new branch (42 differential cases and 224 timed observations).
-Measurements are pending. Native macOS performance remains unqualified. No
-measured allocation-byte, whole-player memory, frame-rate, or battery claim is made.
+The final candidate at `de5f1e403c73093fcff986b79173f5b068b90d0b` completed
+[portable validation and measurement](https://github.com/Jagalite/illiquid/actions/runs/40639774625/job/122654960640).
+All 31 tests passed in baseline release, candidate debug, and candidate release;
+all 42 differential cases matched. All 224 timed observations are retained in
+[evidence/linux-fast-path-de5f1e4.json](evidence/linux-fast-path-de5f1e4.json).
+
+This cohort ran on an AMD EPYC 9V45 Linux x86_64 runner with Swift 6.4. The earlier
+two cohorts used a different host/compiler (AMD EPYC 7763, Swift 6.4.1). Compare
+each candidate only to the paired baseline in its own cohort; absolute times
+between these experiments cannot be attributed to the implementation change.
+
+### Relative-path lookup
+
+Times are per returned relative path, including consuming its UTF-8 length.
+
+| Workload | Baseline median | Candidate median | Median paired wall reduction | Faster pairs |
+| --- | ---: | ---: | ---: | ---: |
+| No roots | 218.92 ns | 218.17 ns | 0.75% | 6/8 |
+| One matching root | 256.92 ns | 222.29 ns | 13.12% | 8/8 |
+| 8 disjoint roots | 664.43 ns | 667.40 ns | -1.39% | 3/8 |
+| 64 disjoint roots | 3671.77 ns | 3675.85 ns | 0.38% | 5/8 |
+| 8 nested roots | 1420.74 ns | 1425.72 ns | -0.76% | 3/8 |
+| 8 Unicode roots | 9332.51 ns | 9360.08 ns | -0.24% | 4/8 |
+| 8 roots, no match | 672.50 ns | 667.37 ns | 0.50% | 5/8 |
+| One root, no match | 309.13 ns | 298.27 ns | 1.61% | 7/8 |
+| One root, exact root path | 210.98 ns | 179.58 ns | 15.24% | 7/8 |
+
+### Visibility projections
+
+Each operation projects 1,000 prepared media rows. The input configurations
+alternate so every operation rebuilds visibility; these are neither cached-hit
+timings nor full UI timings.
+
+| Workload | Baseline median | Candidate median | Median paired wall reduction | Faster pairs |
+| --- | ---: | ---: | ---: | ---: |
+| Tree visibility, one root | 1.932 ms | 1.865 ms | 3.32% | 7/8 |
+| Files-only visibility, one root | 5.353 ms | 5.230 ms | 3.12% | 7/8 |
+| Tree visibility, 64 roots | 5.791 ms | 5.872 ms | -1.30% | 0/8 |
+| Files-only visibility, 8 roots | 7.169 ms | 7.298 ms | -0.93% | 1/8 |
+| No-rule visibility control | 1.273 ms | 1.256 ms | 0.96% | 6/8 |
+
+Positive reductions are faster; negative values are slower. The paired reduction
+is the median of the eight per-pair percentages, not a percentage calculated
+from the two separate time medians. CPU results agree closely and are retained
+in the raw evidence. The shortest timed sample was
+116.25 ms against a 120 ms calibration target.
+No samples or outliers were discarded.
+
+### Decision and limits
+
+The matched single-root lookup improved in all eight pairs, with reductions of
+9.87–14.97% and a median paired reduction of 13.12%. The single-root tree and
+files-only visibility projections improved in seven of eight pairs, by median
+paired amounts of 3.32% and 3.12%.
+
+The multi-root results prevent a uniform-speedup claim. The 64-root tree
+projection was slower in all eight pairs (median paired regression 1.30%),
+and the eight-root files projection was slower in seven pairs (0.93%). The
+additional branch could contribute, but this experiment does not isolate its
+cost. The no-rule control also moved by roughly 1%, and some workloads have
+large pair ranges; see every observation before interpreting small differences.
+No workload-frequency data is available to justify an overall weighted speedup.
+
+The candidate is appropriate for a **draft research PR** for the bounded
+single-root improvement. Native macOS qualification remains queued, so these
+Linux measurements do not establish a production macOS speedup. Full app/UI
+latency, filesystem scans, rendering, frame rate, RSS, allocation-byte totals,
+and battery use were not measured.
+
+The subsequent test change expands the same golden test functions to exercise
+a sole Unicode root, a sole filesystem root, and sole-root exact/descendant/miss
+paths. Those assertions are follow-up regression coverage, not part of the
+already-recorded `de5f1e4` test execution. The PR's current-source regression
+jobs qualify them independently; the measured production implementation and
+benchmark harness are unchanged.

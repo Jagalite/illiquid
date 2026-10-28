@@ -26,6 +26,11 @@ struct SourceRootSelectionTests {
 
     @Test func exactRootsEmptyRootsAndUnrelatedPaths() {
         #expect(matcher([]).relativePath(normalizedPath: "/Elsewhere/Season/Episode.mkv") == "Episode.mkv")
+        let single = matcher(["/Volumes/Shows"])
+        #expect(single.relativePath(normalizedPath: "/Volumes/Shows") == "Shows")
+        #expect(single.relativePath(normalizedPath: "/Volumes/Shows/Season/Episode.mkv") == "Season/Episode.mkv")
+        #expect(single.relativePath(normalizedPath: "/Volumes/Shows2/Season/Episode.mkv") == "Episode.mkv")
+        #expect(matcher(["/"]).relativePath(normalizedPath: "/Volumes/Shows/Episode.mkv") == "Volumes/Shows/Episode.mkv")
         let subject = matcher(["/Volumes/Movies", "/Volumes/Shows"])
         #expect(subject.relativePath(normalizedPath: "/Volumes/Shows") == "Shows")
         #expect(subject.relativePath(normalizedPath: "/Volumes/Movies2/Season/Episode.mkv") == "Episode.mkv")
@@ -45,9 +50,11 @@ struct SourceRootSelectionTests {
         let root = "/Volumes/\u{00c9}missions/\u{1f3ac}"
         let equivalentRoot = "/Volumes/E\u{0301}missions/\u{1f3ac}"
         let suffix = "Saison 01/E\u{0301}pisode \u{1f469}\u{200d}\u{1f4bb}.mkv"
-        for pathRoot in [root, equivalentRoot] {
-            let actual = matcher(["/Volumes", root]).relativePath(normalizedPath: pathRoot + "/" + suffix)
-            #expect(Array(actual.utf8) == Array(suffix.utf8))
+        for roots in [[root], ["/Volumes", root]] {
+            for pathRoot in [root, equivalentRoot] {
+                let actual = matcher(roots).relativePath(normalizedPath: pathRoot + "/" + suffix)
+                #expect(Array(actual.utf8) == Array(suffix.utf8))
+            }
         }
     }
 
