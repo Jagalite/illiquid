@@ -38,7 +38,7 @@ concurrency:
 jobs:
   portable-component:
     runs-on: ubuntu-24.04
-    container: swift:6.3.3-noble
+    container: swift:6.3.3-noble@sha256:1038d54c80063f5cdfabc4560990c30af64b5de8ebf28161deb22ca4ad5db866
     timeout-minutes: 20
     defaults:
       run:
@@ -61,7 +61,10 @@ jobs:
             exit 1
           fi
           echo 'Kyoto is unavailable on this ephemeral Linux runner; compiling serially in an isolated checkout.'
-          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72 HEAD
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git -C "$GITHUB_WORKSPACE" rev-parse --show-toplevel
+          git -C "$GITHUB_WORKSPACE" cat-file -e ea2ff568237e2667f7b1aeee67b11a44ebe95b72^{commit}
+          git -C "$GITHUB_WORKSPACE" diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72 HEAD
       - name: Debug and release neighborhood regressions
         run: |
           mkdir -p "$RUNNER_TEMP/thumbnail-neighborhood-portable"
