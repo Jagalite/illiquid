@@ -1,0 +1,66 @@
+name: File URL key performance
+
+on:
+  push:
+    branches: ['perf/normalized-file-url-keys-20261028']
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/NormalizedFileURLCorpus.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/UtilitiesTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistLookupTests.swift'
+      - 'Benchmarks/NormalizedFileURL/**'
+      - '.github/workflows/normalized-file-url-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
+      - 'Tests/IlliquidCoreTests/TestSupport/NormalizedFileURLCorpus.swift'
+      - 'Tests/IlliquidCoreTests/LocalMediaSourceValidationTests.swift'
+      - 'Tests/IlliquidCoreTests/UtilitiesTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistLookupTests.swift'
+      - 'Benchmarks/NormalizedFileURL/**'
+      - '.github/workflows/normalized-file-url-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: normalized-file-url-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate both implementations and measure native file key workloads
+        run: >-
+          python3 Benchmarks/NormalizedFileURL/run.py --mode all --pairs 8
+          --target-ms 80 --output "$RUNNER_TEMP/normalized-file-url"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: normalized-file-url-evidence
+          path: |
+            ${{ runner.temp }}/normalized-file-url/**/*.json
+            ${{ runner.temp }}/normalized-file-url/**/*.jsonl
+            ${{ runner.temp }}/normalized-file-url/**/*.log
+            ${{ runner.temp }}/normalized-file-url/**/*.swift
+            ${{ runner.temp }}/normalized-file-url/**/*.py
+          retention-days: 30

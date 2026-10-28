@@ -32,7 +32,20 @@ public enum NormalizedFileURL {
         return host.isEmpty || host.lowercased() == "localhost"
     }
 
-    public static func persistenceKey(for url: URL) -> String? { normalize(url)?.path }
+    public static func persistenceKey(for url: URL) -> String? {
+        guard isSupportedLocalFileURL(url) else { return nil }
+        let lexical = url.absoluteURL.standardized
+        let path = lexical.path
+        // ASCII is already canonically composed. Avoid reconstructing a URL
+        // only to extract its path again, but preserve Foundation's special
+        // file-reference interpretation and Unicode filesystem representation.
+        if path.hasPrefix("/"), !path.hasPrefix("/.file/id="),
+           path.utf8.allSatisfy({ $0 < 0x80 }) {
+            return path
+        }
+        return URL(fileURLWithPath: path.precomposedStringWithCanonicalMapping,
+                   isDirectory: lexical.hasDirectoryPath).path
+    }
 
     /// Prepared aliases compare by canonical path; raw URLs compare lexically.
     public static func representsSameFile(_ lhs: URL, _ rhs: URL) -> Bool {
