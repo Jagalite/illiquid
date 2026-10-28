@@ -192,21 +192,31 @@ public enum ThumbnailPolicy {
     public static func samples(duration: Double, focus: Double, count: Int) -> [Double] {
         guard duration.isFinite, duration > 0 else { return [] }
         let last = max(0, floor((duration - 0.5) * 2) / 2)
+        let requestedCount = min(max(count, 1), 64)
+        // A short clip can exhaust every half-second position before reaching
+        // the requested count. Only convert to Int while last is bounded.
+        let limit = last < Double(requestedCount - 1) / 2
+            ? Int(last * 2) + 1 : requestedCount
         var result: [Double] = []
+        result.reserveCapacity(limit)
         func add(_ value: Double) {
             let time = min(last, max(0, (value * 2).rounded() / 2))
             if !result.contains(time) { result.append(time) }
         }
         add(focus.isFinite ? focus : 0)
+        if result.count == limit { return result }
         add(0)
+        if result.count == limit { return result }
         var divisions = 2
-        while result.count < min(max(count, 1), 64), divisions <= 128 {
+        while divisions <= 128 {
             for numerator in stride(from: 1, to: divisions, by: 2) {
                 add(duration * Double(numerator) / Double(divisions))
+                // Later positions cannot change the requested ordered prefix.
+                if result.count == limit { return result }
             }
             divisions *= 2
         }
-        return Array(result.prefix(min(max(count, 1), 64)))
+        return result
     }
 }
 
