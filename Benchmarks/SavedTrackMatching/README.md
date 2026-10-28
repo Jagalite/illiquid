@@ -66,10 +66,117 @@ The existing saved-track restoration and parser tests, together with new
 regressions, run against baseline and candidate in debug and release. No
 external package dependencies or media fixtures are required.
 
-## Results and scope
+## Measured result
 
-Native and portable results will be recorded after validation. This function
-runs when restoring track choices, not on every decoded frame. Component
-improvements do not establish playback FPS, startup latency, battery use or
-whole-player memory savings. The eliminated temporary arrays are a structural
-storage improvement; this study does not instrument allocator bytes or RSS.
+The [Linux component job](https://github.com/Jagalite/illiquid/actions/runs/40638584849/job/122651186682)
+passed for production/test/harness commit
+`81db035aa2f3161c7c16d1f21a8cfac394b48d6a`.
+The measurement host was x86_64 Linux (Azure kernel 6.17.0-1022, glibc 2.39),
+using Swift 6.4 release with optimized Swift 6 compilation.
+Subsequent reporting commits preserve the measured source and harness.
+
+All 18 workloads were faster in every one of their eight paired observations.
+For ordinary two-track rich metadata, the median call fell from **468.79 ns
+to 51.05 ns** (89.15% median paired reduction). The eight-track mixed audio
+case fell from **887.24 ns to 68.38 ns** (92.28%); eight-track external subtitle
+matching fell from **951.34 ns to 123.73 ns** (87.03%).
+These are sub-microsecond absolute savings on small catalogues.
+
+Percent reductions are medians of paired ratios; they need not equal the ratio
+of the two separately displayed timing medians.
+
+| Workload | Baseline ns/call | Candidate ns/call | Median paired reduction | Paired candidate/baseline range |
+| --- | ---: | ---: | ---: | ---: |
+| rich-0 | 14.04 | 4.68 | 66.68% | 0.3329–0.3616 |
+| rich-1 | 262.29 | 44.39 | 82.96% | 0.1465–0.1742 |
+| rich-2 | 468.79 | 51.05 | 89.15% | 0.1075–0.1095 |
+| rich-8 | 1296.32 | 106.20 | 91.72% | 0.0811–0.0856 |
+| rich-32 | 4272.95 | 319.72 | 92.54% | 0.0731–0.0785 |
+| rich-128 | 15487.79 | 1132.86 | 92.70% | 0.0725–0.0776 |
+| sparse-2 | 451.49 | 47.56 | 89.46% | 0.1034–0.1066 |
+| sparse-8 | 1325.82 | 87.65 | 93.38% | 0.0654–0.0690 |
+| sparse-32 | 4576.60 | 229.12 | 94.99% | 0.0498–0.0528 |
+| mixed-audio-8 | 887.24 | 68.38 | 92.28% | 0.0765–0.0800 |
+| mixed-audio-32 | 2803.68 | 170.31 | 93.90% | 0.0601–0.0631 |
+| external-8 | 951.34 | 123.73 | 87.03% | 0.1270–0.1339 |
+| external-32 | 3038.06 | 380.39 | 87.49% | 0.1223–0.1273 |
+| zero-score-1 | 155.18 | 16.16 | 89.57% | 0.1022–0.1112 |
+| zero-score-8 | 768.20 | 89.98 | 88.29% | 0.1140–0.1264 |
+| wrong-kind-8 | 224.77 | 9.03 | 96.01% | 0.0389–0.0425 |
+| saved-id-tie-8 | 1257.56 | 95.72 | 92.28% | 0.0746–0.0787 |
+| legacy-tie-8 | 1291.76 | 89.94 | 93.02% | 0.0671–0.0715 |
+
+The 128-track catalogue is a scaling case. Empty, singleton, zero-score,
+wrong-kind, saved-ID and legacy controls are retained above rather than excluded
+from the reported cohort.
+
+## Validation and retained evidence
+
+- Full output parity passed for **8,464 semantic cases and 72 timed fixture
+  orders**, with zero independent-model mismatches.
+- Baseline and candidate verification files have the identical SHA-256
+  `c896329e216c289e6dd4be0854f829cfeb89730f4232ccb717e33b88148bbd20`.
+- The existing saved-track restoration and parser suites plus the new tests
+  passed **13 tests in three suites** against baseline and candidate in both
+  debug and release (four successful runs, with warnings treated as errors).
+- **288 measured observations** cover 18 workloads, eight balanced pairs,
+  and two variants. Calibration observations, commands, complete output
+  receipts, build/test logs, source hashes, compiler details and binary hashes
+  are retained.
+- The timing and test manifests contain identical production source hashes;
+  MediaPlaybackSettings.swift is the only differing production file between
+  baseline and candidate.
+- Independent source review checked the ranking, duplicate-ID behavior,
+  signed extremes, byte-exact result comparison, and test staging.
+- An [independent evidence audit](evidence/linux/audit.json) verified the
+  compressed bundle and all 452 retained files, recomputed every timing summary,
+  and checked all 428 measured/calibration checksums and selection counts
+  against complete fixture results. All 144 timing pairs favored the candidate.
+  The final production source was independently hashed against the measured
+  source, and all four test-log hashes were verified.
+- Final calibrated intervals met the 100 ms target; actual retained timing
+  intervals ranged from 95.91 ms to 2,567.40 ms.
+
+The [native macOS 15 component job](https://github.com/Jagalite/illiquid/actions/runs/40638584849/job/122651186924)
+was still queued when this report was prepared. The PR is a draft pending that
+native qualification. No macOS timing or full macOS 26 application build is
+claimed by the Linux result.
+
+Durable evidence:
+
+- [Complete compressed evidence bundle](evidence/linux/evidence.json.gz)
+- [Bundle SHA-256](evidence/linux/evidence.sha256)
+- [All timing summaries and paired observations](evidence/linux/summary.json)
+- [Complete-result verification receipt](evidence/linux/verification.json)
+- [Debug/release test receipt](evidence/linux/tests.json)
+- [Compiler, production and harness provenance](evidence/linux/manifest.json)
+
+The gzip contains a JSON mapping from relative evidence filename to exact UTF-8
+file contents. To inspect a retained log or raw measurement file:
+
+~~~sh
+python3 - <<'PY'
+import gzip
+import json
+from pathlib import Path
+
+bundle = json.loads(gzip.decompress(
+    Path("Benchmarks/SavedTrackMatching/evidence/linux/evidence.json.gz").read_bytes()
+))
+print(bundle["timing/observations.json"])
+print(bundle["tests/candidate-release-tests.log"])
+PY
+~~~
+
+## Scope
+
+Matching remains O(n), with O(1) auxiliary collection storage. The old eager
+filter/map/filter pipeline constructed three intermediate arrays; the candidate
+retains an index and score. This is a structural storage improvement, not a
+measurement of exactly three heap allocations, allocated bytes, peak heap or RSS.
+
+This function runs when restoring saved track choices, not on every decoded
+frame. The study does not establish playback FPS, whole-app startup latency,
+battery use, or live UI improvement. The positive performance result currently
+applies to the recorded Linux toolchain; native compiler/runtime costs remain
+for the queued macOS job.
