@@ -196,3 +196,6 @@ Allocation measurements use one call per process after two warmups; native
 timings are collected separately without instrumentation. Every observation,
 source hash, full-row trace hash, compiler identity, and completion marker is
 retained.
+
+The [index-storage research report](../../Documentation/FLAT_PROJECTION_INDEX_STORAGE.md)
+records the completed allocation findings and the current native qualification status.
