@@ -72,46 +72,30 @@ jobs:
           swift --version >> "$RUNNER_TEMP/source-root-lookup/host.txt"
           git rev-parse HEAD >> "$RUNNER_TEMP/source-root-lookup/host.txt"
           python3 - <<'PY'
-          import base64, gzip, hashlib, json, os
+          import os, shutil
           from pathlib import Path
-          for name, marker in [('source-root-lookup', 'SOURCE_ROOT_LOOKUP'),
-                               ('source-root-allocations', 'SOURCE_ROOT_ALLOCATIONS')]:
+          for name in ['source-root-lookup', 'source-root-allocations']:
               root = Path(os.environ['RUNNER_TEMP']) / name
               if not root.exists():
                   continue
-              files = {path.name: path.read_text() for path in sorted(root.iterdir())
-                       if path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}}
-              for folder in ['parity', 'driver', 'logs']:
-                  for path in sorted((root / folder).rglob('*')):
-                      if path.is_file():
-                          files[str(path.relative_to(root))] = path.read_text()
-              snapshot = root / 'evidence/staged-sources.tar.gz'
-              if snapshot.exists():
-                  files['staged-sources.tar.gz.base64'] = base64.b64encode(snapshot.read_bytes()).decode()
-              if 'summary.json' in files:
-                  print('::group::' + name + '/summary.json')
-                  print(files['summary.json'])
-                  print('::endgroup::')
-              packed = gzip.compress(json.dumps(files, sort_keys=True, separators=(',', ':')).encode(),
-                                     compresslevel=9, mtime=0)
-              if len(packed) > 2 * 1024 * 1024:
-                  raise SystemExit('Evidence exceeds log bundle limit; retrieve the uploaded artifact')
-              print(marker + '_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
-              print(marker + '_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+              evidence = root / 'evidence'
+              evidence.mkdir(exist_ok=True)
+              host = Path(os.environ['RUNNER_TEMP']) / 'source-root-lookup/host.txt'
+              if host.exists():
+                  shutil.copyfile(host, evidence / 'host.txt')
+              for filename in ['tests.json', 'parity.json', 'summary.json']:
+                  path = root / filename
+                  if path.exists():
+                      print('::group::' + name + '/' + filename)
+                      print(path.read_text())
+                      print('::endgroup::')
+              print('Complete source snapshots, raw observations, and logs are retained in the artifact.')
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: source-root-lookup-${{ matrix.os }}
           path: |
-            ${{ runner.temp }}/source-root-lookup/
-            !${{ runner.temp }}/source-root-lookup/**/.build/**
-            !${{ runner.temp }}/source-root-lookup/**/build/**
-            !${{ runner.temp }}/source-root-lookup/**/cache/**
-            !${{ runner.temp }}/source-root-lookup/**/module-cache/**
-            ${{ runner.temp }}/source-root-allocations/
-            !${{ runner.temp }}/source-root-allocations/**/.build/**
-            !${{ runner.temp }}/source-root-allocations/**/build/**
-            !${{ runner.temp }}/source-root-allocations/**/cache/**
-            !${{ runner.temp }}/source-root-allocations/**/module-cache/**
+            ${{ runner.temp }}/source-root-lookup/evidence/
+            ${{ runner.temp }}/source-root-allocations/evidence/
           retention-days: 14

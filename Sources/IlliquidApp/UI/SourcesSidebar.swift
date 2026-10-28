@@ -2231,10 +2231,17 @@ struct SourceVisibilityMatcher {
         guard rootPaths.count > 4 else {
             return matchingRootPathByScanning(normalizedPath)
         }
-        var separators = Self.separatorCount(in: normalizedPath)
-        let possibleDepth = max(1, min(separators, maximumRootSeparatorCount))
-        guard rootPaths.count > 4 * possibleDepth else {
-            return matchingRootPathByScanning(normalizedPath)
+        let allowedDepth = (rootPaths.count - 1) / 4
+        var separators: Int
+        if maximumRootSeparatorCount > allowedDepth {
+            // Stop once depth selects the scan; a deep query need not traverse
+            // its remaining suffix just to reject indexed lookup.
+            separators = Self.separatorCount(in: normalizedPath, stoppingAt: allowedDepth + 1)
+            guard separators <= allowedDepth else {
+                return matchingRootPathByScanning(normalizedPath)
+            }
+        } else {
+            separators = Self.separatorCount(in: normalizedPath)
         }
 
         // Reuse the root-evaluation keys as a membership index. Canonical
@@ -2279,12 +2286,13 @@ struct SourceVisibilityMatcher {
             .max { $0.count < $1.count }
     }
 
-    private static func separatorCount(in path: String) -> Int {
-        path.utf8.reduce(into: 0) { count, byte in
-            if byte == 0x2f {
-                count += 1
-            }
+    private static func separatorCount(in path: String, stoppingAt limit: Int = .max) -> Int {
+        var count = 0
+        for byte in path.utf8 where byte == 0x2f {
+            count += 1
+            if count == limit { return count }
         }
+        return count
     }
 }
 
