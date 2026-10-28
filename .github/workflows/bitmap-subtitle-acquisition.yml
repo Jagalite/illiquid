@@ -1,0 +1,122 @@
+name: Bitmap subtitle acquisition performance
+
+on:
+  push:
+    branches: ['perf/bitmap-subtitle-acquisition-view-20261028']
+    paths:
+      - Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift
+      - Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift
+      - Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleAcquisitionBorrowTests.swift
+      - Benchmarks/BitmapSubtitleAcquisition/**
+      - .github/workflows/bitmap-subtitle-acquisition.yml
+      - '!Benchmarks/BitmapSubtitleAcquisition/README.md'
+      - '!Benchmarks/BitmapSubtitleAcquisition/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift
+      - Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift
+      - Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleAcquisitionBorrowTests.swift
+      - Benchmarks/BitmapSubtitleAcquisition/**
+      - .github/workflows/bitmap-subtitle-acquisition.yml
+      - '!Benchmarks/BitmapSubtitleAcquisition/README.md'
+      - '!Benchmarks/BitmapSubtitleAcquisition/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-acquisition-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned FFmpeg
+        run: |
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compare native acquisition decisions and measure paired packet inspection
+        run: |
+          echo "Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout."
+          python3 Benchmarks/BitmapSubtitleAcquisition/run.py \
+            --pairs 8 --target-ms 180 \
+            --output "$RUNNER_TEMP/bitmap-subtitle-acquisition/component"
+      - name: Emit reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "bitmap-subtitle-acquisition/component"
+          for name in ["parity.json", "summary.json", "completion.json", "build-receipt.json"]:
+              path = root / name
+              if path.is_file():
+                  print("ACQUISITION_EVIDENCE " + json.dumps({"file": name, "data": json.loads(path.read_text())}, sort_keys=True))
+          path = root / "measurements.jsonl"
+          if path.is_file():
+              for line in path.read_text().splitlines():
+                  print("ACQUISITION_MEASUREMENT " + line)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-acquisition-component
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-acquisition/component/*.json
+            ${{ runner.temp }}/bitmap-subtitle-acquisition/component/*.jsonl
+            ${{ runner.temp }}/bitmap-subtitle-acquisition/component/*.py
+            ${{ runner.temp }}/bitmap-subtitle-acquisition/component/logs/**
+            ${{ runner.temp }}/bitmap-subtitle-acquisition/component/sources/**
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build app graph and exercise real bitmap-subtitle seeks and ownership
+        run: |
+          fixture_dir="$RUNNER_TEMP/bitmap-subtitle-acquisition/native/fixtures"
+          mkdir -p "$RUNNER_TEMP/bitmap-subtitle-acquisition/native/tmp"
+          python3 Scripts/generate-bitmap-subtitle-fixtures.py "$fixture_dir" --skip-vobsub
+          for name in generated-pgs.mkv generated-dvd.mkv generated-dvb.mkv; do
+            test -s "$fixture_dir/$name"
+          done
+          export ILLIQUID_BITMAP_FIXTURE_DIR="$fixture_dir"
+          export ILLIQUID_PACKET_OWNERSHIP_FIXTURE="$fixture_dir/generated-pgs.mkv"
+          export TMPDIR="$RUNNER_TEMP/bitmap-subtitle-acquisition/native/tmp"
+          echo "Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout."
+          set -o pipefail
+          bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 --filter \
+            'BitmapSubtitleAcquisitionBorrowTests|BitmapSubtitleTests|PGSSubtitlePacketBorrowTests|PacketOwnershipTests' \
+            2>&1 | tee "$RUNNER_TEMP/bitmap-subtitle-acquisition/native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-acquisition-native-tests
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-acquisition/native/tests.log
+            ${{ runner.temp }}/bitmap-subtitle-acquisition/native/tmp/**/results.xml
+          retention-days: 14

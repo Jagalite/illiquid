@@ -273,10 +273,9 @@ final class FFmpegDemuxer {
                         continue
                     }
                 } else if !isBitmap { continue }
-                let acquisition = needsAcquisition && packet.data.map { data in
-                    isPGS ? PGSSubtitlePacket.isAcquisition(data)
-                        : DVBSubtitlePacket.isAcquisition(data, compositionPageID: compositionPageID)
-                } == true
+                let acquisition = needsAcquisition && packet.isSubtitleAcquisition(
+                    isPGS: isPGS, compositionPageID: compositionPageID
+                )
                 if acquisition {
                     active.removeAll()
                     foundAcquisition = true
@@ -526,6 +525,29 @@ final class FFmpegDemuxer {
     ) -> String? {
         key.withCString { keyPointer in
             illiquid_metadata_value(dictionary, keyPointer).map(String.init(cString:))
+        }
+    }
+}
+
+// MARK: - Bitmap subtitle acquisition
+
+extension FFmpegPacket {
+    /// Keeps the packet alive throughout synchronous acquisition inspection.
+    /// The Data wrapper never releases the packet's bytes, and only the Boolean
+    /// result leaves this scope.
+    func isSubtitleAcquisition(isPGS: Bool, compositionPageID: UInt16?) -> Bool {
+        guard let pointer,
+              let data = pointer.pointee.data,
+              pointer.pointee.size > 0 else { return false }
+        return withExtendedLifetime(self) {
+            let view = Data(
+                bytesNoCopy: data,
+                count: Int(pointer.pointee.size),
+                deallocator: .none
+            )
+            return isPGS
+                ? PGSSubtitlePacket.isAcquisition(view)
+                : DVBSubtitlePacket.isAcquisition(view, compositionPageID: compositionPageID)
         }
     }
 }
