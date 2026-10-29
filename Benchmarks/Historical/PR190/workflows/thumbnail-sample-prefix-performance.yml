@@ -1,0 +1,70 @@
+name: Thumbnail sample prefix performance
+
+on:
+  push:
+    branches:
+      - perf/thumbnail-sample-prefix-20261028-ccf7e3
+    paths:
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Tests/IlliquidCoreTests/Thumbnail*Tests.swift
+      - Benchmarks/ThumbnailSamplePrefix/**
+      - .github/workflows/thumbnail-sample-prefix-performance.yml
+      - '!Benchmarks/ThumbnailSamplePrefix/README.md'
+      - '!Benchmarks/ThumbnailSamplePrefix/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Sources/IlliquidCore/Player/ThumbnailPassCursor.swift
+      - Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift
+      - Tests/IlliquidCoreTests/Thumbnail*Tests.swift
+      - Benchmarks/ThumbnailSamplePrefix/**
+      - .github/workflows/thumbnail-sample-prefix-performance.yml
+      - '!Benchmarks/ThumbnailSamplePrefix/README.md'
+      - '!Benchmarks/ThumbnailSamplePrefix/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-sample-prefix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualify:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test exact outputs and measure paired sample planning
+        run: |
+          python3 Benchmarks/ThumbnailSamplePrefix/run.py \
+            --pairs 12 --target-ms 80 \
+            --output "$RUNNER_TEMP/thumbnail-sample-prefix"
+      - name: Emit reviewable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "thumbnail-sample-prefix"
+          for name in ("manifest.json", "tests.json", "differential.json", "cases.json",
+                       "calibration.json", "observations.jsonl", "summary.json", "completion.json"):
+              path = root / name
+              if path.is_file():
+                  print("THUMBNAIL_SAMPLE_EVIDENCE " + json.dumps(
+                      {"path": name, "content": path.read_text()}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-sample-prefix-macos
+          path: |
+            ${{ runner.temp }}/thumbnail-sample-prefix/*.json
+            ${{ runner.temp }}/thumbnail-sample-prefix/*.jsonl
+            ${{ runner.temp }}/thumbnail-sample-prefix/logs
+          retention-days: 14

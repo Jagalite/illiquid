@@ -18,7 +18,8 @@ BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 SOURCE = "Sources/IlliquidCore/Player/ThumbnailPolicy.swift"
 SUPPORT = ["ThumbnailPassCursor.swift", "ThumbnailVisibilityPolicy.swift"]
 TESTS = ["ThumbnailPolicyTests.swift", "ThumbnailSchedulingPolicyRegressionTests.swift",
-         "ThumbnailSamplePlanningTests.swift"]
+         "ThumbnailSamplePlanningTests.swift", "ThumbnailSamplePrefixTests.swift",
+         "ThumbnailSamplePlanningAlternativeTests.swift"]
 CASES = ["storyboard-movie", "storyboard-clip", "background-balanced",
          "background-economical", "background-extensive", "subsecond", "short-clip",
          "full-budget-control", "one-sample", "invalid-control"]
@@ -43,8 +44,34 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
+def frozen_sample_arm(current, historical):
+    """Use current dependency APIs, preserving the exact historical sample body.
+
+    Refuse unfamiliar source structure instead of silently borrowing candidate logic.
+    This adapter is solely for correctness and never for historical timing claims.
+    """
+    signature = "    public static func samples(duration: Double, focus: Double, count: Int) -> [Double] {"
+    def bounds(source):
+        if source.count(signature) != 1:
+            raise RuntimeError("cannot isolate frozen samples: signature changed")
+        start = source.index(signature)
+        end = source.find("\n    }", start) + len("\n    }")
+        if end < start or source[start:end].count("{") != source[start:end].count("}"):
+            raise RuntimeError("cannot isolate frozen samples: body structure changed")
+        return start, end
+    a, b = bounds(current)
+    c, d = bounds(historical)
+    return current[:a] + historical[c:d] + current[b:]
+
+
+def validate_mode(args):
+    if args.current_support and args.mode != "tests":
+        raise RuntimeError("--current-support requires --mode tests; timings are prohibited")
+
+
 class Campaign:
     def __init__(self, args):
+        validate_mode(args)
         self.args = args
         self.output = args.output.resolve()
         self.output.mkdir(parents=True, exist_ok=False)
@@ -75,7 +102,25 @@ class Campaign:
     def prepare(self):
         baseline = self.command(["git", "show", f"{BASELINE}:{SOURCE}"])
         candidate = (ROOT / SOURCE).read_text()
+        historical = baseline
+        if self.args.current_support:
+            baseline = frozen_sample_arm(candidate, historical)
+        # Capture once: both arms consume identical support and tests.
+        support = {}
+        for name in SUPPORT:
+            path = f"Sources/IlliquidCore/Player/{name}"
+            original = self.command(["git", "show", f"{BASELINE}:{path}"])
+            current = (ROOT / path).read_text()
+            if original != current and not self.args.current_support:
+                raise RuntimeError(f"support source changed since baseline: {path}")
+            support[name] = current
+        captured_tests = {name: (ROOT / "Tests/IlliquidCoreTests" / name).read_bytes()
+                          for name in TESTS}
         receipt = {
+            "qualification": "current-regression-only" if self.args.current_support else "historical",
+            "performance_claims_allowed": not self.args.current_support,
+            "historical_policy_sha256": digest(historical.encode()),
+            "support_sha256": {name: digest(value.encode()) for name, value in support.items()},
             "baseline_revision": BASELINE,
             "candidate_revision": self.command(["git", "rev-parse", "HEAD"]).strip(),
             "working_tree_status": self.command(["git", "status", "--porcelain"]),
@@ -84,9 +129,9 @@ class Campaign:
             "compiler": self.command([self.swiftc, "--version"]).strip(),
             "source_sha256": {"baseline": digest(baseline.encode()),
                               "candidate": digest(candidate.encode())},
-            "harness_sha256": digest((HERE / "Harness.swift").read_bytes()),
+            "harness_sha256": digest((HERE / ("RegressionHarness.swift" if self.args.current_support else "Harness.swift")).read_bytes()),
             "runner_sha256": digest(Path(__file__).read_bytes()),
-            "tests_sha256": {name: digest((ROOT / "Tests/IlliquidCoreTests" / name).read_bytes())
+            "tests_sha256": {name: digest(captured_tests[name])
                              for name in TESTS},
             "pairs": self.args.pairs,
             "target_ms": self.args.target_ms,
@@ -97,7 +142,7 @@ class Campaign:
         write_json(self.output / "environment.json", receipt)
         print("ENVIRONMENT " + json.dumps(receipt, sort_keys=True), flush=True)
         harness = self.output / "Harness.swift"
-        shutil.copyfile(HERE / "Harness.swift", harness)
+        shutil.copyfile(HERE / ("RegressionHarness.swift" if self.args.current_support else "Harness.swift"), harness)
         for variant, source in (("baseline", baseline), ("candidate", candidate)):
             package = self.output / (variant + "-package")
             sources = package / "Sources/IlliquidCore"
@@ -107,17 +152,12 @@ class Campaign:
             (package / "Package.swift").write_text(MANIFEST)
             staged = sources / "ThumbnailPolicy.swift"
             staged.write_text(source)
-            for name in SUPPORT:
-                path = f"Sources/IlliquidCore/Player/{name}"
-                original = self.command(["git", "show", f"{BASELINE}:{path}"])
-                current = (ROOT / path).read_text()
-                if original != current:
-                    raise RuntimeError(f"support source changed since baseline: {path}")
-                (sources / name).write_text(current)
-            for name in TESTS:
-                shutil.copyfile(ROOT / "Tests/IlliquidCoreTests" / name, tests / name)
+            for name, content in support.items():
+                (sources / name).write_text(content)
+            for name, content in captured_tests.items():
+                (tests / name).write_bytes(content)
             self.packages[variant] = package
-            if self.args.mode != "tests":
+            if self.args.mode != "tests" or self.args.current_support:
                 binary = self.output / (variant + "-benchmark")
                 flags = ["-O", "-whole-module-optimization", "-swift-version", "6",
                          "-parse-as-library", "-module-cache-path", self.output / "module-cache"]
@@ -149,7 +189,24 @@ class Campaign:
             raise RuntimeError("invalid benchmark timer")
         return row
 
+    def differential(self):
+        if not self.args.current_support:
+            raise RuntimeError("untimed differential requires current support mode")
+        results = {}
+        for case in CASES:
+            rows = {variant: json.loads(self.command([self.binaries[variant], case]))
+                    for variant in ("baseline", "candidate")}
+            for row in rows.values():
+                if row["workload"] != case or len(row["outputs"]) != 64:
+                    raise RuntimeError("incomplete regression corpus")
+            if rows["baseline"] != rows["candidate"]:
+                raise RuntimeError(f"{case}: sample outputs differ")
+            results[case] = rows["candidate"]
+            write_json(self.output / "differential.json", results)
+
     def measure(self):
+        if self.args.current_support:
+            raise RuntimeError("timings are prohibited for current support qualification")
         summaries = {}
         raw = []
         calibrations = {}
@@ -201,6 +258,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True, help="new result directory")
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=80)
+    parser.add_argument("--current-support", action="store_true", help="Correctness only: same current support in both arms; requires --mode tests")
     parser.add_argument("--mode", choices=("all", "tests", "benchmark"), default="all")
     args = parser.parse_args()
     if args.pairs < 2 or args.pairs % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
@@ -209,10 +267,14 @@ def main():
     campaign.prepare()
     if args.mode != "benchmark":
         campaign.test()
-    if args.mode != "tests":
+    if args.current_support:
+        campaign.differential()
+    elif args.mode != "tests":
         campaign.measure()
     write_json(campaign.output / "completion.json",
-               {"complete": True, "mode": args.mode, "pairs": args.pairs})
+               {"complete": True, "mode": args.mode, "pairs": args.pairs,
+                "performance_claims_allowed": not args.current_support,
+                "qualification": "current-regression-only" if args.current_support else "historical"})
     print("CAMPAIGN COMPLETE", flush=True)
 
 

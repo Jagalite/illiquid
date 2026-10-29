@@ -9,6 +9,8 @@ on:
       - 'Tests/IlliquidCoreTests/Thumbnail*Tests.swift'
       - 'Benchmarks/ThumbnailSamplePlanning/Harness.swift'
       - 'Benchmarks/ThumbnailSamplePlanning/run.py'
+      - 'Benchmarks/ThumbnailSamplePlanning/RegressionHarness.swift'
+      - 'Benchmarks/ThumbnailSamplePlanning/test_policy.py'
       - '.github/workflows/thumbnail-sample-planning-portable.yml'
   workflow_dispatch:
 
@@ -28,16 +30,24 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Test exact sample parity and measure paired portable runs
+      - name: Check runner policy
+        run: python3 -B Benchmarks/ThumbnailSamplePlanning/test_policy.py
+      - name: Qualify sample planning
         run: |
           if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
             echo "Shared Kyoto queue found; submit this campaign through Kyoto before running."
             exit 1
           fi
           echo "Kyoto is unavailable on this hosted runner; isolated builds run serially."
-          python3 Benchmarks/ThumbnailSamplePlanning/run.py \
-            --pairs 8 --target-ms 80 \
-            --output "$RUNNER_TEMP/thumbnail-sample-planning"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            python3 Benchmarks/ThumbnailSamplePlanning/run.py \
+              --pairs 8 --target-ms 80 \
+              --output "$RUNNER_TEMP/thumbnail-sample-planning"
+          else
+            python3 Benchmarks/ThumbnailSamplePlanning/run.py \
+              --current-support --mode tests \
+              --output "$RUNNER_TEMP/thumbnail-sample-planning"
+          fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
