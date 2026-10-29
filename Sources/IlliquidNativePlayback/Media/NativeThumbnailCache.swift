@@ -262,6 +262,42 @@ actor NativeThumbnailCache {
     private func trimMemory(incoming: Int, background: Bool) {
         let limit = preferences.memoryMiB * 1024 * 1024
         guard memoryBytes + incoming > limit || (incoming > 0 && images.count >= maximumResidentImages) else { return }
+        // Avoid a speculative scan when byte pressure suggests a bulk trim.
+        // This heuristic only chooses the unchanged sorted fallback below.
+        let bytesToFree = memoryBytes + incoming - limit
+        if incoming > 0, incoming <= limit, !images.isEmpty,
+           bytesToFree <= 0 || bytesToFree <= memoryBytes / images.count {
+            // An insertion usually needs just one victim. Select it without
+            // sorting or retaining every candidate image. Bulk trims keep the
+            // existing sort below instead of repeatedly scanning the cache.
+            var first: (key: Key, bytes: Int, used: UInt64, priority: Int)?
+            var tiedMinimum = false
+            for (key, resident) in images {
+                if background && !resident.background { continue }
+                let protected = storyboardKeys.contains(key)
+                if background && protected { continue }
+                let priority = (protected ? 2 : 0) + (resident.background ? 0 : 1)
+                if let current = first {
+                    if priority == current.priority, resident.used == current.used {
+                        tiedMinimum = true
+                    }
+                    guard priority < current.priority
+                        || (priority == current.priority && resident.used < current.used) else { continue }
+                }
+                first = (key, resident.bytes, resident.used, priority)
+                tiedMinimum = false
+            }
+            guard let victim = first else { return }
+            // Preserve the original sort's tie behavior, including if the
+            // wrapping use counter ever gives two residents the same rank.
+            if !tiedMinimum, memoryBytes - victim.bytes + incoming <= limit,
+               images.count - 1 < maximumResidentImages {
+                memoryBytes -= victim.bytes
+                images.removeValue(forKey: victim.key)
+                storyboardKeys.remove(victim.key)
+                return
+            }
+        }
         let victims = images.filter { (!background || $0.value.background) && (!background || !storyboardKeys.contains($0.key)) }.sorted {
             if storyboardKeys.contains($0.key) != storyboardKeys.contains($1.key) { return !storyboardKeys.contains($0.key) }
             if $0.value.background != $1.value.background { return $0.value.background }
