@@ -140,3 +140,16 @@ Pull requests use this regression route. Manual dispatch defaults to regression;
 select `historical` to retain the original strict dependency-equality test and
 timing experiment. The ordinary `test` and `benchmark` modes retain their strict
 historical support policy and will reject integrated support drift.
+
+The integrated candidate pin includes main's SCC outgoing-index reuse and dense
+SCC bookkeeping, in addition to PR229's three predecessor-indexing edits.
+The earlier candidate pin described pre-integration commit
+`020cfc23e6749981909227a92dbab4a861b08f39`; it did not describe integrated head
+`f18d8d3d83c092575ddcdb05b85d0756d496c562` or its CI merge
+`50e1a0820d5f7f73734b56628c6824d0197df03b`. The corrected exact SHA-256 is
+`ca3976b19fce3e96c5fa93edfa9ed54f6487609aa2190de1917eafce55e8e8de`.
+The historical baseline analyzer remains unchanged, so this regression compares
+the combined integrated focal changes against the historical oracle; it does
+not isolate a new predecessor-indexing performance measurement. Policy tests
+also stage actual checkout sources using the real pins, ensuring synthetic
+controls cannot conceal a stale candidate pin.

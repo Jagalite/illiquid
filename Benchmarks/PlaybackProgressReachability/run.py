@@ -32,7 +32,9 @@ VARIANTS = ("baseline", "candidate")
 # Regression pins describe the reviewed integrated source cohort, not a new timing baseline.
 REGRESSION_BASELINE = '4077f8ad538dd8ed911b38c9b300a98c787c5135'
 REGRESSION_BASELINE_FOCAL_SHA256 = '094a9145b4faec7e13dfc5a964ad922a4e9c6d27ea1e04589ab3e195acf6137e'
-REGRESSION_CANDIDATE_FOCAL_SHA256 = '665db75f71883193a320e6b84580a0c750660c4c6c20a7b844711599e5df7ec8'
+# Integrated analyzer: main SCC reuse/dense bookkeeping plus PR229's three
+# predecessor-indexing edits. Historical performance sources remain unchanged.
+REGRESSION_CANDIDATE_FOCAL_SHA256 = 'ca3976b19fce3e96c5fa93edfa9ed54f6487609aa2190de1917eafce55e8e8de'
 REGRESSION_SUPPORT_SHA256 = {'Sources/IlliquidPlaybackStateSpace/PlaybackPartialOrderReducer.swift': 'a3a4f5010135e55ef6564365aa7bb42a203033baae1c4fd9ed39d81dcabfaf3a', 'Sources/IlliquidPlaybackStateSpace/PlaybackStateSpaceExplorer.swift': '13f04caf1abb97c2d6543094e8e854da09ce98678ea70ff9cf6b4744c18f4905'}
 RESULT_FIELDS = (
     "schema_version", "mode", "workload", "iterations", "operations",

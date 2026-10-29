@@ -106,5 +106,55 @@ class PolicyTests(unittest.TestCase):
             self.assertFalse((out / "measurements.jsonl").exists())
 
 
+class CheckoutSourceTests(unittest.TestCase):
+    """Exercise actual checkout bytes and pins without discovering Swift tools."""
+
+    def test_real_sources_stage_and_reject_drift(self):
+        import argparse
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            out = Path(temporary)
+            receipt = runner.snapshot(out, argparse.Namespace(
+                baseline_ref=runner.REGRESSION_BASELINE, mode="regression"))
+            self.assertFalse(receipt["performance_qualified"])
+            originals, current = {}, {}
+            for name in receipt["captured_production_sha256"]:
+                path = Path(name)
+                originals[path] = runner.git(
+                    ["show", f"{runner.REGRESSION_BASELINE}:{name}"],
+                    "control-" + name.replace("/", "__") + ".log", out)
+                current[path] = (runner.ROOT / path).read_bytes()
+                if path == runner.CORE:
+                    staged = out / "inputs/shared/IlliquidCore" / path.name
+                    self.assertEqual(staged.read_bytes(), current[path])
+                elif path.is_relative_to(runner.PLAYBACK):
+                    staged = out / "inputs/shared/IlliquidPlaybackCore" / path.relative_to(runner.PLAYBACK)
+                    self.assertEqual(staged.read_bytes(), current[path])
+                else:
+                    relative = Path("IlliquidPlaybackStateSpace") / path.relative_to(runner.STATE_SPACE)
+                    self.assertEqual((out / "inputs/candidate" / relative).read_bytes(), current[path])
+                    expected = originals[path] if path == runner.ANALYZER else current[path]
+                    self.assertEqual((out / "inputs/baseline" / relative).read_bytes(), expected)
+            expected_tests = sorted(path.relative_to(runner.ROOT / runner.TESTS)
+                                    for path in (runner.ROOT / runner.TESTS).rglob("*.swift"))
+            self.assertTrue(expected_tests)
+            self.assertEqual(sorted(path.relative_to(out / "inputs/tests")
+                                    for path in (out / "inputs/tests").rglob("*.swift")), expected_tests)
+            for path in expected_tests:
+                self.assertEqual((out / "inputs/tests" / path).read_bytes(),
+                                 (runner.ROOT / runner.TESTS / path).read_bytes())
+            # Do not patch any pins: all controls exercise the published cohort.
+            for path in current:
+                with self.subTest(changed_source=str(path)), self.assertRaises(RuntimeError):
+                    runner.validate_sources(runner.REGRESSION_BASELINE, originals,
+                                            {**current, path: current[path] + b"\n// drift\n"}, "regression")
+            with self.assertRaises(RuntimeError):
+                runner.validate_sources(runner.REGRESSION_BASELINE, originals,
+                                        {**current, runner.ANALYZER: originals[runner.ANALYZER]}, "regression")
+            for mode in ("test", "benchmark"):
+                with self.subTest(mode=mode), self.assertRaises(RuntimeError):
+                    runner.validate_sources(runner.REGRESSION_BASELINE, originals, current, mode)
+
+
 if __name__ == "__main__":
     unittest.main()
