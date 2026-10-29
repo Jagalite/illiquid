@@ -1,0 +1,288 @@
+name: Playback checkpoint membership
+
+on:
+  push:
+    branches: ['perf/checkpoint-membership-refinements-20261028']
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointIndexHintTests.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointMembershipTests.swift'
+      - 'Benchmarks/CheckpointMembership/Driver.swift'
+      - 'Benchmarks/CheckpointMembership/run.py'
+      - 'Benchmarks/CheckpointMembership/test_harness.py'
+      - '.github/workflows/checkpoint-membership.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointIndexHintTests.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointMembershipTests.swift'
+      - 'Benchmarks/CheckpointMembership/Driver.swift'
+      - 'Benchmarks/CheckpointMembership/run.py'
+      - 'Benchmarks/CheckpointMembership/test_harness.py'
+      - '.github/workflows/checkpoint-membership.yml'
+  workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: 'Exact 40-character comparison commit SHA'
+        required: false
+        type: string
+        default: '2620d561d11c9a7d9396d3b455424a10a6dddcd7'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-membership-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify the bundled portable Swift toolchain
+        run: |
+          python3 - <<'PYCODE'
+          import re, subprocess
+          version = subprocess.check_output(['swift', '--version'], text=True)
+          print(version, end='', flush=True)
+          match = re.search(r'Swift version (\d+)\.(\d+)', version)
+          if not match or tuple(map(int, match.groups())) < (6, 1):
+              raise SystemExit('The portable qualification requires Swift 6.1 or newer with bundled Swift Testing')
+          PYCODE
+      - name: Verify production source staging boundaries
+        run: python3 Benchmarks/CheckpointMembership/test_harness.py
+      - name: Test complete records and measure both production implementations
+        env:
+          CHECKPOINT_BASELINE_REF: ${{ inputs.baseline_ref || '2620d561d11c9a7d9396d3b455424a10a6dddcd7' }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/CheckpointMembership/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'checkpoint-membership'),
+                     '--baseline-ref', os.environ['CHECKPOINT_BASELINE_REF']]
+          # PRs still run every semantic test and complete-record comparison;
+          # the full paired research campaign runs on branch pushes and manually.
+          command += ['--quick'] if os.environ['GITHUB_EVENT_NAME'] == 'pull_request' else ['--pairs', '8', '--target-ms', '100']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'running isolated component builds directly.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Publish raw timing and validation receipts in the run log
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'checkpoint-membership/evidence'
+          paths = sorted(set(root.glob('*.json')) | set(root.glob('*.jsonl')))
+          paths += sorted(root.glob('logs/*-tests-*.stdout'))
+          paths += sorted(root.glob('logs/*-tests-*.stderr'))
+          files = {str(path.relative_to(root)): path.read_text() for path in paths if path.is_file()}
+          for name in ('validation.json', 'summary.json', 'completion.json'):
+              if name in files:
+                  print(f'::group::{name}')
+                  print(files[name])
+                  print('::endgroup::')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          root.mkdir(parents=True, exist_ok=True)
+          (root / 'compact-log-receipts.json.gz').write_bytes(packed)
+          print('CHECKPOINT_MEMBERSHIP_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          if len(packed) <= 2 * 1024 * 1024:
+              print('CHECKPOINT_MEMBERSHIP_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          else:
+              print('Compact receipts exceed the log limit; retrieve the complete artifact.')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-membership-portable-component
+          path: ${{ runner.temp }}/checkpoint-membership/evidence/
+          retention-days: 14
+
+
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify production source staging boundaries
+        run: python3 Benchmarks/CheckpointMembership/test_harness.py
+      - name: Test complete records and measure both production implementations
+        env:
+          CHECKPOINT_BASELINE_REF: ${{ inputs.baseline_ref || '2620d561d11c9a7d9396d3b455424a10a6dddcd7' }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/CheckpointMembership/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'checkpoint-membership'),
+                     '--baseline-ref', os.environ['CHECKPOINT_BASELINE_REF']]
+          # PRs still run every semantic test and complete-record comparison;
+          # the full paired research campaign runs on branch pushes and manually.
+          command += ['--quick'] if os.environ['GITHUB_EVENT_NAME'] == 'pull_request' else ['--pairs', '8', '--target-ms', '100']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = json.loads(submitted)['id']
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted runner; '
+                'running isolated component builds directly.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Publish raw timing and validation receipts in the run log
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'checkpoint-membership/evidence'
+          paths = sorted(set(root.glob('*.json')) | set(root.glob('*.jsonl')))
+          paths += sorted(root.glob('logs/*-tests-*.stdout'))
+          paths += sorted(root.glob('logs/*-tests-*.stderr'))
+          files = {str(path.relative_to(root)): path.read_text() for path in paths if path.is_file()}
+          for name in ('validation.json', 'summary.json', 'completion.json'):
+              if name in files:
+                  print(f'::group::{name}')
+                  print(files[name])
+                  print('::endgroup::')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          root.mkdir(parents=True, exist_ok=True)
+          (root / 'compact-log-receipts.json.gz').write_bytes(packed)
+          print('CHECKPOINT_MEMBERSHIP_BUNDLE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          if len(packed) <= 2 * 1024 * 1024:
+              print('CHECKPOINT_MEMBERSHIP_BUNDLE_BASE64 ' + base64.b64encode(packed).decode())
+          else:
+              print('Compact receipts exceed the log limit; retrieve the complete artifact.')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-membership-native-component
+          path: ${{ runner.temp }}/checkpoint-membership/evidence/
+          retention-days: 14
+
+  native-app-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the pinned native SDK
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app and run checkpoint and coordinator regressions
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, re, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path('Benchmarks/CheckpointMembership').resolve()))
+          from run import COMPONENT_TEST_SUITES, swift_testing_receipt
+          root = Path(os.environ['RUNNER_TEMP']) / 'checkpoint-app-integration'
+          root.mkdir(parents=True)
+          environment = {name: subprocess.check_output(command, text=True).strip() for name, command in (
+              ('macos', ['sw_vers']), ('swift', ['swift', '--version']),
+              ('revision', ['git', 'rev-parse', 'HEAD']))}
+          environment['developer_dir'] = os.environ.get('DEVELOPER_DIR')
+          (root / 'environment.json').write_text(json.dumps(environment, indent=2) + '\n')
+          paths = ['Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift',
+                   'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift',
+                   'Tests/IlliquidPlayerTests/PlaybackCheckpointIndexHintTests.swift',
+                   'Tests/IlliquidPlayerTests/PlaybackCheckpointMembershipTests.swift']
+          (root / 'sources.json').write_text(json.dumps({p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
+                                                        for p in paths}, indent=2) + '\n')
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if not queue.is_file():
+              print('The shared Kyoto queue is unavailable on this hosted runner; '
+                    'building and testing serially in this isolated checkout.', flush=True)
+          commands = [
+              ('build', ['swift', 'build', '--force-resolved-versions', '-c', 'release', '--jobs', '2', '--product', 'Illiquid']),
+              ('tests', ['swift', 'test', '--force-resolved-versions', '-c', 'release', '--jobs', '2', '--no-parallel', '--filter',
+                         'PlaybackCheckpointTests|PlaybackCheckpointIndexHintTests|PlaybackCheckpointMembershipTests|PlaybackCoordinatorTests|PlaylistDeduplicationTests|PlaylistSessionRecordTests|PlaylistMutationTests|PlaylistOrderRestorationTests|FolderPlaylistTests|NaturalFilenameOrderingTests']),
+          ]
+          for name, command in commands:
+              if queue.is_file():
+                  cli = [sys.executable, str(queue)]
+                  submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+                  print(submitted, flush=True)
+                  job_id = json.loads(submitted)['id']
+                  subprocess.run([*cli, 'show', job_id], check=True)
+                  result = subprocess.run([*cli, 'wait', job_id])
+                  logs = subprocess.check_output([*cli, 'logs', job_id], text=True)
+                  (root / (name + '.log')).write_text(logs)
+                  print(logs, flush=True)
+                  if result.returncode:
+                      sys.exit(result.returncode)
+              else:
+                  with (root / (name + '.log')).open('w') as log:
+                      process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                      for line in process.stdout:
+                          log.write(line)
+                          print(line, end='', flush=True)
+                      if process.wait():
+                          sys.exit(process.returncode)
+          def test_receipt(text):
+              swift = swift_testing_receipt(text, required_suites=(
+                  *COMPONENT_TEST_SUITES, 'Playback checkpoint construction', 'Playback coordinator'))
+              swift_tests, swift_suites = swift['test_count'], swift['suite_count']
+              # Apple XCTest prints a suite result followed immediately by its
+              # executed/failed summary. Do not count only the Swift Testing run:
+              # the inherited index-hint regressions are six XCTest methods.
+              xctest = re.findall(
+                  r"(?m)^Test Suite '(?:IlliquidPlayerTests\.)?PlaybackCheckpointIndexHintTests' passed at [^\n]+\n"
+                  r"[ \t]*Executed (\d+) tests?, with (\d+) failures?(?: \((\d+) unexpected\))? in ", text)
+              if not xctest:
+                  raise SystemExit('The PlaybackCheckpointIndexHintTests XCTest suite did not report success')
+              xctest_tests, failures, unexpected = (int(value or '0') for value in xctest[-1])
+              if (xctest_tests, failures, unexpected) != (6, 0, 0):
+                  raise SystemExit('Expected all six index-hint XCTest methods to execute with zero failures')
+              return {'app_build_passed': True, 'tests_passed': True,
+                  'test_count': swift_tests + xctest_tests, 'suite_count': swift_suites + 1,
+                  'swift_testing_test_count': swift_tests, 'swift_testing_suite_count': swift_suites,
+                  'swift_testing_run_summaries': swift['run_summaries'],
+                  'swift_testing_passed_suites': swift['passed_suites'],
+                  'xctest_suite': 'PlaybackCheckpointIndexHintTests', 'xctest_test_count': xctest_tests,
+                  'xctest_failure_count': failures, 'xctest_unexpected_failure_count': unexpected}
+          receipt = test_receipt((root / 'tests.log').read_text())
+          (root / 'qualification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-membership-native-app
+          path: ${{ runner.temp }}/checkpoint-app-integration/
+          retention-days: 14

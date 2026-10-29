@@ -16,6 +16,7 @@ private struct Fixture {
     let cues: Int
     let expectedError: String?
     let timed: Bool
+    var comparisonOnly = false
 }
 
 private struct Result {
@@ -84,6 +85,41 @@ private func fixtures(selected: String? = nil) -> [Fixture] {
         result.append(Fixture(name: name, format: format,
             source: makeSource(100, format: format, payload: payload).replacingOccurrences(of: "\n", with: ending),
             cues: 100, expectedError: nil, timed: true))
+    }
+    // Loading-sized CRLF cases isolate normalization from the unchanged
+    // parsing/escaping/output work; existing LF cases remain controls.
+    for format in [Converter.Format.srt, .webVTT] {
+        let prefix = format == .srt ? "srt" : "vtt"
+        for count in [2000, 10000] {
+            for (kind, payload) in payloads.prefix(2) {
+                let name = "\(prefix)-\(count)-\(kind)-crlf"
+                guard wanted(name) else { continue }
+                result.append(Fixture(name: name, format: format,
+                    source: makeSource(count, format: format, payload: payload)
+                        .replacingOccurrences(of: "\n", with: "\r\n"),
+                    cues: count, expectedError: nil, timed: true))
+            }
+        }
+        let name = "\(prefix)-2000-plain-cr"
+        if wanted(name) {
+            result.append(Fixture(name: name, format: format,
+                source: makeSource(2000, format: format, payload: payloads[0].1)
+                    .replacingOccurrences(of: "\n", with: "\r"),
+                cues: 2000, expectedError: nil, timed: true))
+        }
+    }
+    // Force the ASCII eligibility scan to reach the end before falling back.
+    // This bounds the added work for almost-ASCII multilingual files.
+    for format in [Converter.Format.srt, .webVTT] {
+        let prefix = format == .srt ? "srt" : "vtt"
+        for count in [2000, 10000] {
+            let name = "\(prefix)-\(count)-late-unicode-crlf"
+            guard wanted(name) else { continue }
+            result.append(Fixture(name: name, format: format,
+                source: (makeSource(count, format: format, payload: payloads[0].1) + " é")
+                    .replacingOccurrences(of: "\n", with: "\r\n"),
+                cues: count, expectedError: nil, timed: true))
+        }
     }
     if wanted("vtt-100-escaped-bom") {
         result.append(Fixture(name: "vtt-100-escaped-bom", format: .webVTT,
@@ -154,6 +190,34 @@ private func fixtures(selected: String? = nil) -> [Fixture] {
             if length < 3 { level = level.flatMap { prefix in alphabet.map { prefix + $0 } } }
         }
     }
+    // Compare the complete original and candidate converters for every short
+    // newline/Unicode sequence, including typed errors. Do not normalize a
+    // reference and run it through the candidate: Foundation's nonliteral
+    // replacement behavior is itself part of the compatibility contract.
+    if selected == nil || selected?.hasPrefix("newline-diff-") == true {
+        let atoms = ["\r", "\n", "a", "\u{0301}", "\u{200D}", "\u{FE0F}", "\u{0000}", "é"]
+        let timing = "00:00:01.000 --> 00:00:02.000\nCaption"
+        var sequences = [""]
+        for length in 0...3 {
+            for format in [Converter.Format.srt, .webVTT] {
+                let prefix = format == .srt ? "srt" : "vtt"
+                let header = format == .webVTT ? "WEBVTT\n\n" : ""
+                for (index, sequence) in sequences.enumerated() {
+                    for (placement, source) in [
+                        header + timing + sequence + "Tail",
+                        header + sequence + timing,
+                        sequence,
+                    ].enumerated() {
+                        let name = "newline-diff-\(prefix)-\(length)-\(index)-\(placement)"
+                        guard wanted(name) else { continue }
+                        result.append(Fixture(name: name, format: format, source: source,
+                            cues: -1, expectedError: nil, timed: false, comparisonOnly: true))
+                    }
+                }
+            }
+            if length < 3 { sequences = sequences.flatMap { prefix in atoms.map { prefix + $0 } } }
+        }
+    }
     return result
 }
 
@@ -177,6 +241,9 @@ private func fnv(_ text: String) -> String {
 }
 
 private func check(_ result: Result, fixture: Fixture) {
+    // Malformed mixed-newline fixtures are checked against the separately
+    // compiled original converter, without assuming its parsing outcome.
+    guard !fixture.comparisonOnly else { return }
     precondition(result.error == fixture.expectedError, "Unexpected error for \(fixture.name)")
     if let output = result.output {
         let count = output.components(separatedBy: "\n").filter { $0.hasPrefix("Dialogue: ") }.count
