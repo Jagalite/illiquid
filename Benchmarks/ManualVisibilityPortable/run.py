@@ -109,19 +109,8 @@ class PortableStudy(native.Study):
             return subprocess.check_output([
                 "git", "-C", str(native.ROOT), "show", f"{native.BASELINE}:{path}",
             ])
-        baseline, baseline_records = native.support.snapshot(historical)
-        candidate, candidate_records = native.support.snapshot(
-            lambda path: (native.ROOT / path).read_bytes())
-        # Check original production bytes before making any Linux adaptation.
-        if baseline.keys() != candidate.keys():
-            raise ValueError("Source inventories differ")
-        for path in baseline:
-            if path != native.FOCAL and baseline[path] != candidate[path]:
-                raise ValueError(f"Unrelated production source changed: {path}; requalify explicitly")
-        if native.outside_matcher(baseline[native.FOCAL]) != native.outside_matcher(candidate[native.FOCAL]):
-            raise ValueError("Production changes extend outside SourceVisibilityMatcher")
-        if baseline[native.FOCAL] == candidate[native.FOCAL]:
-            raise ValueError("No focal production change")
+        # Select and validate original bytes before symmetric Linux adaptations.
+        variants = self.source_variants(historical)
 
         package = native.support.PACKAGE.replace(
             "SourceTreeVisibilityQualification", "ManualVisibilityPortableQualification")
@@ -134,9 +123,7 @@ class PortableStudy(native.Study):
             shared["Tests/IlliquidAppTests/" + name] = (
                 native.ROOT / "Tests/IlliquidAppTests" / name).read_bytes()
         self.manifest["shared_sha256"] = {path: native.sha(raw) for path, raw in shared.items()}
-        for variant, files, records in [
-            ("baseline", baseline, baseline_records), ("candidate", candidate, candidate_records),
-        ]:
+        for variant, files, records in variants:
             folder = self.output / "packages" / variant
             staged = dict(files)
             staged.update(shared)
@@ -164,7 +151,7 @@ class PortableStudy(native.Study):
                 "production": records, "staged": hashes,
                 "compiled_sha256": compiled, "adaptations": adaptations,
             }
-        if (self.manifest["sources"]["baseline"]["adaptations"]
+        if (self.manifest["sources"][variants[0][0]]["adaptations"]
                 != self.manifest["sources"]["candidate"]["adaptations"]):
             raise ValueError("Baseline and candidate compatibility adaptations differ")
         native.save(self.output / "manifest.json", self.manifest)
@@ -189,7 +176,8 @@ def main():
     parser.add_argument("--cases", default=",".join(native.CASES))
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=80)
-    parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--tests-only", action="store_true",
+                        help="Current-source tests and differential controls using an adapted historical matcher; no timings")
     args = parser.parse_args()
     args.sizes = [int(value) for value in args.sizes.split(",")]
     args.cases = args.cases.split(",")

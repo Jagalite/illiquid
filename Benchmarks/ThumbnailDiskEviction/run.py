@@ -24,6 +24,22 @@ CHANGED = "Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift"
 HEAP = "Sources/IlliquidNativePlayback/Media/ThumbnailDiskEvictionHeap.swift"
 
 
+# Reviewed main integration drift; any other supporting-source change still fails.
+CURRENT_SUPPORT = {
+    "Sources/IlliquidCore/Player/ThumbnailPolicy.swift",
+    "Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift",
+    "Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift",
+}
+
+
+def reference_source(path, historical, current, regression):
+    if path != CHANGED and historical != current:
+        if not regression or path not in CURRENT_SUPPORT:
+            raise RuntimeError(f"Review supporting-source drift before measuring: {path}")
+        return current
+    return historical
+
+
 def workloads():
     def case(name, count, mib, *, layout="exact-byte-cap", background=False,
              prefill=False, target=None, evictions=32, byte_pressure=32, count_pressure=0):
@@ -67,11 +83,15 @@ def main():
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--verify-only", action="store_true")
     parser.add_argument("--swiftc", type=Path)
+    parser.add_argument("--current-source-regression", action="store_true",
+                        help="Use reviewed current support for parity only; no performance claim.")
     args = parser.parse_args()
     if platform.system() != "Darwin":
         parser.error("Requires native macOS CoreGraphics/ImageIO; no Linux adapters are used.")
     if args.pairs < 2 or args.pairs > 20 or args.pairs % 2:
         parser.error("--pairs must be an even number between 2 and 20 for balanced AB/BA order.")
+    if args.current_source_regression and not args.verify_only:
+        parser.error("--current-source-regression requires --verify-only.")
     output = args.output.resolve()
     if output.exists() and any(output.iterdir()):
         parser.error("--output must be new or empty.")
@@ -101,12 +121,20 @@ def main():
 
     print("Staging frozen baseline and unchanged production dependencies", flush=True)
     sources = {}
+    adaptations = {}
     paths = {"baseline": {}, "candidate": {}}
     for path in CORE + NATIVE:
         baseline = run(["git", "show", f"{BASELINE}:{path}"])
         candidate = (ROOT / path).read_bytes()
-        if path != CHANGED and baseline != candidate:
-            raise RuntimeError(f"Supporting source changed since baseline: {path}")
+        historical = baseline
+        baseline = reference_source(path, historical, candidate, args.current_source_regression)
+        if baseline != historical:
+            original = output / "sources" / "historical" / path
+            original.parent.mkdir(parents=True, exist_ok=True)
+            original.write_bytes(historical)
+            sources[f"historical/{path}"] = sha(historical)
+            adaptations[path] = {"historical_sha256": sha(historical),
+                                 "current_sha256": sha(baseline)}
         for variant, content in [("baseline", baseline), ("candidate", candidate)]:
             destination = output / "sources" / variant / path
             destination.parent.mkdir(parents=True, exist_ok=True)
@@ -122,6 +150,14 @@ def main():
         (output / "driver" / name).write_bytes((HERE / name).read_bytes())
         sources[f"driver/{name}"] = sha((output / "driver" / name).read_bytes())
     write_json(output / "sources.json", sources)
+    mode = "current-source-regression" if args.current_source_regression else "historical-measurement"
+    write_json(output / "source-policy.json", {
+        "mode": mode, "pinned_disk_baseline": BASELINE,
+        "adapted_support": adaptations,
+        "performance_qualified": False,
+        "scope": "Parity with reviewed current support; not historical performance evidence."
+                 if args.current_source_regression else "Strict historical support equality.",
+    })
 
     swiftc = args.swiftc.resolve() if args.swiftc else Path(run(["xcrun", "--find", "swiftc"]).decode().strip())
     sdk = run(["xcrun", "--sdk", "macosx", "--show-sdk-path"]).decode().strip()
@@ -227,6 +263,12 @@ def main():
         raise RuntimeError("Verification did not cover the full declared cohort.")
     if args.verify_only:
         verify_integrity()
+        write_json(output / "qualification.json", {
+            "mode": mode, "verification_observations": len(verification),
+            "declared_cases": names, "full_oracle_passed": True,
+            "pinned_disk_baseline": BASELINE, "adapted_support": adaptations,
+            "performance_qualified": False,
+        })
         print("Native verification passed for both implementations and all nine workloads.", flush=True)
         return
 
