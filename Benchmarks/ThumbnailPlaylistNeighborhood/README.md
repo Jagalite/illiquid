@@ -41,7 +41,9 @@ the surrounding type/function needed to call those blocks independently. The
 candidate is the complete production ThumbnailPlaylistNeighborhood.swift file.
 
 Both variants compile with identical, current production FolderPlaylist,
-NormalizedFileURL, and NaturalFilenameOrdering sources. The same six repository
+NormalizedFileURL, and NaturalFilenameOrdering sources. Test packages also include
+current ThumbnailPolicy; the timed core/probe sources remain unchanged. The same
+eleven repository
 test functions execute in debug and release for each variant. These include
 an independent integer-label oracle covering 1,093 small playlists and five
 selection cases each (5,465 neighborhood comparisons), explicit duplicate
@@ -91,3 +93,36 @@ The final measured findings and any limitations belong in
 Documentation/THUMBNAIL_PLAYLIST_NEIGHBORHOOD_PERFORMANCE.md after successful
 execution. Until then, this directory describes an experiment, not a measured
 performance result.
+
+## Consolidated regression provenance
+
+The canonical production helper is retained unchanged from PR #132 at
+`8637a8d2c6a628699d5a552a55061b4e0bfc6f10`. Its six tests retain the independent
+integer-label oracle. Four additional neighborhood tests preserve useful
+coverage from these independently developed alternatives:
+
+- PR #159, `21fa115d3b100fc70f60528a3ae82bd7371fda0b`: candidate equality and
+  final policy ranking for every priority and limits 0, 1, 4, and 100; the
+  original eager projection remains the independent reference.
+- PR #227, `e6dce9c1b305cd86d8ce904d02890e8f5e9d63e4`: normalized item identity
+  versus exact URL equality, stored absolute-string preservation, and seeded
+  mixed-representation differential cases. Its equivalent eager oracle is
+  shared with the #159 test; fixtures and expected semantics are retained.
+- PR #135, `183ecd86ae1b2be581d732e658ab47cea185237e`: snapshot ownership after
+  replacing the source playlist. Integer fixtures use the #227 item factory;
+  the explicit expected window remains independent of the helper.
+- PR #207, `7d83d898eaf164058b9928451501e4a6b324a3af`: the standalone singleton
+  representation test, unchanged, including relative/base URL representations
+  and dictionary key representations. Its production fast path is not imported.
+
+API spelling is adapted to `ThumbnailPlaylistNeighborhood(playlist:current:)`.
+Existing duplicate, clipping, absent-selection, and large-playlist tests already
+cover corresponding alternative cases and are not duplicated. The runner
+executes exactly 11 functions per variant/configuration (44 total executions),
+and the native app workflow includes both neighborhood suites. Historical
+archives, workloads, extraction guards, and timing methodology are unchanged;
+original research remains at the source heads above, and at PR #165
+`793d11e30b59d852923b6c4de991143465ee19ba` and PR #171
+`cc928cca886b5c406dc6c06ebd7d33d5b9484085`. Those archives do not constitute
+qualification of this consolidated test revision. Native execution of this
+revision is pending; no new runtime or performance result is claimed here.

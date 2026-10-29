@@ -6,6 +6,8 @@ on:
     paths:
       - Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift
       - Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Tests/IlliquidAppTests/ThumbnailSingletonNeighborhoodTests.swift
       - Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift
       - Benchmarks/ThumbnailPlaylistNeighborhood/**
       - .github/workflows/thumbnail-playlist-neighborhood.yml
@@ -16,6 +18,8 @@ on:
       - Sources/IlliquidCore/Playlist/FolderPlaylist.swift
       - Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift
       - Sources/IlliquidCore/Utilities/NormalizedFileURL.swift
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Tests/IlliquidAppTests/ThumbnailSingletonNeighborhoodTests.swift
       - Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift
       - Benchmarks/ThumbnailPlaylistNeighborhood/**
       - .github/workflows/thumbnail-playlist-neighborhood.yml
@@ -79,7 +83,7 @@ jobs:
         run: |
           set -o pipefail
           swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
-            --filter 'ThumbnailPlaylistNeighborhoodTests|ThumbnailBackgroundSchedulerTests|ThumbnailLifecycleRegressionTests' \
+            --filter 'ThumbnailPlaylistNeighborhoodTests|ThumbnailSingletonNeighborhoodTests|ThumbnailBackgroundSchedulerTests|ThumbnailLifecycleRegressionTests' \
             2>&1 | tee "$RUNNER_TEMP/thumbnail-neighborhood-app-tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

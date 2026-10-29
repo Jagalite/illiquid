@@ -20,7 +20,12 @@ HERE = Path(__file__).resolve().parent
 BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 SCHEDULER = "Sources/IlliquidApp/App/ThumbnailBackgroundScheduler.swift"
 HELPER = "Sources/IlliquidApp/App/ThumbnailPlaylistNeighborhood.swift"
-TESTS = "Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift"
+TESTS = [
+    "Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift",
+    "Tests/IlliquidAppTests/ThumbnailSingletonNeighborhoodTests.swift",
+]
+TEST_SUPPORT = ["Sources/IlliquidCore/Player/ThumbnailPolicy.swift"]
+EXPECTED_TEST_FUNCTIONS = 11
 CORE = [
     "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
     "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
@@ -115,7 +120,7 @@ class Runner:
         variants = {"baseline": baseline_helper(baseline_source),
                     "candidate": (ROOT / HELPER).read_text()}
         source_receipts = []
-        for path in [*CORE, HELPER, SCHEDULER, TESTS]:
+        for path in [*CORE, *TEST_SUPPORT, HELPER, SCHEDULER, *TESTS]:
             data = (ROOT / path).read_bytes()
             destination = self.out / "sources" / path
             destination.parent.mkdir(parents=True, exist_ok=True)
@@ -164,17 +169,18 @@ class Runner:
             for target in ["Sources/IlliquidCore", "Sources/IlliquidApp", "Tests/IlliquidAppTests"]:
                 (package / target).mkdir(parents=True, exist_ok=True)
             (package / "Package.swift").write_text(package_text)
-            for path in CORE:
+            for path in [*CORE, *TEST_SUPPORT]:
                 shutil.copyfile(ROOT / path, package / "Sources/IlliquidCore" / Path(path).name)
             (package / "Sources/IlliquidApp/ThumbnailPlaylistNeighborhood.swift").write_text(helper)
-            shutil.copyfile(ROOT / TESTS, package / "Tests/IlliquidAppTests" / Path(TESTS).name)
+            for path in TESTS:
+                shutil.copyfile(ROOT / path, package / "Tests/IlliquidAppTests" / Path(path).name)
             (self.out / "sources" / f"{variant}-helper.swift").write_text(helper)
             for configuration in ["debug", "release"]:
                 stdout = self.command([self.swift, "test", "--package-path", package,
                     "--jobs", "2", "--no-parallel", "-c", configuration], f"tests-{variant}-{configuration}")
                 counts = re.findall(r"Test run with (\d+) tests.*passed", stdout)
-                if not counts or int(counts[-1]) < 6:
-                    raise RuntimeError("Expected all six Swift Testing functions to execute")
+                if not counts or int(counts[-1]) != EXPECTED_TEST_FUNCTIONS:
+                    raise RuntimeError(f"Expected all {EXPECTED_TEST_FUNCTIONS} Swift Testing functions to execute")
                 result = {"variant": variant, "configuration": configuration,
                           "test_functions_passed": int(counts[-1]), "passed": True}
                 self.tests.append(result)

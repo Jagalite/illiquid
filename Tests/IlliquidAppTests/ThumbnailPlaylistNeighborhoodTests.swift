@@ -127,4 +127,140 @@ struct ThumbnailPlaylistNeighborhoodTests {
             }
         }
     }
+
+    // Consolidated regression provenance is recorded in the benchmark README.
+    @Test func rankedCandidatesRemainIdenticalForEveryPriority() {
+        var items = (0..<24).map { item("episode-\($0)") }
+        let current = items[8].url
+        items[10] = items[8]
+        items[12] = items[9]
+        let visible: Set<URL> = [items[3].url, items[22].url]
+        let excluded = URL(fileURLWithPath: "/media/excluded/episode.mkv")
+        let discovered = [items[0].url, items[9].url, excluded]
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let recent = [
+            items[9].url: now.addingTimeInterval(-60),
+            items[23].url: now.addingTimeInterval(-90_000),
+            excluded: now,
+        ]
+        func candidates(urls neighbors: [URL], distances: [URL: Int]) -> [ThumbnailPolicy.Candidate] {
+            let urls = [current] + visible.sorted { $0.path < $1.path } + discovered
+                + neighbors + recent.keys.sorted { $0.path < $1.path }
+            return urls.map {
+                ThumbnailPolicy.Candidate(url: $0, lastUsed: recent[$0],
+                    isVisible: visible.contains($0), neighborDistance: distances[$0])
+            }
+        }
+
+        let original = originalProjection(items: items, current: current)
+        let result = ThumbnailPlaylistNeighborhood(playlist: items, current: current)
+        let expectedCandidates = candidates(urls: original.urls, distances: original.distances)
+        let actualCandidates = candidates(urls: result.urls, distances: result.distances)
+        #expect(actualCandidates == expectedCandidates)
+
+        for priority in ThumbnailPreferences.Priority.allCases {
+            var preferences = ThumbnailPreferences()
+            preferences.priority = priority
+            preferences.excludedFolderPaths = ["/media/excluded"]
+            for limit in [0, 1, 4, 100] {
+                let expected = ThumbnailPolicy.ranked(expectedCandidates, current: current,
+                    folder: current.deletingLastPathComponent(), now: now,
+                    preferences: preferences, maximumCount: limit)
+                let actual = ThumbnailPolicy.ranked(actualCandidates, current: current,
+                    folder: current.deletingLastPathComponent(), now: now,
+                    preferences: preferences, maximumCount: limit)
+                #expect(actual == expected)
+                #expect(!actual.contains(excluded))
+                if limit > 0 { #expect(actual.first == current) }
+            }
+        }
+    }
+
+    @Test func restoredURLRepresentationsKeepExactEqualitySemantics() throws {
+        let raw = try decodedItem("file://localhost/Media/Season/../Cafe%CC%81.mkv?restore=1#chapter")
+        let canonical = FolderPlaylistItem(url: URL(fileURLWithPath: "/Media/Caf\u{00E9}.mkv"))
+        #expect(raw.id == canonical.id)
+        #expect(raw.url != canonical.url)
+        let remote = try decodedItem("https://example.invalid/Media/Caf%C3%A9.mkv")
+        let nonlocal = try decodedItem("file://archive.invalid/Media/Caf%C3%A9.mkv")
+        let playlist = [raw] + (0..<10).map(item) + [canonical, remote, nonlocal]
+
+        for current in [raw.url, canonical.url, remote.url, nonlocal.url] {
+            let result = ThumbnailPlaylistNeighborhood(playlist: playlist, current: current)
+            let expected = originalProjection(items: playlist, current: current)
+            #expect(result.urls == expected.urls)
+            #expect(result.distances == expected.distances)
+            #expect(result.urls.map(\.absoluteString) == expected.urls.map(\.absoluteString))
+        }
+        // A normalized identity must not make a differently represented URL
+        // match when that exact URL is absent from the playlist.
+        #expect(ThumbnailPlaylistNeighborhood(playlist: [raw], current: canonical.url).urls.isEmpty)
+    }
+
+    @Test func seededMixedPlaylistsMatchTheOriginalProjection() throws {
+        let corpus = (0..<16).map(item) + [
+            try decodedItem("file:///Media/Caf%C3%A9.mkv"),
+            try decodedItem("file:///Media/Cafe%CC%81.mkv"),
+            try decodedItem("file:///Media/Season/../0.mkv"),
+            try decodedItem("https://example.invalid/video.mkv"),
+            try decodedItem("file://archive.invalid/Media/0.mkv"),
+        ]
+        var state: UInt64 = 0x7468_756D_626E_6169
+        for count in 0...96 {
+            let playlist = (0..<count).map { _ in
+                state = state &* 6_364_136_223_846_793_005 &+ 1
+                return corpus[Int((state >> 32) % UInt64(corpus.count))]
+            }
+            let queries: [URL?] = [nil, item(999).url] + corpus.map { Optional($0.url) }
+            for current in queries {
+                let result = ThumbnailPlaylistNeighborhood(playlist: playlist, current: current)
+                let expected = originalProjection(items: playlist, current: current)
+                #expect(result.urls == expected.urls)
+                #expect(result.distances == expected.distances)
+                #expect(result.urls.count <= 9)
+            }
+        }
+    }
+
+    @Test func resultSurvivesSourceReplacementWithOnlyItsNeighborhoodValues() {
+        var items = (0..<10_000).map(item)
+        let anchor = 5_000
+        let expected = ((anchor - 4)...(anchor + 4)).map { items[$0].url }
+        let result = ThumbnailPlaylistNeighborhood(playlist: items, current: items[anchor].url)
+        items.removeAll(keepingCapacity: false)
+        items.append(item(99_999))
+        #expect(result.urls == expected)
+        #expect(result.urls.count == 9)
+        #expect(result.distances.count == 9)
+        #expect(result.distances[expected[4]] == 0)
+    }
+
+    private func originalProjection(items: [FolderPlaylistItem], current: URL?)
+        -> (urls: [URL], distances: [URL: Int]) {
+        let playlist = items.map(\.url)
+        let anchor = current.flatMap { playlist.firstIndex(of: $0) }
+        let neighbors = anchor.map { index in
+            Array(playlist[max(0, index - 4)..<min(playlist.count, index + 5)])
+        } ?? []
+        var distances: [URL: Int] = [:]
+        if let anchor {
+            for index in max(0, anchor - 4)..<min(playlist.count, anchor + 5) {
+                distances[playlist[index]] = abs(index - anchor)
+            }
+        }
+        return (neighbors, distances)
+    }
+
+    private func item(_ index: Int) -> FolderPlaylistItem {
+        FolderPlaylistItem(url: URL(fileURLWithPath: "/Media/\(index).mkv"),
+                           externalSubtitleURLs: [URL(fileURLWithPath: "/Subtitles/\(index).srt")],
+                           dateAdded: Date(timeIntervalSince1970: Double(index)))
+    }
+
+    private func decodedItem(_ spelling: String) throws -> FolderPlaylistItem {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "url": spelling, "externalSubtitleURLs": [String](),
+        ])
+        return try JSONDecoder().decode(FolderPlaylistItem.self, from: data)
+    }
 }
