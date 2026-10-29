@@ -1,0 +1,116 @@
+name: Subtitle vertex staging
+
+on:
+  push:
+    branches: ['perf/subtitle-vertex-staging-c6bbf6f8']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ASSSubtitleVertexWriter.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleVertexWriterTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/MetalASSSubtitleCompositorTests.swift'
+      - 'Benchmarks/SubtitleVertexStaging/**'
+      - '.github/workflows/subtitle-vertex-staging.yml'
+      - '!Benchmarks/SubtitleVertexStaging/*.md'
+      - '!Benchmarks/SubtitleVertexStaging/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ASSSubtitleVertexWriter.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleVertexWriterTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/MetalASSSubtitleCompositorTests.swift'
+      - 'Benchmarks/SubtitleVertexStaging/**'
+      - '.github/workflows/subtitle-vertex-staging.yml'
+      - '!Benchmarks/SubtitleVertexStaging/*.md'
+      - '!Benchmarks/SubtitleVertexStaging/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-vertex-staging-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds run serially in isolated directories.'
+      - name: Validate both uploads and writer memory safety
+        run: |
+          python3 Benchmarks/SubtitleVertexStaging/run.py --tests-only \
+            --output "$RUNNER_TEMP/subtitle-vertex-staging/tests"
+      - name: Measure paired native vertex staging
+        run: |
+          python3 Benchmarks/SubtitleVertexStaging/run.py --pairs 8 --target-ms 80 \
+            --output "$RUNNER_TEMP/subtitle-vertex-staging/timing"
+      - name: Emit review records
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-vertex-staging"
+          for path in sorted(root.rglob("*")):
+              if path.is_file() and "build" not in path.parts and "receipts" not in path.parts:
+                  content = path.read_text()
+                  chunks = [content[i:i + 12000] for i in range(0, len(content), 12000)] or [""]
+                  for index, chunk in enumerate(chunks):
+                      print("VERTEX_PART " + json.dumps({
+                          "path": str(path.relative_to(root)), "part": index,
+                          "parts": len(chunks), "content": chunk
+                      }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-vertex-staging-components
+          path: ${{ runner.temp }}/subtitle-vertex-staging/
+          retention-days: 14
+
+  native-rendering:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination and prepare pinned native dependencies
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds run serially in this isolated checkout.'
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build app graph and qualify rendered output and resource reuse
+        run: |
+          mkdir -p "$RUNNER_TEMP/subtitle-vertex-native"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+            'MetalASSSubtitleCompositorTests|SubtitleVertexWriterTests|SubtitleStagingReuseTests' \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-vertex-native/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-vertex-staging-native
+          path: ${{ runner.temp }}/subtitle-vertex-native/tests.log
+          retention-days: 14

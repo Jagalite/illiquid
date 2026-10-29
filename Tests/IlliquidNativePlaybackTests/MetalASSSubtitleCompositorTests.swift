@@ -273,6 +273,34 @@ struct MetalASSSubtitleCompositorTests {
         #expect(Array(pixels) == [128, 0, 64, 192])
     }
 
+    @Test @MainActor func pooledVertexStorageHandlesGrowthShrinkAndEmptyClears() throws {
+        let size = CGSize(width: 96, height: 64)
+        let packer = ASSSubtitleFramePacker(maximumTextureDimension: 512)
+        var configuration = MetalASSRenderConfiguration()
+        configuration.sampler = .nearest
+        let renderer = try MetalASSSubtitleRenderer(layer: CAMetalLayer(), configuration: configuration)
+        // More than 28 quads exceeds the initial 4 KiB vertex allocation.
+        // Smaller subsequent atlases also exercise an oversized pooled texture.
+        for (pass, count) in [64, 1, 0, 128, 2, 64].enumerated() {
+            let regions = (0..<count).map { index in
+                ASSRenderedRegion(
+                    bitmap: Data(repeating: 255, count: 16),
+                    color: (index + pass).isMultiple(of: 2) ? 0xFF000000 : 0x00FF0000,
+                    frame: CGRect(x: index % 16 * 6 + 1, y: index / 16 * 6 + 1, width: 4, height: 4),
+                    stride: 4
+                )
+            }
+            let frame = try #require(packer.prepare(regions: regions, canvasSize: size, strategy: .metalR8Atlas))
+            #expect(frame.quads.count == count)
+            let pixels = try #require(renderer.renderOffscreen(frame))
+            let reference = Self.renderCPUReferenceBGRA(
+                regions: regions, logicalSize: size, outputScale: 1, sampling: .nearest
+            )
+            #expect(pixels == reference)
+        }
+        #expect(renderer.commandBuffersSubmitted == 6)
+    }
+
     @Test @MainActor func coverageRampIdentifiesSamplingColorAndAlphaTransforms() throws {
         let logicalSize = CGSize(width: 10, height: 3)
         let region = ASSRenderedRegion(
