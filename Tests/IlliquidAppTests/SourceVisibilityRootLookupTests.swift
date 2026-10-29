@@ -71,10 +71,16 @@ struct SourceVisibilityRootLookupTests {
         let nested = broad + "/日本語"
         let rawSuffix = "Se\u{301}rie – 01.mkv"
         let rawPath = "/Volumes/Cafe\u{301} 👩🏽‍💻/日本語/" + rawSuffix
+        // Foundation may expose decomposed path bytes even after a composed
+        // path is passed to URL. Resolve the expected input independently of
+        // the production normalizer and matcher, then retain its exact suffix.
+        let expectedURLPath = URL(fileURLWithPath: rawPath.precomposedStringWithCanonicalMapping,
+                                  isDirectory: false).path
+        let expectedURLSuffix = String(expectedURLPath.split(separator: "/").last!)
         for roots in [[url(broad), url(nested)], [url(nested), url(broad)]] {
             let matcher = SourceVisibilityMatcher(configuration: .default, roots: roots)
             expectBytes(matcher.relativePath(normalizedPath: rawPath), rawSuffix)
-            expectBytes(matcher.relativePath(for: url(rawPath)), rawSuffix.precomposedStringWithCanonicalMapping)
+            expectBytes(matcher.relativePath(for: url(rawPath)), expectedURLSuffix)
             expectBytes(matcher.relativePath(normalizedPath: broad + "/別の季節/" + rawSuffix),
                         "別の季節/" + rawSuffix)
         }
