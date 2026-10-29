@@ -1,0 +1,69 @@
+Building for debugging...
+[0/18] Write sources
+[3/18] Compiling CReadAheadMetrics CReadAheadMetrics.c
+[4/18] Write swift-version-24593BA9C3E375BF.txt
+[6/20] Emitting module IlliquidNativePlayback
+[7/20] Compiling IlliquidNativePlayback MediaReadAheadGate.swift
+[9/25] Emitting module ReadAheadBenchmark
+[10/25] Compiling ReadAheadBenchmark Harness.swift
+[11/26] Wrapping AST for IlliquidNativePlayback for debugging
+[12/26] Wrapping AST for ReadAheadBenchmark for debugging
+[13/26] Write Objects.LinkFileList
+[14/26] Linking ReadAheadBenchmark
+[16/26] Compiling IlliquidNativePlaybackTests MediaReadAheadGateTests.swift
+[17/26] Emitting module IlliquidNativePlaybackTests
+[18/27] /__w/_temp/read-ahead-eof/build/baseline/x86_64-unknown-linux-gnu/debug/ReadAheadEOFQualificationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[19/27] Write sources
+[20/27] Wrapping AST for IlliquidNativePlaybackTests for debugging
+[22/29] Emitting module ReadAheadEOFQualificationPackageDiscoveredTests
+[23/29] Compiling ReadAheadEOFQualificationPackageDiscoveredTests IlliquidNativePlaybackTests.swift
+[24/30] Compiling ReadAheadEOFQualificationPackageDiscoveredTests all-discovered-tests.swift
+[25/31] /__w/_temp/read-ahead-eof/build/baseline/x86_64-unknown-linux-gnu/debug/ReadAheadEOFQualificationPackageTests.derived/runner.swift
+[26/31] Write sources
+[27/31] Wrapping AST for ReadAheadEOFQualificationPackageDiscoveredTests for debugging
+[29/33] Emitting module ReadAheadEOFQualificationPackageTests
+[30/33] Compiling ReadAheadEOFQualificationPackageTests runner.swift
+[31/34] Wrapping AST for ReadAheadEOFQualificationPackageTests for debugging
+[32/34] Write Objects.LinkFileList
+[33/34] Linking ReadAheadEOFQualificationPackageTests.xctest
+Build complete! (10.67s)
+Test Suite 'All tests' started at 2026-10-28 05:41:54.693
+Test Suite 'debug.xctest' started at 2026-10-28 05:41:54.695
+Test Suite 'debug.xctest' passed at 2026-10-28 05:41:54.695
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-10-28 05:41:54.695
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Media read-ahead admission and retirement" started.
+◇ Test progressWithoutAReaderIsRetainedForLaterAdmission() started.
+✔ Test progressWithoutAReaderIsRetainedForLaterAdmission() passed after 0.001 seconds.
+◇ Test timestampBeyondLookaheadBlocksUntilTheInclusiveBoundary() started.
+✔ Test timestampBeyondLookaheadBlocksUntilTheInclusiveBoundary() passed after 0.001 seconds.
+◇ Test negativeLookaheadIsClampedToZero() started.
+✔ Test negativeLookaheadIsClampedToZero() passed after 0.001 seconds.
+◇ Test backwardEqualAndNonfiniteUpdatesDoNotMoveTheClock() started.
+✔ Test backwardEqualAndNonfiniteUpdatesDoNotMoveTheClock() passed after 0.001 seconds.
+◇ Test resetSanitizesPositionAndCanMoveTheClockBackward() started.
+✔ Test resetSanitizesPositionAndCanMoveTheClockBackward() passed after 0.001 seconds.
+◇ Test eofOnlyProgressIsRecordedAndGenerationChangeRetiresTheReader() started.
+✔ Test eofOnlyProgressIsRecordedAndGenerationChangeRetiresTheReader() passed after 0.001 seconds.
+◇ Test sameGenerationResetCanAdmitATimestampedReader() started.
+✔ Test sameGenerationResetCanAdmitATimestampedReader() passed after 0.001 seconds.
+◇ Test generationChangeRetiresBlockedWork(eof:) started.
+◇ Test case passing 1 argument eof → false to generationChangeRetiresBlockedWork(eof:) started.
+◇ Test case passing 1 argument eof → true to generationChangeRetiresBlockedWork(eof:) started.
+✔ Test generationChangeRetiresBlockedWork(eof:) with 2 test cases passed after 0.001 seconds.
+◇ Test retiringOneTimedReaderDoesNotDisableTheNextNotification() started.
+✔ Test retiringOneTimedReaderDoesNotDisableTheNextNotification() passed after 0.001 seconds.
+◇ Test closeRetiresBlockedWorkAndResetDoesNotReopen(eof:) started.
+◇ Test case passing 1 argument eof → false to closeRetiresBlockedWorkAndResetDoesNotReopen(eof:) started.
+◇ Test case passing 1 argument eof → true to closeRetiresBlockedWorkAndResetDoesNotReopen(eof:) started.
+✔ Test closeRetiresBlockedWorkAndResetDoesNotReopen(eof:) with 2 test cases passed after 0.001 seconds.
+◇ Test blockedReaderObservationTracksAdmissionAndRetirement() started.
+✔ Test blockedReaderObservationTracksAdmissionAndRetirement() passed after 0.001 seconds.
+◇ Test nonfiniteTimestampAdmissionSemanticsRemainUnchanged() started.
+✔ Test nonfiniteTimestampAdmissionSemanticsRemainUnchanged() passed after 0.001 seconds.
+✔ Suite "Media read-ahead admission and retirement" passed after 0.005 seconds.
+✔ Test run with 12 tests in 1 suite passed after 0.005 seconds.

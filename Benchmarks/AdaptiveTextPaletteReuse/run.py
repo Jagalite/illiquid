@@ -109,7 +109,14 @@ def main() -> None:
     parser.add_argument("--target-ms", type=float, default=100, help="baseline calibration target per operation batch")
     parser.add_argument("--receipts-only", action="store_true")
     parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--current-support-regression-only", action="store_true",
+                        help="use captured current support for both arms; tests or complete receipts only, never performance")
     args = parser.parse_args()
+    if args.current_support_regression_only:
+        if not (args.tests_only or args.receipts_only):
+            parser.error("current-support regression mode requires --tests-only or --receipts-only; timing is prohibited")
+        if args.cases != "all" or args.kernels != ",".join(KERNELS) or args.cpu is not None:
+            parser.error("current-support regression mode requires the complete untimed workload")
     kernels = args.kernels.split(",")
     if args.rounds <= 0 or args.rounds % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("rounds must be positive and even; target-ms must be finite and positive")
@@ -153,14 +160,14 @@ def main() -> None:
             command_index = len(commands)
             stdout_path = stdout or logs / f"{command_index:04d}-stdout.txt"
             stderr_path = logs / f"{command_index:04d}-stderr.txt"
-            started = time.time()
-            wall = time.monotonic()
+            started = None if args.current_support_regression_only else time.time()
+            wall = None if args.current_support_regression_only else time.monotonic()
             before_exec = None if cpu is None else lambda: os.sched_setaffinity(0, {cpu})
             with stdout_path.open("w") as out, stderr_path.open("w") as err:
                 result = subprocess.run(command, cwd=ROOT, env=env, text=True,
                                         stdout=out, stderr=err, preexec_fn=before_exec)
             commands.append({"argv": command, "started_unix_seconds": started,
-                             "elapsed_seconds": time.monotonic() - wall, "returncode": result.returncode,
+                             "elapsed_seconds": None if wall is None else time.monotonic() - wall, "returncode": result.returncode,
                              "stdout": str(stdout_path.relative_to(output)),
                              "stderr": str(stderr_path.relative_to(output)), "cpu_affinity": cpu})
             write_json(output / "commands.json", commands)
@@ -169,16 +176,20 @@ def main() -> None:
             return stdout_path.read_text()
 
         # The only compared source difference is the palette declaration.
-        # Every common implementation must still match the pinned baseline.
+        # Historical performance requires pinned support. Regression mode captures
+        # current bytes once and feeds that identical snapshot to both arms.
         support_metadata = {}
         for name, path in SUPPORT.items():
             original = run(["git", "show", f"{baseline_metadata['commit']}:{path.as_posix()}"])
-            current = (ROOT / path).read_text()
-            if original != current:
+            current_bytes = (ROOT / path).read_bytes()
+            current = current_bytes.decode()
+            if original != current and not args.current_support_regression_only:
                 raise RuntimeError(f"Common support changed since baseline: {path}")
-            shutil.copyfile(ROOT / path, sources / name)
+            (sources / name).write_bytes(current_bytes)
             support_metadata[name] = {"original": path.as_posix(), "sha256": digest(sources / name),
-                                      "matches_baseline": True}
+                                      "matches_baseline": original == current,
+                                      "historical_sha256": digest_bytes(original.encode()),
+                                      "used_by": ["baseline", "candidate"]}
         shutil.copyfile(baseline_path, sources / "baseline-PlayerTheme.swift")
         shutil.copyfile(ROOT / THEME, sources / "candidate-PlayerTheme.swift")
         shutil.copyfile(HERE / "LinuxColor.swift", sources / "LinuxColor.swift")
@@ -202,6 +213,8 @@ def main() -> None:
                               for line in Path("/proc/cpuinfo").read_text().splitlines()
                               if line.startswith("model name")), cpu_model)
         manifest = {
+            "support_policy": "current-support-regression-only" if args.current_support_regression_only else "strict-historical",
+            "performance_qualified": False,
             "baseline": baseline_metadata,
             "candidate_git_head": run(["git", "rev-parse", "HEAD"]).strip(),
             "candidate_theme_sha256": digest(ROOT / THEME),
@@ -216,7 +229,7 @@ def main() -> None:
                             "timed_cpu_affinity": args.cpu,
                             "swift_deterministic_hashing": env["SWIFT_DETERMINISTIC_HASHING"],
                             "thermal_or_frequency_controlled": False},
-            "clocks": {"wall": "driver monotonic elapsed nanoseconds",
+            "clocks": {} if args.current_support_regression_only else {"wall": "driver monotonic elapsed nanoseconds",
                        "cpu": "driver process CPU elapsed nanoseconds",
                        "orchestration": "Python time.monotonic"},
             "color_implementation": "numeric Linux Color shim" if linux else "native SwiftUI.Color",
@@ -339,6 +352,9 @@ let package = Package(name: "PaletteReuseValidation", platforms: [.macOS("26.0")
             raise RuntimeError("Exact baseline/candidate palette receipts differ")
         if args.receipts_only:
             return
+
+        if args.current_support_regression_only:
+            raise RuntimeError("Timing is prohibited in current-support regression mode")
 
         selected = cases if args.cases == "all" else args.cases.split(",")
         if not selected or len(set(selected)) != len(selected) or not set(selected) <= set(cases):

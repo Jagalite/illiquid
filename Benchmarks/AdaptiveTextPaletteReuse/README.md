@@ -153,3 +153,33 @@ commands and logs, environment/compiler metadata, binary hashes, complete
 receipts, calibration records, every raw timed observation, paired changes,
 and summaries. The CI artifact additionally retains the native application
 test log and tested revision.
+
+## Integrated current-support regression qualification
+
+Automated pull-request and push runs explicitly select
+`--current-support-regression-only`. This is regression evidence, not a new
+historical performance cohort. The frozen PlayerTheme baseline and its manifest
+remain pinned; candidate substitution is forbidden. The outside-palette theme
+boundary check remains mandatory. Each support file is captured once, hashed,
+and shared by both arms. The manifest identifies this policy, records historical
+and captured support hashes and whether they match, and labels performance as
+unqualified. Main's bounded VideoColorSample region loop can consequently evolve
+without silently redefining historical performance evidence.
+
+This mode requires `--tests-only` or `--receipts-only`; it rejects timing and
+partial workload selection. Tests execute all original six cases against both
+arms in debug and release. Receipts execute the complete driver verification
+stream. No calibration, timed workloads, summaries, or orchestration durations
+are collected in this mode. Native application test logs may include their test
+runner's durations; those are not benchmark evidence. The native qualification
+script still builds the actual application and requires all six palette tests.
+
+```sh
+python3 Benchmarks/AdaptiveTextPaletteReuse/test_source_policy.py
+python3 /Volumes/seed1/Projects/kyoto/kyoto.py submit -- bash Benchmarks/AdaptiveTextPaletteReuse/qualify-native.sh /tmp/palette-current-native --current-support-regression-only
+```
+
+Inspect Kyoto `show JOB_ID`, `wait JOB_ID`, and `logs JOB_ID`. Default/manual
+qualification remains strict historical timing, including all original source
+guards and full timing workloads; it intentionally rejects support drift.
+Existing evidence and production/test sources are unchanged.

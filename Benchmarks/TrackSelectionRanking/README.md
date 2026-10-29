@@ -11,6 +11,26 @@ describe the measured improvement and small-case controls. The successful
 macOS run's complete [retained evidence](evidence/macos-arm64/README.md) remains
 available in the repository, including the original Actions artifact.
 
+## Compact-rank follow-up
+
+The follow-up in [compact-rank performance](../../Documentation/TRACK_SELECTION_COMPACT_RANK_PERFORMANCE.md)
+compares the scalar rank representation with the already-optimized current-main
+implementation at `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`. Its frozen source
+and hashes live in `baseline-compact-rank/`; the historical `baseline/` and its
+retained results remain intact. Select the follow-up baseline explicitly:
+
+```sh
+python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-dir Benchmarks/TrackSelectionRanking/baseline-compact-rank --configuration debug --output /tmp/compact-track-rank-debug
+python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-dir Benchmarks/TrackSelectionRanking/baseline-compact-rank --configuration release --output /tmp/compact-track-rank-release
+python3 Benchmarks/TrackSelectionRanking/run.py benchmark --baseline-dir Benchmarks/TrackSelectionRanking/baseline-compact-rank --rounds 20 --target-ms 250 --output /tmp/compact-track-rank-benchmark
+```
+
+The native compact-rank job retains its 20-round/250 ms comparison using this
+follow-up baseline. Omitting both `--baseline-dir` and `--baseline-ref`
+continues to select the original baseline below, which measures the cumulative
+change since the earlier ranking research. Both baselines use complete production
+sources and the same correctness checks.
+
 ## Reproduce
 
 Use matching Swift 6.1-or-newer `swift` and `swiftc` tools. The native workflow
@@ -24,7 +44,8 @@ python3 Benchmarks/TrackSelectionRanking/run.py benchmark --output /tmp/track-ra
 
 Tests default to both baseline and candidate; `--variant baseline` or
 `--variant candidate` selects one. The isolated package runs
-`Tests/IlliquidCoreTests/TrackSelectionRankingTests.swift` using the toolchain's
+`Tests/IlliquidCoreTests/TrackSelectionRankingTests.swift` and
+`Tests/IlliquidCoreTests/TrackSelectionEligibilityTests.swift` using the toolchain's
 bundled Swift Testing. It has no external package dependencies. The existing
 restoration-regressions workflow also runs the complete native release suite,
 including the pre-existing track-selection and player integration tests.
@@ -39,7 +60,7 @@ Use a fresh output directory for each run so existing evidence is preserved.
 The benchmark defaults to ten paired rounds, with five AB and five BA pairs
 for every workload. Each timed row runs in a fresh process. Before the final
 cohort, separate pilot processes calibrate an iteration count for each workload
-so the faster variant's pilot interval reaches at least 20 ms. Both variants
+so the faster variant's process CPU interval reaches at least 20 ms. Both variants
 then use that exact count in every final pair. `--target-ms` changes the target;
 `--iterations` supplies a fixed count and skips calibration.
 
@@ -70,9 +91,14 @@ python3 Benchmarks/TrackSelectionRanking/run.py summarize --output /tmp/track-ra
 | `subtitle-always` | Rank eight subtitle tracks without a language preference |
 | `subtitle-forced-languages` | Forced-only with explicit English/Japanese preferences, dedicated forced tracks, and bitmap filtering flags |
 | `subtitle-forced-audio-fallback` | Forced-only derives the language policy from English or Japanese audio |
+| `subtitle-automatic-first`, `subtitle-automatic-last` | Fallback at either end of the eight-subtitle catalog |
+| `subtitle-automatic-missing` | Absent fallback in a mixed catalog |
+| `subtitle-automatic-no-subtitles` | Empty catalog or eight audio tracks whose kind cannot match |
+| `single-audio-in-subtitles` | One audio track before or after 32 unrelated subtitles |
 | `mutable-preferences` | Reassign raw public preference fields before each audio/subtitle selection, including aliases, duplicates, and invalid language entries |
 
-Ordinary workloads make two selections per iteration: original/reversed
+The automatic-first, automatic-last, and automatic-missing workloads make one
+selection per iteration. Other ordinary workloads make two selections per iteration: original/reversed
 catalog order, different fallbacks, and (for audio) a variant containing
 unrelated subtitle tracks. The mutable workload makes four selections per
 iteration and intentionally includes the five preference-field assignments.
@@ -115,3 +141,35 @@ visible playback. The zero/one-track and subtitle automatic/off controls
 expose unchanged paths alongside ranking improvements. Native CI publishes
 its independent measurements as `track-selection-ranking-native`; timings
 are evidence, not a noisy percentage-based CI pass/fail threshold.
+
+## Eligibility comparison against the pinned pre-change revision
+
+The frozen default baseline remains the original normalization study.
+The eligibility jobs retain the pre-change revision `ea2ff568` explicitly in both
+test and benchmark modes. After integrating the compact-rank change, this
+comparison measures the combined scalar-ranking and automatic-fallback changes;
+it no longer isolates eligibility alone. If the commit is already available
+locally, no fetch is needed:
+
+```sh
+python3 Benchmarks/TrackSelectionRanking/run.py test --configuration debug \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 --output /tmp/track-eligibility-debug
+python3 Benchmarks/TrackSelectionRanking/run.py test --configuration release \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 --output /tmp/track-eligibility-release
+python3 Benchmarks/TrackSelectionRanking/run.py benchmark --rounds 10 --target-ms 100 \
+  --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 --output /tmp/track-eligibility-benchmark
+```
+
+`--baseline-ref` and `--baseline-dir` are mutually exclusive. An explicit Git
+baseline is resolved once to a commit. Its exact source and blob/SHA-256
+identities are captured with the candidate; the shared `MediaTrack.swift` must
+match. The harness now records process CPU nanoseconds as well as elapsed
+nanoseconds, and calibration targets CPU time for the faster implementation.
+The summary retains the original elapsed-time fields and adds a separate `cpu`
+section. Fixture generation, warmup, serialization and the full differential
+verification remain outside the timed region.
+
+The focused workflow retains this 10-round/100 ms comparison independently on
+macOS and Linux alongside the native compact-rank job. On machines
+where Kyoto is available, submit the Python command through the shared queue as
+required by `AGENTS.md`. Hosted GitHub runners use isolated serial builds.

@@ -1,0 +1,73 @@
+name: Batch-open selection portable qualification
+
+on:
+  push:
+    branches: ['perf/batch-open-selection-20261028']
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Benchmarks/BatchOpenSelection/Harness.swift'
+      - 'Benchmarks/BatchOpenSelection/run.py'
+      - '.github/workflows/batch-open-selection-portable.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Benchmarks/BatchOpenSelection/Harness.swift'
+      - 'Benchmarks/BatchOpenSelection/run.py'
+      - '.github/workflows/batch-open-selection-portable.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: batch-open-selection-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify both configurations and measure paired component timings
+        run: >-
+          python3 Benchmarks/BatchOpenSelection/run.py
+          --pairs 8 --target-ms 50
+          --output "$RUNNER_TEMP/batch-open-selection-portable"
+      - name: Record complete measurement receipts in the job log
+        if: always()
+        run: |
+          python3 - "$RUNNER_TEMP/batch-open-selection-portable" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          root = Path(sys.argv[1])
+          for filename in ("manifest.json", "summary.json"):
+              path = root / filename
+              if path.is_file():
+                  print("EVIDENCE_JSON " + json.dumps({
+                      "file": filename, "value": json.loads(path.read_text())
+                  }, separators=(",", ":")))
+          for filename in ("measurements.jsonl", "calibration.jsonl"):
+              path = root / filename
+              if path.is_file():
+                  for line in path.read_text().splitlines():
+                      print("EVIDENCE_RECORD " + json.dumps({
+                          "file": filename, "value": json.loads(line)
+                      }, separators=(",", ":")))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: batch-open-selection-portable
+          path: |
+            ${{ runner.temp }}/batch-open-selection-portable/**/*.json
+            ${{ runner.temp }}/batch-open-selection-portable/**/*.jsonl
+            ${{ runner.temp }}/batch-open-selection-portable/**/*.log
+            ${{ runner.temp }}/batch-open-selection-portable/**/*.txt
+            ${{ runner.temp }}/batch-open-selection-portable/**/*.swift
+            ${{ runner.temp }}/batch-open-selection-portable/**/*.py
+          retention-days: 14

@@ -2,7 +2,20 @@ name: Adaptive text palette context reuse
 
 on:
   push:
-    branches: ['perf/adaptive-text-context-reuse-20261028']
+    branches: ['main', 'perf/adaptive-text-context-reuse-20261028']
+    paths:
+      - 'Sources/IlliquidApp/UI/PlayerTheme.swift'
+      - 'Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift'
+      - 'Sources/IlliquidCore/Player/VideoColorSample.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackVideoColorStore.swift'
+      - 'Tests/IlliquidAppTests/AdaptiveTextPaletteReuseTests.swift'
+      - 'Benchmarks/AdaptiveTextPaletteReuse/**'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - '.github/workflows/adaptive-text-palette-reuse.yml'
+      - '!Benchmarks/AdaptiveTextPaletteReuse/*.md'
+      - '!Benchmarks/AdaptiveTextPaletteReuse/evidence/**'
+  pull_request:
     paths:
       - 'Sources/IlliquidApp/UI/PlayerTheme.swift'
       - 'Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift'
@@ -35,13 +48,15 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Qualify real SwiftUI output, measure palette calls, and run app regressions
+      - name: Qualify native palette regression receipts and app tests
         run: |
           python3 - <<'PY'
           import json, os, subprocess, sys
           from pathlib import Path
           command = ['bash', 'Benchmarks/AdaptiveTextPaletteReuse/qualify-native.sh',
                      str(Path(os.environ['RUNNER_TEMP']) / 'adaptive-text-palette-reuse')]
+          if os.environ['GITHUB_EVENT_NAME'] != 'workflow_dispatch':
+              command.append('--current-support-regression-only')
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
               cli = [sys.executable, str(queue)]

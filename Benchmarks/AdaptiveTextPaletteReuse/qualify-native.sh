@@ -1,13 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-output=${1:?Usage: qualify-native.sh OUTPUT}
+output=${1:?Usage: qualify-native.sh OUTPUT [--current-support-regression-only]}
+mode=${2:-}
+if (( $# > 2 )) || [[ -n "$mode" && "$mode" != --current-support-regression-only ]]; then
+    echo 'Invalid qualification mode' >&2
+    exit 2
+fi
+support_args=()
+if [[ -n "$mode" ]]; then
+    support_args+=("$mode")
+fi
+python3 Benchmarks/AdaptiveTextPaletteReuse/test_source_policy.py
 test "$(uname -s)" = Darwin
 mkdir -p "$output"
 git rev-parse HEAD > "$output/revision.txt"
-python3 Benchmarks/AdaptiveTextPaletteReuse/run.py --tests-only --output "$output/tests"
-python3 Benchmarks/AdaptiveTextPaletteReuse/run.py --output "$output/benchmark" \
-    --rounds 6 --target-ms 100
+python3 Benchmarks/AdaptiveTextPaletteReuse/run.py "${support_args[@]}" --tests-only --output "$output/tests"
+if [[ -n "$mode" ]]; then
+    python3 Benchmarks/AdaptiveTextPaletteReuse/run.py "$mode" --receipts-only --output "$output/receipts"
+else
+    python3 Benchmarks/AdaptiveTextPaletteReuse/run.py --output "$output/benchmark" \
+        --rounds 6 --target-ms 100
+fi
 
 if ! xcrun -sdk macosx metal --version; then
     xcodebuild -downloadComponent MetalToolchain
