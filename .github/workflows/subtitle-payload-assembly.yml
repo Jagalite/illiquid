@@ -37,6 +37,9 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Trust the checked-out workspace in the ephemeral container
+        shell: bash
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Install Python in the Linux Swift container
         if: runner.os == 'Linux'
         shell: bash
