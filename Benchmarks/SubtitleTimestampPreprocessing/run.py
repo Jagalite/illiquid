@@ -109,7 +109,7 @@ def main():
                 shutil.copyfile(ROOT / "Tests/IlliquidNativePlaybackTests" / name, tests / name)
             (package / "Package.swift").write_text(
                 '// swift-tools-version: 6.1\nimport PackageDescription\n'
-                'let package = Package(name: "SubtitlePreprocessingRegressions", targets: [\n'
+                'let package = Package(name: "SubtitlePreprocessingRegressions", platforms: [.macOS("26.0")], targets: [\n'
                 '    .target(name: "IlliquidNativePlayback"),\n'
                 '    .testTarget(name: "IlliquidNativePlaybackTests", dependencies: ["IlliquidNativePlayback"])\n'
                 '])\n')
