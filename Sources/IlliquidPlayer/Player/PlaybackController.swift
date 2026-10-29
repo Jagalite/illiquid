@@ -2471,16 +2471,18 @@ public final class PlaybackCoordinator {
             fallbackIndex: nil,
             in: items
         )
-        let preservedCurrent = currentURL.flatMap { current in
-            items.firstIndex {
-                NormalizedFileURL.representsSameFile($0.url, current)
-            }
+        // The lookup already prefers an identity match over its fallback.
+        // Check only the selected item to distinguish those two outcomes.
+        let preservesCurrent = if let currentURL, let selectedIndex {
+            NormalizedFileURL.representsSameFile(items[selectedIndex].url, currentURL)
+        } else {
+            false
         }
         // Stop/window-close retains playlist metadata, but retires playback
         // authority. An explicit replacement open must create a fresh session
         // even when its URL matches that retained selection.
         let reopensStoppedSelection = mode == .replace && eventGate.activeIdentity == nil
-        if preservedCurrent == nil || reopensStoppedSelection, let selectedIndex {
+        if !preservesCurrent || reopensStoppedSelection, let selectedIndex {
             let folder = mode == .replace ? plan.folderURL : nil
             beginSourceTransaction(
                 item: items[selectedIndex],

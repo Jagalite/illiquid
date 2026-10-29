@@ -82,7 +82,7 @@ struct PlaylistRestoredIdentityTests {
             "file://LOCALHOST/Media/Season/../Cafe%CC%81.mkv?copy=restored#chapter",
             revision: 1
         )
-        let canonicalID = "/Media/Caf\u{00E9}.mkv"
+        let canonicalID = URL(fileURLWithPath: "/Media/Caf\u{00E9}.mkv").path
         let canonical = FolderPlaylistItem(
             url: URL(fileURLWithPath: canonicalID),
             externalSubtitleURLs: [URL(fileURLWithPath: "/Subtitles/later.srt")],
@@ -103,9 +103,12 @@ struct PlaylistRestoredIdentityTests {
     }
 
     @Test func canonicallyEqualSavedSpellingDoesNotReplaceCurrentIdentityBytes() {
-        let currentID = "/Media/Caf\u{00E9}.mkv"
-        let savedID = "/Media/Cafe\u{0301}.mkv"
-        let current = FolderPlaylistItem(url: URL(fileURLWithPath: currentID))
+        let currentURL = URL(fileURLWithPath: "/Media/Caf\u{00E9}.mkv")
+        let currentID = currentURL.path
+        let composed = currentID.precomposedStringWithCanonicalMapping
+        let decomposed = currentID.decomposedStringWithCanonicalMapping
+        let savedID = Array(currentID.utf8) == Array(composed.utf8) ? decomposed : composed
+        let current = FolderPlaylistItem(url: currentURL)
         // String equality alone misses returning the saved spelling.
         #expect(savedID == currentID)
         #expect(Array(savedID.utf8) != Array(currentID.utf8))

@@ -76,7 +76,9 @@ private func fixture(size: Int, workload: String) -> Fixture {
     return Fixture(
         items: items,
         saved: saved.map { key($0, unicode: unicode) },
-        expected: expectedLabels.map { key($0, unicode: unicode) }
+        // Foundation's file URL path spelling can differ by platform. Keep the
+        // label oracle independent while comparing the actual path bytes.
+        expected: expectedLabels.map { URL(fileURLWithPath: key($0, unicode: unicode)).path }
     )
 }
 

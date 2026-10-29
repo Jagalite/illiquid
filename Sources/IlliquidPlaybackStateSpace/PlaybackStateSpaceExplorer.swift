@@ -169,7 +169,6 @@ func apply(
   node.depth += 1
   let preSession = node.coreState.activeSession?.id
   let preGeneration = node.coreState.activeSession?.generation
-  let preKey = PlaybackSearchCanonicalizer.key(for: node)
   var event: PlaybackEvent?
   var gateRejected = false
   var fairProgress = false
@@ -345,6 +344,10 @@ func apply(
       ))
   }
   if case .stale = transition.disposition {
+    // Only stale transitions need the pre-state invariant. The immutable input
+    // retains the same production state as the former eager key; depth and
+    // environment bookkeeping do not participate in the fields compared below.
+    let preKey = PlaybackSearchCanonicalizer.key(for: input)
     let postKey = PlaybackSearchCanonicalizer.key(for: node)
     if preKey.lifecycle != postKey.lifecycle || preKey.externalWait != postKey.externalWait
       || preKey.session != postKey.session || preKey.leases != postKey.leases

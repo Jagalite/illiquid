@@ -1,0 +1,354 @@
+{
+  "binaries": {
+    "baseline": {
+      "commands": {
+        "all_symbols": [
+          "nm",
+          "-a",
+          "/workspace/scratch/ad1014220f8c/bitmap-projection-linux/build/baseline/libIlliquidNativePlayback.so"
+        ],
+        "defined_symbols": [
+          "nm",
+          "-S",
+          "--defined-only",
+          "/workspace/scratch/ad1014220f8c/bitmap-projection-linux/build/baseline/libIlliquidNativePlayback.so"
+        ],
+        "disassembly": [
+          "objdump",
+          "-d",
+          "--disassemble=$s22IlliquidNativePlayback0B25BitmapSubtitleCompositionV15renderedRegions2in10forcedOnlySayAA17ASSRenderedRegionVG10Foundation6CGRectV_SbtF",
+          "/workspace/scratch/ad1014220f8c/bitmap-projection-linux/build/baseline/libIlliquidNativePlayback.so"
+        ],
+        "dynamic_symbols": [
+          "nm",
+          "-D",
+          "/workspace/scratch/ad1014220f8c/bitmap-projection-linux/build/baseline/libIlliquidNativePlayback.so"
+        ]
+      },
+      "evidence_files": {
+        "disassembly": "assembly/baseline.renderedRegions.disassembly.txt",
+        "function_symbols": "assembly/baseline.renderedRegions.symbols.txt",
+        "runtime_symbols": "assembly/baseline.runtime-symbols.txt"
+      },
+      "function": {
+        "address_hex": "0x9700",
+        "size_bytes": 1380,
+        "stack_frame_bytes": 232,
+        "symbol": "$s22IlliquidNativePlayback0B25BitmapSubtitleCompositionV15renderedRegions2in10forcedOnlySayAA17ASSRenderedRegionVG10Foundation6CGRectV_SbtF"
+      },
+      "keypath_symbol_search": {
+        "all_symbols_scanned_sha256": "151b79ab983f479fbc90968ecb20df7e1fc8c255660647d05e07b8f240cbc614",
+        "dynamic_symbols_scanned_sha256": "8f91dff9888a304f5d95141103ffe99b68f729f2dfd0bce731551317d51af925",
+        "matches": {
+          "all_symbols": [],
+          "dynamic_symbols": []
+        },
+        "predicate": "case-insensitive substring 'keypath' in complete nm -a and nm -D output"
+      },
+      "path": "build/baseline/libIlliquidNativePlayback.so",
+      "sha256": "4ef946d8a5c7a2c844fd33d6411633289b28f1e89cc1593aead44ef2622329af",
+      "size_bytes": 103888,
+      "unchanged_during_inspection": true
+    },
+    "candidate": {
+      "commands": {
+        "all_symbols": [
+          "nm",
+          "-a",
+          "/workspace/scratch/ad1014220f8c/bitmap-projection-linux/build/candidate/libIlliquidNativePlayback.so"
+        ],
+        "defined_symbols": [
+          "nm",
+          "-S",
+          "--defined-only",
+          "/workspace/scratch/ad1014220f8c/bitmap-projection-linux/build/candidate/libIlliquidNativePlayback.so"
+        ],
+        "disassembly": [
+          "objdump",
+          "-d",
+          "--disassemble=$s22IlliquidNativePlayback0B25BitmapSubtitleCompositionV15renderedRegions2in10forcedOnlySayAA17ASSRenderedRegionVG10Foundation6CGRectV_SbtF",
+          "/workspace/scratch/ad1014220f8c/bitmap-projection-linux/build/candidate/libIlliquidNativePlayback.so"
+        ],
+        "dynamic_symbols": [
+          "nm",
+          "-D",
+          "/workspace/scratch/ad1014220f8c/bitmap-projection-linux/build/candidate/libIlliquidNativePlayback.so"
+        ]
+      },
+      "evidence_files": {
+        "disassembly": "assembly/candidate.renderedRegions.disassembly.txt",
+        "function_symbols": "assembly/candidate.renderedRegions.symbols.txt",
+        "runtime_symbols": "assembly/candidate.runtime-symbols.txt"
+      },
+      "function": {
+        "address_hex": "0x9700",
+        "size_bytes": 1440,
+        "stack_frame_bytes": 248,
+        "symbol": "$s22IlliquidNativePlayback0B25BitmapSubtitleCompositionV15renderedRegions2in10forcedOnlySayAA17ASSRenderedRegionVG10Foundation6CGRectV_SbtF"
+      },
+      "keypath_symbol_search": {
+        "all_symbols_scanned_sha256": "ddce82ee6b317aa8934950590d43b7da7b0240fb068b044f7f84382d61e38907",
+        "dynamic_symbols_scanned_sha256": "2a7e20246dff585365ceb7877bacc32c207101bb79e4a96568d3034e0df4780e",
+        "matches": {
+          "all_symbols": [],
+          "dynamic_symbols": []
+        },
+        "predicate": "case-insensitive substring 'keypath' in complete nm -a and nm -D output"
+      },
+      "path": "build/candidate/libIlliquidNativePlayback.so",
+      "sha256": "fdbb6c20f3a5ad6eadd60c48578d819e121e842a31209690e4090a03b24557b2",
+      "size_bytes": 103888,
+      "unchanged_during_inspection": true
+    }
+  },
+  "created_at_utc": "2026-10-28T05:14:23.270412+00:00",
+  "evidence_file_sha256": {
+    "assembly/baseline.renderedRegions.disassembly.txt": {
+      "sha256": "a0168002f6d68d472025403d7cfe34a62e20f9c6a54a908d809503a5501fb4fa",
+      "size_bytes": 23258
+    },
+    "assembly/baseline.renderedRegions.symbols.txt": {
+      "sha256": "434660069b7e83874718e73726cde48a314937fbeca056064a6217e94beb3d26",
+      "size_bytes": 356
+    },
+    "assembly/baseline.runtime-symbols.txt": {
+      "sha256": "597bc5d70f3e77b2348487c359a7292e4f68dce54e827eadaa9f4082408c0cde",
+      "size_bytes": 333
+    },
+    "assembly/candidate.renderedRegions.disassembly.txt": {
+      "sha256": "31c66db5c1b5b831e387136513c194785258a069eb9e5841d57eddaeb0caf779",
+      "size_bytes": 24190
+    },
+    "assembly/candidate.renderedRegions.symbols.txt": {
+      "sha256": "1f4f8c6f26efeb0f61e176796f51ee1841aa498bea025a164bf745e0649ebc4f",
+      "size_bytes": 356
+    },
+    "assembly/candidate.runtime-symbols.txt": {
+      "sha256": "597bc5d70f3e77b2348487c359a7292e4f68dce54e827eadaa9f4082408c0cde",
+      "size_bytes": 333
+    }
+  },
+  "interpretations_not_measurements": [
+    {
+      "assessment": "The observed forced-some regression cannot be attributed to dynamic key-path construction or projection in this optimized binary: selection is a direct field test. This does not prove equal timing, because the surrounding generated code differs.",
+      "id": "no_runtime_keypath_overhead_explanation"
+    },
+    {
+      "assessment": "The additional source-array retain call is a plausible contributor to the roughly 2 ns increase in empty-unforced independent medians. Assembly alone does not establish causation or quantify the cost; it is not a new timing measurement.",
+      "id": "plausible_empty_path_cost"
+    },
+    {
+      "assessment": "The original forced-some-64 result remains unresolved by assembly. A bounded balanced repeat using the same binaries and longer samples is warranted; preserve the original campaign and include neighboring forced controls. Native macOS qualification is stronger evidence for the shipping target. Changing the key path to a closure is not justified by runtime-key-path overhead in this inspection.",
+      "id": "focused_confirmation_warranted"
+    }
+  ],
+  "limitations": [
+    "Inspection is specific to these binary hashes, Swift 6.3.2, and x86_64 Linux. It does not establish Apple-platform code generation or timing.",
+    "Static disassembly cannot prove or exclude a repeatable microarchitectural performance regression.",
+    "The source-array retain is a concrete code difference, but its contribution to the observed empty-control timing is an inference.",
+    "The component only projects changed bitmap compositions or viewport geometry; this evidence does not measure total playback CPU or every video frame."
+  ],
+  "observed_facts": [
+    {
+      "baseline_addresses": [
+        "0x97c2-0x97d3 (load Boolean, OR with !forcedOnly, test, branch)"
+      ],
+      "candidate_addresses": [
+        "0x9756-0x9766 (forcedOnly branch)",
+        "0x97a6-0x97ad (cmpb of stored Boolean and conditional branch)"
+      ],
+      "description": "The candidate tests forcedOnly once before entering selection. Its forced filter directly compares the stored isForced Boolean with zero; the baseline loads the same field and combines it with !forcedOnly. The candidate contains no runtime key-path call in this function and no keypath-named symbol in the complete nm -a or nm -D symbol tables.",
+      "evidence": [
+        "assembly/candidate.renderedRegions.disassembly.txt",
+        "assembly/baseline.renderedRegions.disassembly.txt",
+        "binaries.*.keypath_symbol_search"
+      ],
+      "id": "forced_predicate_is_direct_field_test"
+    },
+    {
+      "baseline_addresses": [
+        "0x9803 (selected Data copy)",
+        "0x9810 (uniqueness check)",
+        "0x982c and 0x98b0 (filter buffer growth)",
+        "0x98ee (map allocation)",
+        "0x9af0 (output Data copy)",
+        "0x9b09 (optional lease copy)",
+        "0x9c31/0x9c3b (alternative input-release exits)"
+      ],
+      "candidate_addresses": [
+        "0x97d3 (selected Data copy)",
+        "0x97de (uniqueness check)",
+        "0x9804 and 0x9894 (filter buffer growth)",
+        "0x9923 (map allocation)",
+        "0x9b33 (output Data copy)",
+        "0x9b4a (optional lease copy)",
+        "0x9c7e (input release)"
+      ],
+      "description": "Both forced paths copy/retain selected Data, check uniqueness and grow the filtered region array when necessary, allocate the mapped ASSRenderedRegion array, copy/retain output Data and lease references, and release the filtered array. No additional forced-path retain or allocation is attributable to key-path dispatch. The candidate source-array swift_retain is on the unforced branch only.",
+      "evidence": [
+        "assembly/baseline.renderedRegions.disassembly.txt",
+        "assembly/candidate.renderedRegions.disassembly.txt"
+      ],
+      "id": "forced_selection_has_same_essential_ownership_work"
+    },
+    {
+      "baseline_addresses": [
+        "0x970a (stack reservation)",
+        "0x9767 (scale division)"
+      ],
+      "candidate_addresses": [
+        "0x970a (stack reservation)",
+        "0x98dc-0x98e3 (selected count test)",
+        "0x98fb (scale division)"
+      ],
+      "description": "The candidate function is 1440 bytes with a 248-byte stack frame; the baseline is 1380 bytes with a 232-byte stack frame. Branch layout, registers, spills, and the mapped loop differ. Baseline computes the scale division before selection; candidate computes it after finding a non-empty selected array.",
+      "evidence": [
+        "assembly/baseline.renderedRegions.symbols.txt",
+        "assembly/candidate.renderedRegions.symbols.txt",
+        "assembly/baseline.renderedRegions.disassembly.txt",
+        "assembly/candidate.renderedRegions.disassembly.txt"
+      ],
+      "id": "generated_code_differs_beyond_filter_predicate"
+    },
+    {
+      "baseline_addresses": [
+        "0x9790-0x97b3 (empty selection setup/count loop)",
+        "0x98c4-0x98d0 (selected count check)",
+        "0x9c38-0x9c3b (empty selection release)"
+      ],
+      "candidate_addresses": [
+        "0x98b5-0x98bb (unforced entry and source-array retain)",
+        "0x98dc-0x98e3 (selected count test)",
+        "0x9c7e (release)"
+      ],
+      "description": "On the candidate unforced path, swift_retain of the original regions array occurs before its count is tested. An empty array then exits through swift_release. The baseline initializes selection from static empty-array storage, checks the original count without retaining that array, and releases its empty selection on exit.",
+      "evidence": [
+        "assembly/baseline.renderedRegions.disassembly.txt",
+        "assembly/candidate.renderedRegions.disassembly.txt"
+      ],
+      "id": "empty_unforced_has_additional_retain_call"
+    }
+  ],
+  "original_campaign_context": {
+    "note": "Copied from existing evidence, not rerun. paired_reduction_percent is the original median of paired percentage reductions; independent medians should not be substituted for that statistic.",
+    "pairs": 10,
+    "selected_workloads": {
+      "forced-some-64": {
+        "cpu": {
+          "baseline_median_ns": 1558.2326214896907,
+          "candidate_faster_pairs": 3,
+          "candidate_median_ns": 1697.8118498490235,
+          "paired_ratios": [
+            0.7979994769246246,
+            0.8013719355926876,
+            1.310336485990586,
+            1.1252728952336017,
+            1.1381226864430598,
+            1.0056205353459207,
+            1.3439509280935782,
+            0.9157175612644401,
+            1.1301718567745205,
+            1.3527603178797307
+          ],
+          "paired_reduction_percent": -12.772237600406111
+        },
+        "iterations": 123529,
+        "pairs": 10,
+        "wall": {
+          "baseline_median_ns": 1585.5550235167452,
+          "candidate_faster_pairs": 3,
+          "candidate_median_ns": 1840.3799350759741,
+          "paired_ratios": [
+            0.9797402903829274,
+            0.8227505188108697,
+            1.2974509270991348,
+            1.156639490542307,
+            1.1694542793098246,
+            1.0097284364311911,
+            1.231140712491453,
+            0.9037671001670632,
+            1.1261813630111936,
+            1.352781732095036
+          ],
+          "paired_reduction_percent": -14.141042677675042
+        },
+        "workload": "forced-some-64"
+      },
+      "unforced-0": {
+        "cpu": {
+          "baseline_median_ns": 12.74268535,
+          "candidate_faster_pairs": 1,
+          "candidate_median_ns": 14.79135855,
+          "paired_ratios": [
+            1.2502356729578388,
+            1.4820810659114114,
+            1.2174630912850222,
+            1.3142465915817492,
+            1.23821652257039,
+            1.1153049367985746,
+            1.10282240183302,
+            0.9975709542709105,
+            1.2108062654876521,
+            1.1813952748860845
+          ],
+          "paired_reduction_percent": -21.413467838633714
+        },
+        "iterations": 10000000,
+        "pairs": 10,
+        "wall": {
+          "baseline_median_ns": 12.75385395,
+          "candidate_faster_pairs": 0,
+          "candidate_median_ns": 14.798234099999998,
+          "paired_ratios": [
+            1.2503627047192911,
+            1.4690080653814326,
+            1.2097191193596006,
+            2.71199482605472,
+            1.2517402544148946,
+            1.1263397865315936,
+            1.099933563501329,
+            1.0715562492260455,
+            1.256578501836327,
+            1.1834260077877488
+          ],
+          "paired_reduction_percent": -23.004091203944597
+        },
+        "workload": "unforced-0"
+      }
+    },
+    "source": "summary.json",
+    "summary_sha256": "8d6d00b9688d882da82dfb071dfd51f3032b570b9d4fd545ef9172a19abb7bf6",
+    "target_ms": 150.0
+  },
+  "purpose": "Check whether the forced filter key path introduces runtime overhead and identify relevant code-generation differences for interpretation of the original benchmark campaign.",
+  "recorded_build_context": {
+    "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "candidate_note": "Candidate source identity is recorded in manifest.json; its candidate_head alone is not the modified source identity because the build was prepared from a dirty worktree. Binary hashes below identify exactly the inspected compiled artifacts.",
+    "compiler": {
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "frontend_binary_sha256": "81a8f92138bb9b2544abb5446eeb554fc37c5b5bf9bef2569f70232578ec15b6",
+      "swift": "/workspace/scratch/ad1014220f8c/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+      "swiftc": "/workspace/scratch/ad1014220f8c/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+      "swiftc_binary_sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de",
+      "version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+    },
+    "flags": [
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors"
+    ],
+    "linux_adapter": "Remove only import CoreGraphics; use real Foundation geometry. Native inputs are unchanged.",
+    "machine": "x86_64",
+    "manifest_sha256": "b78e6b47df5d802f6478f2ed6bf25a0b8e54b871852be08be4e797b5e63297a1",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "source": "manifest.json"
+  },
+  "schema_version": 1,
+  "scope": "Read-only inspection of the two existing optimized x86_64 Linux benchmark libraries; no rebuilds, timing runs, source changes, or deletion of existing artifacts.",
+  "tools": {
+    "nm_version": "GNU nm (GNU Binutils for Ubuntu) 2.42",
+    "objdump_version": "GNU objdump (GNU Binutils for Ubuntu) 2.42"
+  }
+}

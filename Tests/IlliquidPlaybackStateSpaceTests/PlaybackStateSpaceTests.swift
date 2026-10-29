@@ -311,6 +311,29 @@ struct PlaybackStateSpaceTests {
   }
 
   @Test
+  func staleTransitionStillDetectsChangedProductionState() throws {
+    let definition = PlaybackSearchModelDefinition(model: .seek)
+    var input = try definition.makeSeed(profile: "ready-playing")
+    // Deliberately violate a production invariant. A stale drain fact then
+    // changes lifecycle to invariantFailed, so the explorer must compare it
+    // with the original input rather than a snapshot of the mutated node.
+    input.coreState.activeSession?.phase = .paused
+    let original = input.coreState
+
+    let applied = apply(
+      action: .runtimeFact(.drainVideoDecoder, ingress: .current),
+      to: input,
+      configuration: .validation(depthLimit: 1)
+    )
+
+    #expect(applied.transition?.disposition == .stale(reason: .authorityMismatch))
+    #expect(applied.node.coreState.lifecycle == .invariantFailed)
+    #expect(applied.violations.contains { $0.name == "playingRequiresPlayingPhase" })
+    #expect(applied.violations.contains { $0.name == "staleResultChangedSemanticState" })
+    #expect(input.coreState == original)
+  }
+
+  @Test
   func layeredBFSIsDeterministicAndUsesProductionTransitions() throws {
     let configuration = PlaybackSearchConfiguration.validation(depthLimit: 4)
     let first = try PlaybackStateSpaceExplorer().run(
