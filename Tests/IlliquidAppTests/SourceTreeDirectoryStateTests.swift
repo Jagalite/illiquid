@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 import Testing
 
 @testable import IlliquidApp
@@ -175,6 +176,88 @@ struct SourceTreeDirectoryStateTests {
         await consumer.finish(sibling, entries: [media("/Movies2/Running/new.mkv")])
         #expect(consumer.state.directoryContents["/Movies/Running"] == nil)
         #expect(consumer.state.directoryContents["/Movies2/Running"] == [media("/Movies2/Running/new.mkv")])
+    }
+
+    @Test(arguments: [true, false])
+    func treeInvalidationPreservesRetainedSnapshotsAndSiblingCaches(
+        _ preserveExpansion: Bool
+    ) async throws {
+        let consumer = DirectoryConsumerFixture()
+        defer { consumer.stop() }
+        let removed = media("/Movies/Removed/title.mkv")
+        let kept = media("/Movies/Removed2/kept.mkv")
+        try await consumer.loadAndFinish("/Movies/Removed", entries: [removed])
+        try await consumer.loadAndFinish("/Movies/Removed/Error", entries: [], error: "remove")
+        try await consumer.loadAndFinish("/Movies/Removed2", entries: [kept])
+        try await consumer.loadAndFinish("/Movies/Removed2/Error", entries: [], error: "keep")
+        consumer.expanded = [
+            "/Movies", "/Movies/Removed", "/Movies/Removed/Error",
+            "/Movies/Removed/Unloaded", "/Movies/Removed2", "/Movies/Removed2/Error",
+        ]
+
+        // Background projections can retain these value snapshots.
+        let previousContents = consumer.state.directoryContents
+        let previousErrors = consumer.state.directoryErrors
+        let previousExpansion = consumer.expanded
+
+        consumer.state.invalidateCachedTree(
+            beneath: url("/Movies/Removed/."),
+            preserveExpansion: preserveExpansion,
+            expandedFolderIDs: &consumer.expanded
+        )
+
+        #expect(consumer.state.directoryContents == [
+            "/Movies/Removed2": [kept],
+            "/Movies/Removed2/Error": [],
+        ])
+        #expect(consumer.state.directoryErrors == ["/Movies/Removed2/Error": "keep"])
+        #expect(consumer.expanded == (preserveExpansion ? previousExpansion : [
+            "/Movies", "/Movies/Removed2", "/Movies/Removed2/Error",
+        ]))
+        #expect(previousContents == [
+            "/Movies/Removed": [removed],
+            "/Movies/Removed/Error": [],
+            "/Movies/Removed2": [kept],
+            "/Movies/Removed2/Error": [],
+        ])
+        #expect(previousErrors == [
+            "/Movies/Removed/Error": "remove",
+            "/Movies/Removed2/Error": "keep",
+        ])
+    }
+
+    @Test func treeInvalidationNotifiesObserversOfBothChangedCaches() async throws {
+        let consumer = DirectoryConsumerFixture()
+        defer { consumer.stop() }
+        try await consumer.loadAndFinish("/Movies/Ready", entries: [media("/Movies/Ready/title.mkv")])
+        try await consumer.loadAndFinish("/Movies/Offline", entries: [], error: "remove")
+        try await consumer.loadAndFinish("/Movies2/Offline", entries: [], error: "keep")
+        let changes = DirectoryInvalidationObservedChanges()
+
+        withObservationTracking {
+            _ = consumer.state.directoryContents
+        } onChange: {
+            changes.record("contents")
+        }
+        withObservationTracking {
+            _ = consumer.state.directoryErrors
+        } onChange: {
+            changes.record("errors")
+        }
+
+        consumer.state.invalidateCachedTree(
+            beneath: url("/Uncached"), preserveExpansion: true,
+            expandedFolderIDs: &consumer.expanded
+        )
+        #expect(changes.properties.isEmpty)
+
+        consumer.state.invalidateCachedTree(
+            beneath: url("/Movies"), preserveExpansion: true,
+            expandedFolderIDs: &consumer.expanded
+        )
+        #expect(changes.properties == ["contents", "errors"])
+        #expect(consumer.state.directoryContents == ["/Movies2/Offline": []])
+        #expect(consumer.state.directoryErrors == ["/Movies2/Offline": "keep"])
     }
 
     @Test func collapsingFilesystemRootCancelsLoadsButKeepsCachesErrorsAndExpansion() async throws {
@@ -354,6 +437,23 @@ struct SourceTreeDirectoryStateTests {
     }
     private func media(_ path: String) -> SourceTreeEntry {
         .init(url: URL(fileURLWithPath: path), kind: .media, dateAdded: nil, creationDate: nil)
+    }
+}
+
+private final class DirectoryInvalidationObservedChanges: @unchecked Sendable {
+    private let lock = NSLock()
+    private var recorded: Set<String> = []
+
+    func record(_ property: String) {
+        lock.lock()
+        defer { lock.unlock() }
+        recorded.insert(property)
+    }
+
+    var properties: Set<String> {
+        lock.lock()
+        defer { lock.unlock() }
+        return recorded
     }
 }
 
