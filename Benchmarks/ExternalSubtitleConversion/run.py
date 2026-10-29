@@ -51,7 +51,7 @@ def command(args: list[str], log: Path, output: Path) -> str:
 
 
 def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict]:
-    if args.baseline_ref:
+    if args.baseline_ref is not None:
         revision = command(
             ["git", "rev-parse", "--verify", "--end-of-options", f"{args.baseline_ref}^{{commit}}"],
             output / "baseline-revision.log", output,
@@ -59,7 +59,7 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
         source_path = str(SOURCE.relative_to(ROOT))
         baseline = subprocess.check_output(["git", "show", f"{revision}:{source_path}"], cwd=ROOT)
         pinned = {
-            "repository": "Jagalite/illiquid", "revision": revision, "path": source_path,
+            "repository": "Jagalite/illiquid", "revision": revision, "commit": revision, "path": source_path,
             "git_blob": subprocess.check_output(
                 ["git", "rev-parse", f"{revision}:{source_path}"], cwd=ROOT, text=True,
             ).strip(),
@@ -99,7 +99,7 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
         source = folder / "ExternalTextSubtitleConverter.swift"
         if variant == "baseline":
             source.write_bytes(baseline)
-            source_path = (f"{pinned['revision']}:{pinned['path']}" if args.baseline_ref
+            source_path = (f"{pinned['revision']}:{pinned['path']}" if args.baseline_ref is not None
                            else str((HERE / "baseline/ExternalTextSubtitleConverter.swift").relative_to(ROOT)))
         else:
             shutil.copyfile(SOURCE, source)
@@ -118,6 +118,7 @@ def build(args: argparse.Namespace, output: Path) -> tuple[dict[str, Path], dict
         command(driver_command, folder / "build-driver.log", output)
         manifest["variants"][variant] = {
             "source_sha256": sha(source.read_bytes()), "source_path": source_path,
+            "source_ref": pinned.get("commit", pinned.get("revision")) if variant == "baseline" else "working-tree",
             "module_sha256": sha(module.read_bytes()), "library_sha256": sha(library.read_bytes()),
             "binary_sha256": sha(binary.read_bytes()), "module_command": module_command,
             "driver_command": driver_command,

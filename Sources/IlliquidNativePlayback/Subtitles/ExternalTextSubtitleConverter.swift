@@ -43,8 +43,29 @@ enum ExternalTextSubtitleConverter {
     static func convert(_ source: String, format: Format) throws -> String {
         var normalized = source
         if source.utf8.contains(0x0D) {
-            normalized = source.replacingOccurrences(of: "\r\n", with: "\n")
-                .replacingOccurrences(of: "\r", with: "\n")
+            if source.utf8.allSatisfy({ $0 < 0x80 }) {
+                // CR and LF cannot occur inside a multibyte UTF-8 scalar. Normalize
+                // both conventions in one pass, preserving every other byte.
+                normalized = String(unsafeUninitializedCapacity: source.utf8.count) { buffer in
+                    var written = 0
+                    var previousWasCR = false
+                    for byte in source.utf8 {
+                        if byte == 0x0A && previousWasCR {
+                            previousWasCR = false
+                            continue
+                        }
+                        buffer[written] = byte == 0x0D ? 0x0A : byte
+                        written += 1
+                        previousWasCR = byte == 0x0D
+                    }
+                    return written
+                }
+            } else {
+                // Nonliteral Foundation matching can leave CR next to a
+                // combining mark unchanged. Preserve that Unicode behavior.
+                normalized = source.replacingOccurrences(of: "\r\n", with: "\n")
+                    .replacingOccurrences(of: "\r", with: "\n")
+            }
         }
         if format == .webVTT {
             // A UTF-8 decoder may retain the optional WebVTT byte-order mark.
@@ -62,17 +83,23 @@ enum ExternalTextSubtitleConverter {
         var hasEvents = false
         // The WebVTT header and any header metadata never contain cue payloads.
         for block in Blocks(normalized).dropFirst(format == .webVTT ? 1 : 0) {
+            if format == .webVTT,
+               block.utf8.first == 0x4E || block.utf8.first == 0x0A {
+                // Only a leading N (or an empty first line) can begin NOTE.
+                // Recognize it before allocating a Substring for every line
+                // in an ignored comment. Match the first nonempty line only;
+                // NOTEworthy remains a cue identifier, and payload is untouched.
+                let content = block.drop(while: { $0 == "\n" })
+                if content == "NOTE" || content.hasPrefix("NOTE\n")
+                    || content.hasPrefix("NOTE ") || content.hasPrefix("NOTE\t") {
+                    continue
+                }
+            }
             let lines = Array(block.split(separator: "\n", omittingEmptySubsequences: false)
                 .drop(while: { $0.isEmpty }))
             guard let first = lines.first else { continue }
             let timingIndex: Int?
             if format == .webVTT {
-                // NOTE is a block marker, whereas NOTEworthy is a cue identifier.
-                // Ignore the entire comment even if malformed content resembles
-                // a cue.
-                if first == "NOTE" || first.hasPrefix("NOTE ") || first.hasPrefix("NOTE\t") {
-                    continue
-                }
                 // A cue has at most one identifier before its timing line.
                 // This also skips untimed STYLE/REGION metadata while preserving
                 // those words when used as identifiers with immediate timings.

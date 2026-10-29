@@ -1,0 +1,81 @@
+name: Checkpoint construction performance
+
+on:
+  push:
+    branches: ['perf/checkpoint-construction-20261028']
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Benchmarks/CheckpointConstruction/Driver.swift'
+      - 'Benchmarks/CheckpointConstruction/run.py'
+      - '.github/workflows/checkpoint-construction.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift'
+      - 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Player/MediaSource.swift'
+      - 'Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistSessionRecordTests.swift'
+      - 'Tests/IlliquidCoreTests/PlaylistDeduplicationTests.swift'
+      - 'Benchmarks/CheckpointConstruction/Driver.swift'
+      - 'Benchmarks/CheckpointConstruction/run.py'
+      - '.github/workflows/checkpoint-construction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-construction-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-foundation:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test both revisions and measure complete checkpoint construction
+        run: |
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo "Kyoto is available; submit and inspect this qualification through the shared queue."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this isolated GitHub runner; running component builds directly."
+          python3 Benchmarks/CheckpointConstruction/run.py \
+            --pairs 8 --target-ms 100 --output "$RUNNER_TEMP/checkpoint-construction"
+      - name: Retain reviewable measurement receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'checkpoint-construction'
+          files = {}
+          for path in sorted(root.rglob('*')):
+              if path.is_file() and 'build' not in path.relative_to(root).parts:
+                  files[str(path.relative_to(root))] = path.read_text()
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), mtime=0)
+          print('CHECKPOINT_REVIEW_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('CHECKPOINT_REVIEW_BASE64 ' + base64.b64encode(packed).decode())
+          print((root / 'summary.json').read_text() if (root / 'summary.json').exists() else 'No summary')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-construction-macos
+          path: |
+            ${{ runner.temp }}/checkpoint-construction/*.json
+            ${{ runner.temp }}/checkpoint-construction/*.jsonl
+            ${{ runner.temp }}/checkpoint-construction/logs/
+            ${{ runner.temp }}/checkpoint-construction/sources/
+          retention-days: 14

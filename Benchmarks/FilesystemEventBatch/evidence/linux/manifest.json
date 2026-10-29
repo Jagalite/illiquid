@@ -1,0 +1,47 @@
+{
+  "allocator_support_sha256": {
+    "heap.c": "1994cc5c27fab344e6cbb725027314519c14b8190cdcb3b84f04cca55e4b5a3d",
+    "include/CLeaseHeap.h": "b1a8779acea8c01bd5769a04bc95e1e510e072b236f74bf0ce06cdfb56d58bfb"
+  },
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "files": {
+      "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift": {
+        "git_blob": "3a5eaa70e94c22511457fc9d8770de288d9228a3",
+        "sha256": "a47c4b70e6953687c0d1cbca39272959881a19e082028a5fb63d656f2e71c770"
+      },
+      "Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift": {
+        "git_blob": "180354826bbcd6c427cb4ee0351e043ef4295d95",
+        "sha256": "bbf89b4ac3644399cb965a62d4d95ed6c444b4b4942a87e7c93609ed68d194d1"
+      }
+    }
+  },
+  "baseline_adapter": "import Foundation\n\nenum SourceFilesystemEventBatch {\n    static func decode(paths: UnsafeBufferPointer<UnsafePointer<CChar>?>,\n        flagsAt: (Int) -> SourceFilesystemEvent.Flags) -> [SourceFilesystemEvent] {\n        let count = paths.count\n        guard let pointers = paths.baseAddress else { return [] }\n        var events: [SourceFilesystemEvent] = []\n        events.reserveCapacity(count)\n        for index in 0..<count {\n            guard let pointer = pointers[index] else { continue }\n            events.append(.init(path: String(cString: pointer), flags: flagsAt(index)))\n        }\n        return events\n    }\n}\n",
+  "binary_sha256": {
+    "baseline-debug": "19515c27e58ca53797763751449973f1b1d871411f0cf24ba4f11b8f88db504d",
+    "baseline-release": "e12eca7b914523c96d3f1519ada37e6a2a80f3dfde9d942e98f0d91a07e4544b",
+    "candidate-debug": "682b36fcd15c9998161e205934db9a72bccb3376bb411fff155a0cb598878776",
+    "candidate-release": "330ed20248628cb87beee844329dc5a3674c5d4b842be1b28aced07527c78ed1"
+  },
+  "candidate_uses_worktree_source": true,
+  "checkout_head": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "compiled_sources": {
+    "baseline": {
+      "batch_sha256": "3c3a3b252de2a4435711ffc8234df3eea5123cc8c2625b4da0230c814b12ca45",
+      "policy_sha256": "a47c4b70e6953687c0d1cbca39272959881a19e082028a5fb63d656f2e71c770"
+    },
+    "candidate": {
+      "batch_sha256": "9450f5016378fd87091bff7fd6f4bac4f7c0629c96af536cde2e5778b8766419",
+      "policy_sha256": "0570faa0a5c6e728c7605955e14a14c0b5627b4a3f38ce076e1e2b084daeadbd"
+    }
+  },
+  "harness_sha256": {
+    "Harness.swift": "d7b71f88489558ae951b1ff5b516a5d212aebd3371f17ca5192948da69972c64",
+    "run.py": "542ccf736067180d12edee8ac1f671815cf85caa0df5f056dd3b5e2e16bc247f"
+  },
+  "production_sha256": {
+    "Sources/IlliquidApp/UI/SourceFilesystemEventBatch.swift": "9450f5016378fd87091bff7fd6f4bac4f7c0629c96af536cde2e5778b8766419",
+    "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift": "0570faa0a5c6e728c7605955e14a14c0b5627b4a3f38ce076e1e2b084daeadbd",
+    "Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift": "471005dcfac727fc9e9129285168ef223f33802d835fcbba225b3f6bbdd9ec9b"
+  }
+}
