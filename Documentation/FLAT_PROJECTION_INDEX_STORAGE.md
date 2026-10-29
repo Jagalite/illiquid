@@ -152,7 +152,20 @@ checked-in JSON keeps the raw measurements, full-trace hashes, environment,
 source/binary hashes, summaries, and completion marker after that artifact
 expires.
 
+Run the historical commands from the recorded implementation checkout below.
+Current main may contain unrelated Sidebar changes that correctly fail the
+strict surrounding-declaration guard. PR and branch-push CI instead run all
+four regression suites and complete output parity with `--current-support
+--mode verify`, using the current sorter in both variants. Those automated runs
+produce no timing or allocation measurements and do not refresh the retained
+historical findings. Manual workflow dispatch and the default CLI retain their
+strict historical behavior.
+
 ```sh
+git worktree add --detach /tmp/illiquid-flat-projection-index \
+  d31ed9a65523416c330a9702198c06fe446f74b5
+cd /tmp/illiquid-flat-projection-index
+
 python3 Benchmarks/FlatFileProjection/run.py \
   --baseline ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
   --current-support --include-sorter --sizes 10000 --sorts name date off \

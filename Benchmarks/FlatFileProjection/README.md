@@ -44,8 +44,9 @@ python3 Benchmarks/FlatFileProjection/run.py \
 Output directories must be new or empty. `--swift` accepts a compiler path.
 `--sizes`, `--cases`, and `--pairs` select workloads; the default study has six
 balanced pairs for each of six scenarios at 100, 1,000, and 10,000 entries.
-PR CI runs the tests and complete output comparisons in `verify` mode with
-`--current-support`, as described below. Manual
+PR and branch-push CI run all four regression suites and complete output
+comparisons in `verify` mode with `--current-support`, as described below.
+These automated runs produce no timing or allocation measurements. Manual
 workflow dispatch runs the full study with ten pairs and a 1,000 ms target per
 observation. Timing results are research evidence, not a noisy pass/fail gate.
 
@@ -168,7 +169,19 @@ The runner permits only the exact `SourceTreeSorting` declaration to differ
 inside the staged Sidebar values; all surrounding declarations must match.
 `SourceTreeSortingTests` joins the existing three regression suites.
 
+The commands below reproduce the historical index-storage study from its
+recorded implementation checkout, not from current main. Later changes to
+surrounding Sidebar declarations correctly fail the strict `--include-sorter`
+gate. Automated PR and branch-push CI use current-support verification without
+`--include-sorter`; both variants retain the current sorter, and all four
+regression suites still run. This is integration regression evidence, not a new
+qualification of the historical sorter timing or allocation findings.
+
 ```sh
+git worktree add --detach /tmp/illiquid-flat-projection-index \
+  d31ed9a65523416c330a9702198c06fe446f74b5
+cd /tmp/illiquid-flat-projection-index
+
 python3 Benchmarks/FlatFileProjection/run.py \
   --baseline ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
   --current-support --include-sorter --sizes 10000 --sorts name date off \
