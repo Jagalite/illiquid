@@ -27,6 +27,11 @@ LIMIT = 32 * 1024 * 1024
 COUNTS = {"2000": 2_000, "50000": 50_000, "200000": 200_000,
           "long-payload": 2_000, "unicode-long-payload": 2_000,
           "crlf": 50_000, "malformed": 50_000, "blank-heavy": 1}
+# These opt-in sizes describe the complete file, including signature and cue.
+NOTE_BYTES = {"note-512k": 512 * 1024, "note-8m": 8 * 1024 * 1024,
+              "note-near-limit": LIMIT - 1024, "note-only": 8 * 1024 * 1024}
+NOTE_CASES = [f"vtt-{kind}" for kind in NOTE_BYTES] + ["vtt-note-interleaved", "vtt-note-control"]
+NOTE_CUE = b"1\n00:00:00.000 --> 00:00:01.000\nPlain caption 0\n\n"
 
 
 def sha(data: bytes) -> str:
@@ -70,13 +75,30 @@ def fixtures(cases: list[str], output: Path) -> dict:
         path = folder / f"{name}.{format_name}"
         newline = "\r\n" if kind == "crlf" else "\n"
         decimal = "," if format_name == "srt" else "."
+        count = (0 if kind == "note-only" else 2000 if kind == "note-interleaved"
+                 else 1 if name in NOTE_CASES else COUNTS[kind])
         with path.open("wb") as stream:
             if format_name == "vtt":
                 stream.write(("WEBVTT" + newline * 2).encode())
+            if kind in NOTE_BYTES:
+                stream.write(b"NOTE ignored metadata\n")
+                tail = b"x\n\n" + (NOTE_CUE if count else b"")
+                remaining = NOTE_BYTES[kind] - stream.tell() - len(tail)
+                # Nonblank 16-byte lines keep one comment block intact. Stream
+                # bounded chunks so fixture creation cannot raise the launcher's
+                # RSS floor to the size of the input being measured.
+                chunk = b"ignored comment\n" * 4096
+                while remaining:
+                    part = chunk[:min(remaining, len(chunk))]
+                    stream.write(part)
+                    remaining -= len(part)
+                stream.write(tail)
             if kind == "blank-heavy":
                 for _ in range(32):
                     stream.write(b"\n" * (64 * 1024))
-            for index in range(COUNTS[kind]):
+            for index in range(0 if kind in NOTE_BYTES else count):
+                if kind == "note-interleaved":
+                    stream.write(b"NOTE short comment\nignored line\n\n")
                 seconds = index * 2
                 start = f"{seconds // 3600:02}:{seconds // 60 % 60:02}:{seconds % 60:02}{decimal}000"
                 end = f"{seconds // 3600:02}:{seconds // 60 % 60:02}:{seconds % 60 + 1:02}{decimal}000"
@@ -92,21 +114,41 @@ def fixtures(cases: list[str], output: Path) -> dict:
         size = path.stat().st_size
         if size > LIMIT:
             raise ValueError(f"Input exceeds production 32 MiB bound: {name}")
-        manifest[name] = {"format": format_name, "cues": COUNTS[kind], "kind": kind,
+        manifest[name] = {"format": format_name, "cues": count, "kind": kind,
                           "input_bytes": size, "input_sha256": file_sha(path),
                           "file": str(path.relative_to(output)),
                           "expected_error": f"noValidCues({'srt' if format_name == 'srt' else 'webVTT'})"
-                          if kind == "malformed" else None}
+                          if kind in ("malformed", "note-only") else None}
     write_json(output / "fixtures.json", manifest)
     return manifest
 
 
-def build(args: argparse.Namespace, output: Path) -> dict[str, Path]:
-    pinned = json.loads((HERE / "baseline/manifest.json").read_text())
-    baseline = (HERE / "baseline/ExternalTextSubtitleConverter.swift").read_bytes()
+def baseline_snapshot(ref: str | None) -> tuple[bytes, dict]:
+    if ref is None:
+        pinned = json.loads((HERE / "baseline/manifest.json").read_text())
+        baseline = (HERE / "baseline/ExternalTextSubtitleConverter.swift").read_bytes()
+    else:
+        # Resolve once, then read the immutable blob without newline translation.
+        # Refs are subprocess arguments, never shell text. A shallow checkout may
+        # need to fetch the requested commit before invoking this runner.
+        revision = subprocess.check_output(
+            ["git", "rev-parse", "--verify", "--end-of-options", ref + "^{commit}"],
+            cwd=ROOT, text=True).strip()
+        path = SOURCE.relative_to(ROOT).as_posix()
+        git_blob = subprocess.check_output(
+            ["git", "rev-parse", "--verify", revision + ":" + path],
+            cwd=ROOT, text=True).strip()
+        baseline = subprocess.check_output(["git", "cat-file", "blob", git_blob], cwd=ROOT)
+        pinned = {"revision": revision, "requested_ref": ref, "path": path,
+                  "git_blob": git_blob, "sha256": sha(baseline)}
     blob = hashlib.sha1(b"blob " + str(len(baseline)).encode() + b"\0" + baseline).hexdigest()
     if sha(baseline) != pinned["sha256"] or blob != pinned["git_blob"]:
-        raise ValueError("Frozen baseline differs from manifest")
+        raise ValueError("Baseline differs from source manifest")
+    return baseline, pinned
+
+
+def build(args: argparse.Namespace, output: Path) -> dict[str, Path]:
+    baseline, pinned = baseline_snapshot(args.baseline_ref)
     compiler = os.path.abspath(shutil.which(args.swiftc) or args.swiftc)
     version = run([compiler, "--version"], output, output / "compiler.log").strip()
     flags = ["-O", "-whole-module-optimization", "-swift-version", "6", "-warnings-as-errors",
@@ -129,9 +171,13 @@ def build(args: argparse.Namespace, output: Path) -> dict[str, Path]:
     for variant in VARIANTS:
         folder = output / variant
         folder.mkdir()
-        original = HERE / "baseline/ExternalTextSubtitleConverter.swift" if variant == "baseline" else SOURCE
+        original = (HERE / "baseline/ExternalTextSubtitleConverter.swift"
+                    if variant == "baseline" and args.baseline_ref is None else SOURCE)
         source = folder / "ExternalTextSubtitleConverter.swift"
-        shutil.copyfile(original, source)
+        if variant == "baseline":
+            source.write_bytes(baseline)
+        else:
+            shutil.copyfile(original, source)
         library = folder / ("libIlliquidNativePlayback." + ("dylib" if platform.system() == "Darwin" else "so"))
         module = folder / "IlliquidNativePlayback.swiftmodule"
         module_command = [compiler, *flags, "-parse-as-library", "-emit-library", "-emit-module",
@@ -179,6 +225,9 @@ def summarize(output: Path) -> list[dict]:
         if row["case"] in receipts and receipts[row["case"]] != receipt:
             raise ValueError("Output/error receipt differs between measurements")
         receipts[row["case"]] = receipt
+    single_cue = {"vtt-note-512k", "vtt-note-8m", "vtt-note-near-limit", "vtt-note-control"}
+    if len({receipt for name, receipt in receipts.items() if name in single_cue}) > 1:
+        raise ValueError("Ignored NOTE blocks changed the single-cue output")
     summaries = []
     for name in config["cases"]:
         selected = [row for row in rows if row["case"] == name]
@@ -263,6 +312,7 @@ def main() -> None:
     parser.add_argument("mode", choices=("benchmark", "summarize"))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--swiftc", default=os.environ.get("SWIFTC", "swiftc"))
+    parser.add_argument("--baseline-ref", help="Local Git commit/ref for the baseline; default frozen af1c1ad source")
     parser.add_argument("--rounds", type=int, default=6)
     parser.add_argument("--case", action="append", help="Repeat to select cases; default all sixteen")
     args = parser.parse_args()
@@ -272,8 +322,9 @@ def main() -> None:
         return
     if args.rounds < 2 or args.rounds % 2:
         parser.error("--rounds must be even and at least two")
-    available = [f"{format_name}-{kind}" for format_name in ("srt", "vtt") for kind in COUNTS]
-    cases = args.case or available
+    defaults = [f"{format_name}-{kind}" for format_name in ("srt", "vtt") for kind in COUNTS]
+    available = defaults + NOTE_CASES
+    cases = args.case or defaults
     if len(set(cases)) != len(cases) or any(case not in available for case in cases):
         parser.error(f"--case must name unique cases from: {', '.join(available)}")
     if output.exists() and any(output.iterdir()):

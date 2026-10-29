@@ -72,14 +72,14 @@ public struct PlaybackPreferences: Codable, Equatable, Sendable {
         )
     }
 
-    private static func validVolume(_ volume: Double) -> Double {
+    static func validVolume(_ volume: Double) -> Double {
         guard volume.isFinite else {
             return standardVolume
         }
         return min(max(volume, 0), 100)
     }
 
-    private static func validPlaybackSpeed(_ speed: Double) -> Double {
+    static func validPlaybackSpeed(_ speed: Double) -> Double {
         guard speed.isFinite, speed > 0 else {
             return standardPlaybackSpeed
         }

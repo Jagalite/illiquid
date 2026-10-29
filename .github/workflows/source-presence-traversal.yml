@@ -1,0 +1,150 @@
+name: Source presence traversal regression and historical performance
+
+on:
+  push:
+    branches: ['perf/source-presence-traversal-20261028']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift'
+      - 'Tests/IlliquidAppTests/SourcePresenceTraversalRegressionTests.swift'
+      - 'Benchmarks/SourcePresenceTraversal/**'
+      - '.github/workflows/source-presence-traversal.yml'
+      - 'Scripts/tests/source-presence-traversal-policy-tests.py'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - '!Benchmarks/SourcePresenceTraversal/README.md'
+      - '!Benchmarks/SourcePresenceTraversal/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift'
+      - 'Sources/IlliquidApp/UI/SourceMediaPresenceRecomputation.swift'
+      - 'Sources/IlliquidApp/App/SourceRootPruning.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift'
+      - 'Tests/IlliquidAppTests/SourcePresenceTraversalRegressionTests.swift'
+      - 'Tests/IlliquidAppTests/SourceMediaPresence*.swift'
+      - 'Benchmarks/SourcePresenceTraversal/**'
+      - '.github/workflows/source-presence-traversal.yml'
+      - 'Scripts/tests/source-presence-traversal-policy-tests.py'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - '!Benchmarks/SourcePresenceTraversal/README.md'
+      - '!Benchmarks/SourcePresenceTraversal/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-presence-traversal-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-qualification:
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check traversal source policies without compiling
+        run: python3 Scripts/tests/source-presence-traversal-policy-tests.py
+      - name: Prepare pinned native dependencies and record build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the full app graph and run focused native regressions
+        run: |
+          mkdir -p "$RUNNER_TEMP/source-presence-traversal/app"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --filter \
+            'SourceMediaPresenceScannerTests|SourceMediaPresenceReuseTests|SourcePresenceTraversalRegressionTests|SourceMediaPresenceRecomputationTests|SourceEmptyFolderVisibilityTests' \
+            2>&1 | tee "$RUNNER_TEMP/source-presence-traversal/app/tests-release.log"
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-presence-traversal/app'
+          text = (root / 'tests-release.log').read_text()
+          counts = re.findall(r'Test run with (\d+) tests?\b[^\n]*\bpassed\b', text)
+          if not counts or int(counts[-1]) <= 0:
+              raise SystemExit('No positive native test completion receipt')
+          receipt = {'status': 'passed', 'configuration': 'release',
+                     'testCount': int(counts[-1]), 'commit': os.environ['GITHUB_SHA']}
+          (root / 'tests.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          print(json.dumps(receipt))
+          PY
+      - name: Test both implementations or run strict historical measurements
+        shell: bash
+        run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode=(--regression-only)
+          fi
+          python3 Benchmarks/SourcePresenceTraversal/run.py \
+            --output "$RUNNER_TEMP/source-presence-traversal/component" \
+            "${mode[@]}" --pairs 8 --target-ms 250
+      - name: Emit compact evidence and qualification summary
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-presence-traversal'
+          files = {}
+          for directory in (root / 'app', root / 'component'):
+              if directory.is_dir():
+                  for path in sorted(directory.iterdir()):
+                      if path.is_file() and path.suffix in {'.json', '.jsonl', '.log'}:
+                          files[str(path.relative_to(root))] = path.read_text()
+          completion = root / 'component/completion.json'
+          if completion.is_file():
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+                  stream.write('Traversal completion: `' + completion.read_text().strip() + '`\n')
+          summary_path = root / 'component/summary.json'
+          if summary_path.is_file():
+              summary = json.loads(summary_path.read_text())
+              print('::group::Source presence traversal summary')
+              print(json.dumps(summary, indent=2, sort_keys=True))
+              print('::endgroup::')
+              lines = ['## Source presence traversal', '',
+                       'Warm local-filesystem scans using the complete production cursor and native Foundation.', '',
+                       '| Workload | Baseline wall ms/scan | Candidate wall ms/scan | Paired wall reduction | Paired CPU reduction |',
+                       '|---|---:|---:|---:|---:|']
+              for row in summary['results']:
+                  wall, cpu = row['wall'], row['cpu']
+                  lines.append(f"| {row['workload']} | {wall['baselineMedianNanosecondsPerScan']/1e6:.3f} | "
+                               f"{wall['candidateMedianNanosecondsPerScan']/1e6:.3f} | "
+                               f"{wall['pairedMedianReductionPercent']:.1f}% | {cpu['pairedMedianReductionPercent']:.1f}% |")
+              lines += ['', 'Predeclared criteria: `' + json.dumps(summary['predeclaredThresholds'], sort_keys=True) + '`', '',
+                        'A completed benchmark retains unsuccessful outcomes; timing thresholds are not correctness-test assertions.']
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+                  stream.write('\n'.join(lines) + '\n')
+          packed = gzip.compress(json.dumps(files, sort_keys=True, separators=(',', ':')).encode(),
+                                 compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds the log bundle limit; use the uploaded artifact')
+          print('SOURCE_PRESENCE_TRAVERSAL_EVIDENCE_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('SOURCE_PRESENCE_TRAVERSAL_EVIDENCE_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-presence-traversal-native
+          path: |
+            ${{ runner.temp }}/source-presence-traversal/
+            !${{ runner.temp }}/source-presence-traversal/component/fixtures/**
+            !${{ runner.temp }}/source-presence-traversal/component/packages/**/.build/**
+            !${{ runner.temp }}/source-presence-traversal/component/module-cache/**
+            !${{ runner.temp }}/source-presence-traversal/component/package-cache/**
+            !${{ runner.temp }}/source-presence-traversal/component/package-config/**
+            !${{ runner.temp }}/source-presence-traversal/component/package-security/**
+          retention-days: 14

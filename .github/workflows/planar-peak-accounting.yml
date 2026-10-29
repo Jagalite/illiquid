@@ -1,0 +1,134 @@
+name: Planar ownership peak accounting
+
+on:
+  push:
+    branches: ['perf/planar-peak-accounting-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift'
+      - 'Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift'
+      - 'Benchmarks/PlanarOwnership/**'
+      - 'Benchmarks/NonDecodePerformance/allocmeter.c'
+      - '.github/workflows/planar-peak-accounting.yml'
+      - '!Benchmarks/PlanarOwnership/*.md'
+      - '!Benchmarks/PlanarOwnership/evidence/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Sources/IlliquidNativePlayback/Diagnostics/PlanarBufferOwnershipDiagnostics.swift'
+      - 'Sources/IlliquidNativePlayback/Diagnostics/NativePlaybackSignposts.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift'
+      - 'Benchmarks/PlanarOwnership/**'
+      - 'Benchmarks/NonDecodePerformance/allocmeter.c'
+      - '.github/workflows/planar-peak-accounting.yml'
+      - '!Benchmarks/PlanarOwnership/*.md'
+      - '!Benchmarks/PlanarOwnership/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: planar-peak-accounting-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualify:
+    name: ${{ matrix.platform }} ownership qualification
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-26
+            platform: macos
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+          - runner: ubuntu-24.04
+            platform: linux
+            developer_dir: ''
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
+      BASELINE_REF: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+      BASELINE_BLOB: e110a666400aa680a2d7b86ed4852c4fe05f08cc
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination and record host
+        shell: bash
+        run: |
+          if test -e /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo '::error::Kyoto is available; submit compilation through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this hosted runner; building serially in isolated directories.'
+          python3 - <<'PY'
+          import json, os, platform, subprocess
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'planar-peak'
+          root.mkdir(parents=True, exist_ok=True)
+          host = {
+              'platform': platform.platform(), 'machine': platform.machine(),
+              'swift': subprocess.check_output(['swiftc', '--version'], text=True).strip(),
+              'image_os': os.environ.get('ImageOS'), 'image_version': os.environ.get('ImageVersion'),
+              'run_id': os.environ['GITHUB_RUN_ID'], 'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'checkout_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+              'libc': platform.libc_ver(),
+          }
+          (root / 'host.json').write_text(json.dumps(host, indent=2, sort_keys=True) + '\n')
+          PY
+      - name: Compare production semantics in debug and release
+        shell: bash
+        run: |
+          python3 Benchmarks/PlanarOwnership/run.py --tests-only \
+            --baseline-ref "$BASELINE_REF" --baseline-blob "$BASELINE_BLOB" \
+            --output "$RUNNER_TEMP/planar-peak/tests"
+      - name: Measure native frame bookkeeping
+        if: matrix.platform == 'macos' && github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          python3 Benchmarks/PlanarOwnership/run.py \
+            --baseline-ref "$BASELINE_REF" --baseline-blob "$BASELINE_BLOB" \
+            --rounds 8 --iterations 100000 --warmup 10000 \
+            --occupancies 1,7,11,16,32 --workloads pipeline,lifecycle-mixed \
+            --output "$RUNNER_TEMP/planar-peak/timing"
+      - name: Measure cumulative allocation requests separately
+        if: matrix.platform == 'linux' && github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          python3 Benchmarks/PlanarOwnership/run.py --allocations \
+            --baseline-ref "$BASELINE_REF" --baseline-blob "$BASELINE_BLOB" \
+            --rounds 4 --iterations 100000 --warmup 10000 \
+            --occupancies 1,7,11,16,32 --workloads pipeline,lifecycle-mixed \
+            --output "$RUNNER_TEMP/planar-peak/allocations"
+      - name: Export readable evidence
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'planar-peak'
+          paths = set(root.glob('*.json'))
+          for pattern in ['*/*.json', '*/*.jsonl', '*/*.txt']:
+              paths.update(root.glob(pattern))
+          for path in sorted(paths):
+              if not path.is_file() or path.is_symlink():
+                  continue
+              data = path.read_bytes()
+              record = {'path': path.relative_to(root).as_posix(),
+                        'sha256': hashlib.sha256(data).hexdigest(), 'content': data.decode()}
+              print('PLANAR_PEAK_FILE ' + json.dumps(record, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: planar-peak-${{ matrix.platform }}
+          path: |
+            ${{ runner.temp }}/planar-peak/*.json
+            ${{ runner.temp }}/planar-peak/*/*.json
+            ${{ runner.temp }}/planar-peak/*/*.jsonl
+            ${{ runner.temp }}/planar-peak/*/*.txt
+          retention-days: 14

@@ -10,6 +10,7 @@ on:
       - 'Tests/IlliquidCoreTests/ExternalSubtitle*.swift'
       - 'Scripts/test-subtitle-candidate-traversal.sh'
       - 'Scripts/tests/subtitle-source-policy-tests.py'
+      - 'Scripts/tests/benchmark-source-policy-tests.py'
       - 'Benchmarks/SubtitleCandidateStreaming/Harness.swift'
       - 'Benchmarks/SubtitleCandidateStreaming/run.py'
       - 'Benchmarks/SubtitleCandidateStreaming/CHeapProbe/**'
@@ -22,6 +23,7 @@ on:
       - 'Tests/IlliquidCoreTests/ExternalSubtitle*.swift'
       - 'Scripts/test-subtitle-candidate-traversal.sh'
       - 'Scripts/tests/subtitle-source-policy-tests.py'
+      - 'Scripts/tests/benchmark-source-policy-tests.py'
       - 'Benchmarks/SubtitleCandidateStreaming/**'
       - '.github/workflows/subtitle-candidate-memory.yml'
   workflow_dispatch:
@@ -45,7 +47,9 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Check source policies and rejection controls without compiling
-        run: python3 Scripts/tests/subtitle-source-policy-tests.py
+        run: |
+          python3 Scripts/tests/subtitle-source-policy-tests.py
+          python3 Scripts/tests/benchmark-source-policy-tests.py
       - name: Run matcher regressions in debug and release
         run: |
           mkdir -p "$RUNNER_TEMP/subtitle-candidate-memory/tests"
