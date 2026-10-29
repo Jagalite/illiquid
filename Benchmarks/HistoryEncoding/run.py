@@ -91,7 +91,8 @@ class Run:
         return result.stdout.decode().strip()
 
 
-def snapshot_sources(run, manifest):
+def snapshot_sources(run, manifest, regression=False):
+    current = {path: (ROOT / path).read_bytes() for path in [*SOURCES, *ENUMS]}
     result = {}
     for variant in ["baseline", "candidate"]:
         directory = run.output / "sources" / variant
@@ -100,8 +101,8 @@ def snapshot_sources(run, manifest):
         hashes = manifest[variant + "_sources"] = {}
         enums = []
         for path in [*SOURCES, *ENUMS]:
-            raw = (subprocess.check_output(["git", "show", f"{BASELINE}:{path}"], cwd=ROOT)
-                   if variant == "baseline" else (ROOT / path).read_bytes())
+            raw = (subprocess.check_output(["git", "show", f"{BASELINE}:{path}"], cwd=ROOT, timeout=15)
+                   if variant == "baseline" and (not regression or path == STORE) else current[path])
             compiled = raw
             if path in ENUMS:
                 name = ENUMS[path]
@@ -115,13 +116,18 @@ def snapshot_sources(run, manifest):
                 target = directory / Path(path).name
                 target.write_bytes(compiled)
                 result[variant].append(target)
-            hashes[path] = dict(full_sha256=sha256(raw), compiled_sha256=sha256(compiled))
+            hashes[path] = dict(origin=BASELINE if variant == "baseline" and (not regression or path == STORE) else "captured-current", full_sha256=sha256(raw), compiled_sha256=sha256(compiled))
         enum_file = directory / "PersistenceEnums.swift"
         enum_file.write_bytes(b"// Unchanged enums extracted from the hashed production files.\n" + b"\n".join(enums))
         result[variant].append(enum_file)
     for path in [*SOURCES, *ENUMS]:
-        if path != STORE and manifest["baseline_sources"][path] != manifest["candidate_sources"][path]:
-            raise RuntimeError(f"Unrelated production dependency changed: {path}")
+        if path == STORE:
+            continue
+        # Origins differ in strict mode even when bytes match. Compare both
+        # content hashes: extraction must not hide drift in an enum owner.
+        for key in ["full_sha256", "compiled_sha256"]:
+            if manifest["baseline_sources"][path][key] != manifest["candidate_sources"][path][key]:
+                raise RuntimeError(f"Unrelated production dependency changed: {path} ({key})")
     for filename in ["Harness.swift", "run.py"]:
         raw = (HERE / filename).read_bytes()
         (run.output / "sources" / filename).write_bytes(raw)
@@ -253,8 +259,10 @@ def benchmark(run, binaries, args, summary):
             order = ["baseline", "candidate"] if pair % 2 == 0 else ["candidate", "baseline"]
             for variant in order:
                 raw_receipt = run.command([binaries[variant], workload["count"], workload["profile"],
-                    args.iterations, temporary_payload], label=f"{workload['id']}-{pair}-{variant}")
+                    args.iterations, temporary_payload, *(["--no-measurement"] if args.regression else [])], label=f"{workload['id']}-{pair}-{variant}")
                 row = json.loads(raw_receipt)
+                if args.regression and "mutation_flush_ns" in row:
+                    raise RuntimeError("Regression receipt contains measurements")
                 for key in ["count", "profile"]:
                     if row[key] != workload[key]:
                         raise RuntimeError(f"Mismatched workload {key}")
@@ -291,6 +299,11 @@ def benchmark(run, binaries, args, summary):
                 raise RuntimeError("Payload reduction is not exactly one byte per decoded slash")
         entry = dict(workload, pairs=args.pairs, iterations=args.iterations,
                      bytes_saved=slash_count, complete_semantic_comparison_passed=True)
+        if args.regression:
+            entry["measurement_scope"] = "none; current-source regression with historical store oracle"
+            summary["workloads"].append(entry)
+            save(run.output / "summary.json", summary)
+            continue
         for variant, samples in rows.items():
             medians = [statistics.median(row["mutation_flush_ns"]) for row in samples]
             means = [statistics.mean(row["mutation_flush_ns"]) for row in samples]
@@ -315,11 +328,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--mode", choices=["all", "benchmark", "tests"], default="all")
+    parser.add_argument("--regression", action="store_true",
+                        help="Current support + pinned historical store oracle; no measurements")
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--iterations", type=int, default=11)
     parser.add_argument("--quick", action="store_true")
     parser.add_argument("--queued", action="store_true", help="The entire runner was submitted through Kyoto")
     args = parser.parse_args()
+    if args.regression:
+        if args.quick or args.mode != "all":
+            parser.error("Regression requires all 13 workloads and both test arms")
+        args.pairs, args.iterations = 2, 1
     if args.pairs < 2 or args.pairs % 2 or not 1 <= args.iterations <= 100:
         parser.error("Use an even number of at least two pairs and 1...100 iterations")
     if KYOTO.exists() and not args.queued:
@@ -332,7 +351,8 @@ def main():
         parser.error("Output must be new or empty; existing evidence is never overwritten")
     run = Run(output)
     summary = dict(status="running", baseline=BASELINE, mode=args.mode, tests=[], workloads=[],
-        measurement_scope="changed mutation + production writer flush + real UserDefaults.set; not fsync",
+        measurement_scope=("none; current-source regression" if args.regression else
+                           "changed mutation + production writer flush + real UserDefaults.set; not fsync"),
         unqualified=["isolated encoder CPU", "disk durability", "whole-player RSS", "playback frame rate"])
     manifest = dict(baseline=BASELINE, platform=platform.platform(), machine=platform.machine(),
         python_version=platform.python_version(), cpu_count=os.cpu_count(),
@@ -346,7 +366,8 @@ def main():
         manifest["swift_version"] = run.command([swift, "--version"], label="swift-version")
         manifest["head"] = run.command(["git", "rev-parse", "HEAD"], label="head")
         manifest["worktree_status"] = run.command(["git", "status", "--short"], label="status")
-        sources = snapshot_sources(run, manifest)
+        manifest["source_policy"] = "current-support-historical-store" if args.regression else "strict-historical"
+        sources = snapshot_sources(run, manifest, args.regression)
         save(output / "manifest.json", manifest)
         save(output / "summary.json", summary)
         if args.mode in ["all", "tests"]:

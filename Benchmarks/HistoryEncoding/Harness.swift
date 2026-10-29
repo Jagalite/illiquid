@@ -146,7 +146,8 @@ private func verifyRestore(_ store: PlaybackPersistenceStore, count: Int, profil
 private struct Main {
     static func main() throws {
         let arguments = CommandLine.arguments
-        guard arguments.count == 5, let count = Int(arguments[1]), count >= 0,
+        let measure = arguments.count == 5
+        guard (arguments.count == 5 || (arguments.count == 6 && arguments[5] == "--no-measurement")), let count = Int(arguments[1]), count >= 0,
               let iterations = Int(arguments[3]), iterations > 0 else {
             fatalError("usage: history-encoding COUNT PROFILE ITERATIONS PAYLOAD_PATH")
         }
@@ -173,9 +174,9 @@ private struct Main {
         var elapsed: [UInt64] = []
         elapsed.reserveCapacity(iterations)
         for iteration in warmupIterations..<(warmupIterations + iterations) {
-            let before = DispatchTime.now().uptimeNanoseconds
+            let before = measure ? DispatchTime.now().uptimeNanoseconds : 0
             update(iteration)
-            elapsed.append(DispatchTime.now().uptimeNanoseconds - before)
+            if measure { elapsed.append(DispatchTime.now().uptimeNanoseconds - before) }
         }
         let sizes = defaults.recordedSizes()
         precondition(sizes.count == iterations, "each changed update must flush one history callback")
@@ -185,13 +186,15 @@ private struct Main {
         verifyRestore(restored, count: count, profile: profile,
                       finalPosition: Double(100 + warmupIterations + iterations - 1))
         try data.write(to: URL(fileURLWithPath: arguments[4]), options: .atomic)
-        let receipt: [String: Any] = [
+        var receipt: [String: Any] = [
             "count": count, "profile": profile, "iterations": iterations,
-            "warmup_iterations": warmupIterations, "mutation_flush_ns": elapsed,
+            "warmup_iterations": warmupIterations,
             "writes": sizes.count, "write_payload_bytes": sizes,
             "final_payload_bytes": data.count, "restored_entries_checked": count,
             "scope": "changed mutation + production writer flush + real UserDefaults.set; not fsync"
         ]
+        if measure { receipt["mutation_flush_ns"] = elapsed }
+        else { receipt["scope"] = "none; current-source regression" }
         print(String(decoding: try JSONSerialization.data(withJSONObject: receipt, options: [.sortedKeys]),
                      as: UTF8.self))
     }

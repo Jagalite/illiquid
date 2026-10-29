@@ -3,11 +3,12 @@ name: History encoding performance
 on:
   pull_request:
     paths:
-      - 'Sources/IlliquidCore/Persistence/**'
+      - 'Sources/IlliquidCore/**'
       - 'Tests/IlliquidCoreTests/*Persistence*.swift'
       - 'Tests/IlliquidCoreTests/HistoryEncodingTests.swift'
       - 'Benchmarks/HistoryEncoding/Harness.swift'
       - 'Benchmarks/HistoryEncoding/run.py'
+      - 'Benchmarks/HistoryEncoding/test_policy.py'
       - '.github/workflows/history-encoding.yml'
   workflow_dispatch:
 
@@ -31,7 +32,12 @@ jobs:
           fetch-depth: 0
       - name: Test history compatibility and measure complete writes
         run: |
-          python3 Benchmarks/HistoryEncoding/run.py \
+          python3 -m unittest discover -s Benchmarks/HistoryEncoding -p test_policy.py
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = pull_request; then
+            mode+=(--regression)
+          fi
+          python3 Benchmarks/HistoryEncoding/run.py "${mode[@]}" \
             --output "$RUNNER_TEMP/history-encoding"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
