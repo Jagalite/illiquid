@@ -90,6 +90,32 @@ copied production source, all raw observations, paired differences and ranges.
 The workflow also preserves debug/release test logs. Compact machine-readable
 evidence is printed in CI logs as well as uploaded as an artifact.
 
+## macOS validation results
+
+**Validated:** [push run 40772562248](https://github.com/Jagalite/illiquid/actions/runs/40772562248), [job 123113329840](https://github.com/Jagalite/illiquid/actions/runs/40772562248/job/123113329840), and [raw workflow artifact](https://github.com/Jagalite/illiquid/actions/runs/40772562248/artifacts/12869996606). **Exact candidate tested:** `ea2a78ebd5fdfff09f251dc2e4a61e2209246c0e`; **frozen baseline:** `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`. The evidence-only follow-up commit does not change tested implementation or harness code. The [durable parsed receipts](evidence/macos/run-40772562248/) include all 84 observations, paired differences, summary/ranges, source and executable hashes, environment, verification, test logs and command outcomes.
+
+On GitHub-hosted `macos-26` ARM64 (macOS 26.6.2, Xcode 26.6, Apple Swift 6.3.3; macOS 26.5 SDK), **debug and release each passed 80 tests in 11 suites** using Swift 6 and warnings as errors. The isolated full production-monitor tests include real FSEvents delivery, mailbox races/concurrent producers, stop/restart/deinit, overflow and planner behavior. The benchmark compiled baseline and candidate production sources with the same hashed `Driver.swift`; hashes of staged production code matched their pinned Git revisions, and the runner/driver/heap/test script SHA-256 matched the candidate revision. All 84 fresh-process observations (six balanced pairs × seven workloads) verified, including original event path/flag/order and planner semantics within capacity, all-root recovery on overflow, and **identical downstream semantics across both variants** for each workload.
+
+**Held allocator growth in MiB** (signed `malloc_zone_statistics(NULL).size_in_use` after warmed startup, measured before the stalled main actor resumes). Each value is **median (minimum to maximum)** over six runs per variant or six paired baseline-minus-candidate differences:
+
+| Workload | Baseline growth MiB | Candidate growth MiB | Paired savings MiB | Handler deliveries, baseline → candidate |
+| --- | ---: | ---: | ---: | ---: |
+| `single` (1, batches of 1) | 0.002 (0.002 to 0.006) | 0.002 (0.002 to 0.006) | 0.000 (-0.004 to 0.004) | 1 → 1 |
+| `small-32` (32, batches of 1) | 0.053 (0.049 to 0.053) | 0.008 (0.008 to 0.012) | 0.043 (0.041 to 0.045) | 32 → 1 |
+| `boundary-4096` (4,096, batches of 128) | 0.904 (0.793 to 0.975) | 0.876 (0.832 to 0.956) | 0.028 (-0.083 to 0.130) | 32 → 1 |
+| `overflow-4097` (4,097, batches of 128) | 0.884 (0.861 to 0.910) | 0.001 (-0.043 to 0.005) | 0.905 (0.860 to 0.905) | 33 → 1 |
+| `storm-100k` (100,000, batches of 128) | 22.122 (22.085 to 22.152) | 0.036 (-0.064 to 0.064) | 22.094 (22.041 to 22.149) | 782 → 1 |
+| `storm-100k-small-batches` (100,000, batches of 16) | 29.785 (29.727 to 29.828) | 0.055 (-0.014 to 0.079) | 29.748 (29.648 to 29.835) | 6250 → 1 |
+| `oversized-callback` (100,000, batches of 100,000) | 20.683 (20.622 to 20.683) | 0.064 (0.044 to 0.079) | 20.619 (20.542 to 20.622) | 1 → 1 |
+
+For the two multi-callback 100,000-event stresses, baseline median growth was **23,196,176 bytes** (128-event batches) and **31,231,944 bytes** (16-event batches), versus **37,472** and **57,432 bytes** for the mailbox. Median *paired* reductions were **23,166,888** and **31,193,344 bytes** (22.094 and 29.748 MiB); every pair showed a reduction above 22.0 and 29.6 MiB, respectively. In the oversized single-callback case, baseline was **21,687,200 bytes** versus **66,992 bytes**, paired median savings **21,620,208 bytes** (20.619 MiB). Delivery counts dropped from **782 → 1** and **6,250 → 1** for the multi-batch stresses, and remained **1 → 1** for the oversized callback.
+
+Controls and unfavorable differences are not omitted: the one-event paired median was **0 bytes**, with individual paired differences from **−4,096 to +4,112 bytes**; at exactly 4,096 events, the paired median was only **29,248 bytes** and the range included an **87,472-byte regression**. The 4,097-event overflow control had a **948,480-byte** median paired reduction, with the same all-root rescan outcome. Some signed candidate deltas in overflow/stress cases were negative because allocator state can shrink between samples. After-drain and after-stop growth measurements (including adverse results) are recorded verbatim in the summary and observations, not interpreted as isolated freed-task memory.
+
+These results establish **bounded retained callback-task backlog under a synthetically stalled main actor**, not a bound on the peak memory of a native callback: native FSEvents conversion and its temporary path arrays are unchanged. Fixed mailbox startup allocation is excluded from the before-to-held growth measurement; this is not a complete per-monitor footprint, RSS, physical footprint, whole-player memory, throughput or latency result. One executing handler batch and one pending batch can coexist. Exceeding 4,096 queued events conservatively rescans all roots and may increase real filesystem work. The test was run once on one hosted runner image, with six balanced process pairs per case; other hardware, real workloads, and user-visible behavior remain unmeasured.
+
+**Correction history:** [initial run 40634300332](https://github.com/Jagalite/illiquid/actions/runs/40634300332) rejected an immutable `weak var` test declaration with warnings-as-errors (corrected to `weak let`); an intermediate superseded run was cancelled; [run 40634770813](https://github.com/Jagalite/illiquid/actions/runs/40634770813) passed both test configurations but could not compile the benchmark due to missing Swift `-sdk`; [run 40642036115](https://github.com/Jagalite/illiquid/actions/runs/40642036115) also passed both suites but could not compile `Heap.c` without Clang `-isysroot`. Those unsuccessful receipts remain in `evidence/`; **none produced benchmark measurements**. Both SDK fixes are included in the successful exact tested revision above. The hosted runner did not have the shared Kyoto queue, so its isolated builds ran directly, serially, as specified by the workflow.
+
 ## Tradeoffs and scope
 
 - Coalescing changes handler batch boundaries. The sole product consumer appends

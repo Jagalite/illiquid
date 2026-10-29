@@ -1,0 +1,325 @@
+Building for debugging...
+[0/8] Write sources
+[1/8] /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-filesystem-handoff.7oqBrE/.build/arm64-apple-macosx/debug/FilesystemHandoffPackageTests.derived/runner.swift
+[4/8] Write sources
+[5/8] Write swift-version-7974D3F7F03D5E95.txt
+[7/10] Emitting module IlliquidCore
+[8/10] Compiling IlliquidCore LifecyclePerformance.swift
+[9/13] Emitting module IlliquidApp
+[10/13] Compiling IlliquidApp SourceFilesystemEventMailbox.swift
+[11/13] Compiling IlliquidApp SourceFilesystemInvalidation.swift
+[12/15] Compiling IlliquidApp SourceFilesystemMonitor.swift
+[13/15] Compiling IlliquidApp SourceVolumeChangePolicy.swift
+[14/21] Emitting module IlliquidAppTests
+[15/21] Compiling IlliquidAppTests SourceFilesystemEventBufferTests.swift
+[16/21] Compiling IlliquidAppTests SourceFilesystemEventLossTests.swift
+[17/21] Compiling IlliquidAppTests SourceFilesystemEventMailboxTests.swift
+[18/21] Compiling IlliquidAppTests SourceFilesystemHandoffTests.swift
+[19/21] Compiling IlliquidAppTests SourceFilesystemLifecycleTests.swift
+[20/25] Compiling IlliquidAppTests SourceFilesystemMonitorTests.swift
+[21/25] Compiling IlliquidAppTests SourceFilesystemPlanningTests.swift
+[22/25] Compiling IlliquidAppTests SourceFilesystemRootRegressionTests.swift
+[23/25] Compiling IlliquidAppTests SourceVolumeChangePolicyTests.swift
+[24/27] Compiling FilesystemHandoffPackageTests runner.swift
+[25/27] Emitting module FilesystemHandoffPackageTests
+[25/27] Write Objects.LinkFileList
+[26/27] Linking FilesystemHandoffPackageTests
+Build complete! (24.07s)
+Test Suite 'All tests' started at 2026-10-29 03:04:11.083.
+Test Suite 'All tests' passed at 2026-10-29 03:04:11.086.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Bounded source filesystem event retention" started.
+◇ Test emptyInputAndRepeatedDrainsProduceNoWork() started.
+✔ Test emptyInputAndRepeatedDrainsProduceNoWork() passed after 0.001 seconds.
+◇ Test defaultCapacityPreservesExactly4096EventsInArrivalOrder() started.
+✔ Test defaultCapacityPreservesExactly4096EventsInArrivalOrder() passed after 0.004 seconds.
+◇ Test firstEventBeyondDefaultCapacityRequestsRecovery() started.
+✔ Test firstEventBeyondDefaultCapacityRequestsRecovery() passed after 0.003 seconds.
+◇ Test overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 1, singleCallback → false to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 1, singleCallback → true to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 2, singleCallback → false to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 2, singleCallback → true to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 7, singleCallback → false to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 7, singleCallback → true to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 31, singleCallback → false to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+◇ Test case passing 2 arguments capacity → 31, singleCallback → true to overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) started.
+✔ Test overflowAcrossCallbacksAndWithinOneCallbackRequestsRecovery(_:_:) with 8 test cases passed after 0.001 seconds.
+◇ Test reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 0, flags → Flags(rawValue: 32) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 0, flags → Flags(rawValue: 49) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 1, flags → Flags(rawValue: 32) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 1, flags → Flags(rawValue: 49) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 3, flags → Flags(rawValue: 32) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+◇ Test case passing 2 arguments markerIndex → 3, flags → Flags(rawValue: 49) to reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) started.
+✔ Test reportedLossSupersedesDetailedEventsInAnyPosition(_:_:) with 6 test cases passed after 0.001 seconds.
+◇ Test sustainedOverflowStaysCollapsedUntilTaken() started.
+✔ Test sustainedOverflowStaysCollapsedUntilTaken() passed after 0.006 seconds.
+◇ Test clearingForWatcherRestartOrDisappearanceRestoresOrdinaryAdmission(_:) started.
+◇ Test case passing 1 argument overflowed → false to clearingForWatcherRestartOrDisappearanceRestoresOrdinaryAdmission(_:) started.
+◇ Test case passing 1 argument overflowed → true to clearingForWatcherRestartOrDisappearanceRestoresOrdinaryAdmission(_:) started.
+✔ Test clearingForWatcherRestartOrDisappearanceRestoresOrdinaryAdmission(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test takenBatchAndCopiedBufferRemainIndependentOfLaterMutation() started.
+✔ Test takenBatchAndCopiedBufferRemainIndependentOfLaterMutation() passed after 0.001 seconds.
+◇ Test nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+◇ Test case passing 1 argument requestedCapacity → -9223372036854775808 to nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+◇ Test case passing 1 argument requestedCapacity → -1 to nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+◇ Test case passing 1 argument requestedCapacity → 0 to nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+◇ Test case passing 1 argument requestedCapacity → 1 to nonpositiveLimitsAreSafelyClampedToOne(_:) started.
+✔ Test nonpositiveLimitsAreSafelyClampedToOne(_:) with 4 test cases passed after 0.001 seconds.
+◇ Test maximumIntegerLimitDoesNotOverflowOrAllocateUpFront() started.
+✔ Test maximumIntegerLimitDoesNotOverflowOrAllocateUpFront() passed after 0.001 seconds.
+◇ Test overflowUsesCurrentNormalizedRootsAndNoRootsMeansNoWork() started.
+✔ Test overflowUsesCurrentNormalizedRootsAndNoRootsMeansNoWork() passed after 0.001 seconds.
+◇ Test generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+◇ Test case passing 1 argument seed → 1 to generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+◇ Test case passing 1 argument seed → 42 to generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+◇ Test case passing 1 argument seed → 1311768467463790320 to generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+◇ Test case passing 1 argument seed → 3735928559 to generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) started.
+✔ Test generatedBatchesBelowCapacityPreserveEventsAndPlannerResults(_:) with 4 test cases passed after 0.215 seconds.
+◇ Test generatedOverflowNeverLosesRecoveryAndStaysWithinItsBound(_:) started.
+◇ Test case passing 1 argument seed → 7 to generatedOverflowNeverLosesRecoveryAndStaysWithinItsBound(_:) started.
+◇ Test case passing 1 argument seed → 4277009102 to generatedOverflowNeverLosesRecoveryAndStaysWithinItsBound(_:) started.
+✔ Test generatedOverflowNeverLosesRecoveryAndStaysWithinItsBound(_:) with 2 test cases passed after 0.033 seconds.
+✔ Suite "Bounded source filesystem event retention" passed after 0.266 seconds.
+◇ Suite "Source filesystem event-loss recovery" started.
+◇ Test droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/movies/Movie.mkv", flags → Flags(rawValue: 32) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/movies/Movie.mkv", flags → Flags(rawValue: 48) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/media", flags → Flags(rawValue: 32) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/media", flags → Flags(rawValue: 48) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/outside/watched/roots", flags → Flags(rawValue: 32) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/outside/watched/roots", flags → Flags(rawValue: 48) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/", flags → Flags(rawValue: 32) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+◇ Test case passing 2 arguments path → "/", flags → Flags(rawValue: 48) to droppedEventsRescanEveryWatchedRoot(_:_:) started.
+✔ Test droppedEventsRescanEveryWatchedRoot(_:_:) with 8 test cases passed after 0.001 seconds.
+◇ Test eventLossSupersedesTargetedWorkRegardlessOfOrder(_:) started.
+◇ Test case passing 1 argument lossFirst → false to eventLossSupersedesTargetedWorkRegardlessOfOrder(_:) started.
+◇ Test case passing 1 argument lossFirst → true to eventLossSupersedesTargetedWorkRegardlessOfOrder(_:) started.
+✔ Test eventLossSupersedesTargetedWorkRegardlessOfOrder(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test eventLossWithNoWatchedRootsProducesNoWork() started.
+✔ Test eventLossWithNoWatchedRootsProducesNoWork() passed after 0.001 seconds.
+◇ Test pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 16) to pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 128) to pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 64) to pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) started.
+✔ Test pathLocalRecoveryStaysLocalWithoutDroppedEvents(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 2) to ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 4) to ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 8) to ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 9) to ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) started.
+✔ Test ordinaryEventsForOldRootsDoNotAffectReplacementRoots(_:) with 4 test cases passed after 0.001 seconds.
+◇ Test similarPathPrefixesAreNotDescendants(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 2) to similarPathPrefixesAreNotDescendants(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 16) to similarPathPrefixesAreNotDescendants(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 128) to similarPathPrefixesAreNotDescendants(_:) started.
+✔ Test similarPathPrefixesAreNotDescendants(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test eventLossDeduplicatesNormalizedRoots() started.
+✔ Test eventLossDeduplicatesNormalizedRoots() passed after 0.001 seconds.
+✔ Suite "Source filesystem event-loss recovery" passed after 0.002 seconds.
+◇ Suite "Source filesystem event handoff" started.
+◇ Test ordinaryBatchesKeepOrderAndScheduleOnlyOneDelivery() started.
+✔ Test ordinaryBatchesKeepOrderAndScheduleOnlyOneDelivery() passed after 0.001 seconds.
+◇ Test overflowAndNativeLossRecoverEveryRootThenAcceptOrdinaryEvents(_:) started.
+◇ Test case passing 1 argument nativeLoss → false to overflowAndNativeLossRecoverEveryRootThenAcceptOrdinaryEvents(_:) started.
+◇ Test case passing 1 argument nativeLoss → true to overflowAndNativeLossRecoverEveryRootThenAcceptOrdinaryEvents(_:) started.
+✔ Test overflowAndNativeLossRecoverEveryRootThenAcceptOrdinaryEvents(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test oversizedFirstCallbackSchedulesExactlyOneRecovery() started.
+✔ Test oversizedFirstCallbackSchedulesExactlyOneRecovery() passed after 0.001 seconds.
+◇ Test stoppingDiscardsPendingWorkAndPermanentlyRejectsAdmission() started.
+✔ Test stoppingDiscardsPendingWorkAndPermanentlyRejectsAdmission() passed after 0.001 seconds.
+◇ Test concurrentProducersKeepEveryEventWithOnePendingDelivery() started.
+✔ Test concurrentProducersKeepEveryEventWithOnePendingDelivery() passed after 0.002 seconds.
+◇ Test racingTakeAndEnqueueNeverLoseAnEventOrItsWakeup() started.
+✔ Test racingTakeAndEnqueueNeverLoseAnEventOrItsWakeup() passed after 0.003 seconds.
+✔ Suite "Source filesystem event handoff" passed after 0.006 seconds.
+◇ Suite "Filesystem worker-to-main-actor handoff" started.
+◇ Test stalledActorReceivesOneOrderedBatchAndCanBeRearmed() started.
+✔ Test stalledActorReceivesOneOrderedBatchAndCanBeRearmed() passed after 0.032 seconds.
+◇ Test stalledActorOverflowRecoversEveryWatchedRoot() started.
+✔ Test stalledActorOverflowRecoversEveryWatchedRoot() passed after 0.106 seconds.
+◇ Test restartWhileDeliveryIsQueuedRejectsOldEvents() started.
+✔ Test restartWhileDeliveryIsQueuedRejectsOldEvents() passed after 0.028 seconds.
+◇ Test queuedDeliveryDoesNotKeepMonitorAlive() started.
+✔ Test queuedDeliveryDoesNotKeepMonitorAlive() passed after 0.005 seconds.
+✔ Suite "Filesystem worker-to-main-actor handoff" passed after 0.173 seconds.
+◇ Suite "Filesystem watcher lifecycle" started.
+◇ Test blockedCreationDoesNotBlockUIAndRestartDropsObsoleteStream() started.
+✔ Test blockedCreationDoesNotBlockUIAndRestartDropsObsoleteStream() passed after 0.003 seconds.
+◇ Test stopRejectsAlreadyQueuedMainActorDelivery() started.
+✔ Test stopRejectsAlreadyQueuedMainActorDelivery() passed after 0.001 seconds.
+◇ Test startupReconcilesChangesAfterInitialSnapshotForEveryRoot() started.
+✔ Test startupReconcilesChangesAfterInitialSnapshotForEveryRoot() passed after 0.003 seconds.
+◇ Test failedCreationDoesNotReportReadiness() started.
+✔ Test failedCreationDoesNotReportReadiness() passed after 0.001 seconds.
+◇ Test stopRejectsAlreadyQueuedReadiness() started.
+✔ Test stopRejectsAlreadyQueuedReadiness() passed after 0.001 seconds.
+◇ Test nativeStreamDeliversEventsAfterAsynchronousStartup() started.
+✔ Test nativeStreamDeliversEventsAfterAsynchronousStartup() passed after 0.055 seconds.
+◇ Test releasingMonitorStopsItsNativeStream() started.
+✔ Test releasingMonitorStopsItsNativeStream() passed after 0.001 seconds.
+✔ Suite "Filesystem watcher lifecycle" passed after 0.066 seconds.
+◇ Suite "Source filesystem synchronization" started.
+◇ Test volumeChangeInvalidatesNestedRootsButNotSiblingVolumes() started.
+✔ Test volumeChangeInvalidatesNestedRootsButNotSiblingVolumes() passed after 0.001 seconds.
+◇ Test createdFileReloadsItsContainingDirectory() started.
+✔ Test createdFileReloadsItsContainingDirectory() passed after 0.001 seconds.
+◇ Test fileContentAndMetadataChangesDoNotReloadTheListing() started.
+✔ Test fileContentAndMetadataChangesDoNotReloadTheListing() passed after 0.001 seconds.
+◇ Test sidecarContentWritesReloadTheirDirectory(_:) started.
+◇ Test case passing 1 argument name → ".plexmatch" to sidecarContentWritesReloadTheirDirectory(_:) started.
+◇ Test case passing 1 argument name → "tvshow.nfo" to sidecarContentWritesReloadTheirDirectory(_:) started.
+◇ Test case passing 1 argument name → "movie.nfo" to sidecarContentWritesReloadTheirDirectory(_:) started.
+◇ Test case passing 1 argument name → "Episode.NFO" to sidecarContentWritesReloadTheirDirectory(_:) started.
+✔ Test sidecarContentWritesReloadTheirDirectory(_:) with 4 test cases passed after 0.001 seconds.
+◇ Test createdDirectoryReloadsItsParent() started.
+✔ Test createdDirectoryReloadsItsParent() passed after 0.001 seconds.
+◇ Test removedDirectoryDropsItsSubtreeAndReloadsItsParent() started.
+✔ Test removedDirectoryDropsItsSubtreeAndReloadsItsParent() passed after 0.001 seconds.
+◇ Test removedRootIsReloadedSoUnavailableStateCanAppear() started.
+✔ Test removedRootIsReloadedSoUnavailableStateCanAppear() passed after 0.001 seconds.
+◇ Test droppedEventRescansEveryMatchingRoot() started.
+✔ Test droppedEventRescansEveryMatchingRoot() passed after 0.001 seconds.
+◇ Test changesOutsideSourceRootsAreIgnored() started.
+✔ Test changesOutsideSourceRootsAreIgnored() passed after 0.001 seconds.
+◇ Test activeRootImpactIncludesAncestorRescans() started.
+✔ Test activeRootImpactIncludesAncestorRescans() passed after 0.001 seconds.
+✔ Suite "Source filesystem synchronization" passed after 0.001 seconds.
+◇ Suite "Source filesystem planning path semantics" started.
+◇ Test normalizesRelativeRootsAndEventDotSegmentsBeforeMatching() started.
+✔ Test normalizesRelativeRootsAndEventDotSegmentsBeforeMatching() passed after 0.001 seconds.
+◇ Test normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/library/Season 2/", flags → Flags(rawValue: 5) to normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/library/Season 2/", flags → Flags(rawValue: 9) to normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/library/Season 2/", flags → Flags(rawValue: 15) to normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/library/Season 2/.", flags → Flags(rawValue: 5) to normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/library/Season 2/.", flags → Flags(rawValue: 9) to normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/library/Season 2/.", flags → Flags(rawValue: 15) to normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/library/Old/../Season 2", flags → Flags(rawValue: 5) to normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/library/Old/../Season 2", flags → Flags(rawValue: 9) to normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+◇ Test case passing 2 arguments path → "/media/library/Old/../Season 2", flags → Flags(rawValue: 15) to normalizedDirectoryRemovalStillReloadsItsParent(_:_:) started.
+✔ Test normalizedDirectoryRemovalStillReloadsItsParent(_:_:) with 9 test cases passed after 0.001 seconds.
+◇ Test normalizedRootRemovalCannotReloadAnUnwatchedParent(_:) started.
+◇ Test case passing 1 argument path → "/media/library/" to normalizedRootRemovalCannotReloadAnUnwatchedParent(_:) started.
+◇ Test case passing 1 argument path → "/media/library/." to normalizedRootRemovalCannotReloadAnUnwatchedParent(_:) started.
+✔ Test normalizedRootRemovalCannotReloadAnUnwatchedParent(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test eventPathsRemainLiteralFilesystemNames(_:) started.
+◇ Test case passing 1 argument folder → "100% Movies" to eventPathsRemainLiteralFilesystemNames(_:) started.
+◇ Test case passing 1 argument folder → "literal%2Fname" to eventPathsRemainLiteralFilesystemNames(_:) started.
+◇ Test case passing 1 argument folder → "what?now#again" to eventPathsRemainLiteralFilesystemNames(_:) started.
+◇ Test case passing 1 argument folder → "映画 Café" to eventPathsRemainLiteralFilesystemNames(_:) started.
+◇ Test case passing 1 argument folder → "Café" to eventPathsRemainLiteralFilesystemNames(_:) started.
+✔ Test eventPathsRemainLiteralFilesystemNames(_:) with 5 test cases passed after 0.001 seconds.
+◇ Test metadataWritesClassifyTheNormalizedFilename(_:) started.
+◇ Test case passing 1 argument name → "映画.nFo" to metadataWritesClassifyTheNormalizedFilename(_:) started.
+◇ Test case passing 1 argument name → "Café.NFO" to metadataWritesClassifyTheNormalizedFilename(_:) started.
+◇ Test case passing 1 argument name → ".plexmatch" to metadataWritesClassifyTheNormalizedFilename(_:) started.
+◇ Test case passing 1 argument name → ".plexmatch/" to metadataWritesClassifyTheNormalizedFilename(_:) started.
+◇ Test case passing 1 argument name → "tvshow.NFO/." to metadataWritesClassifyTheNormalizedFilename(_:) started.
+✔ Test metadataWritesClassifyTheNormalizedFilename(_:) with 5 test cases passed after 0.001 seconds.
+◇ Test metadataLookalikesDoNotTriggerContentOnlyReloads(_:) started.
+◇ Test case passing 1 argument name → ".PLEXMATCH" to metadataLookalikesDoNotTriggerContentOnlyReloads(_:) started.
+◇ Test case passing 1 argument name → "x.plexmatch" to metadataLookalikesDoNotTriggerContentOnlyReloads(_:) started.
+◇ Test case passing 1 argument name → "episode.nfo.bak" to metadataLookalikesDoNotTriggerContentOnlyReloads(_:) started.
+◇ Test case passing 1 argument name → "episode.ＮＦＯ" to metadataLookalikesDoNotTriggerContentOnlyReloads(_:) started.
+◇ Test case passing 1 argument name → "episode.nfο" to metadataLookalikesDoNotTriggerContentOnlyReloads(_:) started.
+◇ Test case passing 1 argument name → "episode%2Enfo" to metadataLookalikesDoNotTriggerContentOnlyReloads(_:) started.
+✔ Test metadataLookalikesDoNotTriggerContentOnlyReloads(_:) with 6 test cases passed after 0.001 seconds.
+◇ Test structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "plain.mkv", flags → Flags(rawValue: 2) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "plain.mkv", flags → Flags(rawValue: 4) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "plain.mkv", flags → Flags(rawValue: 8) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "plain.mkv", flags → Flags(rawValue: 14) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → ".plexmatch", flags → Flags(rawValue: 2) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → ".plexmatch", flags → Flags(rawValue: 4) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → ".plexmatch", flags → Flags(rawValue: 8) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → ".plexmatch", flags → Flags(rawValue: 14) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "episode.NFO", flags → Flags(rawValue: 2) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "episode.NFO", flags → Flags(rawValue: 4) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "episode.NFO", flags → Flags(rawValue: 8) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "episode.NFO", flags → Flags(rawValue: 14) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "episode.ＮＦＯ", flags → Flags(rawValue: 2) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "episode.ＮＦＯ", flags → Flags(rawValue: 4) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "episode.ＮＦＯ", flags → Flags(rawValue: 8) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+◇ Test case passing 2 arguments name → "episode.ＮＦＯ", flags → Flags(rawValue: 14) to structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) started.
+✔ Test structuralFileEventsReloadRegardlessOfMetadataClassification(_:_:) with 16 test cases passed after 0.001 seconds.
+◇ Test existingDirectoriesDoNotOverrideTheEventFlagsOrMetadataNamePolicy() started.
+✔ Test existingDirectoriesDoNotOverrideTheEventFlagsOrMetadataNamePolicy() passed after 0.003 seconds.
+◇ Test combinedLocalRecoveryFlagsSupersedeOnlyTheirMatchingRoots() started.
+✔ Test combinedLocalRecoveryFlagsSupersedeOnlyTheirMatchingRoots() passed after 0.001 seconds.
+◇ Test normalizedSiblingAndAncestorPrefixesStayOutsideTheSource() started.
+✔ Test normalizedSiblingAndAncestorPrefixesStayOutsideTheSource() passed after 0.001 seconds.
+✔ Suite "Source filesystem planning path semantics" passed after 0.008 seconds.
+◇ Suite "Source filesystem root boundaries" started.
+◇ Test fileChangesBelowFilesystemRootReloadTheirParent(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 2) to fileChangesBelowFilesystemRootReloadTheirParent(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 4) to fileChangesBelowFilesystemRootReloadTheirParent(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 8) to fileChangesBelowFilesystemRootReloadTheirParent(_:) started.
+✔ Test fileChangesBelowFilesystemRootReloadTheirParent(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test ancestorRescanAtFilesystemRootReachesEverySource(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 16) to ancestorRescanAtFilesystemRootReachesEverySource(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 32) to ancestorRescanAtFilesystemRootReachesEverySource(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 64) to ancestorRescanAtFilesystemRootReachesEverySource(_:) started.
+◇ Test case passing 1 argument flags → Flags(rawValue: 128) to ancestorRescanAtFilesystemRootReachesEverySource(_:) started.
+✔ Test ancestorRescanAtFilesystemRootReachesEverySource(_:) with 4 test cases passed after 0.001 seconds.
+◇ Test removedDirectoryBelowFilesystemRootInvalidatesItsTree() started.
+✔ Test removedDirectoryBelowFilesystemRootInvalidatesItsTree() passed after 0.001 seconds.
+◇ Test metadataWritesBelowFilesystemRootReloadTheirParent(_:) started.
+◇ Test case passing 1 argument name → ".plexmatch" to metadataWritesBelowFilesystemRootReloadTheirParent(_:) started.
+◇ Test case passing 1 argument name → "movie.nfo" to metadataWritesBelowFilesystemRootReloadTheirParent(_:) started.
+◇ Test case passing 1 argument name → "Episode.NFO" to metadataWritesBelowFilesystemRootReloadTheirParent(_:) started.
+✔ Test metadataWritesBelowFilesystemRootReloadTheirParent(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test filesystemRootRescanSubsumesNarrowerInvalidationsInEitherEventOrder() started.
+✔ Test filesystemRootRescanSubsumesNarrowerInvalidationsInEitherEventOrder() passed after 0.001 seconds.
+◇ Test impactDetectionHandlesFilesystemRootInBothDirections() started.
+✔ Test impactDetectionHandlesFilesystemRootInBothDirections() passed after 0.001 seconds.
+◇ Test containmentStillRespectsSiblingPathComponents() started.
+✔ Test containmentStillRespectsSiblingPathComponents() passed after 0.001 seconds.
+◇ Test lexicalNormalizationAndUnrelatedContentWritesKeepTheirPolicy() started.
+✔ Test lexicalNormalizationAndUnrelatedContentWritesKeepTheirPolicy() passed after 0.001 seconds.
+✔ Suite "Source filesystem root boundaries" passed after 0.001 seconds.
+◇ Suite "Source filesystem containment invariants" started.
+◇ Test translatingAnAbsoluteTreePreservesPlans() started.
+✔ Test translatingAnAbsoluteTreePreservesPlans() passed after 0.079 seconds.
+◇ Test impactMatchesAPathComponentOracle() started.
+✔ Test impactMatchesAPathComponentOracle() passed after 0.001 seconds.
+✔ Suite "Source filesystem containment invariants" passed after 0.080 seconds.
+◇ Suite "Source volume notification boundaries" started.
+◇ Test exactAndDescendantSourcesRemainAffected() started.
+✔ Test exactAndDescendantSourcesRemainAffected() passed after 0.001 seconds.
+◇ Test sourceContainingMountPointIsAffected() started.
+✔ Test sourceContainingMountPointIsAffected() passed after 0.001 seconds.
+◇ Test filesystemRootSourceContainsMountPoint() started.
+✔ Test filesystemRootSourceContainsMountPoint() passed after 0.001 seconds.
+◇ Test siblingPrefixesRemainUnrelated() started.
+✔ Test siblingPrefixesRemainUnrelated() passed after 0.001 seconds.
+◇ Test affectedRootsPreserveOriginalOrder() started.
+✔ Test affectedRootsPreserveOriginalOrder() passed after 0.001 seconds.
+◇ Test emptyWatchListRemainsEmpty() started.
+✔ Test emptyWatchListRemainsEmpty() passed after 0.001 seconds.
+◇ Test rootVolumeChangeIncludesEverySource() started.
+✔ Test rootVolumeChangeIncludesEverySource() passed after 0.001 seconds.
+◇ Test nonexistentPathsAndDotSegmentsNeedNoFilesystemResolution() started.
+✔ Test nonexistentPathsAndDotSegmentsNeedNoFilesystemResolution() passed after 0.001 seconds.
+◇ Test unicodeAndSpacePathsKeepComponentBoundaries() started.
+✔ Test unicodeAndSpacePathsKeepComponentBoundaries() passed after 0.001 seconds.
+◇ Test filteringDoesNotRewriteOrDeduplicateRootURLs() started.
+✔ Test filteringDoesNotRewriteOrDeduplicateRootURLs() passed after 0.001 seconds.
+◇ Test normalizedPathMatrixMatchesComponentAncestry() started.
+✔ Test normalizedPathMatrixMatchesComponentAncestry() passed after 0.001 seconds.
+✔ Suite "Source volume notification boundaries" passed after 0.002 seconds.
+◇ Suite "Source volume notification invalidation" started.
+◇ Test affectedSourceProducesRootRescan(_:) started.
+◇ Test case passing 1 argument path → "/" to affectedSourceProducesRootRescan(_:) started.
+◇ Test case passing 1 argument path → "/Volumes" to affectedSourceProducesRootRescan(_:) started.
+◇ Test case passing 1 argument path → "/Volumes/Media" to affectedSourceProducesRootRescan(_:) started.
+◇ Test case passing 1 argument path → "/Volumes/Media/Movies" to affectedSourceProducesRootRescan(_:) started.
+✔ Test affectedSourceProducesRootRescan(_:) with 4 test cases passed after 0.001 seconds.
+◇ Test standaloneSiblingVolumeProducesNoInvalidation() started.
+✔ Test standaloneSiblingVolumeProducesNoInvalidation() passed after 0.001 seconds.
+✔ Suite "Source volume notification invalidation" passed after 0.001 seconds.
+✔ Test run with 80 tests in 11 suites passed after 0.611 seconds.

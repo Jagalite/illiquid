@@ -1,0 +1,85 @@
+{
+  "workflow": "Filesystem handoff memory",
+  "status": "completed",
+  "conclusion": "success",
+  "run_id": 40772562248,
+  "job_id": 123113329840,
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40772562248",
+  "artifact_url": "https://github.com/Jagalite/illiquid/actions/runs/40772562248/artifacts/12869996606",
+  "artifact_zip_sha256": "e1575ce6cd9b4fcda70b44bbb9bb46211a062c4b5e6bac1273c475ccd81a0d7b",
+  "tested_revision": "ea2a78ebd5fdfff09f251dc2e4a61e2209246c0e",
+  "frozen_baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "runner_image": "macos-26-arm64",
+  "runner_image_version": "20261021.0445.8",
+  "completed_at_utc": "2026-10-29T03:05:09Z",
+  "test_runs": {
+    "debug": {
+      "passed": 80,
+      "suites": 11,
+      "log": "tests-debug.log",
+      "status": "success"
+    },
+    "release": {
+      "passed": 80,
+      "suites": 11,
+      "log": "tests-release.log",
+      "status": "success"
+    }
+  },
+  "measurements": {
+    "observations": 84,
+    "workloads": 7,
+    "pairs_per_workload": 6,
+    "balanced_order": true,
+    "fresh_processes": 84,
+    "all_verified": true,
+    "semantics_equal_across_variants": true,
+    "overflow_rescans_all_roots": true,
+    "log": "measurements.log"
+  },
+  "data_from": "GitHub Actions job log JSON markers, cross-checked against workflow artifact and pinned GitHub repository content",
+  "commands": [
+    [
+      "bash",
+      "Scripts/test-filesystem-handoff.sh",
+      "--configuration",
+      "debug",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-swift-version",
+      "-Xswiftc",
+      "6"
+    ],
+    [
+      "bash",
+      "Scripts/test-filesystem-handoff.sh",
+      "--configuration",
+      "release",
+      "--jobs",
+      "2",
+      "-Xswiftc",
+      "-warnings-as-errors",
+      "-Xswiftc",
+      "-swift-version",
+      "-Xswiftc",
+      "6"
+    ],
+    [
+      "python3",
+      "Benchmarks/FilesystemHandoff/run.py",
+      "--pairs",
+      "6",
+      "--output",
+      "${EVIDENCE_ROOT}/results"
+    ]
+  ],
+  "command_return_codes": [
+    0,
+    0,
+    0
+  ],
+  "limitations": "Synthetic main-actor-stall backlogs; malloc_zone_statistics(NULL).size_in_use growth, not RSS, peak native callback conversion, physical footprint, whole-app RAM, or throughput/latency."
+}

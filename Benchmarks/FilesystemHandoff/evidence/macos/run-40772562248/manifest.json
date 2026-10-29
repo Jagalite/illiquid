@@ -1,0 +1,62 @@
+{
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidate_commit": "ea2a78ebd5fdfff09f251dc2e4a61e2209246c0e",
+  "cases": [
+    [
+      "single",
+      1,
+      1
+    ],
+    [
+      "small-32",
+      32,
+      1
+    ],
+    [
+      "boundary-4096",
+      4096,
+      128
+    ],
+    [
+      "overflow-4097",
+      4097,
+      128
+    ],
+    [
+      "storm-100k",
+      100000,
+      128
+    ],
+    [
+      "storm-100k-small-batches",
+      100000,
+      16
+    ],
+    [
+      "oversized-callback",
+      100000,
+      100000
+    ]
+  ],
+  "executable_sha256": {
+    "baseline": "67d11c4c5386f89c897a68a1f9cbac91a9a1033f168c00e1f5a32d242796e474",
+    "candidate": "0aedf20e0515556d73e672511393eb76e91106efe3fcab4bf5b82baad41b097b"
+  },
+  "metric": "malloc_zone_statistics(NULL).size_in_use; live allocator bytes, not RSS",
+  "pairs": 6,
+  "source_sha256": {
+    "Benchmarks/FilesystemHandoff/Driver.swift": "a2898b27b8b5a2623d73ed4e55e105351f361483c4f0f75dd3f0ed041dc6a3b6",
+    "Benchmarks/FilesystemHandoff/Heap.c": "ddf6f11612c29c42a1bcac4c33b894ac30470383ea5df23648bee689bf370755",
+    "Benchmarks/FilesystemHandoff/run.py": "a22b7557dda2fc92dd8c9c60bf1303af6739cfec5bc975874e9bc5ffca5abed5",
+    "Scripts/test-filesystem-handoff.sh": "fb5c8f50630abe2fd7265ac6690e0f525b282584832dd60a9d5485f3267fe32b",
+    "sources/baseline/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift": "a47c4b70e6953687c0d1cbca39272959881a19e082028a5fb63d656f2e71c770",
+    "sources/baseline/Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift": "bbf89b4ac3644399cb965a62d4d95ed6c444b4b4942a87e7c93609ed68d194d1",
+    "sources/baseline/Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift": "c3f79c2b1344b1cdf14e9f690cbfbac5da6ad85f6f29dfd8e5785042a336116f",
+    "sources/baseline/Sources/IlliquidCore/Utilities/LifecyclePerformance.swift": "eac6f08a13b62f429fd693168b6019b6ce671ec9ad4641c7f851600f202886df",
+    "sources/candidate/Sources/IlliquidApp/UI/SourceFilesystemEventMailbox.swift": "45382cafc2de370e6fb8d8eec75545559f3087c0fc47ab069f663e76d227c75a",
+    "sources/candidate/Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift": "a47c4b70e6953687c0d1cbca39272959881a19e082028a5fb63d656f2e71c770",
+    "sources/candidate/Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift": "4cbdf586b4d0de7eb8217689ad9bb4fc540264df6955ac50a1facf5f977efc19",
+    "sources/candidate/Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift": "c3f79c2b1344b1cdf14e9f690cbfbac5da6ad85f6f29dfd8e5785042a336116f",
+    "sources/candidate/Sources/IlliquidCore/Utilities/LifecyclePerformance.swift": "eac6f08a13b62f429fd693168b6019b6ce671ec9ad4641c7f851600f202886df"
+  }
+}

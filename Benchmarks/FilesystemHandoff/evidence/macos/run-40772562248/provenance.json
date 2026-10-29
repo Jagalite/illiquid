@@ -1,0 +1,25 @@
+{
+  "tested_candidate_commit": "ea2a78ebd5fdfff09f251dc2e4a61e2209246c0e",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "explanation": "The archived runner artifact's staged production sources were hashed as Git blobs and compared against GitHub Contents API blob SHAs at their respective pinned commits. Runner/Driver/Heap/test-script SHA-256 from HANDOFF_MANIFEST was independently recomputed from GitHub Contents API at the tested candidate commit. Every comparison matched.",
+  "staged_production_source_git_blob_sha1": {
+    "baseline": {
+      "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift": "3a5eaa70e94c22511457fc9d8770de288d9228a3",
+      "Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift": "180354826bbcd6c427cb4ee0351e043ef4295d95",
+      "Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift": "56951a5ac3e0f3fb0246a954f5b45a48c42273ac",
+      "Sources/IlliquidCore/Utilities/LifecyclePerformance.swift": "9cc5eb642a78ce0da3de38a238eab571bd57b7d7"
+    },
+    "candidate": {
+      "Sources/IlliquidApp/UI/SourceFilesystemEventMailbox.swift": "55ce8b0319df6e8cb77daf787be2ca943e850113",
+      "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift": "3a5eaa70e94c22511457fc9d8770de288d9228a3",
+      "Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift": "2af7e4b1cb0342231fe908945000f032b859d48d",
+      "Sources/IlliquidApp/UI/SourceVolumeChangePolicy.swift": "56951a5ac3e0f3fb0246a954f5b45a48c42273ac",
+      "Sources/IlliquidCore/Utilities/LifecyclePerformance.swift": "9cc5eb642a78ce0da3de38a238eab571bd57b7d7"
+    }
+  },
+  "all_staged_source_sha256_match_manifest": true,
+  "all_production_git_blobs_match_pinned_commits": true,
+  "all_harness_sha256_match_tested_commit": true,
+  "shared_driver_sha256": "a2898b27b8b5a2623d73ed4e55e105351f361483c4f0f75dd3f0ed041dc6a3b6",
+  "source_manifest": "manifest.json"
+}
