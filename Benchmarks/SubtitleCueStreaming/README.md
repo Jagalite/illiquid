@@ -1,5 +1,9 @@
 # Subtitle cue streaming
 
+See the [memory qualification follow-up](evidence/linux-memory/README.md) for
+the corrected peak-RSS launcher and expanded memory study. The results below
+retain the original timing study and its inconclusive memory observations.
+
 This experiment measures full SRT and WebVTT conversion to ASS. The candidate
 streams the lines of each cue and appends escaped payloads directly to the final
 output. It removes the per-cue line array, escaped-string array, joined payload,
@@ -11,9 +15,9 @@ timestamp parsing, escaping, and the emitted format retain their existing rules.
 On macOS or Linux with Swift 6.1 or newer:
 
     python3 Benchmarks/SubtitleCueStreaming/run.py \
-      --pairs 8 --target-ms 150 --output /tmp/subtitle-cue-streaming
+      --pairs 8 --target-ms 150 --output "$SUBTITLE_STUDY_OUTPUT"
 
-Use a new output directory each time. The runner checks for Kyoto and explains
+Set `SUBTITLE_STUDY_OUTPUT` to a new output directory each time. The runner checks for Kyoto and explains
 direct compilation when the shared queue is unavailable. When Kyoto is available,
 submit the whole serial runner through that queue as described by its diagnostic.
 The benchmark uses only the real Foundation converter; it does not need FFmpeg,
@@ -35,8 +39,8 @@ fixture/output receipts and consumed checksums must match. The workloads cover
 ordinary SRT and WebVTT cues with LF and CRLF newlines, multiline cues, dense line counts, a long single
 line, and invalid preambles. Input construction and warmup are outside timing.
 
-Dedicated fresh-process runs measure peak resident memory for dense and
-long-line inputs. These are whole-process high-water marks, not allocation
+Dedicated cold-process runs now use an isolated interpreter and an explicit fork
+to measure peak resident memory across twelve ordinary and stress workloads. These are whole-process high-water marks, not allocation
 counts or retained-memory claims. Raw measurements, compiler and machine
 information, source and binary hashes, exact source snapshots, test logs, and
 full correctness traces are retained in separate CI artifacts for each platform. Linux results are preliminary
