@@ -52,7 +52,7 @@ jobs:
         run: |
           echo "Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout."
           mode=()
-          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then mode=(--current-source-correctness); fi
+          if [[ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]]; then mode=(--current-source-correctness); fi
           python3 Benchmarks/SourceVisibilityAncestors/run.py "${mode[@]}" \
             --pairs 6 --target-ms 120 --jobs 2 \
             --output "$RUNNER_TEMP/visibility-ancestors"
@@ -94,7 +94,7 @@ jobs:
         run: |
           echo "Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout."
           mode=()
-          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then mode=(--current-source-correctness); fi
+          if [[ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]]; then mode=(--current-source-correctness); fi
           python3 Benchmarks/SourceVisibilityAncestors/run.py "${mode[@]}" \
             --pairs 6 --target-ms 120 --jobs 2 \
             --output "$RUNNER_TEMP/visibility-ancestors-native"

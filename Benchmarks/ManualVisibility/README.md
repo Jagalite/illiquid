@@ -21,9 +21,25 @@ python3 Benchmarks/ManualVisibility/run.py \
   --pairs 8 --sizes 100,1000,10000 --target-ms 80
 ```
 
-The output directory must be new or empty. Use `--tests-only` for the four
-baseline/candidate debug/release test runs and the differential workload checks
-without collecting timings. `--cases` accepts comma-separated case names below.
+The output directory must be new or empty. `--cases` accepts comma-separated
+case names below. Without `--tests-only`, both runners retain the strict
+historical performance comparison and reject unrelated production changes.
+
+### Current-source regressions
+
+Use `--tests-only` with either runner to run all six suites in debug and release
+against current production and a behavioral reference. The reference inserts the
+verbatim matcher from the pinned revision into the current extracted sidebar;
+all surrounding declarations and supporting files are current and identical in
+both variants. This adapted reference is **not the original performance baseline**.
+The manifest labels it `reference`, records the historical matcher/source hashes
+and current source receipts, sets `baseline` to null, and reports zero timing pairs.
+
+All 13 diagnostic workloads and negative controls still compare both variants at
+1, 31, and 257 entries with identical receipt and cache-rebuild checks. No timing
+observations or performance summaries are produced. Push and pull-request jobs
+use this mode. Manual `workflow_dispatch` retains strict historical performance
+mode and must reject incompatible current sources. Frozen evidence is unchanged.
 
 ### Portable Linux qualification
 
@@ -95,7 +111,7 @@ macOS Foundation or the app's displayed UI.
 
 ## Correctness and retained evidence
 
-The same six suites run against both variants in debug and release. The new
+The same six suites run against both variants in debug and release in both modes. The new
 matcher suite covers manual precedence, hidden roots and ancestors, always-show
 overrides, invalid/disabled rules, active match ordering, Unicode paths,
 overlapping roots, preview annotations, and raw-tree reuse.
@@ -125,3 +141,11 @@ frame rate, playback CPU, energy, RSS, or peak allocations.
 The comparison intentionally stops if unrelated supporting production sources
 change. Review and explicitly refresh the comparison before reusing it against
 a later incompatible snapshot.
+
+The PR212 projection API is bridged only in the regression reference by an
+explicitly pinned, uncached ancestor evaluator adapter. Both overloads forward
+every call to the unchanged historical `evaluateIncludingAncestors` body; the
+manifest records the historical matcher and adapter hashes separately. Automated
+push and pull-request callers select this mode. All 13 cases, including negative
+controls, are required; the measurement entry point rejects regression mode.
+Manual dispatch retains the strict historical study and its fail-closed guards.

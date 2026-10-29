@@ -42,7 +42,9 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Qualify exact production sources and measure paired projections
+      - name: Check regression provenance and strict source guards
+        run: python3 -B Benchmarks/ManualVisibility/test_source_policy.py
+      - name: Run current-source regressions or a dispatched historical study
         run: |
           if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
             echo "Shared Kyoto queue is present; submit this qualification through Kyoto."
@@ -50,7 +52,7 @@ jobs:
           fi
           echo "Kyoto is unavailable on this hosted runner; isolated component builds run serially."
           mode=()
-          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+          if test "$GITHUB_EVENT_NAME" != 'workflow_dispatch'; then
             mode+=(--tests-only)
           fi
           python3 Benchmarks/ManualVisibility/run.py \
