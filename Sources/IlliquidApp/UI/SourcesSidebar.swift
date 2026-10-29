@@ -2438,11 +2438,22 @@ enum SourceTreeSorting {
         _ entries: [SourceTreeEntry],
         using configuration: SourceTreeSortConfiguration
     ) -> [SourceTreeEntry] {
+        guard let indices = sortedIndicesIfNeeded(entries, using: configuration)
+        else { return entries }
+        return indices.map { entries[$0] }
+    }
+
+    /// Nil keeps input order without allocating a permutation for unsorted,
+    /// empty, or singleton inputs. Callers can project directly from positions.
+    static func sortedIndicesIfNeeded(
+        _ entries: [SourceTreeEntry],
+        using configuration: SourceTreeSortConfiguration
+    ) -> [Int]? {
         guard entries.count > 1,
               configuration.type != .off
                 || configuration.dateCreated != .off
                 || configuration.name != .off
-        else { return entries }
+        else { return nil }
 
         // Resolve a filename only if earlier criteria tie, and at most once
         // per entry. A date sort with distinct dates need not read any names.
@@ -2489,7 +2500,7 @@ enum SourceTreeSorting {
                 }
             }
             return leftIndex < rightIndex
-        }.map { entries[$0] }
+        }
     }
 }
 
