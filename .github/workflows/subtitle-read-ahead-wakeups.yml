@@ -1,0 +1,52 @@
+name: Subtitle read-ahead wakeups
+
+on:
+  push:
+    branches:
+      - 'perf/subtitle-read-ahead-wakeups-20261028'
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift'
+      - 'Tests/IlliquidNativePlaybackTests/MediaReadAheadGate*Tests.swift'
+      - 'Benchmarks/SubtitleReadAheadWakeups/Driver.swift'
+      - 'Benchmarks/SubtitleReadAheadWakeups/Probe.swift'
+      - 'Benchmarks/SubtitleReadAheadWakeups/run.py'
+      - '.github/workflows/subtitle-read-ahead-wakeups.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift'
+      - 'Tests/IlliquidNativePlaybackTests/MediaReadAheadGate*Tests.swift'
+      - 'Benchmarks/SubtitleReadAheadWakeups/Driver.swift'
+      - 'Benchmarks/SubtitleReadAheadWakeups/Probe.swift'
+      - 'Benchmarks/SubtitleReadAheadWakeups/run.py'
+      - '.github/workflows/subtitle-read-ahead-wakeups.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-read-ahead-wakeups-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test and measure the production read-ahead gate
+        run: |
+          python3 Benchmarks/SubtitleReadAheadWakeups/run.py \
+            --pairs 7 --output "$RUNNER_TEMP/subtitle-read-ahead-wakeups"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-read-ahead-wakeups-macos
+          path: |
+            ${{ runner.temp }}/subtitle-read-ahead-wakeups/
+            !${{ runner.temp }}/subtitle-read-ahead-wakeups/module-cache/**
+            !${{ runner.temp }}/subtitle-read-ahead-wakeups/*/tests/.build/**
+          retention-days: 30

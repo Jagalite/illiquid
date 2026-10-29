@@ -1,0 +1,54 @@
+{
+  "arguments": {
+    "cases": "lookup-first-1,lookup-first-8,lookup-first-32,lookup-first-128,lookup-middle-8,lookup-middle-32,lookup-middle-128,lookup-penultimate-8,lookup-penultimate-32,lookup-penultimate-128,lookup-latest-1,lookup-latest-8,lookup-latest-32,lookup-latest-128,lookup-missing-1,lookup-missing-8,lookup-missing-32,lookup-missing-128,prune-first-1,prune-first-8,prune-first-32,prune-first-128,prune-missing-32,prune-missing-128,stream-8,stream-32,stream-128",
+    "max_sample_ms": 1500.0,
+    "output": "/Users/runner/work/_temp/bitmap-subtitle-lookup/timing",
+    "pairs": 8,
+    "target_ms": 80.0,
+    "tests_only": false
+  },
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "git_blob": "cd3482a721c63fc9742195f91ce67ae37a0301b7",
+    "path": "Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift",
+    "sha256": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f"
+  },
+  "binary_sha256": {
+    "baseline": {
+      "benchmark": "c3b03fe951353135c6682c6b491909b5c9c62b6d7232bb9656792a07614789b0",
+      "libIlliquidNativePlayback.dylib": "cb39ada2011ac7cdf173653ba96ef04fa76521a1d78834022e7647261c3ed555"
+    },
+    "candidate": {
+      "benchmark": "f1f855dfc2ac0a3fe0a43908de639968306b33b2f3a894dcc33ed0c588a0f427",
+      "libIlliquidNativePlayback.dylib": "c1f3813717ed0017a9b6df111b07d3d37542eb72c577b3e3866907d01bde96fd"
+    }
+  },
+  "collected_at_utc": "2026-10-28T04:57:06Z",
+  "driver_sha256": "c37b46975f2e51e13af5156eefa3da9570997fe3e7b2b2fb055fe68e7d586015",
+  "extraction": "Complete ASSRenderedRegion declaration from LibassContext.swift; only Foundation/CoreGraphics imports added. Timeline and budget copied whole.",
+  "git_head": "6f9d096153d9085d7cc2b64ecd1ced145f3dda68",
+  "git_status": "",
+  "hardware": "hw.model: VirtualMac2,1\nmachdep.cpu.brand_string: Apple M1 (Virtual)",
+  "machine": "arm64",
+  "method": "Separate optimized production module; same-iteration fresh-process pairs; alternating AB/BA order; deterministic per-pair query offsets and payload markers; warm in-memory work; calibration excluded; no discarded timing samples or control subtraction.",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "region_declaration_sha256": "353f37177ca3235616eb358b6096929cc6ba9c5d2ba99d568f388899a3933138",
+  "runner_sha256": "e3bbba60678cabb0d4da26f831ae0f6ce8d63b4847fed6e89eb5c638255ac090",
+  "source_sha256": {
+    "baseline": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    },
+    "candidate": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "9063d80497ad08228355266edc98c1efb669bc90df2708f3c1530331abf76b3b",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  },
+  "swift": "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "test_sha256": {
+    "BitmapSubtitleTimelineOrderingTests.swift": "0c11d1df5f5d5ec516ed3b700fc70c5b5f451734339512e0fef296c739760e4b",
+    "SubtitleMemoryBudgetAccountingTests.swift": "b3d872737944344704762b2097d5734998825a6bae336ab14bda93f78d67ef6b"
+  }
+}

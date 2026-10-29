@@ -1,0 +1,880 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.0018219910000141226,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "elapsed_seconds": 0.018127463000013222,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "--version"
+    ],
+    "elapsed_seconds": 0.05428654799999322,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/media-read-ahead/60hz/module-cache",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/MediaReadAheadGate/baseline/MediaReadAheadGate.swift",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/MediaReadAheadGate/Driver.swift",
+      "-o",
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native"
+    ],
+    "elapsed_seconds": 3.372773287000001,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/media-read-ahead/60hz/module-cache",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/MediaReadAheadGate/baseline/MediaReadAheadGate.swift",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/MediaReadAheadGate/Driver.swift",
+      "-D",
+      "GATE_WAKE_COUNTS",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/MediaReadAheadGate/CountingCondition.swift",
+      "-o",
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-counts"
+    ],
+    "elapsed_seconds": 3.290124517999999,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/media-read-ahead/60hz/module-cache",
+      "/home/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/MediaReadAheadGate/Driver.swift",
+      "-o",
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native"
+    ],
+    "elapsed_seconds": 2.2632633759999976,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-O",
+      "-whole-module-optimization",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/media-read-ahead/60hz/module-cache",
+      "/home/runner/work/illiquid/illiquid/Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/MediaReadAheadGate/Driver.swift",
+      "-D",
+      "GATE_WAKE_COUNTS",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/MediaReadAheadGate/CountingCondition.swift",
+      "-o",
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-counts"
+    ],
+    "elapsed_seconds": 3.328509268999994,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-counts",
+      "--check"
+    ],
+    "elapsed_seconds": 0.06086101500000041,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-counts",
+      "--check"
+    ],
+    "elapsed_seconds": 0.06075137100000916,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-counts",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0095732169999962,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-counts",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0096034930000144,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-counts",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0095774160000133,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-counts",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0095770439999967,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-counts",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0094527609999773,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-counts",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0095849369999996,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-counts",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0091143539999905,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-counts",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009113506999995,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-counts",
+      "--scenario",
+      "multi-eof",
+      "--updates",
+      "24",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 0.41105312199999844,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-counts",
+      "--scenario",
+      "multi-eof",
+      "--updates",
+      "24",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 0.4099254129999963,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0094688279999957,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0092857039999785,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009234364000008,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.00953015500005,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0092919630000097,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0095854230000327,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0091235059999804,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009018456999968,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009075583000026,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0089577429999963,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0094170860000418,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009489199999962,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0091614410000034,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009234826000011,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0092994729999987,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009444572999996,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009477641999979,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0091613230000007,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.00911325200002,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009528222999961,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.00947391699998,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0093042459999992,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009097677999989,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0088616819999743,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009044901999971,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009224613000015,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0091629099999864,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009298957999988,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0093364389999806,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0090439909999986,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0090131839999685,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0092098239999814,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.00970528900001,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009664404999967,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009129795999968,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009228981999968,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0091316159999906,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0092826139999715,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0088793749999923,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.008863799999972,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.008964981999952,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "idle",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009007911000026,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0091444959999762,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "active",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0092656649999867,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0092423000000394,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "future",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009034961999987,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/candidate/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.0093417369999997,
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/media-read-ahead/60hz/baseline/gate-native",
+      "--scenario",
+      "eof",
+      "--updates",
+      "120",
+      "--interval-us",
+      "16667"
+    ],
+    "elapsed_seconds": 2.009279479999975,
+    "returncode": 0
+  }
+]

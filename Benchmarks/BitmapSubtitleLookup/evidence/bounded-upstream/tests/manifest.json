@@ -1,0 +1,59 @@
+{
+  "arguments": {
+    "baseline_ref": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "cases": "fill-ascending-1,fill-ascending-8,fill-ascending-32,fill-ascending-128,fill-descending-128,fill-shuffled-128,replace-32,replace-128,stream-8,stream-32,stream-128,reject-full-128",
+    "max_sample_ms": 1500,
+    "output": "/home/runner/work/_temp/bitmap-subtitle-lookup/tests",
+    "pairs": 8,
+    "portable": true,
+    "target_ms": 80,
+    "tests_only": true
+  },
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "git_blob": "cd3482a721c63fc9742195f91ce67ae37a0301b7",
+    "sha256": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f",
+    "source": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72:Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift"
+  },
+  "collected_at_utc": "2026-10-28T05:21:28Z",
+  "compiled_source_sha256": {
+    "baseline": {
+      "ASSRenderedRegion.swift": "91328ec1d431a8068f0ca73362d0571ce1c8edfbf4a4451f14629674d39193ec",
+      "BitmapSubtitleTimeline.swift": "5ee10d6084fb84f4368dac13358eda551a4105f4d3ec86f1290095120e971ba7",
+      "SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    },
+    "candidate": {
+      "ASSRenderedRegion.swift": "91328ec1d431a8068f0ca73362d0571ce1c8edfbf4a4451f14629674d39193ec",
+      "BitmapSubtitleTimeline.swift": "a6f09a0f8b2dd060a5e021dc5875cb7e3ead03e8eb2323ac33def7ffb3f38400",
+      "SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  },
+  "driver_sha256": "61afe3dfa22dd2f1894bd1b1f0c17da3b3a4c8e7e36814abdbe823bace8115c1",
+  "extraction": "Complete ASSRenderedRegion declaration from LibassContext.swift; imports added. Timeline and budget bodies copied whole.",
+  "git_head": "79d9c9091b5eb4bb94b532fc9f7da9740778532d",
+  "git_status": "",
+  "machine": "x86_64",
+  "method": "Separate optimized production module; same-iteration fresh-process pairs; alternating AB/BA order; deterministic per-pair fixture shuffle; warm in-memory work; calibration excluded; no discarded timing samples or control subtraction.",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "qualification": "portable-linux-foundation",
+  "region_declaration_sha256": "91328ec1d431a8068f0ca73362d0571ce1c8edfbf4a4451f14629674d39193ec",
+  "runner_sha256": "55e576d4f6c1805f2eb88eb7a7469f8206a29aa7aab6cbcb014f38421e3ca886",
+  "source_projection": "Omit only import CoreGraphics from timeline and driver; use Linux Foundation geometry for the unchanged component function bodies.",
+  "source_sha256": {
+    "baseline": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    },
+    "candidate": {
+      "Subtitles/BitmapSubtitleTimeline.swift": "e9664552e9b8d7dc5ea5200fec94a4fd7a2744be361df757688bfbeca01f0800",
+      "Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+      "Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+    }
+  },
+  "swift": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "test_sha256": {
+    "BitmapSubtitleTimelineOrderingTests.swift": "2a62e5408ed8f525e07a29a3bc8b9733ccdaa51c2ddc0c59ca66bb756dc97797",
+    "SubtitleMemoryBudgetAccountingTests.swift": "b3d872737944344704762b2097d5734998825a6bae336ab14bda93f78d67ef6b"
+  }
+}

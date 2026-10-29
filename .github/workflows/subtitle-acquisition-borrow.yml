@@ -11,6 +11,7 @@ on:
       - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleAcquisitionPacket.swift'
       - 'Sources/CFFmpeg/**'
       - 'Tests/IlliquidNativePlaybackTests/SubtitleAcquisitionPacketBorrowTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleAcquisitionPR137RegressionTests.swift'
       - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleTests.swift'
       - 'Benchmarks/SubtitleAcquisitionBorrow/**'
       - 'Scripts/tests/run-native-swift-tests.sh'
@@ -74,7 +75,7 @@ jobs:
           test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
           set -o pipefail
           bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 --filter \
-            'SubtitleAcquisitionPacketBorrowTests|BitmapSubtitleTests|PGSSubtitlePacketBorrowTests|PGSSubtitleCropTests|PacketOwnershipTests' \
+            'SubtitleAcquisitionPacketBorrowTests|BitmapSubtitleAcquisitionPR137RegressionTests|BitmapSubtitleTests|PGSSubtitlePacketBorrowTests|PGSSubtitleCropTests|PacketOwnershipTests' \
             2>&1 | tee "$RUNNER_TEMP/subtitle-acquisition/native-tests.log"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
