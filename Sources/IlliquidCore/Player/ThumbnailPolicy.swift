@@ -145,7 +145,10 @@ public enum ThumbnailPolicy {
             // Preserve first-occurrence semantics even if it is not eligible.
             guard seen.insert(item.url).inserted else { continue }
             let isCurrent = item.url == current
-            let isLocal = item.url.deletingLastPathComponent().path == folderPath
+            // File-only source tabs have no folder, so locality is always false.
+            // Avoid constructing a parent URL/path for every candidate in that case.
+            let isLocal = folderPath != nil
+                && item.url.deletingLastPathComponent().path == folderPath
             guard isCurrent || item.isVisible || item.neighborDistance != nil || isLocal
                     || item.lastUsed.map({ now.timeIntervalSince($0) <= horizon }) == true else { continue }
             let score: Double
@@ -173,13 +176,20 @@ public enum ThumbnailPolicy {
     /// to reuse its decoder without letting one video consume the whole pass.
     public static func refinementOrder(_ plans: [[Double]], maximumPerVisit: Int = 4)
         -> [(video: Int, position: Double)] {
-        let plans = plans.prefix(64).map { Array($0.prefix(64)) }
-        let count = plans.map(\.count).max() ?? 0
+        let plans = plans.prefix(64)
+        var count = 0
+        var total = 0
+        for plan in plans {
+            let boundedCount = min(plan.count, 64)
+            count = max(count, boundedCount)
+            total += boundedCount
+        }
         let visit = min(8, max(1, maximumPerVisit))
         var result: [(video: Int, position: Double)] = []
+        result.reserveCapacity(total)
         for offset in stride(from: 0, to: count, by: visit) {
             for video in plans.indices {
-                for position in plans[video].dropFirst(offset).prefix(visit) {
+                for position in plans[video].prefix(64).dropFirst(offset).prefix(visit) {
                     result.append((video, position))
                 }
             }
