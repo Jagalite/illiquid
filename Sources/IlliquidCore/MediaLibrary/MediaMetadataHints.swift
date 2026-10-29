@@ -31,7 +31,10 @@ public struct MediaMetadataHints: Equatable, Sendable {
         result.lastEpisode = episode == nil ? older.lastEpisode : lastEpisode
         result.episodeTitle = episodeTitle ?? older.episodeTitle
         result.catalogIDs = mergedCatalogIDs(older.catalogIDs, with: catalogIDs)
-        result.sources = Array(Set(older.sources + sources)).sorted()
+        // Episode mappings add no attribution. Zero or one inherited source
+        // is already unique and sorted, so keep its existing array storage.
+        result.sources = sources.isEmpty && older.sources.count <= 1
+            ? older.sources : Array(Set(older.sources + sources)).sorted()
         return result
     }
 
