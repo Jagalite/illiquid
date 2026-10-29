@@ -112,19 +112,20 @@ jobs:
           swift --version > "$RUNNER_TEMP/checkpoint-native/toolchain.txt"
           set -o pipefail
           swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
-            --filter 'shuffledCheckpointPersistsEditedBaseOrderAcrossRelaunch|shuffleRestoresBaseOrderAcrossRelaunch|unshuffleRetainsAdditionsAndOmitsRemovedEntries' \
+            --filter 'shuffledProgressCheckpointReconcilesEditedPlaylistIdentities|shuffledCheckpointPersistsEditedBaseOrderAcrossRelaunch|shuffleRestoresBaseOrderAcrossRelaunch|unshuffleRetainsAdditionsAndOmitsRemovedEntries' \
             2>&1 | tee "$RUNNER_TEMP/checkpoint-native/tests.log"
           python3 - "$RUNNER_TEMP/checkpoint-native/tests.log" <<'PY'
           import pathlib, sys
           log = pathlib.Path(sys.argv[1]).read_text()
           names = [
+              "shuffledProgressCheckpointReconcilesEditedPlaylistIdentities",
               "shuffledCheckpointPersistsEditedBaseOrderAcrossRelaunch",
               "shuffleRestoresBaseOrderAcrossRelaunch",
               "unshuffleRetainsAdditionsAndOmitsRemovedEntries",
           ]
           for name in names:
               assert any(name in line and "passed" in line for line in log.splitlines()), name
-          print("Checkpoint coordinator qualification: all three named tests executed and passed.")
+          print("Checkpoint coordinator qualification: all four named tests executed and passed.")
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

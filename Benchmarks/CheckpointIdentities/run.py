@@ -34,6 +34,10 @@ REGRESSION_SHA256 = {
     "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": "adb8778743e85252e1b432e26541964ca9a2b4bdd706ba59ce1bf677293d27a3"
 }
 TESTS = [
+    "Tests/IlliquidCoreTests/PlaylistPR136ConsolidationTests.swift",
+    "Tests/IlliquidCoreTests/PlaylistPR197ConsolidationTests.swift",
+    "Tests/IlliquidCoreTests/PlaylistPR200ConsolidationTests.swift",
+
     "Tests/IlliquidCoreTests/PlaylistMutationTests.swift",
     "Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift",
     "Tests/IlliquidCoreTests/PlaylistRestoredIdentityTests.swift",
