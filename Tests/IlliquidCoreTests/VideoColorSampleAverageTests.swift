@@ -9,12 +9,12 @@ struct VideoColorSampleAverageTests {
     }
 
     private func sample(columns: Int, rows: Int) -> VideoColorSample {
-        let colors = (0..<(columns * rows)).map { index in
-            SampledVideoColor(
-                red: Double((index * 37 + 11) % 257) / 256,
-                green: Double((index * 73 + 19) % 251) / 250,
-                blue: Double((index * 17 + 23) % 241) / 240
-            )
+        var colors: [SampledVideoColor] = []
+        for index in 0..<(columns * rows) {
+            let red: Double = Double((index * 37 + 11) % 257) / 256
+            let green: Double = Double((index * 73 + 19) % 251) / 250
+            let blue: Double = Double((index * 17 + 23) % 241) / 240
+            colors.append(SampledVideoColor(red: red, green: green, blue: blue))
         }
         return VideoColorSample(columns: columns, rows: rows, colors: colors)
     }
