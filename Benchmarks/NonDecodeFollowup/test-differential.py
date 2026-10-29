@@ -10,11 +10,15 @@ def run(cmd):
  with (a.output/'commands.jsonl').open('a') as f:f.write(json.dumps({'command':list(map(str,cmd)),'returncode':c.returncode,'stdout':c.stdout,'stderr':c.stderr})+'\n')
  if c.returncode:raise RuntimeError(c.stderr)
  return c.stdout
+preferences=R/'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift'
+manifest={'shared_current_preferences':{'path':str(preferences.relative_to(R)),'origin':'current_worktree','sha256':hashlib.sha256(preferences.read_bytes()).hexdigest()},'source_sha256':{}}
 results={}
 for v in ['baseline','candidate']:
  source=H/'fixtures' if v=='baseline' else R/'Sources/IlliquidCore/Persistence'
- inputs=[source/'CoalescingPersistenceWriter.swift',source/'PlaybackPersistenceStore.swift',R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',H/'StoreDifferential.swift']
- inputs += [x for x in sorted((H/'fixtures').glob('*.swift')) if x.name not in ['CoalescingPersistenceWriter.swift','PlaybackPersistenceStore.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']]
+ inputs=[source/'CoalescingPersistenceWriter.swift',source/'PlaybackPersistenceStore.swift',preferences,R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',H/'StoreDifferential.swift']
+ inputs += [x for x in sorted((H/'fixtures').glob('*.swift')) if x.name not in ['CoalescingPersistenceWriter.swift','PlaybackPersistenceStore.swift','PlaybackPreferences.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']]
+ manifest['source_sha256'][v]={str(path.relative_to(R)):hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}
+ (a.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
  run(['swiftc','-O','-swift-version','6','-warnings-as-errors',*inputs,'-o',a.output/v])
  results[v]=run([a.output/v]);(a.output/(v+'.jsonl')).write_text(results[v])
 assert len(results['baseline'].splitlines())==200

@@ -39,6 +39,17 @@ jobs:
           --swiftc "$(xcrun --find swiftc)"
           --rounds 4
           --output "$RUNNER_TEMP/external-subtitle-conversion/memory"
+      - name: Compare ignored WebVTT comments against the pre-change converter
+        run: |
+          git fetch --no-tags --depth=1 origin ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+          python3 Benchmarks/ExternalSubtitleMemory/run.py benchmark \
+            --swiftc "$(xcrun --find swiftc)" \
+            --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+            --rounds 4 --case vtt-note-512k --case vtt-note-8m \
+            --case vtt-note-near-limit --case vtt-note-only \
+            --case vtt-note-interleaved --case vtt-note-control \
+            --case vtt-2000 --case srt-2000 \
+            --output "$RUNNER_TEMP/external-subtitle-conversion/notes"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

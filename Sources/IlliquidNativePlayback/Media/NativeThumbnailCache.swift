@@ -97,23 +97,30 @@ actor NativeThumbnailCache {
 
     func nearest(to key: Key, maximumDistance: Double, fallbackTimes: [Double] = []) async -> (CGImage, Double)? {
         guard maximumDistance.isFinite, maximumDistance >= 0 else { return nil }
-        var candidates = Set(images.keys.filter {
+        var candidates = images.keys.filter {
             $0.path == key.path && $0.version == key.version && $0.width == key.width && $0.height == key.height
                 && abs(Double($0.halfSecond) - Double(key.halfSecond)) / 2 <= maximumDistance
-        })
+        }
+        // Only the time bucket varies within this source/version/size. Keep the
+        // original resident keys: canonically equal strings can encode differently
+        // in the disk digest, so rebuilding them from the request changes identity.
+        var buckets = Set(candidates.map(\.halfSecond))
         // The deterministic storyboard also gives us disk keys after a restart,
         // without a filesystem walk or decoding merely to find an approximation.
         for time in fallbackTimes {
             guard time.isFinite, let bucket = Int(exactly: (time * 2).rounded()),
                   abs(Double(bucket) - Double(key.halfSecond)) / 2 <= maximumDistance else { continue }
-            candidates.insert(Key(path: key.path, version: key.version, halfSecond: bucket,
-                                  width: key.width, height: key.height))
+            if buckets.insert(bucket).inserted {
+                candidates.append(Key(path: key.path, version: key.version, halfSecond: bucket,
+                                      width: key.width, height: key.height))
+            }
         }
-        for match in candidates.sorted(by: {
+        candidates.sort {
             let a = abs(Double($0.halfSecond) - Double(key.halfSecond))
             let b = abs(Double($1.halfSecond) - Double(key.halfSecond))
             return a == b ? $0.halfSecond < $1.halfSecond : a < b
-        }) {
+        }
+        for match in candidates {
             guard !Task.isCancelled else { return nil }
             if let image = await image(for: match, background: false) {
                 return (image, Double(match.halfSecond) / 2)
