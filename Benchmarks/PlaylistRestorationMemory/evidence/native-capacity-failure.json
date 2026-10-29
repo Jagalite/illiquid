@@ -1,0 +1,56 @@
+{
+  "extraction": "Exact JSON rows and capacity-assertion lines from the complete job log; this excerpt is not a complete run dataset.",
+  "failing_pair": [
+    {
+      "beforeBytes": 171533440,
+      "checkpointBytes": 199548736,
+      "checkpointCount": 1,
+      "checkpointDeltaBytes": 28015296,
+      "fullItemsEqual": true,
+      "indexStride": 8,
+      "inputCount": 100000,
+      "itemStride": 40,
+      "mapCapacity": 196608,
+      "milliseconds": [],
+      "mode": "memory",
+      "orderCapacity": 230398,
+      "pair": 0,
+      "position": 0,
+      "requestedCount": 100000,
+      "savedIDCount": 100000,
+      "scenario": "unchanged",
+      "validatedItemCount": 100000,
+      "variant": "baseline"
+    },
+    {
+      "beforeBytes": 171504384,
+      "checkpointBytes": 190590144,
+      "checkpointCount": 1,
+      "checkpointDeltaBytes": 19085760,
+      "fullItemsEqual": true,
+      "indexStride": 8,
+      "inputCount": 100000,
+      "itemStride": 40,
+      "mapCapacity": 196608,
+      "milliseconds": [],
+      "mode": "memory",
+      "orderCapacity": 196606,
+      "pair": 0,
+      "position": 1,
+      "requestedCount": 100000,
+      "savedIDCount": 100000,
+      "scenario": "unchanged",
+      "validatedItemCount": 100000,
+      "variant": "candidate"
+    }
+  ],
+  "failure_lines": [
+    "2026-10-28T23:47:31.0291750Z     assert before[key] == after[key], f\"Different container shape: {key}\"",
+    "2026-10-28T23:47:31.0293040Z AssertionError: Different container shape: orderCapacity"
+  ],
+  "job_url": "https://github.com/Jagalite/illiquid/actions/runs/40639015745/job/122652534983",
+  "original_log_bytes": 163963,
+  "original_log_sha256": "ec2b9d865aec85d02fe921bef55a29c477408c904a963581802fafbe4c6a941a",
+  "source_head": "8bca509c6885ff1454fbb77d9aa1d1dc45c4ef20",
+  "status": "failed; not requalified or corrected retrospectively"
+}

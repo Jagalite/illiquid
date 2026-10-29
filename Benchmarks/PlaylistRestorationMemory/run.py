@@ -26,11 +26,47 @@ FLAGS = [
     "-swift-version", "6", "-O", "-whole-module-optimization",
     "-parse-as-library", "-warnings-as-errors",
 ]
+MEMORY_CONTROL = "reserve-current-order-input-count-v1"
+ORDER_MARKER = "        var currentOrder: [FolderPlaylistItem.ID] = []\n"
+ORDER_INJECTION = (
+    "        currentOrder.reserveCapacity(items.count)\n"
+    "        let restorationReservedOrderCapacity = currentOrder.capacity\n"
+)
 MARKER = "        var restored: [FolderPlaylistItem] = []\n"
 INJECTION = (
+    "        precondition(currentOrder.count == byID.count)\n"
+    "        precondition(currentOrder.capacity >= items.count)\n"
+    "        precondition(currentOrder.capacity == restorationReservedOrderCapacity)\n"
     "        restoration_memory_checkpoint(UInt64(byID.count), "
     "UInt64(byID.capacity), UInt64(currentOrder.capacity))\n"
 )
+
+
+def instrument_memory(text: str) -> str:
+    # Keep allocation inside the measured interval, with identical reservation
+    # in both variants. Timing and production sources retain append growth.
+    if text.count(ORDER_MARKER) != 1 or text.count(MARKER) != 1:
+        raise ValueError("Expected exactly one order and restoration instrumentation marker.")
+    if text.index(ORDER_MARKER) >= text.index(MARKER):
+        raise ValueError("Order allocation must precede the populated-map checkpoint.")
+    return text.replace(ORDER_MARKER, ORDER_MARKER + ORDER_INJECTION).replace(MARKER, INJECTION + MARKER)
+
+
+def validate_pair(before: dict, after: dict, mode: str) -> None:
+    for key in ("inputCount", "savedIDCount", "validatedItemCount", "itemStride", "indexStride"):
+        assert before[key] == after[key], f"Different fixtures/layouts: {key}"
+    if mode == "memory":
+        for row in (before, after):
+            assert row["checkpointCount"] == 1, "Expected one populated-map checkpoint"
+            assert row["orderReservationCount"] == row["inputCount"], "Wrong order reservation"
+            assert row["orderCapacity"] >= row["orderReservationCount"], "Order reservation was not honored"
+            assert row["mapCapacity"] >= row["validatedItemCount"], "Map cannot hold the unique items"
+            assert row["checkpointDeltaBytes"] == row["checkpointBytes"] - row["beforeBytes"], "Inconsistent heap accounting"
+        # Reservation prevents append-growth history from confounding this
+        # control. Still fail if the allocator grants different final capacities;
+        # retain both raw observations, never normalize or retry the pair.
+        for key in ("mapCapacity", "orderCapacity", "checkpointCount"):
+            assert before[key] == after[key], f"Different container shape: {key}"
 
 
 def sha256(data: bytes) -> str:
@@ -94,8 +130,12 @@ def main() -> None:
         "pairs": args.pairs,
         "rounds": args.rounds,
         "timing": "Uninstrumented production sources; warm-up and full-item equality outside timing.",
-        "memory": "malloc_zone_statistics(NULL).size_in_use delta at populated map, before output allocation; not peak or RSS.",
-        "instrumentation": {"marker": MARKER, "inserted_before_marker": INJECTION},
+        "memory": "malloc_zone_statistics(NULL).size_in_use delta with identical measured currentOrder reservation, at populated map before output allocation; not unmodified-call memory, peak or RSS.",
+        "memory_control": MEMORY_CONTROL,
+        "instrumentation": {
+            "marker": MARKER, "inserted_before_marker": INJECTION,
+            "order_marker": ORDER_MARKER, "inserted_after_order_marker": ORDER_INJECTION,
+        },
         "input_sha256": start_hashes,
         "source_sha256": {},
         "binary_sha256": {},
@@ -122,9 +162,7 @@ def main() -> None:
             directory.mkdir(parents=True)
             text = source.decode()
             if mode == "memory":
-                if text.count(MARKER) != 1:
-                    raise SystemExit("Expected exactly one restoration instrumentation marker.")
-                text = text.replace(MARKER, INJECTION + MARKER)
+                text = instrument_memory(text)
             target_copy = directory / Path(TARGET).name
             target_copy.write_text(text)
             inputs = [target_copy]
@@ -176,17 +214,15 @@ def main() -> None:
                         assert row["fullItemsEqual"] is True
                         assert row["requestedCount"] == count and row["scenario"] == scenario
                         row.update(variant=variant, pair=pair, position=position)
+                        if mode == "memory":
+                            row["memoryControl"] = MEMORY_CONTROL
                         pair_rows[variant] = row
                         case.append(row)
                         rows.append(row)
                         with raw_path.open("a") as stream:
                             stream.write(json.dumps(row, sort_keys=True) + "\n")
                     before, after = pair_rows["baseline"], pair_rows["candidate"]
-                    for key in ("inputCount", "savedIDCount", "validatedItemCount", "itemStride", "indexStride"):
-                        assert before[key] == after[key], f"Different fixtures/layouts: {key}"
-                    if mode == "memory":
-                        for key in ("mapCapacity", "orderCapacity", "checkpointCount"):
-                            assert before[key] == after[key], f"Different container shape: {key}"
+                    validate_pair(before, after, mode)
                 metric = "checkpointDeltaBytes" if mode == "memory" else "milliseconds"
                 values = {
                     variant: [
@@ -202,7 +238,7 @@ def main() -> None:
                 ]
                 summary = {
                     "mode": mode, "count": count, "scenario": scenario, "pairs": args.pairs,
-                    "metric": "populated_map_live_heap_delta_bytes" if mode == "memory" else "call_milliseconds",
+                    "metric": "controlled_order_populated_map_live_heap_delta_bytes" if mode == "memory" else "call_milliseconds",
                     "baseline_median": before, "candidate_median": after,
                     "median_saving": before - after,
                     "median_reduction_percent": 100 * (1 - after / before),
@@ -210,6 +246,17 @@ def main() -> None:
                     "candidate_range": [min(values["candidate"]), max(values["candidate"])],
                     "paired_reduction_percent_range": [min(paired_reductions), max(paired_reductions)],
                 }
+                if mode == "memory":
+                    summary["memory_control"] = MEMORY_CONTROL
+                    summary["container_receipts"] = {
+                        variant: [
+                            {key: row[key] for key in (
+                                "pair", "mapCapacity", "orderCapacity", "orderReservationCount",
+                            )}
+                            for row in case if row["variant"] == variant
+                        ]
+                        for variant in ("baseline", "candidate")
+                    }
                 summaries.append(summary)
                 save_json(output / "summary.json", summaries)
                 print(json.dumps(summary, sort_keys=True), flush=True)

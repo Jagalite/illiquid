@@ -13,6 +13,8 @@ on:
       - 'Benchmarks/PlaylistRestorationMemory/Harness.swift'
       - 'Benchmarks/PlaylistRestorationMemory/MemoryProbe.*'
       - 'Benchmarks/PlaylistRestorationMemory/run.py'
+      - 'Benchmarks/PlaylistRestorationMemory/test_run.py'
+      - 'Benchmarks/PlaylistRestorationMemory/evidence/native-capacity-failure.json'
       - '.github/workflows/playlist-restoration-memory.yml'
   pull_request:
     paths:
@@ -56,6 +58,8 @@ jobs:
           sw_vers
           uname -m
           git rev-parse HEAD
+      - name: Memory runner control regressions (no compilation)
+        run: python3 -m unittest discover -s Benchmarks/PlaylistRestorationMemory -p test_run.py
       - name: Candidate debug regression tests
         shell: bash
         run: |

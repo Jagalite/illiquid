@@ -56,12 +56,20 @@ All returned items, including subtitles and dates, must equal independently
 constructed expected arrays. The fixture and expected arrays stay alive across
 the two memory samples.
 
-- **Memory:** in temporary source copies only, insert one C hook immediately
-  before the result array is created, after the map and current-order array are
-  fully populated. The hook reads `malloc_zone_statistics(NULL).size_in_use`
+- **Memory:** in temporary source copies only, reserve `items.count` slots in
+  `currentOrder` immediately after its declaration, identically in both variants.
+  This upper bound includes duplicates and prevents append-growth history from
+  selecting different array capacities. The reservation occurs inside the call,
+  after the pre-call heap sample, so its entire allocation remains counted.
+  Insert one C hook immediately before the result array is created, after the
+  map and current-order array are fully populated. The hook reads `malloc_zone_statistics(NULL).size_in_use`
   across all allocator zones and stores only C integer fields. Subtract the
   pre-call live bytes from this checkpoint. Record map/order capacities and
-  require identical container shapes within each pair.
+  require identical container shapes within each pair. Also require one checkpoint,
+  matching logical counts, no order-buffer growth after reservation, capacities
+  sufficient for their contents, and exact checkpoint-minus-before accounting.
+  The allocator may still grant excess capacity: report actual capacities for
+  both variants and fail on a mismatch, without correction or resampling.
 - **Timing:** compile separate, uninstrumented copies. Time only the restoration
   call; fixture construction, warm-up, full-item comparisons, and returned-array
   destruction are outside the interval. Summarize the median of each process's
@@ -72,12 +80,43 @@ the two memory samples.
   cases contain twice as many input items. Empty saved order creates no map and
   therefore has no populated-map memory sample.
 
-The memory metric is **live-heap delta at the populated-map checkpoint**. It is
-not peak heap, RSS, allocation count, total call allocation, or application-wide
-memory. The returned array has not been allocated at that checkpoint. Temporary
+The current memory metric is **live-heap delta at the populated-map checkpoint
+with controlled current-order reservation** (`reserve-current-order-input-count-v1`).
+It isolates the map representation with a common order-buffer allocation policy;
+this is not unmodified production-call memory, peak heap, RSS, allocation count,
+total call allocation, or application-wide memory. New summaries use
+`controlled_order_populated_map_live_heap_delta_bytes` and include each variant's
+capacity receipts. Do not pool these results with historical append-grown samples. The returned array has not been allocated at that checkpoint. Temporary
 Foundation allocations can contribute to both variants. The benchmark injection
-is checked for a single exact marker, is retained in the receipts, and is absent
-from every production and timing source.
+is checked for single exact declaration/checkpoint markers in the correct order,
+is retained in the receipts, and is absent from every production and timing source.
+Input/expected-array ownership, the all-zone probe, workload sizes, AB/BA process
+pairing, and full-item parity checks are unchanged. No measured bytes are subtracted
+to compensate for container capacity, and no failed pair is dropped.
+
+## Native capacity-control failure and correction
+
+[Native run 40639015745, job 122652534983](https://github.com/Jagalite/illiquid/actions/runs/40639015745/job/122652534983)
+failed with `AssertionError: Different container shape: orderCapacity`. At the
+first 100,000-item unchanged pair, both variants validated all 100,000 complete
+items and reported map capacity 196,608. The baseline order capacity was 230,398;
+the candidate order capacity was 196,606. Thus equal logical contents and the
+same append sequence did not establish equal allocated array storage on this
+native allocator. Different allocation/growth histories are a plausible mechanism;
+the log alone does not establish the allocator's internal cause.
+
+The checkpoint deltas (28,015,296 and 19,085,760 bytes) include that differing
+order-buffer storage and cannot isolate map-value savings. This run stopped
+before the timing phase and remains a failed qualification. The retained
+[failure excerpt](evidence/native-capacity-failure.json) records the exact pair,
+traceback lines, source head, and SHA-256 of the complete original job log.
+
+The memory-only reservation makes the allocation policy explicit and checks that
+no append growth occurs. The original capacity equality assertion remains a hard
+gate. Production restoration and every uninstrumented timing source are unchanged.
+Native execution of this revised control is still required; no successful native
+result is claimed here. The historical Linux evidence below remains byte-for-byte
+unchanged and describes the earlier, append-grown experiment only.
 
 ## Results
 

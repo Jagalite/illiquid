@@ -74,6 +74,7 @@ private struct Observation: Encodable {
     var checkpointBytes: UInt64?
     var checkpointDeltaBytes: Int64?
     var mapCapacity: UInt64?
+    var orderReservationCount: Int?
     var orderCapacity: UInt64?
     var checkpointCount: UInt64?
 }
@@ -116,6 +117,9 @@ private enum Main {
         observation.checkpointBytes = sample.checkpoint_bytes
         observation.checkpointDeltaBytes = Int64(sample.checkpoint_bytes) - Int64(sample.before_bytes)
         observation.mapCapacity = sample.map_capacity
+        // Both temporary memory sources reserve this input-count upper bound
+        // after begin(); the probe includes the full allocation, without subtraction.
+        observation.orderReservationCount = fixture.items.count
         observation.orderCapacity = sample.order_capacity
         observation.checkpointCount = sample.checkpoint_count
         withExtendedLifetime(result) {}
