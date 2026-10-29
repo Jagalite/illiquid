@@ -98,16 +98,23 @@ final class SourceTreeDirectoryState {
     ) {
         cancelLoads(beneath: folderURL)
         let folderPath = SourceTreeIdentity.folderID(for: folderURL)
-        let cachedIDs = Set(directoryContents.keys)
-            .union(directoryErrors.keys)
-            .filter { SourceTreeIdentity.contains($0, within: folderPath) }
+        // Collect matching keys separately instead of building a union of all
+        // cached paths. Arrays do not retain dictionary storage during removal.
+        let contentIDs = directoryContents.keys.filter {
+            SourceTreeIdentity.contains($0, within: folderPath)
+        }
+        let errorIDs = directoryErrors.keys.filter {
+            SourceTreeIdentity.contains($0, within: folderPath)
+        }
         if !preserveExpansion {
             expandedFolderIDs = Set(expandedFolderIDs.filter {
                 !SourceTreeIdentity.contains($0, within: folderPath)
             })
         }
-        for id in cachedIDs {
+        for id in contentIDs {
             directoryContents[id] = nil
+        }
+        for id in errorIDs {
             directoryErrors[id] = nil
         }
     }
@@ -134,10 +141,16 @@ final class SourceTreeDirectoryState {
         activeRoots: [URL],
         expandedFolderIDs: Set<String>
     ) -> Set<String> {
+        guard !activeRoots.isEmpty,
+              !plan.directoriesToReload.isEmpty || !plan.rootsToRescan.isEmpty
+        else { return [] }
         let activeRootPaths = Set(activeRoots.map(SourceTreeIdentity.folderID))
         return Set(plan.directoriesToReload.union(plan.rootsToRescan).filter { path in
-            activeRoots.contains { SourceTreeIdentity.isFolderID(path, inside: $0) }
-                && (activeRootPaths.contains(path) || expandedFolderIDs.contains(path))
+            // Reuse the normalized roots for the whole event batch. Collapsed
+            // directories need no containment check, and roots contain themselves.
+            activeRootPaths.contains(path)
+                || (expandedFolderIDs.contains(path)
+                    && activeRootPaths.contains { SourceTreeIdentity.contains(path, within: $0) })
         })
     }
 }

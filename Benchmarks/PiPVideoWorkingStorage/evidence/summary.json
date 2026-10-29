@@ -1,0 +1,359 @@
+{
+  "comparison": "Matched parent-behavior control versus candidate, identical instrumentation",
+  "pairs": 6,
+  "scope": "Native compositor component with one synthetic cached frame and bitmap subtitle; four extra completed outputs temporarily populate its real pool. Physical footprint and device allocation are process counters, not whole-player memory savings.",
+  "workloads": [
+    {
+      "metrics": {
+        "active_hdr_texture_allocated_bytes": {
+          "candidate": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "control": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "active_metal_current_allocated_bytes": {
+          "candidate": {
+            "max": 50864512,
+            "median": 50864512,
+            "min": 50864512
+          },
+          "control": {
+            "max": 59158976,
+            "median": 50864512,
+            "min": 50864512
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "active_observed_output_buffers": {
+          "candidate": {
+            "max": 5,
+            "median": 5,
+            "min": 5
+          },
+          "control": {
+            "max": 5,
+            "median": 5,
+            "min": 5
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "active_physical_footprint_bytes": {
+          "candidate": {
+            "max": 82659328,
+            "median": 82503712,
+            "min": 82397248
+          },
+          "control": {
+            "max": 82724800,
+            "median": 82577408,
+            "min": 82364352
+          },
+          "paired_candidate_minus_control_median": -114656
+        },
+        "first_start_sample_ns": {
+          "candidate": {
+            "max": 111771625,
+            "median": 91587083.5,
+            "min": 84871792
+          },
+          "control": {
+            "max": 139364541,
+            "median": 103347916.5,
+            "min": 94734166
+          },
+          "paired_candidate_minus_control_median": -7047812,
+          "paired_time_reduction_percent_median": 6.976511590465146
+        },
+        "idle_hdr_texture_allocated_bytes": {
+          "candidate": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "control": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "idle_metal_current_allocated_bytes": {
+          "candidate": {
+            "max": 50864512,
+            "median": 50864512,
+            "min": 50864512
+          },
+          "control": {
+            "max": 59158976,
+            "median": 50864512,
+            "min": 50864512
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "idle_observed_output_buffers": {
+          "candidate": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "control": {
+            "max": 5,
+            "median": 5,
+            "min": 5
+          },
+          "paired_candidate_minus_control_median": -5
+        },
+        "idle_physical_footprint_above_before_bytes": {
+          "candidate": {
+            "max": 43728960,
+            "median": 43696192,
+            "min": 43597824
+          },
+          "control": {
+            "max": 43696192,
+            "median": 43671584,
+            "min": 43614272
+          },
+          "paired_candidate_minus_control_median": 40992
+        },
+        "idle_physical_footprint_bytes": {
+          "candidate": {
+            "max": 82659328,
+            "median": 82503712,
+            "min": 82397248
+          },
+          "control": {
+            "max": 82724800,
+            "median": 82585600,
+            "min": 82364352
+          },
+          "paired_candidate_minus_control_median": -122848
+        },
+        "metal_current_allocated_drop_bytes": {
+          "candidate": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "control": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "physical_footprint_drop_bytes": {
+          "candidate": {
+            "max": 32768,
+            "median": 0,
+            "min": 0
+          },
+          "control": {
+            "max": 0,
+            "median": 0,
+            "min": -16384
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "reentry_first_sample_ns": {
+          "candidate": {
+            "max": 17502334,
+            "median": 10578750.5,
+            "min": 7380375
+          },
+          "control": {
+            "max": 3475333,
+            "median": 2808604,
+            "min": 2401042
+          },
+          "paired_candidate_minus_control_median": 7636167.5,
+          "paired_time_reduction_percent_median": -262.6326136265825
+        }
+      },
+      "mode": "sdr-1080p"
+    },
+    {
+      "metrics": {
+        "active_hdr_texture_allocated_bytes": {
+          "candidate": {
+            "max": 66355200,
+            "median": 66355200,
+            "min": 66355200
+          },
+          "control": {
+            "max": 66355200,
+            "median": 66355200,
+            "min": 66355200
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "active_metal_current_allocated_bytes": {
+          "candidate": {
+            "max": 415939584,
+            "median": 391047680,
+            "min": 391047680
+          },
+          "control": {
+            "max": 440831488,
+            "median": 391047680,
+            "min": 391047680
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "active_observed_output_buffers": {
+          "candidate": {
+            "max": 5,
+            "median": 5,
+            "min": 5
+          },
+          "control": {
+            "max": 5,
+            "median": 5,
+            "min": 5
+          },
+          "paired_candidate_minus_control_median": 0
+        },
+        "active_physical_footprint_bytes": {
+          "candidate": {
+            "max": 249006208,
+            "median": 248776896,
+            "min": 248645824
+          },
+          "control": {
+            "max": 248924416,
+            "median": 248817856,
+            "min": 248744128
+          },
+          "paired_candidate_minus_control_median": -8192
+        },
+        "first_start_sample_ns": {
+          "candidate": {
+            "max": 231291417,
+            "median": 200079708.5,
+            "min": 195687041
+          },
+          "control": {
+            "max": 303456334,
+            "median": 211376563,
+            "min": 182323958
+          },
+          "paired_candidate_minus_control_median": 3796124.5,
+          "paired_time_reduction_percent_median": -1.8139359649170794
+        },
+        "idle_hdr_texture_allocated_bytes": {
+          "candidate": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "control": {
+            "max": 66355200,
+            "median": 66355200,
+            "min": 66355200
+          },
+          "paired_candidate_minus_control_median": -66355200
+        },
+        "idle_metal_current_allocated_bytes": {
+          "candidate": {
+            "max": 349584384,
+            "median": 324692480,
+            "min": 324692480
+          },
+          "control": {
+            "max": 440831488,
+            "median": 391047680,
+            "min": 391047680
+          },
+          "paired_candidate_minus_control_median": -66355200
+        },
+        "idle_observed_output_buffers": {
+          "candidate": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "control": {
+            "max": 5,
+            "median": 5,
+            "min": 5
+          },
+          "paired_candidate_minus_control_median": -5
+        },
+        "idle_physical_footprint_above_before_bytes": {
+          "candidate": {
+            "max": 127058048,
+            "median": 126968032,
+            "min": 126910656
+          },
+          "control": {
+            "max": 193364160,
+            "median": 193331392,
+            "min": 193216704
+          },
+          "paired_candidate_minus_control_median": -66371552
+        },
+        "idle_physical_footprint_bytes": {
+          "candidate": {
+            "max": 182651008,
+            "median": 182421696,
+            "min": 182290624
+          },
+          "control": {
+            "max": 248924416,
+            "median": 248817856,
+            "min": 248744128
+          },
+          "paired_candidate_minus_control_median": -66363392
+        },
+        "metal_current_allocated_drop_bytes": {
+          "candidate": {
+            "max": 66355200,
+            "median": 66355200,
+            "min": 66355200
+          },
+          "control": {
+            "max": 0,
+            "median": 0,
+            "min": 0
+          },
+          "paired_candidate_minus_control_median": 66355200
+        },
+        "physical_footprint_drop_bytes": {
+          "candidate": {
+            "max": 66355200,
+            "median": 66355200,
+            "min": 66355200
+          },
+          "control": {
+            "max": 0,
+            "median": 0,
+            "min": -16384
+          },
+          "paired_candidate_minus_control_median": 66355200
+        },
+        "reentry_first_sample_ns": {
+          "candidate": {
+            "max": 77618250,
+            "median": 50149062.5,
+            "min": 45047834
+          },
+          "control": {
+            "max": 6458208,
+            "median": 5933417,
+            "min": 5163625
+          },
+          "paired_candidate_minus_control_median": 44412104.5,
+          "paired_time_reduction_percent_median": -798.0089889494254
+        }
+      },
+      "mode": "pq-4k"
+    }
+  ]
+}

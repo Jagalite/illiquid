@@ -55,8 +55,55 @@ def utc() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+# Reviewed integration tree 1dde261408290db8d94e1f8f37628c8fea2aadff.
+# These pins authorize only this source combination, never general support drift.
+CURRENT_SOURCE_SHA256 = {'MediaNameRecognition.swift': '546229819194a5844bc052e3837a21296921f4b11e6191ebdc82c0c7c5e64910', 'MediaMetadataHints.swift': '9df354b5f319aee2d29799b601562e46571d664650bfb298133f7425939ba53a', 'NFOMetadataHints.swift': '5e9728f84654f5f38818444b9f1ef40db0d751aa23eb6aba273e587cc1f9892a', 'PlexMatchHints.swift': 'b35ce4f067ecac4f714c0895aaaa6df3b58e1dcb6c8d4353e59d18abc26c962b', 'MediaSidecarReader.swift': '629ea274d9b34e64c8e7702c8963b44df84a5eeee0e4d425401fdf35f4ce635a'}
+FROZEN_MANIFEST_SHA256 = '7179d247d85d640ce240d397360d03f6ff583df953d5e0a7007b2bd8bc4689a2'
+REGRESSION_HARNESS_SHA256 = 'c94e6865c5ea42cd42a4edef71502c2c5c39d6f74912c1ff9673676946aa5195'
+
+
+def validate_mode(args):
+    if args.current_source_regression:
+        if args.cases:
+            raise ValueError("Current-source regression requires every case")
+        args.run_tests = True
+        args.verify_only = True
+
+
+def load_sources(current_source_regression):
+    manifest_bytes = (HERE / "baseline/manifest.json").read_bytes()
+    if digest(manifest_bytes) != FROZEN_MANIFEST_SHA256:
+        raise ValueError("Frozen baseline manifest integrity failed")
+    frozen = json.loads(manifest_bytes)
+    entries = frozen["sourceFiles"]
+    if len(entries) != len(SOURCES) or {item["file"] for item in entries} != set(SOURCES):
+        raise ValueError("Frozen baseline manifest must cover each source exactly once")
+    baseline = {name: (HERE / "baseline" / name).read_bytes() for name in SOURCES}
+    for item in entries:
+        if digest(baseline[item["file"]]) != item["sha256"]:
+            raise ValueError(f"Frozen baseline integrity failed: {item['file']}")
+    current = {name: (ROOT / SOURCE_DIR / name).read_bytes() for name in SOURCES}
+    changed = [name for name in SOURCES if current[name] != baseline[name]]
+    if current_source_regression:
+        for name in SOURCES:
+            if digest(current[name]) != CURRENT_SOURCE_SHA256[name]:
+                raise ValueError(f"Unreviewed current-source drift: {name}")
+        if digest((HERE / "Harness.swift").read_bytes()) != REGRESSION_HARNESS_SHA256:
+            raise ValueError("Unreviewed regression harness drift")
+    elif changed != [READER]:
+        raise ValueError(f"Only the reader may differ from the frozen baseline; got {changed}")
+    return frozen, baseline, current, changed
+
+
+def arm_source(variant, name, baseline, current, current_source_regression):
+    if variant == "baseline" and (name == READER or not current_source_regression):
+        return baseline[name]
+    return current[name]
+
+
 class Experiment:
     def __init__(self, args):
+        validate_mode(args)
         self.args = args
         self.out = args.output.resolve()
         if self.out.exists() and any(self.out.iterdir()):
@@ -98,15 +145,8 @@ class Experiment:
         return result.stdout
 
     def stage(self):
-        frozen = json.loads((HERE / "baseline/manifest.json").read_text())
-        baseline = {name: (HERE / "baseline" / name).read_bytes() for name in SOURCES}
-        for item in frozen["sourceFiles"]:
-            if digest(baseline[item["file"]]) != item["sha256"]:
-                raise ValueError(f"Frozen baseline integrity failed: {item['file']}")
-        current = {name: (ROOT / SOURCE_DIR / name).read_bytes() for name in SOURCES}
-        changed = [name for name in SOURCES if current[name] != baseline[name]]
-        if changed != [READER]:
-            raise ValueError(f"Only the reader may differ from the frozen baseline; got {changed}")
+        validate_mode(self.args)
+        frozen, baseline, current, changed = load_sources(self.args.current_source_regression)
         test_dir = ROOT / "Tests/IlliquidCoreTests"
         names = set()
         for pattern in ("MediaSidecar*Tests.swift", "PlexMatch*Tests.swift", "NFO*Tests.swift",
@@ -114,6 +154,8 @@ class Experiment:
             names.update(path.name for path in test_dir.glob(pattern))
         required = {"MediaSidecarAncestorHintsTests.swift", "MediaSidecarPathPlanTests.swift",
                     "MediaSidecarNegativeCacheTests.swift"}
+        if self.args.current_source_regression:
+            required.update(['EpisodeNameRecognitionRegressionTests.swift', 'MediaNameRecognitionFastPathTests.swift', 'MediaNameRecognitionPerformanceRegressionTests.swift', 'MediaNameRecognitionTests.swift', 'MediaSidecarAncestorHintsTests.swift', 'MediaSidecarNegativeCacheTests.swift', 'MediaSidecarPathPlanTests.swift', 'MediaSidecarTests.swift', 'NFODeclarationPreflightTests.swift', 'NFOEpisodeScopeRegressionTests.swift', 'NFOMetadataFieldSelectionTests.swift', 'NFOTextLimitPerformanceTests.swift', 'PlexMatchHintsRegressionTests.swift', 'PlexMatchReaderRegressionTests.swift'])
         if self.args.run_tests and not required.issubset(names):
             raise ValueError(f"Missing qualification tests: {sorted(required - names)}")
         tests = {name: (test_dir / name).read_bytes() for name in sorted(names)}
@@ -135,7 +177,7 @@ class Experiment:
             (package / "Package.swift").write_text(MANIFEST)
             receipt = {"production": {}, "tests": {}, "manifest_sha256": digest(MANIFEST.encode())}
             for name in SOURCES:
-                original = baseline[name] if variant == "baseline" else current[name]
+                original = arm_source(variant, name, baseline, current, self.args.current_source_regression)
                 compiled, adaptation = original, None
                 if platform.system() == "Linux":
                     if name == READER:
@@ -174,6 +216,11 @@ class Experiment:
             print("Built", variant, flush=True)
         save(self.evidence / "binaries.json", binaries)
         save(self.evidence / "provenance.json", {"baseline": frozen,
+            "mode": "current-source-regression" if self.args.current_source_regression else "historical",
+            "reference_adaptation": ("Independent frozen reader with identical reviewed current support in both arms; not historical timing evidence"
+                if self.args.current_source_regression else None),
+            "reviewed_current_source_sha256": CURRENT_SOURCE_SHA256 if self.args.current_source_regression else None,
+            "frozen_manifest_sha256": FROZEN_MANIFEST_SHA256,
             "candidate_head": self.command(["git", "rev-parse", "HEAD"]).strip(),
             "candidate_uses_worktree_source": True, "changed_production_files": changed,
             "driver_sha256": digest(harness), "runner_sha256": file_digest(Path(__file__)),
@@ -197,6 +244,7 @@ class Experiment:
         save(self.evidence / "tests.json", results)
 
     def verify(self):
+        validate_mode(self.args)
         self.fixtures = self.build / "fixtures"
         self.command([self.binaries["baseline"], "prepare", self.fixtures], "fixture-setup.log")
         catalogs, reports = [], []
@@ -208,6 +256,12 @@ class Experiment:
             reports.append(json.loads(raw))
         if catalogs[0] != catalogs[1] or canonical(reports[0]) != canonical(reports[1]):
             raise RuntimeError("Exact complete output/filesRead/cancellation parity failed")
+        if self.args.current_source_regression:
+            coverage = (len(reports[0]["scans"]),
+                sum(len(row["outputs"]) for row in reports[0]["scans"]),
+                len(reports[0]["cancellations"]))
+            if coverage != (28, 12822, 92):
+                raise RuntimeError(f"Incomplete current-source regression coverage: {coverage}")
         self.expected = {row["scenario"]["name"]: row for row in reports[0]["scans"]}
         measured = [case for case in catalogs[0] if case["measure"]]
         if self.args.cases:
@@ -226,6 +280,8 @@ class Experiment:
               receipt["cancellation_scenarios"], "throw/resume trajectories", flush=True)
 
     def sample(self, variant, case, iterations):
+        if self.args.current_source_regression:
+            raise ValueError("Current-source regression cannot produce timing samples")
         row = json.loads(self.command([self.binaries[variant], "bench", self.fixtures, case, iterations]))
         expected = self.expected[case]
         reads = expected["filesReadAfter"][-1] - expected["filesReadBefore"]
@@ -239,6 +295,8 @@ class Experiment:
         return row
 
     def measure(self):
+        if self.args.current_source_regression:
+            raise ValueError("Current-source regression cannot measure")
         calibration, iterations = [], {}
         for case in self.cases:
             pilots = []
@@ -297,9 +355,15 @@ def main():
     parser.add_argument("--jobs", type=int, default=2)
     parser.add_argument("--run-tests", action="store_true")
     parser.add_argument("--verify-only", action="store_true")
+    parser.add_argument("--current-source-regression", action="store_true",
+        help="Pinned integration sources; forces debug/release tests and complete parity, forbids timing")
     args = parser.parse_args()
     if args.pairs < 2 or args.pairs % 2 or args.target_ms <= 0 or args.jobs <= 0:
         parser.error("Use even pairs >= 2 and positive target-ms/jobs")
+    try:
+        validate_mode(args)
+    except ValueError as error:
+        parser.error(str(error))
     run = Experiment(args)
     save(run.evidence / "environment.json", {"started_utc": utc(),
         "platform": platform.platform(), "architecture": platform.machine(),
@@ -310,7 +374,7 @@ def main():
         "git_status": run.command(["git", "status", "--short"]),
         "LD_LIBRARY_PATH": run.env.get("LD_LIBRARY_PATH"),
         "arguments": {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()},
-        "timing_contract": "complete recognize scans; separate dynamically linked production module; fresh process per sample; cold=new reader each timed pass including first sidecar I/O; warm=primed reused reader; OS caches warm, no cold-disk claim; fixture construction, warmup, calibration and JSON outside timing"})
+        "timing_contract": None if args.current_source_regression else "complete recognize scans; separate dynamically linked production module; fresh process per sample; cold=new reader each timed pass including first sidecar I/O; warm=primed reused reader; OS caches warm, no cold-disk claim; fixture construction, warmup, calibration and JSON outside timing"})
     run.stage()
     if args.run_tests:
         run.tests()
@@ -318,7 +382,9 @@ def main():
     if not args.verify_only:
         run.measure()
     save(run.evidence / "completion.json", {"complete": True, "timing": not args.verify_only,
-        "tests_requested": args.run_tests, "finished_utc": utc()})
+        "tests_requested": args.run_tests,
+        "mode": "current-source-regression" if args.current_source_regression else "historical",
+        "finished_utc": utc()})
 
 
 if __name__ == "__main__":

@@ -5,7 +5,15 @@ on:
     branches: ['perf/ancestor-metadata-merge-20261028-3388']
     paths:
       - 'Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift'
-      - 'Tests/IlliquidCoreTests/MediaSidecarAncestorHintsTests.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/NFOMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecar*Tests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/NFO*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Tests/IlliquidCoreTests/EpisodeNameRecognitionRegressionTests.swift'
       - 'Benchmarks/SidecarAncestorHints/**'
       - '.github/workflows/sidecar-ancestor-hints.yml'
       - '!Benchmarks/SidecarAncestorHints/*.md'
@@ -13,8 +21,15 @@ on:
   pull_request:
     paths:
       - 'Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
       - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/NFOMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
       - 'Tests/IlliquidCoreTests/MediaSidecar*Tests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatch*Tests.swift'
+      - 'Tests/IlliquidCoreTests/NFO*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Tests/IlliquidCoreTests/EpisodeNameRecognitionRegressionTests.swift'
       - 'Benchmarks/SidecarAncestorHints/**'
       - '.github/workflows/sidecar-ancestor-hints.yml'
       - '!Benchmarks/SidecarAncestorHints/*.md'
@@ -38,7 +53,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - name: Test both readers and measure complete metadata scans
+      - name: Test both readers and verify complete metadata scans
         run: |
           python3 - <<'PY'
           import json, os, subprocess, sys
@@ -48,6 +63,8 @@ jobs:
                      '--output', str(Path(os.environ['RUNNER_TEMP']) / 'sidecar-ancestor-hints'),
                      '--swiftc', compiler,
                      '--run-tests', '--pairs', '10', '--target-ms', '150']
+          if os.environ['GITHUB_EVENT_NAME'] in {'push', 'pull_request'}:
+              command += ['--current-source-regression']
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
               cli = [sys.executable, str(queue)]

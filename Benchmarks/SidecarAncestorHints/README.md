@@ -105,6 +105,32 @@ or empty so a later run cannot overwrite prior evidence. Linux hosts using a
 separate toolchain dependency directory should pass it through `LD_LIBRARY_PATH`;
 the runner preserves and records that environment setting.
 
+## Current-source integration regression
+
+Automated `push` and `pull_request` runs use `--current-source-regression`.
+This mode accepts only the exact reviewed SHA-256 pins for all five production
+sources and validates the frozen manifest, every frozen source, and the unchanged
+harness. Both independently built arms use identical reviewed current support;
+the reference arm retains the independent frozen reader. Provenance records this
+reference adaptation rather than treating it as the historical experiment.
+
+The mode forces all selected current tests for both readers in debug and release,
+plus full parity of 28 scans, 12,822 recognized outputs, and 92 cancellation
+throw/resume trajectories. Partial `--case` lists and measurement APIs are
+rejected. It produces no timing samples or performance claim.
+
+```sh
+python3 Benchmarks/SidecarAncestorHints/run.py \
+  --output /tmp/sidecar-ancestor-hints-regression \
+  --current-source-regression
+```
+
+The same Kyoto requirement applies. Manual `workflow_dispatch` and the CLI
+default preserve historical strict validation: they reject the integrated tree's
+three changed support files. Historical timing reproduction requires the recorded
+historical source combination; the integration regression does not replace the
+retained reproduction commands or archived evidence below.
+
 ## Retained research and final candidate
 
 The [research report](../../Documentation/SIDECAR_ANCESTOR_HINTS_PERFORMANCE.md)
