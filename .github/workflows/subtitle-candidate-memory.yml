@@ -9,6 +9,7 @@ on:
       - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
       - 'Tests/IlliquidCoreTests/ExternalSubtitle*.swift'
       - 'Scripts/test-subtitle-candidate-traversal.sh'
+      - 'Scripts/tests/subtitle-source-policy-tests.py'
       - 'Benchmarks/SubtitleCandidateStreaming/Harness.swift'
       - 'Benchmarks/SubtitleCandidateStreaming/run.py'
       - 'Benchmarks/SubtitleCandidateStreaming/CHeapProbe/**'
@@ -20,6 +21,7 @@ on:
       - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
       - 'Tests/IlliquidCoreTests/ExternalSubtitle*.swift'
       - 'Scripts/test-subtitle-candidate-traversal.sh'
+      - 'Scripts/tests/subtitle-source-policy-tests.py'
       - 'Benchmarks/SubtitleCandidateStreaming/**'
       - '.github/workflows/subtitle-candidate-memory.yml'
   workflow_dispatch:
@@ -42,6 +44,8 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Check source policies and rejection controls without compiling
+        run: python3 Scripts/tests/subtitle-source-policy-tests.py
       - name: Run matcher regressions in debug and release
         run: |
           mkdir -p "$RUNNER_TEMP/subtitle-candidate-memory/tests"
@@ -50,11 +54,16 @@ jobs:
             2>&1 | tee "$RUNNER_TEMP/subtitle-candidate-memory/tests/debug.log"
           bash Scripts/test-subtitle-candidate-traversal.sh -c release --jobs 2 -Xswiftc -warnings-as-errors \
             2>&1 | tee "$RUNNER_TEMP/subtitle-candidate-memory/tests/release.log"
-      - name: Compare paired memory and association timing
+      - name: Verify paired outputs or run strict historical measurements
+        shell: bash
         run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode=(--regression-only)
+          fi
           python3 Benchmarks/SubtitleCandidateStreaming/run.py \
             --output "$RUNNER_TEMP/subtitle-candidate-memory/benchmark" \
-            --pairs 6
+            "${mode[@]}" --pairs 6
           cat "$RUNNER_TEMP/subtitle-candidate-memory/benchmark/summary.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
