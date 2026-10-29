@@ -17,7 +17,11 @@ import time
 BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 BASELINE_BLOB = "10374be342abef4546031d6edd988566b31a62b0"
 SOURCE = "Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift"
-TEST = "Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift"
+TESTS = (
+    "Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift",
+    "Tests/IlliquidNativePlaybackTests/MediaReadAheadGatePerformanceTests.swift",
+    "Tests/IlliquidNativePlaybackTests/MediaReadAheadGateEOFTests.swift",
+)
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 KYOTO = Path("/Volumes/seed1/Projects/kyoto/kyoto.py")
@@ -90,12 +94,13 @@ def main():
         raise RuntimeError("Pinned baseline blob does not match")
     baseline = subprocess.check_output(["git", "show", f"{BASELINE}:{SOURCE}"], cwd=ROOT)
     candidate = (ROOT / SOURCE).read_bytes()
-    inputs = {SOURCE: digest(candidate), TEST: digest((ROOT / TEST).read_bytes())}
+    inputs = {SOURCE: digest(candidate), **{path: digest((ROOT / path).read_bytes()) for path in TESTS}}
     for name in ("Driver.swift", "Probe.swift", "run.py"):
         inputs[str((HERE / name).relative_to(ROOT))] = digest((HERE / name).read_bytes())
     compiler = run([swiftc, "--version"], "compiler")
     manifest = {
         "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "test_sha256": {path: digest((ROOT / path).read_bytes()) for path in TESTS},
         "baseline_commit": BASELINE, "baseline_blob": BASELINE_BLOB,
         "candidate_commit": head,
         "baseline_source_sha256": digest(baseline),
@@ -178,17 +183,18 @@ let package = Package(
         tests.mkdir(parents=True)
         (test_package / "Package.swift").write_text(package)
         (target / "MediaReadAheadGate.swift").write_bytes(source)
-        (tests / "MediaReadAheadGateTests.swift").write_bytes((ROOT / TEST).read_bytes())
+        for path in TESTS:
+            (tests / Path(path).name).write_bytes((ROOT / path).read_bytes())
         for configuration in ("debug", "release"):
             label = f"{variant}-tests-{configuration}"
             output = run([swift, "test", "--package-path", test_package,
                           "--configuration", configuration, "--no-parallel"], label)
             # Require the Swift Testing suite, not merely a zero-test XCTest pass.
-            if not re.search(r"Test run with 14 tests\b[^\n]*\bpassed\b", output):
-                raise RuntimeError(f"Missing 14-test success receipt in {label}")
+            if not re.search(r"Test run with 41 tests\b[^\n]*\bpassed\b", output):
+                raise RuntimeError(f"Missing 41-test success receipt in {label}")
             test_receipts.append({
                 "variant": variant, "configuration": configuration,
-                "passed": 14, "log": f"logs/{label}.log",
+                "passed": 41, "log": f"logs/{label}.log",
                 "log_sha256": digest((out / "logs" / f"{label}.log").read_bytes()),
             })
         manifest[variant] = {
@@ -256,7 +262,7 @@ let package = Package(
             raise RuntimeError("Timed executable changed during measurement")
     write_json(out / "summary.json", summary)
     completion = {"passed": True, "pairs": args.pairs, "rows": len(rows),
-                  "test_executions": 56, "mechanism_probes": len(probes)}
+                  "test_executions": 164, "mechanism_probes": len(probes)}
     write_json(out / "completion.json", completion)
 
     # Durable raw evidence is also emitted in the log for connector retrieval.
