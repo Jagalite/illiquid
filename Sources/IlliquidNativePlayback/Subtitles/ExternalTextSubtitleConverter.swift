@@ -43,8 +43,29 @@ enum ExternalTextSubtitleConverter {
     static func convert(_ source: String, format: Format) throws -> String {
         var normalized = source
         if source.utf8.contains(0x0D) {
-            normalized = source.replacingOccurrences(of: "\r\n", with: "\n")
-                .replacingOccurrences(of: "\r", with: "\n")
+            if source.utf8.allSatisfy({ $0 < 0x80 }) {
+                // CR and LF cannot occur inside a multibyte UTF-8 scalar. Normalize
+                // both conventions in one pass, preserving every other byte.
+                normalized = String(unsafeUninitializedCapacity: source.utf8.count) { buffer in
+                    var written = 0
+                    var previousWasCR = false
+                    for byte in source.utf8 {
+                        if byte == 0x0A && previousWasCR {
+                            previousWasCR = false
+                            continue
+                        }
+                        buffer[written] = byte == 0x0D ? 0x0A : byte
+                        written += 1
+                        previousWasCR = byte == 0x0D
+                    }
+                    return written
+                }
+            } else {
+                // Nonliteral Foundation matching can leave CR next to a
+                // combining mark unchanged. Preserve that Unicode behavior.
+                normalized = source.replacingOccurrences(of: "\r\n", with: "\n")
+                    .replacingOccurrences(of: "\r", with: "\n")
+            }
         }
         if format == .webVTT {
             // A UTF-8 decoder may retain the optional WebVTT byte-order mark.

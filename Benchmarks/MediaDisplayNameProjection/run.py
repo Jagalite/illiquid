@@ -24,6 +24,10 @@ FOCAL = "Sources/IlliquidCore/MediaNameRecognition.swift"
 CASES = ["precomputed_episodes", "unprepared_episodes", "mixed_library",
          "movies_control", "cached_projection_control"]
 VARIANTS = ("baseline", "candidate")
+REGRESSION_HELPER = ROOT / "Benchmarks/MediaDisplayName/regression.py"
+spec = importlib.util.spec_from_file_location("media_display_regression", REGRESSION_HELPER)
+regression = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(regression)
 
 
 def digest(raw):
@@ -44,7 +48,13 @@ def main():
     parser.add_argument("--sizes", nargs="+", type=int, default=[100, 1000])
     parser.add_argument("--cases", nargs="+", choices=CASES, default=CASES)
     parser.add_argument("--verify-only", action="store_true")
+    parser.add_argument("--current-source-regression", action="store_true",
+                        help="Verification only: frozen focal baseline with identical current support")
     args = parser.parse_args()
+    try:
+        regression.validate_mode(args.current_source_regression, args.verify_only)
+    except ValueError as error:
+        parser.error(str(error))
     if not args.swiftc or not 2 <= args.pairs <= 40 or args.pairs % 2:
         parser.error("Swift is required and pairs must be even from 2 through 40")
     if not math.isfinite(args.target_ms) or not 10 <= args.target_ms <= 2000:
@@ -94,6 +104,11 @@ def main():
 
     original, baseline_records = helper.snapshot(read_baseline)
     candidate, candidate_records = helper.snapshot(lambda name: (ROOT / name).read_bytes())
+    if args.current_source_regression:
+        original, comparison = regression.select_sources(original, candidate, FOCAL)
+        save(out / "comparison.json", comparison)
+        baseline_records = {name: baseline_records[name] if name == FOCAL else dict(record)
+                            for name, record in candidate_records.items()}
     if original.keys() != candidate.keys():
         raise RuntimeError("Production source inventory differs")
     for name in original:
@@ -101,7 +116,7 @@ def main():
             raise RuntimeError(f"Unexpected unrelated production difference: {name}")
     tracked = {record["repository_path"]: record["source_sha256"] for record in candidate_records.values()}
     for name, path in [("runner.py", Path(__file__)), ("Harness.swift", HERE / "Harness.swift"),
-                       ("source-snapshot-helper.py", HELPER)]:
+                       ("source-snapshot-helper.py", HELPER), ("regression.py", REGRESSION_HELPER)]:
         raw = path.read_bytes()
         (out / name).write_bytes(raw)
         tracked[str(path.relative_to(ROOT))] = digest(raw)
@@ -111,7 +126,8 @@ def main():
     if native:
         sdk = run(["xcrun", "--sdk", "macosx", "--show-sdk-path"], "sdk").read_text().strip()
         flags += ["-target", f"{platform.machine()}-apple-macosx26.0", "-sdk", sdk]
-    environment = {"baseline_revision": BASELINE,
+    environment = {"comparison_mode": "current-source-regression" if args.current_source_regression else "historical-strict",
+                   "baseline_revision": BASELINE,
                    "head": run(["git", "rev-parse", "HEAD"], "head").read_text().strip(),
                    "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                    "platform": platform.platform(), "machine": platform.machine(), "python": sys.version,

@@ -74,9 +74,14 @@ def stage(out: Path) -> dict[str, object]:
     current = candidate.decode()
     if original.count(DECLARATION) != 1 or current.count(DECLARATION) != 1:
         raise RuntimeError("Recognizer extraction anchor changed; review the verifier")
-    # Keep the frozen result type's derived properties as well as its parser.
-    # Sharing today's type would mask a displayName/section regression, and
-    # rejecting all type changes prevents legitimate formatting improvements.
+    current_type, _ = current.split(DECLARATION)
+    reviewed_type = (HERE / "baseline/reviewed-candidate-type.swift.txt").read_text()
+    if current_type != reviewed_type:
+        raise RuntimeError("RecognizedMediaName changed; the candidate type pin requires review")
+    # Keep the complete frozen type and parser independent of today's formatting.
+    # Legitimate type changes require an explicitly reviewed candidate snapshot.
+    if original.count("RecognizedMediaName") < 2:
+        raise RuntimeError("Baseline result type anchor changed; review the verifier")
     renamed = original
     renames = {}
     for name in ("RecognizedMediaName", "MediaNameRecognition"):
@@ -89,13 +94,14 @@ def stage(out: Path) -> dict[str, object]:
         "baseline.swift": baseline, "candidate.swift": candidate, "oracle.swift": oracle,
         "Harness.swift": (HERE / "Harness.swift").read_bytes(),
         "run.py": Path(__file__).read_bytes(),
+        "reviewed-candidate-type.swift.txt": reviewed_type.encode(),
     }
     for name, data in sources.items():
         (out / "sources" / name).write_bytes(data)
     return {
         "baseline_revision": BASELINE_REVISION, "production_path": str(SOURCE),
         "source_sha256": {name: sha256(data) for name, data in sources.items()},
-        "oracle_transform": "Keep the complete frozen source; rename baseline result type and parser identifiers only",
+        "oracle_transform": "Keep the complete frozen source; rename baseline result type and parser identifiers only; require exact reviewed candidate type",
         "oracle_identifier_renames": renames,
     }
 

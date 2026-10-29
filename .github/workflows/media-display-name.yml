@@ -8,6 +8,17 @@ on:
       - 'Tests/IlliquidCoreTests/MediaDisplayNameTests.swift'
       - 'Tests/IlliquidCoreTests/EpisodeDisplayNameTests.swift'
       - 'Tests/IlliquidCoreTests/MediaNameRecognition*Tests.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/NFOMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
       - 'Benchmarks/MediaDisplayName/**'
       - 'Benchmarks/MediaDisplayNameProjection/**'
       - 'Benchmarks/MediaNameRecognition/**'
@@ -52,11 +63,17 @@ jobs:
           echo 'Kyoto is unavailable on this ephemeral runner; building serially in this isolated checkout.'
       # Keep the intact historical bare-dot path corpus in the native job;
       # Linux Foundation traps before formatting (see the research report).
+      - name: Check comparison guards without compiling
+        run: python3 Benchmarks/MediaDisplayName/test_regression.py
       - name: Test labels and compare complete production outputs
         run: |
-          python3 Benchmarks/MediaDisplayName/run.py --correctness-only \
+          regression=()
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            regression=(--current-source-regression)
+          fi
+          python3 Benchmarks/MediaDisplayName/run.py --correctness-only "${regression[@]}" \
             --output "$RUNNER_TEMP/media-display-name-portable/component"
-          python3 Benchmarks/MediaDisplayNameProjection/run.py --verify-only \
+          python3 Benchmarks/MediaDisplayNameProjection/run.py --verify-only "${regression[@]}" \
             --output "$RUNNER_TEMP/media-display-name-portable/projection"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -88,11 +105,22 @@ jobs:
             exit 1
           fi
           echo 'Kyoto is unavailable on this ephemeral runner; building serially in this isolated checkout.'
+      - name: Check comparison guards without compiling
+        run: python3 Benchmarks/MediaDisplayName/test_regression.py
+      - name: Verify current-source component and projection regressions
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/MediaDisplayName/run.py --correctness-only --current-source-regression \
+            --output "$RUNNER_TEMP/media-display-name/component"
+          python3 Benchmarks/MediaDisplayNameProjection/run.py --verify-only --current-source-regression \
+            --output "$RUNNER_TEMP/media-display-name/projection"
       - name: Test exact formatting and measure production labels
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python3 Benchmarks/MediaDisplayName/run.py --pairs 10 --target-ms 100 \
             --output "$RUNNER_TEMP/media-display-name/component"
       - name: Compare complete media row construction
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python3 Benchmarks/MediaDisplayNameProjection/run.py --pairs 10 --target-ms 100 \
             --output "$RUNNER_TEMP/media-display-name/projection"

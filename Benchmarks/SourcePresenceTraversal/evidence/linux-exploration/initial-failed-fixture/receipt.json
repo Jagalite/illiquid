@@ -1,0 +1,61 @@
+{
+  "additionalHarnessRefinementsBeforeRetry": [
+    "Check root directory attributes directly before preparing fixture directories.",
+    "Keep scan receipt accumulation within the per-iteration autorelease pool and eliminate a temporary checksum array."
+  ],
+  "changedStagedFiles": {
+    "baseline": [
+      "Sources/SourcePresenceTraversalBenchmark/Harness.swift",
+      "Tests/IlliquidAppTests/SourcePresenceTraversalRegressionTests.swift"
+    ],
+    "candidate": [
+      "Sources/SourcePresenceTraversalBenchmark/Harness.swift",
+      "Tests/IlliquidAppTests/SourcePresenceTraversalRegressionTests.swift"
+    ]
+  },
+  "correction": "Use ordinary directory names Directory mp4 collection and Empty mkv collection in the test fixture. Preserve the production package-skipping behavior.",
+  "correctionPatch": {
+    "compressedBytes": 1415,
+    "compressedSHA256": "b84f4945d7ac488ed97cb3ef198b0811983c79033f2c06cad578a51d22b6bf4e",
+    "compression": "gzip.compress(data, compresslevel=9, mtime=0)",
+    "note": "Exact unified-diff bytes retained; blank context lines intentionally contain a leading space.",
+    "storedPath": "fixture-and-harness-corrections.patch.gz",
+    "uncompressedBytes": 4576,
+    "uncompressedSHA256": "815ac3dfa31faa650e9f7e4eea4e5b7bc14832daefb694296ae13bb4e4d900ad"
+  },
+  "failure": "Pinned baseline debug tests failed four expectations in the two new traversal fixture tests. Directories named Directory.mp4 and Empty.mkv were not ordinary-directory fixtures under Foundation package classification.",
+  "failureLog": {
+    "compressedBytes": 2451,
+    "compressedSHA256": "57d7594a4c751987163ca039ae772bee53ab5d69d113159176df1a814c74c9d8",
+    "source": "logs/0019-baseline-debug-tests.log",
+    "storedPath": "initial-failed-fixture/baseline-debug-tests.log.gz",
+    "uncompressedBytes": 13619,
+    "uncompressedSHA256": "b20c76b4db1bfdff645eba38a435f9cde73a6416d2b4f0c01dc65ba09e9985fc"
+  },
+  "measurementSamples": 0,
+  "note": "The initial attempt stopped during baseline debug tests. No timings from that attempt are included in the corrected run.",
+  "originalSourceFiles": {
+    "Sources/SourcePresenceTraversalBenchmark/Harness.swift": {
+      "compressedBytes": 4910,
+      "compressedSHA256": "63ae093930e7fd0254e085dafe055306c6fdd5408e863b543ee9f17fbb195054",
+      "source": "Harness.swift",
+      "storedPath": "initial-failed-fixture/Harness.swift.gz",
+      "uncompressedBytes": 18556,
+      "uncompressedSHA256": "053641b4584564a60239fcfd5f85ef864f9e966f2d45732c7a504cb6b36cd956"
+    },
+    "Tests/IlliquidAppTests/SourcePresenceTraversalRegressionTests.swift": {
+      "compressedBytes": 1998,
+      "compressedSHA256": "093bc32dd6d8ce7971037e3abe955f2b543f8ff6d7bfb31da37b6e6c79fcd6ec",
+      "source": "SourcePresenceTraversalRegressionTests.swift",
+      "storedPath": "initial-failed-fixture/SourcePresenceTraversalRegressionTests.swift.gz",
+      "uncompressedBytes": 7659,
+      "uncompressedSHA256": "63b493a66b66f9871013eeffbd808c047ea4f5f48a64188e2a8b7125f3292786"
+    }
+  },
+  "productionSourcesUnchangedAcrossAttempts": {
+    "baseline": true,
+    "candidate": true
+  },
+  "schemaVersion": 1,
+  "status": "failed-before-measurement"
+}

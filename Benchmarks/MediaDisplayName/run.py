@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import regression
 import hashlib
 import json
 import math
@@ -116,11 +117,12 @@ def toolchain(args: argparse.Namespace, output: Path, env: dict) -> dict:
     return receipt
 
 
-def snapshot(output: Path) -> tuple[dict, dict]:
+def snapshot(output: Path, current_source_regression: bool = False) -> tuple[dict, dict]:
     pinned = json.loads((HERE / "baseline/manifest.json").read_text())
     if pinned["revision"] != BASELINE:
         raise RuntimeError("Unexpected frozen baseline revision")
     inputs = {}
+    original, candidate = {}, {}
     for name, entry in pinned["files"].items():
         baseline_data = (HERE / "baseline" / name).read_bytes()
         blob = hashlib.sha1(b"blob " + str(len(baseline_data)).encode()
@@ -128,11 +130,16 @@ def snapshot(output: Path) -> tuple[dict, dict]:
         if digest(baseline_data) != entry["sha256"] or blob != entry["git_blob"]:
             raise RuntimeError(f"Frozen baseline does not match its manifest: {name}")
         candidate_data = (ROOT / entry["path"]).read_bytes()
-        if name == "MediaMetadataHints.swift" and candidate_data != baseline_data:
+        original[name], candidate[name] = baseline_data, candidate_data
+    if current_source_regression:
+        original, comparison = regression.select_sources(original, candidate, "MediaNameRecognition.swift")
+        write_json(output / "comparison.json", comparison)
+    for name in original:
+        if name == "MediaMetadataHints.swift" and candidate[name] != original[name]:
             raise RuntimeError("Shared MediaMetadataHints.swift changed; requalify the baseline")
-        inputs[f"baseline/{name}"] = baseline_data
-        inputs[f"candidate/{name}"] = candidate_data
-    for name in ("run.py", "Driver.swift", "Corpus.swift"):
+        inputs[f"baseline/{name}"] = original[name]
+        inputs[f"candidate/{name}"] = candidate[name]
+    for name in ("run.py", "regression.py", "Driver.swift", "Corpus.swift"):
         inputs[name] = (HERE / name).read_bytes()
     inputs["baseline-manifest.json"] = (HERE / "baseline/manifest.json").read_bytes()
     for name in TESTS:
@@ -276,7 +283,14 @@ def main() -> None:
     modes.add_argument("--tests-only", action="store_true")
     modes.add_argument("--correctness-only", action="store_true")
     modes.add_argument("--summarize-only", action="store_true", help="rebuild summary from retained measurements")
+    parser.add_argument("--current-source-regression", action="store_true",
+                        help="Correctness only: frozen focal baseline with identical current support")
     args = parser.parse_args()
+    try:
+        regression.validate_mode(args.current_source_regression, args.correctness_only,
+                                 skip_tests=args.skip_tests, summarize_only=args.summarize_only)
+    except ValueError as error:
+        parser.error(str(error))
     if args.pairs < 2 or args.pairs > 40 or args.pairs % 2:
         parser.error("pairs must be an even number from 2 to 40")
     if not math.isfinite(args.target_ms) or not 10 <= args.target_ms <= 2000:
@@ -299,7 +313,7 @@ def main() -> None:
     }.items():
         directory.mkdir(parents=True, exist_ok=True)
         env[key] = str(directory)
-    pinned, hashes = snapshot(output)
+    pinned, hashes = snapshot(output, args.current_source_regression)
     compiler = toolchain(args, output, env)
     manifest = {
         "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -309,6 +323,7 @@ def main() -> None:
         "working_tree_status": execute(["git", "status", "--short"], output, env, "environment/status.log"),
         "locale": execute(["locale"], output, env, "environment/locale.log").strip(),
         "baseline": pinned, "source_sha256": hashes, "pairs": args.pairs, "target_ms": args.target_ms,
+        "comparison_mode": "current-source-regression" if args.current_source_regression else "historical-strict",
         "skip_tests": args.skip_tests,
         "mode": "tests-only" if args.tests_only else "correctness-only" if args.correctness_only else "benchmark",
         "production_linkage": "Separate optimized shared IlliquidCore modules; independently optimized common driver; no cross-module optimization",

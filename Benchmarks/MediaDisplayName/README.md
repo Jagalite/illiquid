@@ -109,3 +109,22 @@ the surrounding production row construction and a cached-projection control.
 its own frozen result type so derived-property regressions cannot be hidden.
 The final results and limitations belong in
 [`MEDIA_DISPLAY_NAME_PERFORMANCE.md`](../../Documentation/MEDIA_DISPLAY_NAME_PERFORMANCE.md).
+
+## Current-source integration regression
+
+Automated pull-request checks explicitly pass `--current-source-regression` with
+`--correctness-only` (component) or `--verify-only` (projection). This mode keeps
+the frozen focal recognizer from `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`,
+requires the exact reviewed candidate recognizer hash, and captures current
+non-focal support once for identical use in both arms. Only the exact reviewed
+metadata-merge and sidebar-visibility support changes are allowlisted; other
+support drift still fails. `comparison.json` records
+historical and selected hashes and origins. All tests, differential corpora,
+projection cases and controls remain intact. Timing is rejected in this mode.
+
+The default and manual workflow retain strict historical support equality and
+the historical timing campaign. On an integrated source tree with support drift,
+that historical mode deliberately fails rather than reinterpret old measurements.
+Current-source regression receipts are not historical performance qualification.
+Run `python3 Benchmarks/MediaDisplayName/test_regression.py` for noncompiling
+pin, support-equality, mode and runner-wiring controls.

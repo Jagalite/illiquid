@@ -38,8 +38,13 @@ An optimized verifier compiles the candidate and the complete frozen baseline
 source together. It mechanically renames both the baseline parser and its result
 type, preserving the baseline's original derived display properties. The two
 result types are serialized independently, so today's formatting cannot mask a
-baseline/candidate difference. The runner records identifier-renaming counts and
-rejects a mismatched baseline source hash; the frozen file is never edited.
+baseline/candidate difference. The runner records identifier-renaming counts.
+The reviewed candidate type snapshot permits the episode display formatting
+change only: its fields, other computed properties, and all surrounding
+declaration text must still match exactly. Further type drift or a mismatched
+baseline source hash requires review. The frozen source, reviewed type,
+transformed oracle, and runner are included in the source receipts. The frozen
+file is never edited; its algorithm is otherwise copied verbatim.
 
 Before any timing, it compares every stored field and the derived `seriesTitle`,
 `displayName`, and `section`. String fields, optional strings, and string arrays

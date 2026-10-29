@@ -1,0 +1,56 @@
+import Foundation
+
+/// Filename evidence only: no network requests, directory reads, or guessed catalog matches.
+public struct RecognizedMediaName: Equatable, Sendable {
+    public enum Kind: String, Sendable { case movie, episode, extra, unknown }
+    public let kind: Kind
+    public let title: String
+    public let year: Int?
+    public let season: Int?
+    public let episode: Int?
+    public let lastEpisode: Int?
+    public let airDate: String?
+    public let episodeTitle: String?
+    public let edition: String?
+    public let catalogIDs: [String]
+    public let variant: String?
+    public var metadataSources: [String] = []
+
+    public var seriesTitle: String {
+        title + (year.map { " (\($0))" } ?? "")
+    }
+
+    public var displayName: String {
+        guard kind == .episode else { return seriesTitle }
+        let number = airDate ?? Self.episodeNumber(season: season ?? 0, episode: episode ?? 0,
+                                                  lastEpisode: lastEpisode)
+        return number + (episodeTitle.map { " · \($0)" } ?? "")
+    }
+
+    private static func episodeNumber(season: Int, episode: Int, lastEpisode: Int?) -> String {
+        let maximum = Int(Int32.max)
+        guard season >= 0, season <= maximum, episode >= 0, episode <= maximum,
+              lastEpisode.map({ $0 >= 0 && $0 <= maximum }) ?? true else {
+            // Preserve the original C %d conversion for negative or wider Int values.
+            return String(format: "S%02dE%02d", season, episode)
+                + (lastEpisode.map { String(format: "–E%02d", $0) } ?? "")
+        }
+        func padded(_ value: Int) -> String {
+            let digits = String(value)
+            return value < 10 ? "0" + digits : digits
+        }
+        return "S" + padded(season) + "E" + padded(episode)
+            + (lastEpisode.map { "–E" + padded($0) } ?? "")
+    }
+
+    public var section: String {
+        switch kind {
+        case .movie: "Movies"
+        case .episode:
+            "TV Shows · \(seriesTitle) · " + (season.map { $0 == 0 ? "Specials" : "Season \($0)" } ?? "By date")
+        case .extra: "Extras"
+        case .unknown: "Other Videos"
+        }
+    }
+}
+
