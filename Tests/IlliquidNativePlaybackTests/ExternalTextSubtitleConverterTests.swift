@@ -245,6 +245,43 @@ struct ExternalTextSubtitleConverterTests {
         ])
     }
 
+    @Test(arguments: ["NOTE", "NOTE comment", "NOTE\tcomment", "NOTE --> ignored"])
+    func commentMarkersFollowTheFirstNonemptyLine(marker: String) throws {
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Visible"
+        for leading in ["", "\n"] {
+            let source = "\u{FEFF}WEBVTT\n\n" + leading + marker
+                + "\n00:01.000 --> 00:02.000\nHidden\n\n00:03.000 --> 00:04.000\nVisible"
+            for newline in ["\n", "\r\n", "\r"] {
+                #expect(try Converter.convert(source.replacingOccurrences(of: "\n", with: newline),
+                    format: .webVTT).utf8.elementsEqual(expected.utf8))
+            }
+        }
+    }
+
+    @Test(arguments: ["NOTEworthy", "NOTES", "note", " NOTE", "\tNOTE", "NOTE\u{00A0}",
+                      "NOTE\u{0000}", "NOTE\u{0301}", "NOTE\u{2028}tail",
+                      "ŃOTE", "ℕOTE", "ＮOTE", "\u{0600}NOTE"])
+    func noteLikeIdentifiersAndNotePayloadRemainVisible(identifier: String) throws {
+        let source = "WEBVTT\n\n\(identifier)\n00:01.000 --> 00:02.000\nNOTE\nNOTE annotation\nNOTE\tannotation"
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,NOTE\\NNOTE annotation\\NNOTE\tannotation"
+        #expect(try Converter.convert(source, format: .webVTT).utf8.elementsEqual(expected.utf8))
+    }
+
+    @Test func largeCommentDoesNotExposeTimingLookingLines() throws {
+        let source = "WEBVTT\n\nNOTE\tmetadata\n00:01.000 --> 00:02.000\n"
+            + String(repeating: "ignored\n", count: 50_000)
+            + "00:02.000 --> 00:03.000\nStill ignored"
+        #expect(throws: Converter.ConversionError.noValidCues(.webVTT)) {
+            _ = try Converter.convert(source, format: .webVTT)
+        }
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Visible"
+        #expect(try Converter.convert(source + "\n\n00:03.000 --> 00:04.000\nVisible",
+            format: .webVTT).utf8.elementsEqual(expected.utf8))
+    }
+
     @Test func commentsOnlyAndUntimedTextReportNoValidCues() {
         #expect(throws: Converter.ConversionError.noValidCues(.srt)) {
             _ = try Converter.convert("Untimed plain text", format: .srt)
