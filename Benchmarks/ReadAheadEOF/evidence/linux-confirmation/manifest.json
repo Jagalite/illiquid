@@ -1,0 +1,109 @@
+{
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_sha256": "0eb12da34194e55f47502f2bbb55649718c552d5128021228d9b81728c5973ee",
+  "binaries": {
+    "baseline": {
+      "path": "build/baseline/x86_64-unknown-linux-gnu/release/ReadAheadBenchmark",
+      "sha256": "dc31e9126ed8bb83e3c216e176cfa52c23760fd0143eba1a38db38b3b663729f"
+    },
+    "candidate": {
+      "path": "build/candidate/x86_64-unknown-linux-gnu/release/ReadAheadBenchmark",
+      "sha256": "1f2b1ef3fa03ec4b35b6bd53f143e008fe15773592d2d177acbf2e831758bb2f"
+    }
+  },
+  "cases": [
+    {
+      "rate": 24,
+      "scenario": "eof-update"
+    },
+    {
+      "rate": 60,
+      "scenario": "eof-update"
+    },
+    {
+      "rate": 120,
+      "scenario": "eof-update"
+    },
+    {
+      "rate": 120,
+      "scenario": "eof-idle"
+    },
+    {
+      "rate": 120,
+      "scenario": "timed-update"
+    }
+  ],
+  "compiler": {
+    "path": "/usr/bin/swift",
+    "sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de",
+    "version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+  },
+  "duration_seconds": 3.0,
+  "git_head": "4b65a472b061d4fb48d846f95aa5c90af27c682c",
+  "git_status": "",
+  "host": {
+    "allowed_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "machine": "x86_64",
+    "python": "3.12.3",
+    "reader_context_switches_supported": true,
+    "release": "6.17.0-1022-azure",
+    "system": "Linux"
+  },
+  "inputs": {
+    "Benchmarks/ReadAheadEOF/CReadAheadMetrics/CReadAheadMetrics.c": "d09e8f3d2494b3363bee5330572cdd72dbd3c349b469ca5be033d5019bd61e92",
+    "Benchmarks/ReadAheadEOF/CReadAheadMetrics/include/CReadAheadMetrics.h": "0fe30437fefc2c7663414ee6511c8f9d845f92f3ecdb57e413d0afc9f03726ce",
+    "Benchmarks/ReadAheadEOF/Harness.swift": "c82768ca672df47cb5dcb4b0084896bcf632fd7b768cbd351a7c8f7a97ec1535",
+    "Benchmarks/ReadAheadEOF/baseline/MediaReadAheadGate.swift": "0eb12da34194e55f47502f2bbb55649718c552d5128021228d9b81728c5973ee",
+    "Benchmarks/ReadAheadEOF/run.py": "933da15113db7c39e8335c3a94178db5654a60b5ce493dc253c80dfb24e7d26e",
+    "Sources/IlliquidNativePlayback/Media/MediaReadAheadGate.swift": "1812ccf574cabf4b173333183212421b0724dd5dcc4802672f6673aac5bfd229",
+    "Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift": "fe3d6043c2c4f05fd7707b037454ab5d3e2410a1ef00a2019bd796b547d93f2a"
+  },
+  "pairs": 6,
+  "staged": {
+    "baseline": {
+      "Package.swift": "fdcbc0bf9cb9aba7c915d8084406269aee44fa3f73a3ee8d1fdaee076ad4df54",
+      "Sources/CReadAheadMetrics/CReadAheadMetrics.c": "d09e8f3d2494b3363bee5330572cdd72dbd3c349b469ca5be033d5019bd61e92",
+      "Sources/CReadAheadMetrics/include/CReadAheadMetrics.h": "0fe30437fefc2c7663414ee6511c8f9d845f92f3ecdb57e413d0afc9f03726ce",
+      "Sources/IlliquidNativePlayback/MediaReadAheadGate.swift": "0eb12da34194e55f47502f2bbb55649718c552d5128021228d9b81728c5973ee",
+      "Sources/ReadAheadBenchmark/Harness.swift": "c82768ca672df47cb5dcb4b0084896bcf632fd7b768cbd351a7c8f7a97ec1535",
+      "Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift": "fe3d6043c2c4f05fd7707b037454ab5d3e2410a1ef00a2019bd796b547d93f2a"
+    },
+    "candidate": {
+      "Package.swift": "fdcbc0bf9cb9aba7c915d8084406269aee44fa3f73a3ee8d1fdaee076ad4df54",
+      "Sources/CReadAheadMetrics/CReadAheadMetrics.c": "d09e8f3d2494b3363bee5330572cdd72dbd3c349b469ca5be033d5019bd61e92",
+      "Sources/CReadAheadMetrics/include/CReadAheadMetrics.h": "0fe30437fefc2c7663414ee6511c8f9d845f92f3ecdb57e413d0afc9f03726ce",
+      "Sources/IlliquidNativePlayback/MediaReadAheadGate.swift": "1812ccf574cabf4b173333183212421b0724dd5dcc4802672f6673aac5bfd229",
+      "Sources/ReadAheadBenchmark/Harness.swift": "c82768ca672df47cb5dcb4b0084896bcf632fd7b768cbd351a7c8f7a97ec1535",
+      "Tests/IlliquidNativePlaybackTests/MediaReadAheadGateTests.swift": "fe3d6043c2c4f05fd7707b037454ab5d3e2410a1ef00a2019bd796b547d93f2a"
+    }
+  },
+  "started_utc": "2026-10-28T05:41:43.340075+00:00",
+  "tests": [
+    {
+      "configuration": "debug",
+      "status": "passed",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "status": "passed",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "status": "passed",
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "status": "passed",
+      "variant": "candidate"
+    }
+  ],
+  "tests_only": false
+}
