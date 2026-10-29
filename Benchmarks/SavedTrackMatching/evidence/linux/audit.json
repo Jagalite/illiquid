@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "audit_scope": "Independent audit of retained Linux component evidence; no macOS or full-application qualification",
+  "run_id": "40638584849",
+  "job_id": "122651186682",
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40638584849/job/122651186682",
+  "head_commit": "81db035aa2f3161c7c16d1f21a8cfac394b48d6a",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "compiler": "Swift version 6.4 (swift-6.4-RELEASE); x86_64-unknown-linux-gnu",
+  "retrieval": {
+    "job_log_requests": 1,
+    "evidence_parts": 24,
+    "missing_or_duplicate_parts": 0
+  },
+  "bundle": {
+    "compressed_bytes": 207835,
+    "uncompressed_bytes": 10285510,
+    "file_count": 452,
+    "sha256": "4d8dbd99150841c0362ffaa92cba267c9c60b99f74ddc60ced613b698b29a4d0",
+    "gzip_crc32": "e0ac38a3",
+    "sha256_verified": true,
+    "gzip_crc32_and_size_verified": true,
+    "decompression_method": "Pure JavaScript base64 and DEFLATE decoder in V8",
+    "hash_implementation_self_tests": [
+      "SHA-256 empty string",
+      "SHA-256 abc",
+      "CRC32 123456789",
+      "Unicode UTF-8 round trip"
+    ]
+  },
+  "provenance": {
+    "timing_and_test_heads_match_run": true,
+    "timing_and_test_source_hashes_identical": true,
+    "timing_and_test_harness_hashes_identical": true,
+    "timing_and_test_compilers_identical": true,
+    "cached_main_sources_independently_hashed": {
+      "Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift": "29828b13da06fa30ace37200604dd259c77435896dbbe4d5f8310b996b5c9e81",
+      "Sources/IlliquidCore/Player/MediaTrack.swift": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441",
+      "Tests/IlliquidCoreTests/MediaTrackParserTests.swift": "b35643f458c8ff536eaba9781eb62443334202c91771f7d83c2d68e88d206e24",
+      "Tests/IlliquidCoreTests/TrackRestorationRegressionTests.swift": "bbebaa7c8c1acdbb3d143d2068f8e169a2be6b589f70f87458f5ff384cec632a"
+    },
+    "candidate_production_hash_recorded_identically_in_both_manifests": "6dec4a8cccf2ea96ba15291d8eba67e15a20ca0bfcb1d133e8b5ab287eaf54e5",
+    "candidate_production_source_independently_hashed": {
+      "commit": "81db035aa2f3161c7c16d1f21a8cfac394b48d6a",
+      "path": "Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift",
+      "git_blob": "38726d4b1b333534d450713ca7dd1df08743061a",
+      "utf8_bytes": 3114,
+      "sha256": "6dec4a8cccf2ea96ba15291d8eba67e15a20ca0bfcb1d133e8b5ab287eaf54e5",
+      "matches_timing_manifest": true,
+      "matches_test_manifest": true,
+      "exact_commit_read_requests": 1
+    },
+    "candidate_source_verification_complete": true
+  },
+  "correctness": {
+    "corpus_cases": 8464,
+    "unique_case_labels": 8464,
+    "timed_fixture_orders": 72,
+    "complete_baseline_candidate_receipts_byte_identical": true,
+    "verification_receipt_sha256": "c896329e216c289e6dd4be0854f829cfeb89730f4232ccb717e33b88148bbd20",
+    "verification_hashes_independently_recomputed": true,
+    "all_corpus_outputs_equal_oracle": true,
+    "all_timed_fixture_outputs_equal_oracle": true,
+    "oracle_mismatches": 0,
+    "distinct_selected_results": 660,
+    "nil_results": 20,
+    "non_nil_results": 8444,
+    "negative_id_results": 1856,
+    "zero_id_results": 544,
+    "minimum_selected_id": "-9223372036854775808",
+    "maximum_selected_id": "9223372036854775807"
+  },
+  "measurements": {
+    "workloads": 18,
+    "pairs_per_workload": 8,
+    "timed_pairs": 144,
+    "timed_observations": 288,
+    "calibration_observations": 140,
+    "raw_measurement_files": 428,
+    "all_raw_measurement_files_accounted_for": true,
+    "all_raw_logs_match_aggregate_observations": true,
+    "all_iteration_counts_divisible_by_four": true,
+    "all_pair_orders_match_alternating_AB_BA": true,
+    "all_pair_operation_counts_and_results_match": true,
+    "all_428_checksums_and_selection_counts_recomputed_from_full_fixture_results": true,
+    "all_428_warmup_checksums_and_selection_counts_recomputed_for_64_calls": true,
+    "all_final_calibrations_reached_100_ms_for_faster_variant": true,
+    "all_18_summaries_recomputed": true,
+    "recomputed_summary_fields": [
+      "per-pair ns per operation",
+      "per-pair ratios",
+      "baseline and candidate medians",
+      "median paired ratio",
+      "median paired reduction",
+      "paired ratio minimum and maximum"
+    ],
+    "relative_numeric_comparison_tolerance": 1e-10,
+    "candidate_faster_pairs": 144,
+    "timed_interval_min_ms": 95.910061,
+    "timed_interval_max_ms": 2567.40311
+  },
+  "builds_and_tests": {
+    "timing_command_receipts": 436,
+    "test_command_receipts": 6,
+    "all_commands_returned_zero": true,
+    "all_command_log_files_present": true,
+    "four_separate_optimized_library_driver_compile_commands_verified": true,
+    "flags_verified": [
+      "-swift-version 6",
+      "-O",
+      "-whole-module-optimization",
+      "-warnings-as-errors"
+    ],
+    "tests_per_configuration": 13,
+    "suites_per_configuration": 3,
+    "configurations": [
+      {
+        "variant": "baseline",
+        "configuration": "debug",
+        "passed": true,
+        "log_sha256_verified": "380b816ef3e3eaa1540ea591c738b03f3cc1ebcf8008cf47d258f6ff24d105a0"
+      },
+      {
+        "variant": "baseline",
+        "configuration": "release",
+        "passed": true,
+        "log_sha256_verified": "57bf7d21178fd7a078ff3df7027e771ad7d912ba633a4039c8a963ffc49b9854"
+      },
+      {
+        "variant": "candidate",
+        "configuration": "debug",
+        "passed": true,
+        "log_sha256_verified": "bda96f9ef82d03f602a4e326501a8335e2d79cca7fd8b7d189651ffeb707745f"
+      },
+      {
+        "variant": "candidate",
+        "configuration": "release",
+        "passed": true,
+        "log_sha256_verified": "2c324f173c8e2f9bebeaa9e588bbca2bc74e2cf6f79ab3815aa0daf143d27997"
+      }
+    ],
+    "warnings_errors_or_failed_tests_in_test_logs": 0
+  },
+  "unresolved_discrepancies": [],
+  "limitations": [
+    "One Linux x86_64 cohort using Swift 6.4; macOS remains pending.",
+    "Component timing only; no full-app build, live playback, startup latency, battery, or application-memory claim.",
+    "The 128-track workload is a scaling case, and realistic small-catalogue absolute savings should accompany percentage claims."
+  ]
+}

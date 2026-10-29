@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Qualify the NFO text-limit change with current shared dependencies, without timing.
+"""Regress the reviewed current NFO parser against a frozen oracle, without timing.
 
 Requires Swift 6.1+ and Python 3.10+. Uses a temporary Swift package for the
 regressions; does not resolve the native app's dependencies. Explicit
@@ -26,6 +26,12 @@ PARSER_BLOBS = {
     "baseline": "55e84590829c678f6ac5cb1328e64dead63651b6",
     "candidate": "051c475fd33bcd16ec33f6b4b93ee98fffdb21d3",
 }
+# Separate reviewed comparison for current-source regressions. Never extend the
+# historical pair to accept newer parsers or infer approval from working-tree bytes.
+CURRENT_PARSER_BLOBS = {
+    "baseline": PARSER_BLOBS["baseline"],
+    "candidate": "1dbcc6eb188c95f428e2600d3f585c6e30981676",
+}
 SOURCES = [
     "MediaLibrary/MediaNameRecognition.swift",
     "MediaLibrary/MediaMetadataHints.swift",
@@ -40,6 +46,7 @@ TESTS = [
     "MediaNameRecognitionTests.swift",
     "NFOTextLimitPerformanceTests.swift",
 ]
+CURRENT_TESTS = [*TESTS, "NFODeclarationPreflightTests.swift"]
 CASE_ITERATIONS = {
     "movie-small": 100_000,
     "episode-small": 50_000,
@@ -100,7 +107,8 @@ def stage_sources(root: Path, work: Path, historical: bool) -> dict[str, Path]:
         write("candidate", path, candidate)
         write("baseline", path, baseline)
     # Snapshot the shared tests and driver once, so both builds use the recorded bytes.
-    for path in [*(Path("Tests/IlliquidCoreTests") / name for name in TESTS),
+    tests = TESTS if historical else CURRENT_TESTS
+    for path in [*(Path("Tests/IlliquidCoreTests") / name for name in tests),
                  Path("Benchmarks/NFOTextLimits/Driver.swift")]:
         data = (git_bytes(root, HISTORICAL_CANDIDATE, path) if historical
                 else (root / path).read_bytes())
@@ -108,7 +116,7 @@ def stage_sources(root: Path, work: Path, historical: bool) -> dict[str, Path]:
     return roots
 
 
-def verify_isolation(roots: dict[str, Path]) -> dict:
+def verify_isolation(roots: dict[str, Path], *, historical: bool = False) -> dict:
     source_bytes = {
         variant: {relative: (source_root / "Sources/IlliquidCore" / relative).read_bytes()
                   for relative in SOURCES}
@@ -118,11 +126,13 @@ def verify_isolation(roots: dict[str, Path]) -> dict:
                if source_bytes["baseline"][relative] != source_bytes["candidate"][relative]]
     if changed != [PARSER]:
         raise RuntimeError(f"Source isolation failed: expected only {PARSER}, got {changed}")
-    for variant, expected in PARSER_BLOBS.items():
+    expected_blobs = PARSER_BLOBS if historical else CURRENT_PARSER_BLOBS
+    for variant, expected in expected_blobs.items():
         actual = blob(source_bytes[variant][PARSER])
         if actual != expected:
             raise RuntimeError(f"Unexpected {variant} parser blob: {actual}; expected {expected}")
     return {
+        "expected_parser_blobs": expected_blobs.copy(),
         "changed_sources": changed,
         "source_blobs": {
             variant: {relative: blob(data) for relative, data in sources.items()}
@@ -158,7 +168,8 @@ def compare_differentials(differentials: dict, output: Path) -> dict:
     return differentials["candidate"]
 
 
-def swift_tests(root: Path, sources: Path, output: Path, work: Path, variant: str, jobs: int) -> dict:
+def swift_tests(root: Path, sources: Path, output: Path, work: Path, variant: str, jobs: int,
+                *, historical: bool = False) -> dict:
     package = work / f"tests-{variant}"
     source_dir = package / "Sources/IlliquidCore"
     test_dir = package / "Tests/IlliquidCoreTests"
@@ -167,7 +178,7 @@ def swift_tests(root: Path, sources: Path, output: Path, work: Path, variant: st
     for relative in SOURCES:
         shutil.copy2(sources / "Sources/IlliquidCore" / relative, source_dir)
     # Both implementations receive the same snapshotted regression tests.
-    for relative in TESTS:
+    for relative in TESTS if historical else CURRENT_TESTS:
         shutil.copy2(root / "Tests/IlliquidCoreTests" / relative, test_dir)
     (package / "Package.swift").write_text("""// swift-tools-version: 6.1
 import PackageDescription
@@ -263,14 +274,17 @@ def main() -> None:
         "compile_flags": ["-swift-version", "6", "-O", "-parse-as-library", "-j", str(args.jobs)],
         "runner_blob": blob(Path(__file__).read_bytes()),
         "rounds": args.rounds,
-        "protocol_revision": "3-longer-ordinary-controls" if historical else "current-qualification-1",
+        "protocol_revision": "3-longer-ordinary-controls" if historical else "current-regression-2-declaration-preflight",
         "protocol_change": (
             "After protocol 2 showed a 12.12% small-movie median regression in short "
             "batches, retain the same production source and fix movie/episode/Unicode "
             "ordinary controls at 100000/50000/50000 parses per observation. Keep "
             "protocol 2's other counts, including fallback 64 and ignored plot 1000. "
             "This investigates the ordinary control without pooling earlier cohorts."
-        ) if historical else "Current shared dependencies and tests with only the pinned parser change; no timing.",
+        ) if historical else (
+            "Current shared dependencies and six test suites; exact reviewed declaration-preflight "
+            "candidate against the independent pre-text-limit parser oracle. No timing."
+        ),
         "iterations": CASE_ITERATIONS if historical else {},
         "skipped_tests": args.skip_tests,
         "method": (
@@ -307,20 +321,21 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="nfo-work-", dir=output) as temporary:
         work = Path(temporary)
         roots = stage_sources(root, work, historical)
-        manifest.update(verify_isolation(roots))  # Fail closed before any compilation.
+        manifest.update(verify_isolation(roots, historical=historical))  # Fail closed before any compilation.
         inputs = roots["candidate"]
         driver = inputs / "Benchmarks/NFOTextLimits/Driver.swift"
         manifest["driver_blob"] = blob(driver.read_bytes())
         manifest["test_blobs"] = {
             relative: blob((inputs / "Tests/IlliquidCoreTests" / relative).read_bytes())
-            for relative in TESTS
+            for relative in (TESTS if historical else CURRENT_TESTS)
         }
         (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
         probes = {}
         for variant, source_root in roots.items():
             sources = [source_root / "Sources/IlliquidCore" / relative for relative in SOURCES]
             if not args.skip_tests:
-                manifest["tests"][variant] = swift_tests(inputs, source_root, output, work, variant, args.jobs)
+                manifest["tests"][variant] = swift_tests(
+                    inputs, source_root, output, work, variant, args.jobs, historical=historical)
                 (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
             probe = work / variant
             command = ["swiftc", *manifest["compile_flags"], *map(str, sources),
@@ -345,7 +360,7 @@ def main() -> None:
         if not historical:
             manifest["completed"] = True
             (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-            print("Current qualification passed (no timing). Evidence:", output, flush=True)
+            print("Current-source parser regressions passed (no timing). Evidence:", output, flush=True)
             return
         with (output / "measurements.jsonl").open("w") as measurements:
             for case, iterations in CASE_ITERATIONS.items():

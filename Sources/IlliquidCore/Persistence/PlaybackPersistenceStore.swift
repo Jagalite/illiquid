@@ -488,8 +488,9 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
 
     public func setVolume(_ volume: Double) {
         mutatePreferences {
-            $0.preferences.volume = volume
-            $0.preferences = $0.preferences.sanitized()
+            // Preferences are sanitized on load/save and by each field setter.
+            // Do not normalize unrelated language lists on every slider update.
+            $0.preferences.volume = PlaybackPreferences.validVolume(volume)
         }
     }
 
@@ -507,8 +508,7 @@ public final class PlaybackPersistenceStore: @unchecked Sendable {
 
     public func setPlaybackSpeed(_ playbackSpeed: Double) {
         mutatePreferences {
-            $0.preferences.playbackSpeed = playbackSpeed
-            $0.preferences = $0.preferences.sanitized()
+            $0.preferences.playbackSpeed = PlaybackPreferences.validPlaybackSpeed(playbackSpeed)
         }
     }
 
