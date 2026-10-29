@@ -75,4 +75,108 @@ time cost.
 The output directory records environment, source/binary hashes, actual commands,
 test receipts, fixture receipts, all observations, and paired metric summaries.
 The workflow uploads those records and emits compact text records in its logs.
-Measured results and limitations are recorded here after execution.
+Measured results and limitations follow.
+
+
+## Qualified native results — run 40646200466
+
+[Workflow run](https://github.com/Jagalite/illiquid/actions/runs/40646200466) (completed successfully
+on 2026-10-29 UTC); [component job](https://github.com/Jagalite/illiquid/actions/runs/40646200466/job/122675485140);
+[native-regressions job](https://github.com/Jagalite/illiquid/actions/runs/40646200466/job/122675485369).
+The archived unrounded source data, including every completed unfavorable timing,
+is in [evidence/run-40646200466/](evidence/run-40646200466/); the Actions artifacts additionally
+hold 14-day raw compilation, XCTest, and process logs.
+
+- Baseline source commit: `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`
+  (original `main`).
+- **Qualified candidate source/test/benchmark commit:** `8c559bb53dac08bd2ceadb569d9df63ab55c3151`.
+  This is the code measured below, not any subsequent evidence-only commit.
+- Runner: macOS 26.6.2 (25G83), arm64 `VirtualMac2,1`, 3 CPUs,
+  7 GiB RAM; Xcode 26.6 (17F113); Apple Swift 6.3.3,
+  macOS 26.5 SDK. Kyoto was unavailable on the ephemeral runner;
+  the workflow disclosed this and compiled serially in an isolated checkout.
+- Component qualification: **44 XCTest cases, 0 failures, in each of
+  baseline debug, baseline release, candidate debug, candidate release**
+  (176 test-case executions; 44 distinct tests).
+  Independent native release validation: the complete application graph built,
+  **44 XCTest cases and 19 Swift Testing cases passed**.
+  The affected suites and five new path cases ran on native Foundation/ImageIO.
+- The runner froze and hashed the baseline/candidate production sources,
+  verified ten supporting production-source identities and checked fixtures,
+  decoded pixel SHA-256, expected hit/miss checksums and byte-accounting.
+  The recorded SHA-256 values of the original and modified production cache,
+  path tests, and both benchmark drivers also match the corresponding GitHub
+  commit files. The four inventories had the exact expected byte totals.
+- Six balanced AB/BA process pairs at each of 0, 128, 2,048 and 8,191
+  entries: **48 separate measurement processes**, same preseeded 4,096-byte
+  padded real JPEG fixtures, 512 warm background reads per process.
+  No completed sample or outlier was removed.
+
+### Retained component memory
+
+Values are the median **post-inventory minus pre-inventory** live-byte delta,
+with the populated cache actor alive and inventory autoreleases drained.
+The percentages are median paired candidate-versus-baseline *relative*
+changes from six AB/BA pairs, not ratios inferred from the two displayed medians.
+Allocator-accounted heap uses `malloc_zone_statistics(NULL).size_in_use`;
+RSS uses `task_info(MACH_TASK_BASIC_INFO).resident_size`.
+These are separate measurements of the component process, **not whole-player RAM**.
+
+| JPEG files | Allocator heap Δ, baseline → candidate (MiB) | Paired change | Resident Δ, baseline → candidate (MiB) | Paired change |
+| ---: | ---: | ---: | ---: | ---: |
+| 0 | 0.064 → 0.064 | 0.00% | 0.641 → 0.672 | +4.88% |
+| 128 | 0.195 → 0.103 | -47.17% | 1.922 → 1.813 | -5.69% |
+| 2,048 | 2.025 → 0.556 | -72.54% | 6.094 → 4.547 | -25.38% |
+| 8,191 | 7.881 → 2.023 | -74.34% | 18.234 → 12.094 | -33.68% |
+
+At 8,191 files, all six pairs saved **6,143,312 allocator-accounted bytes**
+(5.859 MiB; **74.34%**) and **6,438,912 resident bytes**
+(6.141 MiB; **33.68%**) after inventory. At 2,048 files the paired
+savings were 1,540,064 heap bytes (1.469 MiB) and
+1,622,016 resident bytes (1.547 MiB). The empty-inventory RSS
+delta increased by 32,768 bytes; it is not omitted.
+
+### Inventory and warm background-read timings
+
+The displayed times are **medians across six process pairs for each variant**,
+and percentages are medians of paired relative changes. Inventory timing is the
+first inventory in each fresh process, using **shared, already-warm filesystem
+fixtures**; this is not guaranteed cold-disk latency. Reads are 512 background
+`image(for:)` operations per process, including digest hashing, URL creation,
+real ImageIO reads and decoding; values are normalized per operation.
+
+| JPEG files | Inventory wall, baseline → candidate (ms) | Inventory CPU (ms) | Warm read wall (µs/op) | Warm read CPU (µs/op) |
+| ---: | ---: | ---: | ---: | ---: |
+| 0 | 0.554 → 0.568 (-3.24%) | 0.554 → 0.552 (-3.87%) | 5.494 → 5.205 (-5.56%) | 5.424 → 5.098 (-7.50%) |
+| 128 | 6.429 → 5.919 (-15.63%) | 5.893 → 5.355 (-12.86%) | 156.666 → 133.082 (-13.02%) | 154.546 → 131.922 (-12.64%) |
+| 2,048 | 77.315 → 80.415 (+4.02%) | 74.464 → 79.786 (+5.53%) | 134.541 → 176.564 (+18.19%) | 132.412 → 174.627 (+20.40%) |
+| 8,191 | 340.997 → 332.373 (-2.24%) | 335.398 → 327.072 (-4.64%) | 186.646 → 164.709 (-8.04%) | 183.854 → 159.457 (-7.95%) |
+
+**Observed time tradeoff:** At 2,048 files, median paired warm-read wall time
+rose **18.19%** (median paired difference **+25.32 µs/read**),
+and CPU time rose **20.40%** (median paired difference
+**+31.05 µs/read**). Five of six wall-time pairs and all six CPU pairs
+were slower, although the wall-time pairs also included an unusually favorable
+candidate result (**−151.99 µs/read**); all six are preserved.
+The 2,048-file inventory also increased wall time **4.02%** and CPU
+time **5.53%** on median paired comparisons. At 8,191 files, warm reads
+and inventory were faster on the paired medians, but individual unfavorable
+timings remain in `observations.jsonl` (including a
+**+78.98 µs/read** warm-read pair). The 128-file read series also
+included a **+92.18 µs/read** candidate-worse pair. At zero files,
+the RSS delta was slightly worse.
+
+**Assessment:** Large, repeatable retained-memory savings in substantial
+inventories justify proposing this small metadata-only optimization for review
+despite the **nontrivial 2,048-entry warm-read regression**. Its measured
+absolute cost is tens of microseconds per background read, not zero. A
+read-dominated real workload could prefer the baseline; production usage
+frequency, cold storage, and other hardware were not measured. In particular,
+the experiment does **not** establish whole-player RAM, playback FPS,
+startup, GPU, battery, or real-world latency improvements.
+
+Evidence files retained verbatim from the completed component job:
+`environment.json`, `sources.json`, `binaries.json`, `tests.json`,
+`fixtures.json`, `observations.jsonl`, `summary.json` and
+`qualification.json`. The raw process orders, paired differences,
+checksums and adverse timing samples are retained, without filtering.
