@@ -30,8 +30,7 @@ public struct MediaMetadataHints: Equatable, Sendable {
         // An explicit new episode replaces a previous range, rather than inheriting it.
         result.lastEpisode = episode == nil ? older.lastEpisode : lastEpisode
         result.episodeTitle = episodeTitle ?? older.episodeTitle
-        let replacedProviders = Set(catalogIDs.compactMap { $0.split(separator: "-").first })
-        result.catalogIDs = older.catalogIDs.filter { !replacedProviders.contains($0.split(separator: "-").first ?? "") } + catalogIDs
+        result.catalogIDs = mergedCatalogIDs(older.catalogIDs, with: catalogIDs)
         result.sources = Array(Set(older.sources + sources)).sorted()
         return result
     }
@@ -71,9 +70,7 @@ extension RecognizedMediaName {
         let changedIdentity = (kind == .movie && resolvedKind != .movie)
             || (kind != .movie && resolvedKind == .movie)
         let previousIDs = changedIdentity ? [] : catalogIDs
-        let providers = Set(hints.catalogIDs.compactMap { $0.split(separator: "-").first })
-        let ids = previousIDs.filter { !providers.contains($0.split(separator: "-").first ?? "") }
-            + hints.catalogIDs
+        let ids = mergedCatalogIDs(previousIDs, with: hints.catalogIDs)
         return .init(kind: resolvedKind, title: resolvedTitle,
             year: hints.year ?? year, season: resolvedKind == .episode ? (resolvedSeason ?? (airDate == nil ? 1 : nil)) : nil,
             episode: resolvedKind == .episode ? resolvedEpisode : nil,
@@ -82,4 +79,15 @@ extension RecognizedMediaName {
             episodeTitle: resolvedKind == .episode ? (hints.episodeTitle ?? episodeTitle) : nil, edition: edition,
             catalogIDs: ids, variant: variant, metadataSources: hints.sources)
     }
+}
+
+private func mergedCatalogIDs(_ previous: [String], with replacements: [String]) -> [String] {
+    // Episode hints commonly inherit the series IDs, and filename evidence often
+    // has no IDs of its own. Preserve that array's copy-on-write storage when
+    // there are no competing providers to merge.
+    guard !replacements.isEmpty else { return previous }
+    guard !previous.isEmpty else { return replacements }
+    let providers = Set(replacements.compactMap { $0.split(separator: "-").first })
+    return previous.filter { !providers.contains($0.split(separator: "-").first ?? "") }
+        + replacements
 }
