@@ -111,6 +111,7 @@ def stage(root: Path, package: Path, revision: str | None) -> dict:
 
     for source, destination in (
         (here / "Driver.swift", "Sources/IlliquidApp/Driver.swift"),
+        (here / "Entry.swift", "Sources/RootIndexBenchmark/Entry.swift"),
         (here / "CProbe/Probe.c", "Sources/CProbe/Probe.c"),
         (here / "CProbe/include/Probe.h", "Sources/CProbe/include/Probe.h"),
     ):
@@ -129,11 +130,12 @@ import PackageDescription
 let package = Package(
     name: "SourceRootIndexReuseQualification",
     platforms: [.macOS("26.0")],
-    products: [.executable(name: "RootIndexBenchmark", targets: ["IlliquidApp"])],
+    products: [.executable(name: "RootIndexBenchmark", targets: ["RootIndexBenchmark"])],
     targets: [
         .target(name: "IlliquidCore"),
         .target(name: "CProbe"),
-        .executableTarget(name: "IlliquidApp", dependencies: ["IlliquidCore", "CProbe"])""" + tests + """
+        .target(name: "IlliquidApp", dependencies: ["IlliquidCore", "CProbe"]),
+        .executableTarget(name: "RootIndexBenchmark", dependencies: ["IlliquidApp"])""" + tests + """
     ],
     swiftLanguageModes: [.v6],
     cLanguageStandard: .c11

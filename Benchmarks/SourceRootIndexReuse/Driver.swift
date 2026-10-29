@@ -54,9 +54,10 @@ private struct SnapshotBytes {
     }
 }
 
-@main
+// Keep the CLI implementation in the same module as the production slices.
+// The executable entry point lives in Entry.swift, outside the test dependency.
 @MainActor
-private struct SourceRootIndexProbe {
+public struct SourceRootIndexProbe {
     private enum Workload: String {
         case visibility
         case remove
@@ -73,7 +74,7 @@ private struct SourceRootIndexProbe {
     <total_files> <tab_count> <iterations> [timing|heap]
     """
 
-    static func main() async {
+    public static func main() async {
         do {
             let arguments = Array(CommandLine.arguments.dropFirst())
             guard let mode = arguments.first else {
