@@ -25,6 +25,12 @@ on:
       - Benchmarks/SourceBrowserSearch/run.py
       - .github/workflows/source-browser-search-performance.yml
   workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: Git ref for the baseline Filter and exact-source oracle
+        required: true
+        default: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+        type: string
 
 permissions:
   contents: read
@@ -33,9 +39,10 @@ concurrency:
   group: source-browser-search-${{ github.ref }}
   cancel-in-progress: true
 
-# Isolate matching-row storage from the earlier flattened-ID optimization.
+# Use the PR base for current comparisons; manual and branch runs can isolate
+# the historical matching-row change.
 env:
-  SOURCE_SEARCH_BASELINE: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+  SOURCE_SEARCH_BASELINE: ${{ github.event.pull_request.base.sha || inputs.baseline_ref || 'ea2ff568237e2667f7b1aeee67b11a44ebe95b72' }}
 
 jobs:
   linux-component:
