@@ -1,10 +1,11 @@
-name: Subtitle fuzzy prefix performance
+name: Subtitle exact-match guard performance
 
 on:
   push:
     branches: ['perf/subtitle-fuzzy-prefix-*']
     paths:
       - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitleQualifierStorageTests.swift'
       - 'Benchmarks/SubtitleFuzzyPrefix/Driver.swift'
       - 'Benchmarks/SubtitleFuzzyPrefix/run.py'
       - '.github/workflows/subtitle-fuzzy-prefix-performance.yml'
@@ -37,12 +38,32 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Test both versions and measure paired complete associations
+      - name: Test both versions and measure the normalized exact-match guard
         run: |
-          # This isolated hosted runner has no Kyoto queue; builds are serialized.
+          if [ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]; then
+            echo "Use the shared Kyoto queue on this host before running Swift builds."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this isolated hosted runner; builds run directly and serially."
           mkdir -p "$RUNNER_TEMP/subtitle-fuzzy-prefix"
           set -o pipefail
           python3 Benchmarks/SubtitleFuzzyPrefix/run.py \
+            --baseline-ref 1063508a14bbc7a08669171880069c4df9472350 \
+            --case ancestor_plain_1_1 \
+            --case ancestor_plain_16_1 \
+            --case ancestor_plain_256_1 \
+            --case ancestor_plain_4096_1 \
+            --case ancestor_plain_256_8 \
+            --case ancestor_long_plain_256_8 \
+            --case ancestor_unicode_plain_256_8 \
+            --case plain_prefix_256_8 \
+            --case ancestor_qualified_256_8 \
+            --case ancestor_long_qualified_256_8 \
+            --case exact_plain_256 \
+            --case exact_256 \
+            --case fuzzy_256_8 \
+            --case unrelated_256 \
+            --case empty_256 \
             --pairs 16 --target-ms 250 \
             --output "$RUNNER_TEMP/subtitle-fuzzy-prefix/results" \
             2>&1 | tee "$RUNNER_TEMP/subtitle-fuzzy-prefix/run.log"
@@ -54,7 +75,7 @@ jobs:
           from pathlib import Path
           root = Path(os.environ['RUNNER_TEMP']) / 'subtitle-fuzzy-prefix/results'
           names = ['manifest.json', 'production.diff', 'parity.json', 'tests.json',
-                   'summary.json', 'calibration.json', 'observations.jsonl', 'completion.json']
+                   'summary.json', 'calibration.json', 'observations.jsonl', 'completion.json', 'commands.json']
           names += [p.name for p in sorted(root.glob('tests-*.log'))]
           names += [p.name for p in sorted(root.glob('build-*.log'))]
           for name in names:

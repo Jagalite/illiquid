@@ -164,7 +164,10 @@ public enum ExternalSubtitleMatcher {
             return 10_000 + tokenWeight(rawMediaTokens)
         }
 
-        if hasOnlySubtitleQualifiers(after: mediaTokens, in: rawSubtitleTokens) {
+        // Without a removed media qualifier, this would repeat the raw-name
+        // check above with exactly the same token sequence.
+        if mediaTokens.count != rawMediaTokens.count,
+           hasOnlySubtitleQualifiers(after: mediaTokens, in: rawSubtitleTokens) {
             return 10_000 + tokenWeight(mediaTokens)
         }
 
