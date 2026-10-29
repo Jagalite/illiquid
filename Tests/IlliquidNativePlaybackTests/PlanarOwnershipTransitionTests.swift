@@ -95,8 +95,8 @@ struct PlanarOwnershipTransitionTests {
             generation: 3, pixelBuffer: buffer
         )
         let checkoutID = try #require(token).checkoutID
-        var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
-            ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+        var attachment: PlanarRendererSampleLifetimeAttachment? = try requireRendererAttachment(
+            ledger, checkoutID: checkoutID
         )
         token?.transition(to: .queued)
         token = nil
@@ -191,9 +191,9 @@ struct PlanarOwnershipTransitionTests {
             ledger.checkout(generation: 1, pixelBuffer: buffers[0]),
         ]
         var attachments: [PlanarRendererSampleLifetimeAttachment?] = [
-            try #require(ledger.makeRendererSampleAttachment(
-                checkoutID: try #require(tokens[0]).checkoutID
-            )),
+            try requireRendererAttachment(
+                ledger, checkoutID: try #require(tokens[0]).checkoutID
+            ),
         ]
         withExtendedLifetime(tokens[0]) {}
         tokens[0] = nil
@@ -204,9 +204,9 @@ struct PlanarOwnershipTransitionTests {
         tokens.append(ledger.checkout(generation: 2, pixelBuffer: buffers[1]))
         tokens.append(ledger.checkout(generation: 2, pixelBuffer: buffers[2]))
         for index in [1, 3] {
-            attachments.append(try #require(ledger.makeRendererSampleAttachment(
-                checkoutID: try #require(tokens[index]).checkoutID
-            )))
+            attachments.append(try requireRendererAttachment(
+                ledger, checkoutID: try #require(tokens[index]).checkoutID
+            ))
         }
 
         var snapshot = ledger.snapshot(activeGeneration: 2)
@@ -222,9 +222,9 @@ struct PlanarOwnershipTransitionTests {
         withExtendedLifetime(tokens[3]) {}
         tokens[3] = nil
         tokens.append(ledger.checkout(generation: 2, pixelBuffer: buffers[3]))
-        attachments.append(try #require(ledger.makeRendererSampleAttachment(
-            checkoutID: try #require(tokens[4]).checkoutID
-        )))
+        attachments.append(try requireRendererAttachment(
+            ledger, checkoutID: try #require(tokens[4]).checkoutID
+        ))
         snapshot = ledger.snapshot(activeGeneration: 2)
         #expect(snapshot.applicationFrames == 3)
         #expect(snapshot.rendererSampleAttachments == 4)
@@ -254,6 +254,15 @@ struct PlanarOwnershipTransitionTests {
         #expect(snapshot.peakRendererSampleAttachments == 4)
         #expect(snapshot.peakKnownOutstandingBuffers == 4)
         withExtendedLifetime((buffers, next, nextAttachment)) {}
+    }
+
+    // Give #require a nonoptional result context before storing an attachment
+    // in optional lifetime fixtures, avoiding redundant-require diagnostics.
+    private func requireRendererAttachment(
+        _ ledger: PlanarBufferOwnershipLedger,
+        checkoutID: UInt64
+    ) throws -> PlanarRendererSampleLifetimeAttachment {
+        try #require(ledger.makeRendererSampleAttachment(checkoutID: checkoutID))
     }
 
     private func phaseCounts(_ snapshot: PlanarBufferOwnershipSnapshot) -> [Int] {
