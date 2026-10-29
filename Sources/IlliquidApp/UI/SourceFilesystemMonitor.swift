@@ -173,12 +173,10 @@ private final class NativeSourceFilesystemStream: SourceFilesystemStream, @unche
         flags: UnsafePointer<FSEventStreamEventFlags>, count: Int,
         receiver: SourceFilesystemEventReceiver) {
         let pointers = paths.assumingMemoryBound(to: Optional<UnsafePointer<CChar>>.self)
-        var events: [SourceFilesystemEvent] = []
-        events.reserveCapacity(count)
-        for index in 0..<count {
-            guard let pointer = pointers[index] else { continue }
-            events.append(.init(path: String(cString: pointer), flags: Self.flags(from: flags[index])))
-        }
+        let events = SourceFilesystemEventBatch.decode(
+            paths: UnsafeBufferPointer(start: pointers, count: count),
+            flagsAt: { Self.flags(from: flags[$0]) }
+        )
         if !events.isEmpty { receiver.receive(events) }
     }
 
