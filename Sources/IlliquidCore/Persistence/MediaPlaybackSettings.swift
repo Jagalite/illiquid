@@ -22,33 +22,39 @@ public struct MediaTrackPreference: Codable, Equatable, Sendable {
     }
 
     public func bestMatch(in tracks: [MediaTrack]) -> MediaTrack? {
-        tracks
-            .filter { $0.kind == kind }
-            .map { track in
-                var score = 0
-                if isExternal == track.isExternal { score += 2 }
-                if let externalFilename,
-                   externalFilename == track.externalFilename
-                {
-                    score += 16
-                }
-                if let title, title == track.title { score += 8 }
-                if let languageCode, languageCode == track.languageCode { score += 4 }
-                if let codec, codec == track.codec { score += 2 }
-                return (track, score)
+        var bestIndex: Int?
+        var bestScore = 0
+        for index in tracks.indices {
+            let track = tracks[index]
+            guard track.kind == kind else { continue }
+            var score = 0
+            if isExternal == track.isExternal { score += 2 }
+            if let externalFilename, externalFilename == track.externalFilename {
+                score += 16
             }
-            .filter { $0.1 > 0 }
-            .max { lhs, rhs in
-                if lhs.1 != rhs.1 { return lhs.1 < rhs.1 }
-                // Distinctive metadata still wins when stream IDs change.
-                // For otherwise indistinguishable tracks, preserve the saved ID
-                // instead of always selecting the lowest ID.
-                if let trackID, (lhs.0.id == trackID) != (rhs.0.id == trackID) {
-                    return rhs.0.id == trackID
+            if let title, title == track.title { score += 8 }
+            if let languageCode, languageCode == track.languageCode { score += 4 }
+            if let codec, codec == track.codec { score += 2 }
+            guard score > 0 else { continue }
+            if let bestIndex {
+                if score < bestScore { continue }
+                if score == bestScore {
+                    let incumbentID = tracks[bestIndex].id
+                    // Metadata outranks the saved ID after remuxing. On a
+                    // metadata tie, preserve that ID before comparing IDs.
+                    if let trackID, (incumbentID == trackID) != (track.id == trackID) {
+                        guard track.id == trackID else { continue }
+                    } else {
+                        // Strict comparison keeps the first complete track
+                        // when duplicate IDs have the same score.
+                        guard track.id < incumbentID else { continue }
+                    }
                 }
-                return lhs.0.id > rhs.0.id
-            }?
-            .0
+            }
+            bestIndex = index
+            bestScore = score
+        }
+        return bestIndex.map { tracks[$0] }
     }
 }
 

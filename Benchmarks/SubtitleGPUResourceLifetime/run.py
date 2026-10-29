@@ -16,6 +16,9 @@ ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
 BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 COMPOSITOR = "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift"
+CANDIDATE_SUPPORT = [
+    "Sources/IlliquidNativePlayback/Subtitles/ASSSubtitleVertexWriter.swift",
+]
 SHARED = [
     "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift",
     "Sources/IlliquidNativePlayback/Presentation/NativeMetalShaderLibrary.swift",
@@ -137,6 +140,13 @@ def main() -> None:
             raise ValueError(f"Shared dependency differs from pinned baseline: {path}")
         shared[path] = contents
         source_receipt["inputs_sha256"][path] = sha(contents)
+    # Complete current production support belongs only to the candidate. The
+    # pinned baseline keeps its original vertex implementation and oracle.
+    candidate_support = {}
+    for path in CANDIDATE_SUPPORT:
+        contents = (ROOT / path).read_bytes()
+        candidate_support[path] = contents
+        source_receipt["inputs_sha256"]["candidate/" + path] = sha(contents)
     for path in [*TESTS, str(HERE.relative_to(ROOT) / "Probe.swift"),
                  str(Path(__file__).relative_to(ROOT))]:
         source_receipt["inputs_sha256"][path] = sha((ROOT / path).read_bytes())
@@ -163,6 +173,8 @@ def main() -> None:
         shutil.copyfile(HERE / "Probe.swift", probe / "Probe.swift")
         test_target = ""
         if variant == "candidate":
+            for path, contents in candidate_support.items():
+                (native / Path(path).name).write_bytes(contents)
             tests = package / "Tests/IlliquidNativePlaybackTests"
             tests.mkdir(parents=True)
             for path in TESTS:

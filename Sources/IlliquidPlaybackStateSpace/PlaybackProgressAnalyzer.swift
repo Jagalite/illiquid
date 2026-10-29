@@ -46,22 +46,36 @@ public enum PlaybackProgressAnalyzer {
       }
     }
 
-    let settled = Set(
+    let transactionIndices = classifications.indices.filter {
+      classifications[$0] == .transactionProgress
+    }
+    var canSettle = Set(
       classifications.indices.filter {
         classifications[$0] == .terminal || classifications[$0] == .stableIntentionalWait
           || classifications[$0] == .declaredExternalWait
       })
-    var canSettle = settled
-    var changed = true
-    while changed {
-      changed = false
-      for edge in result.graph.edges where edge.isFairProgress && canSettle.contains(edge.to) {
-        if canSettle.insert(edge.from).inserted { changed = true }
+    // Reachability is used only to count settled transactions. With no
+    // transactions or no settled seeds, that count is already known.
+    if !transactionIndices.isEmpty && !canSettle.isEmpty {
+      var predecessors: [Int: [Int]] = [:]
+      for edge in result.graph.edges where edge.isFairProgress {
+        predecessors[edge.to, default: []].append(edge.from)
+      }
+
+      // Visit each reachable vertex once, following fair edges backwards.
+      // Cutoff nodes may carry a path even though they are not settled seeds.
+      var worklist = Array(canSettle)
+      while let destination = worklist.popLast() {
+        for predecessor in predecessors[destination, default: []] {
+          if canSettle.insert(predecessor).inserted {
+            worklist.append(predecessor)
+          }
+        }
       }
     }
 
     let components = stronglyConnectedComponents(
-      nodeCount: result.nodes.count, edges: result.graph.edges
+      nodeCount: result.nodes.count, outgoing: outgoing
     )
     let closedNonterminal = components.filter { component in
       guard
@@ -75,9 +89,6 @@ public enum PlaybackProgressAnalyzer {
         $0.isFairProgress && ranks[$0.to] < ranks[$0.from]
       }
       return !hasExit && !hasFairDecrease
-    }
-    let transactionIndices = classifications.indices.filter {
-      classifications[$0] == .transactionProgress
     }
     return PlaybackProgressReport(
       terminalStates: classifications.count(where: { $0 == .terminal }),
@@ -96,12 +107,23 @@ public enum PlaybackProgressAnalyzer {
     nodeCount: Int,
     edges: [PlaybackSearchGraph.Edge]
   ) -> [Set<Int>] {
-    let adjacency = Dictionary(grouping: edges, by: \.from).mapValues { $0.map(\.to) }
+    stronglyConnectedComponents(
+      nodeCount: nodeCount, outgoing: Dictionary(grouping: edges, by: \.from)
+    )
+  }
+
+  private static func stronglyConnectedComponents(
+    nodeCount: Int,
+    outgoing: [Int: [PlaybackSearchGraph.Edge]]
+  ) -> [Set<Int>] {
+    // The analyzer already groups these edges for classification. Reuse that
+    // index, retaining the original successor order for deterministic reports.
     var nextIndex = 0
-    var indices = [Int?](repeating: nil, count: nodeCount)
+    var indices = [Int](repeating: -1, count: nodeCount)
     var lowLinks = Array(repeating: 0, count: nodeCount)
     var stack: [Int] = []
-    var onStack: Set<Int> = []
+    // Search vertices are dense indices in 0..<nodeCount.
+    var onStack = [Bool](repeating: false, count: nodeCount)
     var components: [Set<Int>] = []
 
     func visit(_ vertex: Int) {
@@ -109,26 +131,27 @@ public enum PlaybackProgressAnalyzer {
       lowLinks[vertex] = nextIndex
       nextIndex += 1
       stack.append(vertex)
-      onStack.insert(vertex)
-      for successor in adjacency[vertex, default: []] {
-        if indices[successor] == nil {
+      onStack[vertex] = true
+      for edge in outgoing[vertex, default: []] {
+        let successor = edge.to
+        if indices[successor] == -1 {
           visit(successor)
           lowLinks[vertex] = min(lowLinks[vertex], lowLinks[successor])
-        } else if onStack.contains(successor), let successorIndex = indices[successor] {
-          lowLinks[vertex] = min(lowLinks[vertex], successorIndex)
+        } else if onStack[successor] {
+          lowLinks[vertex] = min(lowLinks[vertex], indices[successor])
         }
       }
       guard lowLinks[vertex] == indices[vertex] else { return }
       var component: Set<Int> = []
       while let member = stack.popLast() {
-        onStack.remove(member)
+        onStack[member] = false
         component.insert(member)
         if member == vertex { break }
       }
       components.append(component)
     }
 
-    for vertex in 0..<nodeCount where indices[vertex] == nil { visit(vertex) }
+    for vertex in 0..<nodeCount where indices[vertex] == -1 { visit(vertex) }
     return components
   }
 

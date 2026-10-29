@@ -25,17 +25,39 @@ struct PlaybackCheckpoint: Sendable {
     let unshuffledPlaylistIDs: [FolderPlaylistItem.ID]?
 
     func record() -> PlaybackSessionRecord {
-        let belongsToFolder = source.url.isFileURL && playlist.contains {
-            NormalizedFileURL.representsSameFile($0.url, source.url)
-        }
         return PlaybackSessionRecord(
             source: source,
-            collectionFolder: belongsToFolder ? folder : nil,
+            collectionFolder: folderContainingSource(),
             playlistItems: playlist,
             playlistIndex: index,
             position: position,
             wasPaused: wasPaused,
             unshuffledPlaylistIDs: unshuffledPlaylistIDs
         )
+    }
+
+    private func folderContainingSource() -> URL? {
+        guard let folder, !playlist.isEmpty,
+              let sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
+        else { return nil }
+        var probedIndex: Int?
+
+        // Verify the captured index instead of trusting it. A singleton already
+        // has a one-item scan and needs no separate probe.
+        if playlist.count > 1, let index, playlist.indices.contains(index) {
+            probedIndex = index
+            if NormalizedFileURL.persistenceKey(for: playlist[index].url) == sourceKey {
+                return folder
+            }
+        }
+
+        // A stale or unsupported hinted item has already failed the same test.
+        // Visit each remaining item at most once while retaining source identity.
+        for candidateIndex in playlist.indices where candidateIndex != probedIndex {
+            if NormalizedFileURL.persistenceKey(for: playlist[candidateIndex].url) == sourceKey {
+                return folder
+            }
+        }
+        return nil
     }
 }
