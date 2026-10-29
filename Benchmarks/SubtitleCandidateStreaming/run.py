@@ -74,6 +74,10 @@ class Runner:
         self.binaries = {}
         self.manifest = {
             "baseline_commit": BASELINE, "candidate_sources": "current worktree captured before compilation",
+            "qualification": "current-support-regression" if args.regression_only else "historical",
+            "performance_measured": False,
+            "source_policy": "Pinned matcher; identical current support in both variants"
+                if args.regression_only else "Pinned baseline; reject supporting-source drift",
             "platform": platform.platform(), "machine": platform.machine(),
             "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "arguments": {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()},
@@ -136,18 +140,29 @@ class Runner:
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(data)
             self.manifest["harness"][relative] = {"sha256": sha(data), "bytes": len(data)}
+        self.snapshot_sources(harness)
+
+    def snapshot_sources(self, harness: dict[str, bytes]) -> None:
         baseline_sources = {}
-        candidate_sources = {}
+        # Capture each current file once, then reuse its bytes for both variants.
+        candidate_sources = {relative: (ROOT / relative).read_bytes() for relative in SOURCES}
+        self.manifest["historical_sources"] = {}
         for relative, expected in SOURCES.items():
             baseline = (self.args.baseline_dir / Path(relative).name).read_bytes() if self.args.baseline_dir else \
                 self.command(["git", "show", f"{BASELINE}:{relative}"])
             if sha(baseline) != expected:
                 raise ValueError(f"Pinned baseline SHA-256 mismatch: {relative}")
-            candidate = (ROOT / relative).read_bytes()
-            if Path(relative).name != "ExternalSubtitleMatcher.swift" and candidate != baseline:
-                raise ValueError(f"A shared dependency changed: {relative}")
+            self.manifest["historical_sources"][relative] = {
+                "sha256": sha(baseline), "revision": BASELINE,
+                "origin": str(self.args.baseline_dir.resolve()) if self.args.baseline_dir else "git",
+            }
+            candidate = candidate_sources[relative]
+            if Path(relative).name != "ExternalSubtitleMatcher.swift":
+                if self.args.regression_only:
+                    baseline = candidate
+                elif candidate != baseline:
+                    raise ValueError(f"A shared dependency changed: {relative}")
             baseline_sources[relative] = baseline
-            candidate_sources[relative] = candidate
         matcher_path = next(path for path in SOURCES if path.endswith("ExternalSubtitleMatcher.swift"))
         if baseline_sources[matcher_path] == candidate_sources[matcher_path]:
             raise ValueError("Candidate matcher is unchanged; refuse a misleading comparison")
@@ -159,11 +174,17 @@ class Runner:
             core.mkdir(parents=True)
             self.manifest["sources"][variant] = {}
             for relative, data in source_files.items():
+                use_current = variant == "candidate" or (
+                    self.args.regression_only and Path(relative).name != "ExternalSubtitleMatcher.swift")
                 name = Path(relative).name
                 (folder / name).write_bytes(data)
                 (core / name).write_bytes(data)
                 self.manifest["sources"][variant][relative] = {
                     "sha256": sha(data), "bytes": len(data), "transformation": "none",
+                    "origin": "current-worktree" if use_current else "pinned-baseline",
+                    "source_revision": self.manifest["checkout_head"] if use_current else BASELINE,
+                    "snapshot": str((folder / name).relative_to(self.output)),
+                    "differs_from_historical": sha(data) != SOURCES[relative],
                     "git_blob_sha1": hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest(),
                 }
             (package / "Package.swift").write_text(PACKAGE)
@@ -176,6 +197,8 @@ class Runner:
                 destination.write_bytes(harness["CHeapProbe/" + relative])
         self.manifest["package_sha256"] = sha(PACKAGE.encode())
         self.save_manifest()
+
+    def build(self) -> None:
         for variant in ("baseline", "candidate"):
             print(f"Build unchanged {variant} source snapshot", flush=True)
             base = [self.args.swift, "build", "--package-path", self.output / "build" / variant,
@@ -250,6 +273,8 @@ class Runner:
         print(f"Full association parity passed for {len(verification)} workloads", flush=True)
 
     def measure(self) -> None:
+        if self.args.regression_only:
+            raise ValueError("Regression-only snapshots cannot qualify historical performance")
         rows, calibration = [], []
         for count in self.args.sizes:
             for scenario in self.args.scenarios:
@@ -284,6 +309,7 @@ class Runner:
                 print(f"Verified {count} media / {scenario} / {self.args.pairs} pairs per mode", flush=True)
         save(self.output / "summary.json", summarize(rows))
         self.manifest.update(observation_count=len(rows), all_parity_checks_passed=True,
+                             performance_measured=True,
                              completed_utc=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
         self.save_manifest()
 
@@ -324,6 +350,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--swift", default=shutil.which("swift") or "swift")
     parser.add_argument("--baseline-dir", type=Path, help="Retained baseline sources when pinned Git commit is unavailable; hashes must match")
+    parser.add_argument("--regression-only", action="store_true",
+        help="Verify full outputs with identical current supporting sources in both variants; no memory or timing measurement")
     parser.add_argument("--sizes", default="64,512,4096,32768")
     parser.add_argument("--scenarios", default=",".join(SCENARIOS))
     parser.add_argument("--pairs", type=int, default=6)
@@ -334,6 +362,8 @@ def main() -> None:
     parser.add_argument("--memory-only", action="store_true", help="Verify outputs and measure memory without calibration or timing processes")
     parser.add_argument("--cpu", type=int, help="Pin this process and children to one available Linux CPU")
     args = parser.parse_args()
+    if args.regression_only and (args.prepare_only or args.memory_only):
+        parser.error("--regression-only requires verification and prohibits measurement")
     args.sizes = [int(value) for value in args.sizes.split(",")]
     args.scenarios = args.scenarios.split(",")
     if args.pairs < 2 or args.pairs % 2:
@@ -349,11 +379,26 @@ def main() -> None:
             parser.error("Requested CPU affinity is unavailable")
         os.sched_setaffinity(0, {args.cpu})
     runner = Runner(args)
-    runner.prepare()
-    if not args.prepare_only:
-        runner.verify()
-        if not args.verify_only:
-            runner.measure()
+    try:
+        runner.prepare()
+        runner.build()
+        if not args.prepare_only:
+            runner.verify()
+            if args.regression_only:
+                save(runner.output / "summary.json", {
+                    "status": "passed", "qualification": "current-support-regression",
+                    "full_output_parity_passed": True, "performance_measured": False,
+                    "workloads": len(args.sizes) * len(args.scenarios),
+                    "scope": "Full fixture oracle and paired output parity; current-source unit tests run separately",
+                })
+            elif not args.verify_only:
+                runner.measure()
+        runner.manifest["status"] = "passed"
+    except BaseException as error:
+        runner.manifest.update(status="failed", error=str(error))
+        raise
+    finally:
+        runner.save_manifest()
     print(f"Evidence: {runner.output}", flush=True)
 
 
