@@ -50,6 +50,45 @@ struct TrackSelectionRankingTests {
         }
     }
 
+    @Test func all32LanguagePrioritiesOutrankTrackFlags() {
+        let languages = [
+            "en", "ja", "fr", "de", "es", "it", "pt", "nl",
+            "sv", "nb", "da", "fi", "pl", "cs", "sk", "hu",
+            "ro", "bg", "el", "ru", "uk", "ar", "he", "tr",
+            "hi", "bn", "ta", "te", "ko", "zh", "vi", "th",
+        ]
+        for mode in [AutomaticSubtitleSelection.always, .forcedOnly] {
+            var preferences = TrackSelectionPreferences(
+                subtitles: mode, prefersAccessibleTracks: true, avoidsCommentary: true
+            )
+            // Public mutations still pass through the 32-entry sanitization limit.
+            preferences.subtitleLanguages = languages + ["id"]
+            #expect(preferences.sanitized().subtitleLanguages == languages)
+
+            // Always also compares the last admitted language with the excluded
+            // 33rd. Forced-only filters the unlisted language before ranking.
+            let pairCount = mode == .forcedOnly ? languages.count - 1 : languages.count
+            for index in 0..<pairCount {
+                let preferred = candidate(
+                    .max, kind: .subtitle, language: languages[index],
+                    commentary: true, filtersForcedEvents: true
+                )
+                let lowerLanguage = index + 1 < languages.count ? languages[index + 1] : "id"
+                let lower = candidate(
+                    .min, kind: .subtitle, language: lowerLanguage,
+                    isDefault: true, isForced: true, accessible: true
+                )
+                // The lower language wins every flag (all six in forced-only)
+                // and the signed-ID tie-breaker. Language priority must prevail.
+                for order in [[preferred, lower], [lower, preferred]] {
+                    #expect(preferences.select(
+                        in: order, kind: .subtitle, fallbackID: Int64.min
+                    ) == Int64.max)
+                }
+            }
+        }
+    }
+
     @Test func commentaryAvoidancePrecedesAccessibilityDefaultAndFallback() {
         let tracks = [
             candidate(20),

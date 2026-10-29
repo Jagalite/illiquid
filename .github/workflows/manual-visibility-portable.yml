@@ -1,0 +1,101 @@
+name: Manual visibility portable performance
+
+on:
+  push:
+    branches: ['perf/manual-visibility-20261028']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityMatcherTests.swift'
+      - 'Benchmarks/ManualVisibility/**'
+      - 'Benchmarks/ManualVisibilityPortable/**'
+      - '.github/workflows/manual-visibility-portable.yml'
+      - '!Benchmarks/ManualVisibility/**/*.md'
+      - '!Benchmarks/ManualVisibility/evidence/**'
+      - '!Benchmarks/ManualVisibilityPortable/**/*.md'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityMatcherTests.swift'
+      - 'Benchmarks/ManualVisibility/**'
+      - 'Benchmarks/ManualVisibilityPortable/**'
+      - '.github/workflows/manual-visibility-portable.yml'
+      - '!Benchmarks/ManualVisibility/**/*.md'
+      - '!Benchmarks/ManualVisibility/evidence/**'
+      - '!Benchmarks/ManualVisibilityPortable/**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-visibility-portable-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record the portable host and compiler
+        run: |
+          mkdir -p "$RUNNER_TEMP/manual-visibility-portable-host"
+          uname -a > "$RUNNER_TEMP/manual-visibility-portable-host/host.txt"
+          lscpu >> "$RUNNER_TEMP/manual-visibility-portable-host/host.txt"
+          swift --version >> "$RUNNER_TEMP/manual-visibility-portable-host/host.txt"
+          python3 --version >> "$RUNNER_TEMP/manual-visibility-portable-host/host.txt"
+      - name: Test symmetric Linux adaptations and measure paired projections
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo "Shared Kyoto queue is present; submit this qualification through Kyoto."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; isolated component builds run serially."
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode+=(--tests-only)
+          fi
+          python3 Benchmarks/ManualVisibilityPortable/run.py \
+            --output "$RUNNER_TEMP/manual-visibility-portable" \
+            --pairs 8 --sizes 100,1000,10000 --target-ms 80 "${mode[@]}"
+      - name: Emit portable qualification evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'manual-visibility-portable'
+          files = {}
+          for name in ['manifest.json', 'tests.json', 'verification.json',
+                       'calibrations.json', 'summary.json', 'failure.json']:
+              path = root / name
+              if path.exists():
+                  files[name] = json.loads(path.read_text())
+          path = root / 'measurements.jsonl'
+          if path.exists():
+              files[path.name] = [json.loads(line) for line in path.read_text().splitlines()]
+          payload = json.dumps(files, sort_keys=True, separators=(',', ':'))
+          if len(payload.encode()) > 4 * 1024 * 1024:
+              raise SystemExit('Evidence exceeds log limit; use the uploaded artifact')
+          print('MANUAL_VISIBILITY_PORTABLE_EVIDENCE ' + payload)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: manual-visibility-portable
+          path: |
+            ${{ runner.temp }}/manual-visibility-portable/*.json
+            ${{ runner.temp }}/manual-visibility-portable/*.jsonl
+            ${{ runner.temp }}/manual-visibility-portable/*.log
+            ${{ runner.temp }}/manual-visibility-portable/packages/**/*.swift
+            ${{ runner.temp }}/manual-visibility-portable-host/host.txt
+          retention-days: 14

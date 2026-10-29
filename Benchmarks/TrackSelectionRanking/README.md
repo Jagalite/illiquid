@@ -11,6 +11,25 @@ describe the measured improvement and small-case controls. The successful
 macOS run's complete [retained evidence](evidence/macos-arm64/README.md) remains
 available in the repository, including the original Actions artifact.
 
+## Compact-rank follow-up
+
+The follow-up in [compact-rank performance](../../Documentation/TRACK_SELECTION_COMPACT_RANK_PERFORMANCE.md)
+compares the scalar rank representation with the already-optimized current-main
+implementation at `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`. Its frozen source
+and hashes live in `baseline-compact-rank/`; the historical `baseline/` and its
+retained results remain intact. Select the follow-up baseline explicitly:
+
+```sh
+python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-dir Benchmarks/TrackSelectionRanking/baseline-compact-rank --configuration debug --output /tmp/compact-track-rank-debug
+python3 Benchmarks/TrackSelectionRanking/run.py test --baseline-dir Benchmarks/TrackSelectionRanking/baseline-compact-rank --configuration release --output /tmp/compact-track-rank-release
+python3 Benchmarks/TrackSelectionRanking/run.py benchmark --baseline-dir Benchmarks/TrackSelectionRanking/baseline-compact-rank --rounds 20 --target-ms 250 --output /tmp/compact-track-rank-benchmark
+```
+
+The native workflow uses this follow-up baseline. Omitting `--baseline-dir`
+continues to select the original baseline below, which measures the cumulative
+change since the earlier ranking research. Both baselines use complete production
+sources and the same correctness checks.
+
 ## Reproduce
 
 Use matching Swift 6.1-or-newer `swift` and `swiftc` tools. The native workflow
