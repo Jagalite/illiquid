@@ -1,0 +1,64 @@
+name: Queue notification performance
+
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Playback/PacketQueue.swift
+      - Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift
+      - Tests/IlliquidNativePlaybackTests/QueueNotificationTests.swift
+      - Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift
+      - Scripts/test-queue-notifications.sh
+      - Benchmarks/QueueNotifications/**
+      - .github/workflows/queue-notifications-performance.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: queue-notifications-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  queue:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated packages.'
+      - name: Verify candidate in debug and release
+        run: |
+          bash Scripts/test-queue-notifications.sh --jobs 2 -Xswiftc -warnings-as-errors 2>&1 | tee "$RUNNER_TEMP/queue-tests-debug.log"
+          bash Scripts/test-queue-notifications.sh --jobs 2 -c release -Xswiftc -warnings-as-errors 2>&1 | tee "$RUNNER_TEMP/queue-tests-release.log"
+      - name: Verify the same regression contract against the frozen baseline
+        run: |
+          ILLIQUID_PACKET_QUEUE_SOURCE="$PWD/Benchmarks/QueueNotifications/baseline/PacketQueue.swift" \
+            bash Scripts/test-queue-notifications.sh --jobs 2 -c release -Xswiftc -warnings-as-errors 2>&1 | tee "$RUNNER_TEMP/queue-tests-baseline.log"
+      - name: Measure actual Swift queue operations
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/QueueNotifications/run.py \
+            --output "$RUNNER_TEMP/queue-notifications" --rounds 8
+          cat "$RUNNER_TEMP/queue-notifications/summary.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: queue-notifications-macos
+          path: |
+            ${{ runner.temp }}/queue-notifications/
+            ${{ runner.temp }}/queue-tests-*.log
+          retention-days: 14

@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "repository": "Jagalite/illiquid",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "measured_candidate": "e604eaa8ba8911e952c1b5a5b1b9f5c88a08ef3e",
+  "workflow_run": 40637699841,
+  "workflow_url": "https://github.com/Jagalite/illiquid/actions/runs/40637699841",
+  "jobs": [
+    {
+      "id": 122648368447,
+      "name": "native-app",
+      "conclusion": "success",
+      "started_at": "2026-10-28T10:49:58Z",
+      "completed_at": "2026-10-28T10:58:09Z",
+      "html_url": "https://github.com/Jagalite/illiquid/actions/runs/40637699841/job/122648368447"
+    },
+    {
+      "id": 122648368700,
+      "name": "native-component",
+      "conclusion": "success",
+      "started_at": "2026-10-28T10:57:38Z",
+      "completed_at": "2026-10-28T10:59:30Z",
+      "html_url": "https://github.com/Jagalite/illiquid/actions/runs/40637699841/job/122648368700"
+    }
+  ],
+  "completion": {
+    "complete": true,
+    "live_playback_qualified": false,
+    "miss_overhead_reported_in": [
+      "alternating-size",
+      "alternating-color"
+    ],
+    "mode": "paired-benchmark",
+    "observations": 80,
+    "parity_passed": true,
+    "performance_measured": true,
+    "player_rss_measured": false,
+    "stable_performance_criterion_met": true,
+    "tests_passed": true
+  },
+  "validation": {
+    "component_debug_tests": 11,
+    "component_release_tests": 11,
+    "native_app_release_tests": 13,
+    "native_app_release_suites": 2,
+    "native_app_graph_compiled": true,
+    "component_test_log_hashes_verified": true,
+    "helper_source_hash_verified": true,
+    "observations": 80,
+    "min_cpu_ns": 97460000,
+    "min_wall_ns": 97458500,
+    "audit": [
+      {
+        "workload": "stable-bgra",
+        "median_paired_cpu_ratio": 0.6551286392978033,
+        "faster_pairs": 8
+      },
+      {
+        "workload": "stable-nv12",
+        "median_paired_cpu_ratio": 0.683432035001467,
+        "faster_pairs": 8
+      },
+      {
+        "workload": "stable-p010-hdr",
+        "median_paired_cpu_ratio": 0.6368557484188939,
+        "faster_pairs": 8
+      },
+      {
+        "workload": "alternating-size",
+        "median_paired_cpu_ratio": 1.0435968217255396,
+        "faster_pairs": 2
+      },
+      {
+        "workload": "alternating-color",
+        "median_paired_cpu_ratio": 1.2142146198969774,
+        "faster_pairs": 0
+      }
+    ],
+    "commands": 106,
+    "all_commands_succeeded": true
+  },
+  "provenance": "The ten component files are exact content strings reconstructed from VIDEO_FORMAT_FILE JSON records in the completed job log. The native-app log is the complete decoded job log. Digests below were calculated after reconstruction. Production sources, tests, runner, and workflow are unchanged by the evidence commit.",
+  "files": [
+    {
+      "name": "manifest.json",
+      "bytes": 2343,
+      "sha256": "67b49374c136a45bc0a039cfea61208e20ea5bbe66dff78824737263ea5635c0"
+    },
+    {
+      "name": "tests.json",
+      "bytes": 129,
+      "sha256": "3d11a2d19557bf561acbec5501736b0edff9f740b87db221c085d3a61479794e"
+    },
+    {
+      "name": "verification.json",
+      "bytes": 3471,
+      "sha256": "028e3c7a39cfa86f69579a2eff3f6668c00bd2c416cc46536efefe214971616f"
+    },
+    {
+      "name": "calibrations.json",
+      "bytes": 4614,
+      "sha256": "f52cb933493bae5eddbda67f505c9c21afd5de779640ac1613885a0a18746c0a"
+    },
+    {
+      "name": "observations.json",
+      "bytes": 32506,
+      "sha256": "e7e22a882d9d98380c6eec23777a17329c24ec416a343b8861e0e082931b96e1"
+    },
+    {
+      "name": "summary.json",
+      "bytes": 6956,
+      "sha256": "7a949da8e32ef1a8998f7944bef5e4fd900f1cd306d518cad8acf8acf002e828"
+    },
+    {
+      "name": "completion.json",
+      "bytes": 354,
+      "sha256": "dfb745c6e6e2cd1d10e8cb6720632e5eb39184f775caf5632ba7e491b4a878ec"
+    },
+    {
+      "name": "commands.json",
+      "bytes": 48728,
+      "sha256": "3104f4a1d4841f2286484ccd482a0269df1817b9d8ed951f96d4488aceef7f67"
+    },
+    {
+      "name": "logs/tests-debug.log",
+      "bytes": 4631,
+      "sha256": "448ed981cce50c15571042d28a507cf3ae5220e4548779e3fbc39119f86f9401"
+    },
+    {
+      "name": "logs/tests-release.log",
+      "bytes": 4482,
+      "sha256": "7495b840bb9665f539e2a31d34d6e91a2579c3ccd40c12f6d10801ab745116d5"
+    },
+    {
+      "name": "logs/native-app-validation.log",
+      "bytes": 46069,
+      "sha256": "8311a2a8acfdeecb8509e3221985ab55cefb58a05efe95f54715712aab82aa83"
+    }
+  ]
+}

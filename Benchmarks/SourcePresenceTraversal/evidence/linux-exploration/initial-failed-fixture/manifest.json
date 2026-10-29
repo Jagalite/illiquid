@@ -1,0 +1,51 @@
+{
+  "arguments": {
+    "cases": [
+      "flat_media_4096",
+      "flat_nonmedia_4096",
+      "nested_mixed_4096",
+      "directory_only_512",
+      "cached_repair",
+      "small_32"
+    ],
+    "output": "/workspace/scratch/8c80bc83c9ff/presence-traversal-linux-exploration",
+    "pairs": 2,
+    "skip_tests": false,
+    "swift": "/tmp/illiquid-swift/usr/bin/swift",
+    "target_ms": 25.0,
+    "tests_only": false
+  },
+  "baselineCommit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "candidateCommit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "collectedAtUTC": "2026-10-28T04:35:20.217490+00:00",
+  "cpuCount": 9,
+  "environment": {
+    "DEVELOPER_DIR": null,
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "LC_COLLATE": null,
+    "SWIFT_DETERMINISTIC_HASHING": "1"
+  },
+  "github": {
+    "GITHUB_EVENT_NAME": null,
+    "GITHUB_RUN_ATTEMPT": null,
+    "GITHUB_RUN_ID": null,
+    "GITHUB_SHA": null
+  },
+  "machine": "x86_64",
+  "method": {
+    "acceptance": "Each of three primary cases: >=15% paired median wall and CPU reduction and >=7/8 favorable pairs; each of three controls: <=5% paired median regression. Final native claim requires all six cases, >=8 pairs, and every observed sample >=250ms.",
+    "calibration": "Both variants warm up, then matched pilots select one count with a 1.5x duration margin targeting at least target-ms in the faster variant; verification pilots retained. Observed samples below target are retained, never retried or discarded.",
+    "sampling": "Fresh processes, same iteration count for both variants, balanced AB/BA pairs, rotating workload order; every sample retained.",
+    "scope": "Complete SourceMediaPresenceCursor traversal of warm generated local filesystems; no file-content decoding, scanner pacing sleeps, UI rendering, or energy measurement.",
+    "sources": "Complete production scanner plus unchanged dependencies; real Foundation/Observation, separate Swift modules, no cross-module optimization.",
+    "tests": "Same complete reuse, recomputation, and traversal regression suites in baseline/candidate, debug/release; complete filesystem oracle receipts compared across all four executables.",
+    "timing": "Harness monotonic wall and process CPU clocks; fixture creation and receipt verification outside timing; no empty-loop subtraction."
+  },
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "relevantGitStatus": "M Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift\n?? .github/workflows/source-presence-traversal.yml\n?? Benchmarks/SourcePresenceTraversal/\n?? Tests/IlliquidAppTests/SourcePresenceTraversalRegressionTests.swift",
+  "runnerSHA256": "e6ae046c2eae3f07c82b2184b70a0a30742c6d223d445f9b031be1ea87c074cb",
+  "schemaVersion": 1,
+  "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+}
