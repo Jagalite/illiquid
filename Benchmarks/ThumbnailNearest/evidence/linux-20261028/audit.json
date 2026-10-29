@@ -1,0 +1,29 @@
+{
+  "observations": 160,
+  "cases": 10,
+  "fixtureCount": 247,
+  "commands": 215,
+  "commandFailures": 0,
+  "uniqueCells": 160,
+  "allOperationsValid": true,
+  "allPairsMatch": true,
+  "summaryAgreement": true,
+  "allCandidateFaster": true,
+  "pairs": 80,
+  "sourceHeadMatches": true,
+  "pinnedBaselineMatches": true,
+  "nativeQualified": false,
+  "minSampleMS": 87.944695,
+  "maxSampleMS": 561.563002,
+  "samplesBelow100ms": 7,
+  "scope": "Planning-only source projection using Dictionary<Key, UInt8>; excludes native actor scheduling, CGImage ownership, image attempts, LRU, disk and playback.",
+  "independent_source_hashes_match": true,
+  "independent_checks": [
+    "Recomputed all 80 paired reductions and summary medians",
+    "Verified every pair's counts, checksums, candidate counts, and AB/BA ordering",
+    "Compared stored baseline, candidate, runner, and workflow SHA256 against executed manifest",
+    "Confirmed all four separate swiftc compilation commands include -disable-cmo",
+    "Retained all seven final samples below the 100 ms calibration target"
+  ],
+  "conclusion": "Supports a focused PR for reduced isolated planning cost. Native cache tests and performance remain unqualified until the macOS workflow executes."
+}

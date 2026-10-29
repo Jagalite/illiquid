@@ -1,0 +1,88 @@
+{
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_blob": "66b8127d5c1ea269860b2c1b63e3dcede4262807",
+  "binary_sha256": {
+    "baseline": {
+      "driver": "305e8fbe60b6c488d26338470e4f0cdfb92b20a1c2d6fe0656d26c91ce560bc0",
+      "module": "370bd739bc812aad4c6eef5d8317392efdb3d9900d7e3b021fc99ad1e8007c83"
+    },
+    "candidate": {
+      "driver": "79bb9523ce9b92d80ec7fa731cd6e958625a8c5305410e1d75cb4de758942b81",
+      "module": "efd069298f64169a9219aa21cafe13e21def758cfa5a066fb695bcdd540a99ba"
+    }
+  },
+  "build_environment": {
+    "CLANG_MODULE_CACHE_PATH": "/__w/_temp/thumbnail-nearest-portable/build/clang",
+    "SWIFT_MODULECACHE_PATH": "/__w/_temp/thumbnail-nearest-portable/build/swift",
+    "TMPDIR": "/__w/_temp/thumbnail-nearest-portable/build/tmp"
+  },
+  "calibration": "Both variants reach target duration before final equal-work pairs",
+  "case_order": "fixed driver verification order",
+  "cgroup_cpu_max": "max 100000",
+  "container_image": "swift:6.3.2-jammy",
+  "cpu_count": 4,
+  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "extraction_sha256": {
+    "baseline": {
+      "after": "30d46116915f88b6721b1a7de06f9788b74e256bf6db99b7db10fcbb0e911b5f",
+      "async_tail": "ae554d14ec6bccaadb73da2841fd966a201d8d1e2ed0d604abad8dca6c3de0aa",
+      "before": "2b7fb75a5d246ea6e3c6745cc9847cd825f9338ef30ead5aa5db811ba9cbbb34",
+      "key": "18fa8cc3be6923121324b7367ffa3a2a7150dca67f1377b039e4db7b76a09c78",
+      "planning_prefix": "8b9d55b222fa8cb493582b2f8e4619e64484c973f540074378ef79bc882c1052"
+    },
+    "candidate": {
+      "after": "30d46116915f88b6721b1a7de06f9788b74e256bf6db99b7db10fcbb0e911b5f",
+      "async_tail": "ae554d14ec6bccaadb73da2841fd966a201d8d1e2ed0d604abad8dca6c3de0aa",
+      "before": "2b7fb75a5d246ea6e3c6745cc9847cd825f9338ef30ead5aa5db811ba9cbbb34",
+      "key": "18fa8cc3be6923121324b7367ffa3a2a7150dca67f1377b039e4db7b76a09c78",
+      "planning_prefix": "80b32162e3017996618679bd29abb69f8c7dd687f74e6eb8a99215420049b2c8"
+    }
+  },
+  "finished_utc": "2026-10-28T06:08:17.876783+00:00",
+  "flags": [
+    "-swift-version",
+    "6",
+    "-O",
+    "-whole-module-optimization",
+    "-disable-cmo",
+    "-parse-as-library",
+    "-warnings-as-errors"
+  ],
+  "generated_sha256": {
+    "baseline": "d7b691443af6464209749bbcd30dfc80cecce34f03cd49912850b420620582ff",
+    "candidate": "de5a5dec71c95afd4fe58141803f3a1dd83e71d5b11f5a4925ac1fe77321242a"
+  },
+  "git_head": "378a1160f2777cdd673ec3bcc0fb77385af98821",
+  "git_status": "",
+  "identical_async_tail": true,
+  "identical_original_key_fields": true,
+  "identical_outside_nearest": true,
+  "input_sha256": {
+    ".github/workflows/thumbnail-nearest-portable.yml": "fd8bf58ae47316fc35ff3f788e2ef3412e6c2562224be9ce18995542bc19fdc6",
+    "Benchmarks/ThumbnailNearest/Portable.swift": "88883d2c5e635b20b468462f364c1acd869d1484588188b5530a87e3239e2779",
+    "Benchmarks/ThumbnailNearest/portable.py": "0995cfcca7fd930fd944bc2a4f0cb6d9322a865fa03625df363bab3783e58343",
+    "Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift": "daaf47e79916bcba996f1f17cb2dd9181b1903b8e0a478f6ae5353180a750fe7"
+  },
+  "inputs_unchanged": true,
+  "libc": [
+    "glibc",
+    "2.35"
+  ],
+  "machine": "x86_64",
+  "method": "Fresh-process equal-work pairs; alternating AB/BA; all observations retained; calibration excluded.",
+  "native_qualification": false,
+  "pairs": 8,
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.35",
+  "scope": "Planning-only source projection using Dictionary<Key, UInt8>; excludes native actor scheduling, CGImage ownership, image attempts, LRU, disk and playback.",
+  "source_sha256": {
+    "baseline": "aa939c5d705fb7b14d064470d6ccf61224ba0f8f84d8587c3ea81fcece96364e",
+    "candidate": "daaf47e79916bcba996f1f17cb2dd9181b1903b8e0a478f6ae5353180a750fe7"
+  },
+  "started_utc": "2026-10-28T06:07:35.264120+00:00",
+  "status": "passed",
+  "swift_path": "/usr/bin/swift",
+  "swift_version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "swiftc_path": "/usr/bin/swiftc",
+  "swiftc_version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "target_ms": 100
+}

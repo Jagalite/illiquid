@@ -13,6 +13,7 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
     private var volumeObservers: [NSObjectProtocol] = []
     private var watchedRoots: [URL] = []
     private var generation: UInt64 = 0
+    private var delivery: SourceFilesystemEventDelivery?
 
     @MainActor init(worker: SourceFilesystemStreamWorker = .init(), handler: @escaping Handler) {
         self.handler = handler
@@ -21,6 +22,7 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
     }
 
     deinit {
+        delivery?.close()
         worker.stop()
         for observer in volumeObservers { notifications.removeObserver(observer) }
     }
@@ -40,11 +42,13 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
                 MainActor.assumeIsolated { self?.volumeChanged(path: volume.standardizedFileURL.path) }
             })
         }
-        worker.start(paths: paths, latency: latency) { [weak self] events in
-            Task { @MainActor [weak self] in
-                guard let self, self.generation == revision else { return }
-                self.handler(events)
-            }
+        let delivery = SourceFilesystemEventDelivery { [weak self] events in
+            guard let self, self.generation == revision else { return }
+            self.handler(events)
+        }
+        self.delivery = delivery
+        worker.start(paths: paths, latency: latency) { events in
+            delivery.send(events)
         }
         return true
     }
@@ -60,6 +64,8 @@ final class SourceFilesystemMonitor: @unchecked Sendable {
 
     @MainActor func stop() {
         generation &+= 1
+        delivery?.close()
+        delivery = nil
         for observer in volumeObservers { notifications.removeObserver(observer) }
         volumeObservers.removeAll()
         watchedRoots.removeAll()
@@ -173,12 +179,10 @@ private final class NativeSourceFilesystemStream: SourceFilesystemStream, @unche
         flags: UnsafePointer<FSEventStreamEventFlags>, count: Int,
         receiver: SourceFilesystemEventReceiver) {
         let pointers = paths.assumingMemoryBound(to: Optional<UnsafePointer<CChar>>.self)
-        var events: [SourceFilesystemEvent] = []
-        events.reserveCapacity(count)
-        for index in 0..<count {
-            guard let pointer = pointers[index] else { continue }
-            events.append(.init(path: String(cString: pointer), flags: Self.flags(from: flags[index])))
-        }
+        let events = SourceFilesystemEventBatch.decode(
+            paths: UnsafeBufferPointer(start: pointers, count: count),
+            flagsAt: { Self.flags(from: flags[$0]) }
+        )
         if !events.isEmpty { receiver.receive(events) }
     }
 
