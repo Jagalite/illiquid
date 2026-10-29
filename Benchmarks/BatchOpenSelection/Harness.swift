@@ -122,6 +122,7 @@ private func decodedItem(_ url: URL, marker: Int) throws -> FolderPlaylistItem {
 
 private func verify() throws -> [String: Any] {
     var checks = 0
+    var results: [[String: Any]] = []
     var checksum: UInt64 = 0
     func record(
         _ items: [FolderPlaylistItem], _ current: URL?,
@@ -133,6 +134,11 @@ private func verify() throws -> [String: Any] {
         ), label: label)
         checksum &+= witness(index: result.selectedIndex,
                              preservesCurrent: result.preservesCurrent)
+        results.append([
+            "label": label,
+            "selectedIndex": result.selectedIndex.map { $0 as Any } ?? NSNull(),
+            "preservesCurrent": result.preservesCurrent,
+        ])
         checks += 1
     }
 
@@ -219,7 +225,8 @@ private func verify() throws -> [String: Any] {
     guard queues.count == 341, checks == 2_102 else {
         throw HarnessError.incorrectResult("verification corpus count changed")
     }
-    return ["status": "passed", "checks": checks, "checksum": NSNumber(value: checksum)]
+    return ["status": "passed", "checks": checks,
+            "checksum": NSNumber(value: checksum), "results": results]
 }
 
 @inline(never)
