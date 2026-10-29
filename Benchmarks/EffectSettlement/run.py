@@ -20,7 +20,7 @@ BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
 FOCAL = "Sources/IlliquidPlaybackCore/PlaybackCore.swift"
 CORE_DEPENDENCY = "Sources/IlliquidCore/Player/MediaTrack.swift"
 VARIANTS = ("baseline", "candidate")
-TEST_FILTER = "EffectSettlementTests|CompletedEffectHistoryTests|StandardCompletionContractTests|PlaybackCoreTests"
+TEST_FILTER = "EffectRetirementTests|EffectSettlementTests|CompletedEffectHistoryTests|StandardCompletionContractTests|PlaybackCoreTests"
 
 
 def sha(data: bytes) -> str:
