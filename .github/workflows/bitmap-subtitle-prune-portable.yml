@@ -1,0 +1,79 @@
+name: Independent bitmap subtitle pruning validation
+
+on:
+  push:
+    branches: [perf/bitmap-prune-noop-validation-b634c30]
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/**
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift
+      - Benchmarks/BitmapSubtitleLookup/Driver.swift
+      - Benchmarks/BitmapSubtitleLookup/run.py
+      - Benchmarks/BitmapSubtitleLookup/baseline/**
+      - .github/workflows/bitmap-subtitle-prune-portable.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/**
+      - Tests/IlliquidNativePlaybackTests/BitmapSubtitleTimelineOrderingTests.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleMemoryBudgetAccountingTests.swift
+      - Benchmarks/BitmapSubtitleLookup/Driver.swift
+      - Benchmarks/BitmapSubtitleLookup/run.py
+      - Benchmarks/BitmapSubtitleLookup/baseline/**
+      - .github/workflows/bitmap-subtitle-prune-portable.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-prune-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-components:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Coordinate builds
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable; building serially in this isolated Linux checkout.'
+      - name: Verify complete baseline and candidate components
+        run: |
+          python3 -m py_compile Benchmarks/BitmapSubtitleLookup/run.py
+          python3 Benchmarks/BitmapSubtitleLookup/run.py --portable --tests-only \
+            --output "$RUNNER_TEMP/bitmap-subtitle-prune/tests"
+      - name: Measure portable components
+        run: |
+          benchmark_cpu="$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')"
+          taskset -c "$benchmark_cpu" python3 Benchmarks/BitmapSubtitleLookup/run.py --portable \
+            --pairs 12 --target-ms 250 --max-sample-ms 1500 \
+            --output "$RUNNER_TEMP/bitmap-subtitle-prune/timing"
+          printf '%s\n' "$benchmark_cpu" > "$RUNNER_TEMP/bitmap-subtitle-prune/timing/cpu-affinity.txt"
+          lscpu > "$RUNNER_TEMP/bitmap-subtitle-prune/timing/cpu.txt"
+      - name: Emit review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "bitmap-subtitle-prune"
+          for path in sorted(root.rglob("*")):
+              if not path.is_file() or "build" in path.parts or "receipts" in path.parts:
+                  continue
+              print("BITMAP_LOOKUP_FILE " + json.dumps({
+                  "path": str(path.relative_to(root)), "content": path.read_text()
+              }, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-prune-portable
+          path: ${{ runner.temp }}/bitmap-subtitle-prune
+          retention-days: 14

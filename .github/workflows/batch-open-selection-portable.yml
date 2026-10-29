@@ -5,14 +5,24 @@ on:
     branches: ['perf/batch-open-selection-20261028']
     paths:
       - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
       - 'Benchmarks/BatchOpenSelection/Harness.swift'
       - 'Benchmarks/BatchOpenSelection/run.py'
+      - 'Benchmarks/BatchOpenSelection/test_policy.py'
       - '.github/workflows/batch-open-selection-portable.yml'
   pull_request:
     paths:
       - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
       - 'Benchmarks/BatchOpenSelection/Harness.swift'
       - 'Benchmarks/BatchOpenSelection/run.py'
+      - 'Benchmarks/BatchOpenSelection/test_policy.py'
       - '.github/workflows/batch-open-selection-portable.yml'
   workflow_dispatch:
 
@@ -32,12 +42,15 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Verify both configurations and measure paired component timings
+      - name: Check source selection and receipt policy without compilation
+        run: python3 -B Benchmarks/BatchOpenSelection/test_policy.py
+      - name: Verify both configurations (manual runs also measure timings)
         run: >-
           python3 Benchmarks/BatchOpenSelection/run.py
+          ${{ github.event_name != 'workflow_dispatch' && '--regression-only' || '' }}
           --pairs 8 --target-ms 50
           --output "$RUNNER_TEMP/batch-open-selection-portable"
-      - name: Record complete measurement receipts in the job log
+      - name: Record complete qualification receipts in the job log
         if: always()
         run: |
           python3 - "$RUNNER_TEMP/batch-open-selection-portable" <<'PY'

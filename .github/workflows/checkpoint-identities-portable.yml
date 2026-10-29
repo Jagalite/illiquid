@@ -1,0 +1,85 @@
+name: Checkpoint identities portable
+
+on:
+  push:
+    branches: ['perf/checkpoint-identities-*']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Benchmarks/CheckpointIdentities/Harness.swift'
+      - 'Benchmarks/CheckpointIdentities/run.py'
+      - 'Scripts/check-ci-whitespace.py'
+      - 'Scripts/test-check-ci-whitespace.py'
+      - 'Scripts/tests/benchmark-source-policy-tests.py'
+      - '.github/workflows/checkpoint-identities-portable.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidPlayer/Player/PlaybackController.swift'
+      - 'Tests/IlliquidCoreTests/Playlist*Tests.swift'
+      - 'Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift'
+      - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
+      - 'Benchmarks/CheckpointIdentities/Harness.swift'
+      - 'Benchmarks/CheckpointIdentities/run.py'
+      - 'Scripts/check-ci-whitespace.py'
+      - 'Scripts/test-check-ci-whitespace.py'
+      - 'Scripts/tests/benchmark-source-policy-tests.py'
+      - '.github/workflows/checkpoint-identities-portable.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-identities-portable-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test benchmark source policies without compilation
+        run: python3 -B Scripts/tests/benchmark-source-policy-tests.py
+      - name: Test whitespace comparison policy without compilation
+        run: python3 -B Scripts/test-check-ci-whitespace.py
+      - name: Check changed-line whitespace and record comparison provenance
+        run: >-
+          python3 Scripts/check-ci-whitespace.py
+          --output "$RUNNER_TEMP/checkpoint-identities-portable-whitespace.json"
+      - name: Qualify Foundation component (manual runs also measure)
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this isolated Ubuntu runner; compiling packages serially.'
+          mode=()
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" ]]; then
+            mode+=(--regression-only)
+          fi
+          python3 Benchmarks/CheckpointIdentities/run.py "${mode[@]}" \
+            --pairs 12 --target-ms 150 \
+            --output "$RUNNER_TEMP/checkpoint-identities-portable"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: checkpoint-identities-portable
+          path: |
+            ${{ runner.temp }}/checkpoint-identities-portable-whitespace.json
+            ${{ runner.temp }}/checkpoint-identities-portable/
+            !${{ runner.temp }}/checkpoint-identities-portable/build/**
+            !${{ runner.temp }}/checkpoint-identities-portable/module-cache/**
+            !${{ runner.temp }}/checkpoint-identities-portable/swiftpm-cache/**
+          retention-days: 30
