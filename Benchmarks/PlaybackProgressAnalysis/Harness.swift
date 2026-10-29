@@ -163,15 +163,24 @@ struct ProgressAnalysisBenchmark {
     try emit(fixture)
 
     if fields[0] == "analyze" {
-      let input = result!
-      let expected = ReferencePlaybackProgressAnalyzer.analyze(input)
+      let input: PlaybackSearchResult = result!
+      let expected: PlaybackProgressReport = ReferencePlaybackProgressAnalyzer.analyze(input)
+      let expectedFingerprint: String = try fingerprint(reportValue(expected))
+      let baseline: () -> PlaybackProgressReport = {
+        ReferencePlaybackProgressAnalyzer.analyze(input)
+      }
+      let candidate: () -> PlaybackProgressReport = {
+        PlaybackProgressAnalyzer.analyze(input)
+      }
+      let consume: (PlaybackProgressReport) -> UInt64 = { report in
+        let count: Int = report.terminalStates + report.externalWaitStates + report.stuckStates.count
+          + report.closedNonterminalSCCs.count + report.settledTransactionStates
+        return UInt64(count)
+      }
       try benchmark(
         caseID: caseID, pairs: pairs, targetMilliseconds: targetMilliseconds,
-        expected: expected, fingerprint: fingerprint(reportValue(expected)),
-        baseline: { ReferencePlaybackProgressAnalyzer.analyze(input) },
-        candidate: { PlaybackProgressAnalyzer.analyze(input) },
-        consume: { UInt64($0.terminalStates + $0.externalWaitStates + $0.stuckStates.count
-          + $0.closedNonterminalSCCs.count + $0.settledTransactionStates) }
+        expected: expected, fingerprint: expectedFingerprint,
+        baseline: baseline, candidate: candidate, consume: consume
       )
     } else {
       precondition(fields[0] == "scc")
