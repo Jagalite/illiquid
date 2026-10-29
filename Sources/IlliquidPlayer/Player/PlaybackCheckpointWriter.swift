@@ -40,18 +40,24 @@ struct PlaybackCheckpoint: Sendable {
         guard let folder, !playlist.isEmpty,
               let sourceKey = NormalizedFileURL.persistenceKey(for: source.url)
         else { return nil }
+        var probedIndex: Int?
 
-        // The captured index is only a hint: restored or changed playlists can
-        // disagree with it. Verify identity before using the shortcut.
-        if let index, playlist.indices.contains(index),
-           NormalizedFileURL.persistenceKey(for: playlist[index].url) == sourceKey {
-            return folder
+        // Verify the captured index instead of trusting it. A singleton already
+        // has a one-item scan and needs no separate probe.
+        if playlist.count > 1, let index, playlist.indices.contains(index) {
+            probedIndex = index
+            if NormalizedFileURL.persistenceKey(for: playlist[index].url) == sourceKey {
+                return folder
+            }
         }
 
-        // Normalize the invariant source once even when the hint is absent or
-        // stale. Decoded playlist items still require their own normalization.
-        return playlist.contains {
-            NormalizedFileURL.persistenceKey(for: $0.url) == sourceKey
-        } ? folder : nil
+        // A stale or unsupported hinted item has already failed the same test.
+        // Visit each remaining item at most once while retaining source identity.
+        for candidateIndex in playlist.indices where candidateIndex != probedIndex {
+            if NormalizedFileURL.persistenceKey(for: playlist[candidateIndex].url) == sourceKey {
+                return folder
+            }
+        }
+        return nil
     }
 }
