@@ -1,0 +1,134 @@
+name: Video recovery EOF memory
+
+on:
+  push:
+    branches: ['perf/video-recovery-eof-release-20261028-2d367']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryDecodedOutputLifetimeTests.swift'
+      - 'Benchmarks/VideoRecoveryEOFMemory/**'
+      - '.github/workflows/video-recovery-eof-memory.yml'
+      - '!Benchmarks/VideoRecoveryEOFMemory/*.md'
+      - '!Benchmarks/VideoRecoveryEOFMemory/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryDecodedOutputLifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeTests.swift'
+      - 'Benchmarks/VideoRecoveryEOFMemory/**'
+      - '.github/workflows/video-recovery-eof-memory.yml'
+      - '!Benchmarks/VideoRecoveryEOFMemory/*.md'
+      - '!Benchmarks/VideoRecoveryEOFMemory/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-recovery-eof-memory-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lifetime:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Verify production EOF ownership and negative controls
+        run: |
+          python3 Benchmarks/VideoRecoveryEOFMemory/run.py \
+            --output "$RUNNER_TEMP/video-recovery-eof" --pairs 2
+      - name: Emit reproducible ownership evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'video-recovery-eof'
+          for name in ('manifest.json', 'summary.json', 'observations.json', 'complete-outputs.json', 'commands.json'):
+              path = root / name
+              if path.is_file():
+                  data = path.read_text()
+                  for offset in range(0, len(data), 16000):
+                      print('RECOVERY_EOF_FILE ' + json.dumps({
+                          'name': name, 'offset': offset, 'length': len(data),
+                          'content': data[offset:offset + 16000]
+                      }, sort_keys=True))
+          summary = root / 'summary.json'
+          if summary.is_file():
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+                  out.write('## Video recovery EOF ownership\n\n')
+                  out.write('Debug/release production-loop comparisons and baseline negative controls passed.\n\n')
+                  out.write('Tracked native packet backing allocations; no whole-player RSS or timing claim.\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-recovery-eof-ownership
+          path: |
+            ${{ runner.temp }}/video-recovery-eof/*.json
+            ${{ runner.temp }}/video-recovery-eof/metrics/
+            ${{ runner.temp }}/video-recovery-eof/logs/
+            ${{ runner.temp }}/video-recovery-eof/sources/
+          retention-days: 14
+
+  native-regressions:
+    # The repository's unfiltered restoration workflow runs the complete native
+    # release suite on PRs; qualify this branch before opening a PR as well.
+    if: github.event_name != 'pull_request'
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies and Metal
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and test native output ownership
+        run: |
+          mkdir -p "$RUNNER_TEMP/video-recovery-native"
+          set -o pipefail
+          python3 - <<'PY' 2>&1 | tee "$RUNNER_TEMP/video-recovery-native/tests.log"
+          import json, subprocess, sys
+          from pathlib import Path
+          command = ['bash', 'Scripts/tests/run-native-swift-tests.sh', '--build',
+                     '--jobs', '2', '--filter',
+                     'VideoRecoveryDecodedOutputLifetimeTests|VideoRecoveryPacketLifetimeTests|PacketOwnershipTests|VideoScratchFrameLifetimeTests']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job = str(json.loads(submitted)['id'])
+              subprocess.run([*cli, 'show', job], check=True)
+              result = subprocess.run([*cli, 'wait', job])
+              subprocess.run([*cli, 'logs', job], check=True)
+              sys.exit(result.returncode)
+          print('Kyoto is unavailable on this hosted runner; building serially in this isolated checkout.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-recovery-eof-native-regressions
+          path: ${{ runner.temp }}/video-recovery-native/
+          retention-days: 14

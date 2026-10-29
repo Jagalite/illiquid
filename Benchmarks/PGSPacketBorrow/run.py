@@ -37,6 +37,8 @@ CASES = ["tiny_end", "composition_one", "composition_two_cropped", "object_4k",
          "object_64k", "composition_object_64k", "multisegment_256k",
          "composition_multisegment_256k"]
 VARIANTS = ("baseline", "candidate")
+REGRESSION_TARGET = "c1ef6aff6060ad35decbc6dce0c224164be941a2"
+CURRENT_SUPPORT = "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift"
 
 
 def sha(data: bytes) -> str:
@@ -94,6 +96,14 @@ class Runner:
         return value
 
     def prepare(self):
+        self.receipt["mode"] = ("current-support-regression-no-timing"
+            if self.args.current_support_regression else "native-exact-production-sources")
+        if self.args.current_support_regression:
+            self.receipt["target_oracle_revision"] = REGRESSION_TARGET
+            for path in (PARSER, DECODER):
+                pinned = subprocess.check_output(["git", "show", f"{REGRESSION_TARGET}:{path}"], cwd=ROOT)
+                if (ROOT / path).read_bytes() != pinned:
+                    raise ValueError(f"Pinned regression target changed: {path}")
         manifest = json.loads((HERE / "baseline/manifest.json").read_text())
         if manifest["revision"] != BASELINE:
             raise ValueError("Frozen baseline revision changed; review the experiment")
@@ -114,6 +124,13 @@ class Runner:
         files = {}
         for path in SHARED:
             old, new = self.source(path, "baseline"), self.source(path, "candidate")
+            if self.args.current_support_regression and path == CURRENT_SUPPORT:
+                if sha(old) != manifest["sha256"][path]:
+                    raise ValueError("Frozen packet support does not match its manifest")
+                self.receipt["support_override"] = {
+                    "path": path, "historical_sha256": sha(old), "both_arms_sha256": sha(new)}
+                files[path] = new
+                continue
             if old != new or sha(old) != manifest["sha256"][path]:
                 raise ValueError(f"Shared dependency changed: {path}; review/requalify this comparison")
             files[path] = new
@@ -256,6 +273,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--swiftc")
+    parser.add_argument("--current-support-regression", action="store_true",
+                        help="Pinned-target regression with identical current packet support; no timing qualification")
     parser.add_argument("--ffmpeg-prefix", type=Path, default=Path("/opt/homebrew/opt/ffmpeg"))
     parser.add_argument("--tests-only", action="store_true")
     parser.add_argument("--pairs", type=int, default=8)
@@ -272,10 +291,11 @@ def main():
         runner = Runner(args)
         runner.prepare()
         runner.verify()
-        if not args.tests_only:
+        if not args.tests_only and not args.current_support_regression:
             runner.measure()
         write_json(runner.output / "completion.json", {"complete": True, "tests_only": args.tests_only,
-                   "minimum_observation_duration_met": not args.tests_only,
+                   "comparison_mode": runner.receipt["mode"],
+                   "minimum_observation_duration_met": not args.tests_only and not args.current_support_regression,
                    "minimum_ms": args.minimum_ms, "pairs": args.pairs})
     finally:
         if runner:

@@ -1,0 +1,2671 @@
+diff --git a/.gitattributes b/.gitattributes
+index bfa19fee..e854401a 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -28,5 +28,7 @@ Benchmarks/DeinterlacerEOFMemory/baseline/** linguist-generated=true
+ Benchmarks/SubtitleCandidateStreaming/evidence/** linguist-generated=true -whitespace
+ Benchmarks/PlanarHistoryMemory/evidence/** linguist-generated=true -whitespace
+ Benchmarks/SidecarNegativeCache/evidence/** linguist-generated=true -whitespace
++Benchmarks/VideoRecoveryPacketLifetime/evidence/** linguist-generated=true -whitespace
++Benchmarks/VideoRecoveryPacketLifetime/baseline/** linguist-generated=true
+ Documentation/PerformanceEvidence/AuxiliaryFontNativeAudit/*.json linguist-generated=true
+ Documentation/PerformanceEvidence/AuxiliaryFontNativeAudit/*.zip linguist-generated=true
+diff --git a/.github/workflows/video-recovery-gop-lifetime.yml b/.github/workflows/video-recovery-gop-lifetime.yml
+new file mode 100644
+index 00000000..358cd412
+--- /dev/null
++++ b/.github/workflows/video-recovery-gop-lifetime.yml
+@@ -0,0 +1,123 @@
++name: Video recovery GOP lifetime
++
++on:
++  push:
++    branches: ['perf/video-recovery-gop-eof-20261028-bc446']
++    paths:
++      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
++      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
++      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift'
++      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketSessionLifetimeTests.swift'
++      - 'Benchmarks/VideoRecoveryPacketLifetime/**'
++      - '.github/workflows/video-recovery-gop-lifetime.yml'
++      - '!Benchmarks/VideoRecoveryPacketLifetime/*.md'
++      - '!Benchmarks/VideoRecoveryPacketLifetime/evidence/**'
++  pull_request:
++    paths:
++      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
++      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
++      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
++      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift'
++      - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketSessionLifetimeTests.swift'
++      - 'Benchmarks/VideoRecoveryPacketLifetime/**'
++      - '.github/workflows/video-recovery-gop-lifetime.yml'
++      - '!Benchmarks/VideoRecoveryPacketLifetime/*.md'
++      - '!Benchmarks/VideoRecoveryPacketLifetime/evidence/**'
++  workflow_dispatch:
++
++permissions:
++  contents: read
++
++concurrency:
++  group: video-recovery-gop-lifetime-${{ github.head_ref && format('refs/heads/{0}', github.head_ref) || github.ref }}
++  cancel-in-progress: true
++
++jobs:
++  portable-ownership:
++    runs-on: ubuntu-24.04
++    timeout-minutes: 25
++    steps:
++      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
++        with:
++          persist-credentials: false
++      - name: Build the pinned native ownership dependencies
++        run: |
++          echo 'Shared Kyoto queue is unavailable on this hosted runner; building serially in this isolated checkout.'
++          swiftc --version
++          bash Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh "$RUNNER_TEMP/recovery-ffmpeg"
++      - name: Verify real packet lifetime in debug and release
++        run: |
++          python3 Benchmarks/VideoRecoveryPacketLifetime/run.py \
++            --ffmpeg-prefix "$RUNNER_TEMP/recovery-ffmpeg" \
++            --output "$RUNNER_TEMP/recovery-lifetime"
++      - name: Emit reproducible ownership evidence
++        if: always()
++        run: |
++          python3 - <<'PY'
++          import base64, gzip, hashlib, json, os
++          from pathlib import Path
++          root = Path(os.environ['RUNNER_TEMP']) / 'recovery-lifetime'
++          files = {}
++          for path in sorted(root.rglob('*')):
++              relative = path.relative_to(root)
++              if path.is_file() and 'build' not in relative.parts:
++                  files[str(relative)] = path.read_text()
++          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
++          print('RECOVERY_GOP_EVIDENCE_SHA256 ' + hashlib.sha256(packed).hexdigest())
++          if len(packed) > 2 * 1024 * 1024:
++              raise SystemExit('Evidence exceeds inline limit; use the artifact')
++          print('RECOVERY_GOP_EVIDENCE_BASE64 ' + base64.b64encode(packed).decode())
++          if 'summary.json' in files:
++              print(files['summary.json'])
++          PY
++      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
++        if: always()
++        with:
++          name: video-recovery-gop-portable
++          path: |
++            ${{ runner.temp }}/recovery-lifetime/
++            !${{ runner.temp }}/recovery-lifetime/build/**
++            ${{ runner.temp }}/recovery-ffmpeg/*receipt.json
++            ${{ runner.temp }}/recovery-ffmpeg/*.log
++          retention-days: 14
++
++  macos-integration:
++    runs-on: macos-26
++    timeout-minutes: 40
++    env:
++      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
++      ILLIQUID_RECOVERY_PACKET_REQUIRE_FIXTURE: '1'
++    steps:
++      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
++        with:
++          persist-credentials: false
++      - name: Prepare the pinned native SDK
++        run: |
++          echo 'Shared Kyoto queue is unavailable on this hosted runner; building serially in this isolated checkout.'
++          if ! xcrun -sdk macosx metal --version; then
++            xcodebuild -downloadComponent MetalToolchain
++          fi
++          python3 Scripts/verify-corresponding-source.py DependencySources
++          python3 Scripts/install-ci-native-sdk.py
++      - name: Generate and verify the native B-frame EOF fixture
++        run: |
++          python3 Benchmarks/FrameStepTimestamps/generate-fixtures.py \
++            --output "$RUNNER_TEMP/recovery-native/fixtures"
++      - name: Build the application graph and test packet recovery lifetime
++        env:
++          ILLIQUID_NATIVE_FIXTURE_DIR: ${{ runner.temp }}/recovery-native/fixtures
++        run: |
++          mkdir -p "$RUNNER_TEMP/recovery-native"
++          sw_vers > "$RUNNER_TEMP/recovery-native/host.txt"
++          swift --version >> "$RUNNER_TEMP/recovery-native/host.txt"
++          git rev-parse HEAD >> "$RUNNER_TEMP/recovery-native/host.txt"
++          set -o pipefail
++          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
++            --filter 'VideoRecoveryPacketLifetimeTests|VideoRecoveryPacketSessionLifetimeTests|PlaybackBufferRegressionTests|PacketOwnershipTests' \
++            2>&1 | tee "$RUNNER_TEMP/recovery-native/tests.log"
++      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
++        if: always()
++        with:
++          name: video-recovery-gop-native
++          path: ${{ runner.temp }}/recovery-native/
++          retention-days: 14
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/.gitignore b/Benchmarks/VideoRecoveryPacketLifetime/.gitignore
+new file mode 100644
+index 00000000..6b5ef9d7
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/.gitignore
+@@ -0,0 +1,2 @@
++/results/
++__pycache__/
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/Probe.swift b/Benchmarks/VideoRecoveryPacketLifetime/Probe.swift
+new file mode 100644
+index 00000000..a3521ae2
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/Probe.swift
+@@ -0,0 +1,275 @@
++import CFFmpeg
++import Foundation
++
++// Observe real AVBuffer destruction. The receipt owns no packet or buffer.
++private final class ReleaseReceipt: @unchecked Sendable {
++    let payloadBytes: Int
++    let storageBytes: Int
++    private let lock = NSLock()
++    private var releases = 0
++
++    init(payloadBytes: Int, storageBytes: Int) {
++        self.payloadBytes = payloadBytes
++        self.storageBytes = storageBytes
++    }
++
++    func released() { lock.withLock { releases += 1 } }
++    var count: Int { lock.withLock { releases } }
++}
++
++private let releasePayload: @convention(c) (
++    UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt8>?
++) -> Void = { opaque, bytes in
++    if let opaque {
++        Unmanaged<ReleaseReceipt>.fromOpaque(opaque).takeRetainedValue().released()
++    }
++    av_free(bytes)
++}
++
++@inline(never)
++private func makePacket(
++    bytes: Int, keyframe: Bool, generation: Int = 1
++) throws -> (FFmpegPacket, ReleaseReceipt) {
++    var header = av_packet_alloc()
++    guard let packet = header else { throw FFmpegError(operation: "fixture header", code: -12) }
++    defer { av_packet_free(&header) }
++    let storageBytes = bytes + Int(AV_INPUT_BUFFER_PADDING_SIZE)
++    guard let allocation = av_mallocz(storageBytes) else {
++        throw FFmpegError(operation: "fixture payload", code: -12)
++    }
++    let data = allocation.assumingMemoryBound(to: UInt8.self)
++    data[0] = 37
++    data[bytes - 1] = 83
++    let receipt = ReleaseReceipt(payloadBytes: bytes, storageBytes: storageBytes)
++    let opaque = Unmanaged.passRetained(receipt).toOpaque()
++    guard let buffer = av_buffer_create(data, storageBytes, releasePayload, opaque, 0) else {
++        Unmanaged<ReleaseReceipt>.fromOpaque(opaque).release()
++        av_free(allocation)
++        throw FFmpegError(operation: "fixture AVBuffer", code: -12)
++    }
++    packet.pointee.buf = buffer
++    packet.pointee.data = data
++    packet.pointee.size = Int32(bytes)
++    packet.pointee.flags = keyframe ? AV_PKT_FLAG_KEY : 0
++    packet.pointee.pts = 90_000
++    packet.pointee.dts = 87_000
++    packet.pointee.duration = 3_000
++    packet.pointee.stream_index = 2
++    return (
++        try FFmpegPacket(taking: &header, timeBase: AVRational(num: 1, den: 90_000), generation: generation),
++        receipt
++    )
++}
++
++// Separate frames ensure no fixture-local FFmpegPacket survives into measurement.
++@inline(never)
++private func fill(
++    _ recovery: VideoRecoveryPacketBuffer, count: Int, bytes: Int, generation: Int = 1
++) throws -> [ReleaseReceipt] {
++    var receipts: [ReleaseReceipt] = []
++    for index in 0..<count {
++        let (packet, receipt) = try makePacket(bytes: bytes, keyframe: index == 0, generation: generation)
++        recovery.record(packet)
++        receipts.append(receipt)
++    }
++    return receipts
++}
++
++private func drain(
++    _ recovery: VideoRecoveryPacketBuffer, generation: Int = 1, _ body: () throws -> Void
++) rethrows {
++    #if BASELINE
++    // The old MediaSession calls drain without retiring its recovery GOP.
++    // The exact old packet/buffer implementation is compiled without edits.
++    try body()
++    #else
++    try recovery.retireAfterSuccessfulDrain(generation: generation, body)
++    #endif
++}
++
++private struct SuccessObservation: Codable {
++    let name: String
++    let packetCount: Int
++    let payloadBytes: Int
++    let requestedStorageBytes: Int
++    let releaseCallbacksDuringDrain: Int
++    let livePayloadBytesAfterDrain: Int
++    let liveStorageBytesAfterDrain: Int
++    let releaseCallbacksAfterReset: Int
++    let everyAllocationReleasedExactlyOnce: Bool
++}
++
++private struct ControlObservation: Codable {
++    let name: String
++    let checks: Int
++}
++
++private enum ExpectedFailure: Error { case decoder }
++
++@main
++private struct Probe {
++    static func main() throws {
++        var checks = 0
++        func check(_ condition: Bool, _ message: String) {
++            checks += 1
++            precondition(condition, message)
++        }
++        check(avcodec_version() == probe_avcodec_header_version(), "libavcodec header/runtime mismatch")
++        check(avutil_version() == probe_avutil_header_version(), "libavutil header/runtime mismatch")
++        #if BASELINE
++        let baseline = true
++        let variant = "baseline"
++        #else
++        let baseline = false
++        let variant = "candidate"
++        #endif
++        var success: [SuccessObservation] = []
++        var controls: [ControlObservation] = []
++
++        for (name, count, bytes) in [
++            ("4KiB-final-GOP", 4, 1_024),
++            ("1MiB-final-GOP", 16, 65_536),
++            ("32MiB-final-GOP", 512, 65_536),
++        ] {
++            let recovery = VideoRecoveryPacketBuffer()
++            let receipts = try fill(recovery, count: count, bytes: bytes)
++            check(receipts.allSatisfy { $0.count == 0 }, "fixture was not retained before drain")
++            var duringDrain = -1
++            drain(recovery) {
++                duringDrain = receipts.reduce(0) { $0 + $1.count }
++                check(duringDrain == 0, "recovery storage released before drain completed")
++            }
++            let livePayload = receipts.filter { $0.count == 0 }.reduce(0) { $0 + $1.payloadBytes }
++            let liveStorage = receipts.filter { $0.count == 0 }.reduce(0) { $0 + $1.storageBytes }
++            check(receipts.allSatisfy { $0.count == (baseline ? 0 : 1) }, "unexpected post-drain ownership")
++            check(livePayload == (baseline ? count * bytes : 0), "unexpected retained payload size")
++            // Repeated successful EOF is harmless; the object remains alive.
++            drain(recovery) {}
++            recovery.reset()
++            check(receipts.allSatisfy { $0.count == 1 }, "reset leaked or freed a payload twice")
++            success.append(SuccessObservation(
++                name: name, packetCount: count, payloadBytes: count * bytes,
++                requestedStorageBytes: receipts.reduce(0) { $0 + $1.storageBytes },
++                releaseCallbacksDuringDrain: duringDrain,
++                livePayloadBytesAfterDrain: livePayload, liveStorageBytesAfterDrain: liveStorage,
++                releaseCallbacksAfterReset: receipts.reduce(0) { $0 + $1.count },
++                everyAllocationReleasedExactlyOnce: receipts.allSatisfy { $0.count == 1 }
++            ))
++            withExtendedLifetime(recovery) {}
++        }
++
++        for cancellation in [false, true] {
++            let start = checks
++            let recovery = VideoRecoveryPacketBuffer()
++            let receipts = try fill(recovery, count: 4, bytes: 65_536)
++            var caught = false
++            do {
++                try drain(recovery) {
++                    check(receipts.allSatisfy { $0.count == 0 }, "failed drain lost recovery input")
++                    if cancellation { throw CancellationError() }
++                    throw ExpectedFailure.decoder
++                }
++            } catch is CancellationError {
++                check(cancellation, "wrong error escaped")
++                caught = true
++            } catch ExpectedFailure.decoder {
++                check(!cancellation, "wrong error escaped")
++                caught = true
++            }
++            check(caught, "drain swallowed its error")
++            check(receipts.allSatisfy { $0.count == 0 }, "throwing drain retired recovery input")
++            func consumeReplay() {
++                let replay = recovery.takeReplayPackets(generation: 1)
++                check(replay.count == 4 && replay.first?.isKeyframe == true, "recovery GOP unavailable after error")
++                check(replay.allSatisfy { $0.byteCount == 65_536 && $0.pointer?.pointee.data[0] == 37 }, "replay payload changed")
++                check(receipts.allSatisfy { $0.count == 0 }, "replay did not own its payloads")
++                withExtendedLifetime(replay) {}
++            }
++            consumeReplay()
++            check(receipts.allSatisfy { $0.count == 1 }, "consumed replay did not release each buffer")
++            controls.append(ControlObservation(name: cancellation ? "throwing-cancellation" : "decoder-error", checks: checks - start))
++            withExtendedLifetime(recovery) {}
++        }
++
++        for changesDuringDrain in [false, true] {
++            let start = checks
++            let recovery = VideoRecoveryPacketBuffer()
++            let old = try fill(recovery, count: 2, bytes: 1_024, generation: 1)
++            var newer: [ReleaseReceipt] = []
++            if !changesDuringDrain { newer = try fill(recovery, count: 3, bytes: 2_048, generation: 2) }
++            try drain(recovery, generation: 1) {
++                if changesDuringDrain { newer = try fill(recovery, count: 3, bytes: 2_048, generation: 2) }
++            }
++            check(old.allSatisfy { $0.count == 1 }, "replaced generation leaked")
++            check(newer.allSatisfy { $0.count == 0 }, "stale EOF retired the new generation")
++            func consumeCurrentReplay() {
++                let replay = recovery.takeReplayPackets(generation: 2)
++                check(replay.count == 3 && replay.allSatisfy { $0.generation == 2 }, "new generation replay changed")
++                withExtendedLifetime(replay) {}
++            }
++            consumeCurrentReplay()
++            check(newer.allSatisfy { $0.count == 1 }, "new generation payloads were not released")
++            controls.append(ControlObservation(name: changesDuringDrain ? "seek-during-drain" : "stale-generation-EOF", checks: checks - start))
++            withExtendedLifetime(recovery) {}
++        }
++
++        do {
++            let start = checks
++            let recovery = VideoRecoveryPacketBuffer()
++            @inline(never) func fillAndClone() throws -> (UnsafeMutablePointer<AVPacket>, ReleaseReceipt) {
++                let (packet, receipt) = try makePacket(bytes: 1_048_576, keyframe: true)
++                recovery.record(packet)
++                guard let clone = av_packet_clone(packet.pointer) else {
++                    throw FFmpegError(operation: "fixture clone", code: -12)
++                }
++                return (clone, receipt)
++            }
++            let (clone, receipt) = try fillAndClone()
++            var borrowed: UnsafeMutablePointer<AVPacket>? = clone
++            drain(recovery) {}
++            check(receipt.count == 0, "EOF freed a borrowed native packet's payload")
++            check(clone.pointee.size == 1_048_576 && clone.pointee.data[0] == 37
++                && clone.pointee.data[1_048_575] == 83, "borrowed payload was invalidated")
++            av_packet_free(&borrowed)
++            check(receipt.count == (baseline ? 0 : 1), "payload did not follow the last native owner")
++            recovery.reset()
++            check(receipt.count == 1, "borrowed payload did not release exactly once")
++            controls.append(ControlObservation(name: "borrowed-native-packet", checks: checks - start))
++            withExtendedLifetime(recovery) {}
++        }
++
++        do {
++            let start = checks
++            let recovery = VideoRecoveryPacketBuffer()
++            let old = try fill(recovery, count: 2, bytes: 1_024, generation: 1)
++            drain(recovery) {}
++            let next = try fill(recovery, count: 3, bytes: 2_048, generation: 2)
++            check(old.allSatisfy { $0.count == 1 }, "new generation retained the old EOF GOP")
++            func consumeFreshReplay() {
++                let replay = recovery.takeReplayPackets(generation: 2)
++                check(replay.count == 3 && replay.first?.isKeyframe == true, "EOF retirement broke fresh recovery")
++                withExtendedLifetime(replay) {}
++            }
++            consumeFreshReplay()
++            check(next.allSatisfy { $0.count == 1 }, "fresh GOP leaked")
++            controls.append(ControlObservation(name: "fresh-GOP-after-seek", checks: checks - start))
++            withExtendedLifetime(recovery) {}
++        }
++
++        struct Result: Codable {
++            let variant: String
++            let ffmpegVersion: String
++            let avcodecVersion: UInt32
++            let avutilVersion: UInt32
++            let checks: Int
++            let success: [SuccessObservation]
++            let controls: [ControlObservation]
++        }
++        let result = Result(variant: variant, ffmpegVersion: String(cString: av_version_info()),
++                            avcodecVersion: avcodec_version(), avutilVersion: avutil_version(),
++                            checks: checks, success: success, controls: controls)
++        let encoder = JSONEncoder()
++        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
++        print(String(decoding: try encoder.encode(result), as: UTF8.self))
++    }
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/README.md b/Benchmarks/VideoRecoveryPacketLifetime/README.md
+new file mode 100644
+index 00000000..b4b14fa9
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/README.md
+@@ -0,0 +1,155 @@
++# Video recovery GOP lifetime at successful EOF
++
++## Question
++
++Does the recovery packet buffer retain the final compressed GOP after a
++successful decoder drain, even while the session remains alive? Can that
++ownership be retired without changing error recovery, generation isolation,
++or the lifetime of other packet owners?
++
++The production buffer retains at most 512 packets and 32 MiB of payload. The
++baseline is `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`. Its complete
++`FFmpegPacket.swift`, including `VideoRecoveryPacketBuffer`, is frozen under
++`baseline/`; the runner checks both its Git blob identity and SHA-256 hash.
++
++## Finding and change
++
++`MediaSession.decodeVideoPacket` records compressed input in this recovery
++buffer. The final GOP used to remain referenced after the video worker drained
++the decoder and queued EOS, until a later seek, stop, or session destruction.
++The worker and session can remain alive while playback sits at the end.
++
++The candidate wraps the existing decoder-drain call in
++`retireAfterSuccessfulDrain`. A normal return releases the buffer's packet
++references and array capacity. A throwing failure or cancellation keeps the
++complete GOP available to the existing recovery path. Draining happens outside
++the buffer lock; the retirement checks the generation under that lock so a
++finishing old drain cannot discard packets belonging to a newer seek.
++
++“Successful” here means normal return from the player's existing drain-to-EOS
++boundary. The patch does not change the decoder's handling of EOF, EAGAIN, or
++tolerated software errors. It also does not change packet admission bounds,
++decoding, frame delivery, or the ordinary seek/replay path. Independent packet
++and frame owners retain their own storage. FFmpeg's
++[reference-counted buffer contract](https://www.ffmpeg.org/doxygen/8.1/group__lavu__buffer.html)
++releases native data only after the last reference disappears.
++
++## Measured ownership results
++
++The [portable CI experiment](https://github.com/Jagalite/illiquid/actions/runs/40639152416/job/122652965238)
++passed using Swift 6.4.1 on Ubuntu 24.04 and the repository's verified FFmpeg
++8.1.2 source. The exact baseline and candidate owners each passed 48 checks in
++debug and release; observations agreed between build configurations.
++
++| Final GOP | Payload still owned after drain, baseline | Candidate |
++| --- | ---: | ---: |
++| 4 packets, 4 KiB | 4,096 bytes | 0 bytes |
++| 16 packets, 1 MiB | 1,048,576 bytes | 0 bytes |
++| 512 packets, 32 MiB | 33,554,432 bytes | 0 bytes |
++
++These fixtures make the recovery buffer the only packet owner. No tracked
++payload was freed during the drain, and every allocation eventually released
++exactly once. The separate native-clone control proves that another real owner
++can legitimately extend the payload lifetime after retirement.
++
++[Raw observations, commands, provenance, and logs](evidence/ubuntu/) are
++committed with the study. This is a reduction in retained recovery-buffer
++ownership, not a measurement of total player RSS or an asserted CPU speedup.
++The retained run covers the ownership probe at commit `9da2b2ed`; the production
++owner has the same source hash in the subsequent test additions. The exact-suite
++and real-session gates added afterward have their own CI results and must not
++be inferred to have passed from this earlier receipt.
++
++## Reproduce the portable ownership experiment
++
++Requires Linux, Swift 6.1 or newer, Python 3, a C compiler, make, and pkg-config.
++Build the repository's verified FFmpeg 8.1.2 source archive and then run:
++
++```sh
++bash Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh /tmp/video-recovery-ffmpeg
++python3 Benchmarks/VideoRecoveryPacketLifetime/run.py \
++  --ffmpeg-prefix /tmp/video-recovery-ffmpeg \
++  --output /tmp/video-recovery-lifetime
++```
++
++Use new SDK and result directories. When Kyoto is available, submit build work
++through it as required by `AGENTS.md`. On a hosted runner without Kyoto, state
++that limitation and run these isolated builds sequentially.
++
++The runner compiles the exact old and new production packet-owner source in
++debug and release with warnings treated as errors. It reuses the narrow
++Foundation-only support declarations from
++`Benchmarks/PlaybackPipeline/PacketProbeSupport.swift`. The FFmpeg APIs and
++public structures come from the real pinned development headers; packet,
++reference, allocation, and release operations use the real FFmpeg libraries.
++Four C helpers are extracted unchanged from the production shim. Header and
++runtime library versions must agree.
++
++Before the ownership probes, the runner stages an isolated Swift package and
++executes the exact, unchanged `VideoRecoveryPacketLifetimeTests.swift` in debug
++and release: ten test functions, including three payload-size arguments, give
++twelve cases per configuration. The package contains the same candidate owner,
++support declarations, and real FFmpeg header module. It uses the compiler's
++bundled Swift Testing library with no external dependencies, and keeps all
++SwiftPM build/cache files under the result directory's `build/`. The runner
++requires the completion markers for all functions and all three size arguments
++and records the test source hash and full test logs.
++
++The new production method wraps a synthetic drain closure in this probe. The
++baseline executes the same closure without EOF retirement, matching its old
++boundary behavior. Neither variant's production owner is rewritten or modeled.
++
++## Measurements and controls
++
++Each payload comes from `av_mallocz` and `av_buffer_create`, with a free callback
++that records actual destruction. Fixture creation ends before the drain so
++the recovery buffer is its only packet owner in the three successful cases:
++
++| Final GOP | Packets | Payload bytes |
++| --- | ---: | ---: |
++| Small | 4 | 4,096 |
++| Medium | 16 | 1,048,576 |
++| Maximum bounded GOP | 512 | 33,554,432 |
++
++Payloads must remain alive during the drain. The baseline must retain them
++afterward while the buffer remains alive; the candidate must release them.
++Explicit reset then proves that every baseline allocation also releases
++exactly once. Repeated successful EOF checks idempotence.
++
++Six controls run against both variants:
++
++- A throwing decoder drain preserves replayable recovery packets.
++- A drain that throws `CancellationError` preserves them and rethrows the error.
++- A stale-generation EOF preserves the current generation's GOP.
++- A generation change from inside the drain preserves the new GOP.
++- An external native `AVPacket` clone keeps its bytes valid after retirement;
++  deallocation follows the last real native owner.
++- A fresh GOP after a seek remains replayable after the prior EOF.
++
++The runner rejects missing controls, missing release callbacks, double
++destruction, wrong retained byte counts, and differing debug/release results.
++It retains source and binary hashes, compiler/library identities, SDK build
++receipts, all commands/logs, raw observations, and a compact summary.
++
++## Scope
++
++This proves a component ownership boundary. The probe does not run
++`MediaSession`, decode media, or qualify end-to-end macOS EOF/recovery behavior.
++The cancellation control covers throwing cancellation; it does not simulate a
++decoder that returns normally after cancellation. Although the exact packet
++lifetime regression suite also runs here, the existing playback/recovery suites
++still need the supported macOS SDK as the integration gate.
++
++The workflow also builds the complete macOS application graph and runs
++`VideoRecoveryPacketSessionLifetimeTests` with a required synthetic H.264
++fixture. That test observes real session packet owners through decoder drain
++and frame submission, before stopping the session. It fails if the fixture is
++missing. A queued job is not executed integration evidence; consult the CI run
++for its status. No live UI, visible-frame, or physical-device performance claim
++is made by this study.
++
++Reported bytes are the requested tracked payload and padded backing allocations.
++They exclude allocator overhead, decoder reference pictures, renderer storage,
++and process RSS. Other real owners may legitimately keep the allocation alive,
++as the native-clone control demonstrates. The experiment makes no CPU-time or
++whole-player memory claim.
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/baseline/FFmpegPacket.swift b/Benchmarks/VideoRecoveryPacketLifetime/baseline/FFmpegPacket.swift
+new file mode 100644
+index 00000000..be28cdb3
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/baseline/FFmpegPacket.swift
+@@ -0,0 +1,185 @@
++import CFFmpeg
++import Foundation
++
++final class FFmpegPacket: @unchecked Sendable {
++    private(set) var pointer: UnsafeMutablePointer<AVPacket>?
++    let streamIndex: Int32
++    let presentationTimestamp: Int64
++    let decodeTimestamp: Int64
++    let duration: Int64
++    let timeBase: FFmpegRational
++    let generation: Int
++    let isCorrupt: Bool
++    let isKeyframe: Bool
++
++    convenience init(
++        moving source: UnsafeMutablePointer<AVPacket>,
++        timeBase: AVRational,
++        generation: Int
++    ) throws {
++        guard let packet = av_packet_alloc() else {
++            throw FFmpegError(operation: "Allocate packet", code: illiquid_averror_nomem())
++        }
++        av_packet_move_ref(packet, source)
++        self.init(owning: packet, timeBase: timeBase, generation: generation)
++    }
++
++    /// Transfers an allocated header and all its references without allocating a
++    /// second AVPacket. The caller's slot is cleared only on successful transfer.
++    /// Use `moving:` when the caller must retain its empty scratch header.
++    convenience init(
++        taking source: inout UnsafeMutablePointer<AVPacket>?,
++        timeBase: AVRational,
++        generation: Int
++    ) throws {
++        guard let packet = source else {
++            throw FFmpegError(operation: "Take missing demux packet", code: -22)
++        }
++        source = nil
++        self.init(owning: packet, timeBase: timeBase, generation: generation)
++    }
++
++    private init(
++        owning packet: UnsafeMutablePointer<AVPacket>,
++        timeBase: AVRational,
++        generation: Int
++    ) {
++        pointer = packet
++        streamIndex = packet.pointee.stream_index
++        presentationTimestamp = packet.pointee.pts
++        decodeTimestamp = packet.pointee.dts
++        duration = packet.pointee.duration
++        self.timeBase = FFmpegRational(timeBase)
++        self.generation = generation
++        isCorrupt = illiquid_packet_is_corrupt(packet) != 0
++        isKeyframe = illiquid_packet_is_keyframe(packet) != 0
++    }
++
++    deinit {
++        av_packet_free(&pointer)
++    }
++
++    var presentationSeconds: Double? {
++        presentationTimestamp == illiquid_nopts_value()
++            ? nil
++            : MediaTime.seconds(presentationTimestamp, timeBase: timeBase)
++    }
++
++    var decodeSeconds: Double? {
++        decodeTimestamp == illiquid_nopts_value()
++            ? nil
++            : MediaTime.seconds(decodeTimestamp, timeBase: timeBase)
++    }
++
++    var durationSeconds: Double? {
++        duration > 0 ? MediaTime.seconds(duration, timeBase: timeBase) : nil
++    }
++
++    var data: Data? {
++        guard let pointer, let bytes = pointer.pointee.data, pointer.pointee.size > 0 else {
++            return nil
++        }
++        return Data(bytes: bytes, count: Int(pointer.pointee.size))
++    }
++
++    var byteCount: Int {
++        guard let pointer else { return 0 }
++        return max(Int(pointer.pointee.size), 0)
++    }
++
++    var durationMicroseconds: Int64 {
++        guard let seconds = durationSeconds, seconds.isFinite, seconds > 0 else { return 0 }
++        return Int64(min((seconds * 1_000_000).rounded(), Double(Int64.max)))
++    }
++}
++
++/// Retains one bounded compressed-video GOP so a failed hardware decoder can
++/// seed its software replacement without seeking or disturbing audio. The
++/// buffer is intentionally invalidated if a GOP exceeds either bound: replay
++/// must always begin at a real keyframe, never at an arbitrary retained tail.
++final class VideoRecoveryPacketBuffer: @unchecked Sendable {
++    static let maximumPacketCount = 512
++    static let maximumByteCount = 32 * 1_024 * 1_024
++
++    private let lock = NSLock()
++    private var generation: Int?
++    private var packets: [FFmpegPacket] = []
++    private var byteCount = 0
++    private var hasReplayableKeyframe = false
++
++    func record(_ packet: FFmpegPacket) {
++        lock.withLock {
++            if generation != packet.generation {
++                resetLocked(generation: packet.generation)
++            }
++            if packet.isKeyframe {
++                // A keyframe starts a new GOP but must obey the same byte bound.
++                // Reject the whole GOP; retaining only its tail cannot seed replay.
++                guard packet.byteCount <= Self.maximumByteCount else {
++                    resetLocked(generation: packet.generation)
++                    return
++                }
++                packets = [packet]
++                byteCount = packet.byteCount
++                hasReplayableKeyframe = true
++                return
++            }
++            guard hasReplayableKeyframe else { return }
++            packets.append(packet)
++            byteCount += packet.byteCount
++            if packets.count > Self.maximumPacketCount
++                || byteCount > Self.maximumByteCount
++            {
++                packets.removeAll(keepingCapacity: false)
++                byteCount = 0
++                hasReplayableKeyframe = false
++            }
++        }
++    }
++
++    func takeReplayPackets(generation expectedGeneration: Int) -> [FFmpegPacket] {
++        lock.withLock {
++            guard generation == expectedGeneration,
++                  hasReplayableKeyframe,
++                  packets.first?.isKeyframe == true
++            else {
++                resetLocked(generation: expectedGeneration)
++                return []
++            }
++            let replay = packets
++            resetLocked(generation: expectedGeneration)
++            return replay
++        }
++    }
++
++    func reset(generation newGeneration: Int? = nil) {
++        lock.withLock { resetLocked(generation: newGeneration) }
++    }
++
++    private func resetLocked(generation newGeneration: Int?) {
++        generation = newGeneration
++        packets.removeAll(keepingCapacity: false)
++        byteCount = 0
++        hasReplayableKeyframe = false
++    }
++}
++
++enum PacketQueueItem: @unchecked Sendable {
++    case packet(FFmpegPacket)
++    case flush(generation: Int)
++    case endOfStream(generation: Int)
++}
++
++extension PacketQueueItem {
++    var boundedQueueCost: BoundedQueueCost {
++        switch self {
++        case .packet(let packet):
++            BoundedQueueCost(
++                bytes: packet.byteCount,
++                durationMicroseconds: packet.durationMicroseconds
++            )
++        case .flush, .endOfStream:
++            BoundedQueueCost()
++        }
++    }
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/baseline/manifest.json b/Benchmarks/VideoRecoveryPacketLifetime/baseline/manifest.json
+new file mode 100644
+index 00000000..27842be0
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/baseline/manifest.json
+@@ -0,0 +1,6 @@
++{
++  "git_blob": "be28cdb3b568fa9adf7b9bf0da8a74bc2d715d4d",
++  "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
++  "sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
++  "source": "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift"
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/baseline-debug.json b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/baseline-debug.json
+new file mode 100644
+index 00000000..79c65d4e
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/baseline-debug.json
+@@ -0,0 +1,68 @@
++{
++  "avcodecVersion": 4070502,
++  "avutilVersion": 3938918,
++  "checks": 48,
++  "controls": [
++    {
++      "checks": 8,
++      "name": "decoder-error"
++    },
++    {
++      "checks": 8,
++      "name": "throwing-cancellation"
++    },
++    {
++      "checks": 4,
++      "name": "stale-generation-EOF"
++    },
++    {
++      "checks": 4,
++      "name": "seek-during-drain"
++    },
++    {
++      "checks": 4,
++      "name": "borrowed-native-packet"
++    },
++    {
++      "checks": 3,
++      "name": "fresh-GOP-after-seek"
++    }
++  ],
++  "ffmpegVersion": "8.1.2",
++  "success": [
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 4096,
++      "liveStorageBytesAfterDrain": 4352,
++      "name": "4KiB-final-GOP",
++      "packetCount": 4,
++      "payloadBytes": 4096,
++      "releaseCallbacksAfterReset": 4,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 4352
++    },
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 1048576,
++      "liveStorageBytesAfterDrain": 1049600,
++      "name": "1MiB-final-GOP",
++      "packetCount": 16,
++      "payloadBytes": 1048576,
++      "releaseCallbacksAfterReset": 16,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 1049600
++    },
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 33554432,
++      "liveStorageBytesAfterDrain": 33587200,
++      "name": "32MiB-final-GOP",
++      "packetCount": 512,
++      "payloadBytes": 33554432,
++      "releaseCallbacksAfterReset": 512,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 33587200
++    }
++  ],
++  "variant": "baseline"
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/baseline-release.json b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/baseline-release.json
+new file mode 100644
+index 00000000..79c65d4e
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/baseline-release.json
+@@ -0,0 +1,68 @@
++{
++  "avcodecVersion": 4070502,
++  "avutilVersion": 3938918,
++  "checks": 48,
++  "controls": [
++    {
++      "checks": 8,
++      "name": "decoder-error"
++    },
++    {
++      "checks": 8,
++      "name": "throwing-cancellation"
++    },
++    {
++      "checks": 4,
++      "name": "stale-generation-EOF"
++    },
++    {
++      "checks": 4,
++      "name": "seek-during-drain"
++    },
++    {
++      "checks": 4,
++      "name": "borrowed-native-packet"
++    },
++    {
++      "checks": 3,
++      "name": "fresh-GOP-after-seek"
++    }
++  ],
++  "ffmpegVersion": "8.1.2",
++  "success": [
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 4096,
++      "liveStorageBytesAfterDrain": 4352,
++      "name": "4KiB-final-GOP",
++      "packetCount": 4,
++      "payloadBytes": 4096,
++      "releaseCallbacksAfterReset": 4,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 4352
++    },
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 1048576,
++      "liveStorageBytesAfterDrain": 1049600,
++      "name": "1MiB-final-GOP",
++      "packetCount": 16,
++      "payloadBytes": 1048576,
++      "releaseCallbacksAfterReset": 16,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 1049600
++    },
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 33554432,
++      "liveStorageBytesAfterDrain": 33587200,
++      "name": "32MiB-final-GOP",
++      "packetCount": 512,
++      "payloadBytes": 33554432,
++      "releaseCallbacksAfterReset": 512,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 33587200
++    }
++  ],
++  "variant": "baseline"
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/candidate-debug.json b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/candidate-debug.json
+new file mode 100644
+index 00000000..f229b8bf
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/candidate-debug.json
+@@ -0,0 +1,68 @@
++{
++  "avcodecVersion": 4070502,
++  "avutilVersion": 3938918,
++  "checks": 48,
++  "controls": [
++    {
++      "checks": 8,
++      "name": "decoder-error"
++    },
++    {
++      "checks": 8,
++      "name": "throwing-cancellation"
++    },
++    {
++      "checks": 4,
++      "name": "stale-generation-EOF"
++    },
++    {
++      "checks": 4,
++      "name": "seek-during-drain"
++    },
++    {
++      "checks": 4,
++      "name": "borrowed-native-packet"
++    },
++    {
++      "checks": 3,
++      "name": "fresh-GOP-after-seek"
++    }
++  ],
++  "ffmpegVersion": "8.1.2",
++  "success": [
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 0,
++      "liveStorageBytesAfterDrain": 0,
++      "name": "4KiB-final-GOP",
++      "packetCount": 4,
++      "payloadBytes": 4096,
++      "releaseCallbacksAfterReset": 4,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 4352
++    },
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 0,
++      "liveStorageBytesAfterDrain": 0,
++      "name": "1MiB-final-GOP",
++      "packetCount": 16,
++      "payloadBytes": 1048576,
++      "releaseCallbacksAfterReset": 16,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 1049600
++    },
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 0,
++      "liveStorageBytesAfterDrain": 0,
++      "name": "32MiB-final-GOP",
++      "packetCount": 512,
++      "payloadBytes": 33554432,
++      "releaseCallbacksAfterReset": 512,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 33587200
++    }
++  ],
++  "variant": "candidate"
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/candidate-release.json b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/candidate-release.json
+new file mode 100644
+index 00000000..f229b8bf
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/candidate-release.json
+@@ -0,0 +1,68 @@
++{
++  "avcodecVersion": 4070502,
++  "avutilVersion": 3938918,
++  "checks": 48,
++  "controls": [
++    {
++      "checks": 8,
++      "name": "decoder-error"
++    },
++    {
++      "checks": 8,
++      "name": "throwing-cancellation"
++    },
++    {
++      "checks": 4,
++      "name": "stale-generation-EOF"
++    },
++    {
++      "checks": 4,
++      "name": "seek-during-drain"
++    },
++    {
++      "checks": 4,
++      "name": "borrowed-native-packet"
++    },
++    {
++      "checks": 3,
++      "name": "fresh-GOP-after-seek"
++    }
++  ],
++  "ffmpegVersion": "8.1.2",
++  "success": [
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 0,
++      "liveStorageBytesAfterDrain": 0,
++      "name": "4KiB-final-GOP",
++      "packetCount": 4,
++      "payloadBytes": 4096,
++      "releaseCallbacksAfterReset": 4,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 4352
++    },
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 0,
++      "liveStorageBytesAfterDrain": 0,
++      "name": "1MiB-final-GOP",
++      "packetCount": 16,
++      "payloadBytes": 1048576,
++      "releaseCallbacksAfterReset": 16,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 1049600
++    },
++    {
++      "everyAllocationReleasedExactlyOnce": true,
++      "livePayloadBytesAfterDrain": 0,
++      "liveStorageBytesAfterDrain": 0,
++      "name": "32MiB-final-GOP",
++      "packetCount": 512,
++      "payloadBytes": 33554432,
++      "releaseCallbacksAfterReset": 512,
++      "releaseCallbacksDuringDrain": 0,
++      "requestedStorageBytes": 33587200
++    }
++  ],
++  "variant": "candidate"
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/ci-receipt.json b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/ci-receipt.json
+new file mode 100644
+index 00000000..f6b5dfec
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/ci-receipt.json
+@@ -0,0 +1,8 @@
++{
++  "workflow_run_id": 40639152416,
++  "job_id": 122652965238,
++  "tested_commit": "9da2b2edb5b01924faad3469f68f3e5e2c17dfed",
++  "workflow_url": "https://github.com/Jagalite/illiquid/actions/runs/40639152416",
++  "compressed_bundle_sha256": "051e7853babfc093b9fb77a9426f455acffa67702e88c9b752b2f591967c6956",
++  "source_snapshots": "Available in workflow artifact; staged source hashes are retained in manifest.json."
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/commands.json b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/commands.json
+new file mode 100644
+index 00000000..4f360c44
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/commands.json
+@@ -0,0 +1,253 @@
++[
++  {
++    "argv": [
++      "/usr/local/bin/swiftc",
++      "--version"
++    ],
++    "log": "logs/compiler.log",
++    "log_sha256": "d7df78b37cc23138e1c65ac3cc35f9bd0db2caf1df39880130951b36a7d039f1",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "git",
++      "rev-parse",
++      "HEAD"
++    ],
++    "log": "logs/git-head.log",
++    "log_sha256": "cc0a1dd27132305e8a577ba2c97b582a84744f8e5100c14069bb08d58af6de58",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "git",
++      "status",
++      "--porcelain=v1"
++    ],
++    "log": "logs/git-status.log",
++    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "pkg-config",
++      "--modversion",
++      "libavcodec",
++      "libavutil"
++    ],
++    "log": "logs/sdk-versions.log",
++    "log_sha256": "60ac1857002031a403c0960a36385fbe49e4ea8a06703a04940390d6f85da0de",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "pkg-config",
++      "--cflags",
++      "libavcodec",
++      "libavutil"
++    ],
++    "log": "logs/sdk-cflags.log",
++    "log_sha256": "ecfd0208294b20f34a028b0f2bc7a98ee61a209d0ee8f0e33c08667aff324f66",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "pkg-config",
++      "--static",
++      "--libs",
++      "libavcodec",
++      "libavutil"
++    ],
++    "log": "logs/sdk-libs.log",
++    "log_sha256": "2ac664cdf9b677c7158a8bfd58e3ee635769e05c55b49618b6e6f1282ad0b4da",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "/usr/local/bin/swiftc",
++      "-Onone",
++      "-swift-version",
++      "6",
++      "-warnings-as-errors",
++      "-parse-as-library",
++      "-module-cache-path",
++      "/home/runner/work/_temp/recovery-lifetime/build/module-cache",
++      "-I",
++      "/home/runner/work/_temp/recovery-lifetime/sources/CFFmpeg",
++      "-D",
++      "BASELINE",
++      "-Xcc",
++      "-I/home/runner/work/_temp/recovery-ffmpeg/include",
++      "/home/runner/work/_temp/recovery-lifetime/sources/shared/PacketProbeSupport.swift",
++      "/home/runner/work/_temp/recovery-lifetime/sources/baseline/FFmpegPacket.swift",
++      "/home/runner/work/_temp/recovery-lifetime/sources/shared/Probe.swift",
++      "-Xlinker",
++      "-L/home/runner/work/_temp/recovery-ffmpeg/lib",
++      "-Xlinker",
++      "-lavcodec",
++      "-Xlinker",
++      "-lm",
++      "-Xlinker",
++      "-lavutil",
++      "-Xlinker",
++      "-lm",
++      "-Xlinker",
++      "-latomic",
++      "-Xlinker",
++      "-lpthread",
++      "-o",
++      "/home/runner/work/_temp/recovery-lifetime/build/baseline-debug"
++    ],
++    "log": "logs/build-baseline-debug.log",
++    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "/home/runner/work/_temp/recovery-lifetime/build/baseline-debug"
++    ],
++    "log": "logs/run-baseline-debug.log",
++    "log_sha256": "e1cc89f98f327ab868f3b4465a074ed30329b3734a7e1f3f36f02c0164b87c78",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "/usr/local/bin/swiftc",
++      "-Onone",
++      "-swift-version",
++      "6",
++      "-warnings-as-errors",
++      "-parse-as-library",
++      "-module-cache-path",
++      "/home/runner/work/_temp/recovery-lifetime/build/module-cache",
++      "-I",
++      "/home/runner/work/_temp/recovery-lifetime/sources/CFFmpeg",
++      "-Xcc",
++      "-I/home/runner/work/_temp/recovery-ffmpeg/include",
++      "/home/runner/work/_temp/recovery-lifetime/sources/shared/PacketProbeSupport.swift",
++      "/home/runner/work/_temp/recovery-lifetime/sources/candidate/FFmpegPacket.swift",
++      "/home/runner/work/_temp/recovery-lifetime/sources/shared/Probe.swift",
++      "-Xlinker",
++      "-L/home/runner/work/_temp/recovery-ffmpeg/lib",
++      "-Xlinker",
++      "-lavcodec",
++      "-Xlinker",
++      "-lm",
++      "-Xlinker",
++      "-lavutil",
++      "-Xlinker",
++      "-lm",
++      "-Xlinker",
++      "-latomic",
++      "-Xlinker",
++      "-lpthread",
++      "-o",
++      "/home/runner/work/_temp/recovery-lifetime/build/candidate-debug"
++    ],
++    "log": "logs/build-candidate-debug.log",
++    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "/home/runner/work/_temp/recovery-lifetime/build/candidate-debug"
++    ],
++    "log": "logs/run-candidate-debug.log",
++    "log_sha256": "6e0ba097efca695e27af3b5a9401ddae91ccd4caa0c9dce66d2be4b9243f56cc",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "/usr/local/bin/swiftc",
++      "-O",
++      "-swift-version",
++      "6",
++      "-warnings-as-errors",
++      "-parse-as-library",
++      "-module-cache-path",
++      "/home/runner/work/_temp/recovery-lifetime/build/module-cache",
++      "-I",
++      "/home/runner/work/_temp/recovery-lifetime/sources/CFFmpeg",
++      "-D",
++      "BASELINE",
++      "-Xcc",
++      "-I/home/runner/work/_temp/recovery-ffmpeg/include",
++      "/home/runner/work/_temp/recovery-lifetime/sources/shared/PacketProbeSupport.swift",
++      "/home/runner/work/_temp/recovery-lifetime/sources/baseline/FFmpegPacket.swift",
++      "/home/runner/work/_temp/recovery-lifetime/sources/shared/Probe.swift",
++      "-Xlinker",
++      "-L/home/runner/work/_temp/recovery-ffmpeg/lib",
++      "-Xlinker",
++      "-lavcodec",
++      "-Xlinker",
++      "-lm",
++      "-Xlinker",
++      "-lavutil",
++      "-Xlinker",
++      "-lm",
++      "-Xlinker",
++      "-latomic",
++      "-Xlinker",
++      "-lpthread",
++      "-o",
++      "/home/runner/work/_temp/recovery-lifetime/build/baseline-release"
++    ],
++    "log": "logs/build-baseline-release.log",
++    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "/home/runner/work/_temp/recovery-lifetime/build/baseline-release"
++    ],
++    "log": "logs/run-baseline-release.log",
++    "log_sha256": "e1cc89f98f327ab868f3b4465a074ed30329b3734a7e1f3f36f02c0164b87c78",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "/usr/local/bin/swiftc",
++      "-O",
++      "-swift-version",
++      "6",
++      "-warnings-as-errors",
++      "-parse-as-library",
++      "-module-cache-path",
++      "/home/runner/work/_temp/recovery-lifetime/build/module-cache",
++      "-I",
++      "/home/runner/work/_temp/recovery-lifetime/sources/CFFmpeg",
++      "-Xcc",
++      "-I/home/runner/work/_temp/recovery-ffmpeg/include",
++      "/home/runner/work/_temp/recovery-lifetime/sources/shared/PacketProbeSupport.swift",
++      "/home/runner/work/_temp/recovery-lifetime/sources/candidate/FFmpegPacket.swift",
++      "/home/runner/work/_temp/recovery-lifetime/sources/shared/Probe.swift",
++      "-Xlinker",
++      "-L/home/runner/work/_temp/recovery-ffmpeg/lib",
++      "-Xlinker",
++      "-lavcodec",
++      "-Xlinker",
++      "-lm",
++      "-Xlinker",
++      "-lavutil",
++      "-Xlinker",
++      "-lm",
++      "-Xlinker",
++      "-latomic",
++      "-Xlinker",
++      "-lpthread",
++      "-o",
++      "/home/runner/work/_temp/recovery-lifetime/build/candidate-release"
++    ],
++    "log": "logs/build-candidate-release.log",
++    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "returncode": 0
++  },
++  {
++    "argv": [
++      "/home/runner/work/_temp/recovery-lifetime/build/candidate-release"
++    ],
++    "log": "logs/run-candidate-release.log",
++    "log_sha256": "6e0ba097efca695e27af3b5a9401ddae91ccd4caa0c9dce66d2be4b9243f56cc",
++    "returncode": 0
++  }
++]
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/build-baseline-debug.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/build-baseline-debug.log
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/build-baseline-release.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/build-baseline-release.log
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/build-candidate-debug.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/build-candidate-debug.log
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/build-candidate-release.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/build-candidate-release.log
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/compiler.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/compiler.log
+new file mode 100644
+index 00000000..a7241d2d
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/compiler.log
+@@ -0,0 +1,2 @@
++Swift version 6.4.1 (swift-6.4.1-RELEASE)
++Target: x86_64-unknown-linux-gnu
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/git-head.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/git-head.log
+new file mode 100644
+index 00000000..10afa852
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/git-head.log
+@@ -0,0 +1 @@
++9da2b2edb5b01924faad3469f68f3e5e2c17dfed
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/git-status.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/git-status.log
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-baseline-debug.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-baseline-debug.log
+new file mode 100644
+index 00000000..b87941b6
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-baseline-debug.log
+@@ -0,0 +1,68 @@
++{
++  "avcodecVersion" : 4070502,
++  "avutilVersion" : 3938918,
++  "checks" : 48,
++  "controls" : [
++    {
++      "checks" : 8,
++      "name" : "decoder-error"
++    },
++    {
++      "checks" : 8,
++      "name" : "throwing-cancellation"
++    },
++    {
++      "checks" : 4,
++      "name" : "stale-generation-EOF"
++    },
++    {
++      "checks" : 4,
++      "name" : "seek-during-drain"
++    },
++    {
++      "checks" : 4,
++      "name" : "borrowed-native-packet"
++    },
++    {
++      "checks" : 3,
++      "name" : "fresh-GOP-after-seek"
++    }
++  ],
++  "ffmpegVersion" : "8.1.2",
++  "success" : [
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 4096,
++      "liveStorageBytesAfterDrain" : 4352,
++      "name" : "4KiB-final-GOP",
++      "packetCount" : 4,
++      "payloadBytes" : 4096,
++      "releaseCallbacksAfterReset" : 4,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 4352
++    },
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 1048576,
++      "liveStorageBytesAfterDrain" : 1049600,
++      "name" : "1MiB-final-GOP",
++      "packetCount" : 16,
++      "payloadBytes" : 1048576,
++      "releaseCallbacksAfterReset" : 16,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 1049600
++    },
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 33554432,
++      "liveStorageBytesAfterDrain" : 33587200,
++      "name" : "32MiB-final-GOP",
++      "packetCount" : 512,
++      "payloadBytes" : 33554432,
++      "releaseCallbacksAfterReset" : 512,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 33587200
++    }
++  ],
++  "variant" : "baseline"
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-baseline-release.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-baseline-release.log
+new file mode 100644
+index 00000000..b87941b6
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-baseline-release.log
+@@ -0,0 +1,68 @@
++{
++  "avcodecVersion" : 4070502,
++  "avutilVersion" : 3938918,
++  "checks" : 48,
++  "controls" : [
++    {
++      "checks" : 8,
++      "name" : "decoder-error"
++    },
++    {
++      "checks" : 8,
++      "name" : "throwing-cancellation"
++    },
++    {
++      "checks" : 4,
++      "name" : "stale-generation-EOF"
++    },
++    {
++      "checks" : 4,
++      "name" : "seek-during-drain"
++    },
++    {
++      "checks" : 4,
++      "name" : "borrowed-native-packet"
++    },
++    {
++      "checks" : 3,
++      "name" : "fresh-GOP-after-seek"
++    }
++  ],
++  "ffmpegVersion" : "8.1.2",
++  "success" : [
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 4096,
++      "liveStorageBytesAfterDrain" : 4352,
++      "name" : "4KiB-final-GOP",
++      "packetCount" : 4,
++      "payloadBytes" : 4096,
++      "releaseCallbacksAfterReset" : 4,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 4352
++    },
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 1048576,
++      "liveStorageBytesAfterDrain" : 1049600,
++      "name" : "1MiB-final-GOP",
++      "packetCount" : 16,
++      "payloadBytes" : 1048576,
++      "releaseCallbacksAfterReset" : 16,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 1049600
++    },
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 33554432,
++      "liveStorageBytesAfterDrain" : 33587200,
++      "name" : "32MiB-final-GOP",
++      "packetCount" : 512,
++      "payloadBytes" : 33554432,
++      "releaseCallbacksAfterReset" : 512,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 33587200
++    }
++  ],
++  "variant" : "baseline"
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-candidate-debug.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-candidate-debug.log
+new file mode 100644
+index 00000000..7c7d4c6b
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-candidate-debug.log
+@@ -0,0 +1,68 @@
++{
++  "avcodecVersion" : 4070502,
++  "avutilVersion" : 3938918,
++  "checks" : 48,
++  "controls" : [
++    {
++      "checks" : 8,
++      "name" : "decoder-error"
++    },
++    {
++      "checks" : 8,
++      "name" : "throwing-cancellation"
++    },
++    {
++      "checks" : 4,
++      "name" : "stale-generation-EOF"
++    },
++    {
++      "checks" : 4,
++      "name" : "seek-during-drain"
++    },
++    {
++      "checks" : 4,
++      "name" : "borrowed-native-packet"
++    },
++    {
++      "checks" : 3,
++      "name" : "fresh-GOP-after-seek"
++    }
++  ],
++  "ffmpegVersion" : "8.1.2",
++  "success" : [
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 0,
++      "liveStorageBytesAfterDrain" : 0,
++      "name" : "4KiB-final-GOP",
++      "packetCount" : 4,
++      "payloadBytes" : 4096,
++      "releaseCallbacksAfterReset" : 4,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 4352
++    },
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 0,
++      "liveStorageBytesAfterDrain" : 0,
++      "name" : "1MiB-final-GOP",
++      "packetCount" : 16,
++      "payloadBytes" : 1048576,
++      "releaseCallbacksAfterReset" : 16,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 1049600
++    },
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 0,
++      "liveStorageBytesAfterDrain" : 0,
++      "name" : "32MiB-final-GOP",
++      "packetCount" : 512,
++      "payloadBytes" : 33554432,
++      "releaseCallbacksAfterReset" : 512,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 33587200
++    }
++  ],
++  "variant" : "candidate"
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-candidate-release.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-candidate-release.log
+new file mode 100644
+index 00000000..7c7d4c6b
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/run-candidate-release.log
+@@ -0,0 +1,68 @@
++{
++  "avcodecVersion" : 4070502,
++  "avutilVersion" : 3938918,
++  "checks" : 48,
++  "controls" : [
++    {
++      "checks" : 8,
++      "name" : "decoder-error"
++    },
++    {
++      "checks" : 8,
++      "name" : "throwing-cancellation"
++    },
++    {
++      "checks" : 4,
++      "name" : "stale-generation-EOF"
++    },
++    {
++      "checks" : 4,
++      "name" : "seek-during-drain"
++    },
++    {
++      "checks" : 4,
++      "name" : "borrowed-native-packet"
++    },
++    {
++      "checks" : 3,
++      "name" : "fresh-GOP-after-seek"
++    }
++  ],
++  "ffmpegVersion" : "8.1.2",
++  "success" : [
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 0,
++      "liveStorageBytesAfterDrain" : 0,
++      "name" : "4KiB-final-GOP",
++      "packetCount" : 4,
++      "payloadBytes" : 4096,
++      "releaseCallbacksAfterReset" : 4,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 4352
++    },
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 0,
++      "liveStorageBytesAfterDrain" : 0,
++      "name" : "1MiB-final-GOP",
++      "packetCount" : 16,
++      "payloadBytes" : 1048576,
++      "releaseCallbacksAfterReset" : 16,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 1049600
++    },
++    {
++      "everyAllocationReleasedExactlyOnce" : true,
++      "livePayloadBytesAfterDrain" : 0,
++      "liveStorageBytesAfterDrain" : 0,
++      "name" : "32MiB-final-GOP",
++      "packetCount" : 512,
++      "payloadBytes" : 33554432,
++      "releaseCallbacksAfterReset" : 512,
++      "releaseCallbacksDuringDrain" : 0,
++      "requestedStorageBytes" : 33587200
++    }
++  ],
++  "variant" : "candidate"
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/sdk-cflags.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/sdk-cflags.log
+new file mode 100644
+index 00000000..ebdc499f
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/sdk-cflags.log
+@@ -0,0 +1 @@
++-I/home/runner/work/_temp/recovery-ffmpeg/include 
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/sdk-libs.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/sdk-libs.log
+new file mode 100644
+index 00000000..d2b1f486
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/sdk-libs.log
+@@ -0,0 +1 @@
++-L/home/runner/work/_temp/recovery-ffmpeg/lib -lavcodec -lm -lavutil -lm -latomic -pthread 
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/sdk-versions.log b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/sdk-versions.log
+new file mode 100644
+index 00000000..69ce1780
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/logs/sdk-versions.log
+@@ -0,0 +1,2 @@
++62.28.102
++60.26.102
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/manifest.json b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/manifest.json
+new file mode 100644
+index 00000000..0fcad304
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/manifest.json
+@@ -0,0 +1,113 @@
++{
++  "baseline": {
++    "git_blob": "be28cdb3b568fa9adf7b9bf0da8a74bc2d715d4d",
++    "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
++    "sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
++    "source": "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift"
++  },
++  "binaries_sha256": {
++    "baseline-debug": "41cb9e042dd5d2ceb2a61e569eb65e04f25e727ae9ebf48e32dfd66599f96e1d",
++    "baseline-release": "9592d4fa92eac775031ee5ff4e1a398481e99432b93df533765133344455f7db",
++    "candidate-debug": "4f4a9bf1243158f9970b0024d051cd24f4a018895a645dc780b5dfb1f8b7d528",
++    "candidate-release": "f857ac7e77a766f5eccb5a03bf19ad42f32fe39fc2eecf755975b6d7edaaad8a"
++  },
++  "candidate_source_sha256": "adc7218f4bbf7ec19a871fcbcf0f45d612089ce32110726031244f2d5662953c",
++  "checkout_head": "9da2b2edb5b01924faad3469f68f3e5e2c17dfed",
++  "compiler": "Swift version 6.4.1 (swift-6.4.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
++  "complete": true,
++  "harness_sha256": {
++    "Probe.swift": "f5daf18461e2aee9cb9ce28fbddb191711f009c2244aa6e4dc324ce09e9e868f",
++    "baseline/manifest.json": "5ebc4f740beffabd94a9b908e96b0d4b25220d9988056917bfc6029bb3bf79f2",
++    "run.py": "70295ec0a75fa4e543208b77e95a7cbaaf0dce0165e70f04816b69d95b6af5de"
++  },
++  "limitations": [
++    "Does not execute MediaSession, decode video, or qualify macOS playback",
++    "Requested tracked native payload/storage bytes, not RSS or allocator overhead",
++    "Cancellation control throws CancellationError; silent early-return cancellation is not modeled"
++  ],
++  "machine": "x86_64",
++  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
++  "schema_version": 1,
++  "scope": "Synthetic drain boundary; exact production packet/recovery owner and real FFmpeg AVBuffer callbacks",
++  "sdk": {
++    "build-receipt.json": {
++      "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
++      "configureLogSHA256": "9ee6d5cff45679fe3f2af05c691adfdd2aec93c82062aae15c5e730841606501",
++      "libraries": {
++        "libavcodec.a": "c5e14a4ac6a75b0d837525b5d16643d69f973200f69712655a73f9e21b9d849a",
++        "libavfilter.a": "885366e5371dfb0f5f4ad5dc4a8e7cc4ad1fc3ddb3404f534f084a5f98e1dfb8",
++        "libavformat.a": "42a26af0b990dfa605c1c578bd345fef0633777bec4bb1466b18d74bc0d4b37f",
++        "libavutil.a": "a71c141b55876b57f806fb2409734a26c194ade68fdb74f33acda40c8a5e70fd",
++        "libswresample.a": "f8547eb2eae8b1668f7a777925e0852dda45d772788f0d2a6363ba63c907d9da",
++        "libswscale.a": "2d04b5f7d58e9fbdb56d9b7ad67bd897c1f493ecdfce63cc7313e66c15c2da53"
++      },
++      "sdkRoot": "/home/runner/work/_temp/recovery-ffmpeg"
++    },
++    "libraries_sha256": {
++      "libavcodec.a": "c5e14a4ac6a75b0d837525b5d16643d69f973200f69712655a73f9e21b9d849a",
++      "libavutil.a": "a71c141b55876b57f806fb2409734a26c194ade68fdb74f33acda40c8a5e70fd"
++    },
++    "packages": {
++      "libavcodec": "62.28.102",
++      "libavutil": "60.26.102"
++    },
++    "prefix": "/home/runner/work/_temp/recovery-ffmpeg",
++    "source-receipt.json": {
++      "archive": "/home/runner/work/illiquid/illiquid/DependencySources/archives/ffmpeg-8.1.2.tar.xz",
++      "component": {
++        "archive": "archives/ffmpeg-8.1.2.tar.xz",
++        "bytes": 11710924,
++        "component": "ffmpeg",
++        "download_url": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
++        "expected_sha256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
++        "git_revision": null,
++        "installed_version": "8.1.2",
++        "libraries": [
++          {
++            "name": "libavcodec.62.28.102.dylib",
++            "sha256": "3963c76dc2430341edef6f75b27efa4e60f60af0bf3aa080751c061084c60b48"
++          },
++          {
++            "name": "libavfilter.11.14.102.dylib",
++            "sha256": "d37212f12cbf5875bed26cf1908537110c47720f73adcdb38c7b6f9e3e026110"
++          },
++          {
++            "name": "libavformat.62.12.102.dylib",
++            "sha256": "c671566dd5fd8cd2dc4df58093bb1fb440f2bedb464396ffc1583f1aa5d1aaa1"
++          },
++          {
++            "name": "libavutil.60.26.102.dylib",
++            "sha256": "475c71ddcf2a5141e12c8abfedb1c97681cded54f7f92a38eeaf17ba02703462"
++          },
++          {
++            "name": "libswresample.6.3.102.dylib",
++            "sha256": "0d92adcb41c113934de473bd95ebb7afd96c1d6177606b08331bdc9dcb6643c2"
++          },
++          {
++            "name": "libswscale.9.5.102.dylib",
++            "sha256": "9dc4a476e6e8f9a5c7f80565005242842f08c012922447943d6655d922e56dfc"
++          }
++        ],
++        "recipe": "recipes/ffmpeg-illiquid.rb",
++        "recipe_sha256": "d718b877dff8cef7f8cdb92eb22eda784f17d983607322e694e5aa8a14aa3d2b",
++        "retrieved_from": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
++        "sha256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
++        "source_url": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
++        "status": "downloaded"
++      },
++      "sha256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
++      "verifiedAgainstProjectManifest": true
++    }
++  },
++  "staged_sha256": {
++    "sources/CFFmpeg/module.modulemap": "083620fda48657831affdbac0424ea34da4ed851129f1f14f285e373423b7793",
++    "sources/CFFmpeg/packet_api.h": "cdb142b04ddc5f5dec45470ac6248d3765b8b065176bff471a7208739fbf555c",
++    "sources/baseline/FFmpegPacket.swift": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
++    "sources/candidate/FFmpegPacket.swift": "adc7218f4bbf7ec19a871fcbcf0f45d612089ce32110726031244f2d5662953c",
++    "sources/originals/ffmpeg_shim.h": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
++    "sources/shared/PacketProbeSupport.swift": "f46e02b2ecb94bb0656c72ee510aaaf68829e550709b5d490116e8c04254ab2f",
++    "sources/shared/Probe.swift": "f5daf18461e2aee9cb9ce28fbddb191711f009c2244aa6e4dc324ce09e9e868f"
++  },
++  "started_utc": "2026-10-28T05:39:10.549843+00:00",
++  "worktree_status": ""
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/summary.json b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/summary.json
+new file mode 100644
+index 00000000..6ac16811
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/evidence/ubuntu/summary.json
+@@ -0,0 +1,49 @@
++{
++  "all_tracked_allocations_released_exactly_once": true,
++  "configurations": [
++    "debug",
++    "release"
++  ],
++  "controls": [
++    "borrowed-native-packet",
++    "decoder-error",
++    "fresh-GOP-after-seek",
++    "seek-during-drain",
++    "stale-generation-EOF",
++    "throwing-cancellation"
++  ],
++  "limitations": [
++    "Does not execute MediaSession, decode video, or qualify macOS playback",
++    "Requested tracked native payload/storage bytes, not RSS or allocator overhead",
++    "Cancellation control throws CancellationError; silent early-return cancellation is not modeled"
++  ],
++  "scope": "Synthetic drain boundary; exact production packet/recovery owner and real FFmpeg AVBuffer callbacks",
++  "status": "passed",
++  "success_cases": [
++    {
++      "baseline_live_payload_bytes_after_drain": 4096,
++      "baseline_live_storage_bytes_after_drain": 4352,
++      "candidate_live_payload_bytes_after_drain": 0,
++      "candidate_live_storage_bytes_after_drain": 0,
++      "name": "4KiB-final-GOP",
++      "payload_bytes": 4096
++    },
++    {
++      "baseline_live_payload_bytes_after_drain": 1048576,
++      "baseline_live_storage_bytes_after_drain": 1049600,
++      "candidate_live_payload_bytes_after_drain": 0,
++      "candidate_live_storage_bytes_after_drain": 0,
++      "name": "1MiB-final-GOP",
++      "payload_bytes": 1048576
++    },
++    {
++      "baseline_live_payload_bytes_after_drain": 33554432,
++      "baseline_live_storage_bytes_after_drain": 33587200,
++      "candidate_live_payload_bytes_after_drain": 0,
++      "candidate_live_storage_bytes_after_drain": 0,
++      "name": "32MiB-final-GOP",
++      "payload_bytes": 33554432
++    }
++  ],
++  "timing_claim": null
++}
+diff --git a/Benchmarks/VideoRecoveryPacketLifetime/run.py b/Benchmarks/VideoRecoveryPacketLifetime/run.py
+new file mode 100644
+index 00000000..340c85f7
+--- /dev/null
++++ b/Benchmarks/VideoRecoveryPacketLifetime/run.py
+@@ -0,0 +1,303 @@
++#!/usr/bin/env python3
++"""Prove recovery-GOP payload lifetime with exact Swift owners and real FFmpeg.
++
++This is an ownership experiment, not a decoder, player-RSS, or timing benchmark.
++"""
++from __future__ import annotations
++
++import argparse
++from datetime import datetime, timezone
++import hashlib
++import json
++import os
++from pathlib import Path
++import platform
++import re
++import shlex
++import shutil
++import subprocess
++
++HERE = Path(__file__).resolve().parent
++ROOT = HERE.parents[1]
++REVISION = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
++SOURCE = "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift"
++SHIM = "Sources/CFFmpeg/include/ffmpeg_shim.h"
++SUPPORT = "Benchmarks/PlaybackPipeline/PacketProbeSupport.swift"
++TEST = "Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift"
++HELPERS = ("illiquid_averror_nomem", "illiquid_nopts_value",
++           "illiquid_packet_is_corrupt", "illiquid_packet_is_keyframe")
++CASES = {"4KiB-final-GOP": (4, 4_096), "1MiB-final-GOP": (16, 1_048_576),
++         "32MiB-final-GOP": (512, 33_554_432)}
++CONTROLS = {"decoder-error", "throwing-cancellation", "stale-generation-EOF",
++            "seek-during-drain", "borrowed-native-packet", "fresh-GOP-after-seek"}
++
++
++def digest(data):
++    return hashlib.sha256(data).hexdigest()
++
++
++def save(path, value):
++    path.write_text(json.dumps(value, sort_keys=True, indent=2, allow_nan=False) + "\n")
++
++
++def c_helper(text, name):
++    pattern = r"(?m)^static inline [^\n]*\b" + re.escape(name) + r"\([^\n]*\) \{\n[^{}]*\n\}"
++    matches = re.findall(pattern, text)
++    if len(matches) != 1:
++        raise ValueError("Review changed C helper before staging: " + name)
++    return matches[0] + "\n"
++
++
++def validate(result, variant):
++    if result["variant"] != variant or result["checks"] < 40:
++        raise ValueError("Wrong or incomplete ownership probe")
++    if {row["name"] for row in result["success"]} != set(CASES):
++        raise ValueError("Missing success case")
++    if {row["name"] for row in result["controls"]} != CONTROLS:
++        raise ValueError("Missing lifetime control")
++    if len(result["success"]) != len(CASES) or len(result["controls"]) != len(CONTROLS):
++        raise ValueError("Duplicate observation")
++    for row in result["success"]:
++        count, payload = CASES[row["name"]]
++        if row["packetCount"] != count or row["payloadBytes"] != payload:
++            raise ValueError("Wrong fixture dimensions")
++        if row["requestedStorageBytes"] <= payload:
++            raise ValueError("Missing real FFmpeg input padding")
++        expected = payload if variant == "baseline" else 0
++        storage = row["requestedStorageBytes"] if variant == "baseline" else 0
++        if (row["livePayloadBytesAfterDrain"] != expected
++                or row["liveStorageBytesAfterDrain"] != storage
++                or row["releaseCallbacksDuringDrain"] != 0
++                or row["releaseCallbacksAfterReset"] != count
++                or row["everyAllocationReleasedExactlyOnce"] is not True):
++            raise ValueError("Unexpected native payload ownership: " + row["name"])
++    if any(row["checks"] < 3 for row in result["controls"]):
++        raise ValueError("Incomplete control")
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--output", required=True, type=Path)
++    parser.add_argument("--ffmpeg-prefix", required=True, type=Path,
++                        help="Pinned SDK built by Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh")
++    parser.add_argument("--swiftc", default="swiftc")
++    args = parser.parse_args()
++    if platform.system() != "Linux":
++        parser.error("This portable probe is qualified for Linux; run the native suite on macOS")
++    output = args.output.resolve()
++    if output.exists() and any(output.iterdir()):
++        parser.error("Use a new or empty output directory")
++    swiftc = shutil.which(args.swiftc)
++    if not swiftc:
++        parser.error("Swift 6.1+ compiler unavailable; set PATH or --swiftc")
++    sdk = args.ffmpeg_prefix.resolve()
++    if not (sdk / "include/libavcodec/packet.h").is_file():
++        parser.error("FFmpeg development headers missing; build the pinned SDK first")
++    output.mkdir(parents=True, exist_ok=True)
++    logs = output / "logs"
++    sources = output / "sources"
++    builds = output / "build"
++    for directory in (logs, sources, builds):
++        directory.mkdir()
++    environment = os.environ.copy()
++    environment["PKG_CONFIG_LIBDIR"] = str(sdk / "lib/pkgconfig")
++    environment.pop("PKG_CONFIG_PATH", None)
++    environment["SWIFT_MODULECACHE_PATH"] = str(builds / "module-cache")
++    environment["CLANG_MODULE_CACHE_PATH"] = str(builds / "module-cache")
++    commands = []
++    manifest = {
++        "schema_version": 1, "started_utc": datetime.now(timezone.utc).isoformat(),
++        "platform": platform.platform(), "machine": platform.machine(),
++        "scope": "Synthetic drain boundary; exact production packet/recovery owner and real FFmpeg AVBuffer callbacks",
++        "limitations": ["Does not execute MediaSession, decode video, or qualify macOS playback",
++                        "Requested tracked native payload/storage bytes, not RSS or allocator overhead",
++                        "Cancellation control throws CancellationError; silent early-return cancellation is not modeled"],
++        "staged_sha256": {}, "binaries_sha256": {}, "complete": False,
++    }
++
++    def command(argv, name):
++        argv = [str(value) for value in argv]
++        process = subprocess.run(argv, cwd=ROOT, env=environment, capture_output=True, timeout=600)
++        log = logs / (name + ".log")
++        log.write_bytes(process.stdout + process.stderr)
++        commands.append({"argv": argv, "returncode": process.returncode,
++                         "log": str(log.relative_to(output)), "log_sha256": digest(log.read_bytes())})
++        save(output / "commands.json", commands)
++        if process.returncode:
++            raise RuntimeError(f"{name} failed; see {log}\n" + log.read_text(errors="replace")[-8000:])
++        return process.stdout.decode()
++
++    def stage(relative, data):
++        path = sources / relative
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_bytes(data)
++        manifest["staged_sha256"][str(path.relative_to(output))] = digest(data)
++        return path
++
++    try:
++        pin = json.loads((HERE / "baseline/manifest.json").read_text())
++        baseline = (HERE / "baseline/FFmpegPacket.swift").read_bytes()
++        blob = hashlib.sha1(b"blob " + str(len(baseline)).encode() + b"\0" + baseline).hexdigest()
++        if (pin["revision"] != REVISION or pin["source"] != SOURCE
++                or pin["git_blob"] != blob or pin["sha256"] != digest(baseline)):
++            raise ValueError("Frozen baseline identity mismatch")
++        candidate = (ROOT / SOURCE).read_bytes()
++        method = b"func retireAfterSuccessfulDrain("
++        if method in baseline or candidate.count(method) != 1:
++            raise ValueError("Expected old and new EOF retirement boundaries are missing")
++        manifest["baseline"] = pin
++        manifest["compiler"] = command([swiftc, "--version"], "compiler").strip()
++        manifest["checkout_head"] = command(["git", "rev-parse", "HEAD"], "git-head").strip()
++        manifest["worktree_status"] = command(["git", "status", "--porcelain=v1"], "git-status")
++        manifest["candidate_source_sha256"] = digest(candidate)
++        manifest["harness_sha256"] = {
++            name: digest((HERE / name).read_bytes()) for name in ("run.py", "Probe.swift", "baseline/manifest.json")
++        }
++        packages = ["libavcodec", "libavutil"]
++        versions = command(["pkg-config", "--modversion", *packages], "sdk-versions").splitlines()
++        if versions != ["62.28.102", "60.26.102"]:
++            raise ValueError("Use the repository's pinned FFmpeg 8.1.2 SDK")
++        ccflags = shlex.split(command(["pkg-config", "--cflags", *packages], "sdk-cflags"))
++        ldflags = shlex.split(command(["pkg-config", "--static", "--libs", *packages], "sdk-libs"))
++        manifest["sdk"] = {"prefix": str(sdk), "packages": dict(zip(packages, versions)),
++                           "libraries_sha256": {name: digest((sdk / "lib" / name).read_bytes())
++                                                for name in ("libavcodec.a", "libavutil.a")}}
++        for name in ("source-receipt.json", "build-receipt.json"):
++            if not (sdk / name).is_file():
++                raise ValueError("Missing pinned SDK provenance: " + name)
++            manifest["sdk"][name] = json.loads((sdk / name).read_text())
++
++        header = """#include <libavcodec/avcodec.h>
++#include <libavcodec/packet.h>
++#include <libavutil/avutil.h>
++#include <libavutil/buffer.h>
++#include <libavutil/error.h>
++#include <libavutil/mem.h>
++#include <errno.h>
++
++static inline unsigned probe_avcodec_header_version(void) { return LIBAVCODEC_VERSION_INT; }
++static inline unsigned probe_avutil_header_version(void) { return LIBAVUTIL_VERSION_INT; }
++"""
++        shim = (ROOT / SHIM).read_bytes()
++        for name in HELPERS:
++            header += "\n" + c_helper(shim.decode(), name)
++        stage("CFFmpeg/packet_api.h", header.encode())
++        stage("CFFmpeg/module.modulemap", b'module CFFmpeg [system] { header "packet_api.h" export * }\n')
++        support = stage("shared/PacketProbeSupport.swift", (ROOT / SUPPORT).read_bytes())
++        driver = stage("shared/Probe.swift", (HERE / "Probe.swift").read_bytes())
++        stage("originals/ffmpeg_shim.h", shim)
++        staged = {
++            "baseline": stage("baseline/FFmpegPacket.swift", baseline),
++            "candidate": stage("candidate/FFmpegPacket.swift", candidate),
++        }
++        # Compile and execute the repository's regression suite unchanged.
++        # Bundled Swift Testing needs no package downloads or root app graph.
++        test_data = (ROOT / TEST).read_bytes()
++        test_count = len(re.findall(rb"(?m)^\s*@Test\b", test_data))
++        if test_count != 10:
++            raise ValueError("Review changed regression coverage before staging")
++        package = sources / "candidate-tests"
++        package_files = {
++            "Sources/IlliquidNativePlayback/FFmpegPacket.swift": candidate,
++            "Sources/IlliquidNativePlayback/PacketProbeSupport.swift": support.read_bytes(),
++            "Sources/CFFmpeg/packet_api.h": header.encode(),
++            "Sources/CFFmpeg/module.modulemap": (sources / "CFFmpeg/module.modulemap").read_bytes(),
++            "Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift": test_data,
++            "Package.swift": b'''// swift-tools-version: 6.1
++import PackageDescription
++let package = Package(name: "VideoRecoveryPacketLifetimeQualification", targets: [
++    .systemLibrary(name: "CFFmpeg"),
++    .target(name: "IlliquidNativePlayback", dependencies: ["CFFmpeg"]),
++    .testTarget(name: "IlliquidNativePlaybackTests", dependencies: ["CFFmpeg", "IlliquidNativePlayback"]),
++])
++''',
++        }
++        for relative, data in package_files.items():
++            stage("candidate-tests/" + relative, data)
++        manifest["candidate_tests"] = {
++            "source": TEST, "sha256": digest(test_data), "test_functions": test_count,
++            "parameterized_cases": 3, "total_cases": 12, "passed_configurations": [],
++        }
++        save(output / "manifest.json", manifest)
++        swift = str(Path(swiftc).with_name("swift"))
++        for configuration in ("debug", "release"):
++            argv = [swift, "test", "--package-path", package, "--scratch-path", builds / "tests",
++                    "--cache-path", builds / "tests-cache", "--config-path", builds / "tests-config",
++                    "--security-path", builds / "tests-security", "--jobs", "2", "-c", configuration,
++                    "-Xswiftc", "-warnings-as-errors", "--filter", "VideoRecoveryPacketLifetimeTests"]
++            for flag in ccflags:
++                argv += ["-Xcc", flag]
++            for flag in ldflags:
++                argv += ["-Xlinker", "-lpthread" if flag == "-pthread" else flag]
++            print(f"Test exact candidate regression suite {configuration}", flush=True)
++            label = "candidate-" + configuration + "-tests"
++            command(argv, label)
++            transcript = (logs / (label + ".log")).read_text()
++            completed = re.search(r"Test run with (\d+) tests?\b[^\n]* passed", transcript)
++            if not completed or int(completed.group(1)) != test_count:
++                raise ValueError("Regression suite did not execute all tests")
++            if not re.search(r"releasesPayloadsThroughTheInclusiveByteLimit\(bytes:\) with 3 test cases passed", transcript):
++                raise ValueError("Regression suite did not execute all payload-size cases")
++            manifest["candidate_tests"]["passed_configurations"].append(configuration)
++            save(output / "manifest.json", manifest)
++        records = {}
++        for configuration, optimization in (("debug", "-Onone"), ("release", "-O")):
++            for variant in ("baseline", "candidate"):
++                binary = builds / f"{variant}-{configuration}"
++                argv = [swiftc, optimization, "-swift-version", "6", "-warnings-as-errors",
++                        "-parse-as-library", "-module-cache-path", builds / "module-cache",
++                        "-I", sources / "CFFmpeg"]
++                if variant == "baseline":
++                    argv += ["-D", "BASELINE"]
++                for flag in ccflags:
++                    argv += ["-Xcc", flag]
++                argv += [support, staged[variant], driver]
++                for flag in ldflags:
++                    argv += ["-Xlinker", "-lpthread" if flag == "-pthread" else flag]
++                argv += ["-o", binary]
++                print(f"Build and run {variant} {configuration}", flush=True)
++                command(argv, f"build-{variant}-{configuration}")
++                manifest["binaries_sha256"][binary.name] = digest(binary.read_bytes())
++                save(output / "manifest.json", manifest)
++                result = json.loads(command([binary], f"run-{variant}-{configuration}"))
++                validate(result, variant)
++                records[variant, configuration] = result
++                save(output / f"{variant}-{configuration}.json", result)
++
++        for variant in ("baseline", "candidate"):
++            if records[variant, "debug"] != records[variant, "release"]:
++                raise ValueError("Debug/release ownership observations differ")
++        before, after = records["baseline", "release"], records["candidate", "release"]
++        if before["controls"] != after["controls"]:
++            raise ValueError("Lifecycle control coverage differs")
++        for name in ("ffmpegVersion", "avcodecVersion", "avutilVersion"):
++            if before[name] != after[name]:
++                raise ValueError("Native libraries differ between variants")
++        if digest((ROOT / SOURCE).read_bytes()) != manifest["candidate_source_sha256"]:
++            raise ValueError("Production source changed during validation")
++        if digest((ROOT / TEST).read_bytes()) != manifest["candidate_tests"]["sha256"]:
++            raise ValueError("Regression source changed during validation")
++        summary = {
++            "status": "passed", "scope": manifest["scope"], "timing_claim": None,
++            "configurations": ["debug", "release"], "controls": sorted(CONTROLS),
++            "success_cases": [
++                {"name": left["name"], "payload_bytes": left["payloadBytes"],
++                 "baseline_live_payload_bytes_after_drain": left["livePayloadBytesAfterDrain"],
++                 "candidate_live_payload_bytes_after_drain": right["livePayloadBytesAfterDrain"],
++                 "baseline_live_storage_bytes_after_drain": left["liveStorageBytesAfterDrain"],
++                 "candidate_live_storage_bytes_after_drain": right["liveStorageBytesAfterDrain"]}
++                for left, right in zip(before["success"], after["success"])
++            ],
++            "all_tracked_allocations_released_exactly_once": True,
++            "candidate_regression_tests": manifest["candidate_tests"],
++            "limitations": manifest["limitations"],
++        }
++        save(output / "summary.json", summary)
++        manifest["complete"] = True
++        print(json.dumps(summary, indent=2, sort_keys=True))
++    finally:
++        save(output / "manifest.json", manifest)
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift b/Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift
+index be28cdb3..5fdea670 100644
+--- a/Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift
++++ b/Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift
+@@ -156,6 +156,25 @@ final class VideoRecoveryPacketBuffer: @unchecked Sendable {
+         lock.withLock { resetLocked(generation: newGeneration) }
+     }
+ 
++    /// Retires replay ownership on normal return from the session's existing
++    /// drain-to-EOS boundary. This does not interpret FFmpeg's drain status;
++    /// throwing failures keep replay available. Emitted frames own their
++    /// buffers, and later seeks rebuild their own GOP.
++    func retireAfterSuccessfulDrain(
++        generation expectedGeneration: Int,
++        _ drain: () throws -> Void
++    ) rethrows {
++        // Draining may block, throw, or overlap a seek. Never hold this lock
++        // across it, and preserve replay packets if it throws or is cancelled.
++        try drain()
++        lock.withLock {
++            // A seek may already have installed a newer generation while the
++            // old drain finished. Its packets and identity must remain intact.
++            guard generation == expectedGeneration else { return }
++            resetLocked(generation: expectedGeneration)
++        }
++    }
++
+     private func resetLocked(generation newGeneration: Int?) {
+         generation = newGeneration
+         packets.removeAll(keepingCapacity: false)
+diff --git a/Sources/IlliquidNativePlayback/Media/MediaSession.swift b/Sources/IlliquidNativePlayback/Media/MediaSession.swift
+index 9173ce17..e49e4a18 100644
+--- a/Sources/IlliquidNativePlayback/Media/MediaSession.swift
++++ b/Sources/IlliquidNativePlayback/Media/MediaSession.swift
+@@ -1502,32 +1502,36 @@ final class MediaSession: @unchecked Sendable {
+                         } else {
+                             reserveSoftwareOutput = nil
+                         }
+-                        try videoDecoder.drain(
+-                            generation: active,
+-                            while: {
+-                                self.isRunning && self.generation.accepts(active)
+-                            },
+-                            reserveSoftwareOutput: reserveSoftwareOutput
+-                        ) { decodedFrame in
+-                            let frame = decodedFrame
+-                            self.stateLock.withLock {
+-                                if videoDecoder.hardwareWasConfigured {
+-                                    self.consecutiveHardwareDecodeFailures = 0
+-                                }
+-                                self.metrics.temporaryDecodedVideoFrames = 1
+-                                self.metrics.peakTemporaryDecodedVideoFrames = max(
+-                                    self.metrics.peakTemporaryDecodedVideoFrames,
+-                                    1
+-                                )
+-                            }
+-                            defer {
++                        // Keep replay available for drain failures, then release
++                        // the final compressed GOP before waiting at EOF.
++                        try videoRecoveryPackets.retireAfterSuccessfulDrain(generation: active) {
++                            try videoDecoder.drain(
++                                generation: active,
++                                while: {
++                                    self.isRunning && self.generation.accepts(active)
++                                },
++                                reserveSoftwareOutput: reserveSoftwareOutput
++                            ) { decodedFrame in
++                                let frame = decodedFrame
+                                 self.stateLock.withLock {
+-                                    self.metrics.temporaryDecodedVideoFrames = 0
++                                    if videoDecoder.hardwareWasConfigured {
++                                        self.consecutiveHardwareDecodeFailures = 0
++                                    }
++                                    self.metrics.temporaryDecodedVideoFrames = 1
++                                    self.metrics.peakTemporaryDecodedVideoFrames = max(
++                                        self.metrics.peakTemporaryDecodedVideoFrames,
++                                        1
++                                    )
++                                }
++                                defer {
++                                    self.stateLock.withLock {
++                                        self.metrics.temporaryDecodedVideoFrames = 0
++                                    }
+                                 }
++                                guard self.accepts(frame) else { return }
++                                guard self.pushVideoFrame(frame) else { return }
++                                self.recordVideoDecodeDiagnostics(videoDecoder)
+                             }
+-                            guard self.accepts(frame) else { return }
+-                            guard self.pushVideoFrame(frame) else { return }
+-                            self.recordVideoDecodeDiagnostics(videoDecoder)
+                         }
+                         _ = videoFrames.push(.endOfStream(generation: active))
+                     case let .flush(active):
+diff --git a/Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift b/Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift
+new file mode 100644
+index 00000000..632d9244
+--- /dev/null
++++ b/Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift
+@@ -0,0 +1,215 @@
++import CFFmpeg
++import Foundation
++import Testing
++@testable import IlliquidNativePlayback
++
++/// These tests use real FFmpeg allocations and the same successful-drain
++/// boundary as MediaSession. The injected callbacks exercise ownership and
++/// error ordering; they do not instantiate a decoder or qualify playback.
++@Suite("Recovery GOP drain lifetime", .serialized)
++struct VideoRecoveryPacketLifetimeTests {
++    private enum DrainFailure: Error { case failed }
++
++    private final class WeakPacket {
++        weak var value: FFmpegPacket?
++        init(_ packet: FFmpegPacket) { value = packet }
++    }
++
++    @Test func successfulDrainReleasesTheFinalGOPWhileTheBufferRemainsAlive() throws {
++        let buffer = VideoRecoveryPacketBuffer()
++        let packets = try recordGOP(in: buffer, generation: 3)
++        #expect(packets.allSatisfy { $0.value != nil })
++        var drains = 0
++
++        buffer.retireAfterSuccessfulDrain(generation: 3) {
++            drains += 1
++            // Replay must survive until the decoder has finished its work.
++            #expect(packets.allSatisfy { $0.value != nil })
++        }
++
++        #expect(drains == 1)
++        #expect(packets.allSatisfy { $0.value == nil })
++        #expect(buffer.takeReplayPackets(generation: 3).isEmpty)
++        withExtendedLifetime(buffer) {}
++    }
++
++    @Test(arguments: [1_024, 1_024 * 1_024, VideoRecoveryPacketBuffer.maximumByteCount])
++    func releasesPayloadsThroughTheInclusiveByteLimit(bytes: Int) throws {
++        let buffer = VideoRecoveryPacketBuffer()
++        let packet = try recordPacket(in: buffer, bytes: bytes, keyframe: true, generation: 1)
++        #expect(packet.value?.byteCount == bytes)
++
++        buffer.retireAfterSuccessfulDrain(generation: 1) {}
++
++        #expect(packet.value == nil)
++        withExtendedLifetime(buffer) {}
++    }
++
++    @Test func failedDrainPreservesTheCompleteReplay() throws {
++        let buffer = VideoRecoveryPacketBuffer()
++        let packets = try recordGOP(in: buffer, generation: 4)
++
++        #expect(throws: DrainFailure.self) {
++            try buffer.retireAfterSuccessfulDrain(generation: 4) {
++                throw DrainFailure.failed
++            }
++        }
++
++        #expect(packets.allSatisfy { $0.value != nil })
++        let replay = buffer.takeReplayPackets(generation: 4)
++        #expect(replay.map(\.presentationTimestamp) == [0, 1, 2])
++        #expect(replay.first?.isKeyframe == true)
++        #expect(zip(replay, packets).allSatisfy { packet, observer in packet === observer.value })
++    }
++
++    @Test func cancelledDrainPreservesTheCompleteReplay() throws {
++        let buffer = VideoRecoveryPacketBuffer()
++        let packets = try recordGOP(in: buffer, generation: 5)
++
++        #expect(throws: CancellationError.self) {
++            try buffer.retireAfterSuccessfulDrain(generation: 5) {
++                throw CancellationError()
++            }
++        }
++
++        #expect(packets.allSatisfy { $0.value != nil })
++        #expect(buffer.takeReplayPackets(generation: 5).map(\.presentationTimestamp) == [0, 1, 2])
++    }
++
++    @Test func staleDrainDoesNotRetireANewerGeneration() throws {
++        let buffer = VideoRecoveryPacketBuffer()
++        let packets = try recordGOP(in: buffer, generation: 8)
++        var drains = 0
++
++        buffer.retireAfterSuccessfulDrain(generation: 7) { drains += 1 }
++
++        #expect(drains == 1)
++        #expect(packets.allSatisfy { $0.value != nil })
++        #expect(buffer.takeReplayPackets(generation: 8).map(\.presentationTimestamp) == [0, 1, 2])
++    }
++
++    @Test func seekDuringDrainPreservesTheNewGOP() throws {
++        let buffer = VideoRecoveryPacketBuffer()
++        let oldPackets = try recordGOP(in: buffer, generation: 10)
++        var nextPackets: [WeakPacket] = []
++
++        try buffer.retireAfterSuccessfulDrain(generation: 10) {
++            // This deterministic interleaving also proves the callback is not
++            // invoked under the buffer's lock: both operations acquire it.
++            buffer.reset(generation: 11)
++            nextPackets = try recordGOP(in: buffer, generation: 11)
++        }
++
++        #expect(oldPackets.allSatisfy { $0.value == nil })
++        #expect(nextPackets.allSatisfy { $0.value != nil })
++        let replay = buffer.takeReplayPackets(generation: 11)
++        #expect(replay.count == 3)
++        #expect(replay.allSatisfy { $0.generation == 11 })
++        #expect(replay.map(\.presentationTimestamp) == [0, 1, 2])
++    }
++
++    @Test func aSeekAfterRetirementCanBuildANewReplay() throws {
++        let buffer = VideoRecoveryPacketBuffer()
++        let oldPackets = try recordGOP(in: buffer, generation: 12)
++        buffer.retireAfterSuccessfulDrain(generation: 12) {}
++        #expect(oldPackets.allSatisfy { $0.value == nil })
++
++        buffer.reset(generation: 13)
++        let dependent = try recordPacket(in: buffer, bytes: 32, keyframe: false, generation: 13)
++        #expect(dependent.value == nil)
++        let nextPackets = try recordGOP(in: buffer, generation: 13)
++        #expect(nextPackets.allSatisfy { $0.value != nil })
++        #expect(buffer.takeReplayPackets(generation: 13).map(\.presentationTimestamp) == [0, 1, 2])
++    }
++
++    @Test func emptyAndRepeatedRetirementStillExecuteTheDrain() {
++        let buffer = VideoRecoveryPacketBuffer()
++        var drains = 0
++        buffer.retireAfterSuccessfulDrain(generation: 1) { drains += 1 }
++        buffer.reset(generation: 1)
++        buffer.retireAfterSuccessfulDrain(generation: 1) { drains += 1 }
++        buffer.retireAfterSuccessfulDrain(generation: 1) { drains += 1 }
++        #expect(drains == 3)
++        #expect(buffer.takeReplayPackets(generation: 1).isEmpty)
++    }
++
++    @Test func retiringPacketsDoesNotInvalidateAnExternalNativeBufferReference() throws {
++        let buffer = VideoRecoveryPacketBuffer()
++        var external: UnsafeMutablePointer<AVBufferRef>?
++        defer { av_buffer_unref(&external) }
++        let packet = try recordPacket(
++            in: buffer, bytes: 64, keyframe: true, generation: 14,
++            borrow: { packet in
++                let native = try #require(packet.pointer?.pointee.buf)
++                external = try #require(av_buffer_ref(native))
++            }
++        )
++
++        buffer.retireAfterSuccessfulDrain(generation: 14) {}
++
++        #expect(packet.value == nil)
++        let retained = try #require(external)
++        #expect(av_buffer_get_ref_count(retained) == 1)
++        // av_new_packet includes FFmpeg's required input padding in its
++        // backing allocation; the packet's advertised payload is 64 bytes.
++        #expect(retained.pointee.size >= 64)
++        #expect(retained.pointee.data[0] == 19)
++        #expect(retained.pointee.data[63] == 23)
++        withExtendedLifetime(buffer) {}
++    }
++
++    @Test func anotherPacketOwnerRemainsValidAfterRetirement() throws {
++        let buffer = VideoRecoveryPacketBuffer()
++        let observer = try recordPacket(in: buffer, bytes: 64, keyframe: true, generation: 15)
++        let packet = try #require(observer.value)
++        let pointer = try #require(packet.pointer)
++
++        buffer.retireAfterSuccessfulDrain(generation: 15) {}
++
++        #expect(buffer.takeReplayPackets(generation: 15).isEmpty)
++        #expect(packet.pointer == pointer)
++        #expect(packet.byteCount == 64)
++        #expect(packet.data?.first == 19)
++        #expect(packet.data?.last == 23)
++        #expect(observer.value === packet)
++        withExtendedLifetime(packet) {}
++    }
++
++    private func recordGOP(
++        in buffer: VideoRecoveryPacketBuffer, generation: Int
++    ) throws -> [WeakPacket] {
++        try (0..<3).map { index in
++            try recordPacket(in: buffer, bytes: 1_024 + index,
++                             keyframe: index == 0, generation: generation, pts: Int64(index))
++        }
++    }
++
++    /// Returning only a weak observer prevents the fixture from extending the
++    /// packet's lifetime beyond the recovery owner being tested.
++    private func recordPacket(
++        in buffer: VideoRecoveryPacketBuffer,
++        bytes: Int,
++        keyframe: Bool,
++        generation: Int,
++        pts: Int64 = 0,
++        borrow: (FFmpegPacket) throws -> Void = { _ in }
++    ) throws -> WeakPacket {
++        var source = av_packet_alloc()
++        let native = try #require(source)
++        defer { av_packet_free(&source) }
++        try #require(av_new_packet(native, Int32(bytes)) == 0)
++        let data = try #require(native.pointee.data)
++        data[0] = 19
++        data[bytes - 1] = 23
++        native.pointee.stream_index = 0
++        native.pointee.pts = pts
++        native.pointee.dts = pts
++        native.pointee.duration = 1
++        native.pointee.flags = keyframe ? AV_PKT_FLAG_KEY : 0
++        let packet = try FFmpegPacket(taking: &source, timeBase: .init(num: 1, den: 30),
++                                      generation: generation)
++        try borrow(packet)
++        buffer.record(packet)
++        return WeakPacket(packet)
++    }
++}
+diff --git a/Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketSessionLifetimeTests.swift b/Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketSessionLifetimeTests.swift
+new file mode 100644
+index 00000000..c7c3016b
+--- /dev/null
++++ b/Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketSessionLifetimeTests.swift
+@@ -0,0 +1,156 @@
++import Foundation
++import Testing
++@testable import IlliquidNativePlayback
++
++@Suite("Recovery GOP lifetime at native session EOF", .serialized)
++struct VideoRecoveryPacketSessionLifetimeTests {
++    private struct PacketObservation {
++        weak var packet: FFmpegPacket?
++        let bytes: Int
++        let keyframe: Bool
++    }
++
++    /// The injected reader demuxes the same fixture as the session. Its input
++    /// is serialized separately from the weak-observation metadata, and it
++    /// never retains a returned Swift packet owner for the test itself.
++    private final class PacketProbe: @unchecked Sendable {
++        private let input: FFmpegDemuxer
++        private let videoIndex: Int32
++        private let inputLock = NSLock()
++        private let observationLock = NSLock()
++        private var packets: [PacketObservation] = []
++        private var reachedEOF = false
++        private var failures: [String] = []
++
++        struct Snapshot {
++            let packetCount: Int
++            let keyframes: Int
++            let payloadBytes: Int
++            let livePackets: Int
++            let livePayloadBytes: Int
++            let reachedEOF: Bool
++            let failures: [String]
++        }
++
++        init(url: URL) throws {
++            input = try FFmpegDemuxer(url: url, loadFontAttachments: false)
++            videoIndex = try #require(input.mediaInfo.videoStreams.first).index
++        }
++
++        func read(generation: Int) throws -> FFmpegPacket? {
++            let packet = try inputLock.withLock { try input.readPacket(generation: generation) }
++            observationLock.withLock {
++                if let packet, packet.streamIndex == videoIndex {
++                    packets.append(PacketObservation(packet: packet, bytes: packet.byteCount,
++                                                     keyframe: packet.isKeyframe))
++                } else if packet == nil {
++                    reachedEOF = true
++                }
++            }
++            return packet
++        }
++
++        func recordFailure(_ code: String) {
++            observationLock.withLock { failures.append(code) }
++        }
++
++        var snapshot: Snapshot {
++            observationLock.withLock {
++                var livePackets = 0
++                var liveBytes = 0
++                for observation in packets where observation.packet != nil {
++                    livePackets += 1
++                    liveBytes += observation.bytes
++                }
++                return Snapshot(
++                    packetCount: packets.count,
++                    keyframes: packets.filter(\.keyframe).count,
++                    payloadBytes: packets.reduce(0) { $0 + $1.bytes },
++                    livePackets: livePackets,
++                    livePayloadBytes: liveBytes,
++                    reachedEOF: reachedEOF,
++                    failures: failures
++                )
++            }
++        }
++    }
++
++    @Test @MainActor
++    func completedSessionReleasesItsFinalGOPBeforeStop() async throws {
++        let environment = ProcessInfo.processInfo.environment
++        let directory = URL(fileURLWithPath: environment["ILLIQUID_NATIVE_FIXTURE_DIR"]
++            ?? FileManager.default.currentDirectoryPath + "/TestFixtures/Generated", isDirectory: true)
++        let fixture = directory.appendingPathComponent("timestamp-cfr-bframes.mkv")
++        guard FileManager.default.fileExists(atPath: fixture.path) else {
++            if environment["ILLIQUID_RECOVERY_PACKET_REQUIRE_FIXTURE"] == "1" {
++                Issue.record("Required recovery-GOP fixture is missing: \(fixture.path)")
++            } else {
++                print("NOT RUN: native recovery-GOP session test requires timestamp-cfr-bframes.mkv")
++            }
++            return
++        }
++
++        let probe = try PacketProbe(url: fixture)
++        let presentation = try NativePresentationCoordinator()
++        let subtitles = try SubtitlePipeline(
++            overlay: SubtitleOverlayView(headless: true), presentsOverlay: false)
++        let session = try MediaSession(
++            url: fixture,
++            presentation: presentation,
++            subtitles: subtitles,
++            preferHardware: false,
++            onFailureObserved: { probe.recordFailure($0.stableCode) },
++            demuxPacketReader: { try probe.read(generation: $0) }
++        )
++        defer {
++            session.stop()
++            _ = session.waitForShutdown()
++            subtitles.terminate()
++            presentation.terminate()
++        }
++
++        // This fixture has no audio. Remove the unfed audio renderer so the
++        // synchronizer can advance, and adopt the membership change's fence.
++        let fence = presentation.configureMembership(hasVideo: true, hasAudio: false)
++        session.adoptPresentationFence(fence)
++        session.start(rate: 1)
++        #expect(session.requestTransport(playing: true))
++        let deadline = ContinuousClock.now + .seconds(15)
++        var state = session.snapshot()
++        while !state.decoderDrainComplete, probe.snapshot.failures.isEmpty,
++              ContinuousClock.now < deadline {
++            try await Task.sleep(for: .milliseconds(10))
++            state = session.snapshot()
++        }
++        try #require(state.decoderDrainComplete,
++                     "The actual session did not consume its video EOS marker before the deadline")
++
++        let ownership = probe.snapshot
++        #expect(ownership.failures.isEmpty)
++        #expect(ownership.reachedEOF)
++        // The existing frame-step generator creates 48 video-only H.264
++        // frames, including B-frames, in one bounded GOP. This makes retained
++        // final-GOP ownership distinguishable from a trivially empty stream.
++        #expect(ownership.packetCount == 48)
++        #expect(ownership.keyframes == 1)
++        #expect(ownership.payloadBytes > 0)
++        #expect(ownership.payloadBytes < VideoRecoveryPacketBuffer.maximumByteCount)
++        #expect(state.framesSubmitted == 48)
++        #expect(state.videoPacketDepth == 0)
++        #expect(state.videoFrameDepth == 0)
++        #expect(state.rendererFailure == nil)
++        #expect(!state.isHardwareDecoded)
++        #expect(ownership.livePackets == 0)
++        #expect(ownership.livePayloadBytes == 0)
++        print("recovery-gop-session packets=\(ownership.packetCount) payload-bytes=\(ownership.payloadBytes) "
++            + "live-packets-at-eos=\(ownership.livePackets) live-payload-bytes-at-eos=\(ownership.livePayloadBytes) "
++            + "submitted-frames=\(state.framesSubmitted)")
++        // Stop/destruction must not be what made the preceding ownership
++        // assertions pass. The finished session remains alive at this point.
++        #expect(session.snapshot().decoderDrainComplete)
++        withExtendedLifetime(session) {}
++
++        session.stop()
++        #expect(await Task.detached { session.waitForShutdown() }.value)
++    }
++}

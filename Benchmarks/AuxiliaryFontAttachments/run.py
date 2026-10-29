@@ -26,6 +26,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASELINE = "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635"
 VARIANTS = ("baseline", "candidate")
+REGRESSION_TARGET = "c1ef6aff6060ad35decbc6dce0c224164be941a2"
+CURRENT_SUPPORT = "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift"
 WORKLOADS = [("auxiliary", count) for count in (1, 2, 3)] + [("default", 1)]
 HELPER = ROOT / "Benchmarks/AttachmentAdmission/run.py"
 FOCAL = {"Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
@@ -142,6 +144,14 @@ class Runner:
         return fixtures
 
     def prepare(self):
+        self.receipt["comparison_mode"] = ("current-support-regression-no-timing"
+            if self.args.current_support_regression else "strict-historical")
+        if self.args.current_support_regression:
+            self.receipt["target_oracle_revision"] = REGRESSION_TARGET
+            for path in FOCAL:
+                pinned = subprocess.check_output(["git", "show", f"{REGRESSION_TARGET}:{path}"], cwd=ROOT)
+                if (ROOT / path).read_bytes() != pinned:
+                    raise ValueError(f"Pinned regression target changed: {path}")
         original = {}
         shared = helper()
         paths = shared.FULL_SOURCES + [shared.PRESENTATION, shared.BITMAP] + shared.C_SOURCES
@@ -156,6 +166,13 @@ class Runner:
                 target.write_bytes(raw)
                 self.sources[f"{variant}:{path}"] = {"sha256": sha(raw), "bytes": len(raw),
                     "origin": "working-tree" if variant == "candidate" else "pinned-baseline"}
+        if self.args.current_support_regression:
+            # Save the historical source above; record and stage identical support.
+            original["baseline"][CURRENT_SUPPORT] = original["candidate"][CURRENT_SUPPORT]
+            self.receipt["support_override"] = {
+                "path": CURRENT_SUPPORT,
+                "historical_sha256": self.sources[f"baseline:{CURRENT_SUPPORT}"]["sha256"],
+                "both_arms_sha256": self.sources[f"candidate:{CURRENT_SUPPORT}"]["sha256"]}
         for path in set(shared.FULL_SOURCES + shared.C_SOURCES) - FOCAL:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
@@ -294,7 +311,7 @@ class Runner:
 
     def measure(self):
         calibrations = []
-        for mode in ("memory", "timing"):
+        for mode in (("memory",) if self.args.current_support_regression else ("memory", "timing")):
             for case in self.fixtures:
                 for policy, count in WORKLOADS:
                     iterations = 1
@@ -316,7 +333,7 @@ class Runner:
 
     def summarize(self):
         measurements = [row for row in self.observations if row["stage"] == "measurement"]
-        expected = len(self.fixtures) * len(WORKLOADS) * 2 * self.args.pairs * 2
+        expected = len(self.fixtures) * len(WORKLOADS) * 2 * self.args.pairs * (1 if self.args.current_support_regression else 2)
         if len(measurements) != expected:
             raise ValueError("Incomplete measurement cohort")
         results = []
@@ -335,6 +352,8 @@ class Runner:
                     "open_close_cpu_seconds_per_batch": ("timing", lambda row: row["cpu_seconds"] / row["iterations"]),
                 }
                 for name, (mode, value) in metrics.items():
+                    if self.args.current_support_regression and mode == "timing":
+                        continue
                     rows = [row for row in selected if row["mode"] == mode]
                     variants = {variant: [value(row) for row in rows if row["variant"] == variant] for variant in VARIANTS}
                     savings, reductions = [], []
@@ -359,7 +378,8 @@ class Runner:
         return {"status": "complete", "pairs": self.args.pairs, "measurement_processes": expected,
                 "ordering": "AB/BA balanced per case, policy, input count, and measurement type; all samples retained",
                 "memory_boundary": "One default main input remains alive; add 1/2/3 auxiliary inputs, then release them. No tracing/hashing before checkpoints.",
-                "timing_boundary": "Open and close one batch of serialized input executors with a main input held alive; one warmup batch excluded.",
+                "comparison_mode": self.receipt["comparison_mode"],
+                "timing_boundary": None if self.args.current_support_regression else "Open and close one batch of serialized input executors with a main input held alive; one warmup batch excluded.",
                 "results": results}
 
     def verify_inputs(self):
@@ -385,6 +405,8 @@ def main():
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--ffmpeg-prefix", type=Path, default=Path("/opt/homebrew/opt/ffmpeg"))
     parser.add_argument("--swiftc")
+    parser.add_argument("--current-support-regression", action="store_true",
+                        help="Pinned-target regression with identical current packet support; no timing qualification")
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--target-ms", type=float, default=100)
     parser.add_argument("--max-iterations", type=int, default=1000)

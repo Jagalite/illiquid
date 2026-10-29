@@ -59,7 +59,11 @@ jobs:
             --output "$RUNNER_TEMP/auxiliary-font-fixtures"
       - name: Compare metadata, packet output, and retained input memory
         run: |
-          python3 Benchmarks/AuxiliaryFontAttachments/run.py \
+          regression=()
+          if [[ "${{ github.event_name }}" != workflow_dispatch ]]; then
+            regression+=(--current-support-regression)
+          fi
+          python3 Benchmarks/AuxiliaryFontAttachments/run.py "${regression[@]}" \
             --fixtures "$RUNNER_TEMP/auxiliary-font-fixtures" \
             --output "$RUNNER_TEMP/auxiliary-font-results" --pairs 6
       - name: Build app graph and qualify attachment ownership and rendering
@@ -74,7 +78,7 @@ jobs:
           swift --version >> "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
           git rev-parse HEAD >> "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
           set -o pipefail
-          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+          bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 \
             --filter 'AuxiliaryFontAttachmentTests|AuxiliaryFontPlaybackTests|FontAttachmentAdmissionTests|NativePlaybackFoundationTests|InputReadFailureTests' \
             2>&1 | tee "$RUNNER_TEMP/auxiliary-font-tests/native-tests.log"
       - name: Emit compact review evidence

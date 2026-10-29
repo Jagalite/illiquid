@@ -1,0 +1,69 @@
+commit 5af8eea6ddd786765f2aea4ad10bbb42085c5360
+Author:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+AuthorDate: Wed Oct 28 02:08:28 2026 -0400
+Commit:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+CommitDate: Wed Oct 28 02:08:28 2026 -0400
+
+    docs: retain independently verified EOF memory measurements
+    
+    Record the successful pinned-FFmpeg debug/release ownership experiment at
+    2922779, all 72 observations and 36 behavior comparisons, negative controls,
+    source provenance, and the remaining queued macOS qualification.
+
+ Benchmarks/VideoRecoveryEOFMemory/README.md        |    2 +
+ Benchmarks/VideoRecoveryEOFMemory/RESULTS.md       |  180 +
+ .../VideoRecoveryEOFMemory/evidence/.gitattributes |    1 +
+ .../evidence/linux/commands.json                   | 1104 ++++
+ .../evidence/linux/complete-outputs.json           |    1 +
+ .../evidence/linux/github-run.json                 |   39 +
+ .../evidence/linux/manifest.json                   |  488 ++
+ .../evidence/linux/observations.json               | 5442 ++++++++++++++++++++
+ .../evidence/linux/summary.json                    |  386 ++
+ 9 files changed, 7643 insertions(+)
+
+commit 29227795552097be22675e0a8c498481042e44b3
+Merge: 1002243b c1ef6aff
+Author:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+AuthorDate: Wed Oct 28 01:57:06 2026 -0400
+Commit:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+CommitDate: Wed Oct 28 01:57:06 2026 -0400
+
+    test: independently qualify the generation-checked EOF recovery release
+    
+    Build on PR #172 without additional production changes. Preserve exact
+    baseline and candidate packet owners and session methods in the experiment,
+    and add decoded-output lifetime checks under a distinct test suite.
+
+commit 1002243b1c5de305e12589c99ecca237fae18cc4
+Author:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+AuthorDate: Wed Oct 28 01:48:48 2026 -0400
+Commit:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+CommitDate: Wed Oct 28 01:48:48 2026 -0400
+
+    test: qualify EOF packet ownership with pinned FFmpeg on Linux
+    
+    Run the same production session methods and real native packet ownership independently of the macOS runner queue; keep native application and decoded-pixel checks as separate gates.
+
+ .github/workflows/video-recovery-eof-portable.yml |  90 +++++++++++++++++
+ Benchmarks/VideoRecoveryEOFMemory/README.md       |  28 +++++-
+ Benchmarks/VideoRecoveryEOFMemory/run.py          | 116 ++++++++++++++++++----
+ 3 files changed, 208 insertions(+), 26 deletions(-)
+
+commit c79e9ddc206fcd91d0f208cd3007453f65934610
+Author:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+AuthorDate: Wed Oct 28 01:38:22 2026 -0400
+Commit:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+CommitDate: Wed Oct 28 01:38:22 2026 -0400
+
+    perf: release video recovery packets after normal EOF drain
+    
+    Clear compressed replay ownership before EOS publication while preserving it on thrown drain failures. Add real native-buffer lifetime experiments and decoder ownership regressions.
+
+ .github/workflows/video-recovery-eof-memory.yml    | 134 +++++++
+ Benchmarks/VideoRecoveryEOFMemory/Harness.swift.in | 393 +++++++++++++++++++++
+ Benchmarks/VideoRecoveryEOFMemory/Probe.h          | 128 +++++++
+ Benchmarks/VideoRecoveryEOFMemory/README.md        |  88 +++++
+ Benchmarks/VideoRecoveryEOFMemory/run.py           | 335 ++++++++++++++++++
+ .../Media/MediaSession.swift                       |   4 +
+ .../VideoRecoveryEOFLifetimeTests.swift            | 115 ++++++
+ 7 files changed, 1197 insertions(+)

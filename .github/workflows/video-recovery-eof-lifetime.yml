@@ -117,14 +117,24 @@ jobs:
           set -euo pipefail
           packet=Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift
           session=Sources/IlliquidNativePlayback/Media/MediaSession.swift
-          unit=Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift
-          saved="$RUNNER_TEMP/video-recovery-eof/unit-candidate.swift"
-          mv "$unit" "$saved"
+          saved="$RUNNER_TEMP/video-recovery-eof/candidate-only-tests"
+          mkdir -p "$saved"
+          # Only these suites call the candidate-only releaseAfterDrain API.
+          candidate_only_tests=(
+            VideoRecoveryPacketLifetimeTests.swift
+            VideoRecoveryGOPSequencingTests.swift
+            VideoRecoveryDecodedOutputLifetimeTests.swift
+          )
           restore_candidate() {
             git restore -- "$packet" "$session"
-            if test -f "$saved"; then mv "$saved" "$unit"; fi
+            for unit in "${candidate_only_tests[@]}"; do
+              test ! -f "$saved/$unit" || mv "$saved/$unit" "Tests/IlliquidNativePlaybackTests/$unit"
+            done
           }
           trap restore_candidate EXIT
+          for unit in "${candidate_only_tests[@]}"; do
+            mv "Tests/IlliquidNativePlaybackTests/$unit" "$saved/"
+          done
           git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:"$packet" > "$packet"
           git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:"$session" > "$session"
           mkdir -p "$RUNNER_TEMP/video-recovery-eof/baseline-tests"
@@ -145,7 +155,7 @@ jobs:
           set -o pipefail
           TMPDIR="$RUNNER_TEMP/video-recovery-eof/candidate-tests" \
             bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 \
-            --filter 'VideoRecoveryEOFLifetimeTests|VideoRecoveryPacketLifetimeTests|PacketOwnershipTests|PlaybackBufferRegressionTests' \
+            --filter 'VideoRecoveryEOFLifetimeTests|VideoRecoveryPacketLifetimeTests|VideoRecoveryGOPSequencingTests|VideoRecoveryDecodedOutputLifetimeTests|PacketOwnershipTests|PlaybackBufferRegressionTests' \
             2>&1 | tee "$RUNNER_TEMP/video-recovery-eof/candidate-tests.log"
           test -s "$ILLIQUID_RECOVERY_EOF_RECEIPT"
           git diff --exit-code
