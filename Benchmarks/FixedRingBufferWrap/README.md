@@ -191,4 +191,3 @@ PR #133, so it was superseded before opening a duplicate PR. The study
 is limited to ring storage and its queue callers. During final packaging,
 PR #193 was found to implement the same ring change, so these results are offered
 as a stacked companion qualification PR. The implementation remains in PR #193.
-

@@ -74,6 +74,8 @@ class Runner:
                       if self.darwin else shutil.which("swift"))
         if not self.swiftc or not self.swift:
             raise RuntimeError("Swift is not installed")
+        self.sdk = (self.command(["xcrun", "--sdk", "macosx", "--show-sdk-path"]).strip()
+                    if self.darwin else None)
         baseline = (HERE / "baseline/FixedRingBuffer.swift").read_bytes()
         if self.command(["git", "show", f"{BASELINE}:{RING}"]).encode() != baseline:
             raise RuntimeError("Frozen baseline does not match its pinned Git commit")
@@ -114,7 +116,7 @@ class Runner:
         flags = ["-Onone", "-g"] if configuration == "debug" else ["-O", "-whole-module-optimization"]
         flags += ["-swift-version", "6", "-warnings-as-errors", "-module-cache-path", self.work / "module-cache"]
         if self.darwin:
-            flags += ["-target", f"{platform.machine()}-apple-macos26.0"]
+            flags += ["-target", f"{platform.machine()}-apple-macosx26.0", "-sdk", self.sdk]
         suffix = "dylib" if self.darwin else "so"
         library = directory / f"libIlliquidNativePlayback.{suffix}"
         library_flags = ["-Xlinker", "-install_name", "-Xlinker", library] if self.darwin else []
