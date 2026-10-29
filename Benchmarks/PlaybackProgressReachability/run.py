@@ -36,6 +36,15 @@ REGRESSION_BASELINE_FOCAL_SHA256 = '094a9145b4faec7e13dfc5a964ad922a4e9c6d27ea1e
 # predecessor-indexing edits. Historical performance sources remain unchanged.
 REGRESSION_CANDIDATE_FOCAL_SHA256 = 'ca3976b19fce3e96c5fa93edfa9ed54f6487609aa2190de1917eafce55e8e8de'
 REGRESSION_SUPPORT_SHA256 = {'Sources/IlliquidPlaybackStateSpace/PlaybackPartialOrderReducer.swift': 'a3a4f5010135e55ef6564365aa7bb42a203033baae1c4fd9ed39d81dcabfaf3a', 'Sources/IlliquidPlaybackStateSpace/PlaybackStateSpaceExplorer.swift': '13f04caf1abb97c2d6543094e8e854da09ce98678ea70ff9cf6b4744c18f4905'}
+# Exact PlaybackCore cohorts reviewed for regression-only compatibility.
+# Both variants consume the same captured shared module; historical timing
+# continues to require byte-identical dependencies.
+REGRESSION_COMPATIBLE_SUPPORT_SHA256 = {
+    "Sources/IlliquidPlaybackCore/PlaybackCore.swift": (
+        '59faf4ba801d6d1e2d937302a19b45aa7c15eec263aebef987521a879d930fa0',  # PR229 head
+        '0733f5d0f2a2ba83e20aeaacaeed38e0c48e141aa9069d7eb85b3c9c4919f6ca',  # main b4bada27: settleEffects ID collection
+    ),
+}
 RESULT_FIELDS = (
     "schema_version", "mode", "workload", "iterations", "operations",
     "checksum", "produced_count", "warmup_iterations",
@@ -148,9 +157,13 @@ def validate_sources(commit: str, originals: dict[Path, bytes], current: dict[Pa
         for path, expected in REGRESSION_SUPPORT_SHA256.items():
             if Path(path) not in current or digest(current[Path(path)]) != expected:
                 raise RuntimeError(f"Reviewed regression support pin mismatch: {path}")
+        for path, accepted in REGRESSION_COMPATIBLE_SUPPORT_SHA256.items():
+            if Path(path) not in current or digest(current[Path(path)]) not in accepted:
+                raise RuntimeError(f"Reviewed regression compatibility pin mismatch: {path}")
     for path, original in originals.items():
         if path != ANALYZER and current[path] != original:
-            if mode != "regression" or str(path) not in REGRESSION_SUPPORT_SHA256:
+            if mode != "regression" or (str(path) not in REGRESSION_SUPPORT_SHA256
+                                        and str(path) not in REGRESSION_COMPATIBLE_SUPPORT_SHA256):
                 raise RuntimeError(f"Dependency {path} changed from the baseline; requalify it explicitly")
 
 

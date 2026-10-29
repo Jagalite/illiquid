@@ -21,6 +21,7 @@ class PolicyTests(unittest.TestCase):
             "REGRESSION_BASELINE_FOCAL_SHA256": runner.digest(self.original[self.focal]),
             "REGRESSION_CANDIDATE_FOCAL_SHA256": runner.digest(self.current[self.focal]),
             "REGRESSION_SUPPORT_SHA256": {str(self.support): runner.digest(self.current[self.support])},
+            "REGRESSION_COMPATIBLE_SUPPORT_SHA256": {},
         }
         for name, value in pins.items():
             context = patch.object(runner, name, value)
@@ -29,6 +30,20 @@ class PolicyTests(unittest.TestCase):
 
     def validate(self, mode="regression", commit=None):
         runner.validate_sources(commit or runner.REGRESSION_BASELINE, self.original, self.current, mode)
+
+    def test_exact_compatible_support_cohorts(self):
+        variants = (b"reviewed old core", b"reviewed new core")
+        with patch.object(runner, "REGRESSION_COMPATIBLE_SUPPORT_SHA256",
+                          {str(self.other): tuple(map(runner.digest, variants))}):
+            for content in variants:
+                self.current[self.other] = content
+                self.validate()
+                for mode in ("test", "benchmark"):
+                    with self.assertRaises(RuntimeError):
+                        self.validate(mode)
+            self.current[self.other] += b"drift"
+            with self.assertRaises(RuntimeError):
+                self.validate()
 
     def test_reviewed_support_accepted(self):
         self.validate()
