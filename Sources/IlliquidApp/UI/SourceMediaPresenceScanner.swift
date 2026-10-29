@@ -254,13 +254,9 @@ final class SourceMediaPresenceCursor: @unchecked Sendable {
                 break
             }
             visited += 1
-            // Enumerator URLs may spell macOS aliases differently (/var versus
-            // /private/var). Keep cache keys in the prepared source's namespace.
             let level = enumerator?.level ?? 1
             while folders.count > level { finishFolder(updates: &updates) }
             guard let parent = folders.last else { markUnknown(); continue }
-            let path = URL(fileURLWithPath: parent.path, isDirectory: true)
-                .appendingPathComponent(url.lastPathComponent).path
             guard let values = try? url.resourceValues(forKeys: Self.keys) else {
                 markUnknown()
                 continue
@@ -269,6 +265,11 @@ final class SourceMediaPresenceCursor: @unchecked Sendable {
                 if values.isSymbolicLink == true || values.isPackage == true {
                     enumerator?.skipDescendants()
                 } else {
+                    // Only traversed directories need a key. Enumerator URLs
+                    // may spell macOS aliases differently (/var versus
+                    // /private/var), so retain the prepared parent's namespace.
+                    let path = URL(fileURLWithPath: parent.path, isDirectory: true)
+                        .appendingPathComponent(url.lastPathComponent).path
                     folders[folders.count - 1].children.insert(path)
                     if let cached = cachedResults[path] {
                         enumerator?.skipDescendants()
