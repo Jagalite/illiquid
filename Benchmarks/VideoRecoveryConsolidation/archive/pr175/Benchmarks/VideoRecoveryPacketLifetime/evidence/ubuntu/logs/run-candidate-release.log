@@ -1,0 +1,68 @@
+{
+  "avcodecVersion" : 4070502,
+  "avutilVersion" : 3938918,
+  "checks" : 48,
+  "controls" : [
+    {
+      "checks" : 8,
+      "name" : "decoder-error"
+    },
+    {
+      "checks" : 8,
+      "name" : "throwing-cancellation"
+    },
+    {
+      "checks" : 4,
+      "name" : "stale-generation-EOF"
+    },
+    {
+      "checks" : 4,
+      "name" : "seek-during-drain"
+    },
+    {
+      "checks" : 4,
+      "name" : "borrowed-native-packet"
+    },
+    {
+      "checks" : 3,
+      "name" : "fresh-GOP-after-seek"
+    }
+  ],
+  "ffmpegVersion" : "8.1.2",
+  "success" : [
+    {
+      "everyAllocationReleasedExactlyOnce" : true,
+      "livePayloadBytesAfterDrain" : 0,
+      "liveStorageBytesAfterDrain" : 0,
+      "name" : "4KiB-final-GOP",
+      "packetCount" : 4,
+      "payloadBytes" : 4096,
+      "releaseCallbacksAfterReset" : 4,
+      "releaseCallbacksDuringDrain" : 0,
+      "requestedStorageBytes" : 4352
+    },
+    {
+      "everyAllocationReleasedExactlyOnce" : true,
+      "livePayloadBytesAfterDrain" : 0,
+      "liveStorageBytesAfterDrain" : 0,
+      "name" : "1MiB-final-GOP",
+      "packetCount" : 16,
+      "payloadBytes" : 1048576,
+      "releaseCallbacksAfterReset" : 16,
+      "releaseCallbacksDuringDrain" : 0,
+      "requestedStorageBytes" : 1049600
+    },
+    {
+      "everyAllocationReleasedExactlyOnce" : true,
+      "livePayloadBytesAfterDrain" : 0,
+      "liveStorageBytesAfterDrain" : 0,
+      "name" : "32MiB-final-GOP",
+      "packetCount" : 512,
+      "payloadBytes" : 33554432,
+      "releaseCallbacksAfterReset" : 512,
+      "releaseCallbacksDuringDrain" : 0,
+      "requestedStorageBytes" : 33587200
+    }
+  ],
+  "variant" : "candidate"
+}

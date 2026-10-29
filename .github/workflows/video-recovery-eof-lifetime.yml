@@ -2,8 +2,22 @@ name: Video recovery EOF lifetime
 
 on:
   push:
-    branches: ['perf/video-recovery-eof-release-20261028-2d367']
+    branches: ['perf/video-recovery-eof-release-20261028-2d367', 'perf/video-recovery-eof-lifetime-20261028']
     paths:
+      - 'Sources/IlliquidNativePlayback/Media/**'
+      - 'Sources/IlliquidNativePlayback/Playback/**'
+      - 'Sources/IlliquidNativePlayback/Runtime/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/**'
+      - 'Scripts/install-ci-native-sdk.py'
+      - 'Scripts/verify-corresponding-source.py'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'DependencySources/**'
+      - 'Licenses/corresponding-source-manifest.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh'
       - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
       - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
       - 'Tests/IlliquidNativePlaybackTests/VideoRecovery*LifetimeTests.swift'
@@ -13,6 +27,20 @@ on:
       - '.github/workflows/video-recovery-eof-lifetime.yml'
   pull_request:
     paths:
+      - 'Sources/IlliquidNativePlayback/Media/**'
+      - 'Sources/IlliquidNativePlayback/Playback/**'
+      - 'Sources/IlliquidNativePlayback/Runtime/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/**'
+      - 'Scripts/install-ci-native-sdk.py'
+      - 'Scripts/verify-corresponding-source.py'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'DependencySources/**'
+      - 'Licenses/corresponding-source-manifest.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh'
       - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
       - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
       - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
@@ -32,7 +60,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: video-recovery-eof-${{ github.head_ref || github.ref_name }}
+  group: video-recovery-eof-lifetime-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -117,14 +145,24 @@ jobs:
           set -euo pipefail
           packet=Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift
           session=Sources/IlliquidNativePlayback/Media/MediaSession.swift
-          unit=Tests/IlliquidNativePlaybackTests/VideoRecoveryPacketLifetimeTests.swift
-          saved="$RUNNER_TEMP/video-recovery-eof/unit-candidate.swift"
-          mv "$unit" "$saved"
+          saved="$RUNNER_TEMP/video-recovery-eof/candidate-only-tests"
+          mkdir -p "$saved"
+          # Only these suites call the candidate-only releaseAfterDrain API.
+          candidate_only_tests=(
+            VideoRecoveryPacketLifetimeTests.swift
+            VideoRecoveryGOPSequencingTests.swift
+            VideoRecoveryDecodedOutputLifetimeTests.swift
+          )
           restore_candidate() {
             git restore -- "$packet" "$session"
-            if test -f "$saved"; then mv "$saved" "$unit"; fi
+            for unit in "${candidate_only_tests[@]}"; do
+              test ! -f "$saved/$unit" || mv "$saved/$unit" "Tests/IlliquidNativePlaybackTests/$unit"
+            done
           }
           trap restore_candidate EXIT
+          for unit in "${candidate_only_tests[@]}"; do
+            mv "Tests/IlliquidNativePlaybackTests/$unit" "$saved/"
+          done
           git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:"$packet" > "$packet"
           git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:"$session" > "$session"
           mkdir -p "$RUNNER_TEMP/video-recovery-eof/baseline-tests"
@@ -145,7 +183,7 @@ jobs:
           set -o pipefail
           TMPDIR="$RUNNER_TEMP/video-recovery-eof/candidate-tests" \
             bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 \
-            --filter 'VideoRecoveryEOFLifetimeTests|VideoRecoveryPacketLifetimeTests|PacketOwnershipTests|PlaybackBufferRegressionTests' \
+            --filter 'VideoRecoveryEOFLifetimeTests|VideoRecoveryPacketLifetimeTests|VideoRecoveryGOPSequencingTests|VideoRecoveryDecodedOutputLifetimeTests|PacketOwnershipTests|PlaybackBufferRegressionTests' \
             2>&1 | tee "$RUNNER_TEMP/video-recovery-eof/candidate-tests.log"
           test -s "$ILLIQUID_RECOVERY_EOF_RECEIPT"
           git diff --exit-code

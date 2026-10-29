@@ -88,6 +88,16 @@ public struct PlexMatchHints: Sendable {
         pattern: #"(?i)^(?:S([0-9]{1,3})E|SP|E)?([0-9]{1,4})(?:-(?:S([0-9]{1,3})E|E)?([0-9]{1,4}))?$"#)
 
     private static func episodeNumber(_ text: String) -> EpisodeMapping? {
+        // The longest ASCII spelling is S999E9999-S999E9999. Keep ICU's
+        // Unicode case folding and end-anchor behavior for all other inputs.
+        let parsed = text.utf8.withContiguousStorageIfAvailable { bytes
+            -> (handled: Bool, value: EpisodeMapping?) in
+            guard bytes.count <= 19,
+                  bytes.allSatisfy({ $0 >= 0x20 && $0 < 0x7f }) else { return (false, nil) }
+            return (true, asciiEpisodeNumber(bytes))
+        }
+        if let parsed, parsed.handled { return parsed.value }
+
         guard let match = episodePattern.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) else { return nil }
         func number(_ index: Int) -> Int? {
             Range(match.range(at: index), in: text).flatMap { Int(text[$0]) }
@@ -98,5 +108,54 @@ public struct PlexMatchHints: Sendable {
         if let endSeason = number(3), endSeason != season { return nil }
         if let lastEpisode, lastEpisode <= first { return nil }
         return EpisodeMapping(season: season, episode: first, lastEpisode: lastEpisode)
+    }
+
+    private static func asciiEpisodeNumber(_ bytes: UnsafeBufferPointer<UInt8>) -> EpisodeMapping? {
+        var index = 0
+        func consume(_ letter: UInt8) -> Bool {
+            guard index < bytes.count, (bytes[index] | 0x20) == letter else { return false }
+            index += 1
+            return true
+        }
+        func number(maximumDigits: Int) -> Int? {
+            let start = index
+            var value = 0
+            while index < bytes.count {
+                let byte = bytes[index]
+                guard byte >= 48, byte <= 57 else { break }
+                guard index - start < maximumDigits else { return nil }
+                value = value * 10 + Int(byte - 48)
+                index += 1
+            }
+            return index > start ? value : nil
+        }
+
+        var season: Int?
+        if consume(0x73) { // S/s
+            if consume(0x70) { // P/p: specials
+                season = 0
+            } else {
+                guard let value = number(maximumDigits: 3), consume(0x65) else { return nil }
+                season = value
+            }
+        } else {
+            _ = consume(0x65) // Optional E/e
+        }
+        guard let first = number(maximumDigits: 4) else { return nil }
+        if index == bytes.count {
+            return EpisodeMapping(season: season, episode: first, lastEpisode: nil)
+        }
+        guard bytes[index] == 45 else { return nil } // -
+        index += 1
+        var endSeason: Int?
+        if consume(0x73) {
+            guard let value = number(maximumDigits: 3), consume(0x65) else { return nil }
+            endSeason = value
+        } else {
+            _ = consume(0x65)
+        }
+        guard let last = number(maximumDigits: 4), index == bytes.count, last > first else { return nil }
+        if let endSeason, endSeason != season { return nil }
+        return EpisodeMapping(season: season, episode: first, lastEpisode: last)
     }
 }

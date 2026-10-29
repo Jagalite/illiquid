@@ -1,0 +1,113 @@
+name: Thumbnail nearest performance
+
+on:
+  push:
+    branches: [perf/thumbnail-nearest-buckets-987bdf6388c2]
+    paths:
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift'
+      - 'Sources/IlliquidCore/Persistence/MediaContentVersion.swift'
+      - 'Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeFileContentVersion.swift'
+      - 'Sources/IlliquidNativePlayback/Media/ThumbnailBlockingReader.swift'
+      - 'Sources/IlliquidNativePlayback/Media/ThumbnailPromotionMailbox.swift'
+      - 'Sources/IlliquidNativePlayback/Media/ThumbnailDiskEvictionHeap.swift'
+      - 'Tests/IlliquidNativePlaybackTests/NativeThumbnailNearestTests.swift'
+      - 'Benchmarks/ThumbnailNearest/Harness.swift'
+      - 'Benchmarks/ThumbnailNearest/run.py'
+      - '.github/workflows/thumbnail-nearest-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift'
+      - 'Sources/IlliquidCore/Persistence/MediaContentVersion.swift'
+      - 'Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeFileContentVersion.swift'
+      - 'Sources/IlliquidNativePlayback/Media/ThumbnailBlockingReader.swift'
+      - 'Sources/IlliquidNativePlayback/Media/ThumbnailPromotionMailbox.swift'
+      - 'Sources/IlliquidNativePlayback/Media/ThumbnailDiskEvictionHeap.swift'
+      - 'Tests/IlliquidNativePlaybackTests/NativeThumbnailNearestTests.swift'
+      - 'Benchmarks/ThumbnailNearest/Harness.swift'
+      - 'Benchmarks/ThumbnailNearest/run.py'
+      - '.github/workflows/thumbnail-nearest-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-nearest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-components:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination and runner syntax
+        run: |
+          if [[ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]]; then
+            echo "::error::Kyoto is available. Submit the complete benchmark command through its shared queue, then inspect show/logs/wait receipts before reporting results."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; compiling sequentially in isolated build directories."
+          swift --version
+          xcodebuild -version
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          path = Path("Benchmarks/ThumbnailNearest/run.py")
+          ast.parse(path.read_text(), filename=str(path))
+          PY
+      - name: Verify both implementations and measure balanced native pairs
+        run: |
+          python3 Benchmarks/ThumbnailNearest/run.py \
+            --pairs 8 --target-ms 100 \
+            --output "$RUNNER_TEMP/thumbnail-nearest"
+      - name: Publish compact review receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "thumbnail-nearest"
+          for name in ("tests.json", "verification.json", "failure.json"):
+              path = root / name
+              if path.exists():
+                  print("NEAREST_REVIEW " + json.dumps({
+                      "file": name, "value": json.loads(path.read_text()),
+                  }, sort_keys=True))
+          path = root / "summary.json"
+          if path.exists():
+              results = json.loads(path.read_text())
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+                  summary.write("## Thumbnail nearest lookup\n\n")
+                  summary.write("| Component case | Baseline ns/op | Candidate ns/op | Median paired reduction |\n")
+                  summary.write("|---|---:|---:|---:|\n")
+                  for name, result in results.items():
+                      summary.write(
+                          f"| {name} | {result['baseline']['median_ns']:.1f} "
+                          f"| {result['candidate']['median_ns']:.1f} "
+                          f"| {result['paired_reduction_percent']['median']:.1f}% |\n")
+                  summary.write("\nNative cache component measurements on the recorded host. "
+                                "Timed cases disable disk access. No player latency, FPS, "
+                                "or energy claim.\n")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-nearest-native
+          path: |
+            ${{ runner.temp }}/thumbnail-nearest/
+            !${{ runner.temp }}/thumbnail-nearest/build/**
+          retention-days: 14

@@ -33,6 +33,25 @@ Every output directory must be new or empty. `--ffmpeg-prefix` defaults to
 builds both variants and performs full correctness comparisons without measuring;
 `--mode build` only compiles. This harness deliberately requires native macOS.
 
+## Current-support regression checks
+
+Automated push and PR checks use `--current-support-regression`. This is a
+correctness and memory regression check, not a historical timing qualification.
+The two focal sources must exactly match the independent pinned target
+`c1ef6aff6060ad35decbc6dce0c224164be941a2`; baseline focal sources still come from
+`6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635`. Only `FFmpegPacket.swift`,
+`PacketQueue.swift`, and `FixedRingBuffer.swift` use identical current bytes in
+both compiled arms. All other complete support sources must match history.
+Historical snapshots remain archived; `support_overrides` records each old and
+compiled support hash. The existing font manifest oracle, twelve trace
+comparisons, ownership checks, native tests, and controls remain required.
+Timing invocation and timing observations are rejected in this mode.
+
+The default CLI and manual workflow remain strict historical comparisons and
+reject support drift. Existing archived historical results are unchanged.
+Run `python3 Benchmarks/AuxiliaryFontAttachments/test_source_policy.py` for the
+portable policy checks; these do not compile Swift or qualify native behavior.
+
 ## Fixtures and correctness
 
 The four measured Matroska files contain two seconds of 64×36 MPEG-4 video,

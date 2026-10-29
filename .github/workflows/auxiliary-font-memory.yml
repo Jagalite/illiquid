@@ -5,6 +5,9 @@ on:
     branches: ['perf/auxiliary-font-memory-*']
     paths:
       - 'Sources/IlliquidNativePlayback/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Benchmarks/AttachmentAdmission/run.py'
+      - 'Scripts/tests/run-native-swift-tests.sh'
       - 'Tests/IlliquidNativePlaybackTests/AuxiliaryFontAttachmentTests.swift'
       - 'Tests/IlliquidNativePlaybackTests/AuxiliaryFontPlaybackTests.swift'
       - 'Benchmarks/AuxiliaryFontAttachments/**'
@@ -13,15 +16,11 @@ on:
       - '!Benchmarks/AuxiliaryFontAttachments/evidence/**'
   pull_request:
     paths:
-      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
-      - 'Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift'
-      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
-      - 'Sources/IlliquidNativePlayback/Media/NativeFrameStepReader.swift'
-      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailMetadataReader.swift'
-      - 'Sources/IlliquidNativePlayback/Media/NativeTimelineThumbnailGenerator.swift'
-      - 'Sources/IlliquidNativePlayback/Subtitles/PreparedExternalSubtitle.swift'
-      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryFontAttachmentTests.swift'
-      - 'Tests/IlliquidNativePlaybackTests/AuxiliaryFontPlaybackTests.swift'
+      - 'Sources/IlliquidNativePlayback/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/**'
+      - 'Benchmarks/AttachmentAdmission/run.py'
+      - 'Scripts/tests/run-native-swift-tests.sh'
       - 'Benchmarks/AuxiliaryFontAttachments/**'
       - '.github/workflows/auxiliary-font-memory.yml'
       - '!Benchmarks/AuxiliaryFontAttachments/*.md'
@@ -46,6 +45,8 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Check source policy without compiling
+        run: python3 Benchmarks/AuxiliaryFontAttachments/test_source_policy.py
       - name: Prepare pinned native dependencies
         run: |
           if ! xcrun -sdk macosx metal --version; then
@@ -57,9 +58,13 @@ jobs:
         run: |
           python3 Benchmarks/AuxiliaryFontAttachments/generate-fixtures.py \
             --output "$RUNNER_TEMP/auxiliary-font-fixtures"
-      - name: Compare metadata, packet output, and retained input memory
+      - name: Compare metadata, packets, and memory (automated runs are regression only)
         run: |
-          python3 Benchmarks/AuxiliaryFontAttachments/run.py \
+          regression=()
+          if [[ "${{ github.event_name }}" != workflow_dispatch ]]; then
+            regression+=(--current-support-regression)
+          fi
+          python3 Benchmarks/AuxiliaryFontAttachments/run.py "${regression[@]}" \
             --fixtures "$RUNNER_TEMP/auxiliary-font-fixtures" \
             --output "$RUNNER_TEMP/auxiliary-font-results" --pairs 6
       - name: Build app graph and qualify attachment ownership and rendering
@@ -74,7 +79,7 @@ jobs:
           swift --version >> "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
           git rev-parse HEAD >> "$RUNNER_TEMP/auxiliary-font-tests/host.txt"
           set -o pipefail
-          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+          bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 \
             --filter 'AuxiliaryFontAttachmentTests|AuxiliaryFontPlaybackTests|FontAttachmentAdmissionTests|NativePlaybackFoundationTests|InputReadFailureTests' \
             2>&1 | tee "$RUNNER_TEMP/auxiliary-font-tests/native-tests.log"
       - name: Emit compact review evidence

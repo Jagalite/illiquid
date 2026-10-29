@@ -67,6 +67,17 @@ for directory in "${native_directories[@]}"; do
         printf 'native-swift-tests: unavailable transitive pin (dyld install-name fallback): %s\n' "$directory" >&2
     fi
 done
+# SwiftPM resolves CLibass separately from CFFmpeg. Include every installed
+# pinned pkg-config directory, rather than falling through to a moving opt link.
+for directory in "${native_directories[@]}"; do
+    if [[ -d "$directory/pkgconfig" ]]; then
+        case ":$PKG_CONFIG_PATH:" in
+            *":$directory/pkgconfig:"*) ;;
+            *) export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$directory/pkgconfig" ;;
+        esac
+    fi
+done
+pkg-config --exists libass || fail 'pinned SDK libass pkg-config metadata is missing'
 for library in libavcodec.dylib libavformat.dylib libavfilter.dylib libavutil.dylib libswresample.dylib libswscale.dylib libass.dylib; do
     illiquid_pinned_native_library "$library" >/dev/null || fail "pinned SDK is missing $library"
 done

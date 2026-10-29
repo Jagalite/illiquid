@@ -1,0 +1,66 @@
+{
+  "architecture": "x86_64",
+  "baseline_blob": "66b8127d5c1ea269860b2c1b63e3dcede4262807",
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_source_sha256": "aa939c5d705fb7b14d064470d6ccf61224ba0f8f84d8587c3ea81fcece96364e",
+  "binary_sha256": {
+    "debug/baseline": "78edf99223f45db978e17d2fb57f8455a551b26ad34de2eecccb21e30768ca14",
+    "debug/candidate": "3f66094434559e0ad42ada6f6e98bd986553b0860876d10c4c88d23e2adf50d9",
+    "release/baseline": "c352e9e76af3baddca55e0a86a90570af6423d1a38b14221e39cedc01e441d50",
+    "release/candidate": "6e17999b2a7fe5f76c46555ff61986fb72126c5486ca995d943f37cdcb8b8186"
+  },
+  "bulk_iterations": 1000,
+  "candidate_blob": "e96869867a686d89aec025eb8c174f14f743b7bb",
+  "cases": [
+    "count-foreground",
+    "count-background",
+    "count-mixed",
+    "byte-budget",
+    "bulk-insert",
+    "bulk-configure",
+    "no-victim",
+    "resident-hit"
+  ],
+  "checkout_revision": "4ae9c4e61a9d24096b8f2488fc8498dae032d306",
+  "common_flags": [
+    "-parse-as-library",
+    "-swift-version",
+    "6",
+    "-warnings-as-errors"
+  ],
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "compiler_path": "/usr/bin/swiftc",
+  "configuration_flags": {
+    "debug": [
+      "-Onone"
+    ],
+    "release": [
+      "-O"
+    ]
+  },
+  "finished_utc": "2026-10-28T05:54:33.842429+00:00",
+  "generated_source_sha256": {
+    "baseline": "1dd4003f599ea100adf0215bd819c8c12f7663845eff64e0dcf0c834c8cbd6b0",
+    "candidate": "77f21dd399a3f68db2f390743dd47b2dd7e57b094a7495427f580d7e52dc568e"
+  },
+  "iterations": 10000,
+  "pairs": 16,
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "schema_version": 1,
+  "skip_debug": false,
+  "source_sha256": {
+    "Benchmarks/ThumbnailMemoryEviction/Harness.swift": "c3a1a95b88c2716f9da70bbca762530c3b781f135dfbcb6c0d5bc943fee8f0a3",
+    "Benchmarks/ThumbnailMemoryEviction/Probe.swift": "c042fb2e296b099e4195abc9daec824a2459cdb28b3be45af09062f13bba2cdb",
+    "Benchmarks/ThumbnailMemoryEviction/Support.swift": "803de501a7670e125d541c5962a398927261597f7f5787cfc69e512224b4df2e",
+    "Benchmarks/ThumbnailMemoryEviction/run.py": "dc464f0a01155463868c6fd46aa7c0be4e302a5b8fc96ae0a4fdf9b7320f19ec",
+    "Sources/IlliquidCore/Player/ThumbnailPolicy.swift": "1c68b9d4819cc9e9d4a8f3dfe2e6e723e69dd0330e7fa63e389eb76c107986d3",
+    "Sources/IlliquidCore/Utilities/NonDecodePerformance.swift": "08c0e240c81ffd6bcdcbc61b7da0167935bb32df8f7d98ec238938d958165964",
+    "Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift": "9e3470f517e2f3c5ecab13450b715e32828a0bf9d860ebb0ee23b7b28a8712ec"
+  },
+  "started_utc": "2026-10-28T05:50:53.783773+00:00",
+  "status": "passed",
+  "test_environment": {
+    "SWIFT_DETERMINISTIC_HASHING": "1"
+  },
+  "tests_only": false
+}

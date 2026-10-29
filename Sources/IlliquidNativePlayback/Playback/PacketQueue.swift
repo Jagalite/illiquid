@@ -130,7 +130,9 @@ final class BoundedQueue<Element>: @unchecked Sendable {
         storage.append(Entry(element: element, cost: elementCost))
         storedBytes += elementCost.bytes
         storedDurationMicroseconds += elementCost.durationMicroseconds
-        condition.broadcast()
+        // Consumers wait only while empty. The first item wakes all of them;
+        // further enqueues cannot make an additional consumer runnable.
+        if storage.count == 1 { condition.broadcast() }
         return true
     }
 
@@ -147,7 +149,7 @@ final class BoundedQueue<Element>: @unchecked Sendable {
             storage.append(Entry(element: element, cost: elementCost))
             storedBytes += elementCost.bytes
             storedDurationMicroseconds += elementCost.durationMicroseconds
-            condition.broadcast()
+            if storage.count == 1 { condition.broadcast() }
             return .pushed
         }
     }
@@ -182,7 +184,7 @@ final class BoundedQueue<Element>: @unchecked Sendable {
         storage.prepend(Entry(element: element, cost: elementCost))
         storedBytes += elementCost.bytes
         storedDurationMicroseconds += elementCost.durationMicroseconds
-        condition.broadcast()
+        if storage.count == 1 { condition.broadcast() }
         return true
     }
 
@@ -198,7 +200,7 @@ final class BoundedQueue<Element>: @unchecked Sendable {
         let entry = storage.removeFirst()
         storedBytes -= entry.cost.bytes
         storedDurationMicroseconds -= entry.cost.durationMicroseconds
-        condition.broadcast()
+        if waitingProducerCount > 0 { condition.broadcast() }
         let handler = capacityChangeHandler
         condition.unlock()
         handler?()
