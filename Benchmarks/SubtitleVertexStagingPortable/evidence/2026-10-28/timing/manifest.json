@@ -1,0 +1,54 @@
+{
+  "arguments": {
+    "output": "/home/runner/work/_temp/subtitle-vertex-portable/timing",
+    "pairs": 8,
+    "target_ms": 80.0,
+    "tests_only": false
+  },
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "git_blob_sha": "59e5334fba3bcd0ba644f6e93040db89da0c7e6a",
+    "path": "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift",
+    "repository": "Jagalite/illiquid",
+    "sha256": "923beb9607e4793a306f4e3931e8f2327d801ebbad92bd21d5681ad5a6829c42"
+  },
+  "binaries": {
+    "baseline": {
+      "benchmark": "6eaf0455f620d5f5bc38b1612cc5af6b779553d83a544f590b7dd5a8975af9b8",
+      "libIlliquidNativePlayback.so": "45c6f08003fe4ca24e4dfefb9eeed49ebc262488bbd2bba4830ebbc63a7b6653"
+    },
+    "candidate": {
+      "benchmark": "d2bd2768501ff3d09cc4b9ad626750856b775207f8f50d049c1e4c55446a961c",
+      "libIlliquidNativePlayback.so": "9949f6f1c60eebc887d0c7b82783df17cf8b39bf3b9f55b86af7713d34df1db7"
+    }
+  },
+  "collected_at_utc": "2026-10-28T05:46:33Z",
+  "extraction": "Exact native-runner extraction of original Vertex/FrameResources/makeVertices/uploadVertices, or candidate FrameResources/uploadVertices plus the complete writer. Import-only Swift transformations. Metal-named stand-ins use aligned raw memory and plain Swift texture dimensions. No Metal API, GPU, encoder or shader is exercised.",
+  "git_head": "92f99f87e4c18e6a0c8aa0d08633355f45f72e68",
+  "git_status": "",
+  "hardware": "Linux runnervmtai0g 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+  "machine": "x86_64",
+  "method": "Portable CPU proxy, separate optimized Swift modules, raw-memory buffer reuse. Native paired protocol and driver preserved: warm capacity, same-iteration fresh-process AB/BA pairs, complete field/Float-bit receipts and consumed checksums, no discarded samples or control subtraction. Proxy timings do not predict native Metal performance.",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "portable_transform": {
+    "address_sanitizer_scope": "Address/bounds checks; ASAN_OPTIONS detect_leaks=0. LeakSanitizer is not qualification of this proxy.",
+    "driver_original_sha256": "c2eb11725992d8112c285b2bf5422975a22a62aba9325bd75481c0aaeb4e1bae",
+    "driver_portable_sha256": "22755b9d08d7531dc1302e083dad615d77f2d4458de4519e2a96899b968fa813",
+    "runner_changes": "Linux eligibility, uname hardware record, .so suffix; portable source/build/test adapters and truthful manifest labels.",
+    "shared_runner_adapted_sha256": "dad4310b779c18896dbc057a35f5b0f9feab5b7d5dac696db155801d13dac62a",
+    "shared_runner_original_sha256": "4f1846e7084251a8d1189d1013c6b87734c3f070b788547b1203aeb1b2d8dd12",
+    "swift_changes": "Remove CoreGraphics/Metal/QuartzCore/Synchronization imports; supply Foundation where needed. All production method bodies, writer statements, tests and benchmark driver statements are unchanged."
+  },
+  "qualification_scope": "portable CPU proxy; no native Metal or GPU qualification",
+  "sources": {
+    ".github/workflows/subtitle-vertex-staging-portable.yml": "0487aff7ddf9a61b5d3281aad1a2b384e9192228846d6e9cc2c18016988a31a0",
+    "Benchmarks/SubtitleVertexStaging/Harness.swift": "c2eb11725992d8112c285b2bf5422975a22a62aba9325bd75481c0aaeb4e1bae",
+    "Benchmarks/SubtitleVertexStaging/run.py": "4f1846e7084251a8d1189d1013c6b87734c3f070b788547b1203aeb1b2d8dd12",
+    "Benchmarks/SubtitleVertexStagingPortable/MetalCPUProxy.swift": "79174268e202b9dc380ba7577aacd5ba2f8af1e170a8c5de26ae60345eddc0a1",
+    "Benchmarks/SubtitleVertexStagingPortable/run.py": "c17d7e1d2592eb4ad337a8801d8cf0927162d417f8404bd217fcc3b209f0d977",
+    "Sources/IlliquidNativePlayback/Subtitles/ASSSubtitleVertexWriter.swift": "608d33bf3b58259b9d4f2b3fbc61c23dfcf8345b02fd973b780fad023d208c8c",
+    "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "b09cfbb54a72a5f44794633d875fd9d036c20aa0fdec3d95c09998d92c2563bb",
+    "Tests/IlliquidNativePlaybackTests/SubtitleVertexWriterTests.swift": "2888361f1fff56c87f6a3746848f18a6765fa009f0cb8e982958d5e992323d76"
+  },
+  "swift": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+}

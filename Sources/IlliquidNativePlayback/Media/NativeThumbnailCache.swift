@@ -97,23 +97,30 @@ actor NativeThumbnailCache {
 
     func nearest(to key: Key, maximumDistance: Double, fallbackTimes: [Double] = []) async -> (CGImage, Double)? {
         guard maximumDistance.isFinite, maximumDistance >= 0 else { return nil }
-        var candidates = Set(images.keys.filter {
+        var candidates = images.keys.filter {
             $0.path == key.path && $0.version == key.version && $0.width == key.width && $0.height == key.height
                 && abs(Double($0.halfSecond) - Double(key.halfSecond)) / 2 <= maximumDistance
-        })
+        }
+        // Only the time bucket varies within this source/version/size. Keep the
+        // original resident keys: canonically equal strings can encode differently
+        // in the disk digest, so rebuilding them from the request changes identity.
+        var buckets = Set(candidates.map(\.halfSecond))
         // The deterministic storyboard also gives us disk keys after a restart,
         // without a filesystem walk or decoding merely to find an approximation.
         for time in fallbackTimes {
             guard time.isFinite, let bucket = Int(exactly: (time * 2).rounded()),
                   abs(Double(bucket) - Double(key.halfSecond)) / 2 <= maximumDistance else { continue }
-            candidates.insert(Key(path: key.path, version: key.version, halfSecond: bucket,
-                                  width: key.width, height: key.height))
+            if buckets.insert(bucket).inserted {
+                candidates.append(Key(path: key.path, version: key.version, halfSecond: bucket,
+                                      width: key.width, height: key.height))
+            }
         }
-        for match in candidates.sorted(by: {
+        candidates.sort {
             let a = abs(Double($0.halfSecond) - Double(key.halfSecond))
             let b = abs(Double($1.halfSecond) - Double(key.halfSecond))
             return a == b ? $0.halfSecond < $1.halfSecond : a < b
-        }) {
+        }
+        for match in candidates {
             guard !Task.isCancelled else { return nil }
             if let image = await image(for: match, background: false) {
                 return (image, Double(match.halfSecond) / 2)
@@ -255,6 +262,42 @@ actor NativeThumbnailCache {
     private func trimMemory(incoming: Int, background: Bool) {
         let limit = preferences.memoryMiB * 1024 * 1024
         guard memoryBytes + incoming > limit || (incoming > 0 && images.count >= maximumResidentImages) else { return }
+        // Avoid a speculative scan when byte pressure suggests a bulk trim.
+        // This heuristic only chooses the unchanged sorted fallback below.
+        let bytesToFree = memoryBytes + incoming - limit
+        if incoming > 0, incoming <= limit, !images.isEmpty,
+           bytesToFree <= 0 || bytesToFree <= memoryBytes / images.count {
+            // An insertion usually needs just one victim. Select it without
+            // sorting or retaining every candidate image. Bulk trims keep the
+            // existing sort below instead of repeatedly scanning the cache.
+            var first: (key: Key, bytes: Int, used: UInt64, priority: Int)?
+            var tiedMinimum = false
+            for (key, resident) in images {
+                if background && !resident.background { continue }
+                let protected = storyboardKeys.contains(key)
+                if background && protected { continue }
+                let priority = (protected ? 2 : 0) + (resident.background ? 0 : 1)
+                if let current = first {
+                    if priority == current.priority, resident.used == current.used {
+                        tiedMinimum = true
+                    }
+                    guard priority < current.priority
+                        || (priority == current.priority && resident.used < current.used) else { continue }
+                }
+                first = (key, resident.bytes, resident.used, priority)
+                tiedMinimum = false
+            }
+            guard let victim = first else { return }
+            // Preserve the original sort's tie behavior, including if the
+            // wrapping use counter ever gives two residents the same rank.
+            if !tiedMinimum, memoryBytes - victim.bytes + incoming <= limit,
+               images.count - 1 < maximumResidentImages {
+                memoryBytes -= victim.bytes
+                images.removeValue(forKey: victim.key)
+                storyboardKeys.remove(victim.key)
+                return
+            }
+        }
         let victims = images.filter { (!background || $0.value.background) && (!background || !storyboardKeys.contains($0.key)) }.sorted {
             if storyboardKeys.contains($0.key) != storyboardKeys.contains($1.key) { return !storyboardKeys.contains($0.key) }
             if $0.value.background != $1.value.background { return $0.value.background }
