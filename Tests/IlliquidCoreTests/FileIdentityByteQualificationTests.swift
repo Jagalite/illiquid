@@ -1,4 +1,8 @@
 import Foundation
+#if canImport(Darwin)
+import PR199NativeFixtures
+import Darwin
+#endif
 import Testing
 @testable import IlliquidCore
 
@@ -12,7 +16,109 @@ struct FileIdentityByteQualificationTests {
         #expect(actual == expected, "URL: \(url.absoluteString)")
     }
 
+    // Only native NSURL references need this preflight. Direct Swift URL
+    // fixtures always reach the unchanged oracle above.
+    private struct BridgeCounts {
+        var parity = 0
+        var unresolved = 0
+    }
+
+    private func expectNativeBytes(_ native: NSURL, allowUnresolved: Bool = false,
+                                   counts: inout BridgeCounts) {
+        #if canImport(Darwin)
+        phase("native.classify.before")
+        if native.isFileReferenceURL() {
+            phase("native.resolve.before")
+            if native.filePathURL == nil {
+                #expect(allowUnresolved, "Unexpected unresolved native reference")
+                counts.unresolved += 1
+                return
+            }
+        }
+        #endif
+        phase("bridge.before")
+        let url = native as URL
+        phase("bridge.after")
+        expectOriginalBytes(url)
+        phase("oracle.after")
+        counts.parity += 1
+    }
+
+    // Diagnostics never inspect/describe a native URL, which could bridge it.
+    private func phase(_ message: String) {
+        guard ProcessInfo.processInfo.environment["PR199_BRIDGE_PHASES"] == "1" else { return }
+        FileHandle.standardError.write(Data(("PR199 phase " + message + "\n").utf8))
+    }
+
+    #if canImport(Darwin)
+    // Independent filesystem assertion: realpath follows actual symlinks on
+    // both existing targets. It never uses the production normalization oracle.
+    private func canonicalBytes(_ path: String) throws -> [UInt8] {
+        let pointer = try #require(path.withCString { realpath($0, nil) })
+        defer { free(pointer) }
+        return UnsafeBufferPointer(start: UnsafeRawPointer(pointer).assumingMemoryBound(to: UInt8.self),
+                                   count: strlen(pointer)).map { $0 }
+    }
+
+    private func referencePath(_ reference: NSURL) throws -> String {
+        return try #require(reference.filePathURL).path
+    }
+
+    private func expectNativePath(_ path: String, isDirectory: Bool,
+                                  allowUnresolved: Bool = false, counts: inout BridgeCounts) {
+        // Nullable Objective-C boundary observes nil before Swift assumes an object exists.
+        guard let object = PR199CreatePath(path, isDirectory) else {
+            phase("native.constructor.nil")
+            #expect(allowUnresolved, "Unexpected nil native path constructor: \(path)")
+            counts.unresolved += 1
+            return
+        }
+        expectNativeBytes(object as! NSURL, allowUnresolved: allowUnresolved, counts: &counts)
+    }
+    #else
+    private func expectNativePath(_ path: String, isDirectory: Bool, allowUnresolved: Bool = false, counts: inout BridgeCounts) {
+        expectNativeBytes(NSURL(fileURLWithPath: path, isDirectory: isDirectory), allowUnresolved: allowUnresolved, counts: &counts)
+    }
+    #endif
+
+    private func report(_ counts: BridgeCounts, suite: String) {
+        print("PR199 \(suite): nativeParity=\(counts.parity) unresolvedNativeReferences=\(counts.unresolved)")
+    }
+
+    #if canImport(Darwin)
+    @Test func liveNativeReferencesPreserveBytesAcrossRename() throws {
+        let fm = FileManager.default
+        let root = fm.temporaryDirectory.resolvingSymlinksInPath().appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try fm.createDirectory(at: root, withIntermediateDirectories: false)
+        defer { try? fm.removeItem(at: root) }
+        var counts = BridgeCounts()
+        defer { report(counts, suite: "liveNativeReferences") }
+        for directory in [false, true] {
+            let original = root.appendingPathComponent(directory ? "directory" : "file", isDirectory: directory)
+            if directory {
+                try fm.createDirectory(at: original, withIntermediateDirectories: false)
+            } else {
+                try Data("reference fixture".utf8).write(to: original)
+            }
+            let reference = try #require(PR199CreateReference(original.path, directory)) as! NSURL
+            #expect(reference.isFileReferenceURL())
+            let before = try referencePath(reference)
+            #expect(try canonicalBytes(before) == canonicalBytes(original.path))
+            expectNativeBytes(reference, counts: &counts)
+            let renamed = root.appendingPathComponent(directory ? "renamed-directory" : "renamed-file", isDirectory: directory)
+            try fm.moveItem(at: original, to: renamed)
+            let after = try referencePath(reference)
+            #expect(try canonicalBytes(after) == canonicalBytes(renamed.path))
+            expectNativeBytes(reference, counts: &counts)
+        }
+        #expect(counts.parity == 4)
+        #expect(counts.unresolved == 0)
+    }
+    #endif
+
     @Test func pathConstructorsPreserveSpecialFormsAndUnicode() {
+        var counts = BridgeCounts()
+        defer { report(counts, suite: "pathConstructorsPreserveSpecialFormsAndUnicode") }
         let paths = [
             "/", "//", "///", "/tmp", "/tmp/", "/tmp//", "/tmp///",
             "//tmp/Film.mkv", "/tmp//Season///Film.mkv",
@@ -33,13 +139,21 @@ struct FileIdentityByteQualificationTests {
         ]
         for path in paths {
             for directory in [false, true] {
+                phase("path=\(path.debugDescription) directory=\(directory) direct.before")
                 expectOriginalBytes(URL(fileURLWithPath: path, isDirectory: directory))
-                expectOriginalBytes(NSURL(fileURLWithPath: path, isDirectory: directory) as URL)
+                phase("direct.after native.constructor.before")
+                expectNativePath(path, isDirectory: directory,
+                                  allowUnresolved: path == "/.file/id=1.2" || path == "/.file/id=1.2/"
+                                      || path == "/.file/id=not-a-real-reference"
+                                      || path == "/tmp/../.file/id=not-a-real-reference",
+                                  counts: &counts)
             }
         }
     }
 
     @Test func everyAsciiByteAndItsPercentEncodingPreserveKeyBytes() throws {
+        var counts = BridgeCounts()
+        defer { report(counts, suite: "everyAsciiByteAndItsPercentEncodingPreserveKeyBytes") }
         for value in 0..<128 {
             let scalar = try #require(UnicodeScalar(value))
             let text = String(scalar)
@@ -48,7 +162,7 @@ struct FileIdentityByteQualificationTests {
             if value != 0 {
                 for directory in [false, true] {
                     expectOriginalBytes(URL(fileURLWithPath: "/tmp/A\(text)Z.mkv", isDirectory: directory))
-                    expectOriginalBytes(NSURL(fileURLWithPath: "/tmp/A\(text)Z.mkv", isDirectory: directory) as URL)
+                    expectNativePath("/tmp/A\(text)Z.mkv", isDirectory: directory, counts: &counts)
                 }
             }
             let hex = String(value, radix: 16, uppercase: true)
@@ -59,12 +173,14 @@ struct FileIdentityByteQualificationTests {
                 "file://LOCALHOST/tmp/A\(escape)Z.mkv/",
             ] {
                 expectOriginalBytes(try #require(URL(string: encoded)))
-                if let bridged = NSURL(string: encoded) { expectOriginalBytes(bridged as URL) }
+                if let bridged = NSURL(string: encoded) { expectNativeBytes(bridged, counts: &counts) }
             }
         }
     }
 
     @Test func relativeReferencesAndAuthoritiesKeepTheOriginalContract() throws {
+        var counts = BridgeCounts()
+        defer { report(counts, suite: "relativeReferencesAndAuthoritiesKeepTheOriginalContract") }
         let bases = try [
             "file:///Movies/Season/",
             "file:///Movies/Season.mkv",
@@ -94,7 +210,10 @@ struct FileIdentityByteQualificationTests {
                     #expect(reference.isEmpty)
                 }
                 if let bridged = NSURL(string: reference, relativeTo: base) {
-                    expectOriginalBytes(bridged as URL)
+                    expectNativeBytes(bridged,
+                                      allowUnresolved: reference == "/.file/id=not-a-real-reference"
+                                          || reference == "/%2Efile/id%3Dnot-a-real-reference",
+                                      counts: &counts)
                 }
             }
         }
@@ -117,6 +236,8 @@ struct FileIdentityByteQualificationTests {
     }
 
     @Test func deterministicPathCombinationsMatchByBytes() throws {
+        var counts = BridgeCounts()
+        defer { report(counts, suite: "deterministicPathCombinationsMatchByBytes") }
         let prefixes = ["file:///", "file:/", "file://localhost/", "file://LOCALHOST/", "file:////"]
         let segments = [
             "Movies", "Movies/Season/..", "Movies//Season",
@@ -136,7 +257,7 @@ struct FileIdentityByteQualificationTests {
                     for suffix in suffixes {
                         let raw = prefix + segment + "/" + filename + suffix
                         expectOriginalBytes(try #require(URL(string: raw)))
-                        if let bridged = NSURL(string: raw) { expectOriginalBytes(bridged as URL) }
+                        if let bridged = NSURL(string: raw) { expectNativeBytes(bridged, counts: &counts) }
                     }
                 }
             }

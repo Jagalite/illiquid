@@ -35,6 +35,10 @@ TESTS = [
     "PlaylistOrderRestorationTests",
     "FolderPlaylistTests",
 ]
+NATIVE_FIXTURES = [
+    "Tests/Support/PR199NativeFixtures/PR199NativeFixtures.m",
+    "Tests/Support/PR199NativeFixtures/include/PR199NativeFixtures.h",
+]
 VARIANTS = ("baseline", "candidate")
 
 
@@ -152,6 +156,7 @@ def main() -> None:
         support = output / "sources" / "qualification"
         support.mkdir()
         support_inputs = [HERE / "Harness.swift", HERE / "run.py",
+                          *(ROOT / name for name in NATIVE_FIXTURES),
                           *(ROOT / "Tests/IlliquidCoreTests" / f"{name}.swift" for name in TESTS)]
         manifest["qualification_hashes"] = {}
         for source in support_inputs:
@@ -169,11 +174,17 @@ def main() -> None:
                     shutil.copyfile(source, src / source.name)
                 for name in TESTS:
                     shutil.copyfile(support / f"{name}.swift", tests / f"{name}.swift")
+                fixtures = package / "Tests/Support/PR199NativeFixtures"
+                (fixtures / "include").mkdir(parents=True)
+                for relative in NATIVE_FIXTURES:
+                    destination = fixtures / ("include" if relative.endswith(".h") else "") / Path(relative).name
+                    shutil.copyfile(support / Path(relative).name, destination)
                 (package / "Package.swift").write_text(
                     '// swift-tools-version: 6.1\nimport PackageDescription\n'
+                    '\n#if canImport(Darwin)\nlet nativeFixtureTargets: [Target] = [\n    .target(name: "PR199NativeFixtures", path: "Tests/Support/PR199NativeFixtures",\n            publicHeadersPath: "include", cSettings: [.unsafeFlags(["-fobjc-arc"])])\n]\nlet nativeFixtureDependencies: [Target.Dependency] = ["PR199NativeFixtures"]\n#else\nlet nativeFixtureTargets: [Target] = []\nlet nativeFixtureDependencies: [Target.Dependency] = []\n#endif\n\n'
                     'let package = Package(name: "FileIdentityQualification", platforms: [.macOS("26.0")], '
                     'targets: [.target(name: "IlliquidCore"), '
-                    '.testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"])], '
+                    '.testTarget(name: "IlliquidCoreTests", dependencies: ["IlliquidCore"] + nativeFixtureDependencies)] + nativeFixtureTargets, '
                     'swiftLanguageModes: [.v6])\n')
                 for configuration in ("debug", "release"):
                     command = [args.swift, "test", "--package-path", package,
