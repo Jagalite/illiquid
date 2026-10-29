@@ -29,6 +29,11 @@ TESTS = Path("Tests/IlliquidPlaybackStateSpaceTests")
 KYOTO = Path("/Volumes/seed1/Projects/kyoto/kyoto.py")
 NATIVE = sys.platform == "darwin"
 VARIANTS = ("baseline", "candidate")
+# Regression pins describe the reviewed integrated source cohort, not a new timing baseline.
+REGRESSION_BASELINE = '4077f8ad538dd8ed911b38c9b300a98c787c5135'
+REGRESSION_BASELINE_FOCAL_SHA256 = '094a9145b4faec7e13dfc5a964ad922a4e9c6d27ea1e04589ab3e195acf6137e'
+REGRESSION_CANDIDATE_FOCAL_SHA256 = '665db75f71883193a320e6b84580a0c750660c4c6c20a7b844711599e5df7ec8'
+REGRESSION_SUPPORT_SHA256 = {'Sources/IlliquidPlaybackStateSpace/PlaybackPartialOrderReducer.swift': 'a3a4f5010135e55ef6564365aa7bb42a203033baae1c4fd9ed39d81dcabfaf3a', 'Sources/IlliquidPlaybackStateSpace/PlaybackStateSpaceExplorer.swift': '13f04caf1abb97c2d6543094e8e854da09ce98678ea70ff9cf6b4744c18f4905'}
 RESULT_FIELDS = (
     "schema_version", "mode", "workload", "iterations", "operations",
     "checksum", "produced_count", "warmup_iterations",
@@ -130,6 +135,30 @@ def git(args: list[str], log: str, out: Path) -> bytes:
     return command(["git", *args], out / "provenance" / log, out)
 
 
+def validate_sources(commit: str, originals: dict[Path, bytes], current: dict[Path, bytes], mode: str) -> None:
+    if originals.keys() != current.keys() or ANALYZER not in originals:
+        raise RuntimeError("Production source file sets differ from the baseline")
+    if mode == "regression":
+        if commit != REGRESSION_BASELINE or digest(originals[ANALYZER]) != REGRESSION_BASELINE_FOCAL_SHA256:
+            raise RuntimeError("Regression requires the exact historical baseline and focal source")
+        if digest(current[ANALYZER]) != REGRESSION_CANDIDATE_FOCAL_SHA256 or current[ANALYZER] == originals[ANALYZER]:
+            raise RuntimeError("Regression requires the exact reviewed candidate focal source, distinct from baseline")
+        for path, expected in REGRESSION_SUPPORT_SHA256.items():
+            if Path(path) not in current or digest(current[Path(path)]) != expected:
+                raise RuntimeError(f"Reviewed regression support pin mismatch: {path}")
+    for path, original in originals.items():
+        if path != ANALYZER and current[path] != original:
+            if mode != "regression" or str(path) not in REGRESSION_SUPPORT_SHA256:
+                raise RuntimeError(f"Dependency {path} changed from the baseline; requalify it explicitly")
+
+
+def validate_mode(mode: str, options: list[str]) -> None:
+    if mode == "regression" and any(option.split("=", 1)[0] in {
+        "--rounds", "--iterations", "--target-ms", "--configuration", "--variant"
+    } for option in options):
+        raise RuntimeError("Regression runs both variants and configurations with no timing options")
+
+
 def snapshot(out: Path, args: argparse.Namespace) -> dict[str, object]:
     commit = git(["rev-parse", "--verify", "--end-of-options", args.baseline_ref + "^{commit}"],
                  "baseline-commit.log", out).decode().strip()
@@ -151,12 +180,15 @@ def snapshot(out: Path, args: argparse.Namespace) -> dict[str, object]:
     (out / "provenance/working-tree.patch").write_bytes(patch)
     inputs = {"Harness.swift": (HERE / "Harness.swift").read_bytes(), "run.py": Path(__file__).read_bytes()}
     pinned = {"commit": commit, "sources": {}}
+    originals, captured = {}, {}
     for path in baseline_paths:
         original = git(["show", f"{commit}:{path.as_posix()}"],
                        "baseline-" + path.as_posix().replace("/", "__") + ".log", out)
         current = (ROOT / path).read_bytes()
-        if path != ANALYZER and current != original:
-            raise RuntimeError(f"Dependency {path} changed from the baseline; requalify it explicitly")
+        originals[path], captured[path] = original, current
+    validate_sources(commit, originals, captured, args.mode)
+    for path in baseline_paths:
+        original, current = originals[path], captured[path]
         pinned["sources"][str(path)] = {"git_blob": git_blob(original), "sha256": digest(original)}
         if path == CORE:
             inputs["shared/IlliquidCore/" + path.name] = current
@@ -164,9 +196,9 @@ def snapshot(out: Path, args: argparse.Namespace) -> dict[str, object]:
             inputs["shared/IlliquidPlaybackCore/" + str(path.relative_to(PLAYBACK))] = current
         else:
             relative = "IlliquidPlaybackStateSpace/" + str(path.relative_to(STATE_SPACE))
-            inputs["baseline/" + relative] = original
+            inputs["baseline/" + relative] = (current if args.mode == "regression" and path != ANALYZER else original)
             inputs["candidate/" + relative] = current
-    if args.mode == "test":
+    if args.mode in ("test", "regression"):
         tests = sorted((ROOT / TESTS).rglob("*.swift"))
         if not tests:
             raise RuntimeError("No state-space regression tests found")
@@ -180,6 +212,9 @@ def snapshot(out: Path, args: argparse.Namespace) -> dict[str, object]:
         destination.write_bytes(data)
         hashes[name] = digest(destination.read_bytes())
     return {
+        "source_policy": "reviewed-current-support" if args.mode == "regression" else "strict-historical-support",
+        "performance_qualified": False,
+        "captured_production_sha256": {str(path): digest(data) for path, data in captured.items()},
         "baseline_commit": commit, "candidate_commit": revision,
         "relevant_working_tree_status": status, "working_tree_patch_sha256": digest(patch),
         "baseline": pinned, "input_sha256": hashes,
@@ -435,6 +470,9 @@ def benchmark(out: Path, args: argparse.Namespace, compiler: dict[str, str]) -> 
     write_json(out / "verification-summary.json", proof)
     print("PASS full graph and progress-report differential: " + json.dumps(proof["top_level_array_counts"]), flush=True)
 
+    if args.mode == "regression":
+        return  # Full differential only: never calibrate or run timing workloads.
+
     def measure(variant: str, workload: str, iterations: int, label: str) -> dict[str, object]:
         log = out / "processes" / f"{label}-{workload}-{variant}.log"
         row = json.loads(command([str(binaries[variant]), "benchmark", workload, str(iterations)], log, out))
@@ -518,7 +556,7 @@ def print_receipt(out: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("test", "benchmark", "summarize"))
+    parser.add_argument("mode", choices=("test", "benchmark", "summarize", "regression"))
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--baseline-ref", default=BASELINE)
     parser.add_argument("--configuration", choices=("debug", "release"), default="debug")
@@ -529,6 +567,10 @@ def main() -> None:
     parser.add_argument("--swiftc")
     parser.add_argument("--swift")
     args = parser.parse_args()
+    try:
+        validate_mode(args.mode, sys.argv[1:])
+    except RuntimeError as error:
+        parser.error(str(error))
     if args.rounds < 2 or args.rounds % 2 or (args.iterations is not None and args.iterations <= 0) or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("Use even --rounds >= 2, positive --iterations, and finite positive --target-ms")
     out = args.output.resolve()
@@ -554,12 +596,19 @@ def main() -> None:
             "python": sys.version, "compiler": compiler, "macos_target": "26.0" if NATIVE else None, "kyoto": queue,
             "ci_image": {key: os.environ[key] for key in ("ImageOS", "ImageVersion") if key in os.environ},
             "arguments": {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()},
-            "method": "Unmodified actual MediaTrack/playback-core/state-space sources; "
+            "method": ("Regression only: exact historical/reviewed focal sources with identical captured reviewed current support; "
+                      "both variants in debug/release plus complete graph/report differential; no timings."
+                      if args.mode == "regression" else "Unmodified actual MediaTrack/playback-core/state-space sources; "
                       "separate optimized production shared modules and harness; "
-                      "fresh-process serial balanced AB/BA pairs; complete normalized reports and graph receipts before timing.",
+                      "fresh-process serial balanced AB/BA pairs; complete normalized reports and graph receipts before timing."),
         })
         write_json(out / "manifest.json", receipt)
-        if args.mode == "test":
+        if args.mode == "regression":
+            results = [test(variant, configuration, out, compiler)
+                       for configuration in ("debug", "release") for variant in VARIANTS]
+            write_json(out / "tests.json", results)
+            benchmark(out, args, compiler)
+        elif args.mode == "test":
             results = [test(variant, args.configuration, out, compiler)
                        for variant in (VARIANTS if args.variant == "both" else (args.variant,))]
             write_json(out / "tests.json", results)

@@ -1,7 +1,21 @@
 name: Playback progress predecessor indexing (native)
 
 on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidPlaybackStateSpace/**'
+      - 'Sources/IlliquidPlaybackCore/**'
+      - 'Sources/IlliquidCore/Player/MediaTrack.swift'
+      - 'Tests/IlliquidPlaybackStateSpaceTests/**'
+      - 'Benchmarks/PlaybackProgressReachability/**'
+      - '.github/workflows/playback-progress-reachability.yml'
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Regression with reviewed current support, or strict historical timing experiment
+        type: choice
+        default: regression
+        options: [regression, historical]
 
 permissions:
   contents: read
@@ -21,13 +35,22 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Check source policy negative controls without compiling
+        run: python3 Benchmarks/PlaybackProgressReachability/test_policy.py
+      - name: Qualify integrated sources without timings
+        if: github.event_name == 'pull_request' || inputs.mode == 'regression'
+        run: |
+          python3 Benchmarks/PlaybackProgressReachability/run.py regression \
+            --baseline-ref 4077f8ad538dd8ed911b38c9b300a98c787c5135 --output "$RUNNER_TEMP/playback-progress/regression"
       - name: Check baseline and candidate state-space suites in debug and release
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'historical'
         run: |
           python3 Benchmarks/PlaybackProgressReachability/run.py test --configuration debug \
             --baseline-ref 4077f8ad538dd8ed911b38c9b300a98c787c5135 --output "$RUNNER_TEMP/playback-progress/debug"
           python3 Benchmarks/PlaybackProgressReachability/run.py test --configuration release \
             --baseline-ref 4077f8ad538dd8ed911b38c9b300a98c787c5135 --output "$RUNNER_TEMP/playback-progress/release"
       - name: Compare complete progress reports and paired analyzer timings
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'historical'
         run: |
           python3 Benchmarks/PlaybackProgressReachability/run.py benchmark --rounds 10 --target-ms 100 \
             --baseline-ref 4077f8ad538dd8ed911b38c9b300a98c787c5135 --output "$RUNNER_TEMP/playback-progress/benchmark"

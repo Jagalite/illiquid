@@ -106,3 +106,37 @@ See [RESULTS.md](RESULTS.md) for the final decision, every measured control,
 source and host identity, and retained evidence. The report also records the
 rejected guarded-scan candidate. Do not combine its observations with the
 final array-index cohort or attribute the parent PR's gains to this change.
+
+
+### Integrated current-support regression
+
+Run the reviewed integration cohort without collecting new performance evidence:
+
+```sh
+python3 Benchmarks/PlaybackProgressReachability/test_policy.py
+python3 Benchmarks/PlaybackProgressReachability/run.py regression \
+  --baseline-ref 4077f8ad538dd8ed911b38c9b300a98c787c5135 \
+  --output /tmp/playback-progress-regression-fresh
+```
+
+This explicit mode pins the historical analyzer and the reviewed PR229 analyzer
+by SHA-256. It captures current production sources once and stages identical
+non-focal support in both arms. Only the reviewed exact versions of
+`PlaybackPartialOrderReducer.swift` and `PlaybackStateSpaceExplorer.swift` may
+differ from historical support; all other support must remain byte-identical.
+New source paths, changed pins, a replacement baseline, and a no-op candidate
+fail before toolchain discovery or compilation.
+
+Both arms execute the complete state-space test suite in debug and release,
+then run the existing complete normalized graph/progress-report differential
+and workload-list comparison. All existing harness graphs and controls remain.
+Regression mode rejects timing options and partial variant/configuration
+selection, and stops before calibration or measurement. Command elapsed-time
+metadata remains operational provenance, not benchmark evidence. Its receipts
+are regression-only and do not replace or update the committed historical
+performance artifacts. Fresh output directories remain mandatory.
+
+Pull requests use this regression route. Manual dispatch defaults to regression;
+select `historical` to retain the original strict dependency-equality test and
+timing experiment. The ordinary `test` and `benchmark` modes retain their strict
+historical support policy and will reject integrated support drift.

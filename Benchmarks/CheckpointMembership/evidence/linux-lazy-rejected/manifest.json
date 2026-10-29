@@ -1,0 +1,162 @@
+{
+  "baseline": "2620d561d11c9a7d9396d3b455424a10a6dddcd7",
+  "baseline_resolved_commit": "2620d561d11c9a7d9396d3b455424a10a6dddcd7",
+  "builds": {
+    "baseline-debug": {
+      "binary_sha256": "ac049c63362223762bd8f8d604603516734a74e5f5b28c3b1b7987002c332680",
+      "flags": [
+        "-Onone",
+        "-g",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/tmp/illiquid-checkpoint-14d1d773fb34-vs-pr140/module-cache"
+      ],
+      "player_library_sha256": "6e2ad96c1c843af0767bb8a20499f2862bfb08b59d58f384b0a620b0e96a0b9a",
+      "separate_production_modules": true
+    },
+    "baseline-release": {
+      "binary_sha256": "38d1a6d14efed3d4e4c53f11fd4d3ee351cacde438f270af7e254282f4b71e56",
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/tmp/illiquid-checkpoint-14d1d773fb34-vs-pr140/module-cache"
+      ],
+      "player_library_sha256": "d880206b8873639ccc6a63fdba8fc557a536b70f3fe224791c36db2e4c5cc9d4",
+      "separate_production_modules": true
+    },
+    "candidate-debug": {
+      "binary_sha256": "f799ad81e51203e85978e95b4dd411f5d5e25e37c7726d6d3a9dc470cffe4929",
+      "flags": [
+        "-Onone",
+        "-g",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/tmp/illiquid-checkpoint-14d1d773fb34-vs-pr140/module-cache"
+      ],
+      "player_library_sha256": "b74cbd75b3b702619c53e6b752611a0668e56bf622ed64fb85ac9a1fbc6beaba",
+      "separate_production_modules": true
+    },
+    "candidate-release": {
+      "binary_sha256": "0795094e957f1bfc569ed95b7c0a1c347709d4c947f52f47555ce50960e214ed",
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/tmp/illiquid-checkpoint-14d1d773fb34-vs-pr140/module-cache"
+      ],
+      "player_library_sha256": "77b841bbadb2c83bbec3b875becc83b0228fcec5f0e71cf715a29ecf97555145",
+      "separate_production_modules": true
+    },
+    "shared-core-debug": {
+      "flags": [
+        "-Onone",
+        "-g",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/tmp/illiquid-checkpoint-14d1d773fb34-vs-pr140/module-cache"
+      ],
+      "library_sha256": "5a7317ff0438b7bd5b024971e3c86dd87b7dbe21ff9a71b0560ec7bf40e63c0d"
+    },
+    "shared-core-release": {
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/tmp/illiquid-checkpoint-14d1d773fb34-vs-pr140/module-cache"
+      ],
+      "library_sha256": "de89aa13e910cc39d5a52fa17e297c24a8df7e77c5a5d23aecf2a18211f7d3c3"
+    }
+  },
+  "candidate_revision": "29de8634b613dba1f5b7212b982a73b25228442b",
+  "harness": {
+    "Driver.swift": "9e92870a7df25b16f8482efc133826c3622ae5c6ebd76f7d94770a2167c90716",
+    "run.py": "675b8200d4dc07e271668241cb1491492fa3e2a5ebd58e6b856f74d639819dc3",
+    "test_harness.py": "262b0265a20b2233b5132fdcfd3b694388aeab091191e4c7a6ad95baee60357e"
+  },
+  "production_sources": {
+    "Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift": {
+      "compiled_bytes": 3039,
+      "compiled_sha256": "1c78a07bea0f3118b410a4940be69ebd7554dbdb2335a3a792bccc3ab307f7f4",
+      "full_sha256": "4318a57a49833f22c3b1181c53694fc31e3a74535ee1644d82bce3134c54228f",
+      "matches_baseline": true,
+      "shared_by_both_variants": true
+    },
+    "Sources/IlliquidCore/Player/MediaSource.swift": {
+      "compiled_bytes": 2209,
+      "compiled_sha256": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254",
+      "full_sha256": "d3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254",
+      "matches_baseline": true,
+      "shared_by_both_variants": true
+    },
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": {
+      "compiled_bytes": 3589,
+      "compiled_sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+      "full_sha256": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+      "matches_baseline": true,
+      "shared_by_both_variants": true
+    },
+    "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": {
+      "compiled_bytes": 7203,
+      "compiled_sha256": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8",
+      "full_sha256": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8",
+      "matches_baseline": true,
+      "shared_by_both_variants": true
+    },
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": {
+      "compiled_bytes": 2180,
+      "compiled_sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+      "full_sha256": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+      "matches_baseline": true,
+      "shared_by_both_variants": true
+    },
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": {
+      "compiled_bytes": 2191,
+      "compiled_sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+      "full_sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+      "matches_baseline": true,
+      "shared_by_both_variants": true
+    },
+    "Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift": {
+      "baseline": {
+        "compiled_bytes": 1980,
+        "compiled_sha256": "51eda4f76ee98055246eb0f90fe54a76fca589419d8aaeedd7f9355c1aba5995",
+        "from_working_tree": false,
+        "full_sha256": "51eda4f76ee98055246eb0f90fe54a76fca589419d8aaeedd7f9355c1aba5995",
+        "source_commit": "2620d561d11c9a7d9396d3b455424a10a6dddcd7"
+      },
+      "candidate": {
+        "compiled_bytes": 2546,
+        "compiled_sha256": "44f1a5d18ac5ad3806552cd003e078e279d7fe449e8bf5d1f2910dec3c953dc1",
+        "from_working_tree": true,
+        "full_sha256": "44f1a5d18ac5ad3806552cd003e078e279d7fe449e8bf5d1f2910dec3c953dc1",
+        "source_commit": "29de8634b613dba1f5b7212b982a73b25228442b"
+      }
+    }
+  },
+  "tests": {
+    "Tests/IlliquidCoreTests/FolderPlaylistTests.swift": "4788f003238a7f8bac174e2bf37db415efb46ec0a38b65313b46e51b87ee779d",
+    "Tests/IlliquidCoreTests/NaturalFilenameOrderingTests.swift": "ba6e040919bdae7f7d4748d95ab6bc39da3547d0add10020dd2261908810f776",
+    "Tests/IlliquidCoreTests/PlaylistDeduplicationTests.swift": "c7861f7dc25c6246ccc260ecaffc5f240ad8be6169947ebe9183d251524798b8",
+    "Tests/IlliquidCoreTests/PlaylistMutationTests.swift": "08b3ea822f18722007b7c32e5316911949a4198767e6bade300c8f88b2d0147f",
+    "Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift": "79a1d9de1abef31e1168ce0b2cb49775c8c653b9a8d298fc3894846efd129045",
+    "Tests/IlliquidCoreTests/PlaylistSessionRecordTests.swift": "d7a495c2ee4284918780e87fb1a66fe4b71623e2bb9824155983c0295121d806",
+    "Tests/IlliquidPlayerTests/PlaybackCheckpointMembershipTests.swift": "b0dc27ffb7a31bbf3fe7e41f98c4cc03c76a9b72627c34f4a8ca109df8a1bf64"
+  },
+  "working_tree_status": "?? Benchmarks/CheckpointMembership/evidence/\n"
+}

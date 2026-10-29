@@ -2826,3 +2826,31 @@ continuity, repeated EOF drain, and seek flush/generation isolation. Each full
 second now emits exactly 48,000 samples/channel, including the previously failing
 44.1 kHz case. The tests construct PCM directly and require no optional fixture.
 Physical audible output and stalled-mount/quit qualification remain separate.
+
+
+## Natural filename sort storage research — 2026-10-28
+
+**Confirmed allocation mechanism; implemented component change; native product
+qualification remains separate.** `NaturalFilenameOrdering` now caches names and
+sorts original integer indices before returning complete original values. The
+localized comparison, literal original-path tie-break, stable equal-key order,
+metadata, and empty/singleton/pair paths are preserved. No persistent cache or
+filesystem policy is introduced.
+
+Against `ea2ff568`, Swift 6.3.2/glibc Linux measurements save 199,968 requested
+bytes per 10,000-URL sort and 559,968 bytes per 10,000-item playlist constructor
+in all five patterns and six pairs, with one additional array allocation. A
+three-URL control costs eight extra bytes. These are allocation requests, not
+retained heap, peak RSS, or whole-player RAM. Normal verified folder discovery
+already bypasses the wide-item constructor sort; URL ordering is the common
+production path.
+
+Thirteen focused tests pass in baseline release and candidate debug/release;
+66 complete-output cases agree per variant. The 720-observation matrix and all
+source/command/hash receipts pass an independent 22,870-check audit. Original
+timings were mixed, including a 12.73% median paired increase for shuffled
+10,000-item construction. A retained 72-observation longer follow-up did not
+reproduce the three investigated slowdowns; no general speedup or universal
+nonregression is claimed. Native CI and physical playback remain distinct gates.
+
+See [the reproducible study, limits, and permanent evidence](../Benchmarks/NaturalFilenameSortStorage/README.md).

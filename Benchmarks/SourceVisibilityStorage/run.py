@@ -21,6 +21,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASELINE = "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635"
 FOCAL = "Sources/IlliquidApp/SourceBrowserFilter.swift"
+FOCAL_REPOSITORY_PATH = "Sources/IlliquidApp/UI/SourceBrowserFilter.swift"
 CASES = ["unchanged", "nonmatching_rule", "hide_half", "hide_last", "preview", "tree_input",
          "hide_penultimate", "preview_last", "keep_one"]
 TESTS = ["SourceBrowserFilterTests.swift", "SourceMediaOrganizationTests.swift",
@@ -43,6 +44,23 @@ def save(path: Path, value) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
+def comparison_sources(historical, current, tests_only):
+    candidate, candidate_records = support.snapshot(current)
+    if tests_only:
+        # Snapshot the mixed inputs directly, so full-source and excerpt hashes
+        # describe the actual sources used in the adapted baseline.
+        baseline, baseline_records = support.snapshot(
+            lambda path: historical(path) if path == FOCAL_REPOSITORY_PATH else current(path))
+    else:
+        baseline, baseline_records = support.snapshot(historical)
+    if baseline.keys() != candidate.keys():
+        raise ValueError("Source inventories differ")
+    for path in baseline:
+        if path != FOCAL and baseline[path] != candidate[path]:
+            raise ValueError(f"Unrelated support source changed: {path}; review and requalify explicitly")
+    return baseline, baseline_records, candidate, candidate_records
+
+
 class Study:
     def __init__(self, args):
         self.args = args
@@ -60,6 +78,9 @@ class Study:
                                 TERM="dumb", NO_COLOR="1")
         self.packages, self.binaries, self.sources = {}, {}, {}
         self.manifest = {"schema": 1, "baseline": BASELINE, "complete": False,
+                         "qualification_mode": "tests-only" if args.tests_only else "performance",
+                         "baseline_provenance": ("tests-only adapted baseline: historical focal source with current support; not historical performance qualification"
+                                                 if args.tests_only else "historical sources at baseline commit"),
                          "platform": platform.platform(), "machine": platform.machine(),
                          "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                          "sizes": args.sizes, "cases": CASES, "pairs": args.pairs,
@@ -102,13 +123,8 @@ class Study:
 
         def historical(path):
             return subprocess.check_output(["git", "-C", str(ROOT), "show", f"{BASELINE}:{path}"])
-        baseline, baseline_records = support.snapshot(historical)
-        candidate, candidate_records = support.snapshot(lambda path: (ROOT / path).read_bytes())
-        if baseline.keys() != candidate.keys():
-            raise ValueError("Source inventories differ")
-        for path in baseline:
-            if path != FOCAL and baseline[path] != candidate[path]:
-                raise ValueError(f"Unrelated support source changed: {path}; review and requalify explicitly")
+        baseline, baseline_records, candidate, candidate_records = comparison_sources(
+            historical, lambda path: (ROOT / path).read_bytes(), self.args.tests_only)
         package = support.PACKAGE.replace("SourceTreeVisibilityQualification", "SourceVisibilityStorage")
         package = package.replace("SourceTreeBenchmark", "SourceVisibilityBenchmark")
         package = package.replace("targets: [\n", 'targets: [\n        .target(name: "CVisibilityHeap", publicHeadersPath: "include"),\n', 1)
