@@ -11,6 +11,8 @@ on:
       - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
       - 'Tests/IlliquidAppTests/ThumbnailSingletonNeighborhoodTests.swift'
       - 'Scripts/test-thumbnail-singleton.sh'
+      - 'Scripts/check-thumbnail-whitespace.py'
+      - 'Scripts/test-thumbnail-whitespace.py'
       - 'Benchmarks/ThumbnailSingleton/**'
       - '!Benchmarks/ThumbnailSingleton/evidence/**'
       - '.github/workflows/thumbnail-singleton.yml'
@@ -23,6 +25,8 @@ on:
       - 'Tests/IlliquidAppTests/ThumbnailPlaylistNeighborhoodTests.swift'
       - 'Tests/IlliquidAppTests/ThumbnailSingletonNeighborhoodTests.swift'
       - 'Scripts/test-thumbnail-singleton.sh'
+      - 'Scripts/check-thumbnail-whitespace.py'
+      - 'Scripts/test-thumbnail-whitespace.py'
       - 'Benchmarks/ThumbnailSingleton/**'
       - '!Benchmarks/ThumbnailSingleton/evidence/**'
       - '.github/workflows/thumbnail-singleton.yml'
@@ -62,14 +66,8 @@ jobs:
           fi
           echo 'Kyoto is unavailable on this ephemeral Linux runner; compiling serially in an isolated checkout.'
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git -C "$GITHUB_WORKSPACE" cat-file -e '8637a8d2c6a628699d5a552a55061b4e0bfc6f10^{commit}'
-          # Check the original stack and the full integration delta independently.
-          # Cached main contains historical evidence whitespace; do not rewrite it.
-          # These are whitespace/provenance boundaries, not benchmark baselines.
-          git -C "$GITHUB_WORKSPACE" merge-base --is-ancestor 70a5c96f41295a2edac27801a4d484a86d623784 HEAD
-          git -C "$GITHUB_WORKSPACE" merge-base --is-ancestor 8e51176463b873cca080d92d9c4854a1d078be35 HEAD
-          git -C "$GITHUB_WORKSPACE" diff --check 8637a8d2c6a628699d5a552a55061b4e0bfc6f10 70a5c96f41295a2edac27801a4d484a86d623784
-          git -C "$GITHUB_WORKSPACE" diff --check 8e51176463b873cca080d92d9c4854a1d078be35 HEAD
+          python3 Scripts/test-thumbnail-whitespace.py
+          python3 Scripts/check-thumbnail-whitespace.py
       - name: Baseline and candidate debug and release regressions
         run: |
           mkdir -p "$RUNNER_TEMP/thumbnail-singleton"
