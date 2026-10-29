@@ -1,0 +1,103 @@
+name: Media metadata merge performance
+on:
+  push:
+    branches: ['perf/metadata-attribution-5217c3']
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatchHintsRegressionTests.swift'
+      - 'Tests/IlliquidCoreTests/MediaMetadataMergeTests.swift'
+      - 'Scripts/test-media-metadata-merge-regressions.sh'
+      - 'Benchmarks/MediaMetadataMerge/**'
+      - '.github/workflows/media-metadata-merge.yml'
+      - '!Benchmarks/MediaMetadataMerge/*.md'
+      - '!Benchmarks/MediaMetadataMerge/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatchHintsRegressionTests.swift'
+      - 'Tests/IlliquidCoreTests/MediaMetadataMergeTests.swift'
+      - 'Scripts/test-media-metadata-merge-regressions.sh'
+      - 'Benchmarks/MediaMetadataMerge/**'
+      - '.github/workflows/media-metadata-merge.yml'
+      - '!Benchmarks/MediaMetadataMerge/*.md'
+      - '!Benchmarks/MediaMetadataMerge/evidence/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: media-metadata-merge-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: swift:6.2.4-noble@sha256:d6f8f6112e9a63da0a4a151d6b93acd16699d35c0b82531ac1a245f5af210197
+    steps:
+      - name: Install Python
+        run: apt-get update && apt-get install -y --no-install-recommends python3
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test exact production metadata merges and measure paired calls
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          echo "Kyoto is unavailable on this Linux runner; using direct, serialized component builds."
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = pull_request; then mode+=(--tests-only); fi
+          python3 Benchmarks/MediaMetadataMerge/run.py benchmark \
+            --output "$RUNNER_TEMP/media-metadata-merge" --pairs 8 --target-ms 75 "${mode[@]}"
+      - name: Publish complete evidence
+        if: always()
+        run: python3 Benchmarks/MediaMetadataMerge/ci-evidence.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-metadata-merge-linux
+          path: |
+            ${{ runner.temp }}/media-metadata-merge/*.json
+            ${{ runner.temp }}/media-metadata-merge/*.jsonl
+            ${{ runner.temp }}/media-metadata-merge/*.gz
+            ${{ runner.temp }}/media-metadata-merge/logs/
+            ${{ runner.temp }}/media-metadata-merge/sources/
+          retention-days: 14
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test and measure with native Foundation
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo "Kyoto is available; submit this benchmark through the shared queue."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this hosted runner; using direct, serialized component builds."
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = pull_request; then mode+=(--tests-only); fi
+          python3 Benchmarks/MediaMetadataMerge/run.py benchmark \
+            --output "$RUNNER_TEMP/media-metadata-merge" --pairs 8 --target-ms 75 "${mode[@]}"
+      - name: Publish complete evidence
+        if: always()
+        run: python3 Benchmarks/MediaMetadataMerge/ci-evidence.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: media-metadata-merge-native
+          path: |
+            ${{ runner.temp }}/media-metadata-merge/*.json
+            ${{ runner.temp }}/media-metadata-merge/*.jsonl
+            ${{ runner.temp }}/media-metadata-merge/*.gz
+            ${{ runner.temp }}/media-metadata-merge/logs/
+            ${{ runner.temp }}/media-metadata-merge/sources/
+          retention-days: 14
+

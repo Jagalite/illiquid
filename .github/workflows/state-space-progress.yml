@@ -1,0 +1,90 @@
+name: Playback progress analysis performance
+
+on:
+  push:
+    branches: [perf/state-space-progress-worklist-20261028]
+    paths:
+      - Sources/IlliquidCore/Player/MediaTrack.swift
+      - Sources/IlliquidPlaybackCore/**
+      - Sources/IlliquidPlaybackStateSpace/**
+      - Tests/IlliquidPlaybackCoreTests/**
+      - Tests/IlliquidPlaybackStateSpaceTests/**
+      - Benchmarks/StateSpaceProgress/**
+      - .github/workflows/state-space-progress.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidCore/Player/MediaTrack.swift
+      - Sources/IlliquidPlaybackCore/**
+      - Sources/IlliquidPlaybackStateSpace/**
+      - Tests/IlliquidPlaybackCoreTests/**
+      - Tests/IlliquidPlaybackStateSpaceTests/**
+      - Benchmarks/StateSpaceProgress/**
+      - .github/workflows/state-space-progress.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: state-space-progress-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component-swift:
+    name: Swift progress analysis (${{ matrix.label }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: macos
+            runner: macos-26
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+          - label: linux
+            runner: ubuntu-24.04
+            developer_dir: ''
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; builds run serially in isolated temporary packages.'
+
+      - name: Regressions, complete graph parity, and paired release measurements
+        run: |
+          python3 Benchmarks/StateSpaceProgress/run.py \
+            --output "$RUNNER_TEMP/state-space-progress" \
+            --pairs 6 --min-seconds 0.25
+
+      - name: Print test summaries
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "state-space-progress"
+          for path in sorted(root.glob("*-tests.*")):
+              print(f"TEST_LOG {path.name}")
+              print("\n".join(path.read_text().splitlines()[-12:]))
+          PY
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: state-space-progress-evidence-${{ matrix.label }}
+          path: |
+            ${{ runner.temp }}/state-space-progress/*.json
+            ${{ runner.temp }}/state-space-progress/*.jsonl
+            ${{ runner.temp }}/state-space-progress/*.stdout
+            ${{ runner.temp }}/state-space-progress/*.stderr
+          retention-days: 30

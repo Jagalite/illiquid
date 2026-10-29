@@ -1,0 +1,72 @@
+{
+  "checks": [
+    {
+      "label": "followup-tests",
+      "command": [
+        "python3",
+        "Benchmarks/NonDecodeFollowup/test-core.py",
+        "--output",
+        "/tmp/illiquid-scalar-integration-v2/followup-tests.txt"
+      ],
+      "returncode": 0,
+      "seconds": 14.838433286000054
+    },
+    {
+      "label": "thirdpass-tests",
+      "command": [
+        "python3",
+        "Benchmarks/NonDecodeThirdPass/test-core.py",
+        "--output",
+        "/tmp/illiquid-scalar-integration-v2/thirdpass-tests.txt"
+      ],
+      "returncode": 0,
+      "seconds": 15.909236876999785
+    },
+    {
+      "label": "history-differential",
+      "command": [
+        "python3",
+        "Benchmarks/NonDecodeFollowup/test-differential.py",
+        "--output",
+        "/tmp/illiquid-scalar-integration-v2/history-differential"
+      ],
+      "returncode": 0,
+      "seconds": 17.582844027999727
+    },
+    {
+      "label": "followup-build",
+      "command": [
+        "python3",
+        "Benchmarks/NonDecodeFollowup/run.py",
+        "--build-only",
+        "--output",
+        "/tmp/illiquid-scalar-integration-v2/followup-build"
+      ],
+      "returncode": 0,
+      "seconds": 13.967935850999766
+    },
+    {
+      "label": "thirdpass-build",
+      "command": [
+        "python3",
+        "Benchmarks/NonDecodeThirdPass/run-history.py",
+        "--build-only",
+        "--output",
+        "/tmp/illiquid-scalar-integration-v2/thirdpass-build"
+      ],
+      "returncode": 0,
+      "seconds": 15.128686841999752
+    }
+  ],
+  "test_counts": {
+    "followup": 12,
+    "thirdpass": 26
+  },
+  "differential": {
+    "operations_per_variant": 10000,
+    "equal_reload_receipts": 200,
+    "effective_state_sha256": "80b02b7e57412d716afd7bbf8c7b8d0df116d49accc9d30ba48e7e702b075134",
+    "embedded_history_preferences": "replaced by authoritative reloaded preferences for comparison"
+  },
+  "timing_harnesses": "Both baseline/candidate pairs compiled; historical timing campaigns were not rerun."
+}
