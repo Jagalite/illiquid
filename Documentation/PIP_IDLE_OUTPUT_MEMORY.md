@@ -2,21 +2,11 @@
 
 ## Qualification status
 
-**Unqualified candidate; native execution is pending.** At 06:30 UTC on
-2026-10-28, [the macOS validation run](https://github.com/Jagalite/illiquid/actions/runs/40639953619)
-was still queued and had executed no job steps. The run was created at
-05:46:41 UTC. A repository-wide Actions snapshot at 06:25 UTC showed 644
-queued runs and two in progress. These are scheduling observations, not
-benchmark results.
+**Optimization rejected after completed native qualification (2026-10-29).** [Run 40639953619](https://github.com/Jagalite/illiquid/actions/runs/40639953619), job [122655532955](https://github.com/Jagalite/illiquid/actions/runs/40639953619/job/122655532955), completed successfully on the isolated macOS runner, but a green workflow **does not demonstrate a memory improvement**. The candidate releases its stopped pool/observer and HDR working-texture owner correctly; nevertheless, in all six paired comparisons for each workload, its settled `MTLDevice.currentAllocatedSize` is **higher** than the baseline, and production first-sample re-entry is slower. **No optimization PR should be opened.**
 
-The editing environment's execution service was unavailable, so this work
-could not compile or run locally. The isolated macOS workflow is the validation
-route. No test pass, memory reduction, or restart cost is claimed for this
-candidate until that workflow executes and its evidence is reviewed.
-
-The source under test is commit
+The actual measured source/test/harness/runner commit is
 [`47b51e515b11da06fc454c1209bbd189dddd7a40`](https://github.com/Jagalite/illiquid/commit/47b51e515b11da06fc454c1209bbd189dddd7a40).
-Later documentation-only commits do not change the measured source.
+The [raw evidence](../Benchmarks/PiPIdleMemory/evidence/run-40639953619/) is retained from that run; subsequent documentation/evidence-only commits do not change the tested inputs. The [workflow artifact](https://github.com/Jagalite/illiquid/actions/runs/40639953619/artifacts/12867161212) also contains staged source files and build/measurement logs.
 
 ## Scope
 
@@ -77,12 +67,63 @@ resource-recreation samples through GPU completion. Those timings exclude
 normal worker scheduling, presenter enqueue, and AVKit UI. The production
 cycle timing separately ends at the actual first-sample callback after enqueue.
 
-## Results
+## Results — actual completed qualification
 
-There are **no measurements of this candidate yet**. The code review identifies
-retained video-sized resources and the implementation supplies a retirement
-path, but source inspection cannot establish the size, timing, or operating-system
-effect of reclamation.
+### Test execution, provenance, and parity
+
+The isolated `macos-26-arm64` runner used macOS **26.6.2**, Xcode **26.6**, Swift **6.3.3**, a virtual Apple M1 CPU, and an **Apple Paravirtual** Metal device. Baseline `ea2ff568237e2667f7b1aeee67b11a44ebe95b72` and tested candidate `47b51e515b11da06fc454c1209bbd189dddd7a40` built their full native test graphs serially in separate worktrees. The baseline original source blob `6ec0cd6317cbecbe40d92ed894fec86a4134438c` was preserved; the read-only baseline instrumentation reversed to exactly the original source. The manifest records each executable's SHA-256 and the command journal ties builds/tests/measurements to their variant-specific binaries.
+
+The existing five selected suites executed **44/44 tests** on the baseline and passed. The baseline's idle-retirement negative-control test **actually executed and failed** the intended pool/observer ownership expectations (exit 1; four assertion issues), rather than failing to compile or selecting zero tests. The candidate executed **49/49 selected tests** and passed, including all five new lifetime functions. The HDR test actually exercised both **PQ and HLG**, and the GPU-drain/shared-event, externally retained buffers/twelve-buffer limit, gated restart, and caption upload-reuse tests executed. The separately selected `mediaSessionMirrorsEmbeddedPacketsAndSeekInvalidationToBothPipelines` test returned early without its optional fixture; **embedded-media behavior was not exercised**.
+
+Across **six alternating-order fresh-process pairs (12 processes)**, eight direct cases have identical complete logical-pixel SHA-256 and color tags across baseline, candidate, restarts, and processes. Each case has six GPU-completed direct-composition recreation samples. Checks of all 28 recorded commands, log receipts, staged-source hashes, baseline negative-control log, process order, raw observations, pixel parity and independently recomputed paired summaries agreed. The **21** `PIP_IDLE_EVIDENCE_JSON` emitted files were independently SHA-256 checked and matched the retained artifact bytes.
+
+### Production stopped-state device allocations and first-sample re-entry
+
+Each fresh process ran eight real receive/start/first-sample/stop cycles per workload **before direct output readbacks** and without holding output buffers or output probes. Stopped compositor and cached input remained alive. Final values below are after the 1 s settle. The growth column compares stopped cycle 1 with stopped cycle 8; all allocation values are **Metal device counters, not RSS or reclaimed physical memory**. Re-entry values are per-process medians of the seven cycles after cold start and end at the actual presenter first-sample callback, including GPU completion and enqueue.
+
+| Workload | Pair | Baseline final MiB | Candidate final MiB | Candidate excess MiB | Cycle 1→8 growth B / C MiB | First-sample re-entry B → C ms |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1080p SDR BGRA | 0 | 16.8 | 48.5 | +31.6 | 0.0 / 31.6 | 2.80 → 14.89 |
+| 1080p SDR BGRA | 1 | 24.7 | 48.5 | +23.7 | 7.9 / 31.6 | 2.47 → 7.54 |
+| 1080p SDR BGRA | 2 | 16.8 | 48.5 | +31.6 | 0.0 / 31.6 | 2.51 → 8.91 |
+| 1080p SDR BGRA | 3 | 16.8 | 56.4 | +39.6 | 0.0 / 39.6 | 2.46 → 6.58 |
+| 1080p SDR BGRA | 4 | 16.8 | 48.5 | +31.6 | 0.0 / 31.6 | 1.72 → 11.15 |
+| 1080p SDR BGRA | 5 | 16.8 | 48.5 | +31.6 | 0.0 / 31.6 | 2.33 → 11.48 |
+| 4K HDR PQ P010 | 0 | 183.0 | 285.9 | +102.9 | 23.7 / 189.9 | 5.25 → 43.26 |
+| 4K HDR PQ P010 | 1 | 183.0 | 285.9 | +102.9 | 23.7 / 189.9 | 5.99 → 29.08 |
+| 4K HDR PQ P010 | 2 | 183.0 | 262.1 | +79.2 | 23.7 / 166.2 | 5.20 → 46.89 |
+| 4K HDR PQ P010 | 3 | 183.0 | 238.4 | +55.4 | 23.7 / 142.4 | 5.61 → 40.61 |
+| 4K HDR PQ P010 | 4 | 183.0 | 190.9 | +7.9 | 23.7 / 95.0 | 5.24 → 92.03 |
+| 4K HDR PQ P010 | 5 | 183.0 | 285.9 | +102.9 | 23.7 / 189.9 | 5.24 → 58.59 |
+
+Every candidate has a higher final settled device counter: **+23.7 to +39.6 MiB** at 1080p SDR (median excess **31.6 MiB**) and **+7.9 to +102.9 MiB** at 4K HDR PQ (median excess **91.0 MiB**). The baseline's 4K cycle-one allocation (159.2 MiB) rose once to 183.0 MiB and then stabilized; the candidate's lower first-stop reading (96.0 MiB) rose over subsequent cycles to 190.9–285.9 MiB. This initial ownership saving therefore did **not** produce a durable lower observed device counter. At 1080p the candidate generally rose by 7.9 MiB per new pool through warmup, whereas the baseline stayed nearly flat. The candidate often plateaued by later cycles, so the evidence does **not** establish unbounded leakage. After the extra **5 s** settle in pair zero, both variants' device counters remained unchanged from their 1 s values (including the adverse candidate readings).
+
+Production re-entry was slower in every pair. The median of paired per-process slowdown percentages was **+323.6%** for 1080p SDR (paired range +167.1–+548.9%) and **+762.7%** for 4K HDR PQ (+385.7–+1655.6%). These are first-sample callback timings, **not** visible PiP-window latency. Cold start was measured separately and not mixed into these medians.
+
+### Direct GPU-completed resource recreation
+
+The following are medians of each variant's six per-process median values; the last column is the separately recomputed median of six **paired** percentage changes. These component-only timings exclude normal worker scheduling, presenter enqueue, AVKit, shader initialization, source preparation, and output hashing.
+
+| Case | Held outputs | Baseline median ms | Candidate median ms | Median paired slowdown |
+| --- | ---: | ---: | ---: | ---: |
+| 1080p-SDR BGRA | 1 | 1.74 | 5.47 | +299.7% |
+| 1080p-SDR BGRA | 12 | 1.42 | 4.80 | +224.7% |
+| 1080p-HDR PQ P010 | 1 | 2.00 | 8.59 | +392.4% |
+| 1080p-HDR PQ P010 | 12 | 2.07 | 10.13 | +402.3% |
+| 4K-SDR BGRA | 1 | 2.60 | 15.22 | +477.6% |
+| 4K-SDR BGRA | 12 | 2.67 | 18.52 | +630.7% |
+| 4K-HDR PQ P010 | 1 | 4.57 | 44.06 | +924.2% |
+| 4K-HDR PQ P010 | 12 | 4.44 | 39.58 | +756.4% |
+
+All eight direct-composition cases are slower in the candidate; no case demonstrates a restart latency improvement.
+
+### Actual ownership versus allocation counters
+
+After idle drain the candidate has **no strongly owned output pool or pool observer** in any of the eight cases across all twelve processes, and no owned HDR working texture. The baseline retains its pool and observer; its HDR texture reports `allocatedSize` **16,596,992 bytes** at 1080p and **66,355,200 bytes** at 4K, versus zero for the stopped candidate. Weak output-buffer probes are zero after strong owners are dropped in both variants; externally retained old outputs still work as asserted by the test. This verifies the lifetime behavior but does **not** offset the adverse multi-cycle device-counter result. The new pool's twelve-buffer limit is per pool, not a global cap on externally held old-pool buffers.
+
+### Decision
+
+**Not successful; do not create a PR against `main`.** The correctness and pixel-fidelity checks passed, but the candidate failed the required net settled-memory and acceptable re-entry tradeoff criteria. Its explicit resource retirement can coexist with larger observed Metal allocator footprints after repeated starts; neither the virtual device's allocator behavior nor the recorded data proves why. There is no claim of an OS page reclamation, RSS, whole-player RAM, FPS, energy or visible-window benefit. The candidate code remains confined to this unmerged experiment branch; the [complete run artifact](https://github.com/Jagalite/illiquid/actions/runs/40639953619/artifacts/12867161212) retains staged sources and raw logs.
 
 ### Historical evidence used to improve the protocol
 
@@ -110,7 +151,7 @@ device counter can coexist. This study consequently measures repeated
 production sessions before any readbacks and preserves the complete
 trajectories, including settling time.
 
-### Decision required before opening an optimization PR
+### Optimization PR decision criteria (evaluated)
 
 1. Both variants must build their complete native test graph with the recorded
    toolchain and real Metal/Core Video resources.
@@ -158,10 +199,10 @@ returns early without a configured media fixture. This workflow does not
 supply that optional fixture, so its selection must not be presented as
 executed embedded-media coverage.
 
-All of the above are implemented checks awaiting execution for this candidate.
-Static review considered worker completion, queue-local ownership, restart
-races, and external output lifetimes; it cannot replace compilation or runtime
-validation.
+All five new lifetime functions were executed and passed on the candidate;
+the baseline's intended negative control failed as required. This runtime
+validation establishes the specified ownership behavior, not a favorable
+idle-memory or performance outcome.
 
 ## Interpretation and limitations
 
@@ -187,9 +228,9 @@ boundaries, and a protocol for repeated-session allocation evidence.
 
 ## Candidate integrity
 
-These SHA-256 digests identify the committed inputs selected for the queued
-run. They were calculated from the exact UTF-8 file content; execution evidence
-must independently record matching hashes.
+These SHA-256 digests identify the committed inputs of the **completed** run.
+They were independently cross-checked against the emitted manifest and staged
+sources, where available; the runner separately recorded executable hashes.
 
 | Input | SHA-256 |
 | --- | --- |
@@ -199,5 +240,7 @@ must independently record matching hashes.
 | [run.py](../Benchmarks/PiPIdleMemory/run.py) | `22ee00c1bdbbfbc7c6bac1448911bc91ab5f6a9588f7f24cd5953c88f3fdbde2` |
 
 The baseline and instrumentation verification procedure is documented in the
-[benchmark README](../Benchmarks/PiPIdleMemory/README.md). No generated evidence
-files are committed while the run remains queued.
+[benchmark README](../Benchmarks/PiPIdleMemory/README.md). The 21 exact emitted
+evidence files are committed under [run-40639953619](../Benchmarks/PiPIdleMemory/evidence/run-40639953619/).
+The complete build, staged-source and measurement logs remain in the
+[workflow artifact](https://github.com/Jagalite/illiquid/actions/runs/40639953619/artifacts/12867161212).

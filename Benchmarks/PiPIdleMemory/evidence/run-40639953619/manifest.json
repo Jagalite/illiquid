@@ -1,0 +1,63 @@
+{
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binaries": {
+    "baseline": {
+      "path": "/Users/runner/work/_temp/pip-idle-memory/build/baseline/arm64-apple-macosx/release/IlliquidPackageTests.xctest/Contents/MacOS/IlliquidPackageTests",
+      "sha256": "9d7d664b0bfd2a57ade47407d7147a11b3f964399bff867814e10767d58feca5"
+    },
+    "candidate": {
+      "path": "/Users/runner/work/_temp/pip-idle-memory/build/candidate/arm64-apple-macosx/release/IlliquidPackageTests.xctest/Contents/MacOS/IlliquidPackageTests",
+      "sha256": "c73d288c709e28f129c8d0cee7604dbddb878ee10421ae0a298b7626dc2802bb"
+    }
+  },
+  "complete": true,
+  "cpu": "Apple M1 (Virtual)",
+  "head": "47b51e515b11da06fc454c1209bbd189dddd7a40",
+  "host": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83\n",
+  "instrumentation": {
+    "description": "queue-synchronized observations and nil-by-default GPU test hook only",
+    "diagnostics_sha256": "ebbf22ddb59c4632705d5176c6f2a3bbe08738a3f75eb5aebcd542b6fb6e0c09",
+    "recovered_baseline_sha256": "b719b1c6683b48d84fe966eca8cc28c21126b526f8aa8e86095aa8e15aba87d5"
+  },
+  "iterations_per_process": 6,
+  "latency_excludes": [
+    "normal production worker scheduling",
+    "presenter enqueue",
+    "AVKit UI",
+    "shader initialization",
+    "source setup",
+    "output hashing"
+  ],
+  "limitations": [
+    "No process RSS, energy, physical display, or visible PiP startup measurement.",
+    "Metal device.currentAllocatedSize is a process/device allocation counter, not resident memory; raw repeated-cycle growth has no numeric pass threshold.",
+    "Production-cycle probes run before direct-composition readbacks and retain no output-buffer probes.",
+    "Weak output-buffer payloads exclude allocation overhead; they are observed live wrappers, not a total-player-memory estimate.",
+    "Metal allocatedSize is the actual owned HDR working-texture allocation; pool capacity is not inferred from configured limits."
+  ],
+  "machine": "arm64",
+  "metal_device": {
+    "name": "Apple Paravirtual device",
+    "registry_id": "4294967686"
+  },
+  "pairs": 6,
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "production_cycle_settle_requested_ns": 150000000,
+  "production_cycles_per_case": 8,
+  "production_extended_settle_pair": 0,
+  "production_extended_settle_requested_ns": 5000000000,
+  "production_final_settle_requested_ns": 1000000000,
+  "scope": "native output-resource ownership; component resource recreation latency through direct GPU-completed composition",
+  "sources": {
+    "baseline_instrumented": "f720ffb06252199e5ca965d1cfa66632e0c384185fcd3861de04dac10a008b77",
+    "baseline_original": "b719b1c6683b48d84fe966eca8cc28c21126b526f8aa8e86095aa8e15aba87d5",
+    "candidate": "5c15f687f02dac9ae403c0016b017a454a9bee78a2bc4bd1ae293157361ccb07",
+    "harness": "f9ff897cb5cb4159f4e71af187a479f2dfb8c1dce2c349f44e9b538e4ed9d81d",
+    "native_sdk_manifest": "59705476f67907a5941ed2c52ebc2744edacde5dc1d06f9f4ab54f8643e19653",
+    "package_resolved": "f5facc8230346efae04cc7846e48a01c37ce0f50654913736af796132ca82892",
+    "regression": "2dfb564674583a5e3c875ca63f7ff720cac03f1a95099e42b4198e7ed89488b8",
+    "runner": "22ee00c1bdbbfbc7c6bac1448911bc91ab5f6a9588f7f24cd5953c88f3fdbde2"
+  },
+  "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "xcode": "Xcode 26.6\nBuild version 17F113"
+}

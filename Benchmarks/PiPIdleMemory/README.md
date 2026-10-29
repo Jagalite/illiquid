@@ -13,6 +13,14 @@ delayed stop callback checks the active state before flushing the presenter.
 The dedicated queue also drains an autorelease pool after every work item,
 including GPU completion processing.
 
+## Completed qualification: negative result (2026-10-29)
+
+[Native run 40639953619](https://github.com/Jagalite/illiquid/actions/runs/40639953619) completed green for tested source commit `47b51e515b11da06fc454c1209bbd189dddd7a40`. Baseline selected regressions passed (44 tests), the intended ownership negative control executed and failed, and the candidate passed 49 selected tests including the five new lifetime functions (PQ/HLG parameterization covered). Full logical pixels and color tags matched across all eight cases and twelve measurement processes.
+
+**Do not open an optimization PR:** clearing the candidate's pool/observer/HDR texture owners did not establish a lower settled Metal device allocation. After eight real production cycles, candidate final device allocation exceeded baseline in all six paired processes: +23.7 to +39.6 MiB at 1080p SDR and +7.9 to +102.9 MiB at 4K HDR PQ. Median paired production first-sample re-entry slowdown was +323.6% and +762.7%, respectively. All eight direct-composition recreation cases were slower. The device counter is not RSS or a whole-player RAM measurement.
+
+See the [full result and pair tables](../../Documentation/PIP_IDLE_OUTPUT_MEMORY.md#results--actual-completed-qualification), the [21 exact emitted evidence files](evidence/run-40639953619/), and the [52-file run artifact](https://github.com/Jagalite/illiquid/actions/runs/40639953619/artifacts/12867161212) with additional logs and staged sources. No `main` or other experiment branch was changed.
+
 ## Reproduce
 
 Use macOS 26 with the project's Xcode toolchain, Metal device, and pinned native
@@ -172,11 +180,11 @@ observations, pixel/tag parity, and summary. Logs emit exact UTF-8 evidence text
 and SHA-256 digests prefixed with `PIP_IDLE_EVIDENCE_JSON`; the workflow also
 uploads the evidence and staged source files as an artifact.
 
-The [research report](../../Documentation/PIP_IDLE_OUTPUT_MEMORY.md) records
-qualification status and the evidence required before accepting the candidate.
-Once available, results must report observed memory ownership, restart cost,
-and the limits of the hosted Metal environment. No process RSS or total-player
-memory reduction should be inferred from resource measurements alone.
+The [research report](../../Documentation/PIP_IDLE_OUTPUT_MEMORY.md) records the
+actual negative qualification result, observed ownership, restart cost, and
+hosted Metal limitations. The exact emitted evidence has been retained under
+`evidence/run-40639953619/`. No process RSS or total-player memory reduction
+can be inferred from these resource measurements.
 
 ## Framework contracts
 

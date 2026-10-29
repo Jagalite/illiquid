@@ -1,0 +1,27 @@
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "PiP idle output resource lifetime" started.
+◇ Test stopRetiresIdleResourcesWithoutInvalidatingCaptionUploads() started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.2.1 (COMPLEX)
+[ass] Using font provider coretext
+[native-pip-subtitles] stop-request
+[native-pip-subtitles] received=0 composed=0 immediate=0 visible=1 subtitle-texture-uploads=1 subtitle-upload-bytes=4096 subtitle-vertex-builds=1 subtitle-vertex-bytes=192 subtitle-resource-reuses=0 coalesced=0 unsupported=0 pool-allocations=1 pool-reuses=0 pool-misses=0 enqueue-failures=0 stale-compositions=0 cpu-ms-per-frame=0.0000 gpu-ms-per-frame=0.0000
+✘ Test stopRetiresIdleResourcesWithoutInvalidatingCaptionUploads() recorded an issue at PiPIdleResourceLifetimeTests.swift:27:9: Expectation failed: await waitUntil {
+            let state = await compositor.outputResourceSnapshotForTesting()
+            return !state.workerActive && !state.hasPool && !state.hasPoolObserver
+        }
+✘ Test stopRetiresIdleResourcesWithoutInvalidatingCaptionUploads() recorded an issue at PiPIdleResourceLifetimeTests.swift:32:9: Expectation failed: (!stopped.hasPool → false) && (!stopped.hasPoolObserver → <not evaluated>)
+✘ Test stopRetiresIdleResourcesWithoutInvalidatingCaptionUploads() recorded an issue at PiPIdleResourceLifetimeTests.swift:33:9: Expectation failed: (stopped.poolSize → (16.0, 16.0)) == (.zero → (0.0, 0.0))
+✘ Test stopRetiresIdleResourcesWithoutInvalidatingCaptionUploads() recorded an issue at PiPIdleResourceLifetimeTests.swift:34:9: Expectation failed: (stopped.observedBufferCount → 1) == 0
+[native-pip-subtitles] stop-request
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793238709.714117 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+✘ Test stopRetiresIdleResourcesWithoutInvalidatingCaptionUploads() failed after 26.368 seconds with 4 issues.
+✘ Suite "PiP idle output resource lifetime" failed after 26.368 seconds with 4 issues.
+✘ Test run with 1 test in 1 suite failed after 26.368 seconds with 4 issues.
