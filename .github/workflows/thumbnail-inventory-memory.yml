@@ -39,8 +39,35 @@ jobs:
           from pathlib import Path
           command = [sys.executable, 'Benchmarks/ThumbnailInventoryMemory/run.py',
                      '--pairs', '6', '--output', os.environ['RUNNER_TEMP'] + '/thumbnail-inventory-memory']
-          if os.environ['GITHUB_EVENT_NAME'] != 'workflow_dispatch':
-              command.append('--current-source-regression')
+          event_name = os.environ['GITHUB_EVENT_NAME']
+          if event_name != 'workflow_dispatch':
+              event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+              if event_name == 'pull_request':
+                  # checkout uses the synthetic merge ref; compare its actual HEAD
+                  # with the event's base commit, not the PR head or HEAD~1.
+                  base = event.get('pull_request', {}).get('base', {}).get('sha')
+              elif event_name == 'push':
+                  # An integration push also introduces preexisting default-branch
+                  # changes relative to before. Check only this branch's delta.
+                  default_branch = event.get('repository', {}).get('default_branch')
+                  if not isinstance(default_branch, str) or not default_branch:
+                      raise RuntimeError('Missing default branch for whitespace boundary.')
+                  remote_ref = 'refs/remotes/origin/' + default_branch
+                  subprocess.run(['git', 'check-ref-format', remote_ref], check=True)
+                  resolved_default = subprocess.check_output(
+                      ['git', 'rev-parse', '--verify', remote_ref + '^{commit}'], text=True).strip()
+                  base = subprocess.check_output(
+                      ['git', 'merge-base', 'HEAD', resolved_default], text=True).strip()
+                  print('THUMBNAIL_INVENTORY_WHITESPACE_BOUNDARY ' + json.dumps({
+                      'source': 'default-branch-merge-base', 'ref': remote_ref,
+                      'resolved_default': resolved_default, 'resolved_boundary': base,
+                      'push_before': event.get('before')}, sort_keys=True), flush=True)
+              else:
+                  raise RuntimeError('Unsupported whitespace event: ' + event_name)
+              # Missing references or invalid event bases have no guessed fallback.
+              if not isinstance(base, str) or len(base) != 40 or set(base) == {'0'}:
+                  raise RuntimeError('Missing/non-commit event whitespace base; use a PR run.')
+              command.extend(['--current-source-regression', '--whitespace-base', base])
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
               cli = [sys.executable, str(queue)]
@@ -64,7 +91,7 @@ jobs:
           from pathlib import Path
           root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-inventory-memory'
           for name in ['environment.json', 'sources.json', 'binaries.json', 'tests.json',
-                       'source-policy.json', 'fixtures.json', 'observations.jsonl', 'summary.json', 'qualification.json']:
+                       'source-policy.json', 'whitespace.json', 'fixtures.json', 'observations.jsonl', 'summary.json', 'qualification.json']:
               path = root / name
               if path.is_file():
                   print('THUMBNAIL_INVENTORY_EVIDENCE ' + json.dumps(

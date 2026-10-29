@@ -55,6 +55,16 @@ def reference_source(path, historical, current, regression):
     return historical
 
 
+def whitespace_boundary(regression, requested):
+    if regression:
+        if not requested or not re.fullmatch(r"[0-9a-fA-F]{40}", requested) or set(requested) == {"0"}:
+            raise ValueError("Regression mode requires --whitespace-base with a full nonzero commit SHA.")
+        return requested
+    if requested is not None:
+        raise ValueError("--whitespace-base is only valid with --current-source-regression.")
+    return BASELINE
+
+
 def executed_test_summaries(log):
     expected = {Path(path).stem for path in TESTS}
     suites = set(re.findall(r"Test Suite '([^']+)' passed", log))
@@ -78,7 +88,13 @@ def main() -> None:
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--current-source-regression", action="store_true",
                         help="Use reviewed current support for parity only; no performance claim.")
+    parser.add_argument("--whitespace-base",
+                        help="Regression-only explicit commit defining the introduced whitespace delta.")
     args = parser.parse_args()
+    try:
+        requested_whitespace_base = whitespace_boundary(args.current_source_regression, args.whitespace_base)
+    except ValueError as error:
+        parser.error(str(error))
     if platform.system() != "Darwin":
         parser.error("Requires macOS: this experiment uses real Foundation, ImageIO, and CoreGraphics.")
     if not 2 <= args.pairs <= 12 or args.pairs % 2:
@@ -118,7 +134,21 @@ def main() -> None:
             raise RuntimeError(f"{label} failed:\n{result.stdout[-6000:]}\n{result.stderr[-6000:]}")
         return result.stdout
 
-    run(["git", "diff", "--check", BASELINE, "HEAD"], "diff-check")
+    whitespace_base = run(["git", "rev-parse", "--verify", requested_whitespace_base + "^{commit}"],
+                          "whitespace-base").strip()
+    whitespace_head = run(["git", "rev-parse", "--verify", "HEAD^{commit}"], "whitespace-head").strip()
+    whitespace = {
+        "mode": "introduced-delta" if args.current_source_regression else "historical-baseline",
+        "requested_base": requested_whitespace_base,
+        "resolved_base": whitespace_base, "resolved_head": whitespace_head,
+        "github_event": os.environ.get("GITHUB_EVENT_NAME"),
+        "github_sha": os.environ.get("GITHUB_SHA"),
+        "passed": False,
+    }
+    write_json(output / "whitespace.json", whitespace)
+    run(["git", "diff", "--check", whitespace_base, whitespace_head], "diff-check")
+    whitespace["passed"] = True
+    write_json(output / "whitespace.json", whitespace)
     sources = {}
     adaptations = {}
     paths = {variant: {} for variant in ("baseline", "candidate")}

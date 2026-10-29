@@ -200,3 +200,17 @@ release. Both AB and BA orders exercise every 0/128/2048/8191 inventory fixture,
 but no metric summary is emitted and `performance_qualified` is false. Frozen
 test inputs and staged source hashes are checked before qualification. The
 existing historical evidence is unchanged; this mode cannot renew its claims.
+
+Regression runs additionally require `--whitespace-base <full-commit-SHA>`.
+The whitespace gate compares that resolved commit with the actual checked-out
+HEAD, retaining both IDs and pass/fail in `whitespace.json`. PR automation uses
+`pull_request.base.sha` against the checked-out synthetic merge commit. Push
+automation resolves `refs/remotes/origin/<repository.default_branch>` from the
+full-depth checkout and uses its merge-base with HEAD, so integrating main does
+not attribute preexisting main whitespace to this branch. Workflow logs record
+the default-branch ref, resolved commit, and resolved boundary. Missing remote
+refs or missing/all-zero PR bases fail closed without a guessed fallback. Local callers must supply the reviewed
+integration base explicitly. This checks the introduced delta across all paths,
+using the existing repository attributes, instead of attributing unrelated main
+whitespace to the historical disk benchmark. Historical default/manual runs keep
+the original pinned baseline boundary and reject `--whitespace-base` overrides.
