@@ -1,0 +1,102 @@
+import Foundation
+
+/// Standard series/season hints and explicit episode mappings from .plexmatch.
+/// Pattern directives are not interpreted as regular expressions or executed.
+public struct PlexMatchHints: Sendable {
+    public let metadata: MediaMetadataHints
+    // Every mapping supplies only episode identity. Keep unused series metadata
+    // fields out of the retained index and materialize a full hint on lookup.
+    private struct EpisodeMapping: Sendable {
+        let season: Int?
+        let episode: Int
+        let lastEpisode: Int?
+    }
+    private let episodes: [String: EpisodeMapping]
+
+    public static func parse(_ text: String) -> Self? {
+        guard text.utf8.count <= 128 * 1024 else { return nil }
+        var metadata = MediaMetadataHints()
+        metadata.content = .show
+        var episodes: [String: EpisodeMapping] = [:]
+        var hasSupportedHint = false
+        for line in text.trimmingCharacters(in: CharacterSet(charactersIn: "\u{feff}")).split(whereSeparator: \.isNewline) {
+            let line = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !line.hasPrefix("#"), let colon = line.firstIndex(of: ":") else { continue }
+            let key = line[..<colon].trimmingCharacters(in: .whitespaces).lowercased()
+            let value = line[line.index(after: colon)...].trimmingCharacters(in: .whitespaces)
+            guard !value.isEmpty, value.count <= 4096 else { continue }
+            switch key {
+            case "title", "show": metadata.title = value; hasSupportedHint = true
+            case "year":
+                if let number = MediaMetadataHints.number(value), (1800...2099).contains(number) {
+                    metadata.year = number; hasSupportedHint = true
+                }
+            case "season":
+                if let number = MediaMetadataHints.number(value, maximum: 999) {
+                    metadata.season = number; hasSupportedHint = true
+                }
+            case "tvdbid", "tmdbid", "imdbid":
+                if let id = MediaMetadataHints.catalogID(provider: String(key.dropLast(2)), value: value) {
+                    metadata.catalogIDs.append(id); hasSupportedHint = true
+                }
+            case "guid":
+                let parts = value.components(separatedBy: "://")
+                if parts.count == 2, let id = MediaMetadataHints.catalogID(provider: parts[0], value: parts[1]) {
+                    metadata.catalogIDs.append(id); hasSupportedHint = true
+                }
+            case "ep", "episode":
+                guard let separator = value.firstIndex(of: ":"),
+                      let hint = episodeNumber(String(value[..<separator])) else { continue }
+                let path = value[value.index(after: separator)...].trimmingCharacters(in: .whitespaces)
+                guard validRelativePath(path) else { continue }
+                episodes[path] = hint; hasSupportedHint = true
+            default: continue
+            }
+        }
+        guard hasSupportedHint else { return nil }
+        metadata.sources = [".plexmatch"]
+        return .init(metadata: metadata, episodes: episodes)
+    }
+
+    public func hints(for relativePath: String, inheritsDescendantMappings: Bool = true, defaultSeason: Int? = nil) -> MediaMetadataHints {
+        guard let episode = episodeHint(for: relativePath, inheritsDescendantMappings: inheritsDescendantMappings) else { return metadata }
+        var result = episode.overriding(metadata)
+        result.season = result.season ?? defaultSeason ?? 1
+        return result
+    }
+
+    func episodeHint(for relativePath: String, inheritsDescendantMappings: Bool) -> MediaMetadataHints? {
+        guard inheritsDescendantMappings || !relativePath.contains("/"),
+              let episode = episodes[relativePath] else { return nil }
+        var hint = MediaMetadataHints()
+        hint.content = .episode
+        hint.season = episode.season
+        hint.episode = episode.episode
+        hint.lastEpisode = episode.lastEpisode
+        return hint
+    }
+
+    private static func validRelativePath(_ path: String) -> Bool {
+        !path.isEmpty && !path.hasPrefix("/") && !path.contains("\\")
+            && !path.split(separator: "/").contains(where: { $0 == ".." || $0 == "." })
+    }
+
+    // Match the ASCII numeric contract used by the other metadata hints. ICU
+    // \d also accepts digits that Int cannot parse; treating those captures as
+    // absent would silently change the season, episode, or range of a mapping.
+    private static let episodePattern = try! NSRegularExpression(
+        pattern: #"(?i)^(?:S([0-9]{1,3})E|SP|E)?([0-9]{1,4})(?:-(?:S([0-9]{1,3})E|E)?([0-9]{1,4}))?$"#)
+
+    private static func episodeNumber(_ text: String) -> EpisodeMapping? {
+        guard let match = episodePattern.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) else { return nil }
+        func number(_ index: Int) -> Int? {
+            Range(match.range(at: index), in: text).flatMap { Int(text[$0]) }
+        }
+        guard let first = number(2) else { return nil }
+        let season = text.uppercased().hasPrefix("SP") ? 0 : number(1)
+        let lastEpisode = number(4)
+        if let endSeason = number(3), endSeason != season { return nil }
+        if let lastEpisode, lastEpisode <= first { return nil }
+        return EpisodeMapping(season: season, episode: first, lastEpisode: lastEpisode)
+    }
+}
