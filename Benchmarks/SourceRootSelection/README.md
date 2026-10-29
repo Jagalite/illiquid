@@ -30,8 +30,10 @@ directly. Builds are serialized and use private scratch/module-cache paths.
 
 The output directory must be new or empty. `--tests-only` runs current candidate
 regressions in debug/release without historical-source constraints or timings.
-This is the pull-request workflow mode, so future unrelated source changes do
-not invalidate the frozen research baseline.
+Both push and pull-request workflows use this mode, so unrelated source changes
+do not invalidate current-source regression coverage. Manual `workflow_dispatch`
+runs retain the strict pinned-baseline performance gates; integration drift must
+still fail those gates rather than reuse historical performance claims.
 
 ## Correctness and measurement
 

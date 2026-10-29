@@ -4,6 +4,18 @@ on:
   push:
     branches: ['perf/source-root-selection-20261028']
     paths:
+      - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
+      - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
+      - 'Sources/IlliquidApp/App/AppModel.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift'
+      - 'Benchmarks/SourceTreeVisibility/run.py'
+      - 'Tests/IlliquidAppTests/SourceBrowserFilterTests.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeVisibilityCacheTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityStorageTests.swift'
       - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
       - 'Tests/IlliquidAppTests/SourceRootSelectionTests.swift'
       - 'Benchmarks/SourceRootSelection/**'
@@ -12,6 +24,14 @@ on:
       - '!Benchmarks/SourceRootSelection/evidence/**'
   pull_request:
     paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserFilterTests.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeVisibilityCacheTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityStorageTests.swift'
       - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
       - 'Sources/IlliquidApp/UI/SourceBrowserFilter.swift'
       - 'Sources/IlliquidApp/UI/SourceTreeProjectionInput.swift'
@@ -42,11 +62,11 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Verify behavior and compare native Swift performance
+      - name: Run current-source regressions or a dispatched historical study
         run: |
           echo "Kyoto is unavailable on this isolated hosted runner; builds use private, serialized scratch paths."
           mode=()
-          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+          if test "$GITHUB_EVENT_NAME" != 'workflow_dispatch'; then
             mode+=(--tests-only)
           fi
           python3 Benchmarks/SourceRootSelection/run.py \
@@ -83,11 +103,11 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Verify portable behavior and compare Swift performance
+      - name: Run current-source regressions or a dispatched historical study
         run: |
           echo "Kyoto is unavailable on this isolated hosted runner; builds use private, serialized scratch paths."
           mode=()
-          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+          if test "$GITHUB_EVENT_NAME" != 'workflow_dispatch'; then
             mode+=(--tests-only)
           fi
           python3 Benchmarks/SourceRootSelection/run.py \
