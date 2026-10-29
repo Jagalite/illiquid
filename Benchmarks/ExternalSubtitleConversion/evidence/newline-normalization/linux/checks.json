@@ -1,0 +1,97 @@
+{
+  "verification": [
+    {
+      "cases": 5222,
+      "sha256": "70dda2f6829dc800d7f42979d6a96c14742e244c6a3a801af2d378d45a4950eb"
+    }
+  ],
+  "tests": [
+    {
+      "passed_test_counts": [
+        "35"
+      ],
+      "path": "baseline-debug.log",
+      "sha256": "4dea8847380bd739fe9449468be43ef0c8a7df7b4813e17eac223541c89a9902"
+    },
+    {
+      "passed_test_counts": [
+        "35"
+      ],
+      "path": "baseline-release.log",
+      "sha256": "8bc3dfd5d2e588215c4e5007507f55a5e0692fa5b75c0104f3270eb53ed55ed2"
+    },
+    {
+      "passed_test_counts": [
+        "35"
+      ],
+      "path": "candidate-debug.log",
+      "sha256": "3353506275912294871fd0e9a13c0bc7c5c2f177fd6efd73253b96fb947cdd4e"
+    },
+    {
+      "passed_test_counts": [
+        "35"
+      ],
+      "path": "candidate-release.log",
+      "sha256": "77dcb1b865364afbf5a76c653d5fe5773f5a08ebf9d390502bfe0cf58cee49a1"
+    }
+  ],
+  "independent_recomputation": {
+    "platform": "linux",
+    "observations": 800,
+    "cases": 50,
+    "pairs": 8,
+    "expected_observations": 800,
+    "byte_parity_cases": 5222,
+    "test_counts": [
+      {
+        "path": "baseline-debug.log",
+        "count": [
+          "35"
+        ]
+      },
+      {
+        "path": "baseline-release.log",
+        "count": [
+          "35"
+        ]
+      },
+      {
+        "path": "candidate-debug.log",
+        "count": [
+          "35"
+        ]
+      },
+      {
+        "path": "candidate-release.log",
+        "count": [
+          "35"
+        ]
+      }
+    ],
+    "max_summary_recomputation_error": 0,
+    "failures": [],
+    "groups": {
+      "ascii_cr": {
+        "cases": 8,
+        "min_pct": -30.282717231511903,
+        "max_pct": -23.684331336406927,
+        "all_target_pairs_improve": true
+      },
+      "late_unicode": {
+        "cases": 4,
+        "min_pct": 0.3146439989698546,
+        "max_pct": 0.9893997432409929
+      },
+      "unicode_crlf": {
+        "cases": 5,
+        "min_pct": -0.12400503209140101,
+        "max_pct": 0.6342635178958389
+      },
+      "lf_controls": {
+        "cases": 33,
+        "min_pct": -0.6707075821715369,
+        "max_pct": 1.8434039707250882
+      }
+    }
+  }
+}

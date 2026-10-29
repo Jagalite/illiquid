@@ -1,0 +1,53 @@
+name: Source reload selection performance
+
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift
+      - Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift
+      - Sources/IlliquidApp/UI/SourcesSidebar.swift
+      - Sources/IlliquidCore/Utilities/NormalizedFileURL.swift
+      - Tests/IlliquidAppTests/SourceTreeDirectoryStateTests.swift
+      - Scripts/test-source-browser-search.py
+      - Benchmarks/SourceReloadSelection/*.swift
+      - Benchmarks/SourceReloadSelection/run.py
+      - Benchmarks/SourceReloadSelection/baseline/**
+      - .github/workflows/source-reload-selection.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-reload-selection-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify exact reload selection and measure native Foundation
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; this qualification must run through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          python3 Benchmarks/SourceReloadSelection/run.py \
+            --output "$RUNNER_TEMP/source-reload-selection" --rounds 8 --target-ms 250
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-reload-selection-macos
+          path: |
+            ${{ runner.temp }}/source-reload-selection/*.json
+            ${{ runner.temp }}/source-reload-selection/*.jsonl
+            ${{ runner.temp }}/source-reload-selection/sources/
+            ${{ runner.temp }}/source-reload-selection/logs/
+          retention-days: 14

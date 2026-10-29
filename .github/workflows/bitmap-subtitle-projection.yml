@@ -1,0 +1,96 @@
+name: Bitmap subtitle region projection
+
+on:
+  push:
+    branches: ['perf/bitmap-region-projection-20261028-ad101422']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleProjectionTests.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Benchmarks/BitmapSubtitleProjection/Harness.swift'
+      - 'Benchmarks/BitmapSubtitleProjection/run.py'
+      - 'Benchmarks/BitmapSubtitleProjection/baseline/**'
+      - '.github/workflows/bitmap-subtitle-projection.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleProjectionTests.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift'
+      - 'Benchmarks/BitmapSubtitleProjection/**'
+      - '.github/workflows/bitmap-subtitle-projection.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitmap-subtitle-projection-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test complete region projections and measure paired native CPU time
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          python3 Benchmarks/BitmapSubtitleProjection/run.py \
+            --pairs 10 --target-ms 150 \
+            --output "$RUNNER_TEMP/bitmap-subtitle-projection"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-projection-native
+          path: |
+            ${{ runner.temp }}/bitmap-subtitle-projection/*.json
+            ${{ runner.temp }}/bitmap-subtitle-projection/*.jsonl
+            ${{ runner.temp }}/bitmap-subtitle-projection/inputs/
+            ${{ runner.temp }}/bitmap-subtitle-projection/logs/
+          retention-days: 14
+
+  native-integration:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compile the app graph and test bitmap subtitle integration
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          mkdir -p "$RUNNER_TEMP/bitmap-projection-integration"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel \
+            --filter 'BitmapSubtitleProjectionTests|BitmapSubtitleTests|BitmapSubtitleTimelineOrderingTests|SubtitleMemoryBudgetAccountingTests|PiPSubtitlePipelineTests' \
+            2>&1 | tee "$RUNNER_TEMP/bitmap-projection-integration/tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: bitmap-subtitle-projection-integration
+          path: ${{ runner.temp }}/bitmap-projection-integration/
+          retention-days: 14
