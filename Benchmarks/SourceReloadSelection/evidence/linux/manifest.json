@@ -1,0 +1,153 @@
+{
+  "architecture": "x86_64",
+  "arguments": {
+    "iterations": null,
+    "output": "/workspace/scratch/1e108e40bb82/validation/reload-exploratory",
+    "rounds": 6,
+    "swiftc": null,
+    "target_ms": 50.0,
+    "verify_only": false,
+    "workloads": null
+  },
+  "baseline": {
+    "production_path": "Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift",
+    "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "sha256": "ca456d601fb65d3e9a6d62f0ce72d161fbd50ab1d78764085b8301c3041e0e61"
+  },
+  "binaries": {
+    "baseline": {
+      "executable_sha256": "472854273da6bfede9afddd2989a13682ae1f8a7056192f44546632019bbd89c",
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/workspace/scratch/1e108e40bb82/validation/reload-exploratory/module-cache"
+      ],
+      "library_sha256": "b6ed50ceb01b92c75bca1f0a616664400cc8476a1383f57d5c2358ad41cb2f57"
+    },
+    "candidate": {
+      "executable_sha256": "1101eceee5b9d0f9551d0695cf79cad87700556ae4fd32eb5482dde4fbd6e646",
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/workspace/scratch/1e108e40bb82/validation/reload-exploratory/module-cache"
+      ],
+      "library_sha256": "92a44ac8d00e9bc0540ec21187fa57242296748b495054701b41994b40b76b94"
+    },
+    "verifier": {
+      "executable_sha256": "ef1da023efb0610688b6715cb831c223e99b793be526ec6fa91c14718b12aca2",
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/workspace/scratch/1e108e40bb82/validation/reload-exploratory/module-cache",
+        "-D",
+        "DIFFERENTIAL_VERIFY"
+      ],
+      "library_sha256": "baff3ae6281c35a30b24fbae8e4ca71a9815424bead92df75212e457badc831e"
+    }
+  },
+  "compiled_slices": {
+    "SourceFilesystemInvalidationPlan": {
+      "first_line": 75,
+      "last_line": 107,
+      "sha256": "17f7b999e2ea7a70daf298e754b99ad101be5f08b73bf2812813629a6998b6b5",
+      "source": "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift"
+    },
+    "SourceTreeIdentity": {
+      "first_line": 2641,
+      "last_line": 2665,
+      "sha256": "3618ed409ed18dff737bbc352431b69e5e486100c898b05efdc518c075072654",
+      "source": "Sources/IlliquidApp/UI/SourcesSidebar.swift"
+    },
+    "baseline": {
+      "first_line": 132,
+      "last_line": 142,
+      "sha256": "eaa0a90c85c72d928c4816790505b50734c9db21ad6df9dbced7b855ab6fc47b",
+      "source": "Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift"
+    },
+    "candidate": {
+      "first_line": 132,
+      "last_line": 148,
+      "sha256": "91041bbad20e5cf30033aef1ac82af387cb8b6c31b4640c1103e69d47efff3b5",
+      "source": "Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift"
+    }
+  },
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "extraction": "Exact reloadPaths method in actor-isolated enum wrappers; no method-body substitutions",
+  "git_status": " M Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift\n M Tests/IlliquidAppTests/SourceTreeDirectoryStateTests.swift\n?? .github/workflows/source-reload-selection.yml\n?? Benchmarks/SourceReloadSelection/\n?? DependencySources/archives/.gettext-1.0.tar.gz.b9rCc5\n",
+  "head": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "logical_cpus": 9,
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "scope": "Reload path selection only; excludes SwiftUI, I/O, and directory loading",
+  "sources": {
+    "Adapter.swift": {
+      "origin": "Benchmarks/SourceReloadSelection/Adapter.swift",
+      "sha256": "39fdd79bf8c8a09b028976e26408337c015234d21055d1d74d61c49d9fbf5ad7"
+    },
+    "Harness.swift": {
+      "origin": "Benchmarks/SourceReloadSelection/Harness.swift",
+      "sha256": "6f5ba638efdf1048b048f689e33d9df900b0597910029cb0c43fc029ba00a2a0"
+    },
+    "NormalizedFileURL.swift": {
+      "origin": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+      "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2"
+    },
+    "Support.swift": {
+      "origin": "verbatim shared declarations",
+      "sha256": "b2d017893e56ee69f1a65879bbaa882749d2da934ac1bb5a0d1007abc33933da"
+    },
+    "baseline/Selector.swift": {
+      "origin": "exact method in enum wrapper",
+      "sha256": "9bcbf2b756e14504d6e1edb3c423dfcc5584e07ba3ae590c40144cc3e5430145"
+    },
+    "baseline/manifest.json": {
+      "origin": "Benchmarks/SourceReloadSelection/baseline/manifest.json",
+      "sha256": "7014aa93bdd113a1d50c8e4935041eac88b292dea5a3646cc01977a4968f3809"
+    },
+    "candidate/Selector.swift": {
+      "origin": "exact method in enum wrapper",
+      "sha256": "3925ce5e9d787ae47b1038674cb6baf2ffc75741ba1fd735e8710dace1048c14"
+    },
+    "declaration-extractor.py": {
+      "origin": "Scripts/test-source-browser-search.py",
+      "sha256": "1dbc17e778d5d011abc72224714be6cae795cd09444bb85740a313ac5472695b"
+    },
+    "originals/baseline/SourceTreeDirectoryState.swift": {
+      "origin": "Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift",
+      "sha256": "ca456d601fb65d3e9a6d62f0ce72d161fbd50ab1d78764085b8301c3041e0e61"
+    },
+    "originals/candidate/SourceTreeDirectoryState.swift": {
+      "origin": "Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift",
+      "sha256": "72a970142d28e98df8f344c3cee61f641e766966b60e23aad813e6d81e366dd4"
+    },
+    "originals/shared/SourceFilesystemInvalidation.swift": {
+      "origin": "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift",
+      "sha256": "a47c4b70e6953687c0d1cbca39272959881a19e082028a5fb63d656f2e71c770"
+    },
+    "originals/shared/SourcesSidebar.swift": {
+      "origin": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+      "sha256": "5f5c28b8ebc9a8043e5eda4cc668dd3e1e395031f50eaae3ca4b9c9fac3af57d"
+    },
+    "run.py": {
+      "origin": "Benchmarks/SourceReloadSelection/run.py",
+      "sha256": "23bbc97d3f9ede073a5933abc401ad8cadec3c5776aa7fb37f2fbe688e84cf94"
+    },
+    "verifier/BaselineSelector.swift": {
+      "origin": "exact baseline method in renamed enum wrapper",
+      "sha256": "cfe4b7cbd473c53d40fd98568c29e5ac4fcfe109edee2f78024aef526dbd2850"
+    }
+  },
+  "started_utc": "2026-10-28T04:35:12Z",
+  "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+}

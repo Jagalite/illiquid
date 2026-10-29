@@ -1,0 +1,37 @@
+{
+  "allocator_support_sha256": {
+    "heap.c": "1994cc5c27fab344e6cbb725027314519c14b8190cdcb3b84f04cca55e4b5a3d",
+    "include/CLeaseHeap.h": "b1a8779acea8c01bd5769a04bc95e1e510e072b236f74bf0ce06cdfb56d58bfb"
+  },
+  "architecture": "x86_64",
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "git_blob": "180354826bbcd6c427cb4ee0351e043ef4295d95",
+    "path": "Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift",
+    "sha256": "bbf89b4ac3644399cb965a62d4d95ed6c444b4b4942a87e7c93609ed68d194d1"
+  },
+  "baseline_adapter_sha256": "abe2ce1bf76407762f2a9e0492f1d1c42eeeb158f6a9e6e06bce703370346d7f",
+  "baseline_task": "            Task { @MainActor [weak self] in\n                guard let self, self.generation == revision else { return }\n                self.handler(events)\n            }",
+  "binaries": {
+    "baseline-debug": "62b6b2a7207304d9d91c1026126b1b3c1503ab60accd2791bfbb9854a6c40f0c",
+    "baseline-release": "5f6e55c43b8a476eafc536d556d96d0b746264b2850eac16574c667644e5cf36",
+    "candidate-debug": "cf6732e10f24a72e9c68f6b9c2ac09c0a8d04d354d30fe8b35264433497a30f7",
+    "candidate-release": "dee1d5c761e41c1eacbda06ae0ef12469398ac0cce35c238939bc042baec0e22"
+  },
+  "candidate_uses_worktree_source": true,
+  "checkout_head": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "harness_sha256": {
+    "Harness.swift": "cc9d8f061c0793153716a5a0de258273dd74ddaf862fab3f81595588ddc55aa9",
+    "run.py": "9d6b5b7ee49fedc91869a203488342738b0142e71d6eae3109e0bd07821ea744"
+  },
+  "pairs": 4,
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "scope": "Live allocator bytes for actual pending MainActor delivery tasks and event payloads. Excludes native FSEvents callback arrays, the sidebar debounce buffer, full app, and RSS. Stress inputs are synthetic, not observed event rates.",
+  "source_sha256": {
+    "Sources/IlliquidApp/UI/SourceFilesystemEventDelivery.swift": "271cff83ba210f8340748411a5cf79485f33fb70bd5756e68dffd8cfd0751d5f",
+    "Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift": "a47c4b70e6953687c0d1cbca39272959881a19e082028a5fb63d656f2e71c770",
+    "Sources/IlliquidApp/UI/SourceFilesystemMonitor.swift": "45e60d2b6e192b91fce473053576b56ae3eb1477898267f6eb98cfcd745de4c9"
+  },
+  "started_utc": "2026-10-28T04:46:58Z"
+}

@@ -1,0 +1,2584 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "elapsed_seconds": 0.0016331672668457031,
+    "exit_code": 0,
+    "name": "head",
+    "started_unix_seconds": 1793164952.3820567
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "elapsed_seconds": 0.4146244525909424,
+    "exit_code": 0,
+    "name": "status",
+    "started_unix_seconds": 1793164952.3838806
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "--version"
+    ],
+    "elapsed_seconds": 22.386857748031616,
+    "exit_code": 0,
+    "name": "swift-version",
+    "started_unix_seconds": 1793164952.799873
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swift",
+      "test",
+      "--package-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-baseline",
+      "--scratch-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-baseline/.build",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "elapsed_seconds": 38.352187633514404,
+    "exit_code": 0,
+    "name": "baseline-debug-tests",
+    "started_unix_seconds": 1793164975.188065
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-Onone",
+      "-emit-module",
+      "-emit-library",
+      "-module-name",
+      "IlliquidCore",
+      "-emit-module-path",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug/IlliquidCore.swiftmodule",
+      "/home/runner/work/_temp/video-color-regions/sources/baseline.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug/libIlliquidCore.so"
+    ],
+    "elapsed_seconds": 1.3433609008789062,
+    "exit_code": 0,
+    "name": "baseline-debug-core-build",
+    "started_unix_seconds": 1793165013.541135
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-Onone",
+      "-I",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug",
+      "-L",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug",
+      "-lIlliquidCore",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug",
+      "/home/runner/work/_temp/video-color-regions/sources/Driver.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug/measure"
+    ],
+    "elapsed_seconds": 0.5213158130645752,
+    "exit_code": 0,
+    "name": "baseline-debug-driver-build",
+    "started_unix_seconds": 1793165014.8849628
+  },
+  {
+    "argv": [
+      "ldd",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug/measure"
+    ],
+    "elapsed_seconds": 0.008661031723022461,
+    "exit_code": 0,
+    "name": "baseline-debug-linkage",
+    "started_unix_seconds": 1793165015.4068592
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swift",
+      "test",
+      "--package-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-baseline",
+      "--scratch-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-baseline/.build",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "elapsed_seconds": 6.529479742050171,
+    "exit_code": 0,
+    "name": "baseline-release-tests",
+    "started_unix_seconds": 1793165015.416395
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-O",
+      "-whole-module-optimization",
+      "-emit-module",
+      "-emit-library",
+      "-module-name",
+      "IlliquidCore",
+      "-emit-module-path",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/IlliquidCore.swiftmodule",
+      "/home/runner/work/_temp/video-color-regions/sources/baseline.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/libIlliquidCore.so"
+    ],
+    "elapsed_seconds": 1.3938462734222412,
+    "exit_code": 0,
+    "name": "baseline-release-core-build",
+    "started_unix_seconds": 1793165021.9466033
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-O",
+      "-whole-module-optimization",
+      "-I",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release",
+      "-L",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release",
+      "-lIlliquidCore",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release",
+      "/home/runner/work/_temp/video-color-regions/sources/Driver.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure"
+    ],
+    "elapsed_seconds": 1.4134039878845215,
+    "exit_code": 0,
+    "name": "baseline-release-driver-build",
+    "started_unix_seconds": 1793165023.3409405
+  },
+  {
+    "argv": [
+      "ldd",
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure"
+    ],
+    "elapsed_seconds": 0.006682634353637695,
+    "exit_code": 0,
+    "name": "baseline-release-linkage",
+    "started_unix_seconds": 1793165024.7548356
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swift",
+      "test",
+      "--package-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-candidate",
+      "--scratch-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-candidate/.build",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "elapsed_seconds": 7.3804473876953125,
+    "exit_code": 0,
+    "name": "candidate-debug-tests",
+    "started_unix_seconds": 1793165024.762719
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-Onone",
+      "-emit-module",
+      "-emit-library",
+      "-module-name",
+      "IlliquidCore",
+      "-emit-module-path",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-debug/IlliquidCore.swiftmodule",
+      "/home/runner/work/_temp/video-color-regions/sources/candidate.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-debug/libIlliquidCore.so"
+    ],
+    "elapsed_seconds": 0.3351285457611084,
+    "exit_code": 0,
+    "name": "candidate-debug-core-build",
+    "started_unix_seconds": 1793165032.143987
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-Onone",
+      "-I",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-debug",
+      "-L",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-debug",
+      "-lIlliquidCore",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-debug",
+      "/home/runner/work/_temp/video-color-regions/sources/Driver.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-debug/measure"
+    ],
+    "elapsed_seconds": 0.42818284034729004,
+    "exit_code": 0,
+    "name": "candidate-debug-driver-build",
+    "started_unix_seconds": 1793165032.4797094
+  },
+  {
+    "argv": [
+      "ldd",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-debug/measure"
+    ],
+    "elapsed_seconds": 0.006754159927368164,
+    "exit_code": 0,
+    "name": "candidate-debug-linkage",
+    "started_unix_seconds": 1793165032.908449
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swift",
+      "test",
+      "--package-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-candidate",
+      "--scratch-path",
+      "/home/runner/work/_temp/video-color-regions/build/tests-candidate/.build",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "elapsed_seconds": 5.575902223587036,
+    "exit_code": 0,
+    "name": "candidate-release-tests",
+    "started_unix_seconds": 1793165032.9162211
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-O",
+      "-whole-module-optimization",
+      "-emit-module",
+      "-emit-library",
+      "-module-name",
+      "IlliquidCore",
+      "-emit-module-path",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/IlliquidCore.swiftmodule",
+      "/home/runner/work/_temp/video-color-regions/sources/candidate.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/libIlliquidCore.so"
+    ],
+    "elapsed_seconds": 0.40660691261291504,
+    "exit_code": 0,
+    "name": "candidate-release-core-build",
+    "started_unix_seconds": 1793165038.4930937
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/video-color-regions/module-cache",
+      "-O",
+      "-whole-module-optimization",
+      "-I",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release",
+      "-L",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release",
+      "-lIlliquidCore",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release",
+      "/home/runner/work/_temp/video-color-regions/sources/Driver.swift",
+      "-o",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure"
+    ],
+    "elapsed_seconds": 1.3178184032440186,
+    "exit_code": 0,
+    "name": "candidate-release-driver-build",
+    "started_unix_seconds": 1793165038.900307
+  },
+  {
+    "argv": [
+      "ldd",
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure"
+    ],
+    "elapsed_seconds": 0.006905078887939453,
+    "exit_code": 0,
+    "name": "candidate-release-linkage",
+    "started_unix_seconds": 1793165040.2188475
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-debug/measure",
+      "--verify"
+    ],
+    "elapsed_seconds": 0.06123852729797363,
+    "exit_code": 0,
+    "name": "baseline-debug-verify",
+    "started_unix_seconds": 1793165040.2270846
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-debug/measure",
+      "--verify"
+    ],
+    "elapsed_seconds": 0.055010080337524414,
+    "exit_code": 0,
+    "name": "candidate-debug-verify",
+    "started_unix_seconds": 1793165040.2970424
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--verify"
+    ],
+    "elapsed_seconds": 0.025393962860107422,
+    "exit_code": 0,
+    "name": "baseline-release-verify",
+    "started_unix_seconds": 1793165040.363788
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--verify"
+    ],
+    "elapsed_seconds": 0.025734424591064453,
+    "exit_code": 0,
+    "name": "candidate-release-verify",
+    "started_unix_seconds": 1793165040.3953757
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--cases"
+    ],
+    "elapsed_seconds": 0.006349325180053711,
+    "exit_code": 0,
+    "name": "cases",
+    "started_unix_seconds": 1793165040.4315362
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "overall",
+      "10000"
+    ],
+    "elapsed_seconds": 0.0075833797454833984,
+    "exit_code": 0,
+    "name": "pilot-overall-baseline",
+    "started_unix_seconds": 1793165040.4385715
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "overall",
+      "10000"
+    ],
+    "elapsed_seconds": 0.007405519485473633,
+    "exit_code": 0,
+    "name": "pilot-overall-candidate",
+    "started_unix_seconds": 1793165040.4467316
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "leading",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006711244583129883,
+    "exit_code": 0,
+    "name": "pilot-leading-baseline",
+    "started_unix_seconds": 1793165040.4547625
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "leading",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006564140319824219,
+    "exit_code": 0,
+    "name": "pilot-leading-candidate",
+    "started_unix_seconds": 1793165040.4620395
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "bottom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006844758987426758,
+    "exit_code": 0,
+    "name": "pilot-bottom-baseline",
+    "started_unix_seconds": 1793165040.46922
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "bottom",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006900787353515625,
+    "exit_code": 0,
+    "name": "pilot-bottom-candidate",
+    "started_unix_seconds": 1793165040.4766924
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localInterior",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006446123123168945,
+    "exit_code": 0,
+    "name": "pilot-localInterior-baseline",
+    "started_unix_seconds": 1793165040.4842598
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localInterior",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006530046463012695,
+    "exit_code": 0,
+    "name": "pilot-localInterior-candidate",
+    "started_unix_seconds": 1793165040.4913476
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localEdge",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006436824798583984,
+    "exit_code": 0,
+    "name": "pilot-localEdge-baseline",
+    "started_unix_seconds": 1793165040.4985597
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localEdge",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006242990493774414,
+    "exit_code": 0,
+    "name": "pilot-localEdge-candidate",
+    "started_unix_seconds": 1793165040.5056796
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "oneCell",
+      "10000"
+    ],
+    "elapsed_seconds": 0.0061664581298828125,
+    "exit_code": 0,
+    "name": "pilot-oneCell-baseline",
+    "started_unix_seconds": 1793165040.5125601
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "oneCell",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006056547164916992,
+    "exit_code": 0,
+    "name": "pilot-oneCell-candidate",
+    "started_unix_seconds": 1793165040.5193648
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "clipped",
+      "10000"
+    ],
+    "elapsed_seconds": 0.007615804672241211,
+    "exit_code": 0,
+    "name": "pilot-clipped-baseline",
+    "started_unix_seconds": 1793165040.5260224
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "clipped",
+      "10000"
+    ],
+    "elapsed_seconds": 0.00750732421875,
+    "exit_code": 0,
+    "name": "pilot-clipped-candidate",
+    "started_unix_seconds": 1793165040.5342784
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "reversed",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006268978118896484,
+    "exit_code": 0,
+    "name": "pilot-reversed-baseline",
+    "started_unix_seconds": 1793165040.542485
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "reversed",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006101131439208984,
+    "exit_code": 0,
+    "name": "pilot-reversed-candidate",
+    "started_unix_seconds": 1793165040.5495124
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "paletteRegions",
+      "10000"
+    ],
+    "elapsed_seconds": 0.009151697158813477,
+    "exit_code": 0,
+    "name": "pilot-paletteRegions-baseline",
+    "started_unix_seconds": 1793165040.5563414
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "paletteRegions",
+      "10000"
+    ],
+    "elapsed_seconds": 0.008903741836547852,
+    "exit_code": 0,
+    "name": "pilot-paletteRegions-candidate",
+    "started_unix_seconds": 1793165040.5662808
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "10000"
+    ],
+    "elapsed_seconds": 0.0064983367919921875,
+    "exit_code": 0,
+    "name": "pilot-pointLookupControl-baseline",
+    "started_unix_seconds": 1793165040.5759158
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "10000"
+    ],
+    "elapsed_seconds": 0.006493330001831055,
+    "exit_code": 0,
+    "name": "pilot-pointLookupControl-candidate",
+    "started_unix_seconds": 1793165040.5831378
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.1879117488861084,
+    "exit_code": 0,
+    "name": "pair-0-overall-baseline",
+    "started_unix_seconds": 1793165040.5906293
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.15696382522583008,
+    "exit_code": 0,
+    "name": "pair-0-overall-candidate",
+    "started_unix_seconds": 1793165040.7795193
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.19779682159423828,
+    "exit_code": 0,
+    "name": "pair-0-leading-baseline",
+    "started_unix_seconds": 1793165040.9374542
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.15909767150878906,
+    "exit_code": 0,
+    "name": "pair-0-leading-candidate",
+    "started_unix_seconds": 1793165041.1362388
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.16457676887512207,
+    "exit_code": 0,
+    "name": "pair-0-bottom-baseline",
+    "started_unix_seconds": 1793165041.296234
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.15757203102111816,
+    "exit_code": 0,
+    "name": "pair-0-bottom-candidate",
+    "started_unix_seconds": 1793165041.4618194
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.19831442832946777,
+    "exit_code": 0,
+    "name": "pair-0-localInterior-baseline",
+    "started_unix_seconds": 1793165041.620409
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.15949130058288574,
+    "exit_code": 0,
+    "name": "pair-0-localInterior-candidate",
+    "started_unix_seconds": 1793165041.819767
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.1779484748840332,
+    "exit_code": 0,
+    "name": "pair-0-localEdge-baseline",
+    "started_unix_seconds": 1793165041.9803143
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.15007400512695312,
+    "exit_code": 0,
+    "name": "pair-0-localEdge-candidate",
+    "started_unix_seconds": 1793165042.1591814
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.1679222583770752,
+    "exit_code": 0,
+    "name": "pair-0-oneCell-baseline",
+    "started_unix_seconds": 1793165042.3103607
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.15850448608398438,
+    "exit_code": 0,
+    "name": "pair-0-oneCell-candidate",
+    "started_unix_seconds": 1793165042.4793816
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.17871522903442383,
+    "exit_code": 0,
+    "name": "pair-0-clipped-baseline",
+    "started_unix_seconds": 1793165042.6389632
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.15076875686645508,
+    "exit_code": 0,
+    "name": "pair-0-clipped-candidate",
+    "started_unix_seconds": 1793165042.8187773
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.16669321060180664,
+    "exit_code": 0,
+    "name": "pair-0-reversed-baseline",
+    "started_unix_seconds": 1793165042.970729
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.15503621101379395,
+    "exit_code": 0,
+    "name": "pair-0-reversed-candidate",
+    "started_unix_seconds": 1793165043.1385293
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.18280267715454102,
+    "exit_code": 0,
+    "name": "pair-0-paletteRegions-baseline",
+    "started_unix_seconds": 1793165043.2945213
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.1562337875366211,
+    "exit_code": 0,
+    "name": "pair-0-paletteRegions-candidate",
+    "started_unix_seconds": 1793165043.4785032
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15420746803283691,
+    "exit_code": 0,
+    "name": "pair-0-pointLookupControl-baseline",
+    "started_unix_seconds": 1793165043.6359117
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15378689765930176,
+    "exit_code": 0,
+    "name": "pair-0-pointLookupControl-candidate",
+    "started_unix_seconds": 1793165043.7913957
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.1573927402496338,
+    "exit_code": 0,
+    "name": "pair-1-leading-candidate",
+    "started_unix_seconds": 1793165043.9464
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.19788098335266113,
+    "exit_code": 0,
+    "name": "pair-1-leading-baseline",
+    "started_unix_seconds": 1793165044.1048508
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.1577167510986328,
+    "exit_code": 0,
+    "name": "pair-1-bottom-candidate",
+    "started_unix_seconds": 1793165044.3039258
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.16442584991455078,
+    "exit_code": 0,
+    "name": "pair-1-bottom-baseline",
+    "started_unix_seconds": 1793165044.462811
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.15940546989440918,
+    "exit_code": 0,
+    "name": "pair-1-localInterior-candidate",
+    "started_unix_seconds": 1793165044.6283364
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.19757604598999023,
+    "exit_code": 0,
+    "name": "pair-1-localInterior-baseline",
+    "started_unix_seconds": 1793165044.788868
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.14792680740356445,
+    "exit_code": 0,
+    "name": "pair-1-localEdge-candidate",
+    "started_unix_seconds": 1793165044.9876254
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.17690062522888184,
+    "exit_code": 0,
+    "name": "pair-1-localEdge-baseline",
+    "started_unix_seconds": 1793165045.1367674
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.1587381362915039,
+    "exit_code": 0,
+    "name": "pair-1-oneCell-candidate",
+    "started_unix_seconds": 1793165045.3147542
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.16737627983093262,
+    "exit_code": 0,
+    "name": "pair-1-oneCell-baseline",
+    "started_unix_seconds": 1793165045.4747283
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.15092682838439941,
+    "exit_code": 0,
+    "name": "pair-1-clipped-candidate",
+    "started_unix_seconds": 1793165045.643402
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.17807865142822266,
+    "exit_code": 0,
+    "name": "pair-1-clipped-baseline",
+    "started_unix_seconds": 1793165045.7955618
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.15574121475219727,
+    "exit_code": 0,
+    "name": "pair-1-reversed-candidate",
+    "started_unix_seconds": 1793165045.9745955
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.16747498512268066,
+    "exit_code": 0,
+    "name": "pair-1-reversed-baseline",
+    "started_unix_seconds": 1793165046.1315045
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.15621042251586914,
+    "exit_code": 0,
+    "name": "pair-1-paletteRegions-candidate",
+    "started_unix_seconds": 1793165046.3002748
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.18309473991394043,
+    "exit_code": 0,
+    "name": "pair-1-paletteRegions-baseline",
+    "started_unix_seconds": 1793165046.4577355
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.1535189151763916,
+    "exit_code": 0,
+    "name": "pair-1-pointLookupControl-candidate",
+    "started_unix_seconds": 1793165046.64212
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.1532580852508545,
+    "exit_code": 0,
+    "name": "pair-1-pointLookupControl-baseline",
+    "started_unix_seconds": 1793165046.7969177
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.1578822135925293,
+    "exit_code": 0,
+    "name": "pair-1-overall-candidate",
+    "started_unix_seconds": 1793165046.9515195
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.1876828670501709,
+    "exit_code": 0,
+    "name": "pair-1-overall-baseline",
+    "started_unix_seconds": 1793165047.1106856
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.16364288330078125,
+    "exit_code": 0,
+    "name": "pair-2-bottom-baseline",
+    "started_unix_seconds": 1793165047.2994878
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.15708112716674805,
+    "exit_code": 0,
+    "name": "pair-2-bottom-candidate",
+    "started_unix_seconds": 1793165047.464429
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.19767045974731445,
+    "exit_code": 0,
+    "name": "pair-2-localInterior-baseline",
+    "started_unix_seconds": 1793165047.6228104
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.15868425369262695,
+    "exit_code": 0,
+    "name": "pair-2-localInterior-candidate",
+    "started_unix_seconds": 1793165047.821896
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.17672300338745117,
+    "exit_code": 0,
+    "name": "pair-2-localEdge-baseline",
+    "started_unix_seconds": 1793165047.9818969
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.1486060619354248,
+    "exit_code": 0,
+    "name": "pair-2-localEdge-candidate",
+    "started_unix_seconds": 1793165048.159865
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.16717910766601562,
+    "exit_code": 0,
+    "name": "pair-2-oneCell-baseline",
+    "started_unix_seconds": 1793165048.3098938
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.16041254997253418,
+    "exit_code": 0,
+    "name": "pair-2-oneCell-candidate",
+    "started_unix_seconds": 1793165048.4784205
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.17786550521850586,
+    "exit_code": 0,
+    "name": "pair-2-clipped-baseline",
+    "started_unix_seconds": 1793165048.6401923
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.1495528221130371,
+    "exit_code": 0,
+    "name": "pair-2-clipped-candidate",
+    "started_unix_seconds": 1793165048.8194392
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.16540908813476562,
+    "exit_code": 0,
+    "name": "pair-2-reversed-baseline",
+    "started_unix_seconds": 1793165048.970362
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.15459775924682617,
+    "exit_code": 0,
+    "name": "pair-2-reversed-candidate",
+    "started_unix_seconds": 1793165049.1371415
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.1825242042541504,
+    "exit_code": 0,
+    "name": "pair-2-paletteRegions-baseline",
+    "started_unix_seconds": 1793165049.2929125
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.15581941604614258,
+    "exit_code": 0,
+    "name": "pair-2-paletteRegions-candidate",
+    "started_unix_seconds": 1793165049.476822
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15343713760375977,
+    "exit_code": 0,
+    "name": "pair-2-pointLookupControl-baseline",
+    "started_unix_seconds": 1793165049.6340206
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15322279930114746,
+    "exit_code": 0,
+    "name": "pair-2-pointLookupControl-candidate",
+    "started_unix_seconds": 1793165049.7889006
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.18771147727966309,
+    "exit_code": 0,
+    "name": "pair-2-overall-baseline",
+    "started_unix_seconds": 1793165049.9435632
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.15840888023376465,
+    "exit_code": 0,
+    "name": "pair-2-overall-candidate",
+    "started_unix_seconds": 1793165050.1326766
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.19729185104370117,
+    "exit_code": 0,
+    "name": "pair-2-leading-baseline",
+    "started_unix_seconds": 1793165050.2925184
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.15765166282653809,
+    "exit_code": 0,
+    "name": "pair-2-leading-candidate",
+    "started_unix_seconds": 1793165050.4915423
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.15903663635253906,
+    "exit_code": 0,
+    "name": "pair-3-localInterior-candidate",
+    "started_unix_seconds": 1793165050.6506178
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.19778800010681152,
+    "exit_code": 0,
+    "name": "pair-3-localInterior-baseline",
+    "started_unix_seconds": 1793165050.811214
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.1486194133758545,
+    "exit_code": 0,
+    "name": "pair-3-localEdge-candidate",
+    "started_unix_seconds": 1793165051.0105627
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.176893949508667,
+    "exit_code": 0,
+    "name": "pair-3-localEdge-baseline",
+    "started_unix_seconds": 1793165051.1606517
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.15747451782226562,
+    "exit_code": 0,
+    "name": "pair-3-oneCell-candidate",
+    "started_unix_seconds": 1793165051.3390455
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.1699047088623047,
+    "exit_code": 0,
+    "name": "pair-3-oneCell-baseline",
+    "started_unix_seconds": 1793165051.4980335
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.15006685256958008,
+    "exit_code": 0,
+    "name": "pair-3-clipped-candidate",
+    "started_unix_seconds": 1793165051.6694603
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.18035340309143066,
+    "exit_code": 0,
+    "name": "pair-3-clipped-baseline",
+    "started_unix_seconds": 1793165051.8211298
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.15538763999938965,
+    "exit_code": 0,
+    "name": "pair-3-reversed-candidate",
+    "started_unix_seconds": 1793165052.003009
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.16555094718933105,
+    "exit_code": 0,
+    "name": "pair-3-reversed-baseline",
+    "started_unix_seconds": 1793165052.1599674
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.15650153160095215,
+    "exit_code": 0,
+    "name": "pair-3-paletteRegions-candidate",
+    "started_unix_seconds": 1793165052.3271022
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.18267011642456055,
+    "exit_code": 0,
+    "name": "pair-3-paletteRegions-baseline",
+    "started_unix_seconds": 1793165052.4851713
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15314960479736328,
+    "exit_code": 0,
+    "name": "pair-3-pointLookupControl-candidate",
+    "started_unix_seconds": 1793165052.6694634
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15322399139404297,
+    "exit_code": 0,
+    "name": "pair-3-pointLookupControl-baseline",
+    "started_unix_seconds": 1793165052.824249
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.1586453914642334,
+    "exit_code": 0,
+    "name": "pair-3-overall-candidate",
+    "started_unix_seconds": 1793165052.9790623
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.1880953311920166,
+    "exit_code": 0,
+    "name": "pair-3-overall-baseline",
+    "started_unix_seconds": 1793165053.139378
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.15744328498840332,
+    "exit_code": 0,
+    "name": "pair-3-leading-candidate",
+    "started_unix_seconds": 1793165053.32908
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.19778752326965332,
+    "exit_code": 0,
+    "name": "pair-3-leading-baseline",
+    "started_unix_seconds": 1793165053.4881818
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.15726733207702637,
+    "exit_code": 0,
+    "name": "pair-3-bottom-candidate",
+    "started_unix_seconds": 1793165053.6875978
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.16342687606811523,
+    "exit_code": 0,
+    "name": "pair-3-bottom-baseline",
+    "started_unix_seconds": 1793165053.8465443
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.18004989624023438,
+    "exit_code": 0,
+    "name": "pair-4-localEdge-baseline",
+    "started_unix_seconds": 1793165054.0116255
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.15039658546447754,
+    "exit_code": 0,
+    "name": "pair-4-localEdge-candidate",
+    "started_unix_seconds": 1793165054.1933491
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.1679227352142334,
+    "exit_code": 0,
+    "name": "pair-4-oneCell-baseline",
+    "started_unix_seconds": 1793165054.3454351
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.1597423553466797,
+    "exit_code": 0,
+    "name": "pair-4-oneCell-candidate",
+    "started_unix_seconds": 1793165054.515045
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.17835068702697754,
+    "exit_code": 0,
+    "name": "pair-4-clipped-baseline",
+    "started_unix_seconds": 1793165054.6764956
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.1510779857635498,
+    "exit_code": 0,
+    "name": "pair-4-clipped-candidate",
+    "started_unix_seconds": 1793165054.8565452
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.16570711135864258,
+    "exit_code": 0,
+    "name": "pair-4-reversed-baseline",
+    "started_unix_seconds": 1793165055.0093153
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.15548205375671387,
+    "exit_code": 0,
+    "name": "pair-4-reversed-candidate",
+    "started_unix_seconds": 1793165055.1767466
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.18281793594360352,
+    "exit_code": 0,
+    "name": "pair-4-paletteRegions-baseline",
+    "started_unix_seconds": 1793165055.3339036
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.15679407119750977,
+    "exit_code": 0,
+    "name": "pair-4-paletteRegions-candidate",
+    "started_unix_seconds": 1793165055.5184443
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15306925773620605,
+    "exit_code": 0,
+    "name": "pair-4-pointLookupControl-baseline",
+    "started_unix_seconds": 1793165055.6769795
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15309453010559082,
+    "exit_code": 0,
+    "name": "pair-4-pointLookupControl-candidate",
+    "started_unix_seconds": 1793165055.8315012
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.1878037452697754,
+    "exit_code": 0,
+    "name": "pair-4-overall-baseline",
+    "started_unix_seconds": 1793165055.986455
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.1579906940460205,
+    "exit_code": 0,
+    "name": "pair-4-overall-candidate",
+    "started_unix_seconds": 1793165056.176285
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.19716143608093262,
+    "exit_code": 0,
+    "name": "pair-4-leading-baseline",
+    "started_unix_seconds": 1793165056.335775
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.15767240524291992,
+    "exit_code": 0,
+    "name": "pair-4-leading-candidate",
+    "started_unix_seconds": 1793165056.534804
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.16393589973449707,
+    "exit_code": 0,
+    "name": "pair-4-bottom-baseline",
+    "started_unix_seconds": 1793165056.6942968
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.15714383125305176,
+    "exit_code": 0,
+    "name": "pair-4-bottom-candidate",
+    "started_unix_seconds": 1793165056.859984
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.19771027565002441,
+    "exit_code": 0,
+    "name": "pair-4-localInterior-baseline",
+    "started_unix_seconds": 1793165057.0190158
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.1587667465209961,
+    "exit_code": 0,
+    "name": "pair-4-localInterior-candidate",
+    "started_unix_seconds": 1793165057.2185721
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.1572723388671875,
+    "exit_code": 0,
+    "name": "pair-5-oneCell-candidate",
+    "started_unix_seconds": 1793165057.3792353
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.16816997528076172,
+    "exit_code": 0,
+    "name": "pair-5-oneCell-baseline",
+    "started_unix_seconds": 1793165057.5383086
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.15025877952575684,
+    "exit_code": 0,
+    "name": "pair-5-clipped-candidate",
+    "started_unix_seconds": 1793165057.7084463
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.17879748344421387,
+    "exit_code": 0,
+    "name": "pair-5-clipped-baseline",
+    "started_unix_seconds": 1793165057.8605673
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.16077089309692383,
+    "exit_code": 0,
+    "name": "pair-5-reversed-candidate",
+    "started_unix_seconds": 1793165058.0412033
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.16544866561889648,
+    "exit_code": 0,
+    "name": "pair-5-reversed-baseline",
+    "started_unix_seconds": 1793165058.2038217
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.1559596061706543,
+    "exit_code": 0,
+    "name": "pair-5-paletteRegions-candidate",
+    "started_unix_seconds": 1793165058.3711066
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.1828451156616211,
+    "exit_code": 0,
+    "name": "pair-5-paletteRegions-baseline",
+    "started_unix_seconds": 1793165058.5289972
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15279102325439453,
+    "exit_code": 0,
+    "name": "pair-5-pointLookupControl-candidate",
+    "started_unix_seconds": 1793165058.7137477
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15305233001708984,
+    "exit_code": 0,
+    "name": "pair-5-pointLookupControl-baseline",
+    "started_unix_seconds": 1793165058.868438
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.15688300132751465,
+    "exit_code": 0,
+    "name": "pair-5-overall-candidate",
+    "started_unix_seconds": 1793165059.0234268
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.18791508674621582,
+    "exit_code": 0,
+    "name": "pair-5-overall-baseline",
+    "started_unix_seconds": 1793165059.1822
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.15693020820617676,
+    "exit_code": 0,
+    "name": "pair-5-leading-candidate",
+    "started_unix_seconds": 1793165059.3719974
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.1971890926361084,
+    "exit_code": 0,
+    "name": "pair-5-leading-baseline",
+    "started_unix_seconds": 1793165059.5308838
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.15713214874267578,
+    "exit_code": 0,
+    "name": "pair-5-bottom-candidate",
+    "started_unix_seconds": 1793165059.7300034
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.1633162498474121,
+    "exit_code": 0,
+    "name": "pair-5-bottom-baseline",
+    "started_unix_seconds": 1793165059.8891675
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.15883302688598633,
+    "exit_code": 0,
+    "name": "pair-5-localInterior-candidate",
+    "started_unix_seconds": 1793165060.0545492
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.19741034507751465,
+    "exit_code": 0,
+    "name": "pair-5-localInterior-baseline",
+    "started_unix_seconds": 1793165060.2153213
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.1477680206298828,
+    "exit_code": 0,
+    "name": "pair-5-localEdge-candidate",
+    "started_unix_seconds": 1793165060.4148347
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.1792314052581787,
+    "exit_code": 0,
+    "name": "pair-5-localEdge-baseline",
+    "started_unix_seconds": 1793165060.5645635
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.1776573657989502,
+    "exit_code": 0,
+    "name": "pair-6-clipped-baseline",
+    "started_unix_seconds": 1793165060.7458177
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.14896321296691895,
+    "exit_code": 0,
+    "name": "pair-6-clipped-candidate",
+    "started_unix_seconds": 1793165060.925441
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.16713690757751465,
+    "exit_code": 0,
+    "name": "pair-6-reversed-baseline",
+    "started_unix_seconds": 1793165061.076421
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.155656099319458,
+    "exit_code": 0,
+    "name": "pair-6-reversed-candidate",
+    "started_unix_seconds": 1793165061.2455676
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.18254804611206055,
+    "exit_code": 0,
+    "name": "pair-6-paletteRegions-baseline",
+    "started_unix_seconds": 1793165061.403223
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.15648460388183594,
+    "exit_code": 0,
+    "name": "pair-6-paletteRegions-candidate",
+    "started_unix_seconds": 1793165061.5878196
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.1541759967803955,
+    "exit_code": 0,
+    "name": "pair-6-pointLookupControl-baseline",
+    "started_unix_seconds": 1793165061.7463422
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15294837951660156,
+    "exit_code": 0,
+    "name": "pair-6-pointLookupControl-candidate",
+    "started_unix_seconds": 1793165061.9025578
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.1876506805419922,
+    "exit_code": 0,
+    "name": "pair-6-overall-baseline",
+    "started_unix_seconds": 1793165062.0575392
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.15787315368652344,
+    "exit_code": 0,
+    "name": "pair-6-overall-candidate",
+    "started_unix_seconds": 1793165062.2472196
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.19726991653442383,
+    "exit_code": 0,
+    "name": "pair-6-leading-baseline",
+    "started_unix_seconds": 1793165062.4072225
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.157393217086792,
+    "exit_code": 0,
+    "name": "pair-6-leading-candidate",
+    "started_unix_seconds": 1793165062.6065505
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.1639404296875,
+    "exit_code": 0,
+    "name": "pair-6-bottom-baseline",
+    "started_unix_seconds": 1793165062.7660959
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.15714073181152344,
+    "exit_code": 0,
+    "name": "pair-6-bottom-candidate",
+    "started_unix_seconds": 1793165062.932181
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.19897174835205078,
+    "exit_code": 0,
+    "name": "pair-6-localInterior-baseline",
+    "started_unix_seconds": 1793165063.0914376
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.15884637832641602,
+    "exit_code": 0,
+    "name": "pair-6-localInterior-candidate",
+    "started_unix_seconds": 1793165063.2922006
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.17788362503051758,
+    "exit_code": 0,
+    "name": "pair-6-localEdge-baseline",
+    "started_unix_seconds": 1793165063.453185
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.14839577674865723,
+    "exit_code": 0,
+    "name": "pair-6-localEdge-candidate",
+    "started_unix_seconds": 1793165063.633223
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.16714143753051758,
+    "exit_code": 0,
+    "name": "pair-6-oneCell-baseline",
+    "started_unix_seconds": 1793165063.7837448
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.1575026512145996,
+    "exit_code": 0,
+    "name": "pair-6-oneCell-candidate",
+    "started_unix_seconds": 1793165063.953025
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.15503644943237305,
+    "exit_code": 0,
+    "name": "pair-7-reversed-candidate",
+    "started_unix_seconds": 1793165064.112717
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "reversed",
+      "14161097"
+    ],
+    "elapsed_seconds": 0.16892385482788086,
+    "exit_code": 0,
+    "name": "pair-7-reversed-baseline",
+    "started_unix_seconds": 1793165064.2699091
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.15570831298828125,
+    "exit_code": 0,
+    "name": "pair-7-paletteRegions-candidate",
+    "started_unix_seconds": 1793165064.4410274
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "paletteRegions",
+      "645920"
+    ],
+    "elapsed_seconds": 0.1830298900604248,
+    "exit_code": 0,
+    "name": "pair-7-paletteRegions-baseline",
+    "started_unix_seconds": 1793165064.598923
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.15323734283447266,
+    "exit_code": 0,
+    "name": "pair-7-pointLookupControl-candidate",
+    "started_unix_seconds": 1793165064.7842224
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "pointLookupControl",
+      "28822874"
+    ],
+    "elapsed_seconds": 0.1529381275177002,
+    "exit_code": 0,
+    "name": "pair-7-pointLookupControl-baseline",
+    "started_unix_seconds": 1793165064.9397764
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.15865087509155273,
+    "exit_code": 0,
+    "name": "pair-7-overall-candidate",
+    "started_unix_seconds": 1793165065.0950441
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "overall",
+      "1298747"
+    ],
+    "elapsed_seconds": 0.18751740455627441,
+    "exit_code": 0,
+    "name": "pair-7-overall-baseline",
+    "started_unix_seconds": 1793165065.2559042
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.15672063827514648,
+    "exit_code": 0,
+    "name": "pair-7-leading-candidate",
+    "started_unix_seconds": 1793165065.44564
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "leading",
+      "3143284"
+    ],
+    "elapsed_seconds": 0.19719314575195312,
+    "exit_code": 0,
+    "name": "pair-7-leading-baseline",
+    "started_unix_seconds": 1793165065.6046052
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.15717291831970215,
+    "exit_code": 0,
+    "name": "pair-7-bottom-candidate",
+    "started_unix_seconds": 1793165065.8040407
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "bottom",
+      "3022786"
+    ],
+    "elapsed_seconds": 0.16377639770507812,
+    "exit_code": 0,
+    "name": "pair-7-bottom-baseline",
+    "started_unix_seconds": 1793165065.9634557
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.15937089920043945,
+    "exit_code": 0,
+    "name": "pair-7-localInterior-candidate",
+    "started_unix_seconds": 1793165066.1295264
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localInterior",
+      "7982333"
+    ],
+    "elapsed_seconds": 0.19768381118774414,
+    "exit_code": 0,
+    "name": "pair-7-localInterior-baseline",
+    "started_unix_seconds": 1793165066.2912629
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.14786720275878906,
+    "exit_code": 0,
+    "name": "pair-7-localEdge-candidate",
+    "started_unix_seconds": 1793165066.4912686
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "localEdge",
+      "10764804"
+    ],
+    "elapsed_seconds": 0.1768178939819336,
+    "exit_code": 0,
+    "name": "pair-7-localEdge-baseline",
+    "started_unix_seconds": 1793165066.6414478
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.15826916694641113,
+    "exit_code": 0,
+    "name": "pair-7-oneCell-candidate",
+    "started_unix_seconds": 1793165066.8206007
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "oneCell",
+      "14449754"
+    ],
+    "elapsed_seconds": 0.1672661304473877,
+    "exit_code": 0,
+    "name": "pair-7-oneCell-baseline",
+    "started_unix_seconds": 1793165066.981194
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/candidate-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.15025687217712402,
+    "exit_code": 0,
+    "name": "pair-7-clipped-candidate",
+    "started_unix_seconds": 1793165067.1507776
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/video-color-regions/build/baseline-release/measure",
+      "--measure",
+      "clipped",
+      "1235778"
+    ],
+    "elapsed_seconds": 0.17814373970031738,
+    "exit_code": 0,
+    "name": "pair-7-clipped-baseline",
+    "started_unix_seconds": 1793165067.3033435
+  }
+]
