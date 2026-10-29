@@ -134,10 +134,16 @@ final class SourceTreeDirectoryState {
         activeRoots: [URL],
         expandedFolderIDs: Set<String>
     ) -> Set<String> {
+        guard !activeRoots.isEmpty,
+              !plan.directoriesToReload.isEmpty || !plan.rootsToRescan.isEmpty
+        else { return [] }
         let activeRootPaths = Set(activeRoots.map(SourceTreeIdentity.folderID))
         return Set(plan.directoriesToReload.union(plan.rootsToRescan).filter { path in
-            activeRoots.contains { SourceTreeIdentity.isFolderID(path, inside: $0) }
-                && (activeRootPaths.contains(path) || expandedFolderIDs.contains(path))
+            // Reuse the normalized roots for the whole event batch. Collapsed
+            // directories need no containment check, and roots contain themselves.
+            activeRootPaths.contains(path)
+                || (expandedFolderIDs.contains(path)
+                    && activeRootPaths.contains { SourceTreeIdentity.contains(path, within: $0) })
         })
     }
 }
