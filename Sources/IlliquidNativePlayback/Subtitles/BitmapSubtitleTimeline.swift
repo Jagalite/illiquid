@@ -66,7 +66,8 @@ struct NativeBitmapSubtitleComposition: Sendable {
         guard canvasSize.width > 0, canvasSize.height > 0 else { return [] }
         let scaleX = viewport.width / canvasSize.width
         let scaleY = viewport.height / canvasSize.height
-        return regions.filter { !forcedOnly || $0.isForced }.map { region in
+        let visibleRegions = forcedOnly ? regions.filter(\.isForced) : regions
+        return visibleRegions.map { region in
             ASSRenderedRegion(bitmap: region.pixels, color: 0,
                 frame: CGRect(x: viewport.minX + region.frame.minX * scaleX,
                               y: viewport.minY + region.frame.minY * scaleY,
