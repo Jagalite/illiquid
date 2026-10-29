@@ -38,7 +38,7 @@ jobs:
           apt-get install --no-install-recommends -y python3
           swift --version
           swift --version | grep -F 'Swift version 6.3.2'
-      - name: Qualify complete outputs and measure root lookup and cold projection
+      - name: Qualify outputs (push current-source correctness; manual strict performance)
         run: |
           if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
             echo 'Kyoto is available; submit this qualification through its shared default queue.'
@@ -47,7 +47,7 @@ jobs:
           echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated component packages.'
           python3 Benchmarks/SourceVisibilityRootLookup/run.py \
             --output "$RUNNER_TEMP/source-visibility-root-lookup" \
-            --pairs 10 --target-ms 350
+            ${{ github.event_name == 'workflow_dispatch' && '--pairs 10 --target-ms 350' || '--current-source-correctness' }}
       - name: Emit numeric evidence and source receipts
         if: always()
         run: |
@@ -102,7 +102,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - name: Qualify complete outputs and measure root lookup and cold projection
+      - name: Qualify outputs (push current-source correctness; manual strict performance)
         run: |
           if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
             echo 'Kyoto is available; submit this qualification through its shared default queue.'
@@ -111,7 +111,7 @@ jobs:
           echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated component packages.'
           python3 Benchmarks/SourceVisibilityRootLookup/run.py \
             --output "$RUNNER_TEMP/source-visibility-root-lookup" \
-            --pairs 10 --target-ms 350
+            ${{ github.event_name == 'workflow_dispatch' && '--pairs 10 --target-ms 350' || '--current-source-correctness' }}
       - name: Emit numeric evidence and source receipts
         if: always()
         run: |

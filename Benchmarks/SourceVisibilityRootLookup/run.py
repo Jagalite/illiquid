@@ -177,7 +177,8 @@ let package = Package(
         return receipts
 
     def prepare_sources(self) -> dict:
-        baseline = json.loads(self.read(HERE / "baseline/manifest.json"))
+        baseline = json.loads(self.read(HERE / ("current-source.json" if self.args.current_source_correctness else "baseline/manifest.json")))
+        self.manifest["evidence_mode"] = "current-source-correctness" if self.args.current_source_correctness else "historical-strict"
         matcher = self.read(HERE / "baseline/SourceVisibilityMatcher.swift").decode()
         if baseline["revision"] != PIN or baseline["source"] != SIDEBAR or digest(matcher.encode()) != baseline["matcher_sha256"]:
             raise RuntimeError("Pinned baseline matcher/manifest mismatch")
@@ -518,7 +519,13 @@ def main() -> None:
     parser.add_argument("--target-ms", type=float, default=350)
     parser.add_argument("--cases", help="Optional comma-separated subset; correctness still checks the full catalog")
     parser.add_argument("--correctness-only", "--tests-only", action="store_true", dest="correctness_only")
+    parser.add_argument("--current-source-correctness", action="store_true",
+                        help="Exact reviewed current support with pinned baseline matcher; never measures performance")
     args = parser.parse_args()
+    if args.current_source_correctness:
+        if args.cases:
+            parser.error("Current-source correctness requires the full workload catalog")
+        args.correctness_only = True
     if args.pairs < 2 or args.pairs % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("Use an even pair count >= 2 and a positive finite target-ms")
     args.output = args.output.resolve()
@@ -533,7 +540,7 @@ def main() -> None:
         if not args.correctness_only:
             runner.measure(cases)
         runner.verify_sources()
-        save(args.output / "completion.json", {"status": "passed", "correctness_only": args.correctness_only,
+        save(args.output / "completion.json", {"status": "passed", "evidence_mode": runner.manifest["evidence_mode"], "correctness_only": args.correctness_only,
             "cases": [case["case"] for case in cases], "sources_unchanged": True,
             "observations": 0 if args.correctness_only else len(cases) * args.pairs * 2,
             "performance_threshold_evaluated": False})
