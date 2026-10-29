@@ -6,6 +6,9 @@ on:
   pull_request:
     paths:
       - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift'
       - 'Tests/IlliquidNativePlaybackTests/ThumbnailDiskPathTests.swift'
       - 'Benchmarks/ThumbnailInventoryMemory/**'
       - '.github/workflows/thumbnail-inventory-memory.yml'
@@ -29,13 +32,15 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Qualify paths and measure retained native inventory memory
+      - name: Qualify inventory, reads, pixels, and executed cache tests
         run: |
           python3 - <<'PY'
           import json, os, subprocess, sys
           from pathlib import Path
           command = [sys.executable, 'Benchmarks/ThumbnailInventoryMemory/run.py',
                      '--pairs', '6', '--output', os.environ['RUNNER_TEMP'] + '/thumbnail-inventory-memory']
+          if os.environ['GITHUB_EVENT_NAME'] != 'workflow_dispatch':
+              command.append('--current-source-regression')
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
               cli = [sys.executable, str(queue)]
@@ -59,7 +64,7 @@ jobs:
           from pathlib import Path
           root = Path(os.environ['RUNNER_TEMP']) / 'thumbnail-inventory-memory'
           for name in ['environment.json', 'sources.json', 'binaries.json', 'tests.json',
-                       'fixtures.json', 'observations.jsonl', 'summary.json', 'qualification.json']:
+                       'source-policy.json', 'fixtures.json', 'observations.jsonl', 'summary.json', 'qualification.json']:
               path = root / name
               if path.is_file():
                   print('THUMBNAIL_INVENTORY_EVIDENCE ' + json.dumps(

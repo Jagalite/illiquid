@@ -180,3 +180,23 @@ Evidence files retained verbatim from the completed component job:
 `fixtures.json`, `observations.jsonl`, `summary.json` and
 `qualification.json`. The raw process orders, paired differences,
 checksums and adverse timing samples are retained, without filtering.
+
+### Current-source regression integration
+
+Automated push/PR runs use `--current-source-regression`. Default CLI and
+`workflow_dispatch` retain the strict historical supporting-source equality guard.
+The opt-in mode substitutes only the reviewed current `ThumbnailPolicy.swift`,
+`MediaPlaybackSettings.swift`, and `NativeThumbnailCache.swift` support files in
+both variants. Every other support file must still match its pinned revision.
+`NativeThumbnailDiskCache.swift` remains byte-for-byte from the pinned baseline
+for the reference and from the working tree for the candidate. This is an
+independent disk-cache reference with current support, not a recreation of the
+historical executable. `source-policy.json` records the adaptation and both hashes;
+original changed support bytes are retained under `sources/historical/`.
+
+Both variants still execute all seven XCTest suites (44 tests) in debug and
+release. Both AB and BA orders exercise every 0/128/2048/8191 inventory fixture,
+512 reads, checksums, and decoded pixel parity. Raw observations are retained,
+but no metric summary is emitted and `performance_qualified` is false. Frozen
+test inputs and staged source hashes are checked before qualification. The
+existing historical evidence is unchanged; this mode cannot renew its claims.

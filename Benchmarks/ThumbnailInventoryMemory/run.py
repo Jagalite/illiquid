@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import statistics
 import subprocess
@@ -38,6 +39,31 @@ METRIC_FILES = ["Benchmarks/ThumbnailReadAllocation/CThumbnailReadMetrics/" + na
                 for name in ("Metrics.c", "Metrics.h", "module.modulemap")]
 
 
+# Reviewed main integration drift; any other supporting-source change still fails.
+CURRENT_SUPPORT = {
+    "Sources/IlliquidCore/Player/ThumbnailPolicy.swift",
+    "Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift",
+    "Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift",
+}
+
+
+def reference_source(path, historical, current, regression):
+    if path != CHANGED and historical != current:
+        if not regression or path not in CURRENT_SUPPORT:
+            raise RuntimeError(f"Review supporting-source drift before measuring: {path}")
+        return current
+    return historical
+
+
+def executed_test_summaries(log):
+    expected = {Path(path).stem for path in TESTS}
+    suites = set(re.findall(r"Test Suite '([^']+)' passed", log))
+    if not expected <= suites or not re.search(r"Executed 44 tests?, with 0 failures", log):
+        raise RuntimeError("Expected all seven suites and 44 executed XCTest tests with zero failures.")
+    return [line.strip() for line in log.splitlines()
+            if "Executed " in line and "0 failures" in line]
+
+
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -50,6 +76,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--pairs", type=int, default=6)
+    parser.add_argument("--current-source-regression", action="store_true",
+                        help="Use reviewed current support for parity only; no performance claim.")
     args = parser.parse_args()
     if platform.system() != "Darwin":
         parser.error("Requires macOS: this experiment uses real Foundation, ImageIO, and CoreGraphics.")
@@ -92,12 +120,20 @@ def main() -> None:
 
     run(["git", "diff", "--check", BASELINE, "HEAD"], "diff-check")
     sources = {}
+    adaptations = {}
     paths = {variant: {} for variant in ("baseline", "candidate")}
     for path in CORE + NATIVE:
         baseline = run(["git", "show", f"{BASELINE}:{path}"], "source-" + Path(path).stem).encode()
         candidate = (ROOT / path).read_bytes()
-        if path != CHANGED and baseline != candidate:
-            raise RuntimeError(f"Review supporting-source drift before measuring: {path}")
+        historical = baseline
+        baseline = reference_source(path, historical, candidate, args.current_source_regression)
+        if baseline != historical:
+            original = output / "sources" / "historical" / path
+            original.parent.mkdir(parents=True, exist_ok=True)
+            original.write_bytes(historical)
+            sources[f"historical/{path}"] = digest(historical)
+            adaptations[path] = {"historical_sha256": digest(historical),
+                                 "current_sha256": digest(baseline)}
         for variant, content in (("baseline", baseline), ("candidate", candidate)):
             destination = output / "sources" / variant / path
             destination.parent.mkdir(parents=True, exist_ok=True)
@@ -115,9 +151,22 @@ def main() -> None:
         target = output / "driver" / name
         target.write_bytes((HERE / name).read_bytes())
         sources["driver/" + name] = digest(target.read_bytes())
+    frozen_tests = {}
     for path in TESTS:
-        sources[path] = digest((ROOT / path).read_bytes())
+        target = output / "sources" / "tests" / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / path).read_bytes())
+        frozen_tests[path] = target
+        sources["tests/" + path] = digest(target.read_bytes())
     write_json(output / "sources.json", sources)
+    mode = "current-source-regression" if args.current_source_regression else "historical-measurement"
+    write_json(output / "source-policy.json", {
+        "mode": mode, "pinned_disk_baseline": BASELINE,
+        "adapted_support": adaptations,
+        "performance_qualified": False,
+        "scope": "Parity with reviewed current support; not historical performance evidence."
+                 if args.current_source_regression else "Strict historical support equality.",
+    })
 
     swiftc = run(["xcrun", "--find", "swiftc"], "find-swiftc").strip()
     sdk = run(["xcrun", "--sdk", "macosx", "--show-sdk-path"], "sdk").strip()
@@ -188,15 +237,12 @@ let package = Package(name: "ThumbnailInventoryQualification",
         destination = package / "Tests" / "ThumbnailTests"
         destination.mkdir(parents=True)
         for path in TESTS:
-            shutil.copyfile(ROOT / path, destination / Path(path).name)
+            shutil.copyfile(frozen_tests[path], destination / Path(path).name)
         for configuration in ("debug", "release"):
             log = run(["swift", "test", "--package-path", package, "--configuration", configuration,
                        "--jobs", "2", "--no-parallel"], f"tests-{variant}-{configuration}", timeout=900)
-            if "Executed " not in log or "0 failures" not in log:
-                raise RuntimeError("Expected executed XCTest success receipt is missing.")
             receipt = dict(variant=variant, configuration=configuration, passed=True,
-                           summaries=[line.strip() for line in log.splitlines()
-                                      if "Executed " in line and "0 failures" in line])
+                           suites=7, tests=44, summaries=executed_test_summaries(log))
             test_receipts.append(receipt)
             print("THUMBNAIL_INVENTORY_TEST " + json.dumps(receipt, sort_keys=True), flush=True)
     write_json(output / "tests.json", test_receipts)
@@ -230,6 +276,28 @@ let package = Package(name: "ThumbnailInventoryQualification",
             for key in ("inventory_bytes", "read_iterations", "read_checksum", "pixel_sha256"):
                 assert pair_rows["baseline"].get(key) == pair_rows["candidate"].get(key), (count, pair, key)
             print(f"Measured pair {pair + 1}/{args.pairs}, inventory {count}", flush=True)
+
+    # These exact frozen inputs were used throughout both builds and all executions.
+    for name, expected_hash in sources.items():
+        if name.startswith("driver/"):
+            staged = output / name
+        elif name in METRIC_FILES:
+            staged = output / "driver" / "metrics" / Path(name).name
+        else:
+            staged = output / "sources" / name
+        if digest(staged.read_bytes()) != expected_hash:
+            raise RuntimeError(f"Staged source changed during qualification: {name}")
+    if args.current_source_regression:
+        qualification = {"mode": mode, "tests_passed": len(test_receipts),
+                         "suites_per_execution": 7, "tests_per_execution": 44,
+                         "measurement_processes": len(observations),
+                         "balanced_ab_ba_pairs": args.pairs, "counts": COUNTS,
+                         "inventory_and_read_parity": True, "sources_frozen_and_hashed": True,
+                         "pinned_disk_baseline": BASELINE, "adapted_support": adaptations,
+                         "performance_qualified": False}
+        write_json(output / "qualification.json", qualification)
+        print("THUMBNAIL_INVENTORY_REGRESSION " + json.dumps(qualification, sort_keys=True), flush=True)
+        return
 
     summary = {"baseline": BASELINE, "candidate_commit": host["candidate_commit"],
                "pairs": args.pairs, "processes": len(observations), "scenarios": []}
