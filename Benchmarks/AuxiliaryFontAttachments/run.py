@@ -27,7 +27,11 @@ ROOT = HERE.parents[1]
 BASELINE = "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635"
 VARIANTS = ("baseline", "candidate")
 REGRESSION_TARGET = "c1ef6aff6060ad35decbc6dce0c224164be941a2"
-CURRENT_SUPPORT = "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift"
+CURRENT_SUPPORT = {
+    "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
+    "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
+    "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
+}
 WORKLOADS = [("auxiliary", count) for count in (1, 2, 3)] + [("default", 1)]
 HELPER = ROOT / "Benchmarks/AttachmentAdmission/run.py"
 FOCAL = {"Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
@@ -95,7 +99,7 @@ class Runner:
             "drivers": {},
         }
         for path in [Path(__file__), HERE / "Harness.swift", HERE / "MemoryProbe.h",
-                     HERE / "generate-fixtures.py", HELPER]:
+                     HERE / "generate-fixtures.py", HERE / "test_source_policy.py", HELPER]:
             name = "admission-source-helper.py" if path == HELPER else path.name
             shutil.copyfile(path, self.output / name)
             self.receipt["drivers"][str(path.relative_to(ROOT))] = file_sha(path)
@@ -143,7 +147,7 @@ class Runner:
         write_json(self.output / "fixtures.json", fixtures)
         return fixtures
 
-    def prepare(self):
+    def prepare_sources(self, shared):
         self.receipt["comparison_mode"] = ("current-support-regression-no-timing"
             if self.args.current_support_regression else "strict-historical")
         if self.args.current_support_regression:
@@ -153,7 +157,6 @@ class Runner:
                 if (ROOT / path).read_bytes() != pinned:
                     raise ValueError(f"Pinned regression target changed: {path}")
         original = {}
-        shared = helper()
         paths = shared.FULL_SOURCES + [shared.PRESENTATION, shared.BITMAP] + shared.C_SOURCES
         for variant in VARIANTS:
             original[variant] = {}
@@ -167,15 +170,23 @@ class Runner:
                 self.sources[f"{variant}:{path}"] = {"sha256": sha(raw), "bytes": len(raw),
                     "origin": "working-tree" if variant == "candidate" else "pinned-baseline"}
         if self.args.current_support_regression:
-            # Save the historical source above; record and stage identical support.
-            original["baseline"][CURRENT_SUPPORT] = original["candidate"][CURRENT_SUPPORT]
-            self.receipt["support_override"] = {
-                "path": CURRENT_SUPPORT,
-                "historical_sha256": self.sources[f"baseline:{CURRENT_SUPPORT}"]["sha256"],
-                "both_arms_sha256": self.sources[f"candidate:{CURRENT_SUPPORT}"]["sha256"]}
+            # Historical snapshots remain archived; only this explicit support
+            # inventory is compiled from identical current bytes in both arms.
+            self.receipt["support_overrides"] = []
+            for path in sorted(CURRENT_SUPPORT):
+                original["baseline"][path] = original["candidate"][path]
+                self.receipt["support_overrides"].append({
+                    "path": path,
+                    "historical_sha256": self.sources[f"baseline:{path}"]["sha256"],
+                    "both_arms_sha256": self.sources[f"candidate:{path}"]["sha256"]})
         for path in set(shared.FULL_SOURCES + shared.C_SOURCES) - FOCAL:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
+        return original
+
+    def prepare(self):
+        shared = helper()
+        original = self.prepare_sources(shared)
         extracted = {}
         for variant in VARIANTS:
             extracted[variant] = "import Foundation\n\n" + shared.extract(
@@ -242,6 +253,8 @@ class Runner:
         write_json(self.output / "manifest.json", self.receipt)
 
     def invoke(self, variant, case, mode, policy, count, iterations, label):
+        if self.args.current_support_regression and mode == "timing":
+            raise ValueError("Timing is prohibited in current-support regression mode")
         raw = self.command([self.executables[variant], mode, case["path"], policy, count, iterations,
                             case["accepted_payload_bytes"]], label)
         result = json.loads(raw)
@@ -332,6 +345,8 @@ class Runner:
         return self.summarize()
 
     def summarize(self):
+        if self.args.current_support_regression and any(row["mode"] == "timing" for row in self.observations):
+            raise ValueError("Timing observations cannot qualify a current-support regression")
         measurements = [row for row in self.observations if row["stage"] == "measurement"]
         expected = len(self.fixtures) * len(WORKLOADS) * 2 * self.args.pairs * (1 if self.args.current_support_regression else 2)
         if len(measurements) != expected:
@@ -406,7 +421,7 @@ def main():
     parser.add_argument("--ffmpeg-prefix", type=Path, default=Path("/opt/homebrew/opt/ffmpeg"))
     parser.add_argument("--swiftc")
     parser.add_argument("--current-support-regression", action="store_true",
-                        help="Pinned-target regression with identical current packet support; no timing qualification")
+                        help="Pinned-target regression with identical current packet/queue/ring support; timing prohibited")
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--target-ms", type=float, default=100)
     parser.add_argument("--max-iterations", type=int, default=1000)
@@ -425,7 +440,8 @@ def main():
         if args.mode == "all":
             summary = runner.measure()
         else:
-            summary = {"status": "complete", "mode": args.mode, "parity": runner.parity}
+            summary = {"status": "complete", "mode": args.mode, "parity": runner.parity,
+                       "comparison_mode": runner.receipt["comparison_mode"]}
         runner.verify_inputs()
         runner.receipt["completed_utc"] = datetime.now(timezone.utc).isoformat()
         write_json(runner.output / "manifest.json", runner.receipt)
