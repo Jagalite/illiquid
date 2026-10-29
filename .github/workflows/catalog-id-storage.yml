@@ -1,0 +1,100 @@
+name: Catalog ID storage
+
+on:
+  push:
+    branches: ['codex/catalog-id-storage']
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatchHintsRegressionTests.swift'
+      - 'Tests/IlliquidCoreTests/CatalogIDStorageTests.swift'
+      - 'Benchmarks/CatalogIDStorage/Driver.swift'
+      - 'Benchmarks/CatalogIDStorage/MemoryProbe.c'
+      - 'Benchmarks/CatalogIDStorage/MemoryProbe.h'
+      - 'Benchmarks/CatalogIDStorage/run.py'
+      - 'Benchmarks/CatalogIDStorage/baseline/**'
+      - '.github/workflows/catalog-id-storage.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/MediaMetadataHints.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/PlexMatchHints.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift'
+      - 'Tests/IlliquidCoreTests/PlexMatchHintsRegressionTests.swift'
+      - 'Tests/IlliquidCoreTests/CatalogIDStorageTests.swift'
+      - 'Benchmarks/CatalogIDStorage/Driver.swift'
+      - 'Benchmarks/CatalogIDStorage/MemoryProbe.c'
+      - 'Benchmarks/CatalogIDStorage/MemoryProbe.h'
+      - 'Benchmarks/CatalogIDStorage/run.py'
+      - 'Benchmarks/CatalogIDStorage/baseline/**'
+      - '.github/workflows/catalog-id-storage.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog-id-storage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualify:
+    name: Catalog ID storage (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Configure runtime
+        shell: bash
+        run: |
+          echo "CATALOG_OUTPUT=$RUNNER_TEMP/catalog-id-storage" >> "$GITHUB_ENV"
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            echo "DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer" >> "$GITHUB_ENV"
+          fi
+      - name: Qualify and measure
+        shell: bash
+        run: |
+          if [[ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]]; then
+            echo "::error::A Kyoto queue exists; route this component run through that queue."
+            exit 1
+          fi
+          echo "Kyoto is unavailable on this isolated runner; running component builds serially."
+          python3 Benchmarks/CatalogIDStorage/run.py \
+            --output "$CATALOG_OUTPUT" --mode all --pairs 12 --target-ms 250
+      - name: Print bounded evidence
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, math, os
+          from pathlib import Path
+          root = Path(os.environ["CATALOG_OUTPUT"])
+          names = [
+              "manifest.json", "tests.json", "parity.json", "baseline-parity.json",
+              "candidate-parity.json", "cases.json", "calibration.json", "summary.json",
+              "memory.jsonl", "timing.jsonl", "completion.json",
+          ]
+          files = {name: (root / name).read_text() for name in names if (root / name).is_file()}
+          if sum(len(value.encode()) for value in files.values()) > 2_000_000:
+              raise SystemExit("Evidence exceeds the bounded log receipt; use the artifact.")
+          for name, value in files.items():
+              count = max(1, math.ceil(len(value) / 8192))
+              for part in range(count):
+                  receipt = {"path": name, "part": part, "parts": count, "text": value[part*8192:(part+1)*8192]}
+                  print("CATALOG_ID_EVIDENCE_JSON " + json.dumps(receipt, separators=(",", ":")))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: catalog-id-storage-${{ matrix.os }}
+          path: ${{ env.CATALOG_OUTPUT }}
+          if-no-files-found: warn
+          retention-days: 30

@@ -46,17 +46,31 @@ public enum PlaybackProgressAnalyzer {
       }
     }
 
-    let settled = Set(
+    let transactionIndices = classifications.indices.filter {
+      classifications[$0] == .transactionProgress
+    }
+    var canSettle = Set(
       classifications.indices.filter {
         classifications[$0] == .terminal || classifications[$0] == .stableIntentionalWait
           || classifications[$0] == .declaredExternalWait
       })
-    var canSettle = settled
-    var changed = true
-    while changed {
-      changed = false
-      for edge in result.graph.edges where edge.isFairProgress && canSettle.contains(edge.to) {
-        if canSettle.insert(edge.from).inserted { changed = true }
+    // Reachability is used only to count settled transactions. With no
+    // transactions or no settled seeds, that count is already known.
+    if !transactionIndices.isEmpty && !canSettle.isEmpty {
+      var predecessors: [Int: [Int]] = [:]
+      for edge in result.graph.edges where edge.isFairProgress {
+        predecessors[edge.to, default: []].append(edge.from)
+      }
+
+      // Visit each reachable vertex once, following fair edges backwards.
+      // Cutoff nodes may carry a path even though they are not settled seeds.
+      var worklist = Array(canSettle)
+      while let destination = worklist.popLast() {
+        for predecessor in predecessors[destination, default: []] {
+          if canSettle.insert(predecessor).inserted {
+            worklist.append(predecessor)
+          }
+        }
       }
     }
 
@@ -75,9 +89,6 @@ public enum PlaybackProgressAnalyzer {
         $0.isFairProgress && ranks[$0.to] < ranks[$0.from]
       }
       return !hasExit && !hasFairDecrease
-    }
-    let transactionIndices = classifications.indices.filter {
-      classifications[$0] == .transactionProgress
     }
     return PlaybackProgressReport(
       terminalStates: classifications.count(where: { $0 == .terminal }),
