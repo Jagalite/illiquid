@@ -1,0 +1,544 @@
+{
+  "binaries": {
+    "copying": "cbfe04f8d97025ab3a269d3a3ab2d52ecf2ce5cf3461d07ace133aea4a256dda",
+    "data_nocopy": "6a55451c5435cc218f3d20df862e4faaf40d2c3239c14085f8a9c4cb15bc5dcb",
+    "raw_buffer": "7eb33ae763f9ac0da2df2ee8be9128337dc0d46d9061fd5d8ba5b62c8127f0b2"
+  },
+  "compiled_sources": {
+    "sources/CFFmpeg/helpers.h": "dab8508df5f8f574cae106c78b8417447ded42ef602b7e8a916903d6e99e691c",
+    "sources/CFFmpeg/module.modulemap": "278beda0d5508d4cc8eacfc4b66244ff653bbaa69d30f26c52e9997b2af46515",
+    "sources/Driver.swift": "d073a21a69e4e98764530f7ac4f7b2a8587faec95c440e0384187ea8483235e3",
+    "sources/copying/BitmapSubtitleClassifiers.swift": "157ed150965c8240bfd4ee0522a795479f2852fa8b9a5685ba1bcc4e35bbd0f3",
+    "sources/data_nocopy/BitmapSubtitleClassifiers.swift": "157ed150965c8240bfd4ee0522a795479f2852fa8b9a5685ba1bcc4e35bbd0f3",
+    "sources/data_nocopy/FFmpegDemuxer.swift": "9f655c8d98323843da1e0a9f5925610abd8b53f2ce1a7c220bf58d2175d7d22c",
+    "sources/raw_buffer/BitmapSubtitleClassifiers.swift": "01f12aa090da26b10b5e202a142bf87bf0209d4a5d7ce3f7dfaf1e30201bd2ca",
+    "sources/raw_buffer/SubtitleAcquisitionPacket.swift": "ac9faae7b4745e24c27dd4e5e88ada9bacfe7a6ebead9439b097d6aba57dafd6",
+    "sources/shared/FFmpegError.swift": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+    "sources/shared/FFmpegPacket.swift": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+    "sources/shared/FixedRingBuffer.swift": "1d4723deb9d40e4a8ea341d6b1b8a83325cefb63233714ef2c5b2c095ab5e89d",
+    "sources/shared/MediaTime.swift": "585065a24ea7b35ff438bb1d222d681250539b27dc4584b21cfe57c9d129dc02",
+    "sources/shared/PacketQueue.swift": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab"
+  },
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "compiler_binary_sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de",
+  "driver_sha256": "d073a21a69e4e98764530f7ac4f7b2a8587faec95c440e0384187ea8483235e3",
+  "extractions": {
+    "C/error-and-flag-helpers": {
+      "compiled_bytes": 758,
+      "compiled_sha256": "616c8d274066261d932fc1bbb7ab8c09bdcf11dca540ade7010aca9625ef0497",
+      "original_sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96"
+    },
+    "C/nopts-helper": {
+      "compiled_bytes": 81,
+      "compiled_sha256": "b81d272a2a7334c52538de67121baa987daa1bc2485dc2d45caaed88771dd932",
+      "original_sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96"
+    },
+    "Swift/FFmpegRational": {
+      "compiled_bytes": 403,
+      "compiled_sha256": "19d26a9e83711dc7058eca4193c69a9c0b9b9371a69a0a921512dbd76fb30963",
+      "original_sha256": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02"
+    },
+    "Swift/MediaTime.seconds": {
+      "compiled_bytes": 278,
+      "compiled_sha256": "558f644a3f9db766630eb62ea65a82b68686f6806e7f34adb325e618268e684a",
+      "original_sha256": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02"
+    },
+    "copying/classifiers": {
+      "compiled_bytes": 1926,
+      "compiled_sha256": "157ed150965c8240bfd4ee0522a795479f2852fa8b9a5685ba1bcc4e35bbd0f3",
+      "original_sha256": "73cfde4dca6aee6f19f7e7de1240592f2574ac47c1974b2ee7dff37a92185316"
+    },
+    "data_nocopy/classifiers": {
+      "compiled_bytes": 1926,
+      "compiled_sha256": "157ed150965c8240bfd4ee0522a795479f2852fa8b9a5685ba1bcc4e35bbd0f3",
+      "original_sha256": "73cfde4dca6aee6f19f7e7de1240592f2574ac47c1974b2ee7dff37a92185316"
+    },
+    "data_nocopy/namespace-assembly": {
+      "added_syntax": "separating newline and enclosing closing brace",
+      "compiled_sha256": "9f655c8d98323843da1e0a9f5925610abd8b53f2ce1a7c220bf58d2175d7d22c",
+      "input_keys": [
+        "data_nocopy/imports",
+        "data_nocopy/type",
+        "data_nocopy/helper"
+      ]
+    },
+    "raw_buffer/classifiers": {
+      "compiled_bytes": 2062,
+      "compiled_sha256": "01f12aa090da26b10b5e202a142bf87bf0209d4a5d7ce3f7dfaf1e30201bd2ca",
+      "original_sha256": "cda72bb73479b7f2bf9568eb8d5d07616705ec6420c645397bb78f4b51d562ff"
+    }
+  },
+  "ffmpeg_library_sha256": {
+    "/lib/x86_64-linux-gnu/libavcodec.so.60": "8231c9aecba7d02c132de0e16195ccb3e8002a235a5f364b3635df09e7f513e0",
+    "/lib/x86_64-linux-gnu/libavutil.so.58": "11b0836441b899e1b2183fc10eda5a5f637c03547fdfe5b97774e2cbd5aeb72c"
+  },
+  "ffmpeg_packages": "libavcodec-dev:amd64\t7:6.1.1-3ubuntu5\nlibavutil-dev:amd64\t7:6.1.1-3ubuntu5\n",
+  "ffmpeg_versions": "60.31.102\n58.29.100\n",
+  "flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-parse-as-library",
+    "-I",
+    "/__w/_temp/bitmap-acquisition-comparison/sources/CFFmpeg",
+    "-module-cache-path",
+    "/__w/_temp/bitmap-acquisition-comparison/module-cache",
+    "-Xcc",
+    "-I/usr/include/x86_64-linux-gnu"
+  ],
+  "hardware": "model name\t: AMD EPYC 9V74 80-Core Processor",
+  "input_manifest_sha256": "fa611c83c84161abecb4c1c48c26ac76a6e96bac9bf96e8d723f3cd06226269d",
+  "inputs": {
+    "copying/call-site": {
+      "bytes": 273,
+      "end_byte_exclusive": 12162,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
+      "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "sha256": "88ddbf83dcfc453f49c6122116f8f419b0781d3fbef722b2c60fe33e39e03278",
+      "snapshot": "frozen/copying/call-site.swift.txt",
+      "source_bytes": 23596,
+      "source_sha256": "ad1e459d5f9475aa2bcea1a7f7a57d02fb956a2f776104daff678eee16a679e6",
+      "start_byte": 11889,
+      "verified_against_git": true
+    },
+    "copying/classifiers": {
+      "bytes": 1946,
+      "end_byte_exclusive": 1946,
+      "path": "Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift",
+      "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "sha256": "73cfde4dca6aee6f19f7e7de1240592f2574ac47c1974b2ee7dff37a92185316",
+      "snapshot": "frozen/copying/BitmapSubtitleClassifiers.swift",
+      "source_bytes": 6794,
+      "source_sha256": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "data_nocopy/call-site": {
+      "bytes": 178,
+      "end_byte_exclusive": 12067,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "1ac131bd15b7ef61f93b0d4f844d0b59bd8268d09d63e34c0a4ffe657c72f797",
+      "snapshot": "frozen/data_nocopy/call-site.swift.txt",
+      "source_bytes": 24446,
+      "source_sha256": "a42bbd2d5291c36b3e60f4f5eea054cc5fbbed40fa4dac6e9bcbaae3f02658c8",
+      "start_byte": 11889,
+      "verified_against_git": true
+    },
+    "data_nocopy/classifiers": {
+      "bytes": 1946,
+      "end_byte_exclusive": 1946,
+      "path": "Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "73cfde4dca6aee6f19f7e7de1240592f2574ac47c1974b2ee7dff37a92185316",
+      "snapshot": "frozen/data_nocopy/BitmapSubtitleClassifiers.swift",
+      "source_bytes": 6794,
+      "source_sha256": "646d9f785d6a996c37282e3ccb32066f968307e09dc05836ff8df1ac99dc329f",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "data_nocopy/helper": {
+      "bytes": 706,
+      "end_byte_exclusive": 14556,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "a10d2ed7a7a6b8db211e9efebd6cc5f71464999b3dc55dc506154526fa765751",
+      "snapshot": "frozen/data_nocopy/helper.swift.txt",
+      "source_bytes": 24446,
+      "source_sha256": "a42bbd2d5291c36b3e60f4f5eea054cc5fbbed40fa4dac6e9bcbaae3f02658c8",
+      "start_byte": 13850,
+      "verified_against_git": true
+    },
+    "data_nocopy/imports": {
+      "bytes": 33,
+      "end_byte_exclusive": 33,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "d5fbe104879303e74839bdebbb762f61a301a49b94f19d301dfac062cdb85c67",
+      "snapshot": "frozen/data_nocopy/imports.swift.txt",
+      "source_bytes": 24446,
+      "source_sha256": "a42bbd2d5291c36b3e60f4f5eea054cc5fbbed40fa4dac6e9bcbaae3f02658c8",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "data_nocopy/tests": {
+      "bytes": 10528,
+      "end_byte_exclusive": 10528,
+      "path": "Tests/IlliquidNativePlaybackTests/BitmapSubtitleAcquisitionBorrowTests.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "29c7ff64999c8d7404f8f7cedce3a0e8826cf96f33fe47d637067df53ec93d74",
+      "snapshot": "frozen/data_nocopy/BitmapSubtitleAcquisitionBorrowTests.swift",
+      "source_bytes": 10528,
+      "source_sha256": "29c7ff64999c8d7404f8f7cedce3a0e8826cf96f33fe47d637067df53ec93d74",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "data_nocopy/type": {
+      "bytes": 28,
+      "end_byte_exclusive": 1317,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "d543cc675c65f22c5f4400d31f57d5aab3ae3dbbda397456eb8060c341d90d1e",
+      "snapshot": "frozen/data_nocopy/type.swift.txt",
+      "source_bytes": 24446,
+      "source_sha256": "a42bbd2d5291c36b3e60f4f5eea054cc5fbbed40fa4dac6e9bcbaae3f02658c8",
+      "start_byte": 1289,
+      "verified_against_git": true
+    },
+    "raw_buffer/adapter": {
+      "bytes": 1181,
+      "end_byte_exclusive": 1181,
+      "path": "Sources/IlliquidNativePlayback/Subtitles/SubtitleAcquisitionPacket.swift",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "ac9faae7b4745e24c27dd4e5e88ada9bacfe7a6ebead9439b097d6aba57dafd6",
+      "snapshot": "frozen/raw_buffer/SubtitleAcquisitionPacket.swift",
+      "source_bytes": 1181,
+      "source_sha256": "ac9faae7b4745e24c27dd4e5e88ada9bacfe7a6ebead9439b097d6aba57dafd6",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "raw_buffer/call-site": {
+      "bytes": 223,
+      "end_byte_exclusive": 12112,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "4570cfc920251710d7e2ebe2ade0111d39f775769f5adb8ad41c9fdc782b4706",
+      "snapshot": "frozen/raw_buffer/call-site.swift.txt",
+      "source_bytes": 23546,
+      "source_sha256": "86cffdd619b737abe86c4f97be0ef5d1f6c76ca732e33ac8bee8f020a5d56ba3",
+      "start_byte": 11889,
+      "verified_against_git": true
+    },
+    "raw_buffer/classifiers": {
+      "bytes": 2082,
+      "end_byte_exclusive": 2082,
+      "path": "Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "cda72bb73479b7f2bf9568eb8d5d07616705ec6420c645397bb78f4b51d562ff",
+      "snapshot": "frozen/raw_buffer/BitmapSubtitleClassifiers.swift",
+      "source_bytes": 6930,
+      "source_sha256": "6e43c7f7c04ccb4fa152b0c53a2dfc3f49a9dfc8007a1cbd3951bfaa05534c14",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "raw_buffer/tests": {
+      "bytes": 9317,
+      "end_byte_exclusive": 9317,
+      "path": "Tests/IlliquidNativePlaybackTests/SubtitleAcquisitionPacketBorrowTests.swift",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "247742bfa13bbf265ea7e8914a4a003bb32aa3a4a8897d121c2844067bca6022",
+      "snapshot": "frozen/raw_buffer/SubtitleAcquisitionPacketBorrowTests.swift",
+      "source_bytes": 9317,
+      "source_sha256": "247742bfa13bbf265ea7e8914a4a003bb32aa3a4a8897d121c2844067bca6022",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/copying/FFmpegError.swift": {
+      "bytes": 916,
+      "end_byte_exclusive": 916,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegError.swift",
+      "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "sha256": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+      "snapshot": "frozen/shared/FFmpegError.swift",
+      "source_bytes": 916,
+      "source_sha256": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/copying/FFmpegPacket.swift": {
+      "bytes": 6265,
+      "end_byte_exclusive": 6265,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
+      "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+      "snapshot": "frozen/shared/FFmpegPacket.swift",
+      "source_bytes": 6265,
+      "source_sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/copying/FixedRingBuffer.swift": {
+      "bytes": 1152,
+      "end_byte_exclusive": 1152,
+      "path": "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
+      "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "sha256": "1d4723deb9d40e4a8ea341d6b1b8a83325cefb63233714ef2c5b2c095ab5e89d",
+      "snapshot": "frozen/shared/FixedRingBuffer.swift",
+      "source_bytes": 1152,
+      "source_sha256": "1d4723deb9d40e4a8ea341d6b1b8a83325cefb63233714ef2c5b2c095ab5e89d",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/copying/MediaTime.swift": {
+      "bytes": 1508,
+      "end_byte_exclusive": 1508,
+      "path": "Sources/IlliquidNativePlayback/Media/MediaTime.swift",
+      "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "sha256": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02",
+      "snapshot": "frozen/shared/MediaTime.swift",
+      "source_bytes": 1508,
+      "source_sha256": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/copying/PacketQueue.swift": {
+      "bytes": 17213,
+      "end_byte_exclusive": 17213,
+      "path": "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
+      "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "sha256": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab",
+      "snapshot": "frozen/shared/PacketQueue.swift",
+      "source_bytes": 17213,
+      "source_sha256": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/copying/ffmpeg_shim.h": {
+      "bytes": 38476,
+      "end_byte_exclusive": 38476,
+      "path": "Sources/CFFmpeg/include/ffmpeg_shim.h",
+      "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+      "snapshot": "frozen/shared/ffmpeg_shim.h",
+      "source_bytes": 38476,
+      "source_sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/copying/module.modulemap": {
+      "bytes": 194,
+      "end_byte_exclusive": 194,
+      "path": "Sources/CFFmpeg/module.modulemap",
+      "revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+      "sha256": "9a2151e77447bcdb17a6a39f4a08c035461a5cedf030b7e8ef40146c84309bbf",
+      "snapshot": "frozen/shared/module.modulemap",
+      "source_bytes": 194,
+      "source_sha256": "9a2151e77447bcdb17a6a39f4a08c035461a5cedf030b7e8ef40146c84309bbf",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/data_nocopy/FFmpegError.swift": {
+      "bytes": 916,
+      "end_byte_exclusive": 916,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegError.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+      "snapshot": "frozen/shared/FFmpegError.swift",
+      "source_bytes": 916,
+      "source_sha256": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/data_nocopy/FFmpegPacket.swift": {
+      "bytes": 6265,
+      "end_byte_exclusive": 6265,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+      "snapshot": "frozen/shared/FFmpegPacket.swift",
+      "source_bytes": 6265,
+      "source_sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/data_nocopy/FixedRingBuffer.swift": {
+      "bytes": 1152,
+      "end_byte_exclusive": 1152,
+      "path": "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "1d4723deb9d40e4a8ea341d6b1b8a83325cefb63233714ef2c5b2c095ab5e89d",
+      "snapshot": "frozen/shared/FixedRingBuffer.swift",
+      "source_bytes": 1152,
+      "source_sha256": "1d4723deb9d40e4a8ea341d6b1b8a83325cefb63233714ef2c5b2c095ab5e89d",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/data_nocopy/MediaTime.swift": {
+      "bytes": 1508,
+      "end_byte_exclusive": 1508,
+      "path": "Sources/IlliquidNativePlayback/Media/MediaTime.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02",
+      "snapshot": "frozen/shared/MediaTime.swift",
+      "source_bytes": 1508,
+      "source_sha256": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/data_nocopy/PacketQueue.swift": {
+      "bytes": 17213,
+      "end_byte_exclusive": 17213,
+      "path": "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab",
+      "snapshot": "frozen/shared/PacketQueue.swift",
+      "source_bytes": 17213,
+      "source_sha256": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/data_nocopy/ffmpeg_shim.h": {
+      "bytes": 38476,
+      "end_byte_exclusive": 38476,
+      "path": "Sources/CFFmpeg/include/ffmpeg_shim.h",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+      "snapshot": "frozen/shared/ffmpeg_shim.h",
+      "source_bytes": 38476,
+      "source_sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/data_nocopy/module.modulemap": {
+      "bytes": 194,
+      "end_byte_exclusive": 194,
+      "path": "Sources/CFFmpeg/module.modulemap",
+      "revision": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+      "sha256": "9a2151e77447bcdb17a6a39f4a08c035461a5cedf030b7e8ef40146c84309bbf",
+      "snapshot": "frozen/shared/module.modulemap",
+      "source_bytes": 194,
+      "source_sha256": "9a2151e77447bcdb17a6a39f4a08c035461a5cedf030b7e8ef40146c84309bbf",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/raw_buffer/FFmpegError.swift": {
+      "bytes": 916,
+      "end_byte_exclusive": 916,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegError.swift",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+      "snapshot": "frozen/shared/FFmpegError.swift",
+      "source_bytes": 916,
+      "source_sha256": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/raw_buffer/FFmpegPacket.swift": {
+      "bytes": 6265,
+      "end_byte_exclusive": 6265,
+      "path": "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+      "snapshot": "frozen/shared/FFmpegPacket.swift",
+      "source_bytes": 6265,
+      "source_sha256": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/raw_buffer/FixedRingBuffer.swift": {
+      "bytes": 1152,
+      "end_byte_exclusive": 1152,
+      "path": "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "1d4723deb9d40e4a8ea341d6b1b8a83325cefb63233714ef2c5b2c095ab5e89d",
+      "snapshot": "frozen/shared/FixedRingBuffer.swift",
+      "source_bytes": 1152,
+      "source_sha256": "1d4723deb9d40e4a8ea341d6b1b8a83325cefb63233714ef2c5b2c095ab5e89d",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/raw_buffer/MediaTime.swift": {
+      "bytes": 1508,
+      "end_byte_exclusive": 1508,
+      "path": "Sources/IlliquidNativePlayback/Media/MediaTime.swift",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02",
+      "snapshot": "frozen/shared/MediaTime.swift",
+      "source_bytes": 1508,
+      "source_sha256": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/raw_buffer/PacketQueue.swift": {
+      "bytes": 17213,
+      "end_byte_exclusive": 17213,
+      "path": "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab",
+      "snapshot": "frozen/shared/PacketQueue.swift",
+      "source_bytes": 17213,
+      "source_sha256": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/raw_buffer/ffmpeg_shim.h": {
+      "bytes": 38476,
+      "end_byte_exclusive": 38476,
+      "path": "Sources/CFFmpeg/include/ffmpeg_shim.h",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+      "snapshot": "frozen/shared/ffmpeg_shim.h",
+      "source_bytes": 38476,
+      "source_sha256": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+      "start_byte": 0,
+      "verified_against_git": true
+    },
+    "shared/raw_buffer/module.modulemap": {
+      "bytes": 194,
+      "end_byte_exclusive": 194,
+      "path": "Sources/CFFmpeg/module.modulemap",
+      "revision": "aa71f1df6045ef35301fb0a95518b571f02f23b7",
+      "sha256": "9a2151e77447bcdb17a6a39f4a08c035461a5cedf030b7e8ef40146c84309bbf",
+      "snapshot": "frozen/shared/module.modulemap",
+      "source_bytes": 194,
+      "source_sha256": "9a2151e77447bcdb17a6a39f4a08c035461a5cedf030b7e8ef40146c84309bbf",
+      "start_byte": 0,
+      "verified_against_git": true
+    }
+  },
+  "linked_dependencies": "\tlinux-vdso.so.1 (0x00007f9f9a618000)\n\tlibavcodec.so.60 => /lib/x86_64-linux-gnu/libavcodec.so.60 (0x00007f9f990d6000)\n\tlibavutil.so.58 => /lib/x86_64-linux-gnu/libavutil.so.58 (0x00007f9f97fbc000)\n\tlibswiftCore.so => /usr/lib/swift/linux/libswiftCore.so (0x00007f9f978a6000)\n\tlibswift_Concurrency.so => /usr/lib/swift/linux/libswift_Concurrency.so (0x00007f9f97800000)\n\tlibswift_StringProcessing.so => /usr/lib/swift/linux/libswift_StringProcessing.so (0x00007f9f97747000)\n\tlibswift_RegexParser.so => /usr/lib/swift/linux/libswift_RegexParser.so (0x00007f9f9762f000)\n\tlibswiftGlibc.so => /usr/lib/swift/linux/libswiftGlibc.so (0x00007f9f9761f000)\n\tlibBlocksRuntime.so => /usr/lib/swift/linux/libBlocksRuntime.so (0x00007f9f9761b000)\n\tlibdispatch.so => /usr/lib/swift/linux/libdispatch.so (0x00007f9f975bc000)\n\tlibswiftDispatch.so => /usr/lib/swift/linux/libswiftDispatch.so (0x00007f9f9758a000)\n\tlibFoundation.so => /usr/lib/swift/linux/libFoundation.so (0x00007f9f96f50000)\n\tlibFoundationEssentials.so => /usr/lib/swift/linux/libFoundationEssentials.so (0x00007f9f968ad000)\n\tlibFoundationInternationalization.so => /usr/lib/swift/linux/libFoundationInternationalization.so (0x00007f9f966d4000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f9f965eb000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f9f963d9000)\n\tlibswresample.so.4 => /lib/x86_64-linux-gnu/libswresample.so.4 (0x00007f9f963b8000)\n\tlibvpx.so.9 => /lib/x86_64-linux-gnu/libvpx.so.9 (0x00007f9f96071000)\n\tlibwebpmux.so.3 => /lib/x86_64-linux-gnu/libwebpmux.so.3 (0x00007f9f96061000)\n\tliblzma.so.5 => /lib/x86_64-linux-gnu/liblzma.so.5 (0x00007f9f9602f000)\n\tlibdav1d.so.7 => /lib/x86_64-linux-gnu/libdav1d.so.7 (0x00007f9f95e53000)\n\tlibrsvg-2.so.2 => /lib/x86_64-linux-gnu/librsvg-2.so.2 (0x00007f9f957ee000)\n\tlibgobject-2.0.so.0 => /lib/x86_64-linux-gnu/libgobject-2.0.so.0 (0x00007f9f9578b000)\n\tlibglib-2.0.so.0 => /lib/x86_64-linux-gnu/libglib-2.0.so.0 (0x00007f9f95642000)\n\tlibcairo.so.2 => /lib/x86_64-linux-gnu/libcairo.so.2 (0x00007f9f954fc000)\n\tlibzvbi.so.0 => /lib/x86_64-linux-gnu/libzvbi.so.0 (0x00007f9f9546f000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f9f95453000)\n\tlibsnappy.so.1 => /lib/x86_64-linux-gnu/libsnappy.so.1 (0x00007f9f95448000)\n\tlibaom.so.3 => /lib/x86_64-linux-gnu/libaom.so.3 (0x00007f9f94eca000)\n\tlibcodec2.so.1.2 => /lib/x86_64-linux-gnu/libcodec2.so.1.2 (0x00007f9f93eba000)\n\tlibgsm.so.1 => /lib/x86_64-linux-gnu/libgsm.so.1 (0x00007f9f93ea9000)\n\tlibjxl.so.0.7 => /lib/x86_64-linux-gnu/libjxl.so.0.7 (0x00007f9f93b2e000)\n\tlibjxl_threads.so.0.7 => /lib/x86_64-linux-gnu/libjxl_threads.so.0.7 (0x00007f9f93b28000)\n\tlibmp3lame.so.0 => /lib/x86_64-linux-gnu/libmp3lame.so.0 (0x00007f9f93ab2000)\n\tlibopenjp2.so.7 => /lib/x86_64-linux-gnu/libopenjp2.so.7 (0x00007f9f93a51000)\n\tlibopus.so.0 => /lib/x86_64-linux-gnu/libopus.so.0 (0x00007f9f939f2000)\n\tlibrav1e.so.0 => /lib/x86_64-linux-gnu/librav1e.so.0 (0x00007f9f936cd000)\n\tlibshine.so.3 => /lib/x86_64-linux-gnu/libshine.so.3 (0x00007f9f936c1000)\n\tlibspeex.so.1 => /lib/x86_64-linux-gnu/libspeex.so.1 (0x00007f9f936a4000)\n\tlibSvtAv1Enc.so.1 => /lib/x86_64-linux-gnu/libSvtAv1Enc.so.1 (0x00007f9f92e82000)\n\tlibtheoraenc.so.1 => /lib/x86_64-linux-gnu/libtheoraenc.so.1 (0x00007f9f92e49000)\n\tlibtheoradec.so.1 => /lib/x86_64-linux-gnu/libtheoradec.so.1 (0x00007f9f92e2b000)\n\tlibtwolame.so.0 => /lib/x86_64-linux-gnu/libtwolame.so.0 (0x00007f9f92e03000)\n\tlibvorbis.so.0 => /lib/x86_64-linux-gnu/libvorbis.so.0 (0x00007f9f92dd5000)\n\tlibvorbisenc.so.2 => /lib/x86_64-linux-gnu/libvorbisenc.so.2 (0x00007f9f92d2a000)\n\tlibwebp.so.7 => /lib/x86_64-linux-gnu/libwebp.so.7 (0x00007f9f92caf000)\n\tlibx264.so.164 => /lib/x86_64-linux-gnu/libx264.so.164 (0x00007f9f929ea000)\n\tlibx265.so.199 => /lib/x86_64-linux-gnu/libx265.so.199 (0x00007f9f91a4c000)\n\tlibxvidcore.so.4 => /lib/x86_64-linux-gnu/libxvidcore.so.4 (0x00007f9f9193d000)\n\tlibva.so.2 => /lib/x86_64-linux-gnu/libva.so.2 (0x00007f9f9190d000)\n\tlibvpl.so.2 => /lib/x86_64-linux-gnu/libvpl.so.2 (0x00007f9f918d5000)\n\tlibva-drm.so.2 => /lib/x86_64-linux-gnu/libva-drm.so.2 (0x00007f9f918d0000)\n\tlibva-x11.so.2 => /lib/x86_64-linux-gnu/libva-x11.so.2 (0x00007f9f918c8000)\n\tlibvdpau.so.1 => /lib/x86_64-linux-gnu/libvdpau.so.1 (0x00007f9f918c0000)\n\tlibX11.so.6 => /lib/x86_64-linux-gnu/libX11.so.6 (0x00007f9f91782000)\n\tlibdrm.so.2 => /lib/x86_64-linux-gnu/libdrm.so.2 (0x00007f9f9176b000)\n\tlibOpenCL.so.1 => /lib/x86_64-linux-gnu/libOpenCL.so.1 (0x00007f9f91758000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f9f914da000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f9f914aa000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f9f9a61a000)\n\tlibswift_Builtin_float.so => /usr/lib/swift/linux/libswift_Builtin_float.so (0x00007f9f914a6000)\n\tlib_FoundationICU.so => /usr/lib/swift/linux/lib_FoundationICU.so (0x00007f9f8ef3b000)\n\tlibswiftSynchronization.so => /usr/lib/swift/linux/libswiftSynchronization.so (0x00007f9f8ef29000)\n\tlibsoxr.so.0 => /lib/x86_64-linux-gnu/libsoxr.so.0 (0x00007f9f8eec1000)\n\tlibcairo-gobject.so.2 => /lib/x86_64-linux-gnu/libcairo-gobject.so.2 (0x00007f9f8eeb5000)\n\tlibgdk_pixbuf-2.0.so.0 => /lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so.0 (0x00007f9f8ee87000)\n\tlibgio-2.0.so.0 => /lib/x86_64-linux-gnu/libgio-2.0.so.0 (0x00007f9f8ecb7000)\n\tlibxml2.so.2 => /lib/x86_64-linux-gnu/libxml2.so.2 (0x00007f9f8ead5000)\n\tlibpangocairo-1.0.so.0 => /lib/x86_64-linux-gnu/libpangocairo-1.0.so.0 (0x00007f9f8eac2000)\n\tlibpango-1.0.so.0 => /lib/x86_64-linux-gnu/libpango-1.0.so.0 (0x00007f9f8ea57000)\n\tlibffi.so.8 => /lib/x86_64-linux-gnu/libffi.so.8 (0x00007f9f8ea4b000)\n\tlibpcre2-8.so.0 => /lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x00007f9f8e9b1000)\n\tlibpng16.so.16 => /lib/x86_64-linux-gnu/libpng16.so.16 (0x00007f9f8e979000)\n\tlibfontconfig.so.1 => /lib/x86_64-linux-gnu/libfontconfig.so.1 (0x00007f9f8e926000)\n\tlibfreetype.so.6 => /lib/x86_64-linux-gnu/libfreetype.so.6 (0x00007f9f8e85a000)\n\tlibXext.so.6 => /lib/x86_64-linux-gnu/libXext.so.6 (0x00007f9f8e846000)\n\tlibXrender.so.1 => /lib/x86_64-linux-gnu/libXrender.so.1 (0x00007f9f8e83a000)\n\tlibxcb.so.1 => /lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f9f8e811000)\n\tlibxcb-render.so.0 => /lib/x86_64-linux-gnu/libxcb-render.so.0 (0x00007f9f8e802000)\n\tlibxcb-shm.so.0 => /lib/x86_64-linux-gnu/libxcb-shm.so.0 (0x00007f9f8e7fb000)\n\tlibpixman-1.so.0 => /lib/x86_64-linux-gnu/libpixman-1.so.0 (0x00007f9f8e74c000)\n\tlibbrotlidec.so.1 => /lib/x86_64-linux-gnu/libbrotlidec.so.1 (0x00007f9f8e73e000)\n\tlibhwy.so.1 => /lib/x86_64-linux-gnu/libhwy.so.1 (0x00007f9f8e732000)\n\tlibbrotlienc.so.1 => /lib/x86_64-linux-gnu/libbrotlienc.so.1 (0x00007f9f8e693000)\n\tliblcms2.so.2 => /lib/x86_64-linux-gnu/liblcms2.so.2 (0x00007f9f8e62f000)\n\tlibogg.so.0 => /lib/x86_64-linux-gnu/libogg.so.0 (0x00007f9f8e625000)\n\tlibsharpyuv.so.0 => /lib/x86_64-linux-gnu/libsharpyuv.so.0 (0x00007f9f8e61d000)\n\tlibnuma.so.1 => /lib/x86_64-linux-gnu/libnuma.so.1 (0x00007f9f8e60f000)\n\tlibXfixes.so.3 => /lib/x86_64-linux-gnu/libXfixes.so.3 (0x00007f9f8e605000)\n\tlibX11-xcb.so.1 => /lib/x86_64-linux-gnu/libX11-xcb.so.1 (0x00007f9f8e600000)\n\tlibxcb-dri3.so.0 => /lib/x86_64-linux-gnu/libxcb-dri3.so.0 (0x00007f9f8e5f9000)\n\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007f9f8e5a3000)\n\tlibgmodule-2.0.so.0 => /lib/x86_64-linux-gnu/libgmodule-2.0.so.0 (0x00007f9f8e59c000)\n\tlibjpeg.so.8 => /lib/x86_64-linux-gnu/libjpeg.so.8 (0x00007f9f8e517000)\n\tlibmount.so.1 => /lib/x86_64-linux-gnu/libmount.so.1 (0x00007f9f8e4ca000)\n\tlibselinux.so.1 => /lib/x86_64-linux-gnu/libselinux.so.1 (0x00007f9f8e49d000)\n\tlibicuuc.so.74 => /lib/x86_64-linux-gnu/libicuuc.so.74 (0x00007f9f8e290000)\n\tlibpangoft2-1.0.so.0 => /lib/x86_64-linux-gnu/libpangoft2-1.0.so.0 (0x00007f9f8e275000)\n\tlibharfbuzz.so.0 => /lib/x86_64-linux-gnu/libharfbuzz.so.0 (0x00007f9f8e166000)\n\tlibfribidi.so.0 => /lib/x86_64-linux-gnu/libfribidi.so.0 (0x00007f9f8e148000)\n\tlibthai.so.0 => /lib/x86_64-linux-gnu/libthai.so.0 (0x00007f9f8e13d000)\n\tlibexpat.so.1 => /lib/x86_64-linux-gnu/libexpat.so.1 (0x00007f9f8e111000)\n\tlibbz2.so.1.0 => /lib/x86_64-linux-gnu/libbz2.so.1.0 (0x00007f9f8e0fd000)\n\tlibXau.so.6 => /lib/x86_64-linux-gnu/libXau.so.6 (0x00007f9f8e0f5000)\n\tlibXdmcp.so.6 => /lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f9f8e0ed000)\n\tlibbrotlicommon.so.1 => /lib/x86_64-linux-gnu/libbrotlicommon.so.1 (0x00007f9f8e0ca000)\n\tlibblkid.so.1 => /lib/x86_64-linux-gnu/libblkid.so.1 (0x00007f9f8e08f000)\n\tlibicudata.so.74 => /lib/x86_64-linux-gnu/libicudata.so.74 (0x00007f9f8c32f000)\n\tlibgraphite2.so.3 => /lib/x86_64-linux-gnu/libgraphite2.so.3 (0x00007f9f8c307000)\n\tlibdatrie.so.1 => /lib/x86_64-linux-gnu/libdatrie.so.1 (0x00007f9f8c2fe000)\n\tlibbsd.so.0 => /lib/x86_64-linux-gnu/libbsd.so.0 (0x00007f9f8c2e8000)\n\tlibmd.so.0 => /lib/x86_64-linux-gnu/libmd.so.0 (0x00007f9f8c2d9000)\n",
+  "machine": "x86_64",
+  "omissions": [
+    "Unused CoreGraphics import in classifier prefixes",
+    "Unused CoreMedia import and MediaTime.cmTime/timestamp; exact FFmpegRational and seconds retained",
+    "Unrelated C shim declarations; exact required production error/packet helpers retained",
+    "Only the exact selected static method and original enclosing type declaration from the no-copy demuxer"
+  ],
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "protocol": {
+    "minimum_ms": 60.0,
+    "orders": [
+      [
+        "copying",
+        "raw_buffer",
+        "data_nocopy"
+      ],
+      [
+        "copying",
+        "data_nocopy",
+        "raw_buffer"
+      ],
+      [
+        "raw_buffer",
+        "copying",
+        "data_nocopy"
+      ],
+      [
+        "raw_buffer",
+        "data_nocopy",
+        "copying"
+      ],
+      [
+        "data_nocopy",
+        "copying",
+        "raw_buffer"
+      ],
+      [
+        "data_nocopy",
+        "raw_buffer",
+        "copying"
+      ]
+    ],
+    "target_ms": 240.0,
+    "triplets": 6
+  },
+  "runner_sha256": "bc55d6f21afd9670a2aa23654da5c48ad78d01b7b6799b4f728be18d8c7f025c",
+  "scope": "Linux acquisition-classification component; not macOS or whole-player qualification",
+  "started_utc": "2026-10-28T06:01:10.939460+00:00",
+  "variant_revisions": {
+    "copying": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "data_nocopy": "6275059f54fc9ec52873fb7d223ad6f598fd0c47",
+    "raw_buffer": "aa71f1df6045ef35301fb0a95518b571f02f23b7"
+  }
+}

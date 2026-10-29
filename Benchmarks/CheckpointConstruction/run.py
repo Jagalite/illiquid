@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare complete production checkpoint construction against a fixed revision."""
+"""Qualify checkpoint regressions or measure construction against a fixed revision."""
 import argparse
 import hashlib
 import json
@@ -28,6 +28,7 @@ CORE = [
 PLAYER = "Sources/IlliquidPlayer/Player/PlaybackCheckpointWriter.swift"
 TESTS = [
     "Tests/IlliquidPlayerTests/PlaybackCheckpointTests.swift",
+    "Tests/IlliquidPlayerTests/PlaybackCheckpointIndexHintTests.swift",
     "Tests/IlliquidCoreTests/PlaylistSessionRecordTests.swift",
     "Tests/IlliquidCoreTests/PlaylistDeduplicationTests.swift",
 ]
@@ -80,7 +81,34 @@ class Run:
         return result.stdout if raw else result.stdout.decode().strip()
 
 
-def stage(run, manifest):
+def compiled_source(path, raw):
+    if path.endswith("PlaybackSessionStore.swift"):
+        marker = b"\n/// A versioned, atomic Application Support document"
+        if raw.count(marker) != 1:
+            raise RuntimeError("Session record/protocol extraction boundary changed")
+        return raw.split(marker)[0] + b"\n"
+    return raw
+
+
+def stage(run, manifest, regression_only=False):
+    # Capture live inputs once. Both variants and every configuration consume
+    # these snapshots even if the checkout changes after staging.
+    current = {path: (ROOT / path).read_bytes() for path in CORE + [PLAYER]}
+    harness_paths = [HERE / "Driver.swift", Path(__file__).resolve()] + [ROOT / p for p in TESTS]
+    harness = {str(path.relative_to(ROOT)): path.read_bytes() for path in harness_paths}
+    historical = {path: run.command(["git", "show", f"{BASELINE}:{path}"],
+        f"baseline-{Path(path).stem}", raw=True) for path in CORE + [PLAYER]}
+    manifest["historical_sources"] = {}
+    for path, raw in historical.items():
+        # Preserve the actual historical support even when it is not compiled.
+        data = compiled_source(path, raw)
+        snapshot = run.output / "sources" / "historical" / path
+        snapshot.parent.mkdir(parents=True, exist_ok=True)
+        snapshot.write_bytes(raw)
+        manifest["historical_sources"][path] = dict(
+            source_revision=BASELINE, full_sha256=digest(raw), compiled_sha256=digest(data),
+            full_snapshot=str(snapshot.relative_to(run.output)))
+
     variants = {}
     manifest["sources"] = {}
     for variant in ("baseline", "candidate"):
@@ -89,29 +117,36 @@ def stage(run, manifest):
         files = {"IlliquidCore": [], "IlliquidPlayer": []}
         manifest["sources"][variant] = {}
         for path in CORE + [PLAYER]:
-            raw = (run.command(["git", "show", f"{BASELINE}:{path}"],
-                               f"baseline-{Path(path).stem}", raw=True)
-                   if variant == "baseline" else (ROOT / path).read_bytes())
-            data = raw
-            if path.endswith("PlaybackSessionStore.swift"):
-                marker = b"\n/// A versioned, atomic Application Support document"
-                if raw.count(marker) != 1:
-                    raise RuntimeError("Session record/protocol extraction boundary changed")
-                data = raw.split(marker)[0] + b"\n"
+            use_current = variant == "candidate" or (regression_only and path in CORE)
+            raw = current[path] if use_current else historical[path]
+            data = compiled_source(path, raw)
             destination = directory / Path(path).name
             destination.write_bytes(data)
+            full_destination = directory / "full" / Path(path).name
+            full_destination.parent.mkdir(exist_ok=True)
+            full_destination.write_bytes(raw)
             module = "IlliquidPlayer" if path == PLAYER else "IlliquidCore"
             files[module].append(destination)
-            manifest["sources"][variant][path] = {
-                "full_sha256": digest(raw), "compiled_sha256": digest(data)}
+            manifest["sources"][variant][path] = dict(
+                origin="current-worktree" if use_current else "pinned-baseline",
+                source_revision=manifest["head"] if use_current else BASELINE,
+                full_sha256=digest(raw), compiled_sha256=digest(data),
+                full_snapshot=str(full_destination.relative_to(run.output)),
+                compiled_snapshot=str(destination.relative_to(run.output)),
+                transformation="prefix before atomic disk store marker plus newline"
+                    if path.endswith("PlaybackSessionStore.swift") else "none",
+                differs_from_historical=raw != historical[path])
         variants[variant] = files
     for path in CORE:
-        if manifest["sources"]["baseline"][path] != manifest["sources"]["candidate"][path]:
+        if any(manifest["sources"]["baseline"][path][key] !=
+               manifest["sources"]["candidate"][path][key]
+               for key in ("full_sha256", "compiled_sha256")):
             raise RuntimeError(f"Unrelated benchmark dependency changed: {path}")
     manifest["harness_sha256"] = {}
-    for path in [HERE / "Driver.swift", Path(__file__).resolve()] + [ROOT / p for p in TESTS]:
-        shutil.copy2(path, run.output / "sources" / path.name)
-        manifest["harness_sha256"][str(path.relative_to(ROOT))] = digest(path.read_bytes())
+    for path, data in harness.items():
+        destination = run.output / "sources" / Path(path).name
+        destination.write_bytes(data)
+        manifest["harness_sha256"][path] = digest(data)
     return variants
 
 
@@ -136,7 +171,7 @@ let package = Package(name: "CheckpointQualification", platforms: [.macOS("26.0"
         for path in TESTS:
             destination = package / path
             destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(ROOT / path, destination)
+            shutil.copy2(run.output / "sources" / Path(path).name, destination)
         (package / "Package.swift").write_text(package_text)
         for configuration in ("debug", "release"):
             argv = ["swift", "test", "--package-path", package, "--scratch-path", package / "build",
@@ -149,8 +184,13 @@ let package = Package(name: "CheckpointQualification", platforms: [.macOS("26.0"
             counts = re.findall(r"Test run with (\d+) tests? (?:in \d+ suites? )?passed", log)
             if not counts or int(counts[-1]) == 0:
                 raise RuntimeError("No successful Swift Testing count found")
+            xctest = re.search(
+                r"Test Suite 'PlaybackCheckpointIndexHintTests' passed[^\n]*\n"
+                r"\s*Executed (\d+) tests?, with 0 failures", log)
+            if not xctest or int(xctest[1]) < 6:
+                raise RuntimeError("Checkpoint index-hint XCTest suite did not execute completely")
             summary["tests"].append(dict(variant=variant, configuration=configuration,
-                                         passed=int(counts[-1])))
+                                         passed=int(counts[-1]), xctest_passed=int(xctest[1])))
             save(run.output / "summary.json", summary)
 
 
@@ -186,6 +226,8 @@ def build(run, variants, manifest):
 
 
 def measure(run, binaries, args, summary):
+    if args.regression_only:
+        raise RuntimeError("Regression-only snapshots cannot qualify historical performance")
     cases = workloads(args.quick)
     save(run.output / "workloads.json", cases)
     summary["workloads"] = []
@@ -249,10 +291,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--mode", choices=("all", "tests", "benchmark"), default="all")
+    parser.add_argument("--regression-only", action="store_true",
+        help="Run both writers' debug/release tests with identical current CORE support; no timing")
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=100)
     parser.add_argument("--quick", action="store_true")
     args = parser.parse_args()
+    if args.regression_only:
+        if args.mode == "benchmark":
+            parser.error("--regression-only cannot measure a historical performance comparison")
+        args.mode = "tests"
     if args.pairs < 2 or args.pairs % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("Use an even pair count >=2 and a positive finite target duration")
     output = args.output.resolve()
@@ -260,10 +308,15 @@ def main():
     if any(output.iterdir()):
         parser.error("Output directory must be empty or nonexistent")
     run = Run(output)
-    summary = dict(status="running", baseline=BASELINE, mode=args.mode)
+    qualification = "current-support-regression" if args.regression_only else "historical"
+    summary = dict(status="running", baseline=BASELINE, mode=args.mode,
+                   qualification=qualification, performance_measured=False)
     manifest = dict(baseline=BASELINE, platform=platform.platform(), machine=platform.machine(),
         python=platform.python_version(), timestamp_utc=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        arguments=vars(args) | {"output": str(output)},
+        arguments=vars(args) | {"output": str(output)}, qualification=qualification,
+        performance_measured=False,
+        source_policy="Pinned PlaybackCheckpointWriter; identical current CORE support in both variants"
+            if args.regression_only else "Pinned baseline; reject CORE supporting-source drift",
         minimum_sample_ms=args.target_ms / 4,
         maximum_iterations=2_000_000,
         scope="complete PlaybackCheckpoint.record construction and release; no encoding or disk I/O")
@@ -278,7 +331,7 @@ def main():
         else:
             manifest["cpu"] = next((line for line in Path("/proc/cpuinfo").read_text().splitlines()
                                     if line.startswith("model name")), "unknown")
-        variants = stage(run, manifest)
+        variants = stage(run, manifest, args.regression_only)
         save(output / "manifest.json", manifest)
         if args.mode in ("all", "tests"):
             test(run, variants, summary)
@@ -286,8 +339,9 @@ def main():
             binaries = build(run, variants, manifest)
             save(output / "manifest.json", manifest)
             measure(run, binaries, args, summary)
+            summary["performance_measured"] = manifest["performance_measured"] = True
         summary["status"] = "passed"
-        print("QUALIFICATION_PASS", flush=True)
+        print("REGRESSION_PASS" if args.regression_only else "QUALIFICATION_PASS", flush=True)
     except BaseException as error:
         summary.update(status="failed", error=str(error))
         raise

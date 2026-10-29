@@ -6,6 +6,9 @@ import Glibc
 #else
 import Darwin
 #endif
+#if ALLOCATION_METER
+import CAllocationMeter
+#endif
 
 // The measured entry point is the complete production rows() implementation in
 // a separate library target. All fixture construction and receipts are untimed.
@@ -13,7 +16,7 @@ private struct Fixture {
     let input: SourceTreeProjectionInput
     let expectedCount: Int
 
-    init(size: Int, scenario: String) {
+    init(size: Int, scenario: String, sortOrder: String) {
         let media = scenario.hasSuffix("-media")
         let roots = ["Series α", "日本語", "Films café", "Releases 2026"].map {
             URL(fileURLWithPath: "/Volumes/Projection Study/" + $0, isDirectory: true)
@@ -66,7 +69,8 @@ private struct Fixture {
         input = SourceTreeProjectionInput(items: items, visibility: visibility,
             roots: sourceRoots, directoryContents: [:], directoryErrors: [:],
             recursiveMediaEntries: entries, expandedFolderIDs: [],
-            sortConfiguration: .init(name: .ascending, dateCreated: .off, type: .off))
+            sortConfiguration: .init(name: sortOrder == "name" ? .ascending : .off,
+                dateCreated: sortOrder == "date" ? .descending : .off, type: .off))
         expectedCount = size + additionalCount
     }
 }
@@ -127,15 +131,26 @@ private enum FlatFileProjectionBenchmark {
         let mode = arguments[1], scenario = arguments[2], size = Int(arguments[3])!
         precondition(size > 0 && ["folders-files", "folders-media", "mixed-files", "mixed-media",
                                  "explicit-files", "explicit-media"].contains(scenario))
-        let fixture = Fixture(size: size, scenario: scenario)
-        var output: [String: Any] = ["mode": mode, "case": scenario, "size": size]
+        let sortArgument = mode == "verify" ? 4 : 5
+        precondition(arguments.count == sortArgument || arguments.count == sortArgument + 1)
+        let sortOrder = arguments.count > sortArgument ? arguments[sortArgument] : "name"
+        precondition(["name", "date", "off"].contains(sortOrder))
+        let fixture = Fixture(size: size, scenario: scenario, sortOrder: sortOrder)
+        var output: [String: Any] = ["mode": mode, "case": scenario, "size": size,
+            "sort": sortOrder, "entry_stride_bytes": MemoryLayout<SourceTreeEntry>.stride,
+            "index_stride_bytes": MemoryLayout<Int>.stride]
+        #if ALLOCATION_METER
+        output["allocation_instrumented"] = true
+        #else
+        output["allocation_instrumented"] = false
+        #endif
         if mode == "verify" {
             let rows = fixture.input.rows()
             precondition(rows.count == fixture.expectedCount)
             precondition(Set(rows.map(\.id)).count == rows.count)
             output["rows"] = rows.map(rowTrace)
         } else {
-            precondition(mode == "measure" && arguments.count == 5)
+            precondition(mode == "measure" && [5, 6].contains(arguments.count))
             let iterations = Int(arguments[4])!
             precondition(iterations > 0)
             var checksum = 0
@@ -143,10 +158,21 @@ private enum FlatFileProjectionBenchmark {
             var wall: [UInt64] = [], cpu: [Double] = []
             wall.reserveCapacity(iterations)
             cpu.reserveCapacity(iterations)
+            #if ALLOCATION_METER
+            var allocationRequests: [UInt64] = [], allocationBytes: [UInt64] = []
+            allocationRequests.reserveCapacity(iterations)
+            allocationBytes.reserveCapacity(iterations)
+            #endif
             for _ in 0..<iterations {
                 let cpuStart = clock()
                 let start = DispatchTime.now().uptimeNanoseconds
+                #if ALLOCATION_METER
+                meter_begin()
+                #endif
                 let rows = fixture.input.rows()
+                #if ALLOCATION_METER
+                meter_end()
+                #endif
                 let elapsed = DispatchTime.now().uptimeNanoseconds - start
                 let cpuElapsed = Double(clock() - cpuStart) / Double(CLOCKS_PER_SEC) * 1_000_000_000
                 // Consumption and returned-row destruction are outside timing.
@@ -154,12 +180,20 @@ private enum FlatFileProjectionBenchmark {
                 checksum &+= consume(rows)
                 wall.append(elapsed)
                 cpu.append(cpuElapsed)
+                #if ALLOCATION_METER
+                allocationRequests.append(meter_requests())
+                allocationBytes.append(meter_bytes())
+                #endif
             }
             output["iterations"] = iterations
             output["wall_ns"] = wall
             output["cpu_ns"] = cpu
             output["checksum"] = checksum
             output["output_count"] = fixture.expectedCount
+            #if ALLOCATION_METER
+            output["allocation_requests"] = allocationRequests
+            output["allocation_requested_bytes"] = allocationBytes
+            #endif
         }
         let data = try JSONSerialization.data(withJSONObject: output, options: [.sortedKeys])
         print(String(decoding: data, as: UTF8.self))
