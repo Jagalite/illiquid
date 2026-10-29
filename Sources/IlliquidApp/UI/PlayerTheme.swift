@@ -772,21 +772,25 @@ struct PlayerTextPalette {
                 contrastHaloRadius: 0
             )
         }
+        // Primary color and subordinate opacities use the same immutable
+        // region, so prepare its legibility context once per style miss.
+        let localColor = sampledColor(at: location, in: sample)
+        let legibility = AdaptiveTextLegibility(backgrounds: contrastRegion.colors(
+            in: sample, localColor: localColor, alignedRegion: alignedRegion),
+            luminanceLift: Self.estimatedClearGlassLuminanceLift)
         let components = resolvedComponents(
             at: location,
             contrastRegion: contrastRegion,
             alignedRegion: alignedRegion,
-            sample: sample
+            sample: sample,
+            localColor: localColor,
+            legibility: legibility
         )
         let color = Color(
             red: components.red,
             green: components.green,
             blue: components.blue
         )
-        let localColor = sampledColor(at: location, in: sample)
-        let legibility = AdaptiveTextLegibility(backgrounds: contrastRegion.colors(
-            in: sample, localColor: localColor, alignedRegion: alignedRegion),
-            luminanceLift: Self.estimatedClearGlassLuminanceLift)
         let usesBrightForeground = SampledVideoColor(red: components.red,
             green: components.green, blue: components.blue).relativeLuminance > 0.45
         return PlayerTextStyleColors(
@@ -803,18 +807,16 @@ struct PlayerTextPalette {
         at location: PlayerTextGridLocation?,
         contrastRegion: PlayerTextContrastRegion,
         alignedRegion: PlayerTextGridRegion?,
-        sample: VideoColorSample
+        sample: VideoColorSample,
+        localColor: SampledVideoColor,
+        legibility: AdaptiveTextLegibility
     ) -> AdaptiveRainbowTextColor {
         let make = { (previous: AdaptiveRainbowTextColor?) in
-            let localColor = sampledColor(at: location, in: sample)
             let paletteColor = contrastRegion.color(
                 in: sample,
                 localColor: localColor,
                 alignedRegion: alignedRegion
             )
-            let legibility = AdaptiveTextLegibility(backgrounds: contrastRegion.colors(
-                in: sample, localColor: localColor, alignedRegion: alignedRegion),
-                luminanceLift: Self.estimatedClearGlassLuminanceLift)
             return legibility.resolve(hueSource: paletteColor, palette: rainbowPalette,
                 monochrome: mode == .dynamicMonochrome, previous: previous)
         }
