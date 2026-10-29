@@ -14,6 +14,7 @@ on:
       - 'Benchmarks/CheckpointIdentities/run.py'
       - 'Scripts/check-ci-whitespace.py'
       - 'Scripts/test-check-ci-whitespace.py'
+      - 'Scripts/tests/benchmark-source-policy-tests.py'
       - '.github/workflows/checkpoint-identities.yml'
   pull_request:
     paths:
@@ -27,6 +28,7 @@ on:
       - 'Benchmarks/CheckpointIdentities/run.py'
       - 'Scripts/check-ci-whitespace.py'
       - 'Scripts/test-check-ci-whitespace.py'
+      - 'Scripts/tests/benchmark-source-policy-tests.py'
       - '.github/workflows/checkpoint-identities.yml'
   workflow_dispatch:
 
@@ -48,20 +50,26 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Test benchmark source policies without compilation
+        run: python3 -B Scripts/tests/benchmark-source-policy-tests.py
       - name: Test whitespace comparison policy without compilation
         run: python3 -B Scripts/test-check-ci-whitespace.py
       - name: Check changed-line whitespace and record comparison provenance
         run: >-
           python3 Scripts/check-ci-whitespace.py
           --output "$RUNNER_TEMP/checkpoint-identities-whitespace.json"
-      - name: Qualify exact source and measure paired checkpoint identities
+      - name: Qualify checkpoint identities (manual runs also measure)
         run: |
           if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
             echo 'Kyoto is available; submit this qualification through the shared queue.'
             exit 1
           fi
           echo 'Kyoto is unavailable on this ephemeral runner; compiling isolated packages serially.'
-          python3 Benchmarks/CheckpointIdentities/run.py \
+          mode=()
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" ]]; then
+            mode+=(--regression-only)
+          fi
+          python3 Benchmarks/CheckpointIdentities/run.py "${mode[@]}" \
             --pairs 12 --target-ms 150 \
             --output "$RUNNER_TEMP/checkpoint-identities"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

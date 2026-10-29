@@ -26,6 +26,13 @@ CORE = [
     "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
     "Sources/IlliquidCore/Playlist/PlaylistMutation.swift",
 ]
+# Reviewed integration cohort. A new source change requires an explicit pin review.
+REGRESSION_SHA256 = {
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "c09072130b113b90faa49b17ff95ce8983668734e69dddf6244572f5de80de62",
+    "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": "adb8778743e85252e1b432e26541964ca9a2b4bdd706ba59ce1bf677293d27a3"
+}
 TESTS = [
     "Tests/IlliquidCoreTests/PlaylistMutationTests.swift",
     "Tests/IlliquidCoreTests/PlaylistOrderRestorationTests.swift",
@@ -89,6 +96,8 @@ def ratio_summary(ratios: list[float]) -> dict:
 class Runner:
     def __init__(self, args: argparse.Namespace):
         self.args = args
+        if args.regression_only and args.baseline != BASELINE:
+            raise ValueError("Regression-only mode requires the pinned historical baseline")
         self.output = args.output.resolve()
         if self.output.exists() and any(self.output.iterdir()):
             raise ValueError("--output must be new or empty; retain earlier attempts")
@@ -150,6 +159,8 @@ class Runner:
               "this runner compiles its isolated packages serially.", flush=True)
         self.environment = {
             "baseline": self.args.baseline,
+            "qualification": "current-support-regression" if self.args.regression_only else "historical-performance",
+            "performance_measured": False,
             "head": self.command(["git", "rev-parse", "HEAD"]).strip(),
             "status": self.command(["git", "status", "--short"]),
             "started_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -165,6 +176,20 @@ class Runner:
         (self.output / "runner.snapshot.py").write_bytes(Path(__file__).read_bytes())
         harness = (HERE / "Harness.swift").read_bytes()
         tests = {path: (ROOT / path).read_bytes() for path in TESTS}
+        current = {path: (ROOT / path).read_bytes() for path in CORE}
+        historical = {path: self.capture(["git", "show", f"{self.args.baseline}:{path}"])
+                      for path in CORE}
+        self.historical_sources = {path: source_hashes(data) for path, data in historical.items()}
+        for path, data in historical.items():
+            destination = self.output / "historical" / path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(data)
+        if self.args.regression_only:
+            if set(REGRESSION_SHA256) != set(CORE):
+                raise AssertionError("Regression source pin set differs from CORE")
+            for path, data in current.items():
+                if sha256(data) != REGRESSION_SHA256[path]:
+                    raise AssertionError(f"Unreviewed regression source: {path}")
         for variant in VARIANTS:
             flags = '[.define("CHECKPOINT_BASELINE")]' if variant == "baseline" else "[]"
             package = f'''// swift-tools-version: 6.1
@@ -186,8 +211,8 @@ let package = Package(
 )
 '''
             sources = {
-                path: ((ROOT / path).read_bytes() if variant == "candidate"
-                       else self.capture(["git", "show", f"{self.args.baseline}:{path}"]))
+                path: (current[path] if variant == "candidate" or
+                       (self.args.regression_only and path in CORE[:-1]) else historical[path])
                 for path in CORE
             }
             staged = {
@@ -201,6 +226,12 @@ let package = Package(
             caller = ((ROOT / caller_path).read_bytes() if variant == "candidate"
                       else self.capture(["git", "show", f"{self.args.baseline}:{caller_path}"]))
             self.sources[variant] = {
+                "source_policy": {
+                    path: {"origin": "current-worktree" if variant == "candidate" or
+                           (self.args.regression_only and path in CORE[:-1]) else "pinned-baseline",
+                           "differs_from_historical": data != historical[path]}
+                    for path, data in sources.items()
+                },
                 "repository_sources": {p: source_hashes(d) for p, d in sources.items()},
                 "staged_sources": {p: source_hashes(d) for p, d in staged.items()},
                 "caller": {"path": caller_path, **source_hashes(caller)},
@@ -278,6 +309,8 @@ let package = Package(
 
     def sample(self, variant: str, size: int, workload: str, iterations: int,
                *, calibration: bool = False) -> dict:
+        if self.args.regression_only:
+            raise ValueError("Regression-only mode cannot measure historical performance")
         result = json.loads(self.capture(
             [self.binaries[variant], "bench", size, workload, iterations]
         ))
@@ -311,6 +344,8 @@ let package = Package(
         )))
 
     def measure(self) -> None:
+        if self.args.regression_only:
+            raise ValueError("Regression-only mode cannot measure historical performance")
         raw_path = self.output / "observations.jsonl"
         for size, workload in CASES:
             iterations = self.calibrate(size, workload)
@@ -357,6 +392,8 @@ let package = Package(
             write_json(self.output / "summary.json", self.summaries)
 
     def finish(self) -> None:
+        self.environment["performance_measured"] = bool(self.observations)
+        write_json(self.output / "environment.json", self.environment)
         for variant, sources in self.sources.items():
             for path, expected in sources["staged_sources"].items():
                 actual = source_hashes((self.output / variant / path).read_bytes())
@@ -364,6 +401,8 @@ let package = Package(
                     raise AssertionError(f"Staged source changed: {variant}/{path}")
         completion = {
             "success": True,
+            "qualification": self.environment["qualification"],
+            "performance_measured": bool(self.observations),
             "observations": len(self.observations), "workloads": len(CASES),
             "tests": len(self.tests), "fixture_checks": len(self.fixtures),
             "binary_sha256": {v: sha256(p.read_bytes()) for v, p in self.binaries.items()},
@@ -373,6 +412,7 @@ let package = Package(
         }
         results = {
             "environment": self.environment, "sources": self.sources,
+            "historical_sources": self.historical_sources,
             "test_receipts": self.tests, "fixture_checks": self.fixtures,
             "calibration": self.calibration, "observations": self.observations,
             "summaries": self.summaries, "completion": completion,
@@ -384,6 +424,8 @@ let package = Package(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--regression-only", action="store_true",
+                        help="Run all tests and fixtures with reviewed current support; no timing")
     parser.add_argument("--swift", default=shutil.which("swift") or "swift")
     parser.add_argument("--baseline", default=BASELINE)
     parser.add_argument("--pairs", type=int, default=12)
@@ -399,7 +441,8 @@ def main() -> None:
     try:
         runner.prepare()
         runner.build_and_test()
-        runner.measure()
+        if not args.regression_only:
+            runner.measure()
         runner.finish()
     except Exception as error:
         write_json(runner.output / "failure.json", {

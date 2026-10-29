@@ -232,3 +232,23 @@ For a local check, pass an explicit base, for example:
 python3 Scripts/check-ci-whitespace.py --base 8e51176463b873cca080d92d9c4854a1d078be35 \
   --output /tmp/checkpoint-identities-whitespace.json
 ```
+
+## Integration regression qualification
+
+Push and pull-request component jobs use `--regression-only`. This runs the
+same five test files and all 16 exact-output fixtures in debug and release for
+both variants, with no calibration or timing. The baseline compiles the pinned
+historical `PlaylistMutation.swift` verbatim, and `CHECKPOINT_BASELINE` retains
+`restoringOrder(...).map(\.id)`. Both variants compile identical captured current
+bytes for the other three supporting sources. The runner checks all four
+current source SHA-256 pins before staging the regression cohort; changed pins
+require a source review. It retains full historical sources and source hashes,
+records each variant's source origin, and labels completion as
+`current-support-regression` with `performance_measured: false`.
+
+Default and manual workflow-dispatch runs retain the historical comparison and
+strict unchanged-support guard. They reject current support drift rather than
+turning regression qualification into performance evidence. Historical native
+measurements apply only to their recorded source cohort. Run
+`python3 -B Scripts/tests/benchmark-source-policy-tests.py` for noncompiling
+source-policy controls. Local Swift qualification must still use Kyoto.
