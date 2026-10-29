@@ -34,6 +34,8 @@ TESTS = ["Tests/IlliquidNativePlaybackTests/" + name + ".swift" for name in (
     "QueuedThumbnailPromotionTests", "ThumbnailImageLifetimeTests",
     "ThumbnailDiskPathTests",
 )]
+# The eviction test file defines two XCTestCase classes.
+TEST_SUITES = {Path(path).stem for path in TESTS} | {"ThumbnailDiskEvictionDiskTests"}
 COUNTS = [0, 128, 2048, 8191]
 METRIC_FILES = ["Benchmarks/ThumbnailReadAllocation/CThumbnailReadMetrics/" + name
                 for name in ("Metrics.c", "Metrics.h", "module.modulemap")]
@@ -66,10 +68,9 @@ def whitespace_boundary(regression, requested):
 
 
 def executed_test_summaries(log):
-    expected = {Path(path).stem for path in TESTS}
     suites = set(re.findall(r"Test Suite '([^']+)' passed", log))
-    if not expected <= suites or not re.search(r"Executed 44 tests?, with 0 failures", log):
-        raise RuntimeError("Expected all seven suites and 44 executed XCTest tests with zero failures.")
+    if not TEST_SUITES <= suites or not re.search(r"Executed 44 tests?, with 0 failures", log):
+        raise RuntimeError("Expected all eight suites and 44 executed XCTest tests with zero failures.")
     return [line.strip() for line in log.splitlines()
             if "Executed " in line and "0 failures" in line]
 
@@ -272,7 +273,7 @@ let package = Package(name: "ThumbnailInventoryQualification",
             log = run(["swift", "test", "--package-path", package, "--configuration", configuration,
                        "--jobs", "2", "--no-parallel"], f"tests-{variant}-{configuration}", timeout=900)
             receipt = dict(variant=variant, configuration=configuration, passed=True,
-                           suites=7, tests=44, summaries=executed_test_summaries(log))
+                           suites=len(TEST_SUITES), tests=44, summaries=executed_test_summaries(log))
             test_receipts.append(receipt)
             print("THUMBNAIL_INVENTORY_TEST " + json.dumps(receipt, sort_keys=True), flush=True)
     write_json(output / "tests.json", test_receipts)
@@ -319,7 +320,7 @@ let package = Package(name: "ThumbnailInventoryQualification",
             raise RuntimeError(f"Staged source changed during qualification: {name}")
     if args.current_source_regression:
         qualification = {"mode": mode, "tests_passed": len(test_receipts),
-                         "suites_per_execution": 7, "tests_per_execution": 44,
+                         "suites_per_execution": len(TEST_SUITES), "tests_per_execution": 44,
                          "measurement_processes": len(observations),
                          "balanced_ab_ba_pairs": args.pairs, "counts": COUNTS,
                          "inventory_and_read_parity": True, "sources_frozen_and_hashed": True,

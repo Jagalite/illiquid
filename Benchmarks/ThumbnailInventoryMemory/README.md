@@ -194,7 +194,7 @@ independent disk-cache reference with current support, not a recreation of the
 historical executable. `source-policy.json` records the adaptation and both hashes;
 original changed support bytes are retained under `sources/historical/`.
 
-Both variants still execute all seven XCTest suites (44 tests) in debug and
+Both variants still execute all eight XCTest suites from seven source files (44 tests) in debug and
 release. Both AB and BA orders exercise every 0/128/2048/8191 inventory fixture,
 512 reads, checksums, and decoded pixel parity. Raw observations are retained,
 but no metric summary is emitted and `performance_qualified` is false. Frozen
