@@ -48,10 +48,12 @@ jobs:
           if not match or tuple(int(x or 0) for x in match.groups()) < (6, 3, 2):
               raise SystemExit("Swift 6.3.2 or later is required")
           PY
-      - name: Execute debug/release regressions and paired projections
+      - name: Execute regressions and projection qualification
         run: |
           echo "Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout."
-          python3 Benchmarks/SourceVisibilityAncestors/run.py \
+          mode=()
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then mode=(--current-source-correctness); fi
+          python3 Benchmarks/SourceVisibilityAncestors/run.py "${mode[@]}" \
             --pairs 6 --target-ms 120 --jobs 2 \
             --output "$RUNNER_TEMP/visibility-ancestors"
       - name: Emit complete numerical receipts
@@ -88,10 +90,12 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Execute native regressions and paired projections
+      - name: Execute native regressions and projection qualification
         run: |
           echo "Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout."
-          python3 Benchmarks/SourceVisibilityAncestors/run.py \
+          mode=()
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then mode=(--current-source-correctness); fi
+          python3 Benchmarks/SourceVisibilityAncestors/run.py "${mode[@]}" \
             --pairs 6 --target-ms 120 --jobs 2 \
             --output "$RUNNER_TEMP/visibility-ancestors-native"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

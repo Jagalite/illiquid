@@ -107,3 +107,33 @@ creation-date sorting; this benchmark disables sorting and does not measure a
 default-library hit rate. Interleaved and unique-parent controls must be reported
 with grouped-sibling gains. Linux Foundation results
 must remain distinct from native macOS qualification.
+
+## Reviewed integration correctness
+
+Pull-request CI uses `--current-source-correctness` for the reviewed integrated
+sources. This explicit mode keeps the historical focal declarations and shares
+the reviewed current support dependencies across both variants. The runner pins
+full source files, extracted snapshots and all four regression files; changes
+require another review. Manifests retain exact per-file origins and hashes.
+
+This mode requires the full default case/size matrix, debug and release tests
+(including all eight candidate ancestor regressions), and lossless equality of
+both complete projection states. Logical output serialization includes all row,
+metadata and visibility fields, URL absolute/relative/base representations and
+Date bits. Ordered collections retain their order; dictionaries and sets are
+canonicalized. Source and binary integrity gates remain enabled.
+
+No projection timing or calibration runs, and completion explicitly marks
+`performance_qualified: false`. This is current-source correctness evidence;
+it does not update or extend the frozen historical performance qualification.
+Default command-line, push, and manual workflow runs retain historical strict
+support equality and the existing measurement path.
+
+```sh
+python3 Benchmarks/SourceVisibilityAncestors/run.py \
+  --current-source-correctness --output /tmp/visibility-ancestors-correctness
+```
+
+The compatibility change was checked with Python controls and exact Git-blob
+staging only. Swift compilation, regression execution and full-output execution
+must pass in CI before the integrated source is qualified.

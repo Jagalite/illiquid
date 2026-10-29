@@ -190,13 +190,62 @@ private struct Measurement: Codable {
     let visibility_build_count: Int?
 }
 
+// Explicit logical fields: independent of private storage representations.
+private func completeOutput(_ projection: SourceBrowserProjection) throws -> String {
+    func optional<T>(_ value: T?) -> Any { value.map { $0 as Any } ?? NSNull() }
+    func url(_ value: URL) -> [String: Any] {
+        ["absolute": value.absoluteString, "relative": value.relativeString,
+         "base": optional(value.baseURL.map { url($0) })]
+    }
+    func visibility(_ value: SourceRowVisibility) -> [String: Any] {
+        let matches: [[String: Any]] = value.matches.map { match in
+            switch match {
+            case .manual: return ["kind": "manual"]
+            case .noMedia: return ["kind": "noMedia"]
+            case let .regex(rule): return ["kind": "regex", "id": rule.id, "colorIndex": rule.colorIndex]
+            }
+        }
+        return ["isInherited": value.isInherited, "matches": matches]
+    }
+    let rows: [[String: Any]] = projection.rows.map { row in
+        let kind: [String: Any]
+        switch row.kind {
+        case let .folder(isRoot): kind = ["kind": "folder", "isRoot": isRoot]
+        case let .media(dateAdded):
+            kind = ["kind": "media", "dateAddedBits": optional(dateAdded.map { String($0.timeIntervalSince1970.bitPattern) })]
+        case let .message(message): kind = ["kind": "message", "message": message]
+        case .mediaSection: kind = ["kind": "mediaSection"]
+        }
+        let media: [String: Any]? = row.recognizedMedia.map { value in
+            ["kind": value.kind.rawValue, "title": value.title,
+             "year": optional(value.year), "season": optional(value.season),
+             "episode": optional(value.episode), "lastEpisode": optional(value.lastEpisode),
+             "airDate": optional(value.airDate), "episodeTitle": optional(value.episodeTitle),
+             "edition": optional(value.edition), "variant": optional(value.variant),
+             "catalogIDs": Array(value.catalogIDs), "metadataSources": Array(value.metadataSources)]
+        }
+        return ["id": row.id, "folderID": row.folderID, "url": url(row.url),
+                "displayName": row.displayName, "contextLabel": optional(row.contextLabel),
+                "recognizedMedia": optional(media), "visibilityPath": optional(row.visibilityPath),
+                "depth": row.depth, "ancestorIDs": row.ancestorIDs, "kind": kind,
+                "visibility": optional(row.visibility.map { visibility($0) }),
+                "containsSupportedMedia": optional(row.containsSupportedMedia)]
+    }
+    let output: [String: Any] = [
+        "rows": rows, "hiddenCount": projection.hiddenCount, "regexCounts": projection.regexCounts,
+        "thumbnailCandidates": projection.thumbnailCandidates.map { url($0) },
+        "mediaPaths": projection.mediaPaths.sorted(),
+    ]
+    return String(decoding: try JSONSerialization.data(withJSONObject: output, options: [.sortedKeys]), as: UTF8.self)
+}
+
 private enum HarnessFailure: Error { case invalidArguments }
 
 @main
 private struct SourceTreeBenchmark {
     static func main() async throws {
         let args = CommandLine.arguments
-        guard args.count == 5, ["measure", "diagnose"].contains(args[1]),
+        guard args.count == 5, ["measure", "diagnose", "correctness"].contains(args[1]),
               let size = Int(args[3]), size > 0,
               let iterations = Int(args[4]), iterations >= 2, iterations % 2 == 0
         else { throw HarnessFailure.invalidArguments }
@@ -218,6 +267,7 @@ private struct SourceTreeBenchmark {
         var durations: [UInt64] = []
         var cpuDurations: [UInt64] = []
         var receipts: [Receipt] = []
+        var completeOutputs: [String] = []
         var coldTreeCount = 0, coldVisibilityCount = 0
         for iteration in 0..<iterations {
             let step = (iteration + 1) % 2
@@ -235,6 +285,7 @@ private struct SourceTreeBenchmark {
             // This materializes observable output and catches stale projections.
             // It is deliberately after the timer and is identical in both builds.
             receipts.append(Receipt(projected))
+            if mode == "correctness" { completeOutputs.append(try completeOutput(projected)) }
             if mode == "diagnose", fixture.cold {
                 coldTreeCount += await filter.treeBuildCount
                 coldVisibilityCount += await filter.visibilityBuildCount
@@ -244,6 +295,15 @@ private struct SourceTreeBenchmark {
             ? (fixture.cold ? coldTreeCount : await filter.treeBuildCount) : nil
         let visibilityCount: Int? = mode == "diagnose"
             ? (fixture.cold ? coldVisibilityCount : await filter.visibilityBuildCount) : nil
+        if mode == "correctness" {
+            let output: [String: Any] = [
+                "case": scenario, "size": size, "iterations": iterations,
+                "outputs": completeOutputs, "tree_build_count": await filter.treeBuildCount,
+                "visibility_build_count": await filter.visibilityBuildCount,
+            ]
+            print(String(decoding: try JSONSerialization.data(withJSONObject: output, options: [.sortedKeys]), as: UTF8.self))
+            return
+        }
         let record = Measurement(mode: mode, case: scenario, size: size, iterations: iterations,
                                  elapsed_ns: durations.reduce(0, +), durations_ns: durations,
                                  cpu_ns: cpuDurations.reduce(0, +), cpu_durations_ns: cpuDurations, receipts: receipts,

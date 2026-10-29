@@ -25,11 +25,14 @@ def main():
  if a.allocations:
   if not a.resume:run(['clang','-O2','-c',R/'Benchmarks/NonDecodePerformance/allocmeter.c','-o',build/'meter.o'])
   extra=['-D','ALLOCATION_METER',build/'meter.o']
- support=[x for x in sorted((R/'Benchmarks/NonDecodeFollowup/fixtures').glob('*.swift')) if x.name not in ['PlaybackPersistenceStore.swift','CoalescingPersistenceWriter.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']]
- shared=[*support,R/'Sources/IlliquidCore/Persistence/CoalescingPersistenceWriter.swift',R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',H/'HistoryHarness.swift']
+ support=[x for x in sorted((R/'Benchmarks/NonDecodeFollowup/fixtures').glob('*.swift')) if x.name not in ['PlaybackPersistenceStore.swift','PlaybackPreferences.swift','CoalescingPersistenceWriter.swift','PreviewCacheV1.swift','NativeThumbnailDiskCache.swift']]
+ # Retain the historical/current store implementations and use identical
+ # current preference validators as supporting code in both variants.
+ preferences=R/'Sources/IlliquidCore/Persistence/PlaybackPreferences.swift'
+ shared=[*support,preferences,R/'Sources/IlliquidCore/Persistence/CoalescingPersistenceWriter.swift',R/'Sources/IlliquidCore/Utilities/NonDecodePerformance.swift',H/'HistoryHarness.swift']
  sources={'v2':H/'baseline/PlaybackPersistenceStoreV2.swift','v3':R/'Sources/IlliquidCore/Persistence/PlaybackPersistenceStore.swift'}
  flags=['-O','-swift-version','6','-warnings-as-errors']
- manifest={'compiler':run(['swiftc','--version']),'platform':platform.platform(),'flags':flags,'allocation_instrumented':a.allocations,'source_sha256':{str(x.relative_to(R)):hashlib.sha256(x.read_bytes()).hexdigest() for x in [*shared,*sources.values()]}}
+ manifest={'compiler':run(['swiftc','--version']),'platform':platform.platform(),'flags':flags,'allocation_instrumented':a.allocations,'source_sha256':{str(x.relative_to(R)):hashlib.sha256(x.read_bytes()).hexdigest() for x in [*shared,*sources.values()]},'shared_current_preferences':{'path':str(preferences.relative_to(R)),'origin':'current_worktree','sha256':hashlib.sha256(preferences.read_bytes()).hexdigest()}}
  if a.resume:
   previous=json.loads((a.output/'manifest.json').read_text())
   if previous['source_sha256']!=manifest['source_sha256']:p.error('source changes prevent resuming')

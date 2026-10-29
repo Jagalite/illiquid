@@ -1,0 +1,108 @@
+name: Ring-buffer wrap performance
+
+on:
+  push:
+    branches:
+      - perf/ring-buffer-wrap-20261028-a16f
+    paths:
+      - Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift
+      - Sources/IlliquidNativePlayback/Playback/PacketQueue.swift
+      - Tests/IlliquidNativePlaybackTests/FixedRingBufferTests.swift
+      - Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift
+      - Benchmarks/RingBufferWrap/**
+      - .github/workflows/ring-buffer-wrap-performance.yml
+      - '!Benchmarks/RingBufferWrap/README.md'
+      - '!Benchmarks/RingBufferWrap/evidence/**'
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift
+      - Sources/IlliquidNativePlayback/Playback/PacketQueue.swift
+      - Tests/IlliquidNativePlaybackTests/FixedRingBufferTests.swift
+      - Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift
+      - Benchmarks/RingBufferWrap/**
+      - .github/workflows/ring-buffer-wrap-performance.yml
+      - '!Benchmarks/RingBufferWrap/README.md'
+      - '!Benchmarks/RingBufferWrap/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ring-buffer-wrap-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if [[ -f /Volumes/seed1/Projects/kyoto/kyoto.py ]]; then
+            echo "::error::The shared Kyoto queue is available; route compilation through it before running this qualification."
+            exit 1
+          fi
+          echo "The shared Kyoto queue is unavailable on this hosted runner. Running isolated component builds directly and serially."
+      - name: Verify both implementations and measure native ring-buffer workloads
+        run: |
+          python3 Benchmarks/RingBufferWrap/run.py \
+            --output "$RUNNER_TEMP/ring-buffer-wrap" --pairs 8 --target-ms 80
+      - name: Publish bounded machine-readable evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "ring-buffer-wrap"
+          result_path = root / "results.json"
+          if not result_path.is_file():
+              print("RING_WRAP_EVIDENCE_UNAVAILABLE=results.json was not produced; inspect the preceding failure and artifact")
+              raise SystemExit(0)
+          evidence = {
+              "github_run": {
+                  "id": os.environ["GITHUB_RUN_ID"],
+                  "attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+                  "sha": os.environ["GITHUB_SHA"],
+                  "event": os.environ["GITHUB_EVENT_NAME"],
+                  "url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              },
+              "results": json.loads(result_path.read_text()),
+          }
+          serialized = json.dumps(evidence, separators=(",", ":"), sort_keys=True, allow_nan=False)
+          encoded = serialized.encode()
+          (root / "review-evidence.json").write_bytes(encoded + b"\n")
+          if len(encoded) > 750000:
+              raise RuntimeError("Review evidence exceeds the bounded log budget; inspect the complete artifact")
+          chunks = [serialized[start:start + 12000] for start in range(0, len(serialized), 12000)]
+          print("RING_WRAP_EVIDENCE_META=" + json.dumps({
+              "parts": len(chunks), "bytes": len(encoded), "sha256": hashlib.sha256(encoded).hexdigest()
+          }, sort_keys=True))
+          for index, chunk in enumerate(chunks):
+              print("RING_WRAP_EVIDENCE_PART=" + json.dumps({
+                  "index": index, "parts": len(chunks), "chunk": chunk
+              }, sort_keys=True))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
+              out.write("## Ring-buffer wrap\n\n")
+              out.write("Native component qualification and paired measurements are retained in the artifact and structured run log. ")
+              out.write("These component measurements do not establish whole-player CPU, playback, or UI performance.\n")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ring-buffer-wrap-native
+          path: |
+            ${{ runner.temp }}/ring-buffer-wrap/
+            !${{ runner.temp }}/ring-buffer-wrap/**/.build/**
+            !${{ runner.temp }}/ring-buffer-wrap/**/build/**
+            !${{ runner.temp }}/ring-buffer-wrap/**/module-cache/**
+            !${{ runner.temp }}/ring-buffer-wrap/**/package-cache/**
+            !${{ runner.temp }}/ring-buffer-wrap/**/package-config/**
+            !${{ runner.temp }}/ring-buffer-wrap/**/package-security/**
+          retention-days: 14

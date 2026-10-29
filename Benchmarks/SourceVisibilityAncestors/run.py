@@ -28,6 +28,11 @@ import xml.etree.ElementTree as ET
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
+# Reviewed integration inputs; future drift requires another explicit review.
+REVIEWED_TREE = 'c635b5eba18326b683a47a87fe343bff5827b7b4'
+REVIEWED_SNAPSHOTS = {'Sources/IlliquidCore/NormalizedFileURL.swift': '3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2', 'Sources/IlliquidCore/MediaFileSupport.swift': '85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00', 'Sources/IlliquidCore/SourcePreparationExecutor.swift': '681fc16a1e263af5f5cf11bd5838fefa29b4bf77ef58aa3615a9180e5bbd7b16', 'Sources/IlliquidCore/MediaNameRecognition.swift': '546229819194a5844bc052e3837a21296921f4b11e6191ebdc82c0c7c5e64910', 'Sources/IlliquidCore/MediaMetadataHints.swift': '9df354b5f319aee2d29799b601562e46571d664650bfb298133f7425939ba53a', 'Sources/IlliquidCore/NFOMetadataHints.swift': '5e9728f84654f5f38818444b9f1ef40db0d751aa23eb6aba273e587cc1f9892a', 'Sources/IlliquidCore/PlexMatchHints.swift': 'b35ce4f067ecac4f714c0895aaaa6df3b58e1dcb6c8d4353e59d18abc26c962b', 'Sources/IlliquidCore/MediaSidecarReader.swift': 'ed88e67d20063535b861a94f147e574601a3d8f75b7584dea1a7cd6e7bb1217c', 'Sources/IlliquidApp/SourceBrowserFilter.swift': '3d0ffefc80607a38c57bcfd4d714b5a3feee3c1b91a6ff48af49957f425f526a', 'Sources/IlliquidApp/SourceTreeProjectionInput.swift': 'a27c6e6bf587718604ff4300194d3e503baaa45239a5f361867d290664dbaa21', 'Sources/IlliquidApp/AppValues.swift': 'f4ccb48676680e0f37a6d99e53e1fb0e19df7c442eb31c77c991b997c0fa6d4f', 'Sources/IlliquidApp/SidebarValues.swift': '4246059d8f32abf070c021e35be5ccef3cef7cb3e4dfa87131dc0ff893446f77'}
+REVIEWED_SOURCE_SHA256 = {'Sources/IlliquidCore/NormalizedFileURL.swift': '3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2', 'Sources/IlliquidCore/MediaFileSupport.swift': '85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00', 'Sources/IlliquidCore/SourcePreparationExecutor.swift': '681fc16a1e263af5f5cf11bd5838fefa29b4bf77ef58aa3615a9180e5bbd7b16', 'Sources/IlliquidCore/MediaNameRecognition.swift': '546229819194a5844bc052e3837a21296921f4b11e6191ebdc82c0c7c5e64910', 'Sources/IlliquidCore/MediaMetadataHints.swift': '9df354b5f319aee2d29799b601562e46571d664650bfb298133f7425939ba53a', 'Sources/IlliquidCore/NFOMetadataHints.swift': '5e9728f84654f5f38818444b9f1ef40db0d751aa23eb6aba273e587cc1f9892a', 'Sources/IlliquidCore/PlexMatchHints.swift': 'b35ce4f067ecac4f714c0895aaaa6df3b58e1dcb6c8d4353e59d18abc26c962b', 'Sources/IlliquidCore/MediaSidecarReader.swift': 'ed88e67d20063535b861a94f147e574601a3d8f75b7584dea1a7cd6e7bb1217c', 'Sources/IlliquidApp/SourceBrowserFilter.swift': '3d0ffefc80607a38c57bcfd4d714b5a3feee3c1b91a6ff48af49957f425f526a', 'Sources/IlliquidApp/SourceTreeProjectionInput.swift': 'a27c6e6bf587718604ff4300194d3e503baaa45239a5f361867d290664dbaa21', 'Sources/IlliquidApp/AppValues.swift': 'b117ee9d5ffcd950430929bc525093fc3533a555bc80abecbf6c981204399af5', 'Sources/IlliquidApp/SidebarValues.swift': 'c28a9db73d4b01a6bd35dc74f1ebe72826cf3fbb294f125bf126dff534e52930'}
+REVIEWED_TESTS = {'SourceBrowserFilterTests.swift': '54e83961990c31f064543337798a637eeaf5a812455f8585501034eb02e2a830', 'SourceMediaOrganizationTests.swift': '517339c32382ae1a546d63a11ab1971fcab6ceb46c96b0087a26ac93947dc48d', 'SourceTreeVisibilityCacheTests.swift': '69d98d02086bdb3511ff1338c92acf13f6b128c263df892faefa4db29c594204', 'SourceAncestorVisibilityTests.swift': '5eb049f8a2d268927f5ec3012a5c0fb7969aa220afda36cd6a5860f59a7a3ef0'}
 CORE = [
     "Utilities/NormalizedFileURL.swift", "Utilities/MediaFileSupport.swift",
     "Utilities/SourcePreparationExecutor.swift", "MediaLibrary/MediaNameRecognition.swift",
@@ -195,12 +200,24 @@ class Runner:
             lambda path: self.execute(["git", "show", f"{BASELINE}:{path}"], "baseline:" + path).stdout.encode()
         )
         candidate_files, candidate_records = snapshot(lambda name: (ROOT / name).read_bytes())
+        if self.args.current_source_correctness:
+            if {name: digest(raw) for name, raw in candidate_files.items()} != REVIEWED_SNAPSHOTS:
+                raise ValueError("Current source differs from reviewed integration snapshots")
+            if {name: record["source_sha256"] for name, record in candidate_records.items()} != REVIEWED_SOURCE_SHA256:
+                raise ValueError("Current source files differ from reviewed integration source pins")
+            for name, expected in REVIEWED_TESTS.items():
+                if digest((ROOT / "Tests/IlliquidAppTests" / name).read_bytes()) != expected:
+                    raise ValueError(f"Current regression differs from reviewed integration test: {name}")
         baseline_files, baseline_records, candidate_records, comparison = comparison_sources(
             baseline_files, baseline_records, candidate_files, candidate_records,
             focal_sources={"Sources/IlliquidApp/SourceBrowserFilter.swift",
                            "Sources/IlliquidApp/SidebarValues.swift"},
             baseline_revision=BASELINE, worktree_head=head,
+            current_support=self.args.current_source_correctness,
         )
+        if self.args.current_source_correctness:
+            comparison["reviewed_integration_tree"] = REVIEWED_TREE
+            comparison["reviewed_test_sha256"] = REVIEWED_TESTS
         for relative, raw in candidate_files.items():
             if Path(relative).name not in {"SourceBrowserFilter.swift", "SidebarValues.swift"}:
                 if raw != baseline_files[relative]:
@@ -259,7 +276,8 @@ class Runner:
             "baseline": BASELINE, "driver_hashes": self.driver_hashes,
             "sizes": self.args.sizes, "cases": self.args.cases, "pairs": self.args.pairs,
             "exploratory": self.args.smoke,
-            "measurement": "Wall and process CPU around each awaited actor.project call; fixture setup, receipt calculation and diagnostics excluded",
+            "performance_qualified": False if self.args.current_source_correctness else None,
+            "measurement": "No timing; full output differential" if self.args.current_source_correctness else "Wall and process CPU around each awaited actor.project call; fixture setup, receipt calculation and diagnostics excluded",
             "fixtures": "Synthetic grouped/interleaved/unique-parent lexical URLs; metadata prepared outside timing; no filesystem I/O during projection",
             "ordering": "AB, BA alternating per case and size; fresh process for every member",
             "target_ms": self.args.target_ms, "minimum_ms": self.args.minimum_ms,
@@ -433,6 +451,37 @@ class Runner:
                           tests_executed=self.args.mode == "all")
         write_json(self.output / "completion.json", completion)
 
+    def correctness(self):
+        """Compare lossless JSON of every output field, with no projection timing."""
+        observations = []
+        for size in self.args.sizes:
+            for case in self.args.cases:
+                outputs = {}
+                for variant in ("baseline", "candidate"):
+                    result = self.execute([self.binaries[variant], "correctness", case, size, 2],
+                                          f"correctness-{variant}-{case}-{size}")
+                    data = json.loads(result.stdout)
+                    if (data["case"], data["size"], data["iterations"]) != (case, size, 2):
+                        raise ValueError("Unexpected correctness workload")
+                    if data["tree_build_count"] != 1 or data["visibility_build_count"] != 3:
+                        raise ValueError("Correctness must rebuild visibility twice and reuse one tree")
+                    if len(data["outputs"]) != 2:
+                        raise ValueError("Both complete projection states are required")
+                    write_json(self.output / f"full-output-{variant}-{case}-{size}.json", data)
+                    outputs[variant] = data
+                if outputs["baseline"] != outputs["candidate"]:
+                    raise ValueError(f"Complete projection differs: {case}/{size}")
+                observations.append({"case": case, "size": size, "states": 2, "equal": True})
+        self.check_sources()
+        for variant, binary in self.binaries.items():
+            if digest(binary.read_bytes()) != self.manifests[variant]["binary_sha256"]:
+                raise ValueError(f"Benchmark binary changed: {variant}")
+        write_json(self.output / "completion.json", {
+            "complete": True, "mode": "current-source-correctness",
+            "tests_executed": True, "source_integrity_passed": True,
+            "performance_qualified": False, "observations": observations,
+        })
+
     def export_evidence(self):
         """Keep an uploadable receipt without compiler caches or build products."""
         evidence = self.output / "evidence"
@@ -452,6 +501,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--mode", choices=["all", "test", "benchmark", "build"], default="all")
+    parser.add_argument("--current-source-correctness", action="store_true",
+                        help="shared current support; full regressions and lossless output differential, no timing")
     parser.add_argument("--swift")
     parser.add_argument("--jobs", type=int, default=1)
     parser.add_argument("--pairs", "--samples", dest="pairs", type=int, default=6)
@@ -476,6 +527,10 @@ def main():
         parser.error("Iterations must be even and at least two so both toggle states are measured")
     if args.minimum_ms < 40 or args.target_ms < args.minimum_ms:
         parser.error("Target must reach the minimum, with at least 40 ms per observation")
+    if args.current_source_correctness and (args.mode != "all" or args.smoke
+            or args.cases != CASES or args.sizes != [100, 1000, 10000]
+            or args.configurations != ["debug", "release"]):
+        parser.error("Current-source correctness requires all regressions, default cases/sizes and debug/release")
     runner = Runner(args)
     try:
         runner.prepare()
@@ -483,7 +538,9 @@ def main():
             runner.test()
         if args.mode in {"all", "benchmark", "build"}:
             runner.build()
-        if args.mode in {"all", "benchmark"}:
+        if args.current_source_correctness:
+            runner.correctness()
+        elif args.mode in {"all", "benchmark"}:
             runner.measure()
     finally:
         runner.export_evidence()
