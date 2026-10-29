@@ -196,6 +196,7 @@ class Runner:
             "candidate_revision": self.command(["git", "rev-parse", "HEAD"]).strip(),
             "platform": platform.platform(), "machine": platform.machine(),
             "processor": platform.processor(), "files": {}, "binaries": {},
+            "shared_source_mode": "current-source regression; both variants share current support; not historical qualification" if args.current_source_regression else "frozen source guard",
             "scope": "Color attachments and both returned HDR payloads for an existing AVFrame/CVPixelBuffer. The *_cleared controls also time clearing all attachments before preparation; other cases use a warm 32-buffer ring. Excludes decode, pixel conversion, allocation of the frame/pixel buffer, geometry attachments and presentation.",
         }
 
@@ -230,7 +231,8 @@ class Runner:
         for path, destination in ((SHIM, module / "include/ffmpeg_shim.h"),
                                   (MODULE_MAP, module / "module.modulemap")):
             candidate = self.source("candidate", path)
-            if candidate != self.source("baseline", path):
+            baseline = self.source("baseline", path)
+            if candidate != baseline and not (self.args.current_source_regression):
                 raise ValueError(f"Shared FFmpeg import changed between revisions: {path}")
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_text(candidate)
@@ -409,6 +411,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--baseline", default=BASELINE)
+    parser.add_argument("--current-source-regression", action="store_true", help="Use current shared support for both variants in verify-only regression mode")
     parser.add_argument("--swiftc")
     parser.add_argument("--pkg-config", default="pkg-config")
     parser.add_argument("--pairs", type=int, default=10)
@@ -419,6 +422,8 @@ def main():
                       help="Save exact extracted sources and receipts without Swift/macOS dependencies")
     mode.add_argument("--verify-only", action="store_true")
     args = parser.parse_args()
+    if args.current_source_regression and not (args.verify_only or args.prepare_only):
+        parser.error("--current-source-regression requires --verify-only or --prepare-only")
     if args.pairs < 2 or args.pairs % 2:
         parser.error("--pairs must be even and at least two for balanced AB/BA ordering")
     if not math.isfinite(args.target_ms) or args.target_ms <= 0:

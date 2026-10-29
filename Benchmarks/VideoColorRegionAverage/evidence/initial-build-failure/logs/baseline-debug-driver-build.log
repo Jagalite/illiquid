@@ -1,0 +1,7 @@
+/home/runner/work/_temp/video-color-regions/sources/Driver.swift:16:22: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+ 14 | private func samples() -> [VideoColorSample] {
+ 15 |     (0..<8).map { seed in
+ 16 |         let colors = (0..<96).map { index in
+    |                      `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+ 17 |             SampledVideoColor(
+ 18 |                 red: Double((index * 37 + seed * 19 + 11) % 257) / 256,

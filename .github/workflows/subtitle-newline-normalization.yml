@@ -1,0 +1,134 @@
+name: Subtitle newline normalization performance
+
+on:
+  pull_request:
+    paths:
+      - Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift
+      - Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift
+      - Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift
+      - Scripts/test-external-subtitle-regressions.sh
+      - Benchmarks/ExternalSubtitleConversion/run.py
+      - Benchmarks/ExternalSubtitleConversion/Driver.swift
+      - .github/workflows/subtitle-newline-normalization.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-newline-normalization-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SUBTITLE_BASELINE: ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+
+jobs:
+  qualify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Select the repository's native toolchain
+        if: runner.os == 'macOS'
+        run: echo "DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer" >> "$GITHUB_ENV"
+      - name: Record host and source identities
+        run: |
+          mkdir -p "$RUNNER_TEMP/subtitle-newlines"
+          uname -a | tee "$RUNNER_TEMP/subtitle-newlines/host.txt"
+          swift --version | tee -a "$RUNNER_TEMP/subtitle-newlines/host.txt"
+          python3 --version | tee -a "$RUNNER_TEMP/subtitle-newlines/host.txt"
+          echo "Kyoto is unavailable on this hosted runner; compile the isolated component directly."
+          python3 - <<'PY'
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+          source = "Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift"
+          baseline = os.environ["SUBTITLE_BASELINE"]
+          paths = [source, "Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift",
+                   "Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift",
+                   "Scripts/test-external-subtitle-regressions.sh",
+                   "Benchmarks/ExternalSubtitleConversion/run.py", "Benchmarks/ExternalSubtitleConversion/Driver.swift"]
+          receipt = {"head": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+                     "baseline": baseline,
+                     "baseline_source_sha256": hashlib.sha256(subprocess.check_output(["git", "show", baseline + ":" + source])).hexdigest(),
+                     "source_sha256": {p: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in paths}}
+          (Path(os.environ["RUNNER_TEMP"]) / "subtitle-newlines" / "source-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
+          print(json.dumps(receipt, sort_keys=True))
+          PY
+      - name: Record Foundation normalization edge cases
+        run: |
+          cat > "$RUNNER_TEMP/subtitle-newlines/normalization-probe.swift" <<'SWIFT'
+          import Foundation
+          let cases = ["\r\u{0301}", "\r\u{FE0F}", "\r\u{200D}", "x\0\r\rend", "\r\n\n", "\r\r\n",
+                       "First Cafe\u{0301}\rSecond\r\nThird\nFourth\u{0000}\r\rnext"]
+          let rows = cases.map { source -> [String: Any] in
+              let normalized = source.replacingOccurrences(of: "\r\n", with: "\n")
+                  .replacingOccurrences(of: "\r", with: "\n")
+              let bytes = Array(normalized.utf8)
+              return ["input": Array(source.utf8), "normalized": bytes, "remainingCR": bytes.contains(13)]
+          }
+          print(String(decoding: try JSONSerialization.data(withJSONObject: rows, options: [.sortedKeys]), as: UTF8.self))
+          SWIFT
+          swift "$RUNNER_TEMP/subtitle-newlines/normalization-probe.swift" \
+            | tee "$RUNNER_TEMP/subtitle-newlines/normalization-probe.json"
+      - name: Test both sources in debug and release
+        run: |
+          set -o pipefail
+          for configuration in debug release; do
+            bash Scripts/test-external-subtitle-regressions.sh --baseline-ref "$SUBTITLE_BASELINE" \
+              -c "$configuration" -Xswiftc -warnings-as-errors \
+              2>&1 | tee "$RUNNER_TEMP/subtitle-newlines/baseline-$configuration.log"
+            bash Scripts/test-external-subtitle-regressions.sh \
+              -c "$configuration" -Xswiftc -warnings-as-errors \
+              2>&1 | tee "$RUNNER_TEMP/subtitle-newlines/candidate-$configuration.log"
+          done
+      - name: Verify exact output and measure complete conversions
+        run: |
+          python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark \
+            --baseline-ref "$SUBTITLE_BASELINE" --rounds 8 --target-ms 120 \
+            --output "$RUNNER_TEMP/subtitle-newlines/timing"
+      - name: Print retained evidence for independent review
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, re
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "subtitle-newlines"
+          for name in ["source-receipt.json", "normalization-probe.json", "timing/manifest.json", "timing/benchmark.json", "timing/summary.json"]:
+              path = root / name
+              if path.exists():
+                  print("NEWLINE_EVIDENCE " + json.dumps({"path": name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                                                        "data": json.loads(path.read_text())}, sort_keys=True))
+          path = root / "timing/verification.json"
+          if path.exists():
+              data = json.loads(path.read_text())
+              print("NEWLINE_VERIFICATION " + json.dumps({"cases": len(data),
+                  "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}, sort_keys=True))
+          path = root / "timing/measurements.jsonl"
+          if path.exists():
+              for line in path.read_text().splitlines():
+                  print("NEWLINE_OBSERVATION " + line)
+          for path in sorted(root.glob("*.log")):
+              counts = re.findall(r"Test run with (\d+) tests?\b[^\n]*\bpassed", path.read_text())
+              print("NEWLINE_TEST " + json.dumps({"path": path.name, "passed_test_counts": counts,
+                  "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-newlines-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/subtitle-newlines/**/*.json
+            ${{ runner.temp }}/subtitle-newlines/**/*.jsonl
+            ${{ runner.temp }}/subtitle-newlines/**/*.gz
+            ${{ runner.temp }}/subtitle-newlines/**/*.log
+            ${{ runner.temp }}/subtitle-newlines/**/*.txt
+            ${{ runner.temp }}/subtitle-newlines/**/*.swift
+            ${{ runner.temp }}/subtitle-newlines/timing/runner.snapshot.py
+          retention-days: 14

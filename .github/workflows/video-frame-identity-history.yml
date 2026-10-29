@@ -28,6 +28,8 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Trust checkout in the Linux container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Prepare tools
         run: |
           apt-get update -qq
