@@ -1,0 +1,116 @@
+{
+  "baseline": {
+    "checks": 81,
+    "instrumented": true,
+    "interpretation": "Semantic receipts must match baseline and candidate. No-update wake counts are observations, not baseline correctness assertions. Handshake and hold timings are not performance evidence.",
+    "mode": "qualification",
+    "observations": [
+      {
+        "case": "mixed-waiters-without-updates",
+        "counts": {
+          "broadcasts": 1875,
+          "diagnostic_wait_calls": 0,
+          "diagnostic_wait_returns": 0,
+          "signals": 0,
+          "wait_calls": 1875,
+          "wait_returns": 1875
+        },
+        "hold_seconds": 0.03
+      }
+    ],
+    "passed": true,
+    "receipt": {
+      "cases": [
+        {
+          "case": "observers-before-reader",
+          "observer_results": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "observers": 4,
+          "reader_results": [
+            false
+          ]
+        },
+        {
+          "case": "mixed-deadlines-and-eof",
+          "positions": [
+            5,
+            10,
+            20
+          ],
+          "results": [
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        {
+          "all_admitted": true,
+          "case": "same-generation-backward-reset-immediate-crossing",
+          "repetitions": 32
+        }
+      ]
+    }
+  },
+  "candidate": {
+    "checks": 81,
+    "instrumented": true,
+    "interpretation": "Semantic receipts must match baseline and candidate. No-update wake counts are observations, not baseline correctness assertions. Handshake and hold timings are not performance evidence.",
+    "mode": "qualification",
+    "observations": [
+      {
+        "case": "mixed-waiters-without-updates",
+        "counts": {
+          "broadcasts": 0,
+          "diagnostic_wait_calls": 0,
+          "diagnostic_wait_returns": 0,
+          "signals": 0,
+          "wait_calls": 0,
+          "wait_returns": 0
+        },
+        "hold_seconds": 0.03
+      }
+    ],
+    "passed": true,
+    "receipt": {
+      "cases": [
+        {
+          "case": "observers-before-reader",
+          "observer_results": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "observers": 4,
+          "reader_results": [
+            false
+          ]
+        },
+        {
+          "case": "mixed-deadlines-and-eof",
+          "positions": [
+            5,
+            10,
+            20
+          ],
+          "results": [
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        {
+          "all_admitted": true,
+          "case": "same-generation-backward-reset-immediate-crossing",
+          "repetitions": 32
+        }
+      ]
+    }
+  }
+}
