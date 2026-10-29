@@ -1,0 +1,31 @@
+Test Suite 'Selected tests' started at 2026-10-28 01:05:33.688
+Test Suite 'Selected tests' passed at 2026-10-28 01:05:33.689
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "Bounded native filesystem callback decoding" started.
+◇ Test oversizedCallbacksCollapseBeforeReadingFlags(_:) started.
+◇ Test case passing 1 argument count → 8192 to oversizedCallbacksCollapseBeforeReadingFlags(_:) started.
+◇ Test case passing 1 argument count → 4097 to oversizedCallbacksCollapseBeforeReadingFlags(_:) started.
+✘ Test oversizedCallbacksCollapseBeforeReadingFlags(_:) recorded an issue with 1 argument count → 4097 at SourceFilesystemEventBatchTests.swift:55:9: Expectation failed: (result.events.count → 4097) == 1
+✘ Test oversizedCallbacksCollapseBeforeReadingFlags(_:) recorded an issue with 1 argument count → 4097 at SourceFilesystemEventBatchTests.swift:56:9: Expectation failed: (result.events.first → SourceFilesystemEvent(path: "/media/movies/Same.mkv", flags: IlliquidApp.SourceFilesystemEvent.Flags(rawValue: 2))) == (recovery → SourceFilesystemEvent(path: "/", flags: IlliquidApp.SourceFilesystemEvent.Flags(rawValue: 32)))
+✘ Test oversizedCallbacksCollapseBeforeReadingFlags(_:) recorded an issue with 1 argument count → 8192 at SourceFilesystemEventBatchTests.swift:55:9: Expectation failed: (result.events.count → 8192) == 1
+✘ Test oversizedCallbacksCollapseBeforeReadingFlags(_:) recorded an issue with 1 argument count → 4097 at SourceFilesystemEventBatchTests.swift:57:9: Expectation failed: (result.readIndices.count → 4097) == 0
+✘ Test oversizedCallbacksCollapseBeforeReadingFlags(_:) recorded an issue with 1 argument count → 8192 at SourceFilesystemEventBatchTests.swift:56:9: Expectation failed: (result.events.first → SourceFilesystemEvent(path: "/media/movies/Same.mkv", flags: IlliquidApp.SourceFilesystemEvent.Flags(rawValue: 2))) == (recovery → SourceFilesystemEvent(path: "/", flags: IlliquidApp.SourceFilesystemEvent.Flags(rawValue: 32)))
+✘ Test oversizedCallbacksCollapseBeforeReadingFlags(_:) recorded an issue with 1 argument count → 8192 at SourceFilesystemEventBatchTests.swift:57:9: Expectation failed: (result.readIndices.count → 8192) == 0
+✘ Test oversizedCallbacksCollapseBeforeReadingFlags(_:) with 2 test cases failed after 0.006 seconds with 6 issues.
+✘ Suite "Bounded native filesystem callback decoding" failed after 0.006 seconds with 6 issues.
+✘ Test run with 1 test in 1 suite failed after 0.007 seconds with 6 issues.
+warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.
+Building for production...
+[0/9] Write swift-version-62507D21D2FE77A5.txt
+[1/9] Compiling IlliquidApp Batch.swift
+[2/9] Compiling IlliquidAppTests SourceFilesystemEventBatchTests.swift
+[3/9] /workspace/scratch/c6fd1221e1df/event-batch-negative-control/.build/x86_64-unknown-linux-gnu/release/FilesystemBatchNegativeControlPackageDiscoveredTests.derived/all-discovered-tests.swift
+[4/9] Compiling FilesystemBatchNegativeControlPackageDiscoveredTests IlliquidAppTests.swift
+[5/9] /workspace/scratch/c6fd1221e1df/event-batch-negative-control/.build/x86_64-unknown-linux-gnu/release/FilesystemBatchNegativeControlPackageTests.derived/runner.swift
+[6/9] Compiling FilesystemBatchNegativeControlPackageTests runner.swift
+[7/9] Write Objects.LinkFileList
+[8/9] Linking FilesystemBatchNegativeControlPackageTests.xctest
+Build complete! (13.95s)

@@ -61,11 +61,13 @@ def command(args: list[str], log: Path, cache: Path) -> str:
     return result.stdout
 
 
-def snapshot(out: Path, include_tests: bool, baseline_ref: str | None = None) -> dict[str, object]:
-    pinned_bytes = (HERE / "baseline/manifest.json").read_bytes()
-    pinned = json.loads(pinned_bytes)
+def snapshot(out: Path, include_tests: bool, baseline_dir: Path | None = None,
+             baseline_ref: str | None = None) -> dict[str, object]:
     if baseline_ref is None:
-        baseline = (HERE / "baseline/TrackSelectionPreferences.swift").read_bytes()
+        baseline_dir = baseline_dir or HERE / "baseline"
+        pinned_bytes = (baseline_dir / "manifest.json").read_bytes()
+        pinned = json.loads(pinned_bytes)
+        baseline = (baseline_dir / "TrackSelectionPreferences.swift").read_bytes()
     else:
         # Resolve once, then read immutable source objects. Only the selection
         # implementation may differ; a changed shared MediaTrack fails below.
@@ -334,7 +336,10 @@ def main() -> None:
     parser.add_argument("mode", choices=("test", "benchmark", "summarize"))
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--configuration", choices=("debug", "release"), default="debug")
-    parser.add_argument("--baseline-ref", help="Git revision for the original selection source; defaults to the frozen normalization-study baseline")
+    baseline = parser.add_mutually_exclusive_group()
+    baseline.add_argument("--baseline-ref", help="Git revision for the original selection source; defaults to the frozen normalization-study baseline")
+    baseline.add_argument("--baseline-dir", type=Path,
+                          help="Frozen source and manifest directory (defaults to the original ranking baseline)")
     parser.add_argument("--variant", choices=(*VARIANTS, "both"), default="both")
     parser.add_argument("--rounds", type=int, default=10)
     parser.add_argument("--iterations", type=int, help="Fixed iterations per workload; otherwise calibrate both variants")
@@ -351,7 +356,8 @@ def main() -> None:
     if args.mode == "summarize":
         write_json(out / "summary.json", summarize([json.loads(line) for line in (out / "measurements.jsonl").read_text().splitlines()]))
         return
-    receipt = snapshot(out, args.mode == "test", args.baseline_ref)
+    receipt = snapshot(out, args.mode == "test",
+                       args.baseline_dir.resolve() if args.baseline_dir else None, args.baseline_ref)
     compiler = toolchain(args, out)
     receipt.update({"recorded_utc": datetime.now(timezone.utc).isoformat(), "platform": platform.platform(),
                     "machine": platform.machine(), "cpu_count": os.cpu_count(), "python": sys.version,

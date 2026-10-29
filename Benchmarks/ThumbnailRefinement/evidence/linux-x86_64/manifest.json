@@ -1,0 +1,50 @@
+{
+  "arguments": {
+    "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "cases": null,
+    "max_sample_ms": 1500.0,
+    "output": "/__w/_temp/thumbnail-refinement",
+    "pairs": 10,
+    "target_ms": 150.0,
+    "tests_only": false
+  },
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binary_sha256": {
+    "baseline": {
+      "benchmark": "ffedcebd62c5cb978f8bd4d8f81f9a27841aa50452756f3604630a66675ea1e3",
+      "libIlliquidCore.so": "43e112e7fb6dfbf8310ef647d8a96ab4449969016bf8092eff7bc77e684b8a48"
+    },
+    "candidate": {
+      "benchmark": "3262f0a3ac63f76c2375abe01b59c3ef28c9caf397506e16fc54c81c276ddfa5",
+      "libIlliquidCore.so": "13100c6a4dcb6f4175ebbf172ec5ad1e3f8a95a6649a53af1ef021ac1cffc84e"
+    }
+  },
+  "collected_at_utc": "2026-10-28T05:51:39Z",
+  "driver_sha256": "c5e24a05e8bf4c18d3d93ad7f3b85f735608ccb89baf714ec89276c9cab2cfec",
+  "git_head": "dc34d5c8eee8fcb55cc2e20bf3985f36bb83fd4d",
+  "git_status": "",
+  "hardware": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 9V45 96-Core Processor\nCPU family:                              26\nModel:                                   2\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                5192.19\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               96 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                2 MiB (2 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Vulnerable: Safe RET, no microcode\nVulnerability Spec store bypass:         Vulnerable\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected",
+  "machine": "x86_64",
+  "method": "Whole production sources, separate optimized module, no behavior stubs; same-iteration fresh-process pairs with alternating AB/BA order; 16 prebuilt inputs per case; warm in-memory work; full bit-pattern oracle checks outside timing; result allocation/destruction inside timing; no discarded samples, control subtraction or timing-based CI threshold.",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "runner_sha256": "972f48e627cb19f67d19eb5cdd1c3c8680be689b23b0e8c8a7c4f4512a59a0ea",
+  "source_sha256": {
+    "baseline": {
+      "Player/ThumbnailPassCursor.swift": "cc92ee68ca438b975daede867ebd40d8bf8e6ce33ce12d9b1b411135b9feb0ee",
+      "Player/ThumbnailPolicy.swift": "1c68b9d4819cc9e9d4a8f3dfe2e6e723e69dd0330e7fa63e389eb76c107986d3",
+      "Player/ThumbnailVisibilityPolicy.swift": "1bc3396f3a2b3b5c77c46a8d0dd8d8d524a898de7278019031c78ac503e75734"
+    },
+    "candidate": {
+      "Player/ThumbnailPassCursor.swift": "cc92ee68ca438b975daede867ebd40d8bf8e6ce33ce12d9b1b411135b9feb0ee",
+      "Player/ThumbnailPolicy.swift": "ee737b41939f79d2289a323d9ac51f286458eb97bacedbbc8c3264216fabc089",
+      "Player/ThumbnailVisibilityPolicy.swift": "1bc3396f3a2b3b5c77c46a8d0dd8d8d524a898de7278019031c78ac503e75734"
+    }
+  },
+  "swift": "Swift version 6.2.1 (swift-6.2.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "test_sha256": {
+    "ThumbnailPolicyTests.swift": "b5edb262a66f37cbf0fce2dadff4d1ec571171e3067682a3cc39b165d73a85da",
+    "ThumbnailRefinementOrderTests.swift": "ada56a4f8dd7d4c2a3b7ddbfc16f61dbe23954757a63e0d850b87add732973c5",
+    "ThumbnailSchedulingPolicyRegressionTests.swift": "f22752c572760f5def7c1cdfb2c2611e99b6197cb8814fabb0e54f6d638d70a3"
+  },
+  "unit": "nanoseconds per complete refinement schedule construction"
+}
