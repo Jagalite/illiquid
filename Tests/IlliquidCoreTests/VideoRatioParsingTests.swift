@@ -35,10 +35,10 @@ struct VideoRatioParsingTests {
     }
 
     @Test func retainsInclusiveBoundsAndExtremeFiniteOperands() {
-        for value in [0.1, 0.1.nextUp, 1.0, 10.0.nextDown, 10.0] {
+        for value in [0.1, Double(0.1).nextUp, 1.0, Double(10.0).nextDown, 10.0] {
             #expect(VideoPresentationGeometry.ratio(String(value))?.bitPattern == value.bitPattern)
         }
-        for value in [0.1.nextDown, 10.0.nextUp] {
+        for value in [Double(0.1).nextDown, Double(10.0).nextUp] {
             #expect(VideoPresentationGeometry.ratio(String(value)) == nil)
         }
         for value in [Double.leastNonzeroMagnitude, .leastNormalMagnitude, .greatestFiniteMagnitude] {
