@@ -96,6 +96,15 @@ class Runner:
             )
         return completed.stdout
 
+    def source(self, variant, path):
+        if variant == "baseline" and (not self.args.current_source_regression or path == PLAYER):
+            return self.command(["git", "show", f"{BASELINE}:{path}"])
+        return (ROOT / path).read_text()
+
+    def require_timing(self):
+        if self.args.current_source_regression:
+            raise RuntimeError("Timing forbidden in current-source regression mode")
+
     def prepare(self):
         kyoto = Path("/Volumes/seed1/Projects/kyoto/kyoto.py")
         if kyoto.exists() and not self.args.kyoto_queued:
@@ -115,7 +124,9 @@ class Runner:
             "sources": {}, "tests": {}, "artifacts": {},
             "runner_sha256": digest(Path(__file__).read_bytes()),
             "driver_sha256": digest((HERE / "Driver.swift").read_bytes()),
-            "qualification": "isolated production checkpoint and playlist component",
+            "qualification": ("current-source regression; historical writer oracle; no performance qualification"
+                              if self.args.current_source_regression else
+                              "historical isolated production checkpoint and playlist component"),
         }
         if platform.system() == "Darwin":
             self.manifest["os"] = self.command(["sw_vers"]).strip()
@@ -132,8 +143,7 @@ class Runner:
             directory.mkdir(parents=True)
             self.manifest["sources"][variant] = {}
             for path in [*CORE, PLAYER]:
-                raw = (self.command(["git", "show", f"{BASELINE}:{path}"])
-                       if variant == "baseline" else (ROOT / path).read_text())
+                raw = self.source(variant, path)
                 compiled = raw
                 if path.endswith("PlaybackSessionStore.swift"):
                     marker = "\n/// A versioned, atomic Application Support document"
@@ -247,6 +257,8 @@ let package = Package(name: "CheckpointQualification",
         self.save("manifest.json", self.manifest)
 
     def invoke(self, variant, configuration, case, iterations=None):
+        if iterations is not None:
+            self.require_timing()
         count, kind = case
         mode = "verify" if iterations is None else "measure"
         arguments = [self.binaries[(variant, configuration)], mode, count, kind]
@@ -283,6 +295,7 @@ let package = Package(name: "CheckpointQualification",
         print(f"Exact full-record parity: {len(CASES)} workloads across four binaries", flush=True)
 
     def measure(self):
+        self.require_timing()
         calibrations = []
         for case in CASES:
             count, kind = case
@@ -359,18 +372,20 @@ let package = Package(name: "CheckpointQualification",
             self.test()
             self.build()
             self.verify()
-            if not self.args.tests_only:
+            if not self.args.tests_only and not self.args.current_source_regression:
                 self.measure()
             self.audit_unchanged()
             complete = {
-                "complete": True, "tests_only": self.args.tests_only,
+                "complete": True, "tests_only": self.args.tests_only or self.args.current_source_regression,
+                "current_source_regression": self.args.current_source_regression,
                 "test_configurations": len(self.tests), "verification_workloads": len(CASES),
                 "measured_observations": len(self.summaries) * self.args.pairs * 2,
-                "minimum_duration_met": all(
+                "minimum_duration_met": None if self.args.current_source_regression else all(
                     not group["observations_under_target"] for group in self.summaries),
                 "source_test_and_binary_hashes_unchanged": True,
             }
-            print("CHECKPOINT_QUALIFICATION_PASS", flush=True)
+            print("CHECKPOINT_CURRENT_SOURCE_REGRESSION_PASS" if self.args.current_source_regression
+                  else "CHECKPOINT_QUALIFICATION_PASS", flush=True)
         except BaseException as error:
             complete["error"] = str(error)
             raise
@@ -385,6 +400,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--target-ms", type=float, default=150)
+    parser.add_argument("--current-source-regression", action="store_true",
+                        help="Current shared support with pinned historical writer; timing forbidden")
     parser.add_argument("--tests-only", action="store_true")
     parser.add_argument("--kyoto-queued", action="store_true",
                         help="The complete harness was submitted through the available Kyoto queue")
