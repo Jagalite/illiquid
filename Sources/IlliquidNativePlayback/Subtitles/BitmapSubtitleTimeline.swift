@@ -66,7 +66,8 @@ struct NativeBitmapSubtitleComposition: Sendable {
         guard canvasSize.width > 0, canvasSize.height > 0 else { return [] }
         let scaleX = viewport.width / canvasSize.width
         let scaleY = viewport.height / canvasSize.height
-        return regions.filter { !forcedOnly || $0.isForced }.map { region in
+        let visibleRegions = forcedOnly ? regions.filter(\.isForced) : regions
+        return visibleRegions.map { region in
             ASSRenderedRegion(bitmap: region.pixels, color: 0,
                 frame: CGRect(x: viewport.minX + region.frame.minX * scaleX,
                               y: viewport.minY + region.frame.minY * scaleY,
@@ -185,7 +186,14 @@ struct BitmapSubtitleTimeline: Sendable {
     mutating func prune(before seconds: Double) {
         // Keep the final set preceding the cutoff: an indefinite PGS display
         // can span an arbitrarily long silent interval before its clear event.
-        guard let lastPastIndex = entries.lastIndex(where: { $0.start <= seconds }), lastPastIndex > 0 else { return }
+        // Nothing can retire until the second event reaches the cutoff. A
+        // steady read-ahead window commonly retires just its oldest event.
+        guard entries.count > 1, entries[1].start <= seconds else { return }
+        var lastPastIndex = 1
+        if entries.count > 2, entries[2].start <= seconds,
+           let bulkIndex = entries.lastIndex(where: { $0.start <= seconds }) {
+            lastPastIndex = bulkIndex
+        }
         for entry in entries[..<lastPastIndex] { retainedBytes -= entry.composition.byteCount }
         entries.removeFirst(lastPastIndex)
     }

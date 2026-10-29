@@ -2106,10 +2106,19 @@ struct SourceVisibilityMatcher {
 
     private static func evaluate(
         normalizedPath: String,
-        candidate: String,
+        candidate: @autoclosure () -> String,
         configuration: SourceVisibilityConfiguration,
         compiledRules: [CompiledRule]
     ) -> SourceVisibilityEvaluation {
+        // Manual-only visibility needs no relative path or UTF-16 regex range.
+        // Keep the candidate lazy for both row and cached root evaluations.
+        guard !compiledRules.isEmpty else {
+            return SourceVisibilityEvaluation(
+                hiddenMatches: configuration.manuallyHiddenPaths.contains(normalizedPath) ? [.manual] : [],
+                regexMatches: []
+            )
+        }
+        let candidate = candidate()
         let range = NSRange(candidate.startIndex..., in: candidate)
         let regexMatches = compiledRules.compactMap { rule in
             var matched = false

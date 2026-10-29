@@ -3,7 +3,7 @@
 
 Requires Swift 6.1+ and Python 3.10+. Complete timeline and budget sources are
 compiled with the exact ASSRenderedRegion declaration, without FFmpeg/libass.
-Explicit --suite lookup --portable also permits Linux component runs: only
+Explicit --portable also permits Linux component runs for either suite: only
 staged CoreGraphics imports are conditionalized, using real Foundation geometry.
 Portable results do not qualify macOS performance or whole-player behavior.
 """
@@ -28,11 +28,23 @@ TIMELINE = "Subtitles/BitmapSubtitleTimeline.swift"
 BUDGET = "Subtitles/SubtitleMemoryBudget.swift"
 REGIONS = "Subtitles/LibassContext.swift"
 SOURCES = [TIMELINE, BUDGET, REGIONS]
-TESTS = ["BitmapSubtitleTimelineOrderingTests.swift", "SubtitleMemoryBudgetAccountingTests.swift"]
+TESTS = ["BitmapSubtitleTimelineOrderingTests.swift", "SubtitleMemoryBudgetAccountingTests.swift",
+         "BitmapSubtitleProjectionTests.swift"]
 CASES = [
     "fill-ascending-1", "fill-ascending-8", "fill-ascending-32", "fill-ascending-128",
     "fill-descending-128", "fill-shuffled-128", "replace-32", "replace-128",
     "stream-8", "stream-32", "stream-128", "reject-full-128",
+]
+# Historical timeline/pruning workloads keep their original driver and CLI.
+TIMELINE_LOOKUP_CASES = [
+    "lookup-front-1", "lookup-front-8", "lookup-front-32", "lookup-front-128",
+    "lookup-middle-128", "lookup-latest-128", "lookup-before-128", "lookup-after-128",
+    "lookup-mixed-128", "tick-front-1", "tick-front-8", "tick-front-32", "tick-front-128",
+    "prune-front-128",
+    "lookup-middle-8", "lookup-middle-32",
+    "lookup-penultimate-8", "lookup-penultimate-32", "lookup-penultimate-128",
+    "lookup-tail4-8", "lookup-tail4-32", "lookup-tail4-128",
+    "stream-centered-8", "stream-centered-32", "stream-centered-128",
 ]
 LOOKUP_CASES = [
     "empty",
@@ -94,9 +106,10 @@ def run(command: list[str], output: Path, *, timeout: int = 300) -> str:
     return result.stdout
 
 
-def source_path(variant: str, relative: str, suite_dir: Path = HERE) -> Path:
+def source_path(variant: str, relative: str, suite_dir: Path = HERE,
+                baseline_source: Path | None = None) -> Path:
     if variant == "baseline" and relative == TIMELINE:
-        return suite_dir / "baseline/BitmapSubtitleTimeline.swift"
+        return baseline_source or suite_dir / "baseline/BitmapSubtitleTimeline.swift"
     return ROOT / "Sources/IlliquidNativePlayback" / relative
 
 
@@ -121,12 +134,12 @@ def staged_swift_bytes(source: bytes, portable: bool) -> bytes:
 
 
 def prepare_sources(variant: str, destination: Path, suite_dir: Path = HERE,
-                    portable: bool = False) -> list[Path]:
+                    portable: bool = False, baseline_source: Path | None = None) -> list[Path]:
     destination.mkdir(parents=True, exist_ok=True)
     paths = []
     for relative in (TIMELINE, BUDGET):
         path = destination / Path(relative).name
-        original = source_path(variant, relative, suite_dir)
+        original = source_path(variant, relative, suite_dir, baseline_source)
         if portable:
             path.write_bytes(staged_swift_bytes(original.read_bytes(), portable))
         else:
@@ -139,13 +152,14 @@ def prepare_sources(variant: str, destination: Path, suite_dir: Path = HERE,
 
 
 def build(variant: str, work: Path, output: Path, suite_dir: Path = HERE,
-          portable: bool = False) -> Path:
+          portable: bool = False, baseline_source: Path | None = None) -> Path:
     destination = work / variant
     destination.mkdir(parents=True)
     library = destination / ("libIlliquidNativePlayback.dylib" if sys.platform == "darwin"
                              else "libIlliquidNativePlayback.so")
     paths = [str(path) for path in prepare_sources(
-        variant, destination / "sources", suite_dir, portable=portable)]
+        variant, destination / "sources", suite_dir,
+        portable=portable, baseline_source=baseline_source)]
     run(["swiftc", "-swift-version", "6", "-O", "-whole-module-optimization", "-enable-testing",
          "-warnings-as-errors", "-emit-library", "-emit-module",
          "-module-name", "IlliquidNativePlayback", "-emit-module-path",
@@ -164,16 +178,16 @@ def build(variant: str, work: Path, output: Path, suite_dir: Path = HERE,
 
 def test_variant(variant: str, work: Path, output: Path,
                  suite_dir: Path = HERE, tests: list[str] = TESTS,
-                 portable: bool = False) -> None:
+                 portable: bool = False, baseline_source: Path | None = None) -> None:
     package = work / f"tests-{variant}"
     source_dir = package / "Sources/IlliquidNativePlayback"
     test_dir = package / "Tests/IlliquidNativePlaybackTests"
     source_dir.mkdir(parents=True)
     test_dir.mkdir(parents=True)
-    prepare_sources(variant, source_dir, suite_dir, portable=portable)
+    prepare_sources(variant, source_dir, suite_dir, portable=portable, baseline_source=baseline_source)
     for relative in tests:
-        shutil.copyfile(ROOT / "Tests/IlliquidNativePlaybackTests" / relative,
-                        test_dir / Path(relative).name)
+        original = ROOT / "Tests/IlliquidNativePlaybackTests" / relative
+        (test_dir / Path(relative).name).write_bytes(staged_swift_bytes(original.read_bytes(), portable))
     (package / "Package.swift").write_text('''// swift-tools-version: 6.1
 import PackageDescription
 let package = Package(
@@ -255,16 +269,17 @@ def main() -> None:
     parser.add_argument("--cases", help="Comma-separated subset of the selected suite")
     parser.add_argument("--tests-only", action="store_true")
     parser.add_argument("--portable", action="store_true",
-                        help="Allow Linux lookup runs using Foundation geometry; not macOS qualification")
+                        help="Allow Linux component runs using Foundation geometry; not macOS qualification")
+    parser.add_argument("--baseline-ref", help="Compare the complete timeline from this Git commit/ref; "
+                        "support sources remain current. The selected suite frozen baseline is the default.")
     args = parser.parse_args()
     suite_dir = HERE if args.suite == "insertion" else ROOT / "Benchmarks/BitmapSubtitleLookup"
-    available_cases = CASES if args.suite == "insertion" else LOOKUP_CASES
+    available_cases = CASES + TIMELINE_LOOKUP_CASES if args.suite == "insertion" else LOOKUP_CASES
+    default_cases = CASES if args.suite == "insertion" else LOOKUP_CASES
     tests = TESTS if args.suite == "insertion" else TESTS + ["BitmapSubtitleTimelineLookupTests.swift"]
-    cases = available_cases if args.cases is None else args.cases.split(",")
-    if args.portable and args.suite != "lookup":
-        parser.error("--portable is limited to --suite lookup")
+    cases = default_cases if args.cases is None else args.cases.split(",")
     if sys.platform != "darwin" and not (sys.platform == "linux" and args.portable):
-        parser.error("Use macOS for native runs, or explicitly select --suite lookup --portable on Linux")
+        parser.error("Use macOS for native runs, or explicitly select --portable on Linux")
     portable = sys.platform == "linux" and args.portable
     if (args.pairs < 2 or args.pairs % 2 or args.target_ms <= 0 or
             args.max_sample_ms < args.target_ms or len(set(cases)) != len(cases) or
@@ -276,9 +291,23 @@ def main() -> None:
     output.mkdir(parents=True, exist_ok=True)
     work = output / "build"
     work.mkdir()
+    baseline_source = suite_dir / "baseline/BitmapSubtitleTimeline.swift"
     baseline = json.loads((suite_dir / "baseline/manifest.json").read_text())
-    if digest((suite_dir / "baseline/BitmapSubtitleTimeline.swift").read_bytes()) != baseline["sha256"]:
+    if digest(baseline_source.read_bytes()) != baseline["sha256"]:
         raise RuntimeError("Frozen baseline hash mismatch")
+    if args.baseline_ref:
+        revision = run(["git", "-C", str(ROOT), "rev-parse", "--verify", "--end-of-options",
+                        args.baseline_ref + "^{commit}"], output).strip()
+        specification = revision + ":Sources/IlliquidNativePlayback/" + TIMELINE
+        content = run(["git", "-C", str(ROOT), "show", specification], output)
+        baseline_source = output / "baseline-BitmapSubtitleTimeline.swift"
+        baseline_source.write_text(content)
+        baseline = {
+            "commit": revision,
+            "git_blob": run(["git", "-C", str(ROOT), "rev-parse", specification], output).strip(),
+            "sha256": digest(baseline_source.read_bytes()),
+            "source": specification,
+        }
     manifest = {
         "collected_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "platform": platform.platform(), "machine": platform.machine(),
@@ -286,18 +315,22 @@ def main() -> None:
         "git_head": run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], output).strip(),
         "git_status": run(["git", "-C", str(ROOT), "status", "--porcelain"], output).strip(),
         "baseline": baseline, "arguments": {**vars(args), "output": str(output)},
-        "source_sha256": {variant: {path: digest(source_path(variant, path, suite_dir).read_bytes())
+        "source_sha256": {variant: {path: digest(source_path(variant, path, suite_dir, baseline_source).read_bytes())
                                     for path in SOURCES} for variant in ("baseline", "candidate")},
         "region_declaration_sha256": digest(region_source().encode()),
         "staged_source_sha256": {
             variant: {
                 **{Path(path).name: digest(staged_swift_bytes(
-                    source_path(variant, path, suite_dir).read_bytes(), portable))
+                    source_path(variant, path, suite_dir, baseline_source).read_bytes(), portable))
                    for path in (TIMELINE, BUDGET)},
                 "ASSRenderedRegion.swift": digest(staged_swift_bytes(
                     region_source().encode(), portable)),
             } for variant in ("baseline", "candidate")
         },
+        "qualification": "portable-linux-foundation" if portable else "native-macos",
+        "source_projection": ("Conditionalize standalone CoreGraphics imports in staged inputs; "
+                              "use Linux Foundation geometry for unchanged component function bodies."
+                              if portable else "None"),
         "execution_scope": ("portable Linux component; Foundation geometry; not macOS qualification"
                             if portable else "native macOS component"),
         "extraction": ("Complete ASSRenderedRegion declaration from LibassContext.swift; "
@@ -311,6 +344,8 @@ def main() -> None:
         "runner_sha256": digest(Path(__file__).read_bytes()),
         "test_sha256": {path: digest((ROOT / "Tests/IlliquidNativePlaybackTests" / path).read_bytes())
                         for path in tests},
+        "staged_test_sha256": {path: digest(staged_swift_bytes(
+            (ROOT / "Tests/IlliquidNativePlaybackTests" / path).read_bytes(), portable)) for path in tests},
         "method": "Separate optimized production module; same-iteration fresh-process pairs; "
                   "alternating AB/BA order; deterministic per-pair fixture shuffle; warm in-memory "
                   "work; calibration excluded; no discarded timing samples or control subtraction.",
@@ -319,15 +354,23 @@ def main() -> None:
         manifest["hardware"] = run(["sysctl", "hw.model", "machdep.cpu.brand_string"], output).strip()
     elif sys.platform == "linux":
         manifest["hardware"] = run(["lscpu"], output).strip()
+    manifest["compiled_source_sha256"] = {
+        variant: {path.name: digest(path.read_bytes())
+                  for path in prepare_sources(variant, output / "sources" / variant, suite_dir,
+                                              portable=portable, baseline_source=baseline_source)}
+        for variant in ("baseline", "candidate")
+    }
     write_json(output / "manifest.json", manifest)
     try:
         if args.tests_only:
             for variant in ("baseline", "candidate"):
-                test_variant(variant, work, output, suite_dir, tests, portable=portable)
+                test_variant(variant, work, output, suite_dir, tests, portable=portable,
+                             baseline_source=baseline_source)
             write_json(output / "tests.json", {"baseline_debug": "passed", "baseline_release": "passed",
                                                "candidate_debug": "passed", "candidate_release": "passed"})
             return
-        executables = {variant: build(variant, work, output, suite_dir, portable=portable)
+        executables = {variant: build(variant, work, output, suite_dir, portable=portable,
+                                      baseline_source=baseline_source)
                        for variant in ("baseline", "candidate")}
         manifest["binary_sha256"] = {
             variant: {path.name: digest(path.read_bytes()) for path in executable.parent.iterdir()
