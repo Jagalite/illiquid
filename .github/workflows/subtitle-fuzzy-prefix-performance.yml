@@ -1,0 +1,77 @@
+name: Subtitle fuzzy prefix performance
+
+on:
+  push:
+    branches: ['perf/subtitle-fuzzy-prefix-*']
+    paths:
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Benchmarks/SubtitleFuzzyPrefix/Driver.swift'
+      - 'Benchmarks/SubtitleFuzzyPrefix/run.py'
+      - '.github/workflows/subtitle-fuzzy-prefix-performance.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift'
+      - 'Sources/IlliquidCore/Utilities/MediaFileSupport.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Tests/IlliquidCoreTests/ExternalSubtitle*.swift'
+      - 'Benchmarks/SubtitleFuzzyPrefix/Driver.swift'
+      - 'Benchmarks/SubtitleFuzzyPrefix/run.py'
+      - '.github/workflows/subtitle-fuzzy-prefix-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-fuzzy-prefix-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test both versions and measure paired complete associations
+        run: |
+          # This isolated hosted runner has no Kyoto queue; builds are serialized.
+          mkdir -p "$RUNNER_TEMP/subtitle-fuzzy-prefix"
+          set -o pipefail
+          python3 Benchmarks/SubtitleFuzzyPrefix/run.py \
+            --pairs 16 --target-ms 250 \
+            --output "$RUNNER_TEMP/subtitle-fuzzy-prefix/results" \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-fuzzy-prefix/run.log"
+      - name: Emit reproducible review evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'subtitle-fuzzy-prefix/results'
+          names = ['manifest.json', 'production.diff', 'parity.json', 'tests.json',
+                   'summary.json', 'calibration.json', 'observations.jsonl', 'completion.json']
+          names += [p.name for p in sorted(root.glob('tests-*.log'))]
+          names += [p.name for p in sorted(root.glob('build-*.log'))]
+          for name in names:
+              path = root / name
+              if not path.is_file():
+                  continue
+              data = path.read_text()
+              for part, start in enumerate(range(0, len(data), 10000)):
+                  print('FUZZY_EVIDENCE ' + json.dumps({'path': name, 'part': part,
+                        'text': data[start:start + 10000]}))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-fuzzy-prefix-macos
+          path: |
+            ${{ runner.temp }}/subtitle-fuzzy-prefix/
+            !${{ runner.temp }}/subtitle-fuzzy-prefix/**/.build/**
+            !${{ runner.temp }}/subtitle-fuzzy-prefix/results/cache/**
+          retention-days: 14
