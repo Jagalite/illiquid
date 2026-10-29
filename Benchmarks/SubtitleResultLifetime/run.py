@@ -62,7 +62,7 @@ def write_json(path: Path, value) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
-def source_inputs() -> tuple[dict[str, bytes], dict]:
+def source_inputs(current_source_regression=False) -> tuple[dict[str, bytes], dict]:
     manifest = json.loads((HERE / "baseline/manifest.json").read_text())
     if manifest["revision"] != BASELINE:
         raise ValueError("Frozen baseline revision changed")
@@ -72,7 +72,7 @@ def source_inputs() -> tuple[dict[str, bytes], dict]:
     inputs = {}
     for path in FULL_SUPPORT + [item[0] for item in EXTRACTED_SUPPORT]:
         data = (ROOT / path).read_bytes()
-        if sha(data) != manifest["source_sha256"][path]:
+        if sha(data) != manifest["source_sha256"][path] and not (current_source_regression):
             raise ValueError(f"Shared source changed: {path}; explicitly review and requalify")
         inputs[path] = data
     inputs["baseline/SubtitleDecoder.swift"] = frozen
@@ -95,6 +95,7 @@ class Study:
             "baseline_revision": BASELINE, "platform": platform.platform(),
             "machine": platform.machine(), "mode": "exact-source-live-transient-output-allocations",
             "source_hashes": {path: sha(data) for path, data in inputs.items()},
+            "shared_source_mode": "current-source regression; both variants share current support; not historical qualification" if args.current_source_regression else "frozen source guard",
             "extractions": [], "binaries": {}, "observations": [], "complete": False,
             "measurement_boundary": {
                 "included": "live malloc block sizes reachable from the original AVSubtitle output",
@@ -260,7 +261,7 @@ class Study:
         for key, binary in self.executables.items():
             if sha(binary.read_bytes()) != self.receipt["binaries"][key]:
                 raise ValueError("Measured binary changed: " + key)
-        current, _ = source_inputs()
+        current, _ = source_inputs(self.args.current_source_regression)
         if current != self.inputs:
             raise ValueError("Source or harness changed during the study")
         self.receipt["complete"] = True
@@ -279,8 +280,9 @@ def main():
     parser.add_argument("--swiftc", default=shutil.which("swiftc") or "swiftc")
     parser.add_argument("--ffmpeg-prefix", type=Path, default=Path("/opt/homebrew/opt/ffmpeg"))
     parser.add_argument("--validate-inputs", action="store_true", help="Verify frozen/shared source hashes without compiling")
+    parser.add_argument("--current-source-regression", action="store_true", help="Use current shared support for both variants; results are regression evidence, not frozen qualification")
     args = parser.parse_args()
-    inputs, frozen = source_inputs()
+    inputs, frozen = source_inputs(args.current_source_regression)
     if args.validate_inputs:
         print(json.dumps({"valid": True, "baseline_revision": BASELINE, "inputs": len(inputs)}, sort_keys=True))
         return
