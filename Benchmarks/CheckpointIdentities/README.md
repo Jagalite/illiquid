@@ -209,3 +209,26 @@ bash Scripts/test-playlist-restoration.sh -c release
 The macOS workflow additionally prepares the repository's pinned native SDK and
 builds the full app graph for the new coordinator regression and the two adjacent
 shuffle/restoration tests. Those checks remain a native qualification gate.
+
+## CI whitespace comparison
+
+Both component workflows run `Scripts/check-ci-whitespace.py` before qualification.
+For pull requests it resolves the event's exact base/head commits and checks the
+merge-base-to-PR-head diff, excluding unrelated base-branch history. Push and
+manual runs resolve the repository's default remote branch and compare its merge
+base with the checked revision. Runs on the default branch compare the push's
+previous commit (or the current commit's parent for manual/new-branch events).
+Missing refs fail rather than silently falling back to the historical benchmark
+baseline. Full-history checkout supplies these objects without script fetches.
+
+The separate uploaded `*-whitespace.json` receipt records the checkout, event,
+requested/resolved base, merge base, comparison head, command, output and exit
+status. The script adds no path filters or whitespace-attribute overrides; it
+uses the existing repository whitespace policy. Changed-line violations still
+fail. Existing evidence logs, attributes and benchmark baseline are unchanged.
+For a local check, pass an explicit base, for example:
+
+```sh
+python3 Scripts/check-ci-whitespace.py --base 8e51176463b873cca080d92d9c4854a1d078be35 \
+  --output /tmp/checkpoint-identities-whitespace.json
+```

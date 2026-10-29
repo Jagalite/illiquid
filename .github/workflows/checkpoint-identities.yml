@@ -12,6 +12,8 @@ on:
       - 'Tests/IlliquidPlayerTests/PlaybackCoordinatorTests.swift'
       - 'Benchmarks/CheckpointIdentities/Harness.swift'
       - 'Benchmarks/CheckpointIdentities/run.py'
+      - 'Scripts/check-ci-whitespace.py'
+      - 'Scripts/test-check-ci-whitespace.py'
       - '.github/workflows/checkpoint-identities.yml'
   pull_request:
     paths:
@@ -23,6 +25,8 @@ on:
       - 'Tests/IlliquidPlayerTests/PlaybackCoordinatorTests.swift'
       - 'Benchmarks/CheckpointIdentities/Harness.swift'
       - 'Benchmarks/CheckpointIdentities/run.py'
+      - 'Scripts/check-ci-whitespace.py'
+      - 'Scripts/test-check-ci-whitespace.py'
       - '.github/workflows/checkpoint-identities.yml'
   workflow_dispatch:
 
@@ -44,6 +48,12 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Test whitespace comparison policy without compilation
+        run: python3 -B Scripts/test-check-ci-whitespace.py
+      - name: Check changed-line whitespace and record comparison provenance
+        run: >-
+          python3 Scripts/check-ci-whitespace.py
+          --output "$RUNNER_TEMP/checkpoint-identities-whitespace.json"
       - name: Qualify exact source and measure paired checkpoint identities
         run: |
           if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
@@ -51,7 +61,6 @@ jobs:
             exit 1
           fi
           echo 'Kyoto is unavailable on this ephemeral runner; compiling isolated packages serially.'
-          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72 HEAD
           python3 Benchmarks/CheckpointIdentities/run.py \
             --pairs 12 --target-ms 150 \
             --output "$RUNNER_TEMP/checkpoint-identities"
@@ -60,6 +69,7 @@ jobs:
         with:
           name: checkpoint-identities-component
           path: |
+            ${{ runner.temp }}/checkpoint-identities-whitespace.json
             ${{ runner.temp }}/checkpoint-identities/
             !${{ runner.temp }}/checkpoint-identities/build/**
             !${{ runner.temp }}/checkpoint-identities/module-cache/**

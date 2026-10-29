@@ -13,6 +13,8 @@ on:
       - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
       - 'Benchmarks/CheckpointIdentities/Harness.swift'
       - 'Benchmarks/CheckpointIdentities/run.py'
+      - 'Scripts/check-ci-whitespace.py'
+      - 'Scripts/test-check-ci-whitespace.py'
       - '.github/workflows/checkpoint-identities-portable.yml'
   pull_request:
     paths:
@@ -25,6 +27,8 @@ on:
       - 'Tests/IlliquidCoreTests/FolderPlaylistTests.swift'
       - 'Benchmarks/CheckpointIdentities/Harness.swift'
       - 'Benchmarks/CheckpointIdentities/run.py'
+      - 'Scripts/check-ci-whitespace.py'
+      - 'Scripts/test-check-ci-whitespace.py'
       - '.github/workflows/checkpoint-identities-portable.yml'
   workflow_dispatch:
 
@@ -44,6 +48,12 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Test whitespace comparison policy without compilation
+        run: python3 -B Scripts/test-check-ci-whitespace.py
+      - name: Check changed-line whitespace and record comparison provenance
+        run: >-
+          python3 Scripts/check-ci-whitespace.py
+          --output "$RUNNER_TEMP/checkpoint-identities-portable-whitespace.json"
       - name: Test and measure the exact Foundation component
         run: |
           if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
@@ -51,7 +61,6 @@ jobs:
             exit 1
           fi
           echo 'Kyoto is unavailable on this isolated Ubuntu runner; compiling packages serially.'
-          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72 HEAD
           python3 Benchmarks/CheckpointIdentities/run.py \
             --pairs 12 --target-ms 150 \
             --output "$RUNNER_TEMP/checkpoint-identities-portable"
@@ -60,6 +69,7 @@ jobs:
         with:
           name: checkpoint-identities-portable
           path: |
+            ${{ runner.temp }}/checkpoint-identities-portable-whitespace.json
             ${{ runner.temp }}/checkpoint-identities-portable/
             !${{ runner.temp }}/checkpoint-identities-portable/build/**
             !${{ runner.temp }}/checkpoint-identities-portable/module-cache/**
