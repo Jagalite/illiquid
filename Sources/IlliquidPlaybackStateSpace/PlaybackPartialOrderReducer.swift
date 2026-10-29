@@ -74,19 +74,46 @@ public enum PlaybackPartialOrderReducer {
         return false
       }
     }
+    guard candidates.count > 1 else { return (validated: 0, nonCommuting: 0) }
+
+    // Every diamond starts from this same node. Reuse each first step and
+    // its enabled actions across pairs. A single pair has nothing to reuse.
+    let firstSteps: [(applied: AppliedSearchAction, enabled: [SearchAction])]
+    if candidates.count > 2 {
+      firstSteps = candidates.map { action in
+        let applied = apply(action: action, to: node, configuration: configuration)
+        return (
+          applied: applied,
+          enabled: definition.enabledActions(
+            for: applied.node, configuration: configuration
+          )
+        )
+      }
+    } else {
+      firstSteps = []
+    }
+
     var validated = 0
     var nonCommuting = 0
     for firstIndex in candidates.indices {
       for secondIndex in candidates.indices where secondIndex > firstIndex {
         let first = candidates[firstIndex]
         let second = candidates[secondIndex]
-        let afterFirst = apply(action: first, to: node, configuration: configuration)
-        let afterSecond = apply(action: second, to: node, configuration: configuration)
-        let secondRemainsEnabled = definition.enabledActions(
-          for: afterFirst.node, configuration: configuration
+        let afterFirst = firstSteps.isEmpty
+          ? apply(action: first, to: node, configuration: configuration)
+          : firstSteps[firstIndex].applied
+        let afterSecond = firstSteps.isEmpty
+          ? apply(action: second, to: node, configuration: configuration)
+          : firstSteps[secondIndex].applied
+        let secondRemainsEnabled = (
+          firstSteps.isEmpty
+          ? definition.enabledActions(for: afterFirst.node, configuration: configuration)
+          : firstSteps[firstIndex].enabled
         ).contains(second)
-        let firstRemainsEnabled = definition.enabledActions(
-          for: afterSecond.node, configuration: configuration
+        let firstRemainsEnabled = (
+          firstSteps.isEmpty
+          ? definition.enabledActions(for: afterSecond.node, configuration: configuration)
+          : firstSteps[secondIndex].enabled
         ).contains(first)
         guard secondRemainsEnabled, firstRemainsEnabled else { continue }
         let firstThenSecond = apply(
