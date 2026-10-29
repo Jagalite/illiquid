@@ -138,6 +138,41 @@ That workflow does not exercise the full player, UI or live playback.
 
 ## Reproduction
 
+### Current supporting-source regressions
+
+Pull-request CI uses `--regression-only` after the existing debug and release
+matcher regression suites. It verifies every full association against the
+fixture oracle and compares the complete outputs for both variants at all
+configured sizes and scenarios, including empty and unrelated controls. No
+memory or timing measurements run in this mode.
+
+The baseline matcher remains pinned and hash-checked. Both variants use the same
+single capture of current `MediaFileSupport.swift` and
+`NaturalFilenameOrdering.swift`; the candidate matcher is captured at the same
+time. This covers changes to either shared dependency without presenting them
+as a reproduction of the historical performance study.
+
+```sh
+python3 Benchmarks/SubtitleCandidateStreaming/run.py \
+  --regression-only --output /tmp/subtitle-candidate-regressions
+```
+
+Manifests and the regression summary label the source policy and lack of
+performance measurements. Every compiled file has a retained snapshot, origin,
+source revision, SHA-256, Git blob hash and comparison with the historical hash;
+checkout/status records distinguish dirty current inputs. Historical files
+(including `--baseline-dir` inputs) must still match every pinned hash before
+support substitution. Failures retain a failed manifest. `--prepare-only` and
+`--memory-only` cannot be combined with this mode.
+
+Default, push and manual runs keep strict historical dependency guards and all
+memory, cancellation-poll and timing checks. Reproduce those measurements in a
+compatible checkout: dependency drift still fails. Existing `--verify-only`
+does not relax the guards. All immutable evidence, including rejected results
+and runner snapshots, remains unchanged.
+
+### Historical measurements
+
 Requirements: Swift 6.1+, Python 3, and either macOS or Linux with glibc 2.33+.
 No package dependencies are fetched. Follow repository build coordination
 instructions, and avoid concurrent builds/tests during formal timing.
@@ -167,7 +202,8 @@ run when Git history is shallow; every file must match its pinned SHA-256.
 ## Workloads and correctness
 
 The baseline is main at `4abf4b44f13386ccd04f1ce4ad0e756255ca4d14`. The two support
-files must remain byte-identical between variants. Every compiled production
+files must remain byte-identical to the historical baseline in default mode.
+Every compiled production
 file and common harness source is preserved with its SHA-256 and Git blob hash.
 The runner records host/compiler details, build commands, binary hashes and
 all raw observations.

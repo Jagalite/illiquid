@@ -33,9 +33,12 @@ public enum NaturalFilenameOrdering {
             return elements.sorted { areInIncreasingOrder(url($0), url($1)) }
         }
 
-        var named = elements.map { (value: $0, name: url($0).lastPathComponent) }
-        named.sort { lhs, rhs in
-            switch lhs.name.localizedStandardCompare(rhs.name) {
+        // Keep names and complete elements stationary while the sort moves only
+        // integer indices through its temporary merge buffers.
+        let names = elements.map { url($0).lastPathComponent }
+        var order = Array(elements.indices)
+        order.sort { lhs, rhs in
+            switch names[lhs].localizedStandardCompare(names[rhs]) {
             case .orderedAscending:
                 return true
             case .orderedDescending:
@@ -43,9 +46,11 @@ public enum NaturalFilenameOrdering {
             case .orderedSame:
                 // Keep the same literal, original-path tie-break as the public
                 // comparator. Most names differ, so do not precompute paths.
-                return url(lhs.value).path.compare(url(rhs.value).path, options: [.literal]) == .orderedAscending
+                return url(elements[lhs]).path.compare(
+                    url(elements[rhs]).path, options: [.literal]
+                ) == .orderedAscending
             }
         }
-        return named.map(\.value)
+        return order.map { elements[$0] }
     }
 }

@@ -1,0 +1,164 @@
+{
+  "audited_at_utc": "2026-10-28T06:04:00.880575+00:00",
+  "auditor": {
+    "path": "/workspace/scratch/663a3fdba62e/research/audit_sort_followup.py",
+    "python": "3.12.14",
+    "sha256": "26596260ed37b8049e42c6e9600362ab3ad0b234a5838f73cc1ee64d6231cb45"
+  },
+  "checks": 7971,
+  "counts": {
+    "AB_pairs": 18,
+    "BA_pairs": 18,
+    "cases": 3,
+    "followup_binary_hashes": 2,
+    "initial_permitted_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "linked_production_library_hashes": 2,
+    "matching_measurement_command_receipts": 72,
+    "metric_summaries_recomputed": 6,
+    "observations": 72,
+    "observed_loop_ms_range": [
+      857.946602,
+      1173.887059
+    ],
+    "paired_comparisons": 36,
+    "pairs_per_case": 12,
+    "selected_cpu": 0,
+    "successful_harness_build_receipts": 2,
+    "unique_observation_keys": 72
+  },
+  "error": null,
+  "failures": [],
+  "file_sha256": {
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/Harness.swift": "1763eedaf90414393a951d4017dd3abdc16a056ee0843cf1d82a6096bddc637a",
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/baseline": "cda0b3ed1aa18f2e867349d79aa39908374b0e9820c5ef8afd21197119d48501",
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/build-baseline.json": "35bc7a1a56a6a1310091ccd6b0d150243095cad4562c1f6c6d57a0e16e8830dd",
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/build-candidate.json": "6816c1c81c800671114cf52cd62feb209c40c6a276dc8e95299b1e30dd61404f",
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/candidate": "9b73e3069b35d45027830aa3681c781f4175db9dcc23094086e0bcd8c20ab565",
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/commands.jsonl": "0726741a3db0613d97bb9687de3fa37567712a6932ec176977f6383c14461192",
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/manifest.json": "5d0fea9cb146054a189d2e2d93f63ed1e6002c6e6ff04ee92932fb0dcf83f796",
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/observations.jsonl": "dcee2dfba125ad4c49ec639a4c6bd715497002765439c9a0f97be4bc46ea92e1",
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/run.py": "88856d469969170ad587108a2c283d24dce6689c0dae1720e9fbc2007fbd8a9a",
+    "/workspace/scratch/663a3fdba62e/research/sort-followup/summary.json": "6d94a5dc7ba983d40fc6d6cc94fb0c20b405c76dcfbd0d1d24243b0516b6d74b",
+    "/workspace/scratch/663a3fdba62e/research/sort-full/baseline/bin/libIlliquidCore.so": "75086ad33a450e62af383001d1e9e33adeca8e5f7fc69b99c273569ed4683f9d",
+    "/workspace/scratch/663a3fdba62e/research/sort-full/candidate/bin/libIlliquidCore.so": "dde077c97e725d30941c45c09767dcd6ef58dc707b30ddda19e9feae8810f001",
+    "/workspace/scratch/663a3fdba62e/research/sort-full/drivers/Harness.swift": "f3b8594e894d1fe97cb6ac3f47d36e06e3e066d04df12a6ce37d026bfdd06934",
+    "/workspace/scratch/663a3fdba62e/research/sort-full/manifest.json": "1465085e14cf03c9eb1c2e74148482e0a0a0019fbe192320048e40b05849aa2d",
+    "/workspace/scratch/663a3fdba62e/research/sort-full/observations.jsonl": "b0469b8e72d640de44de8382c9c331df3a543f479518704440469fd3a872a3c1"
+  },
+  "followup": "/workspace/scratch/663a3fdba62e/research/sort-followup",
+  "original": "/workspace/scratch/663a3fdba62e/research/sort-full",
+  "passed": true,
+  "recomputed_summary": [
+    {
+      "case": "playlist/shuffled/10000",
+      "metrics": {
+        "cpu_ns_per_iteration": {
+          "baseline_median": 240737125.0,
+          "baseline_range": [
+            232244500,
+            266282000
+          ],
+          "candidate_median": 222318875.0,
+          "candidate_range": [
+            214280500,
+            269090250
+          ],
+          "paired_change_median_pct": -5.450817406936423
+        },
+        "ns_per_iteration": {
+          "baseline_median": 240747447.75,
+          "baseline_range": [
+            232427628.25,
+            266402955.5
+          ],
+          "candidate_median": 222410315.625,
+          "candidate_range": [
+            214486650.5,
+            269164181.25
+          ],
+          "paired_change_median_pct": -5.452567990720668
+        }
+      }
+    },
+    {
+      "case": "urls/shuffled/1000",
+      "metrics": {
+        "cpu_ns_per_iteration": {
+          "baseline_median": 24146487.5,
+          "baseline_range": [
+            22947050,
+            26741600
+          ],
+          "candidate_median": 23469150.0,
+          "candidate_range": [
+            22248300,
+            24366875
+          ],
+          "paired_change_median_pct": -2.514039105320423
+        },
+        "ns_per_iteration": {
+          "baseline_median": 24155331.2875,
+          "baseline_range": [
+            22959459.2,
+            26743893.325
+          ],
+          "candidate_median": 23482790.4375,
+          "candidate_range": [
+            22249567.075,
+            24368265.475
+          ],
+          "paired_change_median_pct": -2.5113371476191837
+        }
+      }
+    },
+    {
+      "case": "urls/ties/1000",
+      "metrics": {
+        "cpu_ns_per_iteration": {
+          "baseline_median": 50030575.0,
+          "baseline_range": [
+            48981700,
+            58691600
+          ],
+          "candidate_median": 50181525.0,
+          "candidate_range": [
+            48176650,
+            54493400
+          ],
+          "paired_change_median_pct": -0.07255682127083468
+        },
+        "ns_per_iteration": {
+          "baseline_median": 50032270.525,
+          "baseline_range": [
+            48981721.05,
+            58694352.95
+          ],
+          "candidate_median": 50181872.125,
+          "candidate_range": [
+            48184996.7,
+            54496830
+          ],
+          "paired_change_median_pct": -0.07799672421713147
+        }
+      }
+    }
+  ],
+  "schema": "natural-filename-sort-targeted-followup-audit-v1",
+  "scope": [
+    "Read-only audit; no build or measurement rerun.",
+    "Same production library bytes as original cohort; only harness process-CPU timing added.",
+    "Affinity is supported by successful driver scheduling before child launches, not separate child-affinity receipts.",
+    "Targeted longer measurements neither replace the original adverse results nor prove their cause.",
+    "Wall/process-CPU component timings do not establish a general player speedup."
+  ]
+}

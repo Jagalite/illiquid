@@ -58,9 +58,9 @@ def command(args: list[str], log: Path, cache: Path) -> str:
     return result.stdout
 
 
-def snapshot(out: Path, include_tests: bool) -> dict[str, object]:
-    pinned = json.loads((HERE / "baseline/manifest.json").read_text())
-    baseline = (HERE / "baseline/TrackSelectionPreferences.swift").read_bytes()
+def snapshot(out: Path, include_tests: bool, baseline_dir: Path) -> dict[str, object]:
+    pinned = json.loads((baseline_dir / "manifest.json").read_text())
+    baseline = (baseline_dir / "TrackSelectionPreferences.swift").read_bytes()
     media = (ROOT / pinned["media_track"]["path"]).read_bytes()
     for label, data in (("selection", baseline), ("media_track", media)):
         blob = hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest()
@@ -72,7 +72,7 @@ def snapshot(out: Path, include_tests: bool) -> dict[str, object]:
         "MediaTrack.swift": media,
         "Harness.swift": (HERE / "Harness.swift").read_bytes(),
         "run.py": Path(__file__).read_bytes(),
-        "baseline-manifest.json": (HERE / "baseline/manifest.json").read_bytes(),
+        "baseline-manifest.json": (baseline_dir / "manifest.json").read_bytes(),
     }
     if include_tests:
         inputs[TEST.name] = (ROOT / TEST).read_bytes()
@@ -298,6 +298,8 @@ def main() -> None:
     parser.add_argument("--rounds", type=int, default=10)
     parser.add_argument("--iterations", type=int, help="Fixed iterations per workload; otherwise calibrate both variants")
     parser.add_argument("--target-ms", type=float, default=20.0, help="Calibration target for the faster variant")
+    parser.add_argument("--baseline-dir", type=Path, default=HERE / "baseline",
+                        help="Frozen source and manifest directory (defaults to the original ranking baseline)")
     parser.add_argument("--swiftc")
     parser.add_argument("--swift")
     args = parser.parse_args()
@@ -310,7 +312,7 @@ def main() -> None:
     if args.mode == "summarize":
         write_json(out / "summary.json", summarize([json.loads(line) for line in (out / "measurements.jsonl").read_text().splitlines()]))
         return
-    receipt = snapshot(out, args.mode == "test")
+    receipt = snapshot(out, args.mode == "test", args.baseline_dir.resolve())
     compiler = toolchain(args, out)
     receipt.update({"recorded_utc": datetime.now(timezone.utc).isoformat(), "platform": platform.platform(),
                     "machine": platform.machine(), "cpu_count": os.cpu_count(), "python": sys.version,
