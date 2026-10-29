@@ -245,6 +245,43 @@ struct ExternalTextSubtitleConverterTests {
         ])
     }
 
+    @Test(arguments: ["NOTE", "NOTE comment", "NOTE\tcomment", "NOTE --> ignored"])
+    func commentMarkersFollowTheFirstNonemptyLine(marker: String) throws {
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Visible"
+        for leading in ["", "\n"] {
+            let source = "\u{FEFF}WEBVTT\n\n" + leading + marker
+                + "\n00:01.000 --> 00:02.000\nHidden\n\n00:03.000 --> 00:04.000\nVisible"
+            for newline in ["\n", "\r\n", "\r"] {
+                #expect(try Converter.convert(source.replacingOccurrences(of: "\n", with: newline),
+                    format: .webVTT).utf8.elementsEqual(expected.utf8))
+            }
+        }
+    }
+
+    @Test(arguments: ["NOTEworthy", "NOTES", "note", " NOTE", "\tNOTE", "NOTE\u{00A0}",
+                      "NOTE\u{0000}", "NOTE\u{0301}", "NOTE\u{2028}tail",
+                      "ŃOTE", "ℕOTE", "ＮOTE", "\u{0600}NOTE"])
+    func noteLikeIdentifiersAndNotePayloadRemainVisible(identifier: String) throws {
+        let source = "WEBVTT\n\n\(identifier)\n00:01.000 --> 00:02.000\nNOTE\nNOTE annotation\nNOTE\tannotation"
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,NOTE\\NNOTE annotation\\NNOTE\tannotation"
+        #expect(try Converter.convert(source, format: .webVTT).utf8.elementsEqual(expected.utf8))
+    }
+
+    @Test func largeCommentDoesNotExposeTimingLookingLines() throws {
+        let source = "WEBVTT\n\nNOTE\tmetadata\n00:01.000 --> 00:02.000\n"
+            + String(repeating: "ignored\n", count: 50_000)
+            + "00:02.000 --> 00:03.000\nStill ignored"
+        #expect(throws: Converter.ConversionError.noValidCues(.webVTT)) {
+            _ = try Converter.convert(source, format: .webVTT)
+        }
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Visible"
+        #expect(try Converter.convert(source + "\n\n00:03.000 --> 00:04.000\nVisible",
+            format: .webVTT).utf8.elementsEqual(expected.utf8))
+    }
+
     @Test func commentsOnlyAndUntimedTextReportNoValidCues() {
         #expect(throws: Converter.ConversionError.noValidCues(.srt)) {
             _ = try Converter.convert("Untimed plain text", format: .srt)
@@ -360,6 +397,41 @@ struct ExternalTextSubtitleConverterTests {
             + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,," + secondPayload
         for format in [Converter.Format.srt, .webVTT] {
             let source = (format == .webVTT ? "\u{FEFF}WEBVTT\n\n" : "") + body
+            #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+        }
+    }
+
+    @Test func mixedLineEndingsPreserveHeaderCueBoundariesAndTrailingPayload() throws {
+        let body = "first-id\r00:00:01.000 --> 00:00:02.000\r\n"
+            + "First\rSecond\r\nThird\nFourth\r\r"
+            + "second-id\r\n00:00:03.000 --> 00:00:04.000\r"
+            + "Second cue\r\n"
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,"
+            + "First\\NSecond\\NThird\\NFourth"
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Second cue\\N"
+        for format in [Converter.Format.srt, .webVTT] {
+            let header = format == .webVTT
+                ? "\u{FEFF}WEBVTT - mixed\r\nLanguage: en\r\r\n" : ""
+            let actual = try Converter.convert(header + body, format: format)
+            #expect(actual.utf8.elementsEqual(expected.utf8))
+        }
+    }
+
+    @Test(arguments: ["\r\u{0301}", "\r\u{FE0F}", "\r\u{200D}"])
+    func unicodeNewlineMatchingPreservesFoundationBehavior(boundary: String) throws {
+        let payload = "Caption" + boundary + "Tail"
+        // Only normalize the payload once; running the entire converter on a
+        // normalized reference could apply Foundation's behavior a second time.
+        let normalizedPayload = payload.replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+        let expectedText = normalizedPayload.split(separator: "\n", omittingEmptySubsequences: false)
+            .joined(separator: "\\N")
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,," + expectedText
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                + "00:00:01.000 --> 00:00:02.000\n" + payload
             #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
         }
     }
