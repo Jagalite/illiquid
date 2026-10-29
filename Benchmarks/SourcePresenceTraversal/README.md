@@ -198,21 +198,70 @@ checksum and calibration, plus the app test log. They reproduce the
 [original artifact 12856366334](https://github.com/Jagalite/illiquid/actions/runs/40642915320/artifacts/12856366334)
 and use a SHA-256-marked gzip/base64 JSON filename-to-content mapping.
 
-### Native attempt 3 — calibration margin correction
+### Native attempt 3 — qualified macOS result
 
-Only the research runner's warmup/pilot iteration-count safety multiplier
-was increased from **1.5× to 3.0×** in
-[commit `6867da97`](https://github.com/Jagalite/illiquid/commit/6867da970f633a9a73611cbcb38e487789c2ac64),
-to reduce the chance that an ordinary faster-process fluctuation produces
-a measured sample shorter than 250 ms. **The 250 ms acceptance floor, 15%
-primary improvement thresholds, 7/8 favorable-pair requirement, 5% control
-regression ceiling, six workloads, eight fresh-process pairs, production
-scanner, app regression and component tests are unchanged.** The original
-short samples remain retained. The
-[new independent native run 40780859398](https://github.com/Jagalite/illiquid/actions/runs/40780859398)
-is pending qualification; no successful result or PR is claimed from it
-until all required receipts and raw samples pass.
+[Run 40780859398](https://github.com/Jagalite/illiquid/actions/runs/40780859398),
+[job 123141893934](https://github.com/Jagalite/illiquid/actions/runs/40780859398/job/123141893934),
+completed **2026-10-29 UTC** on **macOS 26.6.2 (25G83), arm64
+VirtualMac2,1 / Apple M1 (Virtual), Xcode 26.6, Apple Swift 6.3.3,
+Python 3.15.0**. The job checked out measurement revision
+`6867da970f633a9a73611cbcb38e487789c2ac64`, with pinned baseline
+`ea2ff568237e2667f7b1aeee67b11a44ebe95b72`.
+The only correction following attempt 2 was the runner's **1.5× → 3.0×
+calibration safety multiplier**. Production, the six workloads, eight
+fresh-process pairs, the 250 ms floor, all performance thresholds, tests,
+and timing scope were unchanged. The research branch's later commits
+preserve evidence and document the result rather than alter the
+qualified production/test/harness/workflow revision.
 
-Across both attempts, the measured operation remains **warm local real-filesystem
-cursor traversal with result accumulation and temporary-object cleanup**,
-not whole-player CPU, UI latency, cold I/O, or energy consumption.
+**Native qualification passed**: `app/tests.json` reports **34/34 focused
+full-application-graph tests passing**; `component/tests.json` reports
+**24/24 tests passing for each baseline/candidate × debug/release combination
+(96 component test executions)**. Independently compared complete
+baseline/candidate debug/release traversal receipts match exactly **before
+and after** timing; their canonical SHA-256 is
+`15401450158498c17f0ac676329cc8263ac032ec781c007a2835e1bc28784a5d`.
+Production source and staged-file hashes match; the four distinct binary
+build hashes are recorded. Both executable/source integrity and all
+measured-pair output/checksum checks pass.
+`component/completion.json` has `nativeQualificationSuccess=true`,
+`exactReceiptParity=true`, and `sourceAndBinaryIntegrity=true`.
+
+Independent recalculation from **all 96 measured native samples** confirms
+that the three file-heavy cases meet **≥15% median paired wall and CPU
+savings**, each with **8/8 favorable pairs** for both metrics. The controls
+avoid the predeclared **>5% median paired regressions**. All samples were
+retained, and the minimum measured elapsed duration was **556.077625 ms**
+(above the mandatory 250 ms floor). The percentage figures below are the
+**median of the eight paired percentage changes**, not a ratio of the
+separately measured per-traversal medians.
+
+| Workload | Wall baseline → candidate (ms/scan) | Paired wall reduction | CPU baseline → candidate (ms/scan) | Paired CPU reduction | Favorable wall / CPU pairs |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `flat_media_4096` | 90.144 → 39.245 | 53.89% | 89.947 → 39.241 | 55.93% | 8/8, 8/8 |
+| `flat_nonmedia_4096` | 94.996 → 39.271 | 59.55% | 94.485 → 39.255 | 58.04% | 8/8, 8/8 |
+| `nested_mixed_4096` | 87.938 → 40.429 | 55.61% | 87.918 → 40.172 | 55.72% | 8/8, 8/8 |
+| `directory_only_512` | 19.311 → 19.418 | −0.17% | 19.309 → 19.409 | −0.14% | 4/8, 4/8 |
+| `cached_repair` | 1.383 → 1.357 | −1.98% | 1.382 → 1.357 | −1.92% | 2/8, 2/8 |
+| `small_32` | 0.670 → 0.326 | 49.70% | 0.669 → 0.326 | 49.70% | 8/8, 8/8 |
+
+A negative reduction is a regression: the directory-only and cached-repair
+control median regressions remain below 5%. The control cases do **not**
+require 7/8 favorable pairs.
+
+[Permanent compressed native attempt-3 receipts](evidence/macos/attempt-3-qualified.json)
+contain the app log, component manifests/tests/build hashes/commands,
+calibration, all 96 raw observations, the summary, and complete four-way
+pre/post verification results. The gzip is SHA-256-marked
+`12ead7bdad11e1afd0d5edbe3dab849938317d5e3e44c283e1600ab90d008c27`,
+verified independently against the
+[original CI artifact](https://github.com/Jagalite/illiquid/actions/runs/40780859398/artifacts/12870462338).
+Decode the JSON's `gzipBase64` as base64 then gunzip; check
+`gzipSha256` first. Unqualified attempts 1 and 2 remain preserved separately
+without sample selection or cohort pooling.
+
+**Scope and limitations:** This result measures a warm local real-filesystem
+`SourceMediaPresenceCursor` traversal, including cursor bookkeeping, result
+accumulation, and temporary-object cleanup under native Foundation. It is
+**not** a measured whole-player CPU benefit, UI responsiveness/latency,
+cold or network I/O, media decoding, or energy improvement.
