@@ -1,0 +1,12 @@
+--- baseline/Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift
++++ candidate/Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift
+@@ -177,8 +177,7 @@
+             return nil
+         }
+ 
+-        let sharedTokens = Array(mediaTokens.prefix(sharedCount))
+-        let sharedWeight = tokenWeight(sharedTokens)
++        let sharedWeight = tokenWeight(mediaTokens.prefix(sharedCount))
+         guard sharedWeight >= 4 else {
+             return nil
+         }
