@@ -35,9 +35,17 @@ or native codec dependency is required.
 python3 Benchmarks/CheckpointConstruction/run.py \
   --pairs 8 --target-ms 100 --output /tmp/checkpoint-construction
 
-# Behavior only, baseline/candidate in both debug and release.
+# Historical behavior only; still rejects CORE support drift.
 python3 Benchmarks/CheckpointConstruction/run.py \
   --mode tests --output /tmp/checkpoint-construction-tests
+
+# Current-support regression check, baseline/candidate in debug and release.
+# Does not measure or qualify historical performance.
+python3 Benchmarks/CheckpointConstruction/run.py \
+  --regression-only --output /tmp/checkpoint-construction-regressions
+
+# Non-compiling source-policy and negative controls.
+python3 Scripts/tests/benchmark-source-policy-tests.py
 
 # A short experiment-mechanics check, not a full performance study.
 python3 Benchmarks/CheckpointConstruction/run.py \
@@ -47,7 +55,10 @@ python3 Benchmarks/CheckpointConstruction/run.py \
 Output directories must be new or empty. Builds run serially; do not run competing
 benchmark cohorts on the same machine. Follow the repository's Kyoto build
 coordination instructions when its shared queue is available. The GitHub workflow
-runs the same experiment on macOS 26 with the repository's selected Xcode.
+runs regression-only checks for pull requests on macOS 26 with the repository's
+selected Xcode. Push and manual runs retain the strict historical experiment and
+reject changed CORE support. Historical evidence below remains immutable; it is
+not evidence for the current-support regression cohort.
 
 ## What is compiled and checked
 
@@ -58,10 +69,32 @@ actual `FolderPlaylist`, `PlaylistMutation`, `NaturalFilenameOrdering`,
 `PlaybackSessionRecord` type and `PlaybackSessionStoring` protocol. The runner
 checks the boundary before the unrelated atomic disk store and records both
 full-source and compiled-source hashes. It rejects changes to any of these core
-dependencies between the baseline and candidate.
+dependencies between the baseline and candidate in default/historical mode,
+including changes outside the extracted prefix.
+
+`--regression-only` captures each current CORE file once and uses those identical
+bytes for both variants. The baseline writer remains the complete, unmodified
+writer from the pinned revision; the candidate uses the current writer. No
+behavioral changes are transplanted into the historical writer. This mode forces
+`--mode tests`, rejects `--mode benchmark`, and cannot enter timing measurement.
+Its manifest and summary explicitly identify `current-support-regression` and
+`performance_measured: false`; success prints `REGRESSION_PASS`.
+
+Every run retains the full historical sources, full and compiled variant
+snapshots, SHA-256 hashes, extraction description, source origin/revision, and
+whether each file differs from history. A current-worktree origin refers to the
+captured bytes; the recorded HEAD and worktree status do not assert those bytes
+are committed. Tests and driver are captured once, hashed from those exact bytes,
+and copied from the retained snapshot rather than reread from the live checkout.
 
 The new checkpoint tests and existing session-record/deduplication tests run
-against both revisions in debug and release with warnings as errors. They cover
+against both revisions in debug and release with warnings as errors. The complete
+current `PlaybackCheckpointIndexHintTests` XCTest suite also runs against both
+writers: its independent identity matrix, stale/invalid hints, empty/no-folder
+controls, source-kind behavior, position sanitization, and save/clear mutations
+are compatible with the historical contract. Both Swift Testing success and at
+least all six index-hint XCTest cases are required; no test filters are applied.
+The suites cover
 folder membership, arbitrary saved indices, raw decoded URL aliases, Unicode,
 unsupported authorities/credentials/ports, remote sources, duplicate metadata,
 shuffle IDs, and invalid positions. These are selected-source component builds;
