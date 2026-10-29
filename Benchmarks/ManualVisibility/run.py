@@ -8,6 +8,7 @@ must be byte-identical. Timings are observations, never flaky pass/fail assertio
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import importlib.util
 import json
@@ -50,9 +51,19 @@ def save(path, value):
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
+def matcher_range(raw):
+    start_marker = b"struct SourceVisibilityMatcher {"
+    end_marker = b"\nenum SourceVisibilityProjection {"
+    if raw.count(start_marker) != 1 or raw.count(end_marker) != 1:
+        raise ValueError("Ambiguous or missing SourceVisibilityMatcher boundary")
+    start, end = raw.index(start_marker), raw.index(end_marker)
+    if end <= start:
+        raise ValueError("Reversed SourceVisibilityMatcher boundary")
+    return start, end
+
+
 def outside_matcher(raw):
-    start = raw.index(b"struct SourceVisibilityMatcher {")
-    end = raw.index(b"\nenum SourceVisibilityProjection {", start)
+    start, end = matcher_range(raw)
     return raw[:start] + raw[end:]
 
 
@@ -110,6 +121,55 @@ class Study:
                                + (result.stdout + result.stderr)[-16000:])
         return result.stdout
 
+    def source_variants(self, historical):
+        candidate, candidate_records = support.snapshot(lambda path: (ROOT / path).read_bytes())
+        self.manifest["mode"] = (
+            "current-source-regressions" if self.args.tests_only else "pinned-baseline-performance-study")
+        if self.args.tests_only:
+            # This is a behavioral oracle, never an original performance baseline.
+            # Only the matcher is historical; all surrounding declarations and
+            # supporting files come from the same current snapshot as candidate.
+            source_path = candidate_records[FOCAL]["repository_path"]
+            original = historical(source_path)
+            old_start, old_end = matcher_range(original)
+            start, end = matcher_range(candidate[FOCAL])
+            matcher = original[old_start:old_end]
+            reference = dict(candidate)
+            reference[FOCAL] = candidate[FOCAL][:start] + matcher + candidate[FOCAL][end:]
+            reference_records = copy.deepcopy(candidate_records)
+            reference_records[FOCAL] = {
+                "origin": "historical-matcher-on-current-support",
+                "current_source": copy.deepcopy(candidate_records[FOCAL]),
+                "historical_revision": BASELINE,
+                "historical_repository_path": source_path,
+                "historical_source_sha256": sha(original),
+                "historical_matcher_sha256": sha(matcher),
+                "snapshot_sha256": sha(reference[FOCAL]),
+            }
+            self.manifest.update(
+                baseline=None, pairs=0, target_ms=None, sizes=[1, 31, 257],
+                qualification="Current-source behavior only; no performance qualification",
+                reference={"kind": "historical-matcher-on-current-support", "matcher_revision": BASELINE},
+            )
+            self.manifest.pop("boundary", None)
+            self.manifest["verification"] = {
+                "variants": ["reference", "candidate"], "configurations": ["debug", "release"],
+                "workloads": "All selected cases, including negative controls; no timed samples",
+            }
+            return [("reference", reference, reference_records), ("candidate", candidate, candidate_records)]
+
+        baseline, baseline_records = support.snapshot(historical)
+        if baseline.keys() != candidate.keys():
+            raise ValueError("Source inventories differ")
+        for path in baseline:
+            if path != FOCAL and baseline[path] != candidate[path]:
+                raise ValueError(f"Unrelated production source changed: {path}; requalify explicitly")
+        if outside_matcher(baseline[FOCAL]) != outside_matcher(candidate[FOCAL]):
+            raise ValueError("Production changes extend outside SourceVisibilityMatcher")
+        if baseline[FOCAL] == candidate[FOCAL]:
+            raise ValueError("No focal production change")
+        return [("baseline", baseline, baseline_records), ("candidate", candidate, candidate_records)]
+
     def prepare(self):
         self.manifest["head"] = self.command(["git", "rev-parse", "HEAD"], "head").strip()
         self.manifest["worktree"] = self.command(["git", "status", "--short"], "worktree")
@@ -120,17 +180,7 @@ class Study:
 
         def historical(path):
             return subprocess.check_output(["git", "-C", str(ROOT), "show", f"{BASELINE}:{path}"])
-        baseline, baseline_records = support.snapshot(historical)
-        candidate, candidate_records = support.snapshot(lambda path: (ROOT / path).read_bytes())
-        if baseline.keys() != candidate.keys():
-            raise ValueError("Source inventories differ")
-        for path in baseline:
-            if path != FOCAL and baseline[path] != candidate[path]:
-                raise ValueError(f"Unrelated production source changed: {path}; requalify explicitly")
-        if outside_matcher(baseline[FOCAL]) != outside_matcher(candidate[FOCAL]):
-            raise ValueError("Production changes extend outside SourceVisibilityMatcher")
-        if baseline[FOCAL] == candidate[FOCAL]:
-            raise ValueError("No focal production change")
+        variants = self.source_variants(historical)
 
         package = support.PACKAGE.replace("SourceTreeVisibilityQualification", "ManualVisibilityQualification")
         package = package.replace("SourceTreeBenchmark", "ManualVisibilityBenchmark")
@@ -141,9 +191,7 @@ class Study:
         for name in TESTS:
             shared["Tests/IlliquidAppTests/" + name] = (ROOT / "Tests/IlliquidAppTests" / name).read_bytes()
         self.manifest["shared_sha256"] = {path: sha(raw) for path, raw in shared.items()}
-        for variant, files, records in [
-            ("baseline", baseline, baseline_records), ("candidate", candidate, candidate_records),
-        ]:
+        for variant, files, records in variants:
             folder = self.output / "packages" / variant
             staged = dict(files)
             staged.update(shared)
@@ -177,7 +225,7 @@ class Study:
     def test(self):
         records = []
         for configuration in ["debug", "release"]:
-            for variant in ["baseline", "candidate"]:
+            for variant in self.packages:
                 self.check_sources()
                 print(f"Test {variant}/{configuration}", flush=True)
                 out = self.command(self.swift_command(variant, "test", configuration) + [
@@ -192,7 +240,7 @@ class Study:
         save(self.output / "tests.json", {"suites": TESTS, "runs": records})
 
     def build(self):
-        for variant in ["baseline", "candidate"]:
+        for variant in self.packages:
             self.command(self.swift_command(variant, "build", "release") + [
                 "--product", "ManualVisibilityBenchmark",
             ], f"build-{variant}")
@@ -233,7 +281,7 @@ class Study:
         records = []
         for case in self.args.cases:
             for size in [1, 31, 257]:
-                for variant in ["baseline", "candidate"]:
+                for variant in self.packages:
                     result = self.run_case(variant, "diagnose", case, size, 4,
                                            f"verify-{variant}-{case}-{size}")
                     if result["tree_build_count"] != 1 or result["visibility_build_count"] != 5:
@@ -301,7 +349,8 @@ def main():
     parser.add_argument("--cases", default=",".join(CASES))
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=80)
-    parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--tests-only", action="store_true",
+                        help="Current-source tests and differential controls using an adapted historical matcher; no timings")
     args = parser.parse_args()
     args.sizes = [int(value) for value in args.sizes.split(",")]
     args.cases = args.cases.split(",")
