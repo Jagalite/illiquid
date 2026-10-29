@@ -44,12 +44,13 @@ class HarnessTests(unittest.TestCase):
         roots = self.staged()
         receipt = RUNNER.verify_isolation(roots)
         self.assertEqual(receipt["changed_sources"], [RUNNER.PARSER])
+        self.assertEqual(receipt["expected_parser_blobs"], RUNNER.CURRENT_PARSER_BLOBS)
         for name in RUNNER.SOURCES:
             path = Path("Sources/IlliquidCore") / name
             self.assertEqual((roots["candidate"] / path).read_bytes(), (ROOT / path).read_bytes())
             if name != RUNNER.PARSER:
                 self.assertEqual((roots["baseline"] / path).read_bytes(), (ROOT / path).read_bytes())
-        for name in RUNNER.TESTS:
+        for name in RUNNER.CURRENT_TESTS:
             path = Path("Tests/IlliquidCoreTests") / name
             self.assertEqual((roots["candidate"] / path).read_bytes(), (ROOT / path).read_bytes())
         reader = Path("Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift")
@@ -90,13 +91,42 @@ class HarnessTests(unittest.TestCase):
 
     def test_historical_inputs_match_archived_manifest_without_timing(self):
         roots = RUNNER.stage_sources(ROOT, self.work, historical=True)
-        receipt = RUNNER.verify_isolation(roots)
+        receipt = RUNNER.verify_isolation(roots, historical=True)
         archived = json.loads((ROOT / "Benchmarks/NFOTextLimits/evidence/long-ordinary-controls/manifest.json").read_text())
         self.assertEqual(receipt["source_blobs"], archived["source_blobs"])
         self.assertEqual(RUNNER.CASE_ITERATIONS, archived["iterations"])
         for name, expected in archived["test_blobs"].items():
             self.assertEqual(RUNNER.blob((roots["candidate"] / "Tests/IlliquidCoreTests" / name).read_bytes()), expected)
         self.assertEqual(RUNNER.blob((roots["candidate"] / "Benchmarks/NFOTextLimits/Driver.swift").read_bytes()), archived["driver_blob"])
+        self.assertEqual(receipt["expected_parser_blobs"], RUNNER.PARSER_BLOBS)
+        self.assertEqual(
+            {path.name for path in (roots["candidate"] / "Tests/IlliquidCoreTests").iterdir()},
+            set(archived["test_blobs"]),
+        )
+
+    def test_reviewed_current_parser_cannot_replace_historical_candidate(self):
+        roots = RUNNER.stage_sources(ROOT, self.work, historical=True)
+        path = Path("Sources/IlliquidCore") / RUNNER.PARSER
+        (roots["candidate"] / path).write_bytes((ROOT / path).read_bytes())
+        with self.assertRaisesRegex(RuntimeError, "Unexpected candidate parser blob"):
+            RUNNER.verify_isolation(roots, historical=True)
+
+    def test_historical_candidate_cannot_replace_current_parser(self):
+        roots = self.staged()
+        path = Path("Sources/IlliquidCore") / RUNNER.PARSER
+        (roots["candidate"] / path).write_bytes(
+            RUNNER.git_bytes(ROOT, RUNNER.HISTORICAL_CANDIDATE, path))
+        with self.assertRaisesRegex(RuntimeError, "Unexpected candidate parser blob"):
+            RUNNER.verify_isolation(roots)
+
+    def test_frozen_baseline_rejects_drift_in_both_modes(self):
+        for historical in (False, True):
+            with self.subTest(historical=historical):
+                roots = RUNNER.stage_sources(ROOT, self.work, historical=historical)
+                path = roots["baseline"] / "Sources/IlliquidCore" / RUNNER.PARSER
+                path.write_bytes(path.read_bytes() + b"\n// unexpected oracle change\n")
+                with self.assertRaisesRegex(RuntimeError, "Unexpected baseline parser blob"):
+                    RUNNER.verify_isolation(roots, historical=historical)
 
     def test_all_complete_outputs_match(self):
         reports = self.reports()
@@ -148,6 +178,10 @@ class HarnessTests(unittest.TestCase):
         self.assertEqual(tests.call_count, 2)
         manifest = json.loads((output / "manifest.json").read_text())
         self.assertTrue(manifest["completed"])
+        self.assertEqual(manifest["protocol_revision"], "current-regression-2-declaration-preflight")
+        self.assertEqual(manifest["expected_parser_blobs"], RUNNER.CURRENT_PARSER_BLOBS)
+        self.assertEqual(set(manifest["test_blobs"]), set(RUNNER.CURRENT_TESTS))
+        self.assertEqual({call.kwargs["historical"] for call in tests.call_args_list}, {False})
         self.assertEqual(manifest["differential_case_count"], 136)
         self.assertIsNone(manifest["rounds"])
         self.assertFalse((output / "measurements.jsonl").exists())

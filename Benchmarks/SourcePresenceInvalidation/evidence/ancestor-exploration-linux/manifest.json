@@ -1,0 +1,187 @@
+{
+  "architecture": "x86_64",
+  "arguments": {
+    "cases": "directory-32,directory-1000,directory-10000,burst-10000-16,tree-10000",
+    "maximum_iterations": 100,
+    "output": "/workspace/scratch/320cb0af67f9/invalidation-ancestors-local-final",
+    "ownerships": "unique,shared",
+    "pairs": 2,
+    "skip_tests": false,
+    "swift": "/tmp/illiquid-swift/usr/bin/swift",
+    "target_ms": 30.0,
+    "tests_only": false
+  },
+  "baseline": {
+    "blob": "bb9c97a7d45830ec493448e49f10dc7117dade37",
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "identitySHA256": "0bf2c6c70ad6c6454b442e11c4b898264b86729ffbf637298c66bf1213b32c7f",
+    "path": "Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift",
+    "sha256": "26e33271d4f289bb5f8dd18c4648a88bf4fc8484a07e9a43f6797b44b5852b28",
+    "sharedSources": {
+      "Sources/IlliquidApp/App/SourceRootPruning.swift": "dafe89a38104ee37c43e954ef082c76d867486ec64092577176e3955b3999c82",
+      "Sources/IlliquidApp/UI/SourceMediaPresenceRecomputation.swift": "5702a74a421ad1fe34107a51c64b623b118ef5f753c26cc1c1f4b9e41cf5da98",
+      "Sources/IlliquidCore/Utilities/MediaFileSupport.swift": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+      "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+      "Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift": "681fc16a1e263af5f5cf11bd5838fefa29b4bf77ef58aa3615a9180e5bbd7b16"
+    }
+  },
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "environment": {
+    "DEVELOPER_DIR": null,
+    "LD_LIBRARY_PATH": "/workspace/scratch/320cb0af67f9/toolchain-support/ubuntu/usr/lib/x86_64-linux-gnu",
+    "SWIFT_DETERMINISTIC_HASHING": "1"
+  },
+  "executables": {
+    "baseline-debug": "5a3756f57c81e820c534b9132d432425225ab96579683001a0e2e2a5fa1fa8a2",
+    "baseline-release": "7f82a84c8c7f22796c59b15e09836dd4ff319198483f2c4e2b833c1a22d25a22",
+    "candidate-debug": "ecb729c028e86e65e55502d73d0d4f47647b9c06e820109ee4ab37f359f2ad7a",
+    "candidate-release": "0c245c96bd2772683102771cdcf3d25c10c5293401bf2d5749275a038385461a"
+  },
+  "gitStatus": " M Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift\n?? .github/workflows/source-presence-invalidation.yml\n?? Benchmarks/SourcePresenceInvalidation/\n?? BuildInputs/.native-sdk.tar.gz.FPdsab\n?? DependencySources/archives/.openssl-3-3.6.3-build-source.tar.xz.yqaozc\n?? DependencySources/archives/.openssl-3-3.6.3-build-source.tar.xz.yqaozc.miwuR3\n?? Tests/IlliquidAppTests/SourceMediaPresenceInvalidationTests.swift\n",
+  "head": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "instrumentation": "Two monotonic wall and two process CPU clock readings per event sequence; no overhead subtraction.",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "runnerSHA256": "6773da4f0c6e030ef9dc3ed94e709ba66fae0d13bc809e9c4374bb70d6c277f5",
+  "scope": "Complete synchronous invalidate; fixture restoration, state receipts and queued asynchronous traversal are outside timing.",
+  "sourceSnapshotsSHA256": "2e7e921e4332b200bee9c534838f827ba0aafb669ce55ed36a3bed2c6eac39dc",
+  "sources": {
+    "baseline": {
+      "Package.swift": {
+        "origin": "Generated isolated component package",
+        "sha256": "18294b735d2bc219caefb27aad9509da8a255845c9aecf60f67e2554db216cfa",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceMediaPresenceRecomputation.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourceMediaPresenceRecomputation.swift",
+        "sha256": "5702a74a421ad1fe34107a51c64b623b118ef5f753c26cc1c1f4b9e41cf5da98",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceMediaPresenceScanner.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift",
+        "sha256": "c025c05090b5b2eade9268b245bc983eb113f9770d2242e4599b470b0def88da",
+        "transformation": "Complete production source unchanged, followed by test-only same-file setup/state access extension"
+      },
+      "Sources/IlliquidApp/SourceRootPruning.swift": {
+        "origin": "Sources/IlliquidApp/App/SourceRootPruning.swift",
+        "sha256": "dafe89a38104ee37c43e954ef082c76d867486ec64092577176e3955b3999c82",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceTreeIdentity.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "sha256": "0bf2c6c70ad6c6454b442e11c4b898264b86729ffbf637298c66bf1213b32c7f",
+        "transformation": "Exact SourceTreeIdentity declaration with imports"
+      },
+      "Sources/IlliquidCore/MediaFileSupport.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/MediaFileSupport.swift",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/NormalizedFileURL.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/SourcePreparationExecutor.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift",
+        "sha256": "681fc16a1e263af5f5cf11bd5838fefa29b4bf77ef58aa3615a9180e5bbd7b16",
+        "transformation": "none"
+      },
+      "Sources/PresenceInvalidationBenchmark/Harness.swift": {
+        "origin": "Benchmarks/SourcePresenceInvalidation/Harness.swift",
+        "sha256": "09a5067f8d565e5207f4dbac36a9aa908243235ded462a742a54bd0be71e24d7",
+        "transformation": "none"
+      },
+      "Tests/IlliquidAppTests/SourceMediaPresenceInvalidationTests.swift": {
+        "origin": "Tests/IlliquidAppTests/SourceMediaPresenceInvalidationTests.swift",
+        "sha256": "d2f348290016633748f80802ace4093e3d395425d3c9e45496371650c4e760dd",
+        "transformation": "none"
+      },
+      "Tests/IlliquidAppTests/SourceMediaPresenceRecomputationTests.swift": {
+        "origin": "Tests/IlliquidAppTests/SourceMediaPresenceRecomputationTests.swift",
+        "sha256": "d51ebb1e6b14fd4aa75886f839db8954309aa4fa6cba21cc7afa48624cfc5b53",
+        "transformation": "none"
+      },
+      "Tests/IlliquidAppTests/SourceMediaPresenceReuseTests.swift": {
+        "origin": "Tests/IlliquidAppTests/SourceMediaPresenceReuseTests.swift",
+        "sha256": "6598ee08c415214a5cce1c94aa5090fdb60aa79d26f26bb3d0ec3fd51633a5c1",
+        "transformation": "none"
+      },
+      "appendedSupport": {
+        "sha256": "92bce60a3b9a7c1b7eee98b13ed51fd7313c312a7a19eb1b95c9a0352d3a350d"
+      },
+      "originalScanner": {
+        "sha256": "26e33271d4f289bb5f8dd18c4648a88bf4fc8484a07e9a43f6797b44b5852b28"
+      }
+    },
+    "candidate": {
+      "Package.swift": {
+        "origin": "Generated isolated component package",
+        "sha256": "18294b735d2bc219caefb27aad9509da8a255845c9aecf60f67e2554db216cfa",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceMediaPresenceRecomputation.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourceMediaPresenceRecomputation.swift",
+        "sha256": "5702a74a421ad1fe34107a51c64b623b118ef5f753c26cc1c1f4b9e41cf5da98",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceMediaPresenceScanner.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift",
+        "sha256": "2438cc13dbb2909c2dceabde4c1bdd5b77a96a06e07b6daee8f3698a1887a990",
+        "transformation": "Complete production source unchanged, followed by test-only same-file setup/state access extension"
+      },
+      "Sources/IlliquidApp/SourceRootPruning.swift": {
+        "origin": "Sources/IlliquidApp/App/SourceRootPruning.swift",
+        "sha256": "dafe89a38104ee37c43e954ef082c76d867486ec64092577176e3955b3999c82",
+        "transformation": "none"
+      },
+      "Sources/IlliquidApp/SourceTreeIdentity.swift": {
+        "origin": "Sources/IlliquidApp/UI/SourcesSidebar.swift",
+        "sha256": "0bf2c6c70ad6c6454b442e11c4b898264b86729ffbf637298c66bf1213b32c7f",
+        "transformation": "Exact SourceTreeIdentity declaration with imports"
+      },
+      "Sources/IlliquidCore/MediaFileSupport.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/MediaFileSupport.swift",
+        "sha256": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/NormalizedFileURL.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+        "sha256": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+        "transformation": "none"
+      },
+      "Sources/IlliquidCore/SourcePreparationExecutor.swift": {
+        "origin": "Sources/IlliquidCore/Utilities/SourcePreparationExecutor.swift",
+        "sha256": "681fc16a1e263af5f5cf11bd5838fefa29b4bf77ef58aa3615a9180e5bbd7b16",
+        "transformation": "none"
+      },
+      "Sources/PresenceInvalidationBenchmark/Harness.swift": {
+        "origin": "Benchmarks/SourcePresenceInvalidation/Harness.swift",
+        "sha256": "09a5067f8d565e5207f4dbac36a9aa908243235ded462a742a54bd0be71e24d7",
+        "transformation": "none"
+      },
+      "Tests/IlliquidAppTests/SourceMediaPresenceInvalidationTests.swift": {
+        "origin": "Tests/IlliquidAppTests/SourceMediaPresenceInvalidationTests.swift",
+        "sha256": "d2f348290016633748f80802ace4093e3d395425d3c9e45496371650c4e760dd",
+        "transformation": "none"
+      },
+      "Tests/IlliquidAppTests/SourceMediaPresenceRecomputationTests.swift": {
+        "origin": "Tests/IlliquidAppTests/SourceMediaPresenceRecomputationTests.swift",
+        "sha256": "d51ebb1e6b14fd4aa75886f839db8954309aa4fa6cba21cc7afa48624cfc5b53",
+        "transformation": "none"
+      },
+      "Tests/IlliquidAppTests/SourceMediaPresenceReuseTests.swift": {
+        "origin": "Tests/IlliquidAppTests/SourceMediaPresenceReuseTests.swift",
+        "sha256": "6598ee08c415214a5cce1c94aa5090fdb60aa79d26f26bb3d0ec3fd51633a5c1",
+        "transformation": "none"
+      },
+      "appendedSupport": {
+        "sha256": "92bce60a3b9a7c1b7eee98b13ed51fd7313c312a7a19eb1b95c9a0352d3a350d"
+      },
+      "originalScanner": {
+        "sha256": "7fce5c90f7268775f6ab834332acd8f23571839acc538599e0df2e6b994453b2"
+      }
+    }
+  },
+  "startedUTC": "2026-10-28T04:45:22.311377+00:00",
+  "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+}

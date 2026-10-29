@@ -1,0 +1,75 @@
+name: Directory cache invalidation performance
+
+on:
+  push:
+    branches: ['perf/directory-cache-invalidation-20261028-9d074f']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift'
+      - 'Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeDirectoryStateTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
+      - 'Scripts/test-source-browser-search.py'
+      - 'Benchmarks/DirectoryCacheInvalidation/Driver.swift'
+      - 'Benchmarks/DirectoryCacheInvalidation/FixtureSupport.swift'
+      - 'Benchmarks/DirectoryCacheInvalidation/run.py'
+      - 'Benchmarks/DirectoryCacheInvalidation/baseline/**'
+      - '.github/workflows/directory-cache-invalidation.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidApp/UI/SourceTreeDirectoryState.swift'
+      - 'Sources/IlliquidApp/UI/SourceFilesystemInvalidation.swift'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/MediaLibrary/MediaNameRecognition.swift'
+      - 'Tests/IlliquidAppTests/SourceTreeDirectoryStateTests.swift'
+      - 'Tests/IlliquidAppTests/SourceBrowserSearchTests.swift'
+      - 'Scripts/test-source-browser-search.py'
+      - 'Benchmarks/DirectoryCacheInvalidation/Driver.swift'
+      - 'Benchmarks/DirectoryCacheInvalidation/FixtureSupport.swift'
+      - 'Benchmarks/DirectoryCacheInvalidation/run.py'
+      - 'Benchmarks/DirectoryCacheInvalidation/baseline/**'
+      - '.github/workflows/directory-cache-invalidation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: directory-cache-invalidation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    name: ${{ matrix.label }} component
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            label: linux
+            developer_dir: ''
+          - os: macos-26
+            label: macos
+            developer_dir: /Applications/Xcode_26.6.app/Contents/Developer
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer_dir }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test actual consumers and measure fresh cache invalidations
+        run: >-
+          python3 Benchmarks/DirectoryCacheInvalidation/run.py
+          --mode all --pairs 8 --target-ms 80 --log-evidence
+          --output "$RUNNER_TEMP/directory-cache-invalidation"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: directory-cache-invalidation-${{ matrix.label }}
+          path: ${{ runner.temp }}/directory-cache-invalidation/
+          retention-days: 14

@@ -90,6 +90,63 @@ struct BitmapSubtitleTests {
         }
     }
 
+    @Test func fullPaletteConversionHonorsStrideAndUnalignedOutput() {
+        // Exactly 512 visible pixels enters the 256-color table path.
+        let width = 32, height = 16, stride = 35
+        let byteCount = width * height * 4
+        let usedIndices: [UInt8] = [0, 1, 2, 255]
+        let expectedColors: [[UInt8]] = [
+            [0, 0, 0, 0],
+            [9, 16, 32, 128],
+            [64, 48, 32, 64],
+            [160, 80, 40, 200],
+        ]
+        // Padding uses a distinct color, so copying across row boundaries fails.
+        var indices = [UInt8](repeating: 99, count: stride * height)
+        var palette = [UInt32](repeating: 0xFFFF00FF, count: 256)
+        palette[0] = 0x00112233
+        palette[1] = 0x80402011
+        palette[2] = 0x4080C0FF
+        palette[255] = 0xC83366CC
+        var expected: [UInt8] = [0xCD]
+        for y in 0..<height {
+            for x in 0..<width {
+                let color = (x + y) % usedIndices.count
+                indices[y * stride + x] = usedIndices[color]
+                expected.append(contentsOf: expectedColors[color])
+            }
+        }
+        expected.append(0xCD)
+
+        let storage = UnsafeMutableRawPointer.allocate(
+            byteCount: byteCount + 2, alignment: 16
+        )
+        let output = storage.bindMemory(to: UInt8.self, capacity: byteCount + 2)
+        output.initialize(repeating: 0xCD, count: byteCount + 2)
+        defer {
+            output.deinitialize(count: byteCount + 2)
+            storage.deallocate()
+        }
+        indices.withUnsafeMutableBufferPointer { input in
+            palette.withUnsafeMutableBytes { colors in
+                var rect = AVSubtitleRect()
+                rect.type = SUBTITLE_BITMAP
+                rect.w = Int32(width)
+                rect.h = Int32(height)
+                rect.nb_colors = 256
+                rect.linesize.0 = Int32(stride)
+                rect.data.0 = input.baseAddress
+                rect.data.1 = colors.bindMemory(to: UInt8.self).baseAddress
+                #expect(illiquid_subtitle_rect_copy_bgra(
+                    &rect, output.advanced(by: 1), byteCount
+                ) == 0)
+            }
+        }
+        #expect(Array(UnsafeBufferPointer(
+            start: output, count: byteCount + 2
+        )) == expected)
+    }
+
     @Test func generatedPGSDecodesPalettePlacementForcedFlagAndClear() throws {
         var parameters: UnsafeMutablePointer<AVCodecParameters>? = avcodec_parameters_alloc()
         defer { avcodec_parameters_free(&parameters) }
