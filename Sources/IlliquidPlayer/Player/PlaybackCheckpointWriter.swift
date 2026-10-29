@@ -25,8 +25,16 @@ struct PlaybackCheckpoint: Sendable {
     let unshuffledPlaylistIDs: [FolderPlaylistItem.ID]?
 
     func record() -> PlaybackSessionRecord {
-        let belongsToFolder = source.url.isFileURL && playlist.contains {
-            NormalizedFileURL.representsSameFile($0.url, source.url)
+        // Flat playlists cannot retain a collection folder. For folder playlists,
+        // prepare the current source identity once for the membership scan.
+        let belongsToFolder: Bool
+        if folder != nil, !playlist.isEmpty, source.url.isFileURL,
+           let sourceKey = NormalizedFileURL.persistenceKey(for: source.url) {
+            belongsToFolder = playlist.contains {
+                NormalizedFileURL.persistenceKey(for: $0.url) == sourceKey
+            }
+        } else {
+            belongsToFolder = false
         }
         return PlaybackSessionRecord(
             source: source,
