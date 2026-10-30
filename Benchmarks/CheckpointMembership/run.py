@@ -53,6 +53,14 @@ COMPONENT_TEST_SUITES = (
     "Playlist session record semantics",
 )
 COMPONENT_TEST_COUNTS = (43, 7)
+# Reviewed current tests add one NaturalFilenameOrderingTests declaration.
+# Both variants stage these same tests in both build configurations.
+REGRESSION_COMPONENT_TEST_COUNTS = (44, 7)
+
+
+def component_test_counts(regression_only: bool) -> tuple[int, int]:
+    return REGRESSION_COMPONENT_TEST_COUNTS if regression_only else COMPONENT_TEST_COUNTS
+
 QUICK_CASES = [
     "valid-32-last", "valid-1000-last", "nil-index-1000",
     "no-folder-1000", "remote-1000", "single-valid",
@@ -407,7 +415,7 @@ let package = Package(name: "CheckpointMembershipQualification",
                 # A zero-exit build without executing the selected tests is not
                 # qualification. Swift Testing may put its summary on stderr.
                 receipt = swift_testing_receipt(raw, required_suites=COMPONENT_TEST_SUITES,
-                                                expected_counts=COMPONENT_TEST_COUNTS)
+                                                expected_counts=component_test_counts(self.args.regression_only))
                 test_count, suite_count = receipt["test_count"], receipt["suite_count"]
                 if results and (test_count, suite_count) != (results[0]["test_count"], results[0]["suite_count"]):
                     raise RuntimeError("Different test or suite counts across production variants/configurations")
