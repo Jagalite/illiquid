@@ -25,6 +25,12 @@ import time
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 BASELINE = "ea2ff568237e2667f7b1aeee67b11a44ebe95b72"
+# Reviewed support-only integration from the PR head; never accepted for performance runs.
+REGRESSION_SUPPORT_COMMIT = "a13019a18e9a05a164b7f724863c98fabfd63ae6"
+REGRESSION_SUPPORT = {
+    "Sources/IlliquidCore/Utilities/MediaFileSupport.swift":
+        "33657b48e87932f789b6ea92cf949029d916743859e964b8445a4e1bf4c8ff28",
+}
 SCANNER = "Sources/IlliquidApp/UI/SourceMediaPresenceScanner.swift"
 IDENTITY = "Sources/IlliquidApp/UI/SourcesSidebar.swift"
 CORE = [
@@ -193,6 +199,12 @@ def paired_parity(samples: dict, label: str) -> None:
 def stage(runner: Runner) -> dict:
     before = {relative: runner.baseline(relative) for relative in CORE + APP + [IDENTITY]}
     after = {relative: (ROOT / relative).read_bytes() for relative in CORE + APP + [IDENTITY]}
+    historical_hashes = {relative: digest(data) for relative, data in before.items()}
+    if runner.args.regression_only:
+        for relative, expected in REGRESSION_SUPPORT.items():
+            if digest(after[relative]) != expected:
+                raise RuntimeError(f"Unreviewed regression support: {relative}")
+            before[relative] = after[relative]
     for relative in CORE + APP:
         if relative != SCANNER and before[relative] != after[relative]:
             raise RuntimeError(f"Non-scanner dependency differs from pinned baseline: {relative}")
@@ -213,6 +225,10 @@ def stage(runner: Runner) -> dict:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(data)
         records[variant] = {
+            "sourcePolicy": "reviewed-current-support-regression" if runner.args.regression_only else "strict-historical",
+            "historicalProductionFiles": historical_hashes,
+            "sharedSupportCommit": REGRESSION_SUPPORT_COMMIT if runner.args.regression_only else None,
+            "sharedSupportPins": REGRESSION_SUPPORT if runner.args.regression_only else {},
             "productionFiles": {relative: digest(data) for relative, data in inputs.items()},
             "stagedFiles": {relative: digest(data) for relative, data in files.items()},
             "transformations": {
@@ -295,7 +311,7 @@ def experiment(args: argparse.Namespace, runner: Runner) -> None:
         "runnerSHA256": digest(Path(__file__).read_bytes()),
         "method": {
             "scope": "Complete SourceMediaPresenceCursor traversal of warm generated local filesystems; no file-content decoding, scanner pacing sleeps, UI rendering, or energy measurement.",
-            "sources": "Complete production scanner plus unchanged dependencies; real Foundation/Observation, separate Swift modules, no cross-module optimization.",
+            "sources": ("Reviewed identical current support in both arms; frozen baseline scanner; correctness only. " if args.regression_only else "") + "Complete production scanner plus unchanged dependencies; real Foundation/Observation, separate Swift modules, no cross-module optimization.",
             "tests": "Same complete reuse, recomputation, and traversal regression suites in baseline/candidate, debug/release; complete filesystem oracle receipts compared across all four executables.",
             "sampling": "Fresh processes, same iteration count for both variants, balanced AB/BA pairs, rotating workload order; every sample retained.",
             "timing": "Harness monotonic wall and process CPU clocks; fixture creation and receipt verification outside timing; no empty-loop subtraction.",
@@ -348,8 +364,18 @@ def experiment(args: argparse.Namespace, runner: Runner) -> None:
     save(args.output / "verification.json", verification)
     if any(value != verification["baseline-release"] for value in verification.values()):
         raise RuntimeError("Exact baseline/candidate or debug/release traversal receipts differ")
-    if args.tests_only:
+    if args.tests_only or args.regression_only:
+        for label, binary in verification_binaries.items():
+            if digest(binary.read_bytes()) != binary_hashes[label]:
+                raise RuntimeError(f"Executable changed during verification: {label}")
+        for variant in ("baseline", "candidate"):
+            for relative, expected in sources[variant]["stagedFiles"].items():
+                if digest((args.output / "packages" / variant / relative).read_bytes()) != expected:
+                    raise RuntimeError(f"Staged source changed during verification: {variant}/{relative}")
         save(args.output / "completion.json", {"status": "tests-and-parity-passed", "measurements": False,
+                                               "mode": "regression-only" if args.regression_only else "tests-only",
+                                               "nativeQualificationSuccess": False,
+                                               "exactReceiptParity": True, "sourceAndBinaryIntegrity": True,
                                                "verifiedExecutables": list(verification_binaries),
                                                "testsSkipped": False})
         return
@@ -441,6 +467,8 @@ def main() -> None:
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=250)
     parser.add_argument("--cases", default=",".join(CASES))
+    parser.add_argument("--regression-only", action="store_true",
+                        help="Full correctness with reviewed identical current support; no performance qualification")
     parser.add_argument("--tests-only", action="store_true")
     parser.add_argument("--skip-tests", action="store_true", help="Exploration only; cannot qualify a final candidate")
     args = parser.parse_args()
@@ -449,8 +477,10 @@ def main() -> None:
             or not args.cases or len(args.cases) != len(set(args.cases))
             or any(case not in CASES for case in args.cases)):
         parser.error("Use an even pair count >=2, a finite positive duration, and unique supported cases")
-    if args.tests_only and args.skip_tests:
-        parser.error("--tests-only and --skip-tests are incompatible")
+    if (args.tests_only or args.regression_only) and args.skip_tests:
+        parser.error("Correctness-only modes and --skip-tests are incompatible")
+    if args.regression_only and args.cases != CASES:
+        parser.error("--regression-only requires all correctness workloads")
     swift = shutil.which(args.swift)
     if not swift:
         parser.error("Swift is unavailable; set --swift, SWIFT, or PATH")

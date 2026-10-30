@@ -76,6 +76,24 @@ private func fixtures(selected: String? = nil) -> [Fixture] {
             }
         }
     }
+    // Timestamp controls: WebVTT's short form exercises the second fast-path
+    // shape; unpadded/large hours keep the unchanged general parser exercised.
+    for (name, format, hourPrefix) in [
+        ("vtt-1000-short-timestamps", Converter.Format.webVTT, ""),
+        ("srt-1000-unpadded-hour", .srt, "0:"),
+        ("srt-1000-large-hour", .srt, "123:"),
+        ("vtt-1000-large-hour", .webVTT, "123:"),
+    ] {
+        guard wanted(name) else { continue }
+        var blocks = format == .webVTT ? ["WEBVTT"] : []
+        for index in 0..<1000 {
+            let start = hourPrefix + timestamp(index * 2000, format: format).dropFirst(3)
+            let end = hourPrefix + timestamp(index * 2000 + 1500, format: format).dropFirst(3)
+            blocks.append("\(index + 1)\n\(start) --> \(end)\nCaption")
+        }
+        result.append(Fixture(name: name, format: format, source: blocks.joined(separator: "\n\n"),
+            cues: 1000, expectedError: nil, timed: true))
+    }
     for (name, format, payload, ending) in [
         ("srt-100-plain-crlf", Converter.Format.srt, payloads[0].1, "\r\n"),
         ("vtt-100-multilingual-crlf", .webVTT, payloads[1].1, "\r\n"),
@@ -218,6 +236,87 @@ private func fixtures(selected: String? = nil) -> [Fixture] {
             if length < 3 { sequences = sequences.flatMap { prefix in atoms.map { prefix + $0 } } }
         }
     }
+    // Mutate every byte position of all four recognized timestamp spellings.
+    // The unchanged baseline is the oracle for these malformed/legacy forms;
+    // -1 means the expected cue count is determined by byte/error parity, not
+    // by a second copy of the parser in this harness. These cases are untimed.
+    if selected == nil || selected?.hasPrefix("diff-timestamp-") == true {
+        let atoms = (0..<128).map { String(UnicodeScalar($0)!) }
+            + ["\u{0301}", "\u{034F}", "\u{00A0}", "\u{200D}", "１", "١", "🙂"]
+        let forms: [(Converter.Format, String)] = [
+            (.srt, "09:58:57,995"), (.srt, "09:58:57.995"),
+            (.webVTT, "09:58:57.995"), (.webVTT, "58:57.995"),
+        ]
+        for (formIndex, form) in forms.enumerated() {
+            let (format, original) = form
+            let characters = Array(original)
+            let header = format == .webVTT ? "WEBVTT\n\n" : "1\n"
+            for position in characters.indices {
+                for (atomIndex, atom) in (atoms + [""]).enumerated() {
+                    let mutated = String(characters[..<position]) + atom
+                        + String(characters[(position + 1)...])
+                    for endpoint in 0...1 {
+                        let name = "diff-timestamp-\(formIndex)-\(position)-\(atomIndex)-\(endpoint)"
+                        guard wanted(name) else { continue }
+                        let start = endpoint == 0 ? mutated : "00:00:00.000"
+                        let end = endpoint == 1 ? mutated : "2147483647:59:59.994"
+                        result.append(Fixture(name: name, format: format,
+                            source: header + start + " --> " + end + "\nCaption",
+                            cues: -1, expectedError: nil, timed: false))
+                    }
+                }
+            }
+        }
+    }
+    result += preprocessingFixtures(selected: selected)
+    return result
+}
+
+private func preprocessingFixtures(selected: String?) -> [Fixture] {
+    guard selected == nil || selected!.hasPrefix("preprocess-") else { return [] }
+    func wanted(_ name: String) -> Bool { selected == nil || selected == name }
+    var result: [Fixture] = []
+    for format in [Converter.Format.srt, .webVTT] {
+        let label = format == .srt ? "srt" : "vtt"
+        let canonical = format == .srt ? "00:12:34,567" : "00:12:34.567"
+        let spaces = [" ", "\t", " \t ", "\u{000B}", "\u{000C}", "\u{00A0}", "\u{2003}",
+                      "\u{200B}", "\u{3000}", "\u{2028}", "\u{2029}", "\u{0085}",
+                      " \u{0301}", "\t\u{034F}"]
+        for (index, space) in spaces.enumerated() {
+            let values = [space + canonical, canonical + space, space + canonical + space,
+                          canonical + space + "align:start", canonical + space + "label:日本語"]
+            for (position, value) in values.enumerated() {
+                for endpoint in 0...1 {
+                    let name = "preprocess-diff-\(label)-\(index)-\(position)-\(endpoint)"
+                    guard wanted(name) else { continue }
+                    let start = endpoint == 0 ? value : "00:00:00.000"
+                    let end = endpoint == 0 ? "100:00:00.000" : value
+                    let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                        + start + " --> " + end + "\nProbe\n\n"
+                        + "00:00:03.000 --> 00:00:04.000\nSentinel"
+                    // As with the existing timestamp mutations, full output and
+                    // errors are checked against the immutable production baseline.
+                    result.append(Fixture(name: name, format: format, source: source,
+                                          cues: -1, expectedError: nil, timed: false))
+                }
+            }
+        }
+        for kind in ["malformed", "unicode-settings"] {
+            if kind == "unicode-settings" && format == .srt { continue }
+            let name = "preprocess-control-\(label)-2000-\(kind)"
+            guard wanted(name) else { continue }
+            var source = makeSource(2000, format: format, payload: "Caption")
+            if kind == "unicode-settings" {
+                source = source.replacingOccurrences(of: "align:start", with: "align:日本語")
+            } else {
+                source = source.replacingOccurrences(of: #"(?m)^\d{2}:\d{2}:\d{2}[.,]\d{3} -->"#,
+                    with: "00:60:00.000 -->", options: .regularExpression)
+            }
+            let error = kind == "malformed" ? "noValidCues." + (format == .srt ? "srt" : "webVTT") : nil
+            result.append(Fixture(name: name, format: format, source: source,
+                cues: kind == "malformed" ? 0 : 2000, expectedError: error, timed: true))
+        }
+    }
     return result
 }
 
@@ -241,6 +340,9 @@ private func fnv(_ text: String) -> String {
 }
 
 private func check(_ result: Result, fixture: Fixture) {
+    // Untimed timestamp mutations are checked against the exact baseline
+    // output/error by run.py; their acceptance is intentionally not predicted.
+    if fixture.cues < 0 { return }
     // Malformed mixed-newline fixtures are checked against the separately
     // compiled original converter, without assuming its parsing outcome.
     guard !fixture.comparisonOnly else { return }

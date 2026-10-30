@@ -1,0 +1,50 @@
+{
+  "result": "passed",
+  "workflow_run": 40638190530,
+  "job_id": 122649943872,
+  "baseline_revision": "4b95487493766f627af6b14338613e02dd466b88",
+  "measured_candidate_revision": "d0e72cc1965603f7cf67cd94c59e7468b77a1293",
+  "evidence_sha256_verified": 10,
+  "observations_verified": 420,
+  "pilot_observations_verified": 41,
+  "uint64_checksums_verified": 461,
+  "summary_numeric_fields_verified": 756,
+  "maximum_summary_recomputation_difference": 0,
+  "golden_test_runs": 4,
+  "tests_per_run": 39,
+  "differential_cases_per_build": 14225,
+  "differential_builds": 4,
+  "common_cases": 15,
+  "common_wall_pairs_faster": 150,
+  "common_cpu_pairs_faster": 150,
+  "common_paired_wall_change_percent_range": [
+    -34.15476662026733,
+    -14.770406719816586
+  ],
+  "minimum_sample_ms": 221.170585,
+  "minimum_baseline_sample_ms": 328.767835,
+  "maximum_sample_ms": 438.762086,
+  "baseline_source_sha256": "307daf66e795d5238d7f28372d350abe3ab260f5a760760ca77a185202cbd12f",
+  "baseline_source_git_blob": "c2df8f4a9abebf88d52bbd83860756b0530fbf99",
+  "candidate_source_sha256": "4b81ba891e5b140e855df70b3517aee2370fc132f6ca6f92ba54846ff2a8498d",
+  "candidate_source_sha256_recomputed_from_published_source": true,
+  "checks": [
+    "Exact emitted-file SHA-256 validation",
+    "Complete sequence, round, variant, reversed workload traversal, AB/BA position and operation-count reconstruction",
+    "Pilot progression, stopping condition and calibrated iteration counts",
+    "Exact wrapping UInt64 checksums for all timed and pilot records",
+    "Independent medians, ranges, ordered paired ratios and percentage changes for wall and CPU metrics",
+    "Matching source/compiler/commit receipts",
+    "All command exit statuses and four golden-test summaries",
+    "Actual sample-duration bounds and control-workload tradeoffs"
+  ],
+  "limitation": "The numerical audit recomputed all raw timing evidence. Full differential traces are retained in the CI artifact; semantic equality is supported by successful comparison commands and matching verification-record hashes, not a second execution by the auditor. Native macOS and full app/playback qualification remain pending.",
+  "paired_control_deltas_ms": {
+    "srt-1000-unpadded-hour": 0.03564816101694915,
+    "srt-1000-large-hour": 0.022465035714285715,
+    "vtt-1000-large-hour": -0.004613509433962264,
+    "preprocess-control-vtt-2000-unicode-settings": -1.5977917857142858,
+    "preprocess-control-srt-2000-malformed": 0.07548591860465116,
+    "preprocess-control-vtt-2000-malformed": 0.11193727419354838
+  }
+}

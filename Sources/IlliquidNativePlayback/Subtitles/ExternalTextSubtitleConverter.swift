@@ -95,30 +95,47 @@ enum ExternalTextSubtitleConverter {
                     continue
                 }
             }
-            let lines = Array(block.split(separator: "\n", omittingEmptySubsequences: false)
-                .drop(while: { $0.isEmpty }))
-            guard let first = lines.first else { continue }
-            let timingIndex: Int?
+            var lines = Lines(block)
+            var first = lines.next()
+            while first?.isEmpty == true { first = lines.next() }
+            guard let first else { continue }
+            let timingLine: Substring?
             if format == .webVTT {
+                // NOTE is a block marker, whereas NOTEworthy is a cue identifier.
+                // Ignore the entire comment even if malformed content resembles
+                // a cue.
+                if first == "NOTE" || first.hasPrefix("NOTE ") || first.hasPrefix("NOTE\t") {
+                    continue
+                }
                 // A cue has at most one identifier before its timing line.
                 // This also skips untimed STYLE/REGION metadata while preserving
                 // those words when used as identifiers with immediate timings.
-                timingIndex = first.contains("-->") ? 0
-                    : (lines.count > 1 && lines[1].contains("-->") ? 1 : nil)
+                timingLine = first.contains("-->") ? first
+                    : lines.next().flatMap { $0.contains("-->") ? $0 : nil }
             } else {
                 // Preserve SRT's tolerant handling of optional cue numbers.
-                timingIndex = lines.firstIndex(where: { $0.contains("-->") })
+                // The first arrow-containing line wins, even if it is invalid.
+                var candidate: Substring? = first
+                while let line = candidate, !line.contains("-->") {
+                    candidate = lines.next()
+                }
+                timingLine = candidate
             }
-            guard let timingIndex else { continue }
-            let timing = lines[timingIndex].components(separatedBy: "-->")
+            guard let timingLine else { continue }
+            let timing = timingLine.components(separatedBy: "-->")
             guard timing.count == 2,
                   let start = parseTimestamp(timing[0], format: format),
                   let end = parseTimestamp(timing[1], format: format, allowsSettings: true),
                   end.milliseconds > start.milliseconds
             else { continue }
-            let text = lines.dropFirst(timingIndex + 1).map(escapeASSPayload)
-                .joined(separator: "\\N")
-            output += "\nDialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,\(text)"
+            output += "\nDialogue: 0,\(assTimestamp(start)),\(assTimestamp(end)),Default,,0,0,0,,"
+            if let line = lines.next() {
+                output += escapeASSPayload(line)
+                while let line = lines.next() {
+                    output += "\\N"
+                    output += escapeASSPayload(line)
+                }
+            }
             hasEvents = true
         }
         guard hasEvents else { throw ConversionError.noValidCues(format) }
@@ -150,6 +167,30 @@ enum ExternalTextSubtitleConverter {
                     return source[start..<newline]
                 }
                 cursor = afterNewline
+            }
+            nextStart = nil
+            return source[start...]
+        }
+    }
+
+    /// Split one cue without retaining an array of all of its lines. Like
+    /// split(omittingEmptySubsequences: false), a final LF yields an empty line;
+    /// that empty payload field must still contribute its ASS line separator.
+    private struct Lines: IteratorProtocol {
+        private let source: Substring
+        private var nextStart: String.Index?
+
+        init(_ source: Substring) {
+            self.source = source
+            nextStart = source.startIndex
+        }
+
+        mutating func next() -> Substring? {
+            guard let start = nextStart else { return nil }
+            let bytes = source.utf8
+            if let newline = bytes[start...].firstIndex(of: 0x0A) {
+                nextStart = bytes.index(after: newline)
+                return source[start..<newline]
             }
             nextStart = nil
             return source[start...]
@@ -195,6 +236,9 @@ enum ExternalTextSubtitleConverter {
     private static func parseTimestamp(
         _ value: String, format: Format, allowsSettings: Bool = false
     ) -> Timestamp? {
+        if let timestamp = commonASCIITimestamp(value, format: format, allowsSettings: allowsSettings) {
+            return timestamp
+        }
         let trimmed = value.trimmingCharacters(in: .whitespaces)
         let timestamp: Substring
         if format == .webVTT, allowsSettings {
@@ -202,6 +246,11 @@ enum ExternalTextSubtitleConverter {
             timestamp = trimmed.split(whereSeparator: { $0 == " " || $0 == "\t" }).first ?? ""
         } else {
             timestamp = trimmed[...]
+        }
+        if let parsed = timestamp.utf8.withContiguousStorageIfAvailable({
+            parseFixedWidthTimestamp($0, format: format)
+        }) ?? nil {
+            return parsed
         }
         let parts = timestamp.split(separator: ":", omittingEmptySubsequences: false)
         let hours: Int64
@@ -258,6 +307,68 @@ enum ExternalTextSubtitleConverter {
         // value too, so the ASS parser never receives an overflowing hour field.
         guard centiseconds / 360_000 <= maximumASSHours else { return nil }
         return Timestamp(milliseconds: milliseconds, centiseconds: centiseconds)
+    }
+
+    /// Bypass Foundation preprocessing for the usual ASCII spelling, including
+    /// its surrounding spaces/tabs and WebVTT end settings. Inspect the complete
+    /// value first: a combining mark can change a space's Character boundary.
+    /// All other input keeps the general parser's trimming/splitting behavior.
+    private static func commonASCIITimestamp(
+        _ value: String, format: Format, allowsSettings: Bool
+    ) -> Timestamp? {
+        value.utf8.withContiguousStorageIfAvailable { bytes -> Timestamp? in
+            guard bytes.allSatisfy({ $0 < 0x80 }) else { return nil }
+            var start = 0
+            var end = bytes.count
+            while start < end, bytes[start] == 0x20 || bytes[start] == 0x09 { start += 1 }
+            while start < end, bytes[end - 1] == 0x20 || bytes[end - 1] == 0x09 { end -= 1 }
+            if format == .webVTT, allowsSettings {
+                var tokenEnd = start
+                while tokenEnd < end, bytes[tokenEnd] != 0x20, bytes[tokenEnd] != 0x09 {
+                    tokenEnd += 1
+                }
+                end = tokenEnd
+            }
+            return parseFixedWidthTimestamp(
+                UnsafeBufferPointer(rebasing: bytes[start..<end]), format: format)
+        } ?? nil
+    }
+
+    /// Most cues use HH:MM:SS,mmm / HH:MM:SS.mmm, or WebVTT's MM:SS.mmm.
+    /// Read those ASCII fields without allocating split arrays. Everything else
+    /// keeps the general parser's whitespace, large-hour, and legacy SRT rules.
+    private static func parseFixedWidthTimestamp(
+        _ bytes: UnsafeBufferPointer<UInt8>, format: Format
+    ) -> Timestamp? {
+        let hours: Int64
+        let offset: Int
+        if bytes.count == 12 {
+            guard bytes[2] == 58,
+                  let value = decimalPair(bytes[0], bytes[1]) else { return nil }
+            hours = value
+            offset = 3
+        } else if bytes.count == 9, format == .webVTT {
+            hours = 0
+            offset = 0
+        } else {
+            return nil
+        }
+        guard bytes[offset + 2] == 58,
+              bytes[offset + 5] == 46 || (format == .srt && bytes[offset + 5] == 44),
+              let minutes = decimalPair(bytes[offset], bytes[offset + 1]), minutes < 60,
+              let seconds = decimalPair(bytes[offset + 3], bytes[offset + 4]), seconds < 60,
+              let fractionPrefix = decimalPair(bytes[offset + 6], bytes[offset + 7]),
+              bytes[offset + 8] >= 48, bytes[offset + 8] <= 57 else { return nil }
+        let fraction = fractionPrefix * 10 + Int64(bytes[offset + 8] - 48)
+        // Two-digit hours and validated fields cannot approach the ASS hour
+        // bound, including a centisecond carry from 99:59:59.995 to 100:00:00.
+        let milliseconds = ((hours * 60 + minutes) * 60 + seconds) * 1_000 + fraction
+        return Timestamp(milliseconds: milliseconds, centiseconds: (milliseconds + 5) / 10)
+    }
+
+    private static func decimalPair(_ first: UInt8, _ second: UInt8) -> Int64? {
+        guard first >= 48, first <= 57, second >= 48, second <= 57 else { return nil }
+        return Int64(first - 48) * 10 + Int64(second - 48)
     }
 
     private static func decimalInteger(_ value: Substring, maximum: Int64) -> Int64? {

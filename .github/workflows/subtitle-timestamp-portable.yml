@@ -1,0 +1,79 @@
+name: Subtitle timestamp portable performance
+on:
+  push:
+    branches: ['perf/subtitle-timestamp-fast-path-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/External*Subtitle*Tests.swift'
+      - Tests/IlliquidNativePlaybackTests/SubtitleCueStreamingTests.swift
+      - 'Benchmarks/ExternalSubtitleConversion/Driver.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/run.py'
+      - '.github/workflows/subtitle-timestamp-portable.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift'
+      - 'Tests/IlliquidNativePlaybackTests/External*Subtitle*Tests.swift'
+      - Tests/IlliquidNativePlaybackTests/SubtitleCueStreamingTests.swift
+      - 'Scripts/test-external-subtitle-regressions.sh'
+      - 'Benchmarks/ExternalSubtitleConversion/Driver.swift'
+      - 'Benchmarks/ExternalSubtitleConversion/run.py'
+      - '.github/workflows/subtitle-timestamp-portable.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: subtitle-timestamp-portable-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      BASELINE_REF: ${{ github.event.pull_request.base.sha || 'ea2ff568237e2667f7b1aeee67b11a44ebe95b72' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check converter behavior in debug and release
+        run: |
+          swift --version
+          bash Scripts/test-external-subtitle-regressions.sh -c debug -Xswiftc -warnings-as-errors
+          bash Scripts/test-external-subtitle-regressions.sh -c release -Xswiftc -warnings-as-errors
+      - name: Verify exact output and compare paired complete conversions
+        run: >-
+          python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark
+          --rounds 10 --target-ms 100 --baseline-ref "$BASELINE_REF"
+          --output "$RUNNER_TEMP/subtitle-timestamp-portable"
+      - name: Emit reproducible conversion timing evidence
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'subtitle-timestamp-portable'
+          names = ['manifest.json', 'benchmark.json', 'calibration.json',
+                   'summary.json', 'measurements.jsonl']
+          for name in names:
+              path = root / name
+              if not path.is_file():
+                  continue
+              for number, line in enumerate(path.read_text().splitlines()):
+                  print('TIMESTAMP_EVIDENCE_LINE ' + json.dumps(
+                      {'file': name, 'line': number, 'text': line}, sort_keys=True))
+          verification = root / 'verification.json'
+          if verification.is_file():
+              print('TIMESTAMP_VERIFICATION_CASES ' + str(len(json.loads(verification.read_text()))))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-timestamp-portable
+          path: |
+            ${{ runner.temp }}/subtitle-timestamp-portable/**/*.json
+            ${{ runner.temp }}/subtitle-timestamp-portable/**/*.jsonl
+            ${{ runner.temp }}/subtitle-timestamp-portable/**/*.gz
+            ${{ runner.temp }}/subtitle-timestamp-portable/**/*.log
+            ${{ runner.temp }}/subtitle-timestamp-portable/**/*.swift
+            ${{ runner.temp }}/subtitle-timestamp-portable/runner.snapshot.py
+          retention-days: 14

@@ -1,0 +1,425 @@
+{
+  "baseline_library_matches_candidate_a_run": false,
+  "baseline_production_source_hashes_match_candidate_a_run": true,
+  "baseline_recognize_disassembly_matches_candidate_a_run": true,
+  "limitations": [
+    "Instruction and call-site counts are static, not dynamic execution counts.",
+    "Stack subtraction excludes saved registers and callees' frames.",
+    "Code-generation changes do not establish the cause or size of a timing difference.",
+    "The reference-plan allocation requests 184 bytes; allocator overhead is not measured."
+  ],
+  "nm_version": "GNU nm (GNU Binutils for Ubuntu) 2.42",
+  "objdump_version": "GNU objdump (GNU Binutils for Ubuntu) 2.42",
+  "scope": "Static inspection of existing Linux x86_64 release modules; no builds or timing runs.",
+  "symbol": "$s12IlliquidCore18MediaSidecarReaderC9recognize_6within17checkCancellationAA010RecognizedC4NameV20FoundationEssentials3URLV_AKyyKXEtKF",
+  "variants": {
+    "baseline": {
+      "binary": "/workspace/scratch/3388caa949a3/ancestor-hints-research/reference-tests/build/baseline/module/libIlliquidCore.so",
+      "binary_sha256": "51effc225d817fbe6fdaee201ab44c5f0d2fb0803ecb6e3be8510f8cf88010de",
+      "inspection_commands": [
+        [
+          "objdump",
+          "-d",
+          "--no-show-raw-insn",
+          "--disassemble=$s12IlliquidCore18MediaSidecarReaderC9recognize_6within17checkCancellationAA010RecognizedC4NameV20FoundationEssentials3URLV_AKyyKXEtKF",
+          "/workspace/scratch/3388caa949a3/ancestor-hints-research/reference-tests/build/baseline/module/libIlliquidCore.so"
+        ],
+        [
+          "nm",
+          "-S",
+          "/workspace/scratch/3388caa949a3/ancestor-hints-research/reference-tests/build/baseline/module/libIlliquidCore.so"
+        ]
+      ],
+      "memcpy_call_site_count": 1,
+      "memcpy_call_sites": [
+        {
+          "call": "22fe6:\tcall   8f10 <memcpy@plt>",
+          "following": [
+            "   22feb:\tmovaps 0x1c0(%rsp),%xmm0",
+            "   22ff3:\tmovaps 0x1d0(%rsp),%xmm1",
+            "   22ffb:\tmovaps 0x1e0(%rsp),%xmm2",
+            "   23003:\tmovaps 0x1f0(%rsp),%xmm3",
+            "   2300b:\tmovaps %xmm0,0xe70(%rsp)",
+            "   23013:\tmovaps %xmm1,0xe80(%rsp)",
+            "   2301b:\tmovaps %xmm2,0xe90(%rsp)",
+            "   23023:\tmovaps %xmm3,0xea0(%rsp)",
+            "   2302b:\tmovaps 0x200(%rsp),%xmm0",
+            "   23033:\tmovaps %xmm0,0xeb0(%rsp)",
+            "   2303b:\tmovaps 0x210(%rsp),%xmm0",
+            "   23043:\tmovaps %xmm0,0xec0(%rsp)",
+            "   2304b:\tmovaps 0x220(%rsp),%xmm0",
+            "   23053:\tmovaps %xmm0,0xed0(%rsp)",
+            "   2305b:\tmov    0x230(%rsp),%rax",
+            "   23063:\tmov    %rax,0xee0(%rsp)",
+            "   2306b:\tlea    0x850(%rsp),%rax",
+            "   23073:\tlea    0xe70(%rsp),%rdi",
+            "   2307b:\tcall   1e6a0 <$s12IlliquidCore19RecognizedMediaNameV8applyingyAcA0D13MetadataHintsVF>",
+            "   23080:\tmov    0x50(%rsp),%rdi",
+            "   23085:\tcall   8ff0 <swift_release@plt>",
+            "   2308a:\tmov    0x58(%rsp),%rdi",
+            "   2308f:\tcall   8ff0 <swift_release@plt>",
+            "   23094:\tmov    %r15,%rdi",
+            "   23097:\tcall   1a540 <$s12IlliquidCore19RecognizedMediaNameVWOh>",
+            "   2309c:\tmov    0x8(%rsp),%rdi",
+            "   230a1:\tcall   8ff0 <swift_release@plt>",
+            "   230a6:\tmov    0x40(%rsp),%rdi",
+            "   230ab:\tcall   8ff0 <swift_release@plt>",
+            "   230b0:\tmov    0x28(%rsp),%rdi",
+            "   230b5:\tcall   8ff0 <swift_release@plt>",
+            "   230ba:\tmov    0x20(%rsp),%rdi",
+            "   230bf:\tcall   8ff0 <swift_release@plt>",
+            "   230c4:\tmov    0x170(%rsp),%rdi",
+            "   230cc:\tmov    0x60(%rsp),%rsi"
+          ],
+          "preceding": [
+            "   22fbb:\tmovups %xmm0,0x360(%rsp)",
+            "   22fc3:\tmov    %rax,0x370(%rsp)",
+            "   22fcb:\tlea    0x13c8(%rsp),%r13",
+            "   22fd3:\tlea    0x2d0(%rsp),%r15",
+            "   22fdb:\tmov    $0xa8,%edx",
+            "   22fe0:\tmov    %r13,%rdi",
+            "   22fe3:\tmov    %r15,%rsi"
+          ]
+        }
+      ],
+      "object_allocation_call_sites": [],
+      "plan_helper_call_sites": [
+        "2018f:\tcall   1a7d0 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOy>",
+        "2024c:\tcall   1a500 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOe>",
+        "202b0:\tcall   1a7d0 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOy>",
+        "21ae0:\tcall   1a500 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOe>",
+        "21c89:\tcall   1a500 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOe>",
+        "225c5:\tcall   1a500 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOe>",
+        "22e27:\tcall   1a500 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOe>",
+        "230f1:\tcall   1a500 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOe>"
+      ],
+      "plan_symbols": [
+        "0000000000023630 0000000000000040 r $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMF",
+        "0000000000028b44 0000000000000008 d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMXX",
+        "000000000001b920 000000000000000a t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMa",
+        "00000000000279b0 0000000000000030 d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMf",
+        "0000000000028b64 000000000000001c d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMn",
+        "000000000001a500 0000000000000039 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOe",
+        "000000000001a7d0 0000000000000039 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOy",
+        "0000000000027958 0000000000000058 d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVWV",
+        "000000000001c630 0000000000000005 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwCP",
+        "000000000001b780 0000000000000086 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwca",
+        "000000000001b710 0000000000000065 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwcp",
+        "000000000001b890 000000000000003a t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwet",
+        "000000000001b8d0 0000000000000048 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwst",
+        "000000000001b830 0000000000000060 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwta",
+        "000000000001b6e0 0000000000000029 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwxx",
+        "00000000000238f6 0000000000000006 r symbolic _____ 12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLV",
+        "00000000000238de 0000000000000008 r symbolic _____Sg 12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLV"
+      ],
+      "reader_source": {
+        "adaptation": "Darwin import -> Glibc",
+        "compiled_sha256": "a995a2524f5cb832b85ecf47b449183aa2bdb34b9a1659c2cacbcefb97f483da",
+        "original_sha256": "ed88e67d20063535b861a94f147e574601a3d8f75b7584dea1a7cd6e7bb1217c"
+      },
+      "recognize_code_bytes": 13068,
+      "recognize_symbol": "000000000001feb0 000000000000330c T $s12IlliquidCore18MediaSidecarReaderC9recognize_6within17checkCancellationAA010RecognizedC4NameV20FoundationEssentials3URLV_AKyyKXEtKF",
+      "source_receipt": "/workspace/scratch/3388caa949a3/ancestor-hints-research/reference-tests/evidence/baseline-sources.json",
+      "source_receipt_sha256": "a77a917d340bd2759e28b183380dcbeca88df367eb46eb925582e358f727f3f0",
+      "stack_frame_subtraction_bytes": 5232,
+      "stack_frame_subtraction_hex": "0x1470",
+      "static_instruction_count": 2182
+    },
+    "candidate_a_value_plan": {
+      "binary": "/workspace/scratch/3388caa949a3/ancestor-hints-research/linux-full/build/candidate/module/libIlliquidCore.so",
+      "binary_sha256": "fc5fe87f52bc6a1194704e61d6c16a947437bc6c6e239998894bff264b33f06d",
+      "inspection_commands": [
+        [
+          "objdump",
+          "-d",
+          "--no-show-raw-insn",
+          "--disassemble=$s12IlliquidCore18MediaSidecarReaderC9recognize_6within17checkCancellationAA010RecognizedC4NameV20FoundationEssentials3URLV_AKyyKXEtKF",
+          "/workspace/scratch/3388caa949a3/ancestor-hints-research/linux-full/build/candidate/module/libIlliquidCore.so"
+        ],
+        [
+          "nm",
+          "-S",
+          "/workspace/scratch/3388caa949a3/ancestor-hints-research/linux-full/build/candidate/module/libIlliquidCore.so"
+        ]
+      ],
+      "memcpy_call_site_count": 7,
+      "memcpy_call_sites": [
+        {
+          "call": "203e5:\tcall   8f10 <memcpy@plt>",
+          "preceding": [
+            "   203b9:\tmov    %rdx,0xa8(%rsp)",
+            "   203c1:\tmov    0x260(%rsp),%r15",
+            "   203c9:\tlea    0x20(%r15),%rsi",
+            "   203cd:\tlea    0x14b0(%rsp),%rbp",
+            "   203d5:\tmov    $0xa8,%edx",
+            "   203da:\tmov    %rbp,%rdi",
+            "   203dd:\tmov    %rsi,0x560(%rsp)"
+          ]
+        },
+        {
+          "call": "20983:\tcall   8f10 <memcpy@plt>",
+          "preceding": [
+            "   20960:\txor    %edi,%edi",
+            "   20962:\txor    %edx,%edx",
+            "   20964:\tcall   e4b0 <$ss22_ContiguousArrayBufferV20_consumeAndCreateNew14bufferIsUnique15minimumCapacity13growForAppendAByxGSb_SiSbtF12IlliquidCore18MediaSidecarReaderC06FolderS5Paths33_DB94D38A6C1C56CD58310182184C8DB6LLV_Tg5>",
+            "   20969:\tmov    %rax,0x68(%rsp)",
+            "   2096e:\tlea    0x1388(%rsp),%rdi",
+            "   20976:\tlea    0x570(%rsp),%rsi",
+            "   2097e:\tmov    $0xa8,%edx"
+          ]
+        },
+        {
+          "call": "20c31:\tcall   8f10 <memcpy@plt>",
+          "preceding": [
+            "   20c12:\tpop    %rbp",
+            "   20c13:\tret",
+            "   20c14:\tmov    %rbp,%rdi",
+            "   20c17:\tcall   8ff0 <swift_release@plt>",
+            "   20c1c:\tlea    0x1388(%rsp),%rdi",
+            "   20c24:\tlea    0x570(%rsp),%rsi",
+            "   20c2c:\tmov    $0xa8,%edx"
+          ]
+        },
+        {
+          "call": "20c5a:\tcall   8f10 <memcpy@plt>",
+          "preceding": [
+            "   20c31:\tcall   8f10 <memcpy@plt>",
+            "   20c36:\tmov    0x8313(%rip),%rax        # 28f50 <_swiftEmptyArrayStorage>",
+            "   20c3d:\tmov    %rax,0x68(%rsp)",
+            "   20c42:\tlea    0x570(%rsp),%rdi",
+            "   20c4a:\tlea    0x1388(%rsp),%rbx",
+            "   20c52:\tmov    $0xa8,%edx",
+            "   20c57:\tmov    %rbx,%rsi"
+          ]
+        },
+        {
+          "call": "22458:\tcall   8f10 <memcpy@plt>",
+          "preceding": [
+            "   22435:\tmov    %r14,%rdi",
+            "   22438:\tcall   1a640 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOi_>",
+            "   2243d:\tlea    0x350(%rsp),%r15",
+            "   22445:\tmov    $0xa8,%edx",
+            "   2244a:\tmov    %r15,%rdi",
+            "   2244d:\tmov    0x560(%rsp),%rbx",
+            "   22455:\tmov    %rbx,%rsi"
+          ]
+        },
+        {
+          "call": "22468:\tcall   8f10 <memcpy@plt>",
+          "preceding": [
+            "   2244a:\tmov    %r15,%rdi",
+            "   2244d:\tmov    0x560(%rsp),%rbx",
+            "   22455:\tmov    %rbx,%rsi",
+            "   22458:\tcall   8f10 <memcpy@plt>",
+            "   2245d:\tmov    $0xa8,%edx",
+            "   22462:\tmov    %rbx,%rdi",
+            "   22465:\tmov    %r14,%rsi"
+          ]
+        },
+        {
+          "call": "237ed:\tcall   8f10 <memcpy@plt>",
+          "following": [
+            "   237f2:\tmovaps 0x150(%rsp),%xmm0",
+            "   237fa:\tmovaps 0x160(%rsp),%xmm1",
+            "   23802:\tmovaps 0x170(%rsp),%xmm2",
+            "   2380a:\tmovaps 0x180(%rsp),%xmm3",
+            "   23812:\tmovaps %xmm0,0x1090(%rsp)",
+            "   2381a:\tmovaps %xmm1,0x10a0(%rsp)",
+            "   23822:\tmovaps %xmm2,0x10b0(%rsp)",
+            "   2382a:\tmovaps %xmm3,0x10c0(%rsp)",
+            "   23832:\tmovaps 0x190(%rsp),%xmm0",
+            "   2383a:\tmovaps %xmm0,0x10d0(%rsp)",
+            "   23842:\tmovaps 0x1a0(%rsp),%xmm0",
+            "   2384a:\tmovaps %xmm0,0x10e0(%rsp)",
+            "   23852:\tmovaps 0x1b0(%rsp),%xmm0",
+            "   2385a:\tmovaps %xmm0,0x10f0(%rsp)",
+            "   23862:\tmov    0x1c0(%rsp),%rax",
+            "   2386a:\tmov    %rax,0x1100(%rsp)",
+            "   23872:\tlea    0x9f0(%rsp),%rax",
+            "   2387a:\tlea    0x1090(%rsp),%rdi",
+            "   23882:\tcall   1e920 <$s12IlliquidCore19RecognizedMediaNameV8applyingyAcA0D13MetadataHintsVF>",
+            "   23887:\tmov    0x70(%rsp),%rdi",
+            "   2388c:\tcall   8ff0 <swift_release@plt>",
+            "   23891:\tmov    0x10(%rsp),%rdi",
+            "   23896:\tcall   8ff0 <swift_release@plt>",
+            "   2389b:\tmov    %r15,%rdi",
+            "   2389e:\tcall   1a570 <$s12IlliquidCore19RecognizedMediaNameVWOh>",
+            "   238a3:\tmov    0x28(%rsp),%rdi",
+            "   238a8:\tcall   8ff0 <swift_release@plt>",
+            "   238ad:\tmov    0x30(%rsp),%rdi",
+            "   238b2:\tcall   8ff0 <swift_release@plt>",
+            "   238b7:\tmov    0xc0(%rsp),%rdi",
+            "   238bf:\tcall   8ff0 <swift_release@plt>",
+            "   238c4:\tmov    0x18(%rsp),%rdi",
+            "   238c9:\tcall   8ff0 <swift_release@plt>",
+            "   238ce:\tlea    0x5bcb(%rip),%rsi        # 294a0 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgMD>",
+            "   238d5:\tlea    0x1388(%rsp),%rdi"
+          ],
+          "preceding": [
+            "   237c2:\tmovups %xmm0,0x3e0(%rsp)",
+            "   237ca:\tmov    %rax,0x3f0(%rsp)",
+            "   237d2:\tlea    0x16a8(%rsp),%r13",
+            "   237da:\tlea    0x350(%rsp),%r15",
+            "   237e2:\tmov    $0xa8,%edx",
+            "   237e7:\tmov    %r13,%rdi",
+            "   237ea:\tmov    %r15,%rsi"
+          ]
+        }
+      ],
+      "object_allocation_call_sites": [],
+      "plan_helper_call_sites": [
+        "20496:\tcall   1a530 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOg>",
+        "205a9:\tcall   1a640 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOi_>",
+        "205d3:\tcall   1c460 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOcTm>",
+        "206aa:\tcall   1a2e0 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOi0_>",
+        "20c62:\tcall   1a530 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOg>",
+        "20f89:\tcall   1a530 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOg>",
+        "2176c:\tcall   1a530 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOg>",
+        "21c62:\tcall   1a530 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOg>",
+        "22249:\tcall   1a530 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOg>",
+        "22438:\tcall   1a640 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOi_>"
+      ],
+      "plan_symbols": [
+        "0000000000023da8 000000000000004c r $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMF",
+        "0000000000029bb4 0000000000000008 d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMXX",
+        "000000000001c2f0 000000000000000a t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMa",
+        "0000000000028ac0 0000000000000038 d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMf",
+        "0000000000029bd4 000000000000001c d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVMn",
+        "00000000000294a0 0000000000000008 d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgMD",
+        "000000000001c460 000000000000002d t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOcTm",
+        "000000000001a530 0000000000000014 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOg",
+        "000000000001a2e0 000000000000003c t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOi0_",
+        "000000000001a640 0000000000000001 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVSgWOi_",
+        "0000000000028a68 0000000000000058 d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVWV",
+        "000000000001c8d0 0000000000000005 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwCP",
+        "000000000001bfb0 0000000000000169 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwca",
+        "000000000001be80 000000000000012d t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwcp",
+        "000000000001c240 000000000000003d t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwet",
+        "000000000001c280 000000000000006c t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwst",
+        "000000000001c120 0000000000000116 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwta",
+        "000000000001be20 0000000000000056 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLVwxx",
+        "00000000000240ca 0000000000000006 r symbolic _____ 12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLV",
+        "0000000000024028 0000000000000008 r symbolic _____Sg 12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLV"
+      ],
+      "reader_source": {
+        "adaptation": "Darwin import -> Glibc",
+        "compiled_sha256": "fe758137e261f170134ee7942a29379b4824b9e8b21cb438bb2e6db608b4c7c5",
+        "original_sha256": "46f6d62cf6fb6d0d3a0ab5066129e381b8b4fdc0e23480020eb9bdb1ba67abb9"
+      },
+      "recognize_code_bytes": 14323,
+      "recognize_symbol": "00000000000201c0 00000000000037f3 T $s12IlliquidCore18MediaSidecarReaderC9recognize_6within17checkCancellationAA010RecognizedC4NameV20FoundationEssentials3URLV_AKyyKXEtKF",
+      "source_receipt": "/workspace/scratch/3388caa949a3/ancestor-hints-research/linux-full/evidence/candidate-sources.json",
+      "source_receipt_sha256": "e6b39e2be54390fabd0d6ad6271ef1289760d363aaa97d639ca08d30f9abebff",
+      "stack_frame_subtraction_bytes": 5968,
+      "stack_frame_subtraction_hex": "0x1750",
+      "static_instruction_count": 2374
+    },
+    "candidate_b_reference_plan": {
+      "binary": "/workspace/scratch/3388caa949a3/ancestor-hints-research/reference-tests/build/candidate/module/libIlliquidCore.so",
+      "binary_sha256": "d951d354bde708f43e77bf8a0310d121f2d6c60a6fd742f4d475a2bfe7b00fb5",
+      "inspection_commands": [
+        [
+          "objdump",
+          "-d",
+          "--no-show-raw-insn",
+          "--disassemble=$s12IlliquidCore18MediaSidecarReaderC9recognize_6within17checkCancellationAA010RecognizedC4NameV20FoundationEssentials3URLV_AKyyKXEtKF",
+          "/workspace/scratch/3388caa949a3/ancestor-hints-research/reference-tests/build/candidate/module/libIlliquidCore.so"
+        ],
+        [
+          "nm",
+          "-S",
+          "/workspace/scratch/3388caa949a3/ancestor-hints-research/reference-tests/build/candidate/module/libIlliquidCore.so"
+        ]
+      ],
+      "memcpy_call_site_count": 1,
+      "memcpy_call_sites": [
+        {
+          "call": "22f91:\tcall   8ed0 <memcpy@plt>",
+          "following": [
+            "   22f96:\tmovaps 0x150(%rsp),%xmm0",
+            "   22f9e:\tmovaps 0x160(%rsp),%xmm1",
+            "   22fa6:\tmovaps 0x170(%rsp),%xmm2",
+            "   22fae:\tmovaps 0x180(%rsp),%xmm3",
+            "   22fb6:\tmovaps %xmm0,0xe50(%rsp)",
+            "   22fbe:\tmovaps %xmm1,0xe60(%rsp)",
+            "   22fc6:\tmovaps %xmm2,0xe70(%rsp)",
+            "   22fce:\tmovaps %xmm3,0xe80(%rsp)",
+            "   22fd6:\tmovaps 0x190(%rsp),%xmm0",
+            "   22fde:\tmovaps %xmm0,0xe90(%rsp)",
+            "   22fe6:\tmovaps 0x1a0(%rsp),%xmm0",
+            "   22fee:\tmovaps %xmm0,0xea0(%rsp)",
+            "   22ff6:\tmovaps 0x1b0(%rsp),%xmm0",
+            "   22ffe:\tmovaps %xmm0,0xeb0(%rsp)",
+            "   23006:\tmov    0x1c0(%rsp),%rax",
+            "   2300e:\tmov    %rax,0xec0(%rsp)",
+            "   23016:\tlea    0x8a8(%rsp),%rax",
+            "   2301e:\tlea    0xe50(%rsp),%rdi",
+            "   23026:\tcall   1e420 <$s12IlliquidCore19RecognizedMediaNameV8applyingyAcA0D13MetadataHintsVF>",
+            "   2302b:\tmov    0x140(%rsp),%rdi",
+            "   23033:\tcall   8fb0 <swift_release@plt>",
+            "   23038:\tmov    0x68(%rsp),%rdi",
+            "   2303d:\tcall   8fb0 <swift_release@plt>",
+            "   23042:\tmov    %r15,%rdi",
+            "   23045:\tcall   1a550 <$s12IlliquidCore19RecognizedMediaNameVWOh>",
+            "   2304a:\tmov    0xa8(%rsp),%rdi",
+            "   23052:\tcall   8fb0 <swift_release@plt>",
+            "   23057:\tmov    0x20(%rsp),%rdi",
+            "   2305c:\tcall   8fb0 <swift_release@plt>",
+            "   23061:\tmov    0x28(%rsp),%rdi",
+            "   23066:\tcall   8fb0 <swift_release@plt>",
+            "   2306b:\tmov    0x60(%rsp),%rdi",
+            "   23070:\tcall   8fb0 <swift_release@plt>",
+            "   23075:\tmov    0x8(%rsp),%rdi",
+            "   2307a:\tcall   8fb0 <swift_release@plt>"
+          ],
+          "preceding": [
+            "   22f66:\tmovups %xmm0,0x310(%rsp)",
+            "   22f6e:\tmov    %rax,0x320(%rsp)",
+            "   22f76:\tlea    0x13a8(%rsp),%r13",
+            "   22f7e:\tlea    0x280(%rsp),%r15",
+            "   22f86:\tmov    $0xa8,%edx",
+            "   22f8b:\tmov    %r13,%rdi",
+            "   22f8e:\tmov    %r15,%rsi"
+          ]
+        }
+      ],
+      "object_allocation_call_sites": [
+        {
+          "call": "21b5f:\tcall   8ef0 <swift_allocObject@plt>",
+          "preceding": [
+            "   21b31:\tmov    %rax,0x1f0(%rsp)",
+            "   21b39:\tmovzbl 0x2c0(%rsp),%eax",
+            "   21b41:\tmov    %al,0x3(%rsp)",
+            "   21b45:\tmovzbl 0x2a0(%rsp),%r13d",
+            "   21b4e:\tlea    0x6b1b(%rip),%rdi        # 28670 <$s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLCMf+0x18>",
+            "   21b55:\tmov    $0xb8,%esi",
+            "   21b5a:\tmov    $0x7,%edx"
+          ]
+        }
+      ],
+      "plan_helper_call_sites": [],
+      "plan_symbols": [
+        "0000000000023528 000000000000004c r $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLCMF",
+        "0000000000028bd4 0000000000000008 d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLCMXX",
+        "000000000001a620 000000000000000a t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLCMa",
+        "0000000000028658 0000000000000080 d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLCMf",
+        "0000000000028bf4 000000000000003c d $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLCMn",
+        "000000000000c630 0000000000000076 t $s12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLCfD",
+        "000000000002384a 0000000000000006 r symbolic _____ 12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLC",
+        "000000000002383e 0000000000000008 r symbolic _____Sg 12IlliquidCore18MediaSidecarReaderC16AncestorPathPlan33_DB94D38A6C1C56CD58310182184C8DB6LLC"
+      ],
+      "reader_source": {
+        "adaptation": "Darwin import -> Glibc",
+        "compiled_sha256": "25d589bd350d5e77e8ae059388559f053ad7cd62d36d6ceb3820f8b89fcb0f78",
+        "original_sha256": "5d8a4f4fef4ec6c931b24197bd5764aabdf7a4d5f2d0abd5652f94351044a8d2"
+      },
+      "recognize_code_bytes": 13625,
+      "recognize_symbol": "000000000001fc10 0000000000003539 T $s12IlliquidCore18MediaSidecarReaderC9recognize_6within17checkCancellationAA010RecognizedC4NameV20FoundationEssentials3URLV_AKyyKXEtKF",
+      "source_receipt": "/workspace/scratch/3388caa949a3/ancestor-hints-research/reference-tests/evidence/candidate-sources.json",
+      "source_receipt_sha256": "e5024719ffa587afba038326dc09c5b14a6f95f72f72eafe7611569016d16a18",
+      "stack_frame_subtraction_bytes": 5200,
+      "stack_frame_subtraction_hex": "0x1450",
+      "static_instruction_count": 2276
+    }
+  }
+}

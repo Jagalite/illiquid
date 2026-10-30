@@ -26,12 +26,15 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASELINE = "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635"
 VARIANTS = ("baseline", "candidate")
-REGRESSION_TARGET = "c1ef6aff6060ad35decbc6dce0c224164be941a2"
+REGRESSION_TARGET = "d4155469a3b1657396a29f8d8e98a56f64afbf56"
 CURRENT_SUPPORT = {
+    'Sources/CFFmpeg/include/ffmpeg_shim.h': 'ca3ed76b8feff89079d1dca5fc96651923f5f0f4693f0c8fb4625741e15c7c05',
+    'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift': '5d12db66ead5f13fa1e0ab6d61975c9fb259fb1ca460fd4561155041d4beb6b6',
     "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift": "9127a96fee6e66c2b43d37b7354b330040910e836f17a69d2a0feb25a3a6f694",
     "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift": "e376c12e8332bc95894bffb916d578ef314f831161f0d9eb4700b88a0f04f4f5",
     "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift": "cbb61a58255926e1d8239e6c82534ede564712ac1c7fad3c02a18c30fba52993"
 }
+CURRENT_ADDITIONS = {'Sources/IlliquidNativePlayback/Subtitles/SubtitleAcquisitionPacket.swift': 'ac9faae7b4745e24c27dd4e5e88ada9bacfe7a6ebead9439b097d6aba57dafd6'}
 WORKLOADS = [("auxiliary", count) for count in (1, 2, 3)] + [("default", 1)]
 HELPER = ROOT / "Benchmarks/AttachmentAdmission/run.py"
 FOCAL = {"Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
@@ -94,7 +97,7 @@ class Runner:
             "system": self.command(["system_profiler", "SPHardwareDataType", "SPSoftwareDataType"], "system"),
             "protocol": {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()},
             "workloads": WORKLOADS, "allowed_production_differences": sorted(FOCAL),
-            "source_transformations": "None. Complete sources plus unchanged guarded error/PGS declarations.",
+            "source_transformations": "Complete focal sources unchanged. Regression support overrides and additions are explicit; guarded declarations use identical reviewed support in both arms.",
             "sources": self.sources, "binaries": self.binaries, "native_libraries": {},
             "drivers": {},
         }
@@ -181,6 +184,21 @@ class Runner:
                     "path": path,
                     "historical_sha256": self.sources[f"baseline:{path}"]["sha256"],
                     "both_arms_sha256": self.sources[f"candidate:{path}"]["sha256"]})
+        if self.args.current_support_regression:
+            self.receipt["support_additions"] = []
+            for path, digest in CURRENT_ADDITIONS.items():
+                raw = (ROOT / path).read_bytes()
+                if sha(raw) != digest:
+                    raise ValueError(f"Reviewed regression addition changed: {path}")
+                for variant in VARIANTS:
+                    original[variant][path] = raw.decode()
+                    target = self.output / "sources" / variant / path
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_bytes(raw)
+                    self.sources[f"{variant}:{path}"] = {"sha256": sha(raw), "bytes": len(raw),
+                        "origin": "current-support-addition-not-historical"}
+                self.receipt["support_additions"].append({"path": path, "both_arms_sha256": digest,
+                    "historical_origin": None})
         for path in set(shared.FULL_SOURCES + shared.C_SOURCES) - FOCAL:
             if original["baseline"][path] != original["candidate"][path]:
                 raise ValueError(f"Unrelated production dependency changed: {path}")
@@ -228,7 +246,7 @@ class Runner:
             directory = self.output / variant
             directory.mkdir()
             inputs = []
-            for path in shared.FULL_SOURCES:
+            for path in shared.FULL_SOURCES + (list(CURRENT_ADDITIONS) if self.args.current_support_regression else []):
                 target = directory / Path(path).name
                 target.write_text(original[variant][path])
                 inputs.append(target)

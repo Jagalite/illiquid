@@ -2,8 +2,22 @@ name: Video recovery EOF memory
 
 on:
   push:
-    branches: ['perf/video-recovery-eof-release-20261028-2d367']
+    branches: ['perf/video-recovery-eof-release-20261028-2d367', 'perf/video-recovery-eof-lifetime-20261028']
     paths:
+      - 'Sources/IlliquidNativePlayback/Media/**'
+      - 'Sources/IlliquidNativePlayback/Playback/**'
+      - 'Sources/IlliquidNativePlayback/Runtime/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/**'
+      - 'Scripts/install-ci-native-sdk.py'
+      - 'Scripts/verify-corresponding-source.py'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'DependencySources/**'
+      - 'Licenses/corresponding-source-manifest.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh'
       - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
       - 'Tests/IlliquidNativePlaybackTests/VideoRecoveryDecodedOutputLifetimeTests.swift'
       - 'Benchmarks/VideoRecoveryEOFMemory/**'
@@ -12,6 +26,20 @@ on:
       - '!Benchmarks/VideoRecoveryEOFMemory/evidence/**'
   pull_request:
     paths:
+      - 'Sources/IlliquidNativePlayback/Media/**'
+      - 'Sources/IlliquidNativePlayback/Playback/**'
+      - 'Sources/IlliquidNativePlayback/Runtime/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/**'
+      - 'Scripts/install-ci-native-sdk.py'
+      - 'Scripts/verify-corresponding-source.py'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'DependencySources/**'
+      - 'Licenses/corresponding-source-manifest.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh'
       - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
       - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
       - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'

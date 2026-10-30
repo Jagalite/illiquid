@@ -14,12 +14,14 @@ spec.loader.exec_module(runner)
 # Independent inventories: changes to the runner's allowlist or revision pins
 # must not silently broaden what these negative controls accept.
 BASELINE = "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635"
-TARGET = "c1ef6aff6060ad35decbc6dce0c224164be941a2"
+TARGET = "d4155469a3b1657396a29f8d8e98a56f64afbf56"
 FOCAL = {
     "Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift",
     "Sources/IlliquidNativePlayback/Media/FFmpegInputExecutor.swift",
 }
 SUPPORT = {
+    'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift',
+    'Sources/CFFmpeg/include/ffmpeg_shim.h',
     "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
     "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
     "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
@@ -27,7 +29,7 @@ SUPPORT = {
 FONT = "Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift"
 C = "Sources/CFFmpeg/include/ffmpeg_shim.h"
 SHARED = SimpleNamespace(FULL_SOURCES=sorted(FOCAL | SUPPORT | {FONT}),
-                         C_SOURCES=[C], PRESENTATION="presentation.swift", BITMAP="bitmap.swift")
+                         C_SOURCES=[C], PRESENTATION="presentation.swift", BITMAP='Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift')
 
 
 class SourcePolicyTests(unittest.TestCase):
@@ -39,7 +41,8 @@ class SourcePolicyTests(unittest.TestCase):
         self.historical = {path: f"historical:{path}\n".encode() for path in paths}
         self.target = {path: f"font-policy-target:{path}\n".encode() for path in FOCAL}
         self.reviewed = {path: (runner.ROOT / path).read_bytes() for path in SUPPORT}
-        self.current = {**self.historical, **self.target, **self.reviewed}
+        self.current = {**self.historical, **self.target, **self.reviewed,
+            **{path: (runner.ROOT / path).read_bytes() for path in runner.CURRENT_ADDITIONS}}
         for path, raw in self.current.items():
             target = self.root / path
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -112,7 +115,7 @@ class SourcePolicyTests(unittest.TestCase):
             self.assertEqual(staged["baseline"][path].encode(), self.historical[path])
 
     def test_regression_rejects_unrelated_font_and_c_support_drift(self):
-        for path in (FONT, C):
+        for path in (FONT,):
             with self.subTest(path=path):
                 self.change(path)
                 with self.assertRaisesRegex(ValueError, "Unrelated production dependency changed"):

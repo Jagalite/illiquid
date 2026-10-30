@@ -265,3 +265,25 @@ without sample selection or cohort pooling.
 accumulation, and temporary-object cleanup under native Foundation. It is
 **not** a measured whole-player CPU benefit, UI responsiveness/latency,
 cold or network I/O, media decoding, or energy improvement.
+
+## Current-source correctness integration
+
+Pull requests use `--regression-only`. This runs every debug/release test in
+both arms and all independent filesystem oracle workloads before reporting
+parity, then checks binary/source integrity and exits without timing. Test
+skipping and workload subsets are rejected. Completion explicitly reports
+`nativeQualificationSuccess=false`; this does not requalify historical timings.
+
+The scanner baseline remains `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`.
+Only `MediaFileSupport.swift` is shared from reviewed PR head
+`a13019a18e9a05a164b7f724863c98fabfd63ae6` in both arms, checked against the
+SHA-256 pin in `REGRESSION_SUPPORT`. Its bounded lowercase ASCII extension
+fast path preserves the POSIX lowercase fallback. All other dependencies and
+the extracted identity declaration retain the historical equality guard.
+Receipts retain historical hashes, actual staged hashes and support provenance.
+Further support edits require explicit review and pin updates.
+
+Default runs, branch pushes and manual dispatch retain the strict historical
+support guard and original timing criteria. They intentionally reject support
+drift. Run `python3 Scripts/tests/source-presence-traversal-policy-tests.py`
+for noncompiling policy and failure controls. Existing evidence is unchanged.
