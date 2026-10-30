@@ -1,0 +1,84 @@
+name: File identity key performance
+
+on:
+  push:
+    branches: ['perf/file-identity-keys-20261028-a0c3']
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
+      - 'Scripts/test-file-identity-keys.sh'
+      - 'Benchmarks/FileIdentityKeys/*.swift'
+      - 'Benchmarks/FileIdentityKeys/run.py'
+      - 'Benchmarks/FileIdentityKeys/NativeFixtures/**'
+      - 'Benchmarks/FileIdentityKeys/baseline/**'
+      - '.github/workflows/file-identity-keys.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift'
+      - 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift'
+      - 'Sources/IlliquidCore/Playlist/FolderPlaylist.swift'
+      - 'Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift'
+      - 'Scripts/test-file-identity-keys.sh'
+      - 'Benchmarks/FileIdentityKeys/*.swift'
+      - 'Benchmarks/FileIdentityKeys/run.py'
+      - 'Benchmarks/FileIdentityKeys/NativeFixtures/**'
+      - 'Benchmarks/FileIdentityKeys/baseline/**'
+      - '.github/workflows/file-identity-keys.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: file-identity-keys-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Record environment and build coordination
+        run: |
+          echo 'The repository Kyoto queue is unavailable on this isolated hosted runner; builds run directly and serially.'
+          mkdir -p "$RUNNER_TEMP/file-identity"
+          sw_vers > "$RUNNER_TEMP/file-identity/environment.txt"
+          xcrun swiftc --version >> "$RUNNER_TEMP/file-identity/environment.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/file-identity/environment.txt"
+      - name: Test baseline and candidate in debug and release
+        run: |
+          set -o pipefail
+          ILLIQUID_KEY_SOURCE_REVISION=ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+            bash Scripts/test-file-identity-keys.sh --jobs 2 2>&1 | tee "$RUNNER_TEMP/file-identity/tests-baseline.log"
+          bash Scripts/test-file-identity-keys.sh --jobs 2 2>&1 | tee "$RUNNER_TEMP/file-identity/tests-candidate.log"
+      - name: Integrated current support correctness (automatic)
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/FileIdentityKeys/run.py --integrated-current-support \
+            --pairs 12 --target-ms 250 --seed 20261028 --output "$RUNNER_TEMP/file-identity/benchmark"
+      - name: Historical performance (manual; frozen support guard retained)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/FileIdentityKeys/run.py \
+            --pairs 12 --target-ms 250 --output "$RUNNER_TEMP/file-identity/benchmark"
+          cat "$RUNNER_TEMP/file-identity/benchmark/summary.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: file-identity-keys-macos
+          path: |
+            ${{ runner.temp }}/file-identity/**/*.json
+            ${{ runner.temp }}/file-identity/**/*.jsonl
+            ${{ runner.temp }}/file-identity/**/*.log
+            ${{ runner.temp }}/file-identity/**/*.txt
+            ${{ runner.temp }}/file-identity/**/*.swift
+            ${{ runner.temp }}/file-identity/**/*.py
+          retention-days: 14

@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "repository": "Jagalite/illiquid",
+  "measured_commit": "9e03582ca516f068e9df0d6e5ed60719d1b83cd2",
+  "production_baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "parent_pr": {
+    "number": 144,
+    "url": "https://github.com/Jagalite/illiquid/pull/144",
+    "head": "630530f27be150823d4dd4737b15cec947bfd8c9"
+  },
+  "workflow_run": {
+    "id": 40640731654,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40640731654"
+  },
+  "portable_job": {
+    "id": 122658005753,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40640731654/job/122658005753",
+    "conclusion": "success"
+  },
+  "native_job_at_capture": {
+    "id": 122658005894,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40640731654/job/122658005894",
+    "status": "queued",
+    "qualification": "The expanded native suite and companion native timing remain unexecuted."
+  },
+  "capture_utc": "2026-10-28T06:16:33.165507+00:00",
+  "artifact": {
+    "id": 12795747885,
+    "name": "persistence-key-portable-swift-6.2.4",
+    "size_in_bytes": 59312,
+    "sha256": "38349fce47e1385b35a01d2d75a79c7a25bdb157c37397a992b025cb11335ba1",
+    "retained_archive": "artifact.zip",
+    "archive_files": [
+      "benchmark.log",
+      "folder-candidate.log",
+      "folder-baseline.log",
+      "parity-debug.json",
+      "parity-release.json",
+      "results.json",
+      "results.receipts.json.gz",
+      "tests-baseline-debug.log",
+      "tests-baseline-release.log",
+      "tests-candidate-debug.log",
+      "tests-candidate-release.log",
+      "toolchain.txt"
+    ]
+  },
+  "environment": {
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "cpu": "x86_64",
+    "logical_cpu_count": 4,
+    "python": "3.12.3",
+    "swiftc": "/usr/bin/swiftc",
+    "swift": "Swift version 6.2.4 (swift-6.2.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+    "variables": {
+      "LANG": null,
+      "LC_ALL": null,
+      "SWIFT_DETERMINISTIC_HASHING": null
+    }
+  },
+  "container": "swift:6.2.4-noble@sha256:d6f8f6112e9a63da0a4a151d6b93acd16699d35c0b82531ac1a245f5af210197",
+  "regression_log_summaries": {
+    "tests-baseline-debug.log": [
+      [
+        7,
+        1
+      ]
+    ],
+    "tests-baseline-release.log": [
+      [
+        7,
+        1
+      ]
+    ],
+    "tests-candidate-debug.log": [
+      [
+        7,
+        1
+      ]
+    ],
+    "tests-candidate-release.log": [
+      [
+        7,
+        1
+      ]
+    ],
+    "folder-baseline.log": [
+      [
+        13,
+        3
+      ],
+      [
+        13,
+        3
+      ]
+    ],
+    "folder-candidate.log": [
+      [
+        13,
+        3
+      ],
+      [
+        13,
+        3
+      ]
+    ]
+  },
+  "regression_scope": {
+    "tests_per_source_and_configuration": 20,
+    "suites_per_source_and_configuration": 4,
+    "source_variants": [
+      "baseline",
+      "candidate"
+    ],
+    "configurations": [
+      "debug",
+      "release"
+    ],
+    "test_function_executions": 80,
+    "parameterized_arguments": "Additional arguments are recorded in logs; they are not added to these test-function counts."
+  },
+  "audit": "audit.json",
+  "audit_input_sha256": {
+    "results_json": "9e5092a78219d7f0fc7d15f6b2f3a2a45840264562d1eda83e483e0429fe88eb",
+    "compressed_receipts": "1d711c00b3515108d5767f614a9fd66950f42a73219dcccd7caa45b44ba1c506",
+    "uncompressed_receipts": "4df8fea4496d733f9912a4398dd388397af12a40f31beced35abaffac72bb238"
+  }
+}
