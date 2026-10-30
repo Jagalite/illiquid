@@ -1,0 +1,51 @@
+{
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "production_code_unchanged_since": "9df9ad6a655fece4750e011da47c25b37b409938",
+  "attempts": [
+    {
+      "run_id": 40639282337,
+      "commit": "9df9ad6a655fece4750e011da47c25b37b409938",
+      "scope": "native macOS",
+      "outcome": "superseded; no result used in this report",
+      "timing_samples_retained": 0,
+      "note": "Native standalone test dependency extraction was corrected in later commit; no result claimed.",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/40639282337"
+    },
+    {
+      "run_id": 40641730607,
+      "commit": "cd7dff9379e92b0a27a19e3b5d064088ede9bb37",
+      "scope": "Linux exploratory",
+      "outcome": "test compilation failed",
+      "timing_samples_retained": 0,
+      "note": "Standalone existing ASSBitmapCopyTests required the actual CPU frame packer declarations. Both production modules and drivers compiled; exact missing declarations were subsequently extracted from production source.",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/40641730607"
+    },
+    {
+      "run_id": 40642729364,
+      "commit": "da0e6c91ccf18eea17482fe429f067b3bb788078",
+      "scope": "native macOS",
+      "outcome": "superseded; no result used in this report",
+      "timing_samples_retained": 0,
+      "note": "Superseded by the test-declaration correction; active native qualification is run 40643162809.",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/40642729364"
+    },
+    {
+      "run_id": 40642729295,
+      "commit": "da0e6c91ccf18eea17482fe429f067b3bb788078",
+      "scope": "Linux exploratory",
+      "outcome": "test compilation failed",
+      "timing_samples_retained": 0,
+      "note": "New test declarations triggered strict Swift 6.3.3 diagnostics: redundant optional #require and a weak variable declaration. Test declarations corrected; production code and measured driver unchanged.",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/40642729295"
+    },
+    {
+      "run_id": 40643162829,
+      "commit": "2c435e420ad7af88065901ede55d1b46e66029f4",
+      "scope": "Linux exploratory",
+      "outcome": "test receipt parser failed after debug command returned success",
+      "timing_samples_retained": 0,
+      "note": "Debug swift test returned exit code 0; successful subprocess text was only retained in the artifact log. The harness did not accept the test receipt. The parser was expanded to accept optional suite counts and emit receipt lines/diagnostics. No exact test count or timing claimed from this attempt.",
+      "url": "https://github.com/Jagalite/illiquid/actions/runs/40643162829"
+    }
+  ]
+}

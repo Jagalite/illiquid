@@ -1,0 +1,307 @@
+{
+  "adapters": [
+    "CoreGraphics import -> Foundation geometry",
+    "CryptoKit import -> pinned official Swift Crypto",
+    "Testable module import -> separately compiled baseline/candidate target"
+  ],
+  "arguments": {
+    "image_receipt": "/work/libass-position-reuse-image.json",
+    "jobs": 2,
+    "max_sample_ms": 1500.0,
+    "output": "/work/libass-position-reuse-portable",
+    "pairs": 8,
+    "target_ms": 100.0
+  },
+  "arial_font_match": "Liberation Sans|Regular|/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "builds": {
+    "baseline": {
+      "executable_sha256": "abf6e6e86413af11d4a00cd3d8b38e10c35f79fcd12ad95f675364a7fcc7fb3a",
+      "linkage": "\tlinux-vdso.so.1 (0x00007f2ff432e000)\n\tlibass.so.9 => /work/libass-position-reuse-portable/build/libass/lib/libass.so.9 (0x00007f2ff42e6000)\n\tlibswiftCore.so => /usr/lib/swift/linux/libswiftCore.so (0x00007f2ff38ea000)\n\tlibswift_Concurrency.so => /usr/lib/swift/linux/libswift_Concurrency.so (0x00007f2ff4240000)\n\tlibswift_StringProcessing.so => /usr/lib/swift/linux/libswift_StringProcessing.so (0x00007f2ff3831000)\n\tlibswift_RegexParser.so => /usr/lib/swift/linux/libswift_RegexParser.so (0x00007f2ff371b000)\n\tlibswiftSynchronization.so => /usr/lib/swift/linux/libswiftSynchronization.so (0x00007f2ff3709000)\n\tlibswiftGlibc.so => /usr/lib/swift/linux/libswiftGlibc.so (0x00007f2ff36f9000)\n\tlibBlocksRuntime.so => /usr/lib/swift/linux/libBlocksRuntime.so (0x00007f2ff423a000)\n\tlibdispatch.so => /usr/lib/swift/linux/libdispatch.so (0x00007f2ff369a000)\n\tlibswiftDispatch.so => /usr/lib/swift/linux/libswiftDispatch.so (0x00007f2ff3668000)\n\tlibFoundation.so => /usr/lib/swift/linux/libFoundation.so (0x00007f2ff302e000)\n\tlibFoundationEssentials.so => /usr/lib/swift/linux/libFoundationEssentials.so (0x00007f2ff298d000)\n\tlibFoundationInternationalization.so => /usr/lib/swift/linux/libFoundationInternationalization.so (0x00007f2ff27b4000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f2ff26cb000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f2ff244d000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f2ff241f000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2ff220c000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f2ff4330000)\n\tlibfribidi.so.0 => /lib/x86_64-linux-gnu/libfribidi.so.0 (0x00007f2ff21ee000)\n\tlibharfbuzz.so.0 => /lib/x86_64-linux-gnu/libharfbuzz.so.0 (0x00007f2ff20e1000)\n\tlibfontconfig.so.1 => /lib/x86_64-linux-gnu/libfontconfig.so.1 (0x00007f2ff2090000)\n\tlibfreetype.so.6 => /lib/x86_64-linux-gnu/libfreetype.so.6 (0x00007f2ff1fc4000)\n\tlibswift_Builtin_float.so => /usr/lib/swift/linux/libswift_Builtin_float.so (0x00007f2ff1fc0000)\n\tlib_FoundationICU.so => /usr/lib/swift/linux/lib_FoundationICU.so (0x00007f2fefa55000)\n\tlibglib-2.0.so.0 => /lib/x86_64-linux-gnu/libglib-2.0.so.0 (0x00007f2fef90c000)\n\tlibgraphite2.so.3 => /lib/x86_64-linux-gnu/libgraphite2.so.3 (0x00007f2fef8e6000)\n\tlibexpat.so.1 => /lib/x86_64-linux-gnu/libexpat.so.1 (0x00007f2fef8b8000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f2fef89c000)\n\tlibbz2.so.1.0 => /lib/x86_64-linux-gnu/libbz2.so.1.0 (0x00007f2fef886000)\n\tlibpng16.so.16 => /lib/x86_64-linux-gnu/libpng16.so.16 (0x00007f2fef84e000)\n\tlibbrotlidec.so.1 => /lib/x86_64-linux-gnu/libbrotlidec.so.1 (0x00007f2fef840000)\n\tlibpcre2-8.so.0 => /lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x00007f2fef7a6000)\n\tlibbrotlicommon.so.1 => /lib/x86_64-linux-gnu/libbrotlicommon.so.1 (0x00007f2fef783000)\n",
+      "optimization": "SwiftPM release (-O), separate variant module, -enable-testing"
+    },
+    "candidate": {
+      "executable_sha256": "14d34d10dbd5e4c1c2f321a65c2a76fdd3a750a53040bc30ae095a24e21e3a12",
+      "linkage": "\tlinux-vdso.so.1 (0x00007fcf5c61a000)\n\tlibass.so.9 => /work/libass-position-reuse-portable/build/libass/lib/libass.so.9 (0x00007fcf5c5d2000)\n\tlibswiftCore.so => /usr/lib/swift/linux/libswiftCore.so (0x00007fcf5baea000)\n\tlibswift_Concurrency.so => /usr/lib/swift/linux/libswift_Concurrency.so (0x00007fcf5c52c000)\n\tlibswift_StringProcessing.so => /usr/lib/swift/linux/libswift_StringProcessing.so (0x00007fcf5c473000)\n\tlibswift_RegexParser.so => /usr/lib/swift/linux/libswift_RegexParser.so (0x00007fcf5b9d4000)\n\tlibswiftSynchronization.so => /usr/lib/swift/linux/libswiftSynchronization.so (0x00007fcf5c45f000)\n\tlibswiftGlibc.so => /usr/lib/swift/linux/libswiftGlibc.so (0x00007fcf5c44f000)\n\tlibBlocksRuntime.so => /usr/lib/swift/linux/libBlocksRuntime.so (0x00007fcf5c44b000)\n\tlibdispatch.so => /usr/lib/swift/linux/libdispatch.so (0x00007fcf5b975000)\n\tlibswiftDispatch.so => /usr/lib/swift/linux/libswiftDispatch.so (0x00007fcf5b943000)\n\tlibFoundation.so => /usr/lib/swift/linux/libFoundation.so (0x00007fcf5b309000)\n\tlibFoundationEssentials.so => /usr/lib/swift/linux/libFoundationEssentials.so (0x00007fcf5ac68000)\n\tlibFoundationInternationalization.so => /usr/lib/swift/linux/libFoundationInternationalization.so (0x00007fcf5aa8f000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fcf5a9a6000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fcf5a728000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fcf5a6fa000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fcf5a4e7000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fcf5c61c000)\n\tlibfribidi.so.0 => /lib/x86_64-linux-gnu/libfribidi.so.0 (0x00007fcf5a4c9000)\n\tlibharfbuzz.so.0 => /lib/x86_64-linux-gnu/libharfbuzz.so.0 (0x00007fcf5a3bc000)\n\tlibfontconfig.so.1 => /lib/x86_64-linux-gnu/libfontconfig.so.1 (0x00007fcf5a36b000)\n\tlibfreetype.so.6 => /lib/x86_64-linux-gnu/libfreetype.so.6 (0x00007fcf5a29f000)\n\tlibswift_Builtin_float.so => /usr/lib/swift/linux/libswift_Builtin_float.so (0x00007fcf5c43f000)\n\tlib_FoundationICU.so => /usr/lib/swift/linux/lib_FoundationICU.so (0x00007fcf57d34000)\n\tlibglib-2.0.so.0 => /lib/x86_64-linux-gnu/libglib-2.0.so.0 (0x00007fcf57beb000)\n\tlibgraphite2.so.3 => /lib/x86_64-linux-gnu/libgraphite2.so.3 (0x00007fcf57bc5000)\n\tlibexpat.so.1 => /lib/x86_64-linux-gnu/libexpat.so.1 (0x00007fcf57b97000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007fcf57b7b000)\n\tlibbz2.so.1.0 => /lib/x86_64-linux-gnu/libbz2.so.1.0 (0x00007fcf57b67000)\n\tlibpng16.so.16 => /lib/x86_64-linux-gnu/libpng16.so.16 (0x00007fcf57b2f000)\n\tlibbrotlidec.so.1 => /lib/x86_64-linux-gnu/libbrotlidec.so.1 (0x00007fcf57b21000)\n\tlibpcre2-8.so.0 => /lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x00007fcf57a87000)\n\tlibbrotlicommon.so.1 => /lib/x86_64-linux-gnu/libbrotlicommon.so.1 (0x00007fcf57a64000)\n",
+      "optimization": "SwiftPM release (-O), separate variant module, -enable-testing"
+    }
+  },
+  "collected_at_utc": "2026-10-28T06:27:06Z",
+  "driver_sha256": "251e0f86011c1aabc53d4a13ea4f953d1e0715de4c7d034bd5bcd5d3b600c6a5",
+  "fonts_sha256": {
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf": "5c1247acef7f2b8522a31742c76d6adcb5569bacc0be7ceaa4dc39dd252ce895",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf": "3a3c502eeff669a231549e80df9f7c49de109bafe303170409e905d0b31a38fe",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf": "a5251173370e30760e6919711dcd33e149d216ca4814eb74332bda03fcc7e834",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Oblique.ttf": "3d7955616e69721f7edb8e1b7a580f8fbd7d737111c6b54266ddc1d9ef13202f",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf": "c805f9436dbc268644c1d9584f01a601a653e028e08fd74b9b949f6cf8304d88",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf": "847b33e13925f19ff87e4d934d6b3cf7cac35ce16424f6f670e40c2f377cf2df",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf": "8f2c103bfa3fd5de71f1b92b18f21906b5a26871fb7e19a9a4c9af539c3cc7ab",
+    "/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf": "626655e94dd82f3f42549daf995c921b0915fa8ab1f4b839559e8892ea41d240",
+    "/usr/share/fonts/truetype/liberation/LiberationMono-BoldItalic.ttf": "15eb161953e3ecc7fc05a3fec8a59e0f4e0a54a4e375736adf8e98d65981f813",
+    "/usr/share/fonts/truetype/liberation/LiberationMono-Italic.ttf": "a71b2c25c89da05cf0e7c4dbba8d473fdead0b181ae56165217747d2c1f39215",
+    "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf": "395fa5ab8d40c8eba390ced528744ea75a7f69aabf3e68b6f925ca0e39a27370",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-BoldItalic.ttf": "c80fa7f2ffa0e01d4d8dcd6a6d1e43eda665222d1b4db597dde1174c456006cf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf": "830c5fa600505fb4c1a271b4271c53c44bae43f492b2a240d0e98a3a7a380121",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf": "4659bc0c58c5028dd488ec928d41d9265db43d9b669fc14ca8b0832daca7b144",
+    "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf": "9e66c25e20868756bf12eb24a520a4552727c9cd108f577f7ae33e3c0110e39c",
+    "/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf": "379010e87421a883f7bbfa7936d23dfe0257a54ce850819b74556e9f2c615a8a",
+    "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf": "eaeaf7f2b12544ecde64290c1fa7ec403ff70fd58b313637b265400b20249242",
+    "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf": "705903ae1382f0150f115d6f10a30f5b2f3d6ade649c474afe6366c39174fb65"
+  },
+  "git_head": "7e1a0ddf53e3bd1da482d5254794ca93c042de7b",
+  "git_status": "",
+  "hardware": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 57 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               GenuineIntel\nModel name:                              INTEL(R) XEON(R) PLATINUM 8573C\nCPU family:                              6\nModel:                                   207\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                2\nCPU(s) scaling MHz:                      138%\nCPU max MHz:                             2300.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                4600.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch tpr_shadow ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx_vnni avx512_bf16 vnmi avx512vbmi umip waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid cldemote movdiri movdir64b fsrm serialize tsxldtrk ibt amx_bf16 avx512_fp16 amx_tile amx_int8 arch_capabilities\nVirtualization:                          VT-x\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               96 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                4 MiB (2 instances)\nL3 cache:                                260 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Mitigation; Aligned branch/return thunks\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Vulnerable\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Vulnerable\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Retpoline\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected",
+  "header_sha256": {
+    "Sources/CLibass/include/libass_shim.h": "7c878f894048a20fb6dac810f8815ed0903256f8c5015f8d2fe5a8591f028d33",
+    "Sources/CLibass/module.modulemap": "d51f32a1d84fcdcb59cbeedc3279c0d1ba69659026d19a611703856b32cab7cb"
+  },
+  "libass": {
+    "archive": "DependencySources/archives/libass-0.17.5.tar.xz",
+    "archive_sha256": "2dca25c0e0c837ddf00b52011b3f82cac1e4ddd3ad018227806b0c2288864acc",
+    "cflags": "-O2",
+    "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+    "configuration": [
+      "--enable-shared",
+      "--disable-static"
+    ],
+    "dependencies": {
+      "fontconfig": "2.15.0",
+      "freetype2": "26.1.20",
+      "fribidi": "1.0.13",
+      "harfbuzz": "8.3.0"
+    },
+    "header_sha256": "04582aa925d4ed2d1206f21915d382584e8b49c50a6b88419d4112f4f88d24da",
+    "library_sha256": "e85d6ce808b72ad8e9bc93bcfa4735cf90bb49e3b9f4b27fc18d14a29c4e4d9e",
+    "source_manifest_sha256": "23a77d36cb6835ee4dc21d5f2e8fa4687e6fac74efa71b0ba110e41b145c9309",
+    "version": "0.17.5"
+  },
+  "limits": "Linux Foundation geometry, Swift Crypto, x86_64/arm64 Linux font/native stack and compiler may differ from macOS. No Apple renderer, live player, GPU, Instruments or energy qualification.",
+  "machine": "x86_64",
+  "method": "Exact production Swift bodies, same Driver/tests, real libass 0.17.5, real C libass with full-copy reference, same Linux font stack, alternating fresh-process optimized AB/BA pairs; all samples retained.",
+  "native_runner_sha256": "7774c543ed542266ac50d777fa5e8406413268d678f178e8f7d560594c35fd8b",
+  "official_image": "swift:6.3.3-noble",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "portable_runner_sha256": "ae30c42c484c18a407c7d0326345da7abdac167454a98376834bfbf84930fc63",
+  "qualification_scope": "Linux exploratory; not native macOS qualification",
+  "sources": {
+    "baseline": {
+      "adapted_sources": {
+        "ASSBitmapCopy.swift": {
+          "adapted_sha256": "b6096ecd2ec85fdeaaf54d5ed48ffc75343db1486a08b44cd97dfd89257143f4",
+          "import_edits": [],
+          "source_sha256": "b6096ecd2ec85fdeaaf54d5ed48ffc75343db1486a08b44cd97dfd89257143f4"
+        },
+        "ASSSubtitleFramePacker.swift": {
+          "adapted_sha256": "318832a7188ded1f936e5fd2098d69bd4c9e07340c92772c05e333591c1f1e63",
+          "import_edits": [
+            {
+              "from": "import CoreGraphics",
+              "to": "import Foundation"
+            }
+          ],
+          "source_sha256": "515d95a257da1286e4abd1e5d4e5da8003b41906e914bd15ce7939ae3b360819"
+        },
+        "FontAttachmentStore.swift": {
+          "adapted_sha256": "c476f1d3064d61acb727919d2bd29c42a459385a021093275de6cf7f0535cac9",
+          "import_edits": [],
+          "source_sha256": "c476f1d3064d61acb727919d2bd29c42a459385a021093275de6cf7f0535cac9"
+        },
+        "LibassContext.swift": {
+          "adapted_sha256": "d39142dfaee15ecd505b646187cbe16255dfc749e06ee92b780d16b0a9628920",
+          "import_edits": [
+            {
+              "from": "import CoreGraphics",
+              "to": "import Foundation"
+            },
+            {
+              "from": "import CryptoKit",
+              "to": "import Crypto"
+            }
+          ],
+          "source_sha256": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253"
+        },
+        "PresentationError.swift": {
+          "adapted_sha256": "89dfaee8b45aded12bc254a1ec7712abca8771ef5915e9a8af7d67caec571fe2",
+          "import_edits": [],
+          "source_sha256": "89dfaee8b45aded12bc254a1ec7712abca8771ef5915e9a8af7d67caec571fe2"
+        },
+        "SubtitleMemoryBudget.swift": {
+          "adapted_sha256": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+          "import_edits": [],
+          "source_sha256": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+        }
+      },
+      "driver_adapted_sha256": "080e55f6b7f6345b9b2fad8bda1b9896692a5b0737f6cfed46a277ae8c761a16",
+      "driver_import_edits": [
+        {
+          "from": "import CoreGraphics",
+          "to": "import Foundation"
+        },
+        {
+          "from": "import CryptoKit",
+          "to": "import Crypto"
+        },
+        {
+          "from": "@testable import IlliquidNativePlayback",
+          "to": "@testable import IlliquidNativePlaybackBaseline"
+        }
+      ],
+      "driver_source_sha256": "251e0f86011c1aabc53d4a13ea4f953d1e0715de4c7d034bd5bcd5d3b600c6a5",
+      "module": "IlliquidNativePlaybackBaseline",
+      "source_sha256": {
+        "Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift": "3b1d16383cc338da440beac9441704ae4d808f16e70703ea5aede5ca2ff3f4d8",
+        "Sources/IlliquidNativePlayback/Subtitles/ASSBitmapCopy.swift": "b6096ecd2ec85fdeaaf54d5ed48ffc75343db1486a08b44cd97dfd89257143f4",
+        "Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift": "c476f1d3064d61acb727919d2bd29c42a459385a021093275de6cf7f0535cac9",
+        "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "3be516a62eb2b2de2bd0c655f16209379cebc26a541c6b6d618f645fcd316253",
+        "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "923beb9607e4793a306f4e3931e8f2327d801ebbad92bd21d5681ad5a6829c42",
+        "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+        "extracted/ASSSubtitleFramePacker.swift": "515d95a257da1286e4abd1e5d4e5da8003b41906e914bd15ce7939ae3b360819",
+        "extracted/PresentationError.swift": "89dfaee8b45aded12bc254a1ec7712abca8771ef5915e9a8af7d67caec571fe2"
+      },
+      "tests": {
+        "ASSBitmapCopyTests.swift": {
+          "adapted_sha256": "e9ab5c15f7252f9d3e6891ea6f77ef2b2e4fa5b7c97ace20adf0a03b1eecae11",
+          "import_edits": [
+            {
+              "from": "@testable import IlliquidNativePlayback",
+              "to": "@testable import IlliquidNativePlaybackBaseline"
+            }
+          ],
+          "source_sha256": "880c0c63cdd8428cf014e35c32ae658617b60d7515c95d3d807b530268677580"
+        }
+      }
+    },
+    "candidate": {
+      "adapted_sources": {
+        "ASSBitmapCopy.swift": {
+          "adapted_sha256": "b6096ecd2ec85fdeaaf54d5ed48ffc75343db1486a08b44cd97dfd89257143f4",
+          "import_edits": [],
+          "source_sha256": "b6096ecd2ec85fdeaaf54d5ed48ffc75343db1486a08b44cd97dfd89257143f4"
+        },
+        "ASSSubtitleFramePacker.swift": {
+          "adapted_sha256": "318832a7188ded1f936e5fd2098d69bd4c9e07340c92772c05e333591c1f1e63",
+          "import_edits": [
+            {
+              "from": "import CoreGraphics",
+              "to": "import Foundation"
+            }
+          ],
+          "source_sha256": "515d95a257da1286e4abd1e5d4e5da8003b41906e914bd15ce7939ae3b360819"
+        },
+        "FontAttachmentStore.swift": {
+          "adapted_sha256": "c476f1d3064d61acb727919d2bd29c42a459385a021093275de6cf7f0535cac9",
+          "import_edits": [],
+          "source_sha256": "c476f1d3064d61acb727919d2bd29c42a459385a021093275de6cf7f0535cac9"
+        },
+        "LibassContext.swift": {
+          "adapted_sha256": "abf6ef90694c81e882cc92191c85a9a902b133f60c175541ec4e0ca63f8ccc97",
+          "import_edits": [
+            {
+              "from": "import CoreGraphics",
+              "to": "import Foundation"
+            },
+            {
+              "from": "import CryptoKit",
+              "to": "import Crypto"
+            }
+          ],
+          "source_sha256": "3f54f4ef38c30191538aa0edfc4f3ad704d9078ec4edf73ee5a2601e153abdae"
+        },
+        "PresentationError.swift": {
+          "adapted_sha256": "89dfaee8b45aded12bc254a1ec7712abca8771ef5915e9a8af7d67caec571fe2",
+          "import_edits": [],
+          "source_sha256": "89dfaee8b45aded12bc254a1ec7712abca8771ef5915e9a8af7d67caec571fe2"
+        },
+        "SubtitleMemoryBudget.swift": {
+          "adapted_sha256": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+          "import_edits": [],
+          "source_sha256": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac"
+        }
+      },
+      "driver_adapted_sha256": "7673d0240e375e2195037c9dde8c052ad56d2242766b22ea53a4251a107ae2f3",
+      "driver_import_edits": [
+        {
+          "from": "import CoreGraphics",
+          "to": "import Foundation"
+        },
+        {
+          "from": "import CryptoKit",
+          "to": "import Crypto"
+        },
+        {
+          "from": "@testable import IlliquidNativePlayback",
+          "to": "@testable import IlliquidNativePlaybackCandidate"
+        }
+      ],
+      "driver_source_sha256": "251e0f86011c1aabc53d4a13ea4f953d1e0715de4c7d034bd5bcd5d3b600c6a5",
+      "module": "IlliquidNativePlaybackCandidate",
+      "source_sha256": {
+        "Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift": "3b1d16383cc338da440beac9441704ae4d808f16e70703ea5aede5ca2ff3f4d8",
+        "Sources/IlliquidNativePlayback/Subtitles/ASSBitmapCopy.swift": "b6096ecd2ec85fdeaaf54d5ed48ffc75343db1486a08b44cd97dfd89257143f4",
+        "Sources/IlliquidNativePlayback/Subtitles/FontAttachmentStore.swift": "c476f1d3064d61acb727919d2bd29c42a459385a021093275de6cf7f0535cac9",
+        "Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift": "3f54f4ef38c30191538aa0edfc4f3ad704d9078ec4edf73ee5a2601e153abdae",
+        "Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift": "923beb9607e4793a306f4e3931e8f2327d801ebbad92bd21d5681ad5a6829c42",
+        "Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift": "9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac",
+        "extracted/ASSSubtitleFramePacker.swift": "515d95a257da1286e4abd1e5d4e5da8003b41906e914bd15ce7939ae3b360819",
+        "extracted/PresentationError.swift": "89dfaee8b45aded12bc254a1ec7712abca8771ef5915e9a8af7d67caec571fe2"
+      },
+      "tests": {
+        "ASSBitmapCopyTests.swift": {
+          "adapted_sha256": "be806fea4f7b851088a8778db29077d189449fc9271995c85e28821432cabe20",
+          "import_edits": [
+            {
+              "from": "@testable import IlliquidNativePlayback",
+              "to": "@testable import IlliquidNativePlaybackCandidate"
+            }
+          ],
+          "source_sha256": "880c0c63cdd8428cf014e35c32ae658617b60d7515c95d3d807b530268677580"
+        },
+        "LibassPositionReuseTests.swift": {
+          "adapted_sha256": "eca6403d5de3c6d7447e07ef6aeb35b5e664aa178e7f4fa58cd4022dfba768e3",
+          "import_edits": [
+            {
+              "from": "import CoreGraphics",
+              "to": "import Foundation"
+            },
+            {
+              "from": "import CryptoKit",
+              "to": "import Crypto"
+            },
+            {
+              "from": "@testable import IlliquidNativePlayback",
+              "to": "@testable import IlliquidNativePlaybackCandidate"
+            }
+          ],
+          "source_sha256": "693344870f872e380421bf9dc80dcb4f62b1dc0215b86a79a56b9b1ebfd7178e"
+        }
+      }
+    }
+  },
+  "swift": "Swift version 6.3.3 (swift-6.3.3-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "swift_packages": {
+    "originHash": "91e13beb6e304661ac99445cd404d7594ea9339c1c932cce8b452cbaceef3ae8",
+    "pins": [
+      {
+        "identity": "swift-asn1",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-asn1.git",
+        "state": {
+          "revision": "ae33e5941bb88d88538d0a6b19ca0b01e6c76dcf",
+          "version": "1.3.1"
+        }
+      },
+      {
+        "identity": "swift-crypto",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-crypto.git",
+        "state": {
+          "revision": "e8d6eba1fef23ae5b359c46b03f7d94be2f41fed",
+          "version": "3.12.3"
+        }
+      }
+    ],
+    "version": 3
+  }
+}

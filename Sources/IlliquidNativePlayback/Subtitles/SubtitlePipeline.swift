@@ -126,6 +126,7 @@ final class SubtitlePipeline: @unchecked Sendable {
     private var lastOverlayViewport: CGRect?
     private var lastOverlayVideoSize: CGSize?
     private var lastRegions: [ASSRenderedRegion] = []
+    private var lastReusableRender: ASSReusableRenderSnapshot?
     private var bitmapSource = false
     private var forcedBitmapEventsOnly = false
     private var bitmapTimeline = BitmapSubtitleTimeline()
@@ -569,6 +570,7 @@ final class SubtitlePipeline: @unchecked Sendable {
         lastRenderedViewport = viewport
         lastRenderedVideoSize = videoSize
         if bitmapSource {
+            lastReusableRender = nil
             let entry = bitmapTimeline.composition(at: seconds)
             let changed = !hasPriorRegions || geometryChanged || lastBitmapStart != entry?.start
                 || lastBitmapRevision != bitmapTimeline.revision
@@ -588,7 +590,8 @@ final class SubtitlePipeline: @unchecked Sendable {
             at: seconds,
             copyIfUnchanged: !hasPriorRegions || geometryChanged,
             maximumImageCount: Limits.renderedRegionCount,
-            maximumBitmapBytes: Limits.renderedPixelBytes
+            maximumBitmapBytes: Limits.renderedPixelBytes,
+            reusing: lastReusableRender
         )
         if result.resourceLimitExceeded {
             renderCounters.resourceLimitRejections += 1
@@ -613,6 +616,8 @@ final class SubtitlePipeline: @unchecked Sendable {
             )
         }
         guard let renderedRegions = result.regions else {
+            // An unchanged native render still advances the reuse token.
+            lastReusableRender = result.reusableSnapshot
             let cached = lastRegions
             lock.unlock()
             return RenderedFrame(
@@ -621,9 +626,15 @@ final class SubtitlePipeline: @unchecked Sendable {
                 libassChange: result.change
             )
         }
-        let regions = renderedRegions.map {
+        let snapshot = result.reusableSnapshot?.offsetBy(
+            dx: viewport.minX, dy: viewport.minY
+        )
+        let regions = snapshot?.regions ?? renderedRegions.map {
             $0.offsetBy(dx: viewport.minX, dy: viewport.minY)
         }
+        // Both caches share the same array and bitmap storage. No additional
+        // mask owner survives the existing rendered-region cache lifetime.
+        lastReusableRender = snapshot
         lastRegions = regions
         lock.unlock()
         return RenderedFrame(
@@ -942,6 +953,7 @@ final class SubtitlePipeline: @unchecked Sendable {
             presentationAuthorityEnabled = false
             bitmapTimeline.reset()
             lastRegions = []
+            lastReusableRender = nil
             latestMetalSequence &+= 1
             pendingMetalRequest = nil
         }
@@ -1006,6 +1018,7 @@ final class SubtitlePipeline: @unchecked Sendable {
         lastOverlayViewport = nil
         lastOverlayVideoSize = nil
         lastRegions = []
+        lastReusableRender = nil
     }
 
     private static func milliseconds(_ nanoseconds: UInt64) -> String {
