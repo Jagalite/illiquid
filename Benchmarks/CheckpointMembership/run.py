@@ -53,6 +53,14 @@ COMPONENT_TEST_SUITES = (
     "Playlist session record semantics",
 )
 COMPONENT_TEST_COUNTS = (43, 7)
+# Reviewed current tests add one NaturalFilenameOrderingTests declaration.
+# Both variants stage these same tests in both build configurations.
+REGRESSION_COMPONENT_TEST_COUNTS = (44, 7)
+
+
+def component_test_counts(regression_only: bool) -> tuple[int, int]:
+    return REGRESSION_COMPONENT_TEST_COUNTS if regression_only else COMPONENT_TEST_COUNTS
+
 QUICK_CASES = [
     "valid-32-last", "valid-1000-last", "nil-index-1000",
     "no-folder-1000", "remote-1000", "single-valid",
@@ -64,6 +72,18 @@ SESSION_BOUNDARY = (
 
 def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+# Reviewed support bytes from prepared integration tree 4f11661eca2cfb73fa6625fbec1502b53e28bc56
+REGRESSION_SUPPORT_SHA256 = {'Sources/IlliquidCore/Playlist/FolderPlaylist.swift': '8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe', 'Sources/IlliquidCore/Playlist/PlaylistMutation.swift': 'adb8778743e85252e1b432e26541964ca9a2b4bdd706ba59ce1bf677293d27a3', 'Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift': 'c09072130b113b90faa49b17ff95ce8983668734e69dddf6244572f5de80de62', 'Sources/IlliquidCore/Utilities/NormalizedFileURL.swift': '5cd5d029b7a5d8573ac3688676d5ea15117848e10249ed74b1f4df8a9566c18c', 'Sources/IlliquidCore/Player/MediaSource.swift': 'd3e776abaa9bdae73a6a656114eee1bc761ddbea78017a6b710ed22895f6d254', 'Sources/IlliquidCore/Persistence/PlaybackSessionStore.swift': '4318a57a49833f22c3b1181c53694fc31e3a74535ee1644d82bce3134c54228f'}
+
+
+def guard_support(path: str, current: bytes, historical: bytes, regression_only: bool) -> None:
+    if regression_only:
+        if sha(current) != REGRESSION_SUPPORT_SHA256[path]:
+            raise RuntimeError(f"Supporting source differs from reviewed regression pin: {path}")
+    elif current != historical:
+        raise RuntimeError(f"Supporting source changed since the frozen baseline: {path}")
 
 
 def save(path: Path, value: object) -> None:
@@ -169,7 +189,7 @@ class Experiment:
         self.player_sources: dict[str, Path] = {}
         self.binaries: dict[tuple[str, str], Path] = {}
         self.swift_sdk: str | None = None
-        self.manifest: dict = {"baseline": self.baseline, "production_sources": {}, "builds": {}}
+        self.manifest: dict = {"mode": "current-source-regression" if args.regression_only else "historical-performance", "performance_qualified": False, "baseline": self.baseline, "production_sources": {}, "builds": {}}
 
     def command(self, argv: list, label: str, *, timeout: int = 900,
                 compress_stdout: bool = False, combined_output: bool = False) -> bytes:
@@ -258,8 +278,7 @@ class Experiment:
             current = (ROOT / path).read_bytes()
             historical = self.command(["git", "show", f"{self.baseline}:{path}"],
                                       "baseline-support-" + Path(path).stem)
-            if current != historical:
-                raise RuntimeError(f"Supporting source changed since the frozen baseline: {path}")
+            guard_support(path, current, historical, self.args.regression_only)
             compiled = session_api(current) if path.endswith("PlaybackSessionStore.swift") else current
             destination = shared / Path(path).name
             destination.write_bytes(compiled)
@@ -267,7 +286,9 @@ class Experiment:
             if compiled != current:
                 (shared / (Path(path).name + ".full-source")).write_bytes(current)
             self.manifest["production_sources"][path] = {
-                "shared_by_both_variants": True, "matches_baseline": True,
+                "shared_by_both_variants": True, "matches_baseline": current == historical,
+                "historical_sha256": sha(historical),
+                "support_policy": "reviewed-current" if self.args.regression_only else "historical-byte-identical",
                 "full_sha256": sha(current), "compiled_sha256": sha(compiled),
                 "compiled_bytes": len(compiled),
             }
@@ -394,7 +415,7 @@ let package = Package(name: "CheckpointMembershipQualification",
                 # A zero-exit build without executing the selected tests is not
                 # qualification. Swift Testing may put its summary on stderr.
                 receipt = swift_testing_receipt(raw, required_suites=COMPONENT_TEST_SUITES,
-                                                expected_counts=COMPONENT_TEST_COUNTS)
+                                                expected_counts=component_test_counts(self.args.regression_only))
                 test_count, suite_count = receipt["test_count"], receipt["suite_count"]
                 if results and (test_count, suite_count) != (results[0]["test_count"], results[0]["suite_count"]):
                     raise RuntimeError("Different test or suite counts across production variants/configurations")
@@ -546,6 +567,8 @@ def main() -> None:
     parser.add_argument("--target-ms", type=float, default=None)
     parser.add_argument("--quick", action="store_true", help="Smoke cohort: six cases, two pairs, 20 ms target")
     parser.add_argument("--tests-only", action="store_true")
+    parser.add_argument("--regression-only", action="store_true",
+                        help="Use exact reviewed current support for both variants; run all correctness checks without timing")
     args = parser.parse_args()
     if args.pairs is None:
         args.pairs = 2 if args.quick else 8
@@ -554,17 +577,19 @@ def main() -> None:
     if args.pairs < 2 or args.pairs % 2 or not math.isfinite(args.target_ms) or args.target_ms <= 0:
         parser.error("Use an even number of pairs >= 2 and a positive finite target-ms")
     experiment = Experiment(args)
-    completion = {"complete": False, "tests_only": args.tests_only, "quick": args.quick}
+    completion = {"mode": experiment.manifest["mode"], "timings_collected": False, "performance_qualified": False, "complete": False, "tests_only": args.tests_only, "quick": args.quick}
     try:
         experiment.prepare()
         experiment.build()
         experiment.test()
         experiment.validate()
-        if not args.tests_only:
+        if not args.tests_only and not args.regression_only:
             experiment.measure()
+            completion["timings_collected"] = True
         experiment.verify_sources_unchanged()
         completion["complete"] = True
-        print("CHECKPOINT_MEMBERSHIP_QUALIFICATION_PASS", flush=True)
+        print("CHECKPOINT_MEMBERSHIP_REGRESSION_PASS" if args.regression_only else
+              "CHECKPOINT_MEMBERSHIP_QUALIFICATION_PASS", flush=True)
     except BaseException as error:
         completion["error"] = str(error)
         raise

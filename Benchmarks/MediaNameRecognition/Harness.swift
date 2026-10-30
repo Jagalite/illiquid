@@ -144,6 +144,8 @@ private struct ExactRecord: Codable, Equatable, Sendable {
     }
 
 #if DIFFERENTIAL_VERIFY
+    // Serialize the frozen type directly. Constructing today's result type
+    // here would accidentally test today's derived formatting on both sides.
     init(_ value: BaselineRecognizedMediaName) {
         kind = value.kind.rawValue
         title = Array(value.title.utf8)

@@ -116,5 +116,45 @@ class SwiftTestingReceiptTests(unittest.TestCase):
             self.receipt(self.combined.replace('43 tests', '42 tests'))
 
 
+    def test_mode_specific_exact_inventory(self):
+        for regression, expected in ((False, 43), (True, 44)):
+            self.assertEqual(runner.component_test_counts(regression), (expected, 7))
+            for count in (0, 42, 43, 44, 45):
+                for split in (False, True):
+                    text = (self.split.replace('34 tests', f'{count - 9} tests') if split
+                            else self.combined.replace('43 tests', f'{count} tests'))
+                    with self.subTest(regression=regression, count=count, split=split):
+                        if count == expected:
+                            receipt = runner.swift_testing_receipt(text,
+                                required_suites=runner.COMPONENT_TEST_SUITES,
+                                expected_counts=runner.component_test_counts(regression))
+                            self.assertEqual(receipt['test_count'], expected)
+                        else:
+                            with self.assertRaises(ValueError):
+                                runner.swift_testing_receipt(text,
+                                    required_suites=runner.COMPONENT_TEST_SUITES,
+                                    expected_counts=runner.component_test_counts(regression))
+
+    def test_regression_wrong_suite_counts_are_rejected(self):
+        for suites in (0, 6, 8):
+            with self.subTest(suites=suites), self.assertRaises(ValueError):
+                runner.swift_testing_receipt(
+                    self.combined.replace('43 tests', '44 tests').replace('7 suites', f'{suites} suites'),
+                    required_suites=runner.COMPONENT_TEST_SUITES,
+                    expected_counts=runner.component_test_counts(True))
+
+
+class ReviewedSupportTests(unittest.TestCase):
+    def test_exact_reviewed_support_and_mutation_controls(self):
+        for path in runner.CORE_PATHS:
+            current = (runner.ROOT / path).read_bytes()
+            with self.subTest(path=path):
+                runner.guard_support(path, current, b"historical bytes", True)
+                with self.assertRaises(RuntimeError):
+                    runner.guard_support(path, current + b"\n", current, True)
+                with self.assertRaises(RuntimeError):
+                    runner.guard_support(path, current, b"historical bytes", False)
+                runner.guard_support(path, current, current, False)
+
 if __name__ == "__main__":
     unittest.main()

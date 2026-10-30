@@ -69,8 +69,8 @@ jobs:
                      '--output', str(Path(os.environ['RUNNER_TEMP']) / 'checkpoint-membership'),
                      '--baseline-ref', os.environ['CHECKPOINT_BASELINE_REF']]
           # PRs still run every semantic test and complete-record comparison;
-          # the full paired research campaign runs on branch pushes and manually.
-          command += ['--quick'] if os.environ['GITHUB_EVENT_NAME'] == 'pull_request' else ['--pairs', '8', '--target-ms', '100']
+          # historical performance remains an explicit manual campaign.
+          command += ['--pairs', '8', '--target-ms', '100'] if os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch' else ['--regression-only']
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
               cli = [sys.executable, str(queue)]
@@ -141,8 +141,8 @@ jobs:
                      '--output', str(Path(os.environ['RUNNER_TEMP']) / 'checkpoint-membership'),
                      '--baseline-ref', os.environ['CHECKPOINT_BASELINE_REF']]
           # PRs still run every semantic test and complete-record comparison;
-          # the full paired research campaign runs on branch pushes and manually.
-          command += ['--quick'] if os.environ['GITHUB_EVENT_NAME'] == 'pull_request' else ['--pairs', '8', '--target-ms', '100']
+          # historical performance remains an explicit manual campaign.
+          command += ['--pairs', '8', '--target-ms', '100'] if os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch' else ['--regression-only']
           queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
           if queue.is_file():
               cli = [sys.executable, str(queue)]
