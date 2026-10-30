@@ -57,16 +57,16 @@ public enum PlaybackProgressAnalyzer {
     // Reachability is used only to count settled transactions. With no
     // transactions or no settled seeds, that count is already known.
     if !transactionIndices.isEmpty && !canSettle.isEmpty {
-      var predecessors: [Int: [Int]] = [:]
+      var predecessors = Array(repeating: [Int](), count: result.nodes.count)
       for edge in result.graph.edges where edge.isFairProgress {
-        predecessors[edge.to, default: []].append(edge.from)
+        predecessors[edge.to].append(edge.from)
       }
 
       // Visit each reachable vertex once, following fair edges backwards.
       // Cutoff nodes may carry a path even though they are not settled seeds.
       var worklist = Array(canSettle)
       while let destination = worklist.popLast() {
-        for predecessor in predecessors[destination, default: []] {
+        for predecessor in predecessors[destination] {
           if canSettle.insert(predecessor).inserted {
             worklist.append(predecessor)
           }

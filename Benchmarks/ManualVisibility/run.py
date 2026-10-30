@@ -122,6 +122,8 @@ class Study:
         return result.stdout
 
     def source_variants(self, historical):
+        if self.args.tests_only and self.args.cases != CASES:
+            raise ValueError("Current-source regressions require every case and negative control")
         candidate, candidate_records = support.snapshot(lambda path: (ROOT / path).read_bytes())
         self.manifest["mode"] = (
             "current-source-regressions" if self.args.tests_only else "pinned-baseline-performance-study")
@@ -290,6 +292,8 @@ class Study:
         save(self.output / "verification.json", {"passed": True, "observations": records})
 
     def measure(self):
+        if self.args.tests_only:
+            raise ValueError("Current-source regressions cannot produce performance measurements")
         calibrations, summaries = [], []
         for case in self.args.cases:
             for size in self.args.sizes:

@@ -1,0 +1,39 @@
+name: Thumbnail sample planning portable
+
+on:
+  push:
+    branches: [perf/thumbnail-sample-planning-20261028-279e]
+    paths:
+      - Sources/IlliquidCore/Player/ThumbnailPolicy.swift
+      - Tests/IlliquidCoreTests/ThumbnailSamplePlanningTests.swift
+      - Benchmarks/ThumbnailSamplePlanning/**
+      - .github/workflows/thumbnail-sample-planning-portable.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thumbnail-sample-planning-portable-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compare sample planning and run focused regressions
+        run: >-
+          python3 Benchmarks/ThumbnailSamplePlanning/run.py
+          --output "$RUNNER_TEMP/thumbnail-sample-planning"
+          --pairs 10 --target-ms 250
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: thumbnail-sample-planning-linux
+          path: ${{ runner.temp }}/thumbnail-sample-planning/evidence/
+          retention-days: 14

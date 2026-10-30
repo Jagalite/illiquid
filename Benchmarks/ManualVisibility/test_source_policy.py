@@ -32,7 +32,7 @@ def snapshot(matcher, support=b"support", prefix=PREFIX):
 class SourcePolicyTests(unittest.TestCase):
     def study(self, tests_only):
         study = object.__new__(native.Study)
-        study.args = SimpleNamespace(tests_only=tests_only)
+        study.args = SimpleNamespace(tests_only=tests_only, cases=list(native.CASES))
         study.manifest = {"baseline": native.BASELINE, "boundary": {"timed": True}}
         return study
 
@@ -65,6 +65,16 @@ class SourcePolicyTests(unittest.TestCase):
         self.assertEqual(study.manifest["pairs"], 0)
         self.assertIsNone(study.manifest["target_ms"])
         self.assertNotIn("boundary", study.manifest)
+
+    def test_regressions_reject_missing_workloads(self):
+        study = self.study(True)
+        study.args.cases = native.CASES[:-1]
+        with self.assertRaisesRegex(ValueError, "every case and negative control"):
+            study.source_variants(lambda path: b"unused")
+
+    def test_regressions_cannot_measure(self):
+        with self.assertRaisesRegex(ValueError, "cannot produce performance"):
+            self.study(True).measure()
 
     def strict(self, current, baseline):
         study = self.study(False)

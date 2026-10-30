@@ -1,0 +1,100 @@
+{
+  "arguments": {
+    "cases": "all",
+    "cpu": 0,
+    "kernels": "uncached,revision,hit,component_hit",
+    "output": "/tmp/illiquid-palette-final-linux-3e1fe2c135de",
+    "receipts_only": false,
+    "rounds": 6,
+    "swiftc": "swiftc",
+    "target_ms": 100.0,
+    "tests_only": false
+  },
+  "baseline": {
+    "commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+    "path": "Sources/IlliquidApp/UI/PlayerTheme.swift",
+    "scope": "Frozen PlayerTheme before per-style immutable legibility context reuse. Common supporting production files must match this commit.",
+    "sha256": "b912e8c0c6e9c18d49def02aecd18de9d3eb8641b7a80f8e282b41ac7517cdc4"
+  },
+  "binary_sha256": {
+    "IlliquidCore": "6684f5e50571504605b5a2f4a14a9fafd3c3c43693ce6416a3a46c1d1d5b561e",
+    "IlliquidPlayer": "353b104b240f1e7dfb20232fdb28bc2b6785b5a6f1b0e72deca81348644d212e",
+    "baseline": "0b3d69d5c845f6f05d909d35dc99de04d16cb12aac1450f324e9b8e74bec23c3",
+    "candidate": "5f483d1bd7766095c4680641df07d713f0a5fd2b1b38232bab8d3fb2c17fa67c"
+  },
+  "candidate_git_head": "2ef550f27a0ecd37ce7cf2fc34815e14ee8abf07",
+  "candidate_theme_sha256": "65ca29ab4da6d6fb2450fef8c812ce8a8c3d2a034cc2844c1ec91ae0b0d2f3c3",
+  "clocks": {
+    "cpu": "driver process CPU elapsed nanoseconds",
+    "orchestration": "Python time.monotonic",
+    "wall": "driver monotonic elapsed nanoseconds"
+  },
+  "color_implementation": "numeric Linux Color shim",
+  "compiler": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "compiler_flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-enable-testing",
+    "-module-cache-path",
+    "/tmp/illiquid-palette-reuse-1wy0lnmo/swift-module-cache"
+  ],
+  "environment": {
+    "allowed_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "logical_cpu_count": 9,
+    "machine": "x86_64",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "thermal_or_frequency_controlled": false,
+    "timed_cpu_affinity": 0
+  },
+  "scope": "Actual palette colors(), region extraction, caches, legibility and numeric output consumption. Includes revision publication in the revision workload and identical checksum/color resolution overhead. Excludes view rendering, decoding, and sampling.",
+  "shared_support": {
+    "AdaptiveTextLegibility.swift": {
+      "matches_baseline": true,
+      "original": "Sources/IlliquidApp/UI/AdaptiveTextLegibility.swift",
+      "sha256": "bbec0383526b1688c46e2e10bc6929774473d8e43e294134dff7fab77a206359"
+    },
+    "PlaybackVideoColorStore.swift": {
+      "matches_baseline": true,
+      "original": "Sources/IlliquidPlayer/Player/PlaybackVideoColorStore.swift",
+      "sha256": "dd9efc9f3ff0a36712b5a2fffb38db767f37589a82f00624a82638316136780b"
+    },
+    "PlayerOverlayMaterial.swift": {
+      "matches_baseline": true,
+      "original": "Sources/IlliquidApp/UI/PlayerOverlayMaterial.swift",
+      "sha256": "35f7c462542972cfc560da08ba76fc377b363528282cae263d683783464b1f3c"
+    },
+    "VideoColorSample.swift": {
+      "matches_baseline": true,
+      "original": "Sources/IlliquidCore/Player/VideoColorSample.swift",
+      "sha256": "e296cb8ddb45850b8c6356bdec8b6f128e22fe48119bc5c24c6c42f1e32fad06"
+    }
+  },
+  "sources": {
+    "AdaptiveTextLegibility.swift": "bbec0383526b1688c46e2e10bc6929774473d8e43e294134dff7fab77a206359",
+    "Driver.swift": "1bafbe71d61c9abea483da759451172a2d679c0eba1e607623ff65162dffc39b",
+    "LinuxColor.swift": "14badf1e19abea655b8f7ca9f94fc0fa50bb4cb4e200e37723cc5a062a532880",
+    "PlaybackVideoColorStore.swift": "dd9efc9f3ff0a36712b5a2fffb38db767f37589a82f00624a82638316136780b",
+    "PlayerOverlayMaterial.swift": "35f7c462542972cfc560da08ba76fc377b363528282cae263d683783464b1f3c",
+    "VideoColorSample.swift": "e296cb8ddb45850b8c6356bdec8b6f128e22fe48119bc5c24c6c42f1e32fad06",
+    "baseline-PlayerTheme.swift": "b912e8c0c6e9c18d49def02aecd18de9d3eb8641b7a80f8e282b41ac7517cdc4",
+    "baseline-PlayerThemeSupport.swift": "84b9ef394da8b0038c30a1ebfc2455fcc3f35e28b7f3f5e2a9e3025a0ae196cf",
+    "candidate-PlayerTheme.swift": "65ca29ab4da6d6fb2450fef8c812ce8a8c3d2a034cc2844c1ec91ae0b0d2f3c3",
+    "candidate-PlayerThemeSupport.swift": "0e9e2fafe6239267be322f9bf299ecd4ffba9876f4075fac5f00b4000a1c5a43",
+    "run.py": "030c94beac8664eac8b8b73a46a954e387ff312c944bf32b2e17dddb7b6603a2"
+  },
+  "theme_support_outside_palette_unchanged": true
+}
