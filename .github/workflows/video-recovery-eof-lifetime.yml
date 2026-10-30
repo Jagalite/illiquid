@@ -1,0 +1,221 @@
+name: Video recovery EOF lifetime
+
+on:
+  push:
+    branches: ['perf/video-recovery-eof-release-20261028-2d367', 'perf/video-recovery-eof-lifetime-20261028']
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/**'
+      - 'Sources/IlliquidNativePlayback/Playback/**'
+      - 'Sources/IlliquidNativePlayback/Runtime/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/**'
+      - 'Scripts/install-ci-native-sdk.py'
+      - 'Scripts/verify-corresponding-source.py'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'DependencySources/**'
+      - 'Licenses/corresponding-source-manifest.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecovery*LifetimeTests.swift'
+      - 'Benchmarks/VideoRecoveryEOF/Driver.swift'
+      - 'Benchmarks/VideoRecoveryEOF/run.py'
+      - 'Benchmarks/VideoRecoveryEOF/collect-evidence.py'
+      - '.github/workflows/video-recovery-eof-lifetime.yml'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/**'
+      - 'Sources/IlliquidNativePlayback/Playback/**'
+      - 'Sources/IlliquidNativePlayback/Runtime/**'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/**'
+      - 'Scripts/install-ci-native-sdk.py'
+      - 'Scripts/verify-corresponding-source.py'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'DependencySources/**'
+      - 'Licenses/corresponding-source-manifest.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Benchmarks/DeinterlacerEOFMemory/build-linux-ffmpeg.sh'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaSession.swift'
+      - 'Sources/IlliquidNativePlayback/Media/VideoDecoder.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegError.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaTime.swift'
+      - 'Sources/IlliquidNativePlayback/Playback/PacketQueue.swift'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/VideoRecovery*LifetimeTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/PacketOwnershipTests.swift'
+      - 'Benchmarks/VideoRecoveryEOF/**'
+      - '.github/workflows/video-recovery-eof-lifetime.yml'
+      - '!Benchmarks/VideoRecoveryEOF/*.md'
+      - '!Benchmarks/VideoRecoveryEOF/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: video-recovery-eof-lifetime-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-ownership:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install native packet libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends libavcodec-dev libavutil-dev pkg-config
+      - name: Compare actual FFmpeg allocation lifetimes
+        run: |
+          test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          python3 Benchmarks/VideoRecoveryEOF/run.py \
+            --pairs 2 --output "$RUNNER_TEMP/video-recovery-eof/component"
+      - name: Emit reproducible evidence
+        if: always()
+        run: python3 Benchmarks/VideoRecoveryEOF/collect-evidence.py "$RUNNER_TEMP/video-recovery-eof"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-recovery-eof-linux
+          path: |
+            ${{ runner.temp }}/video-recovery-eof/
+            !${{ runner.temp }}/video-recovery-eof/**/build/
+            !${{ runner.temp }}/video-recovery-eof/**/bin/
+            !${{ runner.temp }}/video-recovery-eof/**/module-cache/
+          retention-days: 14
+
+  native-lifetime:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Compare actual FFmpeg allocation lifetimes
+        run: |
+          test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          source Scripts/lib/native-sdk-environment.sh
+          illiquid_select_native_sdk "$PWD"
+          export DYLD_LIBRARY_PATH="$ILLIQUID_NATIVE_LIBRARY_PATH"
+          python3 Benchmarks/VideoRecoveryEOF/run.py \
+            --pairs 2 --output "$RUNNER_TEMP/video-recovery-eof/component"
+      - name: Generate required delayed-output fixture
+        run: |
+          mkdir -p "$RUNNER_TEMP/video-recovery-eof/fixtures"
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i "color=c=red:size=64x64:rate=30" -frames:v 1 \
+            -c:v libx264 -preset veryfast -pix_fmt yuv420p \
+            "$RUNNER_TEMP/video-recovery-eof/fixtures/single-frame-h264.mp4"
+          test -s "$RUNNER_TEMP/video-recovery-eof/fixtures/single-frame-h264.mp4"
+          ffmpeg -hide_banner -nostdin -v error -xerror \
+            -i "$RUNNER_TEMP/video-recovery-eof/fixtures/single-frame-h264.mp4" -f null -
+          shasum -a 256 "$RUNNER_TEMP/video-recovery-eof/fixtures/single-frame-h264.mp4" \
+            > "$RUNNER_TEMP/video-recovery-eof/fixture-sha256.txt"
+      - name: Observe baseline session retention after EOF and seeks
+        env:
+          ILLIQUID_RECOVERY_EOF_FIXTURE: ${{ runner.temp }}/video-recovery-eof/fixtures/single-frame-h264.mp4
+          ILLIQUID_RECOVERY_EOF_EXPECT_RETAINED: '1'
+          ILLIQUID_RECOVERY_EOF_RECEIPT: ${{ runner.temp }}/video-recovery-eof/baseline-session.json
+        run: |
+          test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          set -euo pipefail
+          packet=Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift
+          session=Sources/IlliquidNativePlayback/Media/MediaSession.swift
+          saved="$RUNNER_TEMP/video-recovery-eof/candidate-only-tests"
+          mkdir -p "$saved"
+          # Only these suites call the candidate-only releaseAfterDrain API.
+          candidate_only_tests=(
+            VideoRecoveryPacketLifetimeTests.swift
+            VideoRecoveryGOPSequencingTests.swift
+            VideoRecoveryDecodedOutputLifetimeTests.swift
+          )
+          restore_candidate() {
+            git restore -- "$packet" "$session"
+            for unit in "${candidate_only_tests[@]}"; do
+              test ! -f "$saved/$unit" || mv "$saved/$unit" "Tests/IlliquidNativePlaybackTests/$unit"
+            done
+          }
+          trap restore_candidate EXIT
+          for unit in "${candidate_only_tests[@]}"; do
+            mv "Tests/IlliquidNativePlaybackTests/$unit" "$saved/"
+          done
+          git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:"$packet" > "$packet"
+          git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:"$session" > "$session"
+          mkdir -p "$RUNNER_TEMP/video-recovery-eof/baseline-tests"
+          TMPDIR="$RUNNER_TEMP/video-recovery-eof/baseline-tests" \
+            bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 \
+            --filter 'VideoRecoveryEOFLifetimeTests' \
+            2>&1 | tee "$RUNNER_TEMP/video-recovery-eof/baseline-tests.log"
+          test -s "$ILLIQUID_RECOVERY_EOF_RECEIPT"
+      - name: Qualify candidate packet ownership and actual session EOF
+        env:
+          ILLIQUID_RECOVERY_EOF_FIXTURE: ${{ runner.temp }}/video-recovery-eof/fixtures/single-frame-h264.mp4
+          ILLIQUID_PACKET_OWNERSHIP_FIXTURE: ${{ runner.temp }}/video-recovery-eof/fixtures/single-frame-h264.mp4
+          ILLIQUID_RECOVERY_EOF_RECEIPT: ${{ runner.temp }}/video-recovery-eof/candidate-session.json
+        run: |
+          test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          mkdir -p "$RUNNER_TEMP/video-recovery-eof/candidate-tests"
+          set -o pipefail
+          TMPDIR="$RUNNER_TEMP/video-recovery-eof/candidate-tests" \
+            bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 \
+            --filter 'VideoRecoveryEOFLifetimeTests|VideoRecoveryPacketLifetimeTests|VideoRecoveryGOPSequencingTests|VideoRecoveryDecodedOutputLifetimeTests|PacketOwnershipTests|PlaybackBufferRegressionTests' \
+            2>&1 | tee "$RUNNER_TEMP/video-recovery-eof/candidate-tests.log"
+          test -s "$ILLIQUID_RECOVERY_EOF_RECEIPT"
+          git diff --exit-code
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'video-recovery-eof'
+          before = json.loads((root / 'baseline-session.json').read_text())
+          after = json.loads((root / 'candidate-session.json').read_text())
+          assert before['expectedRetainedPacketsAtEOF'] == 1
+          assert after['expectedRetainedPacketsAtEOF'] == 0
+          assert len(before['phases']) == len(after['phases']) == 3
+          for old, new in zip(before['phases'], after['phases']):
+              assert old['phase'] == new['phase']
+              assert old['queuedVideoItems'] == new['queuedVideoItems'] == 2
+              assert old['prepared'] and new['prepared']
+              assert old['packets']['payloadBytesRead'] == new['packets']['payloadBytesRead'] > 0
+              assert old['packets']['retainedPackets'] == 1
+              assert new['packets']['retainedPackets'] == new['packets']['retainedPayloadBytes'] == 0
+          print('SESSION_EOF_COMPARISON_PASS')
+          PY
+      - name: Emit reproducible evidence
+        if: always()
+        run: python3 Benchmarks/VideoRecoveryEOF/collect-evidence.py "$RUNNER_TEMP/video-recovery-eof"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-recovery-eof-native
+          path: |
+            ${{ runner.temp }}/video-recovery-eof/
+            !${{ runner.temp }}/video-recovery-eof/**/build/
+            !${{ runner.temp }}/video-recovery-eof/**/bin/
+            !${{ runner.temp }}/video-recovery-eof/**/module-cache/
+            !${{ runner.temp }}/video-recovery-eof/fixtures/
+          retention-days: 14

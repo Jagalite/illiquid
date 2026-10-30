@@ -77,6 +77,7 @@ for directory in "${native_directories[@]}"; do
     done
 done
 export PKG_CONFIG_PATH
+pkg-config --exists libass || fail 'pinned SDK libass pkg-config metadata is missing'
 for library in libavcodec.dylib libavformat.dylib libavfilter.dylib libavutil.dylib libswresample.dylib libswscale.dylib libass.dylib; do
     illiquid_pinned_native_library "$library" >/dev/null || fail "pinned SDK is missing $library"
 done

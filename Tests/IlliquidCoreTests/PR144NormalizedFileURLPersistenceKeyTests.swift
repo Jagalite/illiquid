@@ -160,4 +160,3 @@ struct PR144NormalizedFileURLPersistenceKeyTests {
                 "URL: \(url.absoluteString)")
     }
 }
-

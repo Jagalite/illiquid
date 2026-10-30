@@ -1,0 +1,386 @@
+{
+  "complete_output_comparisons": 36,
+  "configurations": [
+    "debug",
+    "release"
+  ],
+  "negative_controls": [
+    {
+      "baseline_exit": 73,
+      "candidate_passed": true,
+      "configuration": "debug",
+      "marker": "EOF_RELEASE_REGRESSION"
+    },
+    {
+      "baseline_exit": 73,
+      "candidate_passed": true,
+      "configuration": "release",
+      "marker": "EOF_RELEASE_REGRESSION"
+    }
+  ],
+  "pairs": 2,
+  "passed": true,
+  "results": [
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 0,
+        "totalBytes": 0
+      },
+      "candidate": {
+        "freedAllocations": 0,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 0,
+        "totalBytes": 0
+      },
+      "configuration": "debug",
+      "output_count": 0,
+      "pairs": 2,
+      "scenario": "empty"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "debug",
+      "output_count": 5,
+      "pairs": 2,
+      "scenario": "small"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 512,
+        "liveBytes": 33587200,
+        "totalAllocations": 512,
+        "totalBytes": 33587200
+      },
+      "candidate": {
+        "freedAllocations": 512,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 512,
+        "totalBytes": 33587200
+      },
+      "configuration": "debug",
+      "output_count": 513,
+      "pairs": 2,
+      "scenario": "budget"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "debug",
+      "output_count": 5,
+      "pairs": 2,
+      "scenario": "repeated-eof"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "debug",
+      "output_count": 10,
+      "pairs": 2,
+      "scenario": "failed-drain"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "debug",
+      "output_count": 10,
+      "pairs": 2,
+      "scenario": "cancelled-drain"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "debug",
+      "output_count": 5,
+      "pairs": 2,
+      "scenario": "stale-eof"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 3,
+        "liveAllocations": 1,
+        "liveBytes": 262208,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "debug",
+      "output_count": 5,
+      "pairs": 2,
+      "scenario": "held-owner"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "debug",
+      "output_count": 8,
+      "pairs": 2,
+      "scenario": "new-generation"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 0,
+        "totalBytes": 0
+      },
+      "candidate": {
+        "freedAllocations": 0,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 0,
+        "totalBytes": 0
+      },
+      "configuration": "release",
+      "output_count": 0,
+      "pairs": 2,
+      "scenario": "empty"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "release",
+      "output_count": 5,
+      "pairs": 2,
+      "scenario": "small"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 512,
+        "liveBytes": 33587200,
+        "totalAllocations": 512,
+        "totalBytes": 33587200
+      },
+      "candidate": {
+        "freedAllocations": 512,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 512,
+        "totalBytes": 33587200
+      },
+      "configuration": "release",
+      "output_count": 513,
+      "pairs": 2,
+      "scenario": "budget"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "release",
+      "output_count": 5,
+      "pairs": 2,
+      "scenario": "repeated-eof"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "release",
+      "output_count": 10,
+      "pairs": 2,
+      "scenario": "failed-drain"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "release",
+      "output_count": 10,
+      "pairs": 2,
+      "scenario": "cancelled-drain"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "release",
+      "output_count": 5,
+      "pairs": 2,
+      "scenario": "stale-eof"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 3,
+        "liveAllocations": 1,
+        "liveBytes": 262208,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "release",
+      "output_count": 5,
+      "pairs": 2,
+      "scenario": "held-owner"
+    },
+    {
+      "baseline": {
+        "freedAllocations": 0,
+        "liveAllocations": 4,
+        "liveBytes": 1048832,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "candidate": {
+        "freedAllocations": 4,
+        "liveAllocations": 0,
+        "liveBytes": 0,
+        "totalAllocations": 4,
+        "totalBytes": 1048832
+      },
+      "configuration": "release",
+      "output_count": 8,
+      "pairs": 2,
+      "scenario": "new-generation"
+    }
+  ],
+  "scenario_count": 9
+}

@@ -123,3 +123,11 @@ python3 Benchmarks/FileIdentityKeys/audit_native.py \
 The supplied source index pins the native qualification commit
 `925940f398ead7206c24c616ea02c448629a8360`. The audit script is prepared; a
 successful native audit is not claimed while that workflow remains queued.
+
+## Consolidated donor test provenance
+
+The executable PR144 test copy adapts the original suite name and removes one
+superfluous terminal blank line for CI whitespace compliance. All seven donor
+tests, assertions, fixtures, and helpers are otherwise unchanged. Original donor
+bytes and the original consolidation mapping remain frozen historical evidence;
+their suite-name-only adaptation description records the earlier import state.

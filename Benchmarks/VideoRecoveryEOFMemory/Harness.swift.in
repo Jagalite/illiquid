@@ -1,0 +1,393 @@
+import CFFmpeg
+import CREcoveryEOFProbe
+import CoreMedia
+import Darwin
+import Foundation
+
+// Decode/presentation are controlled; packet and native buffer ownership are real.
+enum SoftwarePixelBufferPoolError: Error { case cancelled }
+enum ProbeFailure: Error {
+    case contract(String)
+    case missingEOFRelease(String)
+}
+func require(_ condition: @autoclosure () -> Bool, _ message: String) throws {
+    if !condition() { throw ProbeFailure.contract(message) }
+}
+struct MemorySnapshot: Codable, Equatable {
+    let liveBytes: Int64
+    let liveAllocations: Int64
+    let totalBytes: Int64
+    let totalAllocations: Int64
+    let freedAllocations: Int64
+    init(_ probe: UnsafeMutablePointer<REProbe>) {
+        liveBytes = re_probe_live_bytes(probe)
+        liveAllocations = re_probe_live_allocations(probe)
+        totalBytes = re_probe_total_bytes(probe)
+        totalAllocations = re_probe_total_allocations(probe)
+        freedAllocations = re_probe_freed_allocations(probe)
+    }
+}
+final class ObservationLog { var points: [String: MemorySnapshot] = [:] }
+
+// A deliberate independent native consumer, unlike the non-owning counter.
+final class NativePacketLease {
+    private var reference: UnsafeMutablePointer<AVBufferRef>?
+    let payloadCount: Int
+    let expectedByte: UInt8
+    let allocationBytes: Int64
+    init(packet: FFmpegPacket) throws {
+        guard let pointer = packet.pointer, let original = pointer.pointee.buf,
+              let copy = av_buffer_ref(original)
+        else { throw ProbeFailure.contract("Unable to retain native packet buffer") }
+        reference = copy
+        payloadCount = packet.byteCount
+        expectedByte = pointer.pointee.data[0]
+        allocationBytes = Int64(original.pointee.size)
+    }
+    deinit { av_buffer_unref(&reference) }
+    func payloadIsIntact() -> Bool {
+        guard let reference, payloadCount > 0 else { return false }
+        let bytes = reference.pointee.data!
+        for index in 0..<payloadCount where bytes[index] != expectedByte { return false }
+        return true
+    }
+}
+struct FrameReceipt: Codable, Equatable {
+    let generation: Int
+    let presentationTimestamp: Int64
+    let kind: String
+    let signature: [UInt8]
+}
+struct NativeDecodedVideoFrame {
+    let generation: Int
+    let receipt: FrameReceipt
+    let independentOwner: NativePacketLease?
+}
+enum VideoFrameQueueItem {
+    case frame(NativeDecodedVideoFrame)
+    case endOfStream(generation: Int)
+}
+
+// Clear consumed slots so the fixture itself does not keep packets alive.
+final class ScriptedPacketQueue {
+    private var items: [PacketQueueItem?] = []
+    private var cursor = 0
+    func append(_ item: PacketQueueItem) { items.append(item) }
+    func pop() -> BoundedQueueResult<PacketQueueItem> {
+        guard cursor < items.count else { return .closed }
+        let item = items[cursor]!
+        items[cursor] = nil
+        cursor += 1
+        return .value(item)
+    }
+    func removeAll() { items.removeAll(); cursor = 0 }
+}
+final class RecordingVideoQueue {
+    private(set) var retainedFrames: [NativeDecodedVideoFrame] = []
+    private(set) var receipts: [FrameReceipt] = []
+    private(set) var endOfStreamGenerations: [Int] = []
+    var onEndOfStream: ((Int) -> Void)?
+    @discardableResult
+    func push(_ item: VideoFrameQueueItem) -> Bool {
+        switch item {
+        case .frame(let frame):
+            retainedFrames.append(frame)
+            receipts.append(frame.receipt)
+        case .endOfStream(let generation):
+            endOfStreamGenerations.append(generation)
+            onEndOfStream?(endOfStreamGenerations.count)
+        }
+        return true
+    }
+    func independentOwnersAreIntact() -> Bool {
+        retainedFrames.allSatisfy { $0.independentOwner?.payloadIsIntact() ?? true }
+    }
+    func independentOwnerCount() -> Int {
+        retainedFrames.reduce(0) { $0 + ($1.independentOwner == nil ? 0 : 1) }
+    }
+    func releaseFrames() { retainedFrames.removeAll() }
+}
+final class VideoDecoder {
+    enum DrainMode { case succeeds, failsAfterOutput, cancelsAfterOutput }
+    var hardwareWasConfigured = false
+    var seekOutputFloor: (generation: Int, seconds: Double)?
+    var drainMode = DrainMode.succeeds
+    var sharePacketTimestamp: Int64?
+    private(set) var sharedAllocationBytes: Int64 = 0
+    private(set) var flushCount = 0
+    private(set) var drainAttempts = 0
+    var observeDrain: ((String) -> Void)?
+    private var lastPacketTimestamp: Int64?
+    private var hasDrained = false
+    func flush() {
+        flushCount += 1
+        lastPacketTimestamp = nil
+        hasDrained = false
+        seekOutputFloor = nil
+    }
+    func decode(
+        _ packet: FFmpegPacket,
+        while shouldContinue: () -> Bool,
+        reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)? = nil,
+        emit: (NativeDecodedVideoFrame) throws -> Void
+    ) throws {
+        guard shouldContinue() else { throw SoftwarePixelBufferPoolError.cancelled }
+        guard let pointer = packet.pointer, let bytes = pointer.pointee.data, packet.byteCount > 0
+        else { throw ProbeFailure.contract("Invalid controlled input packet") }
+        let signature = Array(UnsafeBufferPointer(start: bytes, count: min(packet.byteCount, 32)))
+        let lease: NativePacketLease?
+        if sharePacketTimestamp == packet.presentationTimestamp {
+            lease = try NativePacketLease(packet: packet)
+            sharedAllocationBytes = lease!.allocationBytes
+        } else { lease = nil }
+        lastPacketTimestamp = packet.presentationTimestamp
+        hasDrained = false
+        try emit(NativeDecodedVideoFrame(generation: packet.generation,
+            receipt: FrameReceipt(generation: packet.generation,
+                presentationTimestamp: packet.presentationTimestamp, kind: "packet", signature: signature),
+            independentOwner: lease))
+    }
+    func drain(
+        generation: Int,
+        while shouldContinue: () -> Bool,
+        reserveSoftwareOutput: (() -> VideoFrameCapacityPermit?)? = nil,
+        emit: (NativeDecodedVideoFrame) throws -> Void
+    ) throws {
+        drainAttempts += 1
+        observeDrain?("drain-entry-\(drainAttempts)")
+        guard shouldContinue() else { throw SoftwarePixelBufferPoolError.cancelled }
+        // Even partially productive drains must preserve replay if they throw.
+        if !hasDrained, let timestamp = lastPacketTimestamp {
+            try emit(NativeDecodedVideoFrame(generation: generation,
+                receipt: FrameReceipt(generation: generation, presentationTimestamp: timestamp + 1,
+                    kind: "drain", signature: [0xD0, 0x0D]), independentOwner: nil))
+        }
+        observeDrain?("drain-after-output-\(drainAttempts)")
+        switch drainMode {
+        case .failsAfterOutput: throw ProbeFailure.contract("injected drain error")
+        case .cancelsAfterOutput: throw SoftwarePixelBufferPoolError.cancelled
+        case .succeeds: break
+        }
+        guard shouldContinue() else { throw SoftwarePixelBufferPoolError.cancelled }
+        hasDrained = true
+        observeDrain?("drain-before-return-\(drainAttempts)")
+    }
+}
+struct ProbeMetrics {
+    var temporaryDecodedVideoFrames = 0
+    var peakTemporaryDecodedVideoFrames = 0
+}
+final class MediaSession {
+    let videoDecoder: VideoDecoder? = VideoDecoder()
+    let generation = PlaybackGeneration()
+    let videoPackets = ScriptedPacketQueue()
+    let videoFrames = RecordingVideoQueue()
+    let videoRecoveryPackets = VideoRecoveryPacketBuffer()
+    let stateLock = NSLock()
+    let videoPipelineCapacityGate: VideoFrameCapacityGate? = nil
+    var isRunning = true
+    var videoSeekFloor: (generation: Int, seconds: Double)?
+    var pendingVideoRecoveryReplay: [FFmpegPacket] = []
+    var consecutiveHardwareDecodeFailures = 0
+    var metrics = ProbeMetrics()
+    private(set) var stalePackets = 0
+    private(set) var failureCount = 0
+    private(set) var diagnosticsCount = 0
+    func runScript() { videoDecodeLoop() }
+    func prepareReplay() throws -> Int {
+        pendingVideoRecoveryReplay = videoRecoveryPackets.takeReplayPackets(generation: generation.current)
+        try require(pendingVideoRecoveryReplay.first?.isKeyframe == true, "Drain lost the replay keyframe")
+        return pendingVideoRecoveryReplay.count
+    }
+    func cleanup() {
+        isRunning = false
+        videoPackets.removeAll()
+        pendingVideoRecoveryReplay.removeAll()
+        videoRecoveryPackets.reset()
+        videoFrames.releaseFrames()
+        videoFrames.onEndOfStream = nil
+        videoDecoder?.observeDrain = nil
+    }
+    private func incrementStalePacket() { stalePackets += 1 }
+    private func accepts(_ frame: NativeDecodedVideoFrame) -> Bool {
+        isRunning && generation.accepts(frame.generation)
+    }
+    private func pushVideoFrame(_ frame: NativeDecodedVideoFrame) -> Bool { videoFrames.push(.frame(frame)) }
+    private func recordVideoDecodeDiagnostics(_ decoder: VideoDecoder) { diagnosticsCount += 1 }
+    private func reportVideoDecodeFailure(_ error: Error, decoder: VideoDecoder) { failureCount += 1 }
+
+    // __PRODUCTION_METHODS__
+}
+
+func makePacket(probe: UnsafeMutablePointer<REProbe>, bytes count: Int,
+                ordinal: Int, generation: Int, keyframe: Bool) throws -> FFmpegPacket {
+    var source = av_packet_alloc()
+    guard let pointer = source else { throw ProbeFailure.contract("av_packet_alloc failed") }
+    defer { av_packet_free(&source) }
+    try require(av_new_packet(pointer, Int32(count)) == 0, "av_new_packet failed")
+    pointer.pointee.data.initialize(repeating: UInt8(truncatingIfNeeded: ordinal + generation * 17), count: count)
+    pointer.pointee.pts = Int64(ordinal * 2)
+    pointer.pointee.dts = Int64(ordinal * 2)
+    pointer.pointee.duration = 2
+    pointer.pointee.stream_index = 0
+    pointer.pointee.flags = keyframe ? AV_PKT_FLAG_KEY : 0
+    try require(re_probe_tag_packet(probe, pointer) == 0, "Unable to tag newly allocated native packet")
+    return try FFmpegPacket(taking: &source, timeBase: AVRational(num: 1, den: 1000), generation: generation)
+}
+func feedGOP(into session: MediaSession, probe: UnsafeMutablePointer<REProbe>,
+             count: Int, packetBytes: Int, generation: Int) throws {
+    for ordinal in 0..<count {
+        session.videoPackets.append(.packet(try makePacket(probe: probe, bytes: packetBytes,
+            ordinal: ordinal, generation: generation, keyframe: ordinal == 0)))
+    }
+}
+struct Report: Codable {
+    let implementation: String
+    let scenario: String
+    let ffmpegVersion: String
+    let observations: [String: MemorySnapshot]
+    let output: [FrameReceipt]
+    let endOfStreamGenerations: [Int]
+    let stalePackets: Int
+    let reportedFailures: Int
+    let replayCount: Int?
+    let decoderFlushes: Int
+    let independentOwnersSurvived: Bool
+    let allAllocationsFreedAtCleanup: Bool
+}
+#if BASELINE
+let implementation = "baseline"
+#else
+let implementation = "candidate"
+#endif
+
+func checkSuccessfulEOF(_ observation: MemorySnapshot, baselineBytes: Int64,
+                        baselineAllocations: Int64, heldBytes: Int64, heldAllocations: Int64,
+                        requireRelease: Bool) throws {
+    if implementation == "candidate" || requireRelease {
+        guard observation.liveBytes == heldBytes, observation.liveAllocations == heldAllocations else {
+            throw ProbeFailure.missingEOFRelease(
+                "EOF_RELEASE_REGRESSION: expected \(heldAllocations) allocations / \(heldBytes) bytes, "
+                + "found \(observation.liveAllocations) / \(observation.liveBytes)")
+        }
+    } else {
+        try require(observation.liveBytes == baselineBytes && observation.liveAllocations == baselineAllocations,
+                    "Baseline did not reproduce the retained GOP")
+    }
+}
+func runScenario(_ scenario: String, requireRelease: Bool) throws -> Report {
+    let supported = ["empty", "small", "budget", "repeated-eof", "failed-drain",
+                     "cancelled-drain", "stale-eof", "held-owner", "new-generation"]
+    try require(supported.contains(scenario), "Unknown scenario \(scenario)")
+    guard let probe = re_probe_create() else { throw ProbeFailure.contract("Unable to create allocation counter") }
+    let session = MediaSession(), log = ObservationLog()
+    defer { session.cleanup(); re_probe_destroy(probe) }
+    let decoder = session.videoDecoder!
+    decoder.observeDrain = { log.points[$0] = MemorySnapshot(probe) }
+    session.videoFrames.onEndOfStream = { log.points["eos-enqueue-\($0)"] = MemorySnapshot(probe) }
+    let packetCount = scenario == "empty" ? 0 : (scenario == "budget" ? 512 : 4)
+    let packetBytes = scenario == "budget" ? 65_536 : 262_144
+    let active = session.generation.current
+    if scenario == "failed-drain" { decoder.drainMode = .failsAfterOutput }
+    else if scenario == "cancelled-drain" { decoder.drainMode = .cancelsAfterOutput }
+    else if scenario == "held-owner" { decoder.sharePacketTimestamp = Int64((packetCount - 1) * 2) }
+    try feedGOP(into: session, probe: probe, count: packetCount, packetBytes: packetBytes, generation: active)
+    session.videoPackets.append(.endOfStream(generation: scenario == "stale-eof" ? active - 1 : active))
+    if scenario == "repeated-eof" { session.videoPackets.append(.endOfStream(generation: active)) }
+    let original = MemorySnapshot(probe)
+    log.points["before-run"] = original
+    session.runScript()
+    log.points["after-first-run"] = MemorySnapshot(probe)
+    try require(session.metrics.temporaryDecodedVideoFrames == 0, "Temporary-output diagnostics did not unwind")
+
+    var replayCount: Int?
+    if scenario == "failed-drain" || scenario == "cancelled-drain" {
+        let failed = MemorySnapshot(probe)
+        try require(failed.liveBytes == original.totalBytes && failed.liveAllocations == Int64(packetCount),
+                    "Throwing drain discarded its recovery GOP")
+        try require(session.videoFrames.endOfStreamGenerations.isEmpty, "Throwing drain enqueued EOS")
+        try require(session.failureCount == (scenario == "failed-drain" ? 1 : 0), "Failure classification changed")
+        try require(session.videoFrames.receipts.last?.kind == "drain", "Failure control did not emit partial output")
+        replayCount = try session.prepareReplay()
+        try require(replayCount == packetCount, "Replay packet count changed")
+        log.points["after-taking-replay"] = MemorySnapshot(probe)
+        decoder.drainMode = .succeeds
+        session.videoPackets.append(.endOfStream(generation: active))
+        session.runScript()
+        log.points["after-replay-completion"] = MemorySnapshot(probe)
+    } else if scenario == "stale-eof" {
+        try require(session.stalePackets == 1 && decoder.drainAttempts == 0, "Stale EOF was not rejected")
+        try require(session.videoFrames.endOfStreamGenerations.isEmpty, "Stale EOF reached output queue")
+        let retained = MemorySnapshot(probe)
+        try require(retained.liveBytes == original.totalBytes && retained.liveAllocations == Int64(packetCount),
+                    "Stale EOF changed current-generation ownership")
+        session.videoPackets.append(.endOfStream(generation: active))
+        session.runScript()
+        log.points["after-valid-eof"] = MemorySnapshot(probe)
+    }
+    let heldAllocations: Int64 = scenario == "held-owner" ? 1 : 0
+    let heldBytes = scenario == "held-owner" ? decoder.sharedAllocationBytes : 0
+    try require(session.videoFrames.endOfStreamGenerations.count == (scenario == "repeated-eof" ? 2 : 1),
+                "Unexpected EOF count")
+    guard let firstEOF = log.points["eos-enqueue-1"] else { throw ProbeFailure.contract("No successful EOF observed") }
+    for observation in [firstEOF, MemorySnapshot(probe)] {
+        try checkSuccessfulEOF(observation, baselineBytes: original.totalBytes,
+            baselineAllocations: Int64(packetCount), heldBytes: heldBytes,
+            heldAllocations: heldAllocations, requireRelease: requireRelease)
+    }
+    let ownersSurvived = session.videoFrames.independentOwnersAreIntact()
+    try require(ownersSurvived, "A surviving native owner lost its bytes")
+    if scenario == "held-owner" {
+        try require(session.videoFrames.independentOwnerCount() == 1, "Held-owner control did not retain one buffer")
+        session.videoFrames.releaseFrames()
+        log.points["after-consumer-release"] = MemorySnapshot(probe)
+        try checkSuccessfulEOF(MemorySnapshot(probe), baselineBytes: original.totalBytes,
+            baselineAllocations: Int64(packetCount), heldBytes: 0, heldAllocations: 0, requireRelease: requireRelease)
+    }
+    if scenario == "new-generation" {
+        let next = session.generation.advance()
+        session.videoRecoveryPackets.reset(generation: next)
+        log.points["after-seek-reset"] = MemorySnapshot(probe)
+        try require(MemorySnapshot(probe).liveAllocations == 0, "Seek did not release completed generation")
+        session.videoPackets.append(.flush(generation: next))
+        let beforeNew = MemorySnapshot(probe)
+        try feedGOP(into: session, probe: probe, count: 2, packetBytes: packetBytes, generation: next)
+        let newBytes = MemorySnapshot(probe).totalBytes - beforeNew.totalBytes
+        session.videoPackets.append(.endOfStream(generation: next))
+        session.runScript()
+        log.points["after-new-generation-eof"] = MemorySnapshot(probe)
+        try require(session.videoFrames.endOfStreamGenerations == [active, next], "New-generation EOF order changed")
+        try require(decoder.flushCount == 1, "New generation did not exercise flush")
+        try checkSuccessfulEOF(MemorySnapshot(probe), baselineBytes: newBytes, baselineAllocations: 2,
+            heldBytes: 0, heldAllocations: 0, requireRelease: requireRelease)
+    }
+    let receipts = session.videoFrames.receipts, eofs = session.videoFrames.endOfStreamGenerations
+    let stale = session.stalePackets, failures = session.failureCount, flushes = decoder.flushCount
+    session.cleanup()
+    let cleaned = MemorySnapshot(probe)
+    log.points["after-cleanup"] = cleaned
+    let freed = cleaned.liveBytes == 0 && cleaned.liveAllocations == 0
+        && cleaned.freedAllocations == cleaned.totalAllocations
+    try require(freed, "Cleanup leaked or double-counted a native allocation")
+    return Report(implementation: implementation, scenario: scenario, ffmpegVersion: String(cString: av_version_info()),
+        observations: log.points, output: receipts, endOfStreamGenerations: eofs, stalePackets: stale,
+        reportedFailures: failures, replayCount: replayCount, decoderFlushes: flushes,
+        independentOwnersSurvived: ownersSurvived, allAllocationsFreedAtCleanup: freed)
+}
+@main
+enum Main {
+    static func main() {
+        do {
+            try require(CommandLine.arguments.count >= 2, "Expected scenario")
+            let report = try runScenario(CommandLine.arguments[1],
+                requireRelease: CommandLine.arguments.contains("--require-eof-release"))
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.sortedKeys]
+            print(String(decoding: try encoder.encode(report), as: UTF8.self))
+        } catch ProbeFailure.missingEOFRelease(let message) {
+            FileHandle.standardError.write(Data((message + "\n").utf8)); exit(73)
+        } catch {
+            FileHandle.standardError.write(Data(("HARNESS_FAILURE: \(error)\n").utf8)); exit(1)
+        }
+    }
+}
