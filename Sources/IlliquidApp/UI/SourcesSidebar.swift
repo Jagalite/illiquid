@@ -2246,6 +2246,11 @@ struct SourceVisibilityMatcher {
     }
 
     private func matchingRootPath(for normalizedPath: String) -> RootPath? {
+        // Single-root containment uses the same prepared fields as the ordered scan.
+        if rootPaths.count == 1 {
+            let root = rootPaths[0]
+            return normalizedPath == root.path || normalizedPath.hasPrefix(root.descendantPrefix) ? root : nil
+        }
         var result: RootPath?
         var longestCount = -1
         // Keep the first longest match, as filter(...).max(by:) did. Prefixes
