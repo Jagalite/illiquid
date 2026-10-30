@@ -248,3 +248,21 @@ The original component artifact is `12223040559` from run `39322698431`,
 SHA-256 `ba01282f79eb4f6b0da60a14d6195019a654ba18fc6e21ad6beb9a0ed5261f6e`.
 The permanent archive preserves its research records beyond Actions artifact
 retention.
+
+### Current-source regression integration
+
+Automated push/PR runs use `--current-source-regression`. Default CLI and
+`workflow_dispatch` retain the strict historical supporting-source equality guard.
+The opt-in mode substitutes only the reviewed current `ThumbnailPolicy.swift`,
+`MediaPlaybackSettings.swift`, and `NativeThumbnailCache.swift` support files in
+both variants. Every other support file must still match its pinned revision.
+`NativeThumbnailDiskCache.swift` remains byte-for-byte from the pinned baseline
+for the reference and from the working tree for the candidate. This is an
+independent disk-cache reference with current support, not a recreation of the
+historical executable. `source-policy.json` records the adaptation and both hashes;
+original changed support bytes are retained under `sources/historical/`.
+
+This mode requires `--verify-only` and retains all nine full-survivor oracle
+workloads and baseline/candidate output parity. It emits no timing summary or
+performance claim. Existing historical evidence and the default measurement
+protocol are unchanged. The independent read-allocation workflow remains intact.

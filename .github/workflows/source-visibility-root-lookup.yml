@@ -1,0 +1,213 @@
+name: Source visibility root lookup performance
+
+on:
+  push:
+    branches: ['perf/source-visibility-root-lookup-20261028']
+    paths:
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
+      - 'Tests/IlliquidAppTests/SourceVisibilityRootLookupTests.swift'
+      - 'Benchmarks/SourceVisibilityRootLookup/**'
+      - '.github/workflows/source-visibility-root-lookup.yml'
+      - '!Benchmarks/SourceVisibilityRootLookup/README.md'
+      - '!Benchmarks/SourceVisibilityRootLookup/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-visibility-root-lookup-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  linux-component:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.2-noble@sha256:c4336909a71b2e69b884f4078cdf98c0cd081911632cb349ef72abc4cbed69fc
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare Python and verify the version-pinned official Swift container
+        run: |
+          apt-get update
+          apt-get install --no-install-recommends -y python3
+          swift --version
+          swift --version | grep -F 'Swift version 6.3.2'
+      - name: Qualify outputs (push current-source correctness; manual strict performance)
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through its shared default queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated component packages.'
+          python3 Benchmarks/SourceVisibilityRootLookup/run.py \
+            --output "$RUNNER_TEMP/source-visibility-root-lookup" \
+            ${{ github.event_name == 'workflow_dispatch' && '--pairs 10 --target-ms 350' || '--current-source-correctness' }}
+      - name: Emit numeric evidence and source receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-visibility-root-lookup'
+          names = ['baseline-pin.json', 'manifest.json', 'tests.json', 'parity.json',
+                   'cases.json', 'source-verification.json', 'completion.json', 'schedule.json',
+                   'calibration.jsonl', 'measurements.jsonl', 'summary.json', 'commands.jsonl']
+          files = {name: (root / name).read_text() for name in names if (root / name).is_file()}
+          if 'summary.json' in files:
+              summary = json.loads(files['summary.json'])
+              print('VISIBILITY_ROOT_LOOKUP_SUMMARY ' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
+              lines = ['## Source visibility root lookup', '',
+                       'Complete cold projections include matcher construction. Lookup batches and setup controls have their declared operation units. Linux component evidence does not qualify native macOS performance.', '',
+                       '| Case | Baseline ms/operation | Candidate ms/operation | Paired wall reduction | Paired CPU reduction | CPU faster pairs | CPU change µs/operation |',
+                       '| --- | ---: | ---: | ---: | ---: | ---: | ---: |']
+              for case in summary['cases']:
+                  wall = case['metrics']['elapsed_ns']
+                  cpu = case['metrics']['cpu_ns']
+                  lines.append(f"| {case['case']} | {wall['median_ns_per_operation']['baseline'] / 1e6:.4f} | "
+                               f"{wall['median_ns_per_operation']['candidate'] / 1e6:.4f} | "
+                               f"{wall['median_paired_reduction_percent']:.2f}% | {cpu['median_paired_reduction_percent']:.2f}% | "
+                               f"{cpu['improved_pairs']}/{case['pairs']} | {cpu['median_paired_increase_ns_per_operation'] / 1e3:+.3f} |")
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+                  stream.write('\n'.join(lines) + '\n')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Numeric evidence exceeds the log bundle limit; use the full artifact')
+          print('VISIBILITY_ROOT_LOOKUP_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('VISIBILITY_ROOT_LOOKUP_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-visibility-root-lookup-linux
+          path: |
+            ${{ runner.temp }}/source-visibility-root-lookup/*.json
+            ${{ runner.temp }}/source-visibility-root-lookup/*.jsonl
+            ${{ runner.temp }}/source-visibility-root-lookup/*.log
+            ${{ runner.temp }}/source-visibility-root-lookup/*.xml
+            ${{ runner.temp }}/source-visibility-root-lookup/sources/**
+          retention-days: 14
+
+  native-component:
+    runs-on: macos-26
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Qualify outputs (push current-source correctness; manual strict performance)
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through its shared default queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated component packages.'
+          python3 Benchmarks/SourceVisibilityRootLookup/run.py \
+            --output "$RUNNER_TEMP/source-visibility-root-lookup" \
+            ${{ github.event_name == 'workflow_dispatch' && '--pairs 10 --target-ms 350' || '--current-source-correctness' }}
+      - name: Emit numeric evidence and source receipts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-visibility-root-lookup'
+          names = ['baseline-pin.json', 'manifest.json', 'tests.json', 'parity.json',
+                   'cases.json', 'source-verification.json', 'completion.json', 'schedule.json',
+                   'calibration.jsonl', 'measurements.jsonl', 'summary.json', 'commands.jsonl']
+          files = {name: (root / name).read_text() for name in names if (root / name).is_file()}
+          if 'summary.json' in files:
+              summary = json.loads(files['summary.json'])
+              print('VISIBILITY_ROOT_LOOKUP_SUMMARY ' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
+              lines = ['## Source visibility root lookup', '',
+                       'Complete cold projections include matcher construction. Lookup batches and setup controls have their declared operation units. This does not measure filesystem scans, rendering, or whole-player responsiveness.', '',
+                       '| Case | Baseline ms/operation | Candidate ms/operation | Paired wall reduction | Paired CPU reduction | CPU faster pairs | CPU change µs/operation |',
+                       '| --- | ---: | ---: | ---: | ---: | ---: | ---: |']
+              for case in summary['cases']:
+                  wall = case['metrics']['elapsed_ns']
+                  cpu = case['metrics']['cpu_ns']
+                  lines.append(f"| {case['case']} | {wall['median_ns_per_operation']['baseline'] / 1e6:.4f} | "
+                               f"{wall['median_ns_per_operation']['candidate'] / 1e6:.4f} | "
+                               f"{wall['median_paired_reduction_percent']:.2f}% | {cpu['median_paired_reduction_percent']:.2f}% | "
+                               f"{cpu['improved_pairs']}/{case['pairs']} | {cpu['median_paired_increase_ns_per_operation'] / 1e3:+.3f} |")
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+                  stream.write('\n'.join(lines) + '\n')
+          packed = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)
+          if len(packed) > 2 * 1024 * 1024:
+              raise SystemExit('Numeric evidence exceeds the log bundle limit; use the full artifact')
+          print('VISIBILITY_ROOT_LOOKUP_SHA256 ' + hashlib.sha256(packed).hexdigest())
+          print('VISIBILITY_ROOT_LOOKUP_BASE64 ' + base64.b64encode(packed).decode())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-visibility-root-lookup-macos
+          path: |
+            ${{ runner.temp }}/source-visibility-root-lookup/*.json
+            ${{ runner.temp }}/source-visibility-root-lookup/*.jsonl
+            ${{ runner.temp }}/source-visibility-root-lookup/*.log
+            ${{ runner.temp }}/source-visibility-root-lookup/*.xml
+            ${{ runner.temp }}/source-visibility-root-lookup/sources/**
+          retention-days: 14
+
+  native-app-regressions:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare pinned native dependencies
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+      - name: Build the app graph and run visibility, search, and directory regressions
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through its shared default queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
+          mkdir -p "$RUNNER_TEMP/source-visibility-root-lookup-native"
+          sw_vers > "$RUNNER_TEMP/source-visibility-root-lookup-native/environment.txt"
+          swift --version >> "$RUNNER_TEMP/source-visibility-root-lookup-native/environment.txt"
+          git rev-parse HEAD >> "$RUNNER_TEMP/source-visibility-root-lookup-native/environment.txt"
+          set -o pipefail
+          swift test --force-resolved-versions -c release --jobs 2 --no-parallel --disable-xctest --enable-swift-testing \
+            --xunit-output "$RUNNER_TEMP/source-visibility-root-lookup-native/results.xml" \
+            --filter 'SourceVisibilityRootLookupTests|SourceBrowserFilterTests|SourceBrowserSearchTests|SourceMediaOrganizationTests|SourceTreeVisibilityCacheTests|SourceTreeDirectoryStateTests|SourceVisibilityStorageTests|SourceEmptyFolderVisibilityTests' \
+            2>&1 | tee "$RUNNER_TEMP/source-visibility-root-lookup-native/tests.log"
+          python3 - <<'PY'
+          import json, os, xml.etree.ElementTree as ET
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'source-visibility-root-lookup-native'
+          report = ET.parse(root / 'results.xml').getroot()
+          cases = report.findall('.//testcase')
+          executed = [case for case in cases if case.find('skipped') is None and 'time' in case.attrib]
+          failures = report.findall('.//failure') + report.findall('.//error')
+          skipped = report.findall('.//skipped')
+          receipt = {'matched': len(cases), 'executed': len(executed), 'failures': len(failures),
+                     'skipped': len(skipped), 'tests': [case.attrib for case in executed]}
+          (root / 'tests.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          print(json.dumps(receipt, sort_keys=True))
+          if not executed or failures or skipped:
+              raise SystemExit('Require completed native tests with no failures or skips')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-visibility-root-lookup-native-app
+          path: ${{ runner.temp }}/source-visibility-root-lookup-native/
+          retention-days: 14

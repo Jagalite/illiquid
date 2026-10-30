@@ -57,7 +57,7 @@ def utc() -> str:
 
 # Reviewed integration tree 1dde261408290db8d94e1f8f37628c8fea2aadff.
 # These pins authorize only this source combination, never general support drift.
-CURRENT_SOURCE_SHA256 = {'MediaNameRecognition.swift': '546229819194a5844bc052e3837a21296921f4b11e6191ebdc82c0c7c5e64910', 'MediaMetadataHints.swift': '9df354b5f319aee2d29799b601562e46571d664650bfb298133f7425939ba53a', 'NFOMetadataHints.swift': '5e9728f84654f5f38818444b9f1ef40db0d751aa23eb6aba273e587cc1f9892a', 'PlexMatchHints.swift': 'b35ce4f067ecac4f714c0895aaaa6df3b58e1dcb6c8d4353e59d18abc26c962b', 'MediaSidecarReader.swift': '629ea274d9b34e64c8e7702c8963b44df84a5eeee0e4d425401fdf35f4ce635a'}
+CURRENT_SOURCE_SHA256 = {'MediaNameRecognition.swift': 'cc3c1ac628498798384c3e93973ffa0dcd6f21036b1f1de779cd54c82cc944d1', 'MediaMetadataHints.swift': '9df354b5f319aee2d29799b601562e46571d664650bfb298133f7425939ba53a', 'NFOMetadataHints.swift': '5e9728f84654f5f38818444b9f1ef40db0d751aa23eb6aba273e587cc1f9892a', 'PlexMatchHints.swift': 'b35ce4f067ecac4f714c0895aaaa6df3b58e1dcb6c8d4353e59d18abc26c962b', 'MediaSidecarReader.swift': '629ea274d9b34e64c8e7702c8963b44df84a5eeee0e4d425401fdf35f4ce635a'}
 FROZEN_MANIFEST_SHA256 = '7179d247d85d640ce240d397360d03f6ff583df953d5e0a7007b2bd8bc4689a2'
 REGRESSION_HARNESS_SHA256 = 'c94e6865c5ea42cd42a4edef71502c2c5c39d6f74912c1ff9673676946aa5195'
 

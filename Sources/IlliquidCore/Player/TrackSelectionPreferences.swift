@@ -58,8 +58,18 @@ public struct TrackSelectionPreferences: Codable, Equatable, Sendable {
                        fallbackID: Int64?, audioLanguage: String? = nil) -> Int64? {
         let preferences = sanitized()
         if kind == .subtitle, preferences.subtitles == .off { return nil }
-        var eligible = candidates.filter { $0.track.kind == kind }
         let languages = kind == .audio ? preferences.audioLanguages : preferences.subtitleLanguages
+        // With no language policy, Automatic retains the demuxer's subtitle
+        // choice. Find that eligible fallback directly instead of copying the
+        // subtitle catalog; a missing fallback cannot match a nonoptional ID.
+        if kind == .subtitle, preferences.subtitles == .automatic, languages.isEmpty,
+           !preferences.prefersAccessibleTracks {
+            guard let fallbackID else { return nil }
+            return candidates.first {
+                $0.track.kind == kind && $0.track.id == fallbackID
+            }?.track.id
+        }
+        var eligible = candidates.filter { $0.track.kind == kind }
         if kind == .subtitle, preferences.subtitles == .forcedOnly {
             let forcedLanguages = languages.isEmpty
                 ? Self.normalizedLanguage(audioLanguage).map { [$0] } ?? [] : languages
@@ -68,12 +78,6 @@ public struct TrackSelectionPreferences: Codable, Equatable, Sendable {
                     Self.normalizedLanguage($0.track.languageCode) ?? ""
                 ))
             }
-        }
-        // With no language policy, Automatic retains the demuxer's subtitle
-        // choice. Forced-only and Always have explicit, different semantics.
-        if kind == .subtitle, preferences.subtitles == .automatic, languages.isEmpty,
-           !preferences.prefersAccessibleTracks {
-            return eligible.first { $0.track.id == fallbackID }?.track.id
         }
         // A lone eligible track needs no ranking, including language normalization.
         guard eligible.count > 1 else { return eligible.first?.track.id }

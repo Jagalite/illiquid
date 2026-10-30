@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "qualification": "portable ownership passed; native Metal and authority qualification pending",
+  "production_baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "portable_tested_revision": "66977dc4040629b50de71ca9bdec842e761e383b",
+  "candidate_native_revision": "6e41b75242decf9e2bc57004009bf05ccd2b7d60",
+  "portable_run": {
+    "id": 40642849317,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40642849317",
+    "job_id": 122664760504,
+    "conclusion": "success",
+    "artifact_id": 12795523964,
+    "artifact_zip_sha256": "51db9e1e01f5391f3c0c51be069126b38333697701521aaae98555a0431d4b1f",
+    "artifact_url": "https://github.com/Jagalite/illiquid/actions/runs/40642849317/artifacts/12795523964"
+  },
+  "native_run": {
+    "id": 40643119244,
+    "url": "https://github.com/Jagalite/illiquid/actions/runs/40643119244",
+    "status_at_recording": "queued"
+  },
+  "toolchain": {
+    "container": "swift:6.2@sha256:e508ef1e4be68087f720de622b91cbf1e32799a7aa96134b35e6f1a1d656db7a",
+    "testing_library_version": "6.2.4 (5ee435b15ad40ec)",
+    "swift_language_mode": 6,
+    "warnings_as_errors": true,
+    "strict_concurrency": "complete"
+  },
+  "passed_configurations": [
+    {
+      "configuration": "debug",
+      "tests_passed": 6
+    },
+    {
+      "configuration": "release",
+      "tests_passed": 6
+    }
+  ],
+  "tests": [
+    "returnedResourcesAreReusedWithinTheSameSource",
+    "retirementReleasesEveryIdleResource",
+    "retirementPreservesBorrowedLifetimeButRejectsItsReturn",
+    "delayedOldReturnCannotDisplaceCurrentSourceResources",
+    "interleavedReturnsRemainRetiredAcrossMultipleSourceChanges",
+    "concurrentReturnsCannotRepopulateARetiredSource"
+  ],
+  "source_scope": "Complete production FrameResources and ResourcePool declarations; unchanged production test file. Type-only MTLTexture/MTLBuffer protocol declarations satisfy unused optional fields, which remain nil. No Metal resource implementation or rendering is executed.",
+  "static_source_audit": [
+    {
+      "method": "func draw",
+      "unchanged": true
+    },
+    {
+      "method": "func renderOffscreen",
+      "unchanged": true
+    },
+    {
+      "method": "private func encode",
+      "unchanged": true
+    },
+    {
+      "method": "private func upload",
+      "unchanged": true
+    },
+    {
+      "method": "private func makeVertices",
+      "unchanged": true
+    },
+    {
+      "method": "private func uploadVertices",
+      "unchanged": true
+    },
+    {
+      "method": "private static func makePipeline",
+      "unchanged": true
+    }
+  ],
+  "native_memory_measurements": null,
+  "limitations": [
+    "Actual GPU allocations and pixels remain unmeasured.",
+    "Native pipeline authority tests and the full application build remain pending.",
+    "Process RSS, driver reclamation, frame pacing, and source-switch latency are not measured."
+  ]
+}

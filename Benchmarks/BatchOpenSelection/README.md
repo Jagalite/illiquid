@@ -79,3 +79,26 @@ the separate native test job supplies that integration check.
 
 Results and qualification links will be recorded here after the research
 branch completes its native checks.
+
+## Current-source CI regression mode
+
+Automated push/PR component jobs pass `--regression-only`. This mode retains
+`ea2ff568`'s exact extracted selection-plus-preservation block as the baseline
+oracle and the current controller block as the candidate. All four support
+files are captured once from the current working tree and used byte-for-byte
+in both modules. The manifest identifies this policy, the historical support
+hashes, each snapshot's origin/hash, and both controller extractions.
+
+Both modes verify all 2,102 independent cases in debug and release, retain every
+case's exact selected index and preservation flag, compare the complete output
+across all four builds, and require all 20 workload definitions. Two separately
+compiled candidate release mutations (nil selected index and false preservation)
+must be rejected by the correctness oracle; compile failures or timeouts do not
+count as successful negative controls.
+
+Regression mode returns before calibration or measurement and writes no timing
+samples, command durations, or performance claims. The default command and manual
+workflow dispatch still require historical byte-identical support and retain the
+complete paired performance workload. They intentionally reject support drift;
+regression qualification cannot establish a historical speedup. The component
+runner remains restricted to isolated hosts without the shared Kyoto install.

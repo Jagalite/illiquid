@@ -1,0 +1,47 @@
+{
+  "baseline_blob": "cf3b96706f34ba5c43041d650f4c9f6217e340cc",
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_sha256": "1c68b9d4819cc9e9d4a8f3dfe2e6e723e69dd0330e7fa63e389eb76c107986d3",
+  "binaries": {
+    "baseline-debug": "43df7dfccc1b3f47400851e59debe3cbac532ea3b8671e651473a20c64b4018b",
+    "baseline-release": "b39b843d26cda6b42c1627dc757df41dde430708859bae5930b1401b7a3023dd",
+    "candidate-debug": "cdab29390d0384fe41c416a3567f7bb967b64073de86079eabc1f6e10dbcef44",
+    "candidate-release": "6d064642e350b4477d3742518a2acdf035e9e0cdea2196d6cb77c69532bf9272"
+  },
+  "build_coordination": "Kyoto is unavailable on this host; compiling the isolated packages directly and serially.",
+  "candidate_revision": "fbe1bd0e1a0d5b3ba1cdeaaf5ef4081fa65e9d5e",
+  "candidate_sha256": "67202ae148ee928e1dbed2d171cd3286d0bd27a69f7a0047816e9804b16bef01",
+  "created_utc": "2026-10-28T05:50:18.500094+00:00",
+  "environment": {
+    "DEVELOPER_DIR": null,
+    "cpu_count": 4,
+    "machine": "x86_64",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "swift": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+  },
+  "harness": {
+    "Driver.swift": "66c1b983de745babedc0bb09c16954b72140dd8e41567dc5442ef0b0fd16079d",
+    "run.py": "65628e6648aed549d80bd5ca42267bed03af6b0e0011bca2689d232029b65e60"
+  },
+  "inputs": {
+    "Sources/IlliquidCore/Player/ThumbnailPassCursor.swift": "cc92ee68ca438b975daede867ebd40d8bf8e6ce33ce12d9b1b411135b9feb0ee",
+    "Sources/IlliquidCore/Player/ThumbnailVisibilityPolicy.swift": "1bc3396f3a2b3b5c77c46a8d0dd8d8d524a898de7278019031c78ac503e75734",
+    "Tests/IlliquidCoreTests/ThumbnailPolicyTests.swift": "b5edb262a66f37cbf0fce2dadff4d1ec571171e3067682a3cc39b165d73a85da",
+    "Tests/IlliquidCoreTests/ThumbnailSamplePrefixTests.swift": "c6fba848587c7aa697b829f9c12ac7337c21dcceadb1f1c196783c327b0dac56",
+    "Tests/IlliquidCoreTests/ThumbnailSchedulingPolicyRegressionTests.swift": "f22752c572760f5def7c1cdfb2c2611e99b6197cb8814fabb0e54f6d638d70a3"
+  },
+  "method": {
+    "compilation": "Complete unmodified baseline/candidate source in separate SwiftPM modules; release, no cross-module optimization",
+    "excluded": "builds, fixture setup, warmup, JSON and full-output bit-pattern validation",
+    "interval": "95% percentile bootstrap of paired median speedups; 10000 resamples; seed 20261028",
+    "pairs": 12,
+    "sampling": "fresh processes; same iteration count in paired AB/BA order; rotate workload order",
+    "scope": "CPU and wall service time of sample planning; no decoding, UI, I/O, or energy claim",
+    "target_ms": 80.0,
+    "timed_region": "production call, output count/first/last consumption and array lifetime"
+  },
+  "package_sha256": "402f95140da405c96d22fce3b2006417a80a41f337ed2424bfc1959ef0d5fc3e",
+  "relevant_git_status": "",
+  "schema_version": 1
+}

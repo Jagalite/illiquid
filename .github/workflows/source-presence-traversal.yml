@@ -1,4 +1,4 @@
-name: Source presence traversal performance
+name: Source presence traversal regression and historical performance
 
 on:
   push:
@@ -8,6 +8,8 @@ on:
       - 'Tests/IlliquidAppTests/SourcePresenceTraversalRegressionTests.swift'
       - 'Benchmarks/SourcePresenceTraversal/**'
       - '.github/workflows/source-presence-traversal.yml'
+      - 'Scripts/tests/source-presence-traversal-policy-tests.py'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
       - '!Benchmarks/SourcePresenceTraversal/README.md'
       - '!Benchmarks/SourcePresenceTraversal/evidence/**'
   pull_request:
@@ -22,6 +24,8 @@ on:
       - 'Tests/IlliquidAppTests/SourceMediaPresence*.swift'
       - 'Benchmarks/SourcePresenceTraversal/**'
       - '.github/workflows/source-presence-traversal.yml'
+      - 'Scripts/tests/source-presence-traversal-policy-tests.py'
+      - 'Sources/IlliquidApp/UI/SourcesSidebar.swift'
       - '!Benchmarks/SourcePresenceTraversal/README.md'
       - '!Benchmarks/SourcePresenceTraversal/evidence/**'
   workflow_dispatch:
@@ -44,6 +48,8 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Check traversal source policies without compiling
+        run: python3 Scripts/tests/source-presence-traversal-policy-tests.py
       - name: Prepare pinned native dependencies and record build coordination
         run: |
           if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
@@ -76,11 +82,16 @@ jobs:
           (root / 'tests.json').write_text(json.dumps(receipt, indent=2) + '\n')
           print(json.dumps(receipt))
           PY
-      - name: Test both implementations and measure paired native filesystem traversal
+      - name: Test both implementations or run strict historical measurements
+        shell: bash
         run: |
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = 'pull_request'; then
+            mode=(--regression-only)
+          fi
           python3 Benchmarks/SourcePresenceTraversal/run.py \
             --output "$RUNNER_TEMP/source-presence-traversal/component" \
-            --pairs 8 --target-ms 250
+            "${mode[@]}" --pairs 8 --target-ms 250
       - name: Emit compact evidence and qualification summary
         if: always()
         run: |
@@ -94,6 +105,10 @@ jobs:
                   for path in sorted(directory.iterdir()):
                       if path.is_file() and path.suffix in {'.json', '.jsonl', '.log'}:
                           files[str(path.relative_to(root))] = path.read_text()
+          completion = root / 'component/completion.json'
+          if completion.is_file():
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+                  stream.write('Traversal completion: `' + completion.read_text().strip() + '`\n')
           summary_path = root / 'component/summary.json'
           if summary_path.is_file():
               summary = json.loads(summary_path.read_text())

@@ -35,9 +35,13 @@ network requests and does not require the player's native dependency SDK.
 ## Correctness before timing
 
 An optimized verifier compiles the candidate and a mechanically renamed baseline
-enum together, sharing the unchanged `RecognizedMediaName` result declaration.
-It rejects a changed shared declaration or a mismatched baseline source hash.
-The baseline algorithm is otherwise copied verbatim.
+recognizer together. It keeps a separately renamed frozen result type, so baseline
+display formatting remains independent. The reviewed candidate type snapshot permits the
+episode display formatting change only: its fields, other computed properties, and
+all surrounding declaration text must still match exactly. Further type drift or a
+mismatched baseline source hash requires review. The frozen source, reviewed type,
+transformed oracle, and runner are included in the source receipts. The baseline
+algorithm is otherwise copied verbatim.
 
 Before any timing, it compares every stored field and the derived `seriesTitle`,
 `displayName`, and `section`. String fields, optional strings, and string arrays

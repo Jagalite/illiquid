@@ -1,0 +1,53 @@
+name: History encoding performance
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/**'
+      - 'Tests/IlliquidCoreTests/*Persistence*.swift'
+      - 'Tests/IlliquidCoreTests/HistoryEncodingTests.swift'
+      - 'Benchmarks/HistoryEncoding/Harness.swift'
+      - 'Benchmarks/HistoryEncoding/run.py'
+      - 'Benchmarks/HistoryEncoding/test_policy.py'
+      - '.github/workflows/history-encoding.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: history-encoding-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-foundation:
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Test history compatibility and measure complete writes
+        run: |
+          python3 -m unittest discover -s Benchmarks/HistoryEncoding -p test_policy.py
+          mode=()
+          if test "$GITHUB_EVENT_NAME" = pull_request; then
+            mode+=(--regression)
+          fi
+          python3 Benchmarks/HistoryEncoding/run.py "${mode[@]}" \
+            --output "$RUNNER_TEMP/history-encoding"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: history-encoding-macos
+          path: |
+            ${{ runner.temp }}/history-encoding/*.json
+            ${{ runner.temp }}/history-encoding/*.jsonl
+            ${{ runner.temp }}/history-encoding/*.patch
+            ${{ runner.temp }}/history-encoding/logs/
+            ${{ runner.temp }}/history-encoding/sources/
+            ${{ runner.temp }}/history-encoding/payloads/
+          retention-days: 30
