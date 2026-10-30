@@ -1,0 +1,223 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "--verify",
+      "4b95487493766f627af6b14338613e02dd466b88^{commit}"
+    ],
+    "log": "baseline-ref.log",
+    "log_sha256": "36a33dfabd8bb3caeef869b9939421dd7323c5b8f720a82d15c0e236646f4dea",
+    "returncode": 0,
+    "seconds": 0.0015092980000019907
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "log": "head.log",
+    "log_sha256": "aa2b69791fd9d064247dda2a44f1f7fc278c763e60da2ec793040704bd95220b",
+    "returncode": 0,
+    "seconds": 0.001142201000000398
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "log": "status.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0,
+    "seconds": 0.38427346600000334
+  },
+  {
+    "argv": [
+      "uname",
+      "-a"
+    ],
+    "log": "os.log",
+    "log_sha256": "a64b6d81308dc728b286592ae78f6594e185e6db8c474be3c8886f7694f38bb7",
+    "returncode": 0,
+    "seconds": 0.001806090000002314
+  },
+  {
+    "argv": [
+      "lscpu"
+    ],
+    "log": "hardware.log",
+    "log_sha256": "0535bb1480e83c69fe356e41634e13a277dab7414cf5d563975b02388982cb37",
+    "returncode": 0,
+    "seconds": 0.0031573730000005185
+  },
+  {
+    "argv": [
+      "swift",
+      "--version"
+    ],
+    "log": "swift-version.log",
+    "log_sha256": "d7df78b37cc23138e1c65ac3cc35f9bd0db2caf1df39880130951b36a7d039f1",
+    "returncode": 0,
+    "seconds": 8.577262990000001
+  },
+  {
+    "argv": [
+      "swift",
+      "test",
+      "--package-path",
+      "/home/runner/work/_temp/subtitle-preprocessing/tests/baseline-debug",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "log": "tests-baseline-debug.log",
+    "log_sha256": "620bac5ecf6a6ef9876b53a65d899c5bdb77af88f573425b0ea711c96dc04325",
+    "returncode": 0,
+    "seconds": 33.746027396
+  },
+  {
+    "argv": [
+      "swift",
+      "test",
+      "--package-path",
+      "/home/runner/work/_temp/subtitle-preprocessing/tests/candidate-debug",
+      "-c",
+      "debug",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "log": "tests-candidate-debug.log",
+    "log_sha256": "b2e347220a0d4f0d2c26e85e5712ee6b5ca994e4cdeefda70f55615dde9e288f",
+    "returncode": 0,
+    "seconds": 6.508439031000009
+  },
+  {
+    "argv": [
+      "swift",
+      "test",
+      "--package-path",
+      "/home/runner/work/_temp/subtitle-preprocessing/tests/baseline-release",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "log": "tests-baseline-release.log",
+    "log_sha256": "4987d745dd29046e86d77428a2d4a11c417fb5c872805663025b0db7b421c2a9",
+    "returncode": 0,
+    "seconds": 9.177316399999995
+  },
+  {
+    "argv": [
+      "swift",
+      "test",
+      "--package-path",
+      "/home/runner/work/_temp/subtitle-preprocessing/tests/candidate-release",
+      "-c",
+      "release",
+      "--jobs",
+      "2",
+      "--no-parallel",
+      "-Xswiftc",
+      "-warnings-as-errors"
+    ],
+    "log": "tests-candidate-release.log",
+    "log_sha256": "5ba0f8117153068bfe2ce0805f7c2b5525a8d2c041a45752740fe5d6420531a1",
+    "returncode": 0,
+    "seconds": 8.480731227999996
+  },
+  {
+    "argv": [
+      "/usr/bin/python3",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/ExternalSubtitleConversion/run.py",
+      "verify",
+      "--baseline-ref",
+      "4b95487493766f627af6b14338613e02dd466b88",
+      "--swiftc",
+      "/usr/local/bin/swiftc",
+      "--configuration",
+      "debug",
+      "--output",
+      "/home/runner/work/_temp/subtitle-preprocessing/debug"
+    ],
+    "log": "differential-debug.log",
+    "log_sha256": "56e38bcd99157b0961c4cebb017ef723cfab29e368421a639d691bdce9bd68e7",
+    "returncode": 0,
+    "seconds": 15.08182096600001
+  },
+  {
+    "argv": [
+      "/usr/bin/python3",
+      "/home/runner/work/illiquid/illiquid/Benchmarks/ExternalSubtitleConversion/run.py",
+      "benchmark",
+      "--baseline-ref",
+      "4b95487493766f627af6b14338613e02dd466b88",
+      "--swiftc",
+      "/usr/local/bin/swiftc",
+      "--output",
+      "/home/runner/work/_temp/subtitle-preprocessing/release",
+      "--rounds",
+      "10",
+      "--target-ms",
+      "350.0",
+      "--case",
+      "srt-1-plain",
+      "--case",
+      "vtt-1-plain",
+      "--case",
+      "srt-100-plain",
+      "--case",
+      "vtt-100-plain",
+      "--case",
+      "srt-2000-plain",
+      "--case",
+      "vtt-2000-plain",
+      "--case",
+      "srt-10000-plain",
+      "--case",
+      "vtt-10000-plain",
+      "--case",
+      "srt-2000-multilingual",
+      "--case",
+      "vtt-2000-multilingual",
+      "--case",
+      "srt-2000-escaped",
+      "--case",
+      "vtt-2000-escaped",
+      "--case",
+      "srt-100-plain-crlf",
+      "--case",
+      "vtt-100-multilingual-crlf",
+      "--case",
+      "vtt-1000-short-timestamps",
+      "--case",
+      "srt-1000-unpadded-hour",
+      "--case",
+      "srt-1000-large-hour",
+      "--case",
+      "vtt-1000-large-hour",
+      "--case",
+      "preprocess-control-vtt-2000-unicode-settings",
+      "--case",
+      "preprocess-control-srt-2000-malformed",
+      "--case",
+      "preprocess-control-vtt-2000-malformed"
+    ],
+    "log": "benchmark-release.log",
+    "log_sha256": "0267a7fac626c5fac86bd66c6054baa591ccc2168d49470a4c662b5a70461e81",
+    "returncode": 0,
+    "seconds": 178.58429256899998
+  }
+]

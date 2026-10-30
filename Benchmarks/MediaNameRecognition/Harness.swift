@@ -142,6 +142,26 @@ private struct ExactRecord: Codable, Equatable, Sendable {
         displayName = Array(value.displayName.utf8)
         section = Array(value.section.utf8)
     }
+
+#if DIFFERENTIAL_VERIFY
+    init(_ value: BaselineRecognizedMediaName) {
+        kind = value.kind.rawValue
+        title = Array(value.title.utf8)
+        year = value.year
+        season = value.season
+        episode = value.episode
+        lastEpisode = value.lastEpisode
+        airDate = value.airDate.map { Array($0.utf8) }
+        episodeTitle = value.episodeTitle.map { Array($0.utf8) }
+        edition = value.edition.map { Array($0.utf8) }
+        catalogIDs = value.catalogIDs.map { Array($0.utf8) }
+        variant = value.variant.map { Array($0.utf8) }
+        metadataSources = value.metadataSources.map { Array($0.utf8) }
+        seriesTitle = Array(value.seriesTitle.utf8)
+        displayName = Array(value.displayName.utf8)
+        section = Array(value.section.utf8)
+    }
+#endif
 }
 
 private struct ReceiptHash {

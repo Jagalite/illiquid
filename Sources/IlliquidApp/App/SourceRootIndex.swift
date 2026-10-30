@@ -3,7 +3,7 @@ import Observation
 import IlliquidCore
 
 /// Derived, lexical-only roots. AppModel invalidates this snapshot whenever its
-/// tabs change; UI redraws and search edits reuse the prepared arrays.
+/// indexing inputs change; visibility, UI redraws, and search reuse the arrays.
 struct SourceRootIndex: Sendable {
     struct Roots: Sendable {
         let folders: [URL]
@@ -13,6 +13,28 @@ struct SourceRootIndex: Sendable {
     let byTab: [String: Roots]
     let folders: [URL]
     let watchRoots: [URL]
+
+    /// A sufficient reuse check for visibility-only edits, without scanning file
+    /// paths on MainActor or retaining another long-lived tab snapshot. Keep this
+    /// in sync with every input read by init(tabs:): tab IDs, order, and items.
+    /// Different item storage conservatively rebuilds, even for equal values.
+    static func canReuseSnapshot(from oldTabs: [SourceTab], for newTabs: [SourceTab]) -> Bool {
+        guard oldTabs.count == newTabs.count else { return false }
+        for (old, new) in zip(oldTabs, newTabs) {
+            guard old.id.utf8.elementsEqual(new.id.utf8),
+                  old.items.count == new.items.count else { return false }
+            if old.items.isEmpty { continue }
+            // Both immutable borrows are live together; equal addresses and
+            // counts prove identical value storage. Neither pointer escapes.
+            let sharesItems = old.items.withUnsafeBufferPointer { oldItems in
+                new.items.withUnsafeBufferPointer { newItems in
+                    oldItems.baseAddress == newItems.baseAddress
+                }
+            }
+            guard sharesItems else { return false }
+        }
+        return true
+    }
 
     init(tabs: [SourceTab]) {
         var byTab: [String: Roots] = [:]
