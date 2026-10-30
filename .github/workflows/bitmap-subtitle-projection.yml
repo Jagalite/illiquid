@@ -39,14 +39,16 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - name: Test complete region projections and measure paired native CPU time
+      - name: Qualify complete region projections (manual runs retain historical performance)
         run: |
           if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
             echo 'Kyoto is available; submit this qualification through the shared queue.'
             exit 1
           fi
           echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in this isolated checkout.'
-          python3 Benchmarks/BitmapSubtitleProjection/run.py \
+          mode=regression
+          if [ "${{ github.event_name }}" = workflow_dispatch ]; then mode=all; fi
+          python3 Benchmarks/BitmapSubtitleProjection/run.py --mode "$mode" \
             --pairs 10 --target-ms 150 \
             --output "$RUNNER_TEMP/bitmap-subtitle-projection"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

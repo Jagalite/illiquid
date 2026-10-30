@@ -22,6 +22,7 @@ def load(name):
 PLAYLIST = load("PlaylistDeduplication")
 SUBTITLE = load("SubtitleCandidateStreaming")
 CHECKPOINT = load("CheckpointConstruction")
+IDENTITIES = load("CheckpointIdentities")
 
 
 class SourcePolicyTests(unittest.TestCase):
@@ -293,6 +294,106 @@ class SourcePolicyTests(unittest.TestCase):
 
     def test_subtitle_historical_unchanged_support_is_accepted(self):
         self.subtitle([], False)
+
+
+class CheckpointIdentityPolicyTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name).resolve()
+
+    def stage(self, regression, drift=None, mutate_after_capture=False):
+        module = IDENTITIES
+        current = {path: (path + " current\n").encode() for path in module.CORE}
+        historical = {path: (path + " historical\n").encode() for path in module.CORE}
+        # Only the reviewed natural-order support and focal implementation differ.
+        for path in (module.CORE[0], module.CORE[2]):
+            historical[path] = current[path]
+        pins = {path: module.sha256(data) for path, data in current.items()}
+        if drift:
+            current[drift] += b"unreviewed"
+        here = self.root / "Benchmarks/CheckpointIdentities"
+        here.mkdir(parents=True)
+        for name in ("Harness.swift", "run.py"):
+            (here / name).write_bytes(b"captured harness")
+        caller = "Sources/IlliquidPlayer/Player/PlaybackController.swift"
+        for path, data in (current | {p: b"captured test" for p in module.TESTS} | {caller: b"caller"}).items():
+            destination = self.root / path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(data)
+        args = argparse.Namespace(output=self.root / "out", baseline=module.BASELINE,
+                                  regression_only=regression, swift="swift")
+        runner = module.Runner(args)
+
+        def capture(argv, *unused):
+            self.assertEqual(argv[:2], ["git", "show"])
+            if mutate_after_capture:
+                for path in current:
+                    (self.root / path).write_bytes(b"changed after capture")
+            path = argv[-1].split(":", 1)[1]
+            return historical.get(path, b"historical caller")
+
+        with patch.object(module, "ROOT", self.root), patch.object(module, "HERE", here), \
+                patch.object(module, "__file__", str(here / "run.py")), \
+                patch.object(module, "REGRESSION_SHA256", pins), \
+                patch.object(module.platform, "platform", return_value="policy-fixture"), \
+                patch.object(runner, "command", return_value="fixture-head"), \
+                patch.object(runner, "capture", side_effect=capture):
+            runner.prepare()
+        for path in module.CORE:
+            self.assertEqual((runner.output / "historical" / path).read_bytes(), historical[path])
+            for variant in module.VARIANTS:
+                use_current = variant == "candidate" or (regression and path in module.CORE[:-1])
+                expected = current[path] if use_current else historical[path]
+                self.assertEqual((runner.output / variant / "Sources/IlliquidCore" / Path(path).name).read_bytes(), expected)
+                self.assertEqual(runner.sources[variant]["repository_sources"][path], module.source_hashes(expected))
+        for variant in module.VARIANTS:
+            for path in module.TESTS:
+                self.assertEqual((runner.output / variant / path).read_bytes(), b"captured test")
+        return runner
+
+    def test_current_support_snapshot_symmetry_and_historical_focal_source(self):
+        self.stage(True, mutate_after_capture=True)
+
+    def test_historical_mode_still_rejects_support_drift(self):
+        with self.assertRaisesRegex(AssertionError, "Unintended dependency difference"):
+            self.stage(False)
+
+    def test_each_unreviewed_current_source_is_rejected(self):
+        for path in IDENTITIES.CORE:
+            with self.subTest(path=path), tempfile.TemporaryDirectory() as temporary:
+                self.root = Path(temporary).resolve()
+                with self.assertRaisesRegex(AssertionError, "Unreviewed regression source"):
+                    self.stage(True, drift=path)
+
+    def test_regression_requires_pinned_baseline(self):
+        args = argparse.Namespace(output=self.root / "out", baseline="0" * 40, regression_only=True)
+        with self.assertRaisesRegex(ValueError, "pinned historical baseline"):
+            IDENTITIES.Runner(args)
+        self.assertFalse(args.output.exists())
+
+    def test_regression_measure_and_sample_are_rejected(self):
+        args = argparse.Namespace(output=self.root / "out", baseline=IDENTITIES.BASELINE, regression_only=True)
+        runner = IDENTITIES.Runner(args)
+        with self.assertRaisesRegex(ValueError, "cannot measure historical performance"):
+            runner.measure()
+        with self.assertRaisesRegex(ValueError, "cannot measure historical performance"):
+            runner.sample("baseline", 1, "unchanged", 1)
+
+    def test_main_regression_skips_timing_and_preserves_full_qualification(self):
+        for regression in (False, True):
+            with self.subTest(regression=regression), patch.object(IDENTITIES, "Runner") as constructor:
+                argv = ["run.py", "--output", str(self.root / "out")]
+                if regression:
+                    argv.append("--regression-only")
+                with patch.object(IDENTITIES.sys, "argv", argv):
+                    IDENTITIES.main()
+                runner = constructor.return_value
+                runner.prepare.assert_called_once()
+                runner.build_and_test.assert_called_once()
+                runner.finish.assert_called_once()
+                self.assertEqual(runner.measure.call_count, 0 if regression else 1)
+                self.assertEqual(constructor.call_args.args[0].regression_only, regression)
 
 
 if __name__ == "__main__":

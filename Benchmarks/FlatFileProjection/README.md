@@ -44,8 +44,9 @@ python3 Benchmarks/FlatFileProjection/run.py \
 Output directories must be new or empty. `--swift` accepts a compiler path.
 `--sizes`, `--cases`, and `--pairs` select workloads; the default study has six
 balanced pairs for each of six scenarios at 100, 1,000, and 10,000 entries.
-PR CI runs the tests and complete output comparisons in `verify` mode with
-`--current-support`, as described below. Manual
+PR and branch-push CI run all four regression suites and complete output
+comparisons in `verify` mode with `--current-support`, as described below.
+These automated runs produce no timing or allocation measurements. Manual
 workflow dispatch runs the full study with ten pairs and a 1,000 ms target per
 observation. Timing results are research evidence, not a noisy pass/fail gate.
 
@@ -153,3 +154,61 @@ source receipts, output comparisons, checksums, execution order and statistics.
 See the [complete results and raw evidence](evidence/README.md), the
 [initial native run](https://github.com/Jagalite/illiquid/actions/runs/39666994530),
 and the [targeted confirmation](https://github.com/Jagalite/illiquid/actions/runs/39669135880).
+
+## Sorted-entry storage follow-up
+
+The index-storage study uses baseline
+`ea2ff568237e2667f7b1aeee67b11a44ebe95b72` to isolate a later change:
+flat projection consumes the sorter's existing permutation directly instead of
+materializing a complete sorted entry array before building display rows.
+The ordinary `sorted` API and its comparator are preserved. With sorting disabled,
+or fewer than two entries, projection keeps the original direct iteration path.
+
+`--include-sorter` retains the baseline sorter as well as projection Input.
+The runner permits only the exact `SourceTreeSorting` declaration to differ
+inside the staged Sidebar values; all surrounding declarations must match.
+`SourceTreeSortingTests` joins the existing three regression suites.
+
+The commands below reproduce the historical index-storage study from its
+recorded implementation checkout, not from current main. Later changes to
+surrounding Sidebar declarations correctly fail the strict `--include-sorter`
+gate. Automated PR and branch-push CI use current-support verification without
+`--include-sorter`; both variants retain the current sorter, and all four
+regression suites still run. This is integration regression evidence, not a new
+qualification of the historical sorter timing or allocation findings.
+
+```sh
+git worktree add --detach /tmp/illiquid-flat-projection-index \
+  d31ed9a65523416c330a9702198c06fe446f74b5
+cd /tmp/illiquid-flat-projection-index
+
+python3 Benchmarks/FlatFileProjection/run.py \
+  --baseline ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --current-support --include-sorter --sizes 10000 --sorts name date off \
+  --pairs 6 --target-ms 120 --output /tmp/flat-projection-index-timing
+
+# Separate Linux/glibc cohort; these instrumented timings are not speed evidence.
+python3 Benchmarks/FlatFileProjection/run.py \
+  --baseline ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --current-support --include-sorter --sizes 10000 --sorts name date off \
+  --mode benchmark --allocations --pairs 2 \
+  --output /tmp/flat-projection-index-allocations
+```
+
+The six source/view scenarios run with ascending name order, descending creation
+date order, and all sorting disabled. Complete row traces are compared for each
+scenario and sort before measurement. Default CLI sort selection remains
+`name`, so earlier study commands retain their workload selection.
+
+The allocation cohort uses the existing `NonDecodePerformance/allocmeter.c`.
+It records successful intercepted malloc/calloc/realloc requests and requested
+bytes only during each complete production `rows()` call. It excludes fixture
+setup, result consumption, and returned-row destruction. It does not measure
+peak heap, live heap, all allocation APIs, or whole-player resident memory.
+Allocation measurements use one call per process after two warmups; native
+timings are collected separately without instrumentation. Every observation,
+source hash, full-row trace hash, compiler identity, and completion marker is
+retained.
+
+The [index-storage research report](../../Documentation/FLAT_PROJECTION_INDEX_STORAGE.md)
+records the completed allocation findings and the current native qualification status.

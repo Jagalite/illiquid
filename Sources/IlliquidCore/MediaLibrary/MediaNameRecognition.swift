@@ -22,9 +22,25 @@ public struct RecognizedMediaName: Equatable, Sendable {
 
     public var displayName: String {
         guard kind == .episode else { return seriesTitle }
-        let number = airDate ?? String(format: "S%02dE%02d", season ?? 0, episode ?? 0)
-            + (lastEpisode.map { String(format: "–E%02d", $0) } ?? "")
+        let number = airDate ?? Self.episodeNumber(season: season ?? 0, episode: episode ?? 0,
+                                                  lastEpisode: lastEpisode)
         return number + (episodeTitle.map { " · \($0)" } ?? "")
+    }
+
+    private static func episodeNumber(season: Int, episode: Int, lastEpisode: Int?) -> String {
+        let maximum = Int(Int32.max)
+        guard season >= 0, season <= maximum, episode >= 0, episode <= maximum,
+              lastEpisode.map({ $0 >= 0 && $0 <= maximum }) ?? true else {
+            // Preserve the original C %d conversion for negative or wider Int values.
+            return String(format: "S%02dE%02d", season, episode)
+                + (lastEpisode.map { String(format: "–E%02d", $0) } ?? "")
+        }
+        func padded(_ value: Int) -> String {
+            let digits = String(value)
+            return value < 10 ? "0" + digits : digits
+        }
+        return "S" + padded(season) + "E" + padded(episode)
+            + (lastEpisode.map { "–E" + padded($0) } ?? "")
     }
 
     public var section: String {

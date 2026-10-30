@@ -1,0 +1,95 @@
+name: Subtitle acquisition packet borrowing
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegDemuxer.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift'
+      - 'Sources/IlliquidNativePlayback/Media/MediaTime.swift'
+      - 'Sources/IlliquidNativePlayback/Media/FFmpegError.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/BitmapSubtitleTimeline.swift'
+      - 'Sources/IlliquidNativePlayback/Subtitles/SubtitleAcquisitionPacket.swift'
+      - 'Sources/CFFmpeg/**'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleAcquisitionPacketBorrowTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleAcquisitionPR137RegressionTests.swift'
+      - 'Tests/IlliquidNativePlaybackTests/BitmapSubtitleTests.swift'
+      - 'Benchmarks/SubtitleAcquisitionBorrow/**'
+      - 'Scripts/tests/run-native-swift-tests.sh'
+      - 'Scripts/lib/native-sdk-environment.sh'
+      - '.github/workflows/subtitle-acquisition-borrow.yml'
+      - '!Benchmarks/SubtitleAcquisitionBorrow/README.md'
+      - '!Benchmarks/SubtitleAcquisitionBorrow/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subtitle-acquisition-borrow-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-subtitle-acquisition:
+    runs-on: macos-26
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare the reviewed native SDK
+        run: |
+          if ! xcrun -sdk macosx metal --version; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          python3 Scripts/verify-corresponding-source.py DependencySources
+          python3 Scripts/install-ci-native-sdk.py
+          mkdir -p "$RUNNER_TEMP/subtitle-acquisition"
+          git rev-parse HEAD > "$RUNNER_TEMP/subtitle-acquisition/revision.txt"
+          swift --version > "$RUNNER_TEMP/subtitle-acquisition/compiler.txt"
+          sw_vers > "$RUNNER_TEMP/subtitle-acquisition/host.txt"
+      - name: Compare exact production acquisition scans
+        run: |
+          # Ephemeral hosted runners have no shared workstation Kyoto queue.
+          # These isolated builds have their own output/cache directories.
+          echo 'Kyoto is unavailable on this hosted runner; building isolated components directly.'
+          test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
+          python3 Benchmarks/SubtitleAcquisitionBorrow/run.py \
+            --ffmpeg-prefix /opt/homebrew/opt/ffmpeg \
+            --pairs 6 --target-ms 150 --minimum-ms 50 \
+            --output "$RUNNER_TEMP/subtitle-acquisition/component"
+      - name: Qualify native seek reconstruction and packet ownership
+        run: |
+          fixture_dir="$RUNNER_TEMP/subtitle-acquisition/fixtures"
+          python3 Scripts/generate-bitmap-subtitle-fixtures.py "$fixture_dir" --skip-vobsub
+          for name in generated-pgs.mkv generated-dvd.mkv generated-dvb.mkv; do
+            test -s "$fixture_dir/$name"
+          done
+          export ILLIQUID_BITMAP_FIXTURE_DIR="$fixture_dir"
+          export ILLIQUID_PACKET_OWNERSHIP_FIXTURE="$fixture_dir/generated-pgs.mkv"
+          mkdir -p "$RUNNER_TEMP/subtitle-acquisition/native-tmp"
+          export TMPDIR="$RUNNER_TEMP/subtitle-acquisition/native-tmp"
+          echo 'Kyoto is unavailable on this hosted runner; building and executing the native tests directly.'
+          test ! -f /Volumes/seed1/Projects/kyoto/kyoto.py
+          set -o pipefail
+          bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 --filter \
+            'SubtitleAcquisitionPacketBorrowTests|BitmapSubtitleAcquisitionPR137RegressionTests|BitmapSubtitleTests|PGSSubtitlePacketBorrowTests|PGSSubtitleCropTests|PacketOwnershipTests' \
+            2>&1 | tee "$RUNNER_TEMP/subtitle-acquisition/native-tests.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-acquisition-borrow-native
+          path: |
+            ${{ runner.temp }}/subtitle-acquisition/**/*.json
+            ${{ runner.temp }}/subtitle-acquisition/**/*.jsonl
+            ${{ runner.temp }}/subtitle-acquisition/**/*.log
+            ${{ runner.temp }}/subtitle-acquisition/**/*.txt
+            ${{ runner.temp }}/subtitle-acquisition/**/*.swift
+            ${{ runner.temp }}/subtitle-acquisition/**/*.py
+            ${{ runner.temp }}/subtitle-acquisition/**/*.xml
+            ${{ runner.temp }}/subtitle-acquisition/component/logs/
+            ${{ runner.temp }}/subtitle-acquisition/component/sources/
+            ${{ runner.temp }}/subtitle-acquisition/component/full-sources/
+          retention-days: 14

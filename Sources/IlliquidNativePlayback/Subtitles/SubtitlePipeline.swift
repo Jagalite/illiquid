@@ -886,6 +886,12 @@ final class SubtitlePipeline: @unchecked Sendable {
         }
         _ = revisionFence.acknowledgeSourceInvalidation(revision)
         if enabled {
+            // Candidates share the committed overlay while preparing. Retire
+            // its GPU cache only on promotion, synchronously: an immediate seek
+            // may supersede the queued clear's revision before it runs.
+            if presentsOverlay {
+                overlay.retireSourceResources()
+            }
             scheduleVisibleClear(revision: revision)
         }
     }

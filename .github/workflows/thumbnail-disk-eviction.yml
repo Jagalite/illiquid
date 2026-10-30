@@ -7,6 +7,9 @@ on:
   pull_request:
     paths:
       - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailDiskCache.swift'
+      - 'Sources/IlliquidNativePlayback/Media/NativeThumbnailCache.swift'
+      - 'Sources/IlliquidCore/Player/ThumbnailPolicy.swift'
+      - 'Sources/IlliquidCore/Persistence/MediaPlaybackSettings.swift'
       - 'Sources/IlliquidNativePlayback/Media/ThumbnailDiskEvictionHeap.swift'
       - 'Sources/IlliquidNativePlayback/Media/ThumbnailPromotionMailbox.swift'
       - 'Tests/IlliquidNativePlaybackTests/ThumbnailDiskEvictionTests.swift'
@@ -54,6 +57,8 @@ jobs:
               [sys.executable, 'Benchmarks/ThumbnailReadAllocation/run.py', '--pairs', '8',
                '--output', os.environ['RUNNER_TEMP'] + '/thumbnail-read-allocation'],
           ]
+          if os.environ['GITHUB_EVENT_NAME'] != 'workflow_dispatch':
+              commands[0].extend(['--current-source-regression', '--verify-only'])
           if not queue.is_file():
               print('Shared Kyoto queue is unavailable on this hosted runner; '
                     'compiling isolated components directly and serially.', flush=True)

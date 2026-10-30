@@ -88,8 +88,51 @@ public enum BatchOpenSelection {
     }
 
 
+def select_sources(baseline: dict, current: dict, regression_only: bool) -> dict:
+    """Keep the historical focal block; share one captured support snapshot."""
+    if not regression_only:
+        for path in SOURCES:
+            if current[path] != baseline[path]:
+                raise RuntimeError(f"Shared dependency changed since baseline: {path}")
+    return {
+        "baseline": {**(current if regression_only else baseline),
+                     CONTROLLER: baseline[CONTROLLER]},
+        "candidate": dict(current),
+    }
+
+
+def validate_verification(value: dict) -> None:
+    records = value.get("results")
+    if (value.get("status") != "passed" or value.get("checks") != 2102
+            or not isinstance(records, list) or len(records) != 2102
+            or len({record["label"] for record in records}) != 2102):
+        raise RuntimeError("Incomplete verification corpus")
+    checksum = 0
+    for record in records:
+        index = record["selectedIndex"]
+        if (index is not None and (type(index) is not int or index < 0)
+                or type(record["preservesCurrent"]) is not bool):
+            raise RuntimeError("Malformed verification result")
+        checksum += ((0 if index is None else index + 1) << 1) | int(record["preservesCurrent"])
+    if value.get("checksum") != checksum:
+        raise RuntimeError("Verification checksum disagrees with exact output")
+
+
+def negative_source(wrapper: bytes, field: str) -> bytes:
+    before, after = {
+        "selectedIndex": (b"selectedIndex: selectedIndex,", b"selectedIndex: nil,"),
+        "preservesCurrent": (b"preservesCurrent: preservesCurrent\n",
+                             b"preservesCurrent: false\n"),
+    }[field]
+    if wrapper.count(before) != 1:
+        raise RuntimeError(f"Negative control marker is not unique: {field}")
+    return wrapper.replace(before, after)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--regression-only", action="store_true",
+                        help="Historical selection oracle with identical current support; no timings")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--pairs", type=int, default=8)
     parser.add_argument("--target-ms", type=float, default=50)
@@ -118,15 +161,17 @@ def main() -> None:
     logs.mkdir()
     state = {
         "status": "running",
-        "pairs": args.pairs,
-        "target_ms": args.target_ms,
+        "mode": "current-source-regression" if args.regression_only else "historical-performance",
+        "timings_collected": False,
+        "negative_controls": {},
+        **({} if args.regression_only else {"pairs": args.pairs, "target_ms": args.target_ms}),
         "verification": {},
         "summaries": [],
         "full_controller_compiled": False,
         "ui_qualified": False,
     }
 
-    def run(command, name: str, timeout: int = 600) -> bytes:
+    def run(command, name: str, timeout: int = 600, *, expect_rejection: bool = False) -> bytes:
         argv = list(map(str, command))
         started = time.monotonic()
         process = subprocess.Popen(
@@ -143,8 +188,12 @@ def main() -> None:
         append_json(output / "commands.jsonl", {
             "name": name, "command": argv, "cwd": str(ROOT), "pid": process.pid,
             "exit_code": process.returncode, "timed_out": timed_out,
-            "wall_seconds": time.monotonic() - started,
+            **({} if args.regression_only else {"wall_seconds": time.monotonic() - started}),
         })
+        if expect_rejection:
+            if timed_out or process.returncode == 0 or b"incorrectResult" not in stdout + stderr:
+                raise RuntimeError(f"{name}: control was not rejected by the correctness oracle")
+            return stdout + stderr
         if timed_out or process.returncode:
             print((stdout + stderr).decode(errors="replace")[-20_000:], flush=True)
             raise RuntimeError(f"{name} failed; see logs/{name}.log")
@@ -171,6 +220,8 @@ def main() -> None:
     try:
         manifest = {
             "baseline_commit": BASELINE,
+            "mode": state["mode"],
+            "support_policy": "identical-current" if args.regression_only else "historical-byte-identical",
             "candidate_commit": run(["git", "rev-parse", "HEAD"], "head").decode().strip(),
             "candidate_status": run(["git", "status", "--short"], "status").decode(),
             "swift": run([swift, "--version"], "swift-version").decode().strip(),
@@ -182,7 +233,8 @@ def main() -> None:
             )},
             "scope": "Exact extracted selection-plus-preservation computation",
             "module_policy": "Separate dynamic production module; no cross-module optimization",
-            "process_policy": "Fresh process for each verification, calibration and timed sample",
+            "process_policy": ("Fresh process for each verification" if args.regression_only else
+                               "Fresh process for each verification, calibration and timed sample"),
             "full_controller_compiled": False, "ui_qualified": False,
             "sources": {}, "builds": {},
         }
@@ -204,9 +256,11 @@ def main() -> None:
             baseline_sources[path] = run(
                 ["git", "show", f"{BASELINE}:{path}"], f"baseline-source-{index}"
             )
-        for path in SOURCES:
-            if (ROOT / path).read_bytes() != baseline_sources[path]:
-                raise RuntimeError(f"Shared dependency changed since baseline: {path}")
+        current_sources = {path: (ROOT / path).read_bytes() for path in (*SOURCES, CONTROLLER)}
+        selected_sources = select_sources(baseline_sources, current_sources, args.regression_only)
+        manifest["historical_support_sha256"] = {
+            path: sha(baseline_sources[path]) for path in SOURCES
+        }
 
         snapshots = {}
         for variant in VARIANTS:
@@ -214,12 +268,13 @@ def main() -> None:
             folder.mkdir(parents=True)
             snapshots[variant] = []
             for path in (*SOURCES, CONTROLLER):
-                data = baseline_sources[path] if variant == "baseline" else (ROOT / path).read_bytes()
+                data = selected_sources[variant][path]
                 target = folder / Path(path).name
                 target.write_bytes(data)
                 manifest["sources"][f"{variant}/{target.name}"] = {
                     "path": path, "sha256": sha(data),
-                    "origin": BASELINE if variant == "baseline" else "working-tree",
+                    "origin": (BASELINE if variant == "baseline"
+                               and (path == CONTROLLER or not args.regression_only) else "working-tree"),
                 }
                 if path in SOURCES:
                     snapshots[variant].append(target)
@@ -270,8 +325,8 @@ def main() -> None:
                 }
                 write_json(output / "manifest.json", manifest)
                 verification = run_json([binary, "verify"], f"{label}-verify")
-                if verification.get("status") != "passed" or verification.get("checks", 0) <= 0:
-                    raise RuntimeError(f"{label}: verification did not pass")
+                validate_verification(verification)
+                write_json(output / f"verification-{label}.json", verification)
                 if expected_verification is None:
                     expected_verification = verification
                 elif verification != expected_verification:
@@ -282,6 +337,34 @@ def main() -> None:
                 if configuration == "release":
                     binaries[variant] = binary
 
+                    if variant == "candidate":
+                        for field in ("selectedIndex", "preservesCurrent"):
+                            control = output / "negative-controls" / field
+                            control.mkdir(parents=True)
+                            source = control / "BatchOpenSelection.swift"
+                            source.write_bytes(negative_source(snapshots[variant][-1].read_bytes(), field))
+                            control_command = [
+                                str(part).replace(str(build), str(control))
+                                if str(part).startswith(str(build)) else str(part)
+                                for part in module_command
+                            ]
+                            control_command[control_command.index(str(snapshots[variant][-1]))] = str(source)
+                            run(control_command, f"negative-{field}-module")
+                            control_binary = control / "benchmark"
+                            run([
+                                swift, *flags, "-parse-as-library", "-I", control, "-L", control,
+                                "-lBatchOpenComponent", "-Xlinker", "-rpath", "-Xlinker", rpath,
+                                support / "Harness.swift", "-o", control_binary,
+                            ], f"negative-{field}-driver")
+                            rejection = run([control_binary, "verify"], f"negative-{field}-verify",
+                                            expect_rejection=True)
+                            state["negative_controls"][field] = {
+                                "status": "rejected", "source_sha256": sha(source.read_bytes()),
+                                "binary_sha256": sha(control_binary.read_bytes()),
+                                "library_sha256": sha((control / library.name).read_bytes()),
+                                "rejection_sha256": sha(rejection),
+                            }
+
         workloads = run_json([binaries["baseline"], "list"], "baseline-workloads")
         if (not isinstance(workloads, list) or not workloads
                 or len({case["id"] for case in workloads}) != len(workloads)
@@ -289,6 +372,20 @@ def main() -> None:
             raise RuntimeError("Workload definitions are missing or inconsistent")
         write_json(output / "workloads.json", workloads)
 
+        if len(workloads) != 20:
+            raise RuntimeError("Workload corpus count changed")
+        if args.regression_only:
+            state["status"] = "passed"
+            state["workloads"] = len(workloads)
+            print("REGRESSION_PASS " + json.dumps({
+                "configurations_verified": len(state["verification"]),
+                "checks_per_configuration": expected_verification["checks"],
+                "workloads": len(workloads), "negative_controls": state["negative_controls"],
+                "timings_collected": False,
+            }), flush=True)
+            return
+
+        state["timings_collected"] = True
         for case_index, case in enumerate(workloads):
             per_call = {}
             order = VARIANTS if case_index % 2 == 0 else tuple(reversed(VARIANTS))
