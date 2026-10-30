@@ -28,9 +28,9 @@ BASELINE = "6f70cd2446fc6ef38d4e5a0fbf96f91b2234e635"
 VARIANTS = ("baseline", "candidate")
 REGRESSION_TARGET = "c1ef6aff6060ad35decbc6dce0c224164be941a2"
 CURRENT_SUPPORT = {
-    "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift",
-    "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift",
-    "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift",
+    "Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift": "9127a96fee6e66c2b43d37b7354b330040910e836f17a69d2a0feb25a3a6f694",
+    "Sources/IlliquidNativePlayback/Playback/FixedRingBuffer.swift": "e376c12e8332bc95894bffb916d578ef314f831161f0d9eb4700b88a0f04f4f5",
+    "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift": "cbb61a58255926e1d8239e6c82534ede564712ac1c7fad3c02a18c30fba52993"
 }
 WORKLOADS = [("auxiliary", count) for count in (1, 2, 3)] + [("default", 1)]
 HELPER = ROOT / "Benchmarks/AttachmentAdmission/run.py"
@@ -174,6 +174,8 @@ class Runner:
             # inventory is compiled from identical current bytes in both arms.
             self.receipt["support_overrides"] = []
             for path in sorted(CURRENT_SUPPORT):
+                if sha(original["candidate"][path].encode()) != CURRENT_SUPPORT[path]:
+                    raise ValueError(f"Reviewed regression support changed: {path}; review/requalify this comparison")
                 original["baseline"][path] = original["candidate"][path]
                 self.receipt["support_overrides"].append({
                     "path": path,

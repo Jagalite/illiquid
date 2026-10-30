@@ -70,7 +70,22 @@ def shared_types(source: str) -> str:
 
 
 def adapter(source: str, variant: str) -> str:
-    resources = block(source, "    private final class FrameResources:")
+    if variant == "baseline":
+        resources = block(source, "    private final class FrameResources:")
+        resource_initializer = "FrameResources()"
+    elif variant == "candidate":
+        resources = block(source, "    final class FrameResources: @unchecked Sendable {")
+        # Keep the complete production declaration unchanged. This isolated
+        # upload adapter owns one resource for its entire lifetime, generation 0.
+        expected_initializer = """        init(sourceGeneration: UInt64) {
+            self.sourceGeneration = sourceGeneration
+        }"""
+        if (resources.count("        let sourceGeneration: UInt64\n") != 1
+                or block(resources, "        init(sourceGeneration: UInt64) {") != expected_initializer):
+            raise ValueError("Candidate resource generation initializer changed")
+        resource_initializer = "FrameResources(sourceGeneration: 0)"
+    else:
+        raise ValueError(f"Unknown adapter variant: {variant!r}")
     upload = block(source, "    private func uploadVertices(")
     if variant == "baseline":
         vertex = block(source, "    private struct Vertex {")
@@ -107,7 +122,7 @@ final class VertexUploadHarness {
     fields = """
     private let device: any MTLDevice
     private let configuration: MetalASSRenderConfiguration
-    private let resources = FrameResources()
+    private let resources = """ + resource_initializer + """
     private var synchronousFailure: MetalASSFailureReason?
     private var bufferAllocationFailures = 0
 

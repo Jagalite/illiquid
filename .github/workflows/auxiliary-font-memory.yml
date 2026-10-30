@@ -58,13 +58,21 @@ jobs:
         run: |
           python3 Benchmarks/AuxiliaryFontAttachments/generate-fixtures.py \
             --output "$RUNNER_TEMP/auxiliary-font-fixtures"
-      - name: Compare metadata, packets, and memory (automated runs are regression only)
+      - name: Compare metadata, packet output, and retained input memory
+        # This historical comparison freezes its shared acquisition parsers.
+        # Reproduce that study at the pre-borrowing revision; PRs still build
+        # and execute the current native regression suites in the next step.
+        if: github.event_name == 'workflow_dispatch'
         run: |
-          regression=()
-          if [[ "${{ github.event_name }}" != workflow_dispatch ]]; then
-            regression+=(--current-support-regression)
-          fi
-          python3 Benchmarks/AuxiliaryFontAttachments/run.py "${regression[@]}" \
+          git worktree add --detach "$RUNNER_TEMP/auxiliary-font-history" \
+            ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+          python3 "$RUNNER_TEMP/auxiliary-font-history/Benchmarks/AuxiliaryFontAttachments/run.py" \
+            --fixtures "$RUNNER_TEMP/auxiliary-font-fixtures" \
+            --output "$RUNNER_TEMP/auxiliary-font-results" --pairs 6
+      - name: Current support regression (no historical timing qualification)
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/AuxiliaryFontAttachments/run.py --current-support-regression \
             --fixtures "$RUNNER_TEMP/auxiliary-font-fixtures" \
             --output "$RUNNER_TEMP/auxiliary-font-results" --pairs 6
       - name: Build app graph and qualify attachment ownership and rendering
