@@ -1,0 +1,111 @@
+Building for debugging...
+[0/7] /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/.build/arm64-apple-macosx/debug/IlliquidFileIdentityRegressionsPackageTests.derived/runner.swift
+[1/7] Write sources
+[4/7] Write swift-version-7974D3F7F03D5E95.txt
+[6/11] Compiling IlliquidCore FolderPlaylist.swift
+[7/11] Compiling IlliquidCore MediaFileSupport.swift
+[8/11] Compiling IlliquidCore MediaSource.swift
+[9/11] Emitting module IlliquidCore
+[10/13] Compiling IlliquidCore NaturalFilenameOrdering.swift
+[11/13] Compiling IlliquidCore NormalizedFileURL.swift
+[12/17] Emitting module IlliquidCoreTests
+[13/17] Compiling IlliquidCoreTests FolderPlaylistLookupTests.swift
+[14/17] Compiling IlliquidCoreTests FolderPlaylistTests.swift
+[15/17] Compiling IlliquidCoreTests LocalMediaSourceValidationTests.swift
+[16/19] Compiling IlliquidCoreTests NormalizedFileURLPersistenceKeyTests.swift
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:197:41: error: cannot convert value of type 'Unmanaged<CFURL>' to expected argument type 'CFURL'
+195 |         let reference = try #require(CFURLCreateFileReferenceURL(
+196 |             kCFAllocatorDefault, original as CFURL, &creationError))
+197 |         #expect(CFURLIsFileReferenceURL(reference))
+    |                                         `- error: cannot convert value of type 'Unmanaged<CFURL>' to expected argument type 'CFURL'
+198 |         let spelling = try #require(CFURLGetString(reference)) as String
+199 |         let before = try #require(URL(string: spelling))
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:198:52: error: cannot convert value of type 'Unmanaged<CFURL>' to expected argument type 'CFURL'
+196 |             kCFAllocatorDefault, original as CFURL, &creationError))
+197 |         #expect(CFURLIsFileReferenceURL(reference))
+198 |         let spelling = try #require(CFURLGetString(reference)) as String
+    |                                                    `- error: cannot convert value of type 'Unmanaged<CFURL>' to expected argument type 'CFURL'
+199 |         let before = try #require(URL(string: spelling))
+200 |         expectKeyMatchesNormalization(before)
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:198:24: error: no calls to throwing functions occur within 'try' expression
+196 |             kCFAllocatorDefault, original as CFURL, &creationError))
+197 |         #expect(CFURLIsFileReferenceURL(reference))
+198 |         let spelling = try #require(CFURLGetString(reference)) as String
+    |                        `- error: no calls to throwing functions occur within 'try' expression
+199 |         let before = try #require(URL(string: spelling))
+200 |         expectKeyMatchesNormalization(before)
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:199:22: error: no calls to throwing functions occur within 'try' expression
+197 |         #expect(CFURLIsFileReferenceURL(reference))
+198 |         let spelling = try #require(CFURLGetString(reference)) as String
+199 |         let before = try #require(URL(string: spelling))
+    |                      `- error: no calls to throwing functions occur within 'try' expression
+200 |         expectKeyMatchesNormalization(before)
+201 |         #expect(NormalizedFileURL.persistenceKey(for: before) != nil)
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:206:21: error: no calls to throwing functions occur within 'try' expression
+204 |         // Recreate the URL after the rename; no resource mutation occurs
+205 |         // between the oracle and candidate calls for either phase.
+206 |         let after = try #require(URL(string: spelling))
+    |                     `- error: no calls to throwing functions occur within 'try' expression
+207 |         expectKeyMatchesNormalization(after)
+208 |         #expect(NormalizedFileURL.persistenceKey(for: after) != nil)
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:210:30: error: no calls to throwing functions occur within 'try' expression
+208 |         #expect(NormalizedFileURL.persistenceKey(for: after) != nil)
+209 |         expectKeyMatchesNormalization(try #require(NSURL(string: spelling)) as URL)
+210 |         let foundationPath = try #require((after as NSURL).filePathURL)
+    |                              `- error: no calls to throwing functions occur within 'try' expression
+211 |         #expect(NormalizedFileURL.persistenceKey(for: after).map { Array($0.utf8) }
+212 |             == (NormalizedFileURL.normalize(foundationPath)?.path).map { Array($0.utf8) })
+[17/19] Compiling IlliquidCoreTests UtilitiesTests.swift
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:197:41: error: cannot convert value of type 'Unmanaged<CFURL>' to expected argument type 'CFURL'
+195 |         let reference = try #require(CFURLCreateFileReferenceURL(
+196 |             kCFAllocatorDefault, original as CFURL, &creationError))
+197 |         #expect(CFURLIsFileReferenceURL(reference))
+    |                                         `- error: cannot convert value of type 'Unmanaged<CFURL>' to expected argument type 'CFURL'
+198 |         let spelling = try #require(CFURLGetString(reference)) as String
+199 |         let before = try #require(URL(string: spelling))
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:198:52: error: cannot convert value of type 'Unmanaged<CFURL>' to expected argument type 'CFURL'
+196 |             kCFAllocatorDefault, original as CFURL, &creationError))
+197 |         #expect(CFURLIsFileReferenceURL(reference))
+198 |         let spelling = try #require(CFURLGetString(reference)) as String
+    |                                                    `- error: cannot convert value of type 'Unmanaged<CFURL>' to expected argument type 'CFURL'
+199 |         let before = try #require(URL(string: spelling))
+200 |         expectKeyMatchesNormalization(before)
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:198:24: error: no calls to throwing functions occur within 'try' expression
+196 |             kCFAllocatorDefault, original as CFURL, &creationError))
+197 |         #expect(CFURLIsFileReferenceURL(reference))
+198 |         let spelling = try #require(CFURLGetString(reference)) as String
+    |                        `- error: no calls to throwing functions occur within 'try' expression
+199 |         let before = try #require(URL(string: spelling))
+200 |         expectKeyMatchesNormalization(before)
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:199:22: error: no calls to throwing functions occur within 'try' expression
+197 |         #expect(CFURLIsFileReferenceURL(reference))
+198 |         let spelling = try #require(CFURLGetString(reference)) as String
+199 |         let before = try #require(URL(string: spelling))
+    |                      `- error: no calls to throwing functions occur within 'try' expression
+200 |         expectKeyMatchesNormalization(before)
+201 |         #expect(NormalizedFileURL.persistenceKey(for: before) != nil)
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:206:21: error: no calls to throwing functions occur within 'try' expression
+204 |         // Recreate the URL after the rename; no resource mutation occurs
+205 |         // between the oracle and candidate calls for either phase.
+206 |         let after = try #require(URL(string: spelling))
+    |                     `- error: no calls to throwing functions occur within 'try' expression
+207 |         expectKeyMatchesNormalization(after)
+208 |         #expect(NormalizedFileURL.persistenceKey(for: after) != nil)
+
+/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/illiquid-file-identity.whukla/Tests/IlliquidCoreTests/NormalizedFileURLPersistenceKeyTests.swift:210:30: error: no calls to throwing functions occur within 'try' expression
+208 |         #expect(NormalizedFileURL.persistenceKey(for: after) != nil)
+209 |         expectKeyMatchesNormalization(try #require(NSURL(string: spelling)) as URL)
+210 |         let foundationPath = try #require((after as NSURL).filePathURL)
+    |                              `- error: no calls to throwing functions occur within 'try' expression
+211 |         #expect(NormalizedFileURL.persistenceKey(for: after).map { Array($0.utf8) }
+212 |             == (NormalizedFileURL.normalize(foundationPath)?.path).map { Array($0.utf8) })
+error: fatalError

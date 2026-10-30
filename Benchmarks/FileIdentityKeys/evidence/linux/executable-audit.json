@@ -1,0 +1,139 @@
+{
+  "audited_utc": "2026-10-28T05:00:01.928111+00:00",
+  "binary": {
+    "format": "ELF64 x86-64",
+    "matches_completed_manifest": true,
+    "path": "/tmp/illiquid-file-key-linux-final/build/driver",
+    "sha256": "f4be1b8543f0ae68bf7669ba738178ef50a90d982d44696d9fd8dfb8155b52ff"
+  },
+  "compiler_boundary": {
+    "accurate_description": "Baseline and candidate were separately compiled into optimized Swift modules and objects; the driver was compiled separately and linked to both objects. Swift default CMO was enabled for the recorded module frontend invocations. Inspection of this measured executable confirms that the driver still invokes the compiled production functions on every iteration.",
+    "correction": "The completed manifest says without cross-module optimization. That is too strong: both retained module frontend plans explicitly contain -enable-default-cmo. Separate compilation and lack of @inlinable methods alone do not prove that CMO is disabled.",
+    "driver_build_command": [
+      "/tmp/illiquid-swift/usr/bin/swiftc",
+      "-swift-version",
+      "6",
+      "-O",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/tmp/illiquid-file-key-linux-final/build/module-cache",
+      "-I",
+      "/tmp/illiquid-file-key-linux-final/build/modules",
+      "/tmp/illiquid-file-key-linux-final/sources/Driver.swift",
+      "/tmp/illiquid-file-key-linux-final/build/URLBaseline.o",
+      "/tmp/illiquid-file-key-linux-final/build/URLCandidate.o",
+      "-o",
+      "/tmp/illiquid-file-key-linux-final/build/driver"
+    ],
+    "driver_frontend_plan_retained": false,
+    "explicit_cross_module_optimization_flag_added": false,
+    "flags_changed_for_audit": false,
+    "lto_flag_added": false,
+    "module_frontend_plans": [
+      {
+        "command": "/tmp/illiquid-swift/usr/bin/swift-frontend -frontend -c /tmp/illiquid-file-key-linux-final/sources/baseline/FolderPlaylist.swift /tmp/illiquid-file-key-linux-final/sources/baseline/NaturalFilenameOrdering.swift /tmp/illiquid-file-key-linux-final/sources/baseline/NormalizedFileURL.swift -supplementary-output-file-map /tmp/TemporaryDirectory.yvtzy1/supplementaryOutputs-1 -target x86_64-unknown-linux-gnu -disable-objc-interop -no-color-diagnostics -Xcc -fno-color-diagnostics -module-cache-path /tmp/illiquid-file-key-linux-final/build/module-cache -swift-version 6 -O -empty-abi-descriptor -no-auto-bridging-header-chaining -module-name URLBaseline -in-process-plugin-server-path /tmp/illiquid-swift/usr/lib/swift/host/libSwiftInProcPluginServer.so -plugin-path /tmp/illiquid-swift/usr/lib/swift/host/plugins -plugin-path /tmp/illiquid-swift/usr/local/lib/swift/host/plugins -enable-default-cmo -parse-as-library -o /tmp/illiquid-file-key-linux-final/build/URLBaseline.o",
+        "enable_default_cmo": true,
+        "log": "logs/0004-baseline-compiler-plan.stdout.txt",
+        "variant": "baseline"
+      },
+      {
+        "command": "/tmp/illiquid-swift/usr/bin/swift-frontend -frontend -c /tmp/illiquid-file-key-linux-final/sources/candidate/FolderPlaylist.swift /tmp/illiquid-file-key-linux-final/sources/candidate/NaturalFilenameOrdering.swift /tmp/illiquid-file-key-linux-final/sources/candidate/NormalizedFileURL.swift -supplementary-output-file-map /tmp/TemporaryDirectory.Yr6vq2/supplementaryOutputs-1 -target x86_64-unknown-linux-gnu -disable-objc-interop -no-color-diagnostics -Xcc -fno-color-diagnostics -module-cache-path /tmp/illiquid-file-key-linux-final/build/module-cache -swift-version 6 -O -empty-abi-descriptor -no-auto-bridging-header-chaining -module-name URLCandidate -in-process-plugin-server-path /tmp/illiquid-swift/usr/lib/swift/host/libSwiftInProcPluginServer.so -plugin-path /tmp/illiquid-swift/usr/lib/swift/host/plugins -plugin-path /tmp/illiquid-swift/usr/local/lib/swift/host/plugins -enable-default-cmo -parse-as-library -o /tmp/illiquid-file-key-linux-final/build/URLCandidate.o",
+        "enable_default_cmo": true,
+        "log": "logs/0006-candidate-compiler-plan.stdout.txt",
+        "variant": "candidate"
+      }
+    ]
+  },
+  "completed_manifest": {
+    "modified": false,
+    "path": "manifest.json",
+    "sha256": "f8d597de8344cdd51ee99b4a32b6ec6344969cc6a62c25caaf0c0f997a2a6244"
+  },
+  "excerpts": {
+    "path": "executable-audit-excerpts.txt",
+    "sha256": "21a13de5fcd8421f4014c142df3008c153e5641cdbdd7942dde652c6b0827c78"
+  },
+  "keys": {
+    "baseline_callback_tail_call": {
+      "from": "0x7a20",
+      "optimized_implementation": "0x158a0",
+      "public_function": "0x16db0"
+    },
+    "candidate_callback_tail_call": {
+      "from": "0x7a30",
+      "optimized_implementation": "0x20050",
+      "public_function": "0x21320"
+    },
+    "execute_closure_tail_call": {
+      "from": "0xd25f",
+      "to": "0x6ab0"
+    },
+    "inner_back_edge": {
+      "from": "0x6bdb",
+      "to": "0x6b30"
+    },
+    "outer_round_comparison": "0x6b08",
+    "outer_round_counter": "0x6b00",
+    "per_url_callback_call": "0x6b58",
+    "result_consumption": "Each optional String result contributes its UTF-8 count or one to the accumulated checksum; the loop adds the observed count at 0x6bcf.",
+    "runKeys_start": "0x6ab0"
+  },
+  "limitations": [
+    "This audit covers this exact Linux x86-64 executable and its retained compiler plans; it is not a native macOS binary audit or a guarantee for future toolchains.",
+    "No claim is made that every cross-module optimization is disabled. Retained calls are established by the emitted machine code, not inferred from source-module separation.",
+    "Production intra-module inlining and specialization remain enabled and differ between variants, as expected in an optimized source comparison.",
+    "This is a structural audit of repeated work and timing placement, not a new correctness run, timing campaign, or evaluation of measurement variance.",
+    "The original completed manifest and source snapshots were intentionally preserved, including their overly strong CMO wording; this sidecar records the correction."
+  ],
+  "method": "Read-only nm and objdump inspection of the exact completed measurement executable; manual tracing of callback selection, loop back edges, production targets, and timer placement.",
+  "playlists": {
+    "baseline_function_selection": {
+      "at": "0xcc10",
+      "optimized_implementation": "0x160f0",
+      "public_function": "0x17830"
+    },
+    "baseline_scan": "Baseline normalization is inlined within its own source-module index implementation. The scan retains standardized at 0x16356, canonical composition at 0x163a2, and the URL path constructor at 0x163c9, followed by scan back edge 0x16585 -> 0x16160. This normal intra-module optimization does not eliminate repeated lookup work.",
+    "candidate_function_selection": {
+      "at": "0xc280",
+      "optimized_implementation": "0x20a20",
+      "public_function": "0x21da0"
+    },
+    "candidate_scan_back_edge": {
+      "from": "0x20b16",
+      "to": "0x20a63"
+    },
+    "candidate_scan_item_key_call": {
+      "at": "0x20a95",
+      "target": "0x20050"
+    },
+    "candidate_scan_query_key_call": {
+      "at": "0x20acd",
+      "target": "0x20050"
+    },
+    "inner_back_edge": {
+      "from": "0x95e6",
+      "to": "0x9570"
+    },
+    "outer_round_comparison": "0x9548",
+    "outer_round_counter": "0x9540",
+    "per_query_callback_call": "0x95a3",
+    "result_consumption": "Each observed optional index contributes index plus one or zero to the accumulated checksum at 0x95da.",
+    "shared_execute": "At 0xcc6b the selected public function address is loaded into r9, then 0xcc70 calls the shared runLookups body; 0x94fe stores r9 at stack offset 0x38, used by the loop callback call at 0x95a3.",
+    "shared_runLookups_start": "0x94f0"
+  },
+  "protected_file_count": 10,
+  "protected_files_unchanged": true,
+  "result": "Repeated production work is retained inside the measured loops. No call elimination, result precomputation, or hoisting outside the timed interval was found for either variant.",
+  "schema_version": 1,
+  "timers": {
+    "cpu_end_clock_gettime": "0xb451",
+    "cpu_start_clock_gettime": "0xb3aa",
+    "observation": "Warmup remains before clock start. The execute callback containing the repetition loops is invoked after wall start and returns before wall end, both within the process CPU interval.",
+    "timed_execute": "0xb417",
+    "untimed_warmup_execute": "0xb36e",
+    "wall_end_dispatch_now": "0xb41e",
+    "wall_end_uptime_read": "0xb426",
+    "wall_start_dispatch_now": "0xb3fd",
+    "wall_start_uptime_read": "0xb405"
+  }
+}
