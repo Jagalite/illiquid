@@ -141,3 +141,11 @@ frame rate, playback CPU, energy, RSS, or peak allocations.
 The comparison intentionally stops if unrelated supporting production sources
 change. Review and explicitly refresh the comparison before reusing it against
 a later incompatible snapshot.
+
+The PR212 projection API is bridged only in the regression reference by an
+explicitly pinned, uncached ancestor evaluator adapter. Both overloads forward
+every call to the unchanged historical `evaluateIncludingAncestors` body; the
+manifest records the historical matcher and adapter hashes separately. Automated
+push and pull-request callers select this mode. All 13 cases, including negative
+controls, are required; the measurement entry point rejects regression mode.
+Manual dispatch retains the strict historical study and its fail-closed guards.

@@ -1,0 +1,92 @@
+commit 53782c9688bf7edb7e41b780c6de3e79d75108ff
+Author:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+AuthorDate: Wed Oct 28 01:53:08 2026 -0400
+Commit:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+CommitDate: Wed Oct 28 01:53:08 2026 -0400
+
+    chore: preserve raw ownership receipts and fold generated evidence
+
+ .gitattributes | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 47d611ad9f0b6e1e0aac0197281c1788de4feea5
+Author:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+AuthorDate: Wed Oct 28 01:50:27 2026 -0400
+Commit:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+CommitDate: Wed Oct 28 01:50:27 2026 -0400
+
+    docs: retain measured recovery GOP ownership evidence
+
+ .github/workflows/video-recovery-gop-lifetime.yml  |   2 +-
+ Benchmarks/VideoRecoveryPacketLifetime/README.md   |   6 +-
+ .../evidence/ubuntu/baseline-debug.json            |  68 ++++++
+ .../evidence/ubuntu/baseline-release.json          |  68 ++++++
+ .../evidence/ubuntu/candidate-debug.json           |  68 ++++++
+ .../evidence/ubuntu/candidate-release.json         |  68 ++++++
+ .../evidence/ubuntu/ci-receipt.json                |   8 +
+ .../evidence/ubuntu/commands.json                  | 253 +++++++++++++++++++++
+ .../evidence/ubuntu/logs/build-baseline-debug.log  |   0
+ .../ubuntu/logs/build-baseline-release.log         |   0
+ .../evidence/ubuntu/logs/build-candidate-debug.log |   0
+ .../ubuntu/logs/build-candidate-release.log        |   0
+ .../evidence/ubuntu/logs/compiler.log              |   2 +
+ .../evidence/ubuntu/logs/git-head.log              |   1 +
+ .../evidence/ubuntu/logs/git-status.log            |   0
+ .../evidence/ubuntu/logs/run-baseline-debug.log    |  68 ++++++
+ .../evidence/ubuntu/logs/run-baseline-release.log  |  68 ++++++
+ .../evidence/ubuntu/logs/run-candidate-debug.log   |  68 ++++++
+ .../evidence/ubuntu/logs/run-candidate-release.log |  68 ++++++
+ .../evidence/ubuntu/logs/sdk-cflags.log            |   1 +
+ .../evidence/ubuntu/logs/sdk-libs.log              |   1 +
+ .../evidence/ubuntu/logs/sdk-versions.log          |   2 +
+ .../evidence/ubuntu/manifest.json                  | 113 +++++++++
+ .../evidence/ubuntu/summary.json                   |  49 ++++
+ 24 files changed, 980 insertions(+), 2 deletions(-)
+
+commit 4471909c9ee8ff6975b480e8fd47325164cdf9e8
+Author:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+AuthorDate: Wed Oct 28 01:47:31 2026 -0400
+Commit:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+CommitDate: Wed Oct 28 01:47:31 2026 -0400
+
+    test: configure native EOF fixture and document ownership results
+
+ .github/workflows/video-recovery-gop-lifetime.yml  |  5 ++-
+ Benchmarks/VideoRecoveryPacketLifetime/README.md   | 52 ++++++++++++++++++++++
+ .../VideoRecoveryPacketSessionLifetimeTests.swift  |  4 ++
+ 3 files changed, 59 insertions(+), 2 deletions(-)
+
+commit 45c3fd533aa38daca4792efc783532cce2ec0d45
+Author:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+AuthorDate: Wed Oct 28 01:44:26 2026 -0400
+Commit:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+CommitDate: Wed Oct 28 01:44:26 2026 -0400
+
+    test: qualify recovery packet retirement and require native EOF fixture
+
+ .github/workflows/video-recovery-gop-lifetime.yml  |  10 +-
+ Benchmarks/VideoRecoveryPacketLifetime/README.md   |  16 ++-
+ Benchmarks/VideoRecoveryPacketLifetime/run.py      |  53 +++++++
+ .../VideoRecoveryPacketLifetimeTests.swift         |   4 +-
+ .../VideoRecoveryPacketSessionLifetimeTests.swift  | 152 +++++++++++++++++++++
+ 5 files changed, 230 insertions(+), 5 deletions(-)
+
+commit 9da2b2edb5b01924faad3469f68f3e5e2c17dfed
+Author:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+AuthorDate: Wed Oct 28 01:35:21 2026 -0400
+Commit:     Jaga Tranvo <jaga.tranvo@superseedr.com>
+CommitDate: Wed Oct 28 01:35:21 2026 -0400
+
+    perf: retire the video recovery GOP after normal decoder drain
+
+ .github/workflows/video-recovery-gop-lifetime.yml  | 114 +++++++++
+ Benchmarks/VideoRecoveryPacketLifetime/.gitignore  |   2 +
+ Benchmarks/VideoRecoveryPacketLifetime/Probe.swift | 275 +++++++++++++++++++++
+ Benchmarks/VideoRecoveryPacketLifetime/README.md   |  89 +++++++
+ .../baseline/FFmpegPacket.swift                    | 185 ++++++++++++++
+ .../baseline/manifest.json                         |   6 +
+ Benchmarks/VideoRecoveryPacketLifetime/run.py      | 250 +++++++++++++++++++
+ .../Media/FFmpegPacket.swift                       |  19 ++
+ .../Media/MediaSession.swift                       |  50 ++--
+ .../VideoRecoveryPacketLifetimeTests.swift         | 213 ++++++++++++++++
+ 10 files changed, 1180 insertions(+), 23 deletions(-)

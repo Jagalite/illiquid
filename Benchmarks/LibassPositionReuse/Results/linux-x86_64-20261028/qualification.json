@@ -1,0 +1,35 @@
+{
+  "baseline_commit": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "cases": [
+    "moving-small",
+    "moving-dense",
+    "static",
+    "content-change",
+    "moving-bounded",
+    "moving-fractional"
+  ],
+  "native_macos_qualified": false,
+  "pairs_per_case": 8,
+  "scope": "Linux exploratory only",
+  "source_body_parity": "import-only adapters verified",
+  "status": "passed",
+  "tests": {
+    "debug": {
+      "status": "passed",
+      "targets": [
+        "IlliquidNativePlaybackBaselineTests",
+        "IlliquidNativePlaybackCandidateTests"
+      ],
+      "total_tests": 24
+    },
+    "release": {
+      "status": "passed",
+      "targets": [
+        "IlliquidNativePlaybackBaselineTests",
+        "IlliquidNativePlaybackCandidateTests"
+      ],
+      "total_tests": 24
+    }
+  },
+  "visual_parity": "passed against real-libass full-copy oracle"
+}

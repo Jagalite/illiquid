@@ -1,0 +1,324 @@
+{
+  "adaptation": "Compile whole production FFmpegPacket/FFmpegError; extract unchanged portable support and C helpers. Expose the exact post-drain/pre-EOF action from MediaSession. The driver models successful drain, not decoding.",
+  "baselineRevision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binaryHashes": {
+    "baseline-debug": "e81e615ba331ac217a89550e8646992ffc58b9ae4242b7d3495ae329a0f6a05b",
+    "baseline-release": "f2a2ee79c8699dc10fb049a87992003d91f90a52e3e01e42102d7a15432f6c47",
+    "candidate-debug": "bfc72aa48a76c686a5e3c5a2e5150ca46c8ed063c6660fa455713ec4e4fd6554",
+    "candidate-release": "25493af69ee8362592d9198797219faf7b4facba73a03b4f1afc822fb9293e46"
+  },
+  "candidateRevision": "b162b972b6e13ccfbe08bb6462275f4143dc2077",
+  "candidateWorktreeStatus": "",
+  "compiler": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "complete": true,
+  "environment": {
+    "DEVELOPER_DIR": null,
+    "DYLD_LIBRARY_PATH": null,
+    "ImageOS": "ubuntu24",
+    "ImageVersion": "20261023.334.3",
+    "LD_LIBRARY_PATH": null,
+    "PKG_CONFIG_PATH": null
+  },
+  "finishedUTC": "2026-10-28T05:45:01.974309+00:00",
+  "harnessHashes": {
+    "Driver.swift": "60ec893706456e440986e2a83eb3deb5d96caca9dabd5477120f7356c820a120",
+    "run.py": "575fcb1eb851299c033f8b1dc885d39e19c2691fff51029049c4ace7a1b616da"
+  },
+  "machine": "x86_64",
+  "observations": [
+    {
+      "configuration": "debug",
+      "pair": 0,
+      "path": "observations/debug-0-0-baseline.json",
+      "position": 0,
+      "sha256": "835188c31871e7844d2fecdefdb47d9a41de0520344ffc5556c3ca339a19644e",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "pair": 0,
+      "path": "observations/debug-0-1-candidate.json",
+      "position": 1,
+      "sha256": "ddafe18441ea517971de4752d6a3345d8c64a7eec271bee14d54877cbb3805d4",
+      "variant": "candidate"
+    },
+    {
+      "configuration": "debug",
+      "pair": 0,
+      "path": "observations/debug-0-2-candidate.json",
+      "position": 2,
+      "sha256": "ddafe18441ea517971de4752d6a3345d8c64a7eec271bee14d54877cbb3805d4",
+      "variant": "candidate"
+    },
+    {
+      "configuration": "debug",
+      "pair": 0,
+      "path": "observations/debug-0-3-baseline.json",
+      "position": 3,
+      "sha256": "835188c31871e7844d2fecdefdb47d9a41de0520344ffc5556c3ca339a19644e",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "pair": 1,
+      "path": "observations/debug-1-0-candidate.json",
+      "position": 0,
+      "sha256": "ddafe18441ea517971de4752d6a3345d8c64a7eec271bee14d54877cbb3805d4",
+      "variant": "candidate"
+    },
+    {
+      "configuration": "debug",
+      "pair": 1,
+      "path": "observations/debug-1-1-baseline.json",
+      "position": 1,
+      "sha256": "835188c31871e7844d2fecdefdb47d9a41de0520344ffc5556c3ca339a19644e",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "pair": 1,
+      "path": "observations/debug-1-2-baseline.json",
+      "position": 2,
+      "sha256": "835188c31871e7844d2fecdefdb47d9a41de0520344ffc5556c3ca339a19644e",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "debug",
+      "pair": 1,
+      "path": "observations/debug-1-3-candidate.json",
+      "position": 3,
+      "sha256": "ddafe18441ea517971de4752d6a3345d8c64a7eec271bee14d54877cbb3805d4",
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "pair": 0,
+      "path": "observations/release-0-0-baseline.json",
+      "position": 0,
+      "sha256": "835188c31871e7844d2fecdefdb47d9a41de0520344ffc5556c3ca339a19644e",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "pair": 0,
+      "path": "observations/release-0-1-candidate.json",
+      "position": 1,
+      "sha256": "ddafe18441ea517971de4752d6a3345d8c64a7eec271bee14d54877cbb3805d4",
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "pair": 0,
+      "path": "observations/release-0-2-candidate.json",
+      "position": 2,
+      "sha256": "ddafe18441ea517971de4752d6a3345d8c64a7eec271bee14d54877cbb3805d4",
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "pair": 0,
+      "path": "observations/release-0-3-baseline.json",
+      "position": 3,
+      "sha256": "835188c31871e7844d2fecdefdb47d9a41de0520344ffc5556c3ca339a19644e",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "pair": 1,
+      "path": "observations/release-1-0-candidate.json",
+      "position": 0,
+      "sha256": "ddafe18441ea517971de4752d6a3345d8c64a7eec271bee14d54877cbb3805d4",
+      "variant": "candidate"
+    },
+    {
+      "configuration": "release",
+      "pair": 1,
+      "path": "observations/release-1-1-baseline.json",
+      "position": 1,
+      "sha256": "835188c31871e7844d2fecdefdb47d9a41de0520344ffc5556c3ca339a19644e",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "pair": 1,
+      "path": "observations/release-1-2-baseline.json",
+      "position": 2,
+      "sha256": "835188c31871e7844d2fecdefdb47d9a41de0520344ffc5556c3ca339a19644e",
+      "variant": "baseline"
+    },
+    {
+      "configuration": "release",
+      "pair": 1,
+      "path": "observations/release-1-3-candidate.json",
+      "position": 3,
+      "sha256": "ddafe18441ea517971de4752d6a3345d8c64a7eec271bee14d54877cbb3805d4",
+      "variant": "candidate"
+    }
+  ],
+  "pairs": 2,
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "schemaVersion": 1,
+  "scope": "Live requested AVBuffer payload plus padding; excludes allocator overhead, packet headers, side data, RSS, decoder/render pools, and total player memory.",
+  "sdkLibraryInventorySHA256": {
+    "/usr/lib/x86_64-linux-gnu/libavcodec.a": "deaaea4da1a908ea00a02a1541d505d49d4c31f343f4412eed411bc109d87c42",
+    "/usr/lib/x86_64-linux-gnu/libavcodec.so.60.31.102": "8231c9aecba7d02c132de0e16195ccb3e8002a235a5f364b3635df09e7f513e0",
+    "/usr/lib/x86_64-linux-gnu/libavutil.a": "736d7e37d31a0092c2622871058058b9d1de4278572965ad48138149f9a16263",
+    "/usr/lib/x86_64-linux-gnu/libavutil.so.58.29.100": "11b0836441b899e1b2183fc10eda5a5f637c03547fdfe5b97774e2cbd5aeb72c"
+  },
+  "sdkVersions": {
+    "libavcodec": "60.31.102",
+    "libavutil": "58.29.100"
+  },
+  "sourceHashes": {
+    "baseline/Sources/CFFmpeg/include/ffmpeg_shim.h": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+    "baseline/Sources/IlliquidNativePlayback/Media/FFmpegError.swift": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+    "baseline/Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+    "baseline/Sources/IlliquidNativePlayback/Media/MediaSession.swift": "5707073bcdde07310a63f34c89beb11b76bf8682fe6c5d9a8cf5948a608ce969",
+    "baseline/Sources/IlliquidNativePlayback/Media/MediaTime.swift": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02",
+    "baseline/Sources/IlliquidNativePlayback/Playback/PacketQueue.swift": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab",
+    "candidate/Sources/CFFmpeg/include/ffmpeg_shim.h": "d4092b963f12fdc708c8b7d6fcad61b80322af1c9eca6c0d903b90efaa2e7d96",
+    "candidate/Sources/IlliquidNativePlayback/Media/FFmpegError.swift": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+    "candidate/Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift": "9127a96fee6e66c2b43d37b7354b330040910e836f17a69d2a0feb25a3a6f694",
+    "candidate/Sources/IlliquidNativePlayback/Media/MediaSession.swift": "cf539e3313e886124a99b8b550036c70a039bc9aa5d71ee1eb212a764cb1f27c",
+    "candidate/Sources/IlliquidNativePlayback/Media/MediaTime.swift": "7c1ddfd3e26b27c1871a16cf8f1586aeea0f1cd62c05898b51b59fec6b40cb02",
+    "candidate/Sources/IlliquidNativePlayback/Playback/PacketQueue.swift": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab"
+  },
+  "stagedHashes": {
+    "sources/Driver.swift": "60ec893706456e440986e2a83eb3deb5d96caca9dabd5477120f7356c820a120",
+    "sources/baseline/CFFmpeg/module.modulemap": "4f1679a4065711ca8dde228ddbaa019320d7969486a112e3804d0f057340dfb0",
+    "sources/baseline/CFFmpeg/shim.h": "f5f751acdefa41d8be67d2ca2fd4df15c903f60cbe3103daeafb23a25f94918b",
+    "sources/baseline/EOFAction.swift": "19d04ec2188aa3798758014696a2827335fdcfb6459da548fa5b3b6aa7a8dab4",
+    "sources/baseline/EOFAction.swift.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sources/baseline/EOFCase.swift.txt": "c41fc9051405fa41ebc319111ca55d28071d6cbe7cfda7913e56f71f490de1ed",
+    "sources/baseline/Support.swift": "79455615451724308ea82a49a2fd1abb395465ec1d2c7c3331c949367bd488aa",
+    "sources/baseline/error.swift": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+    "sources/baseline/packet.swift": "de1010a12b09431e01fa46366308b5b9f897615c669ac82f235a5f8f8934e197",
+    "sources/candidate/CFFmpeg/module.modulemap": "4f1679a4065711ca8dde228ddbaa019320d7969486a112e3804d0f057340dfb0",
+    "sources/candidate/CFFmpeg/shim.h": "f5f751acdefa41d8be67d2ca2fd4df15c903f60cbe3103daeafb23a25f94918b",
+    "sources/candidate/EOFAction.swift": "05351a893e555acbb08702ed56ebccf9fa2b380c29e12c15926d3dd20f15e894",
+    "sources/candidate/EOFAction.swift.txt": "565dd18d4a977065b1e625d633738e70e091b40d9ce8b678a594837f9fef0f99",
+    "sources/candidate/EOFCase.swift.txt": "98ea9a40a598e9886938905ff5a0c71634f780ad9dc5b48838e7579649f6ad74",
+    "sources/candidate/Support.swift": "79455615451724308ea82a49a2fd1abb395465ec1d2c7c3331c949367bd488aa",
+    "sources/candidate/error.swift": "7f5432bd7513fc5ceefa540e58e898f861a430574a7ea37b31bc84ffcbb6a341",
+    "sources/candidate/packet.swift": "9127a96fee6e66c2b43d37b7354b330040910e836f17a69d2a0feb25a3a6f694"
+  },
+  "startedUTC": "2026-10-28T05:43:34.507489+00:00",
+  "summary": [
+    {
+      "baselineAfterEOF": {
+        "allocatedBuffers": 0,
+        "allocatedPayloadBytes": 0,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 0,
+        "livePacketWrappers": 0,
+        "livePayloadBytes": 0,
+        "liveRequestedStorageBytes": 0,
+        "releasedBuffers": 0
+      },
+      "candidateAfterEOF": {
+        "allocatedBuffers": 0,
+        "allocatedPayloadBytes": 0,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 0,
+        "livePacketWrappers": 0,
+        "livePayloadBytes": 0,
+        "liveRequestedStorageBytes": 0,
+        "releasedBuffers": 0
+      },
+      "case": "empty"
+    },
+    {
+      "baselineAfterEOF": {
+        "allocatedBuffers": 1,
+        "allocatedPayloadBytes": 65536,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 1,
+        "livePacketWrappers": 1,
+        "livePayloadBytes": 65536,
+        "liveRequestedStorageBytes": 65600,
+        "releasedBuffers": 0
+      },
+      "candidateAfterEOF": {
+        "allocatedBuffers": 1,
+        "allocatedPayloadBytes": 65536,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 0,
+        "livePacketWrappers": 0,
+        "livePayloadBytes": 0,
+        "liveRequestedStorageBytes": 0,
+        "releasedBuffers": 1
+      },
+      "case": "single_64k"
+    },
+    {
+      "baselineAfterEOF": {
+        "allocatedBuffers": 120,
+        "allocatedPayloadBytes": 7864320,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 120,
+        "livePacketWrappers": 120,
+        "livePayloadBytes": 7864320,
+        "liveRequestedStorageBytes": 7872000,
+        "releasedBuffers": 0
+      },
+      "candidateAfterEOF": {
+        "allocatedBuffers": 120,
+        "allocatedPayloadBytes": 7864320,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 0,
+        "livePacketWrappers": 0,
+        "livePayloadBytes": 0,
+        "liveRequestedStorageBytes": 0,
+        "releasedBuffers": 120
+      },
+      "case": "gop_120"
+    },
+    {
+      "baselineAfterEOF": {
+        "allocatedBuffers": 512,
+        "allocatedPayloadBytes": 33554432,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 512,
+        "livePacketWrappers": 512,
+        "livePayloadBytes": 33554432,
+        "liveRequestedStorageBytes": 33587200,
+        "releasedBuffers": 0
+      },
+      "candidateAfterEOF": {
+        "allocatedBuffers": 512,
+        "allocatedPayloadBytes": 33554432,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 0,
+        "livePacketWrappers": 0,
+        "livePayloadBytes": 0,
+        "liveRequestedStorageBytes": 0,
+        "releasedBuffers": 512
+      },
+      "case": "limit_512"
+    },
+    {
+      "baselineAfterEOF": {
+        "allocatedBuffers": 8,
+        "allocatedPayloadBytes": 330752,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 5,
+        "livePacketWrappers": 5,
+        "livePayloadBytes": 327680,
+        "liveRequestedStorageBytes": 328000,
+        "releasedBuffers": 3
+      },
+      "candidateAfterEOF": {
+        "allocatedBuffers": 8,
+        "allocatedPayloadBytes": 330752,
+        "invalidReleaseCounts": 0,
+        "liveBuffers": 0,
+        "livePacketWrappers": 0,
+        "livePayloadBytes": 0,
+        "liveRequestedStorageBytes": 0,
+        "releasedBuffers": 8
+      },
+      "case": "replaced_gop"
+    }
+  ]
+}

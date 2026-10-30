@@ -93,7 +93,10 @@ def portable(data: bytes) -> bytes:
     return data if sys.platform == "darwin" else data.replace(b"import CoreGraphics\n", b"")
 
 
-def snapshot(run: Run) -> tuple[dict, dict[str, list[Path]]]:
+REVIEWED_SUPPORT = {'Sources/IlliquidNativePlayback/Subtitles/LibassContext.swift': '3f54f4ef38c30191538aa0edfc4f3ad704d9078ec4edf73ee5a2601e153abdae', 'Sources/IlliquidNativePlayback/Subtitles/SubtitleMemoryBudget.swift': '9ed5a5969fe23ae90df38aea7987f5a61feeb10d7aa1ffafbcf0c05917974cac'}
+
+
+def snapshot(run: Run, regression: bool = False) -> tuple[dict, dict[str, list[Path]]]:
     pinned = json.loads((HERE / "baseline/manifest.json").read_text())
     inputs = run.output / "inputs"
     inputs.mkdir()
@@ -103,7 +106,11 @@ def snapshot(run: Run) -> tuple[dict, dict[str, list[Path]]]:
         baseline = (HERE / "baseline/BitmapSubtitleTimeline.swift" if path == TIMELINE
                     else ROOT / path).read_bytes()
         blob = hashlib.sha1(f"blob {len(baseline)}\0".encode() + baseline).hexdigest()
-        if digest(baseline) != expected["sha256"] or blob != expected["git_blob"]:
+        if regression and path in REVIEWED_SUPPORT:
+            valid = digest(baseline) == REVIEWED_SUPPORT[path]
+        else:
+            valid = digest(baseline) == expected["sha256"] and blob == expected["git_blob"]
+        if not valid:
             raise RuntimeError(f"Pinned source changed: {path}; requalify the baseline")
         originals[path] = baseline
     for variant in VARIANTS:
@@ -116,7 +123,8 @@ def snapshot(run: Run) -> tuple[dict, dict[str, list[Path]]]:
             name = Path(path).name
             if path == REGIONS:
                 start = b"struct ASSRenderedRegion: Sendable {"
-                end = b"struct ASSRenderResult: Sendable {"
+                end = (b"/// Identity belongs to the render stream," if regression
+                       else b"struct ASSRenderResult: Sendable {")
                 if data.count(start) != 1 or data.count(end) != 1:
                     raise RuntimeError("ASSRenderedRegion extraction boundaries changed")
                 data = b"import Foundation\nimport CoreGraphics\n\n" + data[data.index(start):data.index(end)]
@@ -137,6 +145,9 @@ def snapshot(run: Run) -> tuple[dict, dict[str, list[Path]]]:
         hashes[destination.name] = {"full_sha256": digest(original), "compiled_sha256": digest(data)}
     manifest = {
         "baseline": pinned, "input_sha256": hashes,
+        "support_policy": "reviewed-current-correctness" if regression else "historical-strict",
+        "reviewed_support": REVIEWED_SUPPORT if regression else None,
+        "reviewed_merge_tree": "9f3d7728ea7488242bbfcd7c474b7be1e9c3ee1c" if regression else None,
         "candidate_head": run.command(["git", "rev-parse", "HEAD"], "head").strip(),
         "candidate_status": run.command(["git", "status", "--short"], "status").strip(),
         "platform": platform.platform(), "machine": platform.machine(),
@@ -314,7 +325,7 @@ def measure(run: Run, binaries: dict[str, Path], workloads: list[str], args: arg
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=["all", "test", "benchmark"], default="all")
+    parser.add_argument("--mode", choices=["all", "test", "benchmark", "regression"], default="all")
     parser.add_argument("--pairs", type=int, default=10)
     parser.add_argument("--target-ms", type=float, default=150)
     parser.add_argument("--output", type=Path, required=True)
@@ -330,7 +341,7 @@ def main() -> None:
                "target_ms": args.target_ms, "tests": [], "workloads": []}
     save(output / "summary.json", summary)
     try:
-        manifest, sources = snapshot(run)
+        manifest, sources = snapshot(run, regression=args.mode == "regression")
         toolchain, target = compiler(run)
         manifest["compiler"] = toolchain
         manifest["protocol"] = {
@@ -339,7 +350,7 @@ def main() -> None:
             "calibration": "Target >=90% requested CPU interval in both variants, capped at 12 probes/10 million iterations; stop reasons recorded; identical fixed iterations per workload; all probes retained.",
         }
         save(output / "manifest.json", manifest)
-        if args.mode in ["all", "test"]:
+        if args.mode in ["all", "test", "regression"]:
             tests(run, sources, toolchain, summary)
         binaries = build(run, sources, toolchain, target, manifest)
         workloads = parity(run, binaries, summary)

@@ -1,0 +1,108 @@
+name: Submitted frame identity history
+on:
+  push:
+    branches:
+      - 'perf/video-frame-history-ring-*'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Presentation/SampleBufferVideoPresenter.swift'
+      - 'Sources/IlliquidNativePlayback/Presentation/VideoFrameIdentityHistory.swift'
+      - 'Tests/IlliquidNativePlaybackTests/VideoFrameIdentityHistoryTests.swift'
+      - 'Scripts/test-video-frame-identity-history.sh'
+      - 'Benchmarks/VideoFrameIdentityHistory/**'
+      - '.github/workflows/video-frame-identity-history.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  # Push and PR events for the same branch share one qualification run.
+  group: video-frame-identity-history-refs/heads/${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    container: swift:6.3.2-noble
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Trust checkout in the Linux container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Prepare tools
+        run: |
+          apt-get update -qq
+          apt-get install -y --no-install-recommends python3 gcc
+          swift --version
+          echo 'Kyoto is unavailable on this Linux runner; isolated builds run serially.'
+      - name: Debug and release history tests
+        shell: bash
+        run: |
+          set -o pipefail
+          bash Scripts/test-video-frame-identity-history.sh -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/frame-history-tests-debug.log"
+          bash Scripts/test-video-frame-identity-history.sh -c release -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/frame-history-tests-release.log"
+      - name: Check scoped buffer reads with AddressSanitizer
+        shell: bash
+        env:
+          ASAN_OPTIONS: detect_leaks=0
+        run: |
+          set -o pipefail
+          bash Scripts/test-video-frame-identity-history.sh --sanitize address -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/frame-history-tests-asan.log"
+      - name: Measure bounded history against the pinned array baseline
+        run: >-
+          python3 Benchmarks/VideoFrameIdentityHistory/run.py
+          --output "$RUNNER_TEMP/frame-history" --pairs 6 --target-ms 60
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-frame-identity-history-linux
+          path: |
+            ${{ runner.temp }}/frame-history-tests-*.log
+            ${{ runner.temp }}/frame-history/*.json
+            ${{ runner.temp }}/frame-history/*.jsonl
+            ${{ runner.temp }}/frame-history/logs/
+            ${{ runner.temp }}/frame-history/sources/
+          retention-days: 14
+  macos:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build coordination
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this runner; isolated builds run serially.'
+      - name: Debug and release history tests
+        run: |
+          set -o pipefail
+          bash Scripts/test-video-frame-identity-history.sh -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/frame-history-tests-debug.log"
+          bash Scripts/test-video-frame-identity-history.sh -c release -Xswiftc -warnings-as-errors \
+            2>&1 | tee "$RUNNER_TEMP/frame-history-tests-release.log"
+      - name: Measure bounded history against the pinned array baseline
+        run: >-
+          python3 Benchmarks/VideoFrameIdentityHistory/run.py
+          --output "$RUNNER_TEMP/frame-history" --pairs 6 --target-ms 60
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: video-frame-identity-history-macos
+          path: |
+            ${{ runner.temp }}/frame-history-tests-*.log
+            ${{ runner.temp }}/frame-history/*.json
+            ${{ runner.temp }}/frame-history/*.jsonl
+            ${{ runner.temp }}/frame-history/logs/
+            ${{ runner.temp }}/frame-history/sources/
+          retention-days: 14

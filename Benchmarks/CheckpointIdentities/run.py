@@ -28,7 +28,7 @@ CORE = [
 ]
 # Reviewed integration cohort. A new source change requires an explicit pin review.
 REGRESSION_SHA256 = {
-    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift": "5cd5d029b7a5d8573ac3688676d5ea15117848e10249ed74b1f4df8a9566c18c",
     "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift": "c09072130b113b90faa49b17ff95ce8983668734e69dddf6244572f5de80de62",
     "Sources/IlliquidCore/Playlist/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
     "Sources/IlliquidCore/Playlist/PlaylistMutation.swift": "adb8778743e85252e1b432e26541964ca9a2b4bdd706ba59ce1bf677293d27a3"

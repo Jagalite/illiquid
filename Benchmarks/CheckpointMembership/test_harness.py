@@ -116,5 +116,18 @@ class SwiftTestingReceiptTests(unittest.TestCase):
             self.receipt(self.combined.replace('43 tests', '42 tests'))
 
 
+
+class ReviewedSupportTests(unittest.TestCase):
+    def test_exact_reviewed_support_and_mutation_controls(self):
+        for path in runner.CORE_PATHS:
+            current = (runner.ROOT / path).read_bytes()
+            with self.subTest(path=path):
+                runner.guard_support(path, current, b"historical bytes", True)
+                with self.assertRaises(RuntimeError):
+                    runner.guard_support(path, current + b"\n", current, True)
+                with self.assertRaises(RuntimeError):
+                    runner.guard_support(path, current, b"historical bytes", False)
+                runner.guard_support(path, current, current, False)
+
 if __name__ == "__main__":
     unittest.main()

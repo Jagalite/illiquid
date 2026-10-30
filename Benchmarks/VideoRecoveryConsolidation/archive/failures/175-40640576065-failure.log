@@ -1,0 +1,606 @@
+native-pgs	UNKNOWN STEP	﻿2026-10-28T16:05:20.2250320Z Current runner version: '2.338.0'
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2266700Z ##[group]Runner Image Provisioner
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2267260Z Hosted Compute Agent
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2267640Z Version: 20261012.601
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2268150Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2268710Z Build Date: 2026-10-12T17:48:21Z
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2269180Z Worker ID: {3297c9a7-68da-411a-a09b-aac430a858ff}
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2269640Z Region: westus
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2270050Z Cloud: MacCloud
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2270410Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2271280Z ##[group]Operating System
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2271960Z macOS
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2272410Z 26.6.2
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2272750Z 25G83
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2273170Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2273570Z ##[group]Runner Image
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2274430Z Image: macos-26-arm64
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2274870Z Version: 20261013.0424.1
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2275950Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20261013.0424/images/macos/macos-26-arm64-Readme.md
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2276990Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20261013.0424
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2277660Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2278400Z ##[group]GITHUB_TOKEN Permissions
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2279570Z Contents: read
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2279940Z Metadata: read
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2280310Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2281680Z Secret source: Actions
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2282360Z Cache mode: write
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2282870Z Prepare workflow directory
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2550800Z Prepare all required actions
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.2586430Z Getting action download info
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.5554570Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:20.7706830Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0068420Z Complete job name: native-pgs
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0718780Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0719700Z with:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0720130Z   persist-credentials: false
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0720710Z   fetch-depth: 0
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0721160Z   repository: Jagalite/illiquid
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0724670Z   token: ***
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0725010Z   ssh-strict: true
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0725370Z   ssh-user: git
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0725720Z   clean: true
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0726090Z   sparse-checkout-cone-mode: true
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0726490Z   fetch-tags: false
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0726880Z   show-progress: true
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0727330Z   lfs: false
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0727700Z   submodules: false
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0728140Z   set-safe-directory: true
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0728530Z   allow-unsafe-pr-checkout: false
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0729090Z env:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0729510Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.0730050Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5406900Z Syncing repository: Jagalite/illiquid
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5408400Z ##[group]Getting Git version info
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5408900Z Working directory is '/Users/runner/work/illiquid/illiquid'
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5409750Z [command]/opt/homebrew/bin/git version
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5648370Z git version 2.56.0
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5662620Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5670240Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/bd22ef15-cd9d-4c18-a186-4da704abc17f/.gitconfig'
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5679220Z Temporarily overriding HOME='/Users/runner/work/_temp/bd22ef15-cd9d-4c18-a186-4da704abc17f' before making global git config changes
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5681870Z Adding repository directory to the temporary git global config as a safe directory
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5682870Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5851290Z Deleting the contents of '/Users/runner/work/illiquid/illiquid'
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5853870Z ##[group]Initializing the repository
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.5855530Z [command]/opt/homebrew/bin/git init /Users/runner/work/illiquid/illiquid
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6770390Z hint: Using 'master' as the name for the initial branch. This default branch name
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6771530Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6772330Z hint: to use in all of your new repositories, which will suppress this warning,
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6772950Z hint: call:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6773280Z hint:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6773690Z hint: 	git config --global init.defaultBranch <name>
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6774320Z hint:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6774810Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6775470Z hint: 'development'. The just-created branch can be renamed via this command:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6776120Z hint:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6776440Z hint: 	git branch -m <name>
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6776950Z hint:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6777450Z hint: Disable this message with "git config set advice.defaultBranchName false"
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6778260Z Initialized empty Git repository in /Users/runner/work/illiquid/illiquid/.git/
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6785790Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Jagalite/illiquid
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6864340Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6864990Z ##[group]Disabling automatic garbage collection
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6867130Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6936090Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6936820Z ##[group]Setting up auth
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.6941890Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.7006440Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.7920530Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.7988560Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.8965060Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.9033070Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.9856300Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.9936080Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.9958310Z ##[group]Fetching the repository
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:21.9959880Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +6194f36e520db4da73ad577754dbd4dc93754970:refs/remotes/pull/175/merge
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0310050Z From https://github.com/Jagalite/illiquid
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0312280Z  * [new branch]        codex/bitmap-subtitle-lookup             -> origin/codex/bitmap-subtitle-lookup
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0313400Z  * [new branch]        codex/bitmap-subtitle-lookup-portable    -> origin/codex/bitmap-subtitle-lookup-portable
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0314600Z  * [new branch]        codex/catalog-id-storage                 -> origin/codex/catalog-id-storage
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0315460Z  * [new branch]        codex/checkpoint-membership-performance  -> origin/codex/checkpoint-membership-performance
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0316400Z  * [new branch]        codex/effect-retirement-allocation       -> origin/codex/effect-retirement-allocation
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0317450Z  * [new branch]        codex/illiquid-update-hosting            -> origin/codex/illiquid-update-hosting
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0325640Z  * [new branch]        codex/perf-checkpoint-construction       -> origin/codex/perf-checkpoint-construction
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0326570Z  * [new branch]        codex/perf-checkpoint-folder-membership  -> origin/codex/perf-checkpoint-folder-membership
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0327410Z  * [new branch]        codex/perf-checkpoint-index-hint         -> origin/codex/perf-checkpoint-index-hint
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0328290Z  * [new branch]        codex/perf-checkpoint-zero-hint-fdd5ab   -> origin/codex/perf-checkpoint-zero-hint-fdd5ab
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0329420Z  * [new branch]        codex/perf-empty-subtitle-matching-20261017 -> origin/codex/perf-empty-subtitle-matching-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0330320Z  * [new branch]        codex/perf-file-identity-20261028        -> origin/codex/perf-file-identity-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0331230Z  * [new branch]        codex/perf-full-palette-subtitles-20261028 -> origin/codex/perf-full-palette-subtitles-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0332320Z  * [new branch]        codex/perf-nfo-text-limits-20261017      -> origin/codex/perf-nfo-text-limits-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0333280Z  * [new branch]        codex/perf-persistence-key               -> origin/codex/perf-persistence-key
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0334210Z  * [new branch]        codex/perf-persistence-key-portable      -> origin/codex/perf-persistence-key-portable
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0335200Z  * [new branch]        codex/perf-ring-buffer-wrap-20261028     -> origin/codex/perf-ring-buffer-wrap-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0336090Z  * [new branch]        codex/perf-saved-track-match-20261028    -> origin/codex/perf-saved-track-match-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0337310Z  * [new branch]        codex/perf-state-space-canonicalization  -> origin/codex/perf-state-space-canonicalization
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0338310Z  * [new branch]        codex/perf-subtitle-eof-wakeups          -> origin/codex/perf-subtitle-eof-wakeups
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0344860Z  * [new branch]        codex/perf-subtitle-newline-normalization-b2856 -> origin/codex/perf-subtitle-newline-normalization-b2856
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0346240Z  * [new branch]        codex/perf-thumbnail-samples-20261028    -> origin/codex/perf-thumbnail-samples-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0347240Z  * [new branch]        codex/track-selection-rank-storage       -> origin/codex/track-selection-rank-storage
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0348120Z  * [new branch]        docs/agent-hierarchy-v2                  -> origin/docs/agent-hierarchy-v2
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0349150Z  * [new branch]        feat/playback-reliability-tools          -> origin/feat/playback-reliability-tools
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0350270Z  * [new branch]        feat/recovery-captions-automation        -> origin/feat/recovery-captions-automation
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0351350Z  * [new branch]        fix/external-text-subtitle-import        -> origin/fix/external-text-subtitle-import
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0352480Z  * [new branch]        fix/filesystem-event-loss-recovery       -> origin/fix/filesystem-event-loss-recovery
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0353380Z  * [new branch]        fix/local-media-source-validation        -> origin/fix/local-media-source-validation
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0354100Z  * [new branch]        fix/nfo-episode-field-scope              -> origin/fix/nfo-episode-field-scope
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0354920Z  * [new branch]        fix/nfo-unused-field-limits              -> origin/fix/nfo-unused-field-limits
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0355770Z  * [new branch]        fix/persistence-superseded-request-lifetime -> origin/fix/persistence-superseded-request-lifetime
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0356750Z  * [new branch]        fix/plexmatch-numeric-validation         -> origin/fix/plexmatch-numeric-validation
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0357770Z  * [new branch]        fix/renderer-recovery-budget-revision    -> origin/fix/renderer-recovery-budget-revision
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0358620Z  * [new branch]        fix/sidecar-catalog-id-merge             -> origin/fix/sidecar-catalog-id-merge
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0359500Z  * [new branch]        fix/source-filesystem-root-invalidation  -> origin/fix/source-filesystem-root-invalidation
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0361020Z  * [new branch]        fix/source-filesystem-root-volume-routing -> origin/fix/source-filesystem-root-volume-routing
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0361860Z  * [new branch]        fix/subtitle-exact-stem-priority         -> origin/fix/subtitle-exact-stem-priority
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0362600Z  * [new branch]        fix/subtitle-filename-association        -> origin/fix/subtitle-filename-association
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0363420Z  * [new branch]        fix/subtitle-filename-specificity        -> origin/fix/subtitle-filename-specificity
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0364140Z  * [new branch]        fix/thumbnail-cache-image-lifetime       -> origin/fix/thumbnail-cache-image-lifetime
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0365000Z  * [new branch]        fix/track-restoration-thumbnail-lifecycle -> origin/fix/track-restoration-thumbnail-lifecycle
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0365900Z  * [new branch]        fix/unicode-date-filename-crash          -> origin/fix/unicode-date-filename-crash
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0366760Z  * [new branch]        fix/unicode-date-media-recognition       -> origin/fix/unicode-date-media-recognition
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0367600Z  * [new branch]        integrate/open-pr-review-20261022        -> origin/integrate/open-pr-review-20261022
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0368320Z  * [new branch]        integrate/open-prs-20261017              -> origin/integrate/open-prs-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0369100Z  * [new branch]        integrate/reviewed-prs-20261020          -> origin/integrate/reviewed-prs-20261020
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0369830Z  * [new branch]        integrate/reviewed-prs-20261022-candidate -> origin/integrate/reviewed-prs-20261022-candidate
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0370660Z  * [new branch]        integrate/reviewed-prs-20261024          -> origin/integrate/reviewed-prs-20261024
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0371250Z  * [new branch]        main                                     -> origin/main
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0372210Z  * [new branch]        perf/adaptive-text-context-reuse-20261028 -> origin/perf/adaptive-text-context-reuse-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0373460Z  * [new branch]        perf/adaptive-text-opacity               -> origin/perf/adaptive-text-opacity
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0374390Z  * [new branch]        perf/ancestor-metadata-merge-20261028-3388 -> origin/perf/ancestor-metadata-merge-20261028-3388
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0375290Z  * [new branch]        perf/ascii-file-identity                 -> origin/perf/ascii-file-identity
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0376210Z  * [new branch]        perf/attachment-copy-admission-20261022-491747 -> origin/perf/attachment-copy-admission-20261022-491747
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0377130Z  * [new branch]        perf/audio-delay-memory-20261023         -> origin/perf/audio-delay-memory-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0378030Z  * [new branch]        perf/audio-delay-pcm-sharing-20261023    -> origin/perf/audio-delay-pcm-sharing-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0378900Z  * [new branch]        perf/audio-format-metadata-20261021      -> origin/perf/audio-format-metadata-20261021
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0379760Z  * [new branch]        perf/audio-pcm-block-buffer-20261023     -> origin/perf/audio-pcm-block-buffer-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0380450Z  * [new branch]        perf/audio-pcm-capacity-20261023         -> origin/perf/audio-pcm-capacity-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0381180Z  * [new branch]        perf/audio-pcm-presentation-20261028     -> origin/perf/audio-pcm-presentation-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0382070Z  * [new branch]        perf/auxiliary-font-attachments-20261023 -> origin/perf/auxiliary-font-attachments-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0383180Z  * [new branch]        perf/auxiliary-font-attachments-qualification-20261024 -> origin/perf/auxiliary-font-attachments-qualification-20261024
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0384330Z  * [new branch]        perf/auxiliary-font-memory-1d89f         -> origin/perf/auxiliary-font-memory-1d89f
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0385170Z  * [new branch]        perf/auxiliary-font-memory-20261023      -> origin/perf/auxiliary-font-memory-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0386650Z  * [new branch]        perf/auxiliary-font-memory-20261023-aa530 -> origin/perf/auxiliary-font-memory-20261023-aa530
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0387880Z  * [new branch]        perf/auxiliary-font-memory-aa79          -> origin/perf/auxiliary-font-memory-aa79
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0388890Z  * [new branch]        perf/auxiliary-font-payload-memory-20261023 -> origin/perf/auxiliary-font-payload-memory-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0389900Z  * [new branch]        perf/auxiliary-font-payloads-20261023    -> origin/perf/auxiliary-font-payloads-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0390940Z  * [new branch]        perf/batch-open-selection-20261028       -> origin/perf/batch-open-selection-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0391910Z  * [new branch]        perf/batch-source-presence-recomputation-20261017 -> origin/perf/batch-source-presence-recomputation-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0392880Z  * [new branch]        perf/bitmap-lookup-hybrid-20261028-413a  -> origin/perf/bitmap-lookup-hybrid-20261028-413a
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0504850Z  * [new branch]        perf/bitmap-lookup-hybrid-portable-413a  -> origin/perf/bitmap-lookup-hybrid-portable-413a
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0505830Z  * [new branch]        perf/bitmap-prune-noop-validation-b634c30 -> origin/perf/bitmap-prune-noop-validation-b634c30
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0506720Z  * [new branch]        perf/bitmap-region-projection-20261028-ad101422 -> origin/perf/bitmap-region-projection-20261028-ad101422
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0507590Z  * [new branch]        perf/bitmap-subtitle-acquisition-20261028 -> origin/perf/bitmap-subtitle-acquisition-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0508490Z  * [new branch]        perf/bitmap-subtitle-acquisition-borrow-20261028 -> origin/perf/bitmap-subtitle-acquisition-borrow-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0509400Z  * [new branch]        perf/bitmap-subtitle-acquisition-view-20261028 -> origin/perf/bitmap-subtitle-acquisition-view-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0510310Z  * [new branch]        perf/bitmap-subtitle-lookup              -> origin/perf/bitmap-subtitle-lookup
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0518670Z  * [new branch]        perf/bitmap-subtitle-lookup-20261028     -> origin/perf/bitmap-subtitle-lookup-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0519680Z  * [new branch]        perf/bitmap-subtitle-lookup-bounded-c30885af -> origin/perf/bitmap-subtitle-lookup-bounded-c30885af
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0520990Z  * [new branch]        perf/bitmap-subtitle-palette             -> origin/perf/bitmap-subtitle-palette
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0521870Z  * [new branch]        perf/bitmap-subtitle-tail-search-20261028-3825 -> origin/perf/bitmap-subtitle-tail-search-20261028-3825
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0522730Z  * [new branch]        perf/bitmap-subtitle-timeline-insertion  -> origin/perf/bitmap-subtitle-timeline-insertion
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0523430Z  * [new branch]        perf/bound-runtime-lease-history         -> origin/perf/bound-runtime-lease-history
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0524700Z  * [new branch]        perf/bounded-filesystem-event-buffer-20261023 -> origin/perf/bounded-filesystem-event-buffer-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0525600Z  * [new branch]        perf/bounded-filesystem-handoff-20261028 -> origin/perf/bounded-filesystem-handoff-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0526330Z  * [new branch]        perf/cache-natural-filename-keys         -> origin/perf/cache-natural-filename-keys
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0527290Z  * [new branch]        perf/cache-natural-filename-sort-keys    -> origin/perf/cache-natural-filename-sort-keys
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0528170Z  * [new branch]        perf/checkpoint-construction-20261028    -> origin/perf/checkpoint-construction-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0529730Z  * [new branch]        perf/checkpoint-identities-20261028      -> origin/perf/checkpoint-identities-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0530550Z  * [new branch]        perf/checkpoint-identity-20261028        -> origin/perf/checkpoint-identity-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0531340Z  * [new branch]        perf/checkpoint-membership-20261028      -> origin/perf/checkpoint-membership-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0532920Z  * [new branch]        perf/checkpoint-membership-refinements-20261028 -> origin/perf/checkpoint-membership-refinements-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0533830Z  * [new branch]        perf/checkpoint-preparation-20261028-4ea7 -> origin/perf/checkpoint-preparation-20261028-4ea7
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0534620Z  * [new branch]        perf/checkpoint-source-identity-20261028 -> origin/perf/checkpoint-source-identity-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0535490Z  * [new branch]        perf/compact-libass-bitmap-storage       -> origin/perf/compact-libass-bitmap-storage
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0536190Z  * [new branch]        perf/compact-track-selection-rank        -> origin/perf/compact-track-selection-rank
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0536850Z  * [new branch]        perf/compact-track-selection-ranks       -> origin/perf/compact-track-selection-ranks
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0537510Z  * [new branch]        perf/compiled-player-shortcuts           -> origin/perf/compiled-player-shortcuts
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0538200Z  * [new branch]        perf/completed-effect-history-20261023-16dfe -> origin/perf/completed-effect-history-20261023-16dfe
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0538950Z  * [new branch]        perf/deinterlacer-eof-memory-20261023    -> origin/perf/deinterlacer-eof-memory-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0539760Z  * [new branch]        perf/directory-cache-invalidation-20261028-9d074f -> origin/perf/directory-cache-invalidation-20261028-9d074f
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0540590Z  * [new branch]        perf/effect-settlement-20261028-a63e3014 -> origin/perf/effect-settlement-20261028-a63e3014
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0541400Z  * [new branch]        perf/effect-settlement-memory-20261028   -> origin/perf/effect-settlement-memory-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0542140Z  * [new branch]        perf/elastic-control-bar-geometry        -> origin/perf/elastic-control-bar-geometry
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0542810Z  * [new branch]        perf/empty-subtitle-association          -> origin/perf/empty-subtitle-association
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0544700Z  * [new branch]        perf/empty-subtitle-association-ed13     -> origin/perf/empty-subtitle-association-ed13
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0545620Z  * [new branch]        perf/episode-display-formatting-20261028-355e -> origin/perf/episode-display-formatting-20261028-355e
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0546370Z  * [new branch]        perf/external-subtitle-conversion        -> origin/perf/external-subtitle-conversion
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0547010Z  * [new branch]        perf/external-subtitle-escaping          -> origin/perf/external-subtitle-escaping
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0547780Z  * [new branch]        perf/external-subtitle-peak-memory-20261023 -> origin/perf/external-subtitle-peak-memory-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0548490Z  * [new branch]        perf/file-identity-keys                  -> origin/perf/file-identity-keys
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0549220Z  * [new branch]        perf/file-identity-keys-20261028-a0c3    -> origin/perf/file-identity-keys-20261028-a0c3
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0549990Z  * [new branch]        perf/file-identity-keys-review-20261028-a0c3 -> origin/perf/file-identity-keys-review-20261028-a0c3
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0550780Z  * [new branch]        perf/file-identity-path-20261028         -> origin/perf/file-identity-path-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0551520Z  * [new branch]        perf/file-identity-paths                 -> origin/perf/file-identity-paths
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0552280Z  * [new branch]        perf/file-identity-qualification-20261028 -> origin/perf/file-identity-qualification-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0559000Z  * [new branch]        perf/filesystem-callback-memory-20261028 -> origin/perf/filesystem-callback-memory-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0560320Z  * [new branch]        perf/filesystem-delivery-memory-20261028 -> origin/perf/filesystem-delivery-memory-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0561700Z  * [new branch]        perf/filesystem-event-planning-20261022  -> origin/perf/filesystem-event-planning-20261022
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0563900Z  * [new branch]        perf/fixed-ring-buffer-wrap-20261028     -> origin/perf/fixed-ring-buffer-wrap-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0566680Z  * [new branch]        perf/flat-file-projection-20261021       -> origin/perf/flat-file-projection-20261021
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0567910Z  * [new branch]        perf/flat-projection-index-storage-20261028-e02e -> origin/perf/flat-projection-index-storage-20261028-e02e
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0568960Z  * [new branch]        perf/folder-discovery-classification-31c0bcbc -> origin/perf/folder-discovery-classification-31c0bcbc
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0570010Z  * [new branch]        perf/folder-discovery-selective-io       -> origin/perf/folder-discovery-selective-io
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0570690Z  * [new branch]        perf/frame-step-timestamps               -> origin/perf/frame-step-timestamps
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0571340Z  * [new branch]        perf/history-json-encoding               -> origin/perf/history-json-encoding
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0572600Z  * [new branch]        perf/history-json-encoding-20261028      -> origin/perf/history-json-encoding-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0573510Z  * [new branch]        perf/identity-intel-probe-20261028-6ef890ad -> origin/perf/identity-intel-probe-20261028-6ef890ad
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0574340Z  * [new branch]        perf/identity-portable-probe-20261028-6ef890ad -> origin/perf/identity-portable-probe-20261028-6ef890ad
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0575630Z  * [new branch]        perf/libass-position-mask-reuse-5ae1d4b5 -> origin/perf/libass-position-mask-reuse-5ae1d4b5
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0576370Z  * [new branch]        perf/manual-visibility-20261028          -> origin/perf/manual-visibility-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0577140Z  * [new branch]        perf/media-extension-classification-20261028 -> origin/perf/media-extension-classification-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0577990Z  * [new branch]        perf/media-name-episode-recognition-20261017 -> origin/perf/media-name-episode-recognition-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0578780Z  * [new branch]        perf/media-name-folder-evidence          -> origin/perf/media-name-folder-evidence
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0579850Z  * [new branch]        perf/media-name-folder-parsing           -> origin/perf/media-name-folder-parsing
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0580630Z  * [new branch]        perf/media-name-recognition              -> origin/perf/media-name-recognition
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0581410Z  * [new branch]        perf/media-name-recognition-20261017     -> origin/perf/media-name-recognition-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0582240Z  * [new branch]        perf/media-name-recognition-linux-9200ebe -> origin/perf/media-name-recognition-linux-9200ebe
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0583030Z  * [new branch]        perf/media-name-tag-fast-path            -> origin/perf/media-name-tag-fast-path
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0583790Z  * [new branch]        perf/media-section-grouping-329e         -> origin/perf/media-section-grouping-329e
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0584600Z  * [new branch]        perf/media-section-index-memory-20261023 -> origin/perf/media-section-index-memory-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0585410Z  * [new branch]        perf/metadata-attribution-5217c3         -> origin/perf/metadata-attribution-5217c3
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0586190Z  * [new branch]        perf/native-operation-work-lifetime-810bd -> origin/perf/native-operation-work-lifetime-810bd
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0587030Z  * [new branch]        perf/natural-filename-sort-storage-20261028 -> origin/perf/natural-filename-sort-storage-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0587820Z  * [new branch]        perf/nearest-thumbnail-lookup-20261028-4db1 -> origin/perf/nearest-thumbnail-lookup-20261028-4db1
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0588610Z  * [new branch]        perf/nfo-declaration-preflight-7166db    -> origin/perf/nfo-declaration-preflight-7166db
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0589390Z  * [new branch]        perf/non-decoding-memory-responsiveness  -> origin/perf/non-decoding-memory-responsiveness
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0590280Z  * [new branch]        perf/normalized-file-identity-20261028   -> origin/perf/normalized-file-identity-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0591170Z  * [new branch]        perf/normalized-file-identity-study-7164d307 -> origin/perf/normalized-file-identity-study-7164d307
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0592310Z  * [new branch]        perf/normalized-file-url-keys-20261028   -> origin/perf/normalized-file-url-keys-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0593060Z  * [new branch]        perf/observation-metrics-counters        -> origin/perf/observation-metrics-counters
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0593690Z  * [new branch]        perf/pcm-sanitizer                       -> origin/perf/pcm-sanitizer
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0594350Z  * [new branch]        perf/pgs-packet-borrow-20261022          -> origin/perf/pgs-packet-borrow-20261022
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0595020Z  * [new branch]        perf/pip-hdr-texture-stop-20261028       -> origin/perf/pip-hdr-texture-stop-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0596400Z  * [new branch]        perf/pip-idle-resource-retirement-20261028 -> origin/perf/pip-idle-resource-retirement-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0597460Z  * [new branch]        perf/pip-idle-resources-20261023         -> origin/perf/pip-idle-resources-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0598480Z  * [new branch]        perf/pip-subtitle-upload-reuse           -> origin/perf/pip-subtitle-upload-reuse
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0599540Z  * [new branch]        perf/pip-texture-coordinate-cache-20261028-6a8fb -> origin/perf/pip-texture-coordinate-cache-20261028-6a8fb
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0600860Z  * [new branch]        perf/pip-video-storage-retirement-20261028 -> origin/perf/pip-video-storage-retirement-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0601730Z  * [new branch]        perf/planar-buffer-history-memory-20261023 -> origin/perf/planar-buffer-history-memory-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0602550Z  * [new branch]        perf/planar-ownership-peaks-20261028     -> origin/perf/planar-ownership-peaks-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0603380Z  * [new branch]        perf/planar-ownership-transitions        -> origin/perf/planar-ownership-transitions
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0604120Z  * [new branch]        perf/planar-peak-accounting-20261028     -> origin/perf/planar-peak-accounting-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0605220Z  * [new branch]        perf/planar-peak-bound-20261028-df43     -> origin/perf/planar-peak-bound-20261028-df43
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0606400Z  * [new branch]        perf/planar-peak-probe-20261028          -> origin/perf/planar-peak-probe-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0607500Z  * [new branch]        perf/playback-checkpoint-membership-20261028 -> origin/perf/playback-checkpoint-membership-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0608370Z  * [new branch]        perf/playback-pipeline-phase1            -> origin/perf/playback-pipeline-phase1
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0609120Z  * [new branch]        perf/playlist-checkpoint-ids-20261028    -> origin/perf/playlist-checkpoint-ids-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0610120Z  * [new branch]        perf/playlist-deduplication-sharing-20261024 -> origin/perf/playlist-deduplication-sharing-20261024
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0610940Z  * [new branch]        perf/playlist-identity-lookup            -> origin/perf/playlist-identity-lookup
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0611970Z  * [new branch]        perf/playlist-lookup-query-20261017-a03e8 -> origin/perf/playlist-lookup-query-20261017-a03e8
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0613020Z  * [new branch]        perf/playlist-restoration-index-map-20261028 -> origin/perf/playlist-restoration-index-map-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0614140Z  * [new branch]        perf/playlist-restoration-index-map-linux-20261028 -> origin/perf/playlist-restoration-index-map-linux-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0615070Z  * [new branch]        perf/playlist-selection-identity-scan    -> origin/perf/playlist-selection-identity-scan
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0615970Z  * [new branch]        perf/playlist-shuffle-restoration-20261017 -> origin/perf/playlist-shuffle-restoration-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0616810Z  * [new branch]        perf/playlist-sorting-20261019           -> origin/perf/playlist-sorting-20261019
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0617650Z  * [new branch]        perf/plexmatch-ascii-parser-20261028-36d399 -> origin/perf/plexmatch-ascii-parser-20261028-36d399
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0618500Z  * [new branch]        perf/plexmatch-ascii-parsing-20261028    -> origin/perf/plexmatch-ascii-parsing-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0619850Z  * [new branch]        perf/plexmatch-episode-storage-c018      -> origin/perf/plexmatch-episode-storage-c018
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0620540Z  * [new branch]        perf/por-diamond-reuse                   -> origin/perf/por-diamond-reuse
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0621290Z  * [new branch]        perf/prepared-playlist-construction-20261019 -> origin/perf/prepared-playlist-construction-20261019
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0622160Z  * [new branch]        perf/presence-subtree-snapshot-f4995     -> origin/perf/presence-subtree-snapshot-f4995
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0623150Z  * [new branch]        perf/presentation-observation-cadence-9010 -> origin/perf/presentation-observation-cadence-9010
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0624270Z  * [new branch]        perf/progress-analysis-storage-20261028-14379ad -> origin/perf/progress-analysis-storage-20261028-14379ad
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0625470Z  * [new branch]        perf/progress-reachability-c836a0c4      -> origin/perf/progress-reachability-c836a0c4
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0626230Z  * [new branch]        perf/queue-notifications-20261028        -> origin/perf/queue-notifications-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0627100Z  * [new branch]        perf/queue-notifications-validation-20261028 -> origin/perf/queue-notifications-validation-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0627970Z  * [new branch]        perf/recursive-media-scan                -> origin/perf/recursive-media-scan
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0628860Z  * [new branch]        perf/recursive-visibility-ancestor-cache-20261028-a611 -> origin/perf/recursive-visibility-ancestor-cache-20261028-a611
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0629780Z  * [new branch]        perf/relative-seek-effect-retirement     -> origin/perf/relative-seek-effect-retirement
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0630630Z  * [new branch]        perf/requalify-media-read-ahead-20261028-9a2715 -> origin/perf/requalify-media-read-ahead-20261028-9a2715
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0631790Z  * [new branch]        perf/restoration-snapshot-lifetime-20261024 -> origin/perf/restoration-snapshot-lifetime-20261024
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0632670Z  * [new branch]        perf/ring-buffer-wrap-20261028-a16f      -> origin/perf/ring-buffer-wrap-20261028-a16f
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0633490Z  * [new branch]        perf/ring-index-wrap-20261028            -> origin/perf/ring-index-wrap-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0634200Z  * [new branch]        perf/saved-track-matching                -> origin/perf/saved-track-matching
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0635040Z  * [new branch]        perf/scalar-preference-updates           -> origin/perf/scalar-preference-updates
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0635840Z  * [new branch]        perf/scalar-preference-validation-20261028 -> origin/perf/scalar-preference-validation-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0636640Z  * [new branch]        perf/screenshot-context-reuse-6ef7a6     -> origin/perf/screenshot-context-reuse-6ef7a6
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0637530Z  * [new branch]        perf/session-checkpoint-json-20261022    -> origin/perf/session-checkpoint-json-20261022
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0638340Z  * [new branch]        perf/session-checkpoint-serialization-d27e3 -> origin/perf/session-checkpoint-serialization-d27e3
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0639230Z  * [new branch]        perf/shared-one-shot-completion-contract -> origin/perf/shared-one-shot-completion-contract
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0640080Z  * [new branch]        perf/shuffle-checkpoint-identities       -> origin/perf/shuffle-checkpoint-identities
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0640890Z  * [new branch]        perf/shuffle-checkpoint-identities-20261028 -> origin/perf/shuffle-checkpoint-identities-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0641820Z  * [new branch]        perf/shuffled-checkpoint-identities-20261028-bd49659 -> origin/perf/shuffled-checkpoint-identities-20261028-bd49659
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0642890Z  * [new branch]        perf/sidecar-negative-cache-20261023-d877 -> origin/perf/sidecar-negative-cache-20261023-d877
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0643760Z  * [new branch]        perf/sidecar-path-plan-55fd7             -> origin/perf/sidecar-path-plan-55fd7
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0644860Z  * [new branch]        perf/skip-empty-subtitle-association     -> origin/perf/skip-empty-subtitle-association
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0645660Z  * [new branch]        perf/source-browser-row-storage-20261024 -> origin/perf/source-browser-row-storage-20261024
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0648810Z  * [new branch]        perf/source-browser-sorting              -> origin/perf/source-browser-sorting
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0649750Z  * [new branch]        perf/source-preparation-admission-20261021 -> origin/perf/source-preparation-admission-20261021
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0650750Z  * [new branch]        perf/source-presence-invalidation-20261028-320cb -> origin/perf/source-presence-invalidation-20261028-320cb
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0651580Z  * [new branch]        perf/source-presence-snapshot-f950       -> origin/perf/source-presence-snapshot-f950
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0652440Z  * [new branch]        perf/source-presence-snapshot-memory-20261024 -> origin/perf/source-presence-snapshot-memory-20261024
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0653290Z  * [new branch]        perf/source-presence-traversal-20261028  -> origin/perf/source-presence-traversal-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0654170Z  * [new branch]        perf/source-reload-path-selection-20261028-c50e -> origin/perf/source-reload-path-selection-20261028-c50e
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0655040Z  * [new branch]        perf/source-reload-selection-20261028    -> origin/perf/source-reload-selection-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0655930Z  * [new branch]        perf/source-root-index-reuse-20261028-dbc1 -> origin/perf/source-root-index-reuse-20261028-dbc1
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0656780Z  * [new branch]        perf/source-root-lookup-f307b7a          -> origin/perf/source-root-lookup-f307b7a
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0657510Z  * [new branch]        perf/source-root-matching-20261028       -> origin/perf/source-root-matching-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0658280Z  * [new branch]        perf/source-root-selection-20261028      -> origin/perf/source-root-selection-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0659400Z  * [new branch]        perf/source-search-id-set-3a8b4b         -> origin/perf/source-search-id-set-3a8b4b
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0660170Z  * [new branch]        perf/source-search-index-storage-20261028 -> origin/perf/source-search-index-storage-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0661030Z  * [new branch]        perf/source-search-indices-20261028      -> origin/perf/source-search-indices-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0661780Z  * [new branch]        perf/source-search-match-indices         -> origin/perf/source-search-match-indices
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0662550Z  * [new branch]        perf/source-search-match-indices-20261028 -> origin/perf/source-search-match-indices-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0663440Z  * [new branch]        perf/source-search-row-storage-20261028  -> origin/perf/source-search-row-storage-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0664230Z  * [new branch]        perf/source-tab-membership-20261022      -> origin/perf/source-tab-membership-20261022
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0665720Z  * [new branch]        perf/source-tree-sorting-20261017        -> origin/perf/source-tree-sorting-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0666530Z  * [new branch]        perf/source-tree-traversal-memory-20261028-46a2 -> origin/perf/source-tree-traversal-memory-20261028-46a2
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0667380Z  * [new branch]        perf/source-tree-visibility-cache        -> origin/perf/source-tree-visibility-cache
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0668160Z  * [new branch]        perf/source-visibility-ancestors-d74d3c22 -> origin/perf/source-visibility-ancestors-d74d3c22
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0669050Z  * [new branch]        perf/source-visibility-regex-preparation-20261028 -> origin/perf/source-visibility-regex-preparation-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0669920Z  * [new branch]        perf/source-visibility-root-lookup-20261028 -> origin/perf/source-visibility-root-lookup-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0670670Z  * [new branch]        perf/source-visibility-storage-20261023  -> origin/perf/source-visibility-storage-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0671450Z  * [new branch]        perf/startup-snapshot-lifetime-20261023  -> origin/perf/startup-snapshot-lifetime-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0672670Z  * [new branch]        perf/startup-snapshot-lifetime-20261023-2566e -> origin/perf/startup-snapshot-lifetime-20261023-2566e
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0673500Z  * [new branch]        perf/startup-source-lifetime-20261023-0fa33058 -> origin/perf/startup-source-lifetime-20261023-0fa33058
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0674360Z  * [new branch]        perf/state-space-canonicalization-20261028-e488 -> origin/perf/state-space-canonicalization-20261028-e488
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0675180Z  * [new branch]        perf/state-space-key-storage-0fa33058    -> origin/perf/state-space-key-storage-0fa33058
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0675970Z  * [new branch]        perf/state-space-progress-worklist-20261028 -> origin/perf/state-space-progress-worklist-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0676800Z  * [new branch]        perf/subtitle-acquisition-borrow-20261028 -> origin/perf/subtitle-acquisition-borrow-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0677640Z  * [new branch]        perf/subtitle-acquisition-research-20261028-1d5e -> origin/perf/subtitle-acquisition-research-20261028-1d5e
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0678480Z  * [new branch]        perf/subtitle-ascii-tokenization-20261021 -> origin/perf/subtitle-ascii-tokenization-20261021
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0679250Z  * [new branch]        perf/subtitle-association-indexed-8956e8 -> origin/perf/subtitle-association-indexed-8956e8
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0680020Z  * [new branch]        perf/subtitle-candidate-streaming-f950   -> origin/perf/subtitle-candidate-streaming-f950
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0680780Z  * [new branch]        perf/subtitle-contiguous-ascii-20261021  -> origin/perf/subtitle-contiguous-ascii-20261021
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0681550Z  * [new branch]        perf/subtitle-cue-streaming-20261028-8d19a6 -> origin/perf/subtitle-cue-streaming-20261028-8d19a6
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0682280Z  * [new branch]        perf/subtitle-escaping-20261017          -> origin/perf/subtitle-escaping-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0683160Z  * [new branch]        perf/subtitle-fuzzy-prefix-20261028      -> origin/perf/subtitle-fuzzy-prefix-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0683970Z  * [new branch]        perf/subtitle-fuzzy-prefix-guard-20261028-2a0c8f -> origin/perf/subtitle-fuzzy-prefix-guard-20261028-2a0c8f
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0684810Z  * [new branch]        perf/subtitle-fuzzy-scoring-20261028     -> origin/perf/subtitle-fuzzy-scoring-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0685650Z  * [new branch]        perf/subtitle-gpu-source-retirement-20261028 -> origin/perf/subtitle-gpu-source-retirement-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0686420Z  * [new branch]        perf/subtitle-memory-accounting          -> origin/perf/subtitle-memory-accounting
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0687220Z  * [new branch]        perf/subtitle-memory-budget-accounting-20261017 -> origin/perf/subtitle-memory-budget-accounting-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0688040Z  * [new branch]        perf/subtitle-packet-identity-20261028   -> origin/perf/subtitle-packet-identity-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0689020Z  * [new branch]        perf/subtitle-payload-assembly-20261028-2cf67a -> origin/perf/subtitle-payload-assembly-20261028-2cf67a
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0689870Z  * [new branch]        perf/subtitle-qualifier-storage-f4995    -> origin/perf/subtitle-qualifier-storage-f4995
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0690630Z  * [new branch]        perf/subtitle-read-ahead-wakeups         -> origin/perf/subtitle-read-ahead-wakeups
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0691390Z  * [new branch]        perf/subtitle-read-ahead-wakeups-20261028 -> origin/perf/subtitle-read-ahead-wakeups-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0692170Z  * [new branch]        perf/subtitle-result-lifetime-20261023   -> origin/perf/subtitle-result-lifetime-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0692880Z  * [new branch]        perf/subtitle-slot-capacity-20261023     -> origin/perf/subtitle-slot-capacity-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0693940Z  * [new branch]        perf/subtitle-staging-dirty-prefix       -> origin/perf/subtitle-staging-dirty-prefix
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0694680Z  * [new branch]        perf/subtitle-timestamp-fast-path        -> origin/perf/subtitle-timestamp-fast-path
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0695620Z  * [new branch]        perf/subtitle-timestamp-fast-path-20261028 -> origin/perf/subtitle-timestamp-fast-path-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0696470Z  * [new branch]        perf/subtitle-timestamp-parsing-20261028 -> origin/perf/subtitle-timestamp-parsing-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0697220Z  * [new branch]        perf/subtitle-timestamp-preprocessing    -> origin/perf/subtitle-timestamp-preprocessing
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0697940Z  * [new branch]        perf/subtitle-vertex-review-c6bbf6f8     -> origin/perf/subtitle-vertex-review-c6bbf6f8
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0698630Z  * [new branch]        perf/subtitle-vertex-staging-c6bbf6f8    -> origin/perf/subtitle-vertex-staging-c6bbf6f8
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0701120Z  * [new branch]        perf/text-subtitle-escaping              -> origin/perf/text-subtitle-escaping
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0701860Z  * [new branch]        perf/thumbnail-disk-eviction-33f42739    -> origin/perf/thumbnail-disk-eviction-33f42739
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0702630Z  * [new branch]        perf/thumbnail-inventory-memory-20261028-8ee5938e -> origin/perf/thumbnail-inventory-memory-20261028-8ee5938e
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0703430Z  * [new branch]        perf/thumbnail-memory-eviction-20261028  -> origin/perf/thumbnail-memory-eviction-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0704210Z  * [new branch]        perf/thumbnail-nearest-buckets-987bdf6388c2 -> origin/perf/thumbnail-nearest-buckets-987bdf6388c2
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0704980Z  * [new branch]        perf/thumbnail-neighborhood-bounded-ec593 -> origin/perf/thumbnail-neighborhood-bounded-ec593
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0705800Z  * [new branch]        perf/thumbnail-neighborhood-f7d6ad21289a -> origin/perf/thumbnail-neighborhood-f7d6ad21289a
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0706640Z  * [new branch]        perf/thumbnail-neighborhood-validation-25bf6887 -> origin/perf/thumbnail-neighborhood-validation-25bf6887
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0707660Z  * [new branch]        perf/thumbnail-nil-folder-20261028       -> origin/perf/thumbnail-nil-folder-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0708360Z  * [new branch]        perf/thumbnail-playlist-neighborhood     -> origin/perf/thumbnail-playlist-neighborhood
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0709170Z  * [new branch]        perf/thumbnail-playlist-neighborhood-20261028 -> origin/perf/thumbnail-playlist-neighborhood-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0709950Z  * [new branch]        perf/thumbnail-playlist-neighbors        -> origin/perf/thumbnail-playlist-neighbors
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0710720Z  * [new branch]        perf/thumbnail-playlist-neighbors-20261028 -> origin/perf/thumbnail-playlist-neighbors-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0711540Z  * [new branch]        perf/thumbnail-playlist-neighbors-review-20261028 -> origin/perf/thumbnail-playlist-neighbors-review-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0712320Z  * [new branch]        perf/thumbnail-ranking-context-20261028  -> origin/perf/thumbnail-ranking-context-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0713370Z  * [new branch]        perf/thumbnail-ranking-context-portable-20261028 -> origin/perf/thumbnail-ranking-context-portable-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0714450Z  * [new branch]        perf/thumbnail-read-allocation-20261024-aa530 -> origin/perf/thumbnail-read-allocation-20261024-aa530
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0715310Z  * [new branch]        perf/thumbnail-refinement-storage-20261028-045b6631 -> origin/perf/thumbnail-refinement-storage-20261028-045b6631
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0716150Z  * [new branch]        perf/thumbnail-resident-eviction-20261028 -> origin/perf/thumbnail-resident-eviction-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0716940Z  * [new branch]        perf/thumbnail-sample-planning-20261028-279e -> origin/perf/thumbnail-sample-planning-20261028-279e
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0717700Z  * [new branch]        perf/thumbnail-sample-prefix-20261028-ccf7e3 -> origin/perf/thumbnail-sample-prefix-20261028-ccf7e3
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0718490Z  * [new branch]        perf/thumbnail-singleton-fast-path-c998  -> origin/perf/thumbnail-singleton-fast-path-c998
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0719520Z  * [new branch]        perf/timecode-formatting-d27e3           -> origin/perf/timecode-formatting-d27e3
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0720540Z  * [new branch]        perf/track-eligibility-streaming-20261028 -> origin/perf/track-eligibility-streaming-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0721420Z  * [new branch]        perf/track-eligibility-streaming-fallback-20261028 -> origin/perf/track-eligibility-streaming-fallback-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0722270Z  * [new branch]        perf/track-preference-restoration-20261028 -> origin/perf/track-preference-restoration-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0723040Z  * [new branch]        perf/track-rank-storage-20261028         -> origin/perf/track-rank-storage-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0723730Z  * [new branch]        perf/track-selection-projection          -> origin/perf/track-selection-projection
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0724430Z  * [new branch]        perf/track-selection-ranking-20261017    -> origin/perf/track-selection-ranking-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0725110Z  * [new branch]        perf/video-color-layout-20261028         -> origin/perf/video-color-layout-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0725910Z  * [new branch]        perf/video-color-region-average-20261028-a1db02 -> origin/perf/video-color-region-average-20261028-a1db02
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0726680Z  * [new branch]        perf/video-color-sampler-layout          -> origin/perf/video-color-sampler-layout
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0727340Z  * [new branch]        perf/video-color-sampling-20261028       -> origin/perf/video-color-sampling-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0728080Z  * [new branch]        perf/video-color-sampling-20261028-563b8 -> origin/perf/video-color-sampling-20261028-563b8
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0728910Z  * [new branch]        perf/video-color-sampling-layout-20261028-f5db9f9 -> origin/perf/video-color-sampling-layout-20261028-f5db9f9
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0729760Z  * [new branch]        perf/video-format-description-cache-20261028 -> origin/perf/video-format-description-cache-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0730850Z  * [new branch]        perf/video-format-description-cache-20261028-e604eaa8 -> origin/perf/video-format-description-cache-20261028-e604eaa8
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0731730Z  * [new branch]        perf/video-format-description-reuse-20261028 -> origin/perf/video-format-description-reuse-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0732440Z  * [new branch]        perf/video-frame-color-sampling          -> origin/perf/video-frame-color-sampling
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0733170Z  * [new branch]        perf/video-frame-exit-lifetime-668a      -> origin/perf/video-frame-exit-lifetime-668a
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0733940Z  * [new branch]        perf/video-frame-history-ring-20261028-1c4a -> origin/perf/video-frame-history-ring-20261028-1c4a
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0734800Z  * [new branch]        perf/video-frame-identity-history-20261028-838b -> origin/perf/video-frame-identity-history-20261028-838b
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0735940Z  * [new branch]        perf/video-geometry-metadata-20261022    -> origin/perf/video-geometry-metadata-20261022
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0746560Z  * [new branch]        perf/video-hdr-metadata-20261022         -> origin/perf/video-hdr-metadata-20261022
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0747340Z  * [new branch]        perf/video-hdr-payload-reuse-d27e3       -> origin/perf/video-hdr-payload-reuse-d27e3
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0748130Z  * [new branch]        perf/video-ratio-parsing-20261028-aa060cb1 -> origin/perf/video-ratio-parsing-20261028-aa060cb1
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0749250Z  * [new branch]        perf/video-recovery-eof-lifetime-20261028 -> origin/perf/video-recovery-eof-lifetime-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0750070Z  * [new branch]        perf/video-recovery-eof-memory-20261028-c8bc -> origin/perf/video-recovery-eof-memory-20261028-c8bc
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0750870Z  * [new branch]        perf/video-recovery-eof-release-20261028-2d367 -> origin/perf/video-recovery-eof-release-20261028-2d367
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0751670Z  * [new branch]        perf/video-recovery-gop-eof-20261028-bc446 -> origin/perf/video-recovery-gop-eof-20261028-bc446
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0753030Z  * [new branch]        perf/video-scratch-frame-lifetime-20261023 -> origin/perf/video-scratch-frame-lifetime-20261023
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0753820Z  * [new branch]        perf/video-tab-resource-lookup-b7d0ac7d  -> origin/perf/video-tab-resource-lookup-b7d0ac7d
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0754540Z  * [new branch]        perf/webvtt-note-memory                  -> origin/perf/webvtt-note-memory
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0755250Z  * [new branch]        research/auxiliary-font-memory-audit-1d89f -> origin/research/auxiliary-font-memory-audit-1d89f
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0756070Z  * [new branch]        research/auxiliary-font-qualification-810bd -> origin/research/auxiliary-font-qualification-810bd
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0756970Z  * [new branch]        research/bitmap-subtitle-acquisition-comparison-20261028 -> origin/research/bitmap-subtitle-acquisition-comparison-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0757880Z  * [new branch]        research/compact-track-rank-portable     -> origin/research/compact-track-rank-portable
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0758620Z  * [new branch]        research/file-identity-qualification     -> origin/research/file-identity-qualification
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0759310Z  * [new branch]        research/font-copy-residency-20261024    -> origin/research/font-copy-residency-20261024
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0760040Z  * [new branch]        research/playback-packet-progress        -> origin/research/playback-packet-progress
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0760880Z  * [new branch]        research/playlist-checkpoint-id-qualification-20261028 -> origin/research/playlist-checkpoint-id-qualification-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0761790Z  * [new branch]        research/ring-wrap-independent-20261028-8f8c7ab0 -> origin/research/ring-wrap-independent-20261028-8f8c7ab0
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0762630Z  * [new branch]        research/source-presence-traversal-20261028 -> origin/research/source-presence-traversal-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0763550Z  * [new branch]        research/thumbnail-neighborhood-validation-20261028-355e15c -> origin/research/thumbnail-neighborhood-validation-20261028-355e15c
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0765150Z  * [new branch]        review/new-branch-consolidation-20261017 -> origin/review/new-branch-consolidation-20261017
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0766140Z  * [new branch]        validation/bitmap-subtitle-acquisition-linux-20261028 -> origin/validation/bitmap-subtitle-acquisition-linux-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0767150Z  * [new branch]        validation/subtitle-gpu-pool-20261028    -> origin/validation/subtitle-gpu-pool-20261028
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0767920Z  * [new branch]        work/illiquid-product-review             -> origin/work/illiquid-product-review
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0768920Z  * [new branch]        work/playback-integration-qualification  -> origin/work/playback-integration-qualification
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0769700Z  * [new branch]        work/pr3-integration-qualification       -> origin/work/pr3-integration-qualification
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0770300Z  * [new tag]           appcast                                  -> appcast
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0770760Z  * [new tag]           v0.1.0                                   -> v0.1.0
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0771140Z  * [new tag]           v0.1.1                                   -> v0.1.1
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0772160Z  * [new tag]           v0.1.2                                   -> v0.1.2
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0772640Z  * [new tag]           v0.1.3                                   -> v0.1.3
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0773170Z  * [new ref]           6194f36e520db4da73ad577754dbd4dc93754970 -> pull/175/merge
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0775240Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0776300Z ##[group]Determining the checkout info
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0776810Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0777120Z [command]/opt/homebrew/bin/git sparse-checkout disable
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0778000Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0778880Z ##[group]Checking out the ref
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:28.0779280Z [command]/opt/homebrew/bin/git checkout --progress --force refs/remotes/pull/175/merge
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5012670Z Updating files:  70% (2720/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5111780Z Updating files:  71% (2747/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5288420Z Updating files:  72% (2785/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5381330Z Updating files:  73% (2824/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5569900Z Updating files:  74% (2863/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5656030Z Updating files:  75% (2901/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5715760Z Updating files:  76% (2940/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5793410Z Updating files:  77% (2979/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5869830Z Updating files:  78% (3018/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.5933290Z Updating files:  79% (3056/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.6021540Z Updating files:  80% (3095/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.6075090Z Updating files:  81% (3134/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.6124120Z Updating files:  82% (3172/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.6644340Z Updating files:  83% (3211/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.6868680Z Updating files:  84% (3250/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.7419660Z Updating files:  85% (3288/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.7923430Z Updating files:  86% (3327/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8009670Z Updating files:  87% (3366/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8129590Z Updating files:  88% (3404/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8220860Z Updating files:  89% (3443/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8310320Z Updating files:  90% (3482/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8389390Z Updating files:  91% (3520/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8448890Z Updating files:  92% (3559/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8530400Z Updating files:  93% (3598/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8570720Z Updating files:  94% (3636/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8643460Z Updating files:  95% (3675/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8694410Z Updating files:  96% (3714/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8745550Z Updating files:  97% (3752/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8803490Z Updating files:  98% (3791/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8871840Z Updating files:  99% (3830/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8872800Z Updating files: 100% (3868/3868)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8873360Z Updating files: 100% (3868/3868), done.
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.8958880Z HEAD is now at 6194f36e Merge 53782c9688bf7edb7e41b780c6de3e79d75108ff into ea2ff568237e2667f7b1aeee67b11a44ebe95b72
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.9008100Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.9134140Z [command]/opt/homebrew/bin/git log -1 --format=%H
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.9214400Z 6194f36e520db4da73ad577754dbd4dc93754970
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.9226250Z ##[group]Removing auth
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.9230360Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:29.9296320Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.0146360Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.0203040Z http.https://github.com/.extraheader
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.0209580Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.0275060Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.1120670Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.1182570Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2435910Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2727920Z ##[group]Run if ! xcrun -sdk macosx metal --version; then
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2728360Z ^[[36;1mif ! xcrun -sdk macosx metal --version; then^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2728670Z ^[[36;1m  xcodebuild -downloadComponent MetalToolchain^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2728950Z ^[[36;1mfi^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2729260Z ^[[36;1mpython3 Scripts/verify-corresponding-source.py DependencySources^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2729660Z ^[[36;1mpython3 Scripts/install-ci-native-sdk.py^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2794470Z shell: /bin/bash -e {0}
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2794670Z env:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2794890Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:30.2795250Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:34.1651010Z Apple metal version 32023.883 (metalfe-32023.883)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:34.1753920Z Target: air64-apple-darwin25.6.0
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:34.1854840Z Thread model: posix
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:34.1961470Z InstalledDir: /private/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.pXIF9B/Metal.xctoolchain/usr/metal/current/bin
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:43.5566370Z Verified 28 source/resource/patch inputs and 114 notice documents
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7168860Z Installed checksum-verified SDK on ephemeral runner
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7336650Z ##[group]Run python3 Benchmarks/PGSPacketBorrow/run.py \
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7337160Z ^[[36;1mpython3 Benchmarks/PGSPacketBorrow/run.py \^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7337620Z ^[[36;1m  --pairs 8 --target-ms 240 \^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7338030Z ^[[36;1m  --output "$RUNNER_TEMP/pgs-packet-borrow/benchmark"^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7678540Z shell: /bin/bash -e {0}
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7680180Z env:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7680920Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7694520Z   PKG_CONFIG_LIBDIR: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7711380Z   PKG_CONFIG_PATH: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:44.7718490Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1792930Z Traceback (most recent call last):
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1800870Z   File "/Users/runner/work/illiquid/illiquid/Benchmarks/PGSPacketBorrow/run.py", line 287, in <module>
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1801500Z     main()
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1801760Z     ~~~~^^
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1802320Z   File "/Users/runner/work/illiquid/illiquid/Benchmarks/PGSPacketBorrow/run.py", line 273, in main
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1802970Z     runner.prepare()
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1803330Z     ~~~~~~~~~~~~~~^^
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1803930Z   File "/Users/runner/work/illiquid/illiquid/Benchmarks/PGSPacketBorrow/run.py", line 118, in prepare
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1804620Z     raise ValueError(f"Shared dependency changed: {path}; review/requalify this comparison")
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1810880Z ValueError: Shared dependency changed: Sources/IlliquidNativePlayback/Media/FFmpegPacket.swift; review/requalify this comparison
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.1900540Z ##[error]Process completed with exit code 1.
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2300680Z ##[group]Run python3 - <<'PY'
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2301120Z ^[[36;1mpython3 - <<'PY'^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2301400Z ^[[36;1mimport base64, gzip, hashlib, json, os^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2301720Z ^[[36;1mfrom pathlib import Path^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2302080Z ^[[36;1mroot = Path(os.environ['RUNNER_TEMP']) / 'pgs-packet-borrow'^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2302510Z ^[[36;1mfiles = {}^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2302870Z ^[[36;1mfor path in sorted(root.rglob('*')):^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2303330Z ^[[36;1m    if (path.is_file() and path.suffix in {'.json', '.jsonl', '.log', '.txt'}^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2304010Z ^[[36;1m            and not any(part in {'build', 'module-cache', 'cache', '.build'} for part in path.relative_to(root).parts)):^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2304500Z ^[[36;1m        files[str(path.relative_to(root))] = path.read_text()^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2304970Z ^[[36;1mpacked = gzip.compress(json.dumps(files, sort_keys=True).encode(), compresslevel=9, mtime=0)^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2305700Z ^[[36;1mprint('PGS_REVIEW_SHA256 ' + hashlib.sha256(packed).hexdigest())^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2306220Z ^[[36;1mprint('PGS_REVIEW_BASE64 ' + base64.b64encode(packed).decode())^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2306730Z ^[[36;1mfor name, value in files.items():^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2307180Z ^[[36;1m    if name.endswith(('summary.json', 'parity.json', 'completion.json')):^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2307820Z ^[[36;1m        print(name + '\n' + value)^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2308080Z ^[[36;1mPY^[[0m
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2398640Z shell: /bin/bash -e {0}
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2399330Z env:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2400380Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2406240Z   PKG_CONFIG_LIBDIR: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2417150Z   PKG_CONFIG_PATH: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.2422100Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4195450Z PGS_REVIEW_SHA256 a92df5e8aacfed57d5cff7008894942d70977584f19fde7b1289daf7227dc56a
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4219560Z PGS_REVIEW_BASE64 H4sIAAAAAAAC/81XTW8bNxD9K4JOCZqV+DkkfQuQpu3BjQEHvUSBMSSH9jbSSt1d2QmC/PfOSooiB4Uh2z1odRFnyeHje/PB/TqO1KSbBbafpnFdz3PVUqJ61U/+7pbN+Gw0/jprRqPZOGJH87qhq5Zu665eNjN+ORu7EiIKp3Uw0TkMwpOwPhjjElBOPksRvVZpNn6181M32NbUDcu/ftsZEza5ztj/7B1kMEUDWSVyNBmdxmydc9bkmE1OQfPf4MTee1ouVvWc2u3y16vVnEaXd3XpR7fUDn5HMNETPXrRDcY5NtfVxjCRbEybsZJC8JB/Qr6czZr32F5TfzbCdgGmwsFltcC07D4rmPzY+QbbfIctHe58Lkcv/qrbfo3zl/uJvPaGedzO2zj98WqZd/YG+/qWKvqMqa9W7TKvU8/oq265btNA3m7Fao59WbaL7Sp2/e6yYlgwUdUOb7uowMS6r8553+rdfuXeE8swWA41Prvcvpz+MZ/X/6zr/OcGzsUcv0RMn6bnlGucvn27WNH1BRuon2z43KLIxMwJlCqKYLQkIQsa0ABa+GhjKD44kDYBBExeFaUt2uLZrA3J4HYQHw/och37up/TG0pMZHuISUmUwkmbfQgl8dZORCdKiQg62VyMZUDBi+I82GA4YolsdiGkLKyC8gRM39F004vfLr8PLlrqqOlxEPMQX/IIUmmSRmhtgy4otUAg5QqELL2xoErygIi62JyEUl5BAE4DZZVLB/j2ufQ8FTEnp6QvJsbiKMmA3smSYiqC2cqMVviQSCvJxCoQWipjisoWQAWrn4HoARkLMkUY0AkvuchwFPH5TUHw2UWHJlAAI5khgGjBQrLWOsaPRKEIsE8B9SgdtZNokpfOOO2MkCySk5myTmQgScwA3iJmHQJzFgJnSOHJUpAuRhHOxgO+72Wx67HtKV+t+7QLY6GgkqJS/r2EM2HPjJkEo5j7X4Q4E2JY/m3WjF+NDso618QFH7bbV/QPg/d90nN5ux28f9gaBtN13e+ZGsZclKsVth3ds/7+6+s3W7yj0cc9rzTHVceYO1aPNx08i4nQnGDC8jmHRwvYT2+pX7dN2hU+sbd3PUvfXnU3qCxsD086imSMCr4kmaQJWGJhskOAEoMyimU2knk2IXIpSRwONgQZnbcqensoPntfrvt73k0EiZxjIoHh7M9oPRQgk2RWiFEl4Shazj0lQOUAQURhOVd5WdKW7KFyD3E7XXftlJvgdBM16R6jVbXrUkfRaiYcDVzUnH0Km9aohI6Tx0D2qDPXQm+TTpmJIJFVyYUDlrtsMt4QBOdzDsR2pVIGHR5mM4IzxYW4yQPuBUlYJJeIE1KWUojT0ktIkLxwRduiQwlaE5eXhF5kdyyb3Zcu9fP7JDb3hkO7zbSapNV6ElvOg6uub+vm+tjIHbqGd3YTuILvBvL0QrcUx1VFMreYkLuCY40ILPvh+5EX3ickbitcyaPNUoOzFARf1XhiUk7qY8n+uSwsiG9G1dAPf4riuquw4ZLaL9t7bx55WXx8mTFGe1AmDI/nk5+eVs/3/jStupvl3ZO0+N/a43EKKmE0Y9FbBb05PQWff1U7MQUfvHUdp5pUoBwA7KqkOEHZnv8FcJKy/df1/VjNJLcI63eaqRMsls//ktxoNms+8p3427+ui2Qq6xAAAA==
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4429800Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4430170Z with:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4430340Z   name: pgs-packet-borrow-native
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4431450Z   path: /Users/runner/work/_temp/pgs-packet-borrow/**/*.json
+native-pgs	UNKNOWN STEP	/Users/runner/work/_temp/pgs-packet-borrow/**/*.jsonl
+native-pgs	UNKNOWN STEP	/Users/runner/work/_temp/pgs-packet-borrow/**/*.log
+native-pgs	UNKNOWN STEP	/Users/runner/work/_temp/pgs-packet-borrow/**/*.txt
+native-pgs	UNKNOWN STEP	/Users/runner/work/_temp/pgs-packet-borrow/**/*.swift
+native-pgs	UNKNOWN STEP	/Users/runner/work/_temp/pgs-packet-borrow/**/*.py
+native-pgs	UNKNOWN STEP	
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4432540Z   retention-days: 14
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4432740Z   if-no-files-found: warn
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4432980Z   compression-level: 6
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4433190Z   overwrite: false
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4433350Z   include-hidden-files: false
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4433570Z env:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4433840Z   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4437050Z   PKG_CONFIG_LIBDIR: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4442940Z   PKG_CONFIG_PATH: /Users/runner/work/illiquid/illiquid/BuildInputs/system-pkgconfig:/opt/homebrew/Cellar/dav1d/1.5.3/lib/pkgconfig:/opt/homebrew/Cellar/ffmpeg/8.1.2-illiquid1/lib/pkgconfig:/opt/homebrew/Cellar/freetype/2.14.3/lib/pkgconfig:/opt/homebrew/Cellar/fribidi/1.0.16/lib/pkgconfig:/opt/homebrew/Cellar/glib/2.88.2/lib/pkgconfig:/opt/homebrew/Cellar/graphite2/1.3.15/lib/pkgconfig:/opt/homebrew/Cellar/harfbuzz/14.2.1/lib/pkgconfig:/opt/homebrew/Cellar/libass/0.17.5/lib/pkgconfig:/opt/homebrew/Cellar/libpng/1.6.58/lib/pkgconfig:/opt/homebrew/Cellar/libunibreak/7.0/lib/pkgconfig:/opt/homebrew/Cellar/libvmaf/3.1.0/lib/pkgconfig:/opt/homebrew/Cellar/libvpx/1.16.0/lib/pkgconfig:/opt/homebrew/Cellar/openssl@3/3.6.3/lib/pkgconfig:/opt/homebrew/Cellar/opus/1.6.1/lib/pkgconfig:/opt/homebrew/Cellar/pcre2/10.47_1/lib/pkgconfig:/opt/homebrew/Cellar/svt-av1/4.1.0/lib/pkgconfig:/opt/homebrew/Cellar/x264/r3222/lib/pkgconfig:/opt/homebrew/Cellar/x265/4.2/lib/pkgconfig
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:49.4446060Z ##[endgroup]
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.0111270Z (node:1499) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.0120350Z (Use `node --trace-deprecation ...` to show where the warning was created)
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.0223600Z With the provided path, there will be 2 files uploaded
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.0224260Z Artifact name is valid!
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.0224580Z Root directory input is valid!
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.3333630Z Beginning upload of artifact content to blob storage
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.3470140Z (node:1499) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.4738930Z Uploaded bytes 1725
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.5155090Z Finished uploading artifact content to blob storage!
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.5155770Z SHA256 digest of uploaded artifact zip is f6f6f618abdf8015152c15f6ad5d433e284f2b1d686b0d47e7251aa00cf74a31
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:50.5158300Z Finalizing artifact upload
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.0094090Z Artifact pgs-packet-borrow-native.zip successfully finalized. Artifact ID 12831531375
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.0094910Z Artifact pgs-packet-borrow-native has been successfully uploaded! Final size is 1725 bytes. Artifact ID is 12831531375
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.0095790Z Artifact download URL: https://github.com/Jagalite/illiquid/actions/runs/40640576065/artifacts/12831531375
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.0395970Z Post job cleanup.
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.1771780Z [command]/opt/homebrew/bin/git version
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.1787520Z git version 2.56.0
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.2106500Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/67a22022-9694-42d0-9535-dcff3c279f48/.gitconfig'
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.2107370Z Temporarily overriding HOME='/Users/runner/work/_temp/67a22022-9694-42d0-9535-dcff3c279f48' before making global git config changes
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.2108070Z Adding repository directory to the temporary git global config as a safe directory
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.2108670Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/illiquid/illiquid
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.2109680Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.2112250Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.4261830Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.4275110Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.6067780Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.6299930Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:51.8226560Z Cleaning up orphan processes
+native-pgs	UNKNOWN STEP	2026-10-28T16:05:52.3506900Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

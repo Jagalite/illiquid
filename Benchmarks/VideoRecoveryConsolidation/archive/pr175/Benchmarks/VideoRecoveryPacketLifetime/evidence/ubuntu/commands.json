@@ -1,0 +1,253 @@
+[
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "--version"
+    ],
+    "log": "logs/compiler.log",
+    "log_sha256": "d7df78b37cc23138e1c65ac3cc35f9bd0db2caf1df39880130951b36a7d039f1",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "log": "logs/git-head.log",
+    "log_sha256": "cc0a1dd27132305e8a577ba2c97b582a84744f8e5100c14069bb08d58af6de58",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain=v1"
+    ],
+    "log": "logs/git-status.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "pkg-config",
+      "--modversion",
+      "libavcodec",
+      "libavutil"
+    ],
+    "log": "logs/sdk-versions.log",
+    "log_sha256": "60ac1857002031a403c0960a36385fbe49e4ea8a06703a04940390d6f85da0de",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "pkg-config",
+      "--cflags",
+      "libavcodec",
+      "libavutil"
+    ],
+    "log": "logs/sdk-cflags.log",
+    "log_sha256": "ecfd0208294b20f34a028b0f2bc7a98ee61a209d0ee8f0e33c08667aff324f66",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "pkg-config",
+      "--static",
+      "--libs",
+      "libavcodec",
+      "libavutil"
+    ],
+    "log": "logs/sdk-libs.log",
+    "log_sha256": "2ac664cdf9b677c7158a8bfd58e3ee635769e05c55b49618b6e6f1282ad0b4da",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-Onone",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/recovery-lifetime/build/module-cache",
+      "-I",
+      "/home/runner/work/_temp/recovery-lifetime/sources/CFFmpeg",
+      "-D",
+      "BASELINE",
+      "-Xcc",
+      "-I/home/runner/work/_temp/recovery-ffmpeg/include",
+      "/home/runner/work/_temp/recovery-lifetime/sources/shared/PacketProbeSupport.swift",
+      "/home/runner/work/_temp/recovery-lifetime/sources/baseline/FFmpegPacket.swift",
+      "/home/runner/work/_temp/recovery-lifetime/sources/shared/Probe.swift",
+      "-Xlinker",
+      "-L/home/runner/work/_temp/recovery-ffmpeg/lib",
+      "-Xlinker",
+      "-lavcodec",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-lpthread",
+      "-o",
+      "/home/runner/work/_temp/recovery-lifetime/build/baseline-debug"
+    ],
+    "log": "logs/build-baseline-debug.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/recovery-lifetime/build/baseline-debug"
+    ],
+    "log": "logs/run-baseline-debug.log",
+    "log_sha256": "e1cc89f98f327ab868f3b4465a074ed30329b3734a7e1f3f36f02c0164b87c78",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-Onone",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/recovery-lifetime/build/module-cache",
+      "-I",
+      "/home/runner/work/_temp/recovery-lifetime/sources/CFFmpeg",
+      "-Xcc",
+      "-I/home/runner/work/_temp/recovery-ffmpeg/include",
+      "/home/runner/work/_temp/recovery-lifetime/sources/shared/PacketProbeSupport.swift",
+      "/home/runner/work/_temp/recovery-lifetime/sources/candidate/FFmpegPacket.swift",
+      "/home/runner/work/_temp/recovery-lifetime/sources/shared/Probe.swift",
+      "-Xlinker",
+      "-L/home/runner/work/_temp/recovery-ffmpeg/lib",
+      "-Xlinker",
+      "-lavcodec",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-lpthread",
+      "-o",
+      "/home/runner/work/_temp/recovery-lifetime/build/candidate-debug"
+    ],
+    "log": "logs/build-candidate-debug.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/recovery-lifetime/build/candidate-debug"
+    ],
+    "log": "logs/run-candidate-debug.log",
+    "log_sha256": "6e0ba097efca695e27af3b5a9401ddae91ccd4caa0c9dce66d2be4b9243f56cc",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-O",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/recovery-lifetime/build/module-cache",
+      "-I",
+      "/home/runner/work/_temp/recovery-lifetime/sources/CFFmpeg",
+      "-D",
+      "BASELINE",
+      "-Xcc",
+      "-I/home/runner/work/_temp/recovery-ffmpeg/include",
+      "/home/runner/work/_temp/recovery-lifetime/sources/shared/PacketProbeSupport.swift",
+      "/home/runner/work/_temp/recovery-lifetime/sources/baseline/FFmpegPacket.swift",
+      "/home/runner/work/_temp/recovery-lifetime/sources/shared/Probe.swift",
+      "-Xlinker",
+      "-L/home/runner/work/_temp/recovery-ffmpeg/lib",
+      "-Xlinker",
+      "-lavcodec",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-lpthread",
+      "-o",
+      "/home/runner/work/_temp/recovery-lifetime/build/baseline-release"
+    ],
+    "log": "logs/build-baseline-release.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/recovery-lifetime/build/baseline-release"
+    ],
+    "log": "logs/run-baseline-release.log",
+    "log_sha256": "e1cc89f98f327ab868f3b4465a074ed30329b3734a7e1f3f36f02c0164b87c78",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/usr/local/bin/swiftc",
+      "-O",
+      "-swift-version",
+      "6",
+      "-warnings-as-errors",
+      "-parse-as-library",
+      "-module-cache-path",
+      "/home/runner/work/_temp/recovery-lifetime/build/module-cache",
+      "-I",
+      "/home/runner/work/_temp/recovery-lifetime/sources/CFFmpeg",
+      "-Xcc",
+      "-I/home/runner/work/_temp/recovery-ffmpeg/include",
+      "/home/runner/work/_temp/recovery-lifetime/sources/shared/PacketProbeSupport.swift",
+      "/home/runner/work/_temp/recovery-lifetime/sources/candidate/FFmpegPacket.swift",
+      "/home/runner/work/_temp/recovery-lifetime/sources/shared/Probe.swift",
+      "-Xlinker",
+      "-L/home/runner/work/_temp/recovery-ffmpeg/lib",
+      "-Xlinker",
+      "-lavcodec",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-lavutil",
+      "-Xlinker",
+      "-lm",
+      "-Xlinker",
+      "-latomic",
+      "-Xlinker",
+      "-lpthread",
+      "-o",
+      "/home/runner/work/_temp/recovery-lifetime/build/candidate-release"
+    ],
+    "log": "logs/build-candidate-release.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "returncode": 0
+  },
+  {
+    "argv": [
+      "/home/runner/work/_temp/recovery-lifetime/build/candidate-release"
+    ],
+    "log": "logs/run-candidate-release.log",
+    "log_sha256": "6e0ba097efca695e27af3b5a9401ddae91ccd4caa0c9dce66d2be4b9243f56cc",
+    "returncode": 0
+  }
+]

@@ -1,0 +1,61 @@
+name: Source root index portable correctness
+
+on:
+  push:
+    branches:
+      - perf/source-root-index-reuse-20261028-dbc1
+    paths:
+      - Sources/IlliquidApp/App/AppModel.swift
+      - Sources/IlliquidApp/App/SourceRootIndex.swift
+      - Tests/IlliquidAppTests/SourceRootIndexReuseTests.swift
+      - Benchmarks/SourceRootIndexReuse/Driver.swift
+      - Benchmarks/SourceRootIndexReuse/stage.py
+      - Scripts/test-source-root-index-reuse-portable.py
+      - .github/workflows/source-root-index-portable.yml
+  pull_request:
+    paths:
+      - Sources/IlliquidApp/App/AppModel.swift
+      - Sources/IlliquidApp/App/SourceRootIndex.swift
+      - Tests/IlliquidAppTests/SourceRootIndexReuseTests.swift
+      - Benchmarks/SourceRootIndexReuse/Driver.swift
+      - Benchmarks/SourceRootIndexReuse/stage.py
+      - Scripts/test-source-root-index-reuse-portable.py
+      - .github/workflows/source-root-index-portable.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-root-index-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-correctness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compile and verify actual observer and index sources
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this qualification through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable on this ephemeral runner; compiling serially in isolated packages.'
+          python3 Scripts/test-source-root-index-reuse-portable.py \
+            --output "$RUNNER_TEMP/source-root-index-portable"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: source-root-index-portable
+          path: |
+            ${{ runner.temp }}/source-root-index-portable/**/*.json
+            ${{ runner.temp }}/source-root-index-portable/**/*.jsonl
+            ${{ runner.temp }}/source-root-index-portable/**/*.log
+            !${{ runner.temp }}/source-root-index-portable/**/.build/**
+            !${{ runner.temp }}/source-root-index-portable/**/module-cache/**
+          retention-days: 14

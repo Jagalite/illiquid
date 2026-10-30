@@ -67,6 +67,41 @@ def outside_matcher(raw):
     return raw[:start] + raw[end:]
 
 
+# PR212's reviewed projection calls the evaluator API added after BASELINE.
+# The reference adapter delegates every call to the untouched historical matcher.
+# It owns no cache and is never used for historical performance measurements.
+REVIEWED_FILTER_SHA256 = "3d0ffefc80607a38c57bcfd4d714b5a3feee3c1b91a6ff48af49957f425f526a"
+HISTORICAL_MATCHER_SHA256 = "0a93951f274f4d9b72868d8175bc6cb8542faae45aed342ef3805e5a81a76599"
+REFERENCE_ADAPTER = b"""
+extension SourceVisibilityMatcher {
+    func makeAncestorEvaluator() -> AncestorEvaluator {
+        AncestorEvaluator(matcher: self)
+    }
+
+    struct AncestorEvaluator {
+        let matcher: SourceVisibilityMatcher
+
+        mutating func evaluate(_ url: URL) -> SourceVisibilityEvaluation {
+            matcher.evaluateIncludingAncestors(url)
+        }
+
+        mutating func evaluate(normalizedPath: String) -> SourceVisibilityEvaluation {
+            matcher.evaluateIncludingAncestors(normalizedPath: normalizedPath)
+        }
+    }
+}
+"""
+
+
+def reference_adapter(candidate, matcher):
+    source = candidate.get("Sources/IlliquidApp/SourceBrowserFilter.swift", b"")
+    if b"makeAncestorEvaluator" not in source:
+        return b""
+    if sha(source) != REVIEWED_FILTER_SHA256 or sha(matcher) != HISTORICAL_MATCHER_SHA256:
+        raise ValueError("Unreviewed ancestor evaluator compatibility inputs")
+    return REFERENCE_ADAPTER
+
+
 class Study:
     def __init__(self, args):
         self.args = args
@@ -136,8 +171,9 @@ class Study:
             old_start, old_end = matcher_range(original)
             start, end = matcher_range(candidate[FOCAL])
             matcher = original[old_start:old_end]
+            adapter = reference_adapter(candidate, matcher)
             reference = dict(candidate)
-            reference[FOCAL] = candidate[FOCAL][:start] + matcher + candidate[FOCAL][end:]
+            reference[FOCAL] = candidate[FOCAL][:start] + matcher + adapter + candidate[FOCAL][end:]
             reference_records = copy.deepcopy(candidate_records)
             reference_records[FOCAL] = {
                 "origin": "historical-matcher-on-current-support",
@@ -146,6 +182,11 @@ class Study:
                 "historical_repository_path": source_path,
                 "historical_source_sha256": sha(original),
                 "historical_matcher_sha256": sha(matcher),
+                "compatibility_adapter": {
+                    "kind": "uncached-historical-ancestor-forwarder" if adapter else "none",
+                    "sha256": sha(adapter),
+                    "reviewed_filter_sha256": REVIEWED_FILTER_SHA256 if adapter else None,
+                },
                 "snapshot_sha256": sha(reference[FOCAL]),
             }
             self.manifest.update(

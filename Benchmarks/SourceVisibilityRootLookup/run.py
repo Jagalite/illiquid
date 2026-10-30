@@ -74,6 +74,42 @@ def load_helper(path: Path, name: str):
         sys.dont_write_bytecode = previous
 
 
+REFERENCE_ADAPTER = b"""
+extension SourceVisibilityMatcher {
+    func makeAncestorEvaluator() -> AncestorEvaluator {
+        AncestorEvaluator(matcher: self)
+    }
+
+    struct AncestorEvaluator {
+        let matcher: SourceVisibilityMatcher
+
+        mutating func evaluate(_ url: URL) -> SourceVisibilityEvaluation {
+            matcher.evaluateIncludingAncestors(url)
+        }
+
+        mutating func evaluate(normalizedPath: String) -> SourceVisibilityEvaluation {
+            matcher.evaluateIncludingAncestors(normalizedPath: normalizedPath)
+        }
+    }
+}
+"""
+
+
+REVIEWED_FILTER_SHA256 = "3d0ffefc80607a38c57bcfd4d714b5a3feee3c1b91a6ff48af49957f425f526a"
+HISTORICAL_MATCHER_SHA256 = "161aafef7af5788d16c8f6f0e9eefac5f8865885081f7f4c42e269946dacf52b"
+REVIEWED_ADAPTER_SHA256 = "0e241edcc7686745b1236cafb287d22f545c897304c37cef5d4f3c548a0fe39e"
+
+
+def reference_adapter(current, production, matcher):
+    if not current:
+        return b""
+    if (digest(production["Sources/IlliquidApp/SourceBrowserFilter.swift"]) != REVIEWED_FILTER_SHA256
+            or digest(matcher) != HISTORICAL_MATCHER_SHA256
+            or digest(REFERENCE_ADAPTER) != REVIEWED_ADAPTER_SHA256):
+        raise RuntimeError("Unreviewed ancestor evaluator compatibility inputs")
+    return REFERENCE_ADAPTER
+
+
 class Runner:
     def __init__(self, args: argparse.Namespace):
         self.args = args
@@ -148,6 +184,7 @@ class Runner:
             receipts[relative] = {"origin": origin, "sha256": digest(data), "raw_sha256": digest(raw),
                                   "bytes": len(data), "transformation": transformation,
                                   "platform_adaptations": adaptations,
+                                  "compatibility_adapter": production_receipts.get(relative, {}).get("compatibility_adapter"),
                                   "snapshot": str(snapshot.relative_to(self.output))}
 
         for relative, data in production.items():
@@ -207,6 +244,21 @@ let package = Package(
         for relative, data in baseline_files.items():
             if digest(data) != baseline_receipts[relative]["snapshot_sha256"]:
                 raise RuntimeError(f"Reconstructed baseline snapshot differs from pinned main: {relative}")
+        # Verify the frozen reconstructed snapshot above before adding the API-only
+        # forwarder. Historical performance never stages this adapter.
+        adapter = reference_adapter(self.args.current_source_correctness, candidate_files, matcher.encode())
+        if adapter:
+            baseline_files[SIDEBAR_SNAPSHOT] += adapter
+            record = baseline_receipts[SIDEBAR_SNAPSHOT]
+            record["unadapted_snapshot_sha256"] = record["snapshot_sha256"]
+            record["snapshot_sha256"] = digest(baseline_files[SIDEBAR_SNAPSHOT])
+            record["compatibility_adapter"] = {
+                "kind": "uncached-historical-ancestor-forwarder",
+                "sha256": digest(adapter), "matcher_sha256": digest(matcher.encode()),
+                "reviewed_filter_sha256": REVIEWED_FILTER_SHA256,
+                "qualification": "behavior only; no performance qualification",
+            }
+            self.manifest["compatibility_adapter"] = record["compatibility_adapter"]
         for original in EXTRA_SOURCES:
             raw = self.read(ROOT / original)
             if digest(raw) != baseline["extra_sources_sha256"][original]:
@@ -385,6 +437,8 @@ let package = Package(
         return catalog
 
     def sample(self, variant: str, case: str, iterations: int) -> dict:
+        if self.args.current_source_correctness:
+            raise RuntimeError("Current-source correctness cannot accept timing evidence")
         row = self.invoke(variant, "release", "--case", case, "--iterations", iterations)
         if (row["case"], row["iterations"], row["operations"]) != (case, iterations, iterations):
             raise RuntimeError(f"Sample does not match requested operations: {row}")
@@ -406,6 +460,8 @@ let package = Package(
             raise RuntimeError(f"Timed operation checksum/count mismatch: {values}")
 
     def measure(self, cases: list[dict]) -> None:
+        if self.args.current_source_correctness:
+            raise RuntimeError("Current-source correctness cannot accept timing evidence")
         rows: list[dict] = []
         summaries = []
         iteration_counts = {}

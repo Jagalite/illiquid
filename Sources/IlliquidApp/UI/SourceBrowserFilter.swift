@@ -92,6 +92,7 @@ actor SourceBrowserFilter {
         revealsRulePreview: Bool
     ) -> SourceBrowserProjection? {
         let matcher = SourceVisibilityMatcher(configuration: configuration, roots: roots)
+        var ancestorEvaluator = matcher.makeAncestorEvaluator()
         let evaluatesVisibility =
             !configuration.manuallyHiddenPaths.isEmpty
             || !configuration.alwaysShownPaths.isEmpty
@@ -128,13 +129,13 @@ actor SourceBrowserFilter {
                                 let visibilityPath = row.visibilityPath
             {
                 configuration.viewMode.scansRecursively
-                    ? matcher.evaluateIncludingAncestors(
+                    ? ancestorEvaluator.evaluate(
                         normalizedPath: visibilityPath
                     )
                     : matcher.evaluate(normalizedPath: visibilityPath)
             } else if evaluatesVisibility {
                 configuration.viewMode.scansRecursively
-                    ? matcher.evaluateIncludingAncestors(row.url)
+                    ? ancestorEvaluator.evaluate(row.url)
                     : matcher.evaluate(row.url)
             } else {
                 SourceVisibilityEvaluation(

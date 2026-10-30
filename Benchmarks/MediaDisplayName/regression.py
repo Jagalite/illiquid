@@ -8,11 +8,14 @@ CANDIDATE_SHA256 = "cc3c1ac628498798384c3e93973ffa0dcd6f21036b1f1de779cd54c82cc9
 SUPPORT_PINS = {
     "MediaMetadataHints.swift": "9df354b5f319aee2d29799b601562e46571d664650bfb298133f7425939ba53a",
     "Sources/IlliquidCore/MediaMetadataHints.swift": "9df354b5f319aee2d29799b601562e46571d664650bfb298133f7425939ba53a",
-    "Sources/IlliquidApp/SidebarValues.swift": "165515d0792ba43b81108eadee1c8502b5f1c3aaffbbf6659a73184bc7c08ca8",
+    "Sources/IlliquidApp/SidebarValues.swift": "a728725d048a3d13da14aa95e4383742b3b6cb94db8f518568b6af2c00bc6f9d",
     "Sources/IlliquidCore/NFOMetadataHints.swift": "5e9728f84654f5f38818444b9f1ef40db0d751aa23eb6aba273e587cc1f9892a",
     "Sources/IlliquidCore/PlexMatchHints.swift": "b35ce4f067ecac4f714c0895aaaa6df3b58e1dcb6c8d4353e59d18abc26c962b",
-    "Sources/IlliquidApp/SourceBrowserFilter.swift": "514aab8decb04129bd54bac55230e8491cd469325d089591e0e33565655c28ce",
-    "Sources/IlliquidApp/SourceTreeProjectionInput.swift": "5f1c6e088682ce4a7ef30e65b6ca7f2420dca323ec1ae679ee9c16ea547ffb67"
+    "Sources/IlliquidApp/SourceBrowserFilter.swift": "3d0ffefc80607a38c57bcfd4d714b5a3feee3c1b91a6ff48af49957f425f526a",
+    "Sources/IlliquidApp/SourceTreeProjectionInput.swift": "5f1c6e088682ce4a7ef30e65b6ca7f2420dca323ec1ae679ee9c16ea547ffb67",
+    "Sources/IlliquidCore/NormalizedFileURL.swift": "5cd5d029b7a5d8573ac3688676d5ea15117848e10249ed74b1f4df8a9566c18c",
+    "Sources/IlliquidCore/MediaFileSupport.swift": "33657b48e87932f789b6ea92cf949029d916743859e964b8445a4e1bf4c8ff28",
+    "Sources/IlliquidCore/MediaSidecarReader.swift": "629ea274d9b34e64c8e7702c8963b44df84a5eeee0e4d425401fdf35f4ce635a"
 }
 
 

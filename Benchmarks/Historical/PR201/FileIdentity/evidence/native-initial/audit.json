@@ -1,0 +1,95 @@
+{
+  "status": "passed",
+  "case_count": 13,
+  "pairs_per_case": 8,
+  "observations": 208,
+  "checks": [
+    "Exact 13 × 8 × 2 observation set, without duplicate or missing pairs",
+    "Alternating baseline/candidate process order",
+    "Matching pair receipts, sinks, iterations, and operation counts",
+    "All stored per-variant extrema and medians and paired wall summaries reproduced from observations",
+    "All 24 source hash entries matched 19 repository files fetched at the measured commit",
+    "Four successful test receipts, 64 tests each"
+  ],
+  "paired_cpu": [
+    {
+      "case": "key-ascii",
+      "pairedWallReduction": 8.962552118761302,
+      "pairedCpuReduction": 2.9021209287135474,
+      "cpuFasterPairs": 6
+    },
+    {
+      "case": "key-unicode",
+      "pairedWallReduction": -2.712101092758834,
+      "pairedCpuReduction": -2.7700039489714,
+      "cpuFasterPairs": 3
+    },
+    {
+      "case": "key-relative",
+      "pairedWallReduction": 6.668640587804681,
+      "pairedCpuReduction": 6.645944078001353,
+      "cpuFasterPairs": 7
+    },
+    {
+      "case": "key-escaped",
+      "pairedWallReduction": 25.269897274784565,
+      "pairedCpuReduction": 24.667512972616578,
+      "cpuFasterPairs": 8
+    },
+    {
+      "case": "key-long",
+      "pairedWallReduction": 5.082807981424059,
+      "pairedCpuReduction": 0.26587234235303514,
+      "cpuFasterPairs": 5
+    },
+    {
+      "case": "key-rejected",
+      "pairedWallReduction": 2.8149937761796973,
+      "pairedCpuReduction": 2.296136875558391,
+      "cpuFasterPairs": 4
+    },
+    {
+      "case": "same-file",
+      "pairedWallReduction": 2.186077316732854,
+      "pairedCpuReduction": 4.402989343425645,
+      "cpuFasterPairs": 6
+    },
+    {
+      "case": "lookup-100",
+      "pairedWallReduction": 1.3306057903044566,
+      "pairedCpuReduction": 0.1742717473833144,
+      "cpuFasterPairs": 4
+    },
+    {
+      "case": "lookup-1000",
+      "pairedWallReduction": 1.829467653206207,
+      "pairedCpuReduction": 3.2756555136334353,
+      "cpuFasterPairs": 5
+    },
+    {
+      "case": "lookup-10000",
+      "pairedWallReduction": 15.756158689149002,
+      "pairedCpuReduction": 13.602909503486133,
+      "cpuFasterPairs": 6
+    },
+    {
+      "case": "deduplicate-1000",
+      "pairedWallReduction": 12.954561032015949,
+      "pairedCpuReduction": 10.817560994366914,
+      "cpuFasterPairs": 7
+    },
+    {
+      "case": "deduplicate-10000",
+      "pairedWallReduction": 7.158275525732733,
+      "pairedCpuReduction": 7.229425750836232,
+      "cpuFasterPairs": 6
+    },
+    {
+      "case": "normalize-control",
+      "pairedWallReduction": 5.606737865129668,
+      "pairedCpuReduction": 1.3857037959807306,
+      "cpuFasterPairs": 4
+    }
+  ],
+  "scope": "Independent audit of CI-reported observations and source identities. Artifact ZIP bytes and compiled binaries were not downloaded or independently rehashed."
+}
