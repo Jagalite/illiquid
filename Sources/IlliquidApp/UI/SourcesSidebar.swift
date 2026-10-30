@@ -2189,11 +2189,95 @@ struct SourceVisibilityMatcher {
         rootPath: RootPath
     ) -> SourceVisibilityEvaluation {
         let direct = evaluate(normalizedPath: normalizedPath)
-
-        var regexMatches = direct.regexMatches
-        var ancestorPath = URL(fileURLWithPath: normalizedPath, isDirectory: false)
+        let parentPath = URL(fileURLWithPath: normalizedPath, isDirectory: false)
             .deletingLastPathComponent()
             .path
+        return evaluateAncestors(
+            parentPath: parentPath, rootPath: rootPath, direct: direct
+        )
+    }
+
+    /// A projection owns this mutable evaluator. Its immutable matcher binds the
+    /// cache to one rule/root snapshot; copying the evaluator copies its state.
+    /// Only one parent's ancestry is retained, regardless of library size.
+    func makeAncestorEvaluator() -> AncestorEvaluator {
+        AncestorEvaluator(matcher: self)
+    }
+
+    struct AncestorEvaluator {
+        private let matcher: SourceVisibilityMatcher
+        private var cached: (
+            parent: String, root: String, evaluation: SourceVisibilityEvaluation
+        )?
+
+        fileprivate init(matcher: SourceVisibilityMatcher) {
+            self.matcher = matcher
+        }
+
+        mutating func evaluate(_ url: URL) -> SourceVisibilityEvaluation {
+            guard let path = SourceVisibilityPath.normalized(url) else {
+                return SourceVisibilityEvaluation(hiddenMatches: [], regexMatches: [])
+            }
+            return evaluate(normalizedPath: path)
+        }
+
+        mutating func evaluate(normalizedPath: String) -> SourceVisibilityEvaluation {
+            guard let rootPath = matcher.matchingRootPath(for: normalizedPath) else {
+                return matcher.evaluate(normalizedPath: normalizedPath)
+            }
+            // File-specific matches and overrides are never cached.
+            let direct = matcher.evaluate(normalizedPath: normalizedPath)
+            let parentPath = URL(fileURLWithPath: normalizedPath, isDirectory: false)
+                .deletingLastPathComponent().path
+            if parentPath == rootPath.path {
+                // Root evaluations already belong to the immutable matcher.
+                return SourceVisibilityMatcher.combining(direct, ancestors:
+                    matcher.rootEvaluations[rootPath.path]
+                        ?? matcher.evaluate(normalizedPath: rootPath.path))
+            }
+            let ancestors: SourceVisibilityEvaluation
+            if !Task.isCancelled, let cached,
+               cached.parent.utf8.elementsEqual(parentPath.utf8),
+               cached.root.utf8.elementsEqual(rootPath.path.utf8) {
+                // Swift String equality folds canonical Unicode spellings,
+                // whereas Foundation regexes inspect the original input bytes.
+                ancestors = cached.evaluation
+            } else {
+                ancestors = matcher.evaluateAncestors(
+                    parentPath: parentPath, rootPath: rootPath
+                )
+                // A cancelled regex enumeration may contain partial results.
+                // Never publish those results or reuse a hit while cancelled.
+                if !Task.isCancelled {
+                    cached = (parentPath, rootPath.path, ancestors)
+                }
+            }
+            return SourceVisibilityMatcher.combining(direct, ancestors: ancestors)
+        }
+    }
+
+    private static func combining(
+        _ direct: SourceVisibilityEvaluation,
+        ancestors: SourceVisibilityEvaluation
+    ) -> SourceVisibilityEvaluation {
+        var regexMatches = direct.regexMatches
+        for match in ancestors.regexMatches where !regexMatches.contains(match) {
+            regexMatches.append(match)
+        }
+        return SourceVisibilityEvaluation(
+            hiddenMatches: ancestors.hiddenMatches.isEmpty
+                ? direct.hiddenMatches : ancestors.hiddenMatches,
+            regexMatches: regexMatches
+        )
+    }
+
+    private func evaluateAncestors(
+        parentPath: String,
+        rootPath: RootPath,
+        direct: SourceVisibilityEvaluation = .init(hiddenMatches: [], regexMatches: [])
+    ) -> SourceVisibilityEvaluation {
+        var regexMatches = direct.regexMatches
+        var ancestorPath = parentPath
         while ancestorPath.count >= rootPath.characterCount,
               ancestorPath == rootPath.path || ancestorPath.hasPrefix(rootPath.descendantPrefix)
         {

@@ -81,6 +81,20 @@ class SourcePolicyTests(unittest.TestCase):
         with patch.object(native.support, "snapshot", side_effect=[current, baseline]):
             return study.source_variants(lambda path: b"unused")
 
+    def test_regression_mode_rejects_measurements_and_partial_cases(self):
+        study = self.study(True)
+        with self.assertRaisesRegex(ValueError, "cannot produce performance"):
+            study.measure()
+        study.args.cases = native.CASES[:-1]
+        with self.assertRaisesRegex(ValueError, "every case and negative control"):
+            study.source_variants(lambda path: b"unused")
+
+    def test_adapter_rejects_unreviewed_inputs(self):
+        source = {"Sources/IlliquidApp/SourceBrowserFilter.swift": b"makeAncestorEvaluator"}
+        with self.assertRaisesRegex(ValueError, "Unreviewed ancestor evaluator"):
+            native.reference_adapter(source, OLD)
+        self.assertEqual(native.reference_adapter({}, OLD), b"")
+
     def test_historical_mode_keeps_original_baseline(self):
         baseline = snapshot(OLD)
         variants = self.strict(snapshot(NEW), baseline)
