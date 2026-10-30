@@ -1,0 +1,36 @@
+{
+  "LD_LIBRARY_PATH": "/tmp/illiquid-swift-deps/usr/lib/x86_64-linux-gnu",
+  "architecture": "x86_64",
+  "arguments": {
+    "cases": [
+      "nfo-depth4-1000-cold",
+      "nfo-depth4-1000-warm",
+      "missing-depth4-1000-cold",
+      "rich-depth4-1000-cold"
+    ],
+    "jobs": 2,
+    "output": "../ancestor-hints-research/linux-nfo-followup",
+    "pairs": 10,
+    "run_tests": false,
+    "swiftc": "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+    "target_ms": 1000.0,
+    "verify_only": false
+  },
+  "compiler_flags": [
+    "-O",
+    "-whole-module-optimization",
+    "-swift-version",
+    "6",
+    "-warnings-as-errors"
+  ],
+  "compiler_invocation": "/tmp/illiquid-swift-6.3.2/usr/bin/swiftc",
+  "compiler_realpath": "/workspace/scratch/ad1014220f8c/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift-driver",
+  "compiler_sha256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de",
+  "compiler_version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "git_status": " M .gitattributes\n M Sources/IlliquidCore/MediaLibrary/MediaSidecarReader.swift\n?? .github/workflows/sidecar-ancestor-hints.yml\n?? Benchmarks/SidecarAncestorHints/\n?? Documentation/SIDECAR_ANCESTOR_HINTS_PERFORMANCE.md\n?? Tests/IlliquidCoreTests/MediaSidecarAncestorHintsTests.swift\n",
+  "head": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "started_utc": "2026-10-28T05:15:06.603083+00:00",
+  "timing_contract": "complete recognize scans; separate dynamically linked production module; fresh process per sample; cold=new reader each timed pass including first sidecar I/O; warm=primed reused reader; OS caches warm, no cold-disk claim; fixture construction, warmup, calibration and JSON outside timing"
+}
