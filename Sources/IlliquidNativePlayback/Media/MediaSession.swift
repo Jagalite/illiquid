@@ -1529,6 +1529,7 @@ final class MediaSession: @unchecked Sendable {
                             guard self.pushVideoFrame(frame) else { return }
                             self.recordVideoDecodeDiagnostics(videoDecoder)
                         }
+                        videoRecoveryPackets.releaseAfterDrain(generation: active)
                         _ = videoFrames.push(.endOfStream(generation: active))
                     case let .flush(active):
                         videoDecoder.flush()

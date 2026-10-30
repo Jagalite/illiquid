@@ -1,0 +1,34 @@
+BuildInputs/native-sdk.tar.gz export-ignore
+DependencySources/ export-ignore
+
+# Keep raw research receipts available while folding generated data in PR diffs.
+Documentation/PerformanceEvidence/RelativeSeekCoalescing/**/*.json linguist-generated=true
+Documentation/PerformanceEvidence/RelativeSeekCoalescing/**/*.jsonl linguist-generated=true
+Documentation/PerformanceEvidence/RelativeSeekCoalescing/**/*.txt linguist-generated=true
+Benchmarks/ExternalSubtitleConversion/evidence/** linguist-generated=true
+Benchmarks/ExternalSubtitleConversion/baseline/** linguist-generated=true
+Benchmarks/PiPSubtitleUpload/results/** linguist-generated=true
+Documentation/PerformanceEvidence/PreparedPlaylistConstruction/** linguist-generated=true
+Benchmarks/PlaylistSorting/Results/** linguist-generated=true
+Benchmarks/FlatFileProjection/evidence/**/*.json linguist-generated=true
+Benchmarks/FlatFileProjection/evidence/**/*.log linguist-generated=true
+Benchmarks/TrackSelectionProjection/Results/** linguist-generated=true
+# Preserve the raw compiler/test log verbatim, including source excerpt whitespace.
+Benchmarks/TrackSelectionProjection/Results/**/native-tests.log -whitespace
+Benchmarks/AudioFormatMetadata/evidence/**/native-audio.log -whitespace
+Benchmarks/FrameStepTimestamps/evidence/native/qualification.log -whitespace
+Benchmarks/FilesystemInvalidation/evidence/** linguist-generated=true
+Benchmarks/FilesystemInvalidation/evidence/**/*.log -whitespace
+Benchmarks/SubtitleResultLifetime/evidence/** linguist-generated=true -whitespace
+Benchmarks/PlaylistDeduplication/evidence/** linguist-generated=true -whitespace
+Benchmarks/StartupSnapshotLifetime/baseline/** linguist-generated=true
+Benchmarks/StartupSnapshotLifetime/evidence/** linguist-generated=true -whitespace
+Benchmarks/DeinterlacerEOFMemory/evidence/** linguist-generated=true -whitespace
+Benchmarks/DeinterlacerEOFMemory/baseline/** linguist-generated=true
+Benchmarks/SubtitleCandidateStreaming/evidence/** linguist-generated=true -whitespace
+Benchmarks/PlanarHistoryMemory/evidence/** linguist-generated=true -whitespace
+Benchmarks/SidecarNegativeCache/evidence/** linguist-generated=true -whitespace
+Benchmarks/VideoRecoveryPacketLifetime/evidence/** linguist-generated=true -whitespace
+Benchmarks/VideoRecoveryPacketLifetime/baseline/** linguist-generated=true
+Documentation/PerformanceEvidence/AuxiliaryFontNativeAudit/*.json linguist-generated=true
+Documentation/PerformanceEvidence/AuxiliaryFontNativeAudit/*.zip linguist-generated=true
