@@ -401,6 +401,122 @@ struct ExternalTextSubtitleConverterTests {
         }
     }
 
+    @Test func fixedWidthTimestampsRoundAcrossSecondMinuteAndHourBoundaries() throws {
+        let cases = [
+            ("00:00:00.004", "0:00:00.00"),
+            ("00:00:00.005", "0:00:00.01"),
+            ("09:09:09.994", "9:09:09.99"),
+            ("09:09:59.995", "9:10:00.00"),
+            ("09:59:59.995", "10:00:00.00"),
+            ("99:59:59.999", "100:00:00.00"),
+        ]
+        for format in [Converter.Format.srt, .webVTT] {
+            for (timestamp, expectedStart) in cases {
+                // Exercise both SRT separators and the general parser for the
+                // three-digit end hour alongside the fixed-width start.
+                for separator in (format == .srt ? [",", "."] : ["."]) {
+                    let start = timestamp.replacingOccurrences(of: ".", with: separator)
+                    let source = cue(start: start, end: "100:00:01.000", format: format)
+                    #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                        "Dialogue: 0,\(expectedStart),100:00:01.00,Default,,0,0,0,,Caption",
+                    ])
+                }
+            }
+        }
+    }
+
+    @Test func shortWebVTTTimestampsKeepRoundingAndSettings() throws {
+        let cases = [
+            ("00:00.004", "0:00:00.00"),
+            ("00:00.005", "0:00:00.01"),
+            ("09:59.995", "0:10:00.00"),
+            ("59:59.999", "1:00:00.00"),
+        ]
+        for (start, expectedStart) in cases {
+            let source = cue(
+                start: start, end: "01:00:01.000 align:start line:90%", format: .webVTT
+            )
+            #expect(dialogueLines(try Converter.convert(source, format: .webVTT)) == [
+                "Dialogue: 0,\(expectedStart),1:00:01.00,Default,,0,0,0,,Caption",
+            ])
+        }
+    }
+
+    @Test func timestampFastPathPreservesTrimmedWhitespaceAndFallbackForms() throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(
+                start: "\u{00A0}\t00:00:01.005\u{00A0}",
+                end: "\t00:00:02.000\u{00A0}", format: format
+            )
+            #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                "Dialogue: 0,0:00:01.01,0:00:02.00,Default,,0,0,0,,Caption",
+            ])
+        }
+        for (start, expectedStart) in [
+            ("1:2:3,4", "1:02:03.00"),
+            ("0:00:00.0000", "0:00:00.00"),
+            ("000:00:00.00", "0:00:00.00"),
+            ("123:04:05,6", "123:04:05.01"),
+            ("00:00:01,005999", "0:00:01.01"),
+            ("000:00:01", "0:00:01.00"),
+        ] {
+            #expect(dialogueLines(try Converter.convert(
+                cue(start: start, end: "200:00:00,000", format: .srt), format: .srt
+            )) == ["Dialogue: 0,\(expectedStart),200:00:00.00,Default,,0,0,0,,Caption"])
+        }
+    }
+
+    @Test(arguments: [" \t ", "\u{00A0}\u{2009}", "\t\u{2007} "])
+    func timestampEdgeWhitespacePreservesFoundationTrimming(whitespace: String) throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(
+                start: whitespace + "00:00:01.005" + whitespace,
+                end: whitespace + "00:00:02.015" + whitespace,
+                format: format
+            )
+            #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                "Dialogue: 0,0:00:01.01,0:00:02.02,Default,,0,0,0,,Caption",
+            ])
+        }
+    }
+
+    @Test func webVTTSettingsKeepCharacterBoundarySemantics() throws {
+        for end in [
+            "00:02.000 align:start",
+            "00:02.000\tline:90%",
+            "00:02.000 \tlabel:Cafe\u{0301}",
+            "00:02.000\tlabel:日本語",
+        ] {
+            let source = cue(start: "00:01.000", end: end, format: .webVTT)
+            #expect(dialogueLines(try Converter.convert(source, format: .webVTT)) == [
+                "Dialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,Caption",
+            ])
+        }
+        for end in [
+            "00:02.000\u{00A0}align:start",
+            "00:02.000\u{2009}align:start",
+            "00:02.000 \u{0301}align:start",
+            "00:02.000\u{0301} align:start",
+        ] {
+            // Edge trimming and internal Character-based settings separators
+            // have different semantics, including spaces with combining marks.
+            assertRejectedTimestamp(end, format: .webVTT)
+        }
+    }
+
+    @Test func positiveMillisecondIntervalsSurviveCentisecondRounding() throws {
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = cue(
+                start: "00:00:01.001", end: "00:00:01.002", format: format
+            )
+            // Validation uses milliseconds even when both emitted ASS
+            // endpoints round to the same centisecond.
+            #expect(dialogueLines(try Converter.convert(source, format: format)) == [
+                "Dialogue: 0,0:00:01.00,0:00:01.00,Default,,0,0,0,,Caption",
+            ])
+        }
+    }
+
     @Test func mixedLineEndingsPreserveHeaderCueBoundariesAndTrailingPayload() throws {
         let body = "first-id\r00:00:01.000 --> 00:00:02.000\r\n"
             + "First\rSecond\r\nThird\nFourth\r\r"
@@ -433,6 +549,79 @@ struct ExternalTextSubtitleConverterTests {
             let source = (format == .webVTT ? "WEBVTT\n\n" : "")
                 + "00:00:01.000 --> 00:00:02.000\n" + payload
             #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+        }
+    }
+
+    @Test func emptyAndWhitespaceCuesDoNotLeakPayloadAcrossEvents() throws {
+        let body = """
+        empty-before
+        00:00:01.000 --> 00:00:02.000
+
+        one-line
+        00:00:03.000 --> 00:00:04.000
+        Caption
+
+        rejected
+        invalid --> invalid
+        This payload must not appear
+
+        whitespace
+        00:00:05.000 --> 00:00:06.000
+         \t
+
+        empty-after
+        00:00:07.000 --> 00:00:08.000
+        """
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,"
+            + "\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,Caption"
+            + "\nDialogue: 0,0:00:05.00,0:00:06.00,Default,,0,0,0,, \t"
+            + "\nDialogue: 0,0:00:07.00,0:00:08.00,Default,,0,0,0,,"
+        for format in [Converter.Format.srt, .webVTT] {
+            for trailingLine in ["", "\n"] {
+                let source = (format == .webVTT ? "WEBVTT\n\n" : "") + body + trailingLine
+                #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+            }
+        }
+    }
+
+    @Test func multilineUnicodeEscapesRetainLineLocalMatchingAndTrailingBreak() throws {
+        // These combining marks remain attached to literal metacharacters,
+        // whereas the joiner permits Foundation's existing brace escaping.
+        // Literal "\N", inserted line breaks, and the final empty line differ.
+        let payload = #"literal\N{plain}"# + "\n"
+            + "\\\u{0301}{\u{0308}}\u{0327}\n"
+            + "{\u{200D}joiner\n"
+            + " \t\n"
+            + "Cafe\u{0301}\n"
+        let expected = Converter.defaultASSHeader
+            + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,"
+            + #"literal\\N\{plain\}\N"#
+            + "\\\u{0301}{\u{0308}}\u{0327}\\N"
+            + "\\{\u{200D}joiner\\N \t\\NCafe\u{0301}\\N"
+        for format in [Converter.Format.srt, .webVTT] {
+            let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                + "00:00:01.000 --> 00:00:02.000\n" + payload
+            #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+        }
+    }
+
+    @Test(arguments: [0, 1, 2, 64, 4_096])
+    func manyPayloadLinesPreserveEveryLiteralEscapeAndSeparator(repeatedLines: Int) throws {
+        // The expected record repeats a fixed, independently specified escaped
+        // line. Even thousands of lines remain one cue, with one separator per LF.
+        let payload = String(repeating: #"Line\N{literal}"# + "\n", count: repeatedLines) + "Final"
+        let expectedPayload = String(repeating: #"Line\\N\{literal\}\N"#, count: repeatedLines) + "Final"
+        for format in [Converter.Format.srt, .webVTT] {
+            for hasFinalLineBreak in [false, true] {
+                let source = (format == .webVTT ? "WEBVTT\n\n" : "")
+                    + "00:00:01.000 --> 00:00:02.000\n" + payload
+                    + (hasFinalLineBreak ? "\n" : "")
+                let expected = Converter.defaultASSHeader
+                    + "\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,"
+                    + expectedPayload + (hasFinalLineBreak ? #"\N"# : "")
+                #expect(try Converter.convert(source, format: format).utf8.elementsEqual(expected.utf8))
+            }
         }
     }
 
