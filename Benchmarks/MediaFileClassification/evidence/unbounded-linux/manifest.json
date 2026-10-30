@@ -1,0 +1,71 @@
+{
+  "arguments": {
+    "discovery_target_ms": 100.0,
+    "iterations": null,
+    "output": "/workspace/scratch/5e75b964825a/research/extensions-linux-confirmation",
+    "pairs": 12,
+    "skip_tests": false,
+    "swift": null,
+    "swiftc": null,
+    "target_ms": 500.0
+  },
+  "baselineRevision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "compiler": {
+    "frontendSHA256": "81a8f92138bb9b2544abb5446eeb554fc37c5b5bf9bef2569f70232578ec15b6",
+    "swift": "/workspace/scratch/ad1014220f8c/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swift",
+    "swiftSHA256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de",
+    "swiftc": "/workspace/scratch/ad1014220f8c/toolchains/swift-6.3.2-RELEASE-ubuntu24.04/usr/bin/swiftc",
+    "swiftcSHA256": "8730dd7c45c7b46048a451afb49939cf30219fa4ade4f48691f80c6161a473de",
+    "version": "Swift version 6.3.2 (swift-6.3.2-RELEASE)\nTarget: x86_64-unknown-linux-gnu"
+  },
+  "cpuCount": 9,
+  "inputSHA256": {
+    "ClassificationHarness.swift": "9387f340d5fd8533805b0049ec4d46c4bcc7f99be1b3a9ac633bc1e0c8cefcaa",
+    "DiscoveryHarness.swift": "fc0dfb0fe165f29dc6ade8f0e25c16bfaed42e4c16175d2b7a72728b992c3971",
+    "baseline-manifest.json": "0383e93006e60bff36ccd9d11cd9b7037e3e21231e4ba3f8fe0f6850a733bb20",
+    "baseline/MediaFileSupport.swift": "85680a02f22355e0c7514fe00c12ba253c88d26be3eb2b5ee1149b212e047a00",
+    "candidate/MediaFileSupport.swift": "b1c462b63345e0065752d920f63cf4262a07a972a0cb4ad591dc4493ac2b4639",
+    "fixtures.py": "b3f914d54f2152e270ada5805bf758869c1ba57a66545baa313bb2bd46ce4589",
+    "run.py": "b22e26a41166bdc34ecf213133c56b1729491223df280c58c8bc473069a39baa",
+    "shared/ExternalSubtitleMatcher.swift": "d4b15dc5a8f62d043f187f4a39820cbab2c8d6e7388d8769309516ab18f79f1a",
+    "shared/FolderPlaylist.swift": "8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe",
+    "shared/FolderPlaylistDiscovery.swift": "3748bf70b9c26c7e4a812733d81f4e1df3719c783d4b2a389b8163024d2bded3",
+    "shared/NaturalFilenameOrdering.swift": "d167212f90dd5cd6d8e0e73c208d8e9b4648cc7f4dd21212d51c85a693a263e7",
+    "shared/NormalizedFileURL.swift": "3b65c98b88722ca4d51c315a7fd5e2fde0e40c846071b6b1e34cd1f1eddb3fd2",
+    "shared/PlaylistMutation.swift": "b38441770551ab48f9c5db544479156656494588296c1777ac81caa768796ec8",
+    "tests/ExternalSubtitleMatcherTests.swift": "8e87e9870e636aa622ce977fdc3e36814e77607b250987fa1592484a3aa0c370",
+    "tests/FolderDiscoveryFilesystemRegressionTests.swift": "4b208361b6414eede0026861b9ef63c13df1828d786dbf60e3573cdf91137964",
+    "tests/FolderPlaylistDiscoveryTests.swift": "2114e058b5b4d491214627509b0f1e6ea608b38f668390785bfdd795771415ea",
+    "tests/MediaFileSupportTests.swift": "38bebb1e6625bba5ed2d7f45bcbf235102966d5923b34cd704ad7be7cbb11508",
+    "tests/TemporaryDirectory.swift": "594fb60baced7f9b7618a4b31b9c8bf8eb47165962086282460bb014397bac24"
+  },
+  "machine": "x86_64",
+  "method": "Exact production sources; independently optimized library and harnesses; complete output parity; same iterations within balanced fresh-process AB/BA pairs.",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "recordedUTC": "2026-10-28T05:16:57.576090+00:00",
+  "sourcePaths": {
+    "ClassificationHarness.swift": "Benchmarks/MediaFileClassification/ClassificationHarness.swift",
+    "DiscoveryHarness.swift": "Benchmarks/MediaFileClassification/DiscoveryHarness.swift",
+    "baseline-manifest.json": "Benchmarks/MediaFileClassification/baseline/manifest.json",
+    "baseline/MediaFileSupport.swift": "Benchmarks/MediaFileClassification/baseline/MediaFileSupport.swift",
+    "candidate/MediaFileSupport.swift": "Sources/IlliquidCore/Utilities/MediaFileSupport.swift",
+    "fixtures.py": "Benchmarks/MediaFileClassification/fixtures.py",
+    "run.py": "Benchmarks/MediaFileClassification/run.py",
+    "shared/ExternalSubtitleMatcher.swift": "Sources/IlliquidCore/Playlist/ExternalSubtitleMatcher.swift",
+    "shared/FolderPlaylist.swift": "Sources/IlliquidCore/Playlist/FolderPlaylist.swift",
+    "shared/FolderPlaylistDiscovery.swift": "Sources/IlliquidCore/Playlist/FolderPlaylistDiscovery.swift",
+    "shared/NaturalFilenameOrdering.swift": "Sources/IlliquidCore/Utilities/NaturalFilenameOrdering.swift",
+    "shared/NormalizedFileURL.swift": "Sources/IlliquidCore/Utilities/NormalizedFileURL.swift",
+    "shared/PlaylistMutation.swift": "Sources/IlliquidCore/Playlist/PlaylistMutation.swift",
+    "tests/ExternalSubtitleMatcherTests.swift": "Tests/IlliquidCoreTests/ExternalSubtitleMatcherTests.swift",
+    "tests/FolderDiscoveryFilesystemRegressionTests.swift": "Tests/IlliquidCoreTests/FolderDiscoveryFilesystemRegressionTests.swift",
+    "tests/FolderPlaylistDiscoveryTests.swift": "Tests/IlliquidCoreTests/FolderPlaylistDiscoveryTests.swift",
+    "tests/MediaFileSupportTests.swift": "Tests/IlliquidCoreTests/MediaFileSupportTests.swift",
+    "tests/TemporaryDirectory.swift": "Tests/IlliquidCoreTests/TestSupport/TemporaryDirectory.swift"
+  },
+  "testsIncluded": true,
+  "timingEnvironment": {
+    "SWIFT_DETERMINISTIC_HASHING": "1"
+  }
+}

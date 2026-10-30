@@ -18,6 +18,18 @@ public enum MediaFileSupport {
     }
 
     private static func normalizedExtension(of url: URL) -> String {
-        url.pathExtension.lowercased(with: Locale(identifier: "en_US_POSIX"))
+        let pathExtension = url.pathExtension
+        // Current supported extensions fit in four ASCII bytes. Bound the probe
+        // so longer suffixes do not incur another full scan before lowercasing.
+        var remaining = 4
+        for byte in pathExtension.utf8 {
+            guard remaining > 0,
+                  byte < 0x80,
+                  !(0x41...0x5A).contains(byte) else {
+                return pathExtension.lowercased(with: Locale(identifier: "en_US_POSIX"))
+            }
+            remaining -= 1
+        }
+        return pathExtension
     }
 }
