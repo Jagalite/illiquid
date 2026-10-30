@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.util
+import itertools
 import json
 import math
 import os
@@ -21,7 +22,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BASELINE = "070c7a4c84a4f00b2ac3e17587a7b5f3857952fd"
 CASES = ["folders-files", "folders-media", "mixed-files", "mixed-media", "explicit-files", "explicit-media"]
-TESTS = ["SourceBrowserFilterTests.swift", "SourceMediaOrganizationTests.swift", "FlatFileProjectionTests.swift"]
+TESTS = ["SourceBrowserFilterTests.swift", "SourceMediaOrganizationTests.swift",
+         "FlatFileProjectionTests.swift", "SourceTreeSortingTests.swift"]
 HELPER = ROOT / "Benchmarks/SourceTreeVisibility/run.py"
 spec = importlib.util.spec_from_file_location("source_tree_staging", HELPER)
 staging = importlib.util.module_from_spec(spec)
@@ -65,6 +67,14 @@ def adapt(relative, raw):
     return raw.replace(before, after, 1), [{"from": before.decode(), "to": after.decode()}]
 
 
+def without_sorter(raw):
+    """Compare the staged Sidebar outside its one exact top-level sorter."""
+    pattern = rb"(?ms)^enum SourceTreeSorting \{\n.*?^}\n"
+    if len(re.findall(pattern, raw)) != 1:
+        raise ValueError("Expected one complete SourceTreeSorting declaration")
+    return re.sub(pattern, b"// SourceTreeSorting comparison boundary\n", raw, count=1)
+
+
 class Runner:
     def __init__(self, args):
         self.args, self.output = args, args.output.resolve()
@@ -105,18 +115,40 @@ class Runner:
             ["git", "show", f"{self.args.baseline}:{name}"], cwd=ROOT))
         candidate_files, candidate_records = staging.snapshot(lambda name: (ROOT / name).read_bytes())
         head = self.command(["git", "rev-parse", "HEAD"], "head").strip()
+        focal_sources = {"Sources/IlliquidApp/SourceTreeProjectionInput.swift"}
+        sidebar = "Sources/IlliquidApp/SidebarValues.swift"
+        if self.args.include_sorter:
+            focal_sources.add(sidebar)
         baseline_files, baseline_records, candidate_records, comparison = staging.comparison_sources(
             baseline_files, baseline_records, candidate_files, candidate_records,
-            focal_sources={"Sources/IlliquidApp/SourceTreeProjectionInput.swift"},
+            focal_sources=focal_sources,
             baseline_revision=self.args.baseline, worktree_head=head,
             current_support=self.args.current_support,
         )
         for name in baseline_files:
-            if not name.endswith("/SourceTreeProjectionInput.swift") and baseline_files[name] != candidate_files[name]:
+            if name not in focal_sources and baseline_files[name] != candidate_files[name]:
                 raise ValueError(f"Unrelated staged production source changed: {name}")
+        if self.args.include_sorter and without_sorter(baseline_files[sidebar]) != without_sorter(candidate_files[sidebar]):
+            raise ValueError("Sidebar declarations outside SourceTreeSorting changed")
+        manifest_source = PACKAGE
+        if self.args.allocations:
+            original = '.executableTarget(name: "FlatFileProjectionBenchmark", dependencies: ["IlliquidCore", "IlliquidApp"]),'
+            replacement = ('.target(name: "CAllocationMeter"),\n'
+                '        .executableTarget(name: "FlatFileProjectionBenchmark", '
+                'dependencies: ["IlliquidCore", "IlliquidApp", "CAllocationMeter"], '
+                'swiftSettings: [.define("ALLOCATION_METER")]),')
+            if manifest_source.count(original) != 1:
+                raise ValueError("Benchmark target declaration changed")
+            manifest_source = manifest_source.replace(original, replacement, 1)
         for variant, files, records in [("baseline", baseline_files, baseline_records),
                                         ("candidate", candidate_files, candidate_records)]:
-            files["Package.swift"] = PACKAGE.encode()
+            files["Package.swift"] = manifest_source.encode()
+            if self.args.allocations:
+                files["Sources/CAllocationMeter/allocmeter.c"] = (
+                    ROOT / "Benchmarks/NonDecodePerformance/allocmeter.c").read_bytes()
+                files["Sources/CAllocationMeter/include/AllocationMeter.h"] = (
+                    b"#include <stdint.h>\nvoid meter_begin(void);\nvoid meter_end(void);\n"
+                    b"uint64_t meter_requests(void);\nuint64_t meter_bytes(void);\n")
             files["Sources/FlatFileProjectionBenchmark/Harness.swift"] = (HERE / "Harness.swift").read_bytes()
             for name in TESTS:
                 files["Tests/IlliquidAppTests/" + name] = (ROOT / "Tests/IlliquidAppTests" / name).read_bytes()
@@ -180,61 +212,83 @@ class Runner:
         self.binary_hashes = {name: file_digest(path) for name, path in self.binaries.items()}
         save(self.output / "binaries.json", {name: {"path": str(path), "sha256": self.binary_hashes[name]} for name, path in self.binaries.items()})
         comparisons = []
-        for size in self.args.sizes:
-            for case in self.args.cases:
-                traces = {}
-                for variant, binary in self.binaries.items():
-                    label = f"verify-{case}-{size}-{variant}"
-                    traces[variant] = json.loads(self.command([binary, "verify", case, size], label,
-                        self.output / "traces" / f"{label}.json"))
-                if traces["baseline"] != traces["candidate"]:
-                    raise ValueError(f"Complete output trace differs: {case}/{size}")
-                comparisons.append({"case": case, "size": size, "complete_rows_equal": True, "rows": len(traces["baseline"]["rows"])})
+        for size, case, sort_order in itertools.product(self.args.sizes, self.args.cases, self.args.sorts):
+            traces, trace_hashes = {}, {}
+            for variant, binary in self.binaries.items():
+                label = f"verify-{case}-{size}-{sort_order}-{variant}"
+                trace_path = self.output / "traces" / f"{label}.json"
+                traces[variant] = json.loads(self.command([binary, "verify", case, size, sort_order], label, trace_path))
+                trace_hashes[variant] = file_digest(trace_path)
+            if traces["baseline"] != traces["candidate"]:
+                raise ValueError(f"Complete output trace differs: {case}/{size}/{sort_order}")
+            comparisons.append({"case": case, "size": size, "sort": sort_order,
+                "complete_rows_equal": True, "rows": len(traces["baseline"]["rows"]),
+                "trace_sha256": trace_hashes})
         save(self.output / "parity.json", comparisons)
 
     def measure(self):
         observations, summaries, calibrations = [], [], []
-        for size in self.args.sizes:
-            for case in self.args.cases:
-                def sample(variant, iterations, label):
-                    value = json.loads(self.command([self.binaries[variant], "measure", case, size, iterations], label))
-                    if value["mode"] != "measure" or value["case"] != case or value["size"] != size or value["iterations"] != iterations or len(value["wall_ns"]) != iterations or len(value["cpu_ns"]) != iterations:
-                        raise ValueError("Incomplete measurement")
-                    if any(not math.isfinite(x) or x <= 0 for x in value["wall_ns"] + value["cpu_ns"]):
-                        raise ValueError("Invalid wall/CPU duration")
-                    return value
-                calibration = {variant: sample(variant, 1, f"calibrate-{case}-{size}-{variant}") for variant in self.binaries}
-                fastest = min(value["wall_ns"][0] for value in calibration.values())
-                iterations = max(1, min(1000, math.ceil(self.args.target_ms * 1e6 / fastest)))
-                calibrations.append({"case": case, "size": size, "iterations": iterations, "observations": calibration})
-                times = {variant: {"wall": [], "cpu": []} for variant in self.binaries}
-                paired = {metric: [] for metric in ["wall", "cpu"]}
-                for pair in range(self.args.pairs):
-                    order = ["baseline", "candidate"] if pair % 2 == 0 else ["candidate", "baseline"]
-                    results = {}
-                    for position, variant in enumerate(order):
-                        value = sample(variant, iterations, f"measure-{case}-{size}-{pair}-{variant}")
-                        observations.append(dict(value, variant=variant, pair=pair, execution_position=position, execution_order=order))
-                        results[variant] = value
-                        for metric in times[variant]:
-                            times[variant][metric].append(statistics.mean(value[metric + "_ns"]))
-                    if results["baseline"]["checksum"] != results["candidate"]["checksum"]:
-                        raise ValueError("Timed consumption differs")
-                    for metric in paired:
-                        a, b = times["baseline"][metric][-1], times["candidate"][metric][-1]
-                        paired[metric].append(100 * (b / a - 1))
-                    save(self.output / "observations.json", observations)
-                summary = {"case": case, "size": size, "pairs": self.args.pairs, "iterations": iterations}
+        metrics = {"wall": "wall_ns", "cpu": "cpu_ns"}
+        if self.args.allocations:
+            metrics.update(allocation_requests="allocation_requests",
+                           allocation_requested_bytes="allocation_requested_bytes")
+        for size, case, sort_order in itertools.product(self.args.sizes, self.args.cases, self.args.sorts):
+            def sample(variant, iterations, label):
+                value = json.loads(self.command(
+                    [self.binaries[variant], "measure", case, size, iterations, sort_order], label))
+                if (value["mode"] != "measure" or value["case"] != case or value["size"] != size
+                    or value["sort"] != sort_order or value["iterations"] != iterations
+                    or value["allocation_instrumented"] != self.args.allocations):
+                    raise ValueError("Incomplete measurement")
+                for key in metrics.values():
+                    if len(value[key]) != iterations or any(not math.isfinite(x) or x < 0 for x in value[key]):
+                        raise ValueError(f"Invalid measurement: {key}")
+                if any(x <= 0 for x in value["wall_ns"] + value["cpu_ns"]):
+                    raise ValueError("Invalid wall/CPU duration")
+                return value
+            calibration = {variant: sample(variant, 1, f"calibrate-{case}-{size}-{sort_order}-{variant}")
+                           for variant in self.binaries}
+            fastest = min(value["wall_ns"][0] for value in calibration.values())
+            iterations = 1 if self.args.allocations else max(1, min(1000, math.ceil(self.args.target_ms * 1e6 / fastest)))
+            calibrations.append({"case": case, "size": size, "sort": sort_order,
+                                 "iterations": iterations, "observations": calibration})
+            times = {variant: {metric: [] for metric in metrics} for variant in self.binaries}
+            paired = {metric: [] for metric in metrics}
+            for pair in range(self.args.pairs):
+                order = ["baseline", "candidate"] if pair % 2 == 0 else ["candidate", "baseline"]
+                results = {}
+                for position, variant in enumerate(order):
+                    value = sample(variant, iterations, f"measure-{case}-{size}-{sort_order}-{pair}-{variant}")
+                    observations.append(dict(value, variant=variant, pair=pair, execution_position=position, execution_order=order))
+                    results[variant] = value
+                    for metric, key in metrics.items():
+                        times[variant][metric].append(statistics.mean(value[key]))
+                for key in ("checksum", "output_count", "entry_stride_bytes", "index_stride_bytes"):
+                    if results["baseline"][key] != results["candidate"][key]:
+                        raise ValueError(f"Timed result differs: {key}")
                 for metric in paired:
-                    a, b = times["baseline"][metric], times["candidate"][metric]
-                    summary[metric] = {"baseline_median_ns": statistics.median(a), "candidate_median_ns": statistics.median(b),
-                        "baseline_range_ns": [min(a), max(a)], "candidate_range_ns": [min(b), max(b)],
-                        "paired_change_percent": paired[metric], "median_paired_change_percent": statistics.median(paired[metric]),
-                        "faster_pairs": sum(change < 0 for change in paired[metric])}
-                summaries.append(summary)
-                save(self.output / "calibration.json", calibrations)
-                save(self.output / "summary.json", summaries)
-                print(f"{case:16} {size:6}: {summary['wall']['median_paired_change_percent']:+.1f}% paired wall change", flush=True)
+                    a, b = times["baseline"][metric][-1], times["candidate"][metric][-1]
+                    paired[metric].append(100 * (b / a - 1) if a else None)
+                save(self.output / "observations.json", observations)
+            summary = {"case": case, "size": size, "sort": sort_order,
+                       "pairs": self.args.pairs, "iterations": iterations,
+                       "allocation_instrumented": self.args.allocations,
+                       "entry_stride_bytes": calibration["baseline"]["entry_stride_bytes"],
+                       "index_stride_bytes": calibration["baseline"]["index_stride_bytes"]}
+            for metric in paired:
+                a, b = times["baseline"][metric], times["candidate"][metric]
+                suffix = "_ns" if metric in ("wall", "cpu") else ""
+                changes = [change for change in paired[metric] if change is not None]
+                summary[metric] = {"baseline_median" + suffix: statistics.median(a),
+                    "candidate_median" + suffix: statistics.median(b),
+                    "baseline_range" + suffix: [min(a), max(a)], "candidate_range" + suffix: [min(b), max(b)],
+                    "paired_change_percent": paired[metric],
+                    "median_paired_change_percent": statistics.median(changes) if changes else None,
+                    "faster_pairs": sum(change < 0 for change in changes)}
+            summaries.append(summary)
+            save(self.output / "calibration.json", calibrations)
+            save(self.output / "summary.json", summaries)
+            print(f"{case:16} {size:6} {sort_order:4}: {summary['wall']['median_paired_change_percent']:+.1f}% paired wall change", flush=True)
 
     def finish(self):
         for variant, manifest in self.manifests.items():
@@ -247,7 +301,9 @@ class Runner:
         for original, archived in [(Path(__file__), "runner.py"), (HELPER, "staging-helper.py"), (HERE / "Harness.swift", "Harness.swift")]:
             if file_digest(original) != file_digest(self.output / archived):
                 raise ValueError(f"Benchmark driver changed: {original}")
-        save(self.output / "completion.json", {"completed": True, "mode": self.args.mode, "exploratory": self.args.quick})
+        save(self.output / "completion.json", {"completed": True, "mode": self.args.mode,
+            "exploratory": self.args.quick, "allocation_instrumented": self.args.allocations,
+            "cases": len(self.args.sizes) * len(self.args.cases) * len(self.args.sorts)})
 
 
 def main():
@@ -256,7 +312,11 @@ def main():
     parser.add_argument("--swift", default=shutil.which("swift") or "swift")
     parser.add_argument("--baseline", default=BASELINE)
     parser.add_argument("--current-support", action="store_true",
-                        help="Keep the historical projection Input; use identical current supporting sources in both variants")
+                        help="Keep historical focal implementations; use identical current supporting sources in both variants")
+    parser.add_argument("--include-sorter", action="store_true",
+                        help="Compare the baseline sorter as well as projection Input, checking all surrounding declarations")
+    parser.add_argument("--sorts", nargs="+", choices=["name", "date", "off"], default=["name"])
+    parser.add_argument("--allocations", action="store_true", help="Separate Linux/glibc requested-allocation cohort")
     parser.add_argument("--pairs", type=int, default=6)
     parser.add_argument("--sizes", type=int, nargs="+", default=[100, 1000, 10000])
     parser.add_argument("--cases", nargs="+", choices=CASES, default=CASES)
@@ -272,6 +332,8 @@ def main():
         parser.error("Use 2...20 even pairs and sizes in 1...100000")
     if not math.isfinite(args.target_ms) or not 1 <= args.target_ms <= 1000:
         parser.error("--target-ms must be in 1...1000")
+    if args.allocations and platform.system() != "Linux":
+        parser.error("--allocations requires Linux/glibc")
     runner = Runner(args)
     runner.prepare()
     runner.build_and_verify()

@@ -3,6 +3,7 @@ import URLBaseline
 import URLCandidate
 #if os(macOS)
 import CoreFoundation
+import PR170NativeFixtures
 #endif
 
 struct Fixture {
@@ -10,10 +11,28 @@ struct Fixture {
     let url: URL
 }
 
+nonisolated(unsafe) var constructionFailures: [[String: String]] = []
+
 func fixtures() -> [Fixture] {
     var cases: [Fixture] = []
     func add(_ label: String, _ value: @autoclosure () -> URL?) {
         if let url = value() { cases.append(Fixture(label: label, url: url)) }
+    }
+    func bridgedPath(_ label: String, _ path: String, _ directory: Bool) -> URL? {
+        #if os(macOS)
+        guard let object = PR170CreatePath(path, directory) else {
+            constructionFailures.append(["label": label, "path": path, "status": "constructor.nil", "parity": "not-tested"])
+            return nil
+        }
+        guard let url = object as? NSURL else { preconditionFailure("Unexpected fixture object type") }
+        if !PR170CanResolve(object) {
+            constructionFailures.append(["label": label, "path": path, "status": "constructor.unresolved", "parity": "not-tested"])
+            return nil
+        }
+        return url as URL
+        #else
+        return NSURL(fileURLWithPath: path, isDirectory: directory) as URL
+        #endif
     }
     let components = [
         "tmp", "Media", "Movie.mkv", "", ".", "..", "~", "~user", "Caf\u{E9}", "Cafe\u{301}",
@@ -31,7 +50,7 @@ func fixtures() -> [Fixture] {
             // Linux's legacy NSURL bridge traps while constructing an empty
             // path. The Swift URL initializer above still covers empty input;
             // do not turn an unrelated fixture-construction trap into a key test.
-            if !path.isEmpty { add("bridged-path-\(i)-\(isDirectory)", NSURL(fileURLWithPath: path, isDirectory: isDirectory) as URL) }
+            if !path.isEmpty { add("bridged-path-\(i)-\(isDirectory)", bridgedPath("bridged-path-\(i)-\(isDirectory)", path, isDirectory)) }
         }
     }
     for byte in 0...31 {
@@ -202,7 +221,8 @@ struct Differential {
             try compareReferences("after-rename")
         }
         #endif
-        let output: [String: Any] = ["cases": checked, "rejected": rejected,
+        let output: [String: Any] = ["constructionFailures": constructionFailures, "qualification": "executable-input-only",
+                                     "cases": checked, "rejected": rejected,
                                      "nativeReferenceCases": nativeReferenceCases,
                                      "mismatches": mismatchCount, "examples": examples]
         let data = try JSONSerialization.data(withJSONObject: output, options: [.sortedKeys, .prettyPrinted])

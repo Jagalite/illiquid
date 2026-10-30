@@ -11,6 +11,7 @@ on:
       - 'Scripts/test-file-identity-keys.sh'
       - 'Benchmarks/FileIdentityKeys/*.swift'
       - 'Benchmarks/FileIdentityKeys/run.py'
+      - 'Benchmarks/FileIdentityKeys/NativeFixtures/**'
       - 'Benchmarks/FileIdentityKeys/baseline/**'
       - '.github/workflows/file-identity-keys.yml'
   pull_request:
@@ -22,6 +23,7 @@ on:
       - 'Scripts/test-file-identity-keys.sh'
       - 'Benchmarks/FileIdentityKeys/*.swift'
       - 'Benchmarks/FileIdentityKeys/run.py'
+      - 'Benchmarks/FileIdentityKeys/NativeFixtures/**'
       - 'Benchmarks/FileIdentityKeys/baseline/**'
       - '.github/workflows/file-identity-keys.yml'
   workflow_dispatch:
@@ -57,7 +59,13 @@ jobs:
           ILLIQUID_KEY_SOURCE_REVISION=ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
             bash Scripts/test-file-identity-keys.sh --jobs 2 2>&1 | tee "$RUNNER_TEMP/file-identity/tests-baseline.log"
           bash Scripts/test-file-identity-keys.sh --jobs 2 2>&1 | tee "$RUNNER_TEMP/file-identity/tests-candidate.log"
-      - name: Compare exact keys and complete playlist lookup timings
+      - name: Integrated current support correctness (automatic)
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          python3 Benchmarks/FileIdentityKeys/run.py --integrated-current-support \
+            --pairs 12 --target-ms 250 --seed 20261028 --output "$RUNNER_TEMP/file-identity/benchmark"
+      - name: Historical performance (manual; frozen support guard retained)
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python3 Benchmarks/FileIdentityKeys/run.py \
             --pairs 12 --target-ms 250 --output "$RUNNER_TEMP/file-identity/benchmark"

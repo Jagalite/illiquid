@@ -1,0 +1,299 @@
+{
+  "allocation_probe": {
+    "excludes": "Aligned allocators, free, live/peak/RSS memory, allocator usable sizes",
+    "executed": true,
+    "library_sha256": "f2dc8b4a85325be0e33451c1d59c75cc51bb8e9953615a13f894a39d08d3940e",
+    "scope": "Successful malloc/calloc/realloc requests on the measured thread",
+    "self_test": "ALLOCATION_PROBE_PASS calls=3 requested_bytes=225"
+  },
+  "arguments": {
+    "output": "/__w/_temp/effect-retirement-linux",
+    "pairs": 6,
+    "target_ms": 50
+  },
+  "baseline": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "baseline_binary_sha256": "1c7e6a6943e057c3462817145e82535ff2ef0ac92e5b0f1dbefa0d0134e72ef8",
+  "baseline_sources": {
+    "Sources/IlliquidCore/Player/MediaTrack.swift": {
+      "bytes": 3768,
+      "sha256": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441"
+    },
+    "Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift": {
+      "bytes": 3217,
+      "sha256": "bdcf2f3a283de51150cf03f1b982dd9b3f7861acdb90a470947f84d6f8cda339"
+    },
+    "Sources/IlliquidPlaybackCore/EventsAndEffects.swift": {
+      "bytes": 10671,
+      "sha256": "a297b5e21f05fe7a44b0e3a24939df8a8f5b5ec22bc988e1671ba5247348c46e"
+    },
+    "Sources/IlliquidPlaybackCore/IdentityAndTime.swift": {
+      "bytes": 10209,
+      "sha256": "c1c1ee83d7cfbfb909e30fccba6d239ddc412a9f1138015b431b7cda3df723bb"
+    },
+    "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift": {
+      "bytes": 2964,
+      "sha256": "da35a412ca1a6919c9aa73a1c2eb06e7296ffa4643e27a9506b9294976ffffc4"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackCore.swift": {
+      "bytes": 69064,
+      "sha256": "59faf4ba801d6d1e2d937302a19b45aa7c15eec263aebef987521a879d930fa0"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift": {
+      "bytes": 13019,
+      "sha256": "4832bd64d67568c5ebdc641dc67c64d1f681ba07a7902887fa8ee81e04d1b59f"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift": {
+      "bytes": 4817,
+      "sha256": "d25bb7de8f1871781bc8ee035a4b58dc00446f2dfe7491799a8315822a3c173e"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift": {
+      "bytes": 6382,
+      "sha256": "54a12cac94e739f0ca681b262283c125b3df291be0e3f1a7d1e0eb1b496d2ffb"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackReplay.swift": {
+      "bytes": 9444,
+      "sha256": "a5a94109b548bf12148b3e49b93570fbf2b63efffd97ef56d8deb6ee997279e3"
+    },
+    "Sources/IlliquidPlaybackCore/RecoveryCore.swift": {
+      "bytes": 9243,
+      "sha256": "569ceffa207ba7dfdbd10f07d7f6ffc4d44fef37eefef2315959dcbb56b80f9a"
+    },
+    "Sources/IlliquidPlaybackCore/SeekCore.swift": {
+      "bytes": 3247,
+      "sha256": "08e138ead38382839cb27a2a923247ec2716a2ea8b036bc8045df38feb78eb4b"
+    },
+    "Sources/IlliquidPlaybackCore/SubtitleCore.swift": {
+      "bytes": 2021,
+      "sha256": "87e13ceedada39f64dd80c40b98040b9102db55bbe59784ec01b2111db12311b"
+    },
+    "Sources/IlliquidPlaybackCore/SynchronizationCore.swift": {
+      "bytes": 6016,
+      "sha256": "9337d8cc2936e9155a61d8fdd0dd4d2e2c9312ede2f9047c2d9bd83629459e20"
+    },
+    "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift": {
+      "bytes": 4991,
+      "sha256": "18f1e2274b9d6eb9e78a8916913f2bd538896363437089e16a3f81f49cf92f8d"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackPartialOrderReducer.swift": {
+      "bytes": 4217,
+      "sha256": "2d112d1c718a54e1aa9eb70313c1d63cb34b4844d3dec98a5d32bde4b9e81800"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackProgressAnalyzer.swift": {
+      "bytes": 7109,
+      "sha256": "46d26cc02e031d601e11078bef1336db071a91b30771537e8d74df6edf25d875"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchArtifact.swift": {
+      "bytes": 12665,
+      "sha256": "8c528492cee44ab51fe5ec3f41b80e28c2ed560111c173974d3e742f0893bc12"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchCanonicalizer.swift": {
+      "bytes": 20575,
+      "sha256": "9c31b9f5c823a72cc6929c3cdf604330ea02f287c33da6451fd63711b11e2801"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModel.swift": {
+      "bytes": 271,
+      "sha256": "ff7bae02bac4c03311afc379f202ce5ea369ea852126d2ccadc0a8659f59493b"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModels.swift": {
+      "bytes": 30528,
+      "sha256": "ce6f3a3acbd29499a700dd333dc49281f8caaebd35f8b83cf3526cbad3c3fb87"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTrend.swift": {
+      "bytes": 3405,
+      "sha256": "1b5673c40a13b4ad778f33d1ab667e4794a754088457f7fa55a02ce864b32b32"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTypes.swift": {
+      "bytes": 14525,
+      "sha256": "7d6587900a9bc2db6dba0362758229f00d9bc85b3c912aaa22708ec9a51a8e83"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackStateSpaceExplorer.swift": {
+      "bytes": 23099,
+      "sha256": "a6519fc2997b60f3457999f32c22102d204f8a04d50071d55de981d75616be0f"
+    },
+    "Sources/IlliquidPlaybackStateSpace/SearchAction.swift": {
+      "bytes": 3075,
+      "sha256": "7ffea198f7c55ce6bf78245885fe09d3b30e79de6b2bbec8e20bdf40dff29e7a"
+    }
+  },
+  "candidate_binary_sha256": "e84ec6153c592969f60975fc155f00948be72c4bb8da9602f14560248f372e37",
+  "candidate_sources": {
+    "Sources/IlliquidCore/Player/MediaTrack.swift": {
+      "bytes": 3768,
+      "sha256": "02a2d581f70eb7a18b2a520571999384abe5911e43d4b7e26022f48c1c57a441"
+    },
+    "Sources/IlliquidPlaybackCore/CompletedPlaybackEffectHistory.swift": {
+      "bytes": 3217,
+      "sha256": "bdcf2f3a283de51150cf03f1b982dd9b3f7861acdb90a470947f84d6f8cda339"
+    },
+    "Sources/IlliquidPlaybackCore/EventsAndEffects.swift": {
+      "bytes": 10671,
+      "sha256": "a297b5e21f05fe7a44b0e3a24939df8a8f5b5ec22bc988e1671ba5247348c46e"
+    },
+    "Sources/IlliquidPlaybackCore/IdentityAndTime.swift": {
+      "bytes": 10209,
+      "sha256": "c1c1ee83d7cfbfb909e30fccba6d239ddc412a9f1138015b431b7cda3df723bb"
+    },
+    "Sources/IlliquidPlaybackCore/LoadingAndDrainCore.swift": {
+      "bytes": 2964,
+      "sha256": "da35a412ca1a6919c9aa73a1c2eb06e7296ffa4643e27a9506b9294976ffffc4"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackCore.swift": {
+      "bytes": 70331,
+      "sha256": "dfe451341daf72f6852499534abc527038212e3ce8be2b7719d1a957011e012d"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackCoreState.swift": {
+      "bytes": 13019,
+      "sha256": "4832bd64d67568c5ebdc641dc67c64d1f681ba07a7902887fa8ee81e04d1b59f"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackInvariants.swift": {
+      "bytes": 4817,
+      "sha256": "d25bb7de8f1871781bc8ee035a4b58dc00446f2dfe7491799a8315822a3c173e"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackModelRuntime.swift": {
+      "bytes": 6382,
+      "sha256": "54a12cac94e739f0ca681b262283c125b3df291be0e3f1a7d1e0eb1b496d2ffb"
+    },
+    "Sources/IlliquidPlaybackCore/PlaybackReplay.swift": {
+      "bytes": 9444,
+      "sha256": "a5a94109b548bf12148b3e49b93570fbf2b63efffd97ef56d8deb6ee997279e3"
+    },
+    "Sources/IlliquidPlaybackCore/RecoveryCore.swift": {
+      "bytes": 9243,
+      "sha256": "569ceffa207ba7dfdbd10f07d7f6ffc4d44fef37eefef2315959dcbb56b80f9a"
+    },
+    "Sources/IlliquidPlaybackCore/SeekCore.swift": {
+      "bytes": 3247,
+      "sha256": "08e138ead38382839cb27a2a923247ec2716a2ea8b036bc8045df38feb78eb4b"
+    },
+    "Sources/IlliquidPlaybackCore/SubtitleCore.swift": {
+      "bytes": 2021,
+      "sha256": "87e13ceedada39f64dd80c40b98040b9102db55bbe59784ec01b2111db12311b"
+    },
+    "Sources/IlliquidPlaybackCore/SynchronizationCore.swift": {
+      "bytes": 6016,
+      "sha256": "9337d8cc2936e9155a61d8fdd0dd4d2e2c9312ede2f9047c2d9bd83629459e20"
+    },
+    "Sources/IlliquidPlaybackCore/TrackSelectionCore.swift": {
+      "bytes": 4991,
+      "sha256": "18f1e2274b9d6eb9e78a8916913f2bd538896363437089e16a3f81f49cf92f8d"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackPartialOrderReducer.swift": {
+      "bytes": 4217,
+      "sha256": "2d112d1c718a54e1aa9eb70313c1d63cb34b4844d3dec98a5d32bde4b9e81800"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackProgressAnalyzer.swift": {
+      "bytes": 7109,
+      "sha256": "46d26cc02e031d601e11078bef1336db071a91b30771537e8d74df6edf25d875"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchArtifact.swift": {
+      "bytes": 12665,
+      "sha256": "8c528492cee44ab51fe5ec3f41b80e28c2ed560111c173974d3e742f0893bc12"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchCanonicalizer.swift": {
+      "bytes": 20575,
+      "sha256": "9c31b9f5c823a72cc6929c3cdf604330ea02f287c33da6451fd63711b11e2801"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModel.swift": {
+      "bytes": 271,
+      "sha256": "ff7bae02bac4c03311afc379f202ce5ea369ea852126d2ccadc0a8659f59493b"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchModels.swift": {
+      "bytes": 30528,
+      "sha256": "ce6f3a3acbd29499a700dd333dc49281f8caaebd35f8b83cf3526cbad3c3fb87"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTrend.swift": {
+      "bytes": 3405,
+      "sha256": "1b5673c40a13b4ad778f33d1ab667e4794a754088457f7fa55a02ce864b32b32"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackSearchTypes.swift": {
+      "bytes": 14525,
+      "sha256": "7d6587900a9bc2db6dba0362758229f00d9bc85b3c912aaa22708ec9a51a8e83"
+    },
+    "Sources/IlliquidPlaybackStateSpace/PlaybackStateSpaceExplorer.swift": {
+      "bytes": 23099,
+      "sha256": "a6519fc2997b60f3457999f32c22102d204f8a04d50071d55de981d75616be0f"
+    },
+    "Sources/IlliquidPlaybackStateSpace/SearchAction.swift": {
+      "bytes": 3075,
+      "sha256": "7ffea198f7c55ce6bf78245885fe09d3b30e79de6b2bbec8e20bdf40dff29e7a"
+    }
+  },
+  "cc_version": "clang version 17.0.0 (https://github.com/swiftlang/llvm-project.git 1026de6a0a1b60acae9cf0515b529c2a9aaebcab)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/bin",
+  "compiler_note": "Debug/release tests; release timing; identical -enable-testing flags",
+  "cpu_count": 4,
+  "excluded": "Live player/UI, peak/retained/RSS memory, energy",
+  "head": "896038769f4e0710f207e8779edbc9c09176ed4c",
+  "isolated_package_sha256": "fced51e82aeee6b1bf8258b611de03d90eb8bd5c42366bef8a9127b91a00ad59",
+  "libc": [
+    "glibc",
+    "2.39"
+  ],
+  "machine": "x86_64",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python_version": "3.12.3",
+  "scope": "Actual reducer source-replacement event; synthetic outstanding-effect populations",
+  "shared_sources": {
+    ".github/workflows/effect-retirement-allocation.yml": {
+      "bytes": 4183,
+      "sha256": "86728e0f74509e13257f857c12fa5b664c4d9c73bad2e3e800eb55cd1361037b"
+    },
+    "Benchmarks/EffectRetirementAllocation/AllocationProbe.c": {
+      "bytes": 2232,
+      "sha256": "0e222d610f1aa30799850f31093790b080031f76f62b6da353408b78b3067ffa"
+    },
+    "Benchmarks/EffectRetirementAllocation/Driver.swift": {
+      "bytes": 11770,
+      "sha256": "cbcafdfe44af536b6175e5452ebde3d29d359ba2a3afaa2e80a17ee5c125130f"
+    },
+    "Benchmarks/EffectRetirementAllocation/ProbeSelfTest.c": {
+      "bytes": 1312,
+      "sha256": "526381025d6542101d6108904602446e6ef4ad7b41e9a1c219cb56144d2c095d"
+    },
+    "Benchmarks/EffectRetirementAllocation/run.py": {
+      "bytes": 23918,
+      "sha256": "ecfddc46d2e0feac2ca376e86cdf5f3476c8a75aa8cf5e5344e03484f868b27b"
+    },
+    "Tests/IlliquidPlaybackCoreTests/CompletedEffectHistoryTests.swift": {
+      "bytes": 12067,
+      "sha256": "c7ccfb1ec67ff7e4701377a7d2c5c182106694b4ab9e02adbe95700ebe570a72"
+    },
+    "Tests/IlliquidPlaybackCoreTests/EffectRetirementTests.swift": {
+      "bytes": 15085,
+      "sha256": "71fea217991d9dd02c7f5f2a244af2e6482b1568d9ad107c8023ce97b95d0bdb"
+    },
+    "Tests/IlliquidPlaybackCoreTests/PlaybackCoreTests.swift": {
+      "bytes": 48762,
+      "sha256": "d5557cbde056ac5f73197b5919a31359e116b1ee0a511bf789d00ac9ea7d583f"
+    },
+    "Tests/IlliquidPlaybackCoreTests/PlaybackParityCoreTests.swift": {
+      "bytes": 3079,
+      "sha256": "076e6fc62ceb3025bd717b7e0edd7d65e9576ea8b4537776d6b82cb9e6ddb78a"
+    },
+    "Tests/IlliquidPlaybackCoreTests/RendererRecoveryRegressionTests.swift": {
+      "bytes": 19879,
+      "sha256": "5224038818d574e889c88c2e75fa0f2d710f03144378488906bcbf1ddb5de176"
+    },
+    "Tests/IlliquidPlaybackCoreTests/StandardCompletionContractTests.swift": {
+      "bytes": 8888,
+      "sha256": "acc03c5b9105de72c46b9bde38ed7126c5efc7ce994ec60eaa53d8ff2223f150"
+    },
+    "Tests/IlliquidPlaybackStateSpaceTests/PlaybackStateSpaceTests.swift": {
+      "bytes": 19610,
+      "sha256": "e0078810e194d3972d460f5d917f766fb9e90401e3ba8dffd38c2fde97a04648"
+    }
+  },
+  "source_policy": "Complete production files; no extraction, stubs or benchmark-specific reducers",
+  "swift_version": "Swift version 6.1.3 (swift-6.1.3-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "test_files": [
+    "Tests/IlliquidPlaybackCoreTests/CompletedEffectHistoryTests.swift",
+    "Tests/IlliquidPlaybackCoreTests/EffectRetirementTests.swift",
+    "Tests/IlliquidPlaybackCoreTests/PlaybackCoreTests.swift",
+    "Tests/IlliquidPlaybackCoreTests/PlaybackParityCoreTests.swift",
+    "Tests/IlliquidPlaybackCoreTests/RendererRecoveryRegressionTests.swift",
+    "Tests/IlliquidPlaybackCoreTests/StandardCompletionContractTests.swift",
+    "Tests/IlliquidPlaybackStateSpaceTests/PlaybackStateSpaceTests.swift"
+  ],
+  "timestamp_utc": "2026-10-28T06:18:36Z",
+  "timing_probe": "No LD_PRELOAD; setup and validation outside each measured core.update",
+  "worktree_status": ""
+}

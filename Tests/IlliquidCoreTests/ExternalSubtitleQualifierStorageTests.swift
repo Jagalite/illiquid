@@ -4,6 +4,26 @@ import Testing
 
 @Suite("External subtitle qualifier storage")
 struct ExternalSubtitleQualifierStorageTests {
+
+    @Test func normalizedExactCheckKeepsRawPrecedenceAndFuzzyScores() {
+        let cases: [(media: String, subtitle: String, score: Int?)] = [
+            ("The.Last.of.Us.mkv", "The.Last.of.Us.en.srt", 10_011),
+            ("The.Last.of.Us.1080p.WEB-DL.x265.mkv", "The.Last.of.Us.en.srt", 10_011),
+            ("ABCD.1080p.mkv", "ABCD.1080p.en.srt", 10_009),
+            ("Chronicle.Part.mkv", "Chronicle.Part.Extended.en.srt", 5_175),
+            ("Chronicle.Part.Extended.mkv", "Chronicle.Part.en.srt", 5_175),
+            ("Chronicle.Part.One.mkv", "Chronicle.Part.Two.srt", nil),
+            ("Épisode.mkv", "ＥＰＩＳＯＤＥ.Final.en.srt", 5_090),
+            ("Épisode.1080p.mkv", "ＥＰＩＳＯＤＥ.en.srt", 10_007),
+        ]
+        for item in cases {
+            let media = url(item.media)
+            let subtitle = url(item.subtitle)
+            #expect(ExternalSubtitleMatcher.matchScore(subtitleURL: subtitle, mediaURL: media) == item.score)
+            #expect(ExternalSubtitleMatcher.associate(subtitleURLs: [subtitle], with: [media])
+                == [media: item.score == nil ? [] : [subtitle]])
+        }
+    }
     @Test func longQualifierChainsKeepReleaseSpecificRawNames() {
         // These are URL values, not filesystem entries. A long suffix makes
         // retaining the complete raw name distinct from retaining its prefix.

@@ -25,6 +25,60 @@ MODULE_FLAGS = ["-swift-version", "6", "-O", "-whole-module-optimization", "-par
 DRIVER_FLAGS = ["-swift-version", "6", "-O", "-parse-as-library"]
 
 
+
+REVIEWED_CURRENT_SUPPORT = {'FolderPlaylist.swift': {'sha256': '8a3c017132f0e79cb8280551ff686066b9a3005c49bd7833efc54bb11dfe75fe', 'git_blob_sha1': '3ff5f3c2abccf3a26bcc170a7806aa857f45b37f'}, 'NaturalFilenameOrdering.swift': {'sha256': 'c09072130b113b90faa49b17ff95ce8983668734e69dddf6244572f5de80de62', 'git_blob_sha1': 'd596432bfd4c5bd135b1acd925b4a81065a1d592'}}
+
+def select_source(name, baseline_bytes, current_bytes, variant, integrated):
+    if integrated and name != "NormalizedFileURL.swift":
+        if source_hashes(current_bytes) != REVIEWED_CURRENT_SUPPORT.get(name):
+            raise RuntimeError("Unreviewed current support: " + name)
+        return current_bytes
+    if variant == "candidate" and name != "NormalizedFileURL.swift" and current_bytes != baseline_bytes:
+        raise RuntimeError("Support source changed; historical benchmark boundary requires review: " + name)
+    return baseline_bytes if variant == "baseline" else current_bytes
+
+def classify_construction_outcomes(differential):
+    if sys.platform != "darwin":
+        # Portable Foundation has no Objective-C native reference fixture branch.
+        if (differential["constructionFailures"] != [] or differential["nativeReferenceCases"] != 0
+                or differential["mismatches"] != 0 or differential["examples"] != []
+                or differential["qualification"] != "executable-input-only"
+                or type(differential["cases"]) is not int or differential["cases"] <= 0
+                or type(differential["rejected"]) is not int
+                or not 0 <= differential["rejected"] <= differential["cases"]):
+            raise RuntimeError("Unexpected portable differential outcome")
+        return {"policy": "portable-executable-only-v1", "expectedNegativeConstructors": 0,
+                "constructorParityCases": 0, "executableParityCases": differential["cases"],
+                "executableRejections": differential["rejected"], "liveNativeReferenceCases": 0,
+                "unexpectedConstructorOutcomes": 0, "scope": "portable-executable-input-only"}
+
+    # Reviewed native negative constructor corpus, not persistence-key parity.
+    expected = [
+        {"label": f"bridged-path-{index}-{directory}", "path": path,
+         "status": "constructor.nil", "parity": "not-tested"}
+        for index, path in [(13, "/.file/id=6571367.2773272"),
+                            (14, "/.file/id=6571367.2773272/"),
+                            (15, "/.file/id=0.0")]
+        for directory in ["false", "true"]
+    ]
+    actual = differential["constructionFailures"]
+    if (not isinstance(actual, list) or len(actual) != len(expected)
+            or any(not isinstance(row, dict) for row in actual)
+            or sorted(actual, key=lambda row: str(row.get("label"))) != sorted(expected, key=lambda row: row["label"])):
+        raise RuntimeError("Unexpected constructor outcome corpus; exact six reviewed nil outcomes required")
+    for key, value in {"cases": 79137, "rejected": 46480,
+                       "nativeReferenceCases": 8, "mismatches": 0}.items():
+        if type(differential[key]) is not int or differential[key] != value:
+            raise RuntimeError("Executable corpus accounting changed: " + key)
+    if differential["qualification"] != "executable-input-only" or differential["examples"] != []:
+        raise RuntimeError("Unexpected differential qualification or mismatch examples")
+    return {"policy": "pr170-native-six-nil-v1", "expectedNegativeConstructors": 6,
+            "constructorParityCases": 0, "executableParityCases": 79137,
+            "executableRejections": 46480, "liveNativeReferenceCases": 8,
+            "unexpectedConstructorOutcomes": 0, "scope": "executable-input-only"}
+
+
+
 def now() -> str:
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
@@ -116,7 +170,13 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=20261028)
     parser.add_argument("--case", action="append", dest="cases")
     parser.add_argument("--parity-only", action="store_true")
+    parser.add_argument("--integrated-current-support", action="store_true",
+                        help="Correctness only: reviewed current support shared by both variants; no timings")
     args = parser.parse_args()
+    if args.integrated_current_support:
+        if args.cases:
+            parser.error("Integrated correctness requires all 17 workloads; --case is forbidden")
+        args.parity_only = True
     if args.pairs < 2 or args.pairs % 2:
         parser.error("--pairs must be even and at least two for balanced AB/BA measurements")
     if not math.isfinite(args.target_ms) or args.target_ms <= 0:
@@ -131,6 +191,8 @@ def main() -> None:
     runner = Runner(output)
     manifest = {
         "schema_version": 1, "started_utc": now(), "status": "running",
+        "source_policy": "integrated-current-support-correctness-only" if args.integrated_current_support else "historical-frozen-support",
+        "reviewed_current_support": REVIEWED_CURRENT_SUPPORT if args.integrated_current_support else None,
         "environment": {
             "platform": platform.platform(), "machine": platform.machine(), "cpu": host_cpu(),
             "logical_cpus": os.cpu_count(), "python": platform.python_version(),
@@ -189,9 +251,8 @@ def main() -> None:
                 baseline_bytes = (HERE / "baseline" / name).read_bytes()
                 if source_hashes(baseline_bytes) != {key: expected[key] for key in ["sha256", "git_blob_sha1"]}:
                     raise RuntimeError(f"Frozen baseline hash mismatch for {name}")
-                data = baseline_bytes if variant == "baseline" else (ROOT / expected["source"]).read_bytes()
-                if variant == "candidate" and name != "NormalizedFileURL.swift" and data != baseline_bytes:
-                    raise RuntimeError(f"Support source {name} changed; review the benchmark boundary before rebasing its baseline")
+                data = select_source(name, baseline_bytes, (ROOT / expected["source"]).read_bytes(),
+                                     variant, args.integrated_current_support)
                 target = folder / name
                 target.write_bytes(data)
                 source_paths[variant].append(str(target))
@@ -229,11 +290,28 @@ def main() -> None:
         ]
         if not frontends:
             raise RuntimeError("Compiler dry-run did not identify the actual swift-frontend; inspect compiler-plan logs")
+        fixture_flags = []
+        fixture_objects = []
+        if sys.platform == "darwin":
+            fixtures = output / "sources" / "NativeFixtures"
+            fixtures.mkdir()
+            for name in ["PR170NativeFixtures.h", "PR170NativeFixtures.m", "module.modulemap"]:
+                data = (HERE / "NativeFixtures" / name).read_bytes()
+                (fixtures / name).write_bytes(data)
+                manifest["source_hashes"]["NativeFixtures/" + name] = source_hashes(data)
+            fixture_object = build / "PR170NativeFixtures.o"
+            runner.call(["xcrun", "clang", "-fobjc-arc", "-fmodules", "-c",
+                         str(fixtures / "PR170NativeFixtures.m"), "-o", str(fixture_object)], "build-native-fixtures")
+            manifest["binary_hashes"][fixture_object.name] = sha256(fixture_object)
+            fixture_flags = ["-I", str(fixtures)]
+            fixture_objects = [str(fixture_object)]
         programs = {}
         for name in ["Driver", "Differential"]:
             program = build / name.lower()
             runner.call([swiftc, *DRIVER_FLAGS, "-module-cache-path", str(cache), "-I", str(modules),
-                         str(output / "sources" / f"{name}.swift"), *objects, "-o", str(program)], f"build-{name.lower()}")
+                         str(output / "sources" / f"{name}.swift"), *objects,
+                         *(fixture_flags if name == "Differential" else []),
+                         *(fixture_objects if name == "Differential" else []), "-o", str(program)], f"build-{name.lower()}")
             programs[name] = program
             manifest["binary_hashes"][program.name] = sha256(program)
         write_json(output / "manifest.json", manifest)
@@ -253,9 +331,17 @@ def main() -> None:
             write_json(output / "receipts.json", receipts)
             if receipt["baseline"] != receipt["candidate"]:
                 raise RuntimeError(f"Complete key/item/index receipt mismatch for {case}")
+        classification = classify_construction_outcomes(differential)
+        if (args.integrated_current_support or sys.platform == "darwin") and (len(available) != 17 or set(selected) != set(available) or len(receipts) != 17):
+            raise RuntimeError("All 17 complete workloads required by reviewed constructor policy")
+        write_json(output / "construction-classification.json", classification)
+        manifest["construction_classification"] = classification
         manifest["method"]["cases"] = selected
         print(f"Exact differential: {differential['cases']} cases; {len(receipts)} full workload receipts match", flush=True)
         if args.parity_only:
+            for name, expected in frozen["files"].items():
+                if source_hashes((ROOT / expected["source"]).read_bytes()) != manifest["source_hashes"]["candidate"][name]:
+                    raise RuntimeError("Candidate source changed during correctness run: " + name)
             manifest.update(status="parity-only", completed_utc=now())
             write_json(output / "summary.json", {"complete": True, "parity_only": True, "differential": differential, "cases": selected})
             write_json(output / "manifest.json", manifest)

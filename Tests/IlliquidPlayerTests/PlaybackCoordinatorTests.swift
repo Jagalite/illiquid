@@ -1041,6 +1041,109 @@ struct PlaybackCoordinatorTests {
         #expect(fixture.coordinator.state.currentURL == third)
     }
 
+    @Test(arguments: [PlaylistOpenMode.replace, .append], [0, 1, 2])
+    func batchOpenPreservesMatchingSelectionWithoutReload(
+        mode: PlaylistOpenMode,
+        currentIndex: Int
+    ) async throws {
+        let fixture = try CoordinatorFixture()
+        // Index zero is the singleton control. The other cases select the
+        // middle and final items of the actual prepared three-item playlist.
+        let count = currentIndex == 0 ? 1 : 3
+        let files = try (0..<count).map {
+            try fixture.createFile("preserved-selection-\($0).mkv")
+        }
+
+        fixture.coordinator.open(urls: files)
+        try await waitForPreparation(fixture.coordinator)
+        let initial = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: initial.identity)
+
+        if currentIndex != 0 {
+            fixture.coordinator.playItem(at: currentIndex)
+            let selected = try #require(fixture.runtime.loads.last)
+            fixture.runtime.emit(.loaded, identity: selected.identity)
+        }
+
+        let active = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.pauseChanged(false), identity: active.identity)
+        fixture.runtime.emit(.durationChanged(300), identity: active.identity)
+        fixture.runtime.emit(.positionChanged(43), identity: active.identity)
+
+        let orderedURLs = fixture.coordinator.state.playlist.map(\.url)
+        let currentURL = try #require(fixture.coordinator.state.currentURL)
+        try #require(orderedURLs.count == count)
+        try #require(fixture.coordinator.state.currentPlaylistIndex == currentIndex)
+        try #require(orderedURLs[currentIndex] == currentURL)
+        try #require(fixture.coordinator.state.position == 43)
+        let loadCount = fixture.runtime.loads.count
+
+        fixture.coordinator.open(
+            urls: Array(orderedURLs.reversed()),
+            mode: mode
+        )
+        try await waitForPreparation(fixture.coordinator)
+
+        #expect(fixture.runtime.loads.count == loadCount)
+        #expect(fixture.runtime.loads.last?.identity == active.identity)
+        #expect(fixture.coordinator.state.playlist.map(\.url) == orderedURLs)
+        #expect(fixture.coordinator.state.currentURL == currentURL)
+        #expect(fixture.coordinator.state.currentPlaylistIndex == currentIndex)
+        #expect(fixture.coordinator.state.position == 43)
+
+        // The retained playback session must still own incoming observations.
+        fixture.runtime.emit(.positionChanged(44), identity: active.identity)
+        #expect(fixture.coordinator.state.position == 44)
+        await fixture.coordinator.shutdown()
+    }
+
+    @Test
+    func batchReplacementWithoutCurrentIdentityLoadsFirstFallbackItem() async throws {
+        let fixture = try CoordinatorFixture()
+        let originalFile = try fixture.createFile("original-selection.mkv")
+        let replacements = try [
+            "replacement-selection-01.mkv",
+            "replacement-selection-02.mkv",
+        ].map { try fixture.createFile($0) }
+
+        fixture.coordinator.open(urls: [originalFile])
+        try await waitForPreparation(fixture.coordinator)
+        let original = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: original.identity)
+        fixture.runtime.emit(.pauseChanged(false), identity: original.identity)
+        fixture.runtime.emit(.durationChanged(300), identity: original.identity)
+        fixture.runtime.emit(.positionChanged(43), identity: original.identity)
+        try #require(fixture.coordinator.state.currentURL == originalFile)
+        try #require(fixture.coordinator.state.position == 43)
+        let loadCount = fixture.runtime.loads.count
+
+        fixture.coordinator.open(urls: replacements, mode: .replace)
+        try await waitForPreparation(fixture.coordinator)
+
+        try #require(fixture.runtime.loads.count == loadCount + 1)
+        let replacement = try #require(fixture.runtime.loads.last)
+        #expect(replacement.identity != original.identity)
+        #expect(replacements.contains(replacement.identity.source.url))
+
+        // Selection of a fallback creates a candidate load; it must not
+        // replace the committed source or playlist before that load succeeds.
+        #expect(fixture.coordinator.state.currentURL == originalFile)
+        #expect(fixture.coordinator.state.playlist.map(\.url) == [originalFile])
+        #expect(fixture.coordinator.state.currentPlaylistIndex == 0)
+        #expect(fixture.coordinator.state.position == 43)
+
+        fixture.runtime.emit(.loaded, identity: replacement.identity)
+
+        let committedURLs = fixture.coordinator.state.playlist.map(\.url)
+        try #require(committedURLs.count == 2)
+        #expect(Set(committedURLs) == Set(replacements))
+        #expect(fixture.coordinator.state.currentPlaylistIndex == 0)
+        #expect(committedURLs[0] == replacement.identity.source.url)
+        #expect(fixture.coordinator.state.currentURL == replacement.identity.source.url)
+        #expect(fixture.coordinator.state.position == 0)
+        await fixture.coordinator.shutdown()
+    }
+
     @Test
     func failedCandidateKeepsCommittedPlaylistSourceAndPersistenceAuthority() async throws {
         let fixture = try CoordinatorFixture()
@@ -1531,6 +1634,72 @@ struct PlaybackCoordinatorTests {
         await fixture.coordinator.shutdown()
     }
 
+    @Test func shuffledProgressCheckpointReconcilesEditedPlaylistIdentities() async throws {
+        let fixture = try CoordinatorFixture()
+        do {
+            let files = try [
+                "checkpoint-1.mkv",
+                "checkpoint-2.mkv",
+                "checkpoint-3.mkv",
+            ].map { try fixture.createFile($0) }
+
+            fixture.coordinator.open(urls: files)
+            try await waitForPreparation(fixture.coordinator)
+            let load = try #require(fixture.runtime.loads.last)
+            fixture.runtime.emit(.loaded, identity: load.identity)
+            fixture.runtime.emit(.pauseChanged(false), identity: load.identity)
+            fixture.runtime.emit(.durationChanged(300), identity: load.identity)
+
+            fixture.coordinator.sortPlaylist(by: .name, ascending: true)
+            let originalIDs = fixture.coordinator.state.playlist.map(\.id)
+            let currentURL = try #require(fixture.coordinator.state.currentURL)
+
+            fixture.coordinator.setShuffleEnabled(true)
+            let removed = try #require(
+                fixture.coordinator.state.playlist.first { $0.url != currentURL }
+            )
+            fixture.coordinator.removePlaylistItem(id: removed.id)
+
+            let addedURL = try fixture.createFile("checkpoint-4.mkv")
+            fixture.coordinator.open(urls: [addedURL], mode: .append)
+            try await waitForPreparation(fixture.coordinator)
+
+            let editedPlaylist = fixture.coordinator.state.playlist
+            let editedIndex = try #require(
+                fixture.coordinator.state.currentPlaylistIndex
+            )
+            let expectedIDs = originalIDs.filter { $0 != removed.id }
+                + [FolderPlaylistItem(url: addedURL).id]
+            #expect(fixture.coordinator.state.isShuffleEnabled)
+            #expect(editedPlaylist[editedIndex].url == currentURL)
+            #expect(fixture.runtime.loads.count == 1)
+
+            // Observe the normal ten-second checkpoint path before shutdown
+            // can hide a missed recurring write by saving one final snapshot.
+            fixture.runtime.emit(.positionChanged(42), identity: load.identity)
+            let deadline = ContinuousClock.now.advanced(by: .seconds(5))
+            var saved = try fixture.sessionStore.load()
+            while saved?.position != 42, ContinuousClock.now < deadline {
+                try await Task.sleep(for: .milliseconds(5))
+                saved = try fixture.sessionStore.load()
+            }
+            let checkpoint = try #require(saved)
+
+            #expect(checkpoint.position == 42)
+            #expect(checkpoint.source == .localFile(currentURL))
+            #expect(checkpoint.playlistItems == editedPlaylist)
+            #expect(checkpoint.playlistIndex == editedIndex)
+            #expect(checkpoint.unshuffledPlaylistIDs == expectedIDs)
+            #expect(!checkpoint.wasPaused)
+
+            await fixture.coordinator.shutdown()
+            #expect(fixture.coordinator.shutdownPersistenceError == nil)
+        } catch {
+            await fixture.coordinator.shutdown()
+            throw error
+        }
+    }
+
     @Test func shuffleRestoresBaseOrderAcrossRelaunch() async throws {
         let fixture = try CoordinatorFixture()
         let files = try ["episode-1.mkv", "episode-2.mkv", "episode-3.mkv"].map {
@@ -1569,6 +1738,91 @@ struct PlaybackCoordinatorTests {
         #expect(restored.state.playlist.first?.id == moved)
         #expect(restored.state.currentURL == current)
         await restored.shutdown()
+    }
+
+    @Test func shuffledCheckpointPersistsEditedBaseOrderAcrossRelaunch() async throws {
+        let fixture = try CoordinatorFixture()
+        let files = try [
+            "checkpoint-01.mkv", "checkpoint-02.mkv", "checkpoint-03.mkv",
+        ].map { try fixture.createFile($0) }
+        fixture.coordinator.open(urls: files)
+        try await waitForPreparation(fixture.coordinator)
+        try #require(!fixture.coordinator.isPreparingSource)
+        let load = try #require(fixture.runtime.loads.last)
+        fixture.runtime.emit(.loaded, identity: load.identity)
+        fixture.coordinator.sortPlaylist(by: .name, ascending: true)
+
+        let originalItems = fixture.coordinator.state.playlist
+        try #require(originalItems.count == 3)
+        let currentURL = try #require(fixture.coordinator.state.currentURL)
+        let currentSource = try #require(fixture.coordinator.state.currentSource)
+        // Remove a noncurrent item so no replacement load needs to settle.
+        let removed = try #require(originalItems.first { $0.url != currentURL })
+        let loadCount = fixture.runtime.loads.count
+        fixture.coordinator.setShuffleEnabled(true)
+        try #require(fixture.coordinator.state.isShuffleEnabled)
+        fixture.coordinator.removePlaylistItem(id: removed.id)
+
+        let addedURL = try fixture.createFile("checkpoint-new.mkv")
+        fixture.coordinator.open(urls: [addedURL], mode: .append)
+        try await waitForPreparation(fixture.coordinator)
+        try #require(!fixture.coordinator.isPreparingSource)
+        #expect(fixture.runtime.loads.count == loadCount)
+        #expect(fixture.coordinator.state.isShuffleEnabled)
+        #expect(fixture.coordinator.state.currentSource == currentSource)
+        #expect(fixture.coordinator.state.currentURL == currentURL)
+
+        let checkpointPlaylist = fixture.coordinator.state.playlist
+        try #require(checkpointPlaylist.count == 3)
+        let checkpointIndex = try #require(
+            fixture.coordinator.state.currentPlaylistIndex
+        )
+        try #require(checkpointPlaylist.indices.contains(checkpointIndex))
+        #expect(checkpointPlaylist[checkpointIndex].url == currentURL)
+        let addedItem = try #require(
+            checkpointPlaylist.first { $0.url == addedURL }
+        )
+        // Expected base order comes from the explicit edit, not either helper.
+        let expectedItems = originalItems.filter { $0.id != removed.id }
+            + [addedItem]
+        let expectedIDs = expectedItems.map(\.id)
+
+        // Shutdown joins writes; no dependence on the persistence debounce.
+        await fixture.coordinator.shutdown()
+        try #require(fixture.coordinator.shutdownPersistenceError == nil)
+        let loadedRecord = try fixture.sessionStore.load()
+        let saved = try #require(loadedRecord)
+        let savedIDs = try #require(saved.unshuffledPlaylistIDs)
+        #expect(savedIDs.map { Array($0.utf8) }
+            == expectedIDs.map { Array($0.utf8) })
+        #expect(saved.playlistItems == checkpointPlaylist)
+        #expect(saved.playlistIndex == checkpointIndex)
+        #expect(saved.source == currentSource)
+
+        let runtime = CoordinatorFakeBackend()
+        let restored = PlaybackCoordinator(
+            persistence: fixture.persistence,
+            sessionStore: fixture.sessionStore,
+            runtime: runtime
+        )
+        try #require(restored.restoreLastSession())
+        try await waitForPreparation(restored)
+        try #require(!restored.isPreparingSource)
+        let resumed = try #require(runtime.loads.last)
+        runtime.emit(.loaded, identity: resumed.identity)
+        #expect(restored.state.isShuffleEnabled)
+        #expect(restored.state.playlist == checkpointPlaylist)
+        #expect(restored.state.currentPlaylistIndex == checkpointIndex)
+        #expect(restored.state.currentSource == currentSource)
+
+        restored.setShuffleEnabled(false)
+        #expect(!restored.state.isShuffleEnabled)
+        #expect(restored.state.playlist == expectedItems)
+        #expect(restored.state.currentURL == currentURL)
+        #expect(restored.state.currentPlaylistIndex
+            == expectedItems.firstIndex { $0.url == currentURL })
+        await restored.shutdown()
+        #expect(restored.shutdownPersistenceError == nil)
     }
 
     @Test func unshuffleRetainsAdditionsAndOmitsRemovedEntries() throws {

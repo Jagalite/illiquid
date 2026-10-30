@@ -716,28 +716,72 @@ final class ASSSubtitleFramePacker: Sendable {
 
 @MainActor
 final class MetalASSSubtitleRenderer {
-    private struct Vertex {
-        var position: SIMD2<Float>
-        var textureCoordinate: SIMD2<Float>
-        var color: SIMD4<UInt8>
-    }
+    private typealias Vertex = ASSSubtitleVertexWriter.Vertex
 
-    private final class FrameResources: @unchecked Sendable {
+    // A resource set is exclusively borrowed until its command buffer completes.
+    // Its source generation never changes, including while the GPU owns it.
+    final class FrameResources: @unchecked Sendable {
+        let sourceGeneration: UInt64
         var texture: (any MTLTexture)?
         var vertexBuffer: (any MTLBuffer)?
         var vertexCapacity = 0
+
+        init(sourceGeneration: UInt64) {
+            self.sourceGeneration = sourceGeneration
+        }
     }
 
-    private final class ResourcePool: @unchecked Sendable {
+    final class ResourcePool: @unchecked Sendable {
+        struct Snapshot: Equatable, Sendable {
+            let sourceGeneration: UInt64
+            let idleResourceCount: Int
+            let idleTextureBytes: Int
+            let idleVertexBufferBytes: Int
+        }
+
         private let lock = NSLock()
+        private var sourceGeneration: UInt64 = 0
         private var available: [FrameResources] = []
 
         func acquire() -> FrameResources {
-            lock.withLock { available.popLast() ?? FrameResources() }
+            lock.withLock {
+                available.popLast() ?? FrameResources(sourceGeneration: sourceGeneration)
+            }
         }
 
         func release(_ resources: FrameResources) {
-            lock.withLock { available.append(resources) }
+            lock.withLock {
+                // Completion still owns an old source's resources until this
+                // return; it must not repopulate the replacement source's cache.
+                guard resources.sourceGeneration == sourceGeneration else { return }
+                available.append(resources)
+            }
+        }
+
+        func retireSource() {
+            let retired = lock.withLock {
+                sourceGeneration &+= 1
+                let retired = available
+                available = []
+                return retired
+            }
+            // Metal resource destruction must happen after releasing the lock.
+            withExtendedLifetime(retired) {}
+        }
+
+        func snapshotForTesting() -> Snapshot {
+            lock.withLock {
+                Snapshot(
+                    sourceGeneration: sourceGeneration,
+                    idleResourceCount: available.count,
+                    idleTextureBytes: available.reduce(0) {
+                        $0 + ($1.texture?.allocatedSize ?? 0)
+                    },
+                    idleVertexBufferBytes: available.reduce(0) {
+                        $0 + ($1.vertexBuffer?.allocatedSize ?? 0)
+                    }
+                )
+            }
         }
     }
 
@@ -870,6 +914,16 @@ final class MetalASSSubtitleRenderer {
         self.sampler = sampler
     }
 
+    /// Drops idle resources from the preceding authoritative subtitle source.
+    /// Submitted frames keep their resources until their GPU completion returns.
+    func retireSourceResources() {
+        resourcePool.retireSource()
+    }
+
+    var resourcePoolSnapshotForTesting: ResourcePool.Snapshot {
+        resourcePool.snapshotForTesting()
+    }
+
     func draw(
         _ frame: ASSPreparedSubtitleFrame,
         in layer: CAMetalLayer,
@@ -982,13 +1036,12 @@ final class MetalASSSubtitleRenderer {
                 commandBufferFailures += 1
                 return false
             }
-            let vertices = makeVertices(
+            guard let vertexCount = uploadVertices(
                 frame,
                 texture: texture,
-                targetSize: CGSize(width: target.width, height: target.height)
-            )
-            guard uploadVertices(vertices, resources: resources),
-                  let vertexBuffer = resources.vertexBuffer
+                targetSize: CGSize(width: target.width, height: target.height),
+                resources: resources
+            ), let vertexBuffer = resources.vertexBuffer
             else { return false }
             var viewport = SIMD2<Float>(
                 Float(max(frame.canvasSize.width, 1)),
@@ -1001,7 +1054,7 @@ final class MetalASSSubtitleRenderer {
             encoder.setVertexBytes(&viewport, length: MemoryLayout.size(ofValue: viewport), index: 1)
             encoder.setFragmentTexture(texture, index: 0)
             encoder.setFragmentSamplerState(sampler, index: 0)
-            encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: vertices.count)
+            encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: vertexCount)
             encoder.endEncoding()
         } else {
             guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: pass) else {
@@ -1082,57 +1135,14 @@ final class MetalASSSubtitleRenderer {
         return true
     }
 
-    private func makeVertices(
+    private func uploadVertices(
         _ frame: ASSPreparedSubtitleFrame,
         texture: any MTLTexture,
-        targetSize: CGSize
-    ) -> [Vertex] {
-        var vertices: [Vertex] = []
-        vertices.reserveCapacity(frame.quads.count * 6)
-        for quad in frame.quads {
-            let color = SIMD4<UInt8>(
-                UInt8((quad.color >> 24) & 0xff),
-                UInt8((quad.color >> 16) & 0xff),
-                UInt8((quad.color >> 8) & 0xff),
-                255 - UInt8(quad.color & 0xff)
-            )
-            let xOffset = configuration.quadOffsetPixels
-                * Float(frame.canvasSize.width / max(targetSize.width, 1))
-            let yOffset = configuration.quadOffsetPixels
-                * Float(frame.canvasSize.height / max(targetSize.height, 1))
-            let x0 = Float(quad.destination.minX) + xOffset
-            let y0 = Float(quad.destination.minY) + yOffset
-            let x1 = Float(quad.destination.maxX) + xOffset
-            let y1 = Float(quad.destination.maxY) + yOffset
-            let texelInset: Float = configuration.textureCoordinates == .texelCenters
-                ? 0.5
-                : 0
-            let u0 = (Float(quad.source.minX) + texelInset) / Float(texture.width)
-            let v0 = (Float(quad.source.minY) + texelInset) / Float(texture.height)
-            let u1 = (Float(quad.source.maxX) - texelInset) / Float(texture.width)
-            let v1 = (Float(quad.source.maxY) - texelInset) / Float(texture.height)
-            let topLeft = Vertex(
-                position: SIMD2(x0, y0), textureCoordinate: SIMD2(u0, v0), color: color
-            )
-            let bottomLeft = Vertex(
-                position: SIMD2(x0, y1), textureCoordinate: SIMD2(u0, v1), color: color
-            )
-            let topRight = Vertex(
-                position: SIMD2(x1, y0), textureCoordinate: SIMD2(u1, v0), color: color
-            )
-            let bottomRight = Vertex(
-                position: SIMD2(x1, y1), textureCoordinate: SIMD2(u1, v1), color: color
-            )
-            vertices += [topLeft, bottomLeft, topRight, topRight, bottomLeft, bottomRight]
-        }
-        return vertices
-    }
-
-    private func uploadVertices(
-        _ vertices: [Vertex],
+        targetSize: CGSize,
         resources: FrameResources
-    ) -> Bool {
-        let required = vertices.count * MemoryLayout<Vertex>.stride
+    ) -> Int? {
+        let vertexCount = frame.quads.count * 6
+        let required = vertexCount * MemoryLayout<Vertex>.stride
         if resources.vertexBuffer == nil || resources.vertexCapacity < required {
             resources.vertexCapacity = max(
                 required,
@@ -1146,13 +1156,19 @@ final class MetalASSSubtitleRenderer {
         guard let vertexBuffer = resources.vertexBuffer else {
             synchronousFailure = .bufferAllocation
             bufferAllocationFailures += 1
-            return false
+            return nil
         }
-        vertices.withUnsafeBytes { bytes in
-            guard let base = bytes.baseAddress else { return }
-            vertexBuffer.contents().copyMemory(from: base, byteCount: required)
-        }
-        return true
+        // This resource set is checked out until its command buffer completes.
+        // Write into its shared Metal storage before encoding the draw.
+        ASSSubtitleVertexWriter.write(
+            frame,
+            textureWidth: texture.width,
+            textureHeight: texture.height,
+            targetSize: targetSize,
+            configuration: configuration,
+            into: UnsafeMutableRawBufferPointer(start: vertexBuffer.contents(), count: vertexBuffer.length)
+        )
+        return vertexCount
     }
 
     private static func makePipeline(

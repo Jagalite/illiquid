@@ -1,0 +1,83 @@
+name: NFO declaration preflight performance
+
+on:
+  push:
+    branches: ['perf/nfo-declaration-preflight-7166db']
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/*NFO*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift'
+      - 'Benchmarks/NFODeclarationPreflight/**'
+      - '.github/workflows/nfo-declaration-preflight.yml'
+      - '!Benchmarks/NFODeclarationPreflight/*.md'
+      - '!Benchmarks/NFODeclarationPreflight/evidence/**'
+  pull_request:
+    paths:
+      - 'Sources/IlliquidCore/MediaLibrary/**'
+      - 'Tests/IlliquidCoreTests/*NFO*Tests.swift'
+      - 'Tests/IlliquidCoreTests/MediaSidecarTests.swift'
+      - 'Tests/IlliquidCoreTests/MediaNameRecognitionTests.swift'
+      - 'Benchmarks/NFODeclarationPreflight/**'
+      - '.github/workflows/nfo-declaration-preflight.yml'
+      - '!Benchmarks/NFODeclarationPreflight/*.md'
+      - '!Benchmarks/NFODeclarationPreflight/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nfo-declaration-preflight-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  component:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            name: linux
+          - os: macos-26
+            name: macos
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Select native Xcode
+        if: runner.os == 'macOS'
+        run: echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
+      - name: Test both parsers and measure complete parse calls
+        shell: bash
+        run: |
+          python3 Benchmarks/NFODeclarationPreflight/run.py \
+            --pairs 8 --target-ms 100 \
+            --output "$RUNNER_TEMP/nfo-declaration-preflight"
+      - name: Emit reviewable results and raw observations
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'nfo-declaration-preflight'
+          for name in ('manifest.json', 'summary.json', 'observations.jsonl', 'commands.jsonl'):
+              path = root / name
+              if path.is_file():
+                  print('NFO_PREFLIGHT_EVIDENCE ' + json.dumps({'path': name, 'text': path.read_text()}))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: nfo-declaration-preflight-${{ matrix.name }}
+          path: |
+            ${{ runner.temp }}/nfo-declaration-preflight/*.json
+            ${{ runner.temp }}/nfo-declaration-preflight/*.jsonl
+            ${{ runner.temp }}/nfo-declaration-preflight/logs/
+            ${{ runner.temp }}/nfo-declaration-preflight/packages/*/Sources/
+            ${{ runner.temp }}/nfo-declaration-preflight/packages/*/Tests/
+            ${{ runner.temp }}/nfo-declaration-preflight/packages/*/Package.swift
+          retention-days: 14

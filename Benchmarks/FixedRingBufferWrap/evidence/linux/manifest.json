@@ -1,0 +1,86 @@
+{
+  "architecture": "x86_64",
+  "arguments": {
+    "output": "/home/runner/work/_temp/ring-wrap",
+    "pairs": 12,
+    "target_ms": 150,
+    "tests_only": false
+  },
+  "baseline_revision": "ea2ff568237e2667f7b1aeee67b11a44ebe95b72",
+  "binaries": {
+    "baseline-debug": {
+      "driver_sha256": "674b3bb3de844fc232564b77264ea920d8aa3957c0fb644b87930487f3b569b5",
+      "flags": [
+        "-Onone",
+        "-g",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/home/runner/work/_temp/ring-wrap/work/module-cache"
+      ],
+      "library_resolution": "\tlinux-vdso.so.1 (0x00007f984025d000)\n\tlibswiftSwiftOnoneSupport.so => /usr/share/swift/usr/lib/swift/linux/libswiftSwiftOnoneSupport.so (0x00007f984020c000)\n\tlibswiftCore.so => /usr/share/swift/usr/lib/swift/linux/libswiftCore.so (0x00007f983fa00000)\n\tlibswiftObservation.so => /usr/share/swift/usr/lib/swift/linux/libswiftObservation.so (0x00007f98401ea000)\n\tlibswift_Concurrency.so => /usr/share/swift/usr/lib/swift/linux/libswift_Concurrency.so (0x00007f9840142000)\n\tlibswift_StringProcessing.so => /usr/share/swift/usr/lib/swift/linux/libswift_StringProcessing.so (0x00007f983f945000)\n\tlibswift_RegexParser.so => /usr/share/swift/usr/lib/swift/linux/libswift_RegexParser.so (0x00007f983f837000)\n\tlibswiftGlibc.so => /usr/share/swift/usr/lib/swift/linux/libswiftGlibc.so (0x00007f9840130000)\n\tlibBlocksRuntime.so => /usr/share/swift/usr/lib/swift/linux/libBlocksRuntime.so (0x00007f984012c000)\n\tlibdispatch.so => /usr/share/swift/usr/lib/swift/linux/libdispatch.so (0x00007f983f7d8000)\n\tlibswiftDispatch.so => /usr/share/swift/usr/lib/swift/linux/libswiftDispatch.so (0x00007f983f7a6000)\n\tlibFoundation.so => /usr/share/swift/usr/lib/swift/linux/libFoundation.so (0x00007f983f000000)\n\tlibFoundationEssentials.so => /usr/share/swift/usr/lib/swift/linux/libFoundationEssentials.so (0x00007f983e800000)\n\tlibFoundationInternationalization.so => /usr/share/swift/usr/lib/swift/linux/libFoundationInternationalization.so (0x00007f983e624000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f983f6bd000)\n\tlibIlliquidNativePlayback.so => /home/runner/work/_temp/ring-wrap/work/baseline/debug/libIlliquidNativePlayback.so (0x00007f983f691000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f983e400000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f983e000000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f983f663000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f984025f000)\n\tlibswift_Builtin_float.so => /usr/share/swift/usr/lib/swift/linux/libswift_Builtin_float.so (0x00007f983f65f000)\n\tlib_FoundationICU.so => /usr/share/swift/usr/lib/swift/linux/lib_FoundationICU.so (0x00007f983ba00000)\n\tlibswiftSynchronization.so => /usr/share/swift/usr/lib/swift/linux/libswiftSynchronization.so (0x00007f983f64b000)\n",
+      "library_sha256": "355b0b9891725e2044e4ac44c22890905b1a80eab98c4fcb81a7c2bdd96720b2"
+    },
+    "baseline-release": {
+      "driver_sha256": "441cee9d83a12d61a27c306cad0404f64594bc7a42a4e7a5977a175a09f0bceb",
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/home/runner/work/_temp/ring-wrap/work/module-cache"
+      ],
+      "library_resolution": "\tlinux-vdso.so.1 (0x00007f572f9b2000)\n\tlibswiftCore.so => /usr/share/swift/usr/lib/swift/linux/libswiftCore.so (0x00007f572f200000)\n\tlibswiftObservation.so => /usr/share/swift/usr/lib/swift/linux/libswiftObservation.so (0x00007f572f980000)\n\tlibswift_Concurrency.so => /usr/share/swift/usr/lib/swift/linux/libswift_Concurrency.so (0x00007f572f158000)\n\tlibswift_StringProcessing.so => /usr/share/swift/usr/lib/swift/linux/libswift_StringProcessing.so (0x00007f572f09d000)\n\tlibswift_RegexParser.so => /usr/share/swift/usr/lib/swift/linux/libswift_RegexParser.so (0x00007f572ef8f000)\n\tlibswiftGlibc.so => /usr/share/swift/usr/lib/swift/linux/libswiftGlibc.so (0x00007f572f96e000)\n\tlibBlocksRuntime.so => /usr/share/swift/usr/lib/swift/linux/libBlocksRuntime.so (0x00007f572f96a000)\n\tlibdispatch.so => /usr/share/swift/usr/lib/swift/linux/libdispatch.so (0x00007f572ef30000)\n\tlibswiftDispatch.so => /usr/share/swift/usr/lib/swift/linux/libswiftDispatch.so (0x00007f572f938000)\n\tlibFoundation.so => /usr/share/swift/usr/lib/swift/linux/libFoundation.so (0x00007f572e800000)\n\tlibFoundationEssentials.so => /usr/share/swift/usr/lib/swift/linux/libFoundationEssentials.so (0x00007f572e000000)\n\tlibFoundationInternationalization.so => /usr/share/swift/usr/lib/swift/linux/libFoundationInternationalization.so (0x00007f572de24000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f572ee47000)\n\tlibIlliquidNativePlayback.so => /home/runner/work/_temp/ring-wrap/work/baseline/release/libIlliquidNativePlayback.so (0x00007f572ee2a000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f572dc00000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f572d800000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f572e7d2000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f572f9b4000)\n\tlibswift_Builtin_float.so => /usr/share/swift/usr/lib/swift/linux/libswift_Builtin_float.so (0x00007f572f926000)\n\tlib_FoundationICU.so => /usr/share/swift/usr/lib/swift/linux/lib_FoundationICU.so (0x00007f572b200000)\n\tlibswiftSynchronization.so => /usr/share/swift/usr/lib/swift/linux/libswiftSynchronization.so (0x00007f572e7c0000)\n",
+      "library_sha256": "eefbee1bf479014384e3dd3cddf8fa94820ab5976f48494d76d44c0c455869d3"
+    },
+    "candidate-debug": {
+      "driver_sha256": "a70d5bb35b3507ea23c21a9167813312c229071641977e8a5a63c0ab7aae63cb",
+      "flags": [
+        "-Onone",
+        "-g",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/home/runner/work/_temp/ring-wrap/work/module-cache"
+      ],
+      "library_resolution": "\tlinux-vdso.so.1 (0x00007f88e5b16000)\n\tlibswiftSwiftOnoneSupport.so => /usr/share/swift/usr/lib/swift/linux/libswiftSwiftOnoneSupport.so (0x00007f88e5ac5000)\n\tlibswiftCore.so => /usr/share/swift/usr/lib/swift/linux/libswiftCore.so (0x00007f88e5200000)\n\tlibswiftObservation.so => /usr/share/swift/usr/lib/swift/linux/libswiftObservation.so (0x00007f88e5aa3000)\n\tlibswift_Concurrency.so => /usr/share/swift/usr/lib/swift/linux/libswift_Concurrency.so (0x00007f88e59fb000)\n\tlibswift_StringProcessing.so => /usr/share/swift/usr/lib/swift/linux/libswift_StringProcessing.so (0x00007f88e5940000)\n\tlibswift_RegexParser.so => /usr/share/swift/usr/lib/swift/linux/libswift_RegexParser.so (0x00007f88e50f2000)\n\tlibswiftGlibc.so => /usr/share/swift/usr/lib/swift/linux/libswiftGlibc.so (0x00007f88e592e000)\n\tlibBlocksRuntime.so => /usr/share/swift/usr/lib/swift/linux/libBlocksRuntime.so (0x00007f88e592a000)\n\tlibdispatch.so => /usr/share/swift/usr/lib/swift/linux/libdispatch.so (0x00007f88e5093000)\n\tlibswiftDispatch.so => /usr/share/swift/usr/lib/swift/linux/libswiftDispatch.so (0x00007f88e5061000)\n\tlibFoundation.so => /usr/share/swift/usr/lib/swift/linux/libFoundation.so (0x00007f88e4a00000)\n\tlibFoundationEssentials.so => /usr/share/swift/usr/lib/swift/linux/libFoundationEssentials.so (0x00007f88e4200000)\n\tlibFoundationInternationalization.so => /usr/share/swift/usr/lib/swift/linux/libFoundationInternationalization.so (0x00007f88e4024000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f88e4917000)\n\tlibIlliquidNativePlayback.so => /home/runner/work/_temp/ring-wrap/work/candidate/debug/libIlliquidNativePlayback.so (0x00007f88e5036000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f88e3e00000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f88e3a00000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f88e48e9000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f88e5b18000)\n\tlibswift_Builtin_float.so => /usr/share/swift/usr/lib/swift/linux/libswift_Builtin_float.so (0x00007f88e5030000)\n\tlib_FoundationICU.so => /usr/share/swift/usr/lib/swift/linux/lib_FoundationICU.so (0x00007f88e1400000)\n\tlibswiftSynchronization.so => /usr/share/swift/usr/lib/swift/linux/libswiftSynchronization.so (0x00007f88e48d7000)\n",
+      "library_sha256": "450ea7ed5824fdc953f127f19b08ea817af44ec09108b1f3e68dba96014cc583"
+    },
+    "candidate-release": {
+      "driver_sha256": "19e46d007657e6523986044c74106813bfd5606bccd58a262725d1e27447bfd6",
+      "flags": [
+        "-O",
+        "-whole-module-optimization",
+        "-swift-version",
+        "6",
+        "-warnings-as-errors",
+        "-module-cache-path",
+        "/home/runner/work/_temp/ring-wrap/work/module-cache"
+      ],
+      "library_resolution": "\tlinux-vdso.so.1 (0x00007fbadfce5000)\n\tlibswiftCore.so => /usr/share/swift/usr/lib/swift/linux/libswiftCore.so (0x00007fbadf400000)\n\tlibswiftObservation.so => /usr/share/swift/usr/lib/swift/linux/libswiftObservation.so (0x00007fbadfcb3000)\n\tlibswift_Concurrency.so => /usr/share/swift/usr/lib/swift/linux/libswift_Concurrency.so (0x00007fbadfc0b000)\n\tlibswift_StringProcessing.so => /usr/share/swift/usr/lib/swift/linux/libswift_StringProcessing.so (0x00007fbadfb50000)\n\tlibswift_RegexParser.so => /usr/share/swift/usr/lib/swift/linux/libswift_RegexParser.so (0x00007fbadf2f2000)\n\tlibswiftGlibc.so => /usr/share/swift/usr/lib/swift/linux/libswiftGlibc.so (0x00007fbadfb3e000)\n\tlibBlocksRuntime.so => /usr/share/swift/usr/lib/swift/linux/libBlocksRuntime.so (0x00007fbadfb3a000)\n\tlibdispatch.so => /usr/share/swift/usr/lib/swift/linux/libdispatch.so (0x00007fbadf293000)\n\tlibswiftDispatch.so => /usr/share/swift/usr/lib/swift/linux/libswiftDispatch.so (0x00007fbadf261000)\n\tlibFoundation.so => /usr/share/swift/usr/lib/swift/linux/libFoundation.so (0x00007fbadec00000)\n\tlibFoundationEssentials.so => /usr/share/swift/usr/lib/swift/linux/libFoundationEssentials.so (0x00007fbade400000)\n\tlibFoundationInternationalization.so => /usr/share/swift/usr/lib/swift/linux/libFoundationInternationalization.so (0x00007fbade224000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fbadeb17000)\n\tlibIlliquidNativePlayback.so => /home/runner/work/_temp/ring-wrap/work/candidate/release/libIlliquidNativePlayback.so (0x00007fbadf244000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fbade000000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fbaddc00000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fbadeae9000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fbadfce7000)\n\tlibswift_Builtin_float.so => /usr/share/swift/usr/lib/swift/linux/libswift_Builtin_float.so (0x00007fbadfb28000)\n\tlib_FoundationICU.so => /usr/share/swift/usr/lib/swift/linux/lib_FoundationICU.so (0x00007fbadb600000)\n\tlibswiftSynchronization.so => /usr/share/swift/usr/lib/swift/linux/libswiftSynchronization.so (0x00007fbadf232000)\n",
+      "library_sha256": "4b9d9d9e9219de9f9157d93efc9ea9d855692eac6a9e6c9daddf70ef60be6220"
+    }
+  },
+  "candidate_revision": "0f545d1a60dbb7f0d080d49846ad8faafdad6a5d",
+  "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 7763 64-Core Processor\nCPU family:                              25\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                4890.85\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               64 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                1 MiB (2 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Vulnerable: Safe RET, no microcode\nVulnerability Spec store bypass:         Vulnerable\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Vulnerable: No microcode\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "run_url": "https://github.com/Jagalite/illiquid/actions/runs/40641333427",
+  "scope": "Ring and uncontended BoundedQueue; no decoder, renderer or end-to-end playback claim.",
+  "source_sha256": {
+    "Bridge.swift": "2b8143c999e98056814f358721aa27d4d1db4bfffeb2ba66b1866647162d32ec",
+    "Driver.swift": "13252db2137fd9caec284b3e0cf9a5dcb980ab5ffecc914e06923d5e3abc3812",
+    "FixedRingBufferWrapTests.swift": "04aec3fd9c28fd4eb58fa174af089a13b12f0f8b74af543afcae56c245ba169f",
+    "PacketQueueWakeupTests.swift": "66e01a5cbd911948f2de947cbea6cf5d9e1a4b116c9bb89ad88daf558793b2c7",
+    "Sources/IlliquidNativePlayback/Playback/PacketQueue.swift": "0945c69682e087f73d8a7ffd6b41bb040115d30213efb8004d65076c4e26dbab",
+    "baseline_ring": "1d4723deb9d40e4a8ea341d6b1b8a83325cefb63233714ef2c5b2c095ab5e89d",
+    "candidate_ring": "3fef01538146b9ea8c71b5dbfce9ba5056efa9998000a9cd471f68764ff34f39",
+    "run.py": "60a8b50439a085b4b13ee0eb99b1770dd05287c775b7c5c4408ade7323df5cfb"
+  },
+  "started_utc": "2026-10-28T06:11:20Z",
+  "swift": "Swift version 6.4 (swift-6.4-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "working_tree_status": ""
+}
