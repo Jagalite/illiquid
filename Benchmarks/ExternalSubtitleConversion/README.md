@@ -4,9 +4,14 @@ This benchmark measures complete SRT and WebVTT conversion through the real
 `ExternalTextSubtitleConverter`. It compares the production source with the
 frozen version from `main` at `68274d1b09dcc866296321a5a8858efc297c4f19`.
 The baseline manifest records its original path, Git blob, and SHA-256.
+Use `--baseline-ref REVISION` to compare an incremental change against a specific
+Git revision instead; the runner resolves it to an immutable commit and records
+the exact source blob, SHA-256, and source snapshot. The macOS workflow compares
+PRs with their base commit and uses `ea2ff568237e2667f7b1aeee67b11a44ebe95b72`
+for the timestamp research branch and manual runs.
 
 For the incremental [newline normalization study](../../Documentation/SUBTITLE_NEWLINE_NORMALIZATION_PERFORMANCE.md),
-select the current-main baseline explicitly:
+select the study's original baseline explicitly:
 
 ```sh
 python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark \
@@ -21,6 +26,18 @@ historical comparison. To run the current tests against that same revision, pass
 `Scripts/test-external-subtitle-regressions.sh`, followed by the usual Swift test
 options. The ordinary invocation tests the working-tree converter.
 
+## Integration scope
+
+The integrated converter retains newline normalization and the early WebVTT
+NOTE skip from main alongside both timestamp fast paths. All historical source
+snapshots, manifests, and measurements remain unchanged. Runs against older
+whole-converter revisions now compare the combined intervening changes; they
+must not be attributed solely to timestamp preprocessing or newline handling.
+The dedicated preprocessing runner still selects its explicit PR #134 baseline
+and its original 21 timed workloads, ten pairs, and 350 ms target. The general
+runner retains frozen-baseline validation and explicit PR-base comparisons;
+no baseline is silently replaced and no workload is reduced.
+
 ## Reproduce
 
 Use a Swift 6.1-or-newer toolchain. The component is Foundation-only and needs
@@ -31,7 +48,8 @@ bash Scripts/test-external-subtitle-regressions.sh -c debug -Xswiftc -warnings-a
 bash Scripts/test-external-subtitle-regressions.sh -c release -Xswiftc -warnings-as-errors
 python3 Benchmarks/ExternalSubtitleConversion/run.py verify --output /tmp/subtitle-verify
 python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark \
-  --rounds 10 --target-ms 100 --output /tmp/subtitle-benchmark
+  --rounds 10 --target-ms 100 --baseline-ref ea2ff568237e2667f7b1aeee67b11a44ebe95b72 \
+  --output /tmp/subtitle-benchmark
 python3 Benchmarks/ExternalSubtitleConversion/run.py summarize --output /tmp/subtitle-benchmark
 ```
 
@@ -54,27 +72,33 @@ python3 Benchmarks/ExternalSubtitleConversion/run.py benchmark \
 
 ## Workloads and correctness
 
-The 50 timed cases cover both formats, 1/100/2,000/10,000 cues, plain ASCII,
-multilingual text, ASCII escapes, CRLF/CR/BOM handling, empty input, invalid
-cues, and Unicode-plus-escape fallback controls. All fixtures are synthetic;
-input construction is outside timing. A 2,000-cue fixture is useful for a
-dialogue-heavy title; the 10,000-cue case exercises longer material. The current
-matrix adds eight plain/multilingual CRLF cases at those sizes, two CR-only
-2,000-cue cases, and four almost-ASCII CRLF cases whose first non-ASCII
-character occurs at the end. Historical retained evidence uses the original 36 timed cases
-and 1,698 differential cases; those results are unchanged.
+The 57 timed cases retain the original 36-case conversion matrix, four
+fixed-width/legacy timestamp controls, three preprocessing fallback controls,
+and all 14 newline-normalization workloads. These cover both formats,
+1/100/2,000/10,000 cues, plain ASCII, multilingual text, escapes, CRLF/CR/BOM,
+empty and invalid input, short/large/unpadded hours, and Unicode settings.
+The newline matrix includes eight plain/multilingual CRLF cases, two CR-only
+2,000-cue cases, and four almost-ASCII CRLF cases with non-ASCII text at the end.
+All fixtures are synthetic; input construction is outside timing.
 
 Before timing, the runner compares full input/output UTF-8 bytes and exact
-typed conversion errors in 5,222 cases. The original escaping corpus includes
-every sequence of length zero through three over nine selected atoms in both
-formats, plus Unicode/normalization edges, compatibility punctuation, NUL,
-literal ASS commands, empty payloads, and trailing newlines. An additional
-3,510 newline cases cover every sequence of length zero through three over
-CR, LF, ASCII, combining marks, ZWJ, a variation selector, NUL, and non-ASCII
-text in three placements and both formats. Their expected parsing outcome
-comes from the separately compiled baseline; it is not guessed or obtained by
-passing pre-normalized input through the candidate. Swift String equality is not
+typed conversion errors in 17,749 cases. The escaping corpus includes every
+sequence of length zero through three over nine selected atoms in both formats,
+plus Unicode/normalization edges, compatibility punctuation, NUL, literal ASS
+commands, empty payloads, and trailing newlines. Another 3,510 newline cases
+cover sequences over CR, LF, ASCII, combining marks, ZWJ, a variation selector,
+NUL, and non-ASCII text in three placements and both formats. The preprocessing
+corpus adds 280 whitespace/settings mutations and three timed fallback controls.
+The separately compiled baseline supplies outcomes for differential cases;
+the harness does not pre-normalize reference input. Swift String equality is not
 used for byte parity, since it accepts canonical equivalence.
+
+The timestamp corpus replaces every position in all four fixed-width spellings
+with all 128 ASCII values, seven Unicode atoms, or an empty string, testing both
+cue endpoints (12,240 mutations). The unchanged baseline supplies the expected
+output/error for this corpus; the harness does not duplicate timestamp parsing
+rules. Independent regression tests retain explicit expected outputs for
+rounding carries, whitespace, malformed inputs, and noncanonical SRT fallbacks.
 
 The standalone script also runs the existing timestamp/parser tests and eight
 independent escaping tests from the normal native test target. The tests cover
@@ -104,15 +128,15 @@ serialization are excluded. CPU time and monotonic elapsed time are recorded.
 A checked iteration checksum consumes every result; complete outputs are
 verified again after timing.
 
-Summary generation validates all 1,000 observations in the default ten-pair
-run (800 in the eight-pair newline study), exact pair order, operation
+Summary generation validates all 1,140 observations in the default ten-pair
+run (912 with eight pairs), exact pair order, operation
 counts, checksums, output fingerprints, and durations. It retains individual
 paired ratios and reports medians and ranges; shared-runner timings have no
 hard CI speed threshold.
 
 ## Evidence and limits
 
-The historical `evidence/linux` directory contains its final cohort, source and
+The historical `evidence/linux` directory retains the original 36-case cohort, source and
 compiler receipts, compressed full differential outputs, process command logs,
 and passing baseline/candidate test logs. The exploratory cohort records the
 initial version without the early exit from classification on Unicode fallback
@@ -135,3 +159,8 @@ These measurements concern in-memory subtitle conversion during loading and
 track changes. They exclude file I/O, text decoding, libass installation,
 rendering, visible UI latency, playback frame rate, peak memory, and energy.
 See [the research report](../../Documentation/EXTERNAL_SUBTITLE_CONVERSION_PERFORMANCE.md).
+
+The incremental fixed-width timestamp experiment uses current main as its
+baseline; see [the timestamp report](../../Documentation/SUBTITLE_TIMESTAMP_PERFORMANCE.md).
+The portable timestamp workflow also runs the complete component tests and
+paired benchmark on Ubuntu, with Linux and macOS results reported separately.

@@ -2036,13 +2036,25 @@ struct SourceRowVisibility: Equatable, Sendable {
 }
 
 struct SourceVisibilityMatcher {
+    private struct RootPath {
+        let path: String
+        let descendantPrefix: String
+        let characterCount: Int
+
+        init(_ path: String) {
+            self.path = path
+            descendantPrefix = path == "/" ? "/" : path + "/"
+            characterCount = path.count
+        }
+    }
+
     private struct CompiledRule {
         let match: SourceVisibilityRegexMatch
         let expression: NSRegularExpression
     }
 
     private let configuration: SourceVisibilityConfiguration
-    private let rootPaths: [String]
+    private let rootPaths: [RootPath]
     private let compiledRules: [CompiledRule]
     private let rootEvaluations: [String: SourceVisibilityEvaluation]
 
@@ -2067,7 +2079,7 @@ struct SourceVisibilityMatcher {
                 expression: expression
             )
         }
-        self.rootPaths = rootPaths
+        self.rootPaths = rootPaths.map(RootPath.init)
         self.compiledRules = compiledRules
         rootEvaluations = Dictionary(uniqueKeysWithValues: rootPaths.map { path in
             (
@@ -2174,7 +2186,7 @@ struct SourceVisibilityMatcher {
 
     private func evaluateIncludingAncestors(
         normalizedPath: String,
-        rootPath: String
+        rootPath: RootPath
     ) -> SourceVisibilityEvaluation {
         let direct = evaluate(normalizedPath: normalizedPath)
         let parentPath = URL(fileURLWithPath: normalizedPath, isDirectory: false)
@@ -2217,16 +2229,16 @@ struct SourceVisibilityMatcher {
             let direct = matcher.evaluate(normalizedPath: normalizedPath)
             let parentPath = URL(fileURLWithPath: normalizedPath, isDirectory: false)
                 .deletingLastPathComponent().path
-            if parentPath == rootPath {
+            if parentPath == rootPath.path {
                 // Root evaluations already belong to the immutable matcher.
                 return SourceVisibilityMatcher.combining(direct, ancestors:
-                    matcher.rootEvaluations[rootPath]
-                        ?? matcher.evaluate(normalizedPath: rootPath))
+                    matcher.rootEvaluations[rootPath.path]
+                        ?? matcher.evaluate(normalizedPath: rootPath.path))
             }
             let ancestors: SourceVisibilityEvaluation
             if !Task.isCancelled, let cached,
                cached.parent.utf8.elementsEqual(parentPath.utf8),
-               cached.root.utf8.elementsEqual(rootPath.utf8) {
+               cached.root.utf8.elementsEqual(rootPath.path.utf8) {
                 // Swift String equality folds canonical Unicode spellings,
                 // whereas Foundation regexes inspect the original input bytes.
                 ancestors = cached.evaluation
@@ -2237,7 +2249,7 @@ struct SourceVisibilityMatcher {
                 // A cancelled regex enumeration may contain partial results.
                 // Never publish those results or reuse a hit while cancelled.
                 if !Task.isCancelled {
-                    cached = (parentPath, rootPath, ancestors)
+                    cached = (parentPath, rootPath.path, ancestors)
                 }
             }
             return SourceVisibilityMatcher.combining(direct, ancestors: ancestors)
@@ -2261,16 +2273,16 @@ struct SourceVisibilityMatcher {
 
     private func evaluateAncestors(
         parentPath: String,
-        rootPath: String,
+        rootPath: RootPath,
         direct: SourceVisibilityEvaluation = .init(hiddenMatches: [], regexMatches: [])
     ) -> SourceVisibilityEvaluation {
         var regexMatches = direct.regexMatches
         var ancestorPath = parentPath
-        while ancestorPath.count >= rootPath.count,
-              SourceTreeIdentity.contains(ancestorPath, within: rootPath)
+        while ancestorPath.count >= rootPath.characterCount,
+              ancestorPath == rootPath.path || ancestorPath.hasPrefix(rootPath.descendantPrefix)
         {
-            let ancestor = ancestorPath == rootPath
-                ? rootEvaluations[rootPath] ?? evaluate(
+            let ancestor = ancestorPath == rootPath.path
+                ? rootEvaluations[rootPath.path] ?? evaluate(
                     normalizedPath: ancestorPath
                 )
                 : evaluate(normalizedPath: ancestorPath)
@@ -2283,7 +2295,7 @@ struct SourceVisibilityMatcher {
                     regexMatches: regexMatches
                 )
             }
-            if ancestorPath == rootPath {
+            if ancestorPath == rootPath.path {
                 break
             }
             ancestorPath = URL(fileURLWithPath: ancestorPath, isDirectory: false)
@@ -2311,18 +2323,29 @@ struct SourceVisibilityMatcher {
         guard let matchingRoot else {
             return URL(fileURLWithPath: normalizedPath, isDirectory: false).lastPathComponent
         }
-        guard normalizedPath != matchingRoot else {
-            return URL(fileURLWithPath: matchingRoot, isDirectory: false).lastPathComponent
+        guard normalizedPath != matchingRoot.path else {
+            return URL(fileURLWithPath: matchingRoot.path, isDirectory: false).lastPathComponent
         }
-        return String(normalizedPath.dropFirst(matchingRoot == "/" ? 1 : matchingRoot.count + 1))
+        return String(normalizedPath.dropFirst(matchingRoot.path == "/" ? 1 : matchingRoot.characterCount + 1))
     }
 
-    private func matchingRootPath(for normalizedPath: String) -> String? {
-        rootPaths
-            .filter { rootPath in
-                SourceTreeIdentity.contains(normalizedPath, within: rootPath)
+    private func matchingRootPath(for normalizedPath: String) -> RootPath? {
+        // Single-root containment uses the same prepared fields as the ordered scan.
+        if rootPaths.count == 1 {
+            let root = rootPaths[0]
+            return normalizedPath == root.path || normalizedPath.hasPrefix(root.descendantPrefix) ? root : nil
+        }
+        var result: RootPath?
+        var longestCount = -1
+        // Keep the first longest match, as filter(...).max(by:) did. Prefixes
+        // and grapheme counts are invariant across this projection's lookups.
+        for root in rootPaths where root.characterCount > longestCount {
+            if normalizedPath == root.path || normalizedPath.hasPrefix(root.descendantPrefix) {
+                result = root
+                longestCount = root.characterCount
             }
-            .max { $0.count < $1.count }
+        }
+        return result
     }
 }
 

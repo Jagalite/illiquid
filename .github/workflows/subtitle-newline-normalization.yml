@@ -6,6 +6,7 @@ on:
       - Sources/IlliquidNativePlayback/Subtitles/ExternalTextSubtitleConverter.swift
       - Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift
       - Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift
+      - Tests/IlliquidNativePlaybackTests/SubtitleCueStreamingTests.swift
       - Scripts/test-external-subtitle-regressions.sh
       - Benchmarks/ExternalSubtitleConversion/run.py
       - Benchmarks/ExternalSubtitleConversion/Driver.swift
@@ -52,6 +53,7 @@ jobs:
           baseline = os.environ["SUBTITLE_BASELINE"]
           paths = [source, "Tests/IlliquidNativePlaybackTests/ExternalTextSubtitleConverterTests.swift",
                    "Tests/IlliquidNativePlaybackTests/ExternalSubtitleEscapingTests.swift",
+                   "Tests/IlliquidNativePlaybackTests/SubtitleCueStreamingTests.swift",
                    "Scripts/test-external-subtitle-regressions.sh",
                    "Benchmarks/ExternalSubtitleConversion/run.py", "Benchmarks/ExternalSubtitleConversion/Driver.swift"]
           receipt = {"head": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),

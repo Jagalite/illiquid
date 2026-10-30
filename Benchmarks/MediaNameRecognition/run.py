@@ -75,20 +75,27 @@ def stage(out: Path) -> dict[str, object]:
         raise RuntimeError("Recognizer extraction anchor changed; review the verifier")
     original_type, original_enum = original.split(DECLARATION)
     current_type, _ = current.split(DECLARATION)
-    if original_type != current_type:
+    reviewed_type = (HERE / "baseline/reviewed-candidate-type.swift.txt").read_text()
+    if current_type != reviewed_type:
         raise RuntimeError("RecognizedMediaName changed; the shared-type oracle requires review")
-    oracle = ("import Foundation\n\npublic enum BaselineMediaNameRecognition {" + original_enum).encode()
+    # Keep the frozen result type as well as the frozen recognizer: displayName
+    # must be evaluated independently on both sides of the differential check.
+    if original.count("RecognizedMediaName") < 2:
+        raise RuntimeError("Baseline result type anchor changed; review the verifier")
+    oracle = original.replace("RecognizedMediaName", "BaselineRecognizedMediaName").replace(
+        DECLARATION, "public enum BaselineMediaNameRecognition {", 1).encode()
     sources = {
         "baseline.swift": baseline, "candidate.swift": candidate, "oracle.swift": oracle,
         "Harness.swift": (HERE / "Harness.swift").read_bytes(),
         "run.py": Path(__file__).read_bytes(),
+        "reviewed-candidate-type.swift.txt": reviewed_type.encode(),
     }
     for name, data in sources.items():
         (out / "sources" / name).write_bytes(data)
     return {
         "baseline_revision": BASELINE_REVISION, "production_path": str(SOURCE),
         "source_sha256": {name: sha256(data) for name, data in sources.items()},
-        "oracle_transform": "Remove unchanged result type; rename baseline enum declaration only",
+        "oracle_transform": "Rename frozen result type and recognizer; require exact reviewed candidate type",
     }
 
 
