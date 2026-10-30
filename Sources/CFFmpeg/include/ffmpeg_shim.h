@@ -454,7 +454,7 @@ static inline const AVSubtitleRect *illiquid_subtitle_result_rect(
 
 /* FFmpeg subtitle palettes contain native-endian 0xAARRGGBB entries.
  * Convert to premultiplied BGRA for the existing Metal composition path.
- * Output storage must be separate from the rectangle's index and palette data. */
+ * Output storage must be separate from the rectangle and its index/palette data. */
 static inline int illiquid_subtitle_rect_copy_bgra(
     const AVSubtitleRect *rect, uint8_t *output, size_t output_size
 ) {
@@ -477,6 +477,18 @@ static inline int illiquid_subtitle_rect_copy_bgra(
             palette[i][1] = (((color >> 8) & 255) * alpha + 127) / 255;
             palette[i][2] = (((color >> 16) & 255) * alpha + 127) / 255;
             palette[i][3] = alpha;
+        }
+        if (rect->nb_colors == 256) {
+            /* Every uint8_t index is valid in a complete palette. PGS decoders
+             * expose 256 entries even when a subtitle uses fewer colors. */
+            const int width = rect->w;
+            for (int y = 0; y < rect->h; ++y) {
+                const uint8_t *row = rect->data[0] + (size_t)y * rect->linesize[0];
+                uint8_t *output_row = output + (size_t)y * width * 4;
+                for (int x = 0; x < width; ++x)
+                    memcpy(output_row + (size_t)x * 4, palette[row[x]], 4);
+            }
+            return 0;
         }
         for (int y = 0; y < rect->h; ++y) {
             const uint8_t *row = rect->data[0] + (size_t)y * rect->linesize[0];

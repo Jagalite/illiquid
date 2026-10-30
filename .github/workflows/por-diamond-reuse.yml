@@ -1,0 +1,106 @@
+name: Partial-order diamond reuse research
+
+on:
+  push:
+    branches: [perf/por-diamond-reuse]
+    paths:
+      - Sources/IlliquidPlaybackCore/**
+      - Sources/IlliquidPlaybackStateSpace/**
+      - Sources/IlliquidCore/Player/MediaTrack.swift
+      - Tests/IlliquidPlaybackStateSpaceTests/**
+      - Benchmarks/PORDiamondReuse/Harness.swift
+      - Benchmarks/PORDiamondReuse/run.py
+      - .github/workflows/por-diamond-reuse.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: por-diamond-reuse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-component:
+    runs-on: ubuntu-24.04
+    container: swift:6.2.1-noble
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare the isolated portable environment
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if ! command -v python3 >/dev/null; then
+            apt-get update
+            apt-get install -y --no-install-recommends python3
+          fi
+          git diff --check ea2ff568237e2667f7b1aeee67b11a44ebe95b72 HEAD --
+          swift --version
+      - name: Verify complete behavior and measure paired timings
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          command = [sys.executable, 'Benchmarks/PORDiamondReuse/run.py',
+                     '--output', str(Path(os.environ['RUNNER_TEMP']) / 'por-diamond-reuse'),
+                     '--pairs', '10', '--target-ms', '250']
+          queue = Path('/Volumes/seed1/Projects/kyoto/kyoto.py')
+          if queue.is_file():
+              cli = [sys.executable, str(queue)]
+              submitted = subprocess.check_output([*cli, 'submit', '--', *command], text=True)
+              print(submitted, flush=True)
+              job_id = str(json.loads(submitted)['id'])
+              subprocess.run([*cli, 'show', job_id], check=True)
+              result = subprocess.run([*cli, 'wait', job_id])
+              subprocess.run([*cli, 'logs', job_id], check=True)
+              sys.exit(result.returncode)
+          print('The shared Kyoto queue is unavailable on this hosted Linux runner; '
+                'compiling isolated portable components directly and serially.', flush=True)
+          subprocess.run(command, check=True)
+          PY
+      - name: Emit reviewable evidence
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64, hashlib, json, math, os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'por-diamond-reuse'
+          for path in sorted(root.glob('*.json')):
+              content = path.read_text()
+              parts = max(1, math.ceil(len(content) / 16000))
+              for part in range(parts):
+                  print('POR_REUSE_FILE ' + json.dumps({
+                      'name': path.name, 'part': part, 'parts': parts,
+                      'sha256': hashlib.sha256(content.encode()).hexdigest(),
+                      'content': content[part * 16000:(part + 1) * 16000],
+                  }, sort_keys=True))
+          reference = root / 'traces/baseline-release.json.gz'
+          if reference.is_file():
+              data = reference.read_bytes()
+              encoded = base64.b64encode(data).decode()
+              parts = math.ceil(len(encoded) / 16000)
+              for part in range(parts):
+                  print('POR_REUSE_REFERENCE ' + json.dumps({
+                      'name': 'reference-trace.json.gz', 'part': part, 'parts': parts,
+                      'sha256': hashlib.sha256(data).hexdigest(),
+                      'base64': encoded[part * 16000:(part + 1) * 16000],
+                  }, sort_keys=True))
+          for path in sorted(root.glob('tests-*.log')):
+              print('POR_REUSE_TEST_LOG ' + path.name)
+              print(path.read_text())
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: por-diamond-reuse-portable
+          path: |
+            ${{ runner.temp }}/por-diamond-reuse/*.json
+            ${{ runner.temp }}/por-diamond-reuse/*.log
+            ${{ runner.temp }}/por-diamond-reuse/traces/*.json.gz
+          retention-days: 30

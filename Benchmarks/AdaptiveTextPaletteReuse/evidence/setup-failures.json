@@ -1,0 +1,84 @@
+{
+  "illiquid-palette-tests-3e1fe2c135de": [
+    {
+      "command": {
+        "argv": [
+          "/tmp/illiquid-swift/usr/bin/swift",
+          "test",
+          "--package-path",
+          "/tmp/illiquid-palette-reuse-ywl71akc/tests-baseline",
+          "--scratch-path",
+          "/tmp/illiquid-palette-reuse-ywl71akc/tests-baseline/.build",
+          "--cache-path",
+          "/tmp/illiquid-palette-reuse-ywl71akc/tests-baseline/cache",
+          "--config-path",
+          "/tmp/illiquid-palette-reuse-ywl71akc/tests-baseline/config",
+          "--security-path",
+          "/tmp/illiquid-palette-reuse-ywl71akc/tests-baseline/security",
+          "--manifest-cache",
+          "local",
+          "--jobs",
+          "1",
+          "--use-integrated-swift-driver",
+          "-c",
+          "debug",
+          "-Xswiftc",
+          "-swift-version",
+          "-Xswiftc",
+          "6",
+          "-Xswiftc",
+          "-warnings-as-errors"
+        ],
+        "cpu_affinity": null,
+        "elapsed_seconds": 15.940227010999934,
+        "returncode": 1,
+        "started_unix_seconds": 1793161994.198606,
+        "stderr": "logs/0006-stderr.txt",
+        "stdout": "tests-baseline-debug.txt"
+      },
+      "stderr": "warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.\nBuilding for debugging...\n[0/23] Write swift-version-4E1F6603DD102018.txt\n[1/23] Emitting module for IlliquidCore\n[2/23] Compiling IlliquidCore VideoColorSample.swift\n[3/23] Emitting module for IlliquidPlayer\n[4/23] Compiling IlliquidPlayer PlaybackVideoColorStore.swift\n[5/23] Emitting module for IlliquidApp\n[6/23] Wrapping AST for IlliquidPlayer for debugging\n[7/23] Emitting module for IlliquidAppTests\n[8/23] Wrapping AST for IlliquidCore for debugging\n[9/23] Wrapping AST for IlliquidAppTests for debugging\n/tmp/illiquid-palette-reuse-ywl71akc/tests-baseline/Tests/IlliquidAppTests/AdaptiveTextPaletteReuseTests.swift:214:24: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions\n212 |         let white = SampledVideoColor(red: 1, green: 1, blue: 1)\n213 |         let grey = SampledVideoColor(red: 0.48, green: 0.48, blue: 0.48)\n214 |         let textures = [\n    |                        `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions\n215 |             Array(repeating: white, count: 96),\n216 |             Array(repeating: black, count: 96),\n[10/23] Compiling IlliquidAppTests AdaptiveTextPaletteReuseTests.swift\nerror: fatalError\n",
+      "stdout": ""
+    }
+  ],
+  "illiquid-palette-tests2-3e1fe2c135de": [
+    {
+      "command": {
+        "argv": [
+          "/tmp/illiquid-swift/usr/bin/swift",
+          "test",
+          "--package-path",
+          "/tmp/illiquid-palette-reuse-nbw5x720/tests-candidate",
+          "--scratch-path",
+          "/tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/.build",
+          "--cache-path",
+          "/tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/cache",
+          "--config-path",
+          "/tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/config",
+          "--security-path",
+          "/tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/security",
+          "--manifest-cache",
+          "local",
+          "--jobs",
+          "1",
+          "--use-integrated-swift-driver",
+          "-c",
+          "debug",
+          "-Xswiftc",
+          "-swift-version",
+          "-Xswiftc",
+          "6",
+          "-Xswiftc",
+          "-warnings-as-errors"
+        ],
+        "cpu_affinity": null,
+        "elapsed_seconds": 19.859503884999867,
+        "returncode": 1,
+        "started_unix_seconds": 1793162087.1513174,
+        "stderr": "logs/0008-stderr.txt",
+        "stdout": "tests-candidate-debug.txt"
+      },
+      "stderr": "warning: `--use-integrated-swift-driver` option is deprecated as the feature is not fully functional.\nBuilding for debugging...\n[0/23] Write swift-version-4E1F6603DD102018.txt\n[1/23] Emitting module for IlliquidCore\n[2/23] Compiling IlliquidCore VideoColorSample.swift\n[3/23] Emitting module for IlliquidPlayer\n[4/23] Compiling IlliquidPlayer PlaybackVideoColorStore.swift\n[5/23] Emitting module for IlliquidApp\n[6/23] Wrapping AST for IlliquidPlayer for debugging\n[7/23] Emitting module for IlliquidAppTests\n[8/23] Wrapping AST for IlliquidCore for debugging\n[9/23] Wrapping AST for IlliquidAppTests for debugging\n[10/23] Compiling IlliquidAppTests AdaptiveTextPaletteReuseTests.swift\n[11/23] Wrapping AST for IlliquidApp for debugging\n[12/23] /tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/.build/x86_64-unknown-linux-gnu/debug/PaletteReuseValidationPackageDiscoveredTests.derived/all-discovered-tests.swift\n[13/23] Compiling IlliquidApp AdaptiveTextLegibility.swift\n[14/23] Compiling PaletteReuseValidationPackageDiscoveredTests IlliquidAppTests.swift\n[15/23] Emitting module for PaletteReuseValidationPackageDiscoveredTests\n[16/23] /tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/.build/x86_64-unknown-linux-gnu/debug/PaletteReuseValidationPackageTests.derived/runner.swift\n[17/23] Compiling PaletteReuseValidationPackageTests runner.swift\n[18/23] Wrapping AST for PaletteReuseValidationPackageDiscoveredTests for debugging\n[19/23] Emitting module for PaletteReuseValidationPackageTests\n[20/23] Wrapping AST for PaletteReuseValidationPackageTests for debugging\n[21/23] Write Objects.LinkFileList\n[22/23] Linking PaletteReuseValidationPackageTests.xctest\nBuild complete! (19.30s)\nerror: Process '/tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/.build/x86_64-unknown-linux-gnu/debug/PaletteReuseValidationPackageTests.xctest --package-path /tmp/illiquid-palette-reuse-nbw5x720/tests-candidate --scratch-path /tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/.build --cache-path /tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/cache --config-path /tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/config --security-path /tmp/illiquid-palette-reuse-nbw5x720/tests-candidate/security --manifest-cache local --jobs 1 --use-integrated-swift-driver -c debug -Xswiftc -swift-version -Xswiftc 6 -Xswiftc -warnings-as-errors --testing-library swift-testing' exited with unexpected signal code 4\n",
+      "stdout": "Test Suite 'All tests' started at 2026-10-28 05:35:06.924\nTest Suite 'debug.xctest' started at 2026-10-28 05:35:06.926\nTest Suite 'debug.xctest' passed at 2026-10-28 05:35:06.926\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\nTest Suite 'All tests' passed at 2026-10-28 05:35:06.926\n\t Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds\nswift-runtime: failed to suspend thread 41249 while processing a crash; backtraces will be missing information\nswift-runtime: failed to suspend thread 41252 while processing a crash; backtraces will be missing information\nswift-runtime: failed to suspend thread 41253 while processing a crash; backtraces will be missing information\nswift-runtime: failed to suspend thread 41254 while processing a crash; backtraces will be missing information\nswift-runtime: failed to suspend thread 41255 while processing a crash; backtraces will be missing information\n\n*** Signal 4: Backtracing from 0x7f4567fa02c0...\u25c7 Test run started.\n\u21b3 Testing Library Version: 6.3.2 (70eff261d7f462c)\n\u21b3 Target Platform: x86_64-unknown-linux-gnu\n\u25c7 Suite \"Adaptive text palette context reuse\" started.\n\u25c7 Test uncachedStylesMatchTwoContextReferenceAcrossModesPalettesAndRegions() started.\n done ***\n\n*** Program crashed: Illegal instruction at 0x00007f4567fa02c0 ***\n\nPlatform: x86_64 Linux (Ubuntu 24.04.3 LTS)\n\nThread 0 crashed:\n\n  0      0x00007f4567fa02c0\n  1 [ra] 0x00007f4567fa9048\n  2 [ra] 0x00007f4567fb4696\n  3 [ra] 0x00007f4567fabff6\n  4 [ra] 0x00007f4567faefe0\n  5 [ra] 0x00007f4567faef1d\n  6 [ra] 0x00007f4567fb2125\n  7 [ra] 0x00007f4566bd9aa4\n...\n\n\nRegisters:\n\nrax 0x00000000ffffffff  4294967295\nrdx 0x00007f45632fda30  2f 70 72 6f 63 2f 34 35 36 2f 73 74 61 74 00 00  /proc/456/stat\u00b7\u00b7\nrcx 0x0000000000000000  0\nrbx 0x0000000000000000  0\nrsi 0x00007f45632fe9c8  02 00 00 00 81 00 00 00 00 00 00 00 00 00 00 00  \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\nrdi 0x00007f45632fda30  2f 70 72 6f 63 2f 34 35 36 2f 73 74 61 74 00 00  /proc/456/stat\u00b7\u00b7\nrbp 0x00007f45632fdb10  60 db 2f 63 45 7f 00 00 48 90 fa 67 45 7f 00 00  `\u00db/cE\u00b7\u00b7\u00b7H\u00b7\u00fagE\u00b7\u00b7\u00b7\nrsp 0x00007f45632fca28  4b a8 fb 67 45 7f 00 00 00 00 00 00 00 00 00 00  K\u00a8\u00fbgE\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\n r8 0x0000000000000000  0\n r9 0x0000000000000000  0\nr10 0x0000000000000000  0\nr11 0x0000000000000293  659\nr12 0x00007f4567fdaf50  c0 85 fd 67 45 7f 00 00 00 00 00 00 09 00 00 00  \u00c0\u00b7\u00fdgE\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\nr13 0x00007f4567fdafc8  c0 88 fd 67 45 7f 00 00 00 00 00 00 09 00 00 00  \u00c0\u00b7\u00fdgE\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\nr14 0x00007f4567fdafd8  c9 01 00 80 00 00 00 00 90 13 00 54 45 7f 00 00  \u00c9\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7TE\u00b7\u00b7\u00b7\nr15 0x0000000000000000  0\nrip 0x00007f4567fa02c0  0f 0b 00 00 00 00 00 00 00 00 00 00 00 00 00 00  \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\n\nrflags 0x0000000000010246  ZF PF\n\ncs 0x0033  fs 0x0000  gs 0x0000\n\n\nImages:\n\n\n\nBacktrace took 0.01s\n\n"
+    }
+  ]
+}

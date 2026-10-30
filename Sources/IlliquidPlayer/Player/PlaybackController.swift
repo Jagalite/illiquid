@@ -1926,9 +1926,9 @@ public final class PlaybackCoordinator {
         guard progressClearedAtPosition == nil else { return true }
         guard canPersistCurrentMediaHistory else { return true }
         if state.isShuffleEnabled {
-            unshuffledPlaylistIDs = PlaylistMutation.restoringOrder(
+            unshuffledPlaylistIDs = PlaylistMutation.restoringIDs(
                 state.playlist, ids: unshuffledPlaylistIDs ?? []
-            ).map(\.id)
+            )
         }
         checkpointWriter.submit(.save(PlaybackCheckpoint(
             source: source, folder: state.currentFolder, playlist: state.playlist,

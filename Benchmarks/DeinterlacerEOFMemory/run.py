@@ -112,6 +112,7 @@ class Study:
                             "logical_cpu_count": os.cpu_count(),
                             "developer_dir": self.environment.get("DEVELOPER_DIR")},
             "source_hashes": {}, "staged_hashes": {}, "binaries": {},
+            "shared_source_mode": "current-source regression; both variants share current support; not historical qualification" if args.current_source_regression else "frozen source guard",
             "observations": [], "comparisons": [], "tests": [], "complete": False,
             "linux_adaptation": ("Remove only import CoreVideo; provide a nil VideoToolbox "
                 "guard and CVReturn alias. No filter, frame, or ownership API is mocked.") if self.linux else None,
@@ -191,7 +192,7 @@ class Study:
             if name == SOURCE:
                 continue
             data = (ROOT / name).read_bytes()
-            if sha(data) != expected:
+            if sha(data) != expected and not (self.args.current_source_regression):
                 raise ValueError(f"Shared support changed; review and requalify: {name}")
             self.inputs[name] = data
         self.inputs["baseline/VideoDeinterlacer.swift"] = frozen
@@ -425,6 +426,7 @@ def main():
     parser.add_argument("--pairs", type=int, default=4)
     parser.add_argument("--cases", nargs="+", choices=CASES, default=CASES)
     parser.add_argument("--skip-debug", action="store_true", help="Skip debug output parity processes (lifetime tests still use both configurations)")
+    parser.add_argument("--current-source-regression", action="store_true", help="Use current shared support for both variants; results are regression evidence, not frozen qualification")
     parser.add_argument("--skip-tests", action="store_true", help="For smoke runs only; no lifetime-test qualification is recorded")
     args = parser.parse_args()
     if args.pairs < 2 or args.pairs % 2:

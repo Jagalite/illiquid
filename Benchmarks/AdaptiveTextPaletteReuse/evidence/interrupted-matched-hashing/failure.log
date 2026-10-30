@@ -1,0 +1,16 @@
+Exact palette receipts: 5383, match=True
+Finished balanced round 1/6
+Traceback (most recent call last):
+  File "/workspace/scratch/3e1fe2c135de/illiquid/Benchmarks/AdaptiveTextPaletteReuse/run.py", line 423, in <module>
+    main()
+  File "/workspace/scratch/3e1fe2c135de/illiquid/Benchmarks/AdaptiveTextPaletteReuse/run.py", line 386, in main
+    record = time_process(label, case, kernel, iterations[(case, kernel)],
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3e1fe2c135de/illiquid/Benchmarks/AdaptiveTextPaletteReuse/run.py", line 352, in time_process
+    result = json.loads(run([str(executables[label]), "time", case, kernel, str(iterations), str(warmup)],
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3e1fe2c135de/illiquid/Benchmarks/AdaptiveTextPaletteReuse/run.py", line 168, in run
+    raise RuntimeError(f"Command failed ({result.returncode}): {command}\n{stderr_path.read_text()}\n{stdout_path.read_text()}")
+RuntimeError: Command failed (-4): ['/tmp/illiquid-palette-reuse-qvh5mvno/candidate', 'time', 'local9-midgray-rainbow', 'component_hit', '27764', '64']
+
+

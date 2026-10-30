@@ -8,7 +8,11 @@ CANDIDATE_SHA256 = "cc3c1ac628498798384c3e93973ffa0dcd6f21036b1f1de779cd54c82cc9
 SUPPORT_PINS = {
     "MediaMetadataHints.swift": "9df354b5f319aee2d29799b601562e46571d664650bfb298133f7425939ba53a",
     "Sources/IlliquidCore/MediaMetadataHints.swift": "9df354b5f319aee2d29799b601562e46571d664650bfb298133f7425939ba53a",
-    "Sources/IlliquidApp/SidebarValues.swift": "23bdbd458576bb1889df14cd8881c23a71e3a338840c6dcb3eff30e3d3c3920a",
+    "Sources/IlliquidApp/SidebarValues.swift": "165515d0792ba43b81108eadee1c8502b5f1c3aaffbbf6659a73184bc7c08ca8",
+    "Sources/IlliquidCore/NFOMetadataHints.swift": "5e9728f84654f5f38818444b9f1ef40db0d751aa23eb6aba273e587cc1f9892a",
+    "Sources/IlliquidCore/PlexMatchHints.swift": "b35ce4f067ecac4f714c0895aaaa6df3b58e1dcb6c8d4353e59d18abc26c962b",
+    "Sources/IlliquidApp/SourceBrowserFilter.swift": "514aab8decb04129bd54bac55230e8491cd469325d089591e0e33565655c28ce",
+    "Sources/IlliquidApp/SourceTreeProjectionInput.swift": "5f1c6e088682ce4a7ef30e65b6ca7f2420dca323ec1ae679ee9c16ea547ffb67"
 }
 
 

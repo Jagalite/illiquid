@@ -1,0 +1,193 @@
+Test Suite 'All tests' started at 2026-10-28 01:42:47.965
+Test Suite 'debug.xctest' started at 2026-10-28 01:42:47.968
+Test Suite 'DeferredHistoryStoreTests' started at 2026-10-28 01:42:47.968
+Test Case 'DeferredHistoryStoreTests.testClearAfterPendingUpdatesDoesNotResurrectHistory' started at 2026-10-28 01:42:47.968
+Test Case 'DeferredHistoryStoreTests.testClearAfterPendingUpdatesDoesNotResurrectHistory' passed (0.003 seconds)
+Test Case 'DeferredHistoryStoreTests.testCompletionAndContentReplacementHistoryArePreserved' started at 2026-10-28 01:42:47.970
+Test Case 'DeferredHistoryStoreTests.testCompletionAndContentReplacementHistoryArePreserved' passed (0.001 seconds)
+Test Case 'DeferredHistoryStoreTests.testHistoryDisabledAndExplicitClearKeepExistingSemantics' started at 2026-10-28 01:42:47.972
+Test Case 'DeferredHistoryStoreTests.testHistoryDisabledAndExplicitClearKeepExistingSemantics' passed (0.001 seconds)
+Test Case 'DeferredHistoryStoreTests.testLatestProgressAndSettingsReloadThroughRealJSON' started at 2026-10-28 01:42:47.973
+Test Case 'DeferredHistoryStoreTests.testLatestProgressAndSettingsReloadThroughRealJSON' passed (0.003 seconds)
+Test Case 'DeferredHistoryStoreTests.testStoreRemainsAliveUntilItsDelayedSnapshotHasBeenWritten' started at 2026-10-28 01:42:47.976
+Test Case 'DeferredHistoryStoreTests.testStoreRemainsAliveUntilItsDelayedSnapshotHasBeenWritten' passed (0.103 seconds)
+Test Case 'DeferredHistoryStoreTests.testUnreadableHistoryCannotBeOverwrittenWithoutExplicitReset' started at 2026-10-28 01:42:48.079
+Test Case 'DeferredHistoryStoreTests.testUnreadableHistoryCannotBeOverwrittenWithoutExplicitReset' passed (0.001 seconds)
+Test Suite 'DeferredHistoryStoreTests' passed at 2026-10-28 01:42:48.080
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.112 (0.112) seconds
+Test Suite 'DeferredPersistenceWriterTests' started at 2026-10-28 01:42:48.080
+Test Case 'DeferredPersistenceWriterTests.testAsyncFlushRunsFactoryAndReturnsErrors' started at 2026-10-28 01:42:48.080
+Test Case 'DeferredPersistenceWriterTests.testAsyncFlushRunsFactoryAndReturnsErrors' passed (0.001 seconds)
+Test Case 'DeferredPersistenceWriterTests.testBlockedWriterRetainsImmutableSnapshotAndFlushWaitsForLatest' started at 2026-10-28 01:42:48.081
+Test Case 'DeferredPersistenceWriterTests.testBlockedWriterRetainsImmutableSnapshotAndFlushWaitsForLatest' passed (0.021 seconds)
+Test Case 'DeferredPersistenceWriterTests.testConcurrentSubmissionsAndFlushesPreserveFinalMarker' started at 2026-10-28 01:42:48.102
+Test Case 'DeferredPersistenceWriterTests.testConcurrentSubmissionsAndFlushesPreserveFinalMarker' passed (0.003 seconds)
+Test Case 'DeferredPersistenceWriterTests.testFactoryDoesNotHoldWriterLockAndNewSubmissionIsNotLost' started at 2026-10-28 01:42:48.105
+Test Case 'DeferredPersistenceWriterTests.testFactoryDoesNotHoldWriterLockAndNewSubmissionIsNotLost' passed (0.0 seconds)
+Test Case 'DeferredPersistenceWriterTests.testFailureIsReportedAndLaterSuccessRecovers' started at 2026-10-28 01:42:48.105
+Test Case 'DeferredPersistenceWriterTests.testFailureIsReportedAndLaterSuccessRecovers' passed (0.0 seconds)
+Test Case 'DeferredPersistenceWriterTests.testOnlyNewestFactoryIsCapturedAndEagerSubmissionStillWorks' started at 2026-10-28 01:42:48.105
+Test Case 'DeferredPersistenceWriterTests.testOnlyNewestFactoryIsCapturedAndEagerSubmissionStillWorks' passed (0.0 seconds)
+Test Suite 'DeferredPersistenceWriterTests' passed at 2026-10-28 01:42:48.106
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.026 (0.026) seconds
+Test Suite 'IdempotentPersistenceTests' started at 2026-10-28 01:42:48.106
+Test Case 'IdempotentPersistenceTests.testChangeDuringInFlightWriteIsSaved' started at 2026-10-28 01:42:48.106
+Test Case 'IdempotentPersistenceTests.testChangeDuringInFlightWriteIsSaved' passed (0.102 seconds)
+Test Case 'IdempotentPersistenceTests.testChangingDurationIsNotSkippedAndRechecksCompletion' started at 2026-10-28 01:42:48.208
+Test Case 'IdempotentPersistenceTests.testChangingDurationIsNotSkippedAndRechecksCompletion' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testCompletionThresholdAndStickyRewatchArePreserved' started at 2026-10-28 01:42:48.208
+Test Case 'IdempotentPersistenceTests.testCompletionThresholdAndStickyRewatchArePreserved' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testConcurrentDistinctChangesAndDuplicatesSurviveReload' started at 2026-10-28 01:42:48.209
+Test Case 'IdempotentPersistenceTests.testConcurrentDistinctChangesAndDuplicatesSurviveReload' passed (0.007 seconds)
+Test Case 'IdempotentPersistenceTests.testEncodingFailureIsNotHiddenAndValidMutationRecovers' started at 2026-10-28 01:42:48.216
+Test Case 'IdempotentPersistenceTests.testEncodingFailureIsNotHiddenAndValidMutationRecovers' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testInvalidInputDoesNotWrite' started at 2026-10-28 01:42:48.217
+Test Case 'IdempotentPersistenceTests.testInvalidInputDoesNotWrite' passed (0.0 seconds)
+Test Case 'IdempotentPersistenceTests.testNilSettingsAndTargetsNoOpsButRealDeletionPersists' started at 2026-10-28 01:42:48.217
+Test Case 'IdempotentPersistenceTests.testNilSettingsAndTargetsNoOpsButRealDeletionPersists' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testNoOpDuringInFlightWriteDoesNotCreateSecondWrite' started at 2026-10-28 01:42:48.218
+Test Case 'IdempotentPersistenceTests.testNoOpDuringInFlightWriteDoesNotCreateSecondWrite' passed (0.101 seconds)
+Test Case 'IdempotentPersistenceTests.testPreferenceNoOpsAndSanitization' started at 2026-10-28 01:42:48.320
+Test Case 'IdempotentPersistenceTests.testPreferenceNoOpsAndSanitization' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testRepeatedPositionAndMissingRemovalAreNoOps' started at 2026-10-28 01:42:48.321
+Test Case 'IdempotentPersistenceTests.testRepeatedPositionAndMissingRemovalAreNoOps' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testRepeatedProgressDoesNotWriteButNewProgressDoes' started at 2026-10-28 01:42:48.321
+Test Case 'IdempotentPersistenceTests.testRepeatedProgressDoesNotWriteButNewProgressDoes' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testSettingsVersionAndRestoreTargetNoOps' started at 2026-10-28 01:42:48.322
+Test Case 'IdempotentPersistenceTests.testSettingsVersionAndRestoreTargetNoOps' passed (0.001 seconds)
+Test Case 'IdempotentPersistenceTests.testUnreadableHistoryStillRequiresExplicitClear' started at 2026-10-28 01:42:48.324
+Test Case 'IdempotentPersistenceTests.testUnreadableHistoryStillRequiresExplicitClear' passed (0.101 seconds)
+Test Case 'IdempotentPersistenceTests.testVolumeAndSpeedPreserveHistoryOptOutAndRestorePreference' started at 2026-10-28 01:42:48.424
+Test Case 'IdempotentPersistenceTests.testVolumeAndSpeedPreserveHistoryOptOutAndRestorePreference' passed (0.002 seconds)
+Test Suite 'IdempotentPersistenceTests' passed at 2026-10-28 01:42:48.426
+	 Executed 14 tests, with 0 failures (0 unexpected) in 0.32 (0.32) seconds
+Test Suite 'debug.xctest' passed at 2026-10-28 01:42:48.426
+	 Executed 26 tests, with 0 failures (0 unexpected) in 0.458 (0.458) seconds
+Test Suite 'All tests' passed at 2026-10-28 01:42:48.426
+	 Executed 26 tests, with 0 failures (0 unexpected) in 0.458 (0.458) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite "History opt-out and recovery" started.
+◇ Test optOutPreservesExistingHistoryButDoesNotRecordNewProgress() started.
+✔ Test optOutPreservesExistingHistoryButDoesNotRecordNewProgress() passed after 0.002 seconds.
+◇ Test malformedHistoryIsNotOverwrittenByOrdinaryPlayback() started.
+✔ Test malformedHistoryIsNotOverwrittenByOrdinaryPlayback() passed after 0.001 seconds.
+◇ Test oldPreferencesMigrateToRememberingHistoryAndPausedRestore() started.
+✔ Test oldPreferencesMigrateToRememberingHistoryAndPausedRestore() passed after 0.001 seconds.
+✔ Suite "History opt-out and recovery" passed after 0.004 seconds.
+◇ Suite "Persistence request lifetimes" started.
+◇ Test supersededRequestIsReleasedOutsideWriterLock(old:replacement:) started.
+◇ Test case passing 2 arguments old → .value, replacement → .value to supersededRequestIsReleasedOutsideWriterLock(old:replacement:) started.
+◇ Test case passing 2 arguments old → .value, replacement → .snapshot to supersededRequestIsReleasedOutsideWriterLock(old:replacement:) started.
+◇ Test case passing 2 arguments old → .snapshot, replacement → .value to supersededRequestIsReleasedOutsideWriterLock(old:replacement:) started.
+◇ Test case passing 2 arguments old → .snapshot, replacement → .snapshot to supersededRequestIsReleasedOutsideWriterLock(old:replacement:) started.
+✔ Test supersededRequestIsReleasedOutsideWriterLock(old:replacement:) with 4 test cases passed after 0.001 seconds.
+◇ Test supersededCleanupCanFlushTheReplacement(_:) started.
+◇ Test case passing 1 argument kind → .value to supersededCleanupCanFlushTheReplacement(_:) started.
+◇ Test case passing 1 argument kind → .snapshot to supersededCleanupCanFlushTheReplacement(_:) started.
+✔ Test supersededCleanupCanFlushTheReplacement(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test supersededRequestsAreReleasedWithoutWaitingForDrain(_:) started.
+◇ Test case passing 1 argument kind → .value to supersededRequestsAreReleasedWithoutWaitingForDrain(_:) started.
+◇ Test case passing 1 argument kind → .snapshot to supersededRequestsAreReleasedWithoutWaitingForDrain(_:) started.
+✔ Test supersededRequestsAreReleasedWithoutWaitingForDrain(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test activeWriteDoesNotPreventPendingRequestCleanup(_:) started.
+◇ Test case passing 1 argument kind → .value to activeWriteDoesNotPreventPendingRequestCleanup(_:) started.
+◇ Test case passing 1 argument kind → .snapshot to activeWriteDoesNotPreventPendingRequestCleanup(_:) started.
+✔ Test activeWriteDoesNotPreventPendingRequestCleanup(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test failedFlushStaysFailedUntilANewerWriteSucceeds() started.
+✔ Test failedFlushStaysFailedUntilANewerWriteSucceeds() passed after 0.001 seconds.
+◇ Test newerPendingSnapshotSupersedesAnInFlightWriteFailure() started.
+✔ Test newerPendingSnapshotSupersedesAnInFlightWriteFailure() passed after 0.001 seconds.
+◇ Test snapshotFactoryCanSubmitWithoutHoldingWriterLock() started.
+✔ Test snapshotFactoryCanSubmitWithoutHoldingWriterLock() passed after 0.001 seconds.
+◇ Test concurrentReplacementAndFlushPreserveFinalMarker() started.
+✔ Test concurrentReplacementAndFlushPreserveFinalMarker() passed after 0.003 seconds.
+✔ Suite "Persistence request lifetimes" passed after 0.008 seconds.
+◇ Suite "Coalesced persistence" started.
+◇ Test retainsOnlyTheLatestPendingValueAndFlushesIt() started.
+✔ Test retainsOnlyTheLatestPendingValueAndFlushesIt() passed after 0.001 seconds.
+◇ Test flushWaitsForTheActiveWriteAndPreservesOrder() started.
+✔ Test flushWaitsForTheActiveWriteAndPreservesOrder() passed after 0.001 seconds.
+◇ Test reportsStorageFailureAndRecoversOnNextWrite() started.
+✔ Test reportsStorageFailureAndRecoversOnNextWrite() passed after 0.001 seconds.
+◇ Test preferenceChangesDoNotRewriteHistoryAndMigrateLegacyPreferences() started.
+✔ Test preferenceChangesDoNotRewriteHistoryAndMigrateLegacyPreferences() passed after 0.001 seconds.
+✔ Suite "Coalesced persistence" passed after 0.002 seconds.
+◇ Suite "Playback history scale" started.
+◇ Test largeHistoryPreservesUntouchedEntriesThroughMutationAndFlush(count:versioned:) started.
+◇ Test case passing 2 arguments count → 10000, versioned → false to largeHistoryPreservesUntouchedEntriesThroughMutationAndFlush(count:versioned:) started.
+HISTORY_SCALE count=10000 versioned=false snapshot_load=0.114801065 seconds mutation_p95=8.963e-06 seconds encode_and_flush=0.143966844 seconds bytes=1293298
+◇ Test case passing 2 arguments count → 10000, versioned → true to largeHistoryPreservesUntouchedEntriesThroughMutationAndFlush(count:versioned:) started.
+HISTORY_SCALE count=10000 versioned=true snapshot_load=0.267849689 seconds mutation_p95=7.541e-06 seconds encode_and_flush=0.250240251 seconds bytes=3095170
+◇ Test case passing 2 arguments count → 100000, versioned → false to largeHistoryPreservesUntouchedEntriesThroughMutationAndFlush(count:versioned:) started.
+HISTORY_SCALE count=100000 versioned=false snapshot_load=1.548366061 seconds mutation_p95=8.683e-06 seconds encode_and_flush=1.23879344 seconds bytes=13398501
+◇ Test case passing 2 arguments count → 100000, versioned → true to largeHistoryPreservesUntouchedEntriesThroughMutationAndFlush(count:versioned:) started.
+HISTORY_SCALE count=100000 versioned=true snapshot_load=4.13269566 seconds mutation_p95=1.2288e-05 seconds encode_and_flush=3.498471219 seconds bytes=31619174
+✔ Test largeHistoryPreservesUntouchedEntriesThroughMutationAndFlush(count:versioned:) with 4 test cases passed after 38.514 seconds.
+✔ Suite "Playback history scale" passed after 38.514 seconds.
+◇ Suite "Playback persistence" started.
+◇ Test "Defaults and validated preference updates" started.
+✔ Test "Defaults and validated preference updates" passed after 0.001 seconds.
+◇ Test "Positions use normalized identities and persist across instances" started.
+✔ Test "Positions use normalized identities and persist across instances" passed after 0.001 seconds.
+◇ Test "Illiquid continues using the legacy Illiquid defaults namespace" started.
+✔ Test "Illiquid continues using the legacy Illiquid defaults namespace" passed after 0.001 seconds.
+◇ Test "Rejects invalid positions and remote URLs" started.
+✔ Test "Rejects invalid positions and remote URLs" passed after 0.001 seconds.
+◇ Test "Last watched file can be restored and cleared" started.
+✔ Test "Last watched file can be restored and cleared" passed after 0.001 seconds.
+◇ Test "Last opened file or folder persists across store instances" started.
+✔ Test "Last opened file or folder persists across store instances" passed after 0.001 seconds.
+◇ Test "Last opened media rejects remote URLs" started.
+✔ Test "Last opened media rejects remote URLs" passed after 0.001 seconds.
+◇ Test "Existing version one state decodes without a restore target" started.
+✔ Test "Existing version one state decodes without a restore target" passed after 0.005 seconds.
+◇ Test "Clearing history preserves preferences" started.
+✔ Test "Clearing history preserves preferences" passed after 0.001 seconds.
+◇ Test "Playback progress and remembered media choices can be cleared independently" started.
+✔ Test "Playback progress and remembered media choices can be cleared independently" passed after 0.001 seconds.
+◇ Test "Per-file track and subtitle settings use stable metadata" started.
+✔ Test "Per-file track and subtitle settings use stable metadata" passed after 0.001 seconds.
+✔ Suite "Playback persistence" passed after 0.015 seconds.
+✔ Test run with 27 tests in 5 suites passed after 38.546 seconds.
+Building for debugging...
+[0/13] Write sources
+[2/13] Write swift-version-669ED847A5FC0E21.txt
+[4/20] Compiling IlliquidCore CoalescingPersistenceWriter.swift
+[5/20] Compiling IlliquidCore MediaContentVersion.swift
+[6/20] Compiling IlliquidCore MediaPlaybackSettings.swift
+[7/20] Compiling IlliquidCore MediaTrack.swift
+[8/20] Compiling IlliquidCore NonDecodePerformance.swift
+[9/20] Compiling IlliquidCore NormalizedFileURL.swift
+[10/20] Emitting module IlliquidCore
+[11/26] Compiling IlliquidCore PersistenceEnums.swift
+[12/26] Compiling IlliquidCore PlaybackPersistenceStore.swift
+[13/26] Compiling IlliquidCore PlaybackPreferences.swift
+[14/26] Compiling IlliquidCore PlaybackRestoreTarget.swift
+[15/26] Compiling IlliquidCore SubtitleFallbackEncoding.swift
+[16/26] Compiling IlliquidCore TrackSelectionPreferences.swift
+[17/27] Wrapping AST for IlliquidCore for debugging
+[19/32] Emitting module IlliquidCoreTests
+[20/35] Compiling IlliquidCoreTests DeferredPersistenceTests.swift
+[21/35] Compiling IlliquidCoreTests HistoryPolicyTests.swift
+[22/35] Compiling IlliquidCoreTests IdempotentPersistenceTests.swift
+[23/35] Compiling IlliquidCoreTests PersistenceWriterLifetimeTests.swift
+[24/35] Compiling IlliquidCoreTests PersistenceWriterTests.swift
+[25/35] Compiling IlliquidCoreTests PlaybackHistoryScalingTests.swift
+[26/35] Compiling IlliquidCoreTests PlaybackPersistenceStoreTests.swift
+[27/36] /dev/shm/illiquid-perf-2072f603a954/run-2/build/baseline-tests/build/x86_64-unknown-linux-gnu/debug/HistoryEncodingQualificationPackageDiscoveredTests.derived/all-discovered-tests.swift
+[28/36] Write sources
+[29/36] Wrapping AST for IlliquidCoreTests for debugging
+[31/38] Compiling HistoryEncodingQualificationPackageDiscoveredTests IlliquidCoreTests.swift
+[32/38] Emitting module HistoryEncodingQualificationPackageDiscoveredTests
+[33/39] Compiling HistoryEncodingQualificationPackageDiscoveredTests all-discovered-tests.swift
+[34/40] /dev/shm/illiquid-perf-2072f603a954/run-2/build/baseline-tests/build/x86_64-unknown-linux-gnu/debug/HistoryEncodingQualificationPackageTests.derived/runner.swift
+[35/40] Write sources
+[36/42] Wrapping AST for HistoryEncodingQualificationPackageDiscoveredTests for debugging
+[38/42] Compiling HistoryEncodingQualificationPackageTests runner.swift
+[39/42] Emitting module HistoryEncodingQualificationPackageTests
+[40/43] Wrapping AST for HistoryEncodingQualificationPackageTests for debugging
+[41/43] Write Objects.LinkFileList
+[42/43] Linking HistoryEncodingQualificationPackageTests.xctest
+Build complete! (13.17s)

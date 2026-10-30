@@ -1,0 +1,52 @@
+name: Subtitle GPU pool portable ownership
+on:
+  push:
+    branches: ['validation/subtitle-gpu-pool-20261028']
+  pull_request:
+    paths:
+      - 'Sources/IlliquidNativePlayback/Subtitles/MetalASSSubtitleCompositor.swift'
+      - 'Tests/IlliquidNativePlaybackTests/SubtitleGPUResourcePoolTests.swift'
+      - 'Benchmarks/SubtitleGPUResourceLifetime/check_pool.py'
+      - '.github/workflows/subtitle-gpu-pool-portable.yml'
+permissions:
+  contents: read
+concurrency:
+  group: subtitle-gpu-pool-portable-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  ownership:
+    runs-on: ubuntu-24.04
+    container: swift:6.2@sha256:e508ef1e4be68087f720de622b91cbf1e32799a7aa96134b35e6f1a1d656db7a
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Trust the isolated checkout for source receipts
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install the qualification runner
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3
+      - name: Check actual pool ownership in debug and release
+        run: |
+          if test -f /Volumes/seed1/Projects/kyoto/kyoto.py; then
+            echo 'Kyoto is available; submit this check through the shared queue.'
+            exit 1
+          fi
+          echo 'Kyoto is unavailable in this isolated Linux container; builds run serially with two compiler jobs.'
+          echo 'This check has no Metal implementation and does not replace native macOS qualification.'
+          python3 Benchmarks/SubtitleGPUResourceLifetime/check_pool.py --output "$GITHUB_WORKSPACE/.qualification/subtitle-gpu-pool-portable"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: subtitle-gpu-pool-portable
+          path: |
+            .qualification/subtitle-gpu-pool-portable/*.json
+            .qualification/subtitle-gpu-pool-portable/*.log
+            .qualification/subtitle-gpu-pool-portable/*.txt
+            .qualification/subtitle-gpu-pool-portable/inputs/*.swift
+            .qualification/subtitle-gpu-pool-portable/package/Package.swift
+            .qualification/subtitle-gpu-pool-portable/package/Sources/**/*.swift
+            .qualification/subtitle-gpu-pool-portable/package/Tests/**/*.swift
+          retention-days: 14

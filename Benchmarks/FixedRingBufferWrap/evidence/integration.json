@@ -1,0 +1,28 @@
+{
+  "base_pr": 193,
+  "base_branch": "perf/ring-buffer-wrap-20261028-a16f",
+  "base_commit": "f891750ff9e3a4700fa8f09546bfeaaeb7be822f",
+  "base_production_git_blob": "402592fd2c45972e5621197c82a91d17d82ccd4c",
+  "measured_commit": "0f545d1a60dbb7f0d080d49846ad8faafdad6a5d",
+  "measured_production_sha256": "3fef01538146b9ea8c71b5dbfce9ba5056efa9998000a9cd471f68764ff34f39",
+  "measured_source_snapshot": "linux/FixedRingBuffer.measured.swift",
+  "production_changed_relative_to_base": false,
+  "base_production_byte_identical_to_measured": false,
+  "exact_additional_comment_in_base": "        // head and count are each below capacity, so the sum wraps at most once.\n",
+  "removing_exact_comment_yields_byte_identity": true,
+  "qualification_scope": "Recorded results qualify the measured source on Linux. This source comparison establishes comment-only equivalence with the inherited production file, not a new binary or macOS performance qualification.",
+  "separate_studies": {
+    "this_study": {
+      "compiler": "Swift 6.4",
+      "host": "AMD EPYC 7763",
+      "pairs": 12,
+      "measured_observations": 480
+    },
+    "base_pr": {
+      "compiler": "Swift 6.3.3",
+      "host": "AMD EPYC 9V45",
+      "pairs": 8,
+      "measured_observations": 208
+    }
+  }
+}

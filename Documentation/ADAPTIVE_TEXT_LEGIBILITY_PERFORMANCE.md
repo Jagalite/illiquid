@@ -1,5 +1,11 @@
 # Adaptive text legibility performance research
 
+The later [palette context reuse study](../Benchmarks/AdaptiveTextPaletteReuse/README.md)
+removes the duplicate context construction described below. This report and its
+numeric `style_miss` kernel preserve the call sequence used for the original
+opacity-threshold experiment; the follow-up measures the actual palette method
+and its cache paths.
+
 ## Decision and scope
 
 Optimize the opacity threshold search used by adaptive Liquid Glass text. The
@@ -18,8 +24,9 @@ filesystem performance work elsewhere in this repository.
 
 ## Where the work occurs
 
+At this study's baseline,
 [`PlayerTextPalette.uncachedColors`](../Sources/IlliquidApp/UI/PlayerTheme.swift)
-resolves primary text using one legibility context, then constructs a second
+resolved primary text using one legibility context, then constructed a second
 context to choose secondary and tertiary opacities, preferring 0.96 and 0.90.
 The benchmark includes both context initializations, primary resolution, and
 both opacity calls. Each context expands every background into the source,
