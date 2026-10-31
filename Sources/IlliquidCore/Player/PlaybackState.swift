@@ -75,6 +75,7 @@ public final class PlaybackState {
     public internal(set) var bufferStatus: BufferStatus = .empty { didSet { notifyMutation() } }
     public internal(set) var videoOutputStatus: VideoOutputStatus = .empty { didSet { notifyMutation() } }
     public internal(set) var displayOutputStatus: DisplayOutputStatus = .empty { didSet { notifyMutation() } }
+    public internal(set) var softwareDecoderThreadLimit: Int { didSet { notifyMutation() } }
     public internal(set) var hardwareDecodingStatus: HardwareDecodingStatus { didSet { notifyMutation() } }
     public internal(set) var audioOutputDevice: AudioOutputDevice? { didSet { notifyMutation() } }
     public internal(set) var audioOutputDevices: [AudioOutputDevice] = [] { didSet { notifyMutation() } }
@@ -138,6 +139,7 @@ public final class PlaybackState {
         isSidebarVisible = preferences.isSidebarVisible
         repeatMode = preferences.repeatMode
         isShuffleEnabled = preferences.isShuffleEnabled
+        softwareDecoderThreadLimit = PlaybackPreferences.validSoftwareDecoderThreadLimit(preferences.softwareDecoderThreadLimit)
         hardwareDecodingStatus = HardwareDecodingStatus(policy: preferences.hardwareDecodingPolicy)
     }
 
@@ -427,6 +429,10 @@ public final class PlaybackState {
                 activeVideoFilters.removeAll { $0 == filter }
             }
         }
+    }
+
+    public func setSoftwareDecoderThreadLimit(_ value: Int) {
+        softwareDecoderThreadLimit = PlaybackPreferences.validSoftwareDecoderThreadLimit(value)
     }
 
     public func setHardwareDecodingPolicy(_ policy: HardwareDecodingPolicy) {
