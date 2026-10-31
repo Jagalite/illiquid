@@ -23,6 +23,7 @@ public protocol PlaybackRuntime: AnyObject {
     func setAudioDelay(_ value: TimeInterval)
     func setTrackSelectionPreferences(_ preferences: TrackSelectionPreferences)
     func setSubtitleFallbackEncoding(_ encoding: SubtitleFallbackEncoding)
+    func setSoftwareDecoderThreadLimit(_ value: Int)
     func setHardwareDecodingPolicy(_ policy: HardwareDecodingPolicy)
     func setVideoScaleMode(_ mode: VideoScaleMode)
     func setVideoAspect(_ aspect: String?)
@@ -40,6 +41,7 @@ public protocol PlaybackRuntime: AnyObject {
 }
 
 public extension PlaybackRuntime {
+    func setSoftwareDecoderThreadLimit(_ value: Int) {}
     func frameStepTarget(direction: Int) async throws -> TimeInterval? {
         throw UnsupportedPlaybackCapabilityError("frame stepping")
     }

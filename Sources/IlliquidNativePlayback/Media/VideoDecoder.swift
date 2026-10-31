@@ -1030,8 +1030,11 @@ final class VideoDecoder {
         guard mayAccelerate || restoreHardware else { return }
         var replacement: UnsafeMutablePointer<AVCodecContext>?
         var hardware: Int32 = 0
-        let threads = restoreHardware ? softwareDecoderThreadCount
-            : min(SoftwareSeekAccelerationPolicy.maximumThreads, max(1, process.activeProcessorCount))
+        let accelerationThreads = min(
+            SoftwareSeekAccelerationPolicy.maximumThreads, max(1, process.activeProcessorCount),
+            softwareDecoderThreadCount > 0 ? softwareDecoderThreadCount : Int.max
+        )
+        let threads = restoreHardware ? softwareDecoderThreadCount : accelerationThreads
         let result = illiquid_create_decoder_with_thread_count(
             parameters, restoreHardware ? 1 : 0, Int32(threads), &replacement, &hardware)
         defer { avcodec_free_context(&replacement) }

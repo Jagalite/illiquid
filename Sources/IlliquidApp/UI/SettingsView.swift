@@ -477,6 +477,24 @@ struct SettingsView: View {
                     .accessibilityIdentifier("illiquid.settings.hardware-decoding")
                     .frame(width: 150)
                 }
+                SettingsDivider()
+                SettingsRow(
+                    title: "Software decoder threads",
+                    detail: "Automatic selects playback decoder threads based on available CPU cores. Choose a thread limit to override it. Applies when a video next opens; previews and frame stepping use separate limits."
+                ) {
+                    Picker("Software decoder threads", selection: Binding(
+                        get: { model.state.softwareDecoderThreadLimit },
+                        set: { model.player.setSoftwareDecoderThreadLimit($0) }
+                    )) {
+                        Text("Automatic").tag(0)
+                        ForEach(1...64, id: \.self) { count in
+                            Text("Up to \(count)").tag(count)
+                        }
+                    }
+                    .labelsHidden()
+                    .accessibilityIdentifier("illiquid.settings.software-decoder-threads")
+                    .frame(width: 150)
+                }
             }
 
             SettingsSectionLabel("Current Output")

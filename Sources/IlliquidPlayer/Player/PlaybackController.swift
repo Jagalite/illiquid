@@ -290,6 +290,7 @@ public final class PlaybackCoordinator {
                 )
             }
             self.backend = backend
+            backend.setSoftwareDecoderThreadLimit(preferences.softwareDecoderThreadLimit)
             backend.setTrackSelectionPreferences(preferences.trackSelection)
             backend.setSubtitleFallbackEncoding(state.subtitleFallbackEncoding)
             let driver = PlaybackRuntimeDriver(runtime: backend)
@@ -1125,6 +1126,13 @@ public final class PlaybackCoordinator {
         persistence.setPlaybackSpeed(sanitized)
         _ = runtimeDriver?.setPlaybackSpeed(sanitized)
         backend?.setPlaybackSpeed(sanitized)
+    }
+
+    public func setSoftwareDecoderThreadLimit(_ value: Int) {
+        let limit = PlaybackPreferences.validSoftwareDecoderThreadLimit(value)
+        state.setSoftwareDecoderThreadLimit(limit)
+        persistence.setSoftwareDecoderThreadLimit(limit)
+        backend?.setSoftwareDecoderThreadLimit(limit)
     }
 
     public func setHardwareDecodingPolicy(_ policy: HardwareDecodingPolicy) {
