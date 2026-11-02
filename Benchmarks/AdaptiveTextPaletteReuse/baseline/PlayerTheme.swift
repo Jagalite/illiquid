@@ -94,6 +94,12 @@ enum PlayerTheme: String, CaseIterable, Hashable, Identifiable, Sendable {
         }
     }
 
+    var popoverSurfaceColor: Color {
+        self == .liquidGlass
+            ? Color(red: 0.18, green: 0.20, blue: 0.25)
+            : previewSurfaceColor
+    }
+
     var hoverFillColor: Color {
         primaryColor.opacity(self == .liquidGlass ? 0.07 : 0.12)
     }
