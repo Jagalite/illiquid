@@ -1,0 +1,507 @@
+Updating https://github.com/swiftlang/swift-testing.git
+Updated https://github.com/swiftlang/swift-testing.git (0.42s)
+Updating https://github.com/Jagalite/statelessness.git
+Updated https://github.com/Jagalite/statelessness.git (0.60s)
+Updating https://github.com/swiftlang/swift-syntax.git
+Updating https://github.com/sparkle-project/Sparkle.git
+Updated https://github.com/swiftlang/swift-syntax.git (0.83s)
+Updated https://github.com/sparkle-project/Sparkle.git (0.83s)
+Computing version for https://github.com/sparkle-project/Sparkle.git
+Computed https://github.com/sparkle-project/Sparkle.git at 2.10.0 (0.90s)
+Computing version for https://github.com/swiftlang/swift-syntax.git
+Computed https://github.com/swiftlang/swift-syntax.git at 603.0.2 (0.04s)
+Working copy of https://github.com/Jagalite/statelessness.git resolved at a181e3c0f2f644f482cbeb37016ed1d54eaf86f9
+[0/1] Planning build
+Building for production...
+[0/10] Write swift-version--58304C5D6DBC2206.txt
+[1/10] Write sources
+[3/12] Compiling IlliquidCore MediaMetadataHints.swift
+[4/18] Compiling Statelessness Assurance.swift
+[5/19] Compiling IlliquidPlaybackModel CanonicalJSON.swift
+[6/22] Compiling IlliquidPlayback Module.swift
+[7/24] Compiling IlliquidPlaybackTests RuntimeContractTests.swift
+[8/24] Compiling IlliquidPlaybackStateSpace PlaybackModelTransitions.swift
+[8/24] Write Objects.LinkFileList
+[10/25] Compiling IlliquidCoreTests AspectFitWindowSizingTests.swift
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:99:26: warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 97 |             nil,
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "https://example.invalid/Media/A.mkv")' never equals 'nil' (from macro 'require')
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+101 |         ]
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidCoreTests/PlaylistIdentityLookupTests.swift:100:26: warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+ 98 |             URL(fileURLWithPath: "/Media/A.mkv"),
+ 99 |             try #require(URL(string: "https://example.invalid/Media/A.mkv")),
+100 |             try #require(URL(string: "file://media-server.example/Media/A.mkv")),
+    |                          `- warning: '#require(_:_:)' is redundant because 'URL(string: "file://media-server.example/Media/A.mkv")' never equals 'nil' (from macro 'require')
+101 |         ]
+102 |         let folder = FolderPlaylist(folderURL: URL(fileURLWithPath: "/Media"), items: [])
+[10/25] Linking IlliquidStateSpaceExplorer
+[12/25] Compiling IlliquidPlaybackModelTests CompletedEffectHistoryTests.swift
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/CompletedEffectHistoryTests.swift:211:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+209 |   @Test
+210 |   func productionCoreRetainsDuplicateClassificationAfterLongHistory() throws {
+211 |     var runtime = PlaybackSessionHost()
+    |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+212 |     let load = runtime.send(.command(.load(
+213 |       source: .init(rawValue: "fixture/history.mkv"), autoplay: false
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/CompletedEffectHistoryTests.swift:242:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+240 |   @Test
+241 |   func outstandingHolesRemainLiveUntilTheirOwnResultsArrive() throws {
+242 |     var runtime = PlaybackSessionHost()
+    |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+243 |     _ = runtime.send(.command(.load(source: .init(rawValue: "fixture/holes.mkv"), autoplay: false)))
+244 |     _ = runtime.completeNext()
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/CompletedEffectHistoryTests.swift:270:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+268 |   @Test
+269 |   func arbitraryInitialIDsDoNotTurnUnknownIDsIntoDuplicates() {
+270 |     var runtime = PlaybackSessionHost(
+    |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+271 |       state: PlaybackDomainState(completedEffectIDs: [id(0), id(7), id(.max)]))
+272 |     for value: UInt64 in [0, 1, 6, 7, 8, .max - 1, .max] {
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:11:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+   9 |   @Test
+  10 |   func loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() throws {
+  11 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  12 | 
+  13 |     let load = runtime.send(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:43:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  41 |   @Test
+  42 |   func pausedLoadDoesNotRequestNonzeroRate() throws {
+  43 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  44 |     _ = runtime.send(
+  45 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:63:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  61 |     let first = MediaSourceIdentity(rawValue: "fixture/committed.mkv")
+  62 |     let candidate = MediaSourceIdentity(rawValue: "fixture/candidate.mkv")
+  63 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  64 | 
+  65 |     _ = runtime.send(.command(.load(source: first, autoplay: false)))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:98:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  96 |     let first = MediaSourceIdentity(rawValue: "fixture/committed.mkv")
+  97 |     let candidate = MediaSourceIdentity(rawValue: "fixture/malformed.mkv")
+  98 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  99 | 
+ 100 |     _ = runtime.send(.command(.load(source: first, autoplay: false)))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:131:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 129 |   @Test
+ 130 |   func staleGenerationResultCannotResumeAfterSeek() throws {
+ 131 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 132 |     _ = runtime.send(
+ 133 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:160:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 158 |   @Test
+ 159 |   func duplicateCompletionIsIdempotent() throws {
+ 160 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 161 |     _ = runtime.send(
+ 162 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:183:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 181 |   @Test
+ 182 |   func directEffectResultRetiresPendingRuntimeEffect() throws {
+ 183 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 184 |     _ = runtime.send(
+ 185 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:204:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 202 |   @Test
+ 203 |   func shutdownRequiresCleanupAcknowledgmentAndThenEmitsNothing() throws {
+ 204 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 205 |     _ = runtime.send(
+ 206 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:244:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 242 |   @Test
+ 243 |   func invalidTimeAndInvalidSeekAreRejectedWithoutEffects() {
+ 244 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 245 |     let invalidSeek = runtime.send(.command(.seek(target: .unknown, mode: .exact)))
+ 246 |     #expect(invalidSeek.disposition == .invalid(reason: "seekRequiresValidTarget"))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:272:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 270 |   @Test
+ 271 |   func checkpointAndDiagnosticEventsCarryDeterministicIdentity() throws {
+ 272 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 273 |     _ = runtime.send(
+ 274 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:307:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 305 |   @Test
+ 306 |   func subtitleInvalidationOwnsRevisionsClearAndFinalCommitFence() throws {
+ 307 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 308 |     _ = runtime.send(.command(.load(
+ 309 |       source: MediaSourceIdentity(rawValue: "fixture/subtitle.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:346:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 344 |   @Test
+ 345 |   func aggregateSeekAcknowledgmentRestoresRateOnlyAfterNativePreroll() throws {
+ 346 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 347 |     _ = runtime.send(.command(.load(
+ 348 |       source: MediaSourceIdentity(rawValue: "fixture/seek-transaction.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:381:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 379 |   @Test
+ 380 |   func relativeSeekResolvesFromAcceptedClockAndAccumulatesPendingIntent() throws {
+ 381 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 382 |     _ = runtime.send(.command(.load(
+ 383 |       source: MediaSourceIdentity(rawValue: "fixture/relative.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:418:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 416 |   @Test
+ 417 |   func catalogDefaultsAndDrainFinalizationAreDeterministicAndExactlyOnce() throws {
+ 418 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 419 |     _ = runtime.send(.command(.load(
+ 420 |       source: MediaSourceIdentity(rawValue: "fixture/drain.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:464:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 462 |   @Test
+ 463 |   func duplicateEOFInSameGenerationPreservesObservedDrainProgress() throws {
+ 464 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 465 |     let required: Set<PlaybackDrainComponent> = [.videoDecoder, .videoPresenter]
+ 466 |     _ = runtime.send(.demuxEndOfFile(requiredDrain: required))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:482:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 480 |   @Test
+ 481 |   func failedEOFCheckpointCannotAdvanceAndLateSuccessCannotReplaceNewMedia() throws {
+ 482 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 483 |     let eof = runtime.send(.demuxEndOfFile(requiredDrain: []))
+ 484 |     let checkpoint = try #require(eof.effects.first { $0.kind == .persistCheckpoint })
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:493:9: warning: variable 'replacing' was never mutated; consider changing to 'let' constant
+ 491 |     #expect(runtime.state.lastPersistenceFailureCode != nil)
+ 492 | 
+ 493 |     var replacing = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'replacing' was never mutated; consider changing to 'let' constant
+ 494 |     let oldEOF = replacing.send(.demuxEndOfFile(requiredDrain: []))
+ 495 |     let oldCheckpoint = try #require(oldEOF.effects.first)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:505:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 503 |   @Test
+ 504 |   func aggregateDuplicateEOFCannotSkipExistingDrainObligations() throws {
+ 505 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 506 |     let required: Set<PlaybackDrainComponent> = [.videoDecoder, .videoPresenter]
+ 507 |     _ = runtime.send(.demuxEndOfFile(requiredDrain: required))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:519:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 517 |   @Test
+ 518 |   func acceptedNewSeekGenerationRearmsFinalizedEOFCycle() throws {
+ 519 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 520 |     _ = runtime.send(.demuxEndOfFile(requiredDrain: []))
+ 521 |     #expect(runtime.state.activeSession?.drain.finalized == true)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:532:9: warning: variable 'cancellationRuntime' was never mutated; consider changing to 'let' constant
+ 530 |   @Test
+ 531 |   func shutdownCleanupFailuresBecomeExplicitExternalWaits() throws {
+ 532 |     var cancellationRuntime = PlaybackSessionHost()
+     |         `- warning: variable 'cancellationRuntime' was never mutated; consider changing to 'let' constant
+ 533 |     _ = cancellationRuntime.send(.command(.load(
+ 534 |       source: MediaSourceIdentity(rawValue: "fixture/shutdown-cancel.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:545:9: warning: variable 'finalizerRuntime' was never mutated; consider changing to 'let' constant
+ 543 |     #expect(cancellationRuntime.state.externalWaitReason == .shutdownCancellationFailed)
+ 544 | 
+ 545 |     var finalizerRuntime = PlaybackSessionHost()
+     |         `- warning: variable 'finalizerRuntime' was never mutated; consider changing to 'let' constant
+ 546 |     let finalizerRequest = finalizerRuntime.send(.command(.shutdown))
+ 547 |     let finalizer = try #require(finalizerRequest.effects.first)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:557:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 555 |   @Test
+ 556 |   func shutdownRejectsLateRawFactsBeforeTheyCanEmitPlaybackWork() throws {
+ 557 |     var runtime = try readyRuntime(autoplay: true)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 558 |     _ = runtime.send(.command(.shutdown))
+ 559 | 
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:569:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 567 |   @Test
+ 568 |   func failedTrackReplacementRestoresPrerollAuthorityWithPriorPlayback() throws {
+ 569 |     var runtime = try readyRuntime(autoplay: true)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 570 |     let selection = runtime.send(.command(.selectAudio(.stream(
+ 571 |       PlaybackTrackID(kind: .audio, mediaTrackID: 2)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:588:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 586 |   @Test
+ 587 |   func subtitleInvalidationDoesNotStrandInFlightSubtitleSelection() throws {
+ 588 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 589 |     let selection = runtime.send(.command(.selectSubtitle(.external(
+ 590 |       MediaSourceIdentity(rawValue: "fixture/external.srt")
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:611:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 609 |   @Test
+ 610 |   func subtitleInvalidationDoesNotStrandTrackResumeRate() throws {
+ 611 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 612 |     let selection = runtime.send(.command(.selectSubtitle(.external(
+ 613 |       MediaSourceIdentity(rawValue: "fixture/external.srt")
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:636:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 634 |   @Test
+ 635 |   func aggregatePrerollIsTheOnlyStartupRateAuthority() throws {
+ 636 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 637 |     _ = runtime.send(.command(.load(
+ 638 |       source: MediaSourceIdentity(rawValue: "fixture/preroll-authority.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:661:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 659 |   @Test
+ 660 |   func lateCatalogMetadataDoesNotRearmSatisfiedStartupPreroll() throws {
+ 661 |     var runtime = try readyRuntime(autoplay: true)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 662 | 
+ 663 |     let catalog = runtime.send(.catalogObserved(PlaybackCatalog(hasVideo: true)))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:791:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 789 |   @Test
+ 790 |   func retryableVideoDecodeFailureDoesNotReachUserFacingSnapshot() throws {
+ 791 |     var runtime = try readyRuntime(autoplay: true)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 792 |     let stream = PlaybackStreamID(kind: .video, demuxIndex: 2)
+ 793 |     let failure = PlaybackFailure(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:987:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 985 | 
+ 986 |   private func readyRuntime(autoplay: Bool) throws -> PlaybackSessionHost {
+ 987 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 988 |     _ = runtime.send(.command(.load(
+ 989 |       source: MediaSourceIdentity(rawValue: "fixture/ready.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:1074:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+1072 | 
+1073 |   @Test func audioOnlyDecodeFailureRemainsTerminal() throws {
+1074 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+1075 |     _ = runtime.send(.command(.load(
+1076 |       source: MediaSourceIdentity(rawValue: "fixture/audio-only.m4a"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:1244:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+1242 |   @Test
+1243 |   func productionModeRetainsNoStepHistory() {
+1244 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+1245 | 
+1246 |     let transition = runtime.send(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/RendererRecoveryRegressionTests.swift:21:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 19 | 
+ 20 |   private func readyRuntime(autoplay: Bool = true) throws -> PlaybackSessionHost {
+ 21 |     var runtime = PlaybackSessionHost()
+    |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 22 |     let load = runtime.send(.command(.load(
+ 23 |       source: MediaSourceIdentity(rawValue: "fixture/recovery.mkv"), autoplay: autoplay
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/RendererRecoveryRegressionTests.swift:208:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+206 |   @Test
+207 |   func furtherFailureObservationsDoNotRestartATerminalSession() throws {
+208 |     var runtime = try readyRuntime()
+    |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+209 |     _ = runtime.send(.failureObserved(terminalFailure))
+210 |     let before = runtime.state.activeSession
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/RendererRecoveryRegressionTests.swift:374:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+372 |     event: PlaybackEvent, token: EffectResultKind
+373 |   ) throws {
+374 |     var runtime = try readyRuntime()
+    |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+375 |     let pending = runtime.send(event)
+376 |     let effect = try #require(pending.effects.first)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/RendererRecoveryRegressionTests.swift:394:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+392 |   @Test
+393 |   func aLateDeadlineDoesNotReplaceTheFirstTerminalError() throws {
+394 |     var runtime = try readyRuntime()
+    |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+395 |     _ = runtime.send(.failureObserved(terminalFailure))
+396 |     let before = try #require(runtime.state.activeSession)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/RendererRecoveryRegressionTests.swift:404:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+402 |   @Test(arguments: [PlaybackCommand.play, .pause])
+403 |   func transportCommandsDoNotUnpauseATerminallyFailedPipeline(command: PlaybackCommand) throws {
+404 |     var runtime = try readyRuntime()
+    |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+405 |     _ = runtime.send(.failureObserved(terminalFailure))
+406 |     let before = runtime.state.activeSession
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/StandardCompletionContractTests.swift:11:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  9 |   @Test(arguments: [EffectResultKind.succeeded, .failed, .cancelled])
+ 10 |   func defaultEffectsAcceptEachStandardOutcomeOnce(kind: EffectResultKind) throws {
+ 11 |     var runtime = PlaybackSessionHost()
+    |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 12 |     let load = runtime.send(
+ 13 |       .command(.load(source: .init(rawValue: "fixture/contract.mkv"), autoplay: false)))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/StandardCompletionContractTests.swift:188:11: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+186 |     let effect = makeEffect(completion: contract)
+187 |     for token in accepted {
+188 |       var runtime = makeRuntime(for: effect)
+    |           `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+189 |       let transition = runtime.send(.effectResult(.init(context: effect.context, token: token)))
+190 |       #expect(transition.disposition == .accepted)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/StandardCompletionContractTests.swift:195:11: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+193 |     }
+194 |     for token in rejected {
+195 |       var runtime = makeRuntime(for: effect)
+    |           `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+196 |       let transition = runtime.send(.effectResult(.init(context: effect.context, token: token)))
+197 |       #expect(transition.disposition == .invalid(reason: "undeclaredEffectResultToken"))
+[13/25] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+[14/25] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+/Volumes/seed2/Projects/illiquid-production-migration/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1150 |             self.workQueue.async {
+1151 |                 _ = resources.retainedCVTextures
+1152 |                 guard commandBuffer.status != .error else {
+     |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1153 |                     completion(.failure(
+1154 |                         commandBuffer.error
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+243 |  */
+244 | API_AVAILABLE(macos(10.11), ios(8.0))
+245 | @protocol MTLCommandBuffer <NSObject>
+    |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+246 | 
+247 | /*!
+
+/Volumes/seed2/Projects/illiquid-production-migration/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   4 | import CoreVideo
+   5 | import Foundation
+   6 | import Metal
+     | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   7 | import OSLog
+   8 | import QuartzCore
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[15/29] Compiling IlliquidRenderProfile main.swift
+[15/29] Write Objects.LinkFileList
+[17/29] Compiling IlliquidDifferentialHarness main.swift
+[17/29] Write Objects.LinkFileList
+[18/29] Linking IlliquidRenderProfile
+[19/29] Linking IlliquidDifferentialHarness
+[21/29] Compiling IlliquidPlayer ArchitectureValidation.swift
+[22/33] Compiling IlliquidPlaybackStress main.swift
+[22/33] Write Objects.LinkFileList
+[24/33] Compiling IlliquidArchitectureCheck main.swift
+[24/33] Write Objects.LinkFileList
+[25/33] Linking IlliquidPlaybackStress
+[26/33] Linking IlliquidArchitectureCheck
+[28/33] Compiling IlliquidPlayerTests PlaybackCoordinatorTests.swift
+[29/33] Compiling IlliquidApp AppDelegate.swift
+[29/33] Write Objects.LinkFileList
+[30/34] Linking Illiquid
+[32/35] Compiling IlliquidNativePlaybackTests ASSBitmapCopyTests.swift
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/PGSSubtitlePacketBorrowTests.swift:77:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 75 |             reference(x: 30, y: 40),
+ 76 |         ]))
+ 77 |         weak var released = owner
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 78 |         let metadata = try parseThenOverwrite(try #require(owner))
+ 79 |         owner = nil
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/PacketQueueWakeupTests.swift:127:18: warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+125 |         let queue = BoundedQueue<Payload>(capacity: 1)
+126 |         var value: Payload? = Payload()
+127 |         weak var retained = value
+    |                  `- warning: weak variable 'retained' was never mutated; consider changing to 'let' constant [#WeakMutability]
+128 |         #expect(queue.push(value!)); value = nil
+129 |         #expect(retained != nil); queue.removeAll(); #expect(retained == nil)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/PlanarOwnershipTransitionTests.swift:99:13: warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+ 97 |         let checkoutID = try #require(token).checkoutID
+ 98 |         var attachment: PlanarRendererSampleLifetimeAttachment? = try #require(
+ 99 |             ledger.makeRendererSampleAttachment(checkoutID: checkoutID)
+    |             `- warning: '#require(_:_:)' is redundant because 'ledger.makeRendererSampleAttachment(checkoutID: checkoutID)' never equals 'nil' (from macro 'require')
+100 |         )
+101 |         token?.transition(to: .queued)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/PlaybackPerformanceRegressionTests.swift:168:18: warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+166 |         var ring = FixedRingBuffer<Value>(capacity: 3)
+167 |         var first: Value? = Value()
+168 |         weak var released = first
+    |                  `- warning: weak variable 'released' was never mutated; consider changing to 'let' constant [#WeakMutability]
+169 |         ring.append(first!)
+170 |         first = nil
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:11:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+  9 |     @Test func bitmapEventsOutliveNativeOutputUpdatesFlushAndDecoderDestruction() throws {
+ 10 |         var decoder: SubtitleDecoder? = try makeDecoder()
+ 11 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 12 |         let first = try #require(try decoder?.decode(packet(fullPGS, at: 2)).first)
+ 13 |         let bitmap = try #require(first.bitmapComposition)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/SubtitleResultLifetimeTests.swift:66:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 64 |     @Test func textEventsOwnTheirBytesAcrossNativeOutputReuseFlushAndDestruction() throws {
+ 65 |         var decoder: SubtitleDecoder? = try makeDecoder(codec: AV_CODEC_ID_SUBRIP, name: "subrip")
+ 66 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 67 |         let first = try #require(try decoder?.decode(packet(Array("First caption".utf8), at: 2)).first)
+ 68 |         #expect(decoder?.hasRetainedDecodedOutput == false)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeMeasurements.swift:58:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 56 |             width: workload.width, height: workload.height
+ 57 |         )
+ 58 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+ 59 |         var probes: [VideoScratchAllocationProbe] = []
+ 60 |         var refcounts: [Int] = []
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidNativePlaybackTests/VideoScratchFrameLifetimeTests.swift:317:18: warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+315 |             width: 32, height: 24, deinterlacing: deinterlacing
+316 |         )
+317 |         weak var retiredDecoder = decoder
+    |                  `- warning: weak variable 'retiredDecoder' was never mutated; consider changing to 'let' constant [#WeakMutability]
+318 |         var tracked: (FFmpegPacket, VideoScratchAllocationProbe)? =
+319 |             try VideoScratchFrameFixture.makePacket(width: 32, height: 24,
+
+[#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+[33/35] Compiling IlliquidAppTests AdaptiveRainbowTextColorTests.swift
+[33/35] Write Objects.LinkFileList
+[34/35] Linking IlliquidPackageTests
+Build complete! (251.30s)
+Test Suite 'Selected tests' started at 2026-11-02 03:14:46.249.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-11-02 03:14:46.255.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-11-02 03:14:46.255.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-02 03:14:46.255.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.006) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Production model turn cost" started.
+◇ Test turnLatency() started.
+production-turn-latency engine=statelessness-session ns-per-turn median=3550.947290528233 min=3538.345059198543 max=3557.94746129326
+production-turn-latency engine=model-step ns-per-turn median=1354.7394410291438
+production-turn-latency engine=model-step+checks ns-per-turn median=1379.783783014572
+✔ Test turnLatency() passed after 1.208 seconds.
+✔ Suite "Production model turn cost" passed after 1.208 seconds.
+✔ Test run with 1 test in 1 suite passed after 1.208 seconds.

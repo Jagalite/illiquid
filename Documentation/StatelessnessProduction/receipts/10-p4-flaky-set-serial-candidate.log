@@ -1,0 +1,1141 @@
+Building for debugging...
+[0/16] Write sources
+[1/16] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Compiling IlliquidPlaybackModelTests PlaybackModelTests.swift
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:11:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+   9 |   @Test
+  10 |   func loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() throws {
+  11 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  12 | 
+  13 |     let load = runtime.send(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:43:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  41 |   @Test
+  42 |   func pausedLoadDoesNotRequestNonzeroRate() throws {
+  43 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  44 |     _ = runtime.send(
+  45 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:63:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  61 |     let first = MediaSourceIdentity(rawValue: "fixture/committed.mkv")
+  62 |     let candidate = MediaSourceIdentity(rawValue: "fixture/candidate.mkv")
+  63 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  64 | 
+  65 |     _ = runtime.send(.command(.load(source: first, autoplay: false)))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:98:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  96 |     let first = MediaSourceIdentity(rawValue: "fixture/committed.mkv")
+  97 |     let candidate = MediaSourceIdentity(rawValue: "fixture/malformed.mkv")
+  98 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+  99 | 
+ 100 |     _ = runtime.send(.command(.load(source: first, autoplay: false)))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:131:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 129 |   @Test
+ 130 |   func staleGenerationResultCannotResumeAfterSeek() throws {
+ 131 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 132 |     _ = runtime.send(
+ 133 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:160:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 158 |   @Test
+ 159 |   func duplicateCompletionIsIdempotent() throws {
+ 160 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 161 |     _ = runtime.send(
+ 162 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:183:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 181 |   @Test
+ 182 |   func directEffectResultRetiresPendingRuntimeEffect() throws {
+ 183 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 184 |     _ = runtime.send(
+ 185 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:204:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 202 |   @Test
+ 203 |   func shutdownRequiresCleanupAcknowledgmentAndThenEmitsNothing() throws {
+ 204 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 205 |     _ = runtime.send(
+ 206 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:244:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 242 |   @Test
+ 243 |   func invalidTimeAndInvalidSeekAreRejectedWithoutEffects() {
+ 244 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 245 |     let invalidSeek = runtime.send(.command(.seek(target: .unknown, mode: .exact)))
+ 246 |     #expect(invalidSeek.disposition == .invalid(reason: "seekRequiresValidTarget"))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:272:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 270 |   @Test
+ 271 |   func checkpointAndDiagnosticEventsCarryDeterministicIdentity() throws {
+ 272 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 273 |     _ = runtime.send(
+ 274 |       .command(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:307:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 305 |   @Test
+ 306 |   func subtitleInvalidationOwnsRevisionsClearAndFinalCommitFence() throws {
+ 307 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 308 |     _ = runtime.send(.command(.load(
+ 309 |       source: MediaSourceIdentity(rawValue: "fixture/subtitle.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:346:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 344 |   @Test
+ 345 |   func aggregateSeekAcknowledgmentRestoresRateOnlyAfterNativePreroll() throws {
+ 346 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 347 |     _ = runtime.send(.command(.load(
+ 348 |       source: MediaSourceIdentity(rawValue: "fixture/seek-transaction.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:381:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 379 |   @Test
+ 380 |   func relativeSeekResolvesFromAcceptedClockAndAccumulatesPendingIntent() throws {
+ 381 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 382 |     _ = runtime.send(.command(.load(
+ 383 |       source: MediaSourceIdentity(rawValue: "fixture/relative.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:418:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 416 |   @Test
+ 417 |   func catalogDefaultsAndDrainFinalizationAreDeterministicAndExactlyOnce() throws {
+ 418 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 419 |     _ = runtime.send(.command(.load(
+ 420 |       source: MediaSourceIdentity(rawValue: "fixture/drain.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:464:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 462 |   @Test
+ 463 |   func duplicateEOFInSameGenerationPreservesObservedDrainProgress() throws {
+ 464 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 465 |     let required: Set<PlaybackDrainComponent> = [.videoDecoder, .videoPresenter]
+ 466 |     _ = runtime.send(.demuxEndOfFile(requiredDrain: required))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:482:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 480 |   @Test
+ 481 |   func failedEOFCheckpointCannotAdvanceAndLateSuccessCannotReplaceNewMedia() throws {
+ 482 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 483 |     let eof = runtime.send(.demuxEndOfFile(requiredDrain: []))
+ 484 |     let checkpoint = try #require(eof.effects.first { $0.kind == .persistCheckpoint })
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:493:9: warning: variable 'replacing' was never mutated; consider changing to 'let' constant
+ 491 |     #expect(runtime.state.lastPersistenceFailureCode != nil)
+ 492 | 
+ 493 |     var replacing = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'replacing' was never mutated; consider changing to 'let' constant
+ 494 |     let oldEOF = replacing.send(.demuxEndOfFile(requiredDrain: []))
+ 495 |     let oldCheckpoint = try #require(oldEOF.effects.first)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:505:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 503 |   @Test
+ 504 |   func aggregateDuplicateEOFCannotSkipExistingDrainObligations() throws {
+ 505 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 506 |     let required: Set<PlaybackDrainComponent> = [.videoDecoder, .videoPresenter]
+ 507 |     _ = runtime.send(.demuxEndOfFile(requiredDrain: required))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:519:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 517 |   @Test
+ 518 |   func acceptedNewSeekGenerationRearmsFinalizedEOFCycle() throws {
+ 519 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 520 |     _ = runtime.send(.demuxEndOfFile(requiredDrain: []))
+ 521 |     #expect(runtime.state.activeSession?.drain.finalized == true)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:532:9: warning: variable 'cancellationRuntime' was never mutated; consider changing to 'let' constant
+ 530 |   @Test
+ 531 |   func shutdownCleanupFailuresBecomeExplicitExternalWaits() throws {
+ 532 |     var cancellationRuntime = PlaybackSessionHost()
+     |         `- warning: variable 'cancellationRuntime' was never mutated; consider changing to 'let' constant
+ 533 |     _ = cancellationRuntime.send(.command(.load(
+ 534 |       source: MediaSourceIdentity(rawValue: "fixture/shutdown-cancel.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:545:9: warning: variable 'finalizerRuntime' was never mutated; consider changing to 'let' constant
+ 543 |     #expect(cancellationRuntime.state.externalWaitReason == .shutdownCancellationFailed)
+ 544 | 
+ 545 |     var finalizerRuntime = PlaybackSessionHost()
+     |         `- warning: variable 'finalizerRuntime' was never mutated; consider changing to 'let' constant
+ 546 |     let finalizerRequest = finalizerRuntime.send(.command(.shutdown))
+ 547 |     let finalizer = try #require(finalizerRequest.effects.first)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:557:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 555 |   @Test
+ 556 |   func shutdownRejectsLateRawFactsBeforeTheyCanEmitPlaybackWork() throws {
+ 557 |     var runtime = try readyRuntime(autoplay: true)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 558 |     _ = runtime.send(.command(.shutdown))
+ 559 | 
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:569:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 567 |   @Test
+ 568 |   func failedTrackReplacementRestoresPrerollAuthorityWithPriorPlayback() throws {
+ 569 |     var runtime = try readyRuntime(autoplay: true)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 570 |     let selection = runtime.send(.command(.selectAudio(.stream(
+ 571 |       PlaybackTrackID(kind: .audio, mediaTrackID: 2)
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:588:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 586 |   @Test
+ 587 |   func subtitleInvalidationDoesNotStrandInFlightSubtitleSelection() throws {
+ 588 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 589 |     let selection = runtime.send(.command(.selectSubtitle(.external(
+ 590 |       MediaSourceIdentity(rawValue: "fixture/external.srt")
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:611:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 609 |   @Test
+ 610 |   func subtitleInvalidationDoesNotStrandTrackResumeRate() throws {
+ 611 |     var runtime = try readyRuntime(autoplay: false)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 612 |     let selection = runtime.send(.command(.selectSubtitle(.external(
+ 613 |       MediaSourceIdentity(rawValue: "fixture/external.srt")
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:636:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 634 |   @Test
+ 635 |   func aggregatePrerollIsTheOnlyStartupRateAuthority() throws {
+ 636 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 637 |     _ = runtime.send(.command(.load(
+ 638 |       source: MediaSourceIdentity(rawValue: "fixture/preroll-authority.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:661:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 659 |   @Test
+ 660 |   func lateCatalogMetadataDoesNotRearmSatisfiedStartupPreroll() throws {
+ 661 |     var runtime = try readyRuntime(autoplay: true)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 662 | 
+ 663 |     let catalog = runtime.send(.catalogObserved(PlaybackCatalog(hasVideo: true)))
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:791:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 789 |   @Test
+ 790 |   func retryableVideoDecodeFailureDoesNotReachUserFacingSnapshot() throws {
+ 791 |     var runtime = try readyRuntime(autoplay: true)
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 792 |     let stream = PlaybackStreamID(kind: .video, demuxIndex: 2)
+ 793 |     let failure = PlaybackFailure(
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:987:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 985 | 
+ 986 |   private func readyRuntime(autoplay: Bool) throws -> PlaybackSessionHost {
+ 987 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+ 988 |     _ = runtime.send(.command(.load(
+ 989 |       source: MediaSourceIdentity(rawValue: "fixture/ready.mkv"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:1074:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+1072 | 
+1073 |   @Test func audioOnlyDecodeFailureRemainsTerminal() throws {
+1074 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+1075 |     _ = runtime.send(.command(.load(
+1076 |       source: MediaSourceIdentity(rawValue: "fixture/audio-only.m4a"),
+
+/Volumes/seed2/Projects/illiquid-production-migration/Tests/IlliquidPlaybackModelTests/PlaybackModelTests.swift:1244:9: warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+1242 |   @Test
+1243 |   func productionModeRetainsNoStepHistory() {
+1244 |     var runtime = PlaybackSessionHost()
+     |         `- warning: variable 'runtime' was never mutated; consider changing to 'let' constant
+1245 | 
+1246 |     let transition = runtime.send(
+[4/5] Emitting module IlliquidPlaybackModelTests
+[4/6] Write Objects.LinkFileList
+[5/6] Linking IlliquidPackageTests
+Build complete! (106.42s)
+Test Suite 'Selected tests' started at 2026-11-02 00:01:51.157.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-11-02 00:01:51.167.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-11-02 00:01:51.167.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-02 00:01:51.167.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.010) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Filesystem watcher lifecycle" started.
+◇ Test blockedCreationDoesNotBlockUIAndRestartDropsObsoleteStream() started.
+✔ Test blockedCreationDoesNotBlockUIAndRestartDropsObsoleteStream() passed after 0.004 seconds.
+◇ Test stopRejectsAlreadyQueuedMainActorDelivery() started.
+✔ Test stopRejectsAlreadyQueuedMainActorDelivery() passed after 0.001 seconds.
+◇ Test startupReconcilesChangesAfterInitialSnapshotForEveryRoot() started.
+✔ Test startupReconcilesChangesAfterInitialSnapshotForEveryRoot() passed after 0.002 seconds.
+◇ Test failedCreationDoesNotReportReadiness() started.
+✔ Test failedCreationDoesNotReportReadiness() passed after 0.001 seconds.
+◇ Test stopRejectsAlreadyQueuedReadiness() started.
+✔ Test stopRejectsAlreadyQueuedReadiness() passed after 0.001 seconds.
+◇ Test nativeStreamDeliversEventsAfterAsynchronousStartup() started.
+✔ Test nativeStreamDeliversEventsAfterAsynchronousStartup() passed after 0.026 seconds.
+◇ Test releasingMonitorStopsItsNativeStream() started.
+✔ Test releasingMonitorStopsItsNativeStream() passed after 0.001 seconds.
+✔ Suite "Filesystem watcher lifecycle" passed after 0.037 seconds.
+◇ Suite "Source media presence cache snapshots" started.
+◇ Test rootAndDescendantsRetainBothPresenceValues() started.
+✔ Test rootAndDescendantsRetainBothPresenceValues() passed after 0.001 seconds.
+◇ Test ancestorsPrefixSiblingsAndOtherRootsAreExcluded() started.
+✔ Test ancestorsPrefixSiblingsAndOtherRootsAreExcluded() passed after 0.001 seconds.
+◇ Test filesystemRootMatchesAbsoluteDescendantsWithoutADoubleSeparator() started.
+✔ Test filesystemRootMatchesAbsoluteDescendantsWithoutADoubleSeparator() passed after 0.001 seconds.
+◇ Test missingIncompleteAndUnreadableSummariesCannotSeedReuse() started.
+✔ Test missingIncompleteAndUnreadableSummariesCannotSeedReuse() passed after 0.001 seconds.
+◇ Test canonicallyEquivalentUnicodePathsKeepTheirOriginalKeys() started.
+✔ Test canonicallyEquivalentUnicodePathsKeepTheirOriginalKeys() passed after 0.001 seconds.
+◇ Test snapshotRemainsIndependentWhenInputsChange() started.
+✔ Test snapshotRemainsIndependentWhenInputsChange() passed after 0.001 seconds.
+◇ Test scopedAndUnscopedCachesProduceEquivalentFilesystemTraversal() started.
+✔ Test scopedAndUnscopedCachesProduceEquivalentFilesystemTraversal() passed after 0.008 seconds.
+◇ Test repairingOneWatchedRootPreservesTheOtherRootsResults() started.
+✔ Test repairingOneWatchedRootPreservesTheOtherRootsResults() passed after 0.039 seconds.
+✔ Suite "Source media presence cache snapshots" passed after 0.050 seconds.
+◇ Suite "Bounded source media scanner" started.
+◇ Test wideTreeUsesBoundedSlicesAndListingDoesNotScanDescendants() started.
+✔ Test wideTreeUsesBoundedSlicesAndListingDoesNotScanDescendants() passed after 0.097 seconds.
+◇ Test deepTreePropagatesMediaWithoutRecursiveCallsAndSkipsHiddenPackagesAndLinks() started.
+✔ Test deepTreePropagatesMediaWithoutRecursiveCallsAndSkipsHiddenPackagesAndLinks() passed after 0.021 seconds.
+◇ Test unavailableFolderIsUnknown() started.
+✔ Test unavailableFolderIsUnknown() passed after 0.001 seconds.
+◇ Test repairTraversalSkipsConfirmedSiblingSubtrees() started.
+✔ Test repairTraversalSkipsConfirmedSiblingSubtrees() passed after 0.052 seconds.
+◇ Test eventBurstDoesNotRestartActiveJobAndRepairsAncestorStatus() started.
+✔ Test eventBurstDoesNotRestartActiveJobAndRepairsAncestorStatus() passed after 0.230 seconds.
+◇ Test listenerInvalidationAndManualRescanRefreshCachedResults() started.
+✔ Test listenerInvalidationAndManualRescanRefreshCachedResults() passed after 0.070 seconds.
+✔ Suite "Bounded source media scanner" passed after 0.472 seconds.
+◇ Suite "Native Picture in Picture geometry" started.
+◇ Test matchesSourceLayerBoundsToPictureInPictureViewport() started.
+✔ Test matchesSourceLayerBoundsToPictureInPictureViewport() passed after 0.001 seconds.
+◇ Test preservesQuarterTurnTransformGeometry() started.
+✔ Test preservesQuarterTurnTransformGeometry() passed after 0.001 seconds.
+◇ Test inactivePictureInPictureUsesThePlayerViewport() started.
+✔ Test inactivePictureInPictureUsesThePlayerViewport() passed after 0.001 seconds.
+◇ Test composedPictureInPictureSuppressesAndRestoresTheMainSurface() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test composedPictureInPictureSuppressesAndRestoresTheMainSurface() passed after 0.402 seconds.
+◇ Test mouseMovementOnNativeSurfaceDefersToWindowRevealPolicy() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test mouseMovementOnNativeSurfaceDefersToWindowRevealPolicy() passed after 0.006 seconds.
+✔ Suite "Native Picture in Picture geometry" passed after 0.410 seconds.
+◇ Suite "Native damaged-stream hardening policies" started.
+◇ Test demuxRetryBudgetSeparatesCorruptionFromOtherErrors() started.
+✔ Test demuxRetryBudgetSeparatesCorruptionFromOtherErrors() passed after 0.001 seconds.
+◇ Test demuxRetryBudgetNeverRetriesInterruptionOrExpiredProgress() started.
+✔ Test demuxRetryBudgetNeverRetriesInterruptionOrExpiredProgress() passed after 0.001 seconds.
+◇ Test audioSanitizationZerosInvalidSamplesOnly() started.
+✔ Test audioSanitizationZerosInvalidSamplesOnly() passed after 0.001 seconds.
+◇ Test softwareDecodeProgressResetsOnSuccessfulFrame() started.
+✔ Test softwareDecodeProgressResetsOnSuccessfulFrame() passed after 0.001 seconds.
+◇ Test timestampValidatorDropsSmallBackwardPTSAndSegmentsLargeJumps() started.
+✔ Test timestampValidatorDropsSmallBackwardPTSAndSegmentsLargeJumps() passed after 0.001 seconds.
+◇ Test h264DecoderAdvertisesVideoToolboxConfiguration() started.
+✔ Test h264DecoderAdvertisesVideoToolboxConfiguration() passed after 0.002 seconds.
+◇ Test unknownDecoderDoesNotAdvertiseVideoToolboxConfiguration() started.
+✔ Test unknownDecoderDoesNotAdvertiseVideoToolboxConfiguration() passed after 0.001 seconds.
+◇ Test audioPresentationRecoveryFlushesThenReplacesRenderer() started.
+✔ Test audioPresentationRecoveryFlushesThenReplacesRenderer() passed after 0.127 seconds.
+✔ Suite "Native damaged-stream hardening policies" passed after 0.132 seconds.
+◇ Suite "Native player click routing" started.
+◇ Test singleClickWaitsForDoubleClickInterval() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test singleClickWaitsForDoubleClickInterval() passed after 0.565 seconds.
+◇ Test doubleClickCancelsSingleClick(x:) started.
+◇ Test case passing 1 argument x → 20.0 to doubleClickCancelsSingleClick(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+◇ Test case passing 1 argument x → 200.0 to doubleClickCancelsSingleClick(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+◇ Test case passing 1 argument x → 380.0 to doubleClickCancelsSingleClick(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test doubleClickCancelsSingleClick(x:) with 3 test cases passed after 1.877 seconds.
+◇ Test continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) started.
+◇ Test case passing 1 argument x → 20.0 to continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+◇ Test case passing 1 argument x → 200.0 to continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+◇ Test case passing 1 argument x → 380.0 to continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test continuedTapsSeekWithoutRepeatedFullscreenToggles(x:) with 3 test cases passed after 0.027 seconds.
+◇ Test rejectedPressesDoNotSeek() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test rejectedPressesDoNotSeek() passed after 0.005 seconds.
+◇ Test detachingSurfaceCancelsPendingSingleClick() started.
+[ass-compositor] selected=metal-r8 activation=success
+✔ Test detachingSurfaceCancelsPendingSingleClick() passed after 0.621 seconds.
+✔ Suite "Native player click routing" passed after 3.098 seconds.
+◇ Suite "Native subtitle render policy" started.
+◇ Test rendersOnlyForAnEnabledActiveSubtitleSource() started.
+✔ Test rendersOnlyForAnEnabledActiveSubtitleSource() passed after 0.001 seconds.
+◇ Test subtitlePacketArrivalInvalidatesTheCurrentPresentationTime() started.
+✔ Test subtitlePacketArrivalInvalidatesTheCurrentPresentationTime() passed after 0.001 seconds.
+✔ Suite "Native subtitle render policy" passed after 0.001 seconds.
+◇ Suite "Native playback foundations" started.
+◇ Test packagedMetalLibraryContainsEveryProductionShader() started.
+✔ Test packagedMetalLibraryContainsEveryProductionShader() passed after 0.002 seconds.
+◇ Test headlessSubtitleOverlayDoesNotInitializeMetal() started.
+✔ Test headlessSubtitleOverlayDoesNotInitializeMetal() passed after 0.001 seconds.
+◇ Test surfaceCreationLeavesPictureInPictureSubtitleInfrastructureDeferred() started.
+[ass-compositor] selected=metal-r8 activation=success
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793595715.954163 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+✔ Test surfaceCreationLeavesPictureInPictureSubtitleInfrastructureDeferred() passed after 0.065 seconds.
+◇ Test cancellationBeforeOpenAdmissionRemainsVisibleToNativeInput() started.
+✔ Test cancellationBeforeOpenAdmissionRemainsVisibleToNativeInput() passed after 0.001 seconds.
+◇ Test formatCompletionRequiresTheExactRevisionAndShutdownCancelsWaiters() started.
+✔ Test formatCompletionRequiresTheExactRevisionAndShutdownCancelsWaiters() passed after 0.001 seconds.
+◇ Test rendererClockAdvanceIsGenerationScopedAndRequiresMovement() started.
+✔ Test rendererClockAdvanceIsGenerationScopedAndRequiresMovement() passed after 0.001 seconds.
+◇ Test softwareBGRAOutputPoolBoundsAndReusesAllocations() started.
+✔ Test softwareBGRAOutputPoolBoundsAndReusesAllocations() passed after 0.022 seconds.
+◇ Test softwareBGRAOutputPoolCheckoutHonorsCancellation() started.
+✔ Test softwareBGRAOutputPoolCheckoutHonorsCancellation() passed after 0.002 seconds.
+◇ Test videoFrameCapacityGateReservesBeforeSurfaceCheckout() started.
+✔ Test videoFrameCapacityGateReservesBeforeSurfaceCheckout() passed after 0.001 seconds.
+◇ Test videoFrameCapacityGateCloseCancelsBlockedAcquisition() started.
+✔ Test videoFrameCapacityGateCloseCancelsBlockedAcquisition() passed after 0.009 seconds.
+◇ Test rationalToCMTimePreservesTimestamp() started.
+✔ Test rationalToCMTimePreservesTimestamp() passed after 0.001 seconds.
+◇ Test timestampRoundTripUsesRequestedTimeBase() started.
+✔ Test timestampRoundTripUsesRequestedTimeBase() passed after 0.001 seconds.
+◇ Test boundedQueueAppliesFIFOAndBounds() started.
+✔ Test boundedQueueAppliesFIFOAndBounds() passed after 0.001 seconds.
+◇ Test boundedQueueBackpressuresProducerUntilCapacityIsAvailable() started.
+✔ Test boundedQueueBackpressuresProducerUntilCapacityIsAvailable() passed after 0.032 seconds.
+◇ Test boundedQueueAppliesByteAndDurationGrants() started.
+✔ Test boundedQueueAppliesByteAndDurationGrants() passed after 0.032 seconds.
+◇ Test queueInvalidationPreemptsAProducerBlockedOnDataCapacity() started.
+✔ Test queueInvalidationPreemptsAProducerBlockedOnDataCapacity() passed after 0.001 seconds.
+◇ Test nonblockingQueuePushReportsCapacityWithoutSleeping() started.
+✔ Test nonblockingQueuePushReportsCapacityWithoutSleeping() passed after 0.001 seconds.
+◇ Test interleavingRouterFeedsAudioAroundFullVideoWithoutReordering() started.
+✔ Test interleavingRouterFeedsAudioAroundFullVideoWithoutReordering() passed after 0.001 seconds.
+◇ Test inputCancellationTargetsOnlyTheActiveEffect() started.
+✔ Test inputCancellationTargetsOnlyTheActiveEffect() passed after 0.001 seconds.
+◇ Test inputCancellationRemainsStickyUntilTheNextReadBegins() started.
+✔ Test inputCancellationRemainsStickyUntilTheNextReadBegins() passed after 0.001 seconds.
+◇ Test acceptedSeekClearsDeferredReadCancellation() started.
+✔ Test acceptedSeekClearsDeferredReadCancellation() passed after 0.001 seconds.
+◇ Test inputQuarantineIsStrictlyBoundedByWorkersAndBytes() started.
+✔ Test inputQuarantineIsStrictlyBoundedByWorkersAndBytes() passed after 0.001 seconds.
+◇ Test blockingInputWaitIsBoundedAndRequestsExactCancellation() started.
+✔ Test blockingInputWaitIsBoundedAndRequestsExactCancellation() passed after 0.023 seconds.
+◇ Test exactSeekTrimsAudioAtTheFirstSampleOnOrAfterTarget() started.
+✔ Test exactSeekTrimsAudioAtTheFirstSampleOnOrAfterTarget() passed after 0.001 seconds.
+◇ Test resampledAudioBuffersUseAContinuousOutputClock() started.
+✔ Test resampledAudioBuffersUseAContinuousOutputClock() passed after 0.001 seconds.
+◇ Test resampledAudioClockPreservesRealGapsAndResets() started.
+✔ Test resampledAudioClockPreservesRealGapsAndResets() passed after 0.001 seconds.
+◇ Test queuedHorizonsNeverProducePresentationDriftCorrection() started.
+✔ Test queuedHorizonsNeverProducePresentationDriftCorrection() passed after 0.001 seconds.
+◇ Test pixelBufferExhaustionIsNotClassifiedAsDecoderFallback() started.
+✔ Test pixelBufferExhaustionIsNotClassifiedAsDecoderFallback() passed after 0.001 seconds.
+◇ Test hardwareDecodeFailureCarriesConsecutiveCount() started.
+✔ Test hardwareDecodeFailureCarriesConsecutiveCount() passed after 0.001 seconds.
+◇ Test observationMetricsSeparateSourcesCoalescingAndUrgentDelay() started.
+✔ Test observationMetricsSeparateSourcesCoalescingAndUrgentDelay() passed after 0.001 seconds.
+◇ Test periodicMetricsExposeObservationSourceCounts() started.
+✔ Test periodicMetricsExposeObservationSourceCounts() passed after 0.001 seconds.
+◇ Test generationRejectsStaleOutput() started.
+✔ Test generationRejectsStaleOutput() passed after 0.001 seconds.
+◇ Test synchronizationMetricsTrackWorstDifferenceAndDrift() started.
+✔ Test synchronizationMetricsTrackWorstDifferenceAndDrift() passed after 0.001 seconds.
+◇ Test synchronizationMetricsExcludePrerollAndFinalDrainFromSteadyDrift() started.
+✔ Test synchronizationMetricsExcludePrerollAndFinalDrainFromSteadyDrift() passed after 0.001 seconds.
+◇ Test displayCapabilitiesIdentifySDRAndEDRDisplays() started.
+✔ Test displayCapabilitiesIdentifySDRAndEDRDisplays() passed after 0.001 seconds.
+◇ Test latestSeekReplacesPendingSeek() started.
+✔ Test latestSeekReplacesPendingSeek() passed after 0.001 seconds.
+◇ Test completedOlderSeekCannotOverwriteNewPendingPhase() started.
+✔ Test completedOlderSeekCannotOverwriteNewPendingPhase() passed after 0.001 seconds.
+◇ Test viewportAspectFitsLetterboxAndPillarbox() started.
+✔ Test viewportAspectFitsLetterboxAndPillarbox() passed after 0.001 seconds.
+◇ Test subtitleCoordinatesMapIntoViewport() started.
+✔ Test subtitleCoordinatesMapIntoViewport() passed after 0.001 seconds.
+◇ Test externalSubtitleReaderStopsAtItsConfiguredByteLimit() started.
+✔ Test externalSubtitleReaderStopsAtItsConfiguredByteLimit() passed after 0.002 seconds.
+◇ Test fontAttachmentDetectionUsesExtensionAndMime() started.
+✔ Test fontAttachmentDetectionUsesExtensionAndMime() passed after 0.207 seconds.
+◇ Test fontAttachmentValidationRejectsAggregateBytesBeforeRegistration() started.
+✔ Test fontAttachmentValidationRejectsAggregateBytesBeforeRegistration() passed after 0.001 seconds.
+✔ Suite "Native playback foundations" passed after 0.419 seconds.
+◇ Suite "Global thumbnail cache" started.
+◇ Test residentEntryLimitEvictsEvenBelowByteBudget() started.
+✔ Test residentEntryLimitEvictsEvenBelowByteBudget() passed after 0.005 seconds.
+◇ Test protectedEntryLimitRejectsSpeculativeDecode() started.
+✔ Test protectedEntryLimitRejectsSpeculativeDecode() passed after 0.001 seconds.
+◇ Test storyboardApproximationLoadsFromDiskAfterRestart() started.
+✔ Test storyboardApproximationLoadsFromDiskAfterRestart() passed after 0.098 seconds.
+◇ Test localPreparationCannotEvictStoryboardButPressureCan() started.
+✔ Test localPreparationCannotEvictStoryboardButPressureCan() passed after 0.001 seconds.
+◇ Test memoryPressureReclaimsSpeculativeImagesFirstAndPreservesDisk() started.
+✔ Test memoryPressureReclaimsSpeculativeImagesFirstAndPreservesDisk() passed after 0.003 seconds.
+◇ Test backgroundCannotEvictForegroundWhenMemoryIsFull() started.
+✔ Test backgroundCannotEvictForegroundWhenMemoryIsFull() passed after 0.001 seconds.
+◇ Test foregroundHitPromotesSpeculativeMemoryAndShrinkingEvictsBackgroundFirst() started.
+✔ Test foregroundHitPromotesSpeculativeMemoryAndShrinkingEvictsBackgroundFirst() passed after 0.001 seconds.
+◇ Test foregroundInsertPromotesAnExistingBackgroundResident() started.
+✔ Test foregroundInsertPromotesAnExistingBackgroundResident() passed after 0.001 seconds.
+◇ Test foregroundPromotionSurvivesWriterPressureAndInFlightEncoding() started.
+✔ Test foregroundPromotionSurvivesWriterPressureAndInFlightEncoding() passed after 0.009 seconds.
+◇ Test diskRoundTripStableIdentityAndClear() started.
+✔ Test diskRoundTripStableIdentityAndClear() passed after 0.001 seconds.
+◇ Test fileReplacementChangesKeyAndCorruptDiskEntryIsDiscarded() started.
+✔ Test fileReplacementChangesKeyAndCorruptDiskEntryIsDiscarded() passed after 0.001 seconds.
+◇ Test sourceSwitchReusesGlobalImages() started.
+✔ Test sourceSwitchReusesGlobalImages() passed after 0.001 seconds.
+◇ Test nearbyLookupNeverCrossesFileVersionOrRequestedSize() started.
+✔ Test nearbyLookupNeverCrossesFileVersionOrRequestedSize() passed after 0.001 seconds.
+◇ Test settingDiskBudgetToZeroRemovesPreviouslyPersistedEntries() started.
+✔ Test settingDiskBudgetToZeroRemovesPreviouslyPersistedEntries() passed after 0.001 seconds.
+◇ Test decoderReleaseIsSerializedAfterNativeOwnershipEnds() started.
+✔ Test decoderReleaseIsSerializedAfterNativeOwnershipEnds() passed after 0.001 seconds.
+◇ Test idleCleanupDoesNotCancelANewerDecode() started.
+✔ Test idleCleanupDoesNotCancelANewerDecode() passed after 0.001 seconds.
+◇ Test clearCannotBeUndoneByQueuedPersistence() started.
+✔ Test clearCannotBeUndoneByQueuedPersistence() passed after 0.001 seconds.
+◇ Test symlinkVersionTracksTheTargetRatherThanTheLink() started.
+✔ Test symlinkVersionTracksTheTargetRatherThanTheLink() passed after 0.001 seconds.
+◇ Test stalledMetadataHasBoundedCallersAndOnePhysicalOwner() started.
+✔ Test stalledMetadataHasBoundedCallersAndOnePhysicalOwner() passed after 0.063 seconds.
+✔ Suite "Global thumbnail cache" passed after 0.194 seconds.
+◇ Suite "Playback performance boundaries" started.
+◇ Test expiredThumbnailCanRecoverAfterTheBlockedNativeCallReturns() started.
+✔ Test expiredThumbnailCanRecoverAfterTheBlockedNativeCallReturns() passed after 1.531 seconds.
+◇ Test thumbnailInvalidationRetainsThePhysicalSlotUntilNativeReturns() started.
+✔ Test thumbnailInvalidationRetainsThePhysicalSlotUntilNativeReturns() passed after 0.001 seconds.
+◇ Test pendingThumbnailDeadlineIncludesTimeBehindBlockedDecode() started.
+✔ Test pendingThumbnailDeadlineIncludesTimeBehindBlockedDecode() passed after 1.524 seconds.
+◇ Test seekTimingsKeepFirstEvidenceAndRejectRetiredGenerations() started.
+✔ Test seekTimingsKeepFirstEvidenceAndRejectRetiredGenerations() passed after 0.001 seconds.
+◇ Test thumbnailRejectsNonrepresentableTimesAndSizesWithoutTrapping() started.
+✔ Test thumbnailRejectsNonrepresentableTimesAndSizesWithoutTrapping() passed after 0.001 seconds.
+◇ Test prunedEmbeddedCuesCanBeDecodedAgainAfterSeekingBackward() started.
+[ass-compositor] selected=metal-r8 activation=success
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] fontselect: (sans-serif, 400, 0) -> /System/Library/Fonts/Helvetica.ttc, -1, Helvetica
+✔ Test prunedEmbeddedCuesCanBeDecodedAgainAfterSeekingBackward() passed after 0.032 seconds.
+◇ Test ringBufferWrapsPrependsAndReleasesRemovedEntries() started.
+✔ Test ringBufferWrapsPrependsAndReleasesRemovedEntries() passed after 0.001 seconds.
+◇ Test subtitleReaderWaitsForProgressAndSeekInvalidatesOldRead() started.
+✔ Test subtitleReaderWaitsForProgressAndSeekInvalidatesOldRead() passed after 0.001 seconds.
+◇ Test closingReadAheadWakesBlockedInput() started.
+✔ Test closingReadAheadWakesBlockedInput() passed after 0.001 seconds.
+◇ Test thumbnailWorkerKeepsOneActiveAndOnlyTheLatestPendingRequest() started.
+✔ Test thumbnailWorkerKeepsOneActiveAndOnlyTheLatestPendingRequest() passed after 0.001 seconds.
+✔ Suite "Playback performance boundaries" passed after 3.092 seconds.
+◇ Suite SubtitleSeekRegressionTests started.
+◇ Test seekRecoveryClearsOnlyThePreviousInterruption() started.
+✔ Test seekRecoveryClearsOnlyThePreviousInterruption() passed after 0.001 seconds.
+◇ Test failedSubtitleReaderHonorsSeekDisableAndStop(action:errorCode:) started.
+◇ Test case passing 2 arguments action → "seek", errorCode → -1414092869 to failedSubtitleReaderHonorsSeekDisableAndStop(action:errorCode:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793595719.620892 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+◇ Test case passing 2 arguments action → "seek", errorCode → -1094995529 to failedSubtitleReaderHonorsSeekDisableAndStop(action:errorCode:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793595719.631712 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+◇ Test case passing 2 arguments action → "disable", errorCode → -1414092869 to failedSubtitleReaderHonorsSeekDisableAndStop(action:errorCode:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793595719.635987 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+◇ Test case passing 2 arguments action → "disable", errorCode → -1094995529 to failedSubtitleReaderHonorsSeekDisableAndStop(action:errorCode:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793595719.639699 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+◇ Test case passing 2 arguments action → "stop", errorCode → -1414092869 to failedSubtitleReaderHonorsSeekDisableAndStop(action:errorCode:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793595719.645076 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+◇ Test case passing 2 arguments action → "stop", errorCode → -1094995529 to failedSubtitleReaderHonorsSeekDisableAndStop(action:errorCode:) started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793595719.649844 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+✔ Test failedSubtitleReaderHonorsSeekDisableAndStop(action:errorCode:) with 6 test cases passed after 0.050 seconds.
+◇ Test persistentSubtitleReadErrorsStopInsteadOfSpinning() started.
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+subtitle-read-error code=-1094995529 reads=1 failures=1
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793595719.661292 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+[ass] libass API version: 0x1705000
+[ass] libass source: tarball: 0.17.5
+[ass] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 14.5.1 (COMPLEX)
+[ass] Using font provider coretext
+subtitle-read-error code=-1414092869 reads=1 failures=1
+[ass-compositor-summary] selected=metal-r8 metal-frames=0 metal-clears=0 failure-count=0 last-failure=none drawable-failures=0 command-buffer-failures=0
+[ass-profile-summary] epoch=1793595719.671314 selected=metal-r8 failure-count=0 requests=0 duplicate-requests=0 superseded-before-libass=0 libass-calls=0 libass-changed=0 libass-unchanged=0 libass-config-requests=0 libass-geometry-changes=0 libass-render-ms=0.000 libass-copy-ms=0.000 resource-limit-rejections=0 superseded-after-libass=0 superseded-before-upload=0 images=0 mask-bytes=0 packing-ms=0.000 atlas-reallocations=0 atlas-clear-bytes=0 atlas-max=0x0 uploads=0 upload-bytes=0 quads=0 metal-frames=0 metal-failures=0 drawables=0 drawable-failures=0 command-buffers=0 command-buffer-failures=0 texture-allocation-failures=0 buffer-allocation-failures=0 main-ops=0 main-ms=0.000
+✔ Test persistentSubtitleReadErrorsStopInsteadOfSpinning() passed after 0.021 seconds.
+◇ Test cancelledSubtitleReadCanSeekAndReadAgain() started.
+✔ Test cancelledSubtitleReadCanSeekAndReadAgain() passed after 0.002 seconds.
+➜ Test realMediaTextSubtitleSeeksRemainUsable() skipped.
+➜ Test realMediaCancelledSubtitleReadsRecover() skipped.
+✔ Suite SubtitleSeekRegressionTests passed after 0.074 seconds.
+◇ Suite "Thumbnail completion deadlines" started.
+◇ Test metadataCompletionChecksTimeWithoutWaitingForTimer(_:) started.
+◇ Test case passing 1 argument elapsed → 0 to metadataCompletionChecksTimeWithoutWaitingForTimer(_:) started.
+◇ Test case passing 1 argument elapsed → 60 to metadataCompletionChecksTimeWithoutWaitingForTimer(_:) started.
+◇ Test case passing 1 argument elapsed → 61 to metadataCompletionChecksTimeWithoutWaitingForTimer(_:) started.
+✔ Test metadataCompletionChecksTimeWithoutWaitingForTimer(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test decodeCompletionChecksTimeWithoutWaitingForTimer(_:) started.
+◇ Test case passing 1 argument elapsed → 0 to decodeCompletionChecksTimeWithoutWaitingForTimer(_:) started.
+◇ Test case passing 1 argument elapsed → 60 to decodeCompletionChecksTimeWithoutWaitingForTimer(_:) started.
+◇ Test case passing 1 argument elapsed → 61 to decodeCompletionChecksTimeWithoutWaitingForTimer(_:) started.
+✔ Test decodeCompletionChecksTimeWithoutWaitingForTimer(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test expiredPendingRequestDoesNotStartNativeDecode() started.
+✔ Test expiredPendingRequestDoesNotStartNativeDecode() passed after 0.001 seconds.
+✔ Suite "Thumbnail completion deadlines" passed after 0.001 seconds.
+◇ Suite "Playback takes priority over thumbnail decoding" started.
+◇ Test suspensionCancelsActiveAndPendingButRetainsNativeOwnership() started.
+✔ Test suspensionCancelsActiveAndPendingButRetainsNativeOwnership() passed after 0.006 seconds.
+◇ Test oldAdmissionCannotReviveAfterSeekFinishes() started.
+✔ Test oldAdmissionCannotReviveAfterSeekFinishes() passed after 0.001 seconds.
+◇ Test suspensionInterruptsAnActiveDecodeWithoutAReplacementRequest() started.
+✔ Test suspensionInterruptsAnActiveDecodeWithoutAReplacementRequest() passed after 0.001 seconds.
+◇ Test cachedImagesRemainAvailableDuringPlaybackRecovery() started.
+✔ Test cachedImagesRemainAvailableDuringPlaybackRecovery() passed after 0.001 seconds.
+✔ Suite "Playback takes priority over thumbnail decoding" passed after 0.008 seconds.
+◇ Suite "Thumbnail request priority" started.
+◇ Test pendingHoverGetsForegroundPriorityAfterBackgroundNativeOwnershipEnds() started.
+✔ Test pendingHoverGetsForegroundPriorityAfterBackgroundNativeOwnershipEnds() passed after 0.006 seconds.
+✔ Suite "Thumbnail request priority" passed after 0.006 seconds.
+◇ Suite "Compact completed-effect history" started.
+◇ Test consecutiveHistoryUsesOnlyAPrefixWithoutForgettingOldIDs() started.
+✔ Test consecutiveHistoryUsesOnlyAPrefixWithoutForgettingOldIDs() passed after 0.066 seconds.
+◇ Test outOfOrderCompletionsFillHolesAndDuplicatesDoNotChangeHistory() started.
+✔ Test outOfOrderCompletionsFillHolesAndDuplicatesDoNotChangeHistory() passed after 0.001 seconds.
+◇ Test closingManyCompletionGapsReleasesTheirPeakStorage() started.
+✔ Test closingManyCompletionGapsReleasesTheirPeakStorage() passed after 0.004 seconds.
+◇ Test anEarlyGapKeepsLaterIDsInASetUntilItActuallyCompletes() started.
+✔ Test anEarlyGapKeepsLaterIDsInASetUntilItActuallyCompletes() passed after 0.010 seconds.
+◇ Test zeroAndMaximumIDsDoNotOverflowOrBridgeMissingHistory() started.
+✔ Test zeroAndMaximumIDsDoNotOverflowOrBridgeMissingHistory() passed after 0.001 seconds.
+◇ Test randomizedHistoryMatchesSetIncludingSparseAndRepeatedIDs() started.
+✔ Test randomizedHistoryMatchesSetIncludingSparseAndRepeatedIDs() passed after 0.637 seconds.
+◇ Test shuffledCompleteHistoriesDrainToTheSameCanonicalPrefix() started.
+✔ Test shuffledCompleteHistoriesDrainToTheSameCanonicalPrefix() passed after 0.274 seconds.
+◇ Test publicSetMutationsAndValueCopiesKeepTheirOriginalSemantics() started.
+✔ Test publicSetMutationsAndValueCopiesKeepTheirOriginalSemantics() passed after 0.001 seconds.
+◇ Test stateCodablePreservesLegacySetFieldAndCanonicalReplay() started.
+✔ Test stateCodablePreservesLegacySetFieldAndCanonicalReplay() passed after 0.001 seconds.
+◇ Test productionCoreRetainsDuplicateClassificationAfterLongHistory() started.
+✔ Test productionCoreRetainsDuplicateClassificationAfterLongHistory() passed after 0.577 seconds.
+◇ Test outstandingHolesRemainLiveUntilTheirOwnResultsArrive() started.
+✔ Test outstandingHolesRemainLiveUntilTheirOwnResultsArrive() passed after 0.004 seconds.
+◇ Test arbitraryInitialIDsDoNotTurnUnknownIDsIntoDuplicates() started.
+✔ Test arbitraryInitialIDsDoNotTurnUnknownIDsIntoDuplicates() passed after 0.001 seconds.
+✔ Suite "Compact completed-effect history" passed after 1.579 seconds.
+◇ Suite "Deterministic playback core" started.
+◇ Test loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() started.
+✔ Test loadBecomesPlayingOnlyAfterOpenAndRateAcknowledgments() passed after 0.001 seconds.
+◇ Test pausedLoadDoesNotRequestNonzeroRate() started.
+✔ Test pausedLoadDoesNotRequestNonzeroRate() passed after 0.001 seconds.
+◇ Test replacementKeepsCommittedSourceUntilCandidatePrerollCommits() started.
+✔ Test replacementKeepsCommittedSourceUntilCandidatePrerollCommits() passed after 0.001 seconds.
+◇ Test failedReplacementDiscardsPendingSourceWithoutMutatingCommittedAuthority() started.
+✔ Test failedReplacementDiscardsPendingSourceWithoutMutatingCommittedAuthority() passed after 0.001 seconds.
+◇ Test staleGenerationResultCannotResumeAfterSeek() started.
+✔ Test staleGenerationResultCannotResumeAfterSeek() passed after 0.001 seconds.
+◇ Test duplicateCompletionIsIdempotent() started.
+✔ Test duplicateCompletionIsIdempotent() passed after 0.001 seconds.
+◇ Test directEffectResultRetiresPendingRuntimeEffect() started.
+✔ Test directEffectResultRetiresPendingRuntimeEffect() passed after 0.001 seconds.
+◇ Test shutdownRequiresCleanupAcknowledgmentAndThenEmitsNothing() started.
+✔ Test shutdownRequiresCleanupAcknowledgmentAndThenEmitsNothing() passed after 0.001 seconds.
+◇ Test invalidTimeAndInvalidSeekAreRejectedWithoutEffects() started.
+✔ Test invalidTimeAndInvalidSeekAreRejectedWithoutEffects() passed after 0.001 seconds.
+◇ Test checkpointAndDiagnosticEventsCarryDeterministicIdentity() started.
+✔ Test checkpointAndDiagnosticEventsCarryDeterministicIdentity() passed after 0.001 seconds.
+◇ Test subtitleInvalidationOwnsRevisionsClearAndFinalCommitFence() started.
+✔ Test subtitleInvalidationOwnsRevisionsClearAndFinalCommitFence() passed after 0.001 seconds.
+◇ Test aggregateSeekAcknowledgmentRestoresRateOnlyAfterNativePreroll() started.
+✔ Test aggregateSeekAcknowledgmentRestoresRateOnlyAfterNativePreroll() passed after 0.001 seconds.
+◇ Test relativeSeekResolvesFromAcceptedClockAndAccumulatesPendingIntent() started.
+✔ Test relativeSeekResolvesFromAcceptedClockAndAccumulatesPendingIntent() passed after 0.001 seconds.
+◇ Test catalogDefaultsAndDrainFinalizationAreDeterministicAndExactlyOnce() started.
+✔ Test catalogDefaultsAndDrainFinalizationAreDeterministicAndExactlyOnce() passed after 0.001 seconds.
+◇ Test duplicateEOFInSameGenerationPreservesObservedDrainProgress() started.
+✔ Test duplicateEOFInSameGenerationPreservesObservedDrainProgress() passed after 0.001 seconds.
+◇ Test failedEOFCheckpointCannotAdvanceAndLateSuccessCannotReplaceNewMedia() started.
+✔ Test failedEOFCheckpointCannotAdvanceAndLateSuccessCannotReplaceNewMedia() passed after 0.001 seconds.
+◇ Test aggregateDuplicateEOFCannotSkipExistingDrainObligations() started.
+✔ Test aggregateDuplicateEOFCannotSkipExistingDrainObligations() passed after 0.001 seconds.
+◇ Test acceptedNewSeekGenerationRearmsFinalizedEOFCycle() started.
+✔ Test acceptedNewSeekGenerationRearmsFinalizedEOFCycle() passed after 0.001 seconds.
+◇ Test shutdownCleanupFailuresBecomeExplicitExternalWaits() started.
+✔ Test shutdownCleanupFailuresBecomeExplicitExternalWaits() passed after 0.001 seconds.
+◇ Test shutdownRejectsLateRawFactsBeforeTheyCanEmitPlaybackWork() started.
+✔ Test shutdownRejectsLateRawFactsBeforeTheyCanEmitPlaybackWork() passed after 0.001 seconds.
+◇ Test failedTrackReplacementRestoresPrerollAuthorityWithPriorPlayback() started.
+✔ Test failedTrackReplacementRestoresPrerollAuthorityWithPriorPlayback() passed after 0.001 seconds.
+◇ Test subtitleInvalidationDoesNotStrandInFlightSubtitleSelection() started.
+✔ Test subtitleInvalidationDoesNotStrandInFlightSubtitleSelection() passed after 0.001 seconds.
+◇ Test subtitleInvalidationDoesNotStrandTrackResumeRate() started.
+✔ Test subtitleInvalidationDoesNotStrandTrackResumeRate() passed after 0.001 seconds.
+◇ Test aggregatePrerollIsTheOnlyStartupRateAuthority() started.
+✔ Test aggregatePrerollIsTheOnlyStartupRateAuthority() passed after 0.001 seconds.
+◇ Test lateCatalogMetadataDoesNotRearmSatisfiedStartupPreroll() started.
+✔ Test lateCatalogMetadataDoesNotRearmSatisfiedStartupPreroll() passed after 0.001 seconds.
+◇ Test invariantRejectsPlaybackBeforeCurrentPrerollObligation() started.
+✔ Test invariantRejectsPlaybackBeforeCurrentPrerollObligation() passed after 0.001 seconds.
+◇ Test recoveryBudgetIsScopedToMediaSessionAndSelectedVideoLineage() started.
+✔ Test recoveryBudgetIsScopedToMediaSessionAndSelectedVideoLineage() passed after 0.001 seconds.
+◇ Test retryableVideoDecodeFailureDoesNotReachUserFacingSnapshot() started.
+✔ Test retryableVideoDecodeFailureDoesNotReachUserFacingSnapshot() passed after 0.001 seconds.
+◇ Test presentationRecoveryIsScopedThenRebuildsOnceBeforeTerminalFailure() started.
+✔ Test presentationRecoveryIsScopedThenRebuildsOnceBeforeTerminalFailure() passed after 0.001 seconds.
+◇ Test presentationRecoveryBudgetSurvivesRevisionAdvances() started.
+✔ Test presentationRecoveryBudgetSurvivesRevisionAdvances() passed after 0.001 seconds.
+◇ Test synchronizationOwnsPrerollBufferingDriftAndRateAcknowledgment() started.
+✔ Test synchronizationOwnsPrerollBufferingDriftAndRateAcknowledgment() passed after 0.001 seconds.
+◇ Test lifecycleReducerRemembersExactlyOneResumeAfterWakeDecision() started.
+✔ Test lifecycleReducerRemembersExactlyOneResumeAfterWakeDecision() passed after 0.001 seconds.
+◇ Test trackIntentsAreDistinctAndRollbackKeepsOldEffectiveSelection() started.
+✔ Test trackIntentsAreDistinctAndRollbackKeepsOldEffectiveSelection() passed after 0.001 seconds.
+◇ Test controlReducerOwnsRequestedAndAppliedSubtitleDelay() started.
+✔ Test controlReducerOwnsRequestedAndAppliedSubtitleDelay() passed after 0.001 seconds.
+✔ Suite "Deterministic playback core" passed after 0.024 seconds.
+◇ Suite "Optional track recovery" started.
+◇ Test audioDecodeFailureDisablesAudioWhenVideoCanContinue() started.
+✔ Test audioDecodeFailureDisablesAudioWhenVideoCanContinue() passed after 0.001 seconds.
+◇ Test subtitleReadFailureDisablesOnlyTheSubtitleTrack() started.
+✔ Test subtitleReadFailureDisablesOnlyTheSubtitleTrack() passed after 0.001 seconds.
+◇ Test audioPresentationFlushesThenRebuildsThenDisables() started.
+✔ Test audioPresentationFlushesThenRebuildsThenDisables() passed after 0.001 seconds.
+◇ Test audioOnlyDecodeFailureRemainsTerminal() started.
+✔ Test audioOnlyDecodeFailureRemainsTerminal() passed after 0.001 seconds.
+◇ Test recoveryStateDecodesDocumentsFromBeforeOptionalTrackBudgets() started.
+✔ Test recoveryStateDecodesDocumentsFromBeforeOptionalTrackBudgets() passed after 0.001 seconds.
+✔ Suite "Optional track recovery" passed after 0.004 seconds.
+◇ Suite "Playback core replay" started.
+◇ Test canonicalEncodingIgnoresSetAndDictionaryInsertionHistory() started.
+✔ Test canonicalEncodingIgnoresSetAndDictionaryInsertionHistory() passed after 0.005 seconds.
+◇ Test recordedTraceRoundTripsWithStableBytesAndReplays() started.
+✔ Test recordedTraceRoundTripsWithStableBytesAndReplays() passed after 0.044 seconds.
+◇ Test invariantFailureIsShrunkByStatelessness() started.
+✔ Test invariantFailureIsShrunkByStatelessness() passed after 0.137 seconds.
+✔ Suite "Playback core replay" passed after 0.187 seconds.
+◇ Suite "Playback session host" started.
+◇ Test productionModeRetainsNoStepHistory() started.
+✔ Test productionModeRetainsNoStepHistory() passed after 0.001 seconds.
+◇ Test seededSequencesRemainDeterministicAndInvariantSafe() started.
+✔ Test seededSequencesRemainDeterministicAndInvariantSafe() passed after 0.373 seconds.
+✔ Suite "Playback session host" passed after 0.373 seconds.
+◇ Suite "Playback parity transport policies" started.
+◇ Test speedSurvivesPauseSeekWakeAndSourceReplacement() started.
+✔ Test speedSurvivesPauseSeekWakeAndSourceReplacement() passed after 0.001 seconds.
+◇ Test loopUsesOneExactSeekAndDoesNotLeakToAnotherFile() started.
+✔ Test loopUsesOneExactSeekAndDoesNotLeakToAnotherFile() passed after 0.001 seconds.
+✔ Suite "Playback parity transport policies" passed after 0.001 seconds.
+◇ Suite "Production model oracle" started.
+◇ Test sessionReproducesTheFrozenLegacyCore() started.
+✔ Test sessionReproducesTheFrozenLegacyCore() passed after 34.446 seconds.
+◇ Test stepCallbackReproducesTheFrozenLegacyCore() started.
+✔ Test stepCallbackReproducesTheFrozenLegacyCore() passed after 32.997 seconds.
+✔ Suite "Production model oracle" passed after 67.444 seconds.
+◇ Suite "Production model turn cost" started.
+◇ Test turnLatency() started.
+✔ Test turnLatency() passed after 0.001 seconds.
+✔ Suite "Production model turn cost" passed after 0.001 seconds.
+◇ Suite "Renderer recovery regression coverage" started.
+◇ Test actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → true, stage → .enqueue to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → true, stage → .flush to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → true, stage → .render to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → false, stage → .enqueue to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → false, stage → .flush to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+◇ Test case passing 2 arguments autoplay → false, stage → .render to actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) started.
+✔ Test actualCoreEscalatesAcrossCommittedRevisions(autoplay:stage:) with 6 test cases passed after 0.142 seconds.
+◇ Test lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoFlush, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoFlush, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoFlush, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .transientVideo, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .transientVideo, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .transientVideo, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioFlush, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioFlush, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioFlush, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableAudio, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableAudio, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableAudio, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableSubtitle, token → EffectResultKind(rawValue: "succeeded") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableSubtitle, token → EffectResultKind(rawValue: "failed") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+◇ Test case passing 2 arguments route → .disableSubtitle, token → EffectResultKind(rawValue: "cancelled") to lateRecoveryResultPreservesTerminalFailure(route:token:) started.
+✔ Test lateRecoveryResultPreservesTerminalFailure(route:token:) with 27 test cases passed after 0.009 seconds.
+◇ Test recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .videoFlush to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .videoRebuild to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .hardwareFallback to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .softwareRestart to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .transientVideo to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .audioFlush to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .audioRebuild to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .disableAudio to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+◇ Test case passing 1 argument route → .disableSubtitle to recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) started.
+✔ Test recoveryCompletionAfterItsDeadlineCannotRevivePlayback(route:) with 9 test cases passed after 0.002 seconds.
+◇ Test recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .videoFlush, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .videoFlush, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .videoRebuild, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .hardwareFallback, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .softwareRestart, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .audioFlush, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .audioFlush, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, useDeadline → true to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+◇ Test case passing 2 arguments route → .audioRebuild, useDeadline → false to recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) started.
+✔ Test recoveryRateResultCannotReviveTerminalFailure(route:useDeadline:) with 12 test cases passed after 0.004 seconds.
+◇ Test furtherFailureObservationsDoNotRestartATerminalSession() started.
+✔ Test furtherFailureObservationsDoNotRestartATerminalSession() passed after 0.003 seconds.
+◇ Test terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .enqueue, recoverability → .fatal to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .enqueue, recoverability → .cancelled to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .flush, recoverability → .fatal to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .flush, recoverability → .cancelled to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .render, recoverability → .fatal to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+◇ Test case passing 2 arguments stage → .render, recoverability → .cancelled to terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) started.
+✔ Test terminalPresentationClassificationDoesNotSpendRetryBudget(stage:recoverability:) with 6 test cases passed after 0.001 seconds.
+◇ Test pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .videoFlush to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .videoRebuild to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .hardwareFallback to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .softwareRestart to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .audioFlush to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+◇ Test case passing 1 argument route → .audioRebuild to pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) started.
+✔ Test pauseDuringRecoveryIsRespectedWithoutRequiringCurrentOperationID(route:) with 6 test cases passed after 0.002 seconds.
+◇ Test seekingDoesNotRefundTheRendererBudget() started.
+✔ Test seekingDoesNotRefundTheRendererBudget() passed after 0.001 seconds.
+◇ Test aNewLoadRestoresTheBudgetAfterTerminalFailure() started.
+✔ Test aNewLoadRestoresTheBudgetAfterTerminalFailure() passed after 0.001 seconds.
+◇ Test overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) started.
+◇ Test case passing 1 argument flushFirst → true to overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) started.
+◇ Test case passing 1 argument flushFirst → false to overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) started.
+✔ Test overlappingRendererRecoveriesStayTerminalRegardlessOfCallbackOrder(flushFirst:) with 2 test cases passed after 0.001 seconds.
+◇ Test persistenceAndTeardownStillCompleteAfterTerminalFailure() started.
+✔ Test persistenceAndTeardownStillCompleteAfterTerminalFailure() passed after 0.001 seconds.
+◇ Test failureOfARecoveryEffectIsNotErasedByAnOlderOptionalTrackCompletion() started.
+✔ Test failureOfARecoveryEffectIsNotErasedByAnOlderOptionalTrackCompletion() passed after 0.001 seconds.
+◇ Test automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .synchronization(IlliquidPlaybackModel.SynchronizationCoreEvent.supplyObserved(starved: true, cacheMicroseconds: 0)) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .synchronization(IlliquidPlaybackModel.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackModel.SynchronizedStream.video, revision: IlliquidPlaybackModel.MediaFormatRevisionID(rawValue: 1))) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .lifecycle(IlliquidPlaybackModel.LifecycleCoreEvent.systemWillSleep) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .lifecycle(IlliquidPlaybackModel.LifecycleCoreEvent.systemDidWake) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+◇ Test case passing 1 argument event → .demuxEndOfFile(requiredDrain: Set([])) to automaticObservationsCannotReopenATerminalRecovery(event:) started.
+✔ Test automaticObservationsCannotReopenATerminalRecovery(event:) with 5 test cases passed after 0.004 seconds.
+◇ Test otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackModel.PlaybackCommand.seek(target: IlliquidPlaybackModel.MediaTimestamp.valid(IlliquidPlaybackModel.ValidMediaTime(value: 12, timescale: 1)), mode: IlliquidPlaybackModel.SeekMode.exact)), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackModel.PlaybackCommand.seek(target: IlliquidPlaybackModel.MediaTimestamp.valid(IlliquidPlaybackModel.ValidMediaTime(value: 12, timescale: 1)), mode: IlliquidPlaybackModel.SeekMode.exact)), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackModel.PlaybackCommand.seek(target: IlliquidPlaybackModel.MediaTimestamp.valid(IlliquidPlaybackModel.ValidMediaTime(value: 12, timescale: 1)), mode: IlliquidPlaybackModel.SeekMode.exact)), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .synchronization(IlliquidPlaybackModel.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackModel.SynchronizedStream.video, revision: IlliquidPlaybackModel.MediaFormatRevisionID(rawValue: 1))), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .synchronization(IlliquidPlaybackModel.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackModel.SynchronizedStream.video, revision: IlliquidPlaybackModel.MediaFormatRevisionID(rawValue: 1))), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .synchronization(IlliquidPlaybackModel.SynchronizationCoreEvent.formatChanged(stream: IlliquidPlaybackModel.SynchronizedStream.video, revision: IlliquidPlaybackModel.MediaFormatRevisionID(rawValue: 1))), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .lifecycle(IlliquidPlaybackModel.LifecycleCoreEvent.systemDidWake), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .lifecycle(IlliquidPlaybackModel.LifecycleCoreEvent.systemDidWake), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .lifecycle(IlliquidPlaybackModel.LifecycleCoreEvent.systemDidWake), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackModel.PlaybackCommand.setSubtitleDelay(microseconds: 250000)), token → EffectResultKind(rawValue: "succeeded") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackModel.PlaybackCommand.setSubtitleDelay(microseconds: 250000)), token → EffectResultKind(rawValue: "failed") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+◇ Test case passing 2 arguments event → .command(IlliquidPlaybackModel.PlaybackCommand.setSubtitleDelay(microseconds: 250000)), token → EffectResultKind(rawValue: "cancelled") to otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) started.
+✔ Test otherPendingPlaybackResultsCannotBypassTheTerminalFence(event:token:) with 12 test cases passed after 0.005 seconds.
+◇ Test aLateDeadlineDoesNotReplaceTheFirstTerminalError() started.
+✔ Test aLateDeadlineDoesNotReplaceTheFirstTerminalError() passed after 0.001 seconds.
+◇ Test transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) started.
+◇ Test case passing 1 argument command → .play to transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) started.
+◇ Test case passing 1 argument command → .pause to transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) started.
+✔ Test transportCommandsDoNotUnpauseATerminallyFailedPipeline(command:) with 2 test cases passed after 0.001 seconds.
+◇ Test spentBudgetSurvivesCodableRoundTripAndLegacyDocuments() started.
+✔ Test spentBudgetSurvivesCodableRoundTripAndLegacyDocuments() passed after 0.001 seconds.
+◇ Test exhaustedRevisionCountersFailWithoutOverflow() started.
+✔ Test exhaustedRevisionCountersFailWithoutOverflow() passed after 0.001 seconds.
+✔ Suite "Renderer recovery regression coverage" passed after 0.181 seconds.
+◇ Suite "Standard effect completion contracts" started.
+◇ Test defaultEffectsAcceptEachStandardOutcomeOnce(kind:) started.
+◇ Test case passing 1 argument kind → EffectResultKind(rawValue: "succeeded") to defaultEffectsAcceptEachStandardOutcomeOnce(kind:) started.
+◇ Test case passing 1 argument kind → EffectResultKind(rawValue: "failed") to defaultEffectsAcceptEachStandardOutcomeOnce(kind:) started.
+◇ Test case passing 1 argument kind → EffectResultKind(rawValue: "cancelled") to defaultEffectsAcceptEachStandardOutcomeOnce(kind:) started.
+✔ Test defaultEffectsAcceptEachStandardOutcomeOnce(kind:) with 3 test cases passed after 0.001 seconds.
+◇ Test extractedTerminalMutationIsIsolatedFromExistingAndFutureEffects() started.
+✔ Test extractedTerminalMutationIsIsolatedFromExistingAndFutureEffects() passed after 0.034 seconds.
+◇ Test customOneShotKeepsItsExactTokens() started.
+✔ Test customOneShotKeepsItsExactTokens() passed after 0.001 seconds.
+◇ Test phasedAndSubscriptionContractsRetainIndependentAdmissionRules() started.
+✔ Test phasedAndSubscriptionContractsRetainIndependentAdmissionRules() passed after 0.001 seconds.
+◇ Test legacyCodableDataRoundTripsByValueRegardlessOfTerminalOrder() started.
+✔ Test legacyCodableDataRoundTripsByValueRegardlessOfTerminalOrder() passed after 0.001 seconds.
+◇ Test canonicalReplayIsIndependentOfStandardTerminalSetConstruction() started.
+✔ Test canonicalReplayIsIndependentOfStandardTerminalSetConstruction() passed after 0.031 seconds.
+✔ Suite "Standard effect completion contracts" passed after 0.068 seconds.
+◇ Suite "Playback coordinator" started.
+◇ Test closingVideoUnloadsMetadataAndRejectsLateCallbacks(loaded:) started.
+◇ Test case passing 1 argument loaded → false to closingVideoUnloadsMetadataAndRejectsLateCallbacks(loaded:) started.
+◇ Test case passing 1 argument loaded → true to closingVideoUnloadsMetadataAndRejectsLateCallbacks(loaded:) started.
+✔ Test closingVideoUnloadsMetadataAndRejectsLateCallbacks(loaded:) with 2 test cases passed after 1.202 seconds.
+◇ Test videoTabActivationRestoresPositionWithoutPersistentHistory(paused:) started.
+◇ Test case passing 1 argument paused → true to videoTabActivationRestoresPositionWithoutPersistentHistory(paused:) started.
+◇ Test case passing 1 argument paused → false to videoTabActivationRestoresPositionWithoutPersistentHistory(paused:) started.
+✔ Test videoTabActivationRestoresPositionWithoutPersistentHistory(paused:) with 2 test cases passed after 0.004 seconds.
+◇ Test videoTabActivationRejectsLateLoadFromPreviousTab() started.
+✔ Test videoTabActivationRejectsLateLoadFromPreviousTab() passed after 0.002 seconds.
+◇ Test chapterSelectionUsesIdentifiedSeekAndRestoresTransport(paused:) started.
+◇ Test case passing 1 argument paused → false to chapterSelectionUsesIdentifiedSeekAndRestoresTransport(paused:) started.
+◇ Test case passing 1 argument paused → true to chapterSelectionUsesIdentifiedSeekAndRestoresTransport(paused:) started.
+✔ Test chapterSelectionUsesIdentifiedSeekAndRestoresTransport(paused:) with 2 test cases passed after 0.126 seconds.
+◇ Test chapterSelectionSupersedesPendingSkipsAndRejectsOldCompletion() started.
+✔ Test chapterSelectionSupersedesPendingSkipsAndRejectsOldCompletion() passed after 0.094 seconds.
+◇ Test oversizedSeekAndSubtitleTimestampsAreRejectedWithoutIntegerTraps() started.
+✔ Test oversizedSeekAndSubtitleTimestampsAreRejectedWithoutIntegerTraps() passed after 0.001 seconds.
+◇ Test rapidSkipReversalClampsAtBothBoundariesAndPreservesPause() started.
+✔ Test rapidSkipReversalClampsAtBothBoundariesAndPreservesPause() passed after 0.057 seconds.
+◇ Test pendingSkipsDoNotStartAfterSleepOrShutdown() started.
+✔ Test pendingSkipsDoNotStartAfterSleepOrShutdown() passed after 0.177 seconds.
+◇ Test rapidRelativeSkipsCoalesceNativeWorkAndExposeTheFinalExactTarget() started.
+✔ Test rapidRelativeSkipsCoalesceNativeWorkAndExposeTheFinalExactTarget() passed after 0.053 seconds.
+◇ Test absoluteSeekAndStopRetirePendingRelativeSkips() started.
+✔ Test absoluteSeekAndStopRetirePendingRelativeSkips() passed after 0.180 seconds.
+◇ Test uxVerificationClearThenQuitDoesNotRecreateClearedProgress() started.
+✔ Test uxVerificationClearThenQuitDoesNotRecreateClearedProgress() passed after 0.010 seconds.
+◇ Test uxVerificationShutdownReportsFailedSaveWithoutSkippingNativeCleanup() started.
+✔ Test uxVerificationShutdownReportsFailedSaveWithoutSkippingNativeCleanup() passed after 0.053 seconds.
+◇ Test clearedProgressSurvivesPauseAndRepeatedPositionButRecordsFurtherPlayback() started.
+✔ Test clearedProgressSurvivesPauseAndRepeatedPositionButRecordsFurtherPlayback() passed after 0.010 seconds.
+◇ Test unverifiedContentCanAdvanceWithoutOverwritingEarlierHistory() started.
+✔ Test unverifiedContentCanAdvanceWithoutOverwritingEarlierHistory() passed after 0.052 seconds.
+◇ Test unchangedVersionKeepsResumeAndLocatedVersionKeepsSettings() started.
+✔ Test unchangedVersionKeepsResumeAndLocatedVersionKeepsSettings() passed after 0.054 seconds.
+◇ Test changedOrUnverifiedContentDoesNotInheritResumeAndPerFileChoices(unverified:) started.
+◇ Test case passing 1 argument unverified → false to changedOrUnverifiedContentDoesNotInheritResumeAndPerFileChoices(unverified:) started.
+◇ Test case passing 1 argument unverified → true to changedOrUnverifiedContentDoesNotInheritResumeAndPerFileChoices(unverified:) started.
+✔ Test changedOrUnverifiedContentDoesNotInheritResumeAndPerFileChoices(unverified:) with 2 test cases passed after 0.018 seconds.
+◇ Test changedRestoreStartsAtZeroButKeepsPausedIntent() started.
+✔ Test changedRestoreStartsAtZeroButKeepsPausedIntent() passed after 0.008 seconds.
+◇ Test blockedRestoreDoesNotBlockFinderOpenOrShutdown() started.
+✔ Test blockedRestoreDoesNotBlockFinderOpenOrShutdown() passed after 0.007 seconds.
+◇ Test shutdownJoinsBlockedSaveWithoutBlockingMainActorOrLosingLatestProgress() started.
+✔ Test shutdownJoinsBlockedSaveWithoutBlockingMainActorOrLosingLatestProgress() passed after 0.117 seconds.
+◇ Test failedCheckpointDoesNotAdvanceThePlaylist() started.
+✔ Test failedCheckpointDoesNotAdvanceThePlaylist() passed after 0.015 seconds.
+◇ Test directOpenResolvesAliasesAndStopRejectsPendingPreparation() started.
+✔ Test directOpenResolvesAliasesAndStopRejectsPendingPreparation() passed after 0.022 seconds.
+◇ Test finderFolderClassificationSharesCancellationAndCanonicalPreparation() started.
+✔ Test finderFolderClassificationSharesCancellationAndCanonicalPreparation() passed after 0.025 seconds.
+◇ Test finderRequestsRetainFolderOrderAndAppendDuringPreroll() started.
+✔ Test finderRequestsRetainFolderOrderAndAppendDuringPreroll() passed after 0.014 seconds.
+◇ Test preferredAudioOutputPersistsAndReappliesWhenAvailable() started.
+✔ Test preferredAudioOutputPersistsAndReappliesWhenAvailable() passed after 0.062 seconds.
+◇ Test audioOutputSelectionFailureIsPersistentWithoutFailingPlayback() started.
+✔ Test audioOutputSelectionFailureIsPersistentWithoutFailingPlayback() passed after 0.009 seconds.
+◇ Test disablingVideoColorSamplingResetsPublishedColor() started.
+✔ Test disablingVideoColorSamplingResetsPublishedColor() passed after 0.009 seconds.
+◇ Test productionUsesPlanarWithIsolatedBenchmarkOverrides() started.
+✔ Test productionUsesPlanarWithIsolatedBenchmarkOverrides() passed after 0.001 seconds.
+◇ Test benchmarkControlRequiresExactBundleOverrideAndSession() started.
+✔ Test benchmarkControlRequiresExactBundleOverrideAndSession() passed after 0.001 seconds.
+◇ Test benchmarkControlAcknowledgesTransportAndSeekCompletion() started.
+[benchmark-control] session=session-1 id=pause-1 action=pause phase=request accepted=yes
+[benchmark-control] session=session-1 id=pause-1 action=pause phase=completed accepted=yes result=transport-confirmed paused=yes elapsed-ms=0.105
+[benchmark-control] session=session-1 id=seek-1 action=seek-exact phase=request accepted=yes
+[benchmark-control] session=session-1 id=seek-1 action=seek-exact phase=completed accepted=yes result=seek-pipeline-completed elapsed-ms=0.056
+✔ Test benchmarkControlAcknowledgesTransportAndSeekCompletion() passed after 0.008 seconds.
+◇ Test benchmarkControlCapturesSynchronousTransportCompletion() started.
+[benchmark-control] session=session-1 id=pause-sync action=pause phase=request accepted=yes
+[benchmark-control] session=session-1 id=pause-sync action=pause phase=completed accepted=yes result=transport-confirmed paused=yes elapsed-ms=0.040
+✔ Test benchmarkControlCapturesSynchronousTransportCompletion() passed after 0.008 seconds.
+◇ Test loadedEventRestoresResumePositionThroughNativeRuntime() started.
+✔ Test loadedEventRestoresResumePositionThroughNativeRuntime() passed after 0.008 seconds.
+◇ Test durationPublishedDuringPrerollEnablesTimeline() started.
+✔ Test durationPublishedDuringPrerollEnablesTimeline() passed after 0.008 seconds.
+◇ Test staleEventsAreRejectedAndEOFAdvancesPlaylist() started.
+✔ Test staleEventsAreRejectedAndEOFAdvancesPlaylist() passed after 0.014 seconds.
+◇ Test openingFolderUsesDisplayedOrderAndStartsFirstPlayableItem() started.
+✔ Test openingFolderUsesDisplayedOrderAndStartsFirstPlayableItem() passed after 0.013 seconds.
+◇ Test sourceBrowserSelectionPlaysTheExactFileWithinItsFolderScope() started.
+✔ Test sourceBrowserSelectionPlaysTheExactFileWithinItsFolderScope() passed after 0.013 seconds.
+◇ Test appendPreservesCurrentWhileReplaceStartsTheNewSelection() started.
+✔ Test appendPreservesCurrentWhileReplaceStartsTheNewSelection() passed after 0.021 seconds.
+◇ Test failedCandidateKeepsCommittedPlaylistSourceAndPersistenceAuthority() started.
+✔ Test failedCandidateKeepsCommittedPlaylistSourceAndPersistenceAuthority() passed after 0.014 seconds.
+◇ Test failedAdvanceCanRetryOrSkipWithoutMovingCommittedIdentity() started.
+✔ Test failedAdvanceCanRetryOrSkipWithoutMovingCommittedIdentity() passed after 0.015 seconds.
+◇ Test unavailableRestoreCanBeForgottenWithoutDeletingHistory() started.
+✔ Test unavailableRestoreCanBeForgottenWithoutDeletingHistory() passed after 0.009 seconds.
+◇ Test subtitleEncodingPreferenceSurvivesOtherPreferenceChangesAndRelaunch() started.
+✔ Test subtitleEncodingPreferenceSurvivesOtherPreferenceChangesAndRelaunch() passed after 0.001 seconds.
+◇ Test locatedRestoreCommitsOnlyAfterSuccessfulOpen() started.
+✔ Test locatedRestoreCommitsOnlyAfterSuccessfulOpen() passed after 0.014 seconds.
+◇ Test candidatePrerollAtomicallyCommitsPlaylistSourceAndPersistence() started.
+✔ Test candidatePrerollAtomicallyCommitsPlaylistSourceAndPersistence() passed after 0.014 seconds.
+◇ Test mixedFolderAndFileDropExpandsAndDeduplicatesEverything() started.
+✔ Test mixedFolderAndFileDropExpandsAndDeduplicatesEverything() passed after 0.008 seconds.
+◇ Test subtitleOnlyDropLoadsOneAndReportsTheNativeMultiTrackLimit() started.
+✔ Test subtitleOnlyDropLoadsOneAndReportsTheNativeMultiTrackLimit() passed after 0.014 seconds.
+◇ Test sortingChangesPlaybackOrderWithoutChangingCurrentIdentity() started.
+✔ Test sortingChangesPlaybackOrderWithoutChangingCurrentIdentity() passed after 0.008 seconds.
+◇ Test repeatAndShuffleRemainVisibleAndPreserveCurrentIdentity() started.
+✔ Test repeatAndShuffleRemainVisibleAndPreserveCurrentIdentity() passed after 0.031 seconds.
+◇ Test repeatOneReloadsTheCompletedItemFromTheBeginning() started.
+✔ Test repeatOneReloadsTheCompletedItemFromTheBeginning() passed after 0.014 seconds.
+◇ Test finalEOFKeepsSourceAndQueueAndPlaySeeksBackToStart() started.
+✔ Test finalEOFKeepsSourceAndQueueAndPlaySeeksBackToStart() passed after 0.012 seconds.
+◇ Test ordinaryRestoreHonorsPausedRestorePreference(paused:) started.
+◇ Test case passing 1 argument paused → true to ordinaryRestoreHonorsPausedRestorePreference(paused:) started.
+◇ Test case passing 1 argument paused → false to ordinaryRestoreHonorsPausedRestorePreference(paused:) started.
+✔ Test ordinaryRestoreHonorsPausedRestorePreference(paused:) with 2 test cases passed after 0.016 seconds.
+◇ Test historyOptOutBlocksSessionRestoreAndFinalCheckpoint() started.
+✔ Test historyOptOutBlocksSessionRestoreAndFinalCheckpoint() passed after 0.008 seconds.
+◇ Test repeatAllWrapsFromTheLastDisplayedItemToTheFirst() started.
+✔ Test repeatAllWrapsFromTheLastDisplayedItemToTheFirst() passed after 0.014 seconds.
+◇ Test restoresDirectPlaylistIndexPausedStateAndExactPosition() started.
+✔ Test restoresDirectPlaylistIndexPausedStateAndExactPosition() passed after 0.007 seconds.
+◇ Test finderOpenSupersedesPausedRestoreForEveryRestoredField() started.
+✔ Test finderOpenSupersedesPausedRestoreForEveryRestoredField() passed after 0.008 seconds.
+◇ Test sameFileFinderOpenSupersedesRestoreAfterNativeLoadBegins(restoreCompleted:) started.
+◇ Test case passing 1 argument restoreCompleted → false to sameFileFinderOpenSupersedesRestoreAfterNativeLoadBegins(restoreCompleted:) started.
+◇ Test case passing 1 argument restoreCompleted → true to sameFileFinderOpenSupersedesRestoreAfterNativeLoadBegins(restoreCompleted:) started.
+✔ Test sameFileFinderOpenSupersedesRestoreAfterNativeLoadBegins(restoreCompleted:) with 2 test cases passed after 0.031 seconds.
+◇ Test failedSameSourceReloadPreservesCommittedSessionIdentity(failPreroll:) started.
+◇ Test case passing 1 argument failPreroll → false to failedSameSourceReloadPreservesCommittedSessionIdentity(failPreroll:) started.
+◇ Test case passing 1 argument failPreroll → true to failedSameSourceReloadPreservesCommittedSessionIdentity(failPreroll:) started.
+✔ Test failedSameSourceReloadPreservesCommittedSessionIdentity(failPreroll:) with 2 test cases passed after 0.005 seconds.
+◇ Test shuffleRestoresBaseOrderAcrossRelaunch() started.
+✔ Test shuffleRestoresBaseOrderAcrossRelaunch() passed after 0.033 seconds.
+◇ Test unshuffleRetainsAdditionsAndOmitsRemovedEntries() started.
+✔ Test unshuffleRetainsAdditionsAndOmitsRemovedEntries() passed after 0.002 seconds.
+◇ Test restorationSnapshotRetiresAfterDirectCommitAndReplacement() started.
+✔ Test restorationSnapshotRetiresAfterDirectCommitAndReplacement() passed after 0.021 seconds.
+◇ Test restorationSnapshotRetiresAfterFolderDiscoveryCommits() started.
+✔ Test restorationSnapshotRetiresAfterFolderDiscoveryCommits() passed after 0.013 seconds.
+◇ Test restorationSnapshotSurvivesLocatedNativeFailureUntilRetryCommits() started.
+✔ Test restorationSnapshotSurvivesLocatedNativeFailureUntilRetryCommits() passed after 0.015 seconds.
+◇ Test restorationSnapshotSurvivesFailedFolderLocateUntilSuccessfulCommit() started.
+✔ Test restorationSnapshotSurvivesFailedFolderLocateUntilSuccessfulCommit() passed after 0.023 seconds.
+◇ Test restorationSnapshotRetiresAtTerminalBoundary(_:) started.
+◇ Test case passing 1 argument action → .stop to restorationSnapshotRetiresAtTerminalBoundary(_:) started.
+◇ Test case passing 1 argument action → .close to restorationSnapshotRetiresAtTerminalBoundary(_:) started.
+◇ Test case passing 1 argument action → .forget to restorationSnapshotRetiresAtTerminalBoundary(_:) started.
+◇ Test case passing 1 argument action → .shutdown to restorationSnapshotRetiresAtTerminalBoundary(_:) started.
+◇ Test case passing 1 argument action → .historyOptOut to restorationSnapshotRetiresAtTerminalBoundary(_:) started.
+✔ Test restorationSnapshotRetiresAtTerminalBoundary(_:) with 5 test cases passed after 0.043 seconds.
+◇ Test unavailableRestoreRetainsSessionAndCanRetry(folderSource:) started.
+◇ Test case passing 1 argument folderSource → false to unavailableRestoreRetainsSessionAndCanRetry(folderSource:) started.
+◇ Test case passing 1 argument folderSource → true to unavailableRestoreRetainsSessionAndCanRetry(folderSource:) started.
+✔ Test unavailableRestoreRetainsSessionAndCanRetry(folderSource:) with 2 test cases passed after 0.033 seconds.
+◇ Test rewatchCheckpointOverridesHistoricalCompletedBadge() started.
+✔ Test rewatchCheckpointOverridesHistoricalCompletedBadge() passed after 0.008 seconds.
+◇ Test completedSessionRestoresAtStartInsteadOfTheFinalSeconds() started.
+✔ Test completedSessionRestoresAtStartInsteadOfTheFinalSeconds() passed after 0.008 seconds.
+◇ Test batchOpenOfStoppedCurrentFileCreatesANewPlaybackSession() started.
+✔ Test batchOpenOfStoppedCurrentFileCreatesANewPlaybackSession() passed after 0.014 seconds.
+◇ Test quittingAfterStopKeepsTheLastPlaybackCheckpoint() started.
+✔ Test quittingAfterStopKeepsTheLastPlaybackCheckpoint() passed after 0.008 seconds.
+◇ Test shutdownFlushesLatestProgressWithoutDependingOnDebouncedTask() started.
+✔ Test shutdownFlushesLatestProgressWithoutDependingOnDebouncedTask() passed after 0.009 seconds.
+◇ Test shutdownIsForwardedExactlyOnce() started.
+✔ Test shutdownIsForwardedExactlyOnce() passed after 0.001 seconds.
+◇ Test repeatedAudioRouteChangesReprerollWithoutConsumingFailureRecovery() started.
+✔ Test repeatedAudioRouteChangesReprerollWithoutConsumingFailureRecovery() passed after 0.008 seconds.
+◇ Test audioRouteChangePreservesAnInFlightUserSeekTarget() started.
+✔ Test audioRouteChangePreservesAnInFlightUserSeekTarget() passed after 0.007 seconds.
+◇ Test lifecycleResumeDecisionComesFromDeterministicCore() started.
+✔ Test lifecycleResumeDecisionComesFromDeterministicCore() passed after 0.007 seconds.
+◇ Test pictureInPictureStateAndCommandsUseNativeRuntimeContract() started.
+✔ Test pictureInPictureStateAndCommandsUseNativeRuntimeContract() passed after 0.007 seconds.
+◇ Test capabilitiesGateUnavailableNativeFeatures() started.
+✔ Test capabilitiesGateUnavailableNativeFeatures() passed after 0.007 seconds.
+◇ Test capabilityModelIsTheSharedOperationSourceOfTruth() started.
+✔ Test capabilityModelIsTheSharedOperationSourceOfTruth() passed after 0.001 seconds.
+◇ Test unsupportedPersistedPlaybackSpeedIsSanitizedBeforePublication() started.
+✔ Test unsupportedPersistedPlaybackSpeedIsSanitizedBeforePublication() passed after 0.001 seconds.
+◇ Test productionDriverPreservesEffectIdentityAcrossHostileResults() started.
+✔ Test productionDriverPreservesEffectIdentityAcrossHostileResults() passed after 0.001 seconds.
+◇ Test invariantFailureStillPhysicallyShutsDownRuntime() started.
+✔ Test invariantFailureStillPhysicallyShutsDownRuntime() passed after 0.001 seconds.
+◇ Test coreTrackAndSubtitleCommandsPublishOnlyAcknowledgedValues() started.
+✔ Test coreTrackAndSubtitleCommandsPublishOnlyAcknowledgedValues() passed after 0.008 seconds.
+◇ Test externalLanguageRestoreWaitsForTheInstalledSidecarCatalog() started.
+✔ Test externalLanguageRestoreWaitsForTheInstalledSidecarCatalog() passed after 0.008 seconds.
+◇ Test perFileTrackSubtitleVisibilityAndDelayRestoreByMetadata() started.
+✔ Test perFileTrackSubtitleVisibilityAndDelayRestoreByMetadata() passed after 0.020 seconds.
+✔ Suite "Playback coordinator" passed after 3.068 seconds.
+✔ Test run with 292 tests in 25 suites passed after 80.966 seconds.

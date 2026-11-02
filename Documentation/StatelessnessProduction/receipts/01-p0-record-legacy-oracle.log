@@ -1,0 +1,29 @@
+[0/1] Planning build
+Building for debugging...
+[0/16] Write sources
+[1/16] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Compiling IlliquidPlaybackStateSpaceTests ProductionMigrationOracleTests.swift
+[4/5] Emitting module IlliquidPlaybackStateSpaceTests
+[4/6] Write Objects.LinkFileList
+[5/6] Linking IlliquidPackageTests
+Build complete! (26.53s)
+Test Suite 'Selected tests' started at 2026-11-01 23:33:12.085.
+Test Suite 'IlliquidPackageTests.xctest' started at 2026-11-01 23:33:12.086.
+Test Suite 'IlliquidPackageTests.xctest' passed at 2026-11-01 23:33:12.086.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-01 23:33:12.086.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.3.2 (70eff261d7f462c)
+◇ Suite "Production migration oracle" started.
+◇ Test storedStartsMatchTheReachableSeeds() started.
+◇ Test streamsAreDeterministic() started.
+◇ Test everyStreamMatchesTheFrozenLegacyCore() started.
+✘ Test storedStartsMatchTheReachableSeeds() recorded an issue at ProductionMigrationOracleTests.swift:521:4: Caught error: DecodingError.keyNotFound: Key 'starts' not found in keyed decoding container. Debug description: No value associated with key CodingKeys(stringValue: "starts", intValue: nil) ("starts").
+✘ Test storedStartsMatchTheReachableSeeds() failed after 0.046 seconds with 1 issue.
+↳ /// The stored start states still equal the reachable seeds the production
+↳ /// transition builds today.
+✔ Test streamsAreDeterministic() passed after 0.158 seconds.
+✔ Test everyStreamMatchesTheFrozenLegacyCore() passed after 25.625 seconds.
+✘ Suite "Production migration oracle" failed after 25.625 seconds with 1 issue.
+✘ Test run with 3 tests in 1 suite failed after 25.626 seconds with 1 issue.

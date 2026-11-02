@@ -1,0 +1,269 @@
+[0/1] Planning build
+Building for production...
+[0/3] Write swift-version--58304C5D6DBC2206.txt
+[2/5] Compiling IlliquidCore MediaMetadataHints.swift
+[3/5] Compiling Statelessness Assurance.swift
+[4/6] Compiling IlliquidPlaybackModel CanonicalJSON.swift
+[5/7] Compiling IlliquidPlayback Module.swift
+[6/8] Compiling IlliquidNativePlayback DeterministicCommitBarrier.swift
+/Volumes/seed2/Projects/illiquid-production-migration/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:1152:23: warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1150 |             self.workQueue.async {
+1151 |                 _ = resources.retainedCVTextures
+1152 |                 guard commandBuffer.status != .error else {
+     |                       `- warning: capture of 'commandBuffer' with non-Sendable type 'any MTLCommandBuffer' in a '@Sendable' closure [#SendableClosureCaptures]
+1153 |                     completion(.failure(
+1154 |                         commandBuffer.error
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h:245:11: note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+243 |  */
+244 | API_AVAILABLE(macos(10.11), ios(8.0))
+245 | @protocol MTLCommandBuffer <NSObject>
+    |           `- note: protocol 'MTLCommandBuffer' does not conform to the 'Sendable' protocol
+246 | 
+247 | /*!
+
+/Volumes/seed2/Projects/illiquid-production-migration/Sources/IlliquidNativePlayback/Presentation/PiPSubtitleCompositor.swift:6:1: warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   4 | import CoreVideo
+   5 | import Foundation
+   6 | import Metal
+     | `- warning: add '@preconcurrency' to treat 'Sendable'-related errors from module 'Metal' as warnings
+   7 | import OSLog
+   8 | import QuartzCore
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[7/9] Compiling IlliquidPlayer ArchitectureValidation.swift
+[8/10] Compiling IlliquidApp AppDelegate.swift
+[8/10] Write Objects.LinkFileList
+[9/10] Linking Illiquid
+Build of product 'Illiquid' complete! (137.70s)
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfreetype.6.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfribidi.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libunibreak.7.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libssl.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libcrypto.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvpx.12.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libdav1d.7.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libmp3lame.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libopus.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libSvtAv1Enc.4.1.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx264.165.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx265.216.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvmaf.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfreetype.6.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpng16.16.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfreetype.6.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfribidi.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libglib-2.0.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libgraphite2.3.3.1.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libunibreak.7.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libssl.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libssl.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libcrypto.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvpx.12.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libdav1d.7.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libmp3lame.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libopus.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libSvtAv1Enc.4.1.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx264.165.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx265.216.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvmaf.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpng16.16.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libglib-2.0.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libintl.8.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libglib-2.0.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpcre2-8.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libglib-2.0.0.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libgraphite2.3.3.1.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libintl.8.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpcre2-8.0.dylib
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavcodec.62.28.102.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavfilter.11.14.102.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavformat.62.12.102.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavutil.60.26.102.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libcrypto.3.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libdav1d.7.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfreetype.6.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfribidi.0.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libglib-2.0.0.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libgraphite2.3.3.1.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libintl.8.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libmp3lame.0.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libopus.0.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpcre2-8.0.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpng16.16.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libssl.3.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libSvtAv1Enc.4.1.0.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswresample.6.3.102.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswscale.9.5.102.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libunibreak.7.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvmaf.3.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvpx.12.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx264.165.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx265.216.dylib: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS/Installer: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework: replacing existing signature
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app: replacing existing signature
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavcodec.62.28.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavcodec.62.28.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavfilter.11.14.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavfilter.11.14.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavformat.62.12.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavformat.62.12.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavutil.60.26.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavutil.60.26.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libcrypto.3.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libcrypto.3.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libdav1d.7.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libdav1d.7.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfreetype.6.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfreetype.6.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfribidi.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfribidi.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libglib-2.0.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libglib-2.0.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libgraphite2.3.3.1.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libgraphite2.3.3.1.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libintl.8.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libintl.8.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libmp3lame.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libmp3lame.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libopus.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libopus.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpcre2-8.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpcre2-8.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpng16.16.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpng16.16.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libssl.3.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libssl.3.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libSvtAv1Enc.4.1.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libSvtAv1Enc.4.1.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswresample.6.3.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswresample.6.3.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswscale.9.5.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswscale.9.5.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libunibreak.7.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libunibreak.7.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvmaf.3.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvmaf.3.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvpx.12.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvpx.12.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx264.165.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx264.165.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx265.216.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx265.216.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app: valid on disk
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app: satisfies its Designated Requirement
+Executable=/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/MacOS/Illiquid
+Identifier=com.example.IlliquidBenchmark
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=45046 flags=0x2(adhoc) hashes=1397+7 location=embedded
+Signature=adhoc
+Info.plist entries=27
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=31
+Internal requirements count=0 size=12
+Signed application: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libass.9.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavcodec.62.28.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavcodec.62.28.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavfilter.11.14.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavfilter.11.14.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavformat.62.12.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavformat.62.12.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavutil.60.26.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libavutil.60.26.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libcrypto.3.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libcrypto.3.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libdav1d.7.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libdav1d.7.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfreetype.6.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfreetype.6.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfribidi.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libfribidi.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libglib-2.0.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libglib-2.0.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libgraphite2.3.3.1.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libgraphite2.3.3.1.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libharfbuzz.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libintl.8.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libintl.8.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libmp3lame.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libmp3lame.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libopus.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libopus.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpcre2-8.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpcre2-8.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpng16.16.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libpng16.16.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libssl.3.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libssl.3.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libSvtAv1Enc.4.1.0.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libSvtAv1Enc.4.1.0.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswresample.6.3.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswresample.6.3.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswscale.9.5.102.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libswscale.9.5.102.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libunibreak.7.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libunibreak.7.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvmaf.3.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvmaf.3.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvpx.12.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libvpx.12.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx264.165.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx264.165.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx265.216.dylib
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/libx265.216.dylib
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--prepared:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+--validated:/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app: valid on disk
+/Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app: satisfies its Designated Requirement
+Verified /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app (com.example.IlliquidBenchmark)
+Architectures: arm64
+Mach-O images: 32
+Code signature: valid
+
+Built native application: /Volumes/seed2/Projects/illiquid-production-receipts/final/candidate-bundle/local-bundle/Illiquid.app
