@@ -497,6 +497,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
     private var preferHardware = true
     private let softwareVideoOutputPolicy: NativeSoftwareVideoOutputPolicy
     private let seekPrerollFrameSkippingEnabled: Bool
+    private var softwareDecoderThreadLimit = 0
     private let softwareSeekAccelerationEnabled: Bool
     private let videoFrameQueueCapacity: Int
     private let reservesVideoPipelineCapacity: Bool
@@ -1599,6 +1600,10 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         emit(.subtitleDelayChanged(subtitles.delay))
     }
 
+    public func setSoftwareDecoderThreadLimit(_ value: Int) {
+        softwareDecoderThreadLimit = PlaybackPreferences.validSoftwareDecoderThreadLimit(value)
+    }
+
     public func setHardwareDecodingPolicy(_ policy: HardwareDecodingPolicy) {
         preferHardware = policy != .off
         if policy == .compatibility {
@@ -2266,6 +2271,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
         if !emitLoaded, case .externalBitmap = subtitleSource {
             externalSubtitlePreparation = preparedExternalSubtitle
         } else { externalSubtitlePreparation = nil }
+        let softwareDecoderThreadLimit = softwareDecoderThreadLimit
         let preferHardware = preferHardware
         let softwareVideoOutputPolicy = softwareVideoOutputPolicy
         let seekPrerollFrameSkippingEnabled = seekPrerollFrameSkippingEnabled
@@ -2318,6 +2324,7 @@ public final class NativePlaybackRuntime: PlaybackRuntime {
                         seekPrerollFrameSkippingEnabled: seekPrerollFrameSkippingEnabled,
                         softwareSeekAccelerationEnabled: softwareSeekAccelerationEnabled,
                         softwareVideoOutputMode: softwareVideoOutputMode,
+                        softwareDecoderThreadCount: softwareDecoderThreadLimit,
                         videoFrameQueueCapacity: videoFrameQueueCapacity,
                         reservesVideoPipelineCapacity:
                             reservesVideoPipelineCapacity,

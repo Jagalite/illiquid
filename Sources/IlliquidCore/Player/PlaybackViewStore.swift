@@ -28,6 +28,7 @@ public struct PlaybackViewSnapshot: Equatable, Sendable {
     public let bufferStatus: BufferStatus
     public let videoOutputStatus: VideoOutputStatus
     public let displayOutputStatus: DisplayOutputStatus
+    public let softwareDecoderThreadLimit: Int
     public let hardwareDecodingStatus: HardwareDecodingStatus
     public let audioOutputDevice: AudioOutputDevice?
     public let audioOutputDevices: [AudioOutputDevice]
@@ -72,6 +73,7 @@ public struct PlaybackViewSnapshot: Equatable, Sendable {
         bufferStatus = state.bufferStatus
         videoOutputStatus = state.videoOutputStatus
         displayOutputStatus = state.displayOutputStatus
+        softwareDecoderThreadLimit = state.softwareDecoderThreadLimit
         hardwareDecodingStatus = state.hardwareDecodingStatus
         audioOutputDevice = state.audioOutputDevice
         audioOutputDevices = state.audioOutputDevices
@@ -125,6 +127,7 @@ public final class PlaybackViewStore {
     public private(set) var bufferStatus: BufferStatus
     public private(set) var videoOutputStatus: VideoOutputStatus
     public private(set) var displayOutputStatus: DisplayOutputStatus
+    public private(set) var softwareDecoderThreadLimit: Int
     public private(set) var hardwareDecodingStatus: HardwareDecodingStatus
     public private(set) var audioOutputDevice: AudioOutputDevice?
     public private(set) var audioOutputDevices: [AudioOutputDevice]
@@ -171,6 +174,7 @@ public final class PlaybackViewStore {
         bufferStatus = snapshot.bufferStatus
         videoOutputStatus = snapshot.videoOutputStatus
         displayOutputStatus = snapshot.displayOutputStatus
+        softwareDecoderThreadLimit = snapshot.softwareDecoderThreadLimit
         hardwareDecodingStatus = snapshot.hardwareDecodingStatus
         audioOutputDevice = snapshot.audioOutputDevice
         audioOutputDevices = snapshot.audioOutputDevices
@@ -232,6 +236,9 @@ public final class PlaybackViewStore {
         }
         if displayOutputStatus != snapshot.displayOutputStatus {
             displayOutputStatus = snapshot.displayOutputStatus
+        }
+        if softwareDecoderThreadLimit != snapshot.softwareDecoderThreadLimit {
+            softwareDecoderThreadLimit = snapshot.softwareDecoderThreadLimit
         }
         if hardwareDecodingStatus != snapshot.hardwareDecodingStatus {
             hardwareDecodingStatus = snapshot.hardwareDecodingStatus

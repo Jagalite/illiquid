@@ -369,6 +369,7 @@ final class MediaSession: @unchecked Sendable {
         seekPrerollFrameSkippingEnabled: Bool = true,
         softwareSeekAccelerationEnabled: Bool = true,
         softwareVideoOutputMode: SoftwareVideoOutputMode = .bgra,
+        softwareDecoderThreadCount: Int = 0,
         videoFrameQueueCapacity: Int = 12,
         reservesVideoPipelineCapacity: Bool = true,
         videoPipelineCapacityOverride: Int? = nil,
@@ -484,6 +485,7 @@ final class MediaSession: @unchecked Sendable {
                     preferHardware: preferHardware,
                     timelineOriginSeconds: openedMediaInfo.startTime,
                     softwareOutputMode: softwareVideoOutputMode,
+                    softwareDecoderThreadCount: softwareDecoderThreadCount,
                     softwarePlanarOutputMaximumBufferCount:
                         softwarePlanarOutputMaximumBufferCount,
                     seekPrerollFrameSkippingEnabled: seekPrerollFrameSkippingEnabled,
