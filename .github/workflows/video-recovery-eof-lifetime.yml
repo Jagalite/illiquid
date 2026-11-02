@@ -164,7 +164,9 @@ jobs:
             mv "Tests/IlliquidNativePlaybackTests/$unit" "$saved/"
           done
           git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:"$packet" > "$packet"
-          git show ea2ff568237e2667f7b1aeee67b11a44ebe95b72:"$session" > "$session"
+          # Historical session carried forward to the current package; see
+          # Benchmarks/VideoRecoveryEOF/baseline/README.md.
+          cp Benchmarks/VideoRecoveryEOF/baseline/MediaSession.swift "$session"
           mkdir -p "$RUNNER_TEMP/video-recovery-eof/baseline-tests"
           TMPDIR="$RUNNER_TEMP/video-recovery-eof/baseline-tests" \
             bash Scripts/tests/run-native-swift-tests.sh --build --jobs 2 \

@@ -140,7 +140,13 @@ def main() -> None:
     output.mkdir(parents=True, exist_ok=True)
     baseline_revision = git("rev-parse", "--verify", "--end-of-options",
                             args.baseline_ref + "^{commit}").decode().strip()
-    baseline = git("show", f"{baseline_revision}:{CONTROLLER}")
+    historical = git("show", f"{baseline_revision}:{CONTROLLER}")
+    # The historical controller imports the retired IlliquidPlaybackCore and
+    # predates unrelated controller changes. The requalified baseline is the
+    # current controller with only this study's change reverted (a three-way
+    # merge of the historical file onto current source); see baseline/README.md.
+    requalified = HERE / "baseline" / "PlaybackController.swift"
+    baseline = requalified.read_bytes() if baseline_revision.startswith(BASELINE) and requalified.is_file() else historical
     candidate = (ROOT / CONTROLLER).read_bytes()
     if baseline == candidate:
         parser.error("Baseline and candidate controllers are identical")
@@ -150,6 +156,8 @@ def main() -> None:
         "checkout_head": git("rev-parse", "HEAD").decode().strip(),
         "baseline_controller_revision": baseline_revision,
         "baseline_controller_sha256": digest(baseline),
+        "historical_controller_sha256": digest(historical),
+        "baseline_requalified": baseline != historical,
         "candidate_controller_sha256": digest(candidate),
         "runner_sha256": digest(Path(__file__).read_bytes()),
         "probe_sha256": digest((HERE / "Probe.swift").read_bytes()),
