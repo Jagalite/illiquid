@@ -9,7 +9,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/Jagalite/statelessness.git",
-            revision: "ef6923412ebb38dc14fac58fcfea9404864c9f63"
+            revision: "a181e3c0f2f644f482cbeb37016ed1d54eaf86f9"
         ),
     ],
     targets: [

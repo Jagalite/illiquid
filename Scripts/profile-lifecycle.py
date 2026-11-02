@@ -57,12 +57,16 @@ class Run:
         if source_folders:
             settings['Illiquid.source-tabs.v1'] = json.dumps([{'id': 'benchmark', 'items': [
                 {'kind': 'folder', 'path': str(folder)} for folder in source_folders]}]).encode()
-        seed = directory / 'preferences.plist'
-        seed.write_bytes(plistlib.dumps(settings))
-        # `defaults import` merges unspecified keys. Reset this benchmark-only
-        # domain so source tabs/window choices cannot leak between test cases.
-        subprocess.run(['defaults', 'delete', DOMAIN], capture_output=True)
-        subprocess.run(['defaults', 'import', DOMAIN, str(seed)], check=True, capture_output=True)
+        # The app accepts benchmark preferences only through a fresh isolated
+        # suite seeded from JSON (Scripts/agent-ui/PREFERENCE_ISOLATION_CONTRACT.md).
+        # JSON cannot carry the Data-valued history, playback-preference and
+        # source-tab keys, so cases that need them cannot be seeded.
+        if entries or source_count or source_folders:
+            raise ValueError('history and source-tab seeds require Data values, which the '
+                             'isolated preference seed (JSON) cannot express')
+        scalar = {key: value for key, value in settings.items() if not isinstance(value, bytes)}
+        seed = directory / 'preferences-seed.json'
+        seed.write_text(json.dumps(scalar, sort_keys=True))
         self.log = self.logpath.open('w')
         # Benchmark bundles otherwise default to legacy BGRA, unlike production.
         # Do not inherit unrelated tuning flags from an earlier shell experiment.
@@ -70,6 +74,9 @@ class Run:
             ILLIQUID_BENCHMARK_LIFECYCLE='1', ILLIQUID_BENCHMARK_CONTROL_SESSION=self.session,
             ILLIQUID_BENCHMARK_CONTROL_FILE=str(self.commandpath),
             ILLIQUID_BENCHMARK_SESSION_FILE=str(self.sessionpath),
+            ILLIQUID_BENCHMARK_PREFERENCES_SUITE=f'{DOMAIN}.AgentUI.{self.session}',
+            ILLIQUID_BENCHMARK_PREFERENCES_SEED_FILE=str(seed.resolve()),
+            ILLIQUID_BENCHMARK_PREFERENCES_RECEIPT=str(runtime / 'preferences-receipt.json'),
             ILLIQUID_BENCHMARK_THUMBNAIL_CACHE=str(runtime / 'thumbnails'),
             ILLIQUID_BENCHMARK_WINDOW_SIZE='960x600', ILLIQUID_BENCHMARK_HIDE_SIDEBAR='0',
             ILLIQUID_BENCHMARK_SOFTWARE_OUTPUT='planar', ILLIQUID_BENCHMARK_VP9_HARDWARE='0')

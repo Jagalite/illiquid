@@ -137,6 +137,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--runs', type=int, default=3)
     parser.add_argument('--source-count', type=int, default=100000)
+    parser.add_argument('--skip-navigation', action='store_true',
+                        help='Measure output cases only (navigation needs Data-valued source-tab seeds)')
     args = parser.parse_args()
     if args.runs < 3 or not 1 <= args.source_count <= 100000:
         parser.error('Require at least three repeats and 1...100000 source items')
@@ -150,6 +152,7 @@ def main():
     scripts = Path(__file__).parent
     args.output.mkdir(parents=True, exist_ok=False)
     report = dict(schema=1, machine=platform.platform(), source_count=args.source_count,
+                  skip_navigation=args.skip_navigation,
                   prevents_idle_display_sleep=True,
                   scripts={name: digest(scripts / name) for name in SCRIPTS},
                   apps={name: dict(path=str(path), binary_sha256=digest(path / 'Contents/MacOS/Illiquid'))
@@ -161,7 +164,8 @@ def main():
     # belongs only to this process; it does not alter system sleep preferences.
     awake = subprocess.Popen(['caffeinate', '-di', '-w', str(os.getpid())])
     try:
-        cases = [('navigation', None)] + [(f'output-{i}', p) for i, p in enumerate(fixtures)]
+        cases = ([] if args.skip_navigation else [('navigation', None)]) + [
+            (f'output-{i}', p) for i, p in enumerate(fixtures)]
         for repeat in range(args.runs):
             order = ['baseline', 'candidate'] if repeat % 2 == 0 else ['candidate', 'baseline']
             for case, fixture in cases:
