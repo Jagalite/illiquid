@@ -1,0 +1,49 @@
+warning: 'illiquid-statelessness': found 3 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Volumes/seed2/Projects/illiquid-statelessness/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/legacy-artifact-v1-seek-ready-playing.json
+    /Volumes/seed2/Projects/illiquid-statelessness/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/statelessness-migration-inventory-v1.json
+    /Volumes/seed2/Projects/illiquid-statelessness/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/statelessness-migration-golden-v1.json
+[0/1] Planning build
+Building for debugging...
+[0/3] Write swift-version--58304C5D6DBC2206.txt
+Build of product 'IlliquidStateSpaceExplorer' complete! (0.98s)
+seek/ready-playing: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 6158 states, 41553 edges, 0 findings, 0 trend violations, 162 unmeasured
+seek/ready-paused: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 6158 states, 41553 edges, 0 findings, 0 trend violations, 162 unmeasured
+seek/ended: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 4129 states, 30870 edges, 0 findings, 0 trend violations, 19 unmeasured
+seek/seek-in-flight: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 19011 states, 196615 edges, 0 findings, 0 trend violations, 3132 unmeasured
+eof-drain/playing-av: graph_exhausted [exhaustive], 136 states, 1386 edges, 0 findings, 0 trend violations, 0 unmeasured
+eof-drain/paused-av: graph_exhausted [exhaustive], 136 states, 1386 edges, 0 findings, 0 trend violations, 0 unmeasured
+eof-drain/buffering-av: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 4232 states, 47748 edges, 0 findings, 0 trend violations, 125 unmeasured
+eof-drain/seeking-av: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 16049 states, 177472 edges, 0 findings, 0 trend violations, 1277 unmeasured
+eof-drain/draining-av: graph_exhausted [exhaustive], 138 states, 1350 edges, 0 findings, 0 trend violations, 0 unmeasured
+eof-drain/draining-stop: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 1479 states, 16278 edges, 0 findings, 0 trend violations, 49 unmeasured
+eof-drain/draining-shutdown: graph_exhausted [exhaustive], 161 states, 1657 edges, 0 findings, 0 trend violations, 0 unmeasured
+eof-drain/draining-seek: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 4666 states, 46810 edges, 0 findings, 0 trend violations, 384 unmeasured
+eof-drain/draining-replacement: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 4430 states, 45835 edges, 0 findings, 0 trend violations, 528 unmeasured
+eof-drain/playing-video: graph_exhausted [exhaustive], 16 states, 186 edges, 0 findings, 0 trend violations, 0 unmeasured
+eof-drain/playing-audio: graph_exhausted [exhaustive], 24 states, 266 edges, 0 findings, 0 trend violations, 0 unmeasured
+eof-drain/playing-empty: graph_exhausted [exhaustive], 5 states, 58 edges, 0 findings, 0 trend violations, 0 unmeasured
+recovery/playing-hardware: graph_exhausted [exhaustive], 22 states, 65 edges, 0 findings, 0 trend violations, 0 unmeasured
+recovery/prerolling-hardware: graph_exhausted [exhaustive], 22 states, 65 edges, 0 findings, 0 trend violations, 0 unmeasured
+recovery/software-active: graph_exhausted [exhaustive], 2 states, 2 edges, 0 findings, 0 trend violations, 0 unmeasured
+recovery/presentation-flush-consumed: graph_exhausted [exhaustive], 23 states, 67 edges, 0 findings, 0 trend violations, 0 unmeasured
+recovery/recovery-in-flight: deadline [incomplete(deadline)], 41094 states, 377469 edges, 0 findings, 1 trend violations, 8045 unmeasured
+track-subtitles/automatic: graph_exhausted [exhaustive], 202 states, 846 edges, 0 findings, 0 trend violations, 0 unmeasured
+track-subtitles/embedded-selected: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 5204 states, 51932 edges, 0 findings, 0 trend violations, 843 unmeasured
+track-subtitles/external-subtitle: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 7092 states, 56724 edges, 0 findings, 0 trend violations, 154 unmeasured
+stop-shutdown/opening: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 1337 states, 15272 edges, 0 findings, 0 trend violations, 157 unmeasured
+stop-shutdown/await-preroll: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 1312 states, 15085 edges, 0 findings, 0 trend violations, 157 unmeasured
+stop-shutdown/seeking: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 1600 states, 19098 edges, 0 findings, 0 trend violations, 200 unmeasured
+stop-shutdown/recovery: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 1364 states, 16338 edges, 0 findings, 0 trend violations, 168 unmeasured
+stop-shutdown/track-replacement: depth_bound [bounded(depthCutoff:true,failurePruned:false)][state-space-progress] stop-shutdown/playing depth=0 states=4 edges=4
+, 1624 states, 19402 edges, 0 findings, 0 trend violations, 200 unmeasured
+stop-shutdown/playing: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 391 states, 4321 edges, 0 findings, 0 trend violations, 38 unmeasured
+stop-shutdown/draining: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 391 states, 4321 edges, 0 findings, 0 trend violations, 38 unmeasured
+stop-shutdown/idle: graph_exhausted [exhaustive], 8 states, 44 edges, 0 findings, 0 trend violations, 0 unmeasured
+preroll-buffering/opening-av: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 1928 states, 24303 edges, 0 findings, 0 trend violations, 15 unmeasured
+preroll-buffering/partial-av: graph_exhausted [exhaustive], 235 states, 2697 edges, 0 findings, 0 trend violations, 0 unmeasured
+preroll-buffering/playing-av: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 15275 states, 197071 edges, 0 findings, 0 trend violations, 2489 unmeasured
+preroll-buffering/playing-format: depth_bound [bounded(depthCutoff:true,failurePruned:false)], 2127 states, 26443 edges, 0 findings, 0 trend violations, 8 unmeasured
+preroll-buffering/buffering-av: graph_exhausted [exhaustive], 362 states, 2443 edges, 0 findings, 0 trend violations, 0 unmeasured
+preroll-buffering/opening-video: graph_exhausted [exhaustive], 235 states, 2462 edges, 0 findings, 0 trend violations, 0 unmeasured
+preroll-buffering/opening-audio: graph_exhausted [exhaustive], 235 states, 2462 edges, 0 findings, 0 trend violations, 0 unmeasured
+preroll-buffering/opening-empty: graph_exhausted [exhaustive], 235 states, 2697 edges, 0 findings, 0 trend violations, 0 unmeasured

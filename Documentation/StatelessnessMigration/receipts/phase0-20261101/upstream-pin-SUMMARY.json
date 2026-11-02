@@ -1,0 +1,50 @@
+{
+ "ok": true,
+ "jobs": [
+  {
+   "name": "consumer-build",
+   "job": "81073b034cb14956a2b8a9988f58e714",
+   "command": [
+    "env",
+    "STATELESS_SWIFT_PACKAGE_PATH=/private/tmp/stateless-swift-migration-20261101-illiquid-pin-3fbdca7/Statelessness",
+    "swift",
+    "build",
+    "--package-path",
+    "/private/tmp/stateless-swift-migration-20261101-illiquid-pin-3fbdca7/consumer",
+    "--scratch-path",
+    "/private/tmp/stateless-swift-migration-20261101-illiquid-pin-3fbdca7/consumer-build"
+   ],
+   "status": "succeeded",
+   "exit_code": 0,
+   "elapsed_seconds": 9.53121304512024,
+   "peak_rss_mb": 54.34375
+  },
+  {
+   "name": "consumer-run",
+   "job": "4a1b2cb5883d42af9beb01e51159614f",
+   "command": [
+    "/private/tmp/stateless-swift-migration-20261101-illiquid-pin-3fbdca7/consumer-build/debug/MigrationConsumer"
+   ],
+   "status": "succeeded",
+   "exit_code": 0,
+   "elapsed_seconds": 0.29618287086486816,
+   "peak_rss_mb": 0.0
+  },
+  {
+   "name": "staged-tests",
+   "job": "46606055f07d4f85a1ec4834f30d7810",
+   "command": [
+    "swift",
+    "test",
+    "--package-path",
+    "/private/tmp/stateless-swift-migration-20261101-illiquid-pin-3fbdca7/Statelessness",
+    "--scratch-path",
+    "/private/tmp/stateless-swift-migration-20261101-illiquid-pin-3fbdca7/engine-build"
+   ],
+   "status": "succeeded",
+   "exit_code": 0,
+   "elapsed_seconds": 56.39334177970886,
+   "peak_rss_mb": 56.296875
+  }
+ ]
+}

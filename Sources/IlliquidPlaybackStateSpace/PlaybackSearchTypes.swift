@@ -1,21 +1,14 @@
 import IlliquidPlaybackCore
 
+/// Statelessness graph search is breadth-first. No other algorithm is offered.
 public enum PlaybackSearchAlgorithm: String, Codable, Hashable, Sendable {
   case breadthFirst
-  case iterativeDeepening
 }
 
 public enum PlaybackSearchPORMode: String, Codable, Hashable, Sendable {
   case disabled
   case conservative
   case validation
-}
-
-public enum PlaybackSearchTermination: String, Codable, Hashable, Sendable {
-  case completeWithinBounds
-  case stateCapReached
-  case edgeCapReached
-  case timeBudgetReached
 }
 
 public struct PlaybackSearchConfiguration: Codable, Hashable, Sendable {
@@ -332,33 +325,6 @@ public struct PlaybackSearchInventory: Codable, Hashable, Sendable {
   public let requiredScenarios: [String]
 }
 
-public struct PlaybackSearchSummary: Codable, Hashable, Sendable {
-  public let model: PlaybackSearchModel
-  public let modelVersion: UInt32
-  public let seedProfile: String
-  public let configuration: PlaybackSearchConfiguration
-  public let termination: PlaybackSearchTermination
-  public let stateCount: Int
-  public let edgeCount: Int
-  public let productionTransitionCount: Int
-  public let gateRejectionCount: Int
-  public let peakFrontier: Int
-  public let deepestCompletedLayer: Int
-  public let reducedEdgeCount: Int
-  public let validatedDiamondCount: Int
-  public let nonCommutingDiamondCount: Int
-  public let canonicalDigest: String
-}
-
-public struct PlaybackSearchFailure: Codable, Hashable, Sendable {
-  public let invariantName: String
-  public let details: String
-  public let nodeIndex: Int
-  public let fromNodeIndex: Int
-  public let action: SearchAction
-  public let depth: Int
-}
-
 public enum PlaybackSearchOracle: Codable, Hashable, Sendable {
   case production
   case failOnActionClass(String, invariantName: String)
@@ -378,67 +344,5 @@ public enum PlaybackSearchOracle: Codable, Hashable, Sendable {
         details: "Test-only oracle rejected accepted action class \(actionClass)."
       )
     }
-  }
-}
-
-public struct PlaybackSearchResult: Sendable {
-  public let summary: PlaybackSearchSummary
-  public let oracle: PlaybackSearchOracle
-  public let failures: [PlaybackSearchFailure]
-  public let graph: PlaybackSearchGraph
-  public let nodes: [PlaybackSearchNode]
-  public let predecessors: [PlaybackSearchPredecessor?]
-}
-
-public struct PlaybackSearchPredecessor: Codable, Hashable, Sendable {
-  public let nodeIndex: Int
-  public let action: SearchAction
-}
-
-public struct PlaybackSearchGraph: Codable, Hashable, Sendable {
-  public struct Edge: Codable, Hashable, Sendable {
-    public let from: Int
-    public let to: Int
-    public let actionClass: String
-    public let isFairProgress: Bool
-  }
-  public var edges: [Edge]
-  public init(edges: [Edge] = []) { self.edges = edges }
-}
-
-public struct PlaybackSearchQualificationRecord: Codable, Sendable {
-  public let summary: PlaybackSearchSummary
-  public let progress: PlaybackProgressReport
-  public let failureArtifactPaths: [String]
-  public let trendViolations: [PlaybackSearchTrendViolation]
-  public let evidenceStatement: String
-  public let sourceRevision: String?
-  public let sourceDirty: Bool?
-
-  public init(
-    summary: PlaybackSearchSummary,
-    progress: PlaybackProgressReport,
-    failureArtifactPaths: [String],
-    trendViolations: [PlaybackSearchTrendViolation] = [],
-    sourceRevision: String? = nil,
-    sourceDirty: Bool? = nil
-  ) {
-    self.summary = summary
-    self.progress = progress
-    self.failureArtifactPaths = failureArtifactPaths
-    self.trendViolations = trendViolations
-    self.sourceRevision = sourceRevision
-    self.sourceDirty = sourceDirty
-    evidenceStatement =
-      if failureArtifactPaths.isEmpty
-        && progress.stuckStates.isEmpty
-        && progress.closedNonterminalSCCs.isEmpty
-        && trendViolations.isEmpty
-        && summary.nonCommutingDiamondCount == 0
-      {
-        "No invariant or progress violation within the recorded model/version/configuration bounds."
-      } else {
-        "State-space qualification found a violation; inspect this record and its artifacts."
-      }
   }
 }

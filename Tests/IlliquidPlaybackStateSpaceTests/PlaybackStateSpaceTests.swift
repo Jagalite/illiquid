@@ -1,4 +1,5 @@
 import IlliquidPlaybackCore
+import Statelessness
 import Testing
 
 @testable import IlliquidPlaybackStateSpace
@@ -64,7 +65,7 @@ struct PlaybackStateSpaceTests {
 
   @Test
   func trendPolicyFlagsCountAndNormalizationDrift() throws {
-    let result = try PlaybackStateSpaceExplorer().run(
+    let result = try PlaybackVerifier.run(
       model: .recovery, seedProfile: "playing-hardware",
       configuration: .validation(depthLimit: 2)
     )
@@ -236,16 +237,17 @@ struct PlaybackStateSpaceTests {
   }
 
   @Test
-  func explorerTerminatesAtConfiguredWallClockBudget() throws {
-    let result = try PlaybackStateSpaceExplorer().run(
+  func searchTerminatesAtConfiguredWallClockBudget() throws {
+    let run = try PlaybackVerifier.run(
       model: .seek,
       seedProfile: "ready-playing",
       configuration: PlaybackSearchConfiguration.validation(depthLimit: 8)
         .withTimeLimitSeconds(0)
     )
 
-    #expect(result.summary.termination == .timeBudgetReached)
-    #expect(result.summary.stateCount == 1)
+    #expect(!run.summary.completeWithinBounds)
+    #expect(run.summary.coverage.hasPrefix("incomplete("))
+    #expect(run.summary.stateCount <= 1)
   }
 
   @Test
@@ -313,22 +315,17 @@ struct PlaybackStateSpaceTests {
   @Test
   func layeredBFSIsDeterministicAndUsesProductionTransitions() throws {
     let configuration = PlaybackSearchConfiguration.validation(depthLimit: 4)
-    let first = try PlaybackStateSpaceExplorer().run(
-      model: .seek,
-      seedProfile: "ready-playing",
-      configuration: configuration
-    )
-    let second = try PlaybackStateSpaceExplorer().run(
-      model: .seek,
-      seedProfile: "ready-playing",
-      configuration: configuration
-    )
+      .withTimeLimitSeconds(nil)
+    let first = try PlaybackVerifier.run(
+      model: .seek, seedProfile: "ready-playing", configuration: configuration)
+    let second = try PlaybackVerifier.run(
+      model: .seek, seedProfile: "ready-playing", configuration: configuration)
 
     #expect(first.summary == second.summary)
-    #expect(first.summary.termination == .completeWithinBounds)
+    #expect(first.summary.completeWithinBounds)
     #expect(first.summary.productionTransitionCount > 0)
     #expect(first.summary.stateCount > 1)
-    #expect(first.failures.isEmpty)
+    #expect(first.summary.findingCount == 0)
   }
 
   @Test
@@ -345,13 +342,13 @@ struct PlaybackStateSpaceTests {
   func allSixModelsCompleteAtValidationBounds() throws {
     for model in PlaybackSearchModel.allCases {
       let definition = PlaybackSearchModelDefinition(model: model)
-      let result = try PlaybackStateSpaceExplorer().run(
+      let run = try PlaybackVerifier.run(
         model: model,
         seedProfile: try #require(definition.inventory.seedProfiles.first),
         configuration: .validation(depthLimit: 3)
       )
-      #expect(result.summary.termination == .completeWithinBounds)
-      #expect(result.failures.isEmpty, Comment(rawValue: model.rawValue))
+      #expect(run.summary.completeWithinBounds)
+      #expect(run.summary.findingCount == 0, Comment(rawValue: model.rawValue))
     }
   }
 
@@ -360,126 +357,78 @@ struct PlaybackStateSpaceTests {
     let oracle = PlaybackSearchOracle.failOnActionClass(
       "command.seekExact", invariantName: "syntheticSeekFailure"
     )
-    let result = try PlaybackStateSpaceExplorer().run(
+    let run = try PlaybackVerifier.run(
       model: .seek, seedProfile: "ready-playing",
       configuration: .validation(depthLimit: 2), oracle: oracle
     )
-    let failure = try #require(
-      result.failures.first {
-        $0.invariantName == "syntheticSeekFailure"
-      })
-    let artifact = try PlaybackSearchArtifactBuilder.build(
-      result: result, failure: failure, sourceRevision: "test", dirty: false
-    )
+    let built = try PlaybackVerificationArtifacts.build(
+      run: run, provenance: .init(sourceRevision: "test", sourceDirty: false))
+    let artifact = try #require(
+      built.artifacts.first { $0.target.property == "syntheticSeekFailure" })
 
-    let first = try PlaybackSearchArtifactCodec.encode(artifact)
-    let second = try PlaybackSearchArtifactCodec.encode(
-      PlaybackSearchArtifactCodec.decode(first)
-    )
+    let first = try PlaybackVerificationArtifacts.encode(artifact)
+    let second = try PlaybackVerificationArtifacts.encode(
+      PlaybackVerificationArtifacts.decode(first))
     #expect(first == second)
-    #expect(try PlaybackSearchArtifactReplayer.replay(artifact).reproducedFailure)
-  }
-
-  @Test
-  func causalMinimizerReplaysProductionCoreForEveryAcceptedCandidate() throws {
-    let oracle = PlaybackSearchOracle.failOnActionClass(
-      "command.seekExact", invariantName: "syntheticSeekFailure"
-    )
-    let minimized = try PlaybackSearchMinimizer.minimize(
-      actions: [.command(.pause), .command(.play), .command(.seekExact), .command(.pause)],
-      model: .seek, seedProfile: "ready-playing",
-      configuration: .validation(depthLimit: 6), oracle: oracle
-    )
-
-    #expect(minimized.actions == [.command(.seekExact)])
-    #expect(minimized.productionReplayCount > 0)
-    #expect(!minimized.history.isEmpty)
+    #expect(try PlaybackArtifactReplayer.replay(artifact).reproduced)
   }
 
   @Test
   func progressAnalysisSeparatesNamedWaitsCutoffsAndStuckSCCs() throws {
-    let result = try PlaybackStateSpaceExplorer().run(
+    let run = try PlaybackVerifier.run(
       model: .stopShutdown, seedProfile: "opening",
       configuration: .validation(depthLimit: 2)
     )
-    let progress = PlaybackProgressAnalyzer.analyze(result)
+    let progress = PlaybackProgressPolicy.summary(run.progress)
     #expect(progress.externalWaitStates > 0)
     #expect(progress.unmeasuredCutoffStates > 0)
     #expect(progress.stuckStates.isEmpty)
-
-    let cycle = PlaybackProgressAnalyzer.stronglyConnectedComponents(
-      nodeCount: 2,
-      edges: [
-        .init(from: 0, to: 1, actionClass: "noop", isFairProgress: false),
-        .init(from: 1, to: 0, actionClass: "noop", isFairProgress: false),
-      ]
-    )
-    #expect(cycle.contains(Set([0, 1])))
+    #expect(!run.progress.graphComplete)
   }
 
   @Test
   func externalSubtitleSeedHasNoStuckProgressStates() throws {
-    let result = try PlaybackStateSpaceExplorer().run(
+    let run = try PlaybackVerifier.run(
       model: .trackSubtitles, seedProfile: "external-subtitle",
-      configuration: .pr
+      configuration: PlaybackSearchConfiguration.pr.withTimeLimitSeconds(nil)
     )
-    let progress = PlaybackProgressAnalyzer.analyze(result)
-    #expect(progress.stuckStates.isEmpty)
-    #expect(progress.closedNonterminalSCCs.isEmpty)
+    #expect(run.summary.completeWithinBounds)
+    #expect(run.progress.stuckStates.isEmpty)
+    #expect(run.progress.closedNonterminalComponents.isEmpty)
   }
 
   @Test
   func conservativePORMatchesUnreducedReachabilityAndFailures() throws {
-    let explorer = PlaybackStateSpaceExplorer()
-    let unreduced = try explorer.run(
+    let unreduced = try PlaybackVerifier.run(
       model: .stopShutdown, seedProfile: "opening",
       configuration: .validation(depthLimit: 3, porMode: .disabled)
     )
-    let reduced = try explorer.run(
+    let reduced = try PlaybackVerifier.run(
       model: .stopShutdown, seedProfile: "opening",
       configuration: .validation(depthLimit: 3, porMode: .validation)
     )
 
     #expect(reduced.summary.canonicalDigest == unreduced.summary.canonicalDigest)
-    #expect(reduced.failures == unreduced.failures)
-    #expect(reduced.summary.edgeCount < unreduced.summary.edgeCount)
+    #expect(reduced.summary.failedProperties == unreduced.summary.failedProperties)
+    #expect(reduced.summary.graphEdgeCount < unreduced.summary.graphEdgeCount)
     #expect(reduced.summary.reducedEdgeCount > 0)
     #expect(reduced.summary.nonCommutingDiamondCount == 0)
+    let comparison = try compareReduction(
+      unreduced.model, unreduced: unreduced.report, reduced: reduced.report,
+      progress: PlaybackProgressPolicy.reductionPredicates)
+    #expect(comparison.equivalent)
   }
 
   @Test
-  func porValidationReportsEveryNonCommutingCandidatePair() throws {
-    let definition = PlaybackSearchModelDefinition(model: .prerollBuffering)
-    let node = try definition.makeSeed(profile: "partial-av")
-    let configuration = PlaybackSearchConfiguration.validation(
-      depthLimit: 2, porMode: .validation
+  func porValidationChecksEnabledActionDiamonds() throws {
+    let run = try PlaybackVerifier.run(
+      model: .prerollBuffering, seedProfile: "partial-av",
+      configuration: .validation(depthLimit: 2, porMode: .validation)
     )
-    let reduction = PlaybackPartialOrderReducer.reduce(
-      actions: definition.enabledActions(for: node, configuration: configuration),
-      node: node, definition: definition, configuration: configuration,
-      validateDiamonds: true
-    )
-
-    #expect(reduction.validatedDiamondCount > 0)
-    #expect(reduction.nonCommutingDiamondCount == 0)
-  }
-
-  @Test
-  func eligibleArtifactPromotesToRuntimeScheduleWithoutInventingMechanisms() throws {
-    let oracle = PlaybackSearchOracle.failOnActionClass(
-      "command.seekExact", invariantName: "syntheticSeekFailure"
-    )
-    let result = try PlaybackStateSpaceExplorer().run(
-      model: .seek, seedProfile: "ready-playing",
-      configuration: .validation(depthLimit: 1), oracle: oracle
-    )
-    let failure = try #require(result.failures.first)
-    let artifact = try PlaybackSearchArtifactBuilder.build(
-      result: result, failure: failure, sourceRevision: "test", dirty: false
-    )
-    let promoted = try #require(PlaybackRuntimePromotion.promote(artifact))
-    #expect(!promoted.steps.isEmpty)
-    #expect(promoted.steps.allSatisfy { $0.effectContextPreserved })
+    let diamonds = try #require(run.diamonds)
+    #expect(diamonds.termination == "search_complete")
+    #expect(diamonds.validated > 0)
+    #expect(diamonds.nonCommuting.isEmpty)
   }
 
   private func makeNode(

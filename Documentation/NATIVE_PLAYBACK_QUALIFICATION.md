@@ -53,15 +53,19 @@ Detailed limits and artifacts are in the
 ## Bounded policy-search evidence
 
 `Scripts/run-playback-state-space.sh` executes every named seed in six separate
-models and supports deterministic `SUPERPLAYR_STATE_SPACE_SHARD_INDEX` /
-`SUPERPLAYR_STATE_SPACE_SHARD_COUNT` partitioning. PR runs are unreduced and
+models through the pinned Statelessness Swift engine and supports
+deterministic `ILLIQUID_STATE_SPACE_SHARD_INDEX` /
+`ILLIQUID_STATE_SPACE_SHARD_COUNT` partitioning. PR runs are unreduced and
 checked against the versioned baseline. Nightly runs use conservative POR;
 qualification runs add dynamic diamond checks before the remaining native
-qualification stages.
+qualification stages. See [PLAYBACK_STATE_SPACE_SEARCH.md](PLAYBACK_STATE_SPACE_SEARCH.md).
 
-Each summary records model version, seed, bounds, termination, state and edge
-counts, production transition count, gate rejections, POR measurements,
-structural reachable-key digest, progress classification, and trend findings.
+Each record carries engine revision and source provenance, model, property and
+codec versions, seed and bounds. It also records termination and coverage
+(exhaustive, depth-bounded or incomplete), state and edge counts, production
+transitions, gate rejections, POR and diamond measurements, a structural
+reachable-key digest, progress classification and trend findings. An
+incomplete search is never reported as coverage of its bounds.
 A passing statement is limited to “no invariant or progress violation within
 the recorded model/version/configuration bounds.” Depth/state/edge frontier
 nodes are explicitly unmeasured. See
