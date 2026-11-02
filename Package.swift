@@ -29,6 +29,12 @@ let package = Package(
             url: "https://github.com/swiftlang/swift-testing.git",
             revision: "swift-6.3.2-RELEASE"
         ),
+        // Native Swift Statelessness, pinned to the reviewed S1-S6 merge. See
+        // Documentation/STATELESSNESS_SWIFT_MIGRATION.md before changing it.
+        .package(
+            url: "https://github.com/Jagalite/statelessness.git",
+            revision: "3fbdca7c49be3cf32da613f887a7f149e0b97087"
+        ),
     ],
     targets: [
         .systemLibrary(
@@ -64,7 +70,10 @@ let package = Package(
         ),
         .target(
             name: "IlliquidPlaybackStateSpace",
-            dependencies: ["IlliquidPlaybackCore"],
+            dependencies: [
+                "IlliquidPlaybackCore",
+                .product(name: "Statelessness", package: "statelessness"),
+            ],
             path: "Sources/IlliquidPlaybackStateSpace"
         ),
         .target(
@@ -169,9 +178,11 @@ let package = Package(
             name: "IlliquidPlaybackStateSpaceTests",
             dependencies: [
                 "IlliquidPlaybackStateSpace",
+                .product(name: "Statelessness", package: "statelessness"),
                 .product(name: "Testing", package: "swift-testing"),
             ],
-            path: "Tests/IlliquidPlaybackStateSpaceTests"
+            path: "Tests/IlliquidPlaybackStateSpaceTests",
+            exclude: ["Fixtures"]
         ),
         .testTarget(
             name: "IlliquidCoreTests",

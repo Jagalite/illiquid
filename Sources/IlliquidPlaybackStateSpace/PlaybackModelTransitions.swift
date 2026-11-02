@@ -1,155 +1,11 @@
 import Foundation
 import IlliquidPlaybackCore
 
-public struct PlaybackStateSpaceExplorer: Sendable {
-  public struct Progress: Sendable {
-    public let model: PlaybackSearchModel
-    public let seedProfile: String
-    public let depth: Int
-    public let stateCount: Int
-    public let edgeCount: Int
-    public let frontierCount: Int
-  }
-
-  public init() {}
-
-  public func run(
-    model: PlaybackSearchModel,
-    seedProfile: String,
-    configuration: PlaybackSearchConfiguration,
-    oracle: PlaybackSearchOracle = .production,
-    progressHandler: (@Sendable (Progress) -> Void)? = nil
-  ) throws -> PlaybackSearchResult {
-    let definition = PlaybackSearchModelDefinition(model: model)
-    let seed = try definition.makeSeed(profile: seedProfile)
-    var nodes = [seed]
-    var keys = [PlaybackSearchCanonicalizer.key(for: seed)]
-    var predecessors: [PlaybackSearchPredecessor?] = [nil]
-    var visited: [PlaybackSearchStateKey: Int] = [keys[0]: 0]
-    var graph = PlaybackSearchGraph()
-    var failures: [PlaybackSearchFailure] = []
-    var currentFrontier = [0]
-    var peakFrontier = 1
-    var edgeCount = 0
-    var productionTransitions = 0
-    var gateRejections = 0
-    var reducedEdges = 0
-    var validatedDiamonds = 0
-    var nonCommutingDiamonds = 0
-    var deepestLayer = 0
-    var termination = PlaybackSearchTermination.completeWithinBounds
-    let startNanoseconds = DispatchTime.now().uptimeNanoseconds
-    let timeLimitNanoseconds: UInt64? = configuration.timeLimitSeconds.flatMap {
-      value -> UInt64? in
-      guard value.isFinite else { return nil }
-      return UInt64(min(max(0, value), Double(UInt64.max) / 1_000_000_000)
-        * 1_000_000_000)
-    }
-
-    layerLoop: for depth in 0..<configuration.depthLimit {
-      guard !currentFrontier.isEmpty else { break }
-      if let timeLimitNanoseconds,
-        DispatchTime.now().uptimeNanoseconds - startNanoseconds >= timeLimitNanoseconds
-      {
-        termination = .timeBudgetReached
-        break
-      }
-      var nextFrontier: [Int] = []
-      for nodeIndex in currentFrontier {
-        var actions = definition.enabledActions(for: nodes[nodeIndex], configuration: configuration)
-        if configuration.porMode != .disabled {
-          let reduction = PlaybackPartialOrderReducer.reduce(
-            actions: actions, node: nodes[nodeIndex], definition: definition,
-            configuration: configuration,
-            validateDiamonds: configuration.porMode == .validation
-          )
-          actions = reduction.actions
-          reducedEdges += reduction.removedCount
-          validatedDiamonds += reduction.validatedDiamondCount
-          nonCommutingDiamonds += reduction.nonCommutingDiamondCount
-        }
-        for action in actions {
-          if let timeLimitNanoseconds,
-            DispatchTime.now().uptimeNanoseconds - startNanoseconds >= timeLimitNanoseconds
-          {
-            termination = .timeBudgetReached
-            break layerLoop
-          }
-          if edgeCount >= configuration.edgeLimit {
-            termination = .edgeCapReached
-            break layerLoop
-          }
-          let applied = apply(
-            action: action, to: nodes[nodeIndex], configuration: configuration
-          )
-          var transitionViolations = applied.violations
-          if let violation = oracle.violation(for: action, transition: applied.transition) {
-            transitionViolations.append(violation)
-          }
-          edgeCount += 1
-          if applied.calledProductionCore { productionTransitions += 1 }
-          if applied.gateRejected { gateRejections += 1 }
-          let successorKey = PlaybackSearchCanonicalizer.key(for: applied.node)
-          let successorIndex: Int
-          if let existing = visited[successorKey] {
-            successorIndex = existing
-          } else {
-            if nodes.count >= configuration.stateLimit {
-              termination = .stateCapReached
-              break layerLoop
-            }
-            successorIndex = nodes.count
-            visited[successorKey] = successorIndex
-            nodes.append(applied.node)
-            keys.append(successorKey)
-            predecessors.append(PlaybackSearchPredecessor(nodeIndex: nodeIndex, action: action))
-            nextFrontier.append(successorIndex)
-          }
-          for violation in transitionViolations {
-            failures.append(
-              PlaybackSearchFailure(
-                invariantName: violation.name, details: violation.details,
-                nodeIndex: successorIndex, fromNodeIndex: nodeIndex,
-                action: action, depth: depth + 1
-              ))
-          }
-          graph.edges.append(
-            .init(
-              from: nodeIndex, to: successorIndex, actionClass: action.stableClass,
-              isFairProgress: applied.isFairProgress
-            ))
-        }
-      }
-      deepestLayer = depth + 1
-      currentFrontier = nextFrontier
-      peakFrontier = max(peakFrontier, currentFrontier.count)
-      progressHandler?(
-        Progress(
-          model: model, seedProfile: seedProfile, depth: deepestLayer,
-          stateCount: nodes.count, edgeCount: edgeCount,
-          frontierCount: currentFrontier.count
-        )
-      )
-    }
-
-    let canonicalDigest = digest(keys: keys)
-    let summary = PlaybackSearchSummary(
-      model: model, modelVersion: definition.modelVersion,
-      seedProfile: seedProfile, configuration: configuration,
-      termination: termination, stateCount: nodes.count, edgeCount: edgeCount,
-      productionTransitionCount: productionTransitions, gateRejectionCount: gateRejections,
-      peakFrontier: peakFrontier, deepestCompletedLayer: deepestLayer,
-      reducedEdgeCount: reducedEdges, validatedDiamondCount: validatedDiamonds,
-      nonCommutingDiamondCount: nonCommutingDiamonds,
-      canonicalDigest: canonicalDigest
-    )
-    return PlaybackSearchResult(
-      summary: summary, oracle: oracle, failures: uniqueFailures(failures), graph: graph,
-      nodes: nodes, predecessors: predecessors
-    )
-  }
-}
-
+/// Playback model transitions: the Statelessness `step` callback applies one
+/// search action through the production `PlaybackCore.update(_:)` at most once
+/// and updates the modeled environment and ghost obligations. Traversal,
+/// deduplication, reduction, progress analysis, replay and shrinking belong to
+/// Statelessness (see `PlaybackStatelessnessModels`).
 struct AppliedSearchAction {
   var node: PlaybackSearchNode
   var transition: PlaybackTransition?
@@ -169,7 +25,6 @@ func apply(
   node.depth += 1
   let preSession = node.coreState.activeSession?.id
   let preGeneration = node.coreState.activeSession?.generation
-  let preKey = PlaybackSearchCanonicalizer.key(for: node)
   var event: PlaybackEvent?
   var gateRejected = false
   var fairProgress = false
@@ -345,6 +200,9 @@ func apply(
       ))
   }
   if case .stale = transition.disposition {
+    // The search key excludes depth, so the unmodified input yields the
+    // pre-transition key; it is derived only for stale transitions.
+    let preKey = PlaybackSearchCanonicalizer.key(for: input)
     let postKey = PlaybackSearchCanonicalizer.key(for: node)
     if preKey.lifecycle != postKey.lifecycle || preKey.externalWait != postKey.externalWait
       || preKey.session != postKey.session || preKey.leases != postKey.leases
@@ -575,20 +433,4 @@ func synchronizeEnvironment(node: inout PlaybackSearchNode, transition: Playback
       node.coreState.activeSession?.synchronization.startupAcknowledged == true
     node.environment = .prerollBuffering(environment)
   }
-}
-
-func digest(keys: [PlaybackSearchStateKey]) -> String {
-  var hash: UInt64 = 14_695_981_039_346_656_037
-  for digest in keys.map(PlaybackSearchCanonicalizer.digest).sorted() {
-    for byte in digest.utf8 {
-      hash ^= UInt64(byte)
-      hash &*= 1_099_511_628_211
-    }
-  }
-  return "fnv1a64:" + String(hash, radix: 16)
-}
-
-func uniqueFailures(_ failures: [PlaybackSearchFailure]) -> [PlaybackSearchFailure] {
-  var names: Set<String> = []
-  return failures.filter { names.insert("\($0.invariantName)|\($0.details)").inserted }
 }

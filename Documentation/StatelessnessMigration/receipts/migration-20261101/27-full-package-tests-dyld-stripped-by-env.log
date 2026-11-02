@@ -1,0 +1,25 @@
+[0/1] Planning build
+Building for debugging...
+[0/19] Write swift-version--58304C5D6DBC2206.txt
+[1/20] Write sources
+[5/12] Compiling IlliquidPlaybackStateSpace PlaybackVerificationArtifact.swift
+[6/12] Compiling IlliquidPlaybackStateSpace CanonicalJSONEncoder.swift
+[7/12] Compiling IlliquidPlaybackStateSpace PlaybackVerifier.swift
+[8/12] Emitting module IlliquidPlaybackStateSpace
+[9/18] Emitting module IlliquidStateSpaceExplorer
+[10/18] Compiling IlliquidStateSpaceExplorer main.swift
+[10/18] Write Objects.LinkFileList
+[12/18] Compiling IlliquidPlaybackStateSpaceTests PlaybackStateSpaceTests.swift
+[13/18] Compiling IlliquidPlaybackStateSpaceTests StatelessnessMigrationTests.swift
+[14/18] Emitting module IlliquidPlaybackStateSpaceTests
+[14/18] Linking IlliquidStateSpaceExplorer
+[15/18] Applying IlliquidStateSpaceExplorer
+[16/18] Write Objects.LinkFileList
+[17/18] Linking IlliquidPackageTests
+Build complete! (23.66s)
+error: terminated(1): /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/libexec/swift/pm/swiftpm-xctest-helper /Volumes/seed2/Projects/illiquid-statelessness/.build/arm64-apple-macosx/debug/IlliquidPackageTests.xctest /var/folders/p2/hs2582qs5672qbvtm4z5_9840000gn/T/TemporaryFile.xTwYzC output:
+    error: Error Domain=NSCocoaErrorDomain Code=3588 "dlopen(/Volumes/seed2/Projects/illiquid-statelessness/.build/arm64-apple-macosx/debug/IlliquidPackageTests.xctest/Contents/MacOS/IlliquidPackageTests, 0x0109): Library not loaded: /opt/homebrew/opt/x265/lib/libx265.216.dylib
+      Referenced from: <3491883B-D25F-36CE-8E69-7698AE3F2C8E> /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavfilter.11.14.102.dylib
+      Reason: tried: '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libx265.216.dylib' (no such file), '/opt/homebrew/opt/x265/lib/libx265.216.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/x265/lib/libx265.216.dylib' (no such file), '/opt/homebrew/opt/x265/lib/libx265.216.dylib' (no such file), '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libx265.216.dylib' (no such file), '/opt/homebrew/Cellar/x265/4.3/lib/libx265.216.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/Cellar/x265/4.3/lib/libx265.216.dylib' (no such file), '/opt/homebrew/Cellar/x265/4.3/lib/libx265.216.dylib' (no such file)" UserInfo={NSLocalizedFailureReason=The bundle couldn’t be loaded., NSLocalizedRecoverySuggestion=Try reinstalling the bundle., NSFilePath=/Volumes/seed2/Projects/illiquid-statelessness/.build/arm64-apple-macosx/debug/IlliquidPackageTests.xctest/Contents/MacOS/IlliquidPackageTests, NSDebugDescription=dlopen(/Volumes/seed2/Projects/illiquid-statelessness/.build/arm64-apple-macosx/debug/IlliquidPackageTests.xctest/Contents/MacOS/IlliquidPackageTests, 0x0109): Library not loaded: /opt/homebrew/opt/x265/lib/libx265.216.dylib
+      Referenced from: <3491883B-D25F-36CE-8E69-7698AE3F2C8E> /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavfilter.11.14.102.dylib
+      Reason: tried: '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libx265.216.dylib' (no such file), '/opt/homebrew/opt/x265/lib/libx265.216.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/x265/lib/libx265.216.dylib' (no such file), '/opt/homebrew/opt/x265/lib/libx265.216.dylib' (no such file), '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libx265.216.dylib' (no such file), '/opt/homebrew/Cellar/x265/4.3/lib/libx265.216.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/Cellar/x265/4.3/lib/libx265.216.dylib' (no such file), '/opt/homebrew/Cellar/x265/4.3/lib/libx265.216.dylib' (no such file), NSBundlePath=/Volumes/seed2/Projects/illiquid-statelessness/.build/arm64-apple-macosx/debug/IlliquidPackageTests.xctest, NSLocalizedDescription=The bundle “IlliquidPackageTests.xctest” couldn’t be loaded.}

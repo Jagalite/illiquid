@@ -1,0 +1,32 @@
+warning: 'illiquid-statelessness': found 3 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /Volumes/seed2/Projects/illiquid-statelessness/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/statelessness-migration-golden-v1.json
+    /Volumes/seed2/Projects/illiquid-statelessness/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/legacy-artifact-v1-seek-ready-playing.json
+    /Volumes/seed2/Projects/illiquid-statelessness/Tests/IlliquidPlaybackStateSpaceTests/Fixtures/statelessness-migration-inventory-v1.json
+[0/1] Planning build
+Building for debugging...
+[0/6] Write sources
+[2/6] Write swift-version--58304C5D6DBC2206.txt
+[4/20] Compiling IlliquidPlaybackStateSpace PlaybackReductionPolicy.swift
+[5/20] Compiling IlliquidPlaybackStateSpace PlaybackStatelessnessModel.swift
+[6/21] Compiling IlliquidPlaybackStateSpace PlaybackModelCodec.swift
+[7/21] Compiling IlliquidPlaybackStateSpace PlaybackProgressPolicy.swift
+[8/21] Compiling IlliquidPlaybackStateSpace SearchAction.swift
+[9/21] Compiling IlliquidPlaybackStateSpace CanonicalJSONEncoder.swift
+[10/21] Compiling IlliquidPlaybackStateSpace PlaybackSearchTrend.swift
+[11/21] Compiling IlliquidPlaybackStateSpace PlaybackSearchTypes.swift
+[12/21] Compiling IlliquidPlaybackStateSpace PlaybackVerificationArtifact.swift
+[13/21] Compiling IlliquidPlaybackStateSpace PlaybackSearchModel.swift
+[14/21] Compiling IlliquidPlaybackStateSpace PlaybackSearchModels.swift
+[15/21] Emitting module IlliquidPlaybackStateSpace
+[16/21] Compiling IlliquidPlaybackStateSpace PlaybackModelTransitions.swift
+[17/21] Compiling IlliquidPlaybackStateSpace PlaybackSearchCanonicalizer.swift
+[18/21] Compiling IlliquidPlaybackStateSpace PlaybackVerifier.swift
+[19/23] Emitting module IlliquidStateSpaceExplorer
+[20/23] Compiling IlliquidStateSpaceExplorer main.swift
+/Volumes/seed2/Projects/illiquid-statelessness/Validation/IlliquidStateSpaceExplorer/main.swift:64:68: error: cannot convert value of type 'Never' to expected argument type 'UInt64?'
+ 62 |     case "--max-graph-bytes":
+ 63 |       let raw = value()
+ 64 |       result.maxGraphBytes = raw == "none" ? nil : (UInt64(raw) ?? fail("invalid byte count"))
+    |                                                                    `- error: cannot convert value of type 'Never' to expected argument type 'UInt64?'
+ 65 |     case "--replay": result.replay = value()
+ 66 |     case "--convert-legacy": result.convertLegacy = value()

@@ -1,12 +1,15 @@
 # Playback bounded state-space search
 
-The proposed [full migration to Statelessness Swift](STATELESSNESS_SWIFT_MIGRATION.md)
-defines the replacement architecture, upstream library changes, and qualification gates.
-The implementation described below remains the current custom explorer.
-
-Superplayr includes a deterministic, custom Swift explorer around the production
-`PlaybackCore.update(_:)` transition. It exhausts finite policy schedules; it is
-not a media simulator and does not add a general model-checking dependency.
+Illiquid verifies the production `PlaybackCore.update(_:)` transition with
+the native Swift [Statelessness](https://github.com/Jagalite/statelessness)
+library, pinned to an exact revision in `Package.swift`. Illiquid owns the
+playback models, transition adapter, search identity, properties, progress
+and reduction policies, and acceptance rules. Statelessness owns graph search,
+failure collection, progress graph algorithms, reduction, recording, replay
+and shrinking. The search exhausts finite policy schedules; it is not a media
+simulator. The migration from the earlier custom explorer is recorded in
+[STATELESSNESS_SWIFT_MIGRATION.md](STATELESSNESS_SWIFT_MIGRATION.md) and
+[StatelessnessMigration/STATUS.md](StatelessnessMigration/STATUS.md).
 
 ## Scope and evidence boundary
 
@@ -30,8 +33,13 @@ proving the actual mechanism.
 
 ## Search and state identity
 
-The default kernel is layered, state-aware breadth-first search with stable
-action ordering, predecessor reconstruction, and hard state/edge/depth caps.
+`PlaybackStatelessnessModels.make` builds one `Statelessness.Model` per
+family and seed. Statelessness `exploreGraph` performs layered breadth-first
+search with stable input ordering, an admitted graph with predecessors, and
+hard state/transition/depth/time/graph-byte caps. Failures are collected
+without stopping, and failing successors are still expanded. Coverage is
+reported as `exhaustive`, `bounded` (depth), or `incomplete(reason)`. Only the
+first two are finished searches.
 `PlaybackSearchStateKey` structurally alpha-renames session, generation,
 operation, effect, and revision references. It retains behaviorally relevant
 pending effects, bounded late-result tombstones, model environment, and ghost
@@ -66,22 +74,32 @@ this abstraction or an action inventory requires incrementing the affected
   queue bounds, format repreroll, and control preemption.
 
 Every core transition runs `PlaybackInvariantChecker` plus transition-local
-search invariants before state deduplication. There is no counterexample
-allowlist.
+search invariants before state deduplication. Statelessness records them as
+transition checks. There is no counterexample allowlist.
 
 ## Progress, POR, and profiles
 
-Completed graphs are classified into intentional stable waits, named external
-waits, measured transaction progress, cutoff/unmeasured states, and stuck
-states. Fair-outcome reverse reachability, obligation ranks, and Tarjan SCC
-analysis reject closed nonterminal no-progress cycles without treating an
-event-driven wait as deadlock.
+Graphs are classified into intentional stable waits, named external waits,
+measured transaction progress, unmeasured states, and stuck states.
+`PlaybackProgressPolicy` supplies the playback predicates and obligation
+ranks. Statelessness progress analysis supplies fair-edge reverse
+reachability, strongly connected components and closed-component detection.
+It rejects closed nonterminal no-progress cycles without treating an
+event-driven wait as deadlock. A node is unmeasured when its outgoing edges are
+not all known, and an unmeasured node is never evidence either way.
 
-Partial-order reduction is deliberately narrow: only actions proven to have the
-same successor and observation signature are collapsed. Validation mode also
-executes enabled-action diamonds and counts noncommuting pairs. Tests compare
-POR-on and POR-off reachable-key digests and failures at an exhaustive small
-bound. PR stays unreduced so the baseline continuously checks the full graph.
+Partial-order reduction is deliberately narrow. `PlaybackReductionPolicy`
+marks only `wrongOperation` result mutations as eligible. Statelessness still
+executes and checks every edge, and it collapses one only when the disposition,
+every check, the playback projection and the successor are equal. Validation
+mode also executes enabled-action diamonds and reports noncommuting pairs.
+Reduction policy version 2 declares same-stream queue offer/consume pairs
+dependent: they do not commute at queue bounds, and neither action is ever
+reduced. Those diamonds are reported as `declaredDependentDiamondCount`. Any
+other noncommuting pair is a validation failure.
+Tests compare reduced and unreduced searches with `compareReduction`,
+including progress. PR stays unreduced so the baseline continuously checks the
+full graph.
 
 | Profile | Depth | Generations | Pending / late | Failures | States | Edges | POR |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
@@ -111,41 +129,71 @@ seed. Unit coverage constructs every advertised seed to catch this kind of drift
 
 ## Commands and artifacts
 
-Run every PR seed:
+Run every PR seed through the build queue (the runner compiles first):
 
 ```sh
-./Scripts/run-playback-state-space.sh
+python3 /Volumes/seed1/Projects/kyoto/kyoto.py submit -- ./Scripts/run-playback-state-space.sh
 ```
 
 Select a model/seed directly or validate POR:
 
 ```sh
-swift run SuperplayrStateSpaceExplorer --profile validation \
+swift run IlliquidStateSpaceExplorer --profile validation \
   --model seek --seed ready-playing --por validation \
-  --output /tmp/superplayr-state-space
+  --output /tmp/illiquid-state-space
 ```
 
 Nightly and deterministic sharding use environment variables:
 
 ```sh
-SUPERPLAYR_STATE_SPACE_PROFILE=nightly \
-SUPERPLAYR_STATE_SPACE_SHARD_INDEX=0 \
-SUPERPLAYR_STATE_SPACE_SHARD_COUNT=6 \
+ILLIQUID_STATE_SPACE_PROFILE=nightly \
+ILLIQUID_STATE_SPACE_SHARD_INDEX=0 \
+ILLIQUID_STATE_SPACE_SHARD_COUNT=6 \
   ./Scripts/run-playback-state-space.sh
 ```
 
-Exit 0 means every selected search completed within bounds without a finding;
-exit 1 means an invariant, progress, POR, or trend finding; exit 2 means a cap.
-Success writes one summary per seed and a shard manifest. Each safety finding
-writes deterministic JSON with source/dirty identity, configuration, full
-production pre/post replay states, normalized digests, original and causally
-minimized traces, and minimization replay history.
+`ILLIQUID_STATE_SPACE_MAX_GRAPH_BYTES` (default 3 GiB) bounds Statelessness
+graph bookkeeping. Reaching it ends the search as
+`incomplete(graph_retention_limit)` rather than exhausting host memory.
+`ILLIQUID_STATE_SPACE_SEEDS="model/seed ..."` selects seeds.
+`ILLIQUID_STATE_SPACE_TIME_LIMIT=SECONDS|none` overrides the profile's
+per-seed time budget. The effective configuration is recorded in each record,
+so an untimed run can never pass as a profile run.
 
-`PlaybackSearchArtifactReplayer` rebuilds the seed and replays every action
-through the production core. `PlaybackRuntimePromotion` converts only faithful
-command/result/current-fact traces to a runtime schedule with unchanged effect
-contexts. Executor-only, abstract queue, and resource-custody actions are
-rejected until a real native fault seam exists.
+Measured cost budgets per profile (wall time, peak RSS, deadlines) are in
+[PLAYBACK_STATE_SPACE_COST_BUDGET.json](Baselines/PLAYBACK_STATE_SPACE_COST_BUDGET.json).
+They are resource limits, not acceptance criteria. Each record carries
+`elapsedSeconds`.
+
+Exit 0 means every selected search finished within bounds without a finding.
+Exit 1 means an invariant, progress, POR, trend or unretained-finding failure.
+Exit 2 means an incomplete search (cap, deadline or graph budget).
+
+The runner writes a provenance file: revision, a SHA-256 for every dirty file,
+and Swift and platform identity. It also writes one qualification record per
+seed and a shard manifest. Each record carries engine revision, model, property
+and codec versions, effective configuration, termination, coverage, counts,
+progress and trend results. `--resume` reuses a record only if all of those
+identities and the graph budget match, and the run finished.
+
+Each failed property produces a `PlaybackVerificationArtifact`. It holds the
+provenance, the first finding, and the original and minimized witnesses. The
+witness is minimized with native `shrink64`, or with `shrinkContinued` when the
+witness crosses an earlier failure. The artifact also holds both witnesses as
+`stateless.continued-trace-json` traces, using the versioned deterministic
+`PlaybackModelCodec`. `IlliquidStateSpaceExplorer --replay ARTIFACT` replays
+both traces in a fresh process. Replay compares every step's disposition,
+outputs, post-state and checks, and requires the minimized trace to end with
+the selected property.
+
+`--convert-legacy FILE` reads schema-1 artifacts from the retired explorer,
+re-executes their actions through the Statelessness model, and lists the
+fields it cannot preserve. Original files are never modified. An artifact from
+an older model version must be replayed in its pinned historical checkout.
+`PlaybackRuntimePromotion` converts only faithful command/result/current-fact
+witnesses to a runtime schedule with unchanged effect contexts.
+Executor-only, abstract queue, and resource-custody actions are rejected until
+a real native fault seam exists.
 
 ## Qualification relationship
 

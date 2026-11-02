@@ -1,0 +1,34 @@
+{
+  "engine": "statelessness-swift@3fbdca7c49be3cf32da613f887a7f149e0b97087",
+  "graphByteBudget": 3221225472,
+  "host": "Apple arm64, 8 CPUs, 8 GiB, macOS 26, Swift 6.3.3, debug build, via the Kyoto queue",
+  "policy": "Budgets are resource limits, not acceptance. Exceeding one is a cost regression to investigate; it never changes bounds, properties or baselines. Peak RSS comes from Kyoto process samples.",
+  "profiles": {
+    "nightly": {
+      "budgetPeakRSSMB": 4096,
+      "budgetWallSeconds": 2400,
+      "measuredJob": "e2575b3ddbf84dd881708cfa1d9ed5e7",
+      "measuredPeakRSSMB": 2236,
+      "measuredWallSeconds": 1703,
+      "perSeedDeadlineSeconds": 300
+    },
+    "pr": {
+      "budgetPeakRSSMB": 1536,
+      "budgetWallSeconds": 300,
+      "measuredJob": "2d246e11f9cd47029ff92205ba52a119",
+      "measuredPeakRSSMB": 771,
+      "measuredWallSeconds": 207,
+      "perSeedDeadlineSeconds": 60,
+      "tightestSeed": "recovery/recovery-in-flight (55 s legacy, about 55-78 s Statelessness depending on host load)"
+    },
+    "qualification": {
+      "budgetPeakRSSMB": 6144,
+      "budgetWallSeconds": 10800,
+      "measuredJob": "965c5ad53a6b4579a9d8b7fdaa7afc20",
+      "measuredPeakRSSMB": 3068,
+      "measuredWallSeconds": 8190,
+      "perSeedDeadlineSeconds": 600
+    }
+  },
+  "schemaVersion": 1
+}
