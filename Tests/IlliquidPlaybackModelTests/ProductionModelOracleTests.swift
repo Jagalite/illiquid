@@ -570,5 +570,27 @@ struct ProductionModelTurnCostTests {
     }
     samples.sort()
     print("production-turn-latency engine=statelessness-session ns-per-turn median=\(samples[samples.count / 2]) min=\(samples[0]) max=\(samples[samples.count - 1])")
+    // Components: the bare model step, and the step with its checks.
+    for (label, body) in [
+      ("model-step", { (state: PlaybackDomainState, envelope: PlaybackEventEnvelope) -> PlaybackDomainState in
+        PlaybackProductionModel.step(state, envelope).state }),
+      ("model-step+checks", { (state: PlaybackDomainState, envelope: PlaybackEventEnvelope) -> PlaybackDomainState in
+        let t = PlaybackProductionModel.step(state, envelope); _ = PlaybackProductionModel.checks(t); return t.state }),
+    ] {
+      var componentSamples: [Double] = []
+      for round in 0..<5 {
+        var turns = 0
+        let elapsed = ContinuousClock().measure {
+          for (initial, envelopes) in workloads {
+            var state = initial
+            for envelope in envelopes { state = body(state, envelope); turns += 1 }
+          }
+        }
+        let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
+        if round > 0 { componentSamples.append(seconds / Double(turns) * 1e9) }
+      }
+      componentSamples.sort()
+      print("production-turn-latency engine=\(label) ns-per-turn median=\(componentSamples[componentSamples.count / 2])")
+    }
   }
 }

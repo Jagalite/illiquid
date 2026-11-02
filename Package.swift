@@ -34,7 +34,7 @@ let package = Package(
         // Documentation/STATELESSNESS_PRODUCTION_MIGRATION.md before changing it.
         .package(
             url: "https://github.com/Jagalite/statelessness.git",
-            revision: "20fc035ec3c91a69934657909b3c044cec86a07e"
+            revision: "ef6923412ebb38dc14fac58fcfea9404864c9f63"
         ),
     ],
     targets: [

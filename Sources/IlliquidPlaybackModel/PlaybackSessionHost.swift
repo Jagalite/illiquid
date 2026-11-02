@@ -40,6 +40,13 @@ public final class PlaybackSessionHost {
     }
   }
 
+  /// Reads the committed state in place, without copying it.
+  public func read<R>(_ body: (PlaybackDomainState) -> R) -> R {
+    do { return try session.read(body) } catch {
+      preconditionFailure("playback state read during a turn: \(error)")
+    }
+  }
+
   /// Submits one event and returns the committed transition.
   @discardableResult
   public func send(_ event: PlaybackEvent, advancingBy ticks: UInt64 = 1) -> PlaybackTransition {
@@ -63,14 +70,15 @@ public final class PlaybackSessionHost {
         invariantViolations: [])
     }
 
-    let committed = state
-    if case let .effectResult(result) = event,
-      committed.outstandingEffects[result.context.effectID] == nil,
-      let index = pendingEffects.firstIndex(where: { $0.context == result.context })
-    {
-      pendingEffects.remove(at: index)
+    read { committed in
+      if case let .effectResult(result) = event,
+        committed.outstandingEffects[result.context.effectID] == nil,
+        let index = pendingEffects.firstIndex(where: { $0.context == result.context })
+      {
+        pendingEffects.remove(at: index)
+      }
+      pendingEffects.removeAll { committed.outstandingEffects[$0.context.effectID] == nil }
     }
-    pendingEffects.removeAll { committed.outstandingEffects[$0.context.effectID] == nil }
     pendingEffects.append(contentsOf: transition.effects.filter { $0.completion != .bestEffortMirror })
     return transition
   }

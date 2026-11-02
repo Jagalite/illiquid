@@ -116,13 +116,14 @@ public enum PlaybackProductionModel {
   }
 
   /// Statelessness's classification of the richer playback disposition, which
-  /// the output keeps verbatim.
+  /// the output keeps verbatim (including the duplicate effect ID). Reasons
+  /// reuse existing strings so classifying a turn allocates nothing.
   public static func disposition(_ disposition: EventDisposition) -> Disposition {
     switch disposition {
     case .accepted: .accepted
-    case .duplicate(let effectID): .rejected("duplicate:\(effectID.rawValue)")
-    case .stale(let reason): .rejected("stale:\(reason.rawValue)")
-    case .invalid(let reason): .rejected("invalid:\(reason)")
+    case .duplicate: .rejected("duplicate")
+    case .stale(let reason): .rejected(reason.rawValue)
+    case .invalid(let reason): .rejected(reason)
     case .ignoredAfterTermination: .ignored("afterTermination")
     }
   }
