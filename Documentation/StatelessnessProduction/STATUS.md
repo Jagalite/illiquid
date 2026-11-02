@@ -11,8 +11,10 @@ explores the same `step` callback.
 Statuses stay distinct: compiled, executed tests, bounded search, native
 integration, live UI and release qualification. Evidence for each is listed
 below with its receipt. Final-head evidence was produced on commit
-`c450b683` (Statelessness pinned at `a181e3c0` on branch
-`production/execution-session` of Jagalite/statelessness). This is not
+`0f0ebb5f` (Statelessness pinned at `43406954` on branch
+`production/execution-session` of Jagalite/statelessness, proposed upstream
+as [Jagalite/statelessness#20](https://github.com/Jagalite/statelessness/pull/20)),
+after an independent gpt-6.1-sol review (see Review). This is not
 release qualification: the locked release packager could not run on this
 host (PD1).
 
@@ -20,7 +22,7 @@ host (PD1).
 
 | Component | Owner | Location |
 | --- | --- | --- |
-| Turn execution, committed state, sequence, checks, recording | Statelessness | `ExecutionSession` (production-execution-v1, pinned `a181e3c0`) |
+| Turn execution, committed state, sequence, checks, recording | Statelessness | `ExecutionSession` (production-execution-v1, pinned `43406954`) |
 | Playback state, events, effects, rules, invariants, UI projection | Illiquid model | `Sources/IlliquidPlaybackModel` (`PlaybackProductionModel.step`, `PlaybackRules.swift`, `*Machine.swift`) |
 | Codec (canonical JSON) | Illiquid model | `PlaybackProductionCodec.swift`, `CanonicalJSON.swift` |
 | Host input contract (envelope sequence and virtual time, dispatched-effect list) | Illiquid model | `PlaybackSessionHost.swift` |
@@ -51,27 +53,49 @@ job, numbered as below).
 | Phase | Gate | Evidence |
 | --- | --- | --- |
 | P0 Freeze | Frozen oracle, boundary ledger, budgets agreed | Commit `a3c2013c`. Legacy core manifest [legacy-core-44722ec5.json](legacy-core-44722ec5.json). Differential oracle `production-migration-oracle-v1.json`: 366 streams × 96 steps from 42 start states (fresh, exhausted allocators, all 40 reachable search seeds) recorded from the legacy core (01) and re-verified at that commit (02). Legacy turn cost (03). Fixed native media set with hashed manifest (04, [native-fixture-manifest.json](receipts/native-fixture-manifest.json)) and a 60 s 1080p H.264/AAC performance fixture ([perf-fixture.sha256](receipts/perf-fixture.sha256)). Baseline benchmark bundle from `44722ec5` (05). Ledger, persisted-data inventory and budgets below |
-| P1 Session | Generic contract tests; package builds; pin | Statelessness `production/execution-session`: `ExecutionSession` and [production-execution-v1](https://github.com/Jagalite/statelessness/blob/a181e3c0f2f644f482cbeb37016ed1d54eaf86f9/spec/production-execution-v1.md). 13 contract tests with toy models (06); full upstream suite 745 tests, 0 failures (07, and rerun on every later upstream commit). Pinned at `a181e3c0` |
+| P1 Session | Generic contract tests; package builds; pin | Statelessness `production/execution-session`: `ExecutionSession` and [production-execution-v1](https://github.com/Jagalite/statelessness/blob/43406954bb25dc4979f51d60d09860fc1f5435fa/spec/production-execution-v1.md). Contract tests with small standalone models, every behavior in certified and uncertified mode (06, 34); full upstream suite 750 tests, 0 failures (34; rerun on every upstream commit). Pinned at `43406954` |
 | P2 Model | Every P0 step reproduced; no legacy dependency; not a rename or wrapper | `IlliquidPlaybackModel` depends on Statelessness and `IlliquidCore` only. All 35,136 frozen legacy steps reproduced through a persistent session and through the bare step (08; rerun in every later full suite) |
 | P3 Verification | Search runs on the production model; golden evidence unchanged | State space calls `PlaybackProductionModel.step`; all 40 seeds match the verification golden edge digests, progress and reduction; artifacts replay and shrink; seeds equal the frozen starts (09) |
-| P4 Live switch | Driver owns the session; fake-runtime and live checks against P0 | Driver submits through `PlaybackSessionHost`; player, native and coordinator tests pass serially (10–12, 17, 25). Live UI and paired performance below |
-| P5 Retirement | Legacy gone; guard enforces it; final-head gates | `Sources/IlliquidPlaybackCore`, its product, target and tests removed; core tests ported to the model and session. `IlliquidArchitectureCheck` forbids legacy symbols and requires the model to be defined on Statelessness (13, 25). Final-head runs: 25–33 |
+| P4 Live switch | Driver owns the session; fake-runtime and live checks against P0 | Driver submits through `PlaybackSessionHost`; player, native and coordinator tests pass serially (10–12, 17, 37). Every oracle event stream driven through the host matches the legacy runtime's envelope sequence, virtual-time and pending-effect policy step for step (`SessionHostEquivalenceTests`, 36). Live UI and paired performance below |
+| P5 Retirement | Legacy gone; guard enforces it; final-head gates | `Sources/IlliquidPlaybackCore`, its product, target and tests removed; core tests ported to the model and session. `IlliquidArchitectureCheck` forbids legacy symbols and checks ownership structurally: live targets may not call the model step, build a session or store `PlaybackDomainState`; the model module may not store it; the host must execute through its session; the production model must be a Statelessness model; missing files fail. A mutation probe adding a stored-state shadow to a live target is rejected (36). The guard catches these patterns; ownership itself was also confirmed by review. Final-head runs: 37–39 |
 
-## Final-head evidence (`c450b683`)
+## Final-head evidence (`0f0ebb5f`)
+
+Build-side gates ran as one sequential Kyoto job (37); live checks ran
+afterwards on the quiet host. An earlier full set on `c450b683` (25–28, 31)
+gave the same results before the review fixes.
 
 | Check | Result | Receipt |
 | --- | --- | --- |
-| Architecture check | Passed | 25 |
-| Full suite, serial, native fixtures required | 1,818 tests: all pass except `hardwarePreservesPixelsTimingAndMetadataIncludingSeek` (VP9 10-bit) and `planarEOFDrainAndTeardownAreBounded`, which fail identically on the P0 baseline (PD11) | 25, 23 |
-| Long-duration AV sync and memory gate (60 s, 3 fixtures) | Passed | 25 |
-| Renderer recovery script (production model, no native SDK) | 18 tests passed | 25 |
-| AddressSanitizer and ThreadSanitizer playback stress (HDR10 P010, 12 reopens) | Passed | 25 |
-| State space, PR profile | Exit 0: 40/40 finished, 0 findings, 0 trend violations against the PR baseline | 26 |
-| State space, nightly profile | Exit 2: 0 findings, 0 trend violations; `seek-in-flight`, `recovery-in-flight` and `preroll-buffering/playing-av` reach the deadline, as recorded for the legacy explorer (verification migration D23) | 26 |
-| State space, qualification profile | Exit 2: 0 findings, 0 trend violations, 0 undeclared noncommuting diamonds; the same five deadline seeds as the verification migration record | 26 |
-| Live UI, hook-driven playback (isolated benchmark bundle, validated preference isolation) | 22/22 steps: load, pause, play with advancing position, exact seeks 2 s → 7 s → 2 s | 31 |
-| Live paired performance cohort vs P0 baseline (6 balanced repeats, output case) | Passed the reviewed policy on every metric; zero dropped and zero corrupted frames in both cohorts | 28 |
-| Deterministic turn cost (release) | Legacy 1.01 µs; model step 1.35 µs; session 3.55 µs per turn (PD12) | 03, 18 |
+| Architecture check | Passed | 37 |
+| Full suite, serial, native fixtures required | 1,820 tests: all pass except `hardwarePreservesPixelsTimingAndMetadataIncludingSeek` (VP9 10-bit) and `planarEOFDrainAndTeardownAreBounded`, which fail identically on the P0 baseline (PD11) | 37, 23 |
+| Long-duration AV sync and memory gate (60 s, 3 fixtures) | Passed | 37 |
+| Renderer recovery script (production model, no native SDK) | 18 tests passed | 37 |
+| AddressSanitizer and ThreadSanitizer playback stress (HDR10 P010, 12 reopens) | Passed | 37 |
+| State space, PR profile | Exit 0: 40/40 finished, 0 findings, 0 trend violations against the PR baseline | 37 |
+| State space, nightly profile | Exit 2: 0 findings, 0 trend violations; `seek-in-flight`, `recovery-in-flight` and `preroll-buffering/playing-av` reach the deadline, as recorded for the legacy explorer (verification migration D23) | 37 |
+| State space, qualification profile | Exit 2: 0 findings, 0 trend violations; the same five deadline seeds as the verification migration record | 37 |
+| Live UI, hook-driven playback (isolated benchmark bundle, validated preference isolation) | 22/22 steps: load, pause, play with advancing position, exact seeks 2 s → 7 s → 2 s. A first attempt timed out at launch before the app became ready (kept as receipt); the immediate retry passed | 39 |
+| Live paired performance cohort vs P0 baseline (6 balanced repeats, output case) | Passed the reviewed policy on every metric; zero dropped and zero corrupted frames in both cohorts | 38 |
+| Deterministic turn cost (release) | Legacy 1.01 µs; model step 1.36 µs; session 3.88 µs per turn (PD12) | 03, 37 |
+
+## Review
+
+An independent gpt-6.1-sol review of the Illiquid commits and the upstream
+session found no playback behavior difference (rule bodies match the legacy
+bodies after mechanical renaming; registration precedes invariant checking;
+invariant failure keeps emitted effects) and confirmed that execution and
+committed state are owned by the session. Its findings and dispositions:
+
+| Finding | Disposition |
+| --- | --- |
+| Uncertified sessions checked a reference input after the step had mutated it | Fixed upstream: both modes give checks a pristine input copy; tested in both modes |
+| Session adopted step results without detaching them from references the step keeps | Fixed upstream: the returned transition is detached with the clone contract before use; tested in both modes |
+| `snapshot()` bypassed the reentrancy guard | Fixed upstream; snapshot reentrancy from steps and clone callbacks tested |
+| Harness repair made default profiling commands fail | Defaults now cover only seedable cases; unseedable cases fail up front with the reason (PD10) |
+| Architecture guard weaker than claimed | Ownership checks and a mutation probe added; P5 wording describes what the guard proves |
+| Oracle bypassed the host | `SessionHostEquivalenceTests` drives every oracle stream through the host against the legacy host policy |
+| Missing contract coverage (output-clone faults, recorder capacity, mode matrix) | Added upstream |
 
 ## Boundary ledger
 
@@ -127,11 +151,13 @@ Recorded from the legacy core and reproduced by the model:
 - **Live player (acceptance):** the reviewed paired-cohort policy of
   `Scripts/profile-performance-suite.py`: medians ≤ max(1.15 × baseline,
   baseline + 2 CPU points / 16 MiB / 25 ms); maximum dropped frames cannot
-  increase; no corrupted frames. Final cohort (28), medians baseline →
-  candidate: steady CPU 9.68 → 9.99 %, hover 17.27 → 17.65 %, resize
-  15.96 → 15.88 %; footprint 157.5 → 152.6 / 174.9 → 169.1 / 169.5 → 171.4 MiB;
-  displayed seek 85.6 → 91.3 ms (max 131.8 → 133.7); quit 382 → 317 ms;
-  launch 1,136 → 916 ms. Dropped and corrupted frames 0 in every run.
+  increase; no corrupted frames. Cohort medians baseline → candidate:
+  steady CPU 9.68 → 9.99 %, hover 17.27 → 17.65 %, resize
+  15.96 → 15.88 % (`c450b683`, 28); on the final head (38): steady
+  9.09 → 8.96 %, hover 16.51 → 17.04 %, resize 14.93 → 15.16 %; footprint
+  155.1 → 152.3 / 170.2 → 171.8 / 175.2 → 172.4 MiB; displayed seek
+  78.7 → 83.0 ms (max 135.5 → 115.4); quit 380 → 398 ms; launch 830 → 444 ms.
+  Dropped and corrupted frames 0 in every run.
 - **Deterministic turn cost (recorded, not an acceptance gate):** see PD12.
 - **Long sessions:** the live session keeps no step history; completed-effect
   identity history is compacted as before; the 60 s AV-sync and memory gate
@@ -150,9 +176,9 @@ Recorded from the legacy core and reproduced by the model:
 | PD7 | test | The seeded command generator now draws from Statelessness `Rng`; sequences differ from the legacy generator. | Test-only; the property checked (determinism, no violations) is unchanged. |
 | PD8 | evidence limit | Under full parallel `swift test` load, a stable set of timing-sensitive tests (thumbnail deadlines, filesystem watcher, scanner, click interval, coordinator preparation, subtitle probe) fail; they pass serially both here and on the baseline checkout. | Pre-existing; tracked separately. |
 | PD9 | environment | Synthetic key events from the agent UI helper fail on this host ("Accessibility messaging could not complete") for both the baseline and the candidate, at the first key step of `playback-shortcuts`; the six hook and state steps before it pass on both (32, 33). | A hook-driven variant (31) keeps every assertion and drives play, pause and exact seeks through the benchmark control hook into the real controller; it passes 22/22 on baseline and candidate. Real-key delivery is not qualified here. |
-| PD10 | defect (harness, fixed) | The lifecycle/output probes passed a benchmark control session without the isolated preference suite the app requires since the preference isolation contract, so every benchmark launch was refused, baseline included. | Probes now pass a fresh suite, receipt and scalar JSON seed. JSON cannot carry Data-valued seeds, so the navigation case (100,000 seeded source items) cannot run; the suite gained `--skip-navigation`. Sidebar navigation does not involve the playback model. |
+| PD10 | defect (harness, fixed) | The lifecycle/output/responsiveness probes passed a benchmark control session without the isolated preference suite the app requires since the preference isolation contract, so every benchmark launch was refused, baseline included. | Probes now pass a fresh suite, receipt and scalar JSON seed. JSON cannot carry Data-valued seeds, so cases that seed history or source lists (lifecycle `history10k`/`history100k`/`sources1000`, responsiveness and suite navigation) cannot run under isolation: defaults exclude them and explicit requests fail up front with that reason. Output, empty-launch, preview and soak cases run. Restoring the excluded cases needs an app-side way to seed Data values. None of them involves the playback model. |
 | PD11 | pre-existing | With native fixtures required, `hardwarePreservesPixelsTimingAndMetadataIncludingSeek` (VP9 10-bit: 10 frames, expected ≥ 12) and `planarEOFDrainAndTeardownAreBounded` fail; the differential smoke cannot start the mpv oracle. | Identical on the P0 baseline checkout (23, 24): decoder/fixture and host mpv environment, not the playback model. |
-| PD12 | measured regression (accepted on live evidence) | Deterministic per-turn cost on the oracle workload (release): legacy core 1.01 µs; model step 1.35 µs (output array and Statelessness `Transition`); live session 3.55 µs (clone and check callbacks through Statelessness's generic closure-based `Model`, which copies the state value through reabstraction thunks). Two upstream reductions brought the session from 5.5 µs to 3.55 µs (14–16, 18). | About 2.5 µs per playback event; the live paired cohort shows no CPU, latency or frame regression. Further reduction needs a Statelessness API change (for example specialized or inlinable session paths). |
+| PD12 | measured regression (accepted on live evidence) | Deterministic per-turn cost on the oracle workload (release): legacy core 1.01 µs; model step 1.36 µs (output array and Statelessness `Transition`); live session 3.88 µs (clone and check callbacks through Statelessness's generic closure-based `Model`, which copies the state value through reabstraction thunks; the review's ownership fixes add one detaching clone). Upstream reductions brought the session from 5.5 µs to 3.55 µs before those fixes (14–16, 18, 37). This is not measured against a pre-established turn-cost budget; acceptance rests on the live cohort. | About 2.5 µs per playback event; the live paired cohort shows no CPU, latency or frame regression. Further reduction needs a Statelessness API change (for example specialized or inlinable session paths). |
 | PD13 | evidence limit | A first batch of qualification jobs ran concurrently in Kyoto (19–22), so their deadlines and timings are not valid evidence (the PR profile missed its 60 s deadline on `recovery-in-flight` under that contention). | Superseded by the strictly serial final runs (25, 26), where the PR profile passes. |
 | PD14 | evidence limit | Launch time is bimodal (about 0.4 s or about 1.1 s) depending on which app launches second in a repeat; an unbalanced five-repeat cohort (30) failed `launch_ms` for that reason. | Balanced six-repeat cohorts (28, 29) pass; the bimodality affects both apps. |
-| PD15 | open (upstream) | The pinned Statelessness revision is on the pushed branch `production/execution-session`, not yet merged to Statelessness `main`. | Merge upstream through review; the pin needs no change if the commit is merged as is. |
+| PD15 | open (owner decision) | The pinned Statelessness revision is on the pushed branch `production/execution-session`, proposed as [Jagalite/statelessness#20](https://github.com/Jagalite/statelessness/pull/20), not yet merged to Statelessness `main`. | Merging is the owner's decision; the pin needs no change if the commits are merged as they are. |
